@@ -22,8 +22,8 @@ spring:
     config:
       server:
         git:
-          uri: file://D:/Workspace/source/spring.cloud.config.ehr
-        default-label: master
+          uri: http://192.168.1.103:9000/EHR/ehr.config.git
+        default-label: dev
 
 eureka:
   instance:
