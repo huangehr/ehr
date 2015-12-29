@@ -14,10 +14,6 @@
     <version>1.1.0</version>
     <name>commons-util</name>
     <url>https://ds.ehr.yihu.com:5555/ha</url>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.8</java.version>
-    </properties>
 
     <dependencies>
     </dependencies>

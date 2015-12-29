@@ -14,22 +14,21 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
+ * API 错误返回方式：提取异常中的错误代码与格式化后的错误消息，组成 ApiErrorEcho 返回。若是 API 未发生错误，则直接返回结果的JSON对象。
+ *
  * @author Sand
  * @version 1.0
  * @created 2015.12.20 16:56
  */
 @ControllerAdvice
 public class ApiHandlerExceptionResolver extends AbstractHandlerExceptionResolver {
-    public static ApiErrorEcho failed(ErrorCode errorCode, String...args){
-        return new ApiErrorEcho().failed(errorCode, args);
-    }
-
     protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response, Object handler,
                                               Exception ex) {
         LogService.getLogger().error(ex.getMessage(), ex);
 
         try {
             writeJsonResponse(ex, response);
+
             return new ModelAndView();
         } catch (Exception e) {
             LogService.getLogger().error("Error rendering json response!", e);
@@ -41,18 +40,19 @@ public class ApiHandlerExceptionResolver extends AbstractHandlerExceptionResolve
     private void writeJsonResponse(Exception ex, HttpServletResponse response)
             throws HttpMessageNotWritableException, IOException {
         response.setContentType("application/json;charset=utf-8");
+        response.setStatus(403);
 
         if (ex instanceof ApiException) {
             ApiException apiException = (ApiException)ex;
 
-            String restEcho = failed(apiException.getErrorCode(), apiException.getMessage()).toString();
-            response.getWriter().print(restEcho);
+            ApiErrorEcho errorEcho = new ApiErrorEcho(apiException.getErrorCode(), apiException.getErrMsg());
+            response.getWriter().print(errorEcho.toString());
         } else if (ex instanceof IllegalArgumentException || ex instanceof MissingServletRequestParameterException) {
-            String restEcho = failed(ErrorCode.InvalidParameter, ex.getMessage()).toString();
-            response.getWriter().print(restEcho);
+            ApiErrorEcho errorEcho = new ApiErrorEcho(ErrorCode.InvalidParameter, ex.getMessage());
+            response.getWriter().print(errorEcho.toString());
         } else {
-            String restEcho = failed(ErrorCode.InvalidParameter, ex.getMessage()).toString();
-            response.getWriter().print(restEcho);
+            ApiErrorEcho errorEcho = new ApiErrorEcho(ErrorCode.SystemError, ex.getMessage());
+            response.getWriter().print(errorEcho.toString());
         }
     }
 }

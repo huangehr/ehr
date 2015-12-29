@@ -2,7 +2,6 @@ package com.yihu.ehr.fastdfs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.constrant.Services;
 import com.yihu.ehr.lang.ServiceFactory;
 import com.yihu.ehr.util.log.LogService;
 import org.csource.common.MyException;
@@ -64,7 +63,7 @@ public class FastDFSUtil {
             fileMetaData = new NameValuePair[1];
             fileMetaData[0] = new NameValuePair("description", description == null ? "" : description);
 
-            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
+            ObjectMapper objectMapper = ServiceFactory.getService(ObjectMapper.class);
             ObjectNode message = objectMapper.createObjectNode();
 
             byte fileBuffer[] = new byte[in.available()];
@@ -145,21 +144,21 @@ public class FastDFSUtil {
     public ObjectNode upload(String fileName, String description) throws Exception {
         StorageClient client = clientPool.getStorageClient();
         try {
-            NameValuePair[] meta_list;
-            meta_list = new NameValuePair[1];
-            meta_list[0] = new NameValuePair("description", description == null ? "" : description);
+            NameValuePair[] fileMetaData;
+            fileMetaData = new NameValuePair[1];
+            fileMetaData[0] = new NameValuePair("description", description == null ? "" : description);
 
-            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
+            ObjectMapper objectMapper = ServiceFactory.getService(ObjectMapper.class);
             ObjectNode message = objectMapper.createObjectNode();
-            String fileExtName = "";
+            String fileExtension = "";
             if (fileName.contains(".")) {
-                fileExtName = fileName.substring(fileName.lastIndexOf(".") + 1);
+                fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
             } else {
                 throw new RuntimeException("上传失败, 文件缺失扩展名.");
             }
 
             TrackerServer trackerServer = clientPool.getTrackerServer();
-            String[] results = client.upload_file(fileName, fileExtName, meta_list);
+            String[] results = client.upload_file(fileName, fileExtension, fileMetaData);
             if (results != null) {
                 String fileId;
                 int ts;
