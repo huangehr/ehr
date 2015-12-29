@@ -254,7 +254,7 @@
     <orderEntry type="library" name="Maven: javax.servlet:javax.servlet-api:3.1.0" level="project" />
     <orderEntry type="library" name="Maven: redis.clients:jedis:2.7.3" level="project" />
     <orderEntry type="library" name="Maven: org.apache.thrift:libthrift:0.9.3" level="project" />
-    <orderEntry type="module" module-name="commons-data-mysql" />
+    <orderEntry type="library" name="Maven: com.yihu.ehr:ehr-commons-data-mysql:0.0.1" level="project" />
     <orderEntry type="library" name="Maven: javax.persistence:persistence-api:1.0.2" level="project" />
     <orderEntry type="library" name="Maven: javax.mail:javax.mail-api:1.5.4" level="project" />
     <orderEntry type="library" name="Maven: javax.activation:activation:1.1" level="project" />

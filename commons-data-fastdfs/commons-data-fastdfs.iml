@@ -21,9 +21,9 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="Maven: org.wltea:IKAnalyzer:3.2.8">
+      <library name="Maven: happy.fish:fastDFS:1.0">
         <CLASSES>
-          <root url="jar://D:/第三方/IKAnalyzer3.2.8.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/fastdfs_lib.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

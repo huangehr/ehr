@@ -20,8 +20,8 @@
             <groupId>happy.fish</groupId>
             <artifactId>fastDFS</artifactId>
             <version>1.0</version>
-            <scope>compile</scope>
-            <systemPath>lib/fastdfs_lib.jar</systemPath>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/fastdfs_lib.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>

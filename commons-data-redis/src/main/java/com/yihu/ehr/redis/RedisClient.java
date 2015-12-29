@@ -1,6 +1,5 @@
 package com.yihu.ehr.redis;
 
-import com.yihu.ehr.constrant.Services;
 import com.yihu.ehr.util.log.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -21,7 +20,7 @@ import java.util.Set;
  * @version 1.0
  * @created 2015.08.04 11:12
  */
-@Service(Services.RedisClient)
+@Service
 public class RedisClient implements XRedisClient {
     @Autowired
     private RedisTemplate<String, Serializable> redisTemplate;
