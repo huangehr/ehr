@@ -1,9 +1,8 @@
 package com.yihu.ehr.exception;
 
 import com.yihu.ehr.constrant.ErrorCode;
-import com.yihu.ehr.util.RestEcho;
+import com.yihu.ehr.util.ApiErrorEcho;
 import com.yihu.ehr.util.log.LogService;
-import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -21,8 +20,8 @@ import java.io.IOException;
  */
 @ControllerAdvice
 public class ApiHandlerExceptionResolver extends AbstractHandlerExceptionResolver {
-    public static RestEcho failed(ErrorCode errorCode, String...args){
-        return new RestEcho().failed(errorCode, args);
+    public static ApiErrorEcho failed(ErrorCode errorCode, String...args){
+        return new ApiErrorEcho().failed(errorCode, args);
     }
 
     protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response, Object handler,

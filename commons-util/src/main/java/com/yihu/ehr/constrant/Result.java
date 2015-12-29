@@ -36,7 +36,7 @@ public class Result implements Serializable{
 	private int errorCode;
 
 	public String toJson(){
-        ObjectMapper objectMapper = ServiceFactory.getService(ObjectMapper.class.getCanonicalName());
+        ObjectMapper objectMapper = ServiceFactory.getService(ObjectMapper.class);
         try {
             return objectMapper.writeValueAsString(this);
         } catch (JsonProcessingException e) {

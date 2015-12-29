@@ -40,16 +40,11 @@ public class ServiceFactory implements ApplicationContextAware {
      * @return
      */
     public static <T> T getService(String serviceName) {
-        if (springContext == null) {
-            springContext = new ClassPathXmlApplicationContext(new String[]
-                    {
-                            "spring/applicationContext.xml",
-                            "spring/applicationContextEx.xml"
-                    }
-            );
-        }
-
         return (T) springContext.getBean(serviceName);
+    }
+
+    public static <T> T getService(Class<T> beanCls) {
+        return (T) springContext.getBean(beanCls);
     }
 
     /**
