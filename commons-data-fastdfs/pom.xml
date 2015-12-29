@@ -4,7 +4,7 @@
     <groupId>com.yihu.ehr</groupId>
     <artifactId>ehr-commons-data-fastdfs</artifactId>
     <packaging>jar</packaging>
-    <version>0.0.1</version>
+    <version>1.1.0</version>
     <name>commons-data-fastdfs</name>
     <url></url>
     <properties>
@@ -368,7 +368,7 @@
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>ehr-commons</artifactId>
-            <version>0.0.1</version>
+            <version>1.1.0</version>
         </dependency>
     </dependencies>
 
