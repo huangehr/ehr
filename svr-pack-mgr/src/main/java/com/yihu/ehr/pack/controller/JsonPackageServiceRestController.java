@@ -1,5 +1,6 @@
 package com.yihu.ehr.pack.controller;
 
+import com.sun.javaws.exceptions.InvalidArgumentException;
 import com.yihu.ehr.constrant.ApiVersionPrefix;
 import com.yihu.ehr.constrant.ArchiveStatus;
 import com.yihu.ehr.constrant.ErrorCode;
@@ -10,7 +11,6 @@ import com.yihu.ehr.pack.service.XJsonPackageRepository;
 import com.yihu.ehr.util.ApiErrorEcho;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.encrypt.RSA;
-import groovyjarjarcommonscli.MissingArgumentException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -63,7 +63,7 @@ public class JsonPackageServiceRestController extends BaseRestController {
 
         try {
             MultipartFile file = jsonPackage.getFile("file");
-            if(file == null) throw new MissingArgumentException("file");
+            //if(file == null) throw new InvalidArgumentException({"file"});
 
             //XUserSecurity userSecurity = securityManager.getUserSecurityByUserName(userName);
             //if (null == userSecurity) return failed(ErrorCode.GenerateUserKeyFailed);

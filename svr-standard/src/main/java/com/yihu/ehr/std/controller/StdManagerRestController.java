@@ -5,11 +5,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constrant.ApiVersionPrefix;
 import com.yihu.ehr.constrant.Controllers;
 import com.yihu.ehr.constrant.ErrorCode;
-import com.yihu.ehr.constrant.Services;
 import com.yihu.ehr.lang.ServiceFactory;
 import com.yihu.ehr.std.model.*;
 import com.yihu.ehr.std.service.*;
-import com.yihu.ehr.util.RestEcho;
+import com.yihu.ehr.util.ApiErrorEcho;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -56,7 +55,7 @@ public class StdManagerRestController extends BaseRestController {
     private CDADatasetRelationshipManager cdaDatasetRelationshipManager;
 
     @RequestMapping(value = "/versions", method = RequestMethod.GET)
-    @ApiOperation(value = "获取CDA版本列表", response = RestEcho.class, produces = "application/json", notes = "平台中已创建并发布的版本，不含正在编辑的阶段性版本")
+    @ApiOperation(value = "获取CDA版本列表", response = CDAVersion.class, produces = "application/json", notes = "平台中已创建并发布的版本，不含正在编辑的阶段性版本")
     public Object getCDAVersionList(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion) {

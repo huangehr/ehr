@@ -32,7 +32,6 @@
         <module name="svr-organization" />
         <module name="svr-resources" />
         <module name="svr-sso" />
-        <module name="svr-standard" />
         <module name="svr-user" />
         <module name="svr.archive" />
         <module name="svr.configuration" />
@@ -109,6 +108,13 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="svr-pack-mgr" />
+      </profile>
+      <profile default="false" name="Annotation profile for svr-standard" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="svr-standard" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -878,17 +884,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/com/netflix/eureka/eureka2-client-shaded/2.0.0-rc.2/eureka2-client-shaded-2.0.0-rc.2-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: com.netflix.feign:feign-core:8.11.0">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/netflix/feign/feign-core/8.11.0/feign-core-8.11.0.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/com/netflix/feign/feign-core/8.11.0/feign-core-8.11.0-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/netflix/feign/feign-core/8.11.0/feign-core-8.11.0-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: com.netflix.feign:feign-core:8.12.1">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/com/netflix/feign/feign-core/8.12.1/feign-core-8.12.1.jar!/" />
@@ -900,17 +895,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/com/netflix/feign/feign-core/8.12.1/feign-core-8.12.1-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: com.netflix.feign:feign-hystrix:8.11.0">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/netflix/feign/feign-hystrix/8.11.0/feign-hystrix-8.11.0.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/com/netflix/feign/feign-hystrix/8.11.0/feign-hystrix-8.11.0-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/netflix/feign/feign-hystrix/8.11.0/feign-hystrix-8.11.0-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: com.netflix.feign:feign-hystrix:8.12.1">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/com/netflix/feign/feign-hystrix/8.12.1/feign-hystrix-8.12.1.jar!/" />
@@ -920,17 +904,6 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/com/netflix/feign/feign-hystrix/8.12.1/feign-hystrix-8.12.1-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: com.netflix.feign:feign-slf4j:8.11.0">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/netflix/feign/feign-slf4j/8.11.0/feign-slf4j-8.11.0.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/com/netflix/feign/feign-slf4j/8.11.0/feign-slf4j-8.11.0-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/netflix/feign/feign-slf4j/8.11.0/feign-slf4j-8.11.0-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: com.netflix.feign:feign-slf4j:8.12.1">
@@ -1243,13 +1216,15 @@
     </library>
     <library name="Maven: com.yihu.ehr:ehr-commons-data-fastdfs:0.0.1">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/commons-data-fastdfs/pom.xml!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/ehr-commons-data-fastdfs/0.0.1/ehr-commons-data-fastdfs-0.0.1.jar!/" />
       </CLASSES>
       <JAVADOC>
         <root url="jar://$PROJECT_DIR$/commons-data-fastdfs/ehr-commons-data-fastdfs-0.0.1-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/ehr-commons-data-fastdfs/0.0.1/ehr-commons-data-fastdfs-0.0.1-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
         <root url="jar://$PROJECT_DIR$/commons-data-fastdfs/ehr-commons-data-fastdfs-0.0.1-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/ehr-commons-data-fastdfs/0.0.1/ehr-commons-data-fastdfs-0.0.1-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: com.yihu.ehr:ehr-commons-data-hbase:0.0.1">
@@ -1265,13 +1240,15 @@
     </library>
     <library name="Maven: com.yihu.ehr:ehr-commons-data-mysql:0.0.1">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/commons-data-mysql/pom.xml!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/ehr-commons-data-mysql/0.0.1/ehr-commons-data-mysql-0.0.1.jar!/" />
       </CLASSES>
       <JAVADOC>
         <root url="jar://$PROJECT_DIR$/commons-data-mysql/ehr-commons-data-mysql-0.0.1-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/ehr-commons-data-mysql/0.0.1/ehr-commons-data-mysql-0.0.1-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
         <root url="jar://$PROJECT_DIR$/commons-data-mysql/ehr-commons-data-mysql-0.0.1-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/ehr-commons-data-mysql/0.0.1/ehr-commons-data-mysql-0.0.1-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: com.yihu.ehr:ehr-commons-data-redis:0.0.1">
@@ -1298,13 +1275,15 @@
     </library>
     <library name="Maven: com.yihu.ehr:ehr-commons:0.0.1">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/commons/pom.xml!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/ehr-commons/0.0.1/ehr-commons-0.0.1.jar!/" />
       </CLASSES>
       <JAVADOC>
         <root url="jar://$PROJECT_DIR$/commons/ehr-commons-0.0.1-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/ehr-commons/0.0.1/ehr-commons-0.0.1-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
         <root url="jar://$PROJECT_DIR$/commons/ehr-commons-0.0.1-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/ehr-commons/0.0.1/ehr-commons-0.0.1-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: com.yihu.ehr:ehr-commons:1.1.0">
@@ -4343,17 +4322,6 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-starter-eureka/1.1.0.M4/spring-cloud-starter-eureka-1.1.0.M4-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: org.springframework.cloud:spring-cloud-starter-feign:1.1.0.M3">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-starter-feign/1.1.0.M3/spring-cloud-starter-feign-1.1.0.M3.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-starter-feign/1.1.0.M3/spring-cloud-starter-feign-1.1.0.M3-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-starter-feign/1.1.0.M3/spring-cloud-starter-feign-1.1.0.M3-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.springframework.cloud:spring-cloud-starter-feign:1.1.0.M4">
