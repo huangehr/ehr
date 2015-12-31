@@ -3,13 +3,14 @@ package com.yihu.ehr.pack.controller;
 import com.yihu.ehr.constrant.ApiVersionPrefix;
 import com.yihu.ehr.constrant.ArchiveStatus;
 import com.yihu.ehr.constrant.ErrorCode;
-import com.yihu.ehr.util.ApiException;
+import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.pack.service.JsonPackage;
 import com.yihu.ehr.pack.service.JsonPackageService;
 import com.yihu.ehr.pack.service.XJsonPackageRepository;
-import com.yihu.ehr.util.RestEcho;
+import com.yihu.ehr.util.ApiErrorEcho;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.encrypt.RSA;
+import groovyjarjarcommonscli.MissingArgumentException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -49,7 +50,7 @@ public class JsonPackageServiceRestController extends BaseRestController {
      * @return
      */
     @RequestMapping(value = "/pack", method = {RequestMethod.POST})
-    @ApiOperation(value = "接收档案", response = RestEcho.class, notes = "从集成开放平台接收健康档案数据包")
+    @ApiOperation(value = "接收档案", response = Object.class, notes = "从集成开放平台接收健康档案数据包")
     public Object receiveJsonPackage(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
@@ -62,7 +63,7 @@ public class JsonPackageServiceRestController extends BaseRestController {
 
         try {
             MultipartFile file = jsonPackage.getFile("file");
-            if (null == file) return missParameter("file");
+            if(file == null) throw new MissingArgumentException("file");
 
             //XUserSecurity userSecurity = securityManager.getUserSecurityByUserName(userName);
             //if (null == userSecurity) return failed(ErrorCode.GenerateUserKeyFailed);
@@ -71,16 +72,18 @@ public class JsonPackageServiceRestController extends BaseRestController {
             String unzipPwd = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
             jsonPackageService.receive(file.getInputStream(), unzipPwd);
 
-            return new RestEcho().success().putMessage("ok");
+            return null;
         } catch (IOException e) {
-            return failed(ErrorCode.SaveArchiveFailed, e.getMessage());
+            failed(ErrorCode.SaveArchiveFailed, e.getMessage());
         } catch (Exception e) {
-            return failed(ErrorCode.ParseArchiveCryptoFailed, e.getMessage());
+            failed(ErrorCode.ParseArchiveCryptoFailed, e.getMessage());
         }
+
+        return null;
     }
 
     @RequestMapping(value = "/pack/{package_id}", method = RequestMethod.PUT)
-    @ApiOperation(value = "解析JSON包", response = RestEcho.class, notes = "健康档案数据包入库")
+    @ApiOperation(value = "解析JSON包", response = Object.class, notes = "健康档案数据包入库")
     public Object parseJsonPackage(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
@@ -94,7 +97,7 @@ public class JsonPackageServiceRestController extends BaseRestController {
         //JsonArchiver jsonArchiver = new JsonArchiver();
         //jsonArchiver.doArchive(jsonPackage);
 
-        return succeedWithMessage("ok");
+        return null;
     }
 
     @RequestMapping(value = "/packs", method = RequestMethod.GET)
