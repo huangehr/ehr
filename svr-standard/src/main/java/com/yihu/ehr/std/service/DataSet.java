@@ -1,9 +1,8 @@
 package com.yihu.ehr.std.service;
 
 import com.yihu.ehr.constrant.Services;
-import com.yihu.ehr.std.data.SQLGeneralDAO;
+import com.yihu.ehr.data.SQLGeneralDAO;
 import com.yihu.ehr.lang.ServiceFactory;
-import com.yihu.ehr.std.model.*;
 
 import java.util.List;
 import java.util.Objects;

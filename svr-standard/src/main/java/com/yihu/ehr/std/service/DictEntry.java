@@ -1,6 +1,6 @@
 package com.yihu.ehr.std.service;
 
-import com.yihu.ehr.std.data.SQLGeneralDAO;
+import com.yihu.ehr.data.SQLGeneralDAO;
 import java.util.Objects;
 
 /**

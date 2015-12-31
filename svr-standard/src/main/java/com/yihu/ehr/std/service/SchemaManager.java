@@ -1,7 +1,7 @@
 package com.yihu.ehr.std.service;
 
 import com.yihu.ehr.constrant.BizObject;
-import com.yihu.ehr.std.data.SQLGeneralDAO;
+import com.yihu.ehr.data.SQLGeneralDAO;
 import com.yihu.ehr.util.ObjectId;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.encrypt.DES;

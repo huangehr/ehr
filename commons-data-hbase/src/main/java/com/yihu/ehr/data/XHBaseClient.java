@@ -1,4 +1,4 @@
-package com.yihu.ehr.std.data;
+package com.yihu.ehr.data;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.hadoop.hbase.client.Result;

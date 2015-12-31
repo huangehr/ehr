@@ -1,4 +1,4 @@
-package com.yihu.ehr.std.data;
+package com.yihu.ehr.data;
 
 import com.yihu.ehr.util.log.LogService;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;

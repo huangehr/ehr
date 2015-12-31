@@ -1,8 +1,7 @@
-package com.yihu.ehr.std.data;
+package com.yihu.ehr.data;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.constrant.Services;
 import com.yihu.ehr.lang.ServiceFactory;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.hadoop.hbase.*;
@@ -31,7 +30,7 @@ import java.util.Map;
 /**
  * HBaseClient。目前使用原型模式，但对在多线程中插入数据与查询表是否存在同时进行产生的等待问题，依然不是解决方案。
  */
-@Service(Services.HBaseClient)
+@Service
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class HBaseClient implements XHBaseClient {
     @Autowired
@@ -385,7 +384,7 @@ public class HBaseClient implements XHBaseClient {
 
                     for (Get gt : list) {
                         Result result = table.get(gt);
-                        ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
+                        ObjectMapper objectMapper = ServiceFactory.getService(ObjectMapper.class);
                         ObjectNode record = objectMapper.createObjectNode();
                         record.put("rowkey", Bytes.toString(result.getRow()));
 
@@ -517,7 +516,7 @@ public class HBaseClient implements XHBaseClient {
         return hbaseTemplate.execute(tableName, new TableCallback<ObjectNode>() {
             @Override
             public ObjectNode doInTable(HTableInterface table) throws Throwable {
-                ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
+                ObjectMapper objectMapper = ServiceFactory.getService(ObjectMapper.class);
                 ObjectNode root = objectMapper.createObjectNode();
 
                 HTableDescriptor tableDescriptor = table.getTableDescriptor();

@@ -1,7 +1,7 @@
 package com.yihu.ehr.std.service;
 
 
-import com.yihu.ehr.std.data.SQLGeneralDAO;
+import com.yihu.ehr.data.SQLGeneralDAO;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;

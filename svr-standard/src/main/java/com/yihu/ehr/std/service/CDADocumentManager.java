@@ -1,6 +1,6 @@
 package com.yihu.ehr.std.service;
 
-import com.yihu.ehr.std.data.SQLGeneralDAO;
+import com.yihu.ehr.data.SQLGeneralDAO;
 import com.yihu.ehr.std.model.DataSetForInterface;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang3.StringUtils;

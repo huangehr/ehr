@@ -1,7 +1,7 @@
 package com.yihu.ehr.std.service;
 
 import com.yihu.ehr.constrant.Services;
-import com.yihu.ehr.std.data.SQLGeneralDAO;
+import com.yihu.ehr.data.SQLGeneralDAO;
 import com.yihu.ehr.std.model.*;
 import org.hibernate.Query;
 import org.hibernate.Session;

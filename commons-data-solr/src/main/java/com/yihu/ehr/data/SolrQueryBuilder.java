@@ -1,4 +1,4 @@
-package com.yihu.ehr.std.data;
+package com.yihu.ehr.data;
 
 import java.util.ArrayList;
 import java.util.List;

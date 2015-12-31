@@ -1,4 +1,4 @@
-package com.yihu.ehr.std.data;
+package com.yihu.ehr.data;
 
 import org.hibernate.Query;
 import org.hibernate.Session;

@@ -1,6 +1,6 @@
 package com.yihu.ehr.config;
 
-import com.yihu.ehr.std.data.HBaseClient;
+import com.yihu.ehr.data.HBaseClient;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.security.UserGroupInformation;
