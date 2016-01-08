@@ -1,4 +1,4 @@
-package com.yihu.ehr;
+package com.yihu.ehr.lang;
 
 import org.apache.thrift.TBaseProcessor;
 import org.apache.thrift.TProcessor;
@@ -16,20 +16,20 @@ import java.lang.reflect.Constructor;
  * @version 1.0
  * @created 2016.01.08 11:30
  */
-public class ThriftServiceServerFactory {
+public class ThriftServerFactory {
 
     private Integer port = 6010+1;
 
     private Integer priority = 1;// default
 
-    private DataSetManagerImpl service;// service实现类
+    private Object service;// service实现类
 
     private ServerThread serverThread;
 
     private String configPath;
 
-    public ThriftServiceServerFactory() {
-        this.service = new DataSetManagerImpl();
+    public ThriftServerFactory() {
+        this.service = null;
     }
 
     @PostConstruct
