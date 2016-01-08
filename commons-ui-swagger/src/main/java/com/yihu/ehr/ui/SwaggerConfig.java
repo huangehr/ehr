@@ -1,4 +1,4 @@
-package com.yihu.ehr.pack.config;
+package com.yihu.ehr.ui;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -39,7 +39,6 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter {
                 .forCodeGeneration(true)
                 .pathMapping("/")
                 .select()
-                .paths(or(regex("/rest.*")))
                 .build()
                 .apiInfo(bizApiInfo());
     }
@@ -53,14 +52,13 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter {
                 .forCodeGeneration(false)
                 .pathMapping("/")
                 .select()
-                .paths(not(regex("/rest.*")))
                 .build()
                 .apiInfo(adminApiInfo());
     }
 
     private ApiInfo bizApiInfo() {
         ApiInfo apiInfo = new ApiInfo("Electronic Health Record(EHR) Platform API",
-                "EHR Platform's REST API, all the applications could access the Object model data via JSON.",
+                "EHR Platform's REST API, all the applications could access the object model data via JSON.",
                 "0.1",
                 "NO terms of service",
                 "wenfujian@jkzl.com",
@@ -73,7 +71,7 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter {
 
     private ApiInfo adminApiInfo() {
         ApiInfo apiInfo = new ApiInfo("Electronic Health Record(EHR) Platform API",
-                "EHR Platform's REST API, for system administrator",
+                "EHR Platform's REST API, for service administrator",
                 "1.0",
                 "NO terms of service",
                 "wenfujian@jkzl.com",

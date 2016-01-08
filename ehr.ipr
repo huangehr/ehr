@@ -32,7 +32,6 @@
         <module name="svr-organization" />
         <module name="svr-resources" />
         <module name="svr-sso" />
-        <module name="svr-user" />
         <module name="svr.archive" />
         <module name="svr.configuration" />
         <module name="svr.demo" />
@@ -116,6 +115,20 @@
         <processorPath useClasspath="true" />
         <module name="svr-standard" />
       </profile>
+      <profile default="false" name="Annotation profile for commons-ui-swagger" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="commons-ui-swagger" />
+      </profile>
+      <profile default="false" name="Annotation profile for svr-user" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="svr-user" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="commons" target="1.8" />
@@ -125,6 +138,7 @@
       <module name="commons-data-redis" target="1.8" />
       <module name="commons-data-solr" target="1.8" />
       <module name="commons-dependencies" target="1.8" />
+      <module name="commons-ui-swagger" target="1.8" />
       <module name="commons-util" target="1.8" />
       <module name="svr-archive" target="1.8" />
       <module name="svr-configuration" target="1.8" />
@@ -146,6 +160,7 @@
     <file url="file://$PROJECT_DIR$/commons-data-redis" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/commons-data-solr" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/commons-dependencies" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/commons-ui-swagger" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/commons-util" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/svr-archive" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/svr-configuration" charset="UTF-8" />
@@ -185,6 +200,7 @@
         <option value="$PROJECT_DIR$/svr-configuration/pom.xml" />
         <option value="$PROJECT_DIR$/commons-dependencies/pom.xml" />
         <option value="$PROJECT_DIR$/commons-util/pom.xml" />
+        <option value="$PROJECT_DIR$/commons-ui-swagger/pom.xml" />
       </list>
     </option>
   </component>
@@ -327,6 +343,7 @@
       <module fileurl="file://$PROJECT_DIR$/commons-data-redis/commons-data-redis.iml" filepath="$PROJECT_DIR$/commons-data-redis/commons-data-redis.iml" />
       <module fileurl="file://$PROJECT_DIR$/commons-data-solr/commons-data-solr.iml" filepath="$PROJECT_DIR$/commons-data-solr/commons-data-solr.iml" />
       <module fileurl="file://$PROJECT_DIR$/commons-dependencies/commons-dependencies.iml" filepath="$PROJECT_DIR$/commons-dependencies/commons-dependencies.iml" />
+      <module fileurl="file://$PROJECT_DIR$/commons-ui-swagger/commons-ui-swagger.iml" filepath="$PROJECT_DIR$/commons-ui-swagger/commons-ui-swagger.iml" />
       <module fileurl="file://$PROJECT_DIR$/commons-util/commons-util.iml" filepath="$PROJECT_DIR$/commons-util/commons-util.iml" />
       <module fileurl="file://$PROJECT_DIR$/svr-archive/svr-archive.iml" filepath="$PROJECT_DIR$/svr-archive/svr-archive.iml" />
       <module fileurl="file://$PROJECT_DIR$/svr-configuration/svr-configuration.iml" filepath="$PROJECT_DIR$/svr-configuration/svr-configuration.iml" />
@@ -2696,6 +2713,17 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/apache/sshd/sshd-pam/0.11.0/sshd-pam-0.11.0-sources.jar!/" />
       </SOURCES>
     </library>
+    <library name="Maven: org.apache.thrift:libthrift:0.9.1">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/apache/thrift/libthrift/0.9.1/libthrift-0.9.1.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/apache/thrift/libthrift/0.9.1/libthrift-0.9.1-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/apache/thrift/libthrift/0.9.1/libthrift-0.9.1-sources.jar!/" />
+      </SOURCES>
+    </library>
     <library name="Maven: org.apache.tomcat.embed:tomcat-embed-core:8.0.28">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/org/apache/tomcat/embed/tomcat-embed-core/8.0.28/tomcat-embed-core-8.0.28.jar!/" />
@@ -3620,17 +3648,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-starter-actuator/1.3.1.RELEASE/spring-boot-starter-actuator-1.3.1.RELEASE-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.springframework.boot:spring-boot-starter-aop:1.3.0.RELEASE">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-starter-aop/1.3.0.RELEASE/spring-boot-starter-aop-1.3.0.RELEASE.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-starter-aop/1.3.0.RELEASE/spring-boot-starter-aop-1.3.0.RELEASE-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-starter-aop/1.3.0.RELEASE/spring-boot-starter-aop-1.3.0.RELEASE-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: org.springframework.boot:spring-boot-starter-aop:1.3.1.RELEASE">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-starter-aop/1.3.1.RELEASE/spring-boot-starter-aop-1.3.1.RELEASE.jar!/" />
@@ -3673,17 +3690,6 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-starter-cloud-connectors/1.3.1.RELEASE/spring-boot-starter-cloud-connectors-1.3.1.RELEASE-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: org.springframework.boot:spring-boot-starter-data-jpa:1.3.0.RELEASE">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-starter-data-jpa/1.3.0.RELEASE/spring-boot-starter-data-jpa-1.3.0.RELEASE.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-starter-data-jpa/1.3.0.RELEASE/spring-boot-starter-data-jpa-1.3.0.RELEASE-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-starter-data-jpa/1.3.0.RELEASE/spring-boot-starter-data-jpa-1.3.0.RELEASE-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.springframework.boot:spring-boot-starter-data-jpa:1.3.1.RELEASE">
