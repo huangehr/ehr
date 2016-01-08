@@ -15,10 +15,4 @@ public class StandardServiceApp {
     public static void main(String[] args) {
         SpringApplication.run(StandardServiceApp.class, args);
     }
-
-    @Bean
-    ThriftServiceServerFactory thriftServiceServerFactory(){
-        ThriftServiceServerFactory thriftServiceServerFactory = new ThriftServiceServerFactory();
-        return thriftServiceServerFactory;
-    }
 }

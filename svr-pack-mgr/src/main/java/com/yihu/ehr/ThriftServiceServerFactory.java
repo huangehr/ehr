@@ -1,5 +1,6 @@
-package com.yihu.ehr.std;
+package com.yihu.ehr;
 
+import org.apache.thrift.TBaseProcessor;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.server.TServer;
@@ -17,37 +18,22 @@ import java.lang.reflect.Constructor;
  */
 public class ThriftServiceServerFactory {
 
-    private Integer port;
+    private Integer port = 6010+1;
 
     private Integer priority = 1;// default
 
-    private Object service;// serice实现类
-
-    private ThriftServerIpTransfer ipTransfer;
-
-    private ThriftServerAddressReporter addressReporter;
+    private DataSetManagerImpl service;// service实现类
 
     private ServerThread serverThread;
 
     private String configPath;
 
     public ThriftServiceServerFactory() {
-        this.service = null;
-        this.ipTransfer = ipTransfer;
-        this.addressReporter = addressReporter;
+        this.service = new DataSetManagerImpl();
     }
 
     @PostConstruct
     public void afterPropertiesSet() throws Exception {
-        if (ipTransfer == null) {
-            ipTransfer = new LocalNetworkIpTransfer();
-        }
-
-        String ip = ipTransfer.getIp();
-        if (ip == null) {
-            throw new NullPointerException("cant find server ip...");
-        }
-        String hostname = ip + ":" + port + ":" + priority;
         Class serviceClass = service.getClass();
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         Class<?>[] interfaces = serviceClass.getInterfaces();
@@ -65,9 +51,9 @@ public class ThriftServiceServerFactory {
             String pname = clazz.getEnclosingClass().getName() + "$Processor";
             try {
                 Class pclass = classLoader.loadClass(pname);
-                if (!pclass.isAssignableFrom(TProcessor.class)) {
-                    continue;
-                }
+                //if (pclass instanceof TBaseProcessor) {
+                //    continue;
+                //}
                 Constructor constructor = pclass.getConstructor(clazz);
                 processor = (TProcessor) constructor.newInstance(service);
                 break;
@@ -83,11 +69,6 @@ public class ThriftServiceServerFactory {
         //需要单独的线程,因为serve方法是阻塞的.
         serverThread = new ServerThread(processor, port);
         serverThread.start();
-
-        // report
-        if (addressReporter != null) {
-            addressReporter.report(configPath, hostname);
-        }
     }
 
     class ServerThread extends Thread {
