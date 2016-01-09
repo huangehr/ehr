@@ -2,7 +2,7 @@ package com.yihu.ehr.data;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.lang.ServiceFactory;
+import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
@@ -384,7 +384,7 @@ public class HBaseClient implements XHBaseClient {
 
                     for (Get gt : list) {
                         Result result = table.get(gt);
-                        ObjectMapper objectMapper = ServiceFactory.getService(ObjectMapper.class);
+                        ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
                         ObjectNode record = objectMapper.createObjectNode();
                         record.put("rowkey", Bytes.toString(result.getRow()));
 
@@ -516,7 +516,7 @@ public class HBaseClient implements XHBaseClient {
         return hbaseTemplate.execute(tableName, new TableCallback<ObjectNode>() {
             @Override
             public ObjectNode doInTable(HTableInterface table) throws Throwable {
-                ObjectMapper objectMapper = ServiceFactory.getService(ObjectMapper.class);
+                ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
                 ObjectNode root = objectMapper.createObjectNode();
 
                 HTableDescriptor tableDescriptor = table.getTableDescriptor();

@@ -3,7 +3,7 @@ package com.yihu.ehr.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constrant.ErrorCode;
-import com.yihu.ehr.lang.ServiceFactory;
+import com.yihu.ehr.lang.SpringContext;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -24,7 +24,7 @@ public class ApiErrorEcho implements Serializable {
     }
 
     public ApiErrorEcho(ErrorCode errorCode, String errorDescription, String... args) {
-        ObjectMapper objectMapper = ServiceFactory.getService(ObjectMapper.class);
+        ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
 
         root = objectMapper.createObjectNode();
         root.put(CodeNode, errorCode.getErrorCode());

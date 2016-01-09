@@ -3,19 +3,17 @@ package com.yihu.ehr.lang;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
- * 服务管理器。服务管理器是所有顶级服务的生成器。若是单元测试使用此服务工厂，Spring Context会被ServiceFactory创建。
- * 若是在Tomcat中使用此服务工厂，Spring Context会由 Tomcat 创建，并通过 ApplicationContextAware 赋值给 ServiceFactory。
+ * Spring上下文管理器。
  *
  * @author Sand
  * @version 1.0
  * @created 12-05-2015 17:47:55
  */
 @Component
-public class ServiceFactory implements ApplicationContextAware {
+public class SpringContext implements ApplicationContextAware {
     private static ApplicationContext springContext = null;
 
     /**
@@ -105,7 +103,7 @@ public class ServiceFactory implements ApplicationContextAware {
 
     // static block
     static {
-        String configPath = ServiceFactory.class.getResource("/").getPath() + "log4j/log4j2.xml";
+        String configPath = SpringContext.class.getResource("/").getPath() + "log4j/log4j2.xml";
         System.setProperty("log4j.configurationFile", configPath);  // 由于Spring启动时就依赖到Log4j，在此处就直接设置系统属性
     }
 }

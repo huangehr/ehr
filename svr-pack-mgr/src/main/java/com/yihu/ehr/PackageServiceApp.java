@@ -11,10 +11,4 @@ public class PackageServiceApp {
     public static void main(String[] args) {
         SpringApplication.run(PackageServiceApp.class, args);
     }
-
-    @Bean
-    ThriftServiceServerFactory thriftServiceServerFactory(){
-        ThriftServiceServerFactory thriftServiceServerFactory = new ThriftServiceServerFactory();
-        return thriftServiceServerFactory;
-    }
 }
