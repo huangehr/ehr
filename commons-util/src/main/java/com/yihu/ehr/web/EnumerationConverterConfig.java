@@ -1,7 +1,7 @@
 package com.yihu.ehr.web;
 
-import com.yihu.ehr.constrant.ArchiveStatus;
-import com.yihu.ehr.constrant.JobType;
+import com.yihu.ehr.constants.ArchiveStatus;
+import com.yihu.ehr.constants.JobType;
 import org.springframework.beans.factory.config.CustomEditorConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

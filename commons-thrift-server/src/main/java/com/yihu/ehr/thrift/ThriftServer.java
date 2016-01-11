@@ -30,7 +30,7 @@ public class ThriftServer {
     /**
      * 服务模型：阻塞与非阻塞
      */
-    public enum ServerMode{
+    public enum ServerMode {
         BlockingMode,
         NonBlockingMode
     }
@@ -57,30 +57,27 @@ public class ThriftServer {
     }
 
     /**
-     * 启动只包含一个服务的Thrift服务器。服务的名称就是其类的唯一名。
-     *
-     * @param service 服务对应的类。
-     * @throws Exception
-     */
-    public void startSingleServiceServer(Object service, ServerMode serverMode) throws Exception {
-        TProcessor processor = loadServiceProcessor(service);
-
-        serverThread = new ServerThread(serverMode, port);
-        serverThread.registerProcessor(service.getClass().getCanonicalName(), processor);
-        serverThread.start();
-    }
-
-    /**
      * 启动一个含有多个服务的Thrift服务器。
      *
      * @throws TTransportException
      */
-    public void startMultiServiceServer(List<Object> services, ServerMode serverMode) throws TTransportException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException, IllegalClassFormatException, ClassNotFoundException {
+    public void startServer(List<Object> services, ServerMode serverMode) throws TTransportException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException, IllegalClassFormatException, ClassNotFoundException {
         serverThread = new ServerThread(serverMode, port);
 
-        for (Object service : services){
+        ServiceProviderImpl serviceProvider = new ServiceProviderImpl();
+        services.add(serviceProvider);
+
+        for (Object service : services) {
             TProcessor processor = loadServiceProcessor(service);
-            serverThread.registerProcessor(service.getClass().getCanonicalName(), processor);
+
+            // 在 ServiceProvider 中注册服务端所支持的服务
+            if (service == serviceProvider) {
+                serverThread.registerProcessor(ServiceProvider.class.getCanonicalName(), processor);
+                serviceProvider.registerService(ServiceProvider.class.getCanonicalName(), service.getClass().getCanonicalName());
+            } else {
+                serverThread.registerProcessor(service.getClass().getCanonicalName(), processor);
+                serviceProvider.registerService(service.getClass().getCanonicalName(), service.getClass().getCanonicalName());
+            }
         }
 
         serverThread.start();
@@ -144,18 +141,27 @@ public class ThriftServer {
         ServerThread(ServerMode serverMode, int port) throws TTransportException {
             multiplexedProcessor = new TMultiplexedProcessor();
 
-            if (ServerMode.BlockingMode == serverMode) {
-                TThreadPoolServer.Args args = new TThreadPoolServer.Args(new TServerSocket(port));
-                args.processor(multiplexedProcessor);
-                args.protocolFactory(new TBinaryProtocol.Factory(true, true));
+            switch (serverMode) {
+                case BlockingMode: {
+                    TThreadPoolServer.Args args = new TThreadPoolServer.Args(new TServerSocket(port));
+                    args.processor(multiplexedProcessor);
+                    args.protocolFactory(new TBinaryProtocol.Factory(true, true));
 
-                server = new TThreadPoolServer(args);
-            } else {
-                TNonblockingServer.Args args = new TNonblockingServer.Args(new TNonblockingServerSocket(port));
-                args.processor(multiplexedProcessor);
-                args.protocolFactory(new TBinaryProtocol.Factory(true, true));
+                    server = new TThreadPoolServer(args);
+                }
+                break;
 
-                server = new TNonblockingServer(args);
+                case NonBlockingMode: {
+                    TNonblockingServer.Args args = new TNonblockingServer.Args(new TNonblockingServerSocket(port));
+                    args.processor(multiplexedProcessor);
+                    args.protocolFactory(new TBinaryProtocol.Factory(true, true));
+
+                    server = new TNonblockingServer(args);
+                }
+
+                default:
+                    server = null;
+                    break;
             }
         }
 

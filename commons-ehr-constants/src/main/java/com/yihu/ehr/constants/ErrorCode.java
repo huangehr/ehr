@@ -1,4 +1,4 @@
-package com.yihu.ehr.constrant;
+package com.yihu.ehr.constants;
 
 /**
  *

@@ -1,6 +1,6 @@
 package com.yihu.ehr.exception;
 
-import com.yihu.ehr.constrant.ErrorCode;
+import com.yihu.ehr.constants.ErrorCode;
 
 /**
  * @author Sand

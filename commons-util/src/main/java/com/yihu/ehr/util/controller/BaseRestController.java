@@ -1,9 +1,7 @@
 package com.yihu.ehr.util.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.yihu.ehr.constrant.ErrorCode;
+import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.util.ApiErrorEcho;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 

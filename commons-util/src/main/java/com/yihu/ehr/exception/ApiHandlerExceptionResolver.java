@@ -1,6 +1,6 @@
 package com.yihu.ehr.exception;
 
-import com.yihu.ehr.constrant.ErrorCode;
+import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.ApiErrorEcho;
 import com.yihu.ehr.util.log.LogService;
 import org.springframework.http.converter.HttpMessageNotWritableException;

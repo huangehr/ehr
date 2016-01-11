@@ -13,7 +13,7 @@ public interface XConnectionProvider {
      *
      * @return
      */
-    public TSocket getConnection();
+    public TSocket getConnection(String serviceName, PooledTTransportFactory.TransportType type);
 
     /**
      * 返还链接

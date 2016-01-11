@@ -2,7 +2,7 @@ package com.yihu.ehr.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.constrant.ErrorCode;
+import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.lang.SpringContext;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

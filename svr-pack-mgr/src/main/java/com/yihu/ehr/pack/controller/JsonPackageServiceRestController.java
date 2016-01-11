@@ -1,14 +1,16 @@
 package com.yihu.ehr.pack.controller;
 
-import com.sun.javaws.exceptions.InvalidArgumentException;
-import com.yihu.ehr.constrant.ApiVersionPrefix;
-import com.yihu.ehr.constrant.ArchiveStatus;
-import com.yihu.ehr.constrant.ErrorCode;
+import com.netflix.appinfo.InstanceInfo;
+import com.netflix.discovery.EurekaClient;
+import com.netflix.discovery.shared.Application;
+import com.netflix.discovery.shared.Applications;
+import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ArchiveStatus;
+import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.pack.service.JsonPackage;
 import com.yihu.ehr.pack.service.JsonPackageService;
 import com.yihu.ehr.pack.service.XJsonPackageRepository;
-import com.yihu.ehr.util.ApiErrorEcho;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.encrypt.RSA;
 import io.swagger.annotations.Api;
@@ -31,7 +33,6 @@ import java.util.List;
  *
  * @author Sand
  * @version 1.0
- * @created 2015.09.17 14:22
  */
 @RestController
 @RequestMapping(ApiVersionPrefix.CommonVersion + "/json_package_service")
@@ -47,7 +48,6 @@ public class JsonPackageServiceRestController extends BaseRestController {
      * 归档病人档案-数据上传
      *
      * @param packageCrypto zip密码密文, file 请求体中文件参数名
-     * @return
      */
     @RequestMapping(value = "/pack", method = {RequestMethod.POST})
     @ApiOperation(value = "接收档案", response = Object.class, notes = "从集成开放平台接收健康档案数据包")
@@ -126,3 +126,4 @@ public class JsonPackageServiceRestController extends BaseRestController {
         }
     }
 }
+

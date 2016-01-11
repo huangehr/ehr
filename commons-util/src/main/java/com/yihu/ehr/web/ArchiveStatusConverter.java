@@ -1,6 +1,6 @@
 package com.yihu.ehr.web;
 
-import com.yihu.ehr.constrant.ArchiveStatus;
+import com.yihu.ehr.constants.ArchiveStatus;
 
 import java.beans.PropertyEditorSupport;
 

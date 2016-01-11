@@ -18,7 +18,7 @@ import javax.annotation.PreDestroy;
 public class ConnectionProvider implements XConnectionProvider {
     private String serviceIP;   // 服务的IP地址
     private int servicePort;    // 服务的端口
-    private int conTimeOut;     // 连接超时配置
+    private int connTimeOut;    // 连接超时配置
     private int maxTotal = GenericObjectPoolConfig.DEFAULT_MAX_TOTAL;               // 可以从缓存池中分配对象的最大数量
     private int maxIdle = GenericObjectPoolConfig.DEFAULT_MAX_IDLE;                 // 缓存池中最大空闲对象数量
     private int minIdle = GenericObjectPoolConfig.DEFAULT_MIN_IDLE;                 // 缓存池中最小空闲对象数量
@@ -33,7 +33,7 @@ public class ConnectionProvider implements XConnectionProvider {
 
     @PostConstruct
     public void afterPropertiesSet() throws Exception {
-        PooledTTransportFactory pooledTTransportFactory = new PooledTTransportFactory(serviceIP, servicePort, conTimeOut);
+        PooledTTransportFactory pooledTTransportFactory = new PooledTTransportFactory(serviceIP, servicePort, connTimeOut);
         objectPool = new GenericObjectPool(pooledTTransportFactory);
 
         ((GenericObjectPool)objectPool).setMaxTotal(maxTotal);
@@ -55,7 +55,7 @@ public class ConnectionProvider implements XConnectionProvider {
         }
     }
 
-    public TSocket getConnection() {
+    public TSocket getConnection(String serviceName, PooledTTransportFactory.TransportType type) {
         try {
             TSocket socket = (TSocket) objectPool.borrowObject();
             return socket;
@@ -88,12 +88,12 @@ public class ConnectionProvider implements XConnectionProvider {
         this.servicePort = servicePort;
     }
 
-    public int getConTimeOut() {
-        return conTimeOut;
+    public int getConnTimeOut() {
+        return connTimeOut;
     }
 
-    public void setConTimeOut(int conTimeOut) {
-        this.conTimeOut = conTimeOut;
+    public void setConnTimeOut(int connTimeOut) {
+        this.connTimeOut = connTimeOut;
     }
 
     public int getMaxTotal() {

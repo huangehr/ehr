@@ -1,6 +1,6 @@
 package com.yihu.ehr.pack.service;
 
-import com.yihu.ehr.constrant.ArchiveStatus;
+import com.yihu.ehr.constants.ArchiveStatus;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;

@@ -1,4 +1,4 @@
-package com.yihu.ehr.constrant;
+package com.yihu.ehr.constants;
 
 public class HBConstants {
 	final static public String T_HFILES = "H_Files";

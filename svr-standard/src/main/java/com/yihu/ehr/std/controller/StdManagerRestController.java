@@ -8,7 +8,6 @@ import com.yihu.ehr.constrant.ErrorCode;
 import com.yihu.ehr.lang.ServiceFactory;
 import com.yihu.ehr.std.model.*;
 import com.yihu.ehr.std.service.*;
-import com.yihu.ehr.util.ApiErrorEcho;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

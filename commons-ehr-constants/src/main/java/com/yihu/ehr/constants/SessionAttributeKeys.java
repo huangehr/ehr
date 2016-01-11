@@ -1,4 +1,4 @@
-package com.yihu.ehr.constrant;
+package com.yihu.ehr.constants;
 
 /**
  * Spring MVC 的Web会话常用会话属性常量。

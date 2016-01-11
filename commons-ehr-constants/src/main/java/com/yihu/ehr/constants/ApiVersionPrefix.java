@@ -1,4 +1,4 @@
-package com.yihu.ehr.constrant;
+package com.yihu.ehr.constants;
 
 /**
  * API版本前缀。用于适配Rest控制器的版本。定义好适用的版本之后，可以方便API版本编写。

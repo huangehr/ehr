@@ -1,4 +1,4 @@
-package com.yihu.ehr.constrant;
+package com.yihu.ehr.constants;
 
 /**
  * 业务对象划分, 全局唯一ID会使用此划分. 因为 ObjectId 中仅使用一个short作为

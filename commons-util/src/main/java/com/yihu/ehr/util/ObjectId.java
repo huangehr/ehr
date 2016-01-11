@@ -1,6 +1,6 @@
 package com.yihu.ehr.util;
 
-import com.yihu.ehr.constrant.BizObject;
+import com.yihu.ehr.constants.BizObject;
 
 import java.io.Serializable;
 import java.net.NetworkInterface;
