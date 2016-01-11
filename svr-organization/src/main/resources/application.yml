@@ -1,9 +1,10 @@
 server:
-  port: 0
+#  port: 7070
+  port: 7070
 
 security:
   user:
-    password: org
+    password: organization
 
 info:
   app:
@@ -14,30 +15,6 @@ info:
 ---
 spring:
   profiles: dev
-
-eureka:
-  instance:
-    hostname: localhost
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
-
----
-spring:
-  profiles: test
-
-eureka:
-  instance:
-    hostname: localhost
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
-
----
-spring:
-  profiles: prod
 
 eureka:
   instance:
