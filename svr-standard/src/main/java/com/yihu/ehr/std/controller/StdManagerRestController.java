@@ -2,9 +2,9 @@ package com.yihu.ehr.std.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.constrant.ApiVersionPrefix;
-import com.yihu.ehr.constrant.Controllers;
-import com.yihu.ehr.constrant.ErrorCode;
+import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.Controllers;
+import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.lang.ServiceFactory;
 import com.yihu.ehr.std.model.*;
 import com.yihu.ehr.std.service.*;

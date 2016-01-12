@@ -1,6 +1,6 @@
 package com.yihu.ehr.pack.service;
 
-import com.yihu.ehr.constrant.ArchiveStatus;
+import com.yihu.ehr.constants.ArchiveStatus;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -15,7 +15,7 @@ import java.util.Date;
 @Entity
 @Table(name = "json_archives")
 @Access(value = AccessType.PROPERTY)
-public class JsonPackage {
+public class JsonPackage  {
     public final static String pathSeparator = ":";     // 统一使用冒号作为路径分隔符
 
     private String id;

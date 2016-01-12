@@ -31,9 +31,7 @@ public class ConnectionProvider implements XConnectionProvider {
 
     private ObjectPool objectPool = null;   // 对象缓存池
 
-    @PostConstruct
-    public void afterPropertiesSet() throws Exception {
-        PooledTTransportFactory pooledTTransportFactory = new PooledTTransportFactory(serviceIP, servicePort, connTimeOut);
+    public void init(PooledTTransportFactory pooledTTransportFactory) {
         objectPool = new GenericObjectPool(pooledTTransportFactory);
 
         ((GenericObjectPool)objectPool).setMaxTotal(maxTotal);
@@ -55,7 +53,7 @@ public class ConnectionProvider implements XConnectionProvider {
         }
     }
 
-    public TSocket getConnection(String serviceName, PooledTTransportFactory.TransportType type) {
+    public TSocket getConnection(PooledTTransportFactory.TransportType type) {
         try {
             TSocket socket = (TSocket) objectPool.borrowObject();
             return socket;
@@ -64,11 +62,11 @@ public class ConnectionProvider implements XConnectionProvider {
         }
     }
 
-    public void returnCon(TSocket socket) {
+    public void returnConnection(TSocket socket) {
         try {
             objectPool.returnObject(socket);
         } catch (Exception e) {
-            throw new RuntimeException("error returnCon()", e);
+            throw new RuntimeException("error returnConnection()", e);
         }
     }
 

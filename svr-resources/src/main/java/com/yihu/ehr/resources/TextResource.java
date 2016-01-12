@@ -1,9 +1,7 @@
 package com.yihu.ehr.resources;
 
-import com.yihu.ehr.constrant.ErrorCode;
-import com.yihu.ehr.constrant.RedisNamespace;
-import com.yihu.ehr.constrant.Services;
-import com.yihu.ehr.lang.ServiceFactory;
+import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.constants.RedisNamespace;
 import com.yihu.ehr.redis.XRedisClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -20,8 +18,8 @@ import java.util.Set;
  * @version 1.0
  * @created 2015.08.05 16:16
  */
-@Service(Services.TextResource)
-public class TextResource implements XTextResource {
+@Service
+public class TextResource {
     @Autowired
     Environment environment;
 
@@ -32,17 +30,16 @@ public class TextResource implements XTextResource {
         return RedisNamespace.TextResource + subKey;
     }
 
-    @Override
+    
     public String getErrorPhrase(final ErrorCode errorCode, final String... args) {
         String description = redisClient.get(makeKey(errorCode.getErrorCode()));
 
         return replaceArgs(description, args);
     }
 
-    @Override
+    
     public Map<String, String> getErrorMap(final ErrorCode errorCode, final String... args) {
-        XRedisClient redisDAO = ServiceFactory.getService(Services.RedisClient);
-        String description = redisDAO.get(makeKey(errorCode.getErrorCode()));
+        String description = redisClient.get(makeKey(errorCode.getErrorCode()));
 
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("code", errorCode.getErrorCode());
@@ -91,13 +88,13 @@ public class TextResource implements XTextResource {
         }*/
     }
 
-    @Override
+    
     public void clearTextResource() {
         Set<String> keys = redisClient.keys(makeKey("*"));
         keys.forEach(redisClient::delete);
     }
 
-    @Override
+    
     public int getResourceCount() {
         return redisClient.keys(makeKey("*")).size();
     }

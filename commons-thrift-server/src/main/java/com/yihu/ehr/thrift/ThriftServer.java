@@ -37,7 +37,7 @@ public class ThriftServer {
 
     private Integer port;
     private Integer priority = 1;
-    private ServerMode serverMode;
+    private ServerMode serverMode = ServerMode.BlockingMode;
 
     private ServerThread serverThread;
 
@@ -57,7 +57,7 @@ public class ThriftServer {
     }
 
     /**
-     * 启动一个含有多个服务的Thrift服务器。
+     * 启动一个含有多个服务的Thrift服务器。ServiceProvider 服务会被默认添加进去。
      *
      * @throws TTransportException
      */

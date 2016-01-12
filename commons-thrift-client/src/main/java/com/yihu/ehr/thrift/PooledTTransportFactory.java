@@ -41,8 +41,7 @@ public class PooledTTransportFactory implements PooledObjectFactory<TTransport> 
 
     public PooledObject<TTransport> makeObject() throws Exception {
         try {
-            DefaultPooledObject<TTransport> transport = new DefaultPooledObject<TTransport>(
-                    new TSocket(this.serviceIP,this.servicePort, this.connTimeOut));
+            DefaultPooledObject<TTransport> transport = new DefaultPooledObject<>(makeTransport(serviceIP, servicePort, connTimeOut));
 
             transport.getObject().open();
             return transport;
@@ -108,6 +107,24 @@ public class PooledTTransportFactory implements PooledObjectFactory<TTransport> 
         }
 
         return transport;
+    }
+
+    /**
+     * 通用Transport工厂。
+     *
+     * @param serviceIP
+     * @param servicePort
+     * @param connTimeOut
+     * @return
+     */
+    public static TTransport makeTransport(String serviceIP, int servicePort, int connTimeOut) {
+        try {
+            TTransport transport = new TSocket(serviceIP, servicePort, connTimeOut);
+
+            return transport;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void setServiceIP(String serviceIP) {

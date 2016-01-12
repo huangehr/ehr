@@ -2,9 +2,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <modules>
-        <module>../thrift.demo</module>
-    </modules>
     <parent>
         <groupId>com.yihu.ehr</groupId>
         <artifactId>ehr-commons-dependencies</artifactId>
@@ -88,10 +85,6 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-remote-shell</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
         <dependency>
@@ -109,7 +102,6 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-jpa</artifactId>
@@ -137,6 +129,18 @@
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>ehr-commons-ui-swagger</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>ehr-commons-thrift-server</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>ehr-commons-thrift-client</artifactId>
             <version>1.1.0</version>
         </dependency>
 

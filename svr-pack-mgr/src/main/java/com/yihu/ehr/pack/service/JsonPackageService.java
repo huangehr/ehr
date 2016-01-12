@@ -1,8 +1,8 @@
 package com.yihu.ehr.pack.service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.constrant.ArchiveStatus;
-import com.yihu.ehr.constrant.BizObject;
+import com.yihu.ehr.constants.ArchiveStatus;
+import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.util.DateFormatter;
 import com.yihu.ehr.util.ObjectId;
@@ -31,8 +31,8 @@ import java.util.*;
 @Service
 @Transactional
 public class JsonPackageService {
-    @Value("${admin-region}")
-    Short adminRegion;
+    @Value("${admin.region}")
+    Short adminRegion = 3502;
 
     @Autowired
     XJsonPackageRepository jsonPackageRepo;
