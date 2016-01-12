@@ -57,23 +57,17 @@ public class JsonPackageServiceRestController extends BaseRestController {
             @ApiParam(required = true, name = "package_crypto", value = "档案包解压密码,二次加密")
             @RequestParam(value = "package_crypto") String packageCrypto) {
 
-        try {
-            MultipartFile file = jsonPackage.getFile("file");
-            //if(file == null) throw new InvalidArgumentException({"file"});
+        MultipartFile file = jsonPackage.getFile("file");
+        //if(file == null) throw new InvalidArgumentException({"file"});
 
-            //XUserSecurity userSecurity = securityManager.getUserSecurityByUserName(userName);
-            //if (null == userSecurity) return failed(ErrorCode.GenerateUserKeyFailed);
+        //XUserSecurity userSecurity = securityManager.getUserSecurityByUserName(userName);
+        //if (null == userSecurity) return failed(ErrorCode.GenerateUserKeyFailed);
 
-            String privateKey = "";// = userSecurity.getPrivateKey();
-            String unzipPwd = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
-            jsonPackageService.receive(file.getInputStream(), unzipPwd);
+        String privateKey = "";// = userSecurity.getPrivateKey();
+        String unzipPwd = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
+        jsonPackageService.receive(file.getInputStream(), unzipPwd);
 
-            return null;
-        } catch (IOException e) {
-            failed(ErrorCode.SaveArchiveFailed, e.getMessage());
-        } catch (Exception e) {
-            failed(ErrorCode.ParseArchiveCryptoFailed, e.getMessage());
-        }
+        return null;
 
         return null;
     }
