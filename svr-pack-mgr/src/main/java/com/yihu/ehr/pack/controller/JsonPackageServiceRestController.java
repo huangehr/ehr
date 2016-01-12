@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -55,7 +54,7 @@ public class JsonPackageServiceRestController extends BaseRestController {
             @ApiParam(required = true, name = "user_name", value = "用户名")
             @RequestParam(value = "user_name") String userName,
             @ApiParam(required = true, name = "package_crypto", value = "档案包解压密码,二次加密")
-            @RequestParam(value = "package_crypto") String packageCrypto) {
+            @RequestParam(value = "package_crypto") String packageCrypto) throws Exception {
 
         MultipartFile file = jsonPackage.getFile("file");
         //if(file == null) throw new InvalidArgumentException({"file"});
@@ -66,8 +65,6 @@ public class JsonPackageServiceRestController extends BaseRestController {
         String privateKey = "";// = userSecurity.getPrivateKey();
         String unzipPwd = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
         jsonPackageService.receive(file.getInputStream(), unzipPwd);
-
-        return null;
 
         return null;
     }
