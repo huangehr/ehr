@@ -1,0 +1,25 @@
+server:
+   port: 9003
+
+
+#security:
+#  user:
+#    password: address
+
+info:
+  app:
+    name: AddressService
+    description: EHR platform json address service.
+    version: 1.0.0
+
+---
+spring:
+  profiles: dev
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/

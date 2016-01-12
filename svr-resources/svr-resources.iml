@@ -124,12 +124,12 @@
     <orderEntry type="library" name="Maven: org.springframework.cloud:spring-cloud-commons:1.1.0.M4" level="project" />
     <orderEntry type="module" module-name="commons-ehr-constants" />
     <orderEntry type="module" module-name="commons-util" />
-    <orderEntry type="module" module-name="commons-thrift-service" />
+    <orderEntry type="library" name="Maven: com.yihu.ehr:ehr-commons-thrift-services:1.1.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.thrift:libthrift:0.9.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.4" level="project" />
     <orderEntry type="module" module-name="commons-thrift-client" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-pool2:2.4.2" level="project" />
-    <orderEntry type="module" module-name="commons-thrift-server" />
+    <orderEntry type="library" name="Maven: com.yihu.ehr:commons-thrift-server:1.1.0" level="project" />
     <orderEntry type="module" module-name="commons-data-redis" />
     <orderEntry type="library" name="Maven: org.springframework:spring-orm:4.2.4.RELEASE" level="project" />
     <orderEntry type="module" module-name="commons-data-mysql" />

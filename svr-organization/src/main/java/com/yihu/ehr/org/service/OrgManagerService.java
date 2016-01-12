@@ -1,0 +1,257 @@
+package com.yihu.ehr.org.service;
+
+import com.yihu.ehr.model.AddressModel;
+import com.yihu.ehr.model.OrganizationModel;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 组织机构管理器.
+ *
+ * @author Sand
+ * @version 1.0
+ */
+@Transactional
+@Service
+public class OrgManagerService  {
+
+    @Autowired
+    AddressClient addressClient;
+
+
+    @Autowired
+    private XOrganizationRepository organizationRepository;
+
+
+    @PersistenceContext
+    protected EntityManager entityManager;
+
+
+
+    public Object getAddressById(String id){
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        Query query = session.createSQLQuery("SELECT * from organizations where 1=1 ");
+        Object model=  query.list().get(0);
+        return model;
+    }
+
+    public OrgManagerService(){
+    }
+
+    public Organization register(String orgCode, String fullName, String shortName){
+        Organization org = new Organization();
+        org.setCreateDate(new Date());
+        org.setOrgCode(orgCode);
+        org.setFullName(fullName);
+        org.setShortName(shortName);
+        organizationRepository.save(org);
+        return org;
+    }
+
+    public Organization getOrg(String orgCode) {
+        Organization org = organizationRepository.getOrgByCode(orgCode);
+        return org;
+    }
+
+
+    public String getOrgStr(String tags){
+        return String.join(",", tags);
+    }
+
+
+    /**
+     * 转换成viewModel
+     * @param org
+     * @return
+     */
+    public OrgModel getOrgModel(Organization org) {
+
+        OrgModel orgModel = new OrgModel();
+        orgModel.setOrgCode(org.getOrgCode());
+        orgModel.setFullName(org.getFullName());
+        orgModel.setShortName(org.getShortName());
+        orgModel.setAdmin(org.getAdmin());
+        orgModel.setTel(org.getTel());
+        orgModel.setTags(getOrgStr(org.getTags()));
+        if (!StringUtils.isEmpty(org.getOrgType())) {
+            orgModel.setOrgType(org.getOrgType());
+        }
+        if (!StringUtils.isEmpty(org.getSettledWay())) {
+            orgModel.setSettledWay(org.getSettledWay());
+        }
+        if (org.getLocation() != null) {
+            //这里调用Address服务获取地址
+            AddressModel addres = addressClient.getAddressById(org.getLocation());
+            if(!"00000".equals(addres.getId())){
+                orgModel.setProvince(addres.getProvince());
+                orgModel.setCity(addres.getCity());
+                orgModel.setDistrict(addres.getDistrict());
+                orgModel.setTown(addres.getTown());
+                //获取地址字符串
+                String addressStr = addressClient.getCanonicalAddress(org.getLocation());
+                orgModel.setLocation(addressStr);
+            }
+        }
+
+//        XSecurityManager securityManager = ServiceFactory.getService(Services.SecurityManager);
+//        XUserSecurity userSecurity = securityManager.getUserPublicKeyByOrgCd(org.getOrgCode());
+//        if (userSecurity != null) {
+//            orgModel.setPublicKey(userSecurity.getPublicKey());
+//            String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT)
+//                    + "~" + DateUtil.toString(userSecurity.getExpiryDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT);
+//            orgModel.setValidTime(validTime);
+//            orgModel.setStartTime( DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT));
+//        }
+
+        return orgModel;
+    }
+
+    public boolean isRegistered(String orgCode) {
+        Organization organization = organizationRepository.getOrgByCode(orgCode);
+        return organization != null;
+    }
+
+    public void update(Organization org) {
+        //这里之前Organization是包含地址的，现在只关联id所以现在只保存机构，在这之前先保存地址服务。
+        organizationRepository.save(org);
+    }
+
+
+    public Boolean isExistOrg(String orgCode){
+        Organization org = organizationRepository.getOrgByCode(orgCode);
+        return org!=null;
+    }
+
+    public Boolean update(OrgModel orgModel) {
+        Organization org = null;
+        if (orgModel.getUpdateFlg().equals("0")) {
+            org = register(orgModel.getOrgCode(), orgModel.getFullName(), orgModel.getShortName());
+        } else if (orgModel.getUpdateFlg().equals("1")) {
+            org = getOrg(orgModel.getOrgCode());
+        }
+        if (org == null) {
+            return false;
+        }
+        org.setSettledWay(orgModel.getSettledWay());
+        org.setOrgType(orgModel.getOrgType());
+        org.setShortName(orgModel.getShortName());
+        org.setFullName(orgModel.getFullName());
+        org.setAdmin(orgModel.getAdmin());
+        org.setTel(orgModel.getTel());
+        //org.getTags().clear();
+        org.addTag(orgModel.getTags());
+        AddressModel addressModel = new AddressModel();
+        addressModel.setProvince(orgModel.getProvince());
+        addressModel.setCity(orgModel.getCity());
+        addressModel.setDistrict(orgModel.getDistrict());
+        addressModel.setTown(orgModel.getTown());
+        update(org);
+
+        return true;
+    }
+
+    public List<Organization> getOrgByOrgType(String orgType) {
+        List<Organization> list =  organizationRepository.getOrgByOrgType(orgType);
+        return list;
+    }
+
+
+    public List<OrganizationModel> search(Map<String, Object> args) {
+
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        String orgCode = (String) args.get("orgCode");
+        String fullName = (String) args.get("fullName");
+        String settledWay = (String) args.get("settledWay");
+        String orgType = (String) args.get("orgType");
+        String province = (String) args.get("province");
+        String city = (String) args.get("city");
+        String district = (String) args.get("district");
+
+        Integer page = (Integer) args.get("page");
+        Integer pageSize = (Integer) args.get("pageSize");
+
+        List<String> addressIdList = addressClient.search(province,city,district);
+
+
+        String hql = "from Organization where (orgCode like :orgCode or fullName like :fullName)";
+        if (!StringUtils.isEmpty(settledWay)) {
+            hql += " and settledWay = :settledWay";
+        }
+        if (!StringUtils.isEmpty(orgType)) {
+            hql += " and orgType = :orgType";
+        }
+        if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
+            hql += " and location in (:addressIdList)";
+        }
+
+        Query query = session.createQuery(hql);
+        query.setString("orgCode", "%"+orgCode+"%");
+        query.setString("fullName", "%"+fullName+"%");
+        if (!StringUtils.isEmpty(settledWay)) {
+            query.setParameter("settledWay", settledWay);
+        }
+        if (!StringUtils.isEmpty(orgType)) {
+            query.setParameter("orgType", orgType);
+        }
+        if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
+            query.setParameterList("addressIdList", addressIdList);
+        }
+
+        query.setMaxResults(pageSize);
+        query.setFirstResult((page - 1) * pageSize);
+
+        return query.list();
+    }
+
+
+    public List<OrganizationModel> searchOrgDetailModel(Map<String, Object> args) {
+        List<OrganizationModel> orgList = search(args);
+        return orgList;
+    }
+
+
+
+    public void delete(String orgCode){
+        if(orgCode != null){
+            Organization organization = getOrg(orgCode);
+            List<Organization> organizationList = organizationRepository.getOrgByLocationWithCode(orgCode);
+            if(organization!=null){
+                organizationRepository.delete(organization);
+            }
+            if(organizationList.size()==1){
+                addressClient.deleteByOrgCode(organizationList.get(0).getLocation());
+            }
+
+        }
+    }
+
+    public List<Organization> searchByAddress(String province, String city) {
+        List<Organization> list = organizationRepository.getOrgByAddress(province,city);
+        return list;
+    }
+
+
+    public String saveAddress(AddressModel location) {
+        String country = location.getCountry();
+        String province = location.getProvince()!=null ? location.getProvince() :"";
+        String city = location.getCity()!=null ? location.getCity() :"";
+        String district = location.getDistrict()!=null ? location.getDistrict() :"";
+        String town = location.getTown()!=null ? location.getTown() :"";
+        String street = location.getStreet()!=null ? location.getStreet() :"";
+        String extra = location.getExtra()!=null ? location.getExtra() :"";
+        String postalCode = location.getPostalCode()!=null ? location.getPostalCode() :"";
+        return addressClient.saveAddress(country,province,city,district,town,street,extra,postalCode);
+    }
+
+
+}
