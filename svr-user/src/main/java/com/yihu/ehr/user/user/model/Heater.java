@@ -7,7 +7,7 @@ package com.yihu.ehr.user.user.model;
 /**
  *治疗师
  */
-public class Heater extends AbstractMedicalUser implements XMedicalUser {
+public class Heater extends MedicalUser {
 
     public Heater(){
 

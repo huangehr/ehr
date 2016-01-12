@@ -3,6 +3,7 @@ package com.yihu.ehr.security.model;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
@@ -13,7 +14,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "user-token")
 @Access(value = AccessType.PROPERTY)
-public class UserToken {
+public class UserToken implements Serializable {
     private String tokenId;
     private String accessToken;
     private String refreshToken;

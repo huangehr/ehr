@@ -2,7 +2,7 @@ package com.yihu.ehr.constrant;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.lang.ServiceFactory;
+import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.util.log.LogService;
 
 import java.io.Serializable;
@@ -36,7 +36,7 @@ public class Result implements Serializable{
 	private int errorCode;
 
 	public String toJson(){
-        ObjectMapper objectMapper = ServiceFactory.getService(ObjectMapper.class);
+        ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
         try {
             return objectMapper.writeValueAsString(this);
         } catch (JsonProcessingException e) {

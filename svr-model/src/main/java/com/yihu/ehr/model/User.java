@@ -1,9 +1,5 @@
 package com.yihu.ehr.model;
 
-import com.yihu.ehr.dict.service.Gender;
-import com.yihu.ehr.dict.service.MartialStatus;
-import com.yihu.ehr.dict.service.UserType;
-
 import java.util.Date;
 
 /**
@@ -32,13 +28,13 @@ public class User  {
 
     private String validateCode;
 
-    private UserType userType;
+    private String userType;
 
     private String telephone;
 
-    private MartialStatus martialStatus;
+    private String martialStatus;
 
-    private Gender gender;
+    private String gender;
 
     private String idCardNo;
 
@@ -118,11 +114,11 @@ public class User  {
         this.validateCode = validateCode;
     }
 
-    public UserType getUserType() {
+    public String getUserType() {
         return userType;
     }
 
-    public void setUserType(UserType userType) {
+    public void setUserType(String userType) {
         this.userType = userType;
     }
 
@@ -134,19 +130,19 @@ public class User  {
         this.telephone = telephone;
     }
 
-    public MartialStatus getMartialStatus() {
+    public String getMartialStatus() {
         return martialStatus;
     }
 
-    public void setMartialStatus(MartialStatus martialStatus) {
+    public void setMartialStatus(String martialStatus) {
         this.martialStatus = martialStatus;
     }
 
-    public Gender getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(Gender gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 

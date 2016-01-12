@@ -10,6 +10,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="commons-util" />
     <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-auth:2.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.13" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.4" level="project" />
@@ -130,7 +131,7 @@
     <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-distcp:2.7.1" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.data:spring-data-hadoop-core:2.2.1.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.data:spring-data-hadoop-hbase:2.2.1.RELEASE" level="project" />
-    <orderEntry type="module" module-name="commons-util" />
+    <orderEntry type="library" name="Maven: com.yihu.ehr:ehr-commons-util:1.1.0" level="project" />
     <orderEntry type="module" module-name="commons-data-solr" />
     <orderEntry type="library" name="Maven: org.springframework.data:spring-data-solr:1.5.0.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.data:spring-data-commons:1.11.2.RELEASE" level="project" />

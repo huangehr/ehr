@@ -5,6 +5,7 @@ import com.yihu.ehr.util.encrypt.RSA;
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -25,6 +26,11 @@ import java.util.Map;
 @Service
 public class SecurityManager {
 
+
+    @Autowired
+    private XUserSecurityRepository userSecurityRepository;
+
+
     HashMap<String, Key> hashMap;
 
     static String persenalKeyType  = "Personal";
@@ -32,9 +38,7 @@ public class SecurityManager {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public Map setUp() throws Exception {
-
         hashMap = RSA.generateKeys();
-
         return hashMap;
     }
 
@@ -61,16 +65,14 @@ public class SecurityManager {
         userSecurity.setFromDate(fromDate);
         userSecurity.setExpiryDate(expiryDate);
 
-        saveEntity(userSecurity);
+        userSecurityRepository.save(userSecurity);
 
-        return (UserSecurity) userSecurity;
+        return  userSecurity;
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
     public UserSecurity createSecurityByUserId(String userId) throws Exception {
 
         //1-1根据用户登陆名获取用户信息。
-        XUserManager userManager = ServiceFactory.getService(Services.UserManager);
 
         XUser userInfo = userManager.getUser(userId);
         if(userInfo==null) {

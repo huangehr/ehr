@@ -5,7 +5,7 @@
 
 	<groupId>com.yihu.ehr</groupId>
 	<artifactId>svr-dict</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.1.0</version>
 	<packaging>jar</packaging>
 
 	<name>svr-dict</name>

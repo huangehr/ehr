@@ -1,5 +1,4 @@
-package com.yihu.ha.security.model;
-
+package com.yihu.ehr.security.model;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -17,7 +16,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "user-key")
 @Access(value = AccessType.PROPERTY)
-public class UserKey  {
+public class UserKey implements Serializable{
 
     public UserKey() {
         id  = UUID.randomUUID().toString();
@@ -27,7 +26,7 @@ public class UserKey  {
     @GeneratedValue(generator = "Generator")
     @GenericGenerator(name = "Generator", strategy = "assigned")
     @Column(name = "id", unique = true, nullable = false)
-    private String id;    //
+    private String id;
 
     @Column(name = "user-id",  nullable = true)
     private String userId;  //用户

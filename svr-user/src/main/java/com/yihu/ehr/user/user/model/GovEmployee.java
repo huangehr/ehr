@@ -7,7 +7,7 @@ package com.yihu.ehr.user.user.model;
  * @version 1.0
  * @created 02-6月-2015 17:38:07
  */
-public class GovEmployee extends AbstractUser implements XGovEmployee {
+public class GovEmployee extends User {
 
 	/**
 	 * 行政职称

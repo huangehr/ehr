@@ -2,7 +2,7 @@ package com.yihu.ehr.std.service;
 
 import com.yihu.ehr.data.SQLGeneralDAO;
 import com.yihu.ehr.std.model.StandardSourceModel;
-import com.yihu.ehr.util.operator.DateUtil;
+import com.yihu.ehr.util.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;

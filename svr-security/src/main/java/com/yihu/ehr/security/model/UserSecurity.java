@@ -3,6 +3,7 @@ package com.yihu.ehr.security.model;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
@@ -16,7 +17,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "user-security")
 @Access(value = AccessType.PROPERTY)
-public class UserSecurity {
+public class UserSecurity implements Serializable {
 
 	public UserSecurity() {
 		id  = UUID.randomUUID().toString();

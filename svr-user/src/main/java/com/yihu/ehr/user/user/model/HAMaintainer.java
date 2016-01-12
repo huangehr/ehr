@@ -6,7 +6,7 @@ package com.yihu.ehr.user.user.model;
  * @version 1.0
  * @updated 04-6月-2015 9:18:49
  */
-public class HAMaintainer extends AbstractUser implements XUser {
+public class HAMaintainer extends User {
 
 	public HAMaintainer(){
 	}

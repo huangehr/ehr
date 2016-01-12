@@ -2,7 +2,7 @@ package com.yihu.ehr.fastdfs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.lang.ServiceFactory;
+import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.util.log.LogService;
 import org.csource.common.MyException;
 import org.csource.common.NameValuePair;
@@ -63,7 +63,7 @@ public class FastDFSUtil {
             fileMetaData = new NameValuePair[1];
             fileMetaData[0] = new NameValuePair("description", description == null ? "" : description);
 
-            ObjectMapper objectMapper = ServiceFactory.getService(ObjectMapper.class);
+            ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
             ObjectNode message = objectMapper.createObjectNode();
 
             byte fileBuffer[] = new byte[in.available()];
@@ -148,7 +148,7 @@ public class FastDFSUtil {
             fileMetaData = new NameValuePair[1];
             fileMetaData[0] = new NameValuePair("description", description == null ? "" : description);
 
-            ObjectMapper objectMapper = ServiceFactory.getService(ObjectMapper.class);
+            ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
             ObjectNode message = objectMapper.createObjectNode();
             String fileExtension = "";
             if (fileName.contains(".")) {

@@ -11,6 +11,8 @@ import java.io.Serializable;
 @Entity
 @Table(name = "system_dict_entries")
 @Access(value = AccessType.PROPERTY)
+@Embeddable
+@IdClass(DictPk.class)
 public class MartialStatus implements Serializable {
     private static final long serialVersionUID = 1L;
     String code;
@@ -19,6 +21,8 @@ public class MartialStatus implements Serializable {
     Integer sort;
     String phoneticCode;
     String catalog;
+    DictPk dictPk;
+
     public MartialStatus(){
     }
     public MartialStatus(long dictId, String code, String value, Integer sort, String phoneticCode, String catalog){
@@ -30,8 +34,15 @@ public class MartialStatus implements Serializable {
         this.catalog = catalog;
     }
 
-    @Id
-    @Column(name = "code", unique = true, nullable = false)
+    @EmbeddedId
+    public DictPk getDictPk() {
+        return dictPk;
+    }
+    public void setDictPk(DictPk dictPk) {
+        this.dictPk = dictPk;
+    }
+
+    @Column(name = "code", unique = true, nullable = false ,insertable = false, updatable = false)
     public String getCode() {
         return code;
     }
@@ -39,7 +50,7 @@ public class MartialStatus implements Serializable {
         this.code = code;
     }
 
-    @Column(name = "dictId", unique = true, nullable = false)
+    @Column(name = "dictId", unique = true, nullable = false ,insertable = false, updatable = false)
     public long getDictId() {
         return dictId;
     }

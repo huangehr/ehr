@@ -15,7 +15,7 @@ import javax.persistence.Table;
 @Entity
 @Table( name = "users" )
 @AttributeAccessor( "FIELD" )
-public class Nurse extends AbstractMedicalUser implements XMedicalUser {
+public class Nurse extends MedicalUser {
 
 	public Nurse(){
 	}

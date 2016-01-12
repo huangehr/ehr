@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
  * @version 1.0
  * @created 2015.12.16 15:10
  */
+@Repository
 public interface XJsonPackageRepository extends PagingAndSortingRepository<JsonPackage, String> {
 
     @Query("select count(*) from JsonPackage pack where pack.receiveDate between :from and :to")

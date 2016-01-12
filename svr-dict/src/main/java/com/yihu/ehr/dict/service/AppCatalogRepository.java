@@ -10,6 +10,6 @@ import org.springframework.data.repository.query.Param;
  * @created 2015.07.30 14:43
  */
 public interface AppCatalogRepository extends PagingAndSortingRepository<AppCatalog, String> {
-    @Query("select dict.id from AppCatalog dict where dict.dictId = 1 and dict.code = :code order by dict.sort asc")
+    @Query("select dict from AppCatalog dict where dict.dictId = 1 and dict.code = :code order by dict.sort asc")
     AppCatalog getAppCatalog(@Param("code") String code);
 }

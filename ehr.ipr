@@ -28,10 +28,12 @@
         <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
+        <module name="commons-ehr-service" />
+        <module name="commons-feign-client" />
+        <module name="commons-thrift-client" />
         <module name="movie-microservice" />
         <module name="rest-microservices-store" />
         <module name="svr-archive" />
-        <module name="svr-model" />
         <module name="svr-resources" />
         <module name="svr-sso" />
         <module name="svr.archive" />
@@ -52,70 +54,19 @@
         <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
-        <module name="commons-util" />
       </profile>
-      <profile default="false" name="Annotation profile for commons-data-hbase" enabled="true">
+      <profile default="false" name="Annotation profile for svr-user" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
-        <module name="commons-data-hbase" />
       </profile>
-      <profile default="false" name="Annotation profile for commons-data-mysql" enabled="true">
+      <profile default="false" name="Annotation profile for thrift.demo" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
-        <module name="commons-data-mysql" />
-      </profile>
-      <profile default="false" name="Annotation profile for commons-data-redis" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="true" />
-        <module name="commons-data-redis" />
-      </profile>
-      <profile default="false" name="Annotation profile for commons-data-fastdfs" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="true" />
-        <module name="commons-data-fastdfs" />
-      </profile>
-      <profile default="false" name="Annotation profile for commons-data-solr" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="true" />
-        <module name="commons-data-solr" />
-      </profile>
-      <profile default="false" name="Annotation profile for svr-discovery" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="true" />
-        <module name="svr-discovery" />
-      </profile>
-      <profile default="false" name="Annotation profile for svr-configuration" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="true" />
-        <module name="svr-configuration" />
-      </profile>
-      <profile default="false" name="Annotation profile for svr-pack-mgr" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="true" />
-        <module name="svr-pack-mgr" />
-      </profile>
-      <profile default="false" name="Annotation profile for svr-standard" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="true" />
-        <module name="svr-standard" />
+        <module name="thrift.demo" />
       </profile>
       <profile default="false" name="Annotation profile for svr-address" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -136,7 +87,6 @@
         <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
-        <module name="svr-user" />
       </profile>
       <profile default="false" name="Annotation profile for svr-security" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -159,6 +109,76 @@
         <processorPath useClasspath="true" />
         <module name="svr-organization" />
       </profile>
+      <profile default="false" name="Annotation profile for commons-thrift-server" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="commons-thrift-server" />
+      </profile>
+      <profile default="false" name="Annotation profile for svr-configuration" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="svr-configuration" />
+      </profile>
+      <profile default="false" name="Annotation profile for commons-ui-swagger" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="commons-ui-swagger" />
+      </profile>
+      <profile default="false" name="Annotation profile for svr-discovery" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="svr-discovery" />
+      </profile>
+      <profile default="false" name="Annotation profile for commons-data-fastdfs" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="commons-data-fastdfs" />
+      </profile>
+      <profile default="false" name="Annotation profile for commons-data-hbase" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="commons-data-hbase" />
+      </profile>
+      <profile default="false" name="Annotation profile for commons-data-mysql" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="commons-data-mysql" />
+      </profile>
+      <profile default="false" name="Annotation profile for commons-data-redis" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="commons-data-redis" />
+      </profile>
+      <profile default="false" name="Annotation profile for commons-data-solr" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="commons-data-solr" />
+      </profile>
+      <profile default="false" name="Annotation profile for svr-model" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="svr-model" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="commons" target="1.8" />
@@ -168,6 +188,11 @@
       <module name="commons-data-redis" target="1.8" />
       <module name="commons-data-solr" target="1.8" />
       <module name="commons-dependencies" target="1.8" />
+      <module name="commons-ehr-service" target="1.5" />
+      <module name="commons-feign-client" target="1.8" />
+      <module name="commons-thrift-client" target="1.5" />
+      <module name="commons-thrift-server" target="1.8" />
+      <module name="commons-ui-swagger" target="1.8" />
       <module name="commons-util" target="1.8" />
       <module name="movie-microservice" target="1.8" />
       <module name="rest-microservices-store" target="1.8" />
@@ -177,7 +202,7 @@
       <module name="svr-configuration" target="1.8" />
       <module name="svr-dict" target="1.8" />
       <module name="svr-discovery" target="1.8" />
-      <module name="svr-model" target="1.5" />
+      <module name="svr-model" target="1.8" />
       <module name="svr-organization" target="1.8" />
       <module name="svr-pack-mgr" target="1.8" />
       <module name="svr-resources" target="1.8" />
@@ -185,6 +210,7 @@
       <module name="svr-sso" target="1.8" />
       <module name="svr-standard" target="1.8" />
       <module name="svr-user" target="1.8" />
+      <module name="thrift.demo" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="CopyrightManager" default="" />
@@ -196,6 +222,9 @@
     <file url="file://$PROJECT_DIR$/commons-data-redis" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/commons-data-solr" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/commons-dependencies" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/commons-feign-client" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/commons-thrift-server" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/commons-ui-swagger" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/commons-util" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/movie-microservice" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rest-microservices-store" charset="UTF-8" />
@@ -213,6 +242,7 @@
     <file url="file://$PROJECT_DIR$/svr-sso" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/svr-standard" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/svr-user" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/thrift.demo" charset="UTF-8" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
   <component name="EntryPointsManager">
@@ -226,22 +256,10 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/commons/pom.xml" />
-        <option value="$PROJECT_DIR$/commons-data-mysql/pom.xml" />
-        <option value="$PROJECT_DIR$/commons-data-redis/pom.xml" />
-        <option value="$PROJECT_DIR$/commons-data-fastdfs/pom.xml" />
-        <option value="$PROJECT_DIR$/svr-standard/pom.xml" />
-        <option value="$PROJECT_DIR$/svr-resources/pom.xml" />
-        <option value="$PROJECT_DIR$/svr-discovery/pom.xml" />
-        <option value="$PROJECT_DIR$/svr-archive/pom.xml" />
-        <option value="$PROJECT_DIR$/commons-data-hbase/pom.xml" />
-        <option value="$PROJECT_DIR$/commons-data-solr/pom.xml" />
-        <option value="$PROJECT_DIR$/svr-organization/pom.xml" />
-        <option value="$PROJECT_DIR$/svr-user/pom.xml" />
         <option value="$PROJECT_DIR$/svr-pack-mgr/pom.xml" />
-        <option value="$PROJECT_DIR$/svr-sso/pom.xml" />
-        <option value="$PROJECT_DIR$/svr-configuration/pom.xml" />
-        <option value="$PROJECT_DIR$/commons-dependencies/pom.xml" />
-        <option value="$PROJECT_DIR$/commons-util/pom.xml" />
+        <option value="$PROJECT_DIR$/commons-ehr-service/pom.xml" />
+        <option value="$PROJECT_DIR$/commons-thrift-server/pom.xml" />
+        <option value="$PROJECT_DIR$/commons-thrift-client/pom.xml" />
         <option value="$PROJECT_DIR$/svr-address/pom.xml" />
         <option value="$PROJECT_DIR$/svr-app/pom.xml" />
         <option value="$PROJECT_DIR$/svr-model/pom.xml" />
@@ -249,6 +267,19 @@
         <option value="$PROJECT_DIR$/svr-dict/pom.xml" />
         <option value="$PROJECT_DIR$/movie-microservice/pom.xml" />
         <option value="$PROJECT_DIR$/rest-microservices-store/pom.xml" />
+        <option value="$PROJECT_DIR$/svr-user/pom.xml" />
+        <option value="$PROJECT_DIR$/thrift.demo/pom.xml" />
+        <option value="$PROJECT_DIR$/svr-sso/pom.xml" />
+        <option value="$PROJECT_DIR$/svr-configuration/pom.xml" />
+        <option value="$PROJECT_DIR$/commons-ui-swagger/pom.xml" />
+        <option value="$PROJECT_DIR$/svr-discovery/pom.xml" />
+        <option value="$PROJECT_DIR$/commons-data-fastdfs/pom.xml" />
+        <option value="$PROJECT_DIR$/commons-data-hbase/pom.xml" />
+        <option value="$PROJECT_DIR$/commons-data-mysql/pom.xml" />
+        <option value="$PROJECT_DIR$/commons-data-redis/pom.xml" />
+        <option value="$PROJECT_DIR$/commons-data-solr/pom.xml" />
+        <option value="$PROJECT_DIR$/commons-dependencies/pom.xml" />
+        <option value="$PROJECT_DIR$/commons-feign-client/pom.xml" />
       </list>
     </option>
   </component>
@@ -373,6 +404,13 @@
       </item>
     </group>
   </component>
+  <component name="ProjectDictionaryState">
+    <dictionary name="Witness">
+      <words>
+        <w>iface</w>
+      </words>
+    </dictionary>
+  </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
     <OptionsSetting value="true" id="Remove" />
@@ -391,6 +429,11 @@
       <module fileurl="file://$PROJECT_DIR$/commons-data-redis/commons-data-redis.iml" filepath="$PROJECT_DIR$/commons-data-redis/commons-data-redis.iml" />
       <module fileurl="file://$PROJECT_DIR$/commons-data-solr/commons-data-solr.iml" filepath="$PROJECT_DIR$/commons-data-solr/commons-data-solr.iml" />
       <module fileurl="file://$PROJECT_DIR$/commons-dependencies/commons-dependencies.iml" filepath="$PROJECT_DIR$/commons-dependencies/commons-dependencies.iml" />
+      <module fileurl="file://$PROJECT_DIR$/commons-ehr-service/commons-ehr-service.iml" filepath="$PROJECT_DIR$/commons-ehr-service/commons-ehr-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/commons-feign-client/commons-feign-client.iml" filepath="$PROJECT_DIR$/commons-feign-client/commons-feign-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/commons-thrift-client/commons-thrift-client.iml" filepath="$PROJECT_DIR$/commons-thrift-client/commons-thrift-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/commons-thrift-server/commons-thrift-server.iml" filepath="$PROJECT_DIR$/commons-thrift-server/commons-thrift-server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/commons-ui-swagger/commons-ui-swagger.iml" filepath="$PROJECT_DIR$/commons-ui-swagger/commons-ui-swagger.iml" />
       <module fileurl="file://$PROJECT_DIR$/commons-util/commons-util.iml" filepath="$PROJECT_DIR$/commons-util/commons-util.iml" />
       <module fileurl="file://$PROJECT_DIR$/movie-microservice/movie-microservice.iml" filepath="$PROJECT_DIR$/movie-microservice/movie-microservice.iml" />
       <module fileurl="file://$PROJECT_DIR$/rest-microservices-store/rest-microservices-store.iml" filepath="$PROJECT_DIR$/rest-microservices-store/rest-microservices-store.iml" />
@@ -408,6 +451,7 @@
       <module fileurl="file://$PROJECT_DIR$/svr-sso/svr-sso.iml" filepath="$PROJECT_DIR$/svr-sso/svr-sso.iml" />
       <module fileurl="file://$PROJECT_DIR$/svr-standard/svr-standard.iml" filepath="$PROJECT_DIR$/svr-standard/svr-standard.iml" />
       <module fileurl="file://$PROJECT_DIR$/svr-user/svr-user.iml" filepath="$PROJECT_DIR$/svr-user/svr-user.iml" />
+      <module fileurl="file://$PROJECT_DIR$/thrift.demo/thrift.demo.iml" filepath="$PROJECT_DIR$/thrift.demo/thrift.demo.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="false" assert-keyword="true" jdk-15="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
@@ -449,17 +493,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/aopalliance/aopalliance/1.0/aopalliance-1.0-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: asm:asm:3.1">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/asm/asm/3.1/asm-3.1.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/asm/asm/3.1/asm-3.1-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/asm/asm/3.1/asm-3.1-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: asm:asm:3.3.1">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/asm/asm/3.3.1/asm-3.3.1.jar!/" />
@@ -469,28 +502,6 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/asm/asm/3.3.1/asm-3.3.1-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: c3p0:c3p0:0.9.1.1">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/c3p0/c3p0/0.9.1.1/c3p0-0.9.1.1.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/c3p0/c3p0/0.9.1.1/c3p0-0.9.1.1-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/c3p0/c3p0/0.9.1.1/c3p0-0.9.1.1-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: cglib:cglib:3.1">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/cglib/cglib/3.1/cglib-3.1.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/cglib/cglib/3.1/cglib-3.1-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/cglib/cglib/3.1/cglib-3.1-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: ch.qos.logback:logback-classic:1.1.3">
@@ -845,17 +856,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/com/jamesmurty/utils/java-xmlbuilder/0.4/java-xmlbuilder-0.4-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: com.jayway.jsonpath:json-path:0.9.0">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/jayway/jsonpath/json-path/0.9.0/json-path-0.9.0.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/com/jayway/jsonpath/json-path/0.9.0/json-path-0.9.0-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/jayway/jsonpath/json-path/0.9.0/json-path-0.9.0-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: com.jayway.jsonpath:json-path:2.0.0">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/com/jayway/jsonpath/json-path/2.0.0/json-path-2.0.0.jar!/" />
@@ -999,17 +999,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/com/netflix/governator/governator/1.10.4/governator-1.10.4-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: com.netflix.hystrix:hystrix-core:1.4.18">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/netflix/hystrix/hystrix-core/1.4.18/hystrix-core-1.4.18.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/com/netflix/hystrix/hystrix-core/1.4.18/hystrix-core-1.4.18-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/netflix/hystrix/hystrix-core/1.4.18/hystrix-core-1.4.18-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: com.netflix.hystrix:hystrix-core:1.4.21">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/com/netflix/hystrix/hystrix-core/1.4.21/hystrix-core-1.4.21.jar!/" />
@@ -1129,17 +1118,6 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/com/netflix/servo/servo-core/0.10.0/servo-core-0.10.0-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: com.netflix.servo:servo-core:0.9.4">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/netflix/servo/servo-core/0.9.4/servo-core-0.9.4.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/com/netflix/servo/servo-core/0.9.4/servo-core-0.9.4-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/netflix/servo/servo-core/0.9.4/servo-core-0.9.4-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: com.netflix.servo:servo-internal:0.10.0">
@@ -1274,17 +1252,30 @@
         <root url="jar://$MAVEN_REPOSITORY$/com/thoughtworks/xstream/xstream/1.4.2/xstream-1.4.2-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: com.yihu.ehr:ehr-commons-data-fastdfs:0.0.1">
+    <library name="Maven: com.yihu.ehr:commons-ui-swagger:1.1.0">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/ehr-commons-data-fastdfs/0.0.1/ehr-commons-data-fastdfs-0.0.1.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/commons-ui-swagger/1.1.0/commons-ui-swagger-1.1.0.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$PROJECT_DIR$/commons-data-fastdfs/ehr-commons-data-fastdfs-0.0.1-javadoc.jar!/" />
-        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/ehr-commons-data-fastdfs/0.0.1/ehr-commons-data-fastdfs-0.0.1-javadoc.jar!/" />
+        <root url="jar://$PROJECT_DIR$/commons-ui-swagger/commons-ui-swagger-1.1.0-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/commons-ui-swagger/1.1.0/commons-ui-swagger-1.1.0-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$PROJECT_DIR$/commons-data-fastdfs/ehr-commons-data-fastdfs-0.0.1-sources.jar!/" />
-        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/ehr-commons-data-fastdfs/0.0.1/ehr-commons-data-fastdfs-0.0.1-sources.jar!/" />
+        <root url="jar://$PROJECT_DIR$/commons-ui-swagger/commons-ui-swagger-1.1.0-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/commons-ui-swagger/1.1.0/commons-ui-swagger-1.1.0-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: com.yihu.ehr:ehr-commons-data-fastdfs:1.1.0">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/ehr-commons-data-fastdfs/1.1.0/ehr-commons-data-fastdfs-1.1.0.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$PROJECT_DIR$/commons-data-fastdfs/ehr-commons-data-fastdfs-1.1.0-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/ehr-commons-data-fastdfs/1.1.0/ehr-commons-data-fastdfs-1.1.0-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$PROJECT_DIR$/commons-data-fastdfs/ehr-commons-data-fastdfs-1.1.0-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/ehr-commons-data-fastdfs/1.1.0/ehr-commons-data-fastdfs-1.1.0-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: com.yihu.ehr:ehr-commons-data-mysql:0.0.1">
@@ -1298,6 +1289,32 @@
       <SOURCES>
         <root url="jar://$PROJECT_DIR$/commons-data-mysql/ehr-commons-data-mysql-0.0.1-sources.jar!/" />
         <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/ehr-commons-data-mysql/0.0.1/ehr-commons-data-mysql-0.0.1-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: com.yihu.ehr:ehr-commons-data-mysql:1.1.0">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/ehr-commons-data-mysql/1.1.0/ehr-commons-data-mysql-1.1.0.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$PROJECT_DIR$/commons-data-mysql/ehr-commons-data-mysql-1.1.0-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/ehr-commons-data-mysql/1.1.0/ehr-commons-data-mysql-1.1.0-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$PROJECT_DIR$/commons-data-mysql/ehr-commons-data-mysql-1.1.0-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/ehr-commons-data-mysql/1.1.0/ehr-commons-data-mysql-1.1.0-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: com.yihu.ehr:ehr-commons-util:1.1.0">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/ehr-commons-util/1.1.0/ehr-commons-util-1.1.0.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$PROJECT_DIR$/commons-util/ehr-commons-util-1.1.0-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/ehr-commons-util/1.1.0/ehr-commons-util-1.1.0-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$PROJECT_DIR$/commons-util/ehr-commons-util-1.1.0-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/ehr-commons-util/1.1.0/ehr-commons-util-1.1.0-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: com.yihu.ehr:ehr-commons:0.0.1">
@@ -1348,17 +1365,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/commons-cli/commons-cli/1.2/commons-cli-1.2-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: commons-codec:commons-codec:1.10">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/commons-codec/commons-codec/1.10/commons-codec-1.10.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/commons-codec/commons-codec/1.10/commons-codec-1.10-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/commons-codec/commons-codec/1.10/commons-codec-1.10-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: commons-codec:commons-codec:1.4">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/commons-codec/commons-codec/1.4/commons-codec-1.4.jar!/" />
@@ -1397,9 +1403,11 @@
         <root url="jar://$MAVEN_REPOSITORY$/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar!/" />
       </CLASSES>
       <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/commons-codec/commons-codec/1.9/commons-codec-1.9-javadoc.jar!/" />
         <root url="jar://$MAVEN_REPOSITORY$/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/commons-codec/commons-codec/1.9/commons-codec-1.9-sources.jar!/" />
         <root url="jar://$MAVEN_REPOSITORY$/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1-sources.jar!/" />
       </SOURCES>
     </library>
@@ -1425,17 +1433,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/commons-configuration/commons-configuration/1.8/commons-configuration-1.8-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: commons-dbutils:commons-dbutils:1.6">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/commons-dbutils/commons-dbutils/1.6/commons-dbutils-1.6.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/commons-dbutils/commons-dbutils/1.6/commons-dbutils-1.6-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/commons-dbutils/commons-dbutils/1.6/commons-dbutils-1.6-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: commons-el:commons-el:1.0">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/commons-el/commons-el/1.0/commons-el-1.0.jar!/" />
@@ -1445,17 +1442,6 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/commons-el/commons-el/1.0/commons-el-1.0-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: commons-fileupload:commons-fileupload:1.3.1">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/commons-fileupload/commons-fileupload/1.3.1/commons-fileupload-1.3.1.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/commons-fileupload/commons-fileupload/1.3.1/commons-fileupload-1.3.1-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/commons-fileupload/commons-fileupload/1.3.1/commons-fileupload-1.3.1-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: commons-httpclient:commons-httpclient:3.1">
@@ -1513,17 +1499,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/commons-logging/commons-logging/1.1.3/commons-logging-1.1.3-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: commons-logging:commons-logging:1.2">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/commons-logging/commons-logging/1.2/commons-logging-1.2.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/commons-logging/commons-logging/1.2/commons-logging-1.2-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/commons-logging/commons-logging/1.2/commons-logging-1.2-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: commons-net:commons-net:3.1">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/commons-net/commons-net/3.1/commons-net-3.1.jar!/" />
@@ -1555,17 +1530,6 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/io/netty/netty-all/4.0.23.Final/netty-all-4.0.23.Final-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: io.netty:netty-all:4.0.32.Final">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/io/netty/netty-all/4.0.32.Final/netty-all-4.0.32.Final.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/io/netty/netty-all/4.0.32.Final/netty-all-4.0.32.Final-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/io/netty/netty-all/4.0.32.Final/netty-all-4.0.32.Final-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: io.netty:netty-buffer:4.0.25.Final">
@@ -1942,17 +1906,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/javax/transaction/javax.transaction-api/1.2/javax.transaction-api-1.2-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: javax.transaction:jta:1.1">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/javax/transaction/jta/1.1/jta-1.1.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/javax/transaction/jta/1.1/jta-1.1-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/javax/transaction/jta/1.1/jta-1.1-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: javax.validation:validation-api:1.1.0.Final">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/javax/validation/validation-api/1.1.0.Final/validation-api-1.1.0.Final.jar!/" />
@@ -1995,17 +1948,6 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/javax/xml/stream/stax-api/1.0-2/stax-api-1.0-2-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: jaxen:jaxen:1.1.6">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/jaxen/jaxen/1.1.6/jaxen-1.1.6.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/jaxen/jaxen/1.1.6/jaxen-1.1.6-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/jaxen/jaxen/1.1.6/jaxen-1.1.6-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: junit:junit:4.12">
@@ -2085,17 +2027,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/net/minidev/json-smart/2.1.1/json-smart-2.1.1-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: net.sf.ezmorph:ezmorph:1.0.6">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/net/sf/ezmorph/ezmorph/1.0.6/ezmorph-1.0.6.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/net/sf/ezmorph/ezmorph/1.0.6/ezmorph-1.0.6-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/net/sf/ezmorph/ezmorph/1.0.6/ezmorph-1.0.6-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: net.sf.jpam:jpam:1.1">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/net/sf/jpam/jpam/1.1/jpam-1.1.jar!/" />
@@ -2107,61 +2038,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/net/sf/jpam/jpam/1.1/jpam-1.1-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.abego.treelayout:org.abego.treelayout.core:1.0.1">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/abego/treelayout/org.abego.treelayout.core/1.0.1/org.abego.treelayout.core-1.0.1.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/abego/treelayout/org.abego.treelayout.core/1.0.1/org.abego.treelayout.core-1.0.1-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/abego/treelayout/org.abego.treelayout.core/1.0.1/org.abego.treelayout.core-1.0.1-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: org.antlr:antlr-runtime:3.5.2">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/antlr/antlr-runtime/3.5.2/antlr-runtime-3.5.2.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/antlr/antlr-runtime/3.5.2/antlr-runtime-3.5.2-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/antlr/antlr-runtime/3.5.2/antlr-runtime-3.5.2-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: org.antlr:antlr4-runtime:4.5">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/antlr/antlr4-runtime/4.5/antlr4-runtime-4.5.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/antlr/antlr4-runtime/4.5/antlr4-runtime-4.5-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/antlr/antlr4-runtime/4.5/antlr4-runtime-4.5-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: org.antlr:antlr4:4.5">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/antlr/antlr4/4.5/antlr4-4.5.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/antlr/antlr4/4.5/antlr4-4.5-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/antlr/antlr4/4.5/antlr4-4.5-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: org.antlr:ST4:4.0.8">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/antlr/ST4/4.0.8/ST4-4.0.8.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/antlr/ST4/4.0.8/ST4-4.0.8-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/antlr/ST4/4.0.8/ST4-4.0.8-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: org.apache.avro:avro:1.7.4">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/org/apache/avro/avro/1.7.4/avro-1.7.4.jar!/" />
@@ -2171,17 +2047,6 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/org/apache/avro/avro/1.7.4/avro-1.7.4-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: org.apache.commons:commons-collections4:4.0">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/apache/commons/commons-collections4/4.0/commons-collections4-4.0.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/apache/commons/commons-collections4/4.0/commons-collections4-4.0-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/apache/commons/commons-collections4/4.0/commons-collections4-4.0-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.apache.commons:commons-compress:1.4.1">
@@ -2558,17 +2423,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/apache/httpcomponents/httpclient-cache/4.2.2/httpclient-cache-4.2.2-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.apache.httpcomponents:httpclient:4.3.4">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/apache/httpcomponents/httpclient/4.3.4/httpclient-4.3.4.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/apache/httpcomponents/httpclient/4.3.4/httpclient-4.3.4-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/apache/httpcomponents/httpclient/4.3.4/httpclient-4.3.4-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: org.apache.httpcomponents:httpclient:4.5.1">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/org/apache/httpcomponents/httpclient/4.5.1/httpclient-4.5.1.jar!/" />
@@ -2690,15 +2544,15 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/apache/sshd/sshd-pam/0.11.0/sshd-pam-0.11.0-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.apache.thrift:libthrift:0.9.3">
+    <library name="Maven: org.apache.thrift:libthrift:0.9.1">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/apache/thrift/libthrift/0.9.3/libthrift-0.9.3.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/apache/thrift/libthrift/0.9.1/libthrift-0.9.1.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/apache/thrift/libthrift/0.9.3/libthrift-0.9.3-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/apache/thrift/libthrift/0.9.1/libthrift-0.9.1-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/apache/thrift/libthrift/0.9.3/libthrift-0.9.3-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/apache/thrift/libthrift/0.9.1/libthrift-0.9.1-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.apache.tomcat.embed:tomcat-embed-core:8.0.30">
@@ -2778,17 +2632,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/apache/zookeeper/zookeeper/3.4.6/zookeeper-3.4.6-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.aspectj:aspectjrt:1.8.6">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/aspectj/aspectjrt/1.8.6/aspectjrt-1.8.6.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/aspectj/aspectjrt/1.8.6/aspectjrt-1.8.6-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/aspectj/aspectjrt/1.8.6/aspectjrt-1.8.6-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: org.aspectj:aspectjrt:1.8.7">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/org/aspectj/aspectjrt/1.8.7/aspectjrt-1.8.7.jar!/" />
@@ -2798,17 +2641,6 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/org/aspectj/aspectjrt/1.8.7/aspectjrt-1.8.7-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: org.aspectj:aspectjweaver:1.8.6">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/aspectj/aspectjweaver/1.8.6/aspectjweaver-1.8.6.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/aspectj/aspectjweaver/1.8.6/aspectjweaver-1.8.6-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/aspectj/aspectjweaver/1.8.6/aspectjweaver-1.8.6-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.aspectj:aspectjweaver:1.8.7">
@@ -2899,17 +2731,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jackson/jackson-jaxrs/1.8.3/jackson-jaxrs-1.8.3-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.codehaus.jackson:jackson-jaxrs:1.9.13">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jackson/jackson-jaxrs/1.9.13/jackson-jaxrs-1.9.13.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jackson/jackson-jaxrs/1.9.13/jackson-jaxrs-1.9.13-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jackson/jackson-jaxrs/1.9.13/jackson-jaxrs-1.9.13-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: org.codehaus.jackson:jackson-mapper-asl:1.9.13">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13.jar!/" />
@@ -2930,17 +2751,6 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jackson/jackson-xc/1.8.3/jackson-xc-1.8.3-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: org.codehaus.jackson:jackson-xc:1.9.13">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jackson/jackson-xc/1.9.13/jackson-xc-1.9.13.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jackson/jackson-xc/1.9.13/jackson-xc-1.9.13-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jackson/jackson-xc/1.9.13/jackson-xc-1.9.13-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.codehaus.jettison:jettison:1.1">
@@ -3073,17 +2883,6 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/org/eclipse/jgit/org.eclipse.jgit/3.5.3.201412180710-r/org.eclipse.jgit-3.5.3.201412180710-r-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: org.eclipse.persistence:javax.persistence:2.0.0">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/eclipse/persistence/javax.persistence/2.0.0/javax.persistence-2.0.0.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/eclipse/persistence/javax.persistence/2.0.0/javax.persistence-2.0.0-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/eclipse/persistence/javax.persistence/2.0.0/javax.persistence-2.0.0-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.freemarker:freemarker:2.3.23">
@@ -3229,17 +3028,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/jboss/logging/jboss-logging-annotations/1.2.0.Beta1/jboss-logging-annotations-1.2.0.Beta1-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.jboss.logging:jboss-logging:3.1.3.GA">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/jboss/logging/jboss-logging/3.1.3.GA/jboss-logging-3.1.3.GA.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/jboss/logging/jboss-logging/3.1.3.GA/jboss-logging-3.1.3.GA-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/jboss/logging/jboss-logging/3.1.3.GA/jboss-logging-3.1.3.GA-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: org.jboss.logging:jboss-logging:3.3.0.Final">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/org/jboss/logging/jboss-logging/3.3.0.Final/jboss-logging-3.3.0.Final.jar!/" />
@@ -3361,17 +3149,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/objenesis/objenesis/2.1/objenesis-2.1-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.ow2.asm:asm:4.2">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/ow2/asm/asm/4.2/asm-4.2.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/ow2/asm/asm/4.2/asm-4.2-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/ow2/asm/asm/4.2/asm-4.2-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: org.ow2.asm:asm:5.0.4">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/org/ow2/asm/asm/5.0.4/asm-5.0.4.jar!/" />
@@ -3381,17 +3158,6 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/org/ow2/asm/asm/5.0.4/asm-5.0.4-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: org.quartz-scheduler:quartz:2.0.1">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/quartz-scheduler/quartz/2.0.1/quartz-2.0.1.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/quartz-scheduler/quartz/2.0.1/quartz-2.0.1-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/quartz-scheduler/quartz/2.0.1/quartz-2.0.1-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.reactivestreams:reactive-streams:1.0.0">
@@ -3883,9 +3649,11 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-netflix-eureka-server/1.1.0.BUILD-SNAPSHOT/spring-cloud-netflix-eureka-server-1.1.0.BUILD-20151223.011903-213.jar!/" />
       </CLASSES>
       <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-netflix-eureka-server/1.1.0.M3/spring-cloud-netflix-eureka-server-1.1.0.M3-javadoc.jar!/" />
         <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-netflix-eureka-server/1.1.0.BUILD-SNAPSHOT/spring-cloud-netflix-eureka-server-1.1.0.BUILD-20151223.011903-213-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-netflix-eureka-server/1.1.0.M3/spring-cloud-netflix-eureka-server-1.1.0.M3-sources.jar!/" />
         <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-netflix-eureka-server/1.1.0.BUILD-SNAPSHOT/spring-cloud-netflix-eureka-server-1.1.0.BUILD-20151223.011903-213-sources.jar!/" />
       </SOURCES>
     </library>
@@ -4395,17 +4163,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-aspects/4.2.4.RELEASE/spring-aspects-4.2.4.RELEASE-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.springframework:spring-beans:4.1.8.RELEASE">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-beans/4.1.8.RELEASE/spring-beans-4.1.8.RELEASE.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-beans/4.1.8.RELEASE/spring-beans-4.1.8.RELEASE-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-beans/4.1.8.RELEASE/spring-beans-4.1.8.RELEASE-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: org.springframework:spring-beans:4.2.4.RELEASE">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-beans/4.2.4.RELEASE/spring-beans-4.2.4.RELEASE.jar!/" />
@@ -4415,17 +4172,6 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-beans/4.2.4.RELEASE/spring-beans-4.2.4.RELEASE-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: org.springframework:spring-context-support:4.1.5.RELEASE">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-context-support/4.1.5.RELEASE/spring-context-support-4.1.5.RELEASE.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-context-support/4.1.5.RELEASE/spring-context-support-4.1.5.RELEASE-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-context-support/4.1.5.RELEASE/spring-context-support-4.1.5.RELEASE-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.springframework:spring-context-support:4.2.4.RELEASE">
@@ -4528,17 +4274,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-test/4.2.4.RELEASE/spring-test-4.2.4.RELEASE-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.springframework:spring-tx:4.1.9.RELEASE">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-tx/4.1.9.RELEASE/spring-tx-4.1.9.RELEASE.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-tx/4.1.9.RELEASE/spring-tx-4.1.9.RELEASE-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-tx/4.1.9.RELEASE/spring-tx-4.1.9.RELEASE-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: org.springframework:spring-tx:4.2.4.RELEASE">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-tx/4.2.4.RELEASE/spring-tx-4.2.4.RELEASE.jar!/" />
@@ -4627,17 +4362,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/stax/stax-api/1.0.1/stax-api-1.0.1-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: taglibs:standard:1.1.2">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/taglibs/standard/1.1.2/standard-1.1.2.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/taglibs/standard/1.1.2/standard-1.1.2-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/taglibs/standard/1.1.2/standard-1.1.2-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: xml-apis:xml-apis:1.0.b2">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2.jar!/" />
@@ -4647,17 +4371,6 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: xml-apis:xml-apis:1.4.01">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/xml-apis/xml-apis/1.4.01/xml-apis-1.4.01.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/xml-apis/xml-apis/1.4.01/xml-apis-1.4.01-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/xml-apis/xml-apis/1.4.01/xml-apis-1.4.01-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: xmlenc:xmlenc:0.52">
