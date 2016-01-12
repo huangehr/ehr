@@ -10,12 +10,12 @@
     </parent>
 
 	<groupId>com.yihu.ehr</groupId>
-	<artifactId>svr-log</artifactId>
+	<artifactId>svr-tracing</artifactId>
 	<version>1.1.0</version>
 	<packaging>jar</packaging>
 
-	<name>svr-log</name>
-	<description>EHR platform log service, based on sleuth.</description>
+	<name>svr-tracing</name>
+	<description>EHR platform tracing service, based on sleuth, which could used for logging, system tracing.</description>
 
 	<properties>
 	</properties>
@@ -76,12 +76,6 @@
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>ehr-commons-thrift-server</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>ehr-commons-thrift-client</artifactId>
             <version>1.1.0</version>
         </dependency>
 	</dependencies>
