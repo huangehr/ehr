@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -55,25 +54,17 @@ public class JsonPackageServiceRestController extends BaseRestController {
             @ApiParam(required = true, name = "user_name", value = "用户名")
             @RequestParam(value = "user_name") String userName,
             @ApiParam(required = true, name = "package_crypto", value = "档案包解压密码,二次加密")
-            @RequestParam(value = "package_crypto") String packageCrypto) {
+            @RequestParam(value = "package_crypto") String packageCrypto) throws Exception {
 
-        try {
-            MultipartFile file = jsonPackage.getFile("file");
-            //if(file == null) throw new InvalidArgumentException({"file"});
+        MultipartFile file = jsonPackage.getFile("file");
+        //if(file == null) throw new InvalidArgumentException({"file"});
 
-            //XUserSecurity userSecurity = securityManager.getUserSecurityByUserName(userName);
-            //if (null == userSecurity) return failed(ErrorCode.GenerateUserKeyFailed);
+        //XUserSecurity userSecurity = securityManager.getUserSecurityByUserName(userName);
+        //if (null == userSecurity) return failed(ErrorCode.GenerateUserKeyFailed);
 
-            String privateKey = "";// = userSecurity.getPrivateKey();
-            String unzipPwd = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
-            jsonPackageService.receive(file.getInputStream(), unzipPwd);
-
-            return null;
-        } catch (IOException e) {
-            failed(ErrorCode.SaveArchiveFailed, e.getMessage());
-        } catch (Exception e) {
-            failed(ErrorCode.ParseArchiveCryptoFailed, e.getMessage());
-        }
+        String privateKey = "";// = userSecurity.getPrivateKey();
+        String unzipPwd = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
+        jsonPackageService.receive(file.getInputStream(), unzipPwd);
 
         return null;
     }

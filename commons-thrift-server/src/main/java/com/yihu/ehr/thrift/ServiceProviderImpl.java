@@ -1,5 +1,6 @@
 package com.yihu.ehr.thrift;
 
+import com.yihu.ehr.lang.ServiceProvider;
 import org.apache.thrift.TException;
 
 import java.util.ArrayList;

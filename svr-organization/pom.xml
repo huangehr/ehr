@@ -2,6 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.yihu.ehr</groupId>
+        <artifactId>ehr-commons-dependencies</artifactId>
+        <version>1.1.0</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
 
 	<groupId>com.yihu.ehr</groupId>
 	<artifactId>svr-organization</artifactId>
@@ -10,13 +16,6 @@
 
 	<name>svr-organization</name>
 	<description>EHR platform organization service.</description>
-
-	<parent>
-		<groupId>com.yihu.ehr</groupId>
-		<artifactId>ehr-commons-dependencies</artifactId>
-		<version>1.1.0</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -103,20 +102,10 @@
 			<artifactId>spring-cloud-starter-feign</artifactId>
 		</dependency>
 
-
-
-
 		<dependency>
 			<groupId>com.yihu.ehr</groupId>
-			<artifactId>svr-model</artifactId>
+			<artifactId>ehr-commons-rest-model</artifactId>
 			<version>1.1.0</version>
 		</dependency>
-
-		<!--<dependency>-->
-			<!--<groupId>com.yihu.ehr</groupId>-->
-			<!--<artifactId>svr-address</artifactId>-->
-			<!--<version>1.1.0</version>-->
-		<!--</dependency>-->
-
 	</dependencies>
 </project>
