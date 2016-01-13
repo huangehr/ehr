@@ -51,92 +51,92 @@
         <processorPath useClasspath="true" />
       </profile>
       <profile default="false" name="Annotation profile for svr-configuration" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <sourceOutputDir name="target\generated-sources\annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="svr-configuration" />
       </profile>
       <profile default="false" name="Annotation profile for commons-util" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <sourceOutputDir name="target\generated-sources\annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="commons-util" />
       </profile>
       <profile default="false" name="Annotation profile for commons-thrift-client" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <sourceOutputDir name="target\generated-sources\annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="commons-thrift-client" />
       </profile>
       <profile default="false" name="Annotation profile for commons-thrift-server" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <sourceOutputDir name="target\generated-sources\annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="commons-thrift-server" />
       </profile>
       <profile default="false" name="Annotation profile for commons-data-mysql" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <sourceOutputDir name="target\generated-sources\annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="commons-data-mysql" />
       </profile>
       <profile default="false" name="Annotation profile for commons-data-redis" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <sourceOutputDir name="target\generated-sources\annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="commons-data-redis" />
       </profile>
       <profile default="false" name="Annotation profile for commons-data-fastdfs" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <sourceOutputDir name="target\generated-sources\annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="commons-data-fastdfs" />
       </profile>
       <profile default="false" name="Annotation profile for svr-discovery" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <sourceOutputDir name="target\generated-sources\annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="svr-discovery" />
       </profile>
       <profile default="false" name="Annotation profile for svr-standard" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <sourceOutputDir name="target\generated-sources\annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="svr-standard" />
       </profile>
       <profile default="false" name="Annotation profile for commons-ui-swagger" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <sourceOutputDir name="target\generated-sources\annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="commons-ui-swagger" />
       </profile>
       <profile default="false" name="Annotation profile for svr-user" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <sourceOutputDir name="target\generated-sources\annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="svr-user" />
       </profile>
       <profile default="false" name="Annotation profile for commons-data-hbase" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <sourceOutputDir name="target\generated-sources\annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="commons-data-hbase" />
       </profile>
       <profile default="false" name="Annotation profile for commons-data-solr" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <sourceOutputDir name="target\generated-sources\annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="commons-data-solr" />
@@ -147,29 +147,51 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
       </profile>
-      <profile default="false" name="Annotation profile for commons-ehr-service" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="true" />
-        <module name="commons-ehr-service" />
-      </profile>
       <profile default="false" name="Annotation profile for svr-resources" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <sourceOutputDir name="target\generated-sources\annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="svr-resources" />
       </profile>
       <profile default="false" name="Annotation profile for svr-organization" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <sourceOutputDir name="target\generated-sources\annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="svr-organization" />
       </profile>
+      <profile default="false" name="Annotation profile for svr-model" enabled="true">
+        <sourceOutputDir name="target\generated-sources\annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="svr-model" />
+      </profile>
+      <profile default="false" name="Annotation profile for svr-app" enabled="true">
+        <sourceOutputDir name="target\generated-sources\annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="svr-app" />
+      </profile>
+      <profile default="false" name="Annotation profile for svr-dict" enabled="true">
+        <sourceOutputDir name="target\generated-sources\annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="svr-dict" />
+      </profile>
+      <profile default="false" name="Annotation profile for ag-admin" enabled="true">
+        <sourceOutputDir name="target\generated-sources\annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="ag-admin" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="ag-admin" target="1.8" />
       <module name="commons" target="1.8" />
       <module name="commons-data-fastdfs" target="1.8" />
       <module name="commons-data-hbase" target="1.8" />
@@ -178,16 +200,20 @@
       <module name="commons-data-solr" target="1.8" />
       <module name="commons-dependencies" target="1.8" />
       <module name="commons-ehr-constants" target="1.5" />
-      <module name="commons-ehr-service" target="1.8" />
+      <module name="commons-ehr-service" target="1.5" />
       <module name="commons-thrift-client" target="1.8" />
       <module name="commons-thrift-server" target="1.8" />
       <module name="commons-thrift-service" target="1.8" />
       <module name="commons-ui-swagger" target="1.8" />
       <module name="commons-util" target="1.8" />
+      <module name="demo" target="1.8" />
       <module name="ehr.thrift.demo" target="1.8" />
+      <module name="svr-app" target="1.8" />
       <module name="svr-archive" target="1.8" />
       <module name="svr-configuration" target="1.8" />
+      <module name="svr-dict" target="1.8" />
       <module name="svr-discovery" target="1.8" />
+      <module name="svr-model" target="1.8" />
       <module name="svr-organization" target="1.8" />
       <module name="svr-pack-mgr" target="1.8" />
       <module name="svr-resources" target="1.8" />
@@ -199,6 +225,9 @@
   </component>
   <component name="CopyrightManager" default="" />
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/../../Files/ehr/ehr/ag-admin" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ag-admin" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ag-admin" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/commons-data-fastdfs" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/commons-data-hbase" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/commons-data-hbase/src/main/java/com/yihu/ehr/data/ResultWrapper.java" charset="UTF-8" />
@@ -211,9 +240,13 @@
     <file url="file://$PROJECT_DIR$/commons-thrift-services" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/commons-ui-swagger" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/commons-util" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/demo" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/svr-app" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/svr-archive" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/svr-configuration" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/svr-dict" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/svr-discovery" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/svr-model" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/svr-organization" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/svr-pack-mgr" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/svr-resources" charset="UTF-8" />
@@ -254,6 +287,10 @@
         <option value="$PROJECT_DIR$/svr-archive/pom.xml" />
         <option value="$PROJECT_DIR$/commons-data-hbase/pom.xml" />
         <option value="$PROJECT_DIR$/commons-thrift-client/pom.xml" />
+        <option value="$PROJECT_DIR$/svr-model/pom.xml" />
+        <option value="$PROJECT_DIR$/svr-app/pom.xml" />
+        <option value="$PROJECT_DIR$/svr-dict/pom.xml" />
+        <option value="$PROJECT_DIR$/ag-admin/pom.xml" />
       </list>
     </option>
   </component>
@@ -397,6 +434,7 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/ag-admin/ag-admin.iml" filepath="$PROJECT_DIR$/ag-admin/ag-admin.iml" />
       <module fileurl="file://$PROJECT_DIR$/commons-data-fastdfs/commons-data-fastdfs.iml" filepath="$PROJECT_DIR$/commons-data-fastdfs/commons-data-fastdfs.iml" />
       <module fileurl="file://$PROJECT_DIR$/commons-data-hbase/commons-data-hbase.iml" filepath="$PROJECT_DIR$/commons-data-hbase/commons-data-hbase.iml" />
       <module fileurl="file://$PROJECT_DIR$/commons-data-mysql/commons-data-mysql.iml" filepath="$PROJECT_DIR$/commons-data-mysql/commons-data-mysql.iml" />
@@ -404,11 +442,9 @@
       <module fileurl="file://$PROJECT_DIR$/commons-data-solr/commons-data-solr.iml" filepath="$PROJECT_DIR$/commons-data-solr/commons-data-solr.iml" />
       <module fileurl="file://$PROJECT_DIR$/commons-dependencies/commons-dependencies.iml" filepath="$PROJECT_DIR$/commons-dependencies/commons-dependencies.iml" />
       <module fileurl="file://$PROJECT_DIR$/commons-ehr-constants/commons-ehr-constants.iml" filepath="$PROJECT_DIR$/commons-ehr-constants/commons-ehr-constants.iml" />
-      <module fileurl="file://$PROJECT_DIR$/commons-thrift-service/commons-ehr-service.iml" filepath="$PROJECT_DIR$/commons-thrift-service/commons-ehr-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/commons-feign-client/commons-feign-client.iml" filepath="$PROJECT_DIR$/commons-feign-client/commons-feign-client.iml" />
       <module fileurl="file://$PROJECT_DIR$/commons-thrift-client/commons-thrift-client.iml" filepath="$PROJECT_DIR$/commons-thrift-client/commons-thrift-client.iml" />
       <module fileurl="file://$PROJECT_DIR$/commons-thrift-server/commons-thrift-server.iml" filepath="$PROJECT_DIR$/commons-thrift-server/commons-thrift-server.iml" />
-      <module fileurl="file://$PROJECT_DIR$/commons-thrift-services/commons-thrift-service.iml" filepath="$PROJECT_DIR$/commons-thrift-services/commons-thrift-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/commons-ui-swagger/commons-ui-swagger.iml" filepath="$PROJECT_DIR$/commons-ui-swagger/commons-ui-swagger.iml" />
       <module fileurl="file://$PROJECT_DIR$/commons-util/commons-util.iml" filepath="$PROJECT_DIR$/commons-util/commons-util.iml" />
       <module fileurl="file://$PROJECT_DIR$/svr-address/svr-address.iml" filepath="$PROJECT_DIR$/svr-address/svr-address.iml" />
@@ -440,6 +476,13 @@
     <library name="lib">
       <CLASSES>
         <root url="file://$PROJECT_DIR$/commons-data-fastdfs/lib" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="maven-wrapper">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../../Files/ehr/ehr/ag-admin/.mvn/wrapper/maven-wrapper.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
@@ -972,6 +1015,28 @@
         <root url="jar://$MAVEN_REPOSITORY$/com/netflix/hystrix/hystrix-core/1.4.21/hystrix-core-1.4.21-sources.jar!/" />
       </SOURCES>
     </library>
+    <library name="Maven: com.netflix.hystrix:hystrix-javanica:1.4.21">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/netflix/hystrix/hystrix-javanica/1.4.21/hystrix-javanica-1.4.21.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/com/netflix/hystrix/hystrix-javanica/1.4.21/hystrix-javanica-1.4.21-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/netflix/hystrix/hystrix-javanica/1.4.21/hystrix-javanica-1.4.21-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: com.netflix.hystrix:hystrix-metrics-event-stream:1.4.21">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/netflix/hystrix/hystrix-metrics-event-stream/1.4.21/hystrix-metrics-event-stream-1.4.21.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/com/netflix/hystrix/hystrix-metrics-event-stream/1.4.21/hystrix-metrics-event-stream-1.4.21-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/netflix/hystrix/hystrix-metrics-event-stream/1.4.21/hystrix-metrics-event-stream-1.4.21-sources.jar!/" />
+      </SOURCES>
+    </library>
     <library name="Maven: com.netflix.netflix-commons:netflix-commons-util:0.1.1">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/com/netflix/netflix-commons/netflix-commons-util/0.1.1/netflix-commons-util-0.1.1.jar!/" />
@@ -1091,6 +1156,17 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/com/netflix/servo/servo-internal/0.10.0/servo-internal-0.10.0-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: com.netflix.zuul:zuul-core:1.1.0">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/netflix/zuul/zuul-core/1.1.0/zuul-core-1.1.0.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/com/netflix/zuul/zuul-core/1.1.0/zuul-core-1.1.0-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/netflix/zuul/zuul-core/1.1.0/zuul-core-1.1.0-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: com.sun.jersey.contribs:jersey-apache-client4:1.19">
@@ -1325,17 +1401,6 @@
       <SOURCES>
         <root url="jar://$PROJECT_DIR$/commons-util/ehr-commons-1.1.0-sources.jar!/" />
         <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/ehr-commons/1.1.0/ehr-commons-1.1.0-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: com.yihu.ehr:svr-model:1.1.0">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/svr-model/1.1.0/svr-model-1.1.0.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/svr-model/1.1.0/svr-model-1.1.0-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/yihu/ehr/svr-model/1.1.0/svr-model-1.1.0-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: commons-beanutils:commons-beanutils:1.9.2">
@@ -3626,6 +3691,17 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-starter-feign/1.1.0.M4/spring-cloud-starter-feign-1.1.0.M4-sources.jar!/" />
       </SOURCES>
     </library>
+    <library name="Maven: org.springframework.cloud:spring-cloud-starter-hystrix:1.1.0.M4">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-starter-hystrix/1.1.0.M4/spring-cloud-starter-hystrix-1.1.0.M4.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-starter-hystrix/1.1.0.M4/spring-cloud-starter-hystrix-1.1.0.M4-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-starter-hystrix/1.1.0.M4/spring-cloud-starter-hystrix-1.1.0.M4-sources.jar!/" />
+      </SOURCES>
+    </library>
     <library name="Maven: org.springframework.cloud:spring-cloud-starter-oauth2:1.1.0.M3">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-starter-oauth2/1.1.0.M3/spring-cloud-starter-oauth2-1.1.0.M3.jar!/" />
@@ -3657,6 +3733,17 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-starter-security/1.1.0.M3/spring-cloud-starter-security-1.1.0.M3-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.springframework.cloud:spring-cloud-starter-zuul:1.1.0.M4">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-starter-zuul/1.1.0.M4/spring-cloud-starter-zuul-1.1.0.M4.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-starter-zuul/1.1.0.M4/spring-cloud-starter-zuul-1.1.0.M4-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-starter-zuul/1.1.0.M4/spring-cloud-starter-zuul-1.1.0.M4-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.springframework.cloud:spring-cloud-starter:1.1.0.M4">
@@ -3767,6 +3854,17 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/org/springframework/data/spring-data-jpa/1.9.1.RELEASE/spring-data-jpa-1.9.1.RELEASE-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.springframework.data:spring-data-jpa:1.9.2.RELEASE">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/data/spring-data-jpa/1.9.2.RELEASE/spring-data-jpa-1.9.2.RELEASE.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/data/spring-data-jpa/1.9.2.RELEASE/spring-data-jpa-1.9.2.RELEASE-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/springframework/data/spring-data-jpa/1.9.2.RELEASE/spring-data-jpa-1.9.2.RELEASE-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.springframework.data:spring-data-redis:1.6.2.RELEASE">
