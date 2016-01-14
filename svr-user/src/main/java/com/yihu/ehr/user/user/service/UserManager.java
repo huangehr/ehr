@@ -1,12 +1,17 @@
-package com.yihu.ehr.user.user.model;
+package com.yihu.ehr.user.user.service;
 
 import com.yihu.ehr.model.BaseDict;
 import com.yihu.ehr.util.ApiErrorEcho;
 import com.yihu.ehr.util.encode.HashUtil;
+import org.hibernate.Query;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.util.*;
 
@@ -22,15 +27,15 @@ import java.util.*;
 @Transactional
 public class UserManager  {
 
-//    @Autowired
-//    private XUserRepository userRepository;
+    @Autowired
+    private XUserRepository userRepository;
 
 
     @Autowired
     private ConventionalDictClient conventionalDictClient;
 
-//    @PersistenceContext
-//    protected EntityManager entityManager;
+    @PersistenceContext
+    protected EntityManager entityManager;
 
     //@Value("default.password")
     private String default_password = "123456";
@@ -41,17 +46,16 @@ public class UserManager  {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     private int countRecordByField(String fieldName, String value){
-//        String hql = "select count(*) from User where " + fieldName + " = :value";
-//
-//        Session session = entityManager.unwrap(org.hibernate.Session.class);
-//        Query query = session.createQuery(hql);
-//        query.setString("value", value);
-//
-//        Object ret = query.uniqueResult();
-//        if(ret == null) return 0;
-//
-//        return Integer.parseInt(ret.toString());
-        return 1;
+        String hql = "select count(*) from User where " + fieldName + " = :value";
+
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        Query query = session.createQuery(hql);
+        query.setString("value", value);
+
+        Object ret = query.uniqueResult();
+        if(ret == null) return 0;
+
+        return Integer.parseInt(ret.toString());
     }
 
 
@@ -75,7 +79,7 @@ public class UserManager  {
         user.setPassword(HashUtil.hashStr(pwd));
         user.setEmail(email);
         user.setActivated(true);
-        //userRepository.save(user);
+        userRepository.save(user);
         return user;
     }
 
@@ -92,8 +96,7 @@ public class UserManager  {
      * @param userId
      */
     public User getUser(String userId) {
-        User user = new User();
-//        User user = userRepository.findOne(userId);
+        User user = userRepository.findOne(userId);
         return user;
     }
 
@@ -154,18 +157,17 @@ public class UserManager  {
     @Transactional(Transactional.TxType.SUPPORTS)
     public User getUserByLoginCode(String loginCode) {
 
-//        Map<String,String> map =new HashMap<>();
-//        Session session = entityManager.unwrap(org.hibernate.Session.class);
-//        Query query = session.createQuery("from User where loginCode = :loginCode");
-//
-//        List<User> userList = query.setString("loginCode", loginCode).list();
-//
-//        if(userList.size()== 0) {
-//            return null;
-//        }else {
-//            return userList.get(0);
-//        }
-        return null;
+        Map<String,String> map =new HashMap<>();
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        Query query = session.createQuery("from User where loginCode = :loginCode");
+
+        List<User> userList = query.setString("loginCode", loginCode).list();
+
+        if(userList.size()== 0) {
+            return null;
+        }else {
+            return userList.get(0);
+        }
     }
 
     /**
@@ -177,19 +179,18 @@ public class UserManager  {
     @Transactional(Transactional.TxType.SUPPORTS)
     public User getUserByCodeAndEmail(String loginCode, String email) {
 
-//        Map<String,String> map =new HashMap<>();
-//        Session session = entityManager.unwrap(org.hibernate.Session.class);
-//        Query query = session.createQuery("from User where loginCode = :loginCode and email = :email");
-//        query.setString("loginCode", loginCode);
-//        query.setString("email", email);
-//        List<User> userList = query.list();
-//
-//        if(userList.size()== 0) {
-//            return null;
-//        } else {
-//            return userList.get(0);
-//        }
-        return null;
+        Map<String,String> map =new HashMap<>();
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        Query query = session.createQuery("from User where loginCode = :loginCode and email = :email");
+        query.setString("loginCode", loginCode);
+        query.setString("email", email);
+        List<User> userList = query.list();
+
+        if(userList.size()== 0) {
+            return null;
+        } else {
+            return userList.get(0);
+        }
     }
 
     public String hashPassword(String pwd) {
@@ -238,35 +239,33 @@ public class UserManager  {
     public List<User> searchUser(Map<String, Object> args) {
 
         //// TODO: 2016/1/12 这里要查询机构服务接口根据条件查询机构服务列表
-//        Session session = entityManager.unwrap(org.hibernate.Session.class);
-//        String realName = (String) args.get("realName");
-//        //String organization = (String) args.get("organization");
-//        String fullName = (String) args.get("organization");
-//        String shortName = (String) args.get("organization");
-//        String type = (String) args.get("type");
-//        Integer page = (Integer) args.get("page");
-//        Integer pageSize = (Integer) args.get("pageSize");
-//        //String hql = "from AbstractUser where (realName like :realName or organization like :organization)";
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        String realName = (String) args.get("realName");
+        String fullName = (String) args.get("organization");
+        String shortName = (String) args.get("organization");
+        String type = (String) args.get("type");
+        Integer page = (Integer) args.get("page");
+        Integer pageSize = (Integer) args.get("pageSize");
 //        String hql = "from User where (realName like :realName or organization in " +
 //                "(from Organization where fullName like :fullName or shortName like :shortName ))";
-//        if (!StringUtils.isEmpty(type)) {
-//            hql += " and userType = :userType";
-//        }
-//        Query query = session.createQuery(hql);
-//        query.setString("realName", "%"+realName+"%");
-//        //query.setString("organization", "%"+organization+"%");
-//        query.setString("fullName","%"+fullName+"%");
-//        query.setString("shortName","%"+shortName+"%");
-//        if (!StringUtils.isEmpty(type)) {
-//            //query.setParameter("userType", UserType.valueOf(type));
-//            query.setParameter("userType", type);
-//        }
-//
-//        query.setMaxResults(pageSize);
-//        query.setFirstResult((page - 1) * pageSize);
-//
-//        return query.list();
-        return null;
+        String hql = "from User where realName like :realName ";
+        if (!StringUtils.isEmpty(type)) {
+            hql += " and userType = :userType";
+        }
+        Query query = session.createQuery(hql);
+        query.setString("realName", "%"+realName+"%");
+        //query.setString("organization", "%"+organization+"%");
+        query.setString("fullName","%"+fullName+"%");
+        query.setString("shortName","%"+shortName+"%");
+        if (!StringUtils.isEmpty(type)) {
+            //query.setParameter("userType", UserType.valueOf(type));
+            query.setParameter("userType", type);
+        }
+
+        query.setMaxResults(pageSize);
+        query.setFirstResult((page - 1) * pageSize);
+
+        return query.list();
     }
 
     /**
@@ -314,22 +313,21 @@ public class UserManager  {
     @Transactional(Transactional.TxType.SUPPORTS)
     public Integer searchUserInt(Map<String, Object> args) {
 
-//        Session session = entityManager.unwrap(org.hibernate.Session.class);
-//        String realName = (String) args.get("realName");
-//        String organization = (String) args.get("organization");
-//        String type = (String) args.get("type");
-//        String hql = "select count(*) from User where (realName like :realName or organization like :organization) ";
-//        if (!StringUtils.isEmpty(type)) {
-//            hql += " and userType = :userType";
-//        }
-//        Query query = session.createQuery(hql);
-//        query.setString("realName", "%"+realName+"%");
-//        query.setString("organization", "%"+organization+"%");
-//        if (!StringUtils.isEmpty(type)) {
-//            query.setParameter("userType", type);
-//        }
-//        return Integer.parseInt(query.list().get(0).toString());
-        return null;
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        String realName = (String) args.get("realName");
+        String organization = (String) args.get("organization");
+        String type = (String) args.get("type");
+        String hql = "select count(*) from User where (realName like :realName or organization like :organization) ";
+        if (!StringUtils.isEmpty(type)) {
+            hql += " and userType = :userType";
+        }
+        Query query = session.createQuery(hql);
+        query.setString("realName", "%"+realName+"%");
+        query.setString("organization", "%"+organization+"%");
+        if (!StringUtils.isEmpty(type)) {
+            query.setParameter("userType", type);
+        }
+        return Integer.parseInt(query.list().get(0).toString());
     }
 
 
@@ -371,49 +369,36 @@ public class UserManager  {
         if(user instanceof MedicalUser){
             ((MedicalUser)user).setMajor(userModel.getMajor());
         }
-        //userRepository.save(user);
+        userRepository.save(user);
 
 
     }
 
     public User resetPassword(User user){
-        user.setPassword(default_password);
+        user.setPassword(hashPassword(default_password));
         return user;
     }
 
     public void resetPass(String userId) {
-//        User user = userRepository.findOne(userId);
-//        resetPassword(user);
-//        userRepository.save(user);
+        User user = userRepository.findOne(userId);
+        resetPassword(user);
+        userRepository.save(user);
     }
 
 
     public void updateUser(User user) {
-//        userRepository.save(user);
+        userRepository.save(user);
     }
 
     public void deleteUser(String userId) {
 
-        //userRepository.delete(userId);
+        userRepository.delete(userId);
     }
 
     public void activityUser(String userId, boolean activity) {
-//        User user = userRepository.findOne(userId);
-//        user.setActivated(activity);
-//        userRepository.save(user);
-    }
-
-    public void acquire() {
-    }
-
-    public <T> T queryInterface(Class<T> type) {
-        if (type.isInterface() && type.isInstance(this)) {
-            return (T) this;
-        }
-        return null;
-    }
-
-    public void release() {
+        User user = userRepository.findOne(userId);
+        user.setActivated(activity);
+        userRepository.save(user);
     }
 
     /**
@@ -426,19 +411,18 @@ public class UserManager  {
         if (StringUtils.isEmpty(userId)) {
             return false;
         } else {
-//            User user = userRepository.findOne(userId);
-//            user.setLastLoginTime(lastLoginTime);
-//            userRepository.save(user);
+            User user = userRepository.findOne(userId);
+            user.setLastLoginTime(lastLoginTime);
+            userRepository.save(user);
             return true;
         }
     }
 
     public List<User> searchUser(String loginCode, String searchNm){
-//        Session session = entityManager.unwrap(org.hibernate.Session.class);
-//        String sql = "select * from users where "+loginCode+" ="+ "'"+searchNm+"'";
-//        SQLQuery sqlQuery = session.createSQLQuery(sql);
-//        List userList = sqlQuery.list();
-//        return userList;
-        return null;
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        String sql = "select * from users where "+loginCode+" ="+ "'"+searchNm+"'";
+        SQLQuery sqlQuery = session.createSQLQuery(sql);
+        List userList = sqlQuery.list();
+        return userList;
     }
 }

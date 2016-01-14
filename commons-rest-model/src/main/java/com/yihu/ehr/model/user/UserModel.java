@@ -1,4 +1,4 @@
-package com.yihu.ehr.model;
+package com.yihu.ehr.model.user;
 
 import java.util.Date;
 
@@ -8,7 +8,7 @@ import java.util.Date;
  * @version 1.0
  * @updated 02-6月-2015 20:25:02
  */
-public class User  {
+public class UserModel {
 
     private String id;
 
@@ -38,7 +38,7 @@ public class User  {
 
     private String idCardNo;
 
-    public User() {
+    public UserModel() {
 
     }
 

@@ -1,5 +1,7 @@
 package com.yihu.ehr.user.user.model;
 
+import com.yihu.ehr.user.user.service.User;
+
 /**
  * 平台运维用户及管理员。
  * @author Sand

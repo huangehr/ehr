@@ -1,4 +1,4 @@
-package com.yihu.ehr.model;
+package com.yihu.ehr.model.security;
 
 import java.util.Date;
 

@@ -1,6 +1,8 @@
 package com.yihu.ehr.user.user.model;
 
 
+import com.yihu.ehr.user.user.service.User;
+
 /**
  * 政府用户
  * @author Sand

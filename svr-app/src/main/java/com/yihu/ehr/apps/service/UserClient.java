@@ -1,4 +1,4 @@
-package com.yihu.ehr.user.user.model;
+package com.yihu.ehr.apps.service;
 
 import com.yihu.ehr.model.BaseDict;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -11,7 +11,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  * Created by Administrator on 2016/1/4.
  */
 @FeignClient("svr-dict")
-public interface ConventionalDictClient {
+public interface UserClient {
 
     @RequestMapping(value = "/conventional_dict_service/getOrgType", method = GET,consumes = "application/json")
     BaseDict getOrgType(@RequestParam(value = "code") String code);
@@ -26,7 +26,11 @@ public interface ConventionalDictClient {
     BaseDict getAppStatus(@RequestParam(value = "code") String code);
 
 
-    @RequestMapping(value = "/conventional_dict_service/getUserType", method = GET,consumes = "application/json")
-    BaseDict getUserType(@RequestParam(value = "code") String code);
+
+
+
+
+
+
 
 }

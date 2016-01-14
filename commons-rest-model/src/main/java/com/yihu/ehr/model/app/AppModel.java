@@ -1,4 +1,4 @@
-package com.yihu.ehr.apps.service;
+package com.yihu.ehr.model.app;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.yihu.ehr.user.user.model;
+package com.yihu.ehr.user.user.service;
 
 
 public class UserModel {

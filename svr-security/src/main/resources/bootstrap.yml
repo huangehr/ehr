@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: svr-org
+
+  cloud:
+    config:
+      username: user
+      password: configuration
+      uri: http://localhost:1221
+      label: dev
+

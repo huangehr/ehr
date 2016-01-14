@@ -1,6 +1,7 @@
-package com.yihu.ehr.user.user.model;
+package com.yihu.ehr.user.user.service;
+import org.hibernate.annotations.GenericGenerator;
 
-
+import javax.persistence.*;
 import java.util.Date;
 import java.util.UUID;
 
@@ -9,9 +10,9 @@ import java.util.UUID;
  * @version 1.0
  * @updated 02-6月-2015 20:25:02
  */
-//@Entity
-//@Table(name = "users")
-//@Access(value = AccessType.PROPERTY)
+@Entity
+@Table(name = "users")
+@Access(value = AccessType.PROPERTY)
 public class User  {
 
     private String id;
@@ -49,10 +50,10 @@ public class User  {
         id  = UUID.randomUUID().toString();
     }
 
-    //@Id
-    //@GeneratedValue(generator = "Generator")
-    //@GenericGenerator(name = "Generator", strategy = "assigned")
-    //@Column(name = "id", unique = true, nullable = false)
+    @Id
+    @GeneratedValue(generator = "Generator")
+    @GenericGenerator(name = "Generator", strategy = "assigned")
+    @Column(name = "id", unique = true, nullable = false)
     public String getId() {
         return id;
     }
@@ -60,7 +61,7 @@ public class User  {
         this.id = id;
     }
 
-    //@Column(name = "create_date",  nullable = true)
+    @Column(name = "create_date",  nullable = true)
     public Date getCreateDate() {
         return createDate;
     }
@@ -68,7 +69,7 @@ public class User  {
         this.createDate = createDate;
     }
 
-    //@Column(name = "last_login_time",  nullable = true)
+    @Column(name = "last_login_time",  nullable = true)
     public Date getLastLoginTime() {
         return lastLoginTime;
     }
@@ -76,7 +77,7 @@ public class User  {
         this.lastLoginTime = lastLoginTime;
     }
 
-    //@Column(name = "email",  nullable = false)
+    @Column(name = "email",  nullable = false)
     public String getEmail() {
         return email;
     }
@@ -84,7 +85,7 @@ public class User  {
         this.email = email;
     }
 
-    //@Column(name = "login_code",  nullable = false)
+    @Column(name = "login_code",  nullable = false)
     public String getLoginCode() {
         return loginCode;
     }
@@ -92,7 +93,7 @@ public class User  {
         this.loginCode = loginCode;
     }
 
-    //@Column(name = "real_name",  nullable = false)
+    @Column(name = "real_name",  nullable = false)
     public String getRealName() {
         return realName;
     }
@@ -100,7 +101,7 @@ public class User  {
         this.realName = realName;
     }
 
-    //@Column(name = "password",  nullable = false)
+    @Column(name = "password",  nullable = false)
     public String getPassword() {
         return password;
     }
@@ -108,7 +109,7 @@ public class User  {
         this.password = password;
     }
 
-    //@Column(name = "activated",  nullable = true)
+    @Column(name = "activated",  nullable = true)
     public Boolean getActivated() {
         return activated;
     }
@@ -116,7 +117,7 @@ public class User  {
         this.activated = activated;
     }
 
-    //@Column(name = "validate_code",  nullable = true)
+    @Column(name = "validate_code",  nullable = true)
     public String getValidateCode() {
         return validateCode;
     }
@@ -124,7 +125,7 @@ public class User  {
         this.validateCode = validateCode;
     }
 
-    //@Column(name = "user_type",  nullable = true)
+    @Column(name = "user_type",  nullable = true)
     public String getUserType() {
         return userType;
     }
@@ -132,7 +133,7 @@ public class User  {
         this.userType = userType;
     }
 
-    //@Column(name = "telephone",  nullable = true)
+    @Column(name = "telephone",  nullable = true)
     public String getTelephone() {
         return telephone;
     }
@@ -140,7 +141,7 @@ public class User  {
         this.telephone = telephone;
     }
 
-    //@Column(name = "martial_status",  nullable = true)
+    @Column(name = "martial_status",  nullable = true)
     public String getMartialStatus() {
         return martialStatus;
     }
@@ -148,7 +149,7 @@ public class User  {
         this.martialStatus = martialStatus;
     }
 
-    //@Column(name = "gender",  nullable = true)
+    @Column(name = "gender",  nullable = true)
     public String getGender() {
         return gender;
     }
@@ -156,7 +157,7 @@ public class User  {
         this.gender = gender;
     }
 
-    //@Column(name = "id_card_no",  nullable = true)
+    @Column(name = "id_card_no",  nullable = true)
     public String getIdCardNo() {
         return idCardNo;
     }
@@ -164,7 +165,7 @@ public class User  {
         this.idCardNo = idCardNo;
     }
 
-    //@Column(name = "organization",  nullable = true)
+    @Column(name = "organization",  nullable = true)
     public String getOrganization() {
         return organization;
     }
@@ -172,7 +173,7 @@ public class User  {
         this.organization = organization;
     }
 
-    //@Column(name = "org_post",  nullable = true)
+    @Column(name = "org_post",  nullable = true)
     public String getOrgPost() {
         return orgPost;
     }
@@ -180,7 +181,7 @@ public class User  {
         this.orgPost = orgPost;
     }
 
-    //@Column(name = "privilege",  nullable = true)
+    @Column(name = "privilege",  nullable = true)
     public String getPrivilege() {
         return privilege;
     }
@@ -188,7 +189,7 @@ public class User  {
         this.privilege = privilege;
     }
 
-    //@Column(name = "role",  nullable = true)
+    @Column(name = "role",  nullable = true)
     public String getRole() {
         return role;
     }
@@ -196,7 +197,7 @@ public class User  {
         this.role = role;
     }
 
-    //@Column(name = "major",  nullable = true)
+    @Column(name = "major",  nullable = true)
     public String getMajor() {
         return major;
     }
@@ -204,7 +205,7 @@ public class User  {
         this.major = major;
     }
 
-    //@Column(name = "medical_role",  nullable = true)
+    @Column(name = "medical_role",  nullable = true)
     public String getMedicalRole() {
         return medicalRole;
     }
@@ -212,7 +213,7 @@ public class User  {
         this.medicalRole = medicalRole;
     }
 
-    //@Column(name = "tech_title",  nullable = true)
+    @Column(name = "tech_title",  nullable = true)
     public String getTechTitle() {
         return techTitle;
     }
@@ -220,7 +221,7 @@ public class User  {
         this.techTitle = techTitle;
     }
 
-    //@Column(name = "admin_title",  nullable = true)
+    @Column(name = "admin_title",  nullable = true)
     public String getAdminTitle() {
         return adminTitle;
     }
@@ -228,7 +229,7 @@ public class User  {
         this.adminTitle = adminTitle;
     }
 
-    //@Column(name = "img_remote_path",  nullable = true)
+    @Column(name = "img_remote_path",  nullable = true)
     public String getImgRemotePath() {
         return imgRemotePath;
     }
@@ -236,7 +237,7 @@ public class User  {
         this.imgRemotePath = imgRemotePath;
     }
 
-    //@Column(name = "img_local_path",  nullable = true)
+    @Column(name = "img_local_path",  nullable = true)
     public String getImgLocalPath() {
         return imgLocalPath;
     }
