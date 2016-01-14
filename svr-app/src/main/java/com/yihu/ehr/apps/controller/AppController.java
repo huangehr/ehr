@@ -9,7 +9,6 @@ import com.yihu.ehr.constrant.SessionAttributeKeys;
 import com.yihu.ehr.model.BaseDict;
 import com.yihu.ehr.model.User;
 import com.yihu.ehr.util.ApiErrorEcho;
-import com.yihu.ehr.util.controller.BaseController;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;

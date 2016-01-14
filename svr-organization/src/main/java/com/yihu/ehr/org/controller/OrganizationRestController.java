@@ -6,7 +6,6 @@ import com.yihu.ehr.model.OrganizationModel;
 import com.yihu.ehr.org.service.OrgManagerService;
 import com.yihu.ehr.org.service.OrgModel;
 import com.yihu.ehr.org.service.Organization;
-import com.yihu.ehr.util.controller.BaseController;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

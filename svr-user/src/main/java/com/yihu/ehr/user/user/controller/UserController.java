@@ -5,7 +5,6 @@ import com.yihu.ehr.user.user.model.User;
 import com.yihu.ehr.user.user.model.UserDetailModel;
 import com.yihu.ehr.user.user.model.UserManager;
 import com.yihu.ehr.user.user.model.UserModel;
-import com.yihu.ehr.util.controller.BaseController;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;

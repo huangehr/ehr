@@ -1,5 +1,6 @@
 package com.yihu.ehr;
 
+import com.yihu.ehr.pack.thrift.PackageService;
 import com.yihu.ehr.thrift.ThriftServer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -23,6 +24,8 @@ public class PackageServiceApp {
             thriftServer.setPort(6011);
 
             List<Object> services = new ArrayList();
+            services.add(new PackageService());
+
             thriftServer.startServer(services, ThriftServer.ServerMode.BlockingMode);
         } catch (Exception e) {
             e.printStackTrace();
