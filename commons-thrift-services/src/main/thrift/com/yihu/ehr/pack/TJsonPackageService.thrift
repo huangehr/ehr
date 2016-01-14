@@ -1,22 +1,12 @@
 namespace java com.yihu.ehr.pack
 
-struct JsonPackage {
-    1:string id;
-    2:string pwd;
-    3:string remotePath;
-    4:string userId;
-    5:string message;
-    6:string receiveDate;
-    7:string parseDate;
-    8:string finishDate;
-    9:i32 archiveStatus;
-}
+include "TJsonPackage.thrift"
 
-service JsonPackageManager {
+service TJsonPackageService {
 	/**
 	* 接收病人档案，先存储成功，再在数据库中保存一条待入库记录。
 	*
-	* @param is 病人档案
+	* @param data 病人档案数据
 	* @param pwd  zip密码，需要用私钥匙解密才有效。
 	* @return 档案存储成功, 返回档案ID.
 	*/
@@ -29,14 +19,14 @@ service JsonPackageManager {
 	* @param to
 	* @return
 	*/
-	list<JsonPackage> getArchiveList(1:string since, 2:string to)
+	list<TJsonPackage.TJsonPackage> getArchiveList(1:string since, 2:string to)
 
 	/**
 	* 获取档案列表（用于分页）
 	* @param args
 	* @return
 	*/
-	list<JsonPackage> searchArchives(1:map<string, string> conditions)
+	list<TJsonPackage.TJsonPackage> searchArchives(1:map<string, string> conditions)
 
 	/**
 	* 取得一份JSON档案对象包.
@@ -44,7 +34,7 @@ service JsonPackageManager {
 	* @param id
 	* @return
 	*/
-	JsonPackage getJsonPackage(1:string id)
+	TJsonPackage.TJsonPackage getTJsonPackage.TJsonPackage(1:string id)
 
 	/**
 	* 获取from到to时间内接收到的档案数。以天为单位。若from与to是同一天，则只显示这一天内的数据。
@@ -60,7 +50,7 @@ service JsonPackageManager {
 	*
 	* @return 档案的存储路径.
 	*/
-	JsonPackage acquireArchive();
+	TJsonPackage.TJsonPackage acquireArchive();
 
 	/**
 	* 将档案标记为已入库.
