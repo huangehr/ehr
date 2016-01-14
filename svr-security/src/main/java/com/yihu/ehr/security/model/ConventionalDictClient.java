@@ -1,6 +1,6 @@
 package com.yihu.ehr.security.model;
 
-import com.yihu.ehr.model.BaseDict;
+import com.yihu.ehr.model.dict.BaseDict;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;

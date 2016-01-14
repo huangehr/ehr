@@ -1,12 +1,17 @@
 package com.yihu.ehr.user.user.service;
 
-import com.yihu.ehr.model.BaseDict;
+import com.yihu.ehr.model.address.AddressModel;
+import com.yihu.ehr.model.dict.BaseDict;
+import com.yihu.ehr.model.org.OrganizationModel;
+import com.yihu.ehr.user.user.model.MedicalUser;
 import com.yihu.ehr.util.ApiErrorEcho;
 import com.yihu.ehr.util.encode.HashUtil;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -30,14 +35,19 @@ public class UserManager  {
     @Autowired
     private XUserRepository userRepository;
 
-
     @Autowired
     private ConventionalDictClient conventionalDictClient;
+
+    @Autowired
+    private OrganizationClient organizationClient;
+
+    @Autowired
+    private AddressClient addressClient;
 
     @PersistenceContext
     protected EntityManager entityManager;
 
-    //@Value("default.password")
+    @Value("default.password")
     private String default_password = "123456";
 
     public UserManager() {
@@ -100,8 +110,14 @@ public class UserManager  {
         return user;
     }
 
+    public OrganizationModel getgetOrg(String orgCode) {
+        return organizationClient.getOrg(orgCode);
+    }
 
+    public AddressModel getAddressById(String locarion) {
+        return addressClient.getAddressById(locarion);
 
+    }
     /**
      * 根据User获取用户页面信息.
      *
@@ -220,6 +236,8 @@ public class UserManager  {
     }
 
 
+
+
     /**
      * 判断电子邮箱是否已被占用.
      *
@@ -238,27 +256,31 @@ public class UserManager  {
     @Transactional(Transactional.TxType.SUPPORTS)
     public List<User> searchUser(Map<String, Object> args) {
 
-        //// TODO: 2016/1/12 这里要查询机构服务接口根据条件查询机构服务列表
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         String realName = (String) args.get("realName");
-        String fullName = (String) args.get("organization");
-        String shortName = (String) args.get("organization");
         String type = (String) args.get("type");
         Integer page = (Integer) args.get("page");
         Integer pageSize = (Integer) args.get("pageSize");
-//        String hql = "from User where (realName like :realName or organization in " +
-//                "(from Organization where fullName like :fullName or shortName like :shortName ))";
-        String hql = "from User where realName like :realName ";
+        String name = (String) args.get("organization");
+        List<String> orgIds = organizationClient.getIdsByName(name);
+        String hql = "";
+        if(orgIds.size()>0 && !"00000".equals(orgIds.get(0))){
+            hql += "from User where realName like :realName ";
+        }else{
+            hql += "from User where (realName like :realName or  location in (:orgIds) ";
+        }
+        if (!StringUtils.isEmpty(type)) {
+            hql += " and userType = :userType";
+        }
         if (!StringUtils.isEmpty(type)) {
             hql += " and userType = :userType";
         }
         Query query = session.createQuery(hql);
         query.setString("realName", "%"+realName+"%");
-        //query.setString("organization", "%"+organization+"%");
-        query.setString("fullName","%"+fullName+"%");
-        query.setString("shortName","%"+shortName+"%");
+        if (orgIds.size()>0 && !"00000".equals(orgIds.get(0))) {
+            query.setParameterList("orgIds", orgIds);
+        }
         if (!StringUtils.isEmpty(type)) {
-            //query.setParameter("userType", UserType.valueOf(type));
             query.setParameter("userType", type);
         }
 
@@ -288,16 +310,17 @@ public class UserManager  {
             detailModel.setLoginCode(user.getLoginCode());
             detailModel.setRealName(user.getRealName());
             detailModel.setTelephone(user.getTelephone());
-            //detailModel.setActivated(absDictEManage.getYesNo(user.isActivated()).getValue());
-//            if (user.getOrganization() != null) {
-//                detailModel.setOrganization(user.getOrganization().getFullName());
-//            }
-//            if (user.getLastLoginTime() != null) {
-//                detailModel.setLastLoginTime(DateUtil.toString(user.getLastLoginTime(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT));
-//            }
+            detailModel.setActivated(user.getActivated());
+            if (user.getOrganization() != null) {
+                //detailModel.setOrganization(user.getOrganization().getFullName());
+                detailModel.setOrganization(organizationClient.getOrg(user.getOrganization()).getFullName());
+            }
+            if (user.getLastLoginTime() != null) {
+                detailModel.setLastLoginTime(DateFormatUtils.format(user.getLastLoginTime(),"yyyy-MM-dd HH:mm:ss"));
+            }
             if (user.getUserType() != null) {
                 detailModel.setUserType(user.getUserType());
-                detailModel.setUserTypeValue(user.getUserType());
+                detailModel.setUserTypeValue(conventionalDictClient.getUserType(user.getUserType()).getValue());
             }
             detailModelList.add(detailModel);
         }
@@ -315,19 +338,33 @@ public class UserManager  {
 
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         String realName = (String) args.get("realName");
-        String organization = (String) args.get("organization");
         String type = (String) args.get("type");
-        String hql = "select count(*) from User where (realName like :realName or organization like :organization) ";
+        Integer page = (Integer) args.get("page");
+        Integer pageSize = (Integer) args.get("pageSize");
+        String name = (String) args.get("organization");
+        List<String> orgIds = organizationClient.getIdsByName(name);
+        String hql = "";
+        if(orgIds.size()>0 && !"00000".equals(orgIds.get(0))){
+            hql += "from User where realName like :realName ";
+        }else{
+            hql += "from User where (realName like :realName or  location in (:orgIds) ";
+        }
+        if (!StringUtils.isEmpty(type)) {
+            hql += " and userType = :userType";
+        }
         if (!StringUtils.isEmpty(type)) {
             hql += " and userType = :userType";
         }
         Query query = session.createQuery(hql);
         query.setString("realName", "%"+realName+"%");
-        query.setString("organization", "%"+organization+"%");
+        if (orgIds.size()>0 && !"00000".equals(orgIds.get(0))) {
+            query.setParameterList("orgIds", orgIds);
+        }
         if (!StringUtils.isEmpty(type)) {
             query.setParameter("userType", type);
         }
-        return Integer.parseInt(query.list().get(0).toString());
+
+        return query.list().size();
     }
 
 
@@ -391,7 +428,6 @@ public class UserManager  {
     }
 
     public void deleteUser(String userId) {
-
         userRepository.delete(userId);
     }
 
@@ -425,4 +461,7 @@ public class UserManager  {
         List userList = sqlQuery.list();
         return userList;
     }
+
+
+
 }

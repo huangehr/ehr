@@ -1,10 +1,8 @@
 package com.yihu.ehr.user.user.service;
 
-import com.yihu.ehr.model.AddressModel;
-import io.swagger.annotations.ApiParam;
+import com.yihu.ehr.model.org.OrganizationModel;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -14,40 +12,14 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 /**
  * Created by Administrator on 2016/1/4.
  */
-@FeignClient("svr-address")
+@FeignClient("svr-org")
 public interface OrganizationClient {
 
-    @RequestMapping(value = "/address/getAddressById", method = GET ,consumes = "application/json")
-    AddressModel getAddressById(
-            @RequestParam(value = "id") String id);
 
+    @RequestMapping(value = "/org/org", method = GET ,consumes = "application/json")
+    OrganizationModel getOrg(@RequestParam(value = "orgCode") String orgCode);
 
-    @RequestMapping(value = "/address/canonicalAddress", method = GET ,consumes = "application/json")
-    String getCanonicalAddress(
-            @RequestParam(value = "id") String id);
+    @RequestMapping(value = "/org/org/name", method = GET ,consumes = "application/json")
+    List<String> getIdsByName(@RequestParam(value = "name") String name);
 
-    @RequestMapping(value = "/address/saveAddress", method =  RequestMethod.PUT,consumes = "application/json")
-    String saveAddress(
-
-            @RequestParam(value = "country") String country,
-            @RequestParam(value = "province") String province,
-            @RequestParam(value = "city") String city,
-            @RequestParam(value = "district") String district,
-            @RequestParam(value = "town") String town,
-            @RequestParam(value = "street") String street,
-            @RequestParam(value = "extra") String extra,
-            @RequestParam(value = "postalCode") String postalCode);
-
-
-    @RequestMapping(value = "/address/search", method = GET ,consumes = "application/json")
-    List<String> search(
-            @RequestParam(value = "province") String province,
-            @ApiParam(name = "city", value = "市", defaultValue = "")
-            @RequestParam(value = "city") String city,
-            @ApiParam(name = "district", value = "县", defaultValue = "")
-            @RequestParam(value = "district") String id);
-
-    @RequestMapping(value = "/address/delete", method = GET ,consumes = "application/json")
-    void deleteByOrgCode(@ApiParam(name = "/id", value = "地址代码", defaultValue = "")
-                         @RequestParam(value = "id") String id);
 }

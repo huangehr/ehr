@@ -15,16 +15,16 @@ import java.util.List;
 public interface XOrganizationRepository extends PagingAndSortingRepository<Organization, String> {
 
     @Query("select org from Organization org where org.orgCode = :orgCode")
-    Organization getOrgByCode(@Param("orgCode") String orgCode);
+    public Organization getOrgByCode(@Param("orgCode") String orgCode);
 
     @Query("select org from Organization org where org.orgType = :type")
-    List<Organization> getOrgByOrgType(@Param("type") String type);
+    public List<Organization> getOrgByOrgType(@Param("type") String type);
 
     @Query("select org from Organization org where org.location = (select org1.location from Organization org1 where org1.orgCode = :orgCode)")
-    List<Organization> getOrgByLocationWithCode(@Param("orgCode") String orgCode);
+    public List<Organization> getOrgByLocationWithCode(@Param("orgCode") String orgCode);
 
-    @Query("select org from Organization org where org.province = :province and org.city = :city")
-    List<Organization> getOrgByAddress(@Param("orgCode") String province, @Param("orgCode") String city);
+
+
 
 //    @Modifying(clearAutomatically = true)
 //    @Query("update Organization org set org.activityFlag = :flag where org.orgCode = :orgCode")

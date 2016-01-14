@@ -2,7 +2,7 @@ package com.yihu.ehr.apps.service;
 
 
 
-import com.yihu.ehr.model.BaseDict;
+import com.yihu.ehr.model.dict.BaseDict;
 
 import java.util.Date;
 

@@ -1,6 +1,6 @@
 package com.yihu.ehr.org.service;
 
-import com.yihu.ehr.model.AddressModel;
+import com.yihu.ehr.model.address.AddressModel;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 /**
  * Created by Administrator on 2016/1/4.
@@ -43,10 +42,9 @@ public interface AddressClient {
     @RequestMapping(value = "/address/search", method = GET ,consumes = "application/json")
     List<String> search(
             @RequestParam(value = "province") String province,
-            @ApiParam(name = "city", value = "市", defaultValue = "")
             @RequestParam(value = "city") String city,
-            @ApiParam(name = "district", value = "县", defaultValue = "")
-            @RequestParam(value = "district") String id);
+            @RequestParam(value = "district") String district
+    );
 
     @RequestMapping(value = "/address/delete", method = GET ,consumes = "application/json")
     void deleteByOrgCode(@ApiParam(name = "/id" , value = "地址代码" ,defaultValue = "")

@@ -1,7 +1,7 @@
 package com.yihu.ehr.org.service;
 
-import com.yihu.ehr.model.AddressModel;
-import com.yihu.ehr.model.OrganizationModel;
+import com.yihu.ehr.model.address.AddressModel;
+import com.yihu.ehr.model.org.OrganizationModel;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +62,17 @@ public class OrgManagerService  {
         Organization org = organizationRepository.getOrgByCode(orgCode);
         return org;
     }
+
+    public List<String> getIdsByName(String name) {
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        Query query = session.createQuery("select org.orgCode from Organization org where org.fullName like :name or org.shortName like :name");
+        query.setString("name", "%"+name+"%");
+        List<String> ids = query.list();
+        return ids;
+    }
+
+
+
 
 
     public String getOrgStr(String tags){
@@ -236,8 +247,12 @@ public class OrgManagerService  {
     }
 
     public List<Organization> searchByAddress(String province, String city) {
-        List<Organization> list = organizationRepository.getOrgByAddress(province,city);
-        return list;
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        List<String> addressIds = addressClient.search(province,city,null);
+        String hql = "from Organization where location in (:addressIds)";
+        Query query = session.createQuery(hql);
+        query.setParameterList("addressIds", addressIds);
+        return query.list();
     }
 
 

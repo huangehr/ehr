@@ -15,6 +15,7 @@ import java.util.UUID;
 @Table(name = "user-token")
 @Access(value = AccessType.PROPERTY)
 public class UserToken implements Serializable {
+
     private String tokenId;
     private String accessToken;
     private String refreshToken;

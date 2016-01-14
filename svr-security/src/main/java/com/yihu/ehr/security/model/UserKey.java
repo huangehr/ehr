@@ -22,63 +22,53 @@ public class UserKey implements Serializable{
         id  = UUID.randomUUID().toString();
     }
 
+    private String id;
+    private String user;  //用户
+    private String org;  //个人 或者 机构
+    private String keyType;  //
+    private String key;   //userSecurity
+
+
     @Id
     @GeneratedValue(generator = "Generator")
     @GenericGenerator(name = "Generator", strategy = "assigned")
     @Column(name = "id", unique = true, nullable = false)
-    private String id;
-
-    @Column(name = "user-id",  nullable = true)
-    private String userId;  //用户
-
-    @Column(name = "org-code",  nullable = true)
-    private String orgCode;  //个人 或者 机构
-
-    @Column(name = "key-type",  nullable = true)
-    private String keyType;  //
-
-    @Column(name = "key-id",  nullable = true)
-    private String keyId;   //userSecurity
-
-
-
     public String getId() {
         return id;
     }
-
     public void setId(String id) {
         this.id = id;
     }
 
-    public String getUserId() {
-        return userId;
+    @Column(name = "user-id",  nullable = true)
+    public String getUser() {
+        return user;
+    }
+    public void setUser(String user) {
+        this.user = user;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    @Column(name = "org-code",  nullable = true)
+    public String getOrg() {
+        return org;
+    }
+    public void setOrg(String org) {
+        this.org = org;
     }
 
-    public String getOrgCode() {
-        return orgCode;
-    }
-
-    public void setOrgCode(String orgCode) {
-        this.orgCode = orgCode;
-    }
-
+    @Column(name = "key-type",  nullable = true)
     public String getKeyType() {
         return keyType;
     }
-
     public void setKeyType(String keyType) {
         this.keyType = keyType;
     }
 
-    public String getKeyId() {
-        return keyId;
+    @Column(name = "key-id",  nullable = true)
+    public String getKey() {
+        return key;
     }
-
-    public void setKeyId(String keyId) {
-        this.keyId = keyId;
+    public void setKey(String key) {
+        this.key = key;
     }
 }

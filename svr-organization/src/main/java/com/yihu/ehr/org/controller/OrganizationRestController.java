@@ -1,18 +1,23 @@
 package com.yihu.ehr.org.controller;
 
 import com.yihu.ehr.constrant.Result;
-import com.yihu.ehr.model.AddressModel;
-import com.yihu.ehr.model.OrganizationModel;
+import com.yihu.ehr.model.address.AddressModel;
+import com.yihu.ehr.model.org.OrganizationModel;
+import com.yihu.ehr.model.security.UserSecurityModel;
 import com.yihu.ehr.org.service.OrgManagerService;
 import com.yihu.ehr.org.service.OrgModel;
 import com.yihu.ehr.org.service.Organization;
+import com.yihu.ehr.org.service.SecurityClient;
+import com.yihu.ehr.util.ApiErrorEcho;
 import com.yihu.ehr.util.controller.BaseController;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -25,53 +30,15 @@ import java.util.Map;
  * @created 2015.08.10 17:57
  */
 @RestController
-//@RequestMapping(ApiVersionPrefix.CommonVersion + "/organization")
+@RequestMapping("/org")
 @Api(protocols = "https", value = "organization", description = "组织机构管理接口", tags = {"机构管理"})
 public class OrganizationRestController extends BaseRestController {
 
     @Autowired
     private OrgManagerService orgManagerService;
 
-//    @Autowired
-//    private SecurityManagerService securityManagerService;
-
-
-    /**
-     * 根据id获取地址客户端测试
-     * @param id
-     * @return
-     */
-    @RequestMapping(value = "/address", method = RequestMethod.GET)
-    public Object address(String id) {
-        Object address = orgManagerService.getAddressById(id);
-        return address;
-    }
-
-
-    /**
-     * 根据id获取地址客户端测试
-     * @param id
-     * @return
-     */
-    @RequestMapping(value = "/address/add", method = RequestMethod.PUT)
-    public Object saveAddress(String id) {
-        AddressModel addressModel = new AddressModel();
-        addressModel.setId("sasaas");
-        addressModel.setCountry("dada");
-        addressModel.setProvince("sasa");
-        addressModel.setCity("sasa");
-        //addressModel.setDistrict("wqwqwq");
-        addressModel.setTown("sasa");
-        addressModel.setStreet("sasa");
-        addressModel.setExtra("sasa");
-        addressModel.setPostalCode("sasa");
-        String addressId = orgManagerService.saveAddress(addressModel);
-        return addressId;
-    }
-
-
-
-
+    @Autowired
+    private SecurityClient securityClient;
 
 
     /**
@@ -127,7 +94,7 @@ public class OrganizationRestController extends BaseRestController {
      * @param rows
      * @return
      */
-    @RequestMapping(value = "searchOrgs", method = RequestMethod.GET)
+    @RequestMapping(value = "orgs", method = RequestMethod.GET)
     @ResponseBody
     public Object searchOrgs(
         @ApiParam(name = "searchNm", value = "搜索条件")
@@ -175,8 +142,10 @@ public class OrganizationRestController extends BaseRestController {
      * @param orgCode
      * @return
      */
-    @RequestMapping(value = "delete", method = RequestMethod.GET)
-    public Object deleteOrg(String orgCode) {
+    @RequestMapping(value = "org", method = RequestMethod.DELETE)
+    public Object deleteOrg(
+            @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
+            @RequestParam(value = "orgCode") String orgCode) {
         orgManagerService.delete(orgCode);
         return "删除机构成功！";
     }
@@ -187,9 +156,12 @@ public class OrganizationRestController extends BaseRestController {
      * @param orgCode
      * @return
      */
-    @RequestMapping("activity")
-    @ResponseBody
-    public Object activity(String orgCode,String activityFlag) {
+    @RequestMapping(value = "activity" , method = RequestMethod.PUT)
+    public Object activity(
+            @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
+            @RequestParam(value = "orgCode") String orgCode,
+            @ApiParam(name = "activityFlag", value = "状态", defaultValue = "")
+            @RequestParam(value = "activityFlag") String activityFlag) {
         Organization org = orgManagerService.getOrg(orgCode);
         if("1".equals(activityFlag)){
             org.setActivityFlag(0);
@@ -207,9 +179,8 @@ public class OrganizationRestController extends BaseRestController {
      * @param orgModel
      * @return
      */
-    @RequestMapping("updateOrg")
+    @RequestMapping(value = "org" , method = RequestMethod.PUT)
     public Object updateOrg(OrgModel orgModel) {
-
         Map<String, String> message = new HashMap<>();
         Result result = new Result();
         try {
@@ -289,16 +260,39 @@ public class OrganizationRestController extends BaseRestController {
      * @return
      */
     @ApiOperation(value = "根据地址代码获取机构详细信息")
-    @RequestMapping(value = "/getOrg", method = RequestMethod.GET)
-    public Object getOrg(String orgCode) {
-        Map<String, OrgModel> result = new HashMap<>();
-
+    @RequestMapping(value = "/org", method = RequestMethod.GET)
+    public Object getOrg(
+            @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
+            @RequestParam(value = "orgCode") String orgCode) {
+        OrgModel orgModel = new OrgModel();
         Organization org = orgManagerService.getOrg(orgCode);
-        OrgModel orgModel = orgManagerService.getOrgModel(org);
-
-        result.put("orgModel", orgModel);
-        return result;
+        if(org!=null){
+            orgModel = orgManagerService.getOrgModel(org);
+        }else{
+            orgModel.setOrgCode("00000");
+        }
+        return orgModel;
     }
+
+    /**
+     * 根据name获取机构ids
+     * @param name
+     * @return
+     */
+    @ApiOperation(value = "根据地名称取机构ids")
+    @RequestMapping(value = "/org/name", method = RequestMethod.GET)
+    public Object getIdsByName(
+            @ApiParam(name = "name", value = "机构名称", defaultValue = "")
+            @RequestParam(value = "name") String name) {
+        OrgModel orgModel = new OrgModel();
+        List<String> ids = orgManagerService.getIdsByName(name);
+        if(ids.size()==0){
+            ids.add("00000");
+        }
+        return ids;
+    }
+
+
 
     /**
      * 根据地址获取机构
@@ -306,8 +300,7 @@ public class OrganizationRestController extends BaseRestController {
      * @param city
      * @return
      */
-    @RequestMapping("getOrgs")
-    @ResponseBody
+    @RequestMapping(value = "/orgs" , method = RequestMethod.GET)
     public Object getOrgs(String province, String city) {
 
         List<Organization> orgList = orgManagerService.searchByAddress(province,city);
@@ -318,40 +311,39 @@ public class OrganizationRestController extends BaseRestController {
         return orgMap;
     }
 
-//    @RequestMapping("distributeKey")
-//    @ResponseBody
-//    public String distributeKey(String orgCode) {
-//        try {
-//            Result result = getSuccessResult(true);
-//            XUserSecurity userSecurity = securityManager.getUserPublicKeyByOrgCd(orgCode);
-//            Map<String, String> keyMap = new HashMap<>();
-//            if (userSecurity == null) {
-//                userSecurity = securityManager.createSecurityByOrgCd(orgCode);
-//
-//            }else{
-//                //result.setErrorMsg("公钥信息已存在。");
-//                //这里删除原有的公私钥重新分配
-//                String userKeyId = securityManager.getUserKeyByOrgCd(orgCode);
-//                securityManager.deleteSecurity(userSecurity.getId());
-//                securityManager.deleteUserKey(userKeyId);
-//                userSecurity = securityManager.createSecurityByOrgCd(orgCode);
-//            }
-//            //String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT);
-//            String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT)
-//                    + "~" + DateUtil.toString(userSecurity.getExpiryDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT);
-//
-//            keyMap.put("publicKey", userSecurity.getPublicKey());
-//            keyMap.put("validTime", validTime);
-//            keyMap.put("startTime", DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT));
-//            result.setObj(keyMap);
-//            result.setSuccessFlg(true);
-//            return result.toJson();
-//        } catch (Exception ex) {
-//            Result result = getSuccessResult(false);
-//            return result.toJson();
-//        }
-//    }
-    @RequestMapping("validationOrg")
+    @RequestMapping( value = "distributeKey" , method = RequestMethod.POST)
+    public Object distributeKey(String orgCode) {
+        try {
+            String publicKey = securityClient.getOrgPublicKey(orgCode);
+            UserSecurityModel userSecurity = new UserSecurityModel();
+            Map<String, String> keyMap = new HashMap<>();
+            if (StringUtils.isEmpty(publicKey)) {
+                userSecurity = securityClient.createSecurityByOrgCode(orgCode);
+
+            }else{
+                //result.setErrorMsg("公钥信息已存在。");
+                //这里删除原有的公私钥重新分配
+                String userKeyId = securityClient.getUserKeyByOrgCd(orgCode);
+                securityClient.deleteSecurity(userSecurity.getId());
+                securityClient.deleteUserKey(userKeyId);
+                userSecurity = securityClient.createSecurityByOrgCode(orgCode);
+            }
+            //String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT);
+            String validTime = DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd")
+                    + "~" + DateFormatUtils.format(userSecurity.getExpiryDate(),"yyyy-MM-dd");
+
+            keyMap.put("publicKey", userSecurity.getPublicKey());
+            keyMap.put("validTime", validTime);
+            keyMap.put("startTime", DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd"));
+            return keyMap;
+        } catch (Exception ex) {
+            ApiErrorEcho apiErrorEcho = new ApiErrorEcho();
+            apiErrorEcho.putMessage("failed");
+            return apiErrorEcho;
+        }
+    }
+
+    @RequestMapping(value = "/validation" ,method = RequestMethod.GET)
     @ResponseBody
     public Object validationOrg(String searchNm){
 

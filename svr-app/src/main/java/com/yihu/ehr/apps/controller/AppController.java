@@ -5,9 +5,8 @@ import com.yihu.ehr.apps.service.AppDetailModel;
 import com.yihu.ehr.apps.service.AppManager;
 import com.yihu.ehr.apps.service.ConventionalDictClient;
 import com.yihu.ehr.constrant.Result;
-import com.yihu.ehr.constrant.SessionAttributeKeys;
-import com.yihu.ehr.model.BaseDict;
-import com.yihu.ehr.model.User;
+import com.yihu.ehr.model.dict.BaseDict;
+import com.yihu.ehr.model.user.UserModel;
 import com.yihu.ehr.util.ApiErrorEcho;
 import com.yihu.ehr.util.controller.BaseController;
 import com.yihu.ehr.util.controller.BaseRestController;
@@ -25,7 +24,6 @@ import java.util.Map;
  */
 @RequestMapping("/app")
 @RestController
-//@SessionAttributes(SessionAttributeKeys.CurrentUser)
 public class AppController extends BaseRestController {
 
     @Autowired
@@ -126,11 +124,13 @@ public class AppController extends BaseRestController {
             @RequestParam(value = "description") String description,
             @ApiParam(name = "tags", value = "标记", defaultValue = "")
             @RequestParam(value = "tags") String tags,
-            @ModelAttribute(SessionAttributeKeys.CurrentUser) User user) throws Exception{
+            @ApiParam(name = "userId", value = "用户", defaultValue = "")
+            @RequestParam(value = "userId") String userId) throws Exception{
 
         App app;
         BaseDict appCatalog = conventionalDictClient.getAppCatalog(catalog);
-        app = appManager.createApp(name, appCatalog, url, tags, description, user);
+        UserModel userModel = appManager.getUser(userId);
+        app = appManager.createApp(name, appCatalog, url, tags, description, userModel);
 
         if (app == null) {
             ApiErrorEcho apiErrorEcho = new ApiErrorEcho();
@@ -201,5 +201,16 @@ public class AppController extends BaseRestController {
         appManager.checkStatus(appId, appStatus);
         return "success";
     }
+
+    @RequestMapping(value = "validation" , method = RequestMethod.GET)
+    public Object validationApp(
+            @ApiParam(name = "id", value = "名id", defaultValue = "")
+            @RequestParam(value = "id") String id,
+            @ApiParam(name = "secret", value = "状态", defaultValue = "")
+            @RequestParam(value = "secret") String secret) throws Exception{
+        return appManager.validationApp(id, secret);
+    }
+
+
 
 }

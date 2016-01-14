@@ -1,7 +1,6 @@
 package com.yihu.ehr.address.service;
 
 
-import com.yihu.ehr.model.AddressModel;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;

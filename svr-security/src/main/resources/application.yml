@@ -1,14 +1,11 @@
 server:
-  port: 9005
+  port: 9006
 
-security:
-  user:
-    password: organization
 
 info:
   app:
-    name: OrganizationService
-    description: EHR platform organization service.
+    name: SecurityService
+    description: EHR platform security service.
     version: 1.0.0
 
 ---

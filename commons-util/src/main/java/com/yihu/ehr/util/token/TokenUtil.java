@@ -1,7 +1,7 @@
 package com.yihu.ehr.util.token;
 
-import com.yihu.ha.util.encrypt.DES;
-import com.yihu.ha.util.encrypt.MD5;
+import com.yihu.ehr.util.encrypt.DES;
+import com.yihu.ehr.util.encrypt.MD5;
 
 import java.util.Date;
 import java.util.HashMap;

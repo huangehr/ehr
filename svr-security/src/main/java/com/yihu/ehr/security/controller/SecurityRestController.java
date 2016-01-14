@@ -1,22 +1,29 @@
 package com.yihu.ehr.security.controller;
 
-import com.yihu.ehr.security.model.TokenManager;
+import com.yihu.ehr.model.user.UserModel;
 import com.yihu.ehr.security.model.SecurityManager;
+import com.yihu.ehr.security.model.TokenManager;
 import com.yihu.ehr.security.model.UserSecurity;
+import com.yihu.ehr.security.model.UserToken;
+import com.yihu.ehr.security.service.AppClient;
+import com.yihu.ehr.security.service.UserClient;
 import com.yihu.ehr.util.ApiErrorEcho;
+import com.yihu.ehr.util.DateUtil;
 import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.util.encrypt.RSA;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import java.net.URLDecoder;
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
-@RestController()
+@RestController
 @RequestMapping("/security")
 @Api(protocols = "https", value = "Security", description = "安全管理接口", tags = {"用户", "企业", "应用", "安全"})
 public class SecurityRestController extends BaseRestController {
@@ -24,49 +31,45 @@ public class SecurityRestController extends BaseRestController {
     @Autowired
     private SecurityManager securityManager;
 
-//    @Autowired
-//    private UserManager userManager;
+    @Autowired
+    private UserClient userClient;
 
     @Autowired
     private TokenManager tokenManager;
 
-//    @Autowired
-//    private AppManager appManager;
+    @Autowired
+    private AppClient appClient;
 
-    @RequestMapping(value = "/user_key/{user_name}", method = RequestMethod.GET)
-    @ApiOperation(value = "获取用户公钥",  produces = "application/json", notes = "用户在平台注册时，会分配一个公钥，此公钥用于与健康档案平台加密传输数据使用")
-    public Object getUserPublicKey(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(required = true, name = "user_name", value = "用户名")
-            @PathVariable(value = "user_name") String user_name) throws Exception {
-        UserSecurity userSecurity = securityManager.getUserSecurityByUserName(user_name);
+    public Object getPublicKey(UserSecurity userSecurity){
         if (userSecurity == null) {
             ApiErrorEcho apiErrorEcho = new ApiErrorEcho();
             apiErrorEcho.putMessage("获取安全用户失败！");
             return apiErrorEcho;
         } else {
             String publicKey = userSecurity.getPublicKey();
-
             return publicKey;
         }
     }
 
-    @RequestMapping(value = "/organization_key/{org_code}", method = RequestMethod.GET)
+
+    @RequestMapping(value = "/user_key/{user_name}", method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户公钥",  produces = "application/json", notes = "用户在平台注册时，会分配一个公钥，此公钥用于与健康档案平台加密传输数据使用")
+    public Object getUserPublicKey(
+            @ApiParam(required = true, name = "user_name", value = "用户名")
+            @PathVariable(value = "user_name") String user_name) throws Exception {
+        UserSecurity userSecurity = securityManager.getUserSecurityByUserName(user_name);
+        return getPublicKey(userSecurity);
+    }
+
+
+
+    @RequestMapping(value = "/organization_key/{orgCode}", method = RequestMethod.GET)
     @ApiOperation(value = "获取企业公钥", produces = "application/json", notes = "企业公钥，用于与健康档案平台之间传输数据的加密。")
     public Object getOrgPublicKey(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(required = true, name = "org_code", value = "机构代码")
             @PathVariable(value = "org_code") String orgCode) {
         UserSecurity userSecurity = securityManager.getUserPublicKeyByOrgCd(orgCode);
-        if (userSecurity == null) {
-            ApiErrorEcho apiErrorEcho = new ApiErrorEcho();
-            apiErrorEcho.putMessage("获取安全用户失败！");
-        } else {
-            String publicKey = userSecurity.getPublicKey();
-            return publicKey;
-        }
+        return getPublicKey(userSecurity);
     }
 
     /**
@@ -100,13 +103,14 @@ public class SecurityRestController extends BaseRestController {
             @ApiParam(required = true, name = "app_secret", value = "APP 密码")
             @RequestParam(value = "app_secret", required = true) String appSecret) throws Exception {
 
-        boolean appResult = appManager.validationApp(appId, appSecret);
+        boolean appResult = appClient.validationApp(appId, appSecret);
         if (!appResult) {
-            RestEcho restEcho = new RestEcho().failed(ErrorCode.InvalidAppRegister);
-            return restEcho;
+            ApiErrorEcho apiErrorEcho = new ApiErrorEcho();
+            apiErrorEcho.putMessage("应用不存在");
+            return apiErrorEcho;
         }
 
-        XUserSecurity userSecurity = securityManager.getUserSecurityByUserName(userName);
+        UserSecurity userSecurity = securityManager.getUserSecurityByUserName(userName);
         String privateKey = userSecurity.getPrivateKey();
         Key priKey = RSA.genPrivateKey(privateKey);
         String psw = RSA.decrypt(rsaPWD, priKey);
@@ -114,25 +118,24 @@ public class SecurityRestController extends BaseRestController {
         userName = URLDecoder.decode(userName, "UTF-8");
         appId = URLDecoder.decode(appId, "UTF-8");
 
-        XUser user = userManager.loginIndetification(userName, psw);
+        UserModel user = userClient.loginIndetification(userName, psw);
         if (user == null) {
-            RestEcho restEcho = new RestEcho().failed(ErrorCode.InvalidUserNameOrPwd);
-            return restEcho;
+            ApiErrorEcho apiErrorEcho = new ApiErrorEcho();
+            apiErrorEcho.putMessage("用户不存在");
+            return apiErrorEcho;
         }
 
-        XApp app = appManager.getApp(appId);
-        XUserToken userToken = tokenManager.getUserTokenByUserId(user.getId(), appId);
+        UserToken userToken = tokenManager.getUserTokenByUserId(user.getId(), appId);
 
         if (userToken == null) {
-            userToken = tokenManager.createUserToken(user, app);
+            userToken = tokenManager.createUserToken(user.getId(), appId);
 
-            RestEcho restEcho = new RestEcho().success();
-            restEcho.putResult("access_token", userToken.getAccessToken());
-            restEcho.putResult("refresh_token", userToken.getRefreshToken());
-            restEcho.putResult("expires_in", userToken.getExpiresIn());
-            restEcho.putResult("token_id", userToken.getTokenId());
-
-            return restEcho;
+            Map<String,Object> map = new HashMap<>();
+            map.put("access_token",userToken.getAccessToken());
+            map.put("refresh_token",userToken.getRefreshToken());
+            map.put("expires_in",userToken.getExpiresIn());
+            map.put("token_id",userToken.getTokenId());
+            return map;
         }
 
         Date currentDate = new Date();
@@ -140,21 +143,18 @@ public class SecurityRestController extends BaseRestController {
 
         if (result == true) {
             userToken = tokenManager.refreshAccessToken(user.getId(), userToken.getRefreshToken(), appId);
-
-            RestEcho restEcho = new RestEcho().success();
-            restEcho.putResult("access_token", userToken.getAccessToken());
-            restEcho.putResult("refresh_token", userToken.getRefreshToken());
-            restEcho.putResult("expires_in", userToken.getExpiresIn());
-
-            return restEcho;
+            Map<String,Object> map = new HashMap<>();
+            map.put("access_token",userToken.getAccessToken());
+            map.put("refresh_token",userToken.getRefreshToken());
+            map.put("expires_in",userToken.getExpiresIn());
+            return map;
         }
 
-        RestEcho restEcho = new RestEcho().success();
-        restEcho.putResult("access_token", userToken.getAccessToken());
-        restEcho.putResult("refresh_token", userToken.getRefreshToken());
-        restEcho.putResult("expires_in", userToken.getExpiresIn());
-
-        return restEcho;
+        Map<String,Object> map = new HashMap<>();
+        map.put("access_token",userToken.getAccessToken());
+        map.put("refresh_token",userToken.getRefreshToken());
+        map.put("expires_in",userToken.getExpiresIn());
+        return map;
     }
 
     /**
@@ -167,7 +167,7 @@ public class SecurityRestController extends BaseRestController {
      * }
      */
     @RequestMapping(value = "/token", method = RequestMethod.PUT)
-    @ApiOperation(value = "刷新用户临时会话Token", response = RestEcho.class, produces = "application/json", notes = "若用户的会话Token已失效，调用此方法刷新。")
+    @ApiOperation(value = "刷新用户临时会话Token",  produces = "application/json", notes = "若用户的会话Token已失效，调用此方法刷新。")
     public Object refreshToken(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -178,18 +178,17 @@ public class SecurityRestController extends BaseRestController {
             @ApiParam(required = true, name = "app_id", value = "App Id")
             @RequestParam(value = "app_id", required = true) String appId) throws Exception {
 
-        XUserToken userToken = tokenManager.refreshAccessToken(userId, refreshToken, appId);
+        UserToken userToken = tokenManager.refreshAccessToken(userId, refreshToken, appId);
         if (userToken == null) {
-            RestEcho restEcho = new RestEcho().failed(ErrorCode.UserRefreshTokenError);
-
-            return restEcho;
+            ApiErrorEcho apiErrorEcho = new ApiErrorEcho();
+            apiErrorEcho.putMessage("ehr.security.token.refreshError");
+            return apiErrorEcho;
         } else {
-            RestEcho restEcho = new RestEcho().success();
-            restEcho.putResult("access_token", userToken.getAccessToken());
-            restEcho.putResult("refresh_token", userToken.getRefreshToken());
-            restEcho.putResult("expires_in", userToken.getExpiresIn());
-
-            return restEcho;
+            Map<String,Object> map = new HashMap<>();
+            map.put("access_token",userToken.getAccessToken());
+            map.put("refresh_token",userToken.getRefreshToken());
+            map.put("expires_in",userToken.getExpiresIn());
+            return map;
         }
     }
 
@@ -201,7 +200,7 @@ public class SecurityRestController extends BaseRestController {
      * }
      */
     @RequestMapping(value = "/token", method = RequestMethod.DELETE)
-    @ApiOperation(value = "作废临时会话Token", response = RestEcho.class, produces = "application/json", notes = "用户或App要退出时，调用此方法作废临时会话Token。")
+    @ApiOperation(value = "作废临时会话Token",  produces = "application/json", notes = "用户或App要退出时，调用此方法作废临时会话Token。")
     public Object revokeToken(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -210,10 +209,110 @@ public class SecurityRestController extends BaseRestController {
         boolean result = tokenManager.revokeToken(accessToken);
 
         if (result) {
-            return succeed("{\"status\", \"ok\"}");
+            return "success";
         } else {
-            RestEcho restEcho = new RestEcho().failed(ErrorCode.UserRevokeTokenFailed);
-            return restEcho;
+            ApiErrorEcho apiErrorEcho = new ApiErrorEcho();
+            apiErrorEcho.putMessage("ehr.security.token.revoke");
+            return apiErrorEcho;
         }
     }
+
+    /**
+     * 根据orgCode创建security
+     * @param orgCode
+     * @return
+     * @throws Exception
+     */
+
+    @RequestMapping(value = "/securyty/{orgCode}", method = RequestMethod.POST)
+    @ApiOperation(value = "根据orgCode创建security",  produces = "application/json")
+    public UserSecurity createSecurityByOrgCode(
+            @ApiParam(name = "orgCode", value = "机构代码")
+            @PathVariable( value = "orgCode") String orgCode) throws Exception {
+        UserSecurity userSecurity = securityManager.createSecurityByOrgCode(orgCode);
+        return userSecurity;
+    }
+
+    /**
+     * 根据orgCode创建security
+     * @param orgCode
+     * @return
+     * @throws Exception
+     */
+
+    @RequestMapping(value = "/userKey/{orgCode}", method = RequestMethod.POST)
+    @ApiOperation(value = "根据orgCode创建security",  produces = "application/json")
+    public String getUserKeyByOrgCd(
+            @ApiParam(name = "orgCode", value = "机构代码")
+            @PathVariable( value = "orgCode") String orgCode) throws Exception {
+        String userKeyId = securityManager.getUserKeyByOrgCd(orgCode);
+        return userKeyId;
+    }
+
+    /**
+     * 根据id删除security
+     * @param id
+     */
+    @RequestMapping(value = "/security/{id}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据id删除security",  produces = "application/json")
+    public void deleteSecurity(
+            @ApiParam(name = "id", value = "security代码")
+            @PathVariable( value = "id") String id) {
+        securityManager.deleteSecurity(id);
+
+    }
+
+    /**
+     * UserKey
+     * @param userKeyId
+     */
+    @RequestMapping(value = "/userKey/{userKeyId}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据id删除userKey",  produces = "application/json")
+    public void deleteUserKey(
+            @ApiParam(name = "userKeyId", value = "userKey代码")
+            @PathVariable( value = "userKeyId") String userKeyId) {
+        securityManager.deleteUserKey(userKeyId);
+    }
+
+    /**
+     * 根据loginCode删除Security
+     * @param loginCode
+     */
+    @RequestMapping(value = "/security/{loginCode}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据loginCode删除Security",  produces = "application/json")
+    public Object getUserSecurityByUserName(
+            @ApiParam(name = "loginCode", value = "用户登录代码")
+            @PathVariable( value = "loginCode") String loginCode) throws Exception{
+        return securityManager.getUserSecurityByUserName(loginCode);
+    }
+
+    /**
+     * 根据userId创建Security
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/security/{userId}", method = RequestMethod.POST)
+    @ApiOperation(value = "根据userId创建Security",  produces = "application/json")
+    public UserSecurity createSecurityByUserId(
+            @ApiParam(name = "userId", value = "用户代码")
+            @PathVariable( value = "userId") String userId) throws Exception {
+        return securityManager.createSecurityByUserId(userId);
+    }
+
+
+    /**
+     * 根据userId获取UserKey
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "/userKey/{userId}", method = RequestMethod.POST)
+    @ApiOperation(value = "根据userId创建Security",  produces = "application/json")
+    public String getUserKeyByUserId(
+            @ApiParam(name = "userId", value = "用户代码")
+            @PathVariable( value = "userId") String userId) {
+        return securityManager.getUserKeyByUserId(userId);
+    }
+
+
 }

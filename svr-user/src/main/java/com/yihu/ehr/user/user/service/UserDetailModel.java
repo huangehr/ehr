@@ -4,27 +4,16 @@ package com.yihu.ehr.user.user.service;
 public class UserDetailModel {
 
     Integer order;
-    String id="";
-    String loginCode="";
-    String realName="";
-    String userType="";
-    String userTypeValue="";
-    String organization="";
-    String email="";
-    String lastLoginTime="";
-    String activated="";
-    String telephone="";
-    public String getTelephone() {return telephone;}
-
-    public void setTelephone(String telephone) {this.telephone = telephone;}
-
-    public String getUserTypeValue() {
-        return userTypeValue;
-    }
-
-    public void setUserTypeValue(String userTypeValue) {
-        this.userTypeValue = userTypeValue;
-    }
+    String id;
+    String loginCode;
+    String realName;
+    String userType;
+    String userTypeValue;
+    String organization;
+    String email;
+    String lastLoginTime;
+    Boolean activated;
+    String telephone;
 
     public Integer getOrder() {
         return order;
@@ -66,6 +55,14 @@ public class UserDetailModel {
         this.userType = userType;
     }
 
+    public String getUserTypeValue() {
+        return userTypeValue;
+    }
+
+    public void setUserTypeValue(String userTypeValue) {
+        this.userTypeValue = userTypeValue;
+    }
+
     public String getOrganization() {
         return organization;
     }
@@ -90,11 +87,19 @@ public class UserDetailModel {
         this.lastLoginTime = lastLoginTime;
     }
 
-    public String getActivated() {
+    public Boolean getActivated() {
         return activated;
     }
 
-    public void setActivated(String activated) {
+    public void setActivated(Boolean activated) {
         this.activated = activated;
+    }
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
     }
 }

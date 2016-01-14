@@ -1,14 +1,12 @@
 package com.yihu.ehr.address.controller;
 
 import com.yihu.ehr.address.service.*;
-import com.yihu.ehr.model.AddressModel;
+import com.yihu.ehr.model.address.AddressModel;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -62,7 +60,7 @@ public class AddressController {
         return childMap;
     }
 
-    //--------------------------------------------------------------
+    //--------------------------------------------------------------------
 
     @RequestMapping(value = "/getAddressById", method = RequestMethod.GET)
     public Object getAddressById(
@@ -82,7 +80,6 @@ public class AddressController {
             model.setExtra(address.getExtra());
             model.setPostalCode(address.getPostalCode());
         }else{
-            //为了防止客户端解析服务接口失败（java.util.concurrent.RejectedExecutionException）这里做的特殊处理
             model.setId("00000");
         }
         return model;

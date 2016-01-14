@@ -76,17 +76,6 @@
 			<artifactId>spring-data-jpa</artifactId>
 			<version>1.9.1.RELEASE</version>
 		</dependency>
-
-		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-swagger2</artifactId>
-			<version>2.1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-swagger-ui</artifactId>
-			<version>2.1.2</version>
-		</dependency>
 		<dependency>
 			<groupId>com.yihu.ehr</groupId>
 			<artifactId>ehr-commons-util</artifactId>

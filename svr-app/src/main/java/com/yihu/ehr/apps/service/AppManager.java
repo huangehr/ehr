@@ -1,6 +1,6 @@
 package com.yihu.ehr.apps.service;
-import com.yihu.ehr.model.BaseDict;
-import com.yihu.ehr.model.User;
+import com.yihu.ehr.model.dict.BaseDict;
+import com.yihu.ehr.model.user.UserModel;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -34,12 +34,15 @@ public class AppManager  {
     @Autowired
     private ConventionalDictClient conventionalDictClient;
 
+    @Autowired
+    private UserClient userClient;
+
     public AppManager() {
     }
 
 
 
-    public App createApp(String name, BaseDict catalog, String url, String tags, String description, User creator) {
+    public App createApp(String name, BaseDict catalog, String url, String tags, String description, UserModel creator) {
 
         App app = new App();
         app.setName(name);
@@ -268,5 +271,9 @@ public class AppManager  {
         App app = appRepository.getAppById(appId);
         app.setStatus(appStatus.getCode());
         appRepository.save(app);
+    }
+
+    public UserModel getUser(String userId) {
+        return userClient.getUser(userId);
     }
 }

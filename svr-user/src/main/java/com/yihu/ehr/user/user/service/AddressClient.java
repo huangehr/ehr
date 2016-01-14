@@ -1,6 +1,6 @@
 package com.yihu.ehr.user.user.service;
 
-import com.yihu.ehr.model.AddressModel;
+import com.yihu.ehr.model.address.AddressModel;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;

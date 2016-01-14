@@ -1,13 +1,15 @@
 package com.yihu.ehr.user.user.controller;
 
 import com.yihu.ehr.constrant.Result;
-import com.yihu.ehr.user.user.model.User;
-import com.yihu.ehr.user.user.model.UserDetailModel;
-import com.yihu.ehr.user.user.model.UserManager;
-import com.yihu.ehr.user.user.model.UserModel;
+import com.yihu.ehr.model.address.AddressModel;
+import com.yihu.ehr.model.org.OrganizationModel;
+import com.yihu.ehr.model.security.UserSecurityModel;
+import com.yihu.ehr.user.user.service.*;
+import com.yihu.ehr.util.ApiErrorEcho;
 import com.yihu.ehr.util.controller.BaseController;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -28,22 +30,10 @@ public class UserController extends BaseRestController {
     @Autowired
     private UserManager userManager;
 
-//    @Resource(name = Services.SecurityManager)
-//    private XSecurityManager securityManager;
+    @Autowired
+    private SecurityClient securityClient;
 
-//    @Resource(name = Services.OrgManager)
-//    private XOrgManager orgManager;
 
-//    @ApiParam(name = "searchNm", value = "查询条件", defaultValue = "")
-//    @RequestParam(value = "searchNm") Integer searchNm,
-//    @ApiParam(name = "catalog", value = "类别", defaultValue = "")
-//    @RequestParam(value = "catalog") Integer catalog,
-//    @ApiParam(name = "status", value = "状态", defaultValue = "")
-//    @RequestParam(value = "status") Integer status,
-//    @ApiParam(name = "page", value = "当前页", defaultValue = "")
-//    @RequestParam(value = "page") Integer page,
-//    @ApiParam(name = "rows", value = "页数", defaultValue = "")
-//    @RequestParam(value = "rows") Integer rows
 
     @RequestMapping(value = "initial" , method = RequestMethod.GET)
     public String userInitial(Model model) {
@@ -123,21 +113,29 @@ public class UserController extends BaseRestController {
 
     @RequestMapping(value = "user" , method = RequestMethod.GET)
     public Object getUser(
-            @ApiParam(name = "model", value = "", defaultValue = "")
-            @RequestParam(value = "model") Model model,
             @ApiParam(name = "userId", value = "", defaultValue = "")
             @RequestParam(value = "userId") String userId,
             @ApiParam(name = "mode", value = "", defaultValue = "")
             @RequestParam(value = "mode") String mode) {
+        Map<String,Object> map = new HashMap<>();
         User user = userManager.getUser(userId);
         UserModel userModel = userManager.getUser(user);
-        //OrganizationModel org = orgManager.getOrg(userModel.getOrgCode());
-//        XAddress orgLoc = org==null? new Address():org.getLocation();
-//        model.addAttribute("orgLoc", orgLoc);
-//        model.addAttribute("user",userModel);
-//        model.addAttribute("mode",mode);
-//        model.addAttribute("contentPage", "user/userInfoDialog");
-        return  "simpleView";
+        OrganizationModel org = null;
+        if(userModel.getOrgCode()!=null){
+            org = userManager.getgetOrg(userModel.getOrgCode());
+        }
+        AddressModel addressModel = new AddressModel();
+        if(org!=null && !"00000".equals(org.getOrgCode())){
+            String locarion = org.getLocation();
+            if(!"".equals(locarion)){
+                addressModel = userManager.getAddressById(locarion);
+                map.put("orgLocation",addressModel);
+            }
+        }
+        map.put("user",userModel);
+        map.put("mode",mode);
+        map.put("contentPage","user/userInfoDialog");
+        return map;
     }
 
     @RequestMapping(value = "unbundling" , method = RequestMethod.PUT)
@@ -158,45 +156,41 @@ public class UserController extends BaseRestController {
         return "success";
     }
 
-//    @RequestMapping("distributeKey")
-//    @ResponseBody
-//    public Object distributeKey(String loginCode) {
-//        try {
-//            UserSecurityModel userSecurity = securityManager.getUserSecurityByUserName(loginCode);
-//            Map<String, String> keyMap = new HashMap<>();
-//            if (userSecurity == null) {
-//                XUserManager userManager = ServiceFactory.getService(Services.UserManager);
-//                XUser userInfo = userManager.getUserByLoginCode(loginCode);
-//                String userId = userInfo.getId();
-//                userSecurity = securityManager.createSecurityByUserId(userId);
-//            }else{
-//                //result.setErrorMsg("公钥信息已存在。");
-//                //这里删除原有的公私钥重新分配
-//                //1-1根据用户登陆名获取用户信息。
-//                XUserManager userManager = ServiceFactory.getService(Services.UserManager);
-//                XUser userInfo = userManager.getUserByLoginCode(loginCode);
-//                String userId = userInfo.getId();
-//                String userKeyId = securityManager.getUserKeyByUserId(userId);
-//                securityManager.deleteSecurity(userSecurity.getId());
-//                securityManager.deleteUserKey(userKeyId);
-//                userSecurity = securityManager.createSecurityByUserId(userId);
-//
-//            }
-//                String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT)
-//                        + "~" + DateUtil.toString(userSecurity.getExpiryDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT);
-//                keyMap.put("publicKey", userSecurity.getPublicKey());
-//                keyMap.put("validTime", validTime);
-//                keyMap.put("startTime", DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT));
-//
-//            Result result = getSuccessResult(true);
-//            result.setObj(keyMap);
-//            return result.toJson();
-//        } catch (Exception ex) {
-//
-//            Result result = getSuccessResult(true);
-//            return result.toJson();
-//        }
-//    }
+    @RequestMapping("distributeKey")
+    @ResponseBody
+    public Object distributeKey(String loginCode) {
+        try {
+            UserSecurityModel userSecurity = securityClient.getUserSecurityByUserName(loginCode);
+            Map<String, String> keyMap = new HashMap<>();
+            if (userSecurity == null) {
+                User userInfo = userManager.getUserByLoginCode(loginCode);
+                String userId = userInfo.getId();
+                userSecurity = securityClient.createSecurityByUserId(userId);
+            }else{
+                //result.setErrorMsg("公钥信息已存在。");
+                //这里删除原有的公私钥重新分配
+                //1-1根据用户登陆名获取用户信息。
+                User userInfo = userManager.getUserByLoginCode(loginCode);
+                String userId = userInfo.getId();
+                String userKeyId = securityClient.getUserKeyByUserId(userId);
+                securityClient.deleteSecurity(userSecurity.getId());
+                securityClient.deleteUserKey(userKeyId);
+                userSecurity = securityClient.createSecurityByUserId(userId);
+
+            }
+            String validTime = DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd")
+                    + "~" + DateFormatUtils.format(userSecurity.getExpiryDate(),"yyyy-MM-dd");
+            keyMap.put("publicKey", userSecurity.getPublicKey());
+            keyMap.put("validTime", validTime);
+            keyMap.put("startTime", DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd"));
+            return keyMap;
+        } catch (Exception ex) {
+            ApiErrorEcho apiErrorEcho = new ApiErrorEcho();
+            apiErrorEcho.putMessage("failed");
+            return apiErrorEcho;
+        }
+    }
+
 
     /**
      * 检查用户是否存在
@@ -204,8 +198,7 @@ public class UserController extends BaseRestController {
      * @param searchNm
      * @return
      */
-    @RequestMapping("user/isExit")
-    @ResponseBody
+    @RequestMapping(value = "/user/isExit")
     public Object searchUser(String type,String searchNm){
 
         List<User> list = userManager.searchUser(type,searchNm);
@@ -214,5 +207,28 @@ public class UserController extends BaseRestController {
         }else{
             return true;
         }
+    }
+
+
+    /**
+     * 根据登陆用户名及密码验证用户.
+     *
+     * @param loginCode
+     * @param psw
+     */
+    @RequestMapping(value = "/loginIndetification" , method = RequestMethod.GET)
+    public User loginIndetification(String loginCode,String psw) {
+        return  userManager.loginIndetification(loginCode,psw);
+    }
+
+    /**
+     *
+     * 根据loginCode 获取user
+     * @param loginCode
+     * @return
+     */
+    @RequestMapping(value = "/loginCode" , method = RequestMethod.GET)
+    public User getUserByLoginCode(String loginCode) {
+        return  userManager.getUserByLoginCode(loginCode);
     }
 }

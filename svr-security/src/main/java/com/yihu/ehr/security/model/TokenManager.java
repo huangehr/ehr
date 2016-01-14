@@ -1,8 +1,9 @@
 package com.yihu.ehr.security.model;
-import com.yihu.ehr.security.data.SQLGeneralDAO;
+
+
+import com.yihu.ehr.security.service.AppClient;
+import com.yihu.ehr.security.service.UserClient;
 import com.yihu.ehr.util.token.TokenUtil;
-
-
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -10,6 +11,8 @@ import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,8 +27,17 @@ import java.util.Map;
 @Service
 public class TokenManager {
 
+    @PersistenceContext
+    protected EntityManager entityManager;
+
     @Autowired
     private XUserTokenRepository userTokenRepository;
+
+    @Autowired
+    private UserClient userClient;
+
+    @Autowired
+    private AppClient appClient;
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public UserToken createUserToken(String userId, String appId) throws Exception {
@@ -47,8 +59,6 @@ public class TokenManager {
         userToken.setUpdateDate(new Date());
 
         userTokenRepository.save(userToken);
-        //saveEntity(userToken);
-
         return userToken;
     }
 
@@ -56,11 +66,8 @@ public class TokenManager {
      * 根据授权ID查询用户授权信息
      */
     @Transactional(Transactional.TxType.SUPPORTS)
-    public UserToken getUserToken(Integer tokenId) {
-//        Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
-//        UserToken token = (XUserToken) session.get(UserToken.class, tokenId);
+    public UserToken getUserToken(String tokenId) {
         UserToken token = userTokenRepository.findOne(tokenId);
-
         return token;
     }
 
@@ -71,7 +78,7 @@ public class TokenManager {
 
 
         //1-1根据用户ID获取用户信息。
-        Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
         HashMap resultMap = new HashMap();
         StringBuilder sb = new StringBuilder();
 
@@ -95,13 +102,13 @@ public class TokenManager {
         } else {
             Object[] userTokenInfo = (Object[]) sqlQuery.list().get(0);
 
-            User user = userManager.getUser(userId);
-            App app = appManager.getApp(appId);
+//            UserModel user = userClient.getUser(userId);
+//            AppModel app = appClient.getApp(appId);
 
             UserToken userToken = new UserToken();
             userToken.setTokenId(userTokenInfo[0].toString());
-            userToken.setApp(app);
-            userToken.setUser(user);
+            userToken.setAppId(appId);
+            userToken.setUserId(userId);
             userToken.setAccessToken(userTokenInfo[1].toString());
             userToken.setRefreshToken(userTokenInfo[2].toString());
             userToken.setExpiresIn((Integer) userTokenInfo[3]);
@@ -114,14 +121,13 @@ public class TokenManager {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public List<UserToken> getUserTokenList(int from, int count) {
-        Session session = currentSession();
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
         Criteria criteria = session.createCriteria(UserToken.class);
         if (from >= 0 && count > 0){
             criteria.setFirstResult(from);
             criteria.setMaxResults(count);
         }
-
-        List<XUserToken> list = criteria.list();
+        List<UserToken> list = criteria.list();
 
         return list;
     }
@@ -131,41 +137,35 @@ public class TokenManager {
      */
     @Transactional(Transactional.TxType.SUPPORTS)
     public void deleteUserToken(String tokenId) {
-
-        Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
-        XUserToken token = (XUserToken) session.get(UserToken.class, tokenId);
-
-        deleteEntity(token);
+        userTokenRepository.delete(tokenId);
     }
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public boolean revokeToken(String accessToken) {
 
         Map map = new HashMap<>();
-        Session session = currentSession();
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
         Query query = session.createQuery("from UserToken where accessToken= :accessToken");
 
         List<UserToken> userTokens = query.setString("accessToken", accessToken).list();
 
         if (userTokens.size() == 0) {
             return false;
-
         } else {
-            deleteEntity(userTokens.get(0));
+            userTokenRepository.delete(userTokens.get(0).getTokenId());
             return true;
         }
     }
 
     @Transactional(Transactional.TxType.SUPPORTS)
-    public void updateUserToken(XUserToken userToken) {
-        updateEntity(userToken);
+    public void updateUserToken(UserToken userToken) {
+        userTokenRepository.save(userToken);
     }
 
-    @Override
     @Transactional(Transactional.TxType.SUPPORTS)
-    public XUserToken refreshAccessToken(String userId, String refreshToken,String appId) throws Exception {
+    public UserToken refreshAccessToken(String userId, String refreshToken,String appId) throws Exception {
 
-        XUserToken userToken = getUserTokenByUserId(userId,appId);
+        UserToken userToken = getUserTokenByUserId(userId,appId);
 
         //如果用户的更新授权正确，则重新生成访问授权，并返回
         if (userToken.getRefreshToken().equals(refreshToken)) {
