@@ -13,20 +13,25 @@ service TJsonPackageService {
 	bool receive(1:binary data, 2:string pwd)
 
 	/**
+	* 解析一份档案并入库。
+	**/
+	bool parsePackage(1:string id)
+
+	/**
 	* 获取from到to时间内接收到的档案列表。以天为单位。若from与to是同一天，则只显示这一天内的数据。
 	*
 	* @param since
 	* @param to
 	* @return
 	*/
-	list<TJsonPackage.TJsonPackage> getArchiveList(1:string since, 2:string to)
+	list<TJsonPackage.TJsonPackage> getPackages(1:i32 since, 2:i32 to)
 
 	/**
 	* 获取档案列表（用于分页）
 	* @param args
 	* @return
 	*/
-	list<TJsonPackage.TJsonPackage> searchArchives(1:map<string, string> conditions)
+	list<TJsonPackage.TJsonPackage> searchPackage(1:map<string, string> conditions)
 
 	/**
 	* 取得一份JSON档案对象包.
@@ -34,7 +39,7 @@ service TJsonPackageService {
 	* @param id
 	* @return
 	*/
-	TJsonPackage.TJsonPackage getTJsonPackage.TJsonPackage(1:string id)
+	TJsonPackage.TJsonPackage getPackage(1:string id)
 
 	/**
 	* 获取from到to时间内接收到的档案数。以天为单位。若from与to是同一天，则只显示这一天内的数据。
@@ -43,27 +48,12 @@ service TJsonPackageService {
 	* @param to
 	* @return
 	*/
-	i32 getArchiveCount(1:string since, 2:string to)
+	i32 packageCount(1:i32 since, 2:i32 to);
 
 	/**
 	* 锁定一份要解析的JSON档案, 解析作业会将此档案解析到数据库中.
 	*
 	* @return 档案的存储路径.
 	*/
-	TJsonPackage.TJsonPackage acquireArchive();
-
-	/**
-	* 将档案标记为已入库.
-	*
-	* @param jsonArchiveId
-	*/
-	void reportArchiveFinished(1:string jsonArchiveId, 2:string message)
-
-	/**
-	* 标记档案为解析失败，同时记录失败原因。
-	*
-	* @param jsonArchiveId
-	* @param message
-	*/
-	void reportArchiveFailed(string jsonArchiveId, string message)
+	TJsonPackage.TJsonPackage acquirPackage(1:string id);
 }
