@@ -48,7 +48,7 @@ public class HibernateConfig {
     @Value("${data-source.remove-abandoned-timeout}")
     int removeAbandonedTimeout;
 
-    @Value("${hibernate.hibernate-properties.hibernate.dialect}")
+    @Value("${hibernate.dialect}")
     String dialect;
 
     @Value("${hibernate.show-sql}")
@@ -56,9 +56,6 @@ public class HibernateConfig {
 
     @Value("${hibernate.format-sql}")
     String formatSQL;
-
-    @Value("${hibernate.mapping-locations}")
-    String mappingLocations;
 
     @Bean
     public BasicDataSource dataSource() throws SQLException {

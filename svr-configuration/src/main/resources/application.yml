@@ -18,11 +18,12 @@ info:
 ---
 spring:
   profiles: dev
+
   cloud:
     config:
       server:
         git:
-          uri: http://192.168.1.103:9000/EHR/ehr.config.git
+          uri: file:///D:/Workspace/source/ehr.config
         default-label: dev
 
 eureka:
@@ -37,6 +38,7 @@ eureka:
 ---
 spring:
   profiles: test
+
   cloud:
     config:
       server:
@@ -56,6 +58,7 @@ eureka:
 ---
 spring:
   profiles: prod
+
   cloud:
     config:
       server:
