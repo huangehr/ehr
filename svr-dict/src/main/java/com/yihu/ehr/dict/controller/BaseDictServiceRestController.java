@@ -1,5 +1,6 @@
 package com.yihu.ehr.dict.controller;
 
+import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.dict.service.*;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
@@ -14,14 +15,14 @@ import java.util.List;
  *
  */
 @RestController
-@RequestMapping("/conventional_dict_service")
+@RequestMapping(ApiVersionPrefix.CommonVersion + "/conventionalDict")
 @Api(protocols = "https", value = "conventional_dict_service", description = "通用字典接口", tags = {"通用字典接口"})
 public class BaseDictServiceRestController extends BaseRestController {
 
     @Autowired
     private ConventionalDictEntry baseAbstractDictEntry;
 
-    @RequestMapping(value = "/getAppCatalog", method = RequestMethod.GET)
+    @RequestMapping(value = "/catalog", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public AppCatalog getAppCatalog(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
@@ -30,7 +31,7 @@ public class BaseDictServiceRestController extends BaseRestController {
         return appCatalog;
     }
 
-    @RequestMapping(value = "/getAppStatus", method = RequestMethod.GET)
+    @RequestMapping(value = "/appStatus", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public AppStatus getAppStatus(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
@@ -38,7 +39,7 @@ public class BaseDictServiceRestController extends BaseRestController {
         return baseAbstractDictEntry.getAppStatus(code);
     }
 
-    @RequestMapping(value = "/getGender", method = RequestMethod.GET)
+    @RequestMapping(value = "/gender", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public Gender getGender(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
@@ -46,7 +47,7 @@ public class BaseDictServiceRestController extends BaseRestController {
         return baseAbstractDictEntry.getGender(code);
     }
 
-    @RequestMapping(value = "/getMartialStatus", method = RequestMethod.GET)
+    @RequestMapping(value = "/martialStatus", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public MartialStatus getMartialStatus(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
@@ -54,7 +55,7 @@ public class BaseDictServiceRestController extends BaseRestController {
         return baseAbstractDictEntry.getMartialStatus(code);
     }
 
-    @RequestMapping(value = "/getNation", method = RequestMethod.GET)
+    @RequestMapping(value = "/nation", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public Nation getNation(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
@@ -62,7 +63,7 @@ public class BaseDictServiceRestController extends BaseRestController {
         return baseAbstractDictEntry.getNation(code);
     }
 
-    @RequestMapping(value = "/getResidenceType", method = RequestMethod.GET)
+    @RequestMapping(value = "/residenceType", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public ResidenceType getResidenceType(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
@@ -70,7 +71,7 @@ public class BaseDictServiceRestController extends BaseRestController {
         return baseAbstractDictEntry.getResidenceType(code);
     }
 
-    @RequestMapping(value = "/getOrgType", method = RequestMethod.GET)
+    @RequestMapping(value = "/orgType", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public OrgType getOrgType(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
@@ -78,7 +79,7 @@ public class BaseDictServiceRestController extends BaseRestController {
         return baseAbstractDictEntry.getOrgType(code);
     }
 
-    @RequestMapping(value = "/getSettledWay", method = RequestMethod.GET)
+    @RequestMapping(value = "/settledWay", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public SettledWay getSettledWay(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
@@ -86,7 +87,7 @@ public class BaseDictServiceRestController extends BaseRestController {
         return baseAbstractDictEntry.getSettledWay(code);
     }
 
-    @RequestMapping(value = "/getCardStatus", method = RequestMethod.GET)
+    @RequestMapping(value = "/cardStatus", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public CardStatus getCardStatus(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
@@ -94,7 +95,7 @@ public class BaseDictServiceRestController extends BaseRestController {
         return baseAbstractDictEntry.getCardStatus(code);
     }
 
-    @RequestMapping(value = "/getCardType", method = RequestMethod.GET)
+    @RequestMapping(value = "/cardType", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public CardType getCardType(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
@@ -102,7 +103,7 @@ public class BaseDictServiceRestController extends BaseRestController {
         return baseAbstractDictEntry.getCardType(code);
     }
 
-    @RequestMapping(value = "/getRequestState", method = RequestMethod.GET)
+    @RequestMapping(value = "/requestState", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public RequestState getRequestState(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
@@ -110,7 +111,7 @@ public class BaseDictServiceRestController extends BaseRestController {
         return baseAbstractDictEntry.getRequestState(code);
     }
 
-    @RequestMapping(value = "/getKeyType", method = RequestMethod.GET)
+    @RequestMapping(value = "/keyType", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public KeyType getKeyType(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
@@ -118,7 +119,7 @@ public class BaseDictServiceRestController extends BaseRestController {
         return baseAbstractDictEntry.getKeyType(code);
     }
 
-    @RequestMapping(value = "/getMedicalRole", method = RequestMethod.GET)
+    @RequestMapping(value = "/medicalRole", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public MedicalRole getMedicalRole(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
@@ -126,7 +127,7 @@ public class BaseDictServiceRestController extends BaseRestController {
         return baseAbstractDictEntry.getMedicalRole(code);
     }
 
-    @RequestMapping(value = "/getUserRole", method = RequestMethod.GET)
+    @RequestMapping(value = "/userRole", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public UserRole getUserRole(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
@@ -134,7 +135,7 @@ public class BaseDictServiceRestController extends BaseRestController {
         return baseAbstractDictEntry.getUserRole(code);
     }
 
-    @RequestMapping(value = "/getUserType", method = RequestMethod.GET)
+    @RequestMapping(value = "/userType", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public UserType getUserType(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
@@ -142,7 +143,7 @@ public class BaseDictServiceRestController extends BaseRestController {
         return baseAbstractDictEntry.getUserType(code);
     }
 
-    @RequestMapping(value = "/getLoginAddress", method = RequestMethod.GET)
+    @RequestMapping(value = "/loginAddress", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public LoginAddress getLoginAddress(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
@@ -152,7 +153,7 @@ public class BaseDictServiceRestController extends BaseRestController {
 
     //...............................................................
 
-    @RequestMapping(value = "/getUserTypeList", method = RequestMethod.GET)
+    @RequestMapping(value = "/userTypeList", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public List<UserType> getUserTypeList(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
@@ -160,7 +161,7 @@ public class BaseDictServiceRestController extends BaseRestController {
         return baseAbstractDictEntry.getUserTypeList();
     }
 
-    @RequestMapping(value = "/getTagsList", method = RequestMethod.GET)
+    @RequestMapping(value = "/tagsList", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public List<Tags> getTagsList(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
@@ -170,7 +171,7 @@ public class BaseDictServiceRestController extends BaseRestController {
 
     //...............................................................
 
-    @RequestMapping(value = "/getYesNo", method = RequestMethod.GET)
+    @RequestMapping(value = "/yesNo", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public YesNo getYesNo(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
@@ -178,7 +179,7 @@ public class BaseDictServiceRestController extends BaseRestController {
         return baseAbstractDictEntry.getYesNo(code);
     }
 
-    @RequestMapping(value = "/getAdapterType", method = RequestMethod.GET)
+    @RequestMapping(value = "/adapterType", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public AdapterType getAdapterType(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
