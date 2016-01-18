@@ -222,16 +222,4 @@ public class BeanUtils {
         return value;
     }
 
-    public static void main(String[] args) {
-
-        VoUsers resUser = new VoUsers();
-        ResUser user = new ResUser();
-        user.setUSER_ID("12");
-        user.setUSER_NAME("hh");
-        user.setUSER_PASSWORD("123");
-        // 将model转换为vo
-        resUser = BeanUtils.copyModelToVo(resUser.getClass(), user);
-        // 输出vo的值
-        System.err.println(resUser.toString());
-    }
 }
