@@ -33,11 +33,24 @@
         <developer>
             <id>sand</id>
             <name>Sand Wen</name>
-            <email>sand.fj.wen at gmail.com</email>
+            <email>sand.fj.wen@gmail.com</email>
             <organization>JKZL Software, Inc.</organization>
             <organizationUrl>http://www.yihu.com</organizationUrl>
             <roles>
                 <role>Project lead</role>
+                <role>Project designer</role>
+                <role>Project programmer</role>
+            </roles>
+        </developer>
+
+        <developer>
+            <id>laz</id>
+            <name>林阿忠</name>
+            <email>laz@qq.com</email>
+            <organization>JKZL Software, Inc.</organization>
+            <organizationUrl>http://www.yihu.com</organizationUrl>
+            <roles>
+                <role>Project programmer</role>
             </roles>
         </developer>
     </developers>
@@ -175,6 +188,19 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.3</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.doxia</groupId>
+                        <artifactId>doxia-module-markdown</artifactId>
+                        <version>1.5</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

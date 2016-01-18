@@ -1,6 +1,6 @@
 package com.yihu.ehr.thrift;
 
-import com.yihu.ehr.lang.ServiceProvider;
+import com.yihu.ehr.lang.TServiceProvider;
 import org.apache.thrift.TMultiplexedProcessor;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -62,7 +62,7 @@ public class ThriftServer {
     public void startServer(List<Object> services, ServerMode serverMode) throws TTransportException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException, IllegalClassFormatException, ClassNotFoundException {
         serverThread = new ServerThread(serverMode, port);
 
-        ServiceProviderImpl serviceProvider = new ServiceProviderImpl();
+        TServiceProviderImpl serviceProvider = new TServiceProviderImpl();
         services.add(serviceProvider);
 
         for (Object service : services) {
@@ -70,8 +70,8 @@ public class ThriftServer {
 
             // 在 ServiceProvider 中注册服务端所支持的服务
             if (service == serviceProvider) {
-                serverThread.registerProcessor(ServiceProvider.class.getCanonicalName(), processor);
-                serviceProvider.registerService(ServiceProvider.class.getCanonicalName(), service.getClass().getCanonicalName());
+                serverThread.registerProcessor(TServiceProvider.class.getCanonicalName(), processor);
+                serviceProvider.registerService(TServiceProvider.class.getCanonicalName(), service.getClass().getCanonicalName());
             } else {
                 serverThread.registerProcessor(service.getClass().getCanonicalName(), processor);
                 serviceProvider.registerService(service.getClass().getCanonicalName(), service.getClass().getCanonicalName());

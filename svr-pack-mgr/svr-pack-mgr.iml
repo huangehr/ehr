@@ -202,7 +202,7 @@
     </orderEntry>
     <orderEntry type="module" module-name="commons-ui-swagger" />
     <orderEntry type="module" module-name="commons-thrift-server" />
-    <orderEntry type="library" name="Maven: com.yihu.ehr:ehr-commons-thrift-services:1.1.0" level="project" />
+    <orderEntry type="module" module-name="commons-thrift-services" />
     <orderEntry type="module" module-name="commons-thrift-client" />
     <orderEntry type="library" name="Maven: org.apache.thrift:libthrift:0.9.1" level="project" />
     <orderEntry type="module" module-name="commons-ehr-constants" />

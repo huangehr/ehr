@@ -4,7 +4,7 @@ import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import com.netflix.discovery.shared.Application;
 import com.netflix.discovery.shared.Applications;
-import com.yihu.ehr.lang.ServiceProvider;
+import com.yihu.ehr.lang.TServiceProvider;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TMultiplexedProtocol;
@@ -71,9 +71,9 @@ class ConnectionPoolManager {
 
                 TProtocol protocol = new TBinaryProtocol(transport);
 
-                Constructor<?> clientConstructor = ServiceProvider.Client.class.getConstructor(TProtocol.class);
-                TMultiplexedProtocol multiplexedProtocol = new TMultiplexedProtocol(protocol, ServiceProvider.class.getCanonicalName());
-                ServiceProvider.Client client = (ServiceProvider.Client) clientConstructor.newInstance(multiplexedProtocol);
+                Constructor<?> clientConstructor = TServiceProvider.Client.class.getConstructor(TProtocol.class);
+                TMultiplexedProtocol multiplexedProtocol = new TMultiplexedProtocol(protocol, TServiceProvider.class.getCanonicalName());
+                TServiceProvider.Client client = (TServiceProvider.Client) clientConstructor.newInstance(multiplexedProtocol);
 
                 List<String> supportedServiceNames = client.getSupportedServiceNames();
                 for (String serviceName : supportedServiceNames){

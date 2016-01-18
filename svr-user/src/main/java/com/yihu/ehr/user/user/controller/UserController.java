@@ -6,7 +6,6 @@ import com.yihu.ehr.model.org.OrganizationModel;
 import com.yihu.ehr.model.security.UserSecurityModel;
 import com.yihu.ehr.user.user.service.*;
 import com.yihu.ehr.util.ApiErrorEcho;
-import com.yihu.ehr.util.controller.BaseController;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.time.DateFormatUtils;

@@ -8,7 +8,6 @@ import com.yihu.ehr.constrant.Result;
 import com.yihu.ehr.model.dict.BaseDict;
 import com.yihu.ehr.model.user.UserModel;
 import com.yihu.ehr.util.ApiErrorEcho;
-import com.yihu.ehr.util.controller.BaseController;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
