@@ -1,16 +1,20 @@
 package com.yihu.ehr.user.user.controller;
 
+import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constrant.Result;
-import com.yihu.ehr.model.address.AddressModel;
-import com.yihu.ehr.model.org.OrganizationModel;
-import com.yihu.ehr.model.security.UserSecurityModel;
+import com.yihu.ehr.feignClient.security.SecurityClient;
+import com.yihu.ehr.model.address.MAddress;
+import com.yihu.ehr.model.org.MOrganization;
+import com.yihu.ehr.model.security.MUserSecurity;
+import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.user.user.service.*;
 import com.yihu.ehr.util.ApiErrorEcho;
 import com.yihu.ehr.util.controller.BaseRestController;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -23,7 +27,8 @@ import java.util.Map;
  * @created 2015.08.10 17:57
  */
 @RestController
-@RequestMapping("/user")
+@RequestMapping(ApiVersionPrefix.CommonVersion + "/user")
+@Api(protocols = "https", value = "user", description = "用户管理接口", tags = {"用户", "登录帐号", "密码"})
 public class UserController extends BaseRestController {
 
     @Autowired
@@ -34,20 +39,11 @@ public class UserController extends BaseRestController {
 
 
 
-    @RequestMapping(value = "initial" , method = RequestMethod.GET)
-    public String userInitial(Model model) {
-        model.addAttribute("contentPage","user/user");
-        return "pageView";
-    }
-
-    @RequestMapping(value = "addUserInfoDialog" , method = RequestMethod.GET)
-    public String addUser(Model model){
-        model.addAttribute("contentPage","user/addUserInfoDialog");
-        return "generalView";
-    }
-
     @RequestMapping(value = "users" , method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户列表",produces = "application/json", notes = "根据查询条件获取用户列表在前端表格展示")
     public Object searchUsers(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "searchNm", value = "查询条件", defaultValue = "")
             @RequestParam(value = "searchNm") String searchNm,
             @ApiParam(name = "searchType", value = "类别", defaultValue = "")
@@ -63,18 +59,21 @@ public class UserController extends BaseRestController {
         conditionMap.put("type", searchType);
         conditionMap.put("page", page);
         conditionMap.put("pageSize", rows);
-        BaseController baseController = new BaseController();
 
         List<UserDetailModel> detailModelList = userManager.searchUserDetailModel(conditionMap);
 
         Integer totalCount = userManager.searchUserInt(conditionMap);
-        Result result = baseController.getResult(detailModelList, totalCount, page, rows);
-
+        Result result = new Result();
+        result.setObj(detailModelList);
+        result.setTotalCount(totalCount);
         return result;
     }
 
     @RequestMapping(value = "user" , method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除用户",produces = "application/json", notes = "根据用户id删除用户")
     public Object deleteUser(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "userId", value = "id", defaultValue = "")
             @RequestParam(value = "userId") String userId) throws Exception{
         userManager.deleteUser(userId);
@@ -82,7 +81,10 @@ public class UserController extends BaseRestController {
     }
 
     @RequestMapping(value = "activity" , method = RequestMethod.PUT)
+    @ApiOperation(value = "改变用户状态",produces = "application/json", notes = "根据用户状态改变当前用户状态")
     public Object  activityUser (
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "userId", value = "id", defaultValue = "")
             @RequestParam(value = "userId") String userId,
             @ApiParam(name = "activated", value = "激活状态", defaultValue = "")
@@ -93,16 +95,22 @@ public class UserController extends BaseRestController {
     }
 
     @RequestMapping(value = "user" , method = RequestMethod.PUT)
+    @ApiOperation(value = "修改用户",produces = "application/json", notes = "重新绑定用户信息")
     public Object updateUser(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "userModel", value = "用户对象", defaultValue = "")
-            @RequestParam(value = "userModel") UserModel userModel) throws Exception{
+            @RequestParam(value = "userModel") MUser userModel) throws Exception{
         userManager.updateUser(userModel);
         return "success";
 
     }
 
     @RequestMapping(value = "resetPass" , method = RequestMethod.PUT)
+    @ApiOperation(value = "重设密码",produces = "application/json", notes = "用户忘记密码管理员帮助重新还原密码，初始密码123456")
     public Object resetPass(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "userId", value = "id", defaultValue = "")
             @RequestParam(value = "userId") String userId) throws Exception{
         userManager.resetPass(userId);
@@ -111,19 +119,20 @@ public class UserController extends BaseRestController {
     }
 
     @RequestMapping(value = "user" , method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户",produces = "application/json", notes = "根据用户id获取用户信息")
     public Object getUser(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "userId", value = "", defaultValue = "")
-            @RequestParam(value = "userId") String userId,
-            @ApiParam(name = "mode", value = "", defaultValue = "")
-            @RequestParam(value = "mode") String mode) {
+            @RequestParam(value = "userId") String userId) {
         Map<String,Object> map = new HashMap<>();
         User user = userManager.getUser(userId);
-        UserModel userModel = userManager.getUser(user);
-        OrganizationModel org = null;
+        MUser userModel = userManager.getUser(user);
+        MOrganization org = null;
         if(userModel.getOrgCode()!=null){
-            org = userManager.getgetOrg(userModel.getOrgCode());
+            org = userManager.getOrg(userModel.getOrgCode());
         }
-        AddressModel addressModel = new AddressModel();
+        MAddress addressModel = new MAddress();
         if(org!=null && !"00000".equals(org.getOrgCode())){
             String locarion = org.getLocation();
             if(!"".equals(locarion)){
@@ -132,13 +141,15 @@ public class UserController extends BaseRestController {
             }
         }
         map.put("user",userModel);
-        map.put("mode",mode);
         map.put("contentPage","user/userInfoDialog");
         return map;
     }
 
     @RequestMapping(value = "unbundling" , method = RequestMethod.PUT)
+    @ApiOperation(value = "取消关联绑定",produces = "application/json", notes = "取消相关信息绑定")
     public Object unbundling(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "userId", value = "", defaultValue = "")
             @RequestParam(value = "userId") String userId,
             @ApiParam(name = "type", value = "", defaultValue = "")
@@ -156,10 +167,14 @@ public class UserController extends BaseRestController {
     }
 
     @RequestMapping("distributeKey")
-    @ResponseBody
-    public Object distributeKey(String loginCode) {
+    @ApiOperation(value = "重新分配密钥",produces = "application/json", notes = "重新分配密钥")
+    public Object distributeKey(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
+            @ApiParam(name = "loginCode", value = "登录帐号", defaultValue = "")
+            @RequestParam(value = "loginCode") String loginCode) {
         try {
-            UserSecurityModel userSecurity = securityClient.getUserSecurityByUserName(loginCode);
+            MUserSecurity userSecurity = securityClient.getUserPublicKeyByOrgName(loginCode);
             Map<String, String> keyMap = new HashMap<>();
             if (userSecurity == null) {
                 User userInfo = userManager.getUserByLoginCode(loginCode);
@@ -198,7 +213,14 @@ public class UserController extends BaseRestController {
      * @return
      */
     @RequestMapping(value = "/user/isExit")
-    public Object searchUser(String type,String searchNm){
+    @ApiOperation(value = "验证用户是否存在",produces = "application/json", notes = "根据用户id查询用户，查看此用户是否存在")
+    public Object searchUser(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
+            @ApiParam(name = "type", value = "机构类型", defaultValue = "")
+            @RequestParam(value = "type") String type,
+            @ApiParam(name = "searchNm", value = "查询条件", defaultValue = "")
+            @RequestParam(value = "searchNm") String searchNm){
 
         List<User> list = userManager.searchUser(type,searchNm);
         if(list.size()>0){
@@ -215,8 +237,15 @@ public class UserController extends BaseRestController {
      * @param loginCode
      * @param psw
      */
-    @RequestMapping(value = "/loginIndetification" , method = RequestMethod.GET)
-    public User loginIndetification(String loginCode,String psw) {
+    @RequestMapping(value = "/login_indetification" , method = RequestMethod.GET)
+    @ApiOperation(value = "根据登陆用户名及密码验证用户",produces = "application/json", notes = "根据登陆用户名及密码验证用户")
+    public User loginIndetification(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
+            @ApiParam(name = "loginCode", value = "登录账号", defaultValue = "")
+            @RequestParam(value = "loginCode") String loginCode,
+            @ApiParam(name = "psw", value = "密码", defaultValue = "")
+            @RequestParam(value = "psw") String psw) {
         return  userManager.loginIndetification(loginCode,psw);
     }
 
@@ -226,8 +255,13 @@ public class UserController extends BaseRestController {
      * @param loginCode
      * @return
      */
-    @RequestMapping(value = "/loginCode" , method = RequestMethod.GET)
-    public User getUserByLoginCode(String loginCode) {
+    @RequestMapping(value = "/login_code" , method = RequestMethod.GET)
+    @ApiOperation(value = "根据登录账号获取当前用户",produces = "application/json", notes = "根据登陆用户名及密码验证用户")
+    public User getUserByLoginCode(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
+            @ApiParam(name = "loginCode", value = "登录账号", defaultValue = "")
+            @RequestParam(value = "loginCode") String loginCode) {
         return  userManager.getUserByLoginCode(loginCode);
     }
 }

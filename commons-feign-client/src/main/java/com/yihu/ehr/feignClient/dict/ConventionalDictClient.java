@@ -11,19 +11,26 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  * Created by Administrator on 2016/1/4.
  */
 @FeignClient("svr-dict")
+@RequestMapping("/rest/v1.0/dict")
 public interface ConventionalDictClient {
 
-    @RequestMapping(value = "/conventional_dict_service/getOrgType", method = GET,consumes = "application/json")
+    @RequestMapping(value = "/conventional_dict/orgType", method = GET,consumes = "application/json")
     MBaseDict getOrgType(@RequestParam(value = "code") String code);
 
-    @RequestMapping(value = "/conventional_dict_service/getSettledWay", method = GET,consumes = "application/json")
+    @RequestMapping(value = "/conventional_dict/settledWay", method = GET,consumes = "application/json")
     MBaseDict getSettledWay(@RequestParam(value = "code") String code);
 
-    @RequestMapping(value = "/conventional_dict_service/getAppCatalog", method = GET,consumes = "application/json")
+    @RequestMapping(value = "/conventional_dict/appCatalog", method = GET,consumes = "application/json")
     MBaseDict getAppCatalog(@RequestParam(value = "code") String code);
 
-    @RequestMapping(value = "/conventional_dict_service/getAppStatus", method = GET,consumes = "application/json")
+    @RequestMapping(value = "/conventional_dict/appStatus", method = GET,consumes = "application/json")
     MBaseDict getAppStatus(@RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/conventional_dict/userType", method = GET,consumes = "application/json")
+    MBaseDict getUserType(@RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/conventional_dict/yesNo", method = GET,consumes = "application/json")
+    MBaseDict getYesNo(@RequestParam(value = "code") Boolean code);
 
 
 

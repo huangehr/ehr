@@ -1,7 +1,11 @@
 package com.yihu.ehr.org.service;
 
+import com.yihu.ehr.feignClient.address.AddressClient;
+import com.yihu.ehr.feignClient.security.SecurityClient;
 import com.yihu.ehr.model.address.MAddress;
 import com.yihu.ehr.model.org.MOrganization;
+import com.yihu.ehr.model.security.MUserSecurity;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +31,9 @@ public class OrgManagerService  {
 
     @Autowired
     AddressClient addressClient;
+
+    @Autowired
+    SecurityClient securityClient;
 
 
     @Autowired
@@ -102,27 +109,30 @@ public class OrgManagerService  {
         }
         if (org.getLocation() != null) {
             //这里调用Address服务获取地址
-            MAddress addres = addressClient.getAddressById(org.getLocation());
-            if(!"00000".equals(addres.getId())){
+            MAddress addres;
+            try {
+                addres = addressClient.getAddressById(org.getLocation());
                 orgModel.setProvince(addres.getProvince());
                 orgModel.setCity(addres.getCity());
                 orgModel.setDistrict(addres.getDistrict());
                 orgModel.setTown(addres.getTown());
-                //获取地址字符串
                 String addressStr = addressClient.getCanonicalAddress(org.getLocation());
                 orgModel.setLocation(addressStr);
+            }catch (Exception e){
+                System.out.println(e.getMessage());
             }
         }
+        String publicKey = securityClient.getUserPublicKeyByOrgCode(org.getOrgCode());
+        if (StringUtils.isEmpty(publicKey)) {
+            orgModel.setPublicKey(publicKey);
 
-//        XSecurityManager securityManager = ServiceFactory.getService(Services.SecurityManager);
-//        XUserSecurity userSecurity = securityManager.getUserPublicKeyByOrgCd(org.getOrgCode());
-//        if (userSecurity != null) {
-//            orgModel.setPublicKey(userSecurity.getPublicKey());
-//            String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT)
-//                    + "~" + DateUtil.toString(userSecurity.getExpiryDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT);
-//            orgModel.setValidTime(validTime);
-//            orgModel.setStartTime( DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT));
-//        }
+            MUserSecurity userSecurity = securityClient.createSecurityByOrgCode(org.getOrgCode());
+
+            String validTime = DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd")
+                    + "~" + DateFormatUtils.format(userSecurity.getExpiryDate(),"yyyy-MM-dd");
+            orgModel.setValidTime(validTime);
+            orgModel.setStartTime(DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd"));
+        }
 
         return orgModel;
     }
@@ -174,6 +184,46 @@ public class OrgManagerService  {
     public List<Organization> getOrgByOrgType(String orgType) {
         List<Organization> list =  organizationRepository.getOrgByOrgType(orgType);
         return list;
+    }
+
+    public int searchCount(Map<String, Object> args) {
+
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        String orgCode = (String) args.get("orgCode");
+        String fullName = (String) args.get("fullName");
+        String settledWay = (String) args.get("settledWay");
+        String orgType = (String) args.get("orgType");
+        String province = (String) args.get("province");
+        String city = (String) args.get("city");
+        String district = (String) args.get("district");
+        List<String> addressIdList = addressClient.search(province,city,district);
+
+
+        String hql = "from Organization where (orgCode like :orgCode or fullName like :fullName)";
+        if (!StringUtils.isEmpty(settledWay)) {
+            hql += " and settledWay = :settledWay";
+        }
+        if (!StringUtils.isEmpty(orgType)) {
+            hql += " and orgType = :orgType";
+        }
+        if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
+            hql += " and location in (:addressIdList)";
+        }
+
+        Query query = session.createQuery(hql);
+        query.setString("orgCode", "%"+orgCode+"%");
+        query.setString("fullName", "%"+fullName+"%");
+        if (!StringUtils.isEmpty(settledWay)) {
+            query.setParameter("settledWay", settledWay);
+        }
+        if (!StringUtils.isEmpty(orgType)) {
+            query.setParameter("orgType", orgType);
+        }
+        if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
+            query.setParameterList("addressIdList", addressIdList);
+        }
+
+        return query.list().size();
     }
 
 

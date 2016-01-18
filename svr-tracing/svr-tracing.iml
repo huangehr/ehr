@@ -135,7 +135,7 @@
     <orderEntry type="module" module-name="commons-ehr-constants" />
     <orderEntry type="module" module-name="commons-ui-swagger" />
     <orderEntry type="module" module-name="commons-thrift-server" />
-    <orderEntry type="module" module-name="commons-thrift-services" />
+    <orderEntry type="module" module-name="ehr-commons-thrift-services" />
     <orderEntry type="library" name="Maven: commons-beanutils:commons-beanutils:1.9.2" level="project" />
     <orderEntry type="library" name="Maven: com.belerweb:pinyin4j:2.5.0" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.6.4" level="project" />

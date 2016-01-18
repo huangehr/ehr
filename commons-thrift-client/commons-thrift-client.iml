@@ -81,7 +81,7 @@
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.9" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-pool2:2.4.2" level="project" />
-    <orderEntry type="module" module-name="commons-thrift-services" />
+    <orderEntry type="module" module-name="ehr-commons-thrift-services" />
     <orderEntry type="library" name="Maven: commons-beanutils:commons-beanutils:1.9.2" level="project" />
     <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.2.2" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-core:4.2.4.RELEASE" level="project" />
