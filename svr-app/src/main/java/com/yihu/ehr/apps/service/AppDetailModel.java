@@ -1,8 +1,5 @@
 package com.yihu.ehr.apps.service;
-
-
-
-import com.yihu.ehr.model.dict.BaseDict;
+import com.yihu.ehr.model.dict.MBaseDict;
 
 import java.util.Date;
 
@@ -19,9 +16,9 @@ public class AppDetailModel {
     String auditor;
     Date create_time;
     Date audit_time;
-    BaseDict catalog;
+    MBaseDict catalog;
     String catalogValue;
-    BaseDict status;
+    MBaseDict status;
     String statusValue;
     String description;
     String strTags;
@@ -90,11 +87,11 @@ public class AppDetailModel {
         this.audit_time = audit_time;
     }
 
-    public BaseDict getCatalog() {
+    public MBaseDict getCatalog() {
         return catalog;
     }
 
-    public void setCatalog(BaseDict catalog) {
+    public void setCatalog(MBaseDict catalog) {
         this.catalog = catalog;
     }
 
@@ -106,11 +103,11 @@ public class AppDetailModel {
         this.catalogValue = catalogValue;
     }
 
-    public BaseDict getStatus() {
+    public MBaseDict getStatus() {
         return status;
     }
 
-    public void setStatus(BaseDict status) {
+    public void setStatus(MBaseDict status) {
         this.status = status;
     }
 

@@ -1,15 +1,14 @@
 package com.yihu.ehr.org.controller;
 
 import com.yihu.ehr.constrant.Result;
-import com.yihu.ehr.model.address.AddressModel;
-import com.yihu.ehr.model.org.OrganizationModel;
-import com.yihu.ehr.model.security.UserSecurityModel;
+import com.yihu.ehr.model.address.MAddress;
+import com.yihu.ehr.model.org.MOrganization;
+import com.yihu.ehr.model.security.MUserSecurity;
 import com.yihu.ehr.org.service.OrgManagerService;
 import com.yihu.ehr.org.service.OrgModel;
 import com.yihu.ehr.org.service.Organization;
 import com.yihu.ehr.org.service.SecurityClient;
 import com.yihu.ehr.util.ApiErrorEcho;
-import com.yihu.ehr.util.controller.BaseController;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -94,7 +93,7 @@ public class OrganizationRestController extends BaseRestController {
      * @param rows
      * @return
      */
-    @RequestMapping(value = "orgs", method = RequestMethod.GET)
+    @RequestMapping(value = "search", method = RequestMethod.GET)
     @ResponseBody
     public Object searchOrgs(
         @ApiParam(name = "searchNm", value = "搜索条件")
@@ -114,8 +113,6 @@ public class OrganizationRestController extends BaseRestController {
         @ApiParam(name = "rows", value = "页面记录数", defaultValue = "10")
         @RequestParam(value = "rows") int rows) {
 
-        BaseController baseController = new BaseController();
-
         Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("orgCode", searchNm);
         conditionMap.put("fullName", searchNm);
@@ -128,12 +125,10 @@ public class OrganizationRestController extends BaseRestController {
         conditionMap.put("pageSize", rows);
 
 
-        List<OrganizationModel> organizationModel = orgManagerService.searchOrgDetailModel(conditionMap);
-        Integer totalCount = organizationModel.size();
+        List<MOrganization> organizationList = orgManagerService.searchOrgDetailModel(conditionMap);
+        Integer totalCount = organizationList.size();
 
-        Result result = baseController.getResult(organizationModel, totalCount, page, rows);
-
-        return result;
+        return organizationList;
 
     }
 
@@ -195,7 +190,7 @@ public class OrganizationRestController extends BaseRestController {
 
                 org.setActivityFlag(1);
                 //这里做个服务调用更改地址信息
-                AddressModel location =  new AddressModel();
+                MAddress location =  new MAddress();
                 location.setCity(orgModel.getCity());
                 location.setDistrict(orgModel.getDistrict());
                 location.setProvince(orgModel.getProvince());
@@ -234,7 +229,7 @@ public class OrganizationRestController extends BaseRestController {
                 //org.getTags().clear();
                 org.setTags("");
                 org.addTag(orgModel.getTags());
-                AddressModel location = new AddressModel();
+                MAddress location = new MAddress();
                 location.setProvince(orgModel.getProvince());
                 location.setCity(orgModel.getCity());
                 location.setDistrict(orgModel.getDistrict());
@@ -315,7 +310,7 @@ public class OrganizationRestController extends BaseRestController {
     public Object distributeKey(String orgCode) {
         try {
             String publicKey = securityClient.getOrgPublicKey(orgCode);
-            UserSecurityModel userSecurity = new UserSecurityModel();
+            MUserSecurity userSecurity = new MUserSecurity();
             Map<String, String> keyMap = new HashMap<>();
             if (StringUtils.isEmpty(publicKey)) {
                 userSecurity = securityClient.createSecurityByOrgCode(orgCode);

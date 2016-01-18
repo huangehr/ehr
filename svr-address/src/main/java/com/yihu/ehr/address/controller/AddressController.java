@@ -1,7 +1,7 @@
 package com.yihu.ehr.address.controller;
 
 import com.yihu.ehr.address.service.*;
-import com.yihu.ehr.model.address.AddressModel;
+import com.yihu.ehr.model.address.MAddress;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,12 +62,12 @@ public class AddressController {
 
     //--------------------------------------------------------------------
 
-    @RequestMapping(value = "/getAddressById", method = RequestMethod.GET)
+    @RequestMapping(value = "/address", method = RequestMethod.GET)
     public Object getAddressById(
             @ApiParam(name = "id", value = "地址编号", defaultValue = "")
             @RequestParam(value = "id") String id) {
 
-        AddressModel model = new AddressModel();
+        MAddress model = new MAddress();
         Address address =  addressService.getAddressById(id);
         if(address!=null){
             model.setId(address.getId());
@@ -100,7 +100,7 @@ public class AddressController {
      * 地址检查并保存
      * @return
      */
-    @RequestMapping(value = "/saveAddress", method = RequestMethod.PUT)
+    @RequestMapping(value = "/address", method = RequestMethod.PUT)
     @ApiOperation(value = "地址检查并保存")
     public Object saveAddress(
             @ApiParam(name = "country", value = "国家" , defaultValue = "")
@@ -164,7 +164,7 @@ public class AddressController {
      * @param id
      * @return
      */
-    @RequestMapping("/delete")
+    @RequestMapping(value = "/address" , method = RequestMethod.DELETE)
     public Object delete(
             @ApiParam(name = "/id" , value = "地址代码" ,defaultValue = "")
             @RequestParam (value = "id") String id) {

@@ -23,7 +23,8 @@ spring:
     config:
       server:
         git:
-          uri: file:///D:/Workspace/source/ehr.config
+          uri: http://192.168.1.103:9000/EHR/ehr.config/
+          #uri: file:C:/Users/Administrator/Desktop/103环境/ehr.config
         default-label: dev
 
 eureka:

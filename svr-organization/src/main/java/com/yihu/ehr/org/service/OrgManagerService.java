@@ -1,7 +1,7 @@
 package com.yihu.ehr.org.service;
 
-import com.yihu.ehr.model.address.AddressModel;
-import com.yihu.ehr.model.org.OrganizationModel;
+import com.yihu.ehr.model.address.MAddress;
+import com.yihu.ehr.model.org.MOrganization;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,7 +102,7 @@ public class OrgManagerService  {
         }
         if (org.getLocation() != null) {
             //这里调用Address服务获取地址
-            AddressModel addres = addressClient.getAddressById(org.getLocation());
+            MAddress addres = addressClient.getAddressById(org.getLocation());
             if(!"00000".equals(addres.getId())){
                 orgModel.setProvince(addres.getProvince());
                 orgModel.setCity(addres.getCity());
@@ -161,7 +161,7 @@ public class OrgManagerService  {
         org.setTel(orgModel.getTel());
         //org.getTags().clear();
         org.addTag(orgModel.getTags());
-        AddressModel addressModel = new AddressModel();
+        MAddress addressModel = new MAddress();
         addressModel.setProvince(orgModel.getProvince());
         addressModel.setCity(orgModel.getCity());
         addressModel.setDistrict(orgModel.getDistrict());
@@ -177,7 +177,7 @@ public class OrgManagerService  {
     }
 
 
-    public List<OrganizationModel> search(Map<String, Object> args) {
+    public List<MOrganization> search(Map<String, Object> args) {
 
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         String orgCode = (String) args.get("orgCode");
@@ -225,8 +225,8 @@ public class OrgManagerService  {
     }
 
 
-    public List<OrganizationModel> searchOrgDetailModel(Map<String, Object> args) {
-        List<OrganizationModel> orgList = search(args);
+    public List<MOrganization> searchOrgDetailModel(Map<String, Object> args) {
+        List<MOrganization> orgList = search(args);
         return orgList;
     }
 
@@ -256,7 +256,7 @@ public class OrgManagerService  {
     }
 
 
-    public String saveAddress(AddressModel location) {
+    public String saveAddress(MAddress location) {
         String country = location.getCountry();
         String province = location.getProvince()!=null ? location.getProvince() :"";
         String city = location.getCity()!=null ? location.getCity() :"";

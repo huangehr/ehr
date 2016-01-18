@@ -1,6 +1,7 @@
 package com.yihu.ehr.apps.service;
-import com.yihu.ehr.model.dict.BaseDict;
-import com.yihu.ehr.model.user.UserModel;
+
+import com.yihu.ehr.model.dict.MBaseDict;
+import com.yihu.ehr.model.user.MUser;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -42,7 +43,7 @@ public class AppManager  {
 
 
 
-    public App createApp(String name, BaseDict catalog, String url, String tags, String description, UserModel creator) {
+    public App createApp(String name, MBaseDict catalog, String url, String tags, String description, MUser creator) {
 
         App app = new App();
         app.setName(name);
@@ -267,13 +268,13 @@ public class AppManager  {
     /**
      * 审核app状态的方法
      */
-    public void checkStatus(String appId, BaseDict appStatus) {
+    public void checkStatus(String appId, MBaseDict appStatus) {
         App app = appRepository.getAppById(appId);
         app.setStatus(appStatus.getCode());
         appRepository.save(app);
     }
 
-    public UserModel getUser(String userId) {
+    public MUser getUser(String userId) {
         return userClient.getUser(userId);
     }
 }

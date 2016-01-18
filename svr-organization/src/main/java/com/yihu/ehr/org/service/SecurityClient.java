@@ -1,6 +1,6 @@
 package com.yihu.ehr.org.service;
 
-import com.yihu.ehr.model.security.UserSecurityModel;
+import com.yihu.ehr.model.security.MUserSecurity;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,7 +19,7 @@ public interface SecurityClient {
     String getOrgPublicKey(@RequestParam(value = "orgCode") String orgCode);
 
     @RequestMapping(value = "/security/organization_key/{orgCode}", method = POST, consumes = "application/json")
-    UserSecurityModel createSecurityByOrgCode(@RequestParam(value = "orgCode") String orgCode);
+    MUserSecurity createSecurityByOrgCode(@RequestParam(value = "orgCode") String orgCode);
 
     @RequestMapping(value = "/security/organization_key/{orgCode}", method = GET,consumes = "application/json")
     String getUserKeyByOrgCd(@RequestParam(value = "orgCode") String orgCode);

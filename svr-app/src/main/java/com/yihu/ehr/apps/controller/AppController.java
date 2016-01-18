@@ -4,15 +4,17 @@ import com.yihu.ehr.apps.service.App;
 import com.yihu.ehr.apps.service.AppDetailModel;
 import com.yihu.ehr.apps.service.AppManager;
 import com.yihu.ehr.apps.service.ConventionalDictClient;
-import com.yihu.ehr.constrant.Result;
-import com.yihu.ehr.model.dict.BaseDict;
-import com.yihu.ehr.model.user.UserModel;
+import com.yihu.ehr.model.dict.MBaseDict;
+import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.util.ApiErrorEcho;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.List;
@@ -95,12 +97,9 @@ public class AppController extends BaseRestController {
         conditionMap.put("status", status);
         conditionMap.put("page", page);
         conditionMap.put("rows", rows);
-
-        BaseController baseController = new BaseController();
         List<AppDetailModel> detailModelList = appManager.searchAppDetailModels(conditionMap);
         Integer totalCount = appManager.searchAppsInt(conditionMap);
-        Result result = baseController.getResult(detailModelList, totalCount, page, rows);
-        return result;
+        return detailModelList;
     }
 
     @RequestMapping(value = "/app" , method = RequestMethod.DELETE)
@@ -127,8 +126,8 @@ public class AppController extends BaseRestController {
             @RequestParam(value = "userId") String userId) throws Exception{
 
         App app;
-        BaseDict appCatalog = conventionalDictClient.getAppCatalog(catalog);
-        UserModel userModel = appManager.getUser(userId);
+        MBaseDict appCatalog = conventionalDictClient.getAppCatalog(catalog);
+        MUser userModel = appManager.getUser(userId);
         app = appManager.createApp(name, appCatalog, url, tags, description, userModel);
 
         if (app == null) {
@@ -167,8 +166,8 @@ public class AppController extends BaseRestController {
             @RequestParam(value = "tags") String tags) throws Exception{
 
         App app;
-        BaseDict appCatalog = conventionalDictClient.getAppCatalog(catalog);
-        BaseDict appStatus = conventionalDictClient.getAppStatus(status);
+        MBaseDict appCatalog = conventionalDictClient.getAppCatalog(catalog);
+        MBaseDict appStatus = conventionalDictClient.getAppStatus(status);
 
 
         app = appManager.getApp(appId);
@@ -196,7 +195,7 @@ public class AppController extends BaseRestController {
             @RequestParam(value = "appId") String appId,
             @ApiParam(name = "status", value = "状态", defaultValue = "")
             @RequestParam(value = "status") String status) throws Exception{
-        BaseDict appStatus = conventionalDictClient.getAppStatus(status);
+        MBaseDict appStatus = conventionalDictClient.getAppStatus(status);
         appManager.checkStatus(appId, appStatus);
         return "success";
     }
