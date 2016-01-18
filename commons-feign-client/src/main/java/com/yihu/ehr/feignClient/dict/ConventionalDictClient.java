@@ -1,6 +1,6 @@
-package com.yihu.ehr.security.model;
+package com.yihu.ehr.feignClient.dict;
 
-import com.yihu.ehr.model.dict.BaseDict;
+import com.yihu.ehr.model.dict.MBaseDict;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,19 +14,16 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 public interface ConventionalDictClient {
 
     @RequestMapping(value = "/conventional_dict_service/getOrgType", method = GET,consumes = "application/json")
-    BaseDict getOrgType(@RequestParam(value = "code") String code);
+    MBaseDict getOrgType(@RequestParam(value = "code") String code);
 
     @RequestMapping(value = "/conventional_dict_service/getSettledWay", method = GET,consumes = "application/json")
-    BaseDict getSettledWay(@RequestParam(value = "code") String code);
+    MBaseDict getSettledWay(@RequestParam(value = "code") String code);
 
     @RequestMapping(value = "/conventional_dict_service/getAppCatalog", method = GET,consumes = "application/json")
-    BaseDict getAppCatalog(@RequestParam(value = "code") String code);
+    MBaseDict getAppCatalog(@RequestParam(value = "code") String code);
 
     @RequestMapping(value = "/conventional_dict_service/getAppStatus", method = GET,consumes = "application/json")
-    BaseDict getAppStatus(@RequestParam(value = "code") String code);
-
-
-
+    MBaseDict getAppStatus(@RequestParam(value = "code") String code);
 
 
 

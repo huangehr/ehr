@@ -7,7 +7,7 @@ import java.io.Serializable;
  * @version 1.0
  * @created 2015.07.30 14:43
  */
-public class BaseDict implements Serializable {
+public class MBaseDict implements Serializable {
     private static final long serialVersionUID = 1L;
 
     String code;
@@ -16,9 +16,9 @@ public class BaseDict implements Serializable {
     Integer sort;
     String phoneticCode;
     String catalog;
-    public BaseDict(){
+    public MBaseDict(){
     }
-    public BaseDict(long dictId, String code, String value, Integer sort, String phoneticCode, String catalog){
+    public MBaseDict(long dictId, String code, String value, Integer sort, String phoneticCode, String catalog){
         this.dictId = dictId;
         this.code = code;
         this.value = value;

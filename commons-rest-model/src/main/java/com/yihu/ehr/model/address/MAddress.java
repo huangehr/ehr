@@ -6,7 +6,7 @@ package com.yihu.ehr.model.address;
  * @version 1.0
  * @updated 25-05-2015 19:56:00
  */
-public class AddressModel {
+public class MAddress {
     private String id;
     private String country;
     private String province;
@@ -16,7 +16,7 @@ public class AddressModel {
     private String street;
     private String extra;
     private String postalCode;
-    public AddressModel() {
+    public MAddress() {
     }
 
     public String getId() {

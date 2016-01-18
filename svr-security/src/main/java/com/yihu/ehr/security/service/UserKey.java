@@ -1,4 +1,4 @@
-package com.yihu.ehr.security.model;
+package com.yihu.ehr.security.service;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -14,7 +14,7 @@ import java.util.UUID;
  * @updated 02-6月-2015 20:25:02
  */
 @Entity
-@Table(name = "user-key")
+@Table(name = "user_key")
 @Access(value = AccessType.PROPERTY)
 public class UserKey implements Serializable{
 
@@ -40,7 +40,7 @@ public class UserKey implements Serializable{
         this.id = id;
     }
 
-    @Column(name = "user-id",  nullable = true)
+    @Column(name = "user_id",  nullable = true)
     public String getUser() {
         return user;
     }
@@ -48,7 +48,7 @@ public class UserKey implements Serializable{
         this.user = user;
     }
 
-    @Column(name = "org-code",  nullable = true)
+    @Column(name = "org_code",  nullable = true)
     public String getOrg() {
         return org;
     }
@@ -56,7 +56,7 @@ public class UserKey implements Serializable{
         this.org = org;
     }
 
-    @Column(name = "key-type",  nullable = true)
+    @Column(name = "key_type",  nullable = true)
     public String getKeyType() {
         return keyType;
     }
@@ -64,7 +64,7 @@ public class UserKey implements Serializable{
         this.keyType = keyType;
     }
 
-    @Column(name = "key-id",  nullable = true)
+    @Column(name = "key_id",  nullable = true)
     public String getKey() {
         return key;
     }

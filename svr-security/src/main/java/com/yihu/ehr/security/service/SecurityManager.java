@@ -1,9 +1,7 @@
-package com.yihu.ehr.security.model;
+package com.yihu.ehr.security.service;
 
-import com.yihu.ehr.model.org.OrganizationModel;
-import com.yihu.ehr.model.user.UserModel;
-import com.yihu.ehr.security.service.OrgClient;
-import com.yihu.ehr.security.service.UserClient;
+import com.yihu.ehr.model.org.MOrganization;
+import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.util.DateUtil;
 import com.yihu.ehr.util.encrypt.RSA;
 import org.hibernate.Criteria;
@@ -93,7 +91,7 @@ public class SecurityManager {
 
         //1-1根据用户登陆名获取用户信息。
 
-        UserModel userInfo = userClient.getUser(userId);
+        MUser userInfo = userClient.getUser(userId);
         if(userInfo==null) {
             return null;
         }
@@ -109,7 +107,7 @@ public class SecurityManager {
     @Transactional(Transactional.TxType.SUPPORTS)
     public UserSecurity createSecurityByOrgCode(String orgCode) throws Exception {
 
-        OrganizationModel orgInfo = orgClient.getOrg(orgCode);
+        MOrganization orgInfo = orgClient.getOrg(orgCode);
         if(orgInfo==null) {
             return null;
         }
@@ -129,7 +127,7 @@ public class SecurityManager {
     public UserSecurity getUserSecurityByUserName(String loginCode) throws Exception {
 
         //1-1根据用户登陆名获取用户信息。
-        UserModel userInfo = userClient.getUserByLoginCode(loginCode);
+        MUser userInfo = userClient.getUserByLoginCode(loginCode);
         if(userInfo==null) {
             return null;
         } else {
@@ -179,7 +177,7 @@ public class SecurityManager {
         session.delete(security);
     }
 
-    public UserKey createUserKey(UserSecurity security, UserModel user, String keyType) {
+    public UserKey createUserKey(UserSecurity security, MUser user, String keyType) {
 
         UserKey userKey = new UserKey();
 
@@ -192,7 +190,7 @@ public class SecurityManager {
     }
 
     @Transactional(Transactional.TxType.SUPPORTS)
-    public UserKey createUserKeyByOrg(UserSecurity security, OrganizationModel org, String keyType) {
+    public UserKey createUserKeyByOrg(UserSecurity security, MOrganization org, String keyType) {
 
         UserKey userKey = new UserKey();
 

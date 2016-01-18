@@ -9,9 +9,9 @@ import java.util.Date;
  * @version 1.0
  * @created 02-6月-2015 17:38:05
  */
-public class UserSecurityModel  {
+public class MUserSecurity {
 
-	public UserSecurityModel() {
+	public MUserSecurity() {
 
 	}
 	private String id;

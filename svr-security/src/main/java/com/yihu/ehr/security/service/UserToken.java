@@ -1,4 +1,4 @@
-package com.yihu.ehr.security.model;
+package com.yihu.ehr.security.service;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -12,7 +12,7 @@ import java.util.UUID;
  */
 
 @Entity
-@Table(name = "user-token")
+@Table(name = "user_token")
 @Access(value = AccessType.PROPERTY)
 public class UserToken implements Serializable {
 
@@ -32,7 +32,7 @@ public class UserToken implements Serializable {
     @Id
     @GeneratedValue(generator = "Generator")
     @GenericGenerator(name = "Generator", strategy = "assigned")
-    @Column(name = "tokenId", unique = true, nullable = false)
+    @Column(name = "token_id", unique = true, nullable = false)
     public String getTokenId() {
         return tokenId;
     }
@@ -40,7 +40,7 @@ public class UserToken implements Serializable {
         this.tokenId = tokenId;
     }
 
-    @Column(name = "access-token",  nullable = true)
+    @Column(name = "access_token",  nullable = true)
     public String getAccessToken() {
         return accessToken;
     }
@@ -48,7 +48,7 @@ public class UserToken implements Serializable {
         this.accessToken = accessToken;
     }
 
-    @Column(name = "refresh-token",  nullable = true)
+    @Column(name = "refresh_token",  nullable = true)
     public String getRefreshToken() {
         return refreshToken;
     }
@@ -56,7 +56,7 @@ public class UserToken implements Serializable {
         this.refreshToken = refreshToken;
     }
 
-    @Column(name = "expires-in",  nullable = true)
+    @Column(name = "expires_in",  nullable = true)
     public int getExpiresIn() {
         return expiresIn;
     }
@@ -64,7 +64,7 @@ public class UserToken implements Serializable {
         this.expiresIn = expiresIn;
     }
 
-    @Column(name = "create-date",  nullable = true)
+    @Column(name = "create_date",  nullable = true)
     public Date getCreateDate() {
         return createDate;
     }
@@ -72,7 +72,7 @@ public class UserToken implements Serializable {
         this.createDate = createDate;
     }
 
-    @Column(name = "update-date",  nullable = true)
+    @Column(name = "update_date",  nullable = true)
     public Date getUpdateDate() {
         return updateDate;
     }
@@ -80,7 +80,7 @@ public class UserToken implements Serializable {
         this.updateDate = updateDate;
     }
 
-    @Column(name = "user-id",  nullable = true)
+    @Column(name = "user_id",  nullable = true)
     public String getUserId() {
         return userId;
     }
@@ -88,7 +88,7 @@ public class UserToken implements Serializable {
         this.userId = userId;
     }
 
-    @Column(name = "app-id",  nullable = true)
+    @Column(name = "app_id",  nullable = true)
     public String getAppId() {
         return appId;
     }

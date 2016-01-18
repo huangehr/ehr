@@ -11,7 +11,7 @@ import java.util.Set;
  * @created 03_8月_2015 16:53:21
  */
 
-public class AppModel {
+public class MApp {
     private String id;
     private String name;
     private String secret;
@@ -25,7 +25,7 @@ public class AppModel {
     private String description;
     private Set<String> tags = new HashSet<>();
 
-	public AppModel(){
+	public MApp(){
 
     }
 

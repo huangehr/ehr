@@ -1,7 +1,7 @@
-package com.yihu.ehr.user.user.service;
+package com.yihu.ehr.model.user;
 
 
-public class UserModel {
+public class MUser {
 
     String id="";
     String loginCode="";
