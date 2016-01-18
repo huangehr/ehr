@@ -1,6 +1,6 @@
 spring:
   application:
-    name: ag-admin
+    name: gateway-ehr-browser
 
   cloud:
     config:
@@ -10,3 +10,5 @@ spring:
       uri: http://localhost:1221
       label: dev
 
+encrypt:
+  failOnError: false
