@@ -11,20 +11,23 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  * Created by Administrator on 2016/1/4.
  */
 @FeignClient("svr-user")
+@RequestMapping("/rest/v1.0/user")
 public interface UserClient {
 
+    @RequestMapping(value = "/user", method = GET ,consumes = "application/json")
+    MUser getUser(@RequestParam(value = "userId") String userId);
 
-    @RequestMapping(value = "/user/loginIndetification", method = GET ,consumes = "application/json")
+    @RequestMapping(value = "/login_code", method = GET ,consumes = "application/json")
+    MUser getUserByLoginCode(
+            @RequestParam(value = "loginCode") String loginCode);
+
+
+    @RequestMapping(value = "/login_indetification", method = GET ,consumes = "application/json")
     MUser loginIndetification(
             @RequestParam(value = "userName") String userName,
             @RequestParam(value = "psw") String psw);
 
-    @RequestMapping(value = "/user/user", method = GET ,consumes = "application/json")
-    MUser getUser(
-            @RequestParam(value = "userId") String userId);
 
-    @RequestMapping(value = "/user/user/loginCode", method = GET ,consumes = "application/json")
-    MUser getUserByLoginCode(
-            @RequestParam(value = "loginCode") String loginCode);
+
 
 }

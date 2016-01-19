@@ -1,5 +1,7 @@
 package com.yihu.ehr.security.service;
 
+import com.yihu.ehr.feignClient.org.OrgClient;
+import com.yihu.ehr.feignClient.user.UserClient;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.util.DateUtil;
@@ -171,10 +173,8 @@ public class SecurityManager {
     @Transactional(Transactional.TxType.SUPPORTS)
     public void deleteSecurity(String id) {
 
-        Session session = entityManager.unwrap(org.hibernate.Session.class);
-        UserSecurity security = (UserSecurity) session.load(UserSecurity.class, id);
-
-        session.delete(security);
+        UserSecurity userSecurity = userSecurityRepository.findOne(id);
+        userSecurityRepository.delete(userSecurity);
     }
 
     public UserKey createUserKey(UserSecurity security, MUser user, String keyType) {
@@ -207,6 +207,7 @@ public class SecurityManager {
 
     public String getUserKeyByUserId(String userId) {
 
+        // TODO: 2016/1/18 这里获取的是第几个字段 
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         StringBuilder sb = new StringBuilder();
 
@@ -226,7 +227,7 @@ public class SecurityManager {
             return null;
         } else {
             Object[] userKeyInfo = (Object[]) sqlQuery.list().get(0);
-            String userKeyId = userKeyInfo[0].toString();
+            String userKeyId = userKeyInfo[2].toString(); //大大大大
             return userKeyId;
         }
     }

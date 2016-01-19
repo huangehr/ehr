@@ -1,5 +1,6 @@
 package com.yihu.ehr.security.service;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 /**
@@ -9,4 +10,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  */
 public interface XUserSecurityRepository extends PagingAndSortingRepository<UserSecurity, String> {
 
+//    @Query("select userSecurity from UserSecurity userSecurity where userSecurity.dictId = 1 and dict.code = :code order by dict.sort asc")
+//    UserSecurity getByUserKey(String userKeyId);
 }

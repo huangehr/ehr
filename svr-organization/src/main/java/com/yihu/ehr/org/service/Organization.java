@@ -54,7 +54,7 @@ public class Organization  {
 
     @Column(name = "tags",  nullable = true)
     public String getTags() {
-        return tags.toString();
+        return String.join(",", tags);
     }
     public void setTags(String tags) {
         if(tags == null) return;

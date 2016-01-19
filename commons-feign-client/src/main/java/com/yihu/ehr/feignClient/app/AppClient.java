@@ -12,14 +12,14 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @FeignClient("svr-app")
 public interface AppClient {
 
-
-    @RequestMapping(value = "/app/validation", method = GET ,consumes = "application/json")
+    @RequestMapping(value = "/rest/v1.0/app/validation", method = GET ,consumes = "application/json")
     Boolean validationApp(
             @RequestParam(value = "id") String appId,
             @RequestParam(value = "appSecret") String appSecret);
 
 
-    @RequestMapping(value = "/app/validation", method = GET ,consumes = "application/json")
+    @RequestMapping(value = "/rest/v1.0/app/validation", method = GET ,consumes = "application/json")
     MApp getApp(@RequestParam(value = "appId") String appId);
+
 
 }

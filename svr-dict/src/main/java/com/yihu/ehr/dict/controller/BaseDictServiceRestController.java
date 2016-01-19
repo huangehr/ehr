@@ -15,9 +15,10 @@ import java.util.List;
  *
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/conventionalDict")
-@Api(protocols = "https", value = "conventional_dict_service", description = "通用字典接口", tags = {"通用字典接口"})
+@RequestMapping(ApiVersionPrefix.CommonVersion + "/conventional_dict")
+@Api(protocols = "https", value = "conventional_dict", description = "通用字典接口", tags = {"通用字典接口"})
 public class BaseDictServiceRestController extends BaseRestController {
+
 
     @Autowired
     private ConventionalDictEntry baseAbstractDictEntry;
@@ -25,6 +26,8 @@ public class BaseDictServiceRestController extends BaseRestController {
     @RequestMapping(value = "/catalog", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public AppCatalog getAppCatalog(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         AppCatalog appCatalog = baseAbstractDictEntry.getAppCatalog(code);
@@ -34,6 +37,8 @@ public class BaseDictServiceRestController extends BaseRestController {
     @RequestMapping(value = "/appStatus", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public AppStatus getAppStatus(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         return baseAbstractDictEntry.getAppStatus(code);
@@ -42,6 +47,8 @@ public class BaseDictServiceRestController extends BaseRestController {
     @RequestMapping(value = "/gender", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public Gender getGender(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         return baseAbstractDictEntry.getGender(code);
@@ -50,6 +57,8 @@ public class BaseDictServiceRestController extends BaseRestController {
     @RequestMapping(value = "/martialStatus", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public MartialStatus getMartialStatus(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         return baseAbstractDictEntry.getMartialStatus(code);
@@ -58,6 +67,8 @@ public class BaseDictServiceRestController extends BaseRestController {
     @RequestMapping(value = "/nation", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public Nation getNation(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         return baseAbstractDictEntry.getNation(code);
@@ -66,6 +77,8 @@ public class BaseDictServiceRestController extends BaseRestController {
     @RequestMapping(value = "/residenceType", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public ResidenceType getResidenceType(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         return baseAbstractDictEntry.getResidenceType(code);
@@ -74,6 +87,8 @@ public class BaseDictServiceRestController extends BaseRestController {
     @RequestMapping(value = "/orgType", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public OrgType getOrgType(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         return baseAbstractDictEntry.getOrgType(code);
@@ -82,6 +97,8 @@ public class BaseDictServiceRestController extends BaseRestController {
     @RequestMapping(value = "/settledWay", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public SettledWay getSettledWay(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         return baseAbstractDictEntry.getSettledWay(code);
@@ -90,6 +107,8 @@ public class BaseDictServiceRestController extends BaseRestController {
     @RequestMapping(value = "/cardStatus", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public CardStatus getCardStatus(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         return baseAbstractDictEntry.getCardStatus(code);
@@ -98,6 +117,8 @@ public class BaseDictServiceRestController extends BaseRestController {
     @RequestMapping(value = "/cardType", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public CardType getCardType(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         return baseAbstractDictEntry.getCardType(code);
@@ -106,6 +127,8 @@ public class BaseDictServiceRestController extends BaseRestController {
     @RequestMapping(value = "/requestState", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public RequestState getRequestState(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         return baseAbstractDictEntry.getRequestState(code);
@@ -114,6 +137,8 @@ public class BaseDictServiceRestController extends BaseRestController {
     @RequestMapping(value = "/keyType", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public KeyType getKeyType(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         return baseAbstractDictEntry.getKeyType(code);
@@ -122,6 +147,8 @@ public class BaseDictServiceRestController extends BaseRestController {
     @RequestMapping(value = "/medicalRole", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public MedicalRole getMedicalRole(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         return baseAbstractDictEntry.getMedicalRole(code);
@@ -130,6 +157,8 @@ public class BaseDictServiceRestController extends BaseRestController {
     @RequestMapping(value = "/userRole", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public UserRole getUserRole(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         return baseAbstractDictEntry.getUserRole(code);
@@ -138,6 +167,8 @@ public class BaseDictServiceRestController extends BaseRestController {
     @RequestMapping(value = "/userType", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public UserType getUserType(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         return baseAbstractDictEntry.getUserType(code);
@@ -146,6 +177,8 @@ public class BaseDictServiceRestController extends BaseRestController {
     @RequestMapping(value = "/loginAddress", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public LoginAddress getLoginAddress(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         return baseAbstractDictEntry.getLoginAddress(code);
@@ -156,16 +189,16 @@ public class BaseDictServiceRestController extends BaseRestController {
     @RequestMapping(value = "/userTypeList", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public List<UserType> getUserTypeList(
-            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
-            @RequestParam(value = "code") String code) {
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion) {
         return baseAbstractDictEntry.getUserTypeList();
     }
 
     @RequestMapping(value = "/tagsList", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public List<Tags> getTagsList(
-            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
-            @RequestParam(value = "code") String code) {
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion) {
         return baseAbstractDictEntry.getTagsList();
     }
 
@@ -174,6 +207,8 @@ public class BaseDictServiceRestController extends BaseRestController {
     @RequestMapping(value = "/yesNo", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public YesNo getYesNo(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") boolean code) {
         return baseAbstractDictEntry.getYesNo(code);
@@ -182,6 +217,8 @@ public class BaseDictServiceRestController extends BaseRestController {
     @RequestMapping(value = "/adapterType", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public AdapterType getAdapterType(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         return baseAbstractDictEntry.getAdapterType(code);

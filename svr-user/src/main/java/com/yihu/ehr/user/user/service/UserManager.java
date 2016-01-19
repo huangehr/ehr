@@ -1,8 +1,14 @@
 package com.yihu.ehr.user.user.service;
 
-import com.yihu.ehr.model.address.AddressModel;
-import com.yihu.ehr.model.dict.BaseDict;
-import com.yihu.ehr.model.org.OrganizationModel;
+import com.yihu.ehr.feignClient.address.AddressClient;
+import com.yihu.ehr.feignClient.dict.ConventionalDictClient;
+import com.yihu.ehr.feignClient.org.OrgClient;
+import com.yihu.ehr.feignClient.security.SecurityClient;
+import com.yihu.ehr.model.address.MAddress;
+import com.yihu.ehr.model.dict.MBaseDict;
+import com.yihu.ehr.model.org.MOrganization;
+import com.yihu.ehr.model.security.MUserSecurity;
+import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.user.user.model.MedicalUser;
 import com.yihu.ehr.util.ApiErrorEcho;
 import com.yihu.ehr.util.encode.HashUtil;
@@ -39,10 +45,13 @@ public class UserManager  {
     private ConventionalDictClient conventionalDictClient;
 
     @Autowired
-    private OrganizationClient organizationClient;
+    private OrgClient organizationClient;
 
     @Autowired
     private AddressClient addressClient;
+
+    @Autowired
+    SecurityClient securityClient;
 
     @PersistenceContext
     protected EntityManager entityManager;
@@ -79,7 +88,7 @@ public class UserManager  {
      * @param pwd
      * @param email
      */
-    public User registerUser(BaseDict userType, String loginCode, String nickName, String pwd, String email) {
+    public User registerUser(MBaseDict userType, String loginCode, String nickName, String pwd, String email) {
 
         User user = new User();
         user.setUserType(userType.getCode());
@@ -110,11 +119,11 @@ public class UserManager  {
         return user;
     }
 
-    public OrganizationModel getgetOrg(String orgCode) {
+    public MOrganization getOrg(String orgCode) {
         return organizationClient.getOrg(orgCode);
     }
 
-    public AddressModel getAddressById(String locarion) {
+    public MAddress getAddressById(String locarion) {
         return addressClient.getAddressById(locarion);
 
     }
@@ -124,9 +133,9 @@ public class UserManager  {
      * @param user
      */
     @Transactional(Transactional.TxType.SUPPORTS)
-    public UserModel getUser(User user) {
+    public MUser getUser(User user) {
 
-        UserModel userModel = new UserModel();
+        MUser userModel = new MUser();
         userModel.setId(user.getId());
         userModel.setLoginCode(user.getLoginCode());
         userModel.setEmail(user.getEmail());
@@ -151,15 +160,14 @@ public class UserManager  {
             userModel.setMajor((user).getMajor());
         }
 
-//        XSecurityManager securityManager = ServiceFactory.getService(Services.SecurityManager);
-//        UserSecurity userSecurity = securityManager.getUserPublicKeyByUserId(user.getId());
-//        if (userSecurity != null) {
-//            userModel.setPublicKey(userSecurity.getPublicKey());
-//            String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT)
-//                    + "~" + DateUtil.toString(userSecurity.getExpiryDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT);
-//            userModel.setValidTime(validTime);
-//            userModel.setStartTime( DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT));
-//        }
+        MUserSecurity userSecurity = securityClient.getUserPublicKeyByUserId(user.getId());
+        if (userSecurity != null) {
+            userModel.setPublicKey(userSecurity.getPublicKey());
+            String validTime = DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd")
+                    + "~" + DateFormatUtils.format(userSecurity.getExpiryDate(),"yyyy-MM-dd");
+            userModel.setValidTime(validTime);
+            userModel.setStartTime(DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd"));
+        }
 
         return userModel;
     }
@@ -374,7 +382,7 @@ public class UserManager  {
      *
      * @param userModel
      */
-    public void updateUser(UserModel userModel) {
+    public void updateUser(MUser userModel) {
 
         User user;
         Map<String, Object> message = new HashMap<>();
