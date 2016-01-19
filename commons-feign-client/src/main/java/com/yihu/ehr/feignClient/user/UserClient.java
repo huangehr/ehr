@@ -18,7 +18,8 @@ public interface UserClient {
     MUser getUser(@RequestParam(value = "userId") String userId);
 
     @RequestMapping(value = "/login_code", method = GET ,consumes = "application/json")
-    MUser getUserByLoginCode(@RequestParam(value = "loginCode") String loginCode);
+    MUser getUserByLoginCode(
+            @RequestParam(value = "loginCode") String loginCode);
 
 
     @RequestMapping(value = "/login_indetification", method = GET ,consumes = "application/json")

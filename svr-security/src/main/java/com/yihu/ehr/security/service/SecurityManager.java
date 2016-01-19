@@ -207,6 +207,7 @@ public class SecurityManager {
 
     public String getUserKeyByUserId(String userId) {
 
+        // TODO: 2016/1/18 这里获取的是第几个字段 
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         StringBuilder sb = new StringBuilder();
 
@@ -226,7 +227,7 @@ public class SecurityManager {
             return null;
         } else {
             Object[] userKeyInfo = (Object[]) sqlQuery.list().get(0);
-            String userKeyId = userKeyInfo[0].toString();
+            String userKeyId = userKeyInfo[2].toString(); //大大大大
             return userKeyId;
         }
     }

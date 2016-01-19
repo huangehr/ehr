@@ -122,12 +122,9 @@ public class OrgManagerService  {
                 System.out.println(e.getMessage());
             }
         }
-        String publicKey = securityClient.getUserPublicKeyByOrgCode(org.getOrgCode());
-        if (StringUtils.isEmpty(publicKey)) {
-            orgModel.setPublicKey(publicKey);
-
-            MUserSecurity userSecurity = securityClient.createSecurityByOrgCode(org.getOrgCode());
-
+        MUserSecurity userSecurity = securityClient.createSecurityByOrgCode(org.getOrgCode());
+        if (userSecurity != null) {
+            orgModel.setPublicKey(userSecurity.getPublicKey());
             String validTime = DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd")
                     + "~" + DateFormatUtils.format(userSecurity.getExpiryDate(),"yyyy-MM-dd");
             orgModel.setValidTime(validTime);

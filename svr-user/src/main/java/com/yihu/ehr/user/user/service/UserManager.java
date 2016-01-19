@@ -3,9 +3,11 @@ package com.yihu.ehr.user.user.service;
 import com.yihu.ehr.feignClient.address.AddressClient;
 import com.yihu.ehr.feignClient.dict.ConventionalDictClient;
 import com.yihu.ehr.feignClient.org.OrgClient;
+import com.yihu.ehr.feignClient.security.SecurityClient;
 import com.yihu.ehr.model.address.MAddress;
 import com.yihu.ehr.model.dict.MBaseDict;
 import com.yihu.ehr.model.org.MOrganization;
+import com.yihu.ehr.model.security.MUserSecurity;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.user.user.model.MedicalUser;
 import com.yihu.ehr.util.ApiErrorEcho;
@@ -47,6 +49,9 @@ public class UserManager  {
 
     @Autowired
     private AddressClient addressClient;
+
+    @Autowired
+    SecurityClient securityClient;
 
     @PersistenceContext
     protected EntityManager entityManager;
@@ -155,15 +160,14 @@ public class UserManager  {
             userModel.setMajor((user).getMajor());
         }
 
-//        XSecurityManager securityManager = ServiceFactory.getService(Services.SecurityManager);
-//        UserSecurity userSecurity = securityManager.getUserPublicKeyByUserId(user.getId());
-//        if (userSecurity != null) {
-//            userModel.setPublicKey(userSecurity.getPublicKey());
-//            String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT)
-//                    + "~" + DateUtil.toString(userSecurity.getExpiryDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT);
-//            userModel.setValidTime(validTime);
-//            userModel.setStartTime( DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT));
-//        }
+        MUserSecurity userSecurity = securityClient.getUserPublicKeyByUserId(user.getId());
+        if (userSecurity != null) {
+            userModel.setPublicKey(userSecurity.getPublicKey());
+            String validTime = DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd")
+                    + "~" + DateFormatUtils.format(userSecurity.getExpiryDate(),"yyyy-MM-dd");
+            userModel.setValidTime(validTime);
+            userModel.setStartTime(DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd"));
+        }
 
         return userModel;
     }

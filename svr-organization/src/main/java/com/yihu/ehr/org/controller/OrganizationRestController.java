@@ -16,7 +16,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -308,20 +307,21 @@ public class OrganizationRestController extends BaseRestController {
             @ApiParam(name = "orgCode", value = "机构代码")
             @RequestParam(value = "orgCode") String orgCode) {
         try {
-            String publicKey = securityClient.getOrgPublicKey(orgCode);
-            MUserSecurity userSecurity = new MUserSecurity();
+
+            MUserSecurity userSecurity = securityClient.getUserPublicKeyByOrgCode(orgCode);
             Map<String, String> keyMap = new HashMap<>();
-            if (StringUtils.isEmpty(publicKey)) {
+            if (userSecurity == null) {
                 userSecurity = securityClient.createSecurityByOrgCode(orgCode);
 
             }else{
                 //result.setErrorMsg("公钥信息已存在。");
                 //这里删除原有的公私钥重新分配
-                String userKeyId = securityClient.getUserPublicKeyByOrgCode(orgCode);
+                String userKeyId = securityClient.getUserKeyByOrgCd(orgCode);
                 securityClient.deleteSecurity(userSecurity.getId());
                 securityClient.deleteUserKey(userKeyId);
                 userSecurity = securityClient.createSecurityByOrgCode(orgCode);
             }
+
             //String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT);
             String validTime = DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd")
                     + "~" + DateFormatUtils.format(userSecurity.getExpiryDate(),"yyyy-MM-dd");

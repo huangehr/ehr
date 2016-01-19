@@ -1,5 +1,6 @@
 package com.yihu.ehr.apps.service;
 
+import com.yihu.ehr.feignClient.user.UserClient;
 import com.yihu.ehr.model.dict.MBaseDict;
 import com.yihu.ehr.model.user.MUser;
 import org.hibernate.Criteria;
