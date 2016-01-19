@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Created by AndyCai on 2016/1/19.
  */
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/conDict")
+@RequestMapping(ApiVersionPrefix.CommonVersion + "/sysDict")
 @RestController
 public class SystemDictController extends BaseRestController {
 
