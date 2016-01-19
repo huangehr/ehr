@@ -89,5 +89,11 @@
 			<artifactId>ehr-commons-rest-model</artifactId>
 			<version>1.1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.yihu.ehr</groupId>
+			<artifactId>ehr-commons-ui-swagger</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+
 	</dependencies>
 </project>

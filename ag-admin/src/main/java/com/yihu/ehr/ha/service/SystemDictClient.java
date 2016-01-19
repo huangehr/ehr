@@ -11,16 +11,17 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  * Created by AndyCai on 2016/1/19.
  */
 @FeignClient("svr-dict")
+@RequestMapping("/rest/v1.0")
 public interface SystemDictClient {
-    @RequestMapping(value = "/conventional_dict_service/getOrgType", method = GET,consumes = "application/json")
+    @RequestMapping(value = "/conventional_dict/orgType", method = GET,consumes = "application/json")
     MBaseDict getOrgType(@RequestParam(value = "code") String code);
 
-    @RequestMapping(value = "/conventional_dict_service/getSettledWay", method = GET,consumes = "application/json")
+    @RequestMapping(value = "/conventional_dict/settledWay", method = GET,consumes = "application/json")
     MBaseDict getSettledWay(@RequestParam(value = "code") String code);
 
-    @RequestMapping(value = "/conventional_dict_service/getAppCatalog", method = GET,consumes = "application/json")
+    @RequestMapping(value = "/conventional_dict/catalog", method = GET,consumes = "application/json")
     MBaseDict getAppCatalog(@RequestParam(value = "code") String code);
 
-    @RequestMapping(value = "/conventional_dict_service/getAppStatus", method = GET,consumes = "application/json")
+    @RequestMapping(value = "/conventional_dict/appStatus", method = GET,consumes = "application/json")
     MBaseDict getAppStatus(@RequestParam(value = "code") String code);
 }
