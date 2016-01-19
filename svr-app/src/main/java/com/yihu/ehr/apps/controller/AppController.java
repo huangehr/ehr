@@ -110,6 +110,17 @@ public class AppController extends BaseRestController {
         return "success";
     }
 
+    /**
+     *
+     * @param name
+     * @param catalog
+     * @param url
+     * @param description
+     * @param tags
+     * @param userId
+     * @return
+     * @throws Exception
+     */
     @RequestMapping(value = "app" , method = RequestMethod.POST)
     public Object createApp(
             @ApiParam(name = "name", value = "名称", defaultValue = "")
