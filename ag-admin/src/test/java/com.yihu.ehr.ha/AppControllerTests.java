@@ -1,6 +1,6 @@
 package com.yihu.ehr.ha;
 
-import com.yihu.ehr.ha.controller.AppController;
+import com.yihu.ehr.ha.apps.controller.AppController;
 import com.yihu.ehr.model.app.MApp;
 import org.junit.Test;
 import org.junit.runner.RunWith;

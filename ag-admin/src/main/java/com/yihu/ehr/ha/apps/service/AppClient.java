@@ -1,4 +1,4 @@
-package com.yihu.ehr.ha.service;
+package com.yihu.ehr.ha.apps.service;
 
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +22,7 @@ public interface AppClient {
     @RequestMapping(value = "/app", method = RequestMethod.DELETE)
     Object deleteApp(@RequestParam(value = "appId") String appId);
 
-    @RequestMapping(value = "/app", method = RequestMethod.POST)
+    @RequestMapping(value = "/createApp", method = RequestMethod.POST)
     Object createApp(@RequestParam(value = "name") String name,
                      @RequestParam(value = "catalog") String catalog,
                      @RequestParam(value = "url") String url,

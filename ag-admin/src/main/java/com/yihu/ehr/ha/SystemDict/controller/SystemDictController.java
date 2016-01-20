@@ -1,7 +1,7 @@
-package com.yihu.ehr.ha.controller;
+package com.yihu.ehr.ha.SystemDict.controller;
 
 import com.yihu.ehr.constants.ApiVersionPrefix;
-import com.yihu.ehr.ha.service.SystemDictClient;
+import com.yihu.ehr.ha.SystemDict.service.SystemDictClient;
 import com.yihu.ehr.model.dict.MBaseDict;
 import com.yihu.ehr.util.controller.BaseRestController;
 import org.springframework.beans.factory.annotation.Autowired;

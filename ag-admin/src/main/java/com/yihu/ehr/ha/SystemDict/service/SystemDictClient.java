@@ -1,4 +1,4 @@
-package com.yihu.ehr.ha.service;
+package com.yihu.ehr.ha.SystemDict.service;
 
 import com.yihu.ehr.model.dict.MBaseDict;
 import org.springframework.cloud.netflix.feign.FeignClient;
