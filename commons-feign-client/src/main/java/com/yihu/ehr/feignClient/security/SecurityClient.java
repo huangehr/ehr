@@ -10,8 +10,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
 /**
  * Created by Administrator on 2016/1/4.
  */
-@FeignClient("svr-secutity")
-@RequestMapping("/rest/v1.0/secutity")
+@FeignClient("svr-security")
+@RequestMapping("/rest/v1.0/security")
 public interface SecurityClient {
 
     @RequestMapping(value = "/organization_key/org_code", method = GET,consumes = "application/json")
@@ -39,8 +39,15 @@ public interface SecurityClient {
     MUserSecurity getUserPublicKeyByUserId(@RequestParam(value = "userId") String userId);
 
 
-    @RequestMapping(value = "/userKey/org_code", method = GET ,consumes = "application/json")
+    @RequestMapping(value = "/user_key/org_code", method = GET ,consumes = "application/json")
     String getUserKeyByOrgCd(@RequestParam(value = "orgCode") String orgCode);
+
+    @RequestMapping(value = "/user_id", method = GET ,consumes = "application/json")
+    String getUserKeyByUserId(@RequestParam(value = "userId") String userId);
+
+
+
+
 
 
 

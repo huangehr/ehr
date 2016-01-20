@@ -1,5 +1,6 @@
 package com.yihu.ehr.apps.service;
 
+import com.yihu.ehr.feignClient.dict.ConventionalDictClient;
 import com.yihu.ehr.feignClient.user.UserClient;
 import com.yihu.ehr.model.dict.MBaseDict;
 import com.yihu.ehr.model.user.MUser;
@@ -64,12 +65,12 @@ public class AppManager  {
     }
 
     public void deleteApp(String id) {
-        App app = appRepository.getAppById(id);
+        App app = appRepository.findOne(id);
         appRepository.delete(app);
     }
 
     public App getApp(String id) {
-        App app = appRepository.getAppById(id);
+        App app = appRepository.findOne(id);
         return app;
     }
 
@@ -270,7 +271,7 @@ public class AppManager  {
      * 审核app状态的方法
      */
     public void checkStatus(String appId, MBaseDict appStatus) {
-        App app = appRepository.getAppById(appId);
+        App app = appRepository.findOne(appId);
         app.setStatus(appStatus.getCode());
         appRepository.save(app);
     }

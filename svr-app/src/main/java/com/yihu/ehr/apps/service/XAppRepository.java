@@ -12,8 +12,6 @@ import org.springframework.data.repository.query.Param;
  */
 public interface XAppRepository extends PagingAndSortingRepository<App, String> {
 
-    @Query("select app from App app where app.id = :id")
-    App getAppById(@Param("id") String id);
 
 
 }

@@ -58,7 +58,6 @@ public class OrganizationRestController extends BaseRestController {
 
     /**
      * 机构列表查询
-     * @param searchNm
      * @param settledWay
      * @param orgType
      * @param province
@@ -73,8 +72,10 @@ public class OrganizationRestController extends BaseRestController {
     public Object searchOrgs(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "searchNm", value = "搜索条件")
-            @RequestParam(value = "searchNm") String searchNm,
+            @ApiParam(name = "orgCode", value = "机构代码")
+            @RequestParam(value = "orgCode") String orgCode,
+            @ApiParam(name = "fullName", value = "全称")
+            @RequestParam(value = "fullName") String fullName,
             @ApiParam(name = "settledWay", value = "接入方式",defaultValue = "")
             @RequestParam(value = "settledWay") String settledWay,
             @ApiParam(name = "orgType", value = "机构类型")
@@ -91,8 +92,8 @@ public class OrganizationRestController extends BaseRestController {
             @RequestParam(value = "rows") int rows) {
 
         Map<String, Object> conditionMap = new HashMap<>();
-        conditionMap.put("orgCode", searchNm);
-        conditionMap.put("fullName", searchNm);
+        conditionMap.put("orgCode", orgCode);
+        conditionMap.put("fullName", fullName);
         conditionMap.put("settledWay", settledWay);
         conditionMap.put("orgType", orgType);
         conditionMap.put("province", province);

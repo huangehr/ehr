@@ -1,8 +1,11 @@
 package com.yihu.ehr.address.controller;
 
-import com.yihu.ehr.address.service.*;
+import com.yihu.ehr.address.service.Address;
+import com.yihu.ehr.address.service.AddressDict;
+import com.yihu.ehr.address.service.AddressService;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.model.address.MAddress;
+import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -21,7 +24,7 @@ import java.util.Map;
 @RestController
 @RequestMapping(ApiVersionPrefix.CommonVersion + "/address")
 @Api(protocols = "https", value = "address", description = "通用地址接口", tags = {"地址","地址字典"})
-public class AddressController {
+public class AddressController extends BaseRestController{
 
     @Autowired
     private AddressService addressService;
@@ -32,9 +35,9 @@ public class AddressController {
      * @param level
      * @return
      */
-    @RequestMapping(value = "getParent", method = RequestMethod.GET)
+    @RequestMapping(value = "/address/level", method = RequestMethod.GET)
     @ApiOperation(value = "根据地址等级查询地址信息")
-    public Object getParent(
+    public Object getAddressByLevel(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "level", value = "地址级别", defaultValue = "")
@@ -47,9 +50,9 @@ public class AddressController {
         return parentMap;
     }
 
-    @RequestMapping(value = "getChildByParent", method = RequestMethod.GET)
+    @RequestMapping(value = "/address/pid", method = RequestMethod.GET)
     @ApiOperation(value = "根据父id查询地址信息")
-    public Object getChildByParent(
+    public Object getAddressDictByPid(
         @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
         @PathVariable( value = "api_version") String apiVersion,
         @ApiParam(name = "pid", value = "上级id", defaultValue = "")

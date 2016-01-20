@@ -84,8 +84,8 @@ public class AddressService {
 	 * 地址检查并保存
 	 * @param address
 	 */
+    @Transactional(Transactional.TxType.REQUIRED)
 	public String saveAddress(Address address) {
-        // TODO: 2015/12/29   是否要全部改造成 spring jpa？
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         Criteria criteria = session.createCriteria(Address.class);
 
@@ -280,6 +280,8 @@ public class AddressService {
 
 
 
+
+    @Transactional(Transactional.TxType.REQUIRED)
     public void deleteAddres(Address address) {
         addressRepository.delete(address);
     }

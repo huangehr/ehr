@@ -141,7 +141,6 @@ public class UserController extends BaseRestController {
             }
         }
         map.put("user",userModel);
-        map.put("contentPage","user/userInfoDialog");
         return map;
     }
 

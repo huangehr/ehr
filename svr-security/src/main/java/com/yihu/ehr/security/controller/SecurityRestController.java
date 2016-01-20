@@ -323,7 +323,7 @@ public class SecurityRestController extends BaseRestController {
      * @param userId
      * @return
      */
-    @RequestMapping(value = "/user_key/user_id", method = RequestMethod.GET)
+    @RequestMapping(value = "/user_id", method = RequestMethod.GET)
     @ApiOperation(value = "根据userId获取Security",  produces = "application/json")
     public String getUserKeyByUserId(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")

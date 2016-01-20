@@ -10,15 +10,16 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  * Created by Administrator on 2016/1/4.
  */
 @FeignClient("svr-app")
+@RequestMapping("/rest/v1.0/app")
 public interface AppClient {
 
-    @RequestMapping(value = "/rest/v1.0/app/validation", method = GET ,consumes = "application/json")
+    @RequestMapping(value = "/validation", method = GET ,consumes = "application/json")
     Boolean validationApp(
             @RequestParam(value = "id") String appId,
             @RequestParam(value = "appSecret") String appSecret);
 
 
-    @RequestMapping(value = "/rest/v1.0/app/validation", method = GET ,consumes = "application/json")
+    @RequestMapping(value = "app", method = GET ,consumes = "application/json")
     MApp getApp(@RequestParam(value = "appId") String appId);
 
 
