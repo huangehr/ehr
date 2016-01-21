@@ -1,6 +1,6 @@
 package com.yihu.ehr.ha;
 
-import com.yihu.ehr.ha.SystemDict.controller.SystemDictController;
+import com.yihu.ehr.ha.SystemDict.controller.ConventionalDictEntryController;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ import static org.junit.Assert.assertNotEquals;
 public class SystemDictControllerTests {
 
     @Autowired
-    private SystemDictController systemDictController;
+    private ConventionalDictEntryController systemDictController;
 
     @Test
     public void getOrgType() {

@@ -12,7 +12,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  */
 @FeignClient("svr-dict")
 @RequestMapping("/rest/v1.0")
-public interface SystemDictClient {
+public interface ConventionalDictEntryClient {
     @RequestMapping(value = "/conventional_dict/orgType", method = GET,consumes = "application/json")
     MBaseDict getOrgType(@RequestParam(value = "code") String code);
 
