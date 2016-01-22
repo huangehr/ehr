@@ -1,7 +1,7 @@
-package com.yihu.ehr.ha.controller;
+package com.yihu.ehr.ha.apps.controller;
 
 import com.yihu.ehr.constants.ApiVersionPrefix;
-import com.yihu.ehr.ha.service.AppClient;
+import com.yihu.ehr.ha.apps.service.AppClient;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -75,7 +75,7 @@ public class AppController {
      * @param userId 用户ID
      * @return 操作结果
      */
-    @RequestMapping(value = "/app" , method = RequestMethod.POST)
+    @RequestMapping(value = "/createApp" , method = RequestMethod.POST)
     public Object createApp(
             @ApiParam(name = "name", value = "名称", defaultValue = "")
             @RequestParam(value = "name") String name,

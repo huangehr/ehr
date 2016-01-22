@@ -340,8 +340,7 @@ public class OrganizationRestController extends BaseRestController {
 
     @RequestMapping(value = "/validation" ,method = RequestMethod.GET)
     @ResponseBody
-    public Object validationOrg(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+    public Object validationOrg(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "orgCode", value = "机构代码")
             @RequestParam(value = "orgCode") String orgCode){

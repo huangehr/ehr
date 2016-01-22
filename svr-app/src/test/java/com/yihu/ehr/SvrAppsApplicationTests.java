@@ -4,7 +4,6 @@ import com.yihu.ehr.apps.controller.AppController;
 import com.yihu.ehr.apps.feignClient.dict.ConventionalDictClient;
 import com.yihu.ehr.apps.feignClient.user.UserClient;
 import com.yihu.ehr.model.app.MApp;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +16,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.bind.annotation.RestController;
 
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 @SpringBootApplication
@@ -25,6 +25,8 @@ import static org.junit.Assert.assertTrue;
 @EnableFeignClients
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SvrAppApplication.class)
+@EnableDiscoveryClient
+@EnableFeignClients
 public class SvrAppsApplicationTests {
 
 	String apiVersion = "v1.0";
@@ -143,7 +145,45 @@ public class SvrAppsApplicationTests {
 	}
 
 
+	@Test
+	public void atestCreateApp() {
+		try {
+			//新增测试
+			Object object = appController.createApp("v1.0", "测试APP", "ChildHealth", "http://test", "这是用于测试的数据", "1", "0dae0003561cc415c72d9111e8cb88aa");
+			assertNotEquals("APP新增失败", object, null);
 
+			MApp mApp = (MApp) object;
+			//修改测试
+			String id = mApp.getId();
+			String name = mApp.getName();
+			String secret = mApp.getSecret();
+			String url = mApp.getUrl();
+			String catalog = mApp.getCatalog();
+			String status = mApp.getStatus();
+			String description = mApp.getDescription();
+			String tags = mApp.getTags();
+			object = appController.updateApp("v1.0",id, name, catalog, status, url, description, tags);
+			//success
+			assertTrue("APP修改失败", !object.toString().equals("success"));
+
+			//获取明细
+			object = appController.getAppDetail("v1.0",id);
+			assertNotEquals("APP明细获取失败", object, null);
+
+			//修改状态
+			object = appController.check("v1.0",id, "WaitingForApprove");
+			assertTrue("APP状态修改失败", !object.toString().equals("success"));
+
+			//根据查询条件获取列表
+			// object = appController.getAppList(1, "ChildHealth", "WaitingForApprove", 1, 20);
+			object = appController.deleteApp("v1.0",id);
+			assertTrue("APP删除失败", !object.toString().equals("success"));
+		}
+		catch (Exception ex){
+			int i=0;
+		}
+
+	}
 
 
 }
