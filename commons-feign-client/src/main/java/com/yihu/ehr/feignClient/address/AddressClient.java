@@ -18,9 +18,7 @@ import java.util.List;
 public interface AddressClient {
 
     @RequestMapping(value = "/address", method = RequestMethod.GET ,consumes = "application/json")
-    MAddress getAddressById(
-            //@PathVariable( value = "api_version") String apiVersion,
-            @RequestParam(value = "id") String id);
+    MAddress getAddressById(@RequestParam(value = "id") String id);
 
 
     @RequestMapping(value = "/canonicalAddress", method = RequestMethod.GET ,consumes = "application/json")

@@ -130,7 +130,7 @@ public class App {
 
     @Column(name = "tags",  nullable = true)
     public String getTags() {
-        return tags.toString();
+        return String.join(",", tags);
     }
     public void setTags(String tags) {
         if(tags == null) return;
@@ -141,9 +141,6 @@ public class App {
             this.tags.add(token);
         }
     }
-    //    public String getTagsStr(){
-//        return String.join(",", tags);
-//    }
     public void addTag(String tag) {
         if(tag == null || tag.length() == 0) return;
         if (tags.contains(tag)) return;

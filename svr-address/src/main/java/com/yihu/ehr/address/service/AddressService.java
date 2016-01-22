@@ -62,7 +62,7 @@ public class AddressService {
      * @return
      */
     public Address getAddr(String id) {
-        return addressRepository.getAddressByid(id);
+        return addressRepository.findOne(id);
     }
 
 	public List<AddressDict> getLevelToAddr(Integer level){
@@ -219,7 +219,7 @@ public class AddressService {
 	}
 
     public Address getAddressById(String Id) {
-        return addressRepository.getAddressByid(Id);
+        return addressRepository.findOne(Id);
     }
 
     public String getCanonicalAddress(Address address) {

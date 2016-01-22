@@ -1,11 +1,12 @@
 package com.yihu.ehr.apps.controller;
 
+import com.yihu.ehr.apps.feignClient.dict.ConventionalDictClient;
+import com.yihu.ehr.apps.feignClient.user.UserClient;
 import com.yihu.ehr.apps.service.App;
 import com.yihu.ehr.apps.service.AppDetailModel;
 import com.yihu.ehr.apps.service.AppManager;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constrant.Result;
-import com.yihu.ehr.feignClient.dict.ConventionalDictClient;
 import com.yihu.ehr.model.dict.MBaseDict;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.util.controller.BaseRestController;
@@ -13,6 +14,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -22,6 +24,7 @@ import java.util.Map;
 /**
  * Created by Administrator on 2015/8/12.
  */
+@EnableFeignClients
 @RequestMapping(ApiVersionPrefix.CommonVersion + "/app")
 @RestController
 @Api(protocols = "https", value = "address", description = "通用app接口", tags = {"app"})
@@ -32,6 +35,22 @@ public class AppController extends BaseRestController {
 
     @Autowired
     private ConventionalDictClient conventionalDictClient;
+
+    @Autowired
+    private UserClient userClient;
+
+
+    @RequestMapping(value = "/test", method = RequestMethod.GET)
+    @ApiOperation(value = "根据地址等级查询地址信息")
+    public Object getTest(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
+            @ApiParam(name = "code", value = "地址级别", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        MBaseDict aaa = conventionalDictClient.getAppCatalog(code);
+        return aaa;
+    }
+
 
 
 
@@ -138,7 +157,7 @@ public class AppController extends BaseRestController {
 
         App app;
         MBaseDict appCatalog = conventionalDictClient.getAppCatalog(catalog);
-        MUser userModel = appManager.getUser(userId);
+        MUser userModel = userClient.getUser(userId);
         app = appManager.createApp(name,appCatalog,url, tags, description, userModel);
         return app;
     }

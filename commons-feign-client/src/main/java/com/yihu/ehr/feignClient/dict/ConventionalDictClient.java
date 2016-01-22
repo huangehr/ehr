@@ -1,6 +1,7 @@
 package com.yihu.ehr.feignClient.dict;
 
 import com.yihu.ehr.model.dict.MBaseDict;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -10,6 +11,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 /**
  * Created by Administrator on 2016/1/4.
  */
+@EnableFeignClients
 @FeignClient("svr-dict")
 @RequestMapping("/rest/v1.0/conventional_dict")
 public interface ConventionalDictClient {
@@ -31,8 +33,6 @@ public interface ConventionalDictClient {
 
     @RequestMapping(value = "/yesNo", method = GET,consumes = "application/json")
     MBaseDict getYesNo(@RequestParam(value = "code") Boolean code);
-
-
 
 
 }

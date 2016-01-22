@@ -1,10 +1,10 @@
 package com.yihu.ehr.org.service;
 
-import com.yihu.ehr.feignClient.address.AddressClient;
-import com.yihu.ehr.feignClient.security.SecurityClient;
 import com.yihu.ehr.model.address.MAddress;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MUserSecurity;
+import com.yihu.ehr.org.feignClient.address.AddressClient;
+import com.yihu.ehr.org.feignClient.security.SecurityClient;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;

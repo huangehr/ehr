@@ -1,7 +1,6 @@
 package com.yihu.ehr.apps.service;
 
-import com.yihu.ehr.feignClient.dict.ConventionalDictClient;
-import com.yihu.ehr.feignClient.user.UserClient;
+import com.yihu.ehr.apps.feignClient.dict.ConventionalDictClient;
 import com.yihu.ehr.model.dict.MBaseDict;
 import com.yihu.ehr.model.user.MUser;
 import org.hibernate.Criteria;
@@ -37,8 +36,6 @@ public class AppManager  {
     @Autowired
     private ConventionalDictClient conventionalDictClient;
 
-    @Autowired
-    private UserClient userClient;
 
     public AppManager() {
     }
@@ -276,7 +273,4 @@ public class AppManager  {
         appRepository.save(app);
     }
 
-    public MUser getUser(String userId) {
-        return userClient.getUser(userId);
-    }
 }

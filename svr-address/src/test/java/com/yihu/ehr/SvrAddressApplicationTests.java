@@ -1,32 +1,41 @@
 package com.yihu.ehr;
 
 import com.yihu.ehr.address.controller.AddressController;
-import com.yihu.ehr.address.service.Address;
-import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.annotation.Commit;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.orm.hibernate4.HibernateTransactionManager;
 
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SvrAddressApplication.class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@Transactional(transactionManager="transactionManager")
+
 public class SvrAddressApplicationTests {
 
 	String apiVersion = "v1.0";
-	Object addessId = "";
+	static Object addessId = "";
 
+	@Autowired
+	private HibernateTransactionManager transactionManager;
 
     @Autowired
     private AddressController addressController;
 
 	//新增一条记录
 	@Test
-	//@Rollback(false)
-	public void aSaveAddress(){
+	@Commit
+	public void aSaveAddress()  {
 		String country = "中国";
 		String province = "福建省T";
 		String city = "宁德市T";
@@ -34,19 +43,17 @@ public class SvrAddressApplicationTests {
 		String town = "";
 		String street = "";
 		String extra = "";
-		String postalCode = "072150";
+		String postalCode = "352000";
 		addessId = addressController.saveAddress(apiVersion,country,province,city,district,town,street,extra,postalCode);
-		//Object obj = addressController.getAddressById("v1.0", addessId.toString());
+
 		assertTrue("查询失败！" , addessId != null);
 	}
 
-
-	//根据level查询
+	//根pid查询
 	@Test
-	public void bGetAddressByLevel(){
-		Integer level=3;
-		 Object addressDictList = addressController.getAddressByLevel(apiVersion,level);
-        assertTrue("查询失败！" , addressDictList != null);
+	public void bgetAddressById(){
+		Object address = addressController.getAddressById(apiVersion, addessId.toString());
+		assertTrue("查询失败！" , address != null);
 	}
 
 	//根据pid查询 厦门市
@@ -57,12 +64,18 @@ public class SvrAddressApplicationTests {
 		assertTrue("查询失败！" , addressDictList != null);
 	}
 
-	//根pid查询
+
+	//根据level查询
 	@Test
-	public void egetAddressById(){
-		Object address = addressController.getAddressById(apiVersion,addessId.toString());
-		assertTrue("查询失败！" , address != null);
+	public void cGetAddressByLevel(){
+		Integer level=3;
+		 Object addressDictList = addressController.getAddressByLevel(apiVersion,level);
+        assertTrue("查询失败！" , addressDictList != null);
 	}
+
+
+
+
 
 	//根据id获取地址名称
 	@Test

@@ -1,9 +1,9 @@
 package com.yihu.ehr.security.service;
 
-import com.yihu.ehr.feignClient.org.OrgClient;
-import com.yihu.ehr.feignClient.user.UserClient;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.user.MUser;
+import com.yihu.ehr.security.feignClient.org.OrgClient;
+import com.yihu.ehr.security.feignClient.user.UserClient;
 import com.yihu.ehr.util.DateUtil;
 import com.yihu.ehr.util.encrypt.RSA;
 import org.hibernate.Criteria;

@@ -2,10 +2,10 @@ package com.yihu.ehr.org.controller;
 
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constrant.Result;
-import com.yihu.ehr.feignClient.security.SecurityClient;
 import com.yihu.ehr.model.address.MAddress;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MUserSecurity;
+import com.yihu.ehr.org.feignClient.security.SecurityClient;
 import com.yihu.ehr.org.service.OrgManagerService;
 import com.yihu.ehr.org.service.OrgModel;
 import com.yihu.ehr.org.service.Organization;
@@ -309,7 +309,7 @@ public class OrganizationRestController extends BaseRestController {
             @RequestParam(value = "orgCode") String orgCode) {
         try {
 
-            MUserSecurity userSecurity = securityClient.getUserPublicKeyByOrgCode(orgCode);
+            MUserSecurity userSecurity = securityClient.getUserSecurityByOrgCode(orgCode);
             Map<String, String> keyMap = new HashMap<>();
             if (userSecurity == null) {
                 userSecurity = securityClient.createSecurityByOrgCode(orgCode);

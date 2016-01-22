@@ -23,6 +23,8 @@ public class BaseDictServiceRestController extends BaseRestController {
     @Autowired
     private ConventionalDictEntry baseAbstractDictEntry;
 
+
+
     @RequestMapping(value = "/appCatalog", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public AppCatalog getAppCatalog(

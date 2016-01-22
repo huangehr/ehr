@@ -2,13 +2,12 @@ package com.yihu.ehr.user.user.controller;
 
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constrant.Result;
-import com.yihu.ehr.feignClient.security.SecurityClient;
 import com.yihu.ehr.model.address.MAddress;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MUserSecurity;
 import com.yihu.ehr.model.user.MUser;
+import com.yihu.ehr.user.user.feignClient.security.SecurityClient;
 import com.yihu.ehr.user.user.service.*;
-import com.yihu.ehr.util.ApiErrorEcho;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -36,7 +35,6 @@ public class UserController extends BaseRestController {
 
     @Autowired
     private SecurityClient securityClient;
-
 
 
     @RequestMapping(value = "users" , method = RequestMethod.GET)
@@ -172,36 +170,30 @@ public class UserController extends BaseRestController {
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "loginCode", value = "登录帐号", defaultValue = "")
             @RequestParam(value = "loginCode") String loginCode) {
-        try {
-            MUserSecurity userSecurity = securityClient.getUserPublicKeyByOrgName(loginCode);
-            Map<String, String> keyMap = new HashMap<>();
-            if (userSecurity == null) {
-                User userInfo = userManager.getUserByLoginCode(loginCode);
-                String userId = userInfo.getId();
-                userSecurity = securityClient.createSecurityByUserId(userId);
-            }else{
-                //result.setErrorMsg("公钥信息已存在。");
-                //这里删除原有的公私钥重新分配
-                //1-1根据用户登陆名获取用户信息。
-                User userInfo = userManager.getUserByLoginCode(loginCode);
-                String userId = userInfo.getId();
-                String userKeyId = securityClient.getUserKeyByUserId(userId);
-                securityClient.deleteSecurity(userSecurity.getId());
-                securityClient.deleteUserKey(userKeyId);
-                userSecurity = securityClient.createSecurityByUserId(userId);
+        MUserSecurity userSecurity = securityClient.getUserSecurityByOrgName(loginCode);
+        Map<String, String> keyMap = new HashMap<>();
+        if (userSecurity == null) {
+            User userInfo = userManager.getUserByLoginCode(loginCode);
+            String userId = userInfo.getId();
+            userSecurity = securityClient.createSecurityByUserId(userId);
+        }else{
+            //result.setErrorMsg("公钥信息已存在。");
+            //这里删除原有的公私钥重新分配
+            //1-1根据用户登陆名获取用户信息。
+            User userInfo = userManager.getUserByLoginCode(loginCode);
+            String userId = userInfo.getId();
+            String userKeyId = securityClient.getUserKeyByUserId(userId);
+            securityClient.deleteSecurity(userSecurity.getId());
+            securityClient.deleteUserKey(userKeyId);
+            userSecurity = securityClient.createSecurityByUserId(userId);
 
-            }
-            String validTime = DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd")
-                    + "~" + DateFormatUtils.format(userSecurity.getExpiryDate(),"yyyy-MM-dd");
-            keyMap.put("publicKey", userSecurity.getPublicKey());
-            keyMap.put("validTime", validTime);
-            keyMap.put("startTime", DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd"));
-            return keyMap;
-        } catch (Exception ex) {
-            ApiErrorEcho apiErrorEcho = new ApiErrorEcho();
-            apiErrorEcho.putMessage("failed");
-            return apiErrorEcho;
         }
+        String validTime = DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd")
+                + "~" + DateFormatUtils.format(userSecurity.getExpiryDate(),"yyyy-MM-dd");
+        keyMap.put("publicKey", userSecurity.getPublicKey());
+        keyMap.put("validTime", validTime);
+        keyMap.put("startTime", DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd"));
+        return keyMap;
     }
 
 
