@@ -9,9 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-	<groupId>com.yihu.ehr</groupId>
 	<artifactId>svr-organization</artifactId>
-	<version>1.1.0</version>
 	<packaging>jar</packaging>
 
 	<name>svr-organization</name>
@@ -33,10 +31,6 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-config</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-cloud-connectors</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>

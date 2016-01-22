@@ -9,9 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-	<groupId>com.yihu.ehr</groupId>
 	<artifactId>ehr-commons-rest-model</artifactId>
-	<version>1.1.0</version>
 	<packaging>jar</packaging>
 	<name>commons-rest-model</name>
 	<description>EHR platform rest api object model</description>

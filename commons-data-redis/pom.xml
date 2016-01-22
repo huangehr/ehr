@@ -8,12 +8,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <groupId>com.yihu.ehr</groupId>
     <artifactId>ehr-commons-data-redis</artifactId>
     <packaging>jar</packaging>
-    <version>1.1.0</version>
     <name>commons-data-redis</name>
-    <url></url>
+
     <properties>
         <jedis.version>2.7.3</jedis.version>
     </properties>

@@ -10,10 +10,8 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <groupId>com.yihu.ehr</groupId>
     <artifactId>ehr-commons-thrift-client</artifactId>
     <name>commons-thrift-client</name>
-    <version>1.1.0</version>
 
     <dependencies>
         <dependency>

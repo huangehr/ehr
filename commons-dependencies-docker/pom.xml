@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.yihu.ehr</groupId>
+        <artifactId>ehr-commons-dependencies</artifactId>
+        <version>1.1.0</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <artifactId>ehr-commons-dependencies-docker</artifactId>
+    <name>commons-dependencies-docker</name>
+    <packaging>pom</packaging>
+    <description>EHR platform docker deploy dependencies</description>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.3.8</version>
+                <executions>
+                    <execution>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>build</goal>
+                            <goal>tag</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <dockerHost>http://192.168.1.220:2376</dockerHost>
+                    <imageName>${project.artifactId}:${project.version}</imageName>
+                    <baseImage>java:8</baseImage>
+                    <registryUrl>http://www.yihu.com</registryUrl>
+                    <env>
+                        <TZ>'Asia/Shanghai'</TZ>
+                        <LC_ALL>en_US.UTF-8</LC_ALL>
+                    </env>
+                    <resources>
+                        <resource>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
+                    <exposes>
+                        <expose>8761</expose>
+                    </exposes>
+                    <cmd>["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/${project.build.finalName}.jar"]</cmd>
+                    <image>${project.artifactId}:${project.version}</image>
+                    <newName>${project.artifactId}:${project.version}</newName>
+                    <pushImage>false</pushImage>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

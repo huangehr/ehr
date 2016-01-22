@@ -100,10 +100,4 @@ public class SpringContext implements ApplicationContextAware {
     public static boolean isSingleton(String serviceName) {
         return springContext.isSingleton(serviceName);
     }
-
-    // static block
-    static {
-        String configPath = SpringContext.class.getResource("/").getPath() + "log4j/log4j2.xml";
-        System.setProperty("log4j.configurationFile", configPath);  // 由于Spring启动时就依赖到Log4j，在此处就直接设置系统属性
-    }
 }

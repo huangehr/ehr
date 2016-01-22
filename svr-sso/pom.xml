@@ -9,9 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-	<groupId>com.yihu.ehr</groupId>
 	<artifactId>svr-sso</artifactId>
-	<version>1.1.0</version>
 	<packaging>jar</packaging>
 	<name>svr-sso</name>
 	<description>EHR platform single sign on(SSO) service.</description>
@@ -35,10 +33,6 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-config</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-cloud-connectors</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
