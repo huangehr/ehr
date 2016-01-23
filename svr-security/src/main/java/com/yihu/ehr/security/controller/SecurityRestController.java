@@ -1,12 +1,17 @@
 package com.yihu.ehr.security.controller;
 
 import com.yihu.ehr.constants.ApiVersionPrefix;
-import com.yihu.ehr.feignClient.app.AppClient;
-import com.yihu.ehr.feignClient.user.UserClient;
+import com.yihu.ehr.model.address.MAddress;
+import com.yihu.ehr.model.dict.MBaseDict;
 import com.yihu.ehr.model.user.MUser;
-import com.yihu.ehr.security.service.*;
+import com.yihu.ehr.security.feignClient.address.AddressClient;
+import com.yihu.ehr.security.feignClient.app.AppClient;
+import com.yihu.ehr.security.feignClient.dict.ConventionalDictClient;
+import com.yihu.ehr.security.feignClient.user.UserClient;
 import com.yihu.ehr.security.service.SecurityManager;
-import com.yihu.ehr.util.ApiErrorEcho;
+import com.yihu.ehr.security.service.TokenManager;
+import com.yihu.ehr.security.service.UserSecurity;
+import com.yihu.ehr.security.service.UserToken;
 import com.yihu.ehr.util.DateUtil;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.encrypt.RSA;
@@ -24,7 +29,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping(ApiVersionPrefix.CommonVersion + "/security")
-@Api(protocols = "https", value = "Security", description = "安全管理接口", tags = {"用户", "企业", "应用", "安全"})
+@Api(protocols = "https", value = "securityEhr", description = "安全管理接口", tags = {"用户", "企业", "应用", "安全"})
 public class SecurityRestController extends BaseRestController {
 
     @Autowired
@@ -39,21 +44,37 @@ public class SecurityRestController extends BaseRestController {
     @Autowired
     private AppClient appClient;
 
-    public Object getPublicKey(UserSecurity userSecurity){
-        if (userSecurity == null) {
-            ApiErrorEcho apiErrorEcho = new ApiErrorEcho();
-            apiErrorEcho.putMessage("获取安全用户失败！");
-            return apiErrorEcho;
-        } else {
-            String publicKey = userSecurity.getPublicKey();
-            return publicKey;
-        }
+    @Autowired
+    private ConventionalDictClient conventionalDictClient;
+
+    @Autowired
+    private AddressClient addressClient;
+
+
+    @RequestMapping(value = "/test", method = RequestMethod.GET)
+    public Object test() throws Exception {
+       return "dadadadadadadada";
+    }
+
+    @RequestMapping(value = "/address", method = RequestMethod.GET)
+    public Object test1() throws Exception {
+        MAddress address = addressClient.getAddressById("0dae000155fb8a513c5d6125d8610794");
+        return address;
     }
 
 
-    @RequestMapping(value = "/user_key/user_name", method = RequestMethod.GET)
+    @RequestMapping(value = "/dict", method = RequestMethod.GET)
+    @ApiOperation(value = "根据地址等级查询地址信息")
+    public Object getTest() {
+        MBaseDict aaa = conventionalDictClient.getAppCatalog("ChildHealth");
+        return aaa;
+    }
+
+
+
+    @RequestMapping(value = "/security/user_name", method = RequestMethod.GET)
     @ApiOperation(value = "获取用户公钥",  produces = "application/json", notes = "用户在平台注册时，会分配一个公钥，此公钥用于与健康档案平台加密传输数据使用")
-    public Object getUserPublicKeyByOrgName(
+    public Object getUserSecurityByOrgName(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(required = true, name = "user_name", value = "用户名")
@@ -65,15 +86,14 @@ public class SecurityRestController extends BaseRestController {
 
 
 
-    @RequestMapping(value = "/user_key/org_code", method = RequestMethod.GET)
+    @RequestMapping(value = "/security/org_code", method = RequestMethod.GET)
     @ApiOperation(value = "获取企业公钥", produces = "application/json", notes = "企业公钥，用于与健康档案平台之间传输数据的加密。")
-    public Object getUserPublicKeyByOrgCode(
+    public Object getUserSecurityByOrgCode(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(required = true, name = "org_code", value = "机构代码")
             @RequestParam(value = "org_code") String orgCode) {
         UserSecurity userSecurity = securityManager.getUserPublicKeyByOrgCd(orgCode);
-        //return getPublicKey(userSecurity);
         return userSecurity;
     }
 
@@ -110,9 +130,7 @@ public class SecurityRestController extends BaseRestController {
 
         boolean appResult = appClient.validationApp(appId, appSecret);
         if (!appResult) {
-            ApiErrorEcho apiErrorEcho = new ApiErrorEcho();
-            apiErrorEcho.putMessage("应用不存在");
-            return apiErrorEcho;
+            return "应用不存在";
         }
 
         UserSecurity userSecurity = securityManager.getUserSecurityByUserName(userName);
@@ -125,9 +143,7 @@ public class SecurityRestController extends BaseRestController {
 
         MUser user = userClient.loginIndetification(userName, psw);
         if (user == null) {
-            ApiErrorEcho apiErrorEcho = new ApiErrorEcho();
-            apiErrorEcho.putMessage("用户不存在");
-            return apiErrorEcho;
+            return "应用不存在";
         }
 
         UserToken userToken = tokenManager.getUserTokenByUserId(user.getId(), appId);
@@ -185,9 +201,7 @@ public class SecurityRestController extends BaseRestController {
 
         UserToken userToken = tokenManager.refreshAccessToken(userId, refreshToken, appId);
         if (userToken == null) {
-            ApiErrorEcho apiErrorEcho = new ApiErrorEcho();
-            apiErrorEcho.putMessage("ehr.security.token.refreshError");
-            return apiErrorEcho;
+            return "ehr.security.token.refreshError";
         } else {
             Map<String,Object> map = new HashMap<>();
             map.put("access_token",userToken.getAccessToken());
@@ -216,9 +230,7 @@ public class SecurityRestController extends BaseRestController {
         if (result) {
             return "success";
         } else {
-            ApiErrorEcho apiErrorEcho = new ApiErrorEcho();
-            apiErrorEcho.putMessage("ehr.security.token.revoke");
-            return apiErrorEcho;
+            return "ehr.security.token.revoke";
         }
     }
 
@@ -339,19 +351,16 @@ public class SecurityRestController extends BaseRestController {
      * @param userId
      * @return
      */
-    @RequestMapping(value = "/user_key/user_id", method = RequestMethod.GET)
+    @RequestMapping(value = "/security/user_id", method = RequestMethod.GET)
     @ApiOperation(value = "根据userId获取UserPublicKey",  produces = "application/json")
-    public UserSecurity getUserPublicKeyByUserId(
+    public UserSecurity getUserSecurityByUserId(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "userId", value = "用户代码")
             @RequestParam( value = "userId") String userId) {
-        //return securityManager.getUserKeyByUserId(userId);
         UserSecurity userSecurity = securityManager.getUserPublicKeyByUserId(userId);
         return userSecurity;
 
-
-        //getUserPublicKeyByUserId
     }
 
 

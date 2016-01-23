@@ -1,14 +1,14 @@
 package com.yihu.ehr.user.user.service;
 
-import com.yihu.ehr.feignClient.address.AddressClient;
-import com.yihu.ehr.feignClient.dict.ConventionalDictClient;
-import com.yihu.ehr.feignClient.org.OrgClient;
-import com.yihu.ehr.feignClient.security.SecurityClient;
 import com.yihu.ehr.model.address.MAddress;
 import com.yihu.ehr.model.dict.MBaseDict;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MUserSecurity;
 import com.yihu.ehr.model.user.MUser;
+import com.yihu.ehr.user.user.feignClient.address.AddressClient;
+import com.yihu.ehr.user.user.feignClient.dict.ConventionalDictClient;
+import com.yihu.ehr.user.user.feignClient.org.OrgClient;
+import com.yihu.ehr.user.user.feignClient.security.SecurityClient;
 import com.yihu.ehr.user.user.model.MedicalUser;
 import com.yihu.ehr.util.ApiErrorEcho;
 import com.yihu.ehr.util.encode.HashUtil;
@@ -160,7 +160,7 @@ public class UserManager  {
             userModel.setMajor((user).getMajor());
         }
 
-        MUserSecurity userSecurity = securityClient.getUserPublicKeyByUserId(user.getId());
+        MUserSecurity userSecurity = securityClient.getUserSecurityByUserId(user.getId());
         if (userSecurity != null) {
             userModel.setPublicKey(userSecurity.getPublicKey());
             String validTime = DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd")

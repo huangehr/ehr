@@ -24,7 +24,7 @@ public class ApiErrorEcho implements Serializable {
     }
 
     public ApiErrorEcho(ErrorCode errorCode, String errorDescription, String... args) {
-        ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
+        ObjectMapper objectMapper = SpringContext.getService("objectMapper");
 
         root = objectMapper.createObjectNode();
         root.put(CodeNode, errorCode.getErrorCode());

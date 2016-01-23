@@ -1,9 +1,9 @@
 package com.yihu.ehr.security.service;
 
-import com.yihu.ehr.feignClient.org.OrgClient;
-import com.yihu.ehr.feignClient.user.UserClient;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.user.MUser;
+import com.yihu.ehr.security.feignClient.org.OrgClient;
+import com.yihu.ehr.security.feignClient.user.UserClient;
 import com.yihu.ehr.util.DateUtil;
 import com.yihu.ehr.util.encrypt.RSA;
 import org.hibernate.Criteria;
@@ -206,8 +206,6 @@ public class SecurityManager {
     }
 
     public String getUserKeyByUserId(String userId) {
-
-        // TODO: 2016/1/18 这里获取的是第几个字段 
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         StringBuilder sb = new StringBuilder();
 
@@ -227,7 +225,7 @@ public class SecurityManager {
             return null;
         } else {
             Object[] userKeyInfo = (Object[]) sqlQuery.list().get(0);
-            String userKeyId = userKeyInfo[2].toString(); //大大大大
+            String userKeyId = userKeyInfo[0].toString();
             return userKeyId;
         }
     }

@@ -23,7 +23,9 @@ public class BaseDictServiceRestController extends BaseRestController {
     @Autowired
     private ConventionalDictEntry baseAbstractDictEntry;
 
-    @RequestMapping(value = "/catalog", method = RequestMethod.GET)
+
+
+    @RequestMapping(value = "/appCatalog", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取字典")
     public AppCatalog getAppCatalog(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -223,6 +225,20 @@ public class BaseDictServiceRestController extends BaseRestController {
             @RequestParam(value = "code") String code) {
         return baseAbstractDictEntry.getAdapterType(code);
     }
+
+
+    @RequestMapping(value = "/stdSourceType", method = RequestMethod.GET)
+    @ApiOperation(value = "根据code获取字典")
+    public StdSourceType getStdSourceType(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        return baseAbstractDictEntry.getStdSourceType(code);
+    }
+
+
+
 
 
 }

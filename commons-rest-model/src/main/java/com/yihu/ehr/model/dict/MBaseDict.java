@@ -18,6 +18,18 @@ public class MBaseDict implements Serializable {
     String catalog;
     public MBaseDict(){
     }
+
+    public boolean isVirtualCard(){
+
+        if(this.getCatalog().equals("VirtualCard")){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+
     public MBaseDict(long dictId, String code, String value, Integer sort, String phoneticCode, String catalog){
         this.dictId = dictId;
         this.code = code;
