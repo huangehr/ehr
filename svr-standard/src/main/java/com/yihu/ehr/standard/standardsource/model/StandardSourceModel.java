@@ -1,4 +1,4 @@
-package com.yihu.ehr.std.model;
+package com.yihu.ehr.standard.standardsource.model;
 
 /**
  * Created by zqb on 2015/12/16.
@@ -7,6 +7,8 @@ public class StandardSourceModel {
     String id;
     String code;
     String name;
+    String type;
+    String typeName;
     String createDate;
     String createUser;
     String updateDate;
@@ -35,6 +37,22 @@ public class StandardSourceModel {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getTypeName() {
+        return typeName;
+    }
+
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
     }
 
     public String getCreateDate() {
