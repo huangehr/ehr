@@ -23,19 +23,8 @@ public class CardType implements Serializable {
     String catalog;
     DictPk dictPk;
 
-
     public CardType(){
 
-    }
-
-    public boolean isVirtualCard(){
-
-        if(this.getCatalog().equals("VirtualCard")){
-            return true;
-        }
-        else{
-            return false;
-        }
     }
 
 
