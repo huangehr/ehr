@@ -58,4 +58,27 @@ public class CDAVersionController extends BaseRestController {
                                  @RequestParam(value = "versionCode") String versionCode) {
         return null;
     }
+
+    //发布新版本
+    @RequestMapping(value = "/commitVersion",method = RequestMethod.POST)
+    public String commitVersion(@ApiParam(name = "apiVersion", value = "API版本号", defaultValue = "v1.0")
+                                @PathVariable(value = "apiVersion") String apiVersion,
+                                @ApiParam(name = "versionCode", value = "版本代码")
+                                @RequestParam(value = "versionCode") String versionCode) {
+        return null;
+    }
+
+    @RequestMapping(value = "/existInStage",method = RequestMethod.GET)
+    public String existInStage(@ApiParam(name = "apiVersion", value = "API版本号", defaultValue = "v1.0")
+                                   @PathVariable(value = "apiVersion") String apiVersion){
+        return null;
+    }
+
+    @RequestMapping(value = "/allVersions",method = RequestMethod.GET)
+    public Object getAllVersions(@ApiParam(name = "apiVersion", value = "API版本号", defaultValue = "v1.0")
+                                 @PathVariable(value = "apiVersion") String apiVersion)
+    {
+        return null;
+    }
+
 }
