@@ -131,7 +131,7 @@ public class UserController extends BaseRestController {
             org = userManager.getOrg(userModel.getOrgCode());
         }
         MAddress addressModel = new MAddress();
-        if(org!=null && !"00000".equals(org.getOrgCode())){
+        if(org!=null){
             String locarion = org.getLocation();
             if(!"".equals(locarion)){
                 addressModel = userManager.getAddressById(locarion);

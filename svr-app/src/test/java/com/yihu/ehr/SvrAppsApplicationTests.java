@@ -4,6 +4,7 @@ import com.yihu.ehr.apps.controller.AppController;
 import com.yihu.ehr.apps.feignClient.dict.ConventionalDictClient;
 import com.yihu.ehr.apps.feignClient.user.UserClient;
 import com.yihu.ehr.model.app.MApp;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,6 @@ import static org.junit.Assert.assertTrue;
 @EnableFeignClients
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SvrAppApplication.class)
-@EnableDiscoveryClient
-@EnableFeignClients
 public class SvrAppsApplicationTests {
 
 	String apiVersion = "v1.0";
@@ -43,7 +42,11 @@ public class SvrAppsApplicationTests {
 	@Before
 	public void setUp() throws Exception {
 
+		ApplicationContext context = new SpringApplicationBuilder()
+				.web(false).sources(SvrAppApplication.class).run();
+		ConventionalDictClient conventionalDictClien1t = context.getBean(ConventionalDictClient.class);
 
+		UserClient userClient = context.getBean(UserClient.class);
 	}
 
 
@@ -51,14 +54,6 @@ public class SvrAppsApplicationTests {
 	//新增一条记录
 	@Test
 	public void aSaveApp() throws Exception {
-
-		ApplicationContext context = new SpringApplicationBuilder()
-				.web(false).sources(SvrAppApplication.class).run();
-		ConventionalDictClient conventionalDictClien1t = context.getBean(ConventionalDictClient.class);
-
-		UserClient userClient = context.getBean(UserClient.class);
-
-
 
 		String name = "ehr测试应用";
 		String catalog = "ChildHealth";
