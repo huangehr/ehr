@@ -5,16 +5,13 @@ import com.yihu.ehr.util.operator.DateUtil;
 import com.yihu.ehr.util.operator.StringUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -26,13 +23,12 @@ import java.util.List;
 @Transactional
 public class StandardSourceManager {
     public static final String StandardSourceTableName = "std_standard_source";
-    public static final int SourceTypeDictId = 22;
 
     @Autowired
     XStandardSourceRepository standardSourceRepository;
 
     @PersistenceContext
-    protected EntityManager entityManager;
+    EntityManager entityManager;
     /**
      * 根据ID删除标准来源
      *
@@ -114,25 +110,36 @@ public class StandardSourceManager {
 
     /**
      * 标准来源分页搜索(名称或代码、类型)
-     * @param strKey
+     * @param searchCode
+     * @param searchName
      * @param searchType
      * @param page
      * @param rows
      * @return
      */
-    public List<StandardSource> getSourceByKey(String strKey, String searchType, int page, int rows) {
+    public List<StandardSource> getSourceByKey(String searchCode, String searchName, String searchType, int page, int rows) {
         Session session = currentSession();
         String strSql =  "select  src from StandardSource src WHERE 1=1 ";
-        if (strKey != null && !strKey.equals("")) {
-            strSql += " and (code like :strKey or name like :strKey)";
+        if (!StringUtils.isEmpty(searchCode)) {
+            strSql += " and (code like :searchCode ";
+            if(!StringUtils.isEmpty(searchName))
+                strSql += " or name like :searchName)";
+            else
+                strSql += ") ";
+        }
+        else if(!StringUtils.isEmpty(searchName)){
+            strSql += " and name like :searchName ";
         }
         if (!StringUtil.isEmpty(searchType)) {
             strSql += " and source_type = :searchType";
         }
 
         Query query = session.createQuery(strSql);
-        if (strKey != null && !strKey.equals("")) {
-            query.setParameter("strKey", "%" + strKey + "%");
+        if (!StringUtils.isEmpty(searchCode)) {
+            query.setParameter("searchCode", "%" + searchCode + "%");
+        }
+        if (!StringUtils.isEmpty(searchName)) {
+            query.setParameter("searchName", "%" + searchName + "%");
         }
         if (!StringUtil.isEmpty(searchType)) {
             query.setParameter("searchType", searchType);
@@ -144,23 +151,34 @@ public class StandardSourceManager {
 
     /**
      * 过滤后的标准来源总数
-     * @param strKey
+     * @param searchCode
+     * @param searchName
      * @param searchType
      * @return
      */
-    public Integer getSourceByKeyInt(String strKey, String searchType) {
+    public Integer getSourceByKeyInt(String searchCode, String searchName, String searchType) {
         Session session = currentSession();
         String strSql = " select count(*) FROM StandardSource where 1=1 ";
-        if (strKey != null && !strKey.equals("")) {
-            strSql += " and (code like :strKey or name like :strKey)";
+        if (!StringUtils.isEmpty(searchCode)) {
+            strSql += " and (code like :searchCode ";
+            if(!StringUtils.isEmpty(searchName))
+                strSql += " or name like :searchName)";
+            else
+                strSql += ") ";
+        }
+        else if(!StringUtils.isEmpty(searchName)){
+            strSql += " and name like :searchName ";
         }
         if (!StringUtil.isEmpty(searchType)) {
             strSql += " and source_type = :searchType";
         }
 
         Query query = session.createQuery(strSql);
-        if (strKey != null && !strKey.equals("")) {
-            query.setString("strKey", "%" + strKey + "%");
+        if (!StringUtils.isEmpty(searchCode)) {
+            query.setParameter("searchCode", "%" + searchCode + "%");
+        }
+        if (!StringUtils.isEmpty(searchName)) {
+            query.setParameter("searchName", "%" + searchName + "%");
         }
         if (!StringUtil.isEmpty(searchType)) {
             query.setString("searchType", searchType);
