@@ -1,7 +1,7 @@
 package com.yihu.ehr.adaption.service;
 
-import com.yihu.ha.data.sql.SQLGeneralDAO;
-import com.yihu.ha.user.model.XUser;
+
+import com.yihu.ehr.model.user.MUser;
 
 import java.util.Date;
 
@@ -11,20 +11,19 @@ import java.util.Date;
  * @version 1.0
  * @created 23-10月-2015 10:19:06
  */
-public class OrgDict extends SQLGeneralDAO implements XOrgDict {
+public class OrgDict{
 
     long id;
     String code;
     String name;
     Date createDate;
     Date updateDate;
-    XUser createUser;
-    XUser updateUser;
+    MUser createUser;
+    MUser updateUser;
     String description;
     String organization;
     int sequence;
 
-    @Override
     public long getId() {
         return id;
     }
@@ -65,17 +64,17 @@ public class OrgDict extends SQLGeneralDAO implements XOrgDict {
         this.updateDate = updateDate;
     }
 
-    public XUser getCreateUser() { return createUser; }
+    public MUser getCreateUser() { return createUser; }
 
-    public void setCreateUser(XUser createUser) {
+    public void setCreateUser(MUser createUser) {
         this.createUser = createUser;
     }
 
-    public XUser getUpdateUser() {
+    public MUser getUpdateUser() {
         return updateUser;
     }
 
-    public void setUpdateUser(XUser updateUser) {
+    public void setUpdateUser(MUser updateUser) {
         this.updateUser = updateUser;
     }
 
@@ -101,7 +100,7 @@ public class OrgDict extends SQLGeneralDAO implements XOrgDict {
     public void setSequence(int sequence) {
         this.sequence = sequence;
     }
-    public XOrgDict setNewObject(XOrgDict from){
+    public OrgDict setNewObject(OrgDict from){
         code=from.getCode();
         name=from.getName();
         createDate=from.getCreateDate();

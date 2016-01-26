@@ -1,20 +1,20 @@
 package com.yihu.ehr.adaption.service;
 
-import com.yihu.ha.dict.model.common.AdapterType;
-import com.yihu.ha.geography.model.XAddress;
-import com.yihu.ha.organization.model.XOrganization;
+import com.yihu.ehr.model.address.MAddress;
+import com.yihu.ehr.model.dict.MBaseDict;
+import com.yihu.ehr.model.org.MOrganization;
 
 /** 适配管理映射机构
  * Created by zqb on 2015/11/18.
  */
-public class AdapterOrg implements XAdapterOrg{
+public class AdapterOrg {
     private String code;
-    private AdapterType type;
+    private MBaseDict type;
     private String name;
     private String description;
     private String parent;
-    private XOrganization org;
-    private XAddress area;
+    private MOrganization org;
+    private MAddress area;
 
     public String getCode() {
         return code;
@@ -48,27 +48,27 @@ public class AdapterOrg implements XAdapterOrg{
         this.name = name;
     }
 
-    public AdapterType getType() {
+    public MBaseDict getType() {
         return type;
     }
 
-    public void setType(AdapterType type) {
+    public void setType(MBaseDict type) {
         this.type = type;
     }
 
-    public XOrganization getOrg() {
+    public MOrganization getOrg() {
         return org;
     }
 
-    public void setOrg(XOrganization org) {
+    public void setOrg(MOrganization org) {
         this.org = org;
     }
 
-    public XAddress getArea() {
+    public MAddress getArea() {
         return area;
     }
 
-    public void setArea(XAddress area) {
+    public void setArea(MAddress area) {
         this.area = area;
     }
 }
