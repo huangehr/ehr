@@ -1,7 +1,6 @@
 package com.yihu.ehr.adaption.service;
 
-import com.yihu.ha.dict.model.common.AdapterType;
-import com.yihu.ha.std.model.XCDAVersion;
+import com.yihu.ehr.model.dict.MBaseDict;
 
 /**
  * 机构采集标准信息表
@@ -9,12 +8,12 @@ import com.yihu.ha.std.model.XCDAVersion;
  * @version 1.0
  * @created 26-十月-2015 15:54:58
  */
-public class OrgAdapterPlan implements XOrgAdapterPlan {
+public class OrgAdapterPlan  {
 
 	/**
 	 * 标准版本
 	 */
-	private XCDAVersion version;
+	//private CDAVersion version;
 	/**
 	 * 方案代码
 	 */
@@ -39,7 +38,7 @@ public class OrgAdapterPlan implements XOrgAdapterPlan {
 	/**
 	 * 方案类别
 	 */
-	private AdapterType type;
+	private MBaseDict type;
 
 	private int status;
 
@@ -51,9 +50,9 @@ public class OrgAdapterPlan implements XOrgAdapterPlan {
 
 	}
 
-	public XCDAVersion getVersion(){
-		return version;
-	}
+//	public CDAVersion getVersion(){
+//		return version;
+//	}
 
 	public String getCode(){
 		return code;
@@ -79,20 +78,20 @@ public class OrgAdapterPlan implements XOrgAdapterPlan {
 		return parentId;
 	}
 
-	public AdapterType getType(){
+	public MBaseDict getType(){
 		return type;
 	}
 
 	/**
-	 * 
+	 *
 	 * @param version
 	 */
-	public void setVersion(XCDAVersion version){
-		this.version = version;
-	}
+//	public void setVersion(XCDAVersion version){
+//		this.version = version;
+//	}
 
 	/**
-	 * 
+	 *
 	 * @param code
 	 */
 	public void setCode(String code){
@@ -100,7 +99,7 @@ public class OrgAdapterPlan implements XOrgAdapterPlan {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param description
 	 */
 	public void setDescription(String description){
@@ -108,7 +107,7 @@ public class OrgAdapterPlan implements XOrgAdapterPlan {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param id
 	 */
 	public void setId(Long id){
@@ -116,7 +115,7 @@ public class OrgAdapterPlan implements XOrgAdapterPlan {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param name
 	 */
 	public void setName(String name){
@@ -124,7 +123,7 @@ public class OrgAdapterPlan implements XOrgAdapterPlan {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param org
 	 */
 	public void setOrg(String org){
@@ -132,7 +131,7 @@ public class OrgAdapterPlan implements XOrgAdapterPlan {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param parentId
 	 */
 	public void setParentId(Long parentId){
@@ -140,10 +139,10 @@ public class OrgAdapterPlan implements XOrgAdapterPlan {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param type
 	 */
-	public void setType(AdapterType type){
+	public void setType(MBaseDict type){
 		this.type = type;
 	}
 

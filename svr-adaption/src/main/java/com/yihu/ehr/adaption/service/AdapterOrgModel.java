@@ -1,5 +1,5 @@
 package com.yihu.ehr.adaption.service;
-import com.yihu.ha.geography.model.Address;
+import com.yihu.ehr.model.address.MAddress;
 
 /**
  * Created by zqb on 2015/11/20.
@@ -14,7 +14,7 @@ public class AdapterOrgModel {
     private String parentValue;
     private String org;
     private String orgValue;
-    private Address area;
+    private MAddress area;
 
     public String getCode() {
         return code;
@@ -88,11 +88,11 @@ public class AdapterOrgModel {
         this.orgValue = orgValue;
     }
 
-    public Address getArea() {
+    public MAddress getArea() {
         return area;
     }
 
-    public void setArea(Address area) {
+    public void setArea(MAddress area) {
         this.area = area;
     }
 }

@@ -41,7 +41,7 @@ public class AdapterDataSet {
 
 	public void finalize() throws Throwable {	}
 
-	
+
 	public Long getId() {
 		return id;
 	}
