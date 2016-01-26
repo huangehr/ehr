@@ -1,7 +1,6 @@
 package com.yihu.ehr.adaption.service;
 
-import com.yihu.ha.data.sql.SQLGeneralDAO;
-import com.yihu.ha.user.model.XUser;
+import com.yihu.ehr.model.user.MUser;
 
 import java.util.Date;
 
@@ -11,15 +10,15 @@ import java.util.Date;
  * @version 1.0
  * @created 23-10月-2015 10:19:06
  */
-public class OrgDataSet extends SQLGeneralDAO implements XOrgDataSet {
+public class OrgDataSet  {
 
     long id;
     String code;
     String name;
     Date createDate;
     Date updateDate;
-    XUser createUser;
-    XUser updateUser;
+    MUser createUser;
+    MUser updateUser;
     String description;
     String organization;
     int sequence;
@@ -64,19 +63,19 @@ public class OrgDataSet extends SQLGeneralDAO implements XOrgDataSet {
         this.updateDate = updateDate;
     }
 
-    public XUser getCreateUser() {
+    public MUser getCreateUser() {
         return createUser;
     }
 
-    public void setCreateUser(XUser createUser) {
+    public void setCreateUser(MUser createUser) {
         this.createUser = createUser;
     }
 
-    public XUser getUpdateUser() {
+    public MUser getUpdateUser() {
         return updateUser;
     }
 
-    public void setUpdateUser(XUser updateUser) {
+    public void setUpdateUser(MUser updateUser) {
         this.updateUser = updateUser;
     }
 
@@ -104,7 +103,7 @@ public class OrgDataSet extends SQLGeneralDAO implements XOrgDataSet {
         this.sequence = sequence;
     }
 
-    public XOrgDataSet setNewObject(XOrgDataSet from){
+    public OrgDataSet setNewObject(OrgDataSet from){
         code=from.getCode();
         name=from.getName();
         createDate=from.getCreateDate();

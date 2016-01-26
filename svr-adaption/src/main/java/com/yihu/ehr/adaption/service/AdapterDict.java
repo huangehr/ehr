@@ -88,16 +88,14 @@ public class AdapterDict {
 		this.orgDictItemSeq = orgDictItemSeq;
 	}
 
-	@Override
 	public String getDescription() {
 		return description;
 	}
 
-	@Override
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public XAdapterDict setNewObject(XAdapterDict from){
+	public AdapterDict setNewObject(AdapterDict from){
 		adapterPlanId=from.getAdapterPlanId();
 		dictId=from.getDictId();
 		dictEntryId=from.getDictEntryId();
