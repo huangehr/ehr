@@ -1,15 +1,14 @@
-package com.yihu.ehr.user.user.service;
+package com.yihu.ehr.user.service;
 
 import com.yihu.ehr.model.address.MAddress;
 import com.yihu.ehr.model.dict.MBaseDict;
-import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MUserSecurity;
 import com.yihu.ehr.model.user.MUser;
-import com.yihu.ehr.user.user.feignClient.address.AddressClient;
-import com.yihu.ehr.user.user.feignClient.dict.ConventionalDictClient;
-import com.yihu.ehr.user.user.feignClient.org.OrgClient;
-import com.yihu.ehr.user.user.feignClient.security.SecurityClient;
-import com.yihu.ehr.user.user.model.MedicalUser;
+import com.yihu.ehr.user.feignClient.address.AddressClient;
+import com.yihu.ehr.user.feignClient.dict.ConventionalDictClient;
+import com.yihu.ehr.user.feignClient.org.OrgClient;
+import com.yihu.ehr.user.feignClient.security.SecurityClient;
+import com.yihu.ehr.user.model.MedicalUser;
 import com.yihu.ehr.util.ApiErrorEcho;
 import com.yihu.ehr.util.encode.HashUtil;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -119,10 +118,6 @@ public class UserManager  {
         return user;
     }
 
-    public MOrganization getOrg(String orgCode) {
-        return organizationClient.getOrg(orgCode);
-    }
-
     public MAddress getAddressById(String locarion) {
         return addressClient.getAddressById(locarion);
 
@@ -133,9 +128,9 @@ public class UserManager  {
      * @param user
      */
     @Transactional(Transactional.TxType.SUPPORTS)
-    public MUser getUser(User user) {
+    public UserModel getUser(User user) {
 
-        MUser userModel = new MUser();
+        UserModel userModel = new UserModel();
         userModel.setId(user.getId());
         userModel.setLoginCode(user.getLoginCode());
         userModel.setEmail(user.getEmail());
@@ -150,8 +145,7 @@ public class UserManager  {
         }
         if (user.getOrganization() != null) {
             userModel.setOrgCode(user.getOrganization());
-            //// TODO: 2016/1/12 调用机构服务接口，获取机构全名称
-            //userModel.setOrgName(user.getOrganization().getFullName());
+            userModel.setOrgName(organizationClient.getOrg(user.getOrganization()).getFullName());
         }
         if (user.getUserType() != null) {
             userModel.setUserType(user.getUserType());
@@ -256,6 +250,48 @@ public class UserManager  {
         return countRecordByField("email", email) > 0;
     }
 
+    @Transactional(Transactional.TxType.SUPPORTS)
+    public Integer searchUserInt(Map<String, Object> args) {
+
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        String realName = (String) args.get("realName");
+        String type = (String) args.get("type");
+        Integer page = (Integer) args.get("page");
+        Integer pageSize = (Integer) args.get("pageSize");
+        String name = (String) args.get("organization");
+        List<String> orgIds = new ArrayList<>();
+        try{
+            orgIds = organizationClient.getIdsByName(name);
+        }catch (Exception e){
+            orgIds.add("null");
+        }
+        orgIds = organizationClient.getIdsByName(name);
+        String hql = "";
+        if(orgIds.size()>0 && !orgIds.get(0).equals("null")){
+            hql += "from User where (realName like :realName or  location in (:orgIds) ";
+
+        }else{
+            hql += "from User where realName like :realName ";
+        }
+        if (!StringUtils.isEmpty(type)) {
+            hql += " and userType = :userType";
+        }
+        if (!StringUtils.isEmpty(type)) {
+            hql += " and userType = :userType";
+        }
+        Query query = session.createQuery(hql);
+        query.setString("realName", "%"+realName+"%");
+        if (orgIds.size()>0 && !"00000".equals(orgIds.get(0))) {
+            query.setParameterList("orgIds", orgIds);
+        }
+        if (!StringUtils.isEmpty(type)) {
+            query.setParameter("userType", type);
+        }
+
+        return query.list().size();
+    }
+
+
     /**
      * 根据条件搜索用户.
      *
@@ -270,12 +306,19 @@ public class UserManager  {
         Integer page = (Integer) args.get("page");
         Integer pageSize = (Integer) args.get("pageSize");
         String name = (String) args.get("organization");
-        List<String> orgIds = organizationClient.getIdsByName(name);
+        List<String> orgIds = new ArrayList<>();
+        try{
+            orgIds = organizationClient.getIdsByName(name);
+        }catch (Exception e){
+            orgIds.add("null");
+        }
+        orgIds = organizationClient.getIdsByName(name);
         String hql = "";
-        if(orgIds.size()>0 && !"00000".equals(orgIds.get(0))){
-            hql += "from User where realName like :realName ";
-        }else{
+        if(orgIds.size()>0 && !orgIds.get(0).equals("null")){
             hql += "from User where (realName like :realName or  location in (:orgIds) ";
+
+        }else{
+            hql += "from User where realName like :realName ";
         }
         if (!StringUtils.isEmpty(type)) {
             hql += " and userType = :userType";
@@ -297,6 +340,10 @@ public class UserManager  {
 
         return query.list();
     }
+
+
+
+
 
     /**
      * 根据条件搜索用户.
@@ -336,44 +383,8 @@ public class UserManager  {
         return detailModelList;
     }
 
-    /**
-     * 根据条件搜索用户.
-     *
-     * @param args
-     */
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public Integer searchUserInt(Map<String, Object> args) {
 
-        Session session = entityManager.unwrap(org.hibernate.Session.class);
-        String realName = (String) args.get("realName");
-        String type = (String) args.get("type");
-        Integer page = (Integer) args.get("page");
-        Integer pageSize = (Integer) args.get("pageSize");
-        String name = (String) args.get("organization");
-        List<String> orgIds = organizationClient.getIdsByName(name);
-        String hql = "";
-        if(orgIds.size()>0 && !"00000".equals(orgIds.get(0))){
-            hql += "from User where realName like :realName ";
-        }else{
-            hql += "from User where (realName like :realName or  location in (:orgIds) ";
-        }
-        if (!StringUtils.isEmpty(type)) {
-            hql += " and userType = :userType";
-        }
-        if (!StringUtils.isEmpty(type)) {
-            hql += " and userType = :userType";
-        }
-        Query query = session.createQuery(hql);
-        query.setString("realName", "%"+realName+"%");
-        if (orgIds.size()>0 && !"00000".equals(orgIds.get(0))) {
-            query.setParameterList("orgIds", orgIds);
-        }
-        if (!StringUtils.isEmpty(type)) {
-            query.setParameter("userType", type);
-        }
 
-        return query.list().size();
-    }
 
 
 
@@ -382,7 +393,7 @@ public class UserManager  {
      *
      * @param userModel
      */
-    public void updateUser(MUser userModel) {
+    public void updateUser(UserModel userModel) {
 
         User user;
         Map<String, Object> message = new HashMap<>();

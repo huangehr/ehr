@@ -1,7 +1,7 @@
-package com.yihu.ehr.user.user.model;
+package com.yihu.ehr.user.model;
 
 
-import com.yihu.ehr.user.user.service.User;
+import com.yihu.ehr.user.service.User;
 
 /**
  * 抽象医疗用户类.

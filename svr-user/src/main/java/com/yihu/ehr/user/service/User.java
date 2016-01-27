@@ -1,4 +1,5 @@
-package com.yihu.ehr.user.user.service;
+package com.yihu.ehr.user.service;
+import com.yihu.ehr.util.beanUtil.BaseModel;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -13,7 +14,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "users")
 @Access(value = AccessType.PROPERTY)
-public class User  {
+public class User  extends BaseModel{
 
     private String id;
     private Date createDate;

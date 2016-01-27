@@ -1,6 +1,6 @@
-package com.yihu.ehr.user.user.model;
+package com.yihu.ehr.user.model;
 
-import com.yihu.ehr.user.user.service.User;
+import com.yihu.ehr.user.service.User;
 
 /**
  *第三方开发平台用户

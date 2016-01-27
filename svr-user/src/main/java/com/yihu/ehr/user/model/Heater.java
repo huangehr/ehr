@@ -1,4 +1,4 @@
-package com.yihu.ehr.user.user.model;
+package com.yihu.ehr.user.model;
 
 /**
  * Created by wq on 2015/10/14.

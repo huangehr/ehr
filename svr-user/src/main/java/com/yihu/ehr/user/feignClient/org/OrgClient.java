@@ -1,4 +1,4 @@
-package com.yihu.ehr.user.user.feignClient.org;
+package com.yihu.ehr.user.feignClient.org;
 
 import com.yihu.ehr.model.org.MOrganization;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -16,7 +16,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @RequestMapping("/rest/v1.0/org")
 public interface OrgClient {
 
-    @RequestMapping(value = "/org", method = GET ,consumes = "application/json")
+    @RequestMapping(value = "/org", method = GET )
     MOrganization getOrg(@RequestParam(value = "orgCode") String orgCode);
 
     @RequestMapping(value = "/org/name", method = GET ,consumes = "application/json")
