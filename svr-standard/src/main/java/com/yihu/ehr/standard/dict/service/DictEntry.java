@@ -4,15 +4,15 @@ package com.yihu.ehr.standard.dict.service;
 import java.util.Objects;
 
 /**
- * ×ÖµäÏî
+ * å­—å…¸é¡¹
  * @version 1.0
- * @created 16-7ÔÂ-2015 20:56:04
+ * @created 16-7æœˆ-2015 20:56:04
  */
 public class DictEntry{
 
 
 	long id;
-	long dictId;//×ÖµäID
+	long dictId;//å­—å…¸ID
 	String code;
 	String value;
 	String desc;

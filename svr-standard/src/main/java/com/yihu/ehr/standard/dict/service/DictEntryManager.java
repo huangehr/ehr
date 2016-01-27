@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * @author lincl
  * @version 1.0
- * @created 16-7ÔÂ-2015 20:57:06
+ * @created 16-7æœˆ-2015 20:57:06
  */
 @Transactional
 @Service
@@ -30,7 +30,7 @@ public class DictEntryManager extends BaseManager{
 
 
 	/**
-	 * °Ñ²éÑ¯½á¹û×ª»»ÎªÏëÒªµÄ¸ñÊ½
+	 * æŠŠæŸ¥è¯¢ç»“æœè½¬æ¢ä¸ºæƒ³è¦çš„æ ¼å¼
 	 * @param ls
 	 * @param dict
 	 * @return
@@ -47,7 +47,7 @@ public class DictEntryManager extends BaseManager{
 	}
 
 	/**
-	 * ·ÖÒ³²éÑ¯×Öµä¹ØÁªµÄ×ÖµäÏî
+	 * åˆ†é¡µæŸ¥è¯¢å­—å…¸å…³è”çš„å­—å…¸é¡¹
 	 * @param dict
 	 * @param searchNm
 	 * @param page
@@ -86,7 +86,7 @@ public class DictEntryManager extends BaseManager{
 	}
 
 	/**
-	 * ²éÑ¯·ÖÒ³×ÜÊı
+	 * æŸ¥è¯¢åˆ†é¡µæ€»æ•°
 	 * @param dict
 	 * @param searchNm
 	 * @return
@@ -113,7 +113,7 @@ public class DictEntryManager extends BaseManager{
 	}
 
 	/**
-	 * Í¨¹ıid¼¯É¾³ı×ÖµäÏî
+	 * é€šè¿‡idé›†åˆ é™¤å­—å…¸é¡¹
 	 * @param xcdaVersion
 	 * @param ids
 	 * @return
@@ -128,7 +128,7 @@ public class DictEntryManager extends BaseManager{
 	}
 
 	/**
-	 * É¾³ı×ÖµäÏî
+	 * åˆ é™¤å­—å…¸é¡¹
 	 * @param entry
 	 */
 	public int deleteEntry(DictEntry entry){
@@ -144,7 +144,7 @@ public class DictEntryManager extends BaseManager{
 
 
 	/**
-	 * »ñÈ¡
+	 * è·å–
 	 * @param id
 	 * @param xDict
 	 * @return
@@ -174,7 +174,7 @@ public class DictEntryManager extends BaseManager{
 	}
 	//public
 	/**
-	 * ±£´æ×ÖµäÏî
+	 * ä¿å­˜å­—å…¸é¡¹
 	 * @param entry
 	 */
 	public int saveEntry(DictEntry entry){
@@ -186,20 +186,20 @@ public class DictEntryManager extends BaseManager{
 		Query query;
 
 		long id=dictEntry.getId();
-		if (id==0) {//ĞÂÔö×ÖµäÖµ
+		if (id==0) {//æ–°å¢å­—å…¸å€¼
 
-			//ÏÈ»ñÈ¡×Öµä×î´ó±àºÅ
+			//å…ˆè·å–å­—å…¸æœ€å¤§ç¼–å·
 			sql = "select max(id) from " + strTableName;
 			query = session.createSQLQuery(sql);
 			Object object = query.uniqueResult();
 
 			id = object == null ? 1 : Long.parseLong(object.toString()) + 1;
 			dictEntry.setId(id);
-			//ĞÂÔö×ÖµäÖµ
+			//æ–°å¢å­—å…¸å€¼
 			sql = "insert into " + strTableName +
 					"(id, code, value,dict_id,description,hash) " +
 					"values(:id, :code, :vaule, :dictId,:desc,:hash)";
-		} else {//ĞŞ¸Ä×ÖµäÖµ
+		} else {//ä¿®æ”¹å­—å…¸å€¼
 			sql = "update " + strTableName +
 					" set " +
 					"code = :code, " +
@@ -221,7 +221,7 @@ public class DictEntryManager extends BaseManager{
 	}
 
 	/**
-	 * ÅĞ¶Ï´úÂëÊÇ·ñÒÑ´æÔÚ
+	 * åˆ¤æ–­ä»£ç æ˜¯å¦å·²å­˜åœ¨
 	 * @param dict
 	 * @param code
 	 * @return
@@ -239,7 +239,7 @@ public class DictEntryManager extends BaseManager{
 	}
 
 	/**
-	 * ÉèÖÃ×ÖµäÏîÊôĞÔ
+	 * è®¾ç½®å­—å…¸é¡¹å±æ€§
 	 * @param dictEntry
 	 * @param id
 	 * @param dict
@@ -258,7 +258,7 @@ public class DictEntryManager extends BaseManager{
 	}
 
 	/**
-	 * Ä£ĞÍ×ª»¯
+	 * æ¨¡å‹è½¬åŒ–
 	 * @param ls
 	 * @return
 	 */
@@ -289,7 +289,7 @@ public class DictEntryManager extends BaseManager{
 
 
 	/**
-	 * ´´½¨×ÖµäÏî¶ÔÏó
+	 * åˆ›å»ºå­—å…¸é¡¹å¯¹è±¡
 	 * @param xDict
 	 * @return
 	 */
@@ -301,7 +301,7 @@ public class DictEntryManager extends BaseManager{
 
 
 	/**
-	 * É¾³ı¹ØÁªµÄ×ÖµäÏî
+	 * åˆ é™¤å…³è”çš„å­—å…¸é¡¹
 	 * @param strVersion
 	 * @param strDictId
 	 * @return

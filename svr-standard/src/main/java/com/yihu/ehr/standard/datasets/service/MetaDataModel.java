@@ -10,22 +10,22 @@ import java.util.List;
  */
 public class MetaDataModel {
 
-    long id;                    // Êı¾İÔªID
+    long id;                    // æ•°æ®å…ƒID
     long dataSetIds;
-    String code;                 // ±ê×¼Ôª±àÂë
-    String innerCode;           // ÄÚ²¿´úÂë
-    String name;                // Ãû³Æ
-    String type;                // Êı¾İÔªÊı¾İÀàĞÍ
-    String format;              // ±íÊ¾¸ñÊ½
+    String code;                 // æ ‡å‡†å…ƒç¼–ç 
+    String innerCode;           // å†…éƒ¨ä»£ç 
+    String name;                // åç§°
+    String type;                // æ•°æ®å…ƒæ•°æ®ç±»å‹
+    String format;              // è¡¨ç¤ºæ ¼å¼
     long dictId;
     String dictName;
     List<DictForInterface> dictForInterface;
-    String definition;          // ±ê×¼Ôª¶¨Òå, ¼´ËµÃ÷
-    boolean nullable;           // ÊÇ·ñ¿ÉÎª¿Õ
-    String columnLength;         // Êı¾İ³¤¶È
-    String columnType;          // Êı¾İÀàĞÍ
-    String columnName;          // ×Ö¶ÎÃû
-    boolean primaryKey;         // ÊÇ·ñÎªÖ÷¼ü
+    String definition;          // æ ‡å‡†å…ƒå®šä¹‰, å³è¯´æ˜
+    boolean nullable;           // æ˜¯å¦å¯ä¸ºç©º
+    String columnLength;         // æ•°æ®é•¿åº¦
+    String columnType;          // æ•°æ®ç±»å‹
+    String columnName;          // å­—æ®µå
+    boolean primaryKey;         // æ˜¯å¦ä¸ºä¸»é”®
     int hashCode;
 
     public long getId() {

@@ -6,22 +6,22 @@ import com.yihu.ehr.standard.dict.service.Dict;
 import java.util.Objects;
 
 /**
- * ³éÏóÊı¾İÔªÀà.
+ * æŠ½è±¡æ•°æ®å…ƒç±».
  * @author Witness
  * @version 1.0
- * @created 06-7ÔÂ-2015 15:47:27
+ * @created 06-7æœˆ-2015 15:47:27
  */
 public class MetaData {
 
-    long id;                    // Êı¾İÔªID
-	String code;                 // ±ê×¼Ôª±àÂë
-	String definition;          // ±ê×¼Ôª¶¨Òå, ¼´ËµÃ÷
-	String format;              // ±íÊ¾¸ñÊ½
-	String innerCode;           // ÄÚ²¿´úÂë
-	String name;                // Ãû³Æ
-	String type;                // Êı¾İÔªÊı¾İÀàĞÍ
+    long id;                    // æ•°æ®å…ƒID
+	String code;                 // æ ‡å‡†å…ƒç¼–ç 
+	String definition;          // æ ‡å‡†å…ƒå®šä¹‰, å³è¯´æ˜
+	String format;              // è¡¨ç¤ºæ ¼å¼
+	String innerCode;           // å†…éƒ¨ä»£ç 
+	String name;                // åç§°
+	String type;                // æ•°æ®å…ƒæ•°æ®ç±»å‹
 
-    DataSet dataSet;           // ËùÊôÊı¾İ¼¯
+    DataSet dataSet;           // æ‰€å±æ•°æ®é›†
 
     long dataSetId;
 
@@ -29,13 +29,13 @@ public class MetaData {
 
     int hashCode;
 
-    String columnLength;         // Êı¾İ³¤¶È
-    String columnType;          // Êı¾İÀàĞÍ
-    String columnName;          // ×Ö¶ÎÃû
-    boolean nullable;           // ÊÇ·ñ¿ÉÎª¿Õ
-    boolean primaryKey;         // ÊÇ·ñÎªÖ÷¼ü
-    boolean isHbaseFullTextRetrieval;       // Hbase È«ÎÄ¼ìË÷×Ö¶Î
-    boolean isHbasePrimaryKey;              // Hbase Ö÷¼ü×Ö¶Î
+    String columnLength;         // æ•°æ®é•¿åº¦
+    String columnType;          // æ•°æ®ç±»å‹
+    String columnName;          // å­—æ®µå
+    boolean nullable;           // æ˜¯å¦å¯ä¸ºç©º
+    boolean primaryKey;         // æ˜¯å¦ä¸ºä¸»é”®
+    boolean isHbaseFullTextRetrieval;       // Hbase å…¨æ–‡æ£€ç´¢å­—æ®µ
+    boolean isHbasePrimaryKey;              // Hbase ä¸»é”®å­—æ®µ
 
     String dictName;
     String dictCode;

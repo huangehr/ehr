@@ -19,11 +19,11 @@ import java.util.List;
 
 
 /**
- * Êı¾İ¼¯¹ÜÀíÆ÷.
+ * æ•°æ®é›†ç®¡ç†å™¨.
  *
  * @author Sand
  * @version 1.0
- * @created 30-6ÔÂ-2015 16:19:05
+ * @created 30-6æœˆ-2015 16:19:05
  */
 @Transactional
 @Service
@@ -319,7 +319,7 @@ public class DataSetManager extends BaseManager {
     public int deleteDataSet(long dataSetId, String version) {
         int iResult = 0;
         try {
-            if (version == null || version.length() == 0) throw new IllegalArgumentException("ÎŞĞ§°æ±¾");
+            if (version == null || version.length() == 0) throw new IllegalArgumentException("æ— æ•ˆç‰ˆæœ¬");
 
             Session session = currentSession();
             String sql = "delete from " + CDAVersion.getDataSetTableName(version) + " where id = :id";
@@ -333,7 +333,7 @@ public class DataSetManager extends BaseManager {
     }
 
     /**
-     * ²éÑ¯×ÜÌõÊıµÄ·½·¨
+     * æŸ¥è¯¢æ€»æ¡æ•°çš„æ–¹æ³•
      *
      * @param cdaVersion
      * @return
@@ -356,7 +356,7 @@ public class DataSetManager extends BaseManager {
 
 
     /**
-     * ³õÊ¼»¯ºÍÌõ¼ş²éÑ¯µÄ·½·¨
+     * åˆå§‹åŒ–å’Œæ¡ä»¶æŸ¥è¯¢çš„æ–¹æ³•
      *
      * @param codename
      * @param from
@@ -367,7 +367,7 @@ public class DataSetManager extends BaseManager {
     @Transactional(propagation = Propagation.SUPPORTS)
     public List<DataSet> searchDataSets(String codename, int from, int count, String version) {
 
-        //²ÎÊı»ñÈ¡´¦Àí
+        //å‚æ•°è·å–å¤„ç†
 
         String dataSetTable = CDAVersion.getDataSetTableName(version);
         Session session = currentSession();
@@ -392,7 +392,7 @@ public class DataSetManager extends BaseManager {
 
     public List<DataSetModel> searchDataSetList(String codename, int from, int count, CDAVersion innerVersion) {
 
-        //²ÎÊı»ñÈ¡´¦Àí
+        //å‚æ•°è·å–å¤„ç†
         List DataSetList = searchDataSets(codename, from, count, innerVersion.getVersion());
         List<DataSetModel> dataSetModels = new ArrayList<>();
 
@@ -420,11 +420,11 @@ public class DataSetManager extends BaseManager {
 
 
     /********************************************/
-    /************* ÒÔÏÂÎªExcelµ¼Èë·½·¨ ***********/
+    /************* ä»¥ä¸‹ä¸ºExcelå¯¼å…¥æ–¹æ³• ***********/
     /**********************************************/
-    //TODO ºóÃæ×ö
+    //TODO åé¢åš
 
-    //´Óexcelµ¼ÈëÊı¾İ¼¯¡¢Êı¾İÔª
+    //ä»excelå¯¼å…¥æ•°æ®é›†ã€æ•°æ®å…ƒ
 //    public void importFromExcel(String filePath, CDAVersion cdaVersion){
 //        try {
 //            InputStream is = new FileInputStream(filePath);
@@ -432,52 +432,52 @@ public class DataSetManager extends BaseManager {
 //            Sheet[] sheets = rwb.getSheets();
 //            for (Sheet sheet : sheets) {
 //                XDataSet dataSet = createDataSet(cdaVersion);
-//                //»ñÈ¡Êı¾İ¼¯ĞÅÏ¢
-//                String dataSetNname = sheet.getCell(1, 0).getContents();//Ãû³Æ
-//                String dataSetCode = sheet.getCell(1, 1).getContents();//±êÊ¶
-//                String reference = sheet.getCell(1, 2).getContents();//²Î¿¼
-//                //todo£ºtest--²âÊÔÊ±±¸×¢×öÇø±ğ£¬·½±ãÉ¾³ı²âÊÔ£¬summary±äÁ¿Çø±ğ
-//                String summary = sheet.getCell(1, 3).getContents();//±¸×¢
-//                //String summary="²âÊÔexcelµ¼Èë";
-//                //²åÈëÊı¾İ¼¯ĞÅÏ¢
-//                //todo£ºtest--²âÊÔÊ±codeÇø±ğ£¬·ñÔò²âÊÔ²»³É¹¦£¬ÒòÎªcodeÎ¨Ò»
-//                //dataSet.setCode(dataSetCode+"excel");//codeÎ¨Ò»
-//                dataSet.setCode(dataSetCode);//codeÎ¨Ò»
+//                //è·å–æ•°æ®é›†ä¿¡æ¯
+//                String dataSetNname = sheet.getCell(1, 0).getContents();//åç§°
+//                String dataSetCode = sheet.getCell(1, 1).getContents();//æ ‡è¯†
+//                String reference = sheet.getCell(1, 2).getContents();//å‚è€ƒ
+//                //todoï¼štest--æµ‹è¯•æ—¶å¤‡æ³¨åšåŒºåˆ«ï¼Œæ–¹ä¾¿åˆ é™¤æµ‹è¯•ï¼Œsummaryå˜é‡åŒºåˆ«
+//                String summary = sheet.getCell(1, 3).getContents();//å¤‡æ³¨
+//                //String summary="æµ‹è¯•excelå¯¼å…¥";
+//                //æ’å…¥æ•°æ®é›†ä¿¡æ¯
+//                //todoï¼štest--æµ‹è¯•æ—¶codeåŒºåˆ«ï¼Œå¦åˆ™æµ‹è¯•ä¸æˆåŠŸï¼Œå› ä¸ºcodeå”¯ä¸€
+//                //dataSet.setCode(dataSetCode+"excel");//codeå”¯ä¸€
+//                dataSet.setCode(dataSetCode);//codeå”¯ä¸€
 //                dataSet.setName(dataSetNname);
 //                dataSet.setPublisher(0);
-//                dataSet.setReference("0");//±ê×¼À´Ô´
+//                dataSet.setReference("0");//æ ‡å‡†æ¥æº
 //                if (!StringUtil.isEmpty(reference)) {
 //                    XStandardSource[] standardSources = standardSourceManager.getSourceByKey(reference);
 //                    if (standardSources != null && standardSources.length > 0) {
-//                        dataSet.setReference(standardSources[0].getId());//±ê×¼À´Ô´
+//                        dataSet.setReference(standardSources[0].getId());//æ ‡å‡†æ¥æº
 //                    }
 //                }
 //                dataSet.setStdVersion(cdaVersion.getVersionName());
 //                dataSet.setCatalog(0);
 //                dataSet.setSummary(summary);
-//                saveDataSet(dataSet);//±£´æÊı¾İ¼¯ĞÅÏ¢
-//                //»ñÈ¡Êı¾İÔªĞÅÏ¢
+//                saveDataSet(dataSet);//ä¿å­˜æ•°æ®é›†ä¿¡æ¯
+//                //è·å–æ•°æ®å…ƒä¿¡æ¯
 //                int rows = sheet.getRows();
 //                for (int j = 0; j < rows - 5; j++) {
 //                    MetaData metaData = new MetaData();
 //                    int row = j + 5;
-//                    String innerCode = sheet.getCell(1, row).getContents();//ÄÚ²¿±êÊ¶
-//                    String code = sheet.getCell(2, row).getContents();//Êı¾İÔª±àÂë
-//                    String name = sheet.getCell(3, row).getContents();//Êı¾İÔªÃû³Æ
-//                    //todo£ºtest--²âÊÔÊ±±¸×¢×öÇø±ğ£¬·½±ãÉ¾³ı²âÊÔ£¬definition±äÁ¿Çø±ğ
-//                    String definition = sheet.getCell(4, row).getContents();//Êı¾İÔª¶¨Òå
-//                    //String definition="²âÊÔexcelµ¼Èë";
-//                    String type = sheet.getCell(5, row).getContents();//Êı¾İÀàĞÍ
-//                    String format = sheet.getCell(6, row).getContents();//±íÊ¾ĞÎÊ½
-//                    String dictCode = sheet.getCell(7, row).getContents();//ÊõÓï·¶Î§Öµ
-//                    String columnName = sheet.getCell(8, row).getContents();//ÁĞÃû
-//                    String columnType = sheet.getCell(9, row).getContents();//ÁĞÀàĞÍ
-//                    String columnLength = sheet.getCell(10, row).getContents();//ÁĞ³¤¶È
-//                    String primaryKey = sheet.getCell(11, row).getContents();//Ö÷¼ü
-//                    String nullable = sheet.getCell(12, row).getContents();//¿ÉÎª¿Õ
+//                    String innerCode = sheet.getCell(1, row).getContents();//å†…éƒ¨æ ‡è¯†
+//                    String code = sheet.getCell(2, row).getContents();//æ•°æ®å…ƒç¼–ç 
+//                    String name = sheet.getCell(3, row).getContents();//æ•°æ®å…ƒåç§°
+//                    //todoï¼štest--æµ‹è¯•æ—¶å¤‡æ³¨åšåŒºåˆ«ï¼Œæ–¹ä¾¿åˆ é™¤æµ‹è¯•ï¼Œdefinitionå˜é‡åŒºåˆ«
+//                    String definition = sheet.getCell(4, row).getContents();//æ•°æ®å…ƒå®šä¹‰
+//                    //String definition="æµ‹è¯•excelå¯¼å…¥";
+//                    String type = sheet.getCell(5, row).getContents();//æ•°æ®ç±»å‹
+//                    String format = sheet.getCell(6, row).getContents();//è¡¨ç¤ºå½¢å¼
+//                    String dictCode = sheet.getCell(7, row).getContents();//æœ¯è¯­èŒƒå›´å€¼
+//                    String columnName = sheet.getCell(8, row).getContents();//åˆ—å
+//                    String columnType = sheet.getCell(9, row).getContents();//åˆ—ç±»å‹
+//                    String columnLength = sheet.getCell(10, row).getContents();//åˆ—é•¿åº¦
+//                    String primaryKey = sheet.getCell(11, row).getContents();//ä¸»é”®
+//                    String nullable = sheet.getCell(12, row).getContents();//å¯ä¸ºç©º
 //
-//                    //²åÈëÊı¾İÔªĞÅÏ¢
-//                    metaData.setId(0);//Îª0ÄÚ²¿×ÔÔö
+//                    //æ’å…¥æ•°æ®å…ƒä¿¡æ¯
+//                    metaData.setId(0);//ä¸º0å†…éƒ¨è‡ªå¢
 //                    metaData.setDataSet(dataSet);
 //                    metaData.setCode(code);
 //                    metaData.setName(name);
@@ -486,7 +486,7 @@ public class DataSetManager extends BaseManager {
 //                    if (!StringUtil.isEmpty(dictCode)) {
 //                        XDict[] dicts = dictManager.getDictListForInter(0, 0, cdaVersion, dictCode);
 //                        if (dicts != null && dicts.length > 0) {
-//                            metaData.setDictId(dicts[0].getId()); //×Öµäid
+//                            metaData.setDictId(dicts[0].getId()); //å­—å…¸id
 //                        }
 //                    }
 //                    metaData.setFormat(format);
@@ -496,12 +496,12 @@ public class DataSetManager extends BaseManager {
 //                    metaData.setColumnType(columnType);
 //                    metaData.setPrimaryKey(primaryKey.equals("1"));
 //                    metaData.setNullable(nullable.equals("1"));
-//                    metaDataManager.saveMetaData(dataSet, metaData);//±£´æÊı¾İÔª
+//                    metaDataManager.saveMetaData(dataSet, metaData);//ä¿å­˜æ•°æ®å…ƒ
 //                }
 //
 //            }
 //
-//            //¹Ø±Õ
+//            //å…³é—­
 //            rwb.close();
 //            is.close();
 //
@@ -511,7 +511,7 @@ public class DataSetManager extends BaseManager {
 //
 //    }
 //
-//    //Êı¾İ¼¯¡¢Êı¾İÔªµ¼³öµ½excel
+//    //æ•°æ®é›†ã€æ•°æ®å…ƒå¯¼å‡ºåˆ°excel
 //    public void exportToExcel(String filePath,XDataSet[] dataSets){
 //        XStandardSourceManager standardSourceManager = ServiceFactory.getService(Services.StandardSourceManager);
 //        XMetaDataManager metaDataManager = ServiceFactory.getService(Services.MetaDataManager);
@@ -524,49 +524,49 @@ public class DataSetManager extends BaseManager {
 //
 //            for(int i=0;i<dataSets.length;i++){
 //                XDataSet dataSet=dataSets[i];
-//                //´´½¨Excel¹¤×÷±í Ö¸¶¨Ãû³ÆºÍÎ»ÖÃ
+//                //åˆ›å»ºExcelå·¥ä½œè¡¨ æŒ‡å®šåç§°å’Œä½ç½®
 //                WritableSheet ws = wwb.createSheet(dataSet.getName(),i);
-//                addStaticCell(ws);//Ìí¼Ó¹Ì¶¨ĞÅÏ¢£¬ÌâÍ·µÈ
-//                //Ìí¼ÓÊı¾İ¼¯ĞÅÏ¢
-//                addCell(ws,1,0,dataSet.getName());//Ãû³Æ
-//                addCell(ws,1,1,dataSet.getCode());//±êÊ¶
+//                addStaticCell(ws);//æ·»åŠ å›ºå®šä¿¡æ¯ï¼Œé¢˜å¤´ç­‰
+//                //æ·»åŠ æ•°æ®é›†ä¿¡æ¯
+//                addCell(ws,1,0,dataSet.getName());//åç§°
+//                addCell(ws,1,1,dataSet.getCode());//æ ‡è¯†
 //                String reference = dataSet.getReference();
 //                if (!StringUtil.isEmpty(reference)){
 //                    XStandardSource standardSource=standardSourceManager.getSourceBySingleId(reference);
 //                    if (standardSource!=null){
-//                        addCell(ws,1,2,standardSource.getName());//²Î¿¼
+//                        addCell(ws,1,2,standardSource.getName());//å‚è€ƒ
 //                    }
 //                }
-//                addCell(ws,1,3,dataSet.getSummary());//±¸×¢
+//                addCell(ws,1,3,dataSet.getSummary());//å¤‡æ³¨
 //
-//                //Ìí¼ÓÊı¾İÔªĞÅÏ¢
+//                //æ·»åŠ æ•°æ®å…ƒä¿¡æ¯
 //                List<XMetaData> metaDataList = metaDataManager.getMetaDataList(dataSet);
 //                WritableCellFormat wc = new WritableCellFormat();
-//                wc.setBorder(jxl.format.Border.ALL, jxl.format.BorderLineStyle.THIN, Colour.SKY_BLUE);//±ß¿ò
+//                wc.setBorder(jxl.format.Border.ALL, jxl.format.BorderLineStyle.THIN, Colour.SKY_BLUE);//è¾¹æ¡†
 //                for(int j=0;j<metaDataList.size();j++){
 //                    MetaData metaData = (MetaData)metaDataList.get(j);
 //                    int row=j+5;
-//                    addCell(ws,0,row,j+1+"",wc);//ĞòºÅ
-//                    addCell(ws,1,row,metaData.getInnerCode(),wc);//ÄÚ²¿±êÊ¶
-//                    addCell(ws,2,row,metaData.getCode(),wc);//Êı¾İÔª±àÂë
-//                    addCell(ws,3,row,metaData.getName(),wc);//Êı¾İÔªÃû³Æ
-//                    addCell(ws,4,row,metaData.getDefinition(),wc);//Êı¾İÔª¶¨Òå
-//                    addCell(ws,5,row,metaData.getType(),wc);//Êı¾İÀàĞÍ
-//                    addCell(ws,6,row,metaData.getFormat(),wc);//±íÊ¾ĞÎÊ½
+//                    addCell(ws,0,row,j+1+"",wc);//åºå·
+//                    addCell(ws,1,row,metaData.getInnerCode(),wc);//å†…éƒ¨æ ‡è¯†
+//                    addCell(ws,2,row,metaData.getCode(),wc);//æ•°æ®å…ƒç¼–ç 
+//                    addCell(ws,3,row,metaData.getName(),wc);//æ•°æ®å…ƒåç§°
+//                    addCell(ws,4,row,metaData.getDefinition(),wc);//æ•°æ®å…ƒå®šä¹‰
+//                    addCell(ws,5,row,metaData.getType(),wc);//æ•°æ®ç±»å‹
+//                    addCell(ws,6,row,metaData.getFormat(),wc);//è¡¨ç¤ºå½¢å¼
 //                    XDict dict = metaData.getDict();
 //                    if (dict!=null){
-//                        addCell(ws,7,row,dict.getCode(),wc);//ÊõÓï·¶Î§Öµ
+//                        addCell(ws,7,row,dict.getCode(),wc);//æœ¯è¯­èŒƒå›´å€¼
 //                    }else{
-//                        addCell(ws,7,row,"",wc);//ÊõÓï·¶Î§Öµ
+//                        addCell(ws,7,row,"",wc);//æœ¯è¯­èŒƒå›´å€¼
 //                    }
-//                    addCell(ws,8,row,metaData.getColumnName(),wc);//ÁĞÃû
-//                    addCell(ws,9,row,metaData.getColumnType(),wc);//ÁĞÀàĞÍ
-//                    addCell(ws,10,row,metaData.getColumnLength(),wc);//ÁĞ³¤¶È
-//                    addCell(ws,11,row,metaData.isPrimaryKey()?"1":"0",wc);//Ö÷¼ü
-//                    addCell(ws,12,row,metaData.isNullable()?"1":"0",wc);//¿ÉÎª¿Õ
+//                    addCell(ws,8,row,metaData.getColumnName(),wc);//åˆ—å
+//                    addCell(ws,9,row,metaData.getColumnType(),wc);//åˆ—ç±»å‹
+//                    addCell(ws,10,row,metaData.getColumnLength(),wc);//åˆ—é•¿åº¦
+//                    addCell(ws,11,row,metaData.isPrimaryKey()?"1":"0",wc);//ä¸»é”®
+//                    addCell(ws,12,row,metaData.isNullable()?"1":"0",wc);//å¯ä¸ºç©º
 //                }
 //            }
-//            //Ğ´Èë¹¤×÷±í
+//            //å†™å…¥å·¥ä½œè¡¨
 //            wwb.write();
 //            wwb.close();
 //            os.close();
@@ -575,37 +575,37 @@ public class DataSetManager extends BaseManager {
 //        }
 //    }
 //
-//    //excelÖĞÌí¼Ó¹Ì¶¨ÄÚÈİ
+//    //excelä¸­æ·»åŠ å›ºå®šå†…å®¹
 //    private void addStaticCell(WritableSheet ws){
 //        try {
-//            addCell(ws,0,0,"Ãû³Æ");
-//            addCell(ws,0,1,"±êÊ¶");
-//            addCell(ws,0,2,"²Î¿¼");
-//            addCell(ws,0,3,"±¸×¢");
+//            addCell(ws,0,0,"åç§°");
+//            addCell(ws,0,1,"æ ‡è¯†");
+//            addCell(ws,0,2,"å‚è€ƒ");
+//            addCell(ws,0,3,"å¤‡æ³¨");
 //            //--------------------
 //            WritableFont wfc = new WritableFont(WritableFont.ARIAL,12,WritableFont.NO_BOLD,false,
-//                    UnderlineStyle.NO_UNDERLINE,jxl.format.Colour.WHITE);//×ÖÌå£º´óĞ¡£¬¼Ó´Ö£¬ÑÕÉ«
+//                    UnderlineStyle.NO_UNDERLINE,jxl.format.Colour.WHITE);//å­—ä½“ï¼šå¤§å°ï¼ŒåŠ ç²—ï¼Œé¢œè‰²
 //            WritableCellFormat wcfFC = new WritableCellFormat(wfc);
-//            wcfFC.setBackground(jxl.format.Colour.LIGHT_BLUE);//±±¾©É«
-//            addCell(ws,0,4,"ĞòºÅ",wcfFC);
-//            addCell(ws,1,4,"ÄÚ²¿±êÊ¶",wcfFC);
-//            addCell(ws,2,4,"Êı¾İÔª±àÂë",wcfFC);
-//            addCell(ws,3,4,"Êı¾İÔªÃû³Æ",wcfFC);
-//            addCell(ws,4,4,"Êı¾İÔª¶¨Òå",wcfFC);
-//            addCell(ws,5,4,"Êı¾İÀàĞÍ",wcfFC);
-//            addCell(ws,6,4,"±íÊ¾ĞÎÊ½",wcfFC);
-//            addCell(ws,7,4,"ÊõÓï·¶Î§Öµ",wcfFC);
-//            addCell(ws,8,4,"ÁĞÃû",wcfFC);
-//            addCell(ws,9,4,"ÁĞÀàĞÍ",wcfFC);
-//            addCell(ws,10,4,"ÁĞ³¤¶È",wcfFC);
-//            addCell(ws,11,4,"Ö÷¼ü",wcfFC);
-//            addCell(ws,12,4,"¿ÉÎª¿Õ",wcfFC);
+//            wcfFC.setBackground(jxl.format.Colour.LIGHT_BLUE);//åŒ—äº¬è‰²
+//            addCell(ws,0,4,"åºå·",wcfFC);
+//            addCell(ws,1,4,"å†…éƒ¨æ ‡è¯†",wcfFC);
+//            addCell(ws,2,4,"æ•°æ®å…ƒç¼–ç ",wcfFC);
+//            addCell(ws,3,4,"æ•°æ®å…ƒåç§°",wcfFC);
+//            addCell(ws,4,4,"æ•°æ®å…ƒå®šä¹‰",wcfFC);
+//            addCell(ws,5,4,"æ•°æ®ç±»å‹",wcfFC);
+//            addCell(ws,6,4,"è¡¨ç¤ºå½¢å¼",wcfFC);
+//            addCell(ws,7,4,"æœ¯è¯­èŒƒå›´å€¼",wcfFC);
+//            addCell(ws,8,4,"åˆ—å",wcfFC);
+//            addCell(ws,9,4,"åˆ—ç±»å‹",wcfFC);
+//            addCell(ws,10,4,"åˆ—é•¿åº¦",wcfFC);
+//            addCell(ws,11,4,"ä¸»é”®",wcfFC);
+//            addCell(ws,12,4,"å¯ä¸ºç©º",wcfFC);
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
 //    }
 //
-//    //Ìí¼Óµ¥Ôª¸ñÄÚÈİ
+//    //æ·»åŠ å•å…ƒæ ¼å†…å®¹
 //    private void addCell(WritableSheet ws,int column,int row,String data){
 //        try {
 //            Label label = new Label(column,row,data);
@@ -614,7 +614,7 @@ public class DataSetManager extends BaseManager {
 //            e.printStackTrace();
 //        }
 //    }
-//    //Ìí¼Óµ¥Ôª¸ñÄÚÈİ´øÑùÊ½
+//    //æ·»åŠ å•å…ƒæ ¼å†…å®¹å¸¦æ ·å¼
 //    private void addCell(WritableSheet ws,int column,int row,String data,CellFormat cellFormat){
 //        try {
 //            Label label = new Label(column,row,data,cellFormat);

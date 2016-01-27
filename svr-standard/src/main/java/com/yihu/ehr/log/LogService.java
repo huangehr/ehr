@@ -10,11 +10,11 @@ import org.springframework.stereotype.Service;
 import java.io.FileInputStream;
 
 /**
- * ÈÕÖ¾·þÎñÀà¡£Ä¿Ç°Ê¹ÓÃµÄÊÇ log4j2£¬¼´2.X°æ±¾µÄlog4j,²»ÄÜÓëÆäËû°æ±¾»ìÏý,ÒòÎªËüÃÇµÄÅäÖÃÎÄ¼þ¼ÓÔØ·½Ê½²»Ò»ÖÂ.
+ * æ—¥å¿—æœåŠ¡ç±»ã€‚ç›®å‰ä½¿ç”¨çš„æ˜¯ log4j2ï¼Œå³2.Xç‰ˆæœ¬çš„log4j,ä¸èƒ½ä¸Žå…¶ä»–ç‰ˆæœ¬æ··æ·†,å› ä¸ºå®ƒä»¬çš„é…ç½®æ–‡ä»¶åŠ è½½æ–¹å¼ä¸ä¸€è‡´.
  *
- * @apiNote ÓÉÓÚÉæ¼°µ½Spring¿ò¼ÜµÄ³õÊ¼»¯, Ëü»áÏÈÓÚlog4jµÄ³õÊ¼»¯. Èç¹ûÔÚlog4jÅäÖÃÎ´³õÊ¼»¯Ö®Ç°ÔÚSpring BeanÄÚÏÈÉú³É
- * log4j¶ÔÏó, ¿ÉÄÜ»áÔì³É´íÎó. ÀýÈç: Spring MVC µÄController²¿·Ö¿ÉÄÜ»á»º´æÒ»¸öLogger¶ÔÏó,µ«´ËÊ±log4jÊÇÎ´ÅäÖÃµÄ, ËùÒÔ»á³öÏÖÒì³£.
- * ÕýÈ·µÄ×÷·¨ÊÇSpringµÄBeanÄÚ²»Òª»º´æÕâ¸öLogger¶ÔÏó,²¢ÔÚlo4j³õÊ¼»¯ºóÔÚÔËÐÐÊ±È¥»ñÈ¡Logger¶ÔÏó.
+ * @apiNote ç”±äºŽæ¶‰åŠåˆ°Springæ¡†æž¶çš„åˆå§‹åŒ–, å®ƒä¼šå…ˆäºŽlog4jçš„åˆå§‹åŒ–. å¦‚æžœåœ¨log4jé…ç½®æœªåˆå§‹åŒ–ä¹‹å‰åœ¨Spring Beanå†…å…ˆç”Ÿæˆ
+ * log4jå¯¹è±¡, å¯èƒ½ä¼šé€ æˆé”™è¯¯. ä¾‹å¦‚: Spring MVC çš„Controlleréƒ¨åˆ†å¯èƒ½ä¼šç¼“å­˜ä¸€ä¸ªLoggerå¯¹è±¡,ä½†æ­¤æ—¶log4jæ˜¯æœªé…ç½®çš„, æ‰€ä»¥ä¼šå‡ºçŽ°å¼‚å¸¸.
+ * æ­£ç¡®çš„ä½œæ³•æ˜¯Springçš„Beanå†…ä¸è¦ç¼“å­˜è¿™ä¸ªLoggerå¯¹è±¡,å¹¶åœ¨lo4jåˆå§‹åŒ–åŽåœ¨è¿è¡Œæ—¶åŽ»èŽ·å–Loggerå¯¹è±¡.
  *
  * @author Air
  * @author Sand
@@ -32,7 +32,7 @@ public class LogService {
 
             Configurator.initialize(null, source);
         } catch (Exception ex) {
-            // ´Ë´¦²»ÄÜÔÙµ÷ÓÃ×ÔÉí×÷ÎªÈÕÖ¾¼ÇÂ¼·þÎñ, ÒòÎª´ËÊ±³õÊ¼»¯Ê§°ÜÁË
+            // æ­¤å¤„ä¸èƒ½å†è°ƒç”¨è‡ªèº«ä½œä¸ºæ—¥å¿—è®°å½•æœåŠ¡, å› ä¸ºæ­¤æ—¶åˆå§‹åŒ–å¤±è´¥äº†
             LogManager.getLogger(LogService.class).error(ex.getMessage());
         }
     }

@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Êı¾İÔª¹ÜÀí½Ó¿ÚÊµÏÖ¡£
+ * æ•°æ®å…ƒç®¡ç†æ¥å£å®ç°ã€‚
  *
  * @author Sand
  * @version 1.0
@@ -85,7 +85,7 @@ public class MetaDataManager extends BaseManager{
         CDAVersion cdaVersion = cdaVersionManager.getVersion(dataSet.getInnerVersionId());
         if(ids.size() == 0) return null;
 
-        // ×éºÏID
+        // ç»„åˆID
         String idList = "(";
         for (Integer id: ids){
             idList += id + ", ";
@@ -97,7 +97,7 @@ public class MetaDataManager extends BaseManager{
                 " left join "+cdaVersion.getDictTableName()+" d on t.dict_id=d.id"+
                 " where t.id in " + idList;
 
-        // ²éÑ¯
+        // æŸ¥è¯¢
         List<Object> records = currentSession().createSQLQuery(sql).list();
         List<MetaData> metaDataList = new ArrayList<>(records.size());
         for (int i = 0; i < records.size(); ++i){
@@ -141,7 +141,7 @@ public class MetaDataManager extends BaseManager{
 
         Query query = session.createSQLQuery(sql);
         query.setLong("id", metaData.getId());
-        //todo ÊÇ·ñĞèÈ·ÈÏ´æÔÚ
+        //todo æ˜¯å¦éœ€ç¡®è®¤å­˜åœ¨
         query.setLong("dataset_id", metaData.getDataSetId());
         query.setLong("dict_id", metaData.getDictId());
 
@@ -218,7 +218,7 @@ public class MetaDataManager extends BaseManager{
     }
 
     /**
-     * ³õÊ¼»¯ºÍÌõ¼ş²éÑ¯µÄ·½·¨
+     * åˆå§‹åŒ–å’Œæ¡ä»¶æŸ¥è¯¢çš„æ–¹æ³•
      * @param dataSet
      * @param from
      * @param count
@@ -305,7 +305,7 @@ public class MetaDataManager extends BaseManager{
     }
 
     /**
-     * ²éÑ¯×ÜÌõÊıµÄ·½·¨
+     * æŸ¥è¯¢æ€»æ¡æ•°çš„æ–¹æ³•
      * @param dataSetModel
      * @return
      */
@@ -347,7 +347,7 @@ public class MetaDataManager extends BaseManager{
                 " left join "+ CDAVersion.getDictTableName(dataSet.getInnerVersionId())+" d on t.dict_id=d.id"+
                 " where t.id =" + metaDataId;
 
-        // ²éÑ¯
+        // æŸ¥è¯¢
         List<Object> records = currentSession().createSQLQuery(sql).list();
 
         List<MetaData> metaDataList = new ArrayList<>(records.size());
@@ -361,7 +361,7 @@ public class MetaDataManager extends BaseManager{
     }
 
     /**
-     *  ÅúÁ¿É¾³ıÊı¾İÔ´µÄ·½·¨
+     *  æ‰¹é‡åˆ é™¤æ•°æ®æºçš„æ–¹æ³•
      * @param metaDataId
      * @param version
      * @return
