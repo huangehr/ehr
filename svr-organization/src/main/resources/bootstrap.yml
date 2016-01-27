@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-organization
+    name: svr-org
 
   cloud:
     config:

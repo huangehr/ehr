@@ -30,7 +30,7 @@ import java.util.Map;
 @RestController
 @RequestMapping(ApiVersionPrefix.CommonVersion + "/org")
 @Api(protocols = "https", value = "org", description = "组织机构管理接口", tags = {"机构管理"})
-public class OrganizationRestController extends BaseRestController {
+public class OrganizationController extends BaseRestController {
 
     @Autowired
     private OrgManagerService orgManagerService;
@@ -39,21 +39,6 @@ public class OrganizationRestController extends BaseRestController {
     private SecurityClient securityClient;
 
 
-    /**
-     * 根据orgCode获取机构
-     * @param orgCode
-     * @return
-     */
-    @RequestMapping(value = "/orgModel", method = RequestMethod.GET)
-    public Object getOrgModel(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "orgCode", value = "机构代码")
-            @RequestParam(value = "orgCode") String orgCode) {
-        Organization org = orgManagerService.getOrg(orgCode);
-        OrgModel orgModel = orgManagerService.getOrgModel(org);
-        return orgModel;
-    }
 
 
     /**
@@ -236,14 +221,25 @@ public class OrganizationRestController extends BaseRestController {
         }
     }
 
+
+    @RequestMapping(value = "/org", method = RequestMethod.GET)
+    public Object getOrgByCode(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
+            @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
+            @RequestParam(value = "orgCode") String orgCode) {
+        Organization org = orgManagerService.getOrg(orgCode);
+        return org;
+    }
+
     /**
      * 根据code获取机构信息
      * @param orgCode
      * @return
      */
-    @ApiOperation(value = "根据地址代码获取机构详细信息")
-    @RequestMapping(value = "/org", method = RequestMethod.GET)
-    public Object getOrg(
+    //@ApiOperation(value = "根据地址代码获取机构详细信息")
+    @RequestMapping(value = "/org_model", method = RequestMethod.GET)
+    public Object getOrgModel(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
@@ -270,9 +266,6 @@ public class OrganizationRestController extends BaseRestController {
             @RequestParam(value = "name") String name) {
         OrgModel orgModel = new OrgModel();
         List<String> ids = orgManagerService.getIdsByName(name);
-        if(ids.size()==0){
-            ids.add("00000");
-        }
         return ids;
     }
 
@@ -284,8 +277,8 @@ public class OrganizationRestController extends BaseRestController {
      * @param city
      * @return
      */
-    @RequestMapping(value = "/orgs" , method = RequestMethod.GET)
-    public Object getOrgs(
+    @RequestMapping(value = "/orgs/search" , method = RequestMethod.GET)
+    public Object getOrgsByAddress(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "province", value = "省")
@@ -307,35 +300,27 @@ public class OrganizationRestController extends BaseRestController {
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "orgCode", value = "机构代码")
             @RequestParam(value = "orgCode") String orgCode) {
-        try {
-
-            MUserSecurity userSecurity = securityClient.getUserSecurityByOrgCode(orgCode);
-            Map<String, String> keyMap = new HashMap<>();
-            if (userSecurity == null) {
-                userSecurity = securityClient.createSecurityByOrgCode(orgCode);
-
-            }else{
-                //result.setErrorMsg("公钥信息已存在。");
-                //这里删除原有的公私钥重新分配
-                String userKeyId = securityClient.getUserKeyByOrgCd(orgCode);
-                securityClient.deleteSecurity(userSecurity.getId());
-                securityClient.deleteUserKey(userKeyId);
-                userSecurity = securityClient.createSecurityByOrgCode(orgCode);
-            }
-
-            //String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT);
-            String validTime = DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd")
-                    + "~" + DateFormatUtils.format(userSecurity.getExpiryDate(),"yyyy-MM-dd");
-
-            keyMap.put("publicKey", userSecurity.getPublicKey());
-            keyMap.put("validTime", validTime);
-            keyMap.put("startTime", DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd"));
-            return keyMap;
-        } catch (Exception ex) {
-            ApiErrorEcho apiErrorEcho = new ApiErrorEcho();
-            apiErrorEcho.putMessage("failed");
-            return apiErrorEcho;
+        MUserSecurity userSecurity = securityClient.getUserSecurityByOrgCode(orgCode);
+        Map<String, String> keyMap = new HashMap<>();
+        if (userSecurity == null) {
+            userSecurity = securityClient.createSecurityByOrgCode(orgCode);
+        }else{
+            //result.setErrorMsg("公钥信息已存在。");
+            //这里删除原有的公私钥重新分配
+            String userKeyId = securityClient.getUserKeyIdByOrgCd(orgCode);
+            securityClient.deleteSecurity(userSecurity.getId());
+            securityClient.deleteUserKey(userKeyId);
+            userSecurity = securityClient.createSecurityByOrgCode(orgCode);
         }
+
+        //String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT);
+        String validTime = DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd")
+                + "~" + DateFormatUtils.format(userSecurity.getExpiryDate(),"yyyy-MM-dd");
+
+        keyMap.put("publicKey", userSecurity.getPublicKey());
+        keyMap.put("validTime", validTime);
+        keyMap.put("startTime", DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd"));
+        return keyMap;
     }
 
     @RequestMapping(value = "/validation" ,method = RequestMethod.GET)
@@ -344,7 +329,6 @@ public class OrganizationRestController extends BaseRestController {
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "orgCode", value = "机构代码")
             @RequestParam(value = "orgCode") String orgCode){
-
         Organization org = orgManagerService.getOrg(orgCode);
         if(org == null){
             return "success";
