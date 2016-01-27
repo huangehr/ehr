@@ -1,5 +1,6 @@
 package com.yihu.ehr.standard.standardsource.service;
 
+import com.yihu.ehr.standard.commons.BaseManager;
 import com.yihu.ehr.standard.standardsource.model.StandardSourceModel;
 import com.yihu.ehr.util.operator.DateUtil;
 import com.yihu.ehr.util.operator.StringUtil;
@@ -21,7 +22,7 @@ import java.util.List;
  */
 @Service
 @Transactional
-public class StandardSourceManager {
+public class StandardSourceManager extends BaseManager{
     public static final String StandardSourceTableName = "std_standard_source";
 
     @Autowired
@@ -210,12 +211,6 @@ public class StandardSourceManager {
         return rs.getId();
     }
 
-    /**
-     * 获取当前session
-     * @return
-     */
-    private Session currentSession(){
-        return entityManager.unwrap(Session.class);
-    }
+
 
 }
