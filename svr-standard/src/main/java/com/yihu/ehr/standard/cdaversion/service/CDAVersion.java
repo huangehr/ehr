@@ -11,7 +11,7 @@ import java.util.Date;
 /**
  * @author Sand
  * @version 1.0
- * @created 02-7ÔÂ-2015 14:36:32
+ * @created 02-7æœˆ-2015 14:36:32
  */
 //@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
@@ -120,7 +120,7 @@ public class CDAVersion{
     }
     @Transient
     public static String getDataSetTableName(String version) {
-        if (!ObjectVersion.isValid(version)) throw new IllegalArgumentException("ÎŞĞ§°æ±¾ºÅ");
+        if (!ObjectVersion.isValid(version)) throw new IllegalArgumentException("æ— æ•ˆç‰ˆæœ¬å·");
 
         return DataSetTablePrefix + version;
     }
@@ -130,31 +130,31 @@ public class CDAVersion{
     }
     @Transient
     public static String getMetaDataTableName(String version) {
-        if (!ObjectVersion.isValid(version)) throw new IllegalArgumentException("ÎŞĞ§°æ±¾ºÅ");
+        if (!ObjectVersion.isValid(version)) throw new IllegalArgumentException("æ— æ•ˆç‰ˆæœ¬å·");
 
         return MetaDataTablePrefix + version;
     }
 
-    //»ñÈ¡×Öµä±íÃû³Æ
+    //è·å–å­—å…¸è¡¨åç§°
     @Transient
     public String getDictTableName() {
         return getDictTableName(version.toString());
     }
     @Transient
     public static String getDictTableName(String version) {
-        if (!ObjectVersion.isValid(version)) throw new IllegalArgumentException("ÎŞĞ§°æ±¾ºÅ");
+        if (!ObjectVersion.isValid(version)) throw new IllegalArgumentException("æ— æ•ˆç‰ˆæœ¬å·");
 
         return DictTablePrefix + version;
     }
 
-    //»ñÈ¡×ÖµäÏî±íÃû³Æ
+    //è·å–å­—å…¸é¡¹è¡¨åç§°
     @Transient
     public String getDictEntryTableName() {
         return getDictEntryTableName(version.toString());
     }
     @Transient
     public static String getDictEntryTableName(String version) {
-        if (!ObjectVersion.isValid(version)) throw new IllegalArgumentException("ÎŞĞ§°æ±¾ºÅ");
+        if (!ObjectVersion.isValid(version)) throw new IllegalArgumentException("æ— æ•ˆç‰ˆæœ¬å·");
 
         return DictEntryTablePrefix + version;
     }
@@ -164,7 +164,7 @@ public class CDAVersion{
     }
     @Transient
     public static String getCDATableName(String version) {
-        if (!ObjectVersion.isValid(version)) throw new IllegalArgumentException("ÎŞĞ§°æ±¾ºÅ");
+        if (!ObjectVersion.isValid(version)) throw new IllegalArgumentException("æ— æ•ˆç‰ˆæœ¬å·");
 
         return CDADocumentTablePrefix + version;
     }
@@ -174,7 +174,7 @@ public class CDAVersion{
     }
     @Transient
     public static String getCDADatasetRelationshipTableName(String version) {
-        if (!ObjectVersion.isValid(version)) throw new IllegalArgumentException("ÎŞĞ§°æ±¾ºÅ");
+        if (!ObjectVersion.isValid(version)) throw new IllegalArgumentException("æ— æ•ˆç‰ˆæœ¬å·");
 
         return CDADatasetRelationshipTablePrefix + version;
     }

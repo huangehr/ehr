@@ -5,10 +5,10 @@ import com.yihu.ehr.standard.cdaversion.service.CDAVersion;
 import java.util.Objects;
 
 /**
- * Êı¾İ¼¯ÊµÏÖÀà. IDÓë°æ±¾ÁªºÏÆğÀ´±íÊ¾Ò»¸öÖ÷¼ü¡£´ËÊı¾İ¼¯ÓÃÓÚ±íÊ¾Ò»¸öÒÑ¾­°æ±¾ºÃµÄ¶ÔÏó¡£
+ * æ•°æ®é›†å®ç°ç±». IDä¸ç‰ˆæœ¬è”åˆèµ·æ¥è¡¨ç¤ºä¸€ä¸ªä¸»é”®ã€‚æ­¤æ•°æ®é›†ç”¨äºè¡¨ç¤ºä¸€ä¸ªå·²ç»ç‰ˆæœ¬å¥½çš„å¯¹è±¡ã€‚
  * @author Sand
  * @version 1.0
- * @created 30-6ÔÂ-2015 16:19:03
+ * @created 30-6æœˆ-2015 16:19:03
  */
 public class DataSet {
     public long id;

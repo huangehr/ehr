@@ -15,11 +15,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * °æ±¾¹ÜÀíÊµÏÖÀà¡£
+ * ç‰ˆæœ¬ç®¡ç†å®ç°ç±»ã€‚
  *
  * @author Sand
  * @version 1.0
- * @updated 02-7ÔÂ-2015 14:40:20
+ * @updated 02-7æœˆ-2015 14:40:20
  */
 @Service
 @Transactional
@@ -30,21 +30,21 @@ public class CDAVersionManager extends BaseManager{
     XCDAVersionRepository cdaVersionRepository;
 
     /**
-     * ´´½¨Ò»¸ö½×¶ÎĞÔ°æ±¾. ²ÎÊıÖĞµÄ°æ±¾²»ÄÜ´¦ÓÚ±à¼­×´Ì¬.
+     * åˆ›å»ºä¸€ä¸ªé˜¶æ®µæ€§ç‰ˆæœ¬. å‚æ•°ä¸­çš„ç‰ˆæœ¬ä¸èƒ½å¤„äºç¼–è¾‘çŠ¶æ€.
      *
      * @param baseVersion
      * @param author
      */
     @Transactional(Transactional.TxType.REQUIRED)
     public CDAVersion createStageVersion(CDAVersion baseVersion, String author) {
-        if (author == null || author.length() == 0) throw new IllegalArgumentException("×÷Õß²»ÄÜÎª¿Õ");
+        if (author == null || author.length() == 0) throw new IllegalArgumentException("ä½œè€…ä¸èƒ½ä¸ºç©º");
 
         CDAVersion stagedVersion = null;
         if (baseVersion == null) {
             if (getVersionList().length != 0) {
-                throw new IllegalArgumentException("»ù´¡°æ±¾²»ÄÜÎª¿Õ");
+                throw new IllegalArgumentException("åŸºç¡€ç‰ˆæœ¬ä¸èƒ½ä¸ºç©º");
             } else {
-                // ¿Õ¿âµÄÇé¿öÏÂ£¬Ê¹ÓÃ XCDAVersionManager.FBVersion ×÷Îª³õÊ¼°æ±¾
+                // ç©ºåº“çš„æƒ…å†µä¸‹ï¼Œä½¿ç”¨ XCDAVersionManager.FBVersion ä½œä¸ºåˆå§‹ç‰ˆæœ¬
                 stagedVersion = new CDAVersion(null, author, "0.1");
                 stagedVersion.setVersion(CDAVersionManager.FBVersion);
             }
@@ -71,7 +71,7 @@ public class CDAVersionManager extends BaseManager{
     }
 
     /**
-     * ¸ù¾İ°æ±¾ºÅ»ñÈ¡°æ±¾ĞÅÏ¢
+     * æ ¹æ®ç‰ˆæœ¬å·è·å–ç‰ˆæœ¬ä¿¡æ¯
      * @param version
      * @return
      */
@@ -81,7 +81,7 @@ public class CDAVersionManager extends BaseManager{
     }
 
     /**
-     * »ñÈ¡×îĞÂµÄÒÑ·¢²¼°æ±¾
+     * è·å–æœ€æ–°çš„å·²å‘å¸ƒç‰ˆæœ¬
      * @return
      */
     @Transactional(Transactional.TxType.SUPPORTS)
@@ -99,7 +99,7 @@ public class CDAVersionManager extends BaseManager{
     }
 
     /**
-     * »ñÈ¡ËùÓĞ°æ±¾
+     * è·å–æ‰€æœ‰ç‰ˆæœ¬
      * @return
      */
     @Transactional(Transactional.TxType.SUPPORTS)
@@ -111,13 +111,13 @@ public class CDAVersionManager extends BaseManager{
     }
 
     /**
-     * ·¢²¼°æ±¾
+     * å‘å¸ƒç‰ˆæœ¬
      * @param version
      */
     @Transactional(Transactional.TxType.REQUIRED)
     public void commitVersion(CDAVersion version) {
         if (!version.isInStage()) {
-            throw new IllegalArgumentException("´Ë°æ±¾Î´´¦ÓÚ°æ±¾»¯±à¼­×´Ì¬");
+            throw new IllegalArgumentException("æ­¤ç‰ˆæœ¬æœªå¤„äºç‰ˆæœ¬åŒ–ç¼–è¾‘çŠ¶æ€");
         }
         version.setInStage(false);
         version.setCommitTime(new Date());
@@ -128,7 +128,7 @@ public class CDAVersionManager extends BaseManager{
     @Transactional(Transactional.TxType.REQUIRED)
     public void revertVersion(CDAVersion version) {
         if (!version.isInStage()) {
-            throw new IllegalArgumentException("´Ë°æ±¾Î´´¦ÓÚ°æ±¾»¯±à¼­×´Ì¬");
+            throw new IllegalArgumentException("æ­¤ç‰ˆæœ¬æœªå¤„äºç‰ˆæœ¬åŒ–ç¼–è¾‘çŠ¶æ€");
         }
         dropVersionTables(version);
         cdaVersionRepository.delete(version);
@@ -149,23 +149,23 @@ public class CDAVersionManager extends BaseManager{
     }
 
     /**
-     * »Ø¹öµ½±à¼­×´Ì¬
+     * å›æ»šåˆ°ç¼–è¾‘çŠ¶æ€
      * @param version
      */
     @Transactional(Transactional.TxType.REQUIRED)
     public void rollbackToStage(CDAVersion version) {
-        // ÒÑ¾­ÊÇ±à¼­×´Ì¬£¬Ö±½Ó·µ»Ø
+        // å·²ç»æ˜¯ç¼–è¾‘çŠ¶æ€ï¼Œç›´æ¥è¿”å›
         if (version.isInStage()) {
             return;
         }
 
-        // ·Ç×îĞÂ°æ±¾£¬ÎŞ·¨»Ø¹ö
+        // éæœ€æ–°ç‰ˆæœ¬ï¼Œæ— æ³•å›æ»š
         CDAVersion latestVersion = getLatestVersion();
         if (latestVersion != null && !latestVersion.getVersion().equals(version.getVersion())) {
-            throw new IllegalArgumentException("·Ç×îĞÂ°æ±¾,ÎŞ·¨»Ø¹ö");
+            throw new IllegalArgumentException("éæœ€æ–°ç‰ˆæœ¬,æ— æ³•å›æ»š");
         }
 
-        // »Ø¹ö
+        // å›æ»š
         version.setInStage(true);
         version.setCommitTime(new Date());
         cdaVersionRepository.save(version);
@@ -191,7 +191,7 @@ public class CDAVersionManager extends BaseManager{
 
     @Transactional(Transactional.TxType.REQUIRED)
     private void buildVersionTables(CDAVersion version) {
-        //Îª¿Õ±íÊ¾ÕâÊÇÒ»¸ö³õÊ¼°æ±¾£¬²»ĞèÒªÔÙ´´½¨±í
+        //ä¸ºç©ºè¡¨ç¤ºè¿™æ˜¯ä¸€ä¸ªåˆå§‹ç‰ˆæœ¬ï¼Œä¸éœ€è¦å†åˆ›å»ºè¡¨
         if (version.getBaseVersion() == null) return;
 
         String[] newTables = {version.getDataSetTableName(),
@@ -221,7 +221,7 @@ public class CDAVersionManager extends BaseManager{
         }
     }
 
-    //1¶àÌõ¼ş²éÑ¯
+    //1å¤šæ¡ä»¶æŸ¥è¯¢
     @Transactional(Transactional.TxType.REQUIRED)
     public List<CDAVersion> searchVersions(Map<String, Object> args) {
         Session session = currentSession();
@@ -240,7 +240,7 @@ public class CDAVersionManager extends BaseManager{
         return query.list();
     }
 
-    //2²éÑ¯·ûºÏÌõ¼ş¼ÇÂ¼Êı
+    //2æŸ¥è¯¢ç¬¦åˆæ¡ä»¶è®°å½•æ•°
     @Transactional(Transactional.TxType.REQUIRED)
     public Integer searchVersionInt(Map<String,Object> args){
         Session session = currentSession();
@@ -253,7 +253,7 @@ public class CDAVersionManager extends BaseManager{
         return Integer.parseInt(query.list().get(0).toString());
     }
 
-    //3ĞŞ¸Ä²Ù×÷ºó¸üĞÂµ½Êı¾İ¿â
+    //3ä¿®æ”¹æ“ä½œåæ›´æ–°åˆ°æ•°æ®åº“
     @Transactional(Transactional.TxType.REQUIRED)
     public void updateVersion(CDAVersion xcdaVersion){
         cdaVersionRepository.save(xcdaVersion);

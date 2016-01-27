@@ -10,7 +10,7 @@ public class DictForInterface{
     }
 
     /**
-     * »ñÈ¡ID.
+     * è·å–ID.
      */
     String id;
     public String getId(){
@@ -20,7 +20,7 @@ public class DictForInterface{
         this.id=dictid;
     }
 
-    //×Öµä´úÂë
+    //å­—å…¸ä»£ç 
     String code;
     public String getCode(){
         return code;
@@ -29,7 +29,7 @@ public class DictForInterface{
         this.code=code;
     }
 
-    //×ÖµäÃû³Æ
+    //å­—å…¸åç§°
     String name;
     public String getName(){
         return name;
@@ -38,7 +38,7 @@ public class DictForInterface{
         this.name=name;
     }
 
-    // ×÷Õß
+    // ä½œè€…
     String author;
     public String getAuthor(){
         return author;
@@ -47,7 +47,7 @@ public class DictForInterface{
         this.author=author;
     }
 
-    //²Î¿¼/¼Ì³ĞµÄ×Öµä
+    //å‚è€ƒ/ç»§æ‰¿çš„å­—å…¸
     String baseDict;
     public String getBaseDictId(){
         return baseDict;
@@ -56,7 +56,7 @@ public class DictForInterface{
         this.baseDict=baseDictId;
     }
 
-    //´´½¨ÈÕÆÚ
+    //åˆ›å»ºæ—¥æœŸ
     String createdate;
     public String getCreateDate(){
         return createdate;
@@ -65,7 +65,7 @@ public class DictForInterface{
         this.createdate=createDate;
     }
 
-    //×ÖµäÃèÊö
+    //å­—å…¸æè¿°
     String description;
     public String getDescription(){
         return description;
@@ -86,14 +86,14 @@ public class DictForInterface{
 
     String innerVersionId;
 
-    //ÊÇ·ñ´¦ÓÚ°æ±¾»¯±à¼­×´Ì¬
+    //æ˜¯å¦å¤„äºç‰ˆæœ¬åŒ–ç¼–è¾‘çŠ¶æ€
     String inStage;
     public String getInStage(){return inStage;}
     public void setInStage(String inStage){this.inStage=inStage;}
 
 
     /**
-     * ±ê×¼»¯°æ±¾
+     * æ ‡å‡†åŒ–ç‰ˆæœ¬
      */
     String stdVersion;
     public String getStdVersion(){
@@ -112,7 +112,7 @@ public class DictForInterface{
     }
 
     /**
-     * ±ê×¼»¯°æ±¾
+     * æ ‡å‡†åŒ–ç‰ˆæœ¬
      */
     String stdSource;
 
