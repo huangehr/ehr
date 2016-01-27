@@ -69,6 +69,20 @@ public class StandardSourceController extends BaseController{
         return getResult(standardSourceModels, totalCount, page, rows);
     }
 
+    @RequestMapping("getAllStdSource")
+    @ApiOperation(value = "获取所有标准来源")
+    public Object getAllStdSource(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion ) {
+        List<StandardSource> standardSources = Arrays.asList(standardSourceManager.getSourceList());
+        List<StandardSourceModel> standardSourceModels = new ArrayList<>();
+        for (StandardSource standardSource : standardSources) {
+            StandardSourceModel standardSourceModel = standardSourceManager.getSourceByKey(standardSource);
+            standardSourceModels.add(standardSourceModel);
+        }
+        return getResult(standardSourceModels, standardSourceModels.size(), 1, standardSourceModels.size());
+    }
+
     /**
      * 根据id获取标准来源信息
      *

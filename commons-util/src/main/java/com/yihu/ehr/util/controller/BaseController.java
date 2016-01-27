@@ -9,6 +9,12 @@ import java.util.List;
  */
 public class BaseController {
 
+    protected Result failed(String errMsg){
+        Result rs = getSuccessResult(false);
+        rs.setErrorMsg(errMsg);
+        return rs;
+    }
+
     protected Result getResult(List detaiModelList, int totalCount, int currPage, int rows) {
         Result result = new Result();
         result.setSuccessFlg(true);
