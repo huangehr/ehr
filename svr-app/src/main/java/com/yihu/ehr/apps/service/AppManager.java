@@ -42,18 +42,17 @@ public class AppManager  {
 
 
 
-    public App createApp(String name, MBaseDict catalog, String url, String tags, String description, MUser creator) {
+    public App createApp(String name, MBaseDict catalog, String url, String tags, String description, String creator) {
 
         App app = new App();
         app.setName(name);
         app.setCatalog(catalog.getCode());
-        app.setCreator(creator.getId());
-
+        app.setCreator(creator);
         app.setSecret(getRandomString(AppSecretLength));
         app.setName(name);
         app.setCatalog(catalog.getCode());
         app.setUrl(url);
-        //app.setTags(tags);
+        app.setTags(tags);
         app.setDescription(description);
 
         appRepository.save(app);
@@ -126,8 +125,8 @@ public class AppManager  {
         String appName = (String) args.get("appName");
         String catalog = (String) args.get("catalog");
         String status = (String) args.get("status");
-        Integer page = (Integer) args.get("page");
-        Integer pageSize = (Integer) args.get("rows");
+        Integer page =  Integer.parseInt((String)args.get("page"));
+        Integer pageSize = Integer.parseInt((String)args.get("rows"));
         //动态SQL文拼接
         StringBuilder sb = new StringBuilder();
 
@@ -267,9 +266,9 @@ public class AppManager  {
     /**
      * 审核app状态的方法
      */
-    public void checkStatus(String appId, MBaseDict appStatus) {
+    public void checkStatus(String appId,String appStatus) {
         App app = appRepository.findOne(appId);
-        app.setStatus(appStatus.getCode());
+        app.setStatus(appStatus);
         appRepository.save(app);
     }
 

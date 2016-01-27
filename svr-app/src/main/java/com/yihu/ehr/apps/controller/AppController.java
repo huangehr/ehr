@@ -8,7 +8,6 @@ import com.yihu.ehr.apps.service.AppManager;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constrant.Result;
 import com.yihu.ehr.model.dict.MBaseDict;
-import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -38,20 +37,6 @@ public class AppController extends BaseRestController {
 
     @Autowired
     private UserClient userClient;
-
-
-    @RequestMapping(value = "/test", method = RequestMethod.GET)
-    @ApiOperation(value = "根据地址等级查询地址信息")
-    public Object getTest(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "code", value = "地址级别", defaultValue = "")
-            @RequestParam(value = "code") String code) {
-        MBaseDict aaa = conventionalDictClient.getAppCatalog(code);
-        return aaa;
-    }
-
-
 
 
     /**
@@ -154,11 +139,8 @@ public class AppController extends BaseRestController {
             @RequestParam(value = "tags") String tags,
             @ApiParam(name = "userId", value = "用户", defaultValue = "")
             @RequestParam(value = "userId") String userId) throws Exception{
-
-        App app;
         MBaseDict appCatalog = conventionalDictClient.getAppCatalog(catalog);
-        MUser userModel = userClient.getUser(userId);
-        app = appManager.createApp(name,appCatalog,url, tags, description, userModel);
+        App app = appManager.createApp(name,appCatalog,url, tags, description, userId);
         return app;
     }
 
@@ -167,7 +149,7 @@ public class AppController extends BaseRestController {
     public Object getAppDetail(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "appId", value = "id", defaultValue = "")
+            @ApiParam(name = "appId", value = "编号", defaultValue = "")
             @RequestParam(value = "appId") String appId) throws Exception{
         AppDetailModel appDetailModel = appManager.searchAppDetailModel(appId);
         return appDetailModel;
@@ -223,8 +205,7 @@ public class AppController extends BaseRestController {
             @RequestParam(value = "appId") String appId,
             @ApiParam(name = "status", value = "状态", defaultValue = "")
             @RequestParam(value = "status") String status) throws Exception{
-        MBaseDict appStatus = conventionalDictClient.getAppStatus(status);
-        appManager.checkStatus(appId, appStatus);
+        appManager.checkStatus(appId, status);
         return "success";
     }
 
@@ -233,11 +214,11 @@ public class AppController extends BaseRestController {
     public Object validationApp(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "id", value = "名id", defaultValue = "")
-            @RequestParam(value = "id") String id,
-            @ApiParam(name = "secret", value = "", defaultValue = "")
-            @RequestParam(value = "secret") String secret) throws Exception{
-        return appManager.validationApp(id, secret);
+            @ApiParam(name = "appId", value = "appId", defaultValue = "")
+            @RequestParam(value = "appId") String appId,
+            @ApiParam(name = "appSecret", value = "", defaultValue = "")
+            @RequestParam(value = "appSecret") String appSecret) throws Exception{
+        return appManager.validationApp(appId, appSecret);
     }
 
 
