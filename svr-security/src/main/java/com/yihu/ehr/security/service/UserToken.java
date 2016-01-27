@@ -1,5 +1,6 @@
 package com.yihu.ehr.security.service;
 
+import com.yihu.ehr.util.ObjectVersion;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -26,7 +27,7 @@ public class UserToken implements Serializable {
     private String appId;
 
     public UserToken() {
-        tokenId  = UUID.randomUUID().toString();
+        tokenId = new ObjectVersion().toString();
     }
 
     @Id

@@ -1,10 +1,10 @@
 package com.yihu.ehr.security.service;
 
+import com.yihu.ehr.util.ObjectVersion;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.UUID;
 
 /**
  * 用于关联用户表及用户公私钥信息表.
@@ -19,7 +19,7 @@ import java.util.UUID;
 public class UserKey implements Serializable{
 
     public UserKey() {
-        id  = UUID.randomUUID().toString();
+        id  = new ObjectVersion().toString();
     }
 
     private String id;

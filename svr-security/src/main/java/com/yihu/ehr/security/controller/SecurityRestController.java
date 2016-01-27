@@ -1,18 +1,16 @@
 package com.yihu.ehr.security.controller;
 
 import com.yihu.ehr.constants.ApiVersionPrefix;
-import com.yihu.ehr.model.address.MAddress;
-import com.yihu.ehr.model.dict.MBaseDict;
+import com.yihu.ehr.model.security.MUserSecurity;
 import com.yihu.ehr.model.user.MUser;
-import com.yihu.ehr.security.feignClient.address.AddressClient;
 import com.yihu.ehr.security.feignClient.app.AppClient;
-import com.yihu.ehr.security.feignClient.dict.ConventionalDictClient;
 import com.yihu.ehr.security.feignClient.user.UserClient;
 import com.yihu.ehr.security.service.SecurityManager;
 import com.yihu.ehr.security.service.TokenManager;
 import com.yihu.ehr.security.service.UserSecurity;
 import com.yihu.ehr.security.service.UserToken;
 import com.yihu.ehr.util.DateUtil;
+import com.yihu.ehr.util.beanUtil.BeanUtils;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.encrypt.RSA;
 import io.swagger.annotations.Api;
@@ -44,31 +42,6 @@ public class SecurityRestController extends BaseRestController {
     @Autowired
     private AppClient appClient;
 
-    @Autowired
-    private ConventionalDictClient conventionalDictClient;
-
-    @Autowired
-    private AddressClient addressClient;
-
-
-    @RequestMapping(value = "/test", method = RequestMethod.GET)
-    public Object test() throws Exception {
-       return "dadadadadadadada";
-    }
-
-    @RequestMapping(value = "/address", method = RequestMethod.GET)
-    public Object test1() throws Exception {
-        MAddress address = addressClient.getAddressById("0dae000155fb8a513c5d6125d8610794");
-        return address;
-    }
-
-
-    @RequestMapping(value = "/dict", method = RequestMethod.GET)
-    @ApiOperation(value = "根据地址等级查询地址信息")
-    public Object getTest() {
-        MBaseDict aaa = conventionalDictClient.getAppCatalog("ChildHealth");
-        return aaa;
-    }
 
 
 
@@ -77,11 +50,11 @@ public class SecurityRestController extends BaseRestController {
     public Object getUserSecurityByOrgName(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(required = true, name = "user_name", value = "用户名")
-            @PathVariable(value = "user_name") String user_name) throws Exception {
-        UserSecurity userSecurity = securityManager.getUserSecurityByUserName(user_name);
-        //return getPublicKey(userSecurity);
-        return userSecurity;
+            @ApiParam(required = true, name = "userName", value = "用户名")
+            @RequestParam(value = "userName") String userName) throws Exception {
+        UserSecurity userSecurity = securityManager.getUserSecurityByUserName(userName);
+        MUserSecurity mUserSecurity = BeanUtils.copyModelToVo(MUserSecurity.class,userSecurity);
+        return mUserSecurity;
     }
 
 
@@ -91,10 +64,11 @@ public class SecurityRestController extends BaseRestController {
     public Object getUserSecurityByOrgCode(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(required = true, name = "org_code", value = "机构代码")
-            @RequestParam(value = "org_code") String orgCode) {
+            @ApiParam(required = true, name = "orgCode", value = "机构代码")
+            @RequestParam(value = "orgCode") String orgCode) {
         UserSecurity userSecurity = securityManager.getUserPublicKeyByOrgCd(orgCode);
-        return userSecurity;
+        MUserSecurity userSecurityModel = BeanUtils.copyModelToVo(MUserSecurity.class,userSecurity);
+        return userSecurityModel;
     }
 
     /**
@@ -143,7 +117,7 @@ public class SecurityRestController extends BaseRestController {
 
         MUser user = userClient.loginIndetification(userName, psw);
         if (user == null) {
-            return "应用不存在";
+            return "用户不存在";
         }
 
         UserToken userToken = tokenManager.getUserTokenByUserId(user.getId(), appId);
@@ -243,13 +217,14 @@ public class SecurityRestController extends BaseRestController {
 
     @RequestMapping(value = "/security/org_code", method = RequestMethod.POST)
     @ApiOperation(value = "根据orgCode创建security",  produces = "application/json")
-    public UserSecurity createSecurityByOrgCode(
+    public Object createSecurityByOrgCode(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "orgCode", value = "机构代码")
             @RequestParam( value = "orgCode") String orgCode) throws Exception {
         UserSecurity userSecurity = securityManager.createSecurityByOrgCode(orgCode);
-        return userSecurity;
+        MUserSecurity userSecurityModel = BeanUtils.copyModelToVo(MUserSecurity.class,userSecurity);
+        return userSecurityModel;
     }
 
     /**
@@ -259,9 +234,9 @@ public class SecurityRestController extends BaseRestController {
      * @throws Exception
      */
 
-    @RequestMapping(value = "/userKey/org_code", method = RequestMethod.POST)
+    @RequestMapping(value = "/user_key/org_code", method = RequestMethod.GET)
     @ApiOperation(value = "根据orgCode创建security",  produces = "application/json")
-    public String getUserKeyByOrgCd(
+    public String getUserKeyIdByOrgCd(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "orgCode", value = "机构代码")
@@ -276,13 +251,13 @@ public class SecurityRestController extends BaseRestController {
      */
     @RequestMapping(value = "/security", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除security",  produces = "application/json")
-    public void deleteSecurity(
+    public Object deleteSecurity(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "id", value = "security代码")
             @RequestParam( value = "id") String id) {
         securityManager.deleteSecurity(id);
-
+        return "success";
     }
 
     /**
@@ -291,12 +266,13 @@ public class SecurityRestController extends BaseRestController {
      */
     @RequestMapping(value = "/user_key", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除userKey",  produces = "application/json")
-    public void deleteUserKey(
+    public Object deleteUserKey(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "userKeyId", value = "userKey代码")
             @RequestParam( value = "userKeyId") String userKeyId) {
         securityManager.deleteUserKey(userKeyId);
+        return "success";
     }
 
     /**
