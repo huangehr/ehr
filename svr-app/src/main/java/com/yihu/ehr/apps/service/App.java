@@ -1,13 +1,11 @@
 package com.yihu.ehr.apps.service;
 
-import com.yihu.ehr.util.ObjectVersion;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * APP对象。
@@ -34,7 +32,7 @@ public class App {
     private Set<String> tags = new HashSet<>();
 
 	public App(){
-        id  = new ObjectVersion().toString();
+      //  id  = new ObjectVersion().toString();
     }
 
     @Id

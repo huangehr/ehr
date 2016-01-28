@@ -69,7 +69,7 @@ public class AppController extends BaseRestController {
             @ApiParam(name = "status", value = "状态", defaultValue = "")
             @RequestParam(value = "status") String status,
             @ApiParam(name = "page", value = "当前页", defaultValue = "")
-            @RequestParam(value = "page") String page,
+            @RequestParam(value = "page") int page,
             @ApiParam(name = "rows", value = "页数", defaultValue = "")
             @RequestParam(value = "rows") String rows) throws Exception{
 
@@ -83,8 +83,14 @@ public class AppController extends BaseRestController {
         Result result = new Result();
         List<AppDetailModel> detailModelList = appManager.searchAppDetailModels(conditionMap);
         Integer totalCount = appManager.searchAppsInt(conditionMap);
-        result.setObj(detailModelList);
+        result.setDetailModelList(detailModelList);
         result.setTotalCount(totalCount);
+        result.setCurrPage(page);
+        if(result.getTotalCount()%result.getPageSize()>0){
+            result.setTotalPage((result.getTotalCount()/result.getPageSize())+1);
+        }else {
+            result.setTotalPage(result.getTotalCount()/result.getPageSize());
+        }
         return result;
     }
 

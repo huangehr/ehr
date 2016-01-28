@@ -2,8 +2,6 @@ package com.yihu.ehr;
 
 import com.yihu.ehr.apps.controller.AppController;
 import com.yihu.ehr.apps.service.App;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,18 +39,20 @@ public class SvrAppsApplicationTests {
 		String description = "ehrTest";
 		String tags = "app";
 		String userId = "0dae0003561cc415c72d9111e8cb88aa";  //admin
-		Object app =  appController.createApp(apiVersion,name,catalog,url,description,tags,userId);
+		Object app =  appController.createApp(apiVersion, name, catalog, url, description, tags, userId);
 		appId = ((App) app).getId();
 		assertTrue("查询失败！" , appId != null);
 	}
 
 	@Test
 	public void btestGetAppList() throws Exception{
+		applicationContext = new SpringApplicationBuilder()
+				.web(false).sources(SvrAppApplication.class).run();
 		String appId = "";
 		String appName = "";
 		String catalog = "";
 		String status = "";
-		String page = "1";
+		int page = 1;
 		String rows = "10";
 		Object appList = appController.getAppList(apiVersion,appId,appName,catalog,status,page,rows);
 		assertTrue("查询失败！" , appList != null);
@@ -63,7 +63,7 @@ public class SvrAppsApplicationTests {
 	@Test
 	public void ctestGetApp() throws Exception{
 		String appId = "yYkKALLwUO";
-		Object app = appController.getApp(apiVersion,appId);
+		Object app = appController.getApp(apiVersion, appId);
 		assertTrue("查询失败！" , app != null);
 	}
 
@@ -72,7 +72,7 @@ public class SvrAppsApplicationTests {
 	@Test
 	public void dtestGetAppDetail() throws Exception{
 		String appId = "yYkKALLwUO";
-		Object appDetail = appController.getAppDetail(apiVersion,appId);
+		Object appDetail = appController.getAppDetail(apiVersion, appId);
 		assertTrue("查询失败！" , appDetail != null);
 	}
 
@@ -92,7 +92,7 @@ public class SvrAppsApplicationTests {
 	public void ftestValidationApp() throws Exception {
 		String appId = "yYkKALLwUO";
 		String secret = "RgfyNkytS2PK3D3Xs";
-		Object result = appController.validationApp(apiVersion,appId,secret);
+		Object result = appController.validationApp(apiVersion, appId, secret);
 		assertTrue("faild" , result!=null);
 	}
 
@@ -105,7 +105,7 @@ public class SvrAppsApplicationTests {
 		String url = "104";
 		String description = "yYkKALLwUO";
 		String tags = "appss";
-		Object result = appController.updateApp(apiVersion,appId,name,catalog,status,url,description,tags);
+		Object result = appController.updateApp(apiVersion, appId, name, catalog, status, url, description, tags);
 		assertTrue("修改失败！" , "success".equals(result));
 	}
 

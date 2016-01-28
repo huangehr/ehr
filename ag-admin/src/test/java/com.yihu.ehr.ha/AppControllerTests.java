@@ -2,14 +2,15 @@ package com.yihu.ehr.ha;
 
 import com.yihu.ehr.ha.apps.controller.AppController;
 import com.yihu.ehr.model.app.MApp;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.netflix.feign.EnableFeignClients;
+import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
@@ -19,23 +20,38 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = AgAdminApplication.class)
-@WebAppConfiguration
-@EnableDiscoveryClient
-@EnableFeignClients
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class AppControllerTests {
+
+    private static String version="v1.0";
+
+    ApplicationContext applicationContext;
+
     @Autowired
     private AppController appController;
 
+
     @Test
     public void getAppList() {
-        Object object = appController.getAppList(1, 1, 1, 1, 5);
+        applicationContext = new SpringApplicationBuilder()
+                .web(false).sources(AgAdminApplication.class).run();
+        String appId = "";
+        String appName = "";
+        String catalog = "";
+        String status = "";
+        int page = 1;
+        String rows = "10";
+        Object object = appController.getAppList(appId,appName,catalog,status,page,rows);
         assertNotEquals("机构类别字典获取失败", object, null);
     }
 
     @Test
     public void atestCreateApp() {
+
+        applicationContext = new SpringApplicationBuilder()
+                .web(false).sources(AgAdminApplication.class).run();
         //新增测试
-        Object object = appController.createApp("测试APP", "ChildHealth", "www.baidu.com", "这是用于测试的数据", "1", "0dae0003561cc415c72d9111e8cb88aa");
+        Object object = appController.createApp("测试APP", "ChildHealth", "fsdadfs", "这是用于测试的数据", "1", "0dae0003561cc415c72d9111e8cb88aa");
         assertNotEquals("APP新增失败", object, null);
 
         MApp mApp = (MApp) object;
