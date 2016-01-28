@@ -2,8 +2,6 @@ package com.yihu.ehr;
 
 import com.yihu.ehr.apps.controller.AppController;
 import com.yihu.ehr.apps.service.App;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,8 +50,8 @@ public class SvrAppsApplicationTests {
 		String appName = "";
 		String catalog = "";
 		String status = "";
-		String page = "1";
-		String rows = "10";
+		int page = 1;
+		int rows = 10;
 		Object appList = appController.getAppList(apiVersion,appId,appName,catalog,status,page,rows);
 		assertTrue("查询失败！" , appList != null);
 	}

@@ -156,7 +156,7 @@ public class AppManager  {
         return query.list();
     }
 
-    public List<AppDetailModel> searchAppDetailModels(Map<String, Object> args) {
+    public List<AppDetailModel> searchAppDetailModels(String apiVersion,Map<String, Object> args) {
 
         //参数获取处理
         List<App> appList = searchApps(args);
@@ -172,8 +172,8 @@ public class AppManager  {
             appDetailModel.setCreator(app.getCreator());
             appDetailModel.setCreate_time(app.getCreateTime());
             appDetailModel.setAudit_time(app.getAuditTime());
-            appDetailModel.setCatalog(conventionalDictClient.getAppCatalog(app.getCatalog()));
-            appDetailModel.setStatus(conventionalDictClient.getAppStatus(app.getStatus()));
+            appDetailModel.setCatalog(conventionalDictClient.getAppCatalog(apiVersion,app.getCatalog()));
+            appDetailModel.setStatus(conventionalDictClient.getAppStatus(apiVersion,app.getStatus()));
             appDetailModel.setDescription(app.getDescription());
             appDetailModel.setStrTags(app.getTags());
 
@@ -231,7 +231,7 @@ public class AppManager  {
      *
      * @param appId
      */
-    public AppDetailModel searchAppDetailModel(String appId) {
+    public AppDetailModel searchAppDetailModel(String apiVersion,String appId) {
 
         Session session =  entityManager.unwrap(org.hibernate.Session.class);
         //动态SQL文拼接
@@ -252,8 +252,8 @@ public class AppManager  {
         detailModel.setId(app.getId());
         detailModel.setSecret(app.getSecret());
         detailModel.setName(app.getName());
-        detailModel.setCatalog(conventionalDictClient.getAppCatalog(app.getCatalog()));
-        detailModel.setStatus(conventionalDictClient.getAppStatus(app.getStatus()));
+        detailModel.setCatalog(conventionalDictClient.getAppCatalog(apiVersion,app.getCatalog()));
+        detailModel.setStatus(conventionalDictClient.getAppStatus(apiVersion,app.getStatus()));
         detailModel.setUrl(app.getUrl());
         detailModel.setDescription(app.getDescription());
         detailModel.setStrTags(app.getTags());
