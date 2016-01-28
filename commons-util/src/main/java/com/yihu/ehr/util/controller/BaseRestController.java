@@ -1,12 +1,14 @@
 package com.yihu.ehr.util.controller;
 
 import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.constrant.Result;
 import com.yihu.ehr.exception.ApiException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * REST风格控控制器基类。此控制器用于对API进行校验，并处理平台根层级的业务，如API参数校验，错误及返回码设定等。
@@ -37,5 +39,35 @@ public class BaseRestController extends AbstractController{
      */
     public static void failed(ErrorCode errorCode, String errorDescription, String...args){
         throw new ApiException(errorCode, errorDescription);
+    }
+
+
+    protected Result failed(String errMsg){
+        Result rs = getSuccessResult(false);
+        rs.setErrorMsg(errMsg);
+        return rs;
+    }
+
+    protected Result getResult(List detaiModelList, int totalCount, int currPage, int rows) {
+        Result result = new Result();
+        result.setSuccessFlg(true);
+        result.setDetailModelList(detaiModelList);
+        result.setTotalCount(totalCount);
+        result.setCurrPage(currPage);
+        result.setPageSize(rows);
+        if(result.getPageSize()==0)
+            return result;
+        if (result.getTotalCount() % result.getPageSize() > 0) {
+            result.setTotalPage((result.getTotalCount() / result.getPageSize()) + 1);
+        } else {
+            result.setTotalPage(result.getTotalCount() / result.getPageSize());
+        }
+        return result;
+    }
+
+    protected Result getSuccessResult(Boolean flg) {
+        Result result = new Result();
+        result.setSuccessFlg(flg);
+        return result;
     }
 }
