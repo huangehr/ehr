@@ -1,39 +1,124 @@
 package com.yihu.ehr.user;
 
 import com.yihu.ehr.UserServiceApp;
-import com.yihu.ehr.user.user.controller.UserController;
+import com.yihu.ehr.user.controller.UserController;
+import com.yihu.ehr.user.service.User;
+import com.yihu.ehr.user.service.UserModel;
+import com.yihu.ehr.util.beanUtil.BeanUtils;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.netflix.feign.EnableFeignClients;
+import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.web.bind.annotation.RestController;
 
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by AndyCai on 2016/1/25.
- */
-@SpringBootApplication
-@EnableDiscoveryClient
-@RestController
-@EnableFeignClients
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = UserServiceApp.class)
-public class userControllerTest {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class UserControllerTest {
+
+    String apiVersion = "v1.0";
+    ApplicationContext applicationContext;
 
     @Autowired
     private UserController userController;
 
+
     @Test
-    public void getUser()
-    {
-        String version = "v1.0";
+    public void atestGetUserModel() throws Exception{
+        applicationContext = new SpringApplicationBuilder()
+                .web(false).sources(UserServiceApp.class).run();
         String userId = "0dae0003561cc415c72d9111e8cb88aa";
-        Object object = userController.getUser(version, userId);
-        assertTrue("查询失败！" , object != null);
+        Object userModel = userController.getUserModel(apiVersion,userId);
+        assertTrue("查询失败！" , userModel != null);
+    }
+
+    @Test
+    public void atestGetUserSecurityByOrgName() throws Exception{
+        String realName = "admin";
+        String organization = "41872607-9";
+        String searchType = "PlatformMaintance";
+        int page = 1;
+        int rows = 10;
+        Object userSecurity = userController.searchUsers(apiVersion,realName,organization,searchType,page,rows);
+        assertTrue("查询失败！" , userSecurity != null);
+    }
+
+    @Test
+    public void atestdeleteUser() throws Exception{
+        String userId = "0dae0003561cc415c72d9111e8cb88aa";
+        Object result = userController.deleteUser(apiVersion,userId);
+        assertTrue("删除失败！" , result != null);
+    }
+
+    @Test
+    public void atestActivityUser() throws Exception{
+        String userId = "0dae0003561cc415c72d9111e8cb88aa";
+        Boolean activated = true;
+        Object result = userController.activityUser(apiVersion,userId,activated);
+        assertTrue("操作失败！" , result != null);
+    }
+
+    @Test
+    public void atestUpdateUser() throws Exception{
+        String userId = "0dae0003561cc415c72d9111e8cb88aa";
+        User user = (User) userController.getUser(apiVersion,userId);
+        UserModel userModel = BeanUtils.copyModelToVo(UserModel.class,user);
+        userModel.setEmail("9898987@jkzl.com");
+        Object result = userController.updateUser(apiVersion,userModel);
+        assertTrue("修改失败！" , result != null);
+    }
+
+    @Test
+    public void atestResetPass() throws Exception{
+        String userId = "0dae0003561cc415c72d9111e8cb88aa";
+        Object result = userController.resetPass(apiVersion,userId);
+        assertTrue("修改失败！" , result != null);
+    }
+
+    @Test
+    public void atestGetUser() throws Exception{
+        String userId = "0dae0003561cc415c72d9111e8cb88aa";
+        Object user = userController.getUser(apiVersion,userId);
+        assertTrue("查询失败！" , user != null);
+    }
+
+
+
+    @Test
+    public void atestUnbundling() throws Exception{
+        String userId = "0dae0003561cc415c72d9111e8cb88aa";
+        String type = "tel";
+        Object result = userController.unbundling(apiVersion,userId,type);
+        assertTrue("查询失败！" , result != null);
+    }
+
+    @Test
+    public void atestDistributeKey() throws Exception{
+        //这个测试类暂时没法做?
+//        String loginCode = "admin";
+//        Object result = userController.distributeKey(apiVersion,loginCode);
+//        assertTrue("查询失败！" , result != null);
+        assertTrue("查询失败！" , 1==1);
+    }
+
+    @Test
+    public void atestLoginIndetification() throws Exception{
+        String loginCode = "admin";
+        String psw = "123456";
+        Object result = userController.loginIndetification(apiVersion,loginCode,psw);
+        assertTrue("查询失败！" , result != null);
+    }
+
+    @Test
+    public void atestGetUserByLoginCode() throws Exception{
+        String loginCode = "admin";
+        Object result = userController.getUserByLoginCode(apiVersion,loginCode);
+        assertTrue("查询失败！" , result != null);
     }
 }
