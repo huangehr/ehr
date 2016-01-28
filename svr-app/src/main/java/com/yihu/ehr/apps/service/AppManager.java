@@ -2,7 +2,6 @@ package com.yihu.ehr.apps.service;
 
 import com.yihu.ehr.apps.feignClient.dict.ConventionalDictClient;
 import com.yihu.ehr.model.dict.MBaseDict;
-import com.yihu.ehr.model.user.MUser;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -12,10 +11,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * @author Sand
@@ -25,6 +21,7 @@ import java.util.Random;
 @Service
 @Transactional
 public class AppManager  {
+    private static final int AppIdLength = 10;
     private static final int AppSecretLength = 16;
 
     @Autowired
@@ -44,7 +41,10 @@ public class AppManager  {
 
     public App createApp(String name, MBaseDict catalog, String url, String tags, String description, String creator) {
 
+        MBaseDict status = conventionalDictClient.getAppStatus("WaitingForApprove");
+
         App app = new App();
+        app.setId(getRandomString(AppIdLength));
         app.setName(name);
         app.setCatalog(catalog.getCode());
         app.setCreator(creator);
@@ -54,7 +54,8 @@ public class AppManager  {
         app.setUrl(url);
         app.setTags(tags);
         app.setDescription(description);
-
+        app.setCreateTime(new Date());
+        app.setStatus(status.getCode());
         appRepository.save(app);
 
         return app;
@@ -125,7 +126,7 @@ public class AppManager  {
         String appName = (String) args.get("appName");
         String catalog = (String) args.get("catalog");
         String status = (String) args.get("status");
-        Integer page =  Integer.parseInt((String)args.get("page"));
+        Integer page =  Integer.parseInt(args.get("page").toString());
         Integer pageSize = Integer.parseInt((String)args.get("rows"));
         //动态SQL文拼接
         StringBuilder sb = new StringBuilder();

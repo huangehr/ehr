@@ -1,46 +1,47 @@
 package com.yihu.ehr.ha.apps.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.ha.apps.service.AppClient;
+import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Created by AndyCai on 2016/1/19.
  */
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/app")
+@RequestMapping("/rest/v1.0/appcon")
 @RestController
-public class AppController {
+public class AppController  extends BaseRestController {
     @Autowired
     private AppClient appClient;
 
     /**
      * 根据查询条件获取APP列表
-     * @param searchNm 查询条件
+     * @param appName 查询条件
      * @param catalog 类别
      * @param status 状态
      * @param page 当前页
      * @param rows 数量
      * @return APP列表
      */
-    @RequestMapping(value = "/apps", method = RequestMethod.GET)
-    public Object getAppList(@ApiParam(name = "searchNm", value = "查询条件", defaultValue = "")
-                             @RequestParam(value = "searchNm") Integer searchNm,
+    @RequestMapping(value = "apps", method = RequestMethod.GET)
+    public Object getAppList(
+                             @ApiParam(name = "appId", value = "appId", defaultValue = "")
+                             @RequestParam(value = "appId") String appId,
+                             @ApiParam(name = "appName", value = "appName", defaultValue = "")
+                             @RequestParam(value = "appName") String appName,
                              @ApiParam(name = "catalog", value = "类别", defaultValue = "")
-                             @RequestParam(value = "catalog") Integer catalog,
+                             @RequestParam(value = "catalog") String catalog,
                              @ApiParam(name = "status", value = "状态", defaultValue = "")
-                             @RequestParam(value = "status") Integer status,
+                             @RequestParam(value = "status") String status,
                              @ApiParam(name = "page", value = "当前页", defaultValue = "")
-                             @RequestParam(value = "page") Integer page,
+                             @RequestParam(value = "page") int page,
                              @ApiParam(name = "rows", value = "页数", defaultValue = "")
-                             @RequestParam(value = "rows") Integer rows) {
+                             @RequestParam(value = "rows") String rows) {
 
 
-        return appClient.getAppList(searchNm, catalog, status, page, rows);
+        Object object = appClient.getAppList(appId,appName, catalog, status, page, rows);
+        return object;
     }
 
     /**
@@ -75,21 +76,24 @@ public class AppController {
      * @param userId 用户ID
      * @return 操作结果
      */
-    @RequestMapping(value = "/createApp" , method = RequestMethod.POST)
+    @RequestMapping(value = "/createApp", method = RequestMethod.POST)
     public Object createApp(
-            @ApiParam(name = "name", value = "名称", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "catalog", value = "类别", defaultValue = "")
-            @RequestParam(value = "catalog") String catalog,
-            @ApiParam(name = "url", value = "url", defaultValue = "")
-            @RequestParam(value = "url") String url,
-            @ApiParam(name = "description", value = "描述", defaultValue = "")
-            @RequestParam(value = "description") String description,
-            @ApiParam(name = "tags", value = "标记", defaultValue = "")
-            @RequestParam(value = "tags") String tags,
-            @ApiParam(name = "userId", value = "用户", defaultValue = "")
-            @RequestParam(value = "userId") String userId){
-        return appClient.createApp(name,catalog,url,description,tags,userId);
+                            @ApiParam(name = "name", value = "名称", defaultValue = "")
+                            @RequestParam(value = "name") String name,
+                            @ApiParam(name = "catalog", value = "类别", defaultValue = "")
+                            @RequestParam(value = "catalog") String catalog,
+                            @ApiParam(name = "url", value = "url", defaultValue = "")
+                            @RequestParam(value = "url") String url,
+                            @ApiParam(name = "description", value = "描述", defaultValue = "")
+                            @RequestParam(value = "description") String description,
+                            @ApiParam(name = "tags", value = "标记", defaultValue = "")
+                            @RequestParam(value = "tags") String tags,
+                            @ApiParam(name = "userId", value = "用户", defaultValue = "")
+                            @RequestParam(value = "userId") String userId) {
+
+        Object object = appClient.createApp( name, catalog, url, description, tags, userId);
+
+        return object;
     }
 
     /**

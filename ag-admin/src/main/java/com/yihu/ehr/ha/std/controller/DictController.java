@@ -106,7 +106,7 @@ public class DictController extends BaseRestController {
         return null;
     }
 
-    @RequestMapping(value = "/dicts",method = RequestMethod.GET)
+    @RequestMapping(value = "/getCdaDictList",method = RequestMethod.GET)
     public Object getCdaDictList(@ApiParam(name = "apiVersion", value = "API版本号", defaultValue = "v1.0")
                                  @PathVariable(value = "apiVersion") String apiVersion,
                                  @ApiParam(name = "versionCode", value = "标准版本代码")

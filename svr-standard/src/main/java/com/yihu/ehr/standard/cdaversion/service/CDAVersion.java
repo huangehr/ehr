@@ -60,7 +60,7 @@ public class CDAVersion{
     @Id
     @GeneratedValue(generator = "Generator")
     @GenericGenerator(name = "Generator", strategy = "assigned")
-    @Column(name = "version", unique = false, nullable = true)
+    @Column(name = "version", unique = true, nullable = false)
     @Access(value = AccessType.PROPERTY)
     public String getVersion() {
         if(version==null)return "";
