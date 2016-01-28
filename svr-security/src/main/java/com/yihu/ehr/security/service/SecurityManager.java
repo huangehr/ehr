@@ -1,8 +1,6 @@
 package com.yihu.ehr.security.service;
 
-import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.user.MUser;
-import com.yihu.ehr.security.feignClient.org.OrgClient;
 import com.yihu.ehr.security.feignClient.user.UserClient;
 import com.yihu.ehr.util.DateUtil;
 import com.yihu.ehr.util.encrypt.RSA;
@@ -44,8 +42,6 @@ public class SecurityManager {
     @Autowired
     private UserClient userClient;
 
-    @Autowired
-    private OrgClient orgClient;
 
     @PersistenceContext
     protected EntityManager entityManager;
@@ -89,11 +85,11 @@ public class SecurityManager {
         return  userSecurity;
     }
 
-    public UserSecurity createSecurityByUserId(String userId) throws Exception {
+    public UserSecurity createSecurityByUserId(String apiVersion,String userId) throws Exception {
 
         //1-1根据用户登陆名获取用户信息。
 
-        MUser userInfo = userClient.getUser(userId);
+        MUser userInfo = userClient.getUser(apiVersion,userId);
         if(userInfo==null) {
             return null;
         }
@@ -120,10 +116,10 @@ public class SecurityManager {
         return userSecurityRepository.findOne(securityId);
     }
 
-    public UserSecurity getUserSecurityByUserName(String loginCode) throws Exception {
+    public UserSecurity getUserSecurityByUserName(String apiVersion,String loginCode) throws Exception {
 
         //1-1根据用户登陆名获取用户信息。
-        MUser userInfo = userClient.getUserByLoginCode(loginCode);
+        MUser userInfo = userClient.getUserByLoginCode(apiVersion,loginCode);
         if(userInfo==null) {
             return null;
         } else {

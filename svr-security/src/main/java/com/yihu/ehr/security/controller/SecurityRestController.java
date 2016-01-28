@@ -52,7 +52,7 @@ public class SecurityRestController extends BaseRestController {
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(required = true, name = "userName", value = "用户名")
             @RequestParam(value = "userName") String userName) throws Exception {
-        UserSecurity userSecurity = securityManager.getUserSecurityByUserName(userName);
+        UserSecurity userSecurity = securityManager.getUserSecurityByUserName(apiVersion,userName);
         MUserSecurity mUserSecurity = BeanUtils.copyModelToVo(MUserSecurity.class,userSecurity);
         return mUserSecurity;
     }
@@ -102,12 +102,12 @@ public class SecurityRestController extends BaseRestController {
             @ApiParam(required = true, name = "app_secret", value = "APP 密码")
             @RequestParam(value = "app_secret", required = true) String appSecret) throws Exception {
 
-        boolean appResult = appClient.validationApp(appId, appSecret);
+        boolean appResult = appClient.validationApp(apiVersion,appId, appSecret);
         if (!appResult) {
             return "应用不存在";
         }
 
-        UserSecurity userSecurity = securityManager.getUserSecurityByUserName(userName);
+        UserSecurity userSecurity = securityManager.getUserSecurityByUserName(apiVersion,userName);
         String privateKey = userSecurity.getPrivateKey();
         Key priKey = RSA.genPrivateKey(privateKey);
         String psw = RSA.decrypt(rsaPWD, priKey);
@@ -115,7 +115,7 @@ public class SecurityRestController extends BaseRestController {
         userName = URLDecoder.decode(userName, "UTF-8");
         appId = URLDecoder.decode(appId, "UTF-8");
 
-        MUser user = userClient.loginIndetification(userName, psw);
+        MUser user = userClient.loginIndetification(apiVersion,userName, psw);
         if (user == null) {
             return "用户不存在";
         }
@@ -286,7 +286,7 @@ public class SecurityRestController extends BaseRestController {
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "loginCode", value = "用户登录代码")
             @RequestParam( value = "loginCode") String loginCode) throws Exception{
-        return securityManager.getUserSecurityByUserName(loginCode);
+        return securityManager.getUserSecurityByUserName(apiVersion,loginCode);
     }
 
     /**
@@ -302,7 +302,7 @@ public class SecurityRestController extends BaseRestController {
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "userId", value = "用户代码")
             @RequestParam( value = "userId") String userId) throws Exception {
-        return securityManager.createSecurityByUserId(userId);
+        return securityManager.createSecurityByUserId(apiVersion,userId);
     }
 
 

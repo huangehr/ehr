@@ -71,7 +71,7 @@ public class AppController extends BaseRestController {
             @ApiParam(name = "page", value = "当前页", defaultValue = "")
             @RequestParam(value = "page") int page,
             @ApiParam(name = "rows", value = "页数", defaultValue = "")
-            @RequestParam(value = "rows") String rows) throws Exception{
+            @RequestParam(value = "rows") int rows) throws Exception{
 
         Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("appId", appId);
@@ -80,19 +80,9 @@ public class AppController extends BaseRestController {
         conditionMap.put("status", status);
         conditionMap.put("page", page);
         conditionMap.put("rows", rows);
-        Result result = new Result();
-        List<AppDetailModel> detailModelList = appManager.searchAppDetailModels(conditionMap);
-        Integer totalCount = appManager.searchAppsInt(conditionMap);
-        result.setDetailModelList(detailModelList);
-        result.setTotalCount(totalCount);
-        result.setCurrPage(page);
-        result.setSuccessFlg(true);
-        if(result.getTotalCount()%result.getPageSize()>0){
-            result.setTotalPage((result.getTotalCount()/result.getPageSize())+1);
-        }else {
-            result.setTotalPage(result.getTotalCount()/result.getPageSize());
-        }
-        return result;
+        List<AppDetailModel> detailModelList = appManager.searchAppDetailModels(apiVersion,conditionMap);
+        int totalCount = appManager.searchAppsInt(conditionMap);
+        return new Result().getResult(detailModelList,totalCount,page,rows);
     }
 
     @RequestMapping(value = "/app" , method = RequestMethod.DELETE)
@@ -146,7 +136,7 @@ public class AppController extends BaseRestController {
             @RequestParam(value = "tags") String tags,
             @ApiParam(name = "userId", value = "用户", defaultValue = "")
             @RequestParam(value = "userId") String userId) throws Exception{
-        MBaseDict appCatalog = conventionalDictClient.getAppCatalog(catalog);
+        MBaseDict appCatalog = conventionalDictClient.getAppCatalog(apiVersion,catalog);
         App app = appManager.createApp(name,appCatalog,url, tags, description, userId);
         return app;
     }
@@ -158,7 +148,7 @@ public class AppController extends BaseRestController {
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "appId", value = "编号", defaultValue = "")
             @RequestParam(value = "appId") String appId) throws Exception{
-        AppDetailModel appDetailModel = appManager.searchAppDetailModel(appId);
+        AppDetailModel appDetailModel = appManager.searchAppDetailModel(apiVersion,appId);
         return appDetailModel;
 
     }
@@ -184,8 +174,8 @@ public class AppController extends BaseRestController {
             @RequestParam(value = "tags") String tags) throws Exception{
 
         App app;
-        MBaseDict appCatalog = conventionalDictClient.getAppCatalog(catalog);
-        MBaseDict appStatus = conventionalDictClient.getAppStatus(status);
+        MBaseDict appCatalog = conventionalDictClient.getAppCatalog(apiVersion,catalog);
+        MBaseDict appStatus = conventionalDictClient.getAppStatus(apiVersion,status);
         app = appManager.getApp(appId);
         if (app == null) {
             return "faild";
