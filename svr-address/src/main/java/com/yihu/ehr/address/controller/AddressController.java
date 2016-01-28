@@ -1,13 +1,10 @@
 package com.yihu.ehr.address.controller;
 
-import com.yihu.ehr.address.feignClient.dict.ConventionalDictClient;
-import com.yihu.ehr.address.feignClient.security.SecurityClient;
 import com.yihu.ehr.address.service.Address;
 import com.yihu.ehr.address.service.AddressDict;
 import com.yihu.ehr.address.service.AddressService;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.model.address.MAddress;
-import com.yihu.ehr.model.dict.MBaseDict;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,33 +28,6 @@ public class AddressController extends BaseRestController{
 
     @Autowired
     private AddressService addressService;
-
-    @Autowired
-    private ConventionalDictClient conventionalDictClient;
-
-    @Autowired
-    private SecurityClient securityClient;
-
-
-
-    @RequestMapping(value = "/dict", method = RequestMethod.GET)
-    public Object getTest(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "code", value = "地址级别", defaultValue = "")
-            @RequestParam(value = "code") String code) {
-        MBaseDict aaa = conventionalDictClient.getAppCatalog(code);
-        return aaa;
-    }
-
-
-    @RequestMapping(value = "/security", method = RequestMethod.GET)
-    public Object getSecurity() {
-        String aaaaaaa = securityClient.test1();
-        return aaaaaaa;
-    }
-
-
 
     /**
      * 根据地址等级查询地址信息
@@ -218,7 +188,7 @@ public class AddressController extends BaseRestController{
         if(address!=null){
             addressService.deleteAddres(address);
         }
-        return "删除地址成功！";
+        return "success";
     }
 
 

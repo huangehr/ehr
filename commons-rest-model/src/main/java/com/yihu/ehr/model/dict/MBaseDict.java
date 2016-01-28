@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.dict;
 
+import com.yihu.ehr.util.beanUtil.BaseModel;
+
 import java.io.Serializable;
 
 /**
@@ -7,7 +9,7 @@ import java.io.Serializable;
  * @version 1.0
  * @created 2015.07.30 14:43
  */
-public class MBaseDict implements Serializable {
+public class MBaseDict extends BaseModel implements Serializable {
     private static final long serialVersionUID = 1L;
 
     String code;

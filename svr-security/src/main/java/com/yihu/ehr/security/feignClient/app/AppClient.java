@@ -13,13 +13,13 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @RequestMapping("/rest/v1.0/app")
 public interface AppClient {
 
-    @RequestMapping(value = "/validation", method = GET ,consumes = "application/json")
+    @RequestMapping(value = "/validation", method = GET )
     Boolean validationApp(
-            @RequestParam(value = "id") String appId,
+            @RequestParam(value = "appId") String appId,
             @RequestParam(value = "appSecret") String appSecret);
 
 
-    @RequestMapping(value = "app", method = GET ,consumes = "application/json")
+    @RequestMapping(value = "app", method = GET )
     MApp getApp(@RequestParam(value = "appId") String appId);
 
 

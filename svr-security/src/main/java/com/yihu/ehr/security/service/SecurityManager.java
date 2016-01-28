@@ -64,7 +64,7 @@ public class SecurityManager {
 
     public UserSecurity createSecurity() throws Exception {
 
-        UserSecurity userSecurity = UserSecurity.class.newInstance();
+        UserSecurity userSecurity = new UserSecurity();
 
         Map userRsa = setUp();
 
@@ -109,17 +109,11 @@ public class SecurityManager {
     @Transactional(Transactional.TxType.SUPPORTS)
     public UserSecurity createSecurityByOrgCode(String orgCode) throws Exception {
 
-        MOrganization orgInfo = orgClient.getOrg(orgCode);
-        if(orgInfo==null) {
-            return null;
-        }
-        else {
-            UserSecurity userSecurity = createSecurity();
-            //1-2-1-2 与用户进行关联，user_key数据增加。
-            createUserKeyByOrg(userSecurity, orgInfo, orgKeyType);
+        UserSecurity userSecurity = createSecurity();
+        //1-2-1-2 与用户进行关联，user_key数据增加。
+        createUserKeyByOrg(userSecurity, orgCode, orgKeyType);
 
-            return userSecurity;
-        }
+        return userSecurity;
     }
 
     public UserSecurity getUserSecurity(String securityId) throws Exception {
@@ -190,12 +184,11 @@ public class SecurityManager {
     }
 
     @Transactional(Transactional.TxType.SUPPORTS)
-    public UserKey createUserKeyByOrg(UserSecurity security, MOrganization org, String keyType) {
+    public UserKey createUserKeyByOrg(UserSecurity security, String orgCode, String keyType) {
 
         UserKey userKey = new UserKey();
-
         userKey.setKeyType(keyType);
-        userKey.setOrg(org.getOrgCode());
+        userKey.setOrg(orgCode);
         userKey.setKey(security.getId());
         userKeyRepository.save(userKey);
         return userKey;
@@ -234,9 +227,7 @@ public class SecurityManager {
     public String getUserKeyByOrgCd(String orgCode) {
 
         Session session = entityManager.unwrap(org.hibernate.Session.class);
-
         StringBuilder sb = new StringBuilder();
-
         sb.append(" select id		                ");
         sb.append("       ,org_code		            ");
         sb.append("       ,key_id		            ");
@@ -251,11 +242,9 @@ public class SecurityManager {
 
         if (sqlQuery.list().size() == 0) {
             return null;
-
         } else {
             Object[] userKeyInfo = (Object[]) sqlQuery.list().get(0);
             String userKeyId = userKeyInfo[0].toString();
-
             return userKeyId;
         }
     }

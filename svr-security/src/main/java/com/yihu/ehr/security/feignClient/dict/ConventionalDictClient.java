@@ -16,22 +16,22 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @RequestMapping("/rest/v1.0/conventional_dict")
 public interface ConventionalDictClient {
 
-    @RequestMapping(value = "/orgType", method = GET,consumes = "application/json")
+    @RequestMapping(value = "/orgType", method = GET )
     MBaseDict getOrgType(@RequestParam(value = "code") String code);
 
-    @RequestMapping(value = "/settledWay", method = GET,consumes = "application/json")
+    @RequestMapping(value = "/settledWay", method = GET )
     MBaseDict getSettledWay(@RequestParam(value = "code") String code);
 
-    @RequestMapping(value = "/appCatalog", method = GET,consumes = "application/json")
+    @RequestMapping(value = "/appCatalog", method = GET )
     MBaseDict getAppCatalog(@RequestParam(value = "code") String code);
 
-    @RequestMapping(value = "/appStatus", method = GET,consumes = "application/json")
+    @RequestMapping(value = "/appStatus", method = GET )
     MBaseDict getAppStatus(@RequestParam(value = "code") String code);
 
-    @RequestMapping(value = "/userType", method = GET,consumes = "application/json")
+    @RequestMapping(value = "/userType", method = GET )
     MBaseDict getUserType(@RequestParam(value = "code") String code);
 
-    @RequestMapping(value = "/yesNo", method = GET,consumes = "application/json")
+    @RequestMapping(value = "/yesNo", method = GET )
     MBaseDict getYesNo(@RequestParam(value = "code") Boolean code);
 
 

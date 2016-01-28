@@ -148,4 +148,20 @@ public class Result implements Serializable{
 		sb.append(errorCode);
 		return sb.toString();
 	}
+
+	public Result getResult(List detaiModelList, int totalCount, int currPage, int rows) {
+
+		Result result = new Result();
+		result.setSuccessFlg(true);
+		result.setDetailModelList(detaiModelList);
+		result.setTotalCount(totalCount);
+		result.setCurrPage(currPage);
+		result.setPageSize(rows);
+		if(result.getTotalCount()%result.getPageSize()>0){
+			result.setTotalPage((result.getTotalCount()/result.getPageSize())+1);
+		}else {
+			result.setTotalPage(result.getTotalCount()/result.getPageSize());
+		}
+		return result;
+	}
 }

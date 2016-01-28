@@ -109,13 +109,13 @@ public class OrgManagerService  {
         }
         if (org.getLocation() != null) {
             //这里调用Address服务获取地址
-            MAddress addres;
             try {
-                addres = addressClient.getAddressById(org.getLocation());
-                orgModel.setProvince(addres.getProvince());
-                orgModel.setCity(addres.getCity());
-                orgModel.setDistrict(addres.getDistrict());
-                orgModel.setTown(addres.getTown());
+                MAddress address;
+                address = addressClient.getAddressById(org.getLocation());
+                orgModel.setProvince(address.getProvince());
+                orgModel.setCity(address.getCity());
+                orgModel.setDistrict(address.getDistrict());
+                orgModel.setTown(address.getTown());
                 String addressStr = addressClient.getCanonicalAddress(org.getLocation());
                 orgModel.setLocation(addressStr);
             }catch (Exception e){
@@ -295,7 +295,7 @@ public class OrgManagerService  {
 
     public List<Organization> searchByAddress(String province, String city) {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
-        List<String> addressIds = addressClient.search(province,city,null);
+        List<String> addressIds = addressClient.search(province,city,"");
         String hql = "from Organization where location in (:addressIds)";
         Query query = session.createQuery(hql);
         query.setParameterList("addressIds", addressIds);

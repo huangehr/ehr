@@ -1,6 +1,7 @@
 package com.yihu.ehr.model.security;
 
 import java.util.Date;
+import com.yihu.ehr.util.beanUtil.BaseModel;
 
 /**
  * 医生
@@ -9,7 +10,7 @@ import java.util.Date;
  * @version 1.0
  * @created 02-6月-2015 17:38:05
  */
-public class MUserSecurity {
+public class MUserSecurity extends BaseModel{
 
 	public MUserSecurity() {
 

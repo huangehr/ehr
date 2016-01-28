@@ -109,6 +109,8 @@
     <orderEntry type="library" name="Maven: com.netflix.feign:feign-slf4j:8.12.1" level="project" />
     <orderEntry type="library" name="Maven: com.netflix.feign:feign-hystrix:8.12.1" level="project" />
     <orderEntry type="module" module-name="ehr-commons-rest-model" />
+    <orderEntry type="module" module-name="commons-util" />
+    <orderEntry type="module" module-name="commons-ehr-constants" />
     <orderEntry type="library" name="Maven: com.belerweb:pinyin4j:2.5.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.logging.log4j:log4j-api:2.4.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.logging.log4j:log4j-core:2.4.1" level="project" />

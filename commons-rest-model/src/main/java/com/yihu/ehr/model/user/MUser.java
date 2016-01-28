@@ -1,23 +1,40 @@
 package com.yihu.ehr.model.user;
 
 
-public class MUser {
+import com.yihu.ehr.util.beanUtil.BaseModel;
 
-    String id="";
-    String loginCode="";
-    String realName="";
-    String idCard="";
-    String sex="";
-    String marriage="";
-    String email="";
-    String tel="";
-    String userType="";
-    String orgCode="";
-    String orgName="";
-    String major="";
-    String publicKey="";
-    String validTime="";
-    String startTime="";
+import java.util.Date;
+
+public class MUser extends BaseModel{
+
+    private String id;
+    private Date createDate;
+    private Date lastLoginTime;
+    private String email;
+    private String loginCode;
+    private String realName;
+    private String password;
+    private Boolean activated;
+    private String validateCode;
+    private String userType;
+    private String telephone;
+    private String martialStatus;
+    private String gender;
+    private String idCardNo;
+    private String organization;
+    // 未绑定属性
+    private String orgPost;
+    private String privilege;
+    private String role;
+
+    //特殊属性
+    private String major;
+    private String medicalRole;
+    private String techTitle;
+    private String adminTitle;
+
+    private String imgRemotePath;
+    private String imgLocalPath;
 
     public String getId() {
         return id;
@@ -25,6 +42,30 @@ public class MUser {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public Date getLastLoginTime() {
+        return lastLoginTime;
+    }
+
+    public void setLastLoginTime(Date lastLoginTime) {
+        this.lastLoginTime = lastLoginTime;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getLoginCode() {
@@ -43,44 +84,28 @@ public class MUser {
         this.realName = realName;
     }
 
-    public String getIdCard() {
-        return idCard;
+    public String getPassword() {
+        return password;
     }
 
-    public void setIdCard(String idCard) {
-        this.idCard = idCard;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public String getSex() {
-        return sex;
+    public Boolean getActivated() {
+        return activated;
     }
 
-    public void setSex(String sex) {
-        this.sex = sex;
+    public void setActivated(Boolean activated) {
+        this.activated = activated;
     }
 
-    public String getMarriage() {
-        return marriage;
+    public String getValidateCode() {
+        return validateCode;
     }
 
-    public void setMarriage(String marriage) {
-        this.marriage = marriage;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getTel() {
-        return tel;
-    }
-
-    public void setTel(String tel) {
-        this.tel = tel;
+    public void setValidateCode(String validateCode) {
+        this.validateCode = validateCode;
     }
 
     public String getUserType() {
@@ -91,20 +116,68 @@ public class MUser {
         this.userType = userType;
     }
 
-    public String getOrgCode() {
-        return orgCode;
+    public String getTelephone() {
+        return telephone;
     }
 
-    public void setOrgCode(String orgCode) {
-        this.orgCode = orgCode;
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
     }
 
-    public String getOrgName() {
-        return orgName;
+    public String getMartialStatus() {
+        return martialStatus;
     }
 
-    public void setOrgName(String orgName) {
-        this.orgName = orgName;
+    public void setMartialStatus(String martialStatus) {
+        this.martialStatus = martialStatus;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getIdCardNo() {
+        return idCardNo;
+    }
+
+    public void setIdCardNo(String idCardNo) {
+        this.idCardNo = idCardNo;
+    }
+
+    public String getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(String organization) {
+        this.organization = organization;
+    }
+
+    public String getOrgPost() {
+        return orgPost;
+    }
+
+    public void setOrgPost(String orgPost) {
+        this.orgPost = orgPost;
+    }
+
+    public String getPrivilege() {
+        return privilege;
+    }
+
+    public void setPrivilege(String privilege) {
+        this.privilege = privilege;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public String getMajor() {
@@ -115,27 +188,43 @@ public class MUser {
         this.major = major;
     }
 
-    public String getPublicKey() {
-        return publicKey;
+    public String getMedicalRole() {
+        return medicalRole;
     }
 
-    public void setPublicKey(String publicKey) {
-        this.publicKey = publicKey;
+    public void setMedicalRole(String medicalRole) {
+        this.medicalRole = medicalRole;
     }
 
-    public String getValidTime() {
-        return validTime;
+    public String getTechTitle() {
+        return techTitle;
     }
 
-    public void setValidTime(String validTime) {
-        this.validTime = validTime;
+    public void setTechTitle(String techTitle) {
+        this.techTitle = techTitle;
     }
 
-    public String getStartTime() {
-        return startTime;
+    public String getAdminTitle() {
+        return adminTitle;
     }
 
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
+    public void setAdminTitle(String adminTitle) {
+        this.adminTitle = adminTitle;
+    }
+
+    public String getImgRemotePath() {
+        return imgRemotePath;
+    }
+
+    public void setImgRemotePath(String imgRemotePath) {
+        this.imgRemotePath = imgRemotePath;
+    }
+
+    public String getImgLocalPath() {
+        return imgLocalPath;
+    }
+
+    public void setImgLocalPath(String imgLocalPath) {
+        this.imgLocalPath = imgLocalPath;
     }
 }
