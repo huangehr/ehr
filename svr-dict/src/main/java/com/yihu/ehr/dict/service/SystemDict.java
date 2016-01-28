@@ -25,10 +25,6 @@ public class SystemDict {
 
     SystemDict(){}
 
-
-//    @Id
-//    @GeneratedValue(generator = "Generator")
-//    @GenericGenerator(name = "Generator", strategy = "assigned")
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", unique = true, nullable = false)
