@@ -86,6 +86,7 @@ public class AppController extends BaseRestController {
         result.setDetailModelList(detailModelList);
         result.setTotalCount(totalCount);
         result.setCurrPage(page);
+        result.setSuccessFlg(true);
         if(result.getTotalCount()%result.getPageSize()>0){
             result.setTotalPage((result.getTotalCount()/result.getPageSize())+1);
         }else {
