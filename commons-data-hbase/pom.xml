@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yihu.ehr</groupId>
-        <artifactId>ehr-commons-dependencies</artifactId>
+        <artifactId>commons-dependencies</artifactId>
         <version>1.1.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <artifactId>ehr-commons-data-hbase</artifactId>
+    <artifactId>commons-data-hbase</artifactId>
     <packaging>jar</packaging>
 
     <name>commons-data-hbase</name>
@@ -129,7 +129,7 @@
 
         <dependency>
             <groupId>com.yihu.ehr</groupId>
-            <artifactId>ehr-commons-util</artifactId>
+            <artifactId>commons-util</artifactId>
             <version>1.1.0</version>
         </dependency>
     </dependencies>
