@@ -3,8 +3,8 @@ package com.yihu.ehr.adaption.adapterorg.service;
 import com.yihu.ehr.adaption.commons.BaseManager;
 import com.yihu.ehr.adaption.feignclient.AddressClient;
 import com.yihu.ehr.model.address.MAddress;
-import com.yihu.ehr.util.ParmUtils.FieldCondition;
-import com.yihu.ehr.util.ParmUtils.ParmModel;
+import com.yihu.ehr.util.parm.FieldCondition;
+import com.yihu.ehr.util.parm.PageModel;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,31 +36,31 @@ public class AdapterOrgManager extends BaseManager {
     @Autowired
     XAdapterOrgRepository adapterOrgRepository;
 
-    public List<AdapterOrg> searchAdapterOrg(ParmModel parmModel) {
+    public List<AdapterOrg> searchAdapterOrg(PageModel pageModel) {
         Session session = currentSession();
         String hql = "select org from AdapterOrg org  ";
-        String wh = parmModel.format();
+        String wh = pageModel.format();
         hql += wh.equals("")? "" : wh;
-        Query query = setQueryVal(session.createQuery(hql), parmModel);
-        int page = parmModel.getPage();
+        Query query = setQueryVal(session.createQuery(hql), pageModel);
+        int page = pageModel.getPage();
         if (page>0){
-            query.setMaxResults(parmModel.getRows());
-            query.setFirstResult((page - 1) * parmModel.getRows());
+            query.setMaxResults(pageModel.getRows());
+            query.setFirstResult((page - 1) * pageModel.getRows());
         }
         return query.list();
     }
 
-    public int searchAdapterOrgInt(ParmModel parmModel) {
+    public int searchAdapterOrgInt(PageModel pageModel) {
         Session session = currentSession();
         String hql = "select count(*) from AdapterOrg ";
-        String wh = parmModel.format();
+        String wh = pageModel.format();
         hql += wh.equals("")? "" : wh;
-        Query query = setQueryVal(session.createQuery(hql), parmModel);
+        Query query = setQueryVal(session.createQuery(hql), pageModel);
         return ((Long)query.list().get(0)).intValue();
     }
 
-    private Query setQueryVal(Query query, ParmModel parmModel){
-        Map<String, FieldCondition> filters = parmModel.getFilters();
+    private Query setQueryVal(Query query, PageModel pageModel){
+        Map<String, FieldCondition> filters = pageModel.getFilters();
         for(String k: filters.keySet()){
             if(filters.get(k).getLogic().equals("in"))
                 query.setParameterList(k, (Object[])filters.get(k).formatVal());
