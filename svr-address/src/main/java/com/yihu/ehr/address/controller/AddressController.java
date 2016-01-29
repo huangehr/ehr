@@ -35,7 +35,7 @@ public class AddressController extends BaseRestController{
      * @param level
      * @return
      */
-    @RequestMapping(value = "/address/level", method = RequestMethod.GET)
+    @RequestMapping(value = "/level", method = RequestMethod.GET)
     @ApiOperation(value = "根据地址等级查询地址信息")
     public Object getAddressByLevel(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -50,7 +50,7 @@ public class AddressController extends BaseRestController{
         return parentMap;
     }
 
-    @RequestMapping(value = "/address/pid", method = RequestMethod.GET)
+    @RequestMapping(value = "/pid", method = RequestMethod.GET)
     @ApiOperation(value = "根据父id查询地址信息")
     public Object getAddressDictByPid(
         @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -68,7 +68,7 @@ public class AddressController extends BaseRestController{
 
     //--------------------------------------------------------------------
 
-    @RequestMapping(value = "/address", method = RequestMethod.GET)
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     @ApiOperation(value = "根据id查询地址信息")
     public Object getAddressById(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -84,7 +84,7 @@ public class AddressController extends BaseRestController{
     }
 
 
-    @RequestMapping(value = "/canonicalAddress", method = RequestMethod.GET)
+    @RequestMapping(value = "/canonical", method = RequestMethod.GET)
     @ApiOperation(value = "根据地址代码获取机构详细信息")
     public Object getCanonicalAddress(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -100,7 +100,7 @@ public class AddressController extends BaseRestController{
      * 地址检查并保存
      * @return
      */
-    @RequestMapping(value = "/address", method = RequestMethod.PUT)
+    @RequestMapping(value = "/", method = RequestMethod.PUT)
     @ApiOperation(value = "地址检查并保存")
     public Object saveAddress(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -144,7 +144,7 @@ public class AddressController extends BaseRestController{
      * @param district
      * @return
      */
-    @RequestMapping(value = "/address_list" , method = RequestMethod.GET)
+    @RequestMapping(value = "/search" , method = RequestMethod.GET)
     @ApiOperation(value = "根据省市县查询地址")
     public Object search(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -164,7 +164,7 @@ public class AddressController extends BaseRestController{
      * @param id
      * @return
      */
-    @RequestMapping(value = "/address" , method = RequestMethod.DELETE)
+    @RequestMapping(value = "/" , method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除地址")
     public Object delete(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -179,7 +179,7 @@ public class AddressController extends BaseRestController{
     }
 
 
-    @RequestMapping(value = "/address/is" , method = RequestMethod.GET)
+    @RequestMapping(value = "/is_address" , method = RequestMethod.GET)
     @ApiOperation(value = "判断是否是个地址")
     public boolean isNullAddress(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")

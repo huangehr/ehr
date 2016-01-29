@@ -45,7 +45,7 @@ public class SecurityRestController extends BaseRestController {
 
 
 
-    @RequestMapping(value = "/security/user_name", method = RequestMethod.GET)
+    @RequestMapping(value = "/user_name", method = RequestMethod.GET)
     @ApiOperation(value = "获取用户公钥",  produces = "application/json", notes = "用户在平台注册时，会分配一个公钥，此公钥用于与健康档案平台加密传输数据使用")
     public Object getUserSecurityByOrgName(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -59,7 +59,7 @@ public class SecurityRestController extends BaseRestController {
 
 
 
-    @RequestMapping(value = "/security/org_code", method = RequestMethod.GET)
+    @RequestMapping(value = "/org_code", method = RequestMethod.GET)
     @ApiOperation(value = "获取企业公钥", produces = "application/json", notes = "企业公钥，用于与健康档案平台之间传输数据的加密。")
     public Object getUserSecurityByOrgCode(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -215,7 +215,7 @@ public class SecurityRestController extends BaseRestController {
      * @throws Exception
      */
 
-    @RequestMapping(value = "/security/org_code", method = RequestMethod.POST)
+    @RequestMapping(value = "/org_code", method = RequestMethod.POST)
     @ApiOperation(value = "根据orgCode创建security",  produces = "application/json")
     public Object createSecurityByOrgCode(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -249,7 +249,7 @@ public class SecurityRestController extends BaseRestController {
      * 根据id删除security
      * @param id
      */
-    @RequestMapping(value = "/security", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除security",  produces = "application/json")
     public Object deleteSecurity(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -279,7 +279,7 @@ public class SecurityRestController extends BaseRestController {
      * 根据loginCode删除Security
      * @param loginCode
      */
-    @RequestMapping(value = "/security/login_code", method = RequestMethod.GET)
+    @RequestMapping(value = "/login_code", method = RequestMethod.GET)
     @ApiOperation(value = "根据loginCode获取Security",  produces = "application/json")
     public Object getUserSecurityByUserName(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -295,7 +295,7 @@ public class SecurityRestController extends BaseRestController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/security/user_id", method = RequestMethod.POST)
+    @RequestMapping(value = "/user_id", method = RequestMethod.POST)
     @ApiOperation(value = "根据userId创建Security",  produces = "application/json")
     public UserSecurity createSecurityByUserId(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -327,7 +327,7 @@ public class SecurityRestController extends BaseRestController {
      * @param userId
      * @return
      */
-    @RequestMapping(value = "/security/user_id", method = RequestMethod.GET)
+    @RequestMapping(value = "/user_id", method = RequestMethod.GET)
     @ApiOperation(value = "根据userId获取UserPublicKey",  produces = "application/json")
     public UserSecurity getUserSecurityByUserId(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -338,8 +338,6 @@ public class SecurityRestController extends BaseRestController {
         return userSecurity;
 
     }
-
-
 
 
 
