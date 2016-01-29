@@ -137,7 +137,7 @@ public class AppController extends BaseRestController {
             @ApiParam(name = "userId", value = "用户", defaultValue = "")
             @RequestParam(value = "userId") String userId) throws Exception{
         MBaseDict appCatalog = conventionalDictClient.getAppCatalog(apiVersion,catalog);
-        App app = appManager.createApp(name,appCatalog,url, tags, description, userId);
+        App app = appManager.createApp(apiVersion,name,appCatalog,url, tags, description, userId);
         return app;
     }
 

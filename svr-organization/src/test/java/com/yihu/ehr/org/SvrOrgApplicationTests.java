@@ -56,6 +56,15 @@ public class SvrOrgApplicationTests {
 	}
 
 	@Test
+	public void aaa() throws Exception{
+		OrgModel org = new OrgModel();
+		Object result = organizationController.updateOrg(apiVersion,org);
+		assertTrue("修改失败！" , result != null);
+	}
+
+
+
+	@Test
 	public void dtestgetOrgModel() throws Exception{
 		String orgCode = "341321234";
 		Object org = organizationController.getOrgModel(apiVersion,orgCode);

@@ -9,13 +9,13 @@ import com.yihu.ehr.org.feignClient.security.SecurityClient;
 import com.yihu.ehr.org.service.OrgManagerService;
 import com.yihu.ehr.org.service.OrgModel;
 import com.yihu.ehr.org.service.Organization;
-import com.yihu.ehr.util.ApiErrorEcho;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -140,14 +140,26 @@ public class OrganizationController extends BaseRestController {
 
     /**
      * 跟新机构
-     * @param orgModel
+     * @param apiVersion
      * @return
+     * @throws Exception
      */
-    @RequestMapping(value = "org" , method = RequestMethod.PUT)
+    @RequestMapping(value = "/org" , method = RequestMethod.PUT)
     public Object updateOrg(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
-            OrgModel orgModel) {
+            /*String orgModelJsonData*/
+            OrgModel orgModel) throws Exception{
+
+
+        OrgModel model = new OrgModel();
+        model.setOrgCode("aaaa");
+        model.setAdmin("aa");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String aaa = objectMapper.writeValueAsString(model);
+        OrgModel orgModel1 = objectMapper.readValue(aaa, OrgModel.class);
+
+
         Map<String, String> message = new HashMap<>();
         Result result = new Result();
         try {

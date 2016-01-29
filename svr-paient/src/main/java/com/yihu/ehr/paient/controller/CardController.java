@@ -2,6 +2,7 @@ package com.yihu.ehr.paient.controller;
 
 import com.yihu.ehr.constrant.Result;
 import com.yihu.ehr.paient.feignClient.dict.ConventionalDictClient;
+import com.yihu.ehr.paient.service.card.AbstractCard;
 import com.yihu.ehr.paient.service.card.CardBrowseModel;
 import com.yihu.ehr.paient.service.card.CardManager;
 import com.yihu.ehr.paient.service.card.CardModel;
@@ -69,7 +70,7 @@ public class CardController extends BaseRestController {
 
     @RequestMapping("getCard")
     public Object getCard(String objectId,String type){
-        Card card = cardManager.getCard(objectId, type);
+        AbstractCard card = cardManager.getCard(objectId, type);
         CardModel cardModel = cardManager.getCard(card);
         Map<String,CardModel> data = new HashMap<>();
         data.put("cardModel", cardModel);
@@ -81,7 +82,7 @@ public class CardController extends BaseRestController {
 
     @RequestMapping("detachCard")
     public Object detachCard(String objectId,String type){
-        Card card = cardManager.getCard(objectId, type);
+        AbstractCard card = cardManager.getCard(objectId, type);
         if(cardManager.detachCard(card)){
             return "success";
         }else{
@@ -91,7 +92,7 @@ public class CardController extends BaseRestController {
 
     @RequestMapping("attachCard")
     public Object attachCard(String idCardNo,String objectId,String type){
-        Card card = cardManager.getCard(objectId, type);
+        AbstractCard card = cardManager.getCard(objectId, type);
         if(cardManager.attachCardWith(card, new DemographicId(idCardNo))){
             return "success";
         }else{

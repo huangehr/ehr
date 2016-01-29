@@ -111,7 +111,7 @@ public class SystemDictController extends BaseRestController {
         conditionMap.put("rows", rows);
         List<SystemDict> systemDicts = systemDictManager.searchSysDicts(conditionMap);
         Integer totalCount = systemDictManager.searchAppsInt(conditionMap);
-        return new Result().getResult(systemDicts,totalCount,page,rows);
+        return getResult(systemDicts,totalCount,page,rows);
     }
 
     @ApiOperation(value = "创建字典项")

@@ -90,8 +90,7 @@ public class CardManager {
         Class cls = getCardImplemention(cardType);
         if (cls == null) throw new CardException("未知的卡类型.");
 
-        AbstractCard card = null;
-        card = (AbstractCard) cls.newInstance();
+        AbstractCard card = new AbstractCard();
         card.setNumber(no);
         card.setOwnerName(ownerName);
 
@@ -133,12 +132,12 @@ public class CardManager {
                 }
             }else{
                 AbstractPhysicalCard physicalCard = (AbstractPhysicalCard) card;
-                if (address != null &&
-                        physicalCard.getLocal() != null && physicalCard.getLocal().isAvailable() &&
-                        physicalCard.getLocal().getProvince().equals(address.getProvince()) &&
-                        physicalCard.getLocal().getCity().equals(address.getCity())) {
-                    return true;
-                }
+//                if (address != null &&
+//                        physicalCard.getLocal() != null && physicalCard.getLocal().isAvailable() &&
+//                        physicalCard.getLocal().getProvince().equals(address.getProvince()) &&
+//                        physicalCard.getLocal().getCity().equals(address.getCity())) {
+//                    return true;
+//                }
             }
         }
         return false;
@@ -208,18 +207,18 @@ public class CardManager {
         }else{
             physicalCard=(AbstractPhysicalCard)card;
             if (physicalCard.getLocal()!=null){
-                physicalCard.getLocal().getCanonicalAddress();
+                //physicalCard.getLocal().getCanonicalAddress();
             }
             if (physicalCard.getReleaseOrg()!=null){
-                physicalCard.getReleaseOrg().getFullName();
+                //physicalCard.getReleaseOrg().getFullName();
             }
         }
         CardModel cardModel = new CardModel();
-        cardModel.setTypeValue(card.getType().getValue());
+        //cardModel.setTypeValue(card.getType().getValue());
         cardModel.setNumber(card.getNumber());
         cardModel.setOwnerName(card.getOwnerName());
         cardModel.setCreateDate((new SimpleDateFormat("yyyy-MM-dd")).format(card.getCreateDate()));
-        cardModel.setStatusValue(card.getStatus().getValue());
+        //cardModel.setStatusValue(card.getStatus().getValue());
         cardModel.setDescription(card.getDescription());
 
         return cardModel;
@@ -246,77 +245,78 @@ public class CardManager {
     }
 
     public List<CardBrowseModel> searchCardBrowseModel(Map<String, Object> args) {
-        Session session = entityManager.unwrap(org.hibernate.Session.class);
-        String idCardNo = (String) args.get("idCardNo");
-        String number = (String)args.get("number");
-        String searchType = (String) args.get("type");
-        String searchIdCardNo = (String)args.get("searchIdCardNo");
-        DemographicId demographicId=null;
-        MBaseDict type=null;
-
-        String sqlPhysical="from AbstractPhysicalCard a where (a.number like :number)";
-        String sqlVirtual="from AbstractVirtualCard a where (a.number like :number)";
-        if (!StringUtils.isEmpty(idCardNo)){
-            demographicId = new DemographicId(idCardNo);
-            sqlPhysical += " and (demographicId=:demographicId)";
-            sqlVirtual += " and (demographicId=:demographicId)";
-        }
-        if (!StringUtils.isEmpty(searchType)){
-            type = conventionalDictClient.getCardType(searchType);
-            sqlPhysical += " and (type=:type)";
-            sqlVirtual += " and (type=:type)";
-        }
-        if (!StringUtils.isEmpty(searchIdCardNo)){
-            sqlPhysical += " and (demographicId=null or trim(demographicId)='')";
-            sqlVirtual += " and (demographicId=null or trim(demographicId)='')";
-        }
-        Query queryPhysical = session.createQuery(sqlPhysical);
-        Query queryVirtual = session.createQuery(sqlVirtual);
-        queryPhysical.setString("number", "%"+number+"%");
-        queryVirtual.setString("number", "%"+number+"%");
-        if (!StringUtils.isEmpty(idCardNo)) {
-            queryPhysical.setParameter("demographicId", demographicId);
-            queryVirtual.setParameter("demographicId", demographicId);
-        }
-        if (!StringUtils.isEmpty(searchType)){
-            queryPhysical.setParameter("type", type);
-            queryVirtual.setParameter("type", type);
-        }
-
-        List<AbstractCard> cards = null;
-        cards = queryPhysical.list();
-        cards.addAll(queryVirtual.list());
-
-        List<CardBrowseModel> cardBrowseModelList = new ArrayList<>();
-        Integer order = 1;
-        for(AbstractCard card:cards){
-            AbstractVirtualCard virtualCard=null;
-            AbstractPhysicalCard physicalCard=null;
-            if (conventionalDictClient.getCardType(card.getType()).isVirtualCard()){
-                virtualCard=(AbstractVirtualCard)card;
-            }else{
-                physicalCard=(AbstractPhysicalCard)card;
-                if (physicalCard.getReleaseOrg()!=null){
-                    physicalCard.getReleaseOrg().getFullName();
-                }
-            }
-            CardBrowseModel cardBrowseModel = new CardBrowseModel();
-            cardBrowseModel.setObjectId(card.getId());
-            cardBrowseModel.setOrder(order++);
-            String cardType = card.getType();
-            if (!"".equals(cardType)){
-                cardBrowseModel.setType(cardType);
-                cardBrowseModel.setTypeValue(cardType);
-            }
-            cardBrowseModel.setNumber(card.getNumber());
-            cardBrowseModel.setCreateDate((new SimpleDateFormat("yyyy-MM-dd")).format(card.getCreateDate()));
-            cardBrowseModel.setStatus(card.getStatus());
-            cardBrowseModel.setStatusValue(card.getStatus());
-
-            cardBrowseModelList.add(cardBrowseModel);
-        }
-
-        return cardBrowseModelList;
+//        Session session = entityManager.unwrap(org.hibernate.Session.class);
+//        String idCardNo = (String) args.get("idCardNo");
+//        String number = (String)args.get("number");
+//        String searchType = (String) args.get("type");
+//        String searchIdCardNo = (String)args.get("searchIdCardNo");
+//        DemographicId demographicId=null;
+//        MBaseDict type=null;
+//
+//        String sqlPhysical="from AbstractPhysicalCard a where (a.number like :number)";
+//        String sqlVirtual="from AbstractVirtualCard a where (a.number like :number)";
+//        if (!StringUtils.isEmpty(idCardNo)){
+//            demographicId = new DemographicId(idCardNo);
+//            sqlPhysical += " and (demographicId=:demographicId)";
+//            sqlVirtual += " and (demographicId=:demographicId)";
+//        }
+//        if (!StringUtils.isEmpty(searchType)){
+//            type = conventionalDictClient.getCardType(searchType);
+//            sqlPhysical += " and (type=:type)";
+//            sqlVirtual += " and (type=:type)";
+//        }
+//        if (!StringUtils.isEmpty(searchIdCardNo)){
+//            sqlPhysical += " and (demographicId=null or trim(demographicId)='')";
+//            sqlVirtual += " and (demographicId=null or trim(demographicId)='')";
+//        }
+//        Query queryPhysical = session.createQuery(sqlPhysical);
+//        Query queryVirtual = session.createQuery(sqlVirtual);
+//        queryPhysical.setString("number", "%"+number+"%");
+//        queryVirtual.setString("number", "%"+number+"%");
+//        if (!StringUtils.isEmpty(idCardNo)) {
+//            queryPhysical.setParameter("demographicId", demographicId);
+//            queryVirtual.setParameter("demographicId", demographicId);
+//        }
+//        if (!StringUtils.isEmpty(searchType)){
+//            queryPhysical.setParameter("type", type);
+//            queryVirtual.setParameter("type", type);
+//        }
+//
+//        List<AbstractCard> cards = null;
+//        cards = queryPhysical.list();
+//        cards.addAll(queryVirtual.list());
+//
+//        List<CardBrowseModel> cardBrowseModelList = new ArrayList<>();
+//        Integer order = 1;
+//        for(AbstractCard card:cards){
+//            AbstractVirtualCard virtualCard=null;
+//            AbstractPhysicalCard physicalCard=null;
+//            if (conventionalDictClient.getCardType(card.getType()).isVirtualCard()){
+//                virtualCard=(AbstractVirtualCard)card;
+//            }else{
+//                physicalCard=(AbstractPhysicalCard)card;
+//                if (physicalCard.getReleaseOrg()!=null){
+//                    physicalCard.getReleaseOrg().getFullName();
+//                }
+//            }
+//            CardBrowseModel cardBrowseModel = new CardBrowseModel();
+//            cardBrowseModel.setObjectId(card.getId());
+//            cardBrowseModel.setOrder(order++);
+//            String cardType = card.getType();
+//            if (!"".equals(cardType)){
+//                cardBrowseModel.setType(cardType);
+//                cardBrowseModel.setTypeValue(cardType);
+//            }
+//            cardBrowseModel.setNumber(card.getNumber());
+//            cardBrowseModel.setCreateDate((new SimpleDateFormat("yyyy-MM-dd")).format(card.getCreateDate()));
+//            cardBrowseModel.setStatus(card.getStatus());
+//            cardBrowseModel.setStatusValue(card.getStatus());
+//
+//            cardBrowseModelList.add(cardBrowseModel);
+//        }
+//
+//        return cardBrowseModelList;
+        return null;
     }
 
     public Integer searchCardInt(Map<String, Object> args) {

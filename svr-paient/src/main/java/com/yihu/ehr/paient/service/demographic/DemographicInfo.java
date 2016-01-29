@@ -15,10 +15,12 @@ import java.util.Map;
 @Entity
 @Table(name = "demographics")
 @Access(value = AccessType.PROPERTY)
+@Embeddable
+@IdClass(DemographicId.class)
 public class DemographicInfo {
 
     //private DemographicId demographicId;
-    private DemographicId id;
+    private String id;
     private Date birthday;                            // 出生日期
     private String birthPlace;                    // 出生地
     private String nativePlace;                    // 籍贯
@@ -38,29 +40,16 @@ public class DemographicInfo {
     public DemographicInfo() {
     }
 
-    public DemographicInfo(DemographicId id) {
-        this.id = id;
-        this.extra = new HashMap<String, String>();
-    }
 
-    @EmbeddedId
-    public DemographicId getId() {
+
+    @Id
+    @Column(name = "id", unique = true, nullable = false)
+    public String getId() {
         return id;
     }
-    public void setId(DemographicId id) {
+    public void setId(String id) {
         this.id = id;
     }
-
-//    @Id
-//    @GeneratedValue(generator = "id")
-//    @GenericGenerator(name = "id", strategy = "id")
-//    @Column(name = "id", unique = true, nullable = false)
-//    public String getId() {
-//        return id;
-//    }
-//    public void setId(String id) {
-//        this.id = id;
-//    }
 
     @Column(name = "birthday", unique = true, nullable = false ,insertable = false, updatable = false)
     public Date getBirthday() {
@@ -102,13 +91,6 @@ public class DemographicInfo {
         this.gender = gender;
     }
 
-//    @Column(name = "idCard", unique = true, nullable = false ,insertable = false, updatable = false)
-//    public String getIdCard() {
-//        return idCard;
-//    }
-//    public void setIdCard(String idCard) {
-//        this.idCard = idCard;
-//    }
 
     @Column(name = "name", unique = true, nullable = false ,insertable = false, updatable = false)
     public String getName() {

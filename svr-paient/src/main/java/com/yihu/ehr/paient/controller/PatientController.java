@@ -1,7 +1,6 @@
 package com.yihu.ehr.paient.controller;
 
 import com.yihu.ehr.constrant.Result;
-import com.yihu.ehr.paient.feignClient.address.AddressClient;
 import com.yihu.ehr.paient.paientIdx.model.DemographicIndex;
 import com.yihu.ehr.paient.service.demographic.DemographicId;
 import com.yihu.ehr.paient.service.demographic.DemographicInfo;
@@ -9,16 +8,12 @@ import com.yihu.ehr.paient.service.demographic.PatientBrowseModel;
 import com.yihu.ehr.paient.service.demographic.PatientModel;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.encode.HashUtil;
-import org.apache.tomcat.jni.Address;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -65,21 +60,23 @@ public class PatientController extends BaseRestController {
         return result;
     }
 
-    @RequestMapping("deletePatient")
-    @ResponseBody
+
     /* 删除病人信息 requestBody格式:
     * "idCardNo":""  //身份证号
     */
+    @RequestMapping("deletePatient")
+    @ResponseBody
     public String deletePatient(String idCardNo) {
         demographicIndex.delete(new DemographicId(idCardNo));
         return "seccuss";
     }
 
-    @RequestMapping("getPatient")
-    @ResponseBody
+
     /* 获取病人信息 requestBody格式:
     * "idCardNo":""  //身份证号
     */
+    @RequestMapping("getPatient")
+    @ResponseBody
     public String getPatient(String idCardNo) {
         DemographicInfo demographicInfo = demographicIndex.getDemographicInfo(new DemographicId(idCardNo));
         PatientModel patientModel = demographicIndex.getPatient(demographicInfo);

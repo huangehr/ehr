@@ -65,7 +65,7 @@ public class DemographicIndexStragety {
         List<DemographicInfo> demographicInfos = new ArrayList<DemographicInfo>();
         Session session = entityManager.unwrap(org.hibernate.Session.class);
 
-        SearchStragety tempStragety = stragety;
+        AbstractSearchStragety tempStragety = stragety;
         while (tempStragety != null){
              Criteria criteria = tempStragety.generateQuery(session, args);
             if(criteria != null) {

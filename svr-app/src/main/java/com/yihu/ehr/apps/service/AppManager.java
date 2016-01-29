@@ -39,9 +39,9 @@ public class AppManager  {
 
 
 
-    public App createApp(String name, MBaseDict catalog, String url, String tags, String description, String creator) {
+    public App createApp(String apiVersion,String name, MBaseDict catalog, String url, String tags, String description, String creator) {
 
-        MBaseDict status = conventionalDictClient.getAppStatus("WaitingForApprove");
+        MBaseDict status = conventionalDictClient.getAppStatus(apiVersion,"WaitingForApprove");
 
         App app = new App();
         app.setId(getRandomString(AppIdLength));
