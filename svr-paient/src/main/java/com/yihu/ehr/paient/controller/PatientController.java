@@ -7,20 +7,18 @@ import com.yihu.ehr.paient.service.demographic.DemographicInfo;
 import com.yihu.ehr.paient.service.demographic.PatientBrowseModel;
 import com.yihu.ehr.paient.service.demographic.PatientModel;
 import com.yihu.ehr.util.controller.BaseRestController;
-import com.yihu.ehr.util.encode.HashUtil;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.Date;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +28,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/patient")
+@EnableFeignClients
 public class PatientController extends BaseRestController {
 
 
@@ -40,7 +39,7 @@ public class PatientController extends BaseRestController {
 
 
 
-    @RequestMapping("searchPatient")
+    @RequestMapping("/search")
     @ResponseBody
     public Object searchPatient(String name,String idCardNo,String province, String city, String district, int page, int rows){
         Map<String, Object> conditionMap = new HashMap<>();
@@ -72,29 +71,25 @@ public class PatientController extends BaseRestController {
     }
 
 
-    /* 获取病人信息 requestBody格式:
-    * "idCardNo":""  //身份证号
-    */
-    @RequestMapping("getPatient")
-    @ResponseBody
-    public String getPatient(String idCardNo) {
+    /**
+     * 获取病人信息
+     * @param idCardNo
+     * @return
+     */
+    @RequestMapping(value = "getPatient" ,method = RequestMethod.GET)
+    public Object getPatient(String idCardNo) {
         DemographicInfo demographicInfo = demographicIndex.getDemographicInfo(new DemographicId(idCardNo));
         PatientModel patientModel = demographicIndex.getPatient(demographicInfo);
-        Map<String, PatientModel> data = new HashMap<>();
-        data.put("patientModel", patientModel);
-        Result result = new Result();
-        result.setObj(data);
-
-        return result.toJson();
+        return patientModel;
     }
 
     /**
      * 检查身份证是否已经存在
      */
-    @RequestMapping("checkIdCardNo")
+    @RequestMapping("/demographicInfo/idCardNo")
     @ResponseBody
-    public String checkIdCardNo(String searchNm){
-        DemographicInfo demographicInfo = demographicIndex.getDemographicInfo(new DemographicId(searchNm));
+    public String checkIdCardNo(String IdCardNo){
+        DemographicInfo demographicInfo = demographicIndex.getDemographicInfo(new DemographicId(IdCardNo));
         if(demographicInfo==null){
             return "success";
         }else{
@@ -104,44 +99,29 @@ public class PatientController extends BaseRestController {
     }
 
     @RequestMapping("updatePatient")
-    @ResponseBody
     //注册或更新病人信息
-    public Object updatePatient(String patientJsonData,HttpServletRequest req,HttpServletResponse res) throws IOException {
+    public Object updatePatient(String patientJsonData,HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        try {
-            req.setCharacterEncoding("UTF-8");
-        } catch (UnsupportedEncodingException e1) {
+        String patientData = URLDecoder.decode(patientJsonData,"UTF-8");
+
+        //将文件保存至服务器，返回文件的path，
+        String picPath = webupload(request, response);
+        ObjectMapper objectMapper = new ObjectMapper();
+        PatientModel patientModels = objectMapper.readValue(patientData, PatientModel.class);
+        //将文件path保存至数据库
+        patientModels.setPicPath(picPath);
+        if(picPath != null){
+            patientModels.setLocalPath("");
         }
-//		文件保存目录路径
-        String savePath = "F:/baiduyuan";
-//		获取文件名
-        String fileName = (String) req.getParameter("name");
-//		获取文件后缀
-        String fileExt = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-//		生成新的文件名
-        String newFileName = new Date().getTime()+"."+fileExt;
-
-        FileOutputStream out = null;
-        try {
-            File uploadedFile = new File(savePath, newFileName);
-            out = new FileOutputStream(uploadedFile);
-            IOUtils.copy(req.getInputStream(), out);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
+        Map<String, PatientModel> data = new HashMap<>();
+        Result result = null;
+        if (demographicIndex.updatePatient(patientModels)) {
+            result = getSuccessResult(true);
+        } else {
+            result = getSuccessResult(false);
         }
-//		生成文件地址,保存至数据库
-        String path = savePath+"/"+newFileName;
-
-        IOUtils.closeQuietly(out);
-
-        PatientModel patientModels = new PatientModel();
-        String patientPassword = HashUtil.hashStr(patientModels.getPassword());
-        patientModels.setPassword(patientPassword);
-        if (demographicIndex.updatePatient(patientModels)){
-            return "success";
-        }else {
-            return "faild";
-        }
+        result.setObj(data);
+        return result.toJson();
     }
 
     @RequestMapping("resetPass")
@@ -153,34 +133,37 @@ public class PatientController extends BaseRestController {
 
 
     @RequestMapping(value = "/webupload")
-    public String webupload(String a,HttpServletRequest req,HttpServletResponse resp) throws IOException {
-        try {
-            req.setCharacterEncoding("UTF-8");
-        } catch (UnsupportedEncodingException e1) {
-        }
-//		文件保存目录路径
-        String savePath = "F:/baiduyuan";
-//		获取文件名
-        String fileName = (String) req.getParameter("name");
-//		获取文件后缀
-        String fileExt = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-//		生成新的文件名
-        String newFileName = new Date().getTime()+"."+fileExt;
-
-        FileOutputStream out = null;
-        try {
-            File uploadedFile = new File(savePath, newFileName);
-            out = new FileOutputStream(uploadedFile);
-            IOUtils.copy(req.getInputStream(), out);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
-//		生成文件地址,保存至数据库
-        String path = savePath+"/"+newFileName;
-
-        IOUtils.closeQuietly(out);
-
-        return path;
+    public String webupload(HttpServletRequest request,HttpServletResponse respons) throws IOException {
+//        try {
+//            request.setCharacterEncoding("UTF-8");
+//        } catch (UnsupportedEncodingException e1) {
+//        }
+//        InputStream inputStearm = request.getInputStream();
+//        String fileName = (String) request.getParameter("name");
+//        if(fileName == null){
+//            return null;
+//        }
+//        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+//        String description = null;
+//        if ((fileName != null) && (fileName.length() > 0)) {
+//            int dot = fileName.lastIndexOf('.');
+//            if ((dot > -1) && (dot < (fileName.length()))) {
+//                description = fileName.substring(0, dot);
+//            }
+//        }
+//        ObjectNode objectNode = null;
+//        String path = null;
+//        try {
+//            objectNode = FastDFSUtil.upload(inputStearm, fileExtension, description);
+//            String groupName = objectNode.get("groupName").toString();
+//            String remoteFileName = objectNode.get("remoteFileName").toString();
+//            path = "{groupName:" + groupName + ",remoteFileName:" + remoteFileName + "}";
+//        } catch (Exception e) {
+//            LogService.getLogger(DemographicInfo.class).error("人口头像图片上传失败；错误代码："+e);
+//        }
+//        //返回文件路径
+//        return path;
+        return null;
     }
 
 

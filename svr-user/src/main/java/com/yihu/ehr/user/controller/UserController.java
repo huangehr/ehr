@@ -44,7 +44,7 @@ public class UserController extends BaseRestController {
     @Autowired
     private OrgClient organizationClient;
 
-    @RequestMapping(value = "/users" , method = RequestMethod.GET)
+    @RequestMapping(value = "/search" , method = RequestMethod.GET)
     @ApiOperation(value = "获取用户列表",produces = "application/json", notes = "根据查询条件获取用户列表在前端表格展示")
     public Object searchUsers(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -67,13 +67,13 @@ public class UserController extends BaseRestController {
         conditionMap.put("page", page);
         conditionMap.put("pageSize", rows);
 
-        List<UserDetailModel> detailModelList = userManager.searchUserDetailModel(conditionMap);
+        List<UserDetailModel> detailModelList = userManager.searchUserDetailModel(apiVersion,conditionMap);
 
-        Integer totalCount = userManager.searchUserInt(conditionMap);
+        Integer totalCount = userManager.searchUserInt(apiVersion,conditionMap);
         return new Result().getResult(detailModelList,totalCount,page,rows);
     }
 
-    @RequestMapping(value = "/user" , method = RequestMethod.DELETE)
+    @RequestMapping(value = "/" , method = RequestMethod.DELETE)
     @ApiOperation(value = "删除用户",produces = "application/json", notes = "根据用户id删除用户")
     public Object deleteUser(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -97,14 +97,14 @@ public class UserController extends BaseRestController {
         return "success";
     }
 
-    @RequestMapping(value = "/user" , method = RequestMethod.PUT)
+    @RequestMapping(value = "/" , method = RequestMethod.PUT)
     @ApiOperation(value = "修改用户",produces = "application/json", notes = "重新绑定用户信息")
     public Object updateUser(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "userModel", value = "用户对象", defaultValue = "")
             @RequestParam(value = "userModel") UserModel userModel) throws Exception{
-        userManager.updateUser(userModel);
+        userManager.updateUser(apiVersion,userModel);
         return "success";
 
     }
@@ -121,7 +121,7 @@ public class UserController extends BaseRestController {
 
     }
 
-    @RequestMapping(value = "/user" , method = RequestMethod.GET)
+    @RequestMapping(value = "/" , method = RequestMethod.GET)
     @ApiOperation(value = "获取用户",produces = "application/json", notes = "根据用户id获取用户信息")
     public Object getUser(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -142,16 +142,16 @@ public class UserController extends BaseRestController {
             @RequestParam(value = "userId") String userId) {
         Map<String,Object> map = new HashMap<>();
         User user = userManager.getUser(userId);
-        UserModel userModel = userManager.getUser(user);
+        UserModel userModel = userManager.getUser(apiVersion,user);
         MOrganization org = null;
         if(userModel.getOrgCode()!=null){
-            org = organizationClient.getOrg(userModel.getOrgCode());
+            org = organizationClient.getOrg(apiVersion,userModel.getOrgCode());
         }
         MAddress addressModel = new MAddress();
         if(org!=null){
             String locarion = org.getLocation();
             if(!"".equals(locarion)){
-                addressModel = userManager.getAddressById(locarion);
+                addressModel = userManager.getAddressById(apiVersion,locarion);
                 map.put("orgLocation",addressModel);
             }
         }
@@ -187,22 +187,22 @@ public class UserController extends BaseRestController {
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "loginCode", value = "登录帐号", defaultValue = "")
             @RequestParam(value = "loginCode") String loginCode) {
-        MUserSecurity userSecurity = securityClient.getUserSecurityByOrgName(loginCode);
+        MUserSecurity userSecurity = securityClient.getUserSecurityByOrgName(apiVersion,loginCode);
         Map<String, String> keyMap = new HashMap<>();
         if (userSecurity == null) {
             User userInfo = userManager.getUserByLoginCode(loginCode);
             String userId = userInfo.getId();
-            userSecurity = securityClient.createSecurityByUserId(userId);
+            userSecurity = securityClient.createSecurityByUserId(apiVersion,userId);
         }else{
             //result.setErrorMsg("公钥信息已存在。");
             //这里删除原有的公私钥重新分配
             //1-1根据用户登陆名获取用户信息。
             User userInfo = userManager.getUserByLoginCode(loginCode);
             String userId = userInfo.getId();
-            String userKeyId = securityClient.getUserKeyByUserId(userId);
-            securityClient.deleteSecurity(userSecurity.getId());
+            String userKeyId = securityClient.getUserKeyByUserId(apiVersion,userId);
+            securityClient.deleteSecurity(apiVersion,userSecurity.getId());
             securityClient.deleteUserKey(userKeyId);
-            userSecurity = securityClient.createSecurityByUserId(userId);
+            userSecurity = securityClient.createSecurityByUserId(apiVersion,userId);
 
         }
         String validTime = DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd")

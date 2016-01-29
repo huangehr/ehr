@@ -13,7 +13,6 @@ import java.util.List;
  * Created by Administrator on 2016/1/4.
  */
 @FeignClient("svr-address")
-//@RequestMapping(ApiVersionPrefix.CommonVersion + "/address")
 @RequestMapping("/rest/v1.0/address")
 public interface AddressClient {
 

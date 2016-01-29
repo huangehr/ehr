@@ -23,8 +23,7 @@ public  class AbstractCard {
 
 
 	public AbstractCard(){;
-		id  = UUID.randomUUID().toString();
-
+		id  = UUID.randomUUID().toString().replace("-","");
 		createDate = new Date();
 	}
 

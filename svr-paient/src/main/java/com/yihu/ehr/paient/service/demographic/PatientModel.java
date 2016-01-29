@@ -24,6 +24,9 @@ public class PatientModel {
     String homeAddressFull="";
     String workAddressFull="";
     String password="";
+    String picPath = "";
+    String localPath = "";
+    byte[] imgBuffer=null;
 
     public String getName() {
         return name;
@@ -159,5 +162,21 @@ public class PatientModel {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getPicPath() {return picPath;}
+
+    public void setPicPath(String picPath) {this.picPath = picPath;}
+
+    public String getLocalPath() {return localPath;}
+
+    public void setLocalPath(String localPath) {this.localPath = localPath;}
+
+    public byte[] getImgBuffer() {
+        return imgBuffer;
+    }
+
+    public void setImgBuffer(byte[] imgBuffer) {
+        this.imgBuffer = imgBuffer;
     }
 }

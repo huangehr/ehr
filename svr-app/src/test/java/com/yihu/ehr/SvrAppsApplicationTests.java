@@ -81,7 +81,7 @@ public class SvrAppsApplicationTests {
 	public void etestCheck() throws Exception {
 		String appId = "yYkKALLwUO";
 		String status = "Approved";
-		Object result = appController.check(apiVersion,appId,status);
+		Object result = appController.checkStatus(apiVersion,appId,status);
 		assertTrue("faild" , "success".equals(result));
 	}
 
