@@ -118,8 +118,8 @@ public class UserManager  {
         return user;
     }
 
-    public MAddress getAddressById(String locarion) {
-        return addressClient.getAddressById(locarion);
+    public MAddress getAddressById(String apiVersion,String locarion) {
+        return addressClient.getAddressById(apiVersion,locarion);
 
     }
     /**
@@ -128,7 +128,7 @@ public class UserManager  {
      * @param user
      */
     @Transactional(Transactional.TxType.SUPPORTS)
-    public UserModel getUser(User user) {
+    public UserModel getUser(String apiVersion,User user) {
 
         UserModel userModel = new UserModel();
         userModel.setId(user.getId());
@@ -145,7 +145,7 @@ public class UserManager  {
         }
         if (user.getOrganization() != null) {
             userModel.setOrgCode(user.getOrganization());
-            userModel.setOrgName(organizationClient.getOrg(user.getOrganization()).getFullName());
+            userModel.setOrgName(organizationClient.getOrg(apiVersion,user.getOrganization()).getFullName());
         }
         if (user.getUserType() != null) {
             userModel.setUserType(user.getUserType());
@@ -154,7 +154,7 @@ public class UserManager  {
             userModel.setMajor((user).getMajor());
         }
 
-        MUserSecurity userSecurity = securityClient.getUserSecurityByUserId(user.getId());
+        MUserSecurity userSecurity = securityClient.getUserSecurityByUserId(apiVersion,user.getId());
         if (userSecurity != null) {
             userModel.setPublicKey(userSecurity.getPublicKey());
             String validTime = DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd")
@@ -251,7 +251,7 @@ public class UserManager  {
     }
 
     @Transactional(Transactional.TxType.SUPPORTS)
-    public Integer searchUserInt(Map<String, Object> args) {
+    public Integer searchUserInt(String apiVersion,Map<String, Object> args) {
 
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         String realName = (String) args.get("realName");
@@ -261,11 +261,11 @@ public class UserManager  {
         String name = (String) args.get("organization");
         List<String> orgIds = new ArrayList<>();
         try{
-            orgIds = organizationClient.getIdsByName(name);
+            orgIds = organizationClient.getIdsByName(apiVersion,name);
         }catch (Exception e){
             orgIds.add("null");
         }
-        orgIds = organizationClient.getIdsByName(name);
+        orgIds = organizationClient.getIdsByName(apiVersion,name);
         String hql = "";
         if(orgIds.size()>0 && !orgIds.get(0).equals("null")){
             hql += "from User where (realName like :realName or  location in (:orgIds) ";
@@ -298,7 +298,7 @@ public class UserManager  {
      * @param args
      */
     @Transactional(Transactional.TxType.SUPPORTS)
-    public List<User> searchUser(Map<String, Object> args) {
+    public List<User> searchUser(String apiVersion,Map<String, Object> args) {
 
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         String realName = (String) args.get("realName");
@@ -308,11 +308,11 @@ public class UserManager  {
         String name = (String) args.get("organization");
         List<String> orgIds = new ArrayList<>();
         try{
-            orgIds = organizationClient.getIdsByName(name);
+            orgIds = organizationClient.getIdsByName(apiVersion,name);
         }catch (Exception e){
             orgIds.add("null");
         }
-        orgIds = organizationClient.getIdsByName(name);
+        orgIds = organizationClient.getIdsByName(apiVersion,name);
         String hql = "";
         if(orgIds.size()>0 && !orgIds.get(0).equals("null")){
             hql += "from User where (realName like :realName or  location in (:orgIds) ";
@@ -351,9 +351,9 @@ public class UserManager  {
      * @param args
      */
     @Transactional(Transactional.TxType.SUPPORTS)
-    public List<UserDetailModel> searchUserDetailModel(Map<String, Object> args) {
+    public List<UserDetailModel> searchUserDetailModel(String apiVersion,Map<String, Object> args) {
 
-        List<User> userList = searchUser (args);
+        List<User> userList = searchUser (apiVersion,args);
         List<UserDetailModel> detailModelList = new ArrayList<>();
         Integer order = 1;
 
@@ -368,14 +368,14 @@ public class UserManager  {
             detailModel.setActivated(user.getActivated());
             if (user.getOrganization() != null) {
                 //detailModel.setOrganization(user.getOrganization().getFullName());
-                detailModel.setOrganization(organizationClient.getOrg(user.getOrganization()).getFullName());
+                detailModel.setOrganization(organizationClient.getOrg(apiVersion,user.getOrganization()).getFullName());
             }
             if (user.getLastLoginTime() != null) {
                 detailModel.setLastLoginTime(DateFormatUtils.format(user.getLastLoginTime(),"yyyy-MM-dd HH:mm:ss"));
             }
             if (user.getUserType() != null) {
                 detailModel.setUserType(user.getUserType());
-                detailModel.setUserTypeValue(conventionalDictClient.getUserType(user.getUserType()).getValue());
+                detailModel.setUserTypeValue(conventionalDictClient.getUserType(apiVersion,user.getUserType()).getValue());
             }
             detailModelList.add(detailModel);
         }
@@ -393,13 +393,13 @@ public class UserManager  {
      *
      * @param userModel
      */
-    public void updateUser(UserModel userModel) {
+    public void updateUser(String apiVersion,UserModel userModel) {
 
         User user;
         Map<String, Object> message = new HashMap<>();
         if (StringUtils.isEmpty(userModel.getId())) {
             String password = default_password;
-            user = registerUser(conventionalDictClient.getUserType(userModel.getUserType()), userModel.getLoginCode(), userModel.getRealName(), default_password, userModel.getEmail());
+            user = registerUser(conventionalDictClient.getUserType(apiVersion,userModel.getUserType()), userModel.getLoginCode(), userModel.getRealName(), default_password, userModel.getEmail());
         } else {
             user = getUser(userModel.getId());
         }
