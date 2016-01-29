@@ -198,17 +198,16 @@ public class AppController extends BaseRestController {
 
     }
 
-    @RequestMapping(value = "check" , method = RequestMethod.PUT)
+    @RequestMapping(value = "status" , method = RequestMethod.POST)
     @ApiOperation(value = "修改状态")
-    public Object check(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "appId", value = "名id", defaultValue = "")
-            @RequestParam(value = "appId") String appId,
-            @ApiParam(name = "status", value = "状态", defaultValue = "")
-            @RequestParam(value = "status") String status) throws Exception{
+    public Object checkStatus(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+                              @PathVariable(value = "api_version") String apiVersion,
+                              @ApiParam(name = "appId", value = "名id", defaultValue = "")
+                              @RequestParam(value = "appId") String appId,
+                              @ApiParam(name = "status", value = "状态", defaultValue = "")
+                              @RequestParam(value = "status") String status) throws Exception {
         appManager.checkStatus(appId, status);
-        return "success";
+        return true;
     }
 
     @RequestMapping(value = "validation" , method = RequestMethod.GET)

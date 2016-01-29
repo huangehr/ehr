@@ -56,8 +56,8 @@ public interface AppClient {
                      @RequestParam(value = "description") String description,
                      @RequestParam(value = "tags") String tags);
 
-    @RequestMapping(value = "/rest/{api_version}/app/check", method = RequestMethod.PUT)
-    Object check(@PathVariable(value = "api_version") String apiVersion,
+    @RequestMapping(value = "/rest/{api_version}/app/status", method = RequestMethod.POST)
+    Object checkStatus(@PathVariable(value = "api_version") String apiVersion,
                  @RequestParam(value = "appId") String appId,
                  @RequestParam(value = "status") String status);
 

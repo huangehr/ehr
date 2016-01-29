@@ -146,14 +146,15 @@ public class AppController extends BaseRestController {
      * @param status 状态
      * @return 操作结果
      */
-    @RequestMapping(value = "/check", method = RequestMethod.PUT)
-    public Object check(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+    @RequestMapping(value = "/status", method = RequestMethod.POST)
+    public Object checkStatus(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                         @PathVariable(value = "api_version") String apiVersion,
                         @ApiParam(name = "appId", value = "名id", defaultValue = "")
                         @RequestParam(value = "appId") String appId,
                         @ApiParam(name = "status", value = "状态", defaultValue = "")
                         @RequestParam(value = "status") String status) {
-        return appClient.check(apiVersion, appId, status);
+        Object object =appClient.checkStatus(apiVersion, appId, status);
+        return object;
     }
 
     /**
