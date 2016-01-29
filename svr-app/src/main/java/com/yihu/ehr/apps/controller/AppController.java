@@ -107,7 +107,8 @@ public class AppController extends BaseRestController {
             @ApiParam(name = "appId", value = "id", defaultValue = "")
             @RequestParam(value = "appId") String appId) throws Exception{
         App app = appManager.getApp(appId);
-        return app;
+        MApp appModel = BeanUtils.copyModelToVo(MApp.class,app);
+        return appModel;
     }
 
     /**
@@ -191,7 +192,8 @@ public class AppController extends BaseRestController {
             app.setTags(tags);
 
             appManager.updateApp(app);
-            return "success";
+            MApp appModel = BeanUtils.copyModelToVo(MApp.class,app);
+            return appModel;
         }
 
     }
