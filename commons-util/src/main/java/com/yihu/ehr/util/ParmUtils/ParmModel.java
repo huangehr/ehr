@@ -12,6 +12,13 @@ public class ParmModel {
     private int rows;
     private Map<String, FieldCondition> filters;
 
+    public ParmModel() {
+    }
+
+    public ParmModel(int page, int rows) {
+        this.page = page;
+        this.rows = rows;
+    }
 
     public String format(String tableName){
         Map<String, FieldCondition> filters = getFilters();
@@ -79,6 +86,11 @@ public class ParmModel {
         this.filters = filters;
     }
 
+    public void addFieldCondition(FieldCondition fieldCondition){
+        if(filters==null)
+            filters = new HashMap<>();
+        filters.put(fieldCondition.getCol(), fieldCondition);
+    }
     public static void main(String[] args){
 
     }

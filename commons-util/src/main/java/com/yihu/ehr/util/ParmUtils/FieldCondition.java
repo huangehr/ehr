@@ -1,5 +1,6 @@
 package com.yihu.ehr.util.ParmUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,6 +11,27 @@ public class FieldCondition {
     private String logic;// =, sw, ew, like, >, <
     private List<Object> val;
     private String group;
+
+    public FieldCondition() {
+
+    }
+    public FieldCondition(String col, Object val) {
+        this.col = col;
+        this.addVal(val);
+    }
+
+    public FieldCondition(String col, String logic, Object ... vals) {
+        this.col = col;
+        this.logic = logic;
+        this.addVal(vals);
+    }
+
+    public FieldCondition(String col, String logic, List<Object> val, String group) {
+        this.col = col;
+        this.logic = logic;
+        this.val = val;
+        this.group = group;
+    }
 
     public String format(String tableName){
         if(getCol()==null || getCol().equals(""))
@@ -76,4 +98,13 @@ public class FieldCondition {
     public boolean isGroup(){
         return !(getGroup()==null || "".equals(getGroup()));
     }
+
+    public void addVal(Object ... vals){
+        if(this.val==null)
+            this.val = new ArrayList<>();
+        for(Object val:vals){
+            this.val.add(val);
+        }
+    }
+
 }

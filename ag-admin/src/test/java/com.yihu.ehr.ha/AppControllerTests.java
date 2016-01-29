@@ -40,8 +40,8 @@ public class AppControllerTests {
         String catalog = "";
         String status = "";
         int page = 1;
-        String rows = "10";
-        Object object = appController.getAppList(appId,appName,catalog,status,page,rows);
+        int rows = 15;
+        Object object = appController.getAppList(version,appId,appName,catalog,status,page,rows);
         assertNotEquals("机构类别字典获取失败", object, null);
     }
 
@@ -51,7 +51,7 @@ public class AppControllerTests {
         applicationContext = new SpringApplicationBuilder()
                 .web(false).sources(AgAdminApplication.class).run();
         //新增测试
-        Object object = appController.createApp("测试APP", "ChildHealth", "fsdadfs", "这是用于测试的数据", "1", "0dae0003561cc415c72d9111e8cb88aa");
+        Object object = appController.createApp(version,"测试APP", "ChildHealth", "fsdadfs", "这是用于测试的数据", "1", "0dae0003561cc415c72d9111e8cb88aa");
         assertNotEquals("APP新增失败", object, null);
 
         MApp mApp = (MApp) object;
@@ -64,21 +64,21 @@ public class AppControllerTests {
         String status = mApp.getStatus();
         String description = mApp.getDescription();
         String tags = mApp.getTags();
-        object = appController.updateApp(id, name, catalog, status, url, description, tags);
+        object = appController.updateApp(version,id, name, catalog, status, url, description, tags);
         //success
         assertTrue("APP修改失败", !object.toString().equals("success"));
 
         //获取明细
-        object = appController.getAppDetail(id);
+        object = appController.getAppDetail(version,id);
         assertNotEquals("APP明细获取失败", object, null);
 
         //修改状态
-        object = appController.check(id,"WaitingForApprove");
+        object = appController.check(version,id,"WaitingForApprove");
         assertTrue("APP状态修改失败", !object.toString().equals("success"));
 
         //根据查询条件获取列表
        // object = appController.getAppList(1, "ChildHealth", "WaitingForApprove", 1, 20);
-        object = appController.deleteApp(id);
+        object = appController.deleteApp(version,id);
         assertTrue("APP删除失败", !object.toString().equals("success"));
 
 
