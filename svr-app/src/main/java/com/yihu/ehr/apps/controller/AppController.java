@@ -7,7 +7,9 @@ import com.yihu.ehr.apps.service.AppDetailModel;
 import com.yihu.ehr.apps.service.AppManager;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constrant.Result;
+import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.dict.MBaseDict;
+import com.yihu.ehr.util.beanUtil.BeanUtils;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -138,7 +140,8 @@ public class AppController extends BaseRestController {
             @RequestParam(value = "userId") String userId) throws Exception{
         MBaseDict appCatalog = conventionalDictClient.getAppCatalog(apiVersion,catalog);
         App app = appManager.createApp(apiVersion,name,appCatalog,url, tags, description, userId);
-        return app;
+        MApp appModel = BeanUtils.copyModelToVo(MApp.class,app);
+        return appModel;
     }
 
     @RequestMapping(value = "appDetail" , method = RequestMethod.GET)
