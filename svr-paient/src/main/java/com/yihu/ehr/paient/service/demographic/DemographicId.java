@@ -12,7 +12,15 @@ import java.util.Objects;
  * @created 2015.06.10 17:51
  */
 public class DemographicId implements Serializable {
+
 	public String idCardNo;	// 身份证号码
+
+	public String getIdCardNo() {
+		return idCardNo;
+	}
+	public void setIdCardNo(String idCardNo) {
+		this.idCardNo = idCardNo;
+	}
 
 	public DemographicId(){}
 
@@ -20,24 +28,39 @@ public class DemographicId implements Serializable {
 		this.idCardNo = idCardNo == null ? "" : idCardNo;
 	}
 
-	public boolean isAvailable(){
+	public boolean idAvailable(){
 		return idCardNo != null && idCardNo.length() > 0;
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-
-		DemographicId demId = (DemographicId) o;
-		return Objects.equals(idCardNo, demId.idCardNo);
+	public boolean equals(Object obj) {
+		if(obj instanceof DemographicId){
+			DemographicId pk = (DemographicId)obj;
+			if(this.idCardNo==pk.getIdCardNo()){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(idCardNo);
 	}
-	public String toString(){
-		return idCardNo;
-	}
+
+//	public boolean equals(Object o) {
+//		if (this == o) return true;
+//		if (o == null || getClass() != o.getClass()) return false;
+//
+//		DemographicId demId = (DemographicId) o;
+//		return Objects.equals(idCardNo, demId.idCardNo);
+//	}
+//
+//	@Override
+//	public int hashCode() {
+//		return Objects.hash(idCardNo);
+//	}
+//	public String toString(){
+//		return idCardNo;
+//	}
 }

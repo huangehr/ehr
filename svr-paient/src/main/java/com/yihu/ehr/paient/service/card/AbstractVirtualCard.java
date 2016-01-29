@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * 抽象虚拟卡
@@ -17,9 +18,6 @@ import java.util.Date;
 @Access(value = AccessType.PROPERTY)
 
 public class AbstractVirtualCard extends AbstractCard {
-	public AbstractVirtualCard(){
-		super();
-	}
 
 	protected String id;				    // 卡ID
 	protected String number;				// 卡号
@@ -30,9 +28,13 @@ public class AbstractVirtualCard extends AbstractCard {
 	protected Date createDate;				// 创建日期
 	protected DemographicId demographicId;	// 人口学ID
 
+	public AbstractVirtualCard() {
+		id  = UUID.randomUUID().toString().replace("-","");
+	}
+
 	@Id
-	@GeneratedValue(generator = "id")
-	@GenericGenerator(name = "id", strategy = "id")
+	@GeneratedValue(generator = "Generator")
+	@GenericGenerator(name = "Generator", strategy = "assigned")
 	@Column(name = "id", unique = true, nullable = false)
 	public String getId() {
 		return id;

@@ -2,7 +2,6 @@ package com.yihu.ehr.paient.service.demographic;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -19,14 +18,13 @@ import java.util.Map;
 @IdClass(DemographicId.class)
 public class DemographicInfo {
 
-    //private DemographicId demographicId;
-    private String id;
+    //private DemographicId id;
+    private String idCardNo;                       // 身份证
     private Date birthday;                            // 出生日期
     private String birthPlace;                    // 出生地
     private String nativePlace;                    // 籍贯
     private String email;                            // 邮箱
     private String gender;                            // 性别
-    //private String idCard;                            // 身份证
     private String name;                            // 姓名
     private String martialStatus;            // 婚姻情况
     private String nation;                            // 民族
@@ -41,17 +39,17 @@ public class DemographicInfo {
     }
 
 
-
     @Id
     @Column(name = "id", unique = true, nullable = false)
-    public String getId() {
-        return id;
+    public String getIdCardNo() {
+        return idCardNo;
     }
-    public void setId(String id) {
-        this.id = id;
+    public void setIdCardNo(String idCardNo) {
+        this.idCardNo = idCardNo;
     }
 
-    @Column(name = "birthday", unique = true, nullable = false ,insertable = false, updatable = false)
+
+    @Column(name = "birthday", nullable = true)
     public Date getBirthday() {
         return birthday;
     }
@@ -59,7 +57,7 @@ public class DemographicInfo {
         this.birthday = birthday;
     }
 
-    @Column(name = "birth_place", unique = true, nullable = false ,insertable = false, updatable = false)
+    @Column(name = "birth_place", nullable = true)
     public String getBirthPlace() {
         return birthPlace;
     }
@@ -67,7 +65,7 @@ public class DemographicInfo {
         this.birthPlace = birthPlace;
     }
 
-    @Column(name = "native_place", unique = true, nullable = false ,insertable = false, updatable = false)
+    @Column(name = "native_place", nullable = true)
     public String getNativePlace() {
         return nativePlace;
     }
@@ -75,7 +73,7 @@ public class DemographicInfo {
         this.nativePlace = nativePlace;
     }
 
-    @Column(name = "email", unique = true, nullable = false ,insertable = false, updatable = false)
+    @Column(name = "email", nullable = true)
     public String getEmail() {
         return email;
     }
@@ -83,7 +81,7 @@ public class DemographicInfo {
         this.email = email;
     }
 
-    @Column(name = "gender", unique = true, nullable = false ,insertable = false, updatable = false)
+    @Column(name = "gender",nullable = true)
     public String getGender() {
         return gender;
     }
@@ -92,7 +90,7 @@ public class DemographicInfo {
     }
 
 
-    @Column(name = "name", unique = true, nullable = false ,insertable = false, updatable = false)
+    @Column(name = "name", nullable = true)
     public String getName() {
         return name;
     }
@@ -100,7 +98,7 @@ public class DemographicInfo {
         this.name = name;
     }
 
-    @Column(name = "martial_status", unique = true, nullable = false ,insertable = false, updatable = false)
+    @Column(name = "martial_status", nullable = true)
     public String getMartialStatus() {
         return martialStatus;
     }
@@ -108,7 +106,7 @@ public class DemographicInfo {
         this.martialStatus = martialStatus;
     }
 
-    @Column(name = "nation", unique = true, nullable = false ,insertable = false, updatable = false)
+    @Column(name = "nation",  nullable = true)
     public String getNation() {
         return nation;
     }
@@ -116,7 +114,7 @@ public class DemographicInfo {
         this.nation = nation;
     }
 
-    @Column(name = "residence_type", unique = true, nullable = false ,insertable = false, updatable = false)
+    @Column(name = "residence_type", nullable = true)
     public String getResidenceType() {
         return residenceType;
     }
@@ -124,7 +122,7 @@ public class DemographicInfo {
         this.residenceType = residenceType;
     }
 
-    @Column(name = "work_address", unique = true, nullable = false ,insertable = false, updatable = false)
+    @Column(name = "work_address",  nullable = true)
     public String getWorkAddress() {
         return workAddress;
     }
@@ -132,7 +130,7 @@ public class DemographicInfo {
         this.workAddress = workAddress;
     }
 
-    @Column(name = "home_address", unique = true, nullable = false ,insertable = false, updatable = false)
+    @Column(name = "home_address",  nullable = true)
     public String getHomeAddress() {
         return homeAddress;
     }
@@ -140,7 +138,7 @@ public class DemographicInfo {
         this.homeAddress = homeAddress;
     }
 
-    @Column(name = "password", unique = true, nullable = false ,insertable = false, updatable = false)
+    @Column(name = "password", nullable = true)
     public String getPassword() {
         return password;
     }
@@ -148,7 +146,7 @@ public class DemographicInfo {
         this.password = password;
     }
 
-    @Column(name = "telphone_number", unique = true, nullable = false ,insertable = false, updatable = false)
+    @Column(name = "telphone_number",  nullable = true)
     public String getTelphoneNo() {
         return telphoneNo;
     }
@@ -156,12 +154,13 @@ public class DemographicInfo {
         this.telphoneNo = telphoneNo;
     }
 
-    @Column(name = "extra", unique = true, nullable = false ,insertable = false, updatable = false)
-    public Map<String, String> getExtra() {
-        return extra;
-    }
-    public void setExtra(Map<String, String> extra) {
-        this.extra = extra;
-    }
+//    @Column(name = "extra",  nullable = true)
+//    public Map<String, String> getExtra() {
+//        return extra;
+//    }
+//    public void setExtra(Map<String, String> extra) {
+//        this.extra = extra;
+//    }
+
 }
 

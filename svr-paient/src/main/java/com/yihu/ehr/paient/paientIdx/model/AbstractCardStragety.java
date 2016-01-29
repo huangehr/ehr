@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by zqb on 2015/6/29.
  */
-public abstract class AbstractCardStragety extends AbstractSearchStragety {
+public class AbstractCardStragety extends AbstractSearchStragety {
     @Override
     public Criteria addNotNull(Session session,Criteria criteria){
         //不为空条件，默认卡搜索策略中卡表的demographicId不为空(即卡已绑定)，返回人口学信息
