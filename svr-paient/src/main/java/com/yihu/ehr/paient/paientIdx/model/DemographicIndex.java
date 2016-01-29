@@ -8,6 +8,7 @@ import com.yihu.ehr.paient.service.demographic.DemographicId;
 import com.yihu.ehr.paient.service.demographic.DemographicInfo;
 import com.yihu.ehr.paient.service.demographic.PatientBrowseModel;
 import com.yihu.ehr.paient.service.demographic.PatientModel;
+import com.yihu.ehr.util.ApiErrorEcho;
 import com.yihu.ehr.util.encode.HashUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -54,7 +55,7 @@ public class DemographicIndex{
     }
 
     @Transactional(Transactional.TxType.SUPPORTS)
-    public DemographicInfo createDemographicInfo(String id, String name) {
+    public DemographicInfo createDemographicInfo(String idCardNo, String name) {
 //        if (!id.isAvailable()) {
 //            throw new IllegalArgumentException("人口学索引无效.");
 //        }
@@ -64,7 +65,7 @@ public class DemographicIndex{
         }
 
         DemographicInfo demoInfo = new DemographicInfo();
-        demoInfo.setId(id);
+        demoInfo.setIdCardNo(idCardNo);
         demoInfo.setName(name);
 
         return demoInfo;
@@ -82,7 +83,6 @@ public class DemographicIndex{
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public DemographicInfo getDemographicInfo(DemographicId id) {
-
         DemographicInfo demInfo = demographicInfoRepository.findOne(id);
         return demInfo;
     }
@@ -92,7 +92,7 @@ public class DemographicIndex{
         PatientModel patientModel = new PatientModel();
 
         patientModel.setName(demoinfo.getName());
-        patientModel.setIdCardNo(demoinfo.getId().toString());
+        patientModel.setIdCardNo(demoinfo.getIdCardNo().toString());
         if (demoinfo.getGender() != null) {
             patientModel.setGender(demoinfo.getGender());
         }
@@ -106,12 +106,33 @@ public class DemographicIndex{
         if (demoinfo.getBirthday() != null) {
             patientModel.setBirthday((new SimpleDateFormat("yyyy-MM-dd")).format(demoinfo.getBirthday()));
         }
-        patientModel.setBirthPlace(addressClient.getAddressById(demoinfo.getBirthPlace()));
-        patientModel.setBirthPlaceFull(addressClient.getCanonicalAddress(demoinfo.getBirthPlace()));
-        patientModel.setHomeAddress(addressClient.getAddressById( demoinfo.getHomeAddress()));
-        patientModel.setHomeAddressFull(addressClient.getCanonicalAddress(demoinfo.getHomeAddress()));
-        patientModel.setWorkAddress(addressClient.getAddressById( demoinfo.getWorkAddress()));
-        patientModel.setWorkAddressFull(addressClient.getCanonicalAddress(demoinfo.getWorkAddress()));
+        if(demoinfo.getBirthPlace()!=null){
+            try{
+                patientModel.setBirthPlace(addressClient.getAddressById(demoinfo.getBirthPlace()));
+                patientModel.setBirthPlaceFull(addressClient.getCanonicalAddress(demoinfo.getBirthPlace()));
+            }catch (Exception e){
+                System.out.println(e);
+            }
+
+        }
+        if(demoinfo.getHomeAddress()!=null){
+            try{
+                patientModel.setHomeAddress(addressClient.getAddressById(demoinfo.getHomeAddress()));
+                patientModel.setHomeAddressFull(addressClient.getCanonicalAddress(demoinfo.getHomeAddress()));
+            }catch (Exception e){
+                System.out.println(e);
+            }
+
+        }
+        if(demoinfo.getWorkAddress()!=null){
+            try{
+                patientModel.setWorkAddress(addressClient.getAddressById(demoinfo.getWorkAddress()));
+                patientModel.setWorkAddressFull(addressClient.getCanonicalAddress(demoinfo.getWorkAddress()));
+            }catch (Exception e){
+                System.out.println(e);
+            }
+
+        }
         if (demoinfo.getResidenceType() != null) {
             patientModel.setResidenceType(demoinfo.getResidenceType());
         }
@@ -166,7 +187,8 @@ public class DemographicIndex{
         try {
             isRegistered = isRegistered(new DemographicId(patientModel.getIdCardNo()));
             if (!isRegistered) {
-                demographicInfo = createDemographicInfo(new DemographicId(patientModel.getIdCardNo()), patientModel.getName());
+                demographicInfo = createDemographicInfo(patientModel.getIdCardNo(), patientModel.getName());
+                //demographicInfo = createDemographicInfo(new DemographicId(patientModel.getIdCardNo()), patientModel.getName());
             } else {
                 demographicInfo = getDemographicInfo(new DemographicId(patientModel.getIdCardNo()));
             }
@@ -222,33 +244,32 @@ public class DemographicIndex{
         Integer page = (Integer) args.get("page");
         Integer pageSize = (Integer) args.get("pageSize");
 
-        String province = (String) args.get("province");
-        String city = (String) args.get("city");
-        String district = (String) args.get("district");
+//        String province = (String) args.get("province");
+//        String city = (String) args.get("city");
+//        String district = (String) args.get("district");
 
         String hql = "from DemographicInfo where (name like :name or id like :idCardNo)";
-        //Query query = session.createQuery("from DemographicInfo where name like :name or id like :idCardNo");
-        if (!StringUtils.isEmpty(province)) {
-            hql += " and homeAddress.province = :province";
-        }
-        if (!StringUtils.isEmpty(city)) {
-            hql += " and homeAddress.city = :city";
-        }
-        if (!StringUtils.isEmpty(district)) {
-            hql += " and homeAddress.district = :district";
-        }
+//        if (!StringUtils.isEmpty(province)) {
+//            hql += " and homeAddress.province = :province";
+//        }
+//        if (!StringUtils.isEmpty(city)) {
+//            hql += " and homeAddress.city = :city";
+//        }
+//        if (!StringUtils.isEmpty(district)) {
+//            hql += " and homeAddress.district = :district";
+//        }
 
         Query query = session.createQuery(hql);
 
-        if (!StringUtils.isEmpty(province)) {
-            query.setString("province", province);
-        }
-        if (!StringUtils.isEmpty(city)) {
-            query.setString("city", city);
-        }
-        if (!StringUtils.isEmpty(district)) {
-            query.setString("district", district);
-        }
+//        if (!StringUtils.isEmpty(province)) {
+//            query.setString("province", province);
+//        }
+//        if (!StringUtils.isEmpty(city)) {
+//            query.setString("city", city);
+//        }
+//        if (!StringUtils.isEmpty(district)) {
+//            query.setString("district", district);
+//        }
 
         query.setString("name", "%" + name + "%");
         query.setString("idCardNo", "%" + idCardNo + "%");
@@ -263,7 +284,7 @@ public class DemographicIndex{
             PatientBrowseModel patientBrowseModel = new PatientBrowseModel();
             patientBrowseModel.setOrder(order++);
             patientBrowseModel.setName(demoinfo.getName());
-            patientBrowseModel.setIdCardNo(demoinfo.getId().toString());
+            patientBrowseModel.setIdCardNo(demoinfo.getIdCardNo().toString());
             if (demoinfo.getGender() != null) {
                 patientBrowseModel.setGender(demoinfo.getGender());
                 patientBrowseModel.setGenderValue(conventionalDictClient.getGender(demoinfo.getGender()).getValue());
@@ -289,26 +310,26 @@ public class DemographicIndex{
         String district = (String) args.get("district");
 
         String hql = "from DemographicInfo where (name like :name or id like :idCardNo)";
-        if (!StringUtils.isEmpty(province)) {
-            hql += " and homeAddress.province = :province";
-        }
-        if (!StringUtils.isEmpty(city)) {
-            hql += " and homeAddress.city = :city";
-        }
-        if (!StringUtils.isEmpty(district)) {
-            hql += " and homeAddress.district = :district";
-        }
+//        if (!StringUtils.isEmpty(province)) {
+//            hql += " and homeAddress.province = :province";
+//        }
+//        if (!StringUtils.isEmpty(city)) {
+//            hql += " and homeAddress.city = :city";
+//        }
+//        if (!StringUtils.isEmpty(district)) {
+//            hql += " and homeAddress.district = :district";
+//        }
 
         Query query = session.createQuery(hql);
-        if (!StringUtils.isEmpty(province)) {
-            query.setString("province", province);
-        }
-        if (!StringUtils.isEmpty(city)) {
-            query.setString("city", city);
-        }
-        if (!StringUtils.isEmpty(district)) {
-            query.setString("district", district);
-        }
+//        if (!StringUtils.isEmpty(province)) {
+//            query.setString("province", province);
+//        }
+//        if (!StringUtils.isEmpty(city)) {
+//            query.setString("city", city);
+//        }
+//        if (!StringUtils.isEmpty(district)) {
+//            query.setString("district", district);
+//        }
 
         //Query query = session.createQuery("select 1 from DemographicInfo where name like :name or id like :idCardNo");
         query.setString("name", "%" + name + "%");
@@ -377,18 +398,6 @@ public class DemographicIndex{
     @Transactional(Transactional.TxType.SUPPORTS)
     public void delete(DemographicId id) {
         DemographicInfo di = (DemographicInfo) getDemographicInfo(id);
-//        MAddress birthPlace = addressClient.getAddressById(di.getBirthPlace());
-//        if (!isNullAddress(birthPlace)) {
-//            addressClient.delete(birthPlace.getId());
-//        }
-//        MAddress homeAddress = addressClient.getAddressById(di.getBirthPlace());
-//        if (!isNullAddress(homeAddress)) {
-//            addressClient.delete(homeAddress.getId());
-//        }
-//        MAddress workAddress = addressClient.getAddressById(di.getBirthPlace());
-//        if (!isNullAddress(workAddress)) {
-//            addressClient.delete(workAddress.getId());
-//        }
         demographicInfoRepository.delete(di);
     }
 
@@ -397,6 +406,6 @@ public class DemographicIndex{
         String pwd = "123456";
         DemographicInfo demInfo = getDemographicInfo(id);
         demInfo.setPassword(HashUtil.hashStr(pwd));
-        update(demInfo);
+        demographicInfoRepository.save(demInfo);
     }
 }

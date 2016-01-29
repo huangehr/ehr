@@ -1,7 +1,6 @@
 package com.yihu.ehr.paient.controller;
 
 import com.yihu.ehr.constrant.Result;
-import com.yihu.ehr.paient.feignClient.dict.ConventionalDictClient;
 import com.yihu.ehr.paient.service.card.AbstractCard;
 import com.yihu.ehr.paient.service.card.CardBrowseModel;
 import com.yihu.ehr.paient.service.card.CardManager;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.smartcardio.Card;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,20 +27,18 @@ public class CardController extends BaseRestController {
 
     public CardController(){}
 
-    @Autowired
-    private ConventionalDictClient conventionalDictClient;
-
-
 
     @RequestMapping("searchCard")
-    public Object searchCard(String idCardNo,String searchNm, int page, int rows){
+    public Object searchCard(String idCardNo,String searchNm, String cardType, int page, int rows) throws Exception{
         Map<String, Object> conditionMap = new HashMap<>();
-        Map<String, Object> infoMap = null;
-        //conditionMap.put("idCardNo",encodeStr(idCardNo));
+        conditionMap.put("idCardNo",idCardNo);
         conditionMap.put("number",searchNm);
+        conditionMap.put("type",cardType);
+        conditionMap.put("page",page);
+        conditionMap.put("rows",rows);
 
         List<CardBrowseModel> cardBrowseModelList = cardManager.searchCardBrowseModel(conditionMap);
-        Integer totalCount = cardManager.searchCardInt(conditionMap);
+        Integer totalCount = cardManager.searchCardInt(conditionMap, false);
         Result result = new Result();
         result.setObj(cardBrowseModelList);
         result.setTotalCount(totalCount);
@@ -50,27 +46,27 @@ public class CardController extends BaseRestController {
     }
 
     @RequestMapping("searchNewCard")
-    //搜索新卡
-    public Object searchNewCard(String idCardNo,String searchNm,String searchType, int page, int rows){
+    @ResponseBody
+    public String searchNewCard(String idCardNo,String searchNm,String searchType, int page, int rows) throws Exception{
         Map<String, Object> conditionMap = new HashMap<>();
         Map<String, Object> infoMap = null;
         conditionMap.put("searchIdCardNo",idCardNo);
         conditionMap.put("number",searchNm);
         conditionMap.put("type",searchType);
+        conditionMap.put("page",page);
+        conditionMap.put("rows",rows);
 
         List<CardBrowseModel> cardBrowseModelList = cardManager.searchCardBrowseModel(conditionMap);
-        Integer totalCount = cardManager.searchCardInt(conditionMap);
+        Integer totalCount = cardManager.searchCardInt(conditionMap, false);
 
-        Result result =  new Result();
-        result.setObj(cardBrowseModelList);
-        result.setTotalCount(totalCount);
+        Result result = getResult(cardBrowseModelList, totalCount, page, rows);
 
-        return result;
+        return result.toJson();
     }
 
     @RequestMapping("getCard")
-    public Object getCard(String objectId,String type){
-        AbstractCard card = cardManager.getCard(objectId, type);
+    public Object getCard(String id,String type){
+        AbstractCard card = cardManager.getCard(id, type);
         CardModel cardModel = cardManager.getCard(card);
         Map<String,CardModel> data = new HashMap<>();
         data.put("cardModel", cardModel);

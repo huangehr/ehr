@@ -6,6 +6,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * 卡抽象类，仅作为继承时的数据成员使用
@@ -18,27 +19,31 @@ import java.util.Date;
 @Access(value = AccessType.PROPERTY)
 public  class AbstractPhysicalCard extends AbstractCard {
 
-	protected String id;				    // 卡ID
-	protected String number;				// 卡号
-	protected String ownerName;			// 持有人姓名
-	protected String status;			// 状态 CardStatus
-	protected String type;				// 类型 CardType
-	protected String description;			// 描述
-	protected Date createDate;				// 创建日期
-	protected DemographicId demographicId;	// 人口学ID
+	  String id;				    // 卡ID
+	  String number;				// 卡号
+	  String ownerName;			// 持有人姓名
+	  String status;			// 状态 CardStatus
+	  String type;				// 类型 CardType
+	  String description;			// 描述
+	  Date createDate;				// 创建日期
+	  DemographicId demographicId;	// 人口学ID
 
 	//特殊字段
-	protected String local;				// 发行地/归属地
-	protected String releaseOrg;				// 发行机构
-	protected Date releaseDate;			// 发行时间
-	protected Date validityDateBegin;		// 有效期起始时间
-	protected Date validityDateEnd;		// 有效期结束时间
+	  String local;				// 发行地/归属地
+	  String releaseOrg;				// 发行机构
+	  Date releaseDate;			// 发行时间
+	  Date validityDateBegin;		// 有效期起始时间
+	  Date validityDateEnd;		// 有效期结束时间
+
+	public AbstractPhysicalCard() {
+		id  = UUID.randomUUID().toString().replace("-","");
+	}
 
 
 	@Id
-    @GeneratedValue(generator = "id")
-    @GenericGenerator(name = "id", strategy = "id")
-    @Column(name = "id", unique = true, nullable = false)
+	@GeneratedValue(generator = "Generator")
+	@GenericGenerator(name = "Generator", strategy = "assigned")
+	@Column(name = "id", unique = true, nullable = false)
 	public String getId() {
 		return id;
 	}
