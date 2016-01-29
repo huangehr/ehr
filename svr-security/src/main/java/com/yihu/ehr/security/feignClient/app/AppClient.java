@@ -20,7 +20,7 @@ public interface AppClient {
             @RequestParam(value = "appSecret") String appSecret);
 
 
-    @RequestMapping(value = "/rest/{api_version}/app/app", method = GET )
+    @RequestMapping(value = "/rest/{api_version}/app", method = GET )
     MApp getApp(
             @PathVariable(value = "api_version") String apiVersion,
             @RequestParam(value = "appId") String appId);
