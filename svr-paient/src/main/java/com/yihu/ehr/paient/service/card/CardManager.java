@@ -2,6 +2,8 @@ package com.yihu.ehr.paient.service.card;
 
 import com.yihu.ehr.model.address.MAddress;
 import com.yihu.ehr.model.dict.MBaseDict;
+import com.yihu.ehr.paient.dao.XAbstractPhysicalCardRepository;
+import com.yihu.ehr.paient.dao.XAbstractVirtualCardRepository;
 import com.yihu.ehr.paient.feignClient.address.AddressClient;
 import com.yihu.ehr.paient.feignClient.dict.ConventionalDictClient;
 import com.yihu.ehr.paient.service.demographic.DemographicId;
@@ -40,6 +42,12 @@ public class CardManager {
 
     @Autowired
     private AddressClient addressClient;
+
+    @Autowired
+    private XAbstractPhysicalCardRepository abstractPhysicalCardRepository;
+
+    @Autowired
+    private XAbstractVirtualCardRepository abstractVirtualCardRepository;
 
     public CardManager() {
     }
@@ -108,7 +116,7 @@ public class CardManager {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
 
         Criteria criteria = null;
-        if (type.isVirtualCard()) {
+        if (type.checkIsVirtualCard()) {
             criteria = session.createCriteria(AbstractVirtualCard.class);
         } else {
             criteria = session.createCriteria(AbstractPhysicalCard.class);
@@ -122,9 +130,9 @@ public class CardManager {
 
         // 根据地址/平台来判断
         for (AbstractCard card : cards) {
-            if (type.isVirtualCard()) {
+            if (card.checkIsVirtualCard()) {
                 AbstractVirtualCard virtualCard = (AbstractVirtualCard) card;
-                if (type.isVirtualCard() && platform != null) {
+                if (card.checkIsVirtualCard() && platform != null) {
                     SNSAccount snsAccount = (SNSAccount) virtualCard;
                     if (snsAccount.getPlatform().getHomePage().equals(platform.getHomePage())) {
                         return true;
@@ -149,10 +157,7 @@ public class CardManager {
         } else if ("Invalid".equals(card.getStatus())) {
             throw new CardException("卡已作废, 无法更新");
         }
-        MBaseDict cardType = card.getType();
-
-//        if (!card.isVirtualCard()) {
-        if (!cardType.isVirtualCard()) {
+        if (!card.checkIsVirtualCard()) {
             MAddress local = card.getLocal();
 
             String country = local.getCountry();
@@ -167,7 +172,7 @@ public class CardManager {
 
                 String extra = local.getExtra();
                 String postalCode = local.getPostalCode();
-                String newAddressId = addressClient.saveAddress(country,province,city,district,town,street,extra,postalCode);
+                addressClient.saveAddress(country,province,city,district,town,street,extra,postalCode);
                 //get set
                 AbstractPhysicalCard abstractPhysicalCard = new AbstractPhysicalCard();
                 abstractPhysicalCard.setId(card.getId());
@@ -187,12 +192,14 @@ public class CardManager {
     }
 
     public AbstractCard getCard(String id, String cardType) {
-        Session session = entityManager.unwrap(org.hibernate.Session.class);
         AbstractCard card = null;
-        if (!conventionalDictClient.getCardType(cardType).isVirtualCard()) {
-            card = (AbstractPhysicalCard) session.get(AbstractPhysicalCard.class, id);
+        AbstractPhysicalCard abstractPhysicalCard = new AbstractPhysicalCard();
+        AbstractCard abstractCard = new AbstractCard();
+        abstractCard.setType(cardType);
+        if (!abstractCard.checkIsVirtualCard()) {
+            card = abstractPhysicalCardRepository.findOne(id);
         } else {
-            card = (AbstractVirtualCard) session.get(AbstractVirtualCard.class, id);
+            card = abstractVirtualCardRepository.findOne(id);
         }
         return card;
     }
@@ -297,7 +304,7 @@ public class CardManager {
         for(AbstractCard card:cards){
             AbstractVirtualCard virtualCard=null;
             AbstractPhysicalCard physicalCard=null;
-            if (conventionalDictClient.getCardType(card.getType()).isVirtualCard()){
+            if (card.checkIsVirtualCard()){
                 virtualCard=(AbstractVirtualCard)card;
             }else{
                 physicalCard=(AbstractPhysicalCard)card;
@@ -385,7 +392,7 @@ public class CardManager {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         Criteria criteria = null;
 
-        if (conventionalDictClient.getCardType(card.getType()).isVirtualCard()) {
+        if (card.checkIsVirtualCard()) {
             criteria = session.createCriteria(AbstractVirtualCard.class);
         } else {
             criteria = session.createCriteria(AbstractPhysicalCard.class);

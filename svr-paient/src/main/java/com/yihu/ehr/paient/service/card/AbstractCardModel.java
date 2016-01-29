@@ -33,6 +33,15 @@ public abstract class AbstractCardModel {
 	public AbstractCardModel(){;
 	}
 
+
+	public boolean checkIsVirtualCard(){
+		if(this.getType().equals("VirtualCard")){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
 	public String getId() {
 		return id;
 	}

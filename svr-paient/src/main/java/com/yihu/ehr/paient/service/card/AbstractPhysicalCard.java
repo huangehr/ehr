@@ -5,6 +5,7 @@ import com.yihu.ehr.paient.service.demographic.DemographicId;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
@@ -17,7 +18,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "physical_cards")
 @Access(value = AccessType.PROPERTY)
-public  class AbstractPhysicalCard extends AbstractCard {
+public class AbstractPhysicalCard extends AbstractCard implements Serializable {
 
 	  String id;				    // 卡ID
 	  String number;				// 卡号
@@ -26,7 +27,9 @@ public  class AbstractPhysicalCard extends AbstractCard {
 	  String type;				// 类型 CardType
 	  String description;			// 描述
 	  Date createDate;				// 创建日期
-	  DemographicId demographicId;	// 人口学ID
+	  //DemographicId demographicId;	// 人口学ID
+	  String idCardNo;
+	  String DType;
 
 	//特殊字段
 	  String local;				// 发行地/归属地
@@ -51,7 +54,7 @@ public  class AbstractPhysicalCard extends AbstractCard {
 		this.id = id;
 	}
 
-	@Column(name = "number", unique = true, nullable = false ,insertable = false, updatable = false)
+	@Column(name = "number",nullable = false )
 	public String getNumber() {
 		return number;
 	}
@@ -59,7 +62,7 @@ public  class AbstractPhysicalCard extends AbstractCard {
 		this.number = number;
 	}
 
-	@Column(name = "owner_name", unique = true, nullable = false ,insertable = false, updatable = false)
+	@Column(name = "owner_name", nullable = true)
 	public String getOwnerName() {
 		return ownerName;
 	}
@@ -67,7 +70,7 @@ public  class AbstractPhysicalCard extends AbstractCard {
 		this.ownerName = ownerName;
 	}
 
-	@Column(name = "card_status", unique = true, nullable = false ,insertable = false, updatable = false)
+	@Column(name = "card_status", nullable = true)
 	public String getStatus() {
 		return status;
 	}
@@ -75,7 +78,7 @@ public  class AbstractPhysicalCard extends AbstractCard {
 		this.status = status;
 	}
 
-	@Column(name = "card_type", unique = true, nullable = false ,insertable = false, updatable = false)
+	@Column(name = "card_type", nullable = true)
 	public String getType() {
 		return type;
 	}
@@ -83,7 +86,7 @@ public  class AbstractPhysicalCard extends AbstractCard {
 		this.type = type;
 	}
 
-	@Column(name = "description", unique = true, nullable = false ,insertable = false, updatable = false)
+	@Column(name = "description", nullable = true)
 	public String getDescription() {
 		return description;
 	}
@@ -91,7 +94,7 @@ public  class AbstractPhysicalCard extends AbstractCard {
 		this.description = description;
 	}
 
-	@Column(name = "create_date", unique = true, nullable = false ,insertable = false, updatable = false)
+	@Column(name = "create_date", nullable = true)
 	public Date getCreateDate() {
 		return createDate;
 	}
@@ -99,15 +102,32 @@ public  class AbstractPhysicalCard extends AbstractCard {
 		this.createDate = createDate;
 	}
 
-	@Column(name = "id_card_no", unique = true, nullable = false ,insertable = false, updatable = false)
-	public DemographicId getDemographicId() {
-		return demographicId;
+//	@Column(name = "id_card_no", nullable = true)
+//	public DemographicId getDemographicId() {
+//		return demographicId;
+//	}
+//	public void setDemographicId(DemographicId demographicId) {
+//		this.demographicId = demographicId;
+//	}
+
+
+	@Column(name = "id_card_no", nullable = true)
+	public String getIdCardNo() {
+		return idCardNo;
 	}
-	public void setDemographicId(DemographicId demographicId) {
-		this.demographicId = demographicId;
+	public void setIdCardNo(String idCardNo) {
+		this.idCardNo = idCardNo;
 	}
 
-	@Column(name = "local", unique = true, nullable = false ,insertable = false, updatable = false)
+	@Column(name = "DType", nullable = true)
+	public String getDType() {
+		return DType;
+	}
+	public void setDType(String DType) {
+		this.DType = DType;
+	}
+
+	@Column(name = "local", nullable = true)
 	public String getLocal() {
 		return local;
 	}
@@ -115,7 +135,7 @@ public  class AbstractPhysicalCard extends AbstractCard {
 		this.local = local;
 	}
 
-	@Column(name = "release_org", unique = true, nullable = false ,insertable = false, updatable = false)
+	@Column(name = "release_org", nullable = true)
 	public String getReleaseOrg() {
 		return releaseOrg;
 	}
@@ -123,14 +143,14 @@ public  class AbstractPhysicalCard extends AbstractCard {
 		this.releaseOrg = releaseOrg;
 	}
 
-	@Column(name = "release_date", unique = true, nullable = false ,insertable = false, updatable = false)
+	@Column(name = "release_date", nullable = true)
 	public Date getReleaseDate() {
 		return releaseDate;
 	}
 	public void setReleaseDate(Date releaseDate) {
 		this.releaseDate = releaseDate;
 	}
-	@Column(name = "validity_date_begin", unique = true, nullable = false ,insertable = false, updatable = false)
+	@Column(name = "validity_date_begin", nullable = true)
 	public Date getValidityDateBegin() {
 		return validityDateBegin;
 	}
@@ -138,7 +158,7 @@ public  class AbstractPhysicalCard extends AbstractCard {
 		this.validityDateBegin = validityDateBegin;
 	}
 
-	@Column(name = "validity_date_end", unique = true, nullable = false ,insertable = false, updatable = false)
+	@Column(name = "validity_date_end", nullable = true)
 	public Date getValidityDateEnd() {
 		return validityDateEnd;
 	}

@@ -3,15 +3,14 @@ package com.yihu.ehr.paient.service.card;
 import com.yihu.ehr.paient.service.demographic.DemographicId;
 
 import java.util.Date;
-import java.util.UUID;
-
 /**
  * 卡抽象类，仅作为继承时的数据成员使用
  * @author Witness
  * @version 1.0
  * @updated 11-6月-2015 9:51:15
  */
-public  class AbstractCard {
+public class AbstractCard {
+
 	protected String id;				    // 卡ID
 	protected String number;				// 卡号
 	protected String ownerName;			// 持有人姓名
@@ -22,9 +21,15 @@ public  class AbstractCard {
 	protected DemographicId demographicId;	// 人口学ID
 
 
-	public AbstractCard(){;
-		id  = UUID.randomUUID().toString().replace("-","");
-		createDate = new Date();
+	public AbstractCard(){
+	}
+
+	public boolean checkIsVirtualCard(){
+		if(this.getType().equals("VirtualCard")){
+			return true;
+		}else{
+			return false;
+		}
 	}
 
 
