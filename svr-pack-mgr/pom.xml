@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <artifactId>package-svr</artifactId>
+    <artifactId>svr-pack-mgr</artifactId>
     <packaging>pom</packaging>
 
     <name>svr-pack-mgr</name>
