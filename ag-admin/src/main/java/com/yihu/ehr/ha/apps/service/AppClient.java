@@ -1,6 +1,5 @@
 package com.yihu.ehr.ha.apps.service;
 
-import com.yihu.ehr.model.app.MApp;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient("svr-app")
 public interface AppClient {
 
-    @RequestMapping(value = "/rest/{api_version}/app/apps", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/{api_version}/app/search", method = RequestMethod.GET)
     Object getAppList(@PathVariable(value = "api_version") String apiVersion,
                       @ApiParam(name = "appId", value = "appId", defaultValue = "")
                       @RequestParam(value = "appId") String appId,
@@ -29,12 +28,12 @@ public interface AppClient {
                       @ApiParam(name = "rows", value = "页数", defaultValue = "")
                       @RequestParam(value = "rows") int rows);
 
-    @RequestMapping(value = "/rest/{api_version}/app/app", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/rest/{api_version}/app/", method = RequestMethod.DELETE)
     Object deleteApp(@PathVariable(value = "api_version") String apiVersion,
                      @RequestParam(value = "appId") String appId);
 
-    @RequestMapping(value = "/rest/{api_version}/app/app", method = RequestMethod.POST)
-    MApp createApp(@PathVariable(value = "api_version") String apiVersion,
+    @RequestMapping(value = "/rest/{api_version}/app/", method = RequestMethod.POST)
+    Object createApp(@PathVariable(value = "api_version") String apiVersion,
                    @RequestParam(value = "name") String name,
                    @RequestParam(value = "catalog") String catalog,
                    @RequestParam(value = "url") String url,
@@ -42,11 +41,11 @@ public interface AppClient {
                    @RequestParam(value = "tags") String tags,
                    @RequestParam(value = "userId") String userId);
 
-    @RequestMapping(value = "/rest/{api_version}/app/app", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/{api_version}/app/detail", method = RequestMethod.GET)
     Object getAppDetail(@PathVariable(value = "api_version") String apiVersion,
                         @RequestParam(value = "appId") String appId);
 
-    @RequestMapping(value = "/rest/{api_version}/app/app", method = RequestMethod.PUT)
+    @RequestMapping(value = "/rest/{api_version}/app/", method = RequestMethod.PUT)
     Object updateApp(@PathVariable(value = "api_version") String apiVersion,
                      @RequestParam(value = "appId") String appId,
                      @RequestParam(value = "name") String name,
@@ -56,7 +55,7 @@ public interface AppClient {
                      @RequestParam(value = "description") String description,
                      @RequestParam(value = "tags") String tags);
 
-    @RequestMapping(value = "/rest/{api_version}/app/status", method = RequestMethod.POST)
+    @RequestMapping(value = "/rest/{api_version}/app/check", method = RequestMethod.PUT)
     Object checkStatus(@PathVariable(value = "api_version") String apiVersion,
                  @RequestParam(value = "appId") String appId,
                  @RequestParam(value = "status") String status);
