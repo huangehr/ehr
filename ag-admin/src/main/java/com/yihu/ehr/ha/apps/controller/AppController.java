@@ -60,7 +60,7 @@ public class AppController  extends BaseRestController {
      * @param appId APPId
      * @return APP明细
      */
-    @RequestMapping(value = "/appDetail", method = RequestMethod.GET)
+    @RequestMapping(value = "/app", method = RequestMethod.GET)
     public Object getAppDetail(@ApiParam(name = "appId", value = "appid", defaultValue = "")
                                @RequestParam(value = "appId") String appId) {
         return appClient.getAppDetail(appId);

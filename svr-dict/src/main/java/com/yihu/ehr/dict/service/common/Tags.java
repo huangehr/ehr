@@ -1,5 +1,7 @@
 package com.yihu.ehr.dict.service.common;
 
+import com.yihu.ehr.model.dict.MBaseDict;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -13,7 +15,7 @@ import java.io.Serializable;
 @Access(value = AccessType.PROPERTY)
 @Embeddable
 @IdClass(DictPk.class)
-public class Tags implements Serializable {
+public class Tags extends MBaseDict implements Serializable {
     private static final long serialVersionUID = 1L;
     String code;
     long dictId;
@@ -21,30 +23,11 @@ public class Tags implements Serializable {
     Integer sort;
     String phoneticCode;
     String catalog;
-    DictPk dictPk;
-
 
     public Tags(){
 
     }
-    public Tags(long dictId, String code, String value, Integer sort, String phoneticCode, String catalog){
-        this.dictId = dictId;
-        this.code = code;
-        this.value = value;
-        this.sort = sort;
-        this.phoneticCode = phoneticCode;
-        this.catalog = catalog;
-    }
-
-
-    @EmbeddedId
-    public DictPk getDictPk() {
-        return dictPk;
-    }
-    public void setDictPk(DictPk dictPk) {
-        this.dictPk = dictPk;
-    }
-
+    @Id
     @Column(name = "code", unique = true, nullable = false ,insertable = false, updatable = false)
     public String getCode() {
         return code;
@@ -53,6 +36,7 @@ public class Tags implements Serializable {
         this.code = code;
     }
 
+    @Id
     @Column(name = "dictId", unique = true, nullable = false ,insertable = false, updatable = false)
     public long getDictId() {
         return dictId;

@@ -11,7 +11,7 @@ import java.util.UUID;
  * @version 1.0
  * @updated 11-6月-2015 9:51:15
  */
-public abstract class AbstractCard {
+public  class AbstractCard {
 	protected String id;				    // 卡ID
 	protected String number;				// 卡号
 	protected String ownerName;			// 持有人姓名

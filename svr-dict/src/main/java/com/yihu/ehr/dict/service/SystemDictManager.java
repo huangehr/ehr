@@ -1,7 +1,10 @@
 package com.yihu.ehr.dict.service;
 
+import com.yihu.ehr.dict.service.common.DictPk;
+import com.yihu.ehr.util.operator.StringUtil;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -85,9 +88,12 @@ public class SystemDictManager {
     }
 
     public void deleteDict(long dictId) {
-        systemDictRepository.delete(dictId);
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        session.createQuery("delete from SystemDict where id = " + dictId)
+                .executeUpdate();
 
-        systemDictEntryRepository.deleteByDictId(dictId);
+        session.createQuery("delete from SystemDictEntry where dictId = " + dictId)
+                .executeUpdate();
     }
 
 
@@ -109,7 +115,6 @@ public class SystemDictManager {
         sb.append("  where 1=1     ");
 
         if (!(args.get("name")==null || args.get("name").equals(""))) {
-
             sb.append("    and (name like '%" + name + "%' or phoneticCode like '%" + phoneticCode + "%')   ");
         }
         sb.append("    order by  name asc  ");
@@ -151,7 +156,7 @@ public class SystemDictManager {
         return query.list().size();
     }
 
-    public Map<String, Object> searchEntryList(Map<String, Object> args){
+    public List<SystemDictEntry> searchEntryList(Map<String, Object> args){
         Map<String,Object> infoMap= new HashMap<>();
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         Long dictId = (Long) args.get("dictId");
@@ -164,9 +169,7 @@ public class SystemDictManager {
         Integer totalCount =query.list().size();
         query.setMaxResults(pageSize);
         query.setFirstResult((page - 1) * pageSize);
-        infoMap.put("SystemDictEntry",query.list());
-        infoMap.put("totalCount",totalCount);
-        return infoMap;
+        return query.list();
     }
 
 
@@ -185,16 +188,25 @@ public class SystemDictManager {
     }
 
     public void deleteDictEntry(long dictId,String code) {
-        systemDictEntryRepository.deleteByDictIdAndCode(dictId, code);
+        DictPk dictPk = new DictPk();
+        dictPk.setCode(code);
+        dictPk.setDictId(dictId);
+        systemDictEntryRepository.delete(dictPk);
     }
 
 
     public List<SystemDictEntry> getEntryList(Long dictId) {
-        Session session  = entityManager.unwrap(org.hibernate.Session.class);
+        return systemDictEntryRepository.getByDictId(dictId);
+    }
 
-        String hql="from SystemDictEntry where dictId = :dictId order by sort asc";
+    public List<SystemDictEntry> getDict(long dictId,String name){
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        String sql = "select * from system_dict_entries dict where dict_id = "+dictId;
+        if(!StringUtil.isStrEmpty(name)){
+            sql += " and value like '%"+name+"%' ";
+        }
+        SQLQuery query = session.createSQLQuery(sql);
 
-        Query query = session.createQuery(hql);
-        return query.list();
+        return  query.list();
     }
 }

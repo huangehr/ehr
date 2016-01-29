@@ -70,10 +70,7 @@ public class UserController extends BaseRestController {
         List<UserDetailModel> detailModelList = userManager.searchUserDetailModel(conditionMap);
 
         Integer totalCount = userManager.searchUserInt(conditionMap);
-        Result result = new Result();
-        result.setObj(detailModelList);
-        result.setTotalCount(totalCount);
-        return result;
+        return new Result().getResult(detailModelList,totalCount,page,rows);
     }
 
     @RequestMapping(value = "/user" , method = RequestMethod.DELETE)

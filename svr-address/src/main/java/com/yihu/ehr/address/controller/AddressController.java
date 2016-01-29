@@ -5,6 +5,7 @@ import com.yihu.ehr.address.service.AddressDict;
 import com.yihu.ehr.address.service.AddressService;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.model.address.MAddress;
+import com.yihu.ehr.util.beanUtil.BeanUtils;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -74,21 +75,12 @@ public class AddressController extends BaseRestController{
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "id", value = "地址编号", defaultValue = "")
             @RequestParam(value = "id") String id) {
-
-        MAddress model = new MAddress();
+        MAddress addressModel = new MAddress();
         Address address =  addressService.getAddressById(id);
         if(address!=null){
-            model.setId(address.getId());
-            model.setCountry(address.getCountry());
-            model.setProvince(address.getProvince());
-            model.setCity(address.getCity());
-            model.setDistrict(address.getDistrict());
-            model.setTown(address.getTown());
-            model.setStreet(address.getStreet());
-            model.setExtra(address.getExtra());
-            model.setPostalCode(address.getPostalCode());
+            addressModel = BeanUtils.copyModelToVo(MAddress.class,address);
         }
-        return model;
+        return addressModel;
     }
 
 
@@ -140,8 +132,8 @@ public class AddressController extends BaseRestController{
         address.setStreet(street);
         address.setExtra(extra);
         address.setPostalCode(postalCode);
-        addressService.saveAddress(address);
-        return address.getId();
+        String addressId = addressService.saveAddress(address);
+        return addressId;
     }
 
 
@@ -152,7 +144,7 @@ public class AddressController extends BaseRestController{
      * @param district
      * @return
      */
-    @RequestMapping(value = "/search" , method = RequestMethod.GET)
+    @RequestMapping(value = "/address_list" , method = RequestMethod.GET)
     @ApiOperation(value = "根据省市县查询地址")
     public Object search(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -163,13 +155,8 @@ public class AddressController extends BaseRestController{
             @RequestParam(value = "city") String city,
             @ApiParam(name = "district", value = "县", defaultValue = "")
             @RequestParam(value = "district") String district) {
-
         List<String> idList =  addressService.search(province,city,district);
-        if(idList.size()>0){
-            return idList;
-        }else{
-            return null;
-        }
+        return idList;
     }
 
     /**
@@ -188,7 +175,7 @@ public class AddressController extends BaseRestController{
         if(address!=null){
             addressService.deleteAddres(address);
         }
-        return "success";
+        return true;
     }
 
 
@@ -218,6 +205,5 @@ public class AddressController extends BaseRestController{
         address.setStreet(street);
         return addressService.isNullAddress(address);
     }
-
 
 }

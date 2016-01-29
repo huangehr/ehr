@@ -41,7 +41,7 @@ public interface AppClient {
                      @RequestParam(value = "tags") String tags,
                      @RequestParam(value = "userId") String userId);
 
-    @RequestMapping(value = "/appDetail", method = RequestMethod.GET)
+    @RequestMapping(value = "/app", method = RequestMethod.GET)
     Object getAppDetail(@RequestParam(value = "appId") String appId);
 
     @RequestMapping(value = "/app", method = RequestMethod.PUT)

@@ -54,16 +54,17 @@ public class DemographicIndex{
     }
 
     @Transactional(Transactional.TxType.SUPPORTS)
-    public DemographicInfo createDemographicInfo(DemographicId id, String name) {
-        if (!id.isAvailable()) {
-            throw new IllegalArgumentException("人口学索引无效.");
-        }
+    public DemographicInfo createDemographicInfo(String id, String name) {
+//        if (!id.isAvailable()) {
+//            throw new IllegalArgumentException("人口学索引无效.");
+//        }
 
         if (name == null || name.length() <= 1) {
             throw new IllegalArgumentException("姓名不能少于一个字符");
         }
 
-        DemographicInfo demoInfo = new DemographicInfo(id);
+        DemographicInfo demoInfo = new DemographicInfo();
+        demoInfo.setId(id);
         demoInfo.setName(name);
 
         return demoInfo;
@@ -121,9 +122,9 @@ public class DemographicIndex{
     }
 
     public void register(DemographicInfo demographicInfo) {
-        if (!demographicInfo.getId().isAvailable()) {
-            throw new IllegalArgumentException("无效人口学ID.");
-        }
+//        if (!demographicInfo.getId().isAvailable()) {
+//            throw new IllegalArgumentException("无效人口学ID.");
+//        }
         //地址检查并保存
         MAddress xlocation = null;
         //出生地

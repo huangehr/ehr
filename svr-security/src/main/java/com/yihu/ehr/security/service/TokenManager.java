@@ -33,12 +33,6 @@ public class TokenManager {
     @Autowired
     private XUserTokenRepository userTokenRepository;
 
-    @Autowired
-    private UserClient userClient;
-
-    @Autowired
-    private AppClient appClient;
-
     @Transactional(Transactional.TxType.SUPPORTS)
     public UserToken createUserToken(String userId, String appId) throws Exception {
 
