@@ -8,14 +8,15 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <groupId>com.yihu.ehr</groupId>
     <artifactId>ehr-commons-util</artifactId>
     <packaging>jar</packaging>
-    <version>1.1.0</version>
     <name>commons-util</name>
-    <url>https://ds.ehr.yihu.com:5555/ha</url>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>ehr-commons-constants</artifactId>

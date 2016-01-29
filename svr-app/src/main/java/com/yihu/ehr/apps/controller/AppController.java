@@ -204,7 +204,7 @@ public class AppController extends BaseRestController {
             @ApiParam(name = "status", value = "状态", defaultValue = "")
             @RequestParam(value = "status") String status) throws Exception{
         appManager.checkStatus(appId, status);
-        return "success";
+        return true;
     }
 
     @RequestMapping(value = "/validation" , method = RequestMethod.GET)

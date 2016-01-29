@@ -73,7 +73,7 @@ public class AppControllerTests {
         assertNotEquals("APP明细获取失败", object, null);
 
         //修改状态
-        object = appController.check(version,id,"WaitingForApprove");
+        object = appController.checkStatus(version,id,"WaitingForApprove");
         assertTrue("APP状态修改失败", !object.toString().equals("success"));
 
         //根据查询条件获取列表

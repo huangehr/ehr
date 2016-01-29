@@ -4,22 +4,20 @@
 	<modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yihu.ehr</groupId>
-        <artifactId>ehr-commons-dependencies</artifactId>
+        <artifactId>ehr-commons-dependencies-docker</artifactId>
         <version>1.1.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-	<groupId>com.yihu.ehr</groupId>
 	<artifactId>ehr-config-svr</artifactId>
-	<version>1.1.0</version>
 	<packaging>jar</packaging>
 	<name>svr-configuration</name>
 	<description>EHR platform configuration service</description>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.8</java.version>
-	</properties>
+    <properties>
+        <docker.host>http://192.168.1.220:2376</docker.host>
+        <docker.expose.port>1221:1221</docker.expose.port>
+    </properties>
 
 	<dependencies>
 		<dependency>
@@ -33,10 +31,6 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-config-server</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-cloud-connectors</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>

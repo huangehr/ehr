@@ -28,7 +28,7 @@ public class AdapterOrg {
     @Id
     @GeneratedValue(generator = "Generator")
     @GenericGenerator(name = "Generator", strategy = "assigned")
-    @Column(name = "", unique = true, nullable = false)
+    @Column(name = "code", unique = true, nullable = false)
     public String getCode() {
         return code;
     }

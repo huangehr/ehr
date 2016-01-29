@@ -1,15 +1,16 @@
 package com.yihu.ehr.adaption.adapterorg.controller;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adaption.adapterorg.service.AdapterOrg;
 import com.yihu.ehr.adaption.adapterorg.service.AdapterOrgManager;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constrant.Result;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.util.ParmUtils.FieldCondition;
-import com.yihu.ehr.util.ParmUtils.JSONUtil;
-import com.yihu.ehr.util.ParmUtils.ParmModel;
+import com.yihu.ehr.util.parm.FieldCondition;
+import com.yihu.ehr.util.parm.JSONUtil;
+import com.yihu.ehr.util.parm.PageModel;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -18,9 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /** 采集标准
  * Created by lincl on 2016.1.27
@@ -41,11 +40,13 @@ public class AdapterOrgController extends BaseRestController {
             @RequestParam(value = "parmJson", required = false) String parmJson){
 
         Result result = new Result();
-        ParmModel parmModel = (ParmModel) JSONUtil.jsonToObj(parmJson, ParmModel.class);
         try {
-            List<AdapterOrg> adapterOrgs = adapterOrgManager.searchAdapterOrg(parmModel);
-            Integer totalCount = adapterOrgManager.searchAdapterOrgInt(parmModel);
-            result = getResult(adapterOrgs, totalCount, parmModel.getPage(), parmModel.getRows());
+            ObjectMapper objectMapper = new ObjectMapper();
+            PageModel pageModel = objectMapper.readValue(parmJson, PageModel.class);
+            pageModel.setModelClass(AdapterOrg.class);
+            List<AdapterOrg> adapterOrgs = adapterOrgManager.searchAdapterOrg(pageModel);
+            Integer totalCount = adapterOrgManager.searchAdapterOrgInt(pageModel);
+            result = getResult(adapterOrgs, totalCount, pageModel.getPage(), pageModel.getRows());
             result.setSuccessFlg(true);
         }catch (Exception ex){
             result.setSuccessFlg(false);
@@ -81,7 +82,8 @@ public class AdapterOrgController extends BaseRestController {
             @ApiParam(name = "adapterOrgModel", value = "采集机构json模型", defaultValue = "")
             @RequestParam(value = "adapterOrgModel", required = false) String adapterOrgModel){
         try {
-            AdapterOrg adapterOrg = (AdapterOrg) JSONUtil.jsonToObj(adapterOrgModel, AdapterOrg.class);
+            ObjectMapper objectMapper = new ObjectMapper();
+            AdapterOrg adapterOrg = objectMapper.readValue(adapterOrgModel, AdapterOrg.class);
             if (adapterOrgManager.getAdapterOrg(adapterOrg.getCode())!=null){
                 failed(ErrorCode.ExistOrgForCreate, "该机构已存在采集标准！");
             }
@@ -148,7 +150,7 @@ public class AdapterOrgController extends BaseRestController {
         //根据类型获取所有采集标准
         Result result = new Result();
         try {
-            ParmModel parmModel = new ParmModel(page, rows);
+            PageModel pageModel = new PageModel(page, rows);
             FieldCondition fieldCondition = new FieldCondition("type","in", "1");
             //厂商，初始标准只能是厂商
             if("2".equals(type)){
@@ -159,14 +161,14 @@ public class AdapterOrgController extends BaseRestController {
                 //区域,初始标准只能选择厂商或区域
                 fieldCondition.addVal("1");
             }
-            parmModel.addFieldCondition(fieldCondition);
-            List<AdapterOrg> ls = adapterOrgManager.searchAdapterOrg(parmModel);
-            Integer totalCount = adapterOrgManager.searchAdapterOrgInt(parmModel);
+            pageModel.addFieldCondition(fieldCondition);
+            List<AdapterOrg> ls = adapterOrgManager.searchAdapterOrg(pageModel);
+            Integer totalCount = adapterOrgManager.searchAdapterOrgInt(pageModel);
             List<String> adapterOrgs = new ArrayList<>();
             for (AdapterOrg adapterOrg : ls) {
                 adapterOrgs.add(adapterOrg.getCode() + ',' + adapterOrg.getName());
             }
-            result = getResult(adapterOrgs, totalCount, parmModel.getPage(), parmModel.getRows());
+            result = getResult(adapterOrgs, totalCount, pageModel.getPage(), pageModel.getRows());
         } catch (Exception ex) {
             result.setSuccessFlg(false);
         }
