@@ -33,7 +33,7 @@ public class ModelConverter {
 
     /**
      * Convert thrift object to business object, which is used internal only.
-     * 
+     *
      * @param model
      * @param bizClz
      * @param <T>

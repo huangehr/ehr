@@ -8,10 +8,10 @@ ENV spring.profiles.active default,dev
 
 VOLUME /tmp
 
-ADD ehr-config-service-1.1.0.jar app.jar
+ADD ehr-config-svr-1.1.0.jar app.jar
 
 RUN bash -c 'touch /app.jar'
 
-EXPOSE 1221
+EXPOSE 0.0.0.0:1221:1221
 
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]

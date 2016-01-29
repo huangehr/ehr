@@ -15,6 +15,11 @@
     <packaging>pom</packaging>
     <description>EHR platform docker deploy dependencies</description>
 
+    <properties>
+        <docker.host></docker.host>
+        <docker.expose.port></docker.expose.port>
+    </properties>
+
     <build>
         <plugins>
             <!--spring 插件-->
@@ -27,38 +32,26 @@
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>0.3.8</version>
+                <version>0.4.0</version>
                 <executions>
                     <execution>
-                        <phase>deploy</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>build</goal>
-                            <goal>tag</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
-                    <dockerHost>http://192.168.1.220:2376</dockerHost>
+                    <dockerDirectory>${project.build.sourceDirectory}/docker</dockerDirectory>
+                    <dockerHost>${docker.host}</dockerHost>
                     <imageName>${project.artifactId}:${project.version}</imageName>
-                    <baseImage>java:8</baseImage>
-                    <registryUrl>http://www.yihu.com</registryUrl>
-                    <env>
-                        <TZ>'Asia/Shanghai'</TZ>
-                        <LC_ALL>en_US.UTF-8</LC_ALL>
-                    </env>
                     <resources>
                         <resource>
+                            <targetPath>/</targetPath>
                             <directory>${project.build.directory}</directory>
                             <include>${project.build.finalName}.jar</include>
                         </resource>
                     </resources>
-                    <exposes>
-                        <expose>8761</expose>
-                    </exposes>
-                    <cmd>["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/${project.build.finalName}.jar"]</cmd>
-                    <image>${project.artifactId}:${project.version}</image>
-                    <newName>${project.artifactId}:${project.version}</newName>
-                    <pushImage>false</pushImage>
                 </configuration>
             </plugin>
 

@@ -16,6 +16,8 @@
     <description>EHR platform Service Discovery.</description>
 
     <properties>
+        <docker.host>http://192.168.1.220:2376</docker.host>
+        <!--docker.expose.port>8761:8761</docker.expose.port-->
     </properties>
 
     <dependencies>
