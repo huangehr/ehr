@@ -48,8 +48,8 @@ public class HibernateConfig {
     @Value("${data-source.remove-abandoned-timeout}")
     int removeAbandonedTimeout;
 
-    @Value("${hibernate.dialect}")
-    String dialect;
+//    @Value("${hibernate.dialect}")
+//    String dialect;
 
     @Value("${hibernate.show-sql}")
     String showSQL;

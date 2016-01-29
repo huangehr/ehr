@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='utf-8'?>
+<configuration>
+    <property key="admin.region" notes="服务器所在行政区划编码,直接编码,直接使用政府的编码即可">3502</property>
+    <property key="log4j.config" notes="log4j配置文件">log4j/log4j2.xml</property>
+    <property key="text.resource.error.message" notes="系统及业务错误提示信息配置">
+        text/error.zh_CN.properties
+    </property>
+    <property key="default.user.password" notes="用户默认密码">123456</property>
+
+    <!--Quartz参数-->
+    <property key="quartz.config">quartz/quartz.properties</property>
+
+    <!--Solr参数-->
+    <property key="solr.server">http://172.19.103.68:8983/solr</property>
+    <property key="solr.zk.host">node1.jkzldev.com,node2.jkzldev.com,node4.jkzldev.com:2181/solr</property>
+
+    <!--fastDFS参数-->
+    <property key="fastDFS.config">fastDFS/client/fdfs.conf</property>
+
+    <!--HTTPFS参数-->
+    <property key="httpfs.host">192.168.1.243</property>
+    <property key="httpfs.port">50070</property>
+    <property key="username">root</property>
+
+    <!--包含身份信息的数据集-->
+    <property key="identity.contained.data.set">
+        {
+        "HDSA00_01":"人口学信息",
+        "HDSC01_01":"门诊-病人摘要",
+        "HDSC02_01":"住院-病人摘要"
+        }
+    </property>
+
+    <!--包含卡信息的数据集-->
+    <property key="card.info.contained.data.set">
+        {
+        "HDSC01_01":"门诊-病人摘要",
+        "HDSC01_02":"门诊-挂号",
+        "HDSC02_01":"住院-病人摘要",
+        "HDSC02_02":"住院-首页"
+        }
+    </property>
+
+    <!--诊疗事件摘要的数据集，用于生成事件摘要-->
+    <property key="ehr.summary.data.set">
+        {
+        "HDSC01_01": "门诊",
+        "HDSC01_02": "门诊",
+        "HDSC02_01": "住院",
+        "HDSC02_02": "住院",
+        "HDSC02_09": "住院(未重新配置数据集，临时使用)"
+        }
+    </property>
+
+    <!--健康档案CDA文档与数据集类目对照关系-->
+    <property key="ehr.cda.catalog.map">
+        {
+        "HDSC01_02": "0dae000656720cf2269e0319806c0eef",
+        "HDSC02_09": "0dae000656720d02269e0319806c0ef0"
+        }
+    </property>
+</configuration>

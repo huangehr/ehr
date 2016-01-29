@@ -1,5 +1,5 @@
 server:
-  port: 6020
+  port: 7020
 
 security:
   user:
@@ -7,10 +7,22 @@ security:
 
 info:
   app:
-    name: StandardManageService
-    description: EHR platform standard manage service.
+    name: StandardService
+    description: EHR platform standard service.
     version: 1.0.0
 
+data-source:
+  driver-class-name: com.mysql.jdbc.Driver
+  initialize-size: 1
+  max-total: 20
+  max-idle: 10
+  min-idle: 1
+  validation-query: SELECT 1
+  test-on-borrow: true
+  remove-abandoned-timeout: 55
+
+hibernate:
+  dialect: org.hibernate.dialect.MySQL5Dialect
 ---
 spring:
   profiles: dev
@@ -22,6 +34,15 @@ eureka:
     registerWithEureka: true
     fetchRegistry: true
     serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
+
+data-source:
+  url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+  user-name: ha
+  password: ha
+
+hibernate:
+  show-sql: true
+  format-sql: true
 
 ---
 spring:
@@ -46,3 +67,4 @@ eureka:
     registerWithEureka: true
     fetchRegistry: true
     serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
+

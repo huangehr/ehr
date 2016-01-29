@@ -1,7 +1,6 @@
 package com.yihu.ehr.address.service;
 
 
-import com.yihu.ehr.model.AddressModel;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -63,7 +62,7 @@ public class AddressService {
      * @return
      */
     public Address getAddr(String id) {
-        return addressRepository.getAddressByid(id);
+        return addressRepository.findOne(id);
     }
 
 	public List<AddressDict> getLevelToAddr(Integer level){
@@ -85,8 +84,8 @@ public class AddressService {
 	 * 地址检查并保存
 	 * @param address
 	 */
+    @Transactional(Transactional.TxType.REQUIRED)
 	public String saveAddress(Address address) {
-        // TODO: 2015/12/29   是否要全部改造成 spring jpa？
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         Criteria criteria = session.createCriteria(Address.class);
 
@@ -220,7 +219,7 @@ public class AddressService {
 	}
 
     public Address getAddressById(String Id) {
-        return addressRepository.getAddressByid(Id);
+        return addressRepository.findOne(Id);
     }
 
     public String getCanonicalAddress(Address address) {
@@ -281,6 +280,8 @@ public class AddressService {
 
 
 
+
+    @Transactional(Transactional.TxType.REQUIRED)
     public void deleteAddres(Address address) {
         addressRepository.delete(address);
     }

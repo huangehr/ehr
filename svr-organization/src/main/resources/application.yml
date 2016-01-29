@@ -1,10 +1,6 @@
 server:
-#  port: 7070
-  port: 7070
+  port: 9005
 
-security:
-  user:
-    password: organization
 
 info:
   app:

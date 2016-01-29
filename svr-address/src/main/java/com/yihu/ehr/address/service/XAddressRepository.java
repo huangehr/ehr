@@ -20,9 +20,6 @@ public interface XAddressRepository extends PagingAndSortingRepository<Address, 
     @Query("delete from Address address where address.id = :id")
     void delAddress(@Param("id") String id);
 
-    @Query("select address from Address address where address.id = :id")
-    Address getAddressByid(@Param("id") String id);
-
     @Query("select address from Address address where address.country = :country")
     List<Address> findAddressListByCountry(@Param("country") String country);
 

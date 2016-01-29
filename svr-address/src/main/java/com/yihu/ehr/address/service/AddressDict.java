@@ -15,28 +15,28 @@ import java.util.UUID;
 public class AddressDict {
 
 
-    private Integer id;   //序号
+    private int id;   //序号
 
     private String abbreviation;    //简称
 
-    private Integer level;  //级别
+    private int level;  //级别
 
     private String name;  //名字
 
-    private Integer pid; //上级序号
+    private int pid; //上级序号
 
     private String postCode;  //邮政编码
 
     public AddressDict(){
-        id  = Integer.parseInt(UUID.randomUUID().toString());
+        //id  = Integer.parseInt(UUID.randomUUID().toString());
     }
 
     @Id
     @Column(name = "id", unique = true, nullable = false)
-    public Integer getId() {
+    public int getId() {
         return id;
     }
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -49,10 +49,10 @@ public class AddressDict {
     }
 
     @Column(name = "level",  nullable = false)
-    public Integer getLevel() {
+    public int getLevel() {
         return level;
     }
-    public void setLevel(Integer level) {
+    public void setLevel(int level) {
         this.level = level;
     }
 
@@ -65,10 +65,10 @@ public class AddressDict {
     }
 
     @Column(name = "pid",  nullable = true)
-    public Integer getPid() {
+    public int getPid() {
         return pid;
     }
-    public void setPid(Integer pid) {
+    public void setPid(int pid) {
         this.pid = pid;
     }
 

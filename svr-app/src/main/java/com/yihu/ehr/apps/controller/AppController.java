@@ -1,18 +1,20 @@
 package com.yihu.ehr.apps.controller;
 
+import com.yihu.ehr.apps.feignClient.dict.ConventionalDictClient;
 import com.yihu.ehr.apps.service.App;
 import com.yihu.ehr.apps.service.AppDetailModel;
 import com.yihu.ehr.apps.service.AppManager;
-import com.yihu.ehr.apps.service.ConventionalDictClient;
+import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constrant.Result;
-import com.yihu.ehr.constrant.SessionAttributeKeys;
-import com.yihu.ehr.model.BaseDict;
-import com.yihu.ehr.model.User;
-import com.yihu.ehr.util.ApiErrorEcho;
+import com.yihu.ehr.model.app.MApp;
+import com.yihu.ehr.model.dict.MBaseDict;
+import com.yihu.ehr.util.beanUtil.BeanUtils;
 import com.yihu.ehr.util.controller.BaseRestController;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -22,9 +24,10 @@ import java.util.Map;
 /**
  * Created by Administrator on 2015/8/12.
  */
-@RequestMapping("/app")
+@EnableFeignClients
+@RequestMapping(ApiVersionPrefix.CommonVersion + "/app")
 @RestController
-//@SessionAttributes(SessionAttributeKeys.CurrentUser)
+@Api(protocols = "https", value = "address", description = "通用app接口", tags = {"app"})
 public class AppController extends BaseRestController {
 
     @Autowired
@@ -33,32 +36,6 @@ public class AppController extends BaseRestController {
     @Autowired
     private ConventionalDictClient conventionalDictClient;
 
-    @RequestMapping(value = "template/appInfo" , method = RequestMethod.GET)
-    public Object appInfoTemplate(Model model, String appId, String mode) throws Exception{
-        App app;
-        //mode定义：new modify view三种模式，新增，修改，查看
-        if(mode.equals("view")){
-            app = appManager.getApp(appId);
-        }
-        else if(mode.equals("modify")){
-            app = appManager.getApp(appId);
-        }
-        else{
-            app = new App();
-        }
-
-        model.addAttribute("app", app);
-        model.addAttribute("mode",mode);
-        model.addAttribute("contentPage","/app/appInfoDialog");
-        return "generalView";
-    }
-
-    @RequestMapping(value = "initial" , method = RequestMethod.GET)
-    public Object appInitial(Model model) {
-
-        model.addAttribute("contentPage","/app/appManage");
-        return "pageView";
-    }
 
     /**
      * 1-1 根据查询条件查询应用信息。
@@ -72,49 +49,80 @@ public class AppController extends BaseRestController {
      * "rows"  : "0"
      * }
      *
-     * @param searchNm
      * @param catalog
      * @param status
      * @return
      */
-    @RequestMapping(value = "/apps" , method = RequestMethod.GET)
+    @RequestMapping(value = "/search" , method = RequestMethod.GET)
+    @ApiOperation(value = "查询获取app列表")
     public Object getAppList(
-            @ApiParam(name = "searchNm", value = "查询条件", defaultValue = "")
-            @RequestParam(value = "searchNm") Integer searchNm,
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
+            @ApiParam(name = "appId", value = "appId", defaultValue = "")
+            @RequestParam(value = "appId") String appId,
+            @ApiParam(name = "appName", value = "appName", defaultValue = "")
+            @RequestParam(value = "appName") String appName,
             @ApiParam(name = "catalog", value = "类别", defaultValue = "")
-            @RequestParam(value = "catalog") Integer catalog,
+            @RequestParam(value = "catalog") String catalog,
             @ApiParam(name = "status", value = "状态", defaultValue = "")
-            @RequestParam(value = "status") Integer status,
+            @RequestParam(value = "status") String status,
             @ApiParam(name = "page", value = "当前页", defaultValue = "")
-            @RequestParam(value = "page") Integer page,
+            @RequestParam(value = "page") int page,
             @ApiParam(name = "rows", value = "页数", defaultValue = "")
-            @RequestParam(value = "rows") Integer rows) throws Exception{
+            @RequestParam(value = "rows") int rows) throws Exception{
 
         Map<String, Object> conditionMap = new HashMap<>();
-        conditionMap.put("appId", searchNm);
-        conditionMap.put("appName", searchNm);
+        conditionMap.put("appId", appId);
+        conditionMap.put("appName", appName);
         conditionMap.put("catalog", catalog);
         conditionMap.put("status", status);
         conditionMap.put("page", page);
         conditionMap.put("rows", rows);
-
-        BaseController baseController = new BaseController();
-        List<AppDetailModel> detailModelList = appManager.searchAppDetailModels(conditionMap);
-        Integer totalCount = appManager.searchAppsInt(conditionMap);
-        Result result = baseController.getResult(detailModelList, totalCount, page, rows);
-        return result;
+        List<AppDetailModel> detailModelList = appManager.searchAppDetailModels(apiVersion,conditionMap);
+        int totalCount = appManager.searchAppsInt(conditionMap);
+        return new Result().getResult(detailModelList,totalCount,page,rows);
     }
 
-    @RequestMapping(value = "/app" , method = RequestMethod.DELETE)
+    @RequestMapping(value = "/" , method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据id删除app")
     public Object deleteApp(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "appId", value = "id", defaultValue = "")
             @RequestParam(value = "appId") String appId) throws Exception{
         appManager.deleteApp(appId);
         return "success";
     }
 
-    @RequestMapping(value = "app" , method = RequestMethod.POST)
+
+    @RequestMapping(value = "/" , method = RequestMethod.GET)
+    @ApiOperation(value = "根据id查询app")
+    public Object getApp(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
+            @ApiParam(name = "appId", value = "id", defaultValue = "")
+            @RequestParam(value = "appId") String appId) throws Exception{
+        App app = appManager.getApp(appId);
+        MApp appModel = BeanUtils.copyModelToVo(MApp.class,app);
+        return appModel;
+    }
+
+    /**
+     *
+     * @param name
+     * @param catalog
+     * @param url
+     * @param description
+     * @param tags
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/" , method = RequestMethod.POST)
+    @ApiOperation(value = "创建app")
     public Object createApp(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "name", value = "名称", defaultValue = "")
             @RequestParam(value = "name") String name,
             @ApiParam(name = "catalog", value = "类别", defaultValue = "")
@@ -125,33 +133,32 @@ public class AppController extends BaseRestController {
             @RequestParam(value = "description") String description,
             @ApiParam(name = "tags", value = "标记", defaultValue = "")
             @RequestParam(value = "tags") String tags,
-            @ModelAttribute(SessionAttributeKeys.CurrentUser) User user) throws Exception{
-
-        App app;
-        BaseDict appCatalog = conventionalDictClient.getAppCatalog(catalog);
-        app = appManager.createApp(name, appCatalog, url, tags, description, user);
-
-        if (app == null) {
-            ApiErrorEcho apiErrorEcho = new ApiErrorEcho();
-            apiErrorEcho.putMessage("failed");
-            return apiErrorEcho;
-        } else {
-            return app;
-        }
+            @ApiParam(name = "userId", value = "用户", defaultValue = "")
+            @RequestParam(value = "userId") String userId) throws Exception{
+        MBaseDict appCatalog = conventionalDictClient.getAppCatalog(apiVersion,catalog);
+        App app = appManager.createApp(apiVersion,name,appCatalog,url, tags, description, userId);
+        MApp appModel = BeanUtils.copyModelToVo(MApp.class,app);
+        return appModel;
     }
 
-    @RequestMapping(value = "appDetail" , method = RequestMethod.GET)
+    @RequestMapping(value = "/detail" , method = RequestMethod.GET)
+    @ApiOperation(value = "根据id获取app详细信息")
     public Object getAppDetail(
-            @ApiParam(name = "appId", value = "id", defaultValue = "")
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
+            @ApiParam(name = "appId", value = "编号", defaultValue = "")
             @RequestParam(value = "appId") String appId) throws Exception{
-        AppDetailModel appDetailModel = appManager.searchAppDetailModel(appId);
+        AppDetailModel appDetailModel = appManager.searchAppDetailModel(apiVersion,appId);
         return appDetailModel;
 
     }
 
-    @RequestMapping(value = "app" , method = RequestMethod.PUT)
+    @RequestMapping(value = "/" , method = RequestMethod.PUT)
+    @ApiOperation(value = "修改app")
     public Object updateApp(
-            @ApiParam(name = "appId", value = "名id", defaultValue = "")
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
+            @ApiParam(name = "appId", value = "appId", defaultValue = "")
             @RequestParam(value = "appId") String appId,
             @ApiParam(name = "name", value = "名称", defaultValue = "")
             @RequestParam(value = "name") String name,
@@ -167,15 +174,11 @@ public class AppController extends BaseRestController {
             @RequestParam(value = "tags") String tags) throws Exception{
 
         App app;
-        BaseDict appCatalog = conventionalDictClient.getAppCatalog(catalog);
-        BaseDict appStatus = conventionalDictClient.getAppStatus(status);
-
-
+        MBaseDict appCatalog = conventionalDictClient.getAppCatalog(apiVersion,catalog);
+        MBaseDict appStatus = conventionalDictClient.getAppStatus(apiVersion,status);
         app = appManager.getApp(appId);
         if (app == null) {
-            ApiErrorEcho apiErrorEcho = new ApiErrorEcho();
-            apiErrorEcho.putMessage("failed");
-            return apiErrorEcho;
+            return "faild";
         } else {
             app.setName(name);
             app.setCatalog(appCatalog.getCode());
@@ -185,20 +188,36 @@ public class AppController extends BaseRestController {
             app.setTags(tags);
 
             appManager.updateApp(app);
-            return "success";
+            MApp appModel = BeanUtils.copyModelToVo(MApp.class,app);
+            return appModel;
         }
 
     }
 
-    @RequestMapping(value = "check" , method = RequestMethod.PUT)
+    @RequestMapping(value = "/check" , method = RequestMethod.PUT)
+    @ApiOperation(value = "修改状态")
     public Object check(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "appId", value = "名id", defaultValue = "")
             @RequestParam(value = "appId") String appId,
             @ApiParam(name = "status", value = "状态", defaultValue = "")
             @RequestParam(value = "status") String status) throws Exception{
-        BaseDict appStatus = conventionalDictClient.getAppStatus(status);
-        appManager.checkStatus(appId, appStatus);
+        appManager.checkStatus(appId, status);
         return "success";
     }
+
+    @RequestMapping(value = "/validation" , method = RequestMethod.GET)
+    @ApiOperation(value = "")
+    public Object validationApp(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
+            @ApiParam(name = "appId", value = "appId", defaultValue = "")
+            @RequestParam(value = "appId") String appId,
+            @ApiParam(name = "appSecret", value = "", defaultValue = "")
+            @RequestParam(value = "appSecret") String appSecret) throws Exception{
+        return appManager.validationApp(appId, appSecret);
+    }
+
 
 }

@@ -3,11 +3,16 @@ package com.yihu.ehr;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.web.bind.annotation.RestController;
+
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@EnableAspectJAutoProxy(proxyTargetClass = true)
+@RestController
+@EnableFeignClients
+//@EnableAspectJAutoProxy(proxyTargetClass = true)
 public class StandardServiceApp {
 
 

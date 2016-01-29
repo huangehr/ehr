@@ -1,6 +1,7 @@
 package com.yihu.ehr.apps.service;
-import com.yihu.ehr.model.BaseDict;
-import com.yihu.ehr.model.User;
+
+import com.yihu.ehr.apps.feignClient.dict.ConventionalDictClient;
+import com.yihu.ehr.model.dict.MBaseDict;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -10,10 +11,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * @author Sand
@@ -23,6 +21,7 @@ import java.util.Random;
 @Service
 @Transactional
 public class AppManager  {
+    private static final int AppIdLength = 10;
     private static final int AppSecretLength = 16;
 
     @Autowired
@@ -34,37 +33,41 @@ public class AppManager  {
     @Autowired
     private ConventionalDictClient conventionalDictClient;
 
+
     public AppManager() {
     }
 
 
 
-    public App createApp(String name, BaseDict catalog, String url, String tags, String description, User creator) {
+    public App createApp(String apiVersion,String name, MBaseDict catalog, String url, String tags, String description, String creator) {
+
+        MBaseDict status = conventionalDictClient.getAppStatus(apiVersion,"WaitingForApprove");
 
         App app = new App();
+        app.setId(getRandomString(AppIdLength));
         app.setName(name);
         app.setCatalog(catalog.getCode());
-        app.setCreator(creator.getId());
-
+        app.setCreator(creator);
         app.setSecret(getRandomString(AppSecretLength));
         app.setName(name);
         app.setCatalog(catalog.getCode());
         app.setUrl(url);
-        //app.setTags(tags);
+        app.setTags(tags);
         app.setDescription(description);
-
+        app.setCreateTime(new Date());
+        app.setStatus(status.getCode());
         appRepository.save(app);
 
         return app;
     }
 
     public void deleteApp(String id) {
-        App app = appRepository.getAppById(id);
+        App app = appRepository.findOne(id);
         appRepository.delete(app);
     }
 
     public App getApp(String id) {
-        App app = appRepository.getAppById(id);
+        App app = appRepository.findOne(id);
         return app;
     }
 
@@ -123,8 +126,8 @@ public class AppManager  {
         String appName = (String) args.get("appName");
         String catalog = (String) args.get("catalog");
         String status = (String) args.get("status");
-        Integer page = (Integer) args.get("page");
-        Integer pageSize = (Integer) args.get("rows");
+        Integer page =  Integer.parseInt(args.get("page").toString());
+        Integer pageSize = Integer.parseInt(args.get("rows").toString());
         //动态SQL文拼接
         StringBuilder sb = new StringBuilder();
 
@@ -154,7 +157,7 @@ public class AppManager  {
         return query.list();
     }
 
-    public List<AppDetailModel> searchAppDetailModels(Map<String, Object> args) {
+    public List<AppDetailModel> searchAppDetailModels(String apiVersion,Map<String, Object> args) {
 
         //参数获取处理
         List<App> appList = searchApps(args);
@@ -170,8 +173,8 @@ public class AppManager  {
             appDetailModel.setCreator(app.getCreator());
             appDetailModel.setCreate_time(app.getCreateTime());
             appDetailModel.setAudit_time(app.getAuditTime());
-            appDetailModel.setCatalog(conventionalDictClient.getAppCatalog(app.getCatalog()));
-            appDetailModel.setStatus(conventionalDictClient.getAppStatus(app.getStatus()));
+            appDetailModel.setCatalog(conventionalDictClient.getAppCatalog(apiVersion,app.getCatalog()));
+            appDetailModel.setStatus(conventionalDictClient.getAppStatus(apiVersion,app.getStatus()));
             appDetailModel.setDescription(app.getDescription());
             appDetailModel.setStrTags(app.getTags());
 
@@ -229,7 +232,7 @@ public class AppManager  {
      *
      * @param appId
      */
-    public AppDetailModel searchAppDetailModel(String appId) {
+    public AppDetailModel searchAppDetailModel(String apiVersion,String appId) {
 
         Session session =  entityManager.unwrap(org.hibernate.Session.class);
         //动态SQL文拼接
@@ -250,8 +253,8 @@ public class AppManager  {
         detailModel.setId(app.getId());
         detailModel.setSecret(app.getSecret());
         detailModel.setName(app.getName());
-        detailModel.setCatalog(conventionalDictClient.getAppCatalog(app.getCatalog()));
-        detailModel.setStatus(conventionalDictClient.getAppStatus(app.getStatus()));
+        detailModel.setCatalog(conventionalDictClient.getAppCatalog(apiVersion,app.getCatalog()));
+        detailModel.setStatus(conventionalDictClient.getAppStatus(apiVersion,app.getStatus()));
         detailModel.setUrl(app.getUrl());
         detailModel.setDescription(app.getDescription());
         detailModel.setStrTags(app.getTags());
@@ -264,9 +267,10 @@ public class AppManager  {
     /**
      * 审核app状态的方法
      */
-    public void checkStatus(String appId, BaseDict appStatus) {
-        App app = appRepository.getAppById(appId);
-        app.setStatus(appStatus.getCode());
+    public void checkStatus(String appId,String appStatus) {
+        App app = appRepository.findOne(appId);
+        app.setStatus(appStatus);
         appRepository.save(app);
     }
+
 }

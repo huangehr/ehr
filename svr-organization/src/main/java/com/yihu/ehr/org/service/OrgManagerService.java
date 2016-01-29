@@ -1,7 +1,11 @@
 package com.yihu.ehr.org.service;
 
-import com.yihu.ehr.model.AddressModel;
-import com.yihu.ehr.model.OrganizationModel;
+import com.yihu.ehr.model.address.MAddress;
+import com.yihu.ehr.model.org.MOrganization;
+import com.yihu.ehr.model.security.MUserSecurity;
+import com.yihu.ehr.org.feignClient.address.AddressClient;
+import com.yihu.ehr.org.feignClient.security.SecurityClient;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +31,9 @@ public class OrgManagerService  {
 
     @Autowired
     AddressClient addressClient;
+
+    @Autowired
+    SecurityClient securityClient;
 
 
     @Autowired
@@ -63,6 +70,17 @@ public class OrgManagerService  {
         return org;
     }
 
+    public List<String> getIdsByName(String name) {
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        Query query = session.createQuery("select org.orgCode from Organization org where org.fullName like :name or org.shortName like :name");
+        query.setString("name", "%"+name+"%");
+        List<String> ids = query.list();
+        return ids;
+    }
+
+
+
+
 
     public String getOrgStr(String tags){
         return String.join(",", tags);
@@ -74,7 +92,7 @@ public class OrgManagerService  {
      * @param org
      * @return
      */
-    public OrgModel getOrgModel(Organization org) {
+    public OrgModel getOrgModel(String apiVersion,Organization org) {
 
         OrgModel orgModel = new OrgModel();
         orgModel.setOrgCode(org.getOrgCode());
@@ -91,27 +109,27 @@ public class OrgManagerService  {
         }
         if (org.getLocation() != null) {
             //这里调用Address服务获取地址
-            AddressModel addres = addressClient.getAddressById(org.getLocation());
-            if(!"00000".equals(addres.getId())){
-                orgModel.setProvince(addres.getProvince());
-                orgModel.setCity(addres.getCity());
-                orgModel.setDistrict(addres.getDistrict());
-                orgModel.setTown(addres.getTown());
-                //获取地址字符串
-                String addressStr = addressClient.getCanonicalAddress(org.getLocation());
+            try {
+                MAddress address;
+                address = addressClient.getAddressById(apiVersion,org.getLocation());
+                orgModel.setProvince(address.getProvince());
+                orgModel.setCity(address.getCity());
+                orgModel.setDistrict(address.getDistrict());
+                orgModel.setTown(address.getTown());
+                String addressStr = addressClient.getCanonicalAddress(apiVersion,org.getLocation());
                 orgModel.setLocation(addressStr);
+            }catch (Exception e){
+                System.out.println(e.getMessage());
             }
         }
-
-//        XSecurityManager securityManager = ServiceFactory.getService(Services.SecurityManager);
-//        XUserSecurity userSecurity = securityManager.getUserPublicKeyByOrgCd(org.getOrgCode());
-//        if (userSecurity != null) {
-//            orgModel.setPublicKey(userSecurity.getPublicKey());
-//            String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT)
-//                    + "~" + DateUtil.toString(userSecurity.getExpiryDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT);
-//            orgModel.setValidTime(validTime);
-//            orgModel.setStartTime( DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT));
-//        }
+        MUserSecurity userSecurity = securityClient.createSecurityByOrgCode(org.getOrgCode());
+        if (userSecurity != null) {
+            orgModel.setPublicKey(userSecurity.getPublicKey());
+            String validTime = DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd")
+                    + "~" + DateFormatUtils.format(userSecurity.getExpiryDate(),"yyyy-MM-dd");
+            orgModel.setValidTime(validTime);
+            orgModel.setStartTime(DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd"));
+        }
 
         return orgModel;
     }
@@ -150,7 +168,7 @@ public class OrgManagerService  {
         org.setTel(orgModel.getTel());
         //org.getTags().clear();
         org.addTag(orgModel.getTags());
-        AddressModel addressModel = new AddressModel();
+        MAddress addressModel = new MAddress();
         addressModel.setProvince(orgModel.getProvince());
         addressModel.setCity(orgModel.getCity());
         addressModel.setDistrict(orgModel.getDistrict());
@@ -165,8 +183,48 @@ public class OrgManagerService  {
         return list;
     }
 
+    public int searchCount(String apiVersion,Map<String, Object> args) {
 
-    public List<OrganizationModel> search(Map<String, Object> args) {
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        String orgCode = (String) args.get("orgCode");
+        String fullName = (String) args.get("fullName");
+        String settledWay = (String) args.get("settledWay");
+        String orgType = (String) args.get("orgType");
+        String province = (String) args.get("province");
+        String city = (String) args.get("city");
+        String district = (String) args.get("district");
+        List<String> addressIdList = addressClient.search(apiVersion,province,city,district);
+
+
+        String hql = "from Organization where (orgCode like :orgCode or fullName like :fullName)";
+        if (!StringUtils.isEmpty(settledWay)) {
+            hql += " and settledWay = :settledWay";
+        }
+        if (!StringUtils.isEmpty(orgType)) {
+            hql += " and orgType = :orgType";
+        }
+        if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
+            hql += " and location in (:addressIdList)";
+        }
+
+        Query query = session.createQuery(hql);
+        query.setString("orgCode", "%"+orgCode+"%");
+        query.setString("fullName", "%"+fullName+"%");
+        if (!StringUtils.isEmpty(settledWay)) {
+            query.setParameter("settledWay", settledWay);
+        }
+        if (!StringUtils.isEmpty(orgType)) {
+            query.setParameter("orgType", orgType);
+        }
+        if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
+            query.setParameterList("addressIdList", addressIdList);
+        }
+
+        return query.list().size();
+    }
+
+
+    public List<MOrganization> search(String apiVersion,Map<String, Object> args) {
 
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         String orgCode = (String) args.get("orgCode");
@@ -180,7 +238,7 @@ public class OrgManagerService  {
         Integer page = (Integer) args.get("page");
         Integer pageSize = (Integer) args.get("pageSize");
 
-        List<String> addressIdList = addressClient.search(province,city,district);
+        List<String> addressIdList = addressClient.search(apiVersion,province,city,district);
 
 
         String hql = "from Organization where (orgCode like :orgCode or fullName like :fullName)";
@@ -214,8 +272,8 @@ public class OrgManagerService  {
     }
 
 
-    public List<OrganizationModel> searchOrgDetailModel(Map<String, Object> args) {
-        List<OrganizationModel> orgList = search(args);
+    public List<MOrganization> searchOrgDetailModel(String apiVersion,Map<String, Object> args) {
+        List<MOrganization> orgList = search(apiVersion,args);
         return orgList;
     }
 
@@ -224,24 +282,24 @@ public class OrgManagerService  {
     public void delete(String orgCode){
         if(orgCode != null){
             Organization organization = getOrg(orgCode);
-            List<Organization> organizationList = organizationRepository.getOrgByLocationWithCode(orgCode);
             if(organization!=null){
                 organizationRepository.delete(organization);
-            }
-            if(organizationList.size()==1){
-                addressClient.deleteByOrgCode(organizationList.get(0).getLocation());
             }
 
         }
     }
 
-    public List<Organization> searchByAddress(String province, String city) {
-        List<Organization> list = organizationRepository.getOrgByAddress(province,city);
-        return list;
+    public List<Organization> searchByAddress(String apiVersion,String province, String city) {
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        List<String> addressIds = addressClient.search(apiVersion,province,city,"");
+        String hql = "from Organization where location in (:addressIds)";
+        Query query = session.createQuery(hql);
+        query.setParameterList("addressIds", addressIds);
+        return query.list();
     }
 
 
-    public String saveAddress(AddressModel location) {
+    public String saveAddress(String apiVersion,MAddress location) {
         String country = location.getCountry();
         String province = location.getProvince()!=null ? location.getProvince() :"";
         String city = location.getCity()!=null ? location.getCity() :"";
@@ -250,7 +308,7 @@ public class OrgManagerService  {
         String street = location.getStreet()!=null ? location.getStreet() :"";
         String extra = location.getExtra()!=null ? location.getExtra() :"";
         String postalCode = location.getPostalCode()!=null ? location.getPostalCode() :"";
-        return addressClient.saveAddress(country,province,city,district,town,street,extra,postalCode);
+        return addressClient.saveAddress(apiVersion,country,province,city,district,town,street,extra,postalCode);
     }
 
 

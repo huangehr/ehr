@@ -1,12 +1,12 @@
 package com.yihu.ehr.apps.service;
 
+import com.yihu.ehr.util.beanUtil.BaseModel;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * APP对象。
@@ -18,7 +18,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "apps")
 @Access(value = AccessType.PROPERTY)
-public class App {
+public class App extends BaseModel{
     private String id;
     private String name;
     private String secret;
@@ -33,7 +33,7 @@ public class App {
     private Set<String> tags = new HashSet<>();
 
 	public App(){
-        id  = UUID.randomUUID().toString();
+      //  id  = new ObjectVersion().toString();
     }
 
     @Id
@@ -129,7 +129,7 @@ public class App {
 
     @Column(name = "tags",  nullable = true)
     public String getTags() {
-        return tags.toString();
+        return String.join(",", tags);
     }
     public void setTags(String tags) {
         if(tags == null) return;
@@ -140,9 +140,6 @@ public class App {
             this.tags.add(token);
         }
     }
-    //    public String getTagsStr(){
-//        return String.join(",", tags);
-//    }
     public void addTag(String tag) {
         if(tag == null || tag.length() == 0) return;
         if (tags.contains(tag)) return;

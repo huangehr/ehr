@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: svr-paient
+
+  cloud:
+    config:
+      username: user
+      password: configuration
+      uri: http://localhost:1221
+      label: dev
+

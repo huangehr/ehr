@@ -16,6 +16,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="commons-rest-model" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-data-jpa:1.3.1.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter:1.3.1.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-logging:1.3.1.RELEASE" level="project" />
@@ -166,7 +167,7 @@
     <orderEntry type="library" name="Maven: com.netflix.feign:feign-slf4j:8.12.1" level="project" />
     <orderEntry type="library" name="Maven: com.netflix.feign:feign-hystrix:8.12.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.netflix.hystrix:hystrix-core:1.4.21" level="project" />
-    <orderEntry type="module" module-name="commons-rest-model" />
+    <orderEntry type="module" module-name="ehr-commons-rest-model" />
     <orderEntry type="library" name="Maven: com.belerweb:pinyin4j:2.5.0" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.6.4" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.6.4" level="project" />
