@@ -92,7 +92,7 @@ public class OrgManagerService  {
      * @param org
      * @return
      */
-    public OrgModel getOrgModel(Organization org) {
+    public OrgModel getOrgModel(String apiVersion,Organization org) {
 
         OrgModel orgModel = new OrgModel();
         orgModel.setOrgCode(org.getOrgCode());
@@ -111,12 +111,12 @@ public class OrgManagerService  {
             //这里调用Address服务获取地址
             try {
                 MAddress address;
-                address = addressClient.getAddressById(org.getLocation());
+                address = addressClient.getAddressById(apiVersion,org.getLocation());
                 orgModel.setProvince(address.getProvince());
                 orgModel.setCity(address.getCity());
                 orgModel.setDistrict(address.getDistrict());
                 orgModel.setTown(address.getTown());
-                String addressStr = addressClient.getCanonicalAddress(org.getLocation());
+                String addressStr = addressClient.getCanonicalAddress(apiVersion,org.getLocation());
                 orgModel.setLocation(addressStr);
             }catch (Exception e){
                 System.out.println(e.getMessage());
@@ -183,7 +183,7 @@ public class OrgManagerService  {
         return list;
     }
 
-    public int searchCount(Map<String, Object> args) {
+    public int searchCount(String apiVersion,Map<String, Object> args) {
 
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         String orgCode = (String) args.get("orgCode");
@@ -193,7 +193,7 @@ public class OrgManagerService  {
         String province = (String) args.get("province");
         String city = (String) args.get("city");
         String district = (String) args.get("district");
-        List<String> addressIdList = addressClient.search(province,city,district);
+        List<String> addressIdList = addressClient.search(apiVersion,province,city,district);
 
 
         String hql = "from Organization where (orgCode like :orgCode or fullName like :fullName)";
@@ -224,7 +224,7 @@ public class OrgManagerService  {
     }
 
 
-    public List<MOrganization> search(Map<String, Object> args) {
+    public List<MOrganization> search(String apiVersion,Map<String, Object> args) {
 
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         String orgCode = (String) args.get("orgCode");
@@ -238,7 +238,7 @@ public class OrgManagerService  {
         Integer page = (Integer) args.get("page");
         Integer pageSize = (Integer) args.get("pageSize");
 
-        List<String> addressIdList = addressClient.search(province,city,district);
+        List<String> addressIdList = addressClient.search(apiVersion,province,city,district);
 
 
         String hql = "from Organization where (orgCode like :orgCode or fullName like :fullName)";
@@ -272,8 +272,8 @@ public class OrgManagerService  {
     }
 
 
-    public List<MOrganization> searchOrgDetailModel(Map<String, Object> args) {
-        List<MOrganization> orgList = search(args);
+    public List<MOrganization> searchOrgDetailModel(String apiVersion,Map<String, Object> args) {
+        List<MOrganization> orgList = search(apiVersion,args);
         return orgList;
     }
 
@@ -282,20 +282,16 @@ public class OrgManagerService  {
     public void delete(String orgCode){
         if(orgCode != null){
             Organization organization = getOrg(orgCode);
-            List<Organization> organizationList = organizationRepository.getOrgByLocationWithCode(orgCode);
             if(organization!=null){
                 organizationRepository.delete(organization);
-            }
-            if(organizationList.size()==1){
-                addressClient.deleteByOrgCode(organizationList.get(0).getLocation());
             }
 
         }
     }
 
-    public List<Organization> searchByAddress(String province, String city) {
+    public List<Organization> searchByAddress(String apiVersion,String province, String city) {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
-        List<String> addressIds = addressClient.search(province,city,"");
+        List<String> addressIds = addressClient.search(apiVersion,province,city,"");
         String hql = "from Organization where location in (:addressIds)";
         Query query = session.createQuery(hql);
         query.setParameterList("addressIds", addressIds);
@@ -303,7 +299,7 @@ public class OrgManagerService  {
     }
 
 
-    public String saveAddress(MAddress location) {
+    public String saveAddress(String apiVersion,MAddress location) {
         String country = location.getCountry();
         String province = location.getProvince()!=null ? location.getProvince() :"";
         String city = location.getCity()!=null ? location.getCity() :"";
@@ -312,7 +308,7 @@ public class OrgManagerService  {
         String street = location.getStreet()!=null ? location.getStreet() :"";
         String extra = location.getExtra()!=null ? location.getExtra() :"";
         String postalCode = location.getPostalCode()!=null ? location.getPostalCode() :"";
-        return addressClient.saveAddress(country,province,city,district,town,street,extra,postalCode);
+        return addressClient.saveAddress(apiVersion,country,province,city,district,town,street,extra,postalCode);
     }
 
 

@@ -52,7 +52,7 @@ public class OrganizationController extends BaseRestController {
      * @param rows
      * @return
      */
-    @RequestMapping(value = "search", method = RequestMethod.GET)
+    @RequestMapping(value = "/search", method = RequestMethod.GET)
     @ResponseBody
     public Object searchOrgs(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -88,8 +88,8 @@ public class OrganizationController extends BaseRestController {
         conditionMap.put("pageSize", rows);
 
 
-        List<MOrganization> organizationList = orgManagerService.searchOrgDetailModel(conditionMap);
-        Integer totalCount = orgManagerService.searchCount(conditionMap);
+        List<MOrganization> organizationList = orgManagerService.searchOrgDetailModel(apiVersion,conditionMap);
+        Integer totalCount = orgManagerService.searchCount(apiVersion,conditionMap);
         Map<String,Object> map = new HashMap<>();
         map.put("organizationList",organizationList);
         map.put("totalCount",totalCount);
@@ -102,7 +102,7 @@ public class OrganizationController extends BaseRestController {
      * @param orgCode
      * @return
      */
-    @RequestMapping(value = "org", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/", method = RequestMethod.DELETE)
     public Object deleteOrg(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -118,7 +118,7 @@ public class OrganizationController extends BaseRestController {
      * @param orgCode
      * @return
      */
-    @RequestMapping(value = "activity" , method = RequestMethod.PUT)
+    @RequestMapping(value = "/activity" , method = RequestMethod.PUT)
     public Object activity(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -144,7 +144,7 @@ public class OrganizationController extends BaseRestController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/org" , method = RequestMethod.PUT)
+    @RequestMapping(value = "/" , method = RequestMethod.PUT)
     public Object updateOrg(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -180,7 +180,7 @@ public class OrganizationController extends BaseRestController {
                 location.setProvince(orgModel.getProvince());
                 location.setTown(orgModel.getTown());
                 location.setStreet(orgModel.getStreet());
-                orgManagerService.saveAddress(location);
+                orgManagerService.saveAddress(apiVersion,location);
 
                 org.setAdmin(orgModel.getAdmin());
                 org.setTel(orgModel.getTel());
@@ -218,7 +218,7 @@ public class OrganizationController extends BaseRestController {
                 location.setCity(orgModel.getCity());
                 location.setDistrict(orgModel.getDistrict());
                 location.setTown(orgModel.getTown());
-                orgManagerService.saveAddress(location);
+                orgManagerService.saveAddress(apiVersion,location);
                 orgManagerService.update(org);
 
                 result.setSuccessFlg(true);
@@ -234,7 +234,7 @@ public class OrganizationController extends BaseRestController {
     }
 
 
-    @RequestMapping(value = "/org", method = RequestMethod.GET)
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     public Object getOrgByCode(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -249,7 +249,7 @@ public class OrganizationController extends BaseRestController {
      * @param orgCode
      * @return
      */
-    //@ApiOperation(value = "根据地址代码获取机构详细信息")
+    @ApiOperation(value = "根据地址代码获取model")
     @RequestMapping(value = "/org_model", method = RequestMethod.GET)
     public Object getOrgModel(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -259,7 +259,7 @@ public class OrganizationController extends BaseRestController {
         OrgModel orgModel = new OrgModel();
         Organization org = orgManagerService.getOrg(orgCode);
         if(org!=null){
-            orgModel = orgManagerService.getOrgModel(org);
+            orgModel = orgManagerService.getOrgModel(apiVersion,org);
         }
         return orgModel;
     }
@@ -270,7 +270,7 @@ public class OrganizationController extends BaseRestController {
      * @return
      */
     @ApiOperation(value = "根据地名称取机构ids")
-    @RequestMapping(value = "/org/name", method = RequestMethod.GET)
+    @RequestMapping(value = "/name", method = RequestMethod.GET)
     public Object getIdsByName(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -289,7 +289,7 @@ public class OrganizationController extends BaseRestController {
      * @param city
      * @return
      */
-    @RequestMapping(value = "/orgs/search" , method = RequestMethod.GET)
+    @RequestMapping(value = "/search" , method = RequestMethod.GET)
     public Object getOrgsByAddress(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -298,7 +298,7 @@ public class OrganizationController extends BaseRestController {
             @ApiParam(name = "city", value = "市")
             @RequestParam(value = "city") String city) {
 
-        List<Organization> orgList = orgManagerService.searchByAddress(province,city);
+        List<Organization> orgList = orgManagerService.searchByAddress(apiVersion,province,city);
         Map<String, String> orgMap = new HashMap<>();
         for (Organization org : orgList) {
             orgMap.put(org.getOrgCode(), org.getFullName());
@@ -343,9 +343,9 @@ public class OrganizationController extends BaseRestController {
             @RequestParam(value = "orgCode") String orgCode){
         Organization org = orgManagerService.getOrg(orgCode);
         if(org == null){
-            return "success";
+            return true;
         }else{
-            return "fail";
+            return false;
         }
 
     }
