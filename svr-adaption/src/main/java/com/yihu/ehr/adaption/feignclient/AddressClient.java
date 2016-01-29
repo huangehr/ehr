@@ -19,12 +19,14 @@ import java.util.List;
  */
 @EnableFeignClients
 @FeignClient("svr-address")
-@RequestMapping("/rest/v1.0/address")
+@RequestMapping("/rest")
 public interface AddressClient {
 
-    @RequestMapping(value = "/saveAddress", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{api_version}/address/address", method = RequestMethod.PUT)
     @ApiOperation(value = "地址检查并保存")
-    public Result saveAddress(
+    public Object saveAddress(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "country", value = "国家" , defaultValue = "")
             @RequestParam(value = "country") String country,
             @ApiParam(name = "province", value = "省" , defaultValue = "")

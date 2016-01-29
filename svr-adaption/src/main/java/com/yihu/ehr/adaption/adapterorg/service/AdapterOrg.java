@@ -92,11 +92,11 @@ public class AdapterOrg {
     }
 
     @Transient
-    public MAddress getmAddress() {
+    public MAddress getMAddress() {
         return mAddress;
     }
 
-    public void setmAddress(MAddress mAddress) {
+    public void setMAddress(MAddress mAddress) {
         this.mAddress = mAddress;
     }
     @Transient
