@@ -1,4 +1,6 @@
-package com.yihu.ehr.util.ParmUtils;
+package com.yihu.ehr.util.parm;
+
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +13,7 @@ public class FieldCondition {
     private String logic;// =, sw, ew, like, >, <
     private List<Object> val;
     private String group;
-
+    private String tableCol;
     public FieldCondition() {
 
     }
@@ -33,20 +35,24 @@ public class FieldCondition {
         this.group = group;
     }
 
-    public String format(String tableName){
+    public String format(String modelName, boolean isSql){
         if(getCol()==null || getCol().equals(""))
             return "";
         String val = ":" + getCol();
         if(getLogic().equals("in"))
             val = "("+val+") ";
-        String rs = getCol() + " " + getLogic() + " " + val;
-        if(tableName.trim().equals(""))
+        String rs = (isSql ? getTableCol() : getCol()) + " " + getLogic() + " " + val;
+        if(modelName.trim().equals(""))
             return " " + rs;
-        return " " +tableName + "." + rs;
+        return " " +modelName + "." + rs;
     }
 
     public String format(){
-        return format("");
+        return format("", false);
+    }
+
+    public String formatSql(){
+        return format("", true);
     }
 
     public String getCol() {
@@ -107,4 +113,15 @@ public class FieldCondition {
         }
     }
 
+    public String getTableCol() {
+        return tableCol;
+    }
+
+    public void setTableCol(String tableCol) {
+        this.tableCol = tableCol;
+    }
+
+    public boolean isValid() {
+        return !StringUtils.isEmpty(getTableCol());
+    }
 }
