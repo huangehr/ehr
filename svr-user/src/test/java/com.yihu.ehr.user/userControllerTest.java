@@ -20,7 +20,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = UserServiceApp.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class UserControllerTest {
+public class userControllerTest {
 
     String apiVersion = "v1.0";
     ApplicationContext applicationContext;

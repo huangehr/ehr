@@ -127,7 +127,7 @@ public class AppManager  {
         String catalog = (String) args.get("catalog");
         String status = (String) args.get("status");
         Integer page =  Integer.parseInt(args.get("page").toString());
-        Integer pageSize = Integer.parseInt((String)args.get("rows"));
+        Integer pageSize = Integer.parseInt(args.get("rows").toString());
         //动态SQL文拼接
         StringBuilder sb = new StringBuilder();
 

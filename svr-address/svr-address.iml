@@ -192,5 +192,7 @@
     <orderEntry type="library" name="Maven: com.netflix.feign:feign-slf4j:8.12.1" level="project" />
     <orderEntry type="library" name="Maven: com.netflix.feign:feign-hystrix:8.12.1" level="project" />
     <orderEntry type="module" module-name="ehr-commons-rest-model" />
+    <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-mapper-asl:1.9.13" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-core-asl:1.9.13" level="project" />
   </component>
 </module>
