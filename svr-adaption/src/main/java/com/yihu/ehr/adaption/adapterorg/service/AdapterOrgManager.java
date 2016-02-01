@@ -3,7 +3,6 @@ package com.yihu.ehr.adaption.adapterorg.service;
 import com.yihu.ehr.adaption.commons.BaseManager;
 import com.yihu.ehr.adaption.feignclient.AddressClient;
 import com.yihu.ehr.model.address.MAddress;
-import com.yihu.ehr.util.parm.FieldCondition;
 import com.yihu.ehr.util.parm.PageModel;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -13,22 +12,14 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 
-/** 适配机构
- * Created by zqb on 2015/11/19.
+/**
+ * 适配机构
+ * Created by lincl on 2016.1.29
  */
 @Transactional
 @Service
-public class AdapterOrgManager extends BaseManager {
-//    @Resource(name = Services.OrgDataSetManager)
-//    XOrgDataSetManager orgDataSetManager;
-//    @Resource(name = Services.OrgMetaDataManager)
-//    XOrgMetaDataManager orgMetaDataManager;
-//    @Resource(name = Services.OrgDictManager)
-//    XOrgDictManager orgDictManager;
-//    @Resource(name = Services.OrgDictItemManager)
-//    XOrgDictItemManager orgDictItemManager;
+public class AdapterOrgManager extends BaseManager<AdapterOrg, XAdapterOrgRepository> {
 
     @Autowired
     AddressClient addressClient;
@@ -40,10 +31,10 @@ public class AdapterOrgManager extends BaseManager {
         Session session = currentSession();
         String hql = "select org from AdapterOrg org  ";
         String wh = pageModel.format();
-        hql += wh.equals("")? "" : wh;
+        hql += wh.equals("") ? "" : wh;
         Query query = setQueryVal(session.createQuery(hql), pageModel);
         int page = pageModel.getPage();
-        if (page>0){
+        if (page > 0) {
             query.setMaxResults(pageModel.getRows());
             query.setFirstResult((page - 1) * pageModel.getRows());
         }
@@ -54,20 +45,9 @@ public class AdapterOrgManager extends BaseManager {
         Session session = currentSession();
         String hql = "select count(*) from AdapterOrg ";
         String wh = pageModel.format();
-        hql += wh.equals("")? "" : wh;
+        hql += wh.equals("") ? "" : wh;
         Query query = setQueryVal(session.createQuery(hql), pageModel);
-        return ((Long)query.list().get(0)).intValue();
-    }
-
-    private Query setQueryVal(Query query, PageModel pageModel){
-        Map<String, FieldCondition> filters = pageModel.getFilters();
-        for(String k: filters.keySet()){
-            if(filters.get(k).getLogic().equals("in"))
-                query.setParameterList(k, (Object[])filters.get(k).formatVal());
-            else
-                query.setParameter(k, filters.get(k).formatVal());
-        }
-        return query;
+        return ((Long) query.list().get(0)).intValue();
     }
 
     public AdapterOrg getAdapterOrg(String code) {
@@ -78,7 +58,7 @@ public class AdapterOrgManager extends BaseManager {
     public boolean addAdapterOrg(AdapterOrg adapterOrg, String apiVersion) {
         //地址检查并保存
         MAddress address = adapterOrg.getMAddress();
-        if (address!=null){
+        if (address != null) {
             address.setCity("TEST");
             address.setProvince("TEST");
             address.setDistrict("TEST");
@@ -92,8 +72,8 @@ public class AdapterOrgManager extends BaseManager {
         }
         saveAdapterOrg(adapterOrg);
         //拷贝采集标准
-        String parent=adapterOrg.getParent();
-        if (parent!=null && !parent.equals("")){
+        String parent = adapterOrg.getParent();
+        if (parent != null && !parent.equals("")) {
             copy(adapterOrg.getCode(), parent);
         }
         return true;
@@ -113,18 +93,19 @@ public class AdapterOrgManager extends BaseManager {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void deleteAdapterOrg(String[] codes) {
-        for(String code:codes){
+        for (String code : codes) {
             deleteAdapterOrg(code);
         }
     }
 
     /**
      * 删除机构下的采集标准数据
+     *
      * @param code
      */
-    @Transactional(propagation= Propagation.REQUIRED)
-    public void deleteData(String code){
-        Query query=null;
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void deleteData(String code) {
+        Query query = null;
         //数据集
         Session session = currentSession();
         query = session.createQuery("delete from OrgDataSet where organization = :code");
@@ -147,18 +128,20 @@ public class AdapterOrgManager extends BaseManager {
 //    public boolean isExistData(String org){
 //        return orgDataSetManager.getMaxSeq(org)+orgMetaDataManager.getMaxSeq(org)+ orgDictManager.getMaxSeq(org)+orgDictItemManager.getMaxSeq(org)>0;
 //    }
+
     /**
      * 拷贝
      * 2015-12-31  速度优化以及添加事务控制
+     *
      * @param code
      * @param parent
      * @return
      */
-    @Transactional(propagation= Propagation.REQUIRED)
-    public boolean copy(String code,String parent){
+    @Transactional(propagation = Propagation.REQUIRED)
+    public boolean copy(String code, String parent) {
         Session session = currentSession();
         String hql;
-        Query query=null;
+        Query query = null;
 
         //数据集拷贝
         String sql = "insert into org_std_dataset(code,name,create_date,update_date,create_user,update_user,description,organization,sequence)  " +

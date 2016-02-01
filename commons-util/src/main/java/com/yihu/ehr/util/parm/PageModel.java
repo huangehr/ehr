@@ -16,6 +16,7 @@ public class PageModel {
     private Map<String, FieldCondition> filters;
     private String[] result;
     private Class modelClass;
+
     public PageModel() {
 
     }
@@ -26,53 +27,53 @@ public class PageModel {
     }
 
     public String format(String modelName, boolean isSql) {
-        if(modelClass==null){
+        if (modelClass == null) {
             System.err.print("NullPoint: modelClass");
             return "";
         }
         Map<String, FieldCondition> filters = getFilters();
-        if(filters.size()==0)
+        if (filters.size() == 0)
             return "";
         Map<String, String> whMap = new HashMap<>();
         FieldCondition fieldCondition;
         String wh = "";
-        for(String k: filters.keySet()){
+        for (String k : filters.keySet()) {
             fieldCondition = filters.get(k);
-            if(!fieldCondition.isValid())
+            if (!fieldCondition.isValid())
                 continue;
-            if(fieldCondition.isGroup()){
+            if (fieldCondition.isGroup()) {
                 String str = whMap.get(fieldCondition.getGroup());
-                if(str==null)
-                    str = "("+fieldCondition.format(modelName, isSql);
+                if (str == null)
+                    str = "(" + fieldCondition.format(modelName, isSql);
                 else
                     str += " or " + fieldCondition.format(modelName, isSql);
                 whMap.put(fieldCondition.getGroup(), str);
-            }
-            else {
-                if(wh.equals(""))
+            } else {
+                if (wh.equals(""))
                     wh = fieldCondition.format(modelName, isSql);
                 else
-                    wh += " and "+ fieldCondition.format(modelName, isSql);
+                    wh += " and " + fieldCondition.format(modelName, isSql);
             }
         }
-        for (String k : whMap.keySet()){
+        for (String k : whMap.keySet()) {
             wh += " and " + whMap.get(k) + ") ";
         }
         return wh;
     }
 
-    private String getTableCol(String field){
+    private String getTableCol(String field) {
         try {
             Method method = modelClass.getMethod("get" + firstLetterToUpper(field));
             Column column = method.getDeclaredAnnotation(Column.class);
-            if (column!=null){
+            if (column != null) {
                 return column.name();
             }
             return null;
-        }catch (Exception e){
+        } catch (Exception e) {
             return null;
         }
     }
+
     public String formatSqlOrder(String modelName) {
         return formatOrder(modelName, true);
     }
@@ -85,62 +86,65 @@ public class PageModel {
         return formatOrder("", false);
     }
 
-    public String formatOrder(String modelName, boolean isSql){
-        if(modelClass==null){
+    public String formatOrder(String modelName, boolean isSql) {
+        if (modelClass == null) {
             System.err.print("NullPoint: modelClass");
             return "";
         }
-        if(order==null || order.length==0)
+        if (order == null || order.length == 0)
             return "";
         List<String> ls = new ArrayList<>();
         String tmp = "";
-        if(isSql){
-            for(String item : order){
+        if (isSql) {
+            for (String item : order) {
                 tmp = getTableCol(item);
-                if(!StringUtils.isEmpty(tmp))
+                if (!StringUtils.isEmpty(tmp))
                     ls.add(tmp);
             }
-        }
-        else
-            for(String item : order){
+        } else
+            for (String item : order) {
                 tmp = getTableCol(item);
-                if(!StringUtils.isEmpty(tmp))
+                if (!StringUtils.isEmpty(tmp))
                     ls.add(item);
             }
-        return arrayJoin(ls, StringUtils.isEmpty(modelName)? "," : ","+modelName+".", 1);
+        return arrayJoin(ls, StringUtils.isEmpty(modelName) ? "," : "," + modelName + ".", 1);
     }
 
-    public String arrayJoin(Collection<String> ls, String joinStr, int offer){
-        if(ls==null || ls.size()==0)
+    public String arrayJoin(Collection<String> ls, String joinStr, int offer) {
+        if (ls == null || ls.size() == 0)
             return "";
         String tmp = "";
-        for (String str : ls){
+        for (String str : ls) {
             tmp += joinStr + str;
         }
         return tmp.substring(offer);
     }
 
-    public String formatWithOrder(String modelName){
-        return  format(modelName, false) + " order by " + formatOrder(modelName, false);
+    public String formatWithOrder(String modelName) {
+        return format(modelName, false) + " order by " + formatOrder(modelName, false);
     }
-    public String formatSqlWithOrder(String modelName){
-        return  formatSql(modelName) + " order by " + formatSqlOrder(modelName);
+
+    public String formatSqlWithOrder(String modelName) {
+        return formatSql(modelName) + " order by " + formatSqlOrder(modelName);
     }
-    public String format(){
+
+    public String format() {
         return format("", false);
     }
-    public String formatSql(String modelName){
+
+    public String formatSql(String modelName) {
         return format(modelName, true);
     }
-    public String formatSql(){
+
+    public String formatSql() {
         return formatSql("");
     }
 
-    public Object getFieldVal(String field){
+    public Object getFieldVal(String field) {
         return filters.get(field).getVal();
     }
 
-    public void setFieldVal(String field, List val){
+    public void setFieldVal(String field, List val) {
         filters.get(field).setVal(val);
     }
 
@@ -161,15 +165,15 @@ public class PageModel {
     }
 
     public Map<String, FieldCondition> getFilters() {
-        return filters==null? new HashMap<>() : filters;
+        return filters == null ? new HashMap<>() : filters;
     }
 
     public void setFilters(Map<String, FieldCondition> filters) {
         this.filters = filters;
     }
 
-    public void addFieldCondition(FieldCondition fieldCondition){
-        if(filters==null)
+    public void addFieldCondition(FieldCondition fieldCondition) {
+        if (filters == null)
             filters = new HashMap<>();
         filters.put(fieldCondition.getCol(), fieldCondition);
     }
@@ -197,7 +201,7 @@ public class PageModel {
     public void setModelClass(Class modelClass) {
         this.modelClass = modelClass;
         Map<String, FieldCondition> map = getFilters();
-        for(String key : map.keySet()){
+        for (String key : map.keySet()) {
             map.get(key).setTableCol(getTableCol(key));
         }
 //        List<String> result = new ArrayList<>();
@@ -218,14 +222,14 @@ public class PageModel {
 //        setOrder((String[]) result.toArray());
     }
 
-    public static String firstLetterToUpper(String str){
-        if(str==null || "".equals(str.trim())){
+    public static String firstLetterToUpper(String str) {
+        if (str == null || "".equals(str.trim())) {
             return "";
         }
-        return str.replaceFirst((""+str.charAt(0)), (""+str.charAt(0)).toUpperCase());
+        return str.replaceFirst(("" + str.charAt(0)), ("" + str.charAt(0)).toUpperCase());
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
 
     }
 
