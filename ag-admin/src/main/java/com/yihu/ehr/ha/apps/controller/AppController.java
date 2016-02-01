@@ -26,7 +26,7 @@ public class AppController extends BaseRestController {
      * @param rows    数量
      * @return APP列表
      */
-    @RequestMapping(value = "apps", method = RequestMethod.GET)
+    @RequestMapping(value = "search", method = RequestMethod.GET)
     public Object getAppList(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                              @PathVariable(value = "api_version") String apiVersion,
                              @ApiParam(name = "appId", value = "appId", defaultValue = "")
@@ -53,7 +53,7 @@ public class AppController extends BaseRestController {
      * @param appId APPId
      * @return 操作结果
      */
-    @RequestMapping(value = "/app", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/", method = RequestMethod.DELETE)
     public Object deleteApp(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                             @PathVariable(value = "api_version") String apiVersion,
                             @ApiParam(name = "appId", value = "appid", defaultValue = "")
@@ -67,7 +67,7 @@ public class AppController extends BaseRestController {
      * @param appId APPId
      * @return APP明细
      */
-    @RequestMapping(value = "/app", method = RequestMethod.GET)
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     public Object getAppDetail(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                                @PathVariable(value = "api_version") String apiVersion,
                                @ApiParam(name = "appId", value = "appid", defaultValue = "")
@@ -86,7 +86,7 @@ public class AppController extends BaseRestController {
      * @param userId      用户ID
      * @return 操作结果
      */
-    @RequestMapping(value = "/createApp", method = RequestMethod.POST)
+    @RequestMapping(value = "/", method = RequestMethod.POST)
     public Object createApp(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                             @PathVariable(value = "api_version") String apiVersion,
                             @ApiParam(name = "name", value = "名称", defaultValue = "")
@@ -119,7 +119,7 @@ public class AppController extends BaseRestController {
      * @param tags        标记
      * @return 操作结果
      */
-    @RequestMapping(value = "/app", method = RequestMethod.PUT)
+    @RequestMapping(value = "/", method = RequestMethod.PUT)
     public Object updateApp(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                             @PathVariable(value = "api_version") String apiVersion,
                             @ApiParam(name = "appId", value = "名id", defaultValue = "")
@@ -146,7 +146,7 @@ public class AppController extends BaseRestController {
      * @param status 状态
      * @return 操作结果
      */
-    @RequestMapping(value = "/status", method = RequestMethod.POST)
+    @RequestMapping(value = "/check", method = RequestMethod.PUT)
     public Object checkStatus(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                         @PathVariable(value = "api_version") String apiVersion,
                         @ApiParam(name = "appId", value = "名id", defaultValue = "")
