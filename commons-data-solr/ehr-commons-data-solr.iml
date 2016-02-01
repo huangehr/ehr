@@ -9,10 +9,10 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="ehr-commons-util" />
+    <orderEntry type="library" name="Maven: com.yihu.ehr:ehr-commons-util:1.1.0" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-log4j2:1.3.1.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:jul-to-slf4j:1.7.13" level="project" />
-    <orderEntry type="module" module-name="commons-ehr-constants" />
+    <orderEntry type="library" name="Maven: com.yihu.ehr:ehr-commons-constants:1.1.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.solr:solr-solrj:5.4.0" level="project" />
     <orderEntry type="library" name="Maven: commons-io:commons-io:2.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.1" level="project" />

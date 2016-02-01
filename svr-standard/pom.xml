@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yihu.ehr</groupId>
-        <artifactId>ehr-commons-dependencies</artifactId>
+        <artifactId>commons-dependencies</artifactId>
         <version>1.1.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-	<artifactId>ehr-standard-svr</artifactId>
+	<artifactId>svr-standard</artifactId>
 	<packaging>jar</packaging>
 	<name>svr-standard</name>
 	<description>EHR platform standard service</description>
@@ -88,12 +88,12 @@
 		</dependency>
 		<dependency>
 			<groupId>com.yihu.ehr</groupId>
-			<artifactId>ehr-commons-util</artifactId>
+			<artifactId>commons-util</artifactId>
 			<version>1.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.yihu.ehr</groupId>
-			<artifactId>ehr-commons-data-mysql</artifactId>
+			<artifactId>commons-data-mysql</artifactId>
 			<version>1.1.0</version>
 		</dependency>
 		<dependency>
@@ -102,7 +102,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.yihu.ehr</groupId>
-			<artifactId>ehr-commons-rest-model</artifactId>
+			<artifactId>commons-rest-model</artifactId>
 			<version>1.1.0</version>
 		</dependency>
 	</dependencies>

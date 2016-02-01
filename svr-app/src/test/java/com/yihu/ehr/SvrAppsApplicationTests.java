@@ -46,6 +46,8 @@ public class SvrAppsApplicationTests {
 
 	@Test
 	public void btestGetAppList() throws Exception{
+		applicationContext = new SpringApplicationBuilder()
+				.web(false).sources(SvrAppApplication.class).run();
 		String appId = "";
 		String appName = "";
 		String catalog = "";
@@ -81,7 +83,7 @@ public class SvrAppsApplicationTests {
 	public void etestCheck() throws Exception {
 		String appId = "yYkKALLwUO";
 		String status = "Approved";
-		Object result = appController.checkStatus(apiVersion,appId,status);
+		Object result = appController.check(apiVersion,appId,status);
 		assertTrue("faild" , "success".equals(result));
 	}
 

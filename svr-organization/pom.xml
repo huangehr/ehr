@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yihu.ehr</groupId>
-        <artifactId>ehr-commons-dependencies</artifactId>
+        <artifactId>commons-dependencies</artifactId>
         <version>1.1.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
@@ -70,47 +70,24 @@
 			<artifactId>spring-data-jpa</artifactId>
 			<version>1.9.1.RELEASE</version>
 		</dependency>
-
-		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-swagger2</artifactId>
-			<version>2.1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-swagger-ui</artifactId>
-			<version>2.1.2</version>
-		</dependency>
 		<dependency>
 			<groupId>com.yihu.ehr</groupId>
-			<artifactId>ehr-commons-util</artifactId>
+			<artifactId>commons-util</artifactId>
 			<version>1.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.yihu.ehr</groupId>
-			<artifactId>ehr-commons-data-mysql</artifactId>
+			<artifactId>commons-data-mysql</artifactId>
 			<version>1.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-feign</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>com.yihu.ehr</groupId>
-			<artifactId>ehr-commons-rest-model</artifactId>
+			<artifactId>commons-rest-model</artifactId>
 			<version>1.1.0</version>
 		</dependency>
-		<!--<dependency>-->
-			<!--<groupId>org.apache.htrace</groupId>-->
-			<!--<artifactId>htrace-core</artifactId>-->
-			<!--<version>3.1.0-incubating</version>-->
-		<!--</dependency>-->
-		<!--<dependency>-->
-			<!--<groupId>org.codehaus.jackson</groupId>-->
-			<!--<artifactId>jackson-mapper-asl</artifactId>-->
-			<!--<version>1.9.13</version>-->
-		<!--</dependency>-->
-
 	</dependencies>
 </project>

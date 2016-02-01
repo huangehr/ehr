@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableDiscoveryClient
 @RestController
 @EnableFeignClients
-public class SvrPaientApplication {
+public class SvrPatientApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SvrPaientApplication.class, args);
+		SpringApplication.run(SvrPatientApplication.class, args);
 	}
 }

@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yihu.ehr</groupId>
-        <artifactId>ehr-commons-dependencies</artifactId>
+        <artifactId>commons-dependencies</artifactId>
         <version>1.1.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <artifactId>ehr-commons-dependencies-docker</artifactId>
+    <artifactId>commons-dependencies-docker</artifactId>
     <name>commons-dependencies-docker</name>
     <packaging>pom</packaging>
     <description>EHR platform docker deploy dependencies</description>
@@ -20,54 +20,72 @@
         <docker.expose.port></docker.expose.port>
     </properties>
 
+    <!-- general Maven resources>
+    <resources>
+        <resource>
+            <directory>${project.basedir}</directory>
+            <filtering>true</filtering>
+            <includes>
+                <include>**/Dockerfile</include>
+            </includes>
+        </resource>
+    </resources-->
+
     <build>
-        <plugins>
-            <!--spring 插件-->
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
+        <pluginManagement>
+            <plugins>
+                <!--spring 插件-->
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                </plugin>
 
-            <!--docker 插件-->
-            <plugin>
-                <groupId>com.spotify</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <version>0.3.8</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>build</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <dockerDirectory>${project.build.sourceDirectory}/docker</dockerDirectory>
-                    <dockerHost>${docker.host}</dockerHost>
-                    <imageName>${project.artifactId}:${project.version}</imageName>
-                    <resources>
-                        <resource>
-                            <targetPath>/</targetPath>
-                            <directory>${project.build.directory}</directory>
-                            <include>${project.build.finalName}.jar</include>
-                        </resource>
-                    </resources>
-                </configuration>
-            </plugin>
+                <!--docker 插件-->
+                <plugin>
+                    <groupId>com.spotify</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>0.3.8</version>
+                    <executions>
+                        <execution>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>build</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <dockerHost>${docker.host}</dockerHost>
 
-            <!--markdown site 插件-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
-                <version>3.3</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.maven.doxia</groupId>
-                        <artifactId>doxia-module-markdown</artifactId>
-                        <version>1.5</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-        </plugins>
+                        <dockerDirectory>${project.build.sourceDirectory}/docker</dockerDirectory>
+
+                        <imageName>${project.artifactId}:${project.version}</imageName>
+
+                        <resources>
+                            <resource>
+                                <targePath>/</targePath>
+                                <directory>${project.build.directory}</directory>
+                                <include>${project.build.finalName}.jar</include>
+                            </resource>
+                        </resources>
+
+                        <pushImage>false</pushImage>
+                    </configuration>
+                </plugin>
+
+                <!--markdown site 插件-->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>3.3</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.maven.doxia</groupId>
+                            <artifactId>doxia-module-markdown</artifactId>
+                            <version>1.5</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 </project>

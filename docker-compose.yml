@@ -1,5 +1,5 @@
 containers:
-  ehr-address-svr:
+  svr-address:
     build: ./svr-address/src/main/docker
 
   ehr-app-svr:

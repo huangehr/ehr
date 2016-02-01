@@ -3,7 +3,7 @@ spring:
     active: dev
 
 server:
-  port: 87610
+  port: 8761
 
 info:
   app:
