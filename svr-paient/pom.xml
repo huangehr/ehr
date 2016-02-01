@@ -4,17 +4,15 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.yihu.ehr</groupId>
-		<artifactId>ehr-commons-dependencies</artifactId>
+		<artifactId>commons-dependencies</artifactId>
 		<version>1.1.0</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
-	<groupId>com.yihu.ehr</groupId>
-	<artifactId>svr-paient</artifactId>
-	<version>1.1.0</version>
+	<artifactId>svr-patient</artifactId>
 	<packaging>jar</packaging>
-	<name>svr-paient</name>
-	<description>EHR platform paient service</description>
+	<name>svr-patient</name>
+	<description>EHR platform patient service</description>
 
 	<properties>
 	</properties>
@@ -78,12 +76,12 @@
 		</dependency>
 		<dependency>
 			<groupId>com.yihu.ehr</groupId>
-			<artifactId>ehr-commons-util</artifactId>
+			<artifactId>commons-util</artifactId>
 			<version>1.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.yihu.ehr</groupId>
-			<artifactId>ehr-commons-data-mysql</artifactId>
+			<artifactId>commons-data-mysql</artifactId>
 			<version>1.1.0</version>
 		</dependency>
 		<dependency>
@@ -92,7 +90,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.yihu.ehr</groupId>
-			<artifactId>ehr-commons-rest-model</artifactId>
+			<artifactId>commons-rest-model</artifactId>
 			<version>1.1.0</version>
 		</dependency>
 		<dependency>

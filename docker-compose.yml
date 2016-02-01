@@ -1,0 +1,29 @@
+containers:
+  svr-address:
+    build: ./svr-address/src/main/docker
+
+  ehr-app-svr:
+
+  ehr-archive-svr:
+
+  ehr-config-svr:
+
+  ehr-dict-svr:
+
+  ehr-discovery-svr:
+
+  ehr-organization-svr:
+
+  ehr-pack-mgr-svr:
+
+  ehr-pack-resolve-svr:
+
+  ehr-resources-svr:
+
+  ehr-security-svr:
+
+  ehr-sso-svr:
+
+  ehr-standard-svr:
+
+  ehr-user-svr:

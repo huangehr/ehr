@@ -4,16 +4,13 @@
 	<modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yihu.ehr</groupId>
-        <artifactId>ehr-commons-dependencies</artifactId>
+        <artifactId>commons-dependencies</artifactId>
         <version>1.1.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-	<groupId>com.yihu.ehr</groupId>
-	<artifactId>resources-svr</artifactId>
-	<version>1.1.0</version>
+	<artifactId>svr-resources</artifactId>
 	<packaging>jar</packaging>
-
 	<name>svr-resources</name>
 	<description>EHR platform resources service</description>
 
@@ -32,10 +29,6 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-config</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-cloud-connectors</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -64,37 +57,37 @@
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
-            <artifactId>ehr-commons-constants</artifactId>
+            <artifactId>commons-constants</artifactId>
             <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
-            <artifactId>ehr-commons-util</artifactId>
+            <artifactId>commons-util</artifactId>
             <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
-            <artifactId>ehr-commons-thrift-services</artifactId>
+            <artifactId>commons-thrift-services</artifactId>
             <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
-            <artifactId>ehr-commons-thrift-client</artifactId>
+            <artifactId>commons-thrift-client</artifactId>
             <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
-            <artifactId>ehr-commons-thrift-server</artifactId>
+            <artifactId>commons-thrift-server</artifactId>
             <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
-            <artifactId>ehr-commons-data-redis</artifactId>
+            <artifactId>commons-data-redis</artifactId>
             <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
-            <artifactId>ehr-commons-data-mysql</artifactId>
+            <artifactId>commons-data-mysql</artifactId>
             <version>1.1.0</version>
         </dependency>
     </dependencies>

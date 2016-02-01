@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
-import org.apache.solr.client.solrj.SolrServerException;
 
 import java.io.IOException;
 import java.util.List;
@@ -58,10 +57,6 @@ public interface XHBaseClient {
 
     public String getValue(String tableName, String rowKey, String familyName, String columnName) throws IOException;
 
-    public List<ObjectNode> find(String tableName, String queryString);
-
-    public List<ObjectNode> find(String tableName, String queryString, List<String> fields, Map<String, String> sort, int pageSize, int page);
-
     public ResultWrapper getResultAsWrapper(String tableName, String rowKey) throws IOException;
 
     //
@@ -69,10 +64,4 @@ public interface XHBaseClient {
 
     // Scanner
     public ResultScanner getScanner(String tableName, Scan scan);
-
-    // Key查询
-    public List<String> findRowKey(String tableName, String queryString, Map<String, String> sort, int pageSize, int page) throws IOException;
-
-    //
-    public void clearSolrData(List<String> tables) throws IOException, SolrServerException;
 }

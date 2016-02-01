@@ -3,44 +3,16 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.yihu.ehr</groupId>
+    <parent>
+        <groupId>com.yihu.ehr</groupId>
+        <artifactId>commons-dependencies</artifactId>
+        <version>1.1.0</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
     <artifactId>docs-micro-services</artifactId>
-    <version>1.1.0</version>
     <name>docs-micro-services</name>
-
-    <organization>
-        <name>福建健康之路信息技术有限公司</name>
-        <url>http://www.yihu.com</url>
-    </organization>
-
     <description>健康档案微服务平台。此模块介绍与微服务相关的技术与业务逻辑。</description>
-
-    <repositories>
-        <repository>
-            <id>nexus</id>
-            <name>local private nexus</name>
-            <url>http://maven.oschina.net/content/groups/public/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>nexus</id>
-            <name>local private nexus</name>
-            <url>http://maven.oschina.net/content/groups/public/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
 
     <build>
         <plugins>

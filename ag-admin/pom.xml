@@ -1,25 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>com.yihu.ehr</groupId>
-		<artifactId>ehr-commons-dependencies</artifactId>
-		<version>1.1.0</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
+    <parent>
+        <groupId>com.yihu.ehr</groupId>
+        <artifactId>commons-dependencies</artifactId>
+        <version>1.1.0</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
 
-	<groupId>com.yihu.ehr</groupId>
 	<artifactId>ag-admin</artifactId>
-	<version>1.1.0</version>
 	<packaging>jar</packaging>
-
 	<name>ag-admin</name>
-	<description>总支撑平台网关，提供总支撑平台与数据交互接口</description>
+	<description>Demo project for Spring Boot</description>
 
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>1.8</java.version>
 	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -71,7 +69,7 @@
 		</dependency>
 		<!--<dependency>-->
 			<!--<groupId>com.yihu.ehr</groupId>-->
-			<!--<artifactId>ehr-commons-thrift-client</artifactId>-->
+			<!--<artifactId>commons-thrift-client</artifactId>-->
 			<!--<version>1.1.0</version>-->
 		<!--</dependency>-->
 		<dependency>
@@ -81,17 +79,17 @@
 		</dependency>
 		<dependency>
 			<groupId>com.yihu.ehr</groupId>
-			<artifactId>ehr-commons-util</artifactId>
+			<artifactId>commons-util</artifactId>
 			<version>1.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.yihu.ehr</groupId>
-			<artifactId>ehr-commons-rest-model</artifactId>
+			<artifactId>commons-rest-model</artifactId>
 			<version>1.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.yihu.ehr</groupId>
-			<artifactId>ehr-commons-ui-swagger</artifactId>
+			<artifactId>commons-ui-swagger</artifactId>
 			<version>1.1.0</version>
 		</dependency>
 

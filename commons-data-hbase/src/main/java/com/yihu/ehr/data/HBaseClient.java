@@ -3,16 +3,11 @@ package com.yihu.ehr.data;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.lang.SpringContext;
-import com.yihu.ehr.util.log.LogService;
-import org.apache.hadoop.hbase.*;
+import org.apache.hadoop.hbase.HColumnDescriptor;
+import org.apache.hadoop.hbase.HTableDescriptor;
+import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CloudSolrClient;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -35,9 +30,6 @@ import java.util.Map;
 public class HBaseClient implements XHBaseClient {
     @Autowired
     HbaseTemplate hbaseTemplate;
-
-    @Autowired
-    SolrClientFactory solrClientFactory;
 
     String batchTableName;
     boolean synchronizeMode;
@@ -334,86 +326,6 @@ public class HBaseClient implements XHBaseClient {
     }
 
     @Override
-    public List<ObjectNode> find(String tableName, String queryString) {
-        return find(tableName, queryString, null, null, 100, 1);
-    }
-
-    @Override
-    public List<ObjectNode> find(String tableName, String queryString, List<String> fields, Map<String, String> sort, int countPerPage, int pageCount) {
-        return hbaseTemplate.execute(tableName, new TableCallback<List<ObjectNode>>() {
-            @Override
-            public List<ObjectNode> doInTable(HTableInterface table) throws Throwable {
-                List<Get> list = new ArrayList<>();
-                List<ObjectNode> data = new ArrayList<>();
-
-                SolrQuery query = new SolrQuery();
-                query.setQuery(queryString);
-
-                int start = 0;
-                int pageSize = countPerPage < 0 ? 1 : (countPerPage > 100 ? 100 : countPerPage);
-
-                int page = pageCount < 0 ? 1 : pageCount;
-                start = (page - 1) * pageSize;
-
-                query.setStart(start);
-                query.setRows(pageSize);
-
-                //设置排序条件
-                if (sort != null) {
-                    for (String field : sort.keySet()) {
-                        SolrQuery.ORDER order = SolrQuery.ORDER.asc;
-                        if (sort.get(field) != null && sort.get(field).trim().toLowerCase().equals("desc")) {
-                            order = SolrQuery.ORDER.desc;
-                        }
-                        query.addSort(field, order);
-                    }
-                }
-
-                QueryResponse rsp;
-                CloudSolrClient cloudSolrClient = null;
-                try {
-                    cloudSolrClient = solrClientFactory.getCloudSolrClient(tableName);
-                    rsp = cloudSolrClient.query(query);
-                    SolrDocumentList rs = rsp.getResults();
-
-                    // 获取文档的rowKey列表
-                    for (SolrDocument doc : rs) {
-                        Get get = new Get(Bytes.toBytes(String.valueOf(doc.getFieldValue("rowkey"))));
-                        list.add(get);
-                    }
-
-                    for (Get gt : list) {
-                        Result result = table.get(gt);
-                        ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
-                        ObjectNode record = objectMapper.createObjectNode();
-                        record.put("rowkey", Bytes.toString(result.getRow()));
-
-                        for (Cell cell : result.listCells()) {
-                            String fieldName = Bytes.toString(CellUtil.cloneQualifier(cell));
-                            String fieldValue = Bytes.toString(CellUtil.cloneValue(cell));
-                            if (fields != null && fields.size() > 0) {
-                                if (fields.contains(fieldName)) {
-                                    record.put(fieldName, fieldValue);
-                                }
-                            } else {
-                                record.put(fieldName, fieldValue);
-                            }
-                        }
-
-                        data.add(record);
-                    }
-                } catch (Exception e) {
-                    LogService.getLogger(HBaseClient.class).error(e.getMessage());
-                } finally {
-                    if (cloudSolrClient != null) cloudSolrClient.close();
-                }
-
-                return data;
-            }
-        });
-    }
-
-    @Override
     public ResultWrapper getResultAsWrapper(String tableName, String rowKey) throws IOException {
         return new ResultWrapper(getRecord(tableName, rowKey));
     }
@@ -449,62 +361,6 @@ public class HBaseClient implements XHBaseClient {
                 return resultScanner;
             }
         });
-    }
-
-    @Override
-    public List<String> findRowKey(String tableName, String queryString, Map<String, String> sort, int pageSize, int page) throws IOException {
-        List<String> list = new ArrayList<>();
-
-        SolrQuery query = new SolrQuery();
-        query.setQuery(queryString);
-
-        int start = 0;
-        if (pageSize < 0) pageSize = 1;
-        if (pageSize > 100) pageSize = 100;
-
-        if (page < 0) page = 1;
-        start = (page - 1) * pageSize;
-
-        query.setStart(start);
-        query.setRows(pageSize);
-        query.setFields("rowkey");
-
-        //设置排序条件
-        if (sort != null) {
-            for (String field : sort.keySet()) {
-                SolrQuery.ORDER order = SolrQuery.ORDER.asc;
-                if (sort.get(field) != null && sort.get(field).trim().toLowerCase().equals("desc")) {
-                    order = SolrQuery.ORDER.desc;
-                }
-                query.addSort(field, order);
-            }
-        }
-
-        CloudSolrClient cloudSolrClient = solrClientFactory.getCloudSolrClient(tableName);
-        try {
-            QueryResponse rsp = cloudSolrClient.query(query);
-            SolrDocumentList rs = rsp.getResults();
-
-            for (SolrDocument doc : rs) {
-                String rowkey = String.valueOf(doc.getFieldValue("rowkey"));
-                list.add(rowkey);
-            }
-        } catch (Exception e) {
-            LogService.getLogger(HBaseClient.class).error(e.getMessage());
-        } finally {
-            if (cloudSolrClient != null) cloudSolrClient.close();
-        }
-
-        return list;
-    }
-
-    @Override
-    public void clearSolrData(List<String> tables) throws IOException, SolrServerException {
-        for (String tableName : tables) {
-            CloudSolrClient solr = solrClientFactory.getCloudSolrClient(tableName);
-            solr.deleteByQuery("*:*");
-            solr.close();
-        }
     }
 
     private Connection getConnection() throws IOException {
