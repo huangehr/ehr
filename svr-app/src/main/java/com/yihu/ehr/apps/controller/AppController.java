@@ -91,7 +91,7 @@ public class AppController extends BaseRestController {
             @ApiParam(name = "appId", value = "id", defaultValue = "")
             @RequestParam(value = "appId") String appId) throws Exception{
         appManager.deleteApp(appId);
-        return "success";
+        return true;
     }
 
 
@@ -178,7 +178,7 @@ public class AppController extends BaseRestController {
         MBaseDict appStatus = conventionalDictClient.getAppStatus(apiVersion,status);
         app = appManager.getApp(appId);
         if (app == null) {
-            return "faild";
+            return null;
         } else {
             app.setName(name);
             app.setCatalog(appCatalog.getCode());

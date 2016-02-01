@@ -2,9 +2,11 @@ package com.yihu.ehr.ha.organization.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.ha.organization.service.OrganizationClient;
 import com.yihu.ehr.ha.users.model.UserModel;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.ApiParam;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URLDecoder;
@@ -15,20 +17,23 @@ import java.net.URLDecoder;
 @RequestMapping(ApiVersionPrefix.CommonVersion + "/organization")
 @RestController
 public class OrganizationController extends BaseRestController {
+
+    @Autowired
+    private OrganizationClient orgClient;
     /**
      * 根据机构代码获取机构
      * @param orgCode 机构代码
      * @return
      */
-    @RequestMapping(value = "/orgDetail", method = RequestMethod.GET)
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     public Object getOrgDetailByCode(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "orgCode", value = "机构代码")
             @RequestParam(value = "orgCode") String orgCode) {
 
-        //TODO:根据机构代码获取机构信息
-        return null;
+        Object object = orgClient.getOrgByCode(apiVersion, orgCode);
+        return object;
     }
 
     /**
