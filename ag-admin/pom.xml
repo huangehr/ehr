@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yihu.ehr</groupId>
-        <artifactId>ehr-commons-dependencies</artifactId>
+        <artifactId>commons-dependencies</artifactId>
         <version>1.1.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
@@ -69,7 +69,7 @@
 		</dependency>
 		<!--<dependency>-->
 			<!--<groupId>com.yihu.ehr</groupId>-->
-			<!--<artifactId>ehr-commons-thrift-client</artifactId>-->
+			<!--<artifactId>commons-thrift-client</artifactId>-->
 			<!--<version>1.1.0</version>-->
 		<!--</dependency>-->
 		<dependency>
@@ -79,17 +79,17 @@
 		</dependency>
 		<dependency>
 			<groupId>com.yihu.ehr</groupId>
-			<artifactId>ehr-commons-util</artifactId>
+			<artifactId>commons-util</artifactId>
 			<version>1.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.yihu.ehr</groupId>
-			<artifactId>ehr-commons-rest-model</artifactId>
+			<artifactId>commons-rest-model</artifactId>
 			<version>1.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.yihu.ehr</groupId>
-			<artifactId>ehr-commons-ui-swagger</artifactId>
+			<artifactId>commons-ui-swagger</artifactId>
 			<version>1.1.0</version>
 		</dependency>
 
