@@ -37,7 +37,7 @@ public class SystemDictController extends BaseRestController {
 
 
     @ApiOperation(value = "创建字典")
-    @RequestMapping(value = "/dict" ,method = RequestMethod.POST)
+    @RequestMapping(value = "/" ,method = RequestMethod.POST)
     public Object createDict(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -49,25 +49,25 @@ public class SystemDictController extends BaseRestController {
             @RequestParam(value = "userId") String userId) {
         boolean isExist = systemDictManager.isExistDict(name);
         if (isExist) {
-            return "faild";
+            return null;
         }
         SystemDict systemDict = systemDictManager.createDict(name, reference,userId);
         return systemDict;
     }
 
     @ApiOperation(value = "删除字典")
-    @RequestMapping(value = "/dict" ,method = RequestMethod.DELETE)
+    @RequestMapping(value = "/" ,method = RequestMethod.DELETE)
     public Object deleteDict(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "dictId", value = "字典编号", defaultValue = "")
             @RequestParam(value = "dictId") long dictId) {
         systemDictManager.deleteDict(dictId);
-        return "success";
+        return true;
     }
 
     @ApiOperation(value = "修改字典")
-    @RequestMapping(value = "/dict" ,method = RequestMethod.PUT)
+    @RequestMapping(value = "/" ,method = RequestMethod.PUT)
     public Object updateDict(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -129,13 +129,24 @@ public class SystemDictController extends BaseRestController {
             @RequestParam(value = "sort") Integer sort,
             @ApiParam(name = "catalog", value = "类别", defaultValue = "")
             @RequestParam(value = "catalog") String catalog) {
+
+        Result result = new Result();
+        String errorMsg="";
         SystemDict systemDict = systemDictManager.getDict(dictId);
         if (systemDict == null) {
-            return "系统字典不存在";
+            errorMsg+= "系统字典不存在!";
         }
         if (systemDictManager.containEntry(code)) {
-            return "系统字典代码已存在";
+            errorMsg+= "系统字典代码已存在";
         }
+
+        if(!errorMsg.equals(""))
+        {
+            result.setSuccessFlg(false);
+            result.setErrorMsg(errorMsg);
+            return result;
+        }
+
         int nextSort;
         if (sort != null) {
             nextSort = sort;
@@ -148,7 +159,10 @@ public class SystemDictController extends BaseRestController {
         systemDictEntry.setSort(nextSort);
         systemDictEntry.setCatalog(catalog);
         systemDictManager.createDictEntry(systemDictEntry);
-        return systemDictEntry;
+
+        result.setSuccessFlg(true);
+        result.setObj(systemDictEntry);
+        return result;
     }
 
     @ApiOperation(value = "删除字典项")
@@ -156,19 +170,19 @@ public class SystemDictController extends BaseRestController {
     public Object deleteDictEntry(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "dictId", value = "字典编号", defaultValue = "")
+            @ApiParam(name = "dictId", value = "字典ID", defaultValue = "")
             @RequestParam(value = "dictId") long dictId,
-            @ApiParam(name = "code", value = "字典编号", defaultValue = "")
+            @ApiParam(name = "code", value = "字典项代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
-        SystemDict systemDict = systemDictManager.getDict(dictId);
-        if (systemDict == null) {
-            return "字典不存在";
-        }
-        if (!systemDictManager.containEntry(code)) {
-            return "字典名称不可用";
-        }
+//        SystemDict systemDict = systemDictManager.getDict(dictId);
+//        if (systemDict == null) {
+//            return "字典不存在";
+//        }
+//        if (!systemDictManager.containEntry(code)) {
+//            return "字典名称不可用";
+//        }
         systemDictManager.deleteDictEntry(dictId,code);
-        return "success";
+        return true;
     }
 
     @ApiOperation(value = "修改字典项")
@@ -203,9 +217,9 @@ public class SystemDictController extends BaseRestController {
             @ApiParam(name = "dictId", value = "字典编号", defaultValue = "")
             @RequestParam(value = "dictId") long dictId,
             @ApiParam(name = "page", value = "当前页", defaultValue = "")
-            @RequestParam(value = "page") Integer page,
+            @RequestParam(value = "page") int page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
-            @RequestParam(value = "rows") Integer rows) {
+            @RequestParam(value = "rows") int rows) {
         Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("dictId", dictId);
         conditionMap.put("page", page);
@@ -231,11 +245,7 @@ public class SystemDictController extends BaseRestController {
             @RequestParam(value = "dictId") long dictId) {
         SystemDict systemDict = systemDictManager.getDict(dictId);
         List<SystemDictEntry> systemDictEntryList = systemDictManager.getEntryList(dictId);
-        if (systemDict==null || systemDictEntryList.size() == 0) {
-            return "success";
-        }else{
-            return systemDictEntryList;
-        }
+        return systemDictEntryList;
     }
 
     @ApiOperation(value = "根据字典名称判断字典是否已存在")

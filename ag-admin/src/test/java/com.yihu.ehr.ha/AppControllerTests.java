@@ -26,7 +26,7 @@ public class AppControllerTests {
 
     private static String version = "v1.0";
 
-    MApp mApp = null;
+    public MApp mApp = null;
 
     ApplicationContext applicationContext;
 
@@ -50,64 +50,35 @@ public class AppControllerTests {
         }
         assertNotEquals("APP新增失败", mApp, null);
 
-    }
-
-    @Test
-    public void btestgetAppList() {
-
-        applicationContext = new SpringApplicationBuilder()
-                .web(false).sources(AgAdminApplication.class).run();
         String appId = "";
         String appName = "";
         String catalog = "";
         String status = "";
         int page = 1;
         int rows = 15;
-        Object object = appController.getAppList(version, appId, appName, catalog, status, page, rows);
+        object = appController.getAppList(version, appId, appName, catalog, status, page, rows);
         assertNotEquals("机构类别字典获取失败", object, null);
-    }
 
-    @Test
-    public void ctestUpdateApp() {
-        //修改测试
         String id = mApp.getId();
         String name = mApp.getName();
         String secret = mApp.getSecret();
         String url = mApp.getUrl();
-        String catalog = mApp.getCatalog();
-        String status = mApp.getStatus();
+        catalog = mApp.getCatalog();
+        status = mApp.getStatus();
         String description = mApp.getDescription();
         String tags = mApp.getTags();
-        Object object = appController.updateApp(version, id, name, catalog, status, url, description, tags);
+        object = appController.updateApp(version, id, name, catalog, status, url, description, tags);
         //success
-        assertTrue("APP修改失败", !object.toString().equals("true"));
-    }
+        assertNotEquals("APP修改失败", object,null);
 
-    @Test
-    public void dtestGetAppDetailById()
-    {
-
-        String id = mApp.getId();
-        //获取明细
-        Object object = appController.getAppDetail(version, id);
+        object = appController.getAppDetail(version, id);
         assertNotEquals("APP明细获取失败", object, null);
 
+        object = appController.checkStatus(version, id, "WaitingForApprove");
+        assertTrue("APP状态修改失败", object.toString().equals("true"));
+
+        object = appController.deleteApp(version, id);
+        assertTrue("APP删除失败", object.toString().equals("true"));
     }
 
-    @Test
-    public void etestUpdateStatus(){
-
-        String id=mApp.getId();
-        //修改状态
-        Object object = appController.checkStatus(version, id, "WaitingForApprove");
-        assertTrue("APP状态修改失败", !object.toString().equals("success"));
-    }
-
-    @Test
-    public void ftestDeleteAppById(){
-        String id = mApp.getId();
-        //根据查询条件获取列表
-        Object object = appController.deleteApp(version, id);
-        assertTrue("APP删除失败", !object.toString().equals("success"));
-    }
 }

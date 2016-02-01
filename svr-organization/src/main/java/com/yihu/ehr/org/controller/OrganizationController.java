@@ -109,7 +109,7 @@ public class OrganizationController extends BaseRestController {
             @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
             @RequestParam(value = "orgCode") String orgCode) {
         orgManagerService.delete(orgCode);
-        return "删除机构成功！";
+        return true;
     }
 
 
@@ -134,7 +134,7 @@ public class OrganizationController extends BaseRestController {
             org.setActivityFlag(1);
             orgManagerService.update(org);
         }
-        return "success";
+        return true;
     }
 
 
@@ -289,7 +289,7 @@ public class OrganizationController extends BaseRestController {
      * @param city
      * @return
      */
-    @RequestMapping(value = "/search" , method = RequestMethod.GET)
+    @RequestMapping(value = "/address" , method = RequestMethod.GET)
     public Object getOrgsByAddress(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,

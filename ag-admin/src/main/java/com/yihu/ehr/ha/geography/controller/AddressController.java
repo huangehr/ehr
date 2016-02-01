@@ -17,23 +17,17 @@ public class AddressController extends BaseRestController {
     @Autowired
     private AddressClient addressClient;
 
-    @RequestMapping(value = "/address/level", method = RequestMethod.GET)
+    @RequestMapping(value = "/level", method = RequestMethod.GET)
     @ApiOperation(value = "根据地址等级查询地址信息")
     public Object getAddressByLevel(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                                     @PathVariable(value = "api_version") String apiVersion,
                                     @ApiParam(name = "level", value = "地址级别", defaultValue = "")
                                     @RequestParam(value = "level") Integer level) {
-        Object object = null;
-        try {
-            object = addressClient.getAddressByLevel(apiVersion, level);
-        }
-        catch (Exception ex){
-            int i=0;
-        }
-        return object;
+
+        return addressClient.getAddressByLevel(apiVersion, level);
     }
 
-    @RequestMapping(value = "/address/pid", method = RequestMethod.GET)
+    @RequestMapping(value = "/pid", method = RequestMethod.GET)
     @ApiOperation(value = "根据父id查询地址信息")
     public Object getAddressDictByPid(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                                       @PathVariable(value = "api_version") String apiVersion,
@@ -43,7 +37,7 @@ public class AddressController extends BaseRestController {
         return addressClient.getAddressDictByPid(apiVersion, pid);
     }
 
-    @RequestMapping(value = "/address", method = RequestMethod.GET)
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     @ApiOperation(value = "根据id查询地址信息")
     public Object getAddressById(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                                  @PathVariable(value = "api_version") String apiVersion,
@@ -53,7 +47,7 @@ public class AddressController extends BaseRestController {
         return addressClient.getAddressById(apiVersion, id);
     }
 
-    @RequestMapping(value = "/canonicalAddress", method = RequestMethod.GET)
+    @RequestMapping(value = "/canonical", method = RequestMethod.GET)
     @ApiOperation(value = "根据地址代码获取机构详细信息")
     public Object getCanonicalAddress(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                                       @PathVariable(value = "api_version") String apiVersion,
@@ -63,7 +57,7 @@ public class AddressController extends BaseRestController {
         return addressClient.getCanonicalAddress(apiVersion, id);
     }
 
-    @RequestMapping(value = "/address", method = RequestMethod.PUT)
+    @RequestMapping(value = "/", method = RequestMethod.PUT)
     @ApiOperation(value = "地址检查并保存")
     public Object saveAddress(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                               @PathVariable(value = "api_version") String apiVersion,
@@ -101,20 +95,34 @@ public class AddressController extends BaseRestController {
         return addressClient.search(apiVersion, province, city, district);
     }
 
-    @RequestMapping(value = "/address", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除地址")
     public Object delete(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                          @PathVariable(value = "api_version") String apiVersion,
                          @ApiParam(name = "/id", value = "地址代码", defaultValue = "")
                          @RequestParam(value = "id") String id) {
 
-        Object result = addressClient.delete(apiVersion,id);
-        if(result==null)
-        {
-            return false;
-        }
-        else {
-            return  true;
-        }
+       return addressClient.delete(apiVersion,id);
     }
+    @RequestMapping(value = "/is_address" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断是否是个地址")
+    public boolean isNullAddress(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
+            @ApiParam(name = "/country" , value = "地址代码" ,defaultValue = "")
+            @RequestParam (value = "country") String country,
+            @ApiParam(name = "/province" , value = "地址代码" ,defaultValue = "")
+            @RequestParam (value = "province") String province,
+            @ApiParam(name = "/city" , value = "地址代码" ,defaultValue = "")
+            @RequestParam (value = "city") String city,
+            @ApiParam(name = "/district" , value = "地址代码" ,defaultValue = "")
+            @RequestParam (value = "district") String district,
+            @ApiParam(name = "/town" , value = "地址代码" ,defaultValue = "")
+            @RequestParam (value = "town") String town,
+            @ApiParam(name = "/street" , value = "地址代码" ,defaultValue = "")
+            @RequestParam (value = "street") String street) {
+
+        return  addressClient.isNullAddress(apiVersion,country,province,city,district,town,street);
+    }
+
 }

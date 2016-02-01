@@ -1,15 +1,12 @@
 package com.yihu.ehr.ha.organization.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.ha.organization.service.OrganizationClient;
-import com.yihu.ehr.ha.users.model.UserModel;
 import com.yihu.ehr.util.controller.BaseRestController;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URLDecoder;
 
 /**
  * Created by AndyCai on 2016/1/21.
@@ -20,42 +17,16 @@ public class OrganizationController extends BaseRestController {
 
     @Autowired
     private OrganizationClient orgClient;
-    /**
-     * 根据机构代码获取机构
-     * @param orgCode 机构代码
-     * @return
-     */
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public Object getOrgDetailByCode(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "orgCode", value = "机构代码")
-            @RequestParam(value = "orgCode") String orgCode) {
 
-        Object object = orgClient.getOrgByCode(apiVersion, orgCode);
-        return object;
-    }
-
-    /**
-     * 机构列表查询
-     * @param settledWay 结算方式
-     * @param orgType 机构类别
-     * @param province 省
-     * @param city 市
-     * @param district 区
-     * @param page
-     * @param rows
-     * @return
-     */
-    @RequestMapping(value = "organizations", method = RequestMethod.GET)
-    public Object getOrgs(
+    @RequestMapping(value = "/search", method = RequestMethod.GET)
+    public Object searchOrgs(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
+            @PathVariable(value = "api_version") String apiVersion,
             @ApiParam(name = "orgCode", value = "机构代码")
             @RequestParam(value = "orgCode") String orgCode,
             @ApiParam(name = "fullName", value = "全称")
             @RequestParam(value = "fullName") String fullName,
-            @ApiParam(name = "settledWay", value = "接入方式",defaultValue = "")
+            @ApiParam(name = "settledWay", value = "接入方式", defaultValue = "")
             @RequestParam(value = "settledWay") String settledWay,
             @ApiParam(name = "orgType", value = "机构类型")
             @RequestParam(value = "orgType") String orgType,
@@ -68,113 +39,146 @@ public class OrganizationController extends BaseRestController {
             @ApiParam(name = "page", value = "页面号，从0开始", defaultValue = "0")
             @RequestParam(value = "page") int page,
             @ApiParam(name = "rows", value = "页面记录数", defaultValue = "10")
-            @RequestParam(value = "rows") int rows){
+            @RequestParam(value = "rows") int rows) {
 
-        //TODO:查询机构列表
-        return null;
+        return orgClient.searchOrgs(apiVersion, orgCode, fullName, settledWay, orgType, province, city, district, page, rows);
+
     }
 
     /**
      * 删除机构
+     *
      * @param orgCode
      * @return
      */
-    @RequestMapping(value = "organization", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/", method = RequestMethod.DELETE)
     public Object deleteOrg(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
+            @PathVariable(value = "api_version") String apiVersion,
             @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
-            @RequestParam(value = "orgCode") String orgCode){
+            @RequestParam(value = "orgCode") String orgCode) {
 
-        //TODO:删除机构
-        return null;
+        return orgClient.deleteOrg(apiVersion, orgCode);
     }
+
 
     /**
      * 激活机构
+     *
      * @param orgCode
      * @return
      */
-    @RequestMapping(value = "activity" , method = RequestMethod.PUT)
+    @RequestMapping(value = "/activity", method = RequestMethod.PUT)
     public Object activity(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
+            @PathVariable(value = "api_version") String apiVersion,
             @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
             @RequestParam(value = "orgCode") String orgCode,
             @ApiParam(name = "activityFlag", value = "状态", defaultValue = "")
-            @RequestParam(value = "activityFlag") String activityFlag){
+            @RequestParam(value = "activityFlag") String activityFlag) {
 
-        //TODO:激活机构
-        return null;
+        return orgClient.activity(apiVersion, orgCode, activityFlag);
     }
 
-    /**OrgModel
+
+    /**
      * 跟新机构
-     * @param orgModelJson
+     *
+     * @param apiVersion
      * @return
+     * @throws Exception
      */
-    @RequestMapping(value = "org" , method = RequestMethod.PUT)
+    @RequestMapping(value = "/", method = RequestMethod.PUT)
     public Object updateOrg(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            String orgModelJson) throws Exception{
+            @PathVariable(value = "api_version") String apiVersion,
+            String orgModelJsonData) throws Exception {
 
-        orgModelJson = URLDecoder.decode(orgModelJson, "UTF-8");
+        return orgClient.updateOrg(apiVersion, orgModelJsonData);
+    }
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        UserModel userModel = objectMapper.readValue(orgModelJson, UserModel.class);
-        //TODO:修改机构数据
-        return null;
+
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public Object getOrgByCode(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable(value = "api_version") String apiVersion,
+            @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
+            @RequestParam(value = "orgCode") String orgCode) {
+
+        return orgClient.getOrgByCode(apiVersion, orgCode);
+    }
+
+    /**
+     * 根据code获取机构信息
+     *
+     * @param orgCode
+     * @return
+     */
+    @ApiOperation(value = "根据地址代码获取model")
+    @RequestMapping(value = "/org_model", method = RequestMethod.GET)
+    public Object getOrgModel(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable(value = "api_version") String apiVersion,
+            @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
+            @RequestParam(value = "orgCode") String orgCode) {
+
+        return orgClient.getOrgModel(apiVersion, orgCode);
     }
 
     /**
      * 根据name获取机构ids
+     *
      * @param name
      * @return
      */
-    @RequestMapping(value = "/org/name", method = RequestMethod.GET)
+    @ApiOperation(value = "根据地名称取机构ids")
+    @RequestMapping(value = "/name", method = RequestMethod.GET)
     public Object getIdsByName(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
+            @PathVariable(value = "api_version") String apiVersion,
             @ApiParam(name = "name", value = "机构名称", defaultValue = "")
-            @RequestParam(value = "name") String name){
-        return null;
-    }
-    @RequestMapping( value = "distributeKey" , method = RequestMethod.POST)
-    public Object distributeKey(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "orgCode", value = "机构代码")
-            @RequestParam(value = "orgCode") String orgCode){
+            @RequestParam(value = "name") String name) {
 
-        return null;
+        return orgClient.getIdsByName(apiVersion, name);
     }
+
+
     /**
      * 根据地址获取机构
+     *
      * @param province
      * @param city
      * @return
      */
-    @RequestMapping(value = "/orgs" , method = RequestMethod.GET)
-    public Object getOrgs(
+    @RequestMapping(value = "/search", method = RequestMethod.GET)
+    public Object getOrgsByAddress(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
+            @PathVariable(value = "api_version") String apiVersion,
             @ApiParam(name = "province", value = "省")
             @RequestParam(value = "province") String province,
             @ApiParam(name = "city", value = "市")
-            @RequestParam(value = "city") String city){
+            @RequestParam(value = "city") String city) {
 
-        return null;
+        return orgClient.getOrgsByAddress(apiVersion, province, city);
     }
 
-    @RequestMapping(value = "/isOrgCodeExist" ,method = RequestMethod.GET)
-    public Object isOrgCodeExist(
+    @RequestMapping(value = "distributeKey", method = RequestMethod.POST)
+    public Object distributeKey(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
+            @PathVariable(value = "api_version") String apiVersion,
             @ApiParam(name = "orgCode", value = "机构代码")
-            @RequestParam(value = "orgCode") String orgCode){
+            @RequestParam(value = "orgCode") String orgCode) {
 
-        //TODO:机构代码判断重复
-        return null;
+        return orgClient.distributeKey(apiVersion, orgCode);
+    }
+
+    @RequestMapping(value = "/validation", method = RequestMethod.GET)
+    public Object validationOrg(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+                                @PathVariable(value = "api_version") String apiVersion,
+                                @ApiParam(name = "orgCode", value = "机构代码")
+                                @RequestParam(value = "orgCode") String orgCode) {
+
+        Object object = orgClient.validationOrg(apiVersion, orgCode);
+        return object;
     }
 }

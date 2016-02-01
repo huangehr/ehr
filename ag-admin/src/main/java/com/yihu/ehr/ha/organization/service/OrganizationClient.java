@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @FeignClient("svr-org")
 public interface OrganizationClient {
 
-    @RequestMapping(value = "rest/{api_version}/org/search", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/{api_version}/org/search", method = RequestMethod.GET)
     Object searchOrgs(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                       @PathVariable(value = "api_version") String apiVersion,
                       @ApiParam(name = "orgCode", value = "机构代码")
@@ -33,13 +33,13 @@ public interface OrganizationClient {
                       @ApiParam(name = "rows", value = "页面记录数", defaultValue = "10")
                       @RequestParam(value = "rows") int rows);
 
-    @RequestMapping(value = "rest/{api_version}/org/", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/rest/{api_version}/org/", method = RequestMethod.DELETE)
     Object deleteOrg(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                      @PathVariable(value = "api_version") String apiVersion,
                      @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
                      @RequestParam(value = "orgCode") String orgCode);
 
-    @RequestMapping(value = "rest/{api_version}/org/activity", method = RequestMethod.PUT)
+    @RequestMapping(value = "/rest/{api_version}/org/activity", method = RequestMethod.PUT)
     Object activity(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                     @PathVariable(value = "api_version") String apiVersion,
                     @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
@@ -47,32 +47,32 @@ public interface OrganizationClient {
                     @ApiParam(name = "activityFlag", value = "状态", defaultValue = "")
                     @RequestParam(value = "activityFlag") String activityFlag);
 
-    @RequestMapping(value = "rest/{api_version}/org/", method = RequestMethod.PUT)
+    @RequestMapping(value = "/rest/{api_version}/org/", method = RequestMethod.PUT)
     Object updateOrg(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                      @PathVariable(value = "api_version") String apiVersion,
                      String orgModelJsonData);
 
-    @RequestMapping(value = "rest/{api_version}/org/", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/{api_version}/org/", method = RequestMethod.GET)
     Object getOrgByCode(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                         @PathVariable(value = "api_version") String apiVersion,
                         @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
                         @RequestParam(value = "orgCode") String orgCode);
 
     @ApiOperation(value = "根据地址代码获取model")
-    @RequestMapping(value = "rest/{api_version}/org/org_model", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/{api_version}/org/org_model", method = RequestMethod.GET)
     Object getOrgModel(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                        @PathVariable(value = "api_version") String apiVersion,
                        @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
                        @RequestParam(value = "orgCode") String orgCode);
 
     @ApiOperation(value = "根据地名称取机构ids")
-    @RequestMapping(value = "rest/{api_version}/org/name", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/{api_version}/org/name", method = RequestMethod.GET)
     Object getIdsByName(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                         @PathVariable(value = "api_version") String apiVersion,
                         @ApiParam(name = "name", value = "机构名称", defaultValue = "")
                         @RequestParam(value = "name") String name);
 
-    @RequestMapping(value = "rest/{api_version}/org/search", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/{api_version}/org/search", method = RequestMethod.GET)
     Object getOrgsByAddress(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                             @PathVariable(value = "api_version") String apiVersion,
                             @ApiParam(name = "province", value = "省")
@@ -80,13 +80,13 @@ public interface OrganizationClient {
                             @ApiParam(name = "city", value = "市")
                             @RequestParam(value = "city") String city);
 
-    @RequestMapping(value = "rest/{api_version}/org/distributeKey", method = RequestMethod.POST)
+    @RequestMapping(value = "/rest/{api_version}/org/distributeKey", method = RequestMethod.POST)
     Object distributeKey(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                          @PathVariable(value = "api_version") String apiVersion,
                          @ApiParam(name = "orgCode", value = "机构代码")
                          @RequestParam(value = "orgCode") String orgCode);
 
-    @RequestMapping(value = "rest/{api_version}/org/validation", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/{api_version}/org/validation", method = RequestMethod.GET)
     Object validationOrg(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                          @PathVariable(value = "api_version") String apiVersion,
                          @ApiParam(name = "orgCode", value = "机构代码")
