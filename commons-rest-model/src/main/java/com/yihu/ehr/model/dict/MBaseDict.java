@@ -21,12 +21,10 @@ public class MBaseDict extends BaseModel implements Serializable {
     public MBaseDict(){
     }
 
-    public boolean isVirtualCard(){
-
+    public boolean checkIsVirtualCard(){
         if(this.getCatalog().equals("VirtualCard")){
             return true;
-        }
-        else{
+        }else{
             return false;
         }
     }
