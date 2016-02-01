@@ -46,6 +46,8 @@ public class SvrAppsApplicationTests {
 
 	@Test
 	public void btestGetAppList() throws Exception{
+		applicationContext = new SpringApplicationBuilder()
+				.web(false).sources(SvrAppApplication.class).run();
 		String appId = "";
 		String appName = "";
 		String catalog = "";

@@ -4,8 +4,8 @@ server:
 
 info:
   app:
-    name: PaientService
-    description: EHR platform json paient service.
+    name: PatientService
+    description: EHR platform json patient service.
     version: 1.0.0
 
 ---

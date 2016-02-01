@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-paient
+    name: svr-patient
 
   cloud:
     config:
