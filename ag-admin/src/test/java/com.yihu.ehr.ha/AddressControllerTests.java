@@ -29,7 +29,7 @@ public class AddressControllerTests {
     private AddressController addressController;
 
     @Test
-    public void testGetAddressByLevel()
+    public void atestGetAddressByLevel()
     {
         Integer level = 1;
         Object object = addressController.getAddressByLevel(apiVersion,level);
@@ -37,7 +37,7 @@ public class AddressControllerTests {
     }
 
     @Test
-    public void getAddressDictByPid()
+    public void bgetAddressDictByPid()
     {
         Integer level = 2;
         Object object = addressController.getAddressDictByPid(apiVersion, level);
@@ -45,7 +45,7 @@ public class AddressControllerTests {
     }
 
     @Test
-    public void saveAddress(){
+    public void csaveAddress(){
         String country = "中国";
         String province = "福建省T";
         String city = "宁德市T";
