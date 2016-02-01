@@ -18,14 +18,14 @@ import java.util.List;
 @Repository
 public interface XJsonPackageRepository extends PagingAndSortingRepository<JsonPackage, String> {
 
-    @Query("select count(*) from JsonPackage pack where pack.receiveDate between :from and :to")
-    long count(@Param("from") Date from, @Param("to") Date to);
+    @Query("select count(*) from JsonPackage pack where pack.receiveDate between :since and :to")
+    long count(@Param("since") Date since, @Param("to") Date to);
 
-    @Query("select pack from JsonPackage pack where pack.receiveDate between :from and :to")
-    List<JsonPackage> findAll(@Param("from") Date from, @Param("to") Date to);
+    @Query("select pack from JsonPackage pack where pack.receiveDate between :since and :to")
+    List<JsonPackage> findAll(@Param("since") Date since, @Param("to") Date to);
 
-    @Query("select pack from JsonPackage pack where archiveStatus in (:archiveStatus) and receiveDate between :from and :to")
-    List<JsonPackage> findAll(@Param("archiveStatus") ArchiveStatus archiveStatus, @Param("from") Date from, @Param("to") Date to, Pageable pageable);
+    @Query("select pack from JsonPackage pack where archiveStatus in (:archiveStatus) and receiveDate between :since and :to")
+    List<JsonPackage> findAll(@Param("archiveStatus") ArchiveStatus archiveStatus, @Param("since") Date since, @Param("to") Date to, Pageable pageable);
 
     @Query("select pack from JsonPackage pack where archiveStatus = :archiveStatus order by receiveDate asc")
     JsonPackage findEarliestOne();

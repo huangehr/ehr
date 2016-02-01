@@ -1,14 +1,22 @@
 package com.yihu.ehr.util.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.constrant.Result;
-import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.util.ApiErrorEcho;
+import com.yihu.ehr.util.StringBuilderUtil;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.ParameterizedType;
+import java.util.*;
 
 /**
  * REST风格控控制器基类。此控制器用于对API进行校验，并处理平台根层级的业务，如API参数校验，错误及返回码设定等。
@@ -21,53 +29,42 @@ import java.util.List;
  * @author zhiyong
  * @author Sand
  */
-public class BaseRestController extends AbstractController{
+@Controller
+@RequestMapping("/rest")
+public class BaseRestController extends AbstractController {
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
         return null;
     }
 
+    public <T> T convertToModel(Object source, Class<T> targetCls, String... ignoreProperties) {
+        T target = BeanUtils.instantiate(targetCls);
+        BeanUtils.copyProperties(source, target, ignoreProperties);
+
+        return target;
+    }
+
     /**
-     * 通用：请求失败.
+     * 将实体集合转换为模型集合。
      *
-     * 请求成功后, 返回的内容为: { code: "ha.archive.upload.failed", message: "档案上传失败"}
-     * 其中 code 必须为特定的错误代码, message 必须为错误描述. 没有其他字段。
-     *
-     * @param errorCode
-     * @param args
+     * @param sources
+     * @param targets
+     * @param ignoreProperties
+     * @param <T>
      * @return
      */
-    public static void failed(ErrorCode errorCode, String errorDescription, String...args){
-        throw new ApiException(errorCode, errorDescription);
-    }
+    public <T> Collection<T> convertToModels(Collection sources, Collection<T> targets, String... ignoreProperties) {
+        Class<T> targetCls = (Class<T>)((ParameterizedType)targets.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 
+        Iterator iterator = sources.iterator();
+        while(iterator.hasNext()){
+            Object source = iterator.next();
 
-    protected Result failed(String errMsg){
-        Result rs = getSuccessResult(false);
-        rs.setErrorMsg(errMsg);
-        return rs;
-    }
-
-    protected Result getResult(List detaiModelList, int totalCount, int currPage, int rows) {
-        Result result = new Result();
-        result.setSuccessFlg(true);
-        result.setDetailModelList(detaiModelList);
-        result.setTotalCount(totalCount);
-        result.setCurrPage(currPage);
-        result.setPageSize(rows);
-        if(result.getPageSize()==0)
-            return result;
-        if (result.getTotalCount() % result.getPageSize() > 0) {
-            result.setTotalPage((result.getTotalCount() / result.getPageSize()) + 1);
-        } else {
-            result.setTotalPage(result.getTotalCount() / result.getPageSize());
+            T target = BeanUtils.instantiate(targetCls);
+            BeanUtils.copyProperties(source, target, ignoreProperties);
+            targets.add(target);
         }
-        return result;
-    }
 
-    protected Result getSuccessResult(Boolean flg) {
-        Result result = new Result();
-        result.setSuccessFlg(flg);
-        return result;
+        return targets;
     }
 }

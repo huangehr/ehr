@@ -1,7 +1,7 @@
 package com.yihu.ehr.model.security;
 
+import java.io.Serializable;
 import java.util.Date;
-import com.yihu.ehr.util.beanUtil.BaseModel;
 
 /**
  * 医生
@@ -10,63 +10,64 @@ import com.yihu.ehr.util.beanUtil.BaseModel;
  * @version 1.0
  * @created 02-6月-2015 17:38:05
  */
-public class MUserSecurity extends BaseModel{
+public class MUserSecurity implements Serializable {
 
-	public MUserSecurity() {
+    public MUserSecurity() {
 
-	}
-	private String id;
-	private String privateKey;
-	private String publicKey;
-	private Date fromDate;
-	private Date expiryDate;
-	private Integer valid;
+    }
 
-	public Integer getValid() {
-		return valid;
-	}
+    private String id;
+    private String privateKey;
+    private String publicKey;
+    private Date fromDate;
+    private Date expiryDate;
+    private Integer valid;
 
-	public void setValid(Integer valid) {
-		this.valid = valid;
-	}
+    public Integer getValid() {
+        return valid;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public void setValid(Integer valid) {
+        this.valid = valid;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public String getPrivateKey() {
-		return privateKey;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public void setPrivateKey(String privateKey) {
-		this.privateKey = privateKey;
-	}
+    public String getPrivateKey() {
+        return privateKey;
+    }
 
-	public String getPublicKey() {
-		return publicKey;
-	}
+    public void setPrivateKey(String privateKey) {
+        this.privateKey = privateKey;
+    }
 
-	public void setPublicKey(String publicKey) {
-		this.publicKey = publicKey;
-	}
+    public String getPublicKey() {
+        return publicKey;
+    }
 
-	public Date getFromDate() {
-		return fromDate;
-	}
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
+    }
 
-	public void setFromDate(Date fromDate) {
-		this.fromDate = fromDate;
-	}
+    public Date getFromDate() {
+        return fromDate;
+    }
 
-	public Date getExpiryDate() {
-		return expiryDate;
-	}
+    public void setFromDate(Date fromDate) {
+        this.fromDate = fromDate;
+    }
 
-	public void setExpiryDate(Date expiryDate) {
-		this.expiryDate = expiryDate;
-	}
+    public Date getExpiryDate() {
+        return expiryDate;
+    }
+
+    public void setExpiryDate(Date expiryDate) {
+        this.expiryDate = expiryDate;
+    }
 }

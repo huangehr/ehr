@@ -42,35 +42,34 @@ public class JsonPackageService {
 
     private List<JsonPackage> packageQueue = new ArrayList<JsonPackage>();
 
-    public String receive(InputStream is, String pwd) {
+    public String savePackage(InputStream is, String pwd) {
         Map<String, String> metaData = storeJsonPackage(is);
         checkIn(metaData.get("id"), metaData.get("path"), pwd);
 
         return metaData.get("id");
     }
 
+    public void deletePackage(String id){
+        jsonPackageRepo.delete(id);
+    }
+
     public List<JsonPackage> getArchiveList(Date from, Date to) {
         return jsonPackageRepo.findAll(from, to);
     }
 
-    public JsonPackage getJsonPackage(String id) {
+    public JsonPackage getPackage(String id) {
         return jsonPackageRepo.findOne(id);
     }
 
-    public List<JsonPackage> searchArchives(Map<String, Object> args, Pageable pageable) throws ParseException {
-
-        ArchiveStatus archiveStatus = (ArchiveStatus) args.get("archiveStatus");
-        Date from = DateFormatter.simpleDateTimeParse((String) args.get("fromTime"));
-        Date to = DateFormatter.simpleDateTimeParse((String) args.get("toTime"));
-
-        return jsonPackageRepo.findAll(archiveStatus, from, to, pageable);
+    public List<JsonPackage> search(Date since, Date to, ArchiveStatus archiveStatus, Pageable pageable) {
+        return jsonPackageRepo.findAll(archiveStatus, since, to, pageable);
     }
 
-    public int getArchiveCount(Date from, Date to) {
+    public int packageCount(Date from, Date to) {
         return getArchiveList(from, to).size();
     }
 
-    public void acquireArchive(String id) {
+    public void acquirePackage(String id) {
         JsonPackage jsonPackage = jsonPackageRepo.findOne(id);
 
         // 设置为'解析'状态
@@ -80,20 +79,11 @@ public class JsonPackageService {
         jsonPackageRepo.save(jsonPackage);
     }
 
-    public void reportArchiveFinished(String id, String message) {
+    public void updatePackageStatus(String id, ArchiveStatus status, String message) {
         JsonPackage jsonPackage = jsonPackageRepo.findOne(id);
-        jsonPackage.setArchiveStatus(ArchiveStatus.Finished);
+        jsonPackage.setArchiveStatus(status);
         jsonPackage.setMessage(message);
         jsonPackage.setFinishDate(new Date());
-
-        jsonPackageRepo.save(jsonPackage);
-    }
-
-    public void reportArchiveFailed(String id, String message) {
-        JsonPackage jsonPackage = jsonPackageRepo.findOne(id);
-        jsonPackage.setArchiveStatus(ArchiveStatus.Failed);
-        jsonPackage.setMessage(message);
-        jsonPackage.setFinishDate(null);
 
         jsonPackageRepo.save(jsonPackage);
     }
@@ -104,11 +94,11 @@ public class JsonPackageService {
      * @param is 文件流
      * @return 完整路径
      */
-    Map<String, String> storeJsonPackage(InputStream is) {
+    private Map<String, String> storeJsonPackage(InputStream is) {
         ObjectId objectId = new ObjectId(adminRegion, BizObject.JsonPackage);
 
         try {
-            ObjectNode msg = fastDFSUtil.upload(is, "zip", "健康档案JSON临时文件");
+            ObjectNode msg = fastDFSUtil.upload(is, "zip", "健康档案JSON文件");
             String group = msg.get(FastDFSUtil.GroupField).asText();
             String remoteFile = msg.get(FastDFSUtil.RemoteFileField).asText();
 
@@ -135,7 +125,7 @@ public class JsonPackageService {
      * @param pwd  zip密码
      * @return 索引存储成功
      */
-    boolean checkIn(String id, String path, String pwd) {
+    private boolean checkIn(String id, String path, String pwd) {
         try {
             JsonPackage jsonPackage = new JsonPackage();
             jsonPackage.setId(id);
@@ -150,15 +140,6 @@ public class JsonPackageService {
             LogService.getLogger(JsonPackageService.class).error(ex.getMessage());
 
             return false;
-        }
-    }
-
-    public String downloadTo(String remotePath, String localPath) {
-        try {
-            String[] meta = remotePath.split(JsonPackage.pathSeparator);
-            return fastDFSUtil.download(meta[0], meta[1], localPath);
-        } catch (IOException | MyException ex) {
-            throw new RuntimeException("fastDFS - " + ex.getMessage());
         }
     }
 }

@@ -37,7 +37,6 @@ public interface SecurityClient {
     @RequestMapping(value = "/rest/{api_version}/security/user_id", method = GET  )
     MUserSecurity getUserSecurityByUserId(@RequestParam(value = "userId") String userId);
 
-
     @RequestMapping(value = "/rest/{api_version}/security/user_key/org_code", method = GET  )
     String getUserKeyIdByOrgCd(@RequestParam(value = "orgCode") String orgCode);
 
@@ -46,6 +45,4 @@ public interface SecurityClient {
 
     @RequestMapping(value = "/rest/{api_version}/security/login_code", method = GET  )
     String getUserSecurityByUserName(@RequestParam(value = "loginCode") String loginCode);
-
-
 }

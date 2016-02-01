@@ -10,8 +10,8 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <artifactId>commons-constants</artifactId>
-    <name>commons-constants</name>
+    <artifactId>commons-ehr-constants</artifactId>
+    <name>commons-ehr-constants</name>
     <packaging>jar</packaging>
 
 </project>

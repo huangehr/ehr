@@ -1,8 +1,8 @@
 /****************************************************************************
  * Copyright(c) Yamaha Motor Solutions CO.,Ltd. 2010 All Rights Reserved
  * <p>
- * System Nameï¼?smart)Human Resource Management System
- * SubSystem Nameï¼?
+ * System Nameï¿½?smart)Human Resource Management System
+ * SubSystem Nameï¿½?
  * service for all substystems
  * <p>
  * File Name: DateUtil
@@ -10,9 +10,11 @@
  * HISTORY RECORD
  * Ver.   Date           Create User/Update     Comment
  * -------------------------------------------------------------------------
- * 1.0 ã€? 2010/07/12 ã€? tuchengye              New Making
+ * 1.0 ï¿½? 2010/07/12 ï¿½? tuchengye              New Making
  ***************************************************************************/
 package com.yihu.ehr.util.operator;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.sql.Date;
 import java.sql.Time;
@@ -49,7 +51,7 @@ public class DateUtil {
 
     public static String changeFormat(String changeDate, String beforeFormat, String afterFormat) {
 
-        if (StringUtil.isBlank(changeDate)) {
+        if (StringUtils.isBlank(changeDate)) {
             return changeDate;
         }
 
@@ -58,7 +60,7 @@ public class DateUtil {
 
     public static String changeToYMDFormatForPrint(String changeDate) {
 
-        if (StringUtil.isBlank(changeDate)) {
+        if (StringUtils.isBlank(changeDate)) {
             return "";
         }
         DateFormat df = new SimpleDateFormat(PRINT_DATE_YMD_FORMAT, Locale.ENGLISH);
@@ -68,7 +70,7 @@ public class DateUtil {
 
     public static String changeToYMFormatForPrint(String changeDate) {
 
-        if (StringUtil.isBlank(changeDate)) {
+        if (StringUtils.isBlank(changeDate)) {
             return "";
         }
         DateFormat df = new SimpleDateFormat(PRINT_DATE_YM_FORMAT, Locale.ENGLISH);
@@ -172,9 +174,9 @@ public class DateUtil {
             return null;
         }
 
-        return StringUtil.substring(timeStr, 0, 2)
-                + ":" + StringUtil.substring(timeStr, 2, 4)
-                + ":" + StringUtil.substring(timeStr, 4);
+        return StringUtils.substring(timeStr, 0, 2)
+                + ":" + StringUtils.substring(timeStr, 2, 4)
+                + ":" + StringUtils.substring(timeStr, 4);
     }
 
     public static String toString(Date date) {
@@ -360,7 +362,7 @@ public class DateUtil {
     public static java.util.Date getSysDateYMDHMS() {
 
         Date dSysDateYMD = DateUtil.getSysDate();
-        Timestamp ts = formatYMDToYMDHMS(StringUtil.toString(dSysDateYMD));
+        Timestamp ts = formatYMDToYMDHMS(dSysDateYMD.toString());
 
         return ts;
     }
@@ -740,7 +742,7 @@ public class DateUtil {
     }
 
     public static Timestamp toTimestampFromGMT(Timestamp time) {
-        return toTimestampFromGMT(StringUtil.toString(time));
+        return toTimestampFromGMT(time.toString());
     }
 
     public static Timestamp toTimestampFromLocal(String yy, String mm, String dd, String hh,
@@ -793,7 +795,7 @@ public class DateUtil {
                                                  String summerTimeTo, String summerTime) {
 
         return toTimestampFromLocal(
-                StringUtil.toString(time),
+                time.toString(),
                 differTimeSign,
                 differenceTime,
                 summerTimeFrom,
@@ -807,7 +809,7 @@ public class DateUtil {
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         ParsePosition pos = new ParsePosition(0);
-        java.util.Date date = sdf.parse(StringUtil.toString(new Timestamp(local)), pos);
+        java.util.Date date = sdf.parse(new Timestamp(local).toString(), pos);
 
         if (date == null) {
             return -1;
