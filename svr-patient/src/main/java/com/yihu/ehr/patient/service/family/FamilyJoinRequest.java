@@ -1,6 +1,6 @@
 package com.yihu.ehr.patient.service.family;
 
-import com.yihu.ehr.model.dict.MBaseDict;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.patient.service.card.IdCard;
 
 import java.util.Date;
@@ -32,7 +32,7 @@ public class FamilyJoinRequest {
 	/**
 	 * 请求状态.
 	 */
-	public MBaseDict state;
+	public MConventionalDict state;
 
 	public FamilyJoinRequest(){
 

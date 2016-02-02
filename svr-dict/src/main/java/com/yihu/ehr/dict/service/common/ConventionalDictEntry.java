@@ -16,141 +16,104 @@ import java.util.List;
 @Transactional
 public class ConventionalDictEntry {
 
+    @Autowired
+    private ConvertionalRepository convertionalRepository;
+
     public ConventionalDictEntry() {
     }
 
-    @Autowired
-    private AppCatalogRepository appCatalogRepository;
-    public AppCatalog getAppCatalog(String code) {
-        return appCatalogRepository.getAppCatalog(code);
+    public ConventionalDict getAppCatalog(String code) {
+        return convertionalRepository.getConvertionalDict(1,code);
     }
 
-    @Autowired
-    private AppStatusRepository appStatusRepository;
-    public AppStatus getAppStatus(String code) {
-        return  appStatusRepository.getAppStatus(code);
+    public ConventionalDict getAppStatus(String code) {
+        return convertionalRepository.getConvertionalDict(2,code);
     }
 
-    @Autowired
-    private GenderRepository genderRepository;
-    public Gender getGender(String code) {
-        return  genderRepository.getGender(code);
+    public ConventionalDict getGender(String code) {
+        return convertionalRepository.getConvertionalDict(3,code);
     }
 
-    @Autowired
-    private MartialStatusRepository martialStatusRepository;
-    public MartialStatus getMartialStatus(String code) {
-        return  martialStatusRepository.getMartialStatus(code);
+    public ConventionalDict getMartialStatus(String code) {
+        return convertionalRepository.getConvertionalDict(4,code);
     }
 
-    @Autowired
-    private NationRepository nationRepository;
-    public Nation getNation(String code) {
-        return  nationRepository.getNation(code);
+    public ConventionalDict getNation(String code) {
+        return convertionalRepository.getConvertionalDict(5,code);
     }
 
-    @Autowired
-    private ResidenceTypeRepository residenceTypeRepository;
-    public ResidenceType getResidenceType(String code) {
-        return  residenceTypeRepository.getResidenceType(code);
+    public ConventionalDict getResidenceType(String code) {
+        return convertionalRepository.getConvertionalDict(6,code);
     }
 
-    @Autowired
-    private OrgTypeRepository orgTypeRepository;
-    public OrgType getOrgType(String code) {
-        return  orgTypeRepository.getOrgType(code);
+    public ConventionalDict getOrgType(String code) {
+        return convertionalRepository.getConvertionalDict(7,code);
     }
 
-    @Autowired
-    private SettledWayRepository settledWayRepository;
-    public SettledWay getSettledWay(String code) {
-        return  settledWayRepository.getSettledWay(code);
+    public ConventionalDict getSettledWay(String code) {
+        return convertionalRepository.getConvertionalDict(8,code);
     }
 
-    @Autowired
-    private CardStatusRepository cardStatusRepository;
-    public CardStatus getCardStatus(String code) {
-        return  cardStatusRepository.getCardStatus(code);
+    public ConventionalDict getCardStatus(String code) {
+        return convertionalRepository.getConvertionalDict(9,code);
     }
 
-    @Autowired
-    private CardTypeRepository cardTypeRepository;
-    public CardType getCardType(String code) {
-        return  cardTypeRepository.getCardType(code);
+    public ConventionalDict getCardType(String code) {
+        return convertionalRepository.getConvertionalDict(10,code);
     }
 
-    @Autowired
-    RequestStateRepository requestStateRepository;
-    public RequestState getRequestState(String code) {
-        return  requestStateRepository.getRequestState(code);
+    public ConventionalDict getRequestState(String code) {
+        return convertionalRepository.getConvertionalDict(11,code);
     }
 
-    @Autowired
-    private KeyTypeRepository keyTypeRepository;
-    public KeyType getKeyType(String code) {
-        return  keyTypeRepository.getKeyType(code);
+    public ConventionalDict getKeyType(String code) {
+        return convertionalRepository.getConvertionalDict(12,code);
     }
 
-    @Autowired
-    private MedicalRoleRepository medicalRoleRepository;
-    public MedicalRole getMedicalRole(String code) {
-        return  medicalRoleRepository.getMedicalRole(code);
+    public ConventionalDict getMedicalRole(String code) {
+        return convertionalRepository.getConvertionalDict(13,code);
     }
 
-    @Autowired
-    private UserRoleRepository userRoleRepository;
-    public UserRole getUserRole(String code) {
-        return userRoleRepository.getUserRole(code);
-    }
-
-    @Autowired
-    private UserTypeRepository userTypeRepository;
-    public UserType getUserType(String code) {
-        return  userTypeRepository.getUserType(code);
-    }
-
-    @Autowired
-    private LoginAddressRepository loginAddressRepository;
-    public LoginAddress getLoginAddress(String code){
-        return  loginAddressRepository.getLoginAddress(code);
-    }
-
-    //...............................................................
-    public List<UserType> getUserTypeList(){
-        return  userTypeRepository.getUserTypeList();
+    public ConventionalDict getUserRole(String code) {
+        return convertionalRepository.getConvertionalDict(14,code);
     }
 
 
-    @Autowired
-    private TagsRepository tagsRepository;
-    public List<Tags> getTagsList(){
-        return  tagsRepository.getTagList();
+    public ConventionalDict getUserType(String code) {
+        return convertionalRepository.getConvertionalDict(15,code);
+    }
+
+    public ConventionalDict getLoginAddress(String code){
+        return convertionalRepository.getConvertionalDict(20,code);
+    }
+
+    //..................................................
+    public List<ConventionalDict> getUserTypeList(){
+        return convertionalRepository.getConventionalDictList(15);
+    }
+
+
+    public List<ConventionalDict> getTagsList(){
+        return convertionalRepository.getConventionalDictList(17);
     }
     //...............................................................
 
-    @Autowired
-    private YesNoRepository yesNoRepository;
-    public YesNo getYesNo(boolean code) {
+    public ConventionalDict getYesNo(boolean code) {
         String resultCode = "";
         resultCode = code ? "True" : "False";
-        return  yesNoRepository.getYesNo(resultCode);
+        return convertionalRepository.getConvertionalDict(18,resultCode);
+    }
+
+    public ConventionalDict getAdapterType(String code) {
+        return convertionalRepository.getConvertionalDict(21,code);
+    }
+
+    public ConventionalDict getStdSourceType(String code) {
+        return convertionalRepository.getConvertionalDict(22,code);
     }
 
 
-    @Autowired
-    private AdapterTypeRepository adapterTypeRepository;
-    public AdapterType getAdapterType(String code) {
-        return adapterTypeRepository.getAdapterType(code);
-    }
-
-    @Autowired
-    private StdSourceTypeRepository stdSourceTypeRepository;
-    public StdSourceType getStdSourceType(String code) {
-        return  stdSourceTypeRepository.getStdSourceType(code);
-    }
-
-
-    public List<StdSourceType> getStdSourceTypeList(String[] codes) {
-        return  stdSourceTypeRepository.getStdSourceTypeList(codes);
+    public List<ConventionalDict> getStdSourceTypeList(String[] codes) {
+        return convertionalRepository.getConventionalDictList(22,codes);
     }
 }

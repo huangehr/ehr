@@ -1,5 +1,7 @@
 package com.yihu.ehr.util.operator;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
@@ -178,11 +180,11 @@ public class NumberUtil {
     }
 
     public static BigDecimal toBigDecimal(int num) {
-        return toBigDecimal(StringUtil.toString(num));
+        return toBigDecimal(Integer.toString(num));
     }
 
     public static Integer toInteger(long num) {
-        return toInteger(StringUtil.toString(num));
+        return toInteger(Long.toString(num));
     }
 
     public static BigDecimal roundBigDecimal(BigDecimal dec1, int scale) {
@@ -224,9 +226,10 @@ public class NumberUtil {
             return null;
         }
 
-        if (StringUtil.isBlank(str)) {
+        if (StringUtils.isBlank(str)) {
             return 0;
         }
+
         try {
             return new Integer(str.trim());
         } catch (NumberFormatException nfe) {
@@ -265,7 +268,7 @@ public class NumberUtil {
             return null;
         }
 
-        if (StringUtil.isBlank(str)) {
+        if (StringUtils.isBlank(str)) {
             return BigDecimal.ZERO;
         }
 
@@ -566,7 +569,7 @@ public class NumberUtil {
 
     public static String roundString(String str) {
         BigDecimal dec = toBigDecimal(str);
-        return (dec == null ? str : StringUtil.toString(roundBigDecimal(dec)));
+        return (dec == null ? str : roundBigDecimal(dec).toString());
     }
 
     public static BigDecimal roundBigDecimal(BigDecimal dec) {
@@ -574,11 +577,10 @@ public class NumberUtil {
     }
 
     public static int roundBigDecimal(int num) {
-        return toInt(roundString(StringUtil.toString(num)));
+        return toInt(roundString(Integer.toString(num)));
     }
 
     public static String fomatNumber(double amount, String pattern) {
-
         NumberFormat nf = NumberFormat.getCurrencyInstance();
         DecimalFormat df = (DecimalFormat) nf;
         df.setMinimumFractionDigits(2);
@@ -589,7 +591,6 @@ public class NumberUtil {
     }
 
     public static String fomatNumber(long amount, String pattern) {
-
         NumberFormat nf = NumberFormat.getCurrencyInstance();
         DecimalFormat df = (DecimalFormat) nf;
         df.setMinimumFractionDigits(2);

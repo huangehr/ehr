@@ -1,13 +1,13 @@
 package com.yihu.ehr.dict.service;
 
 import com.yihu.ehr.dict.service.common.DictPk;
-import com.yihu.ehr.util.operator.StringUtil;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -39,7 +39,7 @@ public class SystemDictManager {
     public SystemDict[] getDictList(int from, int count) {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         Criteria criteria = session.createCriteria(SystemDict.class);
-        if (from >= 0 && count > 0){
+        if (from >= 0 && count > 0) {
             criteria.setFirstResult(from);
             criteria.setMaxResults(count);
         }
@@ -48,23 +48,34 @@ public class SystemDictManager {
         return list.toArray(new SystemDict[list.size()]);
     }
 
-    public SystemDict getDict(long dictId) {
+    public SystemDict getDictEntries(long dictId) {
         return systemDictRepository.findOne(dictId);
+    }
+
+    public List<SystemDictEntry> getDictEntries(long dictId, String name) {
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        String sql = "select * from system_dict_entries dict where dict_id = " + dictId;
+        if (!StringUtils.isEmpty(name)) {
+            sql += " and value like '%" + name + "%' ";
+        }
+        SQLQuery query = session.createSQLQuery(sql);
+
+        return query.list();
     }
 
     public int getNextSort(long dictId) {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
-        Query query = session.createQuery("select max(sort) from SystemDictEntry  where id.dictId= '"+dictId+"'");
+        Query query = session.createQuery("select max(sort) from SystemDictEntry  where id.dictId= '" + dictId + "'");
         int result;
-        if(query.uniqueResult()==null){
+        if (query.uniqueResult() == null) {
             result = 1;
-        }else{
-            result = Integer.parseInt(query.uniqueResult().toString())+1;
+        } else {
+            result = Integer.parseInt(query.uniqueResult().toString()) + 1;
         }
         return result;
     }
 
-    public boolean isExistDict(String name){
+    public boolean isExistDict(String name) {
 
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         Query query = session.createQuery("from SystemDict where name = :name");
@@ -97,7 +108,6 @@ public class SystemDictManager {
     }
 
 
-
     public List<SystemDict> searchSysDicts(Map<String, Object> args) {
 
         //参数获取处理
@@ -114,7 +124,7 @@ public class SystemDictManager {
         sb.append("   from SystemDict 	   ");
         sb.append("  where 1=1     ");
 
-        if (!(args.get("name")==null || args.get("name").equals(""))) {
+        if (!(args.get("name") == null || args.get("name").equals(""))) {
             sb.append("    and (name like '%" + name + "%' or phoneticCode like '%" + phoneticCode + "%')   ");
         }
         sb.append("    order by  name asc  ");
@@ -144,7 +154,7 @@ public class SystemDictManager {
         sb.append(" select 1  from SystemDict 	   ");
         sb.append("  where 1=1     ");
 
-        if (!(args.get("name")==null || args.get("name").equals(""))) {
+        if (!(args.get("name") == null || args.get("name").equals(""))) {
 
             sb.append("    and (name like '%" + name + "%' or phoneticCode like '%" + phoneticCode + "%')   ");
         }
@@ -156,17 +166,17 @@ public class SystemDictManager {
         return query.list().size();
     }
 
-    public List<SystemDictEntry> searchEntryList(Map<String, Object> args){
-        Map<String,Object> infoMap= new HashMap<>();
+    public List<SystemDictEntry> searchEntryList(Map<String, Object> args) {
+        Map<String, Object> infoMap = new HashMap<>();
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         Long dictId = (Long) args.get("dictId");
         Integer page = (Integer) args.get("page");
         Integer pageSize = (Integer) args.get("rows");
-        String hql="from SystemDictEntry where id.dictId=:dictId order by sort asc";
+        String hql = "from SystemDictEntry where id.dictId=:dictId order by sort asc";
 
         Query query = session.createQuery(hql);
-        query.setParameter("dictId",dictId);
-        Integer totalCount =query.list().size();
+        query.setParameter("dictId", dictId);
+        Integer totalCount = query.list().size();
         query.setMaxResults(pageSize);
         query.setFirstResult((page - 1) * pageSize);
         return query.list();
@@ -179,34 +189,18 @@ public class SystemDictManager {
 
 
     public boolean containEntry(String code) {
-        SystemDictEntry systemDictEntry =  systemDictEntryRepository.getByCode(code);
-        return systemDictEntry!=null;
+        SystemDictEntry systemDictEntry = systemDictEntryRepository.getByCode(code);
+        return systemDictEntry != null;
     }
 
     public void createDictEntry(SystemDictEntry systemDictEntry) {
         systemDictEntryRepository.save(systemDictEntry);
     }
 
-    public void deleteDictEntry(long dictId,String code) {
+    public void deleteDictEntry(long dictId, String code) {
         DictPk dictPk = new DictPk();
         dictPk.setCode(code);
         dictPk.setDictId(dictId);
         systemDictEntryRepository.delete(dictPk);
-    }
-
-
-    public List<SystemDictEntry> getEntryList(Long dictId) {
-        return systemDictEntryRepository.getByDictId(dictId);
-    }
-
-    public List<SystemDictEntry> getDict(long dictId,String name){
-        Session session = entityManager.unwrap(org.hibernate.Session.class);
-        String sql = "select * from system_dict_entries dict where dict_id = "+dictId;
-        if(!StringUtil.isStrEmpty(name)){
-            sql += " and value like '%"+name+"%' ";
-        }
-        SQLQuery query = session.createSQLQuery(sql);
-
-        return  query.list();
     }
 }

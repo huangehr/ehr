@@ -2,8 +2,8 @@ package com.yihu.ehr.patient.paientIdx.model;
 
 import com.yihu.ehr.model.address.MAddress;
 import com.yihu.ehr.patient.dao.XDemographicInfoRepository;
-import com.yihu.ehr.patient.feignClient.address.AddressClient;
-import com.yihu.ehr.patient.feignClient.dict.ConventionalDictClient;
+import com.yihu.ehr.patient.feignClient.AddressClient;
+import com.yihu.ehr.patient.feignClient.ConventionalDictClient;
 import com.yihu.ehr.patient.service.demographic.DemographicId;
 import com.yihu.ehr.patient.service.demographic.DemographicInfo;
 import com.yihu.ehr.patient.service.demographic.PatientBrowseModel;
@@ -140,90 +140,85 @@ public class DemographicIndex{
         return patientModel;
     }
 
-    public void register(DemographicInfo demographicInfo) {
-//        if (!demographicInfo.getId().isAvailable()) {
-//            throw new IllegalArgumentException("无效人口学ID.");
-//        }
+    public void save(DemographicInfo demoInfo) {
+        DemographicInfo di = (DemographicInfo) demoInfo;
+
         //地址检查并保存
         MAddress xlocation = null;
         //出生地
-        xlocation = addressClient.getAddressById(demographicInfo.getBirthPlace());
+        xlocation = addressClient.getAddressById( demoInfo.getBirthPlace());
         if (!isNullAddress(xlocation)) {
             String addressId = savaAddress(xlocation);
-            demographicInfo.setBirthPlace(addressId);
+            demoInfo.setBirthPlace(addressId);
         }else{
-            demographicInfo.setBirthPlace(null);
+            demoInfo.setBirthPlace(null);
         }
         //工作地址
-        xlocation = addressClient.getAddressById(demographicInfo.getWorkAddress());
+        xlocation = addressClient.getAddressById(demoInfo.getWorkAddress());
         if (!isNullAddress(xlocation)) {
-            String addressId = savaAddress(xlocation);
-            demographicInfo.setBirthPlace(addressId);
+            String addressid = savaAddress(xlocation);
+            demoInfo.setWorkAddress(addressid);
         }else{
-            demographicInfo.setWorkAddress(null);
+            demoInfo.setWorkAddress(null);
         }
         //家庭地址
-        xlocation = addressClient.getAddressById(demographicInfo.getHomeAddress());
+        xlocation = addressClient.getAddressById(demoInfo.getHomeAddress());
         if (!isNullAddress(xlocation)) {
             String addressId = savaAddress(xlocation);
-            demographicInfo.setBirthPlace(addressId);
+            demoInfo.setHomeAddress(addressId);
         }else{
-            demographicInfo.setWorkAddress(null);
+            demoInfo.setHomeAddress(null);
         }
-        //default password
-        String pwd = "123456";
-        demographicInfo.setPassword(HashUtil.hashStr(pwd));
-        demographicInfoRepository.save(demographicInfo);
+        demographicInfoRepository.save(demoInfo);
     }
 
+
+
     @Transactional(Transactional.TxType.SUPPORTS)
-    public boolean updatePatient(PatientModel patientModel) {
+    public boolean updatePatient(PatientModel patientModel) throws Exception{
         DemographicInfo demographicInfo = null;
         boolean isRegistered = false;
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String date = null;
-        try {
-            isRegistered = isRegistered(new DemographicId(patientModel.getIdCardNo()));
-            if (!isRegistered) {
-                demographicInfo = createDemographicInfo(patientModel.getIdCardNo(), patientModel.getName());
-                //demographicInfo = createDemographicInfo(new DemographicId(patientModel.getIdCardNo()), patientModel.getName());
-            } else {
-                demographicInfo = getDemographicInfo(new DemographicId(patientModel.getIdCardNo()));
-            }
-            if (patientModel.getGender() != null && !patientModel.getGender().isEmpty()) {
-                demographicInfo.setGender(patientModel.getGender());
-            }
-            if (patientModel.getNation() != null && !patientModel.getNation().isEmpty()) {
-                demographicInfo.setNation(patientModel.getNation());
-            }
-            demographicInfo.setNativePlace(patientModel.getNativePlace());
-            if (patientModel.getMartialStatus() != null && !patientModel.getMartialStatus().isEmpty()) {
-                demographicInfo.setMartialStatus(patientModel.getMartialStatus());
-            }
-            date = patientModel.getBirthday();
-            if (date != null && !date.isEmpty()) {
-                demographicInfo.setBirthday(format.parse(date));
-            }
-            demographicInfo.setBirthPlace(patientModel.getBirthPlace().getId());
-            demographicInfo.setHomeAddress(patientModel.getHomeAddress().getId());
-            demographicInfo.setWorkAddress(patientModel.getWorkAddress().getId());
-            if (patientModel.getResidenceType() != null && !patientModel.getResidenceType().isEmpty()) {
-                demographicInfo.setResidenceType(patientModel.getResidenceType());
-            }
-            if(patientModel.getPassword()!=null&&!patientModel.getPassword().equals("")){
-                demographicInfo.setPassword(patientModel.getPassword());
-            }
-            //TODO：Map类型的电话号码还要处理，如何展示问题
-            demographicInfo.setTelphoneNo(patientModel.getTel());
-            demographicInfo.setEmail(patientModel.getEmail());
-
-            if (!isRegistered) {
-                register(demographicInfo);
-            } else {
-                update(demographicInfo);
-            }
-        } catch (Exception e) {
+        isRegistered = isRegistered(new DemographicId(patientModel.getIdCardNo()));
+        if (!isRegistered) {
+            demographicInfo = createDemographicInfo(patientModel.getIdCardNo(), patientModel.getName());
+            //demographicInfo = createDemographicInfo(new DemographicId(patientModel.getIdCardNo()), patientModel.getName());
+        } else {
+            demographicInfo = getDemographicInfo(new DemographicId(patientModel.getIdCardNo()));
         }
+        if (patientModel.getGender() != null && !patientModel.getGender().isEmpty()) {
+            demographicInfo.setGender(patientModel.getGender());
+        }
+        if (patientModel.getNation() != null && !patientModel.getNation().isEmpty()) {
+            demographicInfo.setNation(patientModel.getNation());
+        }
+        demographicInfo.setNativePlace(patientModel.getNativePlace());
+        if (patientModel.getMartialStatus() != null && !patientModel.getMartialStatus().isEmpty()) {
+            demographicInfo.setMartialStatus(patientModel.getMartialStatus());
+        }
+        date = patientModel.getBirthday();
+        if (date != null && !date.isEmpty()) {
+            demographicInfo.setBirthday(format.parse(date));
+        }
+        demographicInfo.setBirthPlace(patientModel.getBirthPlace().getId());
+        demographicInfo.setHomeAddress(patientModel.getHomeAddress().getId());
+        demographicInfo.setWorkAddress(patientModel.getWorkAddress().getId());
+        if (patientModel.getResidenceType() != null && !patientModel.getResidenceType().isEmpty()) {
+            demographicInfo.setResidenceType(patientModel.getResidenceType());
+        }
+        if(patientModel.getPassword()!=null&&!patientModel.getPassword().equals("")){
+            demographicInfo.setPassword(patientModel.getPassword());
+        }
+        //TODO：Map类型的电话号码还要处理，如何展示问题
+        demographicInfo.setTelphoneNo(patientModel.getTel());
+        demographicInfo.setEmail(patientModel.getEmail());
+
+        if (isRegistered) {
+            String pwd = "123456";
+            demographicInfo.setPassword(HashUtil.hashStr(pwd));
+        }
+        save(demographicInfo);
         return true;
     }
 
@@ -361,37 +356,7 @@ public class DemographicIndex{
     }
 
 
-    public void update(DemographicInfo demoInfo) {
-        DemographicInfo di = (DemographicInfo) demoInfo;
 
-        //地址检查并保存
-        MAddress xlocation = null;
-        //出生地
-        xlocation = addressClient.getAddressById( demoInfo.getBirthPlace());
-        if (!isNullAddress(xlocation)) {
-            String addressId = savaAddress(xlocation);
-            demoInfo.setBirthPlace(addressId);
-        }else{
-            demoInfo.setBirthPlace(null);
-        }
-        //工作地址
-        xlocation = addressClient.getAddressById(demoInfo.getWorkAddress());
-        if (!isNullAddress(xlocation)) {
-            String addressid = savaAddress(xlocation);
-            demoInfo.setWorkAddress(addressid);
-        }else{
-            demoInfo.setWorkAddress(null);
-        }
-        //家庭地址
-        xlocation = addressClient.getAddressById(demoInfo.getHomeAddress());
-        if (!isNullAddress(xlocation)) {
-            String addressId = savaAddress(xlocation);
-            demoInfo.setHomeAddress(addressId);
-        }else{
-            demoInfo.setHomeAddress(null);
-        }
-        entityManager.unwrap(org.hibernate.Session.class).save(demoInfo);
-    }
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public void delete(DemographicId id) {

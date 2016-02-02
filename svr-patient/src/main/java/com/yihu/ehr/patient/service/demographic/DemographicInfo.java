@@ -33,7 +33,8 @@ public class DemographicInfo {
     private String homeAddress;                    // 家庭地址
     private String password;                        //密码
     private String telphoneNo ;                     // 电话号码，之前是个电话号码列表
-    private Map<String, String> extra;             // 额外的信息，作为不同平台之间的冗余数据
+    private String picPath = "";
+    private String localPath = "";
 
     public DemographicInfo() {
     }
@@ -154,13 +155,22 @@ public class DemographicInfo {
         this.telphoneNo = telphoneNo;
     }
 
-//    @Column(name = "extra",  nullable = true)
-//    public Map<String, String> getExtra() {
-//        return extra;
-//    }
-//    public void setExtra(Map<String, String> extra) {
-//        this.extra = extra;
-//    }
+
+    @Column(name = "Pic_path",  nullable = true)
+    public String getPicPath() {
+        return picPath;
+    }
+    public void setPicPath(String picPath) {
+        this.picPath = picPath;
+    }
+
+    @Column(name = "local_path",  nullable = true)
+    public String getLocalPath() {
+        return localPath;
+    }
+    public void setLocalPath(String localPath) {
+        this.localPath = localPath;
+    }
 
 }
 

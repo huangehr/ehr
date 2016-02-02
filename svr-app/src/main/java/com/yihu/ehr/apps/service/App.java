@@ -1,6 +1,5 @@
 package com.yihu.ehr.apps.service;
 
-import com.yihu.ehr.util.beanUtil.BaseModel;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -18,7 +17,7 @@ import java.util.Set;
 @Entity
 @Table(name = "apps")
 @Access(value = AccessType.PROPERTY)
-public class App extends BaseModel{
+public class App {
     private String id;
     private String name;
     private String secret;

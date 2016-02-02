@@ -1,11 +1,10 @@
 package com.yihu.ehr.model.user;
 
 
-import com.yihu.ehr.util.beanUtil.BaseModel;
-
+import java.io.Serializable;
 import java.util.Date;
 
-public class MUser extends BaseModel{
+public class MUser implements Serializable{
 
     private String id;
     private Date createDate;

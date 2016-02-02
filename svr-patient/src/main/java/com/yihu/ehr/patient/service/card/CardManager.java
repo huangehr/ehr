@@ -1,11 +1,11 @@
 package com.yihu.ehr.patient.service.card;
 
 import com.yihu.ehr.model.address.MAddress;
-import com.yihu.ehr.model.dict.MBaseDict;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.patient.dao.XAbstractPhysicalCardRepository;
 import com.yihu.ehr.patient.dao.XAbstractVirtualCardRepository;
-import com.yihu.ehr.patient.feignClient.address.AddressClient;
-import com.yihu.ehr.patient.feignClient.dict.ConventionalDictClient;
+import com.yihu.ehr.patient.feignClient.AddressClient;
+import com.yihu.ehr.patient.feignClient.ConventionalDictClient;
 import com.yihu.ehr.patient.service.demographic.DemographicId;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -52,7 +52,7 @@ public class CardManager {
     public CardManager() {
     }
 
-    public static Class getCardImplemention(MBaseDict cardType) {
+    public static Class getCardImplemention(MConventionalDict cardType) {
         switch (cardType.getCode()) {
             case "HealthCard":
                 return HealthCard.class;
@@ -94,7 +94,7 @@ public class CardManager {
         }
     }
 
-    public AbstractCard registerCard(MBaseDict cardType, String no, String ownerName,SNSPlatform platform) {
+    public AbstractCard registerCard(MConventionalDict cardType, String no, String ownerName, SNSPlatform platform) {
         Class cls = getCardImplemention(cardType);
         if (cls == null) throw new CardException("未知的卡类型.");
 
@@ -112,7 +112,7 @@ public class CardManager {
         return card;
     }
 
-    public boolean isCardRegistered(String number, MBaseDict type, MAddress address, SNSPlatform platform) {
+    public boolean isCardRegistered(String number, MConventionalDict type, MAddress address, SNSPlatform platform) {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
 
         Criteria criteria = null;
@@ -244,7 +244,7 @@ public class CardManager {
         int rows = (Integer)args.get("rows");
         int page = (Integer)args.get("page");
         DemographicId demographicId=null;
-        MBaseDict type=null;
+        MConventionalDict type=null;
 
         String sqlPhysical="from AbstractPhysicalCard a where (a.number like :number)";
         String sqlVirtual="from AbstractVirtualCard a where (a.number like :number)";
@@ -338,7 +338,7 @@ public class CardManager {
         String searchType = (String) args.get("type");
         String searchIdCardNo = (String)args.get("searchIdCardNo");
         DemographicId demographicId=null;
-        MBaseDict type=null;
+        MConventionalDict type=null;
 
         String sqlPhysical="select 1 from AbstractPhysicalCard a where (a.number like :number)";
         String sqlVirtual="select 1 from AbstractVirtualCard a where (a.number like :number)";
