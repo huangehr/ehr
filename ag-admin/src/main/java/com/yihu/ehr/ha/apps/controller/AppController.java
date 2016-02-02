@@ -1,7 +1,10 @@
 package com.yihu.ehr.ha.apps.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.ha.apps.service.AppClient;
+import com.yihu.ehr.model.app.MApp;
+import com.yihu.ehr.model.app.MAppDetail;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +45,6 @@ public class AppController extends BaseRestController {
                              @ApiParam(name = "rows", value = "页数", defaultValue = "")
                              @RequestParam(value = "rows") int rows) {
 
-
         Object object = appClient.getAppList(apiVersion, appId, appName, catalog, status, page, rows);
         return object;
     }
@@ -53,7 +55,7 @@ public class AppController extends BaseRestController {
      * @param appId APPId
      * @return 操作结果
      */
-    @RequestMapping(value = "/", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/id", method = RequestMethod.DELETE)
     public Object deleteApp(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                             @PathVariable(value = "api_version") String apiVersion,
                             @ApiParam(name = "appId", value = "appid", defaultValue = "")
@@ -67,12 +69,19 @@ public class AppController extends BaseRestController {
      * @param appId APPId
      * @return APP明细
      */
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public Object getAppDetail(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+    @RequestMapping(value = "/id", method = RequestMethod.GET)
+    public MAppDetail getAppDetail(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                                @PathVariable(value = "api_version") String apiVersion,
                                @ApiParam(name = "appId", value = "appid", defaultValue = "")
-                               @RequestParam(value = "appId") String appId) {
-        return appClient.getAppDetail(apiVersion, appId);
+                               @RequestParam(value = "appId") String appId) throws Exception {
+
+        Object object = appClient.getAppDetail(apiVersion, appId);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String appJson = objectMapper.writeValueAsString(object);
+        MAppDetail mAppDetail = objectMapper.readValue(appJson, MAppDetail.class);
+
+        return mAppDetail;
     }
 
     /**
@@ -86,8 +95,8 @@ public class AppController extends BaseRestController {
      * @param userId      用户ID
      * @return 操作结果
      */
-    @RequestMapping(value = "/", method = RequestMethod.POST)
-    public Object createApp(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+    @RequestMapping(value = "", method = RequestMethod.POST)
+    public MApp createApp(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                             @PathVariable(value = "api_version") String apiVersion,
                             @ApiParam(name = "name", value = "名称", defaultValue = "")
                             @RequestParam(value = "name") String name,
@@ -100,11 +109,15 @@ public class AppController extends BaseRestController {
                             @ApiParam(name = "tags", value = "标记", defaultValue = "")
                             @RequestParam(value = "tags") String tags,
                             @ApiParam(name = "userId", value = "用户", defaultValue = "")
-                            @RequestParam(value = "userId") String userId) {
+                            @RequestParam(value = "userId") String userId) throws Exception{
 
         Object object = appClient.createApp(apiVersion, name, catalog, url, description, tags, userId);
 
-        return object;
+        ObjectMapper objectMapper = new ObjectMapper();
+        String appJson = objectMapper.writeValueAsString(object);
+        MApp mApp = objectMapper.readValue(appJson, MApp.class);
+
+        return mApp;
     }
 
     /**
@@ -119,8 +132,8 @@ public class AppController extends BaseRestController {
      * @param tags        标记
      * @return 操作结果
      */
-    @RequestMapping(value = "/", method = RequestMethod.PUT)
-    public Object updateApp(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+    @RequestMapping(value = "", method = RequestMethod.PUT)
+    public MApp updateApp(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                             @PathVariable(value = "api_version") String apiVersion,
                             @ApiParam(name = "appId", value = "名id", defaultValue = "")
                             @RequestParam(value = "appId") String appId,
@@ -135,8 +148,15 @@ public class AppController extends BaseRestController {
                             @ApiParam(name = "description", value = "描述", defaultValue = "")
                             @RequestParam(value = "description") String description,
                             @ApiParam(name = "tags", value = "标记", defaultValue = "")
-                            @RequestParam(value = "tags") String tags) {
-        return appClient.updateApp(apiVersion, appId, name, catalog, status, url, description, tags);
+                            @RequestParam(value = "tags") String tags) throws Exception{
+
+        Object object = appClient.updateApp(apiVersion, appId, name, catalog, status, url, description, tags);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String appJson = objectMapper.writeValueAsString(object);
+        MApp mApp = objectMapper.readValue(appJson, MApp.class);
+
+        return mApp;
     }
 
     /**
