@@ -1,6 +1,6 @@
 package com.yihu.ehr.patient.controller;
 
-import com.yihu.ehr.constrant.Result;
+import com.yihu.ehr.constants.Result;
 import com.yihu.ehr.patient.service.card.AbstractCard;
 import com.yihu.ehr.patient.service.card.CardBrowseModel;
 import com.yihu.ehr.patient.service.card.CardManager;
@@ -42,12 +42,12 @@ public class CardController extends BaseRestController {
         Result result = new Result();
         result.setObj(cardBrowseModelList);
         result.setTotalCount(totalCount);
-        return result;
+        return getResult(cardBrowseModelList,totalCount,page,rows);
     }
 
     @RequestMapping("searchNewCard")
     @ResponseBody
-    public String searchNewCard(String idCardNo,String searchNm,String searchType, int page, int rows) throws Exception{
+    public Object searchNewCard(String idCardNo,String searchNm,String searchType, int page, int rows) throws Exception{
         Map<String, Object> conditionMap = new HashMap<>();
         Map<String, Object> infoMap = null;
         conditionMap.put("searchIdCardNo",idCardNo);
@@ -58,10 +58,7 @@ public class CardController extends BaseRestController {
 
         List<CardBrowseModel> cardBrowseModelList = cardManager.searchCardBrowseModel(conditionMap);
         Integer totalCount = cardManager.searchCardInt(conditionMap, false);
-
-        Result result = getResult(cardBrowseModelList, totalCount, page, rows);
-
-        return result.toJson();
+        return getResult(cardBrowseModelList, totalCount, page, rows);
     }
 
     @RequestMapping("getCard")
@@ -80,9 +77,9 @@ public class CardController extends BaseRestController {
     public Object detachCard(String objectId,String type){
         AbstractCard card = cardManager.getCard(objectId, type);
         if(cardManager.detachCard(card)){
-            return "success";
+            return true;
         }else{
-            return "faild";
+            return false;
         }
     }
 
@@ -90,9 +87,9 @@ public class CardController extends BaseRestController {
     public Object attachCard(String idCardNo,String objectId,String type){
         AbstractCard card = cardManager.getCard(objectId, type);
         if(cardManager.attachCardWith(card, new DemographicId(idCardNo))){
-            return "success";
+            return true;
         }else{
-            return "faild";
+            return false;
         }
     }
 

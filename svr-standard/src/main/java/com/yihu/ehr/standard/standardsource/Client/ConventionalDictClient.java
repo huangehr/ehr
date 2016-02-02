@@ -1,7 +1,6 @@
 package com.yihu.ehr.standard.standardsource.Client;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
-import com.yihu.ehr.model.dict.MBaseDict;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +18,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 public interface ConventionalDictClient {
 
     @RequestMapping(value = "/{api_version}/conventional_dict/stdSourceType", method = GET,consumes = "application/json")
-    MBaseDict getStdSourceType(
+    MConventionalDict getStdSourceType(
             @PathVariable(value="api_version")String version,
             @RequestParam(value = "code") String code);
 

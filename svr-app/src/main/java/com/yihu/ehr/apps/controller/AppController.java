@@ -5,10 +5,8 @@ import com.yihu.ehr.apps.service.App;
 import com.yihu.ehr.apps.service.AppDetailModel;
 import com.yihu.ehr.apps.service.AppManager;
 import com.yihu.ehr.constants.ApiVersionPrefix;
-import com.yihu.ehr.constrant.Result;
 import com.yihu.ehr.model.app.MApp;
-import com.yihu.ehr.model.dict.MBaseDict;
-import com.yihu.ehr.util.beanUtil.BeanUtils;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -80,10 +78,10 @@ public class AppController extends BaseRestController {
         conditionMap.put("rows", rows);
         List<AppDetailModel> detailModelList = appManager.searchAppDetailModels(apiVersion,conditionMap);
         int totalCount = appManager.searchAppsInt(conditionMap);
-        return new Result().getResult(detailModelList,totalCount,page,rows);
+        return getResult(detailModelList,totalCount,page,rows);
     }
 
-    @RequestMapping(value = "/" , method = RequestMethod.DELETE)
+    @RequestMapping(value = "" , method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除app")
     public Object deleteApp(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -95,7 +93,7 @@ public class AppController extends BaseRestController {
     }
 
 
-    @RequestMapping(value = "/" , method = RequestMethod.GET)
+    @RequestMapping(value = "" , method = RequestMethod.GET)
     @ApiOperation(value = "根据id查询app")
     public Object getApp(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -103,8 +101,7 @@ public class AppController extends BaseRestController {
             @ApiParam(name = "appId", value = "id", defaultValue = "")
             @RequestParam(value = "appId") String appId) throws Exception{
         App app = appManager.getApp(appId);
-        MApp appModel = BeanUtils.copyModelToVo(MApp.class,app);
-        return appModel;
+        return convertToModel(app,MApp.class);
     }
 
     /**
@@ -118,7 +115,7 @@ public class AppController extends BaseRestController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/" , method = RequestMethod.POST)
+    @RequestMapping(value = "" , method = RequestMethod.POST)
     @ApiOperation(value = "创建app")
     public Object createApp(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -135,10 +132,9 @@ public class AppController extends BaseRestController {
             @RequestParam(value = "tags") String tags,
             @ApiParam(name = "userId", value = "用户", defaultValue = "")
             @RequestParam(value = "userId") String userId) throws Exception{
-        MBaseDict appCatalog = conventionalDictClient.getAppCatalog(apiVersion,catalog);
+        MConventionalDict appCatalog = conventionalDictClient.getAppCatalog(apiVersion,catalog);
         App app = appManager.createApp(apiVersion,name,appCatalog,url, tags, description, userId);
-        MApp appModel = BeanUtils.copyModelToVo(MApp.class,app);
-        return appModel;
+        return convertToModel(app,MApp.class);
     }
 
     @RequestMapping(value = "/detail" , method = RequestMethod.GET)
@@ -153,7 +149,7 @@ public class AppController extends BaseRestController {
 
     }
 
-    @RequestMapping(value = "/" , method = RequestMethod.PUT)
+    @RequestMapping(value = "" , method = RequestMethod.PUT)
     @ApiOperation(value = "修改app")
     public Object updateApp(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -174,8 +170,8 @@ public class AppController extends BaseRestController {
             @RequestParam(value = "tags") String tags) throws Exception{
 
         App app;
-        MBaseDict appCatalog = conventionalDictClient.getAppCatalog(apiVersion,catalog);
-        MBaseDict appStatus = conventionalDictClient.getAppStatus(apiVersion,status);
+        MConventionalDict appCatalog = conventionalDictClient.getAppCatalog(apiVersion,catalog);
+        MConventionalDict appStatus = conventionalDictClient.getAppStatus(apiVersion,status);
         app = appManager.getApp(appId);
         if (app == null) {
             return "faild";
@@ -186,10 +182,8 @@ public class AppController extends BaseRestController {
             app.setUrl(url);
             app.setDescription(description);
             app.setTags(tags);
-
             appManager.updateApp(app);
-            MApp appModel = BeanUtils.copyModelToVo(MApp.class,app);
-            return appModel;
+            return convertToModel(app,MApp.class);
         }
 
     }

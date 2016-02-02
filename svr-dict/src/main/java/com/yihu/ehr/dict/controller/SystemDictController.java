@@ -1,12 +1,11 @@
 package com.yihu.ehr.dict.controller;
 
 import com.yihu.ehr.constants.ApiVersionPrefix;
-import com.yihu.ehr.constrant.Result;
 import com.yihu.ehr.dict.service.SystemDict;
 import com.yihu.ehr.dict.service.SystemDictEntry;
 import com.yihu.ehr.dict.service.SystemDictManager;
+import com.yihu.ehr.dict.service.common.ConventionalDict;
 import com.yihu.ehr.dict.service.common.ConventionalDictEntry;
-import com.yihu.ehr.dict.service.common.Tags;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,8 +23,8 @@ import java.util.Map;
  */
 @EnableFeignClients
 @RestController
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/sys_dict")
-@Api(protocols = "https", value = "conventional_dict", description = "系统字典接口", tags = {"系统字典接口"})
+@RequestMapping(ApiVersionPrefix.CommonVersion)
+@Api(value = "conventional_dict", description = "系统字典接口", tags = {"系统字典接口"})
 public class SystemDictController extends BaseRestController {
 
     @Autowired
@@ -37,7 +36,7 @@ public class SystemDictController extends BaseRestController {
 
 
     @ApiOperation(value = "创建字典")
-    @RequestMapping(value = "/dict" ,method = RequestMethod.POST)
+    @RequestMapping(value = "/system_dict" ,method = RequestMethod.POST)
     public Object createDict(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -56,7 +55,7 @@ public class SystemDictController extends BaseRestController {
     }
 
     @ApiOperation(value = "删除字典")
-    @RequestMapping(value = "/dict" ,method = RequestMethod.DELETE)
+    @RequestMapping(value = "/system_dict" ,method = RequestMethod.DELETE)
     public Object deleteDict(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -67,7 +66,7 @@ public class SystemDictController extends BaseRestController {
     }
 
     @ApiOperation(value = "修改字典")
-    @RequestMapping(value = "/dict" ,method = RequestMethod.PUT)
+    @RequestMapping(value = "/system_dict" ,method = RequestMethod.PUT)
     public Object updateDict(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -92,7 +91,7 @@ public class SystemDictController extends BaseRestController {
      * @return
      */
     @ApiOperation(value = "查询字典列表")
-    @RequestMapping(value = "/search" , method = RequestMethod.GET)
+    @RequestMapping(value = "/system_dict/search" , method = RequestMethod.GET)
     public Object searchSysDicts(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -115,7 +114,7 @@ public class SystemDictController extends BaseRestController {
     }
 
     @ApiOperation(value = "创建字典项")
-    @RequestMapping(value = "/dict_entry" , method = RequestMethod.POST)
+    @RequestMapping(value = "/system_dict_entry" , method = RequestMethod.POST)
     public Object createDictEntry(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -152,7 +151,7 @@ public class SystemDictController extends BaseRestController {
     }
 
     @ApiOperation(value = "删除字典项")
-    @RequestMapping(value = "/dict_entry" ,method = RequestMethod.DELETE)
+    @RequestMapping(value = "/system_dict_entry" ,method = RequestMethod.DELETE)
     public Object deleteDictEntry(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -172,7 +171,7 @@ public class SystemDictController extends BaseRestController {
     }
 
     @ApiOperation(value = "修改字典项")
-    @RequestMapping(value = "/dict_entry" ,method = RequestMethod.PUT)
+    @RequestMapping(value = "/system_dict_entry" ,method = RequestMethod.PUT)
     public Object updateDictEntry(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -196,7 +195,7 @@ public class SystemDictController extends BaseRestController {
     }
 
     @ApiOperation(value = "查询字典项列表")
-    @RequestMapping(value = "/dict_entry/search" , method = RequestMethod.GET)
+    @RequestMapping(value = "/system_dict_entry/search" , method = RequestMethod.GET)
     public Object searchDictEntryList(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -212,18 +211,18 @@ public class SystemDictController extends BaseRestController {
         conditionMap.put("rows", rows);
         List<SystemDictEntry> list = systemDictManager.searchEntryList(conditionMap);
         Integer totalCount = list.size();
-        return new Result().getResult(list,totalCount,page,rows);
+        return getResult(list,totalCount,page,rows);
     }
 
     @ApiOperation(value = "获取标签项")
-    @RequestMapping(value = "/select_tags",method = RequestMethod.GET)
+    @RequestMapping(value = "/tags",method = RequestMethod.GET)
     public Object selectTags() {
-        List<Tags> tags = conventionalDictEntry.getTagsList();
+        List<ConventionalDict> tags = conventionalDictEntry.getTagsList();
         return tags;
     }
 
     @ApiOperation(value = "根据字典编号获取字典项")
-    @RequestMapping(value = "/dict_entry_list_ddl" ,method = RequestMethod.GET)
+    @RequestMapping(value = "/system_dict_entry" ,method = RequestMethod.GET)
     public Object searchDictEntryListForDDL(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -239,7 +238,7 @@ public class SystemDictController extends BaseRestController {
     }
 
     @ApiOperation(value = "根据字典名称判断字典是否已存在")
-    @RequestMapping("/validator")
+    @RequestMapping("/system_dict/exists")
     public Object validator(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -250,7 +249,7 @@ public class SystemDictController extends BaseRestController {
     }
 
     @ApiOperation(value = "根据字典编号和字典名称查询字典列表，模糊查询")
-    @RequestMapping("/autoSearchDictEntryList")
+    @RequestMapping("/system_dict_entry/")
     public Object autoSearchDictEntryList(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,

@@ -1,7 +1,7 @@
 package com.yihu.ehr.patient.service.card;
 
 import com.yihu.ehr.model.address.MAddress;
-import com.yihu.ehr.model.dict.MBaseDict;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.user.MUser;
 
@@ -17,8 +17,8 @@ public abstract class AbstractCardModel {
 	protected String id;				    // 卡ID
 	protected String number;				// 卡号
 	protected MUser ownerName;			// 持有人姓名
-	protected MBaseDict status;			// 状态 CardStatus
-	protected MBaseDict type;				// 类型 CardType
+	protected MConventionalDict status;			// 状态 CardStatus
+	protected MConventionalDict type;				// 类型 CardType
 	protected String description;			// 描述
 	protected Date createDate;				// 创建日期
 	protected String demographicId;	// 人口学ID
@@ -65,19 +65,19 @@ public abstract class AbstractCardModel {
 		this.ownerName = ownerName;
 	}
 
-	public MBaseDict getStatus() {
+	public MConventionalDict getStatus() {
 		return status;
 	}
 
-	public void setStatus(MBaseDict status) {
+	public void setStatus(MConventionalDict status) {
 		this.status = status;
 	}
 
-	public MBaseDict getType() {
+	public MConventionalDict getType() {
 		return type;
 	}
 
-	public void setType(MBaseDict type) {
+	public void setType(MConventionalDict type) {
 		this.type = type;
 	}
 

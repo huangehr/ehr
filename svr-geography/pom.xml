@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-	<artifactId>svr-address</artifactId>
+	<artifactId>svr-geography</artifactId>
 	<packaging>jar</packaging>
-	<name>svr-address</name>
-	<description>EHR platform address service</description>
+	<name>svr-geography</name>
+	<description>EHR platform geography service</description>
 
 	<properties>
 	</properties>

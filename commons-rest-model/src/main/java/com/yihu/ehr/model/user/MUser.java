@@ -1,9 +1,10 @@
 package com.yihu.ehr.model.user;
 
+
 import java.io.Serializable;
 import java.util.Date;
 
-public class MUser implements Serializable {
+public class MUser implements Serializable{
 
     private String id;
     private Date createDate;

@@ -10,7 +10,6 @@ import com.yihu.ehr.security.service.TokenManager;
 import com.yihu.ehr.security.service.UserSecurity;
 import com.yihu.ehr.security.service.UserToken;
 import com.yihu.ehr.util.DateUtil;
-import com.yihu.ehr.util.beanUtil.BeanUtils;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.encrypt.RSA;
 import io.swagger.annotations.Api;
@@ -53,8 +52,7 @@ public class SecurityRestController extends BaseRestController {
             @ApiParam(required = true, name = "userName", value = "用户名")
             @RequestParam(value = "userName") String userName) throws Exception {
         UserSecurity userSecurity = securityManager.getUserSecurityByUserName(apiVersion,userName);
-        MUserSecurity mUserSecurity = BeanUtils.copyModelToVo(MUserSecurity.class,userSecurity);
-        return mUserSecurity;
+        return convertToModel(userSecurity,MUserSecurity.class);
     }
 
 
@@ -67,8 +65,7 @@ public class SecurityRestController extends BaseRestController {
             @ApiParam(required = true, name = "orgCode", value = "机构代码")
             @RequestParam(value = "orgCode") String orgCode) {
         UserSecurity userSecurity = securityManager.getUserPublicKeyByOrgCd(orgCode);
-        MUserSecurity userSecurityModel = BeanUtils.copyModelToVo(MUserSecurity.class,userSecurity);
-        return userSecurityModel;
+        return convertToModel(userSecurity,MUserSecurity.class);
     }
 
     /**
@@ -223,8 +220,7 @@ public class SecurityRestController extends BaseRestController {
             @ApiParam(name = "orgCode", value = "机构代码")
             @RequestParam( value = "orgCode") String orgCode) throws Exception {
         UserSecurity userSecurity = securityManager.createSecurityByOrgCode(orgCode);
-        MUserSecurity userSecurityModel = BeanUtils.copyModelToVo(MUserSecurity.class,userSecurity);
-        return userSecurityModel;
+        return convertToModel(userSecurity,MUserSecurity.class);
     }
 
     /**

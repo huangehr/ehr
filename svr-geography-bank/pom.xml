@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>com.yihu.ehr</groupId>
-		<artifactId>commons-dependencies</artifactId>
-		<version>1.1.0</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
+    <parent>
+        <groupId>com.yihu.ehr</groupId>
+        <artifactId>commons-dependencies</artifactId>
+        <version>1.1.0</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
 
-	<artifactId>svr-patient</artifactId>
+	<artifactId>svr-address</artifactId>
 	<packaging>jar</packaging>
-	<name>svr-patient</name>
-	<description>EHR platform patient service</description>
+	<name>svr-address</name>
+	<description>EHR platform address service</description>
 
 	<properties>
 	</properties>
@@ -29,10 +29,6 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-config</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-cloud-connectors</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
@@ -94,9 +90,9 @@
 			<version>1.1.0</version>
 		</dependency>
 		<dependency>
-			<groupId>com.yihu.ehr</groupId>
-			<artifactId>commons-data-fastdfs</artifactId>
-			<version>1.1.0</version>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>1.9.13</version>
 		</dependency>
 	</dependencies>
 

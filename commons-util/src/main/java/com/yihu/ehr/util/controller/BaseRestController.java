@@ -1,22 +1,18 @@
 package com.yihu.ehr.util.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.util.ApiErrorEcho;
-import com.yihu.ehr.util.StringBuilderUtil;
+import com.yihu.ehr.constants.Result;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * REST风格控控制器基类。此控制器用于对API进行校验，并处理平台根层级的业务，如API参数校验，错误及返回码设定等。
@@ -67,4 +63,22 @@ public class BaseRestController extends AbstractController {
 
         return targets;
     }
+
+    protected Result getResult(List detaiModelList, int totalCount, int currPage, int rows) {
+        Result result = new Result();
+        result.setSuccessFlg(true);
+        result.setDetailModelList(detaiModelList);
+        result.setTotalCount(totalCount);
+        result.setCurrPage(currPage);
+        result.setPageSize(rows);
+        if(result.getPageSize()==0)
+            return result;
+        if (result.getTotalCount() % result.getPageSize() > 0) {
+            result.setTotalPage((result.getTotalCount() / result.getPageSize()) + 1);
+        } else {
+            result.setTotalPage(result.getTotalCount() / result.getPageSize());
+        }
+        return result;
+    }
+
 }

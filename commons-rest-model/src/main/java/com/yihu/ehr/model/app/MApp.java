@@ -1,5 +1,4 @@
 package com.yihu.ehr.model.app;
-
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
@@ -12,7 +11,7 @@ import java.util.Set;
  * @created 03_8月_2015 16:53:21
  */
 
-public class MApp  implements Serializable {
+public class MApp implements Serializable {
     private String id;
     private String name;
     private String secret;

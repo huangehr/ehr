@@ -1,7 +1,6 @@
 package com.yihu.ehr.security.service;
 
 import com.yihu.ehr.util.ObjectVersion;
-import com.yihu.ehr.util.beanUtil.BaseModel;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -18,7 +17,7 @@ import java.util.Date;
 @Entity
 @Table(name = "user_security")
 @Access(value = AccessType.PROPERTY)
-public class UserSecurity extends BaseModel implements Serializable {
+public class UserSecurity implements Serializable {
 
 	public UserSecurity() {
 		id  = new ObjectVersion().toString();

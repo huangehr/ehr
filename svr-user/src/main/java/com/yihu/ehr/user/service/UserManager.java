@@ -1,9 +1,8 @@
 package com.yihu.ehr.user.service;
 
 import com.yihu.ehr.model.address.MAddress;
-import com.yihu.ehr.model.dict.MBaseDict;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.security.MUserSecurity;
-import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.user.feignClient.address.AddressClient;
 import com.yihu.ehr.user.feignClient.dict.ConventionalDictClient;
 import com.yihu.ehr.user.feignClient.org.OrgClient;
@@ -87,7 +86,7 @@ public class UserManager  {
      * @param pwd
      * @param email
      */
-    public User registerUser(MBaseDict userType, String loginCode, String nickName, String pwd, String email) {
+    public User registerUser(MConventionalDict userType, String loginCode, String nickName, String pwd, String email) {
 
         User user = new User();
         user.setUserType(userType.getCode());

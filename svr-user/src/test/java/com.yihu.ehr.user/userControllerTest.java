@@ -4,11 +4,11 @@ import com.yihu.ehr.UserServiceApp;
 import com.yihu.ehr.user.controller.UserController;
 import com.yihu.ehr.user.service.User;
 import com.yihu.ehr.user.service.UserModel;
-import com.yihu.ehr.util.beanUtil.BeanUtils;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -68,7 +68,8 @@ public class userControllerTest {
     public void atestUpdateUser() throws Exception{
         String userId = "0dae0003561cc415c72d9111e8cb88aa";
         User user = (User) userController.getUser(apiVersion,userId);
-        UserModel userModel = BeanUtils.copyModelToVo(UserModel.class,user);
+        UserModel userModel = new UserModel();
+        BeanUtils.copyProperties(user,userModel);
         userModel.setEmail("9898987@jkzl.com");
         Object result = userController.updateUser(apiVersion,userModel);
         assertTrue("修改失败！" , result != null);

@@ -11,7 +11,7 @@ import java.util.Set;
  * @version 1.0
  * @updated 21-5月-2015 10:51:30
  */
-public class MOrganization implements Serializable {
+public class MOrganization implements Serializable{
     private String orgCode;         // 机构代码,对医院编码属性需要调研
     private String admin;            // 机构管理员
     private String settled;        // 是否已接入,对第三方平台有效.
