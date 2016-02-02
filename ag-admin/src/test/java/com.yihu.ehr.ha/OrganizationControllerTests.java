@@ -1,5 +1,6 @@
 package com.yihu.ehr.ha;
 
+import com.eureka2.shading.codehaus.jackson.map.ObjectMapper;
 import com.yihu.ehr.ha.organization.controller.OrganizationController;
 import com.yihu.ehr.ha.organization.model.OrgModel;
 import org.junit.FixMethodOrder;
@@ -27,10 +28,13 @@ public class OrganizationControllerTests {
     @Autowired
     private static OrganizationController orgController;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     ApplicationContext applicationContext;
 
     @Test
-    public void atestOrg(){
+    public void atestOrg() throws Exception{
         applicationContext = new SpringApplicationBuilder()
                 .web(false).sources(AgAdminApplication.class).run();
 
@@ -46,7 +50,11 @@ public class OrganizationControllerTests {
         orgModel.setShortName("卫宁");
         orgModel.setTags("电子病历");
         orgModel.setTel("15959208182");
-        //Object object = orgController.updateOrg();
+        String orgModelJson = objectMapper.writeValueAsString(orgModel);
+        Object object = orgController.updateOrg(version,orgModelJson);
+        assertNotEquals("机构新增失败！", object, null);
+
+        String id = "";
 
         String orgCode = "";
         String fullName="";
@@ -58,8 +66,36 @@ public class OrganizationControllerTests {
         int page=1;
         int rows =15;
 
-        Object object = orgController.searchOrgs(version,orgCode,fullName,settledWay,orgType,province,city,district,page,rows);
+        object = orgController.searchOrgs(version,orgCode,fullName,settledWay,orgType,province,city,district,page,rows);
         assertNotEquals("机构列表数据获取失败！", object, null);
+
+        object = orgController.getOrgByCode(version,id);
+        assertNotEquals("机构信息获取失败！", object, null);
+
+        object = orgController.getOrgModel(version,id);
+        assertNotEquals("机构明细获取失败！", object, null);
+
+        object = orgController.updateOrg(version,orgModelJson);
+        assertNotEquals("机构修改失败！", object, null);
+
+        String status = "1";
+        object = orgController.activity(version,id,status);
+        assertNotEquals("机构激活失败！", object, "true");
+
+        object=orgController.getIdsByName(version,fullName);
+        assertNotEquals("机构ID获取失败！", object, null);
+
+        object = orgController.getOrgsByAddress(version,province,city);
+        assertNotEquals("根据地址获取机构信息失败！", object, null);
+
+        object = orgController.distributeKey(version,id);
+        assertNotEquals("秘钥分发失败！", object, null);
+
+        object = orgController.validationOrg(version,id);
+        assertNotEquals("机构验证失败！", object, null);
+
+        object = orgController.deleteOrg(version,id);
+        assertNotEquals("机构上传失败！", object, "false");
     }
 
 }

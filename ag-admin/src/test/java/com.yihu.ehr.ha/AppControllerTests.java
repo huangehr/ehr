@@ -33,6 +33,8 @@ public class AppControllerTests {
     @Autowired
     private AppController appController;
 
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Test
     public void atestCreateApp() throws Exception{
@@ -41,7 +43,7 @@ public class AppControllerTests {
                 .web(false).sources(AgAdminApplication.class).run();
         //新增测试
         Object object = appController.createApp(version, "测试APP", "ChildHealth", "fsdadfs", "这是用于测试的数据", "1", "0dae0003561cc415c72d9111e8cb88aa");
-        ObjectMapper objectMapper = new ObjectMapper();
+
         try {
             String aaa = objectMapper.writeValueAsString(object);
             mApp = objectMapper.readValue(aaa, MApp.class);

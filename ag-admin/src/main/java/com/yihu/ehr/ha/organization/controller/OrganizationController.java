@@ -114,7 +114,7 @@ public class OrganizationController extends BaseRestController {
      * @param orgCode
      * @return
      */
-    @ApiOperation(value = "根据地址代码获取model")
+    @ApiOperation(value = "根据机构代码获取model")
     @RequestMapping(value = "/org_model", method = RequestMethod.GET)
     public Object getOrgModel(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
