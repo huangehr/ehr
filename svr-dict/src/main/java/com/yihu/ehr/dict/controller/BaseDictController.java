@@ -3,11 +3,11 @@ package com.yihu.ehr.dict.controller;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.dict.service.common.*;
 import com.yihu.ehr.model.dict.MBaseDict;
-import com.yihu.ehr.util.beanUtil.BeanUtils;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +28,8 @@ public class BaseDictController extends BaseRestController {
 
 
     MBaseDict getDictModel(MBaseDict dict){
-        MBaseDict dictModel = BeanUtils.copyModelToVo(MBaseDict.class,dict);
+        MBaseDict dictModel = new MBaseDict();
+        BeanUtils.copyProperties(dict,dictModel);
         return dictModel;
     }
 
@@ -218,7 +219,8 @@ public class BaseDictController extends BaseRestController {
         List<UserType> list = baseAbstractDictEntry.getUserTypeList();
         List<MBaseDict> listnew = new ArrayList<>();
         for(UserType userType : list){
-            MBaseDict dictModel = BeanUtils.copyModelToVo(MBaseDict.class,userType);
+            MBaseDict dictModel = new MBaseDict();
+            BeanUtils.copyProperties(userType,dictModel);
             listnew.add(dictModel);
         }
         return listnew;
@@ -232,7 +234,8 @@ public class BaseDictController extends BaseRestController {
         List<Tags> list = baseAbstractDictEntry.getTagsList();
         List<MBaseDict> listnew = new ArrayList<>();
         for(Tags tags : list){
-            MBaseDict dictModel = BeanUtils.copyModelToVo(MBaseDict.class,tags);
+            MBaseDict dictModel = new MBaseDict();
+            BeanUtils.copyProperties(tags,dictModel);
             listnew.add(dictModel);
         }
         return listnew;
@@ -285,7 +288,8 @@ public class BaseDictController extends BaseRestController {
         List<StdSourceType> list = baseAbstractDictEntry.getStdSourceTypeList(codes);
         List<MBaseDict> listnew = new ArrayList<>();
         for(StdSourceType stdSourceType : list){
-            MBaseDict dictModel = BeanUtils.copyModelToVo(MBaseDict.class,stdSourceType);
+            MBaseDict dictModel = new MBaseDict();
+            BeanUtils.copyProperties(stdSourceType,dictModel);
             listnew.add(dictModel);
         }
         return listnew;

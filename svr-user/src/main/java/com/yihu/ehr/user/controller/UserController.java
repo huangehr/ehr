@@ -12,12 +12,12 @@ import com.yihu.ehr.user.service.User;
 import com.yihu.ehr.user.service.UserDetailModel;
 import com.yihu.ehr.user.service.UserManager;
 import com.yihu.ehr.user.service.UserModel;
-import com.yihu.ehr.util.beanUtil.BeanUtils;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -271,7 +271,8 @@ public class UserController extends BaseRestController {
             @ApiParam(name = "loginCode", value = "登录账号", defaultValue = "")
             @RequestParam(value = "loginCode") String loginCode) {
         User user = userManager.getUserByLoginCode(loginCode);
-        MUser userModel = BeanUtils.copyModelToVo(MUser.class,user);
+        MUser userModel = new MUser();
+        BeanUtils.copyProperties(user,userModel);
         return userModel;
     }
 }

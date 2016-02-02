@@ -1,14 +1,14 @@
 package com.yihu.ehr.model.address;
 
 
-import com.yihu.ehr.util.beanUtil.BaseModel;
+import java.io.Serializable;
 
 /**
  * @author Sand
  * @version 1.0
  * @updated 25-05-2015 19:56:00
  */
-public class MAddress extends BaseModel {
+public class MAddress implements Serializable {
     private String id;
     private String country;
     private String province;

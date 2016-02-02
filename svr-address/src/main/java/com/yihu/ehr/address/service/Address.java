@@ -1,6 +1,5 @@
 package com.yihu.ehr.address.service;
 
-import com.yihu.ehr.util.beanUtil.BaseModel;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -14,7 +13,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "addresses")
 @Access(value = AccessType.PROPERTY)
-public class Address extends BaseModel {
+public class Address {
     private String id;
     private String country;
     private String province;

@@ -1,4 +1,4 @@
-package com.yihu.ehr.patient.feignClient.dict;
+package com.yihu.ehr.feignClient.dict;
 
 import com.yihu.ehr.model.dict.MBaseDict;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
@@ -33,15 +33,6 @@ public interface ConventionalDictClient {
 
     @RequestMapping(value = "/yesNo", method = GET,consumes = "application/json")
     MBaseDict getYesNo(@RequestParam(value = "code") Boolean code);
-
-    @RequestMapping(value = "/cardType", method = GET,consumes = "application/json")
-    MBaseDict getCardType(@RequestParam(value = "code") String code);
-
-    @RequestMapping(value = "/cardStatus", method = GET,consumes = "application/json")
-    MBaseDict getCardStatus(@RequestParam(value = "code") String code);
-
-    @RequestMapping(value = "/gender", method = GET,consumes = "application/json")
-    MBaseDict getGender(@RequestParam(value = "code") String code);
 
 
 }

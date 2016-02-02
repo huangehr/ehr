@@ -1,15 +1,10 @@
 package com.yihu.ehr.fastdfs;
 
-import com.yihu.ehr.util.log.LogService;
-import org.csource.common.MyException;
-import org.csource.fastdfs.*;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.csource.fastdfs.StorageClient;
+import org.csource.fastdfs.TrackerClient;
+import org.csource.fastdfs.TrackerServer;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;

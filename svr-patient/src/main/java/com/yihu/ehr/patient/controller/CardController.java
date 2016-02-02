@@ -80,9 +80,9 @@ public class CardController extends BaseRestController {
     public Object detachCard(String objectId,String type){
         AbstractCard card = cardManager.getCard(objectId, type);
         if(cardManager.detachCard(card)){
-            return "success";
+            return true;
         }else{
-            return "faild";
+            return false;
         }
     }
 
@@ -90,9 +90,9 @@ public class CardController extends BaseRestController {
     public Object attachCard(String idCardNo,String objectId,String type){
         AbstractCard card = cardManager.getCard(objectId, type);
         if(cardManager.attachCardWith(card, new DemographicId(idCardNo))){
-            return "success";
+            return true;
         }else{
-            return "faild";
+            return false;
         }
     }
 

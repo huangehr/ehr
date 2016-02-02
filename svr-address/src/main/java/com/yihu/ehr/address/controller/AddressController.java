@@ -5,11 +5,11 @@ import com.yihu.ehr.address.service.AddressDict;
 import com.yihu.ehr.address.service.AddressService;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.model.address.MAddress;
-import com.yihu.ehr.util.beanUtil.BeanUtils;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -68,7 +68,7 @@ public class AddressController extends BaseRestController{
 
     //--------------------------------------------------------------------
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping(value = "", method = RequestMethod.GET)
     @ApiOperation(value = "根据id查询地址信息")
     public Object getAddressById(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -78,7 +78,7 @@ public class AddressController extends BaseRestController{
         MAddress addressModel = new MAddress();
         Address address =  addressService.getAddressById(id);
         if(address!=null){
-            addressModel = BeanUtils.copyModelToVo(MAddress.class,address);
+            BeanUtils.copyProperties(address,addressModel);
         }
         return addressModel;
     }
@@ -100,7 +100,7 @@ public class AddressController extends BaseRestController{
      * 地址检查并保存
      * @return
      */
-    @RequestMapping(value = "/", method = RequestMethod.PUT)
+    @RequestMapping(value = "", method = RequestMethod.PUT)
     @ApiOperation(value = "地址检查并保存")
     public Object saveAddress(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -114,13 +114,13 @@ public class AddressController extends BaseRestController{
             @ApiParam(name = "district", value = "县", defaultValue = "")
             @RequestParam(value = "district") String district,
             @ApiParam(name = "town", value = "", defaultValue = "")
-            @RequestParam(value = "town") String town,
+            @RequestParam(value = "town" ,required = false) String town,
             @ApiParam(name = "street", value = "街道", defaultValue = "")
-            @RequestParam(value = "street") String street,
+            @RequestParam(value = "street" ,required = false) String street,
             @ApiParam(name = "extra", value = "其他", defaultValue = "")
-            @RequestParam(value = "extra") String extra,
+            @RequestParam(value = "extra" ,required = false) String extra,
             @ApiParam(name = "postalCode", value = "行政编码", defaultValue = "")
-            @RequestParam(value = "postalCode") String postalCode) {
+            @RequestParam(value = "postalCode" ,required = false) String postalCode) {
 
         Address address = new Address();
 
@@ -164,7 +164,7 @@ public class AddressController extends BaseRestController{
      * @param id
      * @return
      */
-    @RequestMapping(value = "/" , method = RequestMethod.DELETE)
+    @RequestMapping(value = "" , method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除地址")
     public Object delete(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
@@ -191,11 +191,11 @@ public class AddressController extends BaseRestController{
             @ApiParam(name = "/city" , value = "地址代码" ,defaultValue = "")
             @RequestParam (value = "city") String city,
             @ApiParam(name = "/district" , value = "地址代码" ,defaultValue = "")
-            @RequestParam (value = "district") String district,
+            @RequestParam (value = "district",required = false) String district,
             @ApiParam(name = "/town" , value = "地址代码" ,defaultValue = "")
-            @RequestParam (value = "town") String town,
+            @RequestParam (value = "town",required = false) String town,
             @ApiParam(name = "/street" , value = "地址代码" ,defaultValue = "")
-            @RequestParam (value = "street") String street) {
+            @RequestParam (value = "street",required = false) String street) {
         Address address = new Address();
         address.setCountry(country);
         address.setProvince(province);

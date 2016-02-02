@@ -1,7 +1,7 @@
 package com.yihu.ehr.model.security;
 
+import java.io.Serializable;
 import java.util.Date;
-import com.yihu.ehr.util.beanUtil.BaseModel;
 
 /**
  * 医生
@@ -10,7 +10,7 @@ import com.yihu.ehr.util.beanUtil.BaseModel;
  * @version 1.0
  * @created 02-6月-2015 17:38:05
  */
-public class MUserSecurity extends BaseModel{
+public class MUserSecurity implements Serializable{
 
 	public MUserSecurity() {
 

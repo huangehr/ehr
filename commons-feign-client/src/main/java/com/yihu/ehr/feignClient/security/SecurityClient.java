@@ -1,4 +1,4 @@
-package com.yihu.ehr.patient.feignClient.security;
+package com.yihu.ehr.feignClient.security;
 
 import com.yihu.ehr.model.security.MUserSecurity;
 import org.springframework.cloud.netflix.feign.FeignClient;
