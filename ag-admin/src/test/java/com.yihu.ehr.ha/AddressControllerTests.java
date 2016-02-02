@@ -4,13 +4,14 @@ import com.yihu.ehr.ha.geography.controller.AddressController;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
+import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 /**
@@ -28,8 +29,45 @@ public class AddressControllerTests {
     @Autowired
     private AddressController addressController;
 
+    ApplicationContext applicationContext;
+
+    public void atestAddress(){
+        applicationContext = new SpringApplicationBuilder()
+                .web(false).sources(AgAdminApplication.class).run();
+        String country ="test_country";
+        String province="test_province";
+        String city = "test_city";
+        String district ="test_district";
+        String town = "test_town";
+        String street = "test_street";
+        String extra="test_extra";
+        String postalCode = "363000";
+        Object object = addressController.saveAddress(apiVersion,country,province,city,district,town,street,extra,postalCode);
+        assertNotEquals("地址新增失败", object, null);
+
+        String id = "";
+        object=addressController.getAddressById(apiVersion,id);
+        assertNotEquals("地址明细获取失败", object, null);
+
+        object = addressController.getCanonicalAddress(apiVersion,id);
+        assertNotEquals("地址信息获取失败", object, null);
+
+        street = "test_street_c";
+        extra="test_extra_c";
+        postalCode = "363000";
+        object = addressController.saveAddress(apiVersion,country,province,city,district,town,street,extra,postalCode);
+        assertNotEquals("地址修改失败", object, null);
+
+        object = addressController.search(apiVersion,province,city,district);
+        assertNotEquals("地址搜索失败", object, null);
+
+        object = addressController.delete(apiVersion,id);
+        assertNotEquals("地址删除失败", object, "true");
+
+    }
+
     @Test
-    public void atestGetAddressByLevel()
+    public void btestGetAddressByLevel()
     {
         Integer level = 1;
         Object object = addressController.getAddressByLevel(apiVersion,level);
@@ -37,34 +75,11 @@ public class AddressControllerTests {
     }
 
     @Test
-    public void bgetAddressDictByPid()
+    public void cgetAddressDictByPid()
     {
         Integer level = 2;
         Object object = addressController.getAddressDictByPid(apiVersion, level);
         assertNotEquals("地址信息查询失败",object,null);
     }
 
-    @Test
-    public void csaveAddress(){
-        String country = "中国";
-        String province = "福建省T";
-        String city = "宁德市T";
-        String district = "霞浦县T";
-        String town = "";
-        String street = "";
-        String extra = "";
-        String postalCode = "072150";
-        Object addessId = addressController.saveAddress(apiVersion,country,province,city,district,town,street,extra,postalCode);
-        //Object obj = addressController.getAddressById("v1.0", addessId.toString());
-        assertNotEquals("新增失败！", addessId , null);
-
-        Object object = addressController.getAddressById(apiVersion,addessId.toString());
-
-      //  assertTrue("查询失败！" , object != null);
-
-        assertNotEquals("查询失败！", object , null);
-        object = addressController.delete(apiVersion,addessId.toString());
-
-        assertEquals("删除失败！", object,null);
-    }
 }

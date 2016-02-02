@@ -46,7 +46,7 @@ public class OrganizationControllerTests {
         orgModel.setShortName("卫宁");
         orgModel.setTags("电子病历");
         orgModel.setTel("15959208182");
-
+        //Object object = orgController.updateOrg();
 
         String orgCode = "";
         String fullName="";

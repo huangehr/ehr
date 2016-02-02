@@ -19,6 +19,9 @@ public class AppController extends BaseRestController {
     @Autowired
     private AppClient appClient;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     /**
      * 根据查询条件获取APP列表
      *
@@ -77,7 +80,6 @@ public class AppController extends BaseRestController {
 
         Object object = appClient.getAppDetail(apiVersion, appId);
 
-        ObjectMapper objectMapper = new ObjectMapper();
         String appJson = objectMapper.writeValueAsString(object);
         MAppDetail mAppDetail = objectMapper.readValue(appJson, MAppDetail.class);
 
@@ -113,7 +115,6 @@ public class AppController extends BaseRestController {
 
         Object object = appClient.createApp(apiVersion, name, catalog, url, description, tags, userId);
 
-        ObjectMapper objectMapper = new ObjectMapper();
         String appJson = objectMapper.writeValueAsString(object);
         MApp mApp = objectMapper.readValue(appJson, MApp.class);
 
@@ -152,7 +153,6 @@ public class AppController extends BaseRestController {
 
         Object object = appClient.updateApp(apiVersion, appId, name, catalog, status, url, description, tags);
 
-        ObjectMapper objectMapper = new ObjectMapper();
         String appJson = objectMapper.writeValueAsString(object);
         MApp mApp = objectMapper.readValue(appJson, MApp.class);
 

@@ -35,7 +35,7 @@ public class AppControllerTests {
 
 
     @Test
-    public void atestCreateApp() {
+    public void atestCreateApp() throws Exception{
 
         applicationContext = new SpringApplicationBuilder()
                 .web(false).sources(AgAdminApplication.class).run();
