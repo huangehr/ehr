@@ -39,11 +39,11 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter {
                 .forCodeGeneration(true)
                 .pathMapping("/")
                 .select()
+                .paths(or(regex("/rest/\\{api_version.*")))
                 .build()
                 .apiInfo(bizApiInfo());
     }
 
-    @Bean
     public Docket adminApi(){
         return new Docket(DocumentationType.SWAGGER_2)
                 .groupName("Admin")
@@ -52,6 +52,7 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter {
                 .forCodeGeneration(false)
                 .pathMapping("/")
                 .select()
+                .paths(or(regex("/rest/\\{api_version.*")))
                 .build()
                 .apiInfo(adminApiInfo());
     }

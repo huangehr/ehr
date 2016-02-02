@@ -1,19 +1,19 @@
-package com.yihu.ehr.dict.service.common;
+package com.yihu.ehr.dict.service;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * Created by Administrator on 2016/1/11.
+ * 字典项主键（联合主键）。
  */
-public class DictPk implements Serializable{
+public class DictEntryKey implements Serializable{
     String code;
     long dictId;
 
-    public DictPk(){
+    public DictEntryKey(){
     }
 
-    public DictPk(String code,Long dictId){
+    public DictEntryKey(String code, Long dictId){
         this.code = code == null ? "" : code;
         this.dictId = dictId == null ? null : dictId;
     }
@@ -36,8 +36,8 @@ public class DictPk implements Serializable{
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof DictPk){
-            DictPk pk = (DictPk)obj;
+        if(obj instanceof DictEntryKey){
+            DictEntryKey pk = (DictEntryKey)obj;
             if(this.code==pk.getCode() && this.dictId==(pk.getDictId())){
                 return true;
             }
