@@ -1,13 +1,13 @@
 package com.yihu.ehr.dict.service;
 
 import com.yihu.ehr.dict.service.common.DictPk;
-import com.yihu.ehr.util.operator.StringUtil;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -202,7 +202,7 @@ public class SystemDictManager {
     public List<SystemDictEntry> getDict(long dictId,String name){
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         String sql = "select * from system_dict_entries dict where dict_id = "+dictId;
-        if(!StringUtil.isStrEmpty(name)){
+        if(!StringUtils.isEmpty(name)){
             sql += " and value like '%"+name+"%' ";
         }
         SQLQuery query = session.createSQLQuery(sql);

@@ -1,6 +1,6 @@
 package com.yihu.ehr.patient.feignClient;
 
-import com.yihu.ehr.model.dict.MBaseDict;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,31 +17,31 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 public interface ConventionalDictClient {
 
     @RequestMapping(value = "/orgType", method = GET,consumes = "application/json")
-    MBaseDict getOrgType(@RequestParam(value = "code") String code);
+    MConventionalDict getOrgType(@RequestParam(value = "code") String code);
 
     @RequestMapping(value = "/settledWay", method = GET,consumes = "application/json")
-    MBaseDict getSettledWay(@RequestParam(value = "code") String code);
+    MConventionalDict getSettledWay(@RequestParam(value = "code") String code);
 
     @RequestMapping(value = "/appCatalog", method = GET,consumes = "application/json")
-    MBaseDict getAppCatalog(@RequestParam(value = "code") String code);
+    MConventionalDict getAppCatalog(@RequestParam(value = "code") String code);
 
     @RequestMapping(value = "/appStatus", method = GET,consumes = "application/json")
-    MBaseDict getAppStatus(@RequestParam(value = "code") String code);
+    MConventionalDict getAppStatus(@RequestParam(value = "code") String code);
 
     @RequestMapping(value = "/userType", method = GET,consumes = "application/json")
-    MBaseDict getUserType(@RequestParam(value = "code") String code);
+    MConventionalDict getUserType(@RequestParam(value = "code") String code);
 
     @RequestMapping(value = "/yesNo", method = GET,consumes = "application/json")
-    MBaseDict getYesNo(@RequestParam(value = "code") Boolean code);
+    MConventionalDict getYesNo(@RequestParam(value = "code") Boolean code);
 
     @RequestMapping(value = "/cardType", method = GET,consumes = "application/json")
-    MBaseDict getCardType(@RequestParam(value = "code") String code);
+    MConventionalDict getCardType(@RequestParam(value = "code") String code);
 
     @RequestMapping(value = "/cardStatus", method = GET,consumes = "application/json")
-    MBaseDict getCardStatus(@RequestParam(value = "code") String code);
+    MConventionalDict getCardStatus(@RequestParam(value = "code") String code);
 
     @RequestMapping(value = "/gender", method = GET,consumes = "application/json")
-    MBaseDict getGender(@RequestParam(value = "code") String code);
+    MConventionalDict getGender(@RequestParam(value = "code") String code);
 
 
 }

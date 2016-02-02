@@ -1,7 +1,7 @@
 package com.yihu.ehr.apps.service;
 
 import com.yihu.ehr.apps.feignClient.dict.ConventionalDictClient;
-import com.yihu.ehr.model.dict.MBaseDict;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -39,9 +39,9 @@ public class AppManager  {
 
 
 
-    public App createApp(String apiVersion,String name, MBaseDict catalog, String url, String tags, String description, String creator) {
+    public App createApp(String apiVersion, String name, MConventionalDict catalog, String url, String tags, String description, String creator) {
 
-        MBaseDict status = conventionalDictClient.getAppStatus(apiVersion,"WaitingForApprove");
+        MConventionalDict status = conventionalDictClient.getAppStatus(apiVersion,"WaitingForApprove");
 
         App app = new App();
         app.setId(getRandomString(AppIdLength));

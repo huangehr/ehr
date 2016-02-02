@@ -2,7 +2,7 @@ package com.yihu.ehr.standard.standardsource.controller;
 
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constrant.Result;
-import com.yihu.ehr.model.dict.MBaseDict;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.standard.standardsource.Client.ConventionalDictClient;
 import com.yihu.ehr.standard.standardsource.model.StandardSourceModel;
 import com.yihu.ehr.standard.standardsource.service.StandardSource;
@@ -101,7 +101,7 @@ public class StandardSourceController extends BaseController{
             StandardSource xStandardSources = standardSourceManager.getSourceBySingleId(id);
             if(xStandardSources!=null){
                 if(!StringUtils.isEmpty(xStandardSources.getSourceType())){
-                    MBaseDict dict = conventionalDictClient.getStdSourceType(apiVersion, xStandardSources.getSourceType());
+                    MConventionalDict dict = conventionalDictClient.getStdSourceType(apiVersion, xStandardSources.getSourceType());
                     xStandardSources.setSourceValue(dict.getValue());
                 }
             }

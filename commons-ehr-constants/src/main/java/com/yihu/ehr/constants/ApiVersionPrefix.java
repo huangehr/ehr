@@ -11,4 +11,6 @@ package com.yihu.ehr.constants;
  */
 public class ApiVersionPrefix {
     public static final String CommonVersion = "/rest/{api_version:^v[0-9]\\d*\\.\\d*$}";   // 通用
+
+    public static final String Version1_0 = "/rest/{api_version:v1.0}";      // v1.0 版本
 }

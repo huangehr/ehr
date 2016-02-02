@@ -2,7 +2,7 @@ package com.yihu.ehr.org.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersionPrefix;
-import com.yihu.ehr.constrant.Result;
+import com.yihu.ehr.constants.Result;
 import com.yihu.ehr.model.address.MAddress;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MUserSecurity;
@@ -150,8 +150,7 @@ public class OrganizationController extends BaseRestController {
             @PathVariable( value = "api_version") String apiVersion,
             /*String orgModelJsonData*/
             OrgModel orgModel) throws Exception{
-
-
+        Result result = new Result();
         OrgModel model = new OrgModel();
         model.setOrgCode("aaaa");
         model.setAdmin("aa");
@@ -159,77 +158,63 @@ public class OrganizationController extends BaseRestController {
         String aaa = objectMapper.writeValueAsString(model);
         OrgModel orgModel1 = objectMapper.readValue(aaa, OrgModel.class);
 
-
-        Map<String, String> message = new HashMap<>();
-        Result result = new Result();
-        try {
-            if (orgModel.getUpdateFlg().equals("0")){
-                if(orgManagerService.isExistOrg(orgModel.getOrgCode())){
-                    result.setSuccessFlg(false);
-                    result.setErrorMsg("该机构已存在!");
-                    // // TODO: 2015/12/30 跟新失败，返回指定类型 
-                    return result.toJson();
-                }
-                Organization org = orgManagerService.register(orgModel.getOrgCode(), orgModel.getFullName(), orgModel.getShortName());
-
-                org.setActivityFlag(1);
-                //这里做个服务调用更改地址信息
-                MAddress location =  new MAddress();
-                location.setCity(orgModel.getCity());
-                location.setDistrict(orgModel.getDistrict());
-                location.setProvince(orgModel.getProvince());
-                location.setTown(orgModel.getTown());
-                location.setStreet(orgModel.getStreet());
-                orgManagerService.saveAddress(apiVersion,location);
-
-                org.setAdmin(orgModel.getAdmin());
-                org.setTel(orgModel.getTel());
-                org.setOrgType(orgModel.getOrgType());
-                org.setSettledWay(orgModel.getSettledWay());
-                org.setOrgType(orgModel.getOrgType());
-                org.setSettledWay(orgModel.getSettledWay());
-                org.addTag(orgModel.getTags());
-
-                orgManagerService.update(org);
-
-                result.setSuccessFlg(true);
-                return result.toJson();
-            }else{
-                Organization org = null;
-                if (orgModel.getUpdateFlg().equals("0")) {
-                    org = orgManagerService.register(orgModel.getOrgCode(), orgModel.getFullName(), orgModel.getShortName());
-                } else if (orgModel.getUpdateFlg().equals("1")) {
-                    org = orgManagerService.getOrg(orgModel.getOrgCode());
-                }
-                if (org == null) {
-                    return false;
-                }
-                org.setSettledWay(orgModel.getSettledWay());
-                org.setOrgType(orgModel.getOrgType());
-                org.setShortName(orgModel.getShortName());
-                org.setFullName(orgModel.getFullName());
-                org.setAdmin(orgModel.getAdmin());
-                org.setTel(orgModel.getTel());
-                //org.getTags().clear();
-                org.setTags("");
-                org.addTag(orgModel.getTags());
-                MAddress location = new MAddress();
-                location.setProvince(orgModel.getProvince());
-                location.setCity(orgModel.getCity());
-                location.setDistrict(orgModel.getDistrict());
-                location.setTown(orgModel.getTown());
-                orgManagerService.saveAddress(apiVersion,location);
-                orgManagerService.update(org);
-
-                result.setSuccessFlg(true);
-                result.setErrorMsg("该机构不存在。");
-                return result.toJson();
+        if (orgModel.getUpdateFlg().equals("0")){
+            if(orgManagerService.isExistOrg(orgModel.getOrgCode())){
+                result.setSuccessFlg(false);
+                result.setErrorMsg("改机构不存在");
             }
+            Organization org = orgManagerService.register(orgModel.getOrgCode(), orgModel.getFullName(), orgModel.getShortName());
 
-        } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg("更新失败，请联系管理员");
-            return result.toJson();
+            org.setActivityFlag(1);
+            //这里做个服务调用更改地址信息
+            MAddress location =  new MAddress();
+            location.setCity(orgModel.getCity());
+            location.setDistrict(orgModel.getDistrict());
+            location.setProvince(orgModel.getProvince());
+            location.setTown(orgModel.getTown());
+            location.setStreet(orgModel.getStreet());
+            orgManagerService.saveAddress(apiVersion,location);
+
+            org.setAdmin(orgModel.getAdmin());
+            org.setTel(orgModel.getTel());
+            org.setOrgType(orgModel.getOrgType());
+            org.setSettledWay(orgModel.getSettledWay());
+            org.setOrgType(orgModel.getOrgType());
+            org.setSettledWay(orgModel.getSettledWay());
+            org.addTag(orgModel.getTags());
+            orgManagerService.update(org);
+            result.setSuccessFlg(true);
+            return result;
+        }else{
+            Organization org = null;
+            if (orgModel.getUpdateFlg().equals("0")) {
+                org = orgManagerService.register(orgModel.getOrgCode(), orgModel.getFullName(), orgModel.getShortName());
+            } else if (orgModel.getUpdateFlg().equals("1")) {
+                org = orgManagerService.getOrg(orgModel.getOrgCode());
+            }
+            if (org == null) {
+                result.setSuccessFlg(false);
+                result.setErrorMsg("该机构不存在。");
+                return result;
+            }
+            org.setSettledWay(orgModel.getSettledWay());
+            org.setOrgType(orgModel.getOrgType());
+            org.setShortName(orgModel.getShortName());
+            org.setFullName(orgModel.getFullName());
+            org.setAdmin(orgModel.getAdmin());
+            org.setTel(orgModel.getTel());
+            //org.getTags().clear();
+            org.setTags("");
+            org.addTag(orgModel.getTags());
+            MAddress location = new MAddress();
+            location.setProvince(orgModel.getProvince());
+            location.setCity(orgModel.getCity());
+            location.setDistrict(orgModel.getDistrict());
+            location.setTown(orgModel.getTown());
+            orgManagerService.saveAddress(apiVersion,location);
+            orgManagerService.update(org);
+            result.setSuccessFlg(true);
+            return result;
         }
     }
 

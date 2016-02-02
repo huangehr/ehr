@@ -2,7 +2,7 @@ package com.yihu.ehr.ha.SystemDict.controller;
 
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
-import com.yihu.ehr.model.dict.MBaseDict;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.util.controller.BaseRestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,28 +22,28 @@ public class ConventionalDictEntryController extends BaseRestController {
     @RequestMapping(value = "/orgType" , method = RequestMethod.GET)
     public Object getOrgType(String type) throws Exception{
 
-        MBaseDict baseDict = dictEntryClient.getOrgType(type);
+        MConventionalDict baseDict = dictEntryClient.getOrgType(type);
         return baseDict;
     }
 
     @RequestMapping(value = "/settledWay" , method = RequestMethod.GET)
     public Object getSettledWay(String type) throws Exception{
 
-        MBaseDict baseDict = dictEntryClient.getSettledWay(type);
+        MConventionalDict baseDict = dictEntryClient.getSettledWay(type);
         return baseDict;
     }
 
     @RequestMapping(value = "/appCatalog" , method = RequestMethod.GET)
     public Object getAppCatalog(String type) throws Exception{
 
-        MBaseDict baseDict = dictEntryClient.getAppCatalog(type);
+        MConventionalDict baseDict = dictEntryClient.getAppCatalog(type);
         return baseDict;
     }
 
     @RequestMapping(value = "/appStatus" , method = RequestMethod.GET)
     public Object getAppStatus(String type) throws Exception{
 
-        MBaseDict baseDict = dictEntryClient.getAppStatus(type);
+        MConventionalDict baseDict = dictEntryClient.getAppStatus(type);
         return baseDict;
     }
 }

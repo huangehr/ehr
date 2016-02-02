@@ -1,6 +1,6 @@
 package com.yihu.ehr.apps.feignClient.dict;
 
-import com.yihu.ehr.model.dict.MBaseDict;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,22 +17,22 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 public interface ConventionalDictClient {
 
     @RequestMapping(value = "/rest/{api_version}/conventional_dict/appCatalog", method = GET )
-    MBaseDict getAppCatalog(
+    MConventionalDict getAppCatalog(
             @PathVariable(value = "api_version") String apiVersion,
             @RequestParam(value = "code") String code);
 
     @RequestMapping(value = "/rest/{api_version}/conventional_dict/appStatus", method = GET )
-    MBaseDict getAppStatus(
+    MConventionalDict getAppStatus(
             @PathVariable(value = "api_version") String apiVersion,
             @RequestParam(value = "code") String code);
 
     @RequestMapping(value = "/rest/{api_version}/conventional_dict/userType", method = GET )
-    MBaseDict getUserType(
+    MConventionalDict getUserType(
             @PathVariable(value = "api_version") String apiVersion,
             @RequestParam(value = "code") String code);
 
     @RequestMapping(value = "/rest/{api_version}/conventional_dict/yesNo", method = GET )
-    MBaseDict getYesNo(
+    MConventionalDict getYesNo(
             @PathVariable(value = "api_version") String apiVersion,
             @RequestParam(value = "code") Boolean code);
 

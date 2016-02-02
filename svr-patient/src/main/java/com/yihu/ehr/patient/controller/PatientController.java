@@ -2,7 +2,6 @@ package com.yihu.ehr.patient.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.constrant.Result;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.patient.feignClient.AddressClient;
 import com.yihu.ehr.patient.paientIdx.model.DemographicIndex;
@@ -62,10 +61,7 @@ public class PatientController extends BaseRestController {
 
         List<PatientBrowseModel> patientBrowseModel = demographicIndex.searchPatientBrowseModel(conditionMap);
         Integer totalCount = demographicIndex.searchPatientInt(conditionMap);
-        Result result = new Result();
-        result.setObj(patientBrowseModel);
-        result.setTotalCount(totalCount);
-        return result;
+        return getResult(patientBrowseModel,totalCount,page,rows);
     }
 
 

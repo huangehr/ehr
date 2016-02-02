@@ -1,7 +1,6 @@
 package com.yihu.ehr.user.controller;
 
 import com.yihu.ehr.constants.ApiVersionPrefix;
-import com.yihu.ehr.constrant.Result;
 import com.yihu.ehr.model.address.MAddress;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MUserSecurity;
@@ -70,7 +69,7 @@ public class UserController extends BaseRestController {
         List<UserDetailModel> detailModelList = userManager.searchUserDetailModel(apiVersion,conditionMap);
 
         Integer totalCount = userManager.searchUserInt(apiVersion,conditionMap);
-        return new Result().getResult(detailModelList,totalCount,page,rows);
+        return getResult(detailModelList,totalCount,page,rows);
     }
 
     @RequestMapping(value = "/" , method = RequestMethod.DELETE)
