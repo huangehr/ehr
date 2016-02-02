@@ -22,7 +22,7 @@ import java.util.Map;
  * @created 2015.08.10 17:57
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/address")
+@RequestMapping(ApiVersionPrefix.Version1_0 + "/geography")
 @Api(protocols = "https", value = "address", description = "通用地址接口", tags = {"地址","地址字典"})
 public class GeographyController extends BaseRestController{
 
@@ -34,13 +34,13 @@ public class GeographyController extends BaseRestController{
      * @param level
      * @return
      */
-    @RequestMapping(value = "/level", method = RequestMethod.GET)
+    @RequestMapping(value = "/{level}", method = RequestMethod.GET)
     @ApiOperation(value = "根据地址等级查询地址信息")
     public Object getAddressByLevel(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "level", value = "地址级别", defaultValue = "")
-            @RequestParam(value = "level") Integer level) {
+            @PathVariable(value = "level") Integer level) {
         List<GeographyDict> addressDictList = addressService.getLevelToAddr(level);
         Map<Integer, String> parentMap = new HashMap<>();
         for (GeographyDict addressDict : addressDictList) {
@@ -49,13 +49,13 @@ public class GeographyController extends BaseRestController{
         return parentMap;
     }
 
-    @RequestMapping(value = "/pid", method = RequestMethod.GET)
+    @RequestMapping(value = "/{pid}", method = RequestMethod.GET)
     @ApiOperation(value = "根据父id查询地址信息")
     public Object getAddressDictByPid(
         @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
         @PathVariable( value = "api_version") String apiVersion,
         @ApiParam(name = "pid", value = "上级id", defaultValue = "")
-        @RequestParam(value = "pid") Integer pid) {
+        @PathVariable(value = "pid") Integer pid) {
 
         List<GeographyDict> addressDictList = addressService.getPidToAddr(pid);
         Map<Integer, String> childMap = new HashMap<>();
@@ -65,27 +65,22 @@ public class GeographyController extends BaseRestController{
         return childMap;
     }
 
-    //--------------------------------------------------------------------
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping(value = "", method = RequestMethod.GET)
     @ApiOperation(value = "根据id查询地址信息")
     public Object getAddressById(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "id", value = "地址编号", defaultValue = "")
             @RequestParam(value = "id") String id) {
-        MAddress addressModel = new MAddress();
         Geography address =  addressService.getAddressById(id);
-        if(address!=null){
-            convertToModel(address, MAddress.class, null);
-        }
-        return addressModel;
+        return convertToModel(address, MAddress.class);
     }
 
 
     @RequestMapping(value = "/canonical", method = RequestMethod.GET)
     @ApiOperation(value = "根据地址代码获取机构详细信息")
-    public Object getCanonicalAddress(
+    public String getCanonicalAddress(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "id", value = "地址代码", defaultValue = "")
@@ -99,9 +94,9 @@ public class GeographyController extends BaseRestController{
      * 地址检查并保存
      * @return
      */
-    @RequestMapping(value = "/", method = RequestMethod.PUT)
+    @RequestMapping(value = "", method = RequestMethod.PUT)
     @ApiOperation(value = "地址检查并保存")
-    public Object saveAddress(
+    public String saveAddress(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "country", value = "国家" , defaultValue = "")
@@ -163,9 +158,9 @@ public class GeographyController extends BaseRestController{
      * @param id
      * @return
      */
-    @RequestMapping(value = "/" , method = RequestMethod.DELETE)
+    @RequestMapping(value = "" , method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除地址")
-    public Object delete(
+    public boolean delete(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "/id" , value = "地址代码" ,defaultValue = "")

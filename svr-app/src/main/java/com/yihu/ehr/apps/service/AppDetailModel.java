@@ -17,9 +17,7 @@ public class AppDetailModel {
     Date create_time;
     Date audit_time;
     MConventionalDict catalog;
-    String catalogValue;
     MConventionalDict status;
-    String statusValue;
     String description;
     String strTags;
 
@@ -95,28 +93,12 @@ public class AppDetailModel {
         this.catalog = catalog;
     }
 
-    public String getCatalogValue() {
-        return catalogValue;
-    }
-
-    public void setCatalogValue(String catalogValue) {
-        this.catalogValue = catalogValue;
-    }
-
     public MConventionalDict getStatus() {
         return status;
     }
 
     public void setStatus(MConventionalDict status) {
         this.status = status;
-    }
-
-    public String getStatusValue() {
-        return statusValue;
-    }
-
-    public void setStatusValue(String statusValue) {
-        this.statusValue = statusValue;
     }
 
     public String getDescription() {

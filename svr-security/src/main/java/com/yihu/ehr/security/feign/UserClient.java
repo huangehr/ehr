@@ -1,5 +1,6 @@
-package com.yihu.ehr.security.feignClient.user;
+package com.yihu.ehr.security.feign;
 
+import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.user.MUser;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,7 +12,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 /**
  * Created by Administrator on 2016/1/4.
  */
-@FeignClient("svr-user")
+@FeignClient(MicroServices.User)
 public interface UserClient {
 
     @RequestMapping(value = "/rest/{api_version}/user", method = GET )
@@ -19,16 +20,16 @@ public interface UserClient {
             @PathVariable(value = "api_version") String apiVersion,
             @RequestParam(value = "userId") String userId);
 
-    @RequestMapping(value = "/rest/{api_version}/login_code", method = GET )
+    @RequestMapping(value = "/rest/{api_version}/{login_code}", method = GET )
     MUser getUserByLoginCode(
             @PathVariable(value = "api_version") String apiVersion,
-            @RequestParam(value = "loginCode") String loginCode);
+            @PathVariable(value = "login_code") String loginCode);
 
 
-    @RequestMapping(value = "/rest/{api_version}/login_indetification", method = GET )
+    @RequestMapping(value = "/rest/{api_version}/login_indetify/{login_code}/{psw}", method = GET )
     MUser loginIndetification(
             @PathVariable(value = "api_version") String apiVersion,
-            @RequestParam(value = "userName") String userName,
-            @RequestParam(value = "psw") String psw);
+            @PathVariable(value = "login_code") String loginCode,
+            @PathVariable(value = "psw") String psw);
 
 }

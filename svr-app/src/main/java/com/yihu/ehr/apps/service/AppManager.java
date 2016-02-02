@@ -1,6 +1,7 @@
 package com.yihu.ehr.apps.service;
 
-import com.yihu.ehr.apps.feignClient.dict.ConventionalDictClient;
+import com.yihu.ehr.apps.dao.XAppRepository;
+import com.yihu.ehr.apps.feign.ConventionalDictClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -101,7 +102,6 @@ public class AppManager  {
     }
 
     public boolean validationApp(String id, String secret) {
-
         App app = getApp(id);
         if(app == null){
             return false;

@@ -1,6 +1,6 @@
 package com.yihu.ehr.apps.controller;
 
-import com.yihu.ehr.apps.feignClient.dict.ConventionalDictClient;
+import com.yihu.ehr.apps.feign.ConventionalDictClient;
 import com.yihu.ehr.apps.service.App;
 import com.yihu.ehr.apps.service.AppDetailModel;
 import com.yihu.ehr.apps.service.AppManager;
@@ -23,9 +23,9 @@ import java.util.Map;
  * Created by Administrator on 2015/8/12.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/app")
+@RequestMapping(ApiVersionPrefix.Version1_0 + "/app")
 @RestController
-@Api(protocols = "https", value = "address", description = "通用app接口", tags = {"app"})
+@Api(protocols = "https", value = "app", description = "通用app接口", tags = {"app"})
 public class AppController extends BaseRestController {
 
     @Autowired
@@ -81,15 +81,15 @@ public class AppController extends BaseRestController {
         return getResult(detailModelList,totalCount,page,rows);
     }
 
-    @RequestMapping(value = "" , method = RequestMethod.DELETE)
+    @RequestMapping(value = "}" , method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除app")
     public Object deleteApp(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "appId", value = "id", defaultValue = "")
-            @RequestParam(value = "appId") String appId) throws Exception{
+            @ApiParam(name = "app_id", value = "应用编号", defaultValue = "")
+            @RequestParam(value = "app_id") String appId) throws Exception{
         appManager.deleteApp(appId);
-        return "success";
+        return true;
     }
 
 
@@ -169,48 +169,41 @@ public class AppController extends BaseRestController {
             @ApiParam(name = "tags", value = "标记", defaultValue = "")
             @RequestParam(value = "tags") String tags) throws Exception{
 
-        App app;
-        MConventionalDict appCatalog = conventionalDictClient.getAppCatalog(apiVersion,catalog);
-        MConventionalDict appStatus = conventionalDictClient.getAppStatus(apiVersion,status);
-        app = appManager.getApp(appId);
-        if (app == null) {
-            return "faild";
-        } else {
-            app.setName(name);
-            app.setCatalog(appCatalog.getCode());
-            app.setStatus(appStatus.getCode());
-            app.setUrl(url);
-            app.setDescription(description);
-            app.setTags(tags);
-            appManager.updateApp(app);
-            return convertToModel(app,MApp.class);
-        }
+        App app = appManager.getApp(appId);
+        app.setName(name);
+        app.setCatalog(catalog);
+        app.setStatus(status);
+        app.setUrl(url);
+        app.setDescription(description);
+        app.setTags(tags);
+        appManager.updateApp(app);
+        return convertToModel(app,MApp.class);
 
     }
 
-    @RequestMapping(value = "/check" , method = RequestMethod.PUT)
+    @RequestMapping(value = "/{app_id}/{status}" , method = RequestMethod.PUT)
     @ApiOperation(value = "修改状态")
     public Object check(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "appId", value = "名id", defaultValue = "")
-            @RequestParam(value = "appId") String appId,
+            @ApiParam(name = "app_id", value = "名id", defaultValue = "")
+            @PathVariable(value = "app_id") String appId,
             @ApiParam(name = "status", value = "状态", defaultValue = "")
-            @RequestParam(value = "status") String status) throws Exception{
+            @PathVariable(value = "status") String status) throws Exception{
         appManager.checkStatus(appId, status);
         return true;
     }
 
-    @RequestMapping(value = "/validation" , method = RequestMethod.GET)
-    @ApiOperation(value = "")
+    @RequestMapping(value = "/{app_id}/{secret}" , method = RequestMethod.GET)
+    @ApiOperation(value = "验证")
     public Object validationApp(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "appId", value = "appId", defaultValue = "")
-            @RequestParam(value = "appId") String appId,
-            @ApiParam(name = "appSecret", value = "", defaultValue = "")
-            @RequestParam(value = "appSecret") String appSecret) throws Exception{
-        return appManager.validationApp(appId, appSecret);
+            @ApiParam(name = "app_id", value = "应用编号", defaultValue = "")
+            @PathVariable(value = "app_id") String appId,
+            @ApiParam(name = "secret", value = "", defaultValue = "")
+            @PathVariable(value = "secret") String secret) throws Exception{
+        return appManager.validationApp(appId, secret);
     }
 
 

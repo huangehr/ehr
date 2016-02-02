@@ -3,10 +3,10 @@ package com.yihu.ehr.user.service;
 import com.yihu.ehr.model.address.MAddress;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.security.MUserSecurity;
-import com.yihu.ehr.user.feignClient.address.AddressClient;
-import com.yihu.ehr.user.feignClient.dict.ConventionalDictClient;
-import com.yihu.ehr.user.feignClient.org.OrgClient;
-import com.yihu.ehr.user.feignClient.security.SecurityClient;
+import com.yihu.ehr.user.feign.GeographyClient;
+import com.yihu.ehr.user.feign.ConventionalDictClient;
+import com.yihu.ehr.user.feign.OrgClient;
+import com.yihu.ehr.user.feign.SecurityClient;
 import com.yihu.ehr.user.model.MedicalUser;
 import com.yihu.ehr.util.ApiErrorEcho;
 import com.yihu.ehr.util.encode.HashUtil;
@@ -46,7 +46,7 @@ public class UserManager  {
     private OrgClient organizationClient;
 
     @Autowired
-    private AddressClient addressClient;
+    private GeographyClient addressClient;
 
     @Autowired
     SecurityClient securityClient;
@@ -144,7 +144,7 @@ public class UserManager  {
         }
         if (user.getOrganization() != null) {
             userModel.setOrgCode(user.getOrganization());
-            userModel.setOrgName(organizationClient.getOrg(apiVersion,user.getOrganization()).getFullName());
+            userModel.setOrgName(organizationClient.getOrgByCode(apiVersion,user.getOrganization()).getFullName());
         }
         if (user.getUserType() != null) {
             userModel.setUserType(user.getUserType());
@@ -367,7 +367,7 @@ public class UserManager  {
             detailModel.setActivated(user.getActivated());
             if (user.getOrganization() != null) {
                 //detailModel.setOrganization(user.getOrganization().getFullName());
-                detailModel.setOrganization(organizationClient.getOrg(apiVersion,user.getOrganization()).getFullName());
+                detailModel.setOrganization(organizationClient.getOrgByCode(apiVersion,user.getOrganization()).getFullName());
             }
             if (user.getLastLoginTime() != null) {
                 detailModel.setLastLoginTime(DateFormatUtils.format(user.getLastLoginTime(),"yyyy-MM-dd HH:mm:ss"));

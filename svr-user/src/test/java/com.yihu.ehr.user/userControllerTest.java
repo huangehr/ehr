@@ -1,5 +1,6 @@
 package com.yihu.ehr.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.UserServiceApp;
 import com.yihu.ehr.user.controller.UserController;
 import com.yihu.ehr.user.service.User;
@@ -71,7 +72,9 @@ public class userControllerTest {
         UserModel userModel = new UserModel();
         BeanUtils.copyProperties(user,userModel);
         userModel.setEmail("9898987@jkzl.com");
-        Object result = userController.updateUser(apiVersion,userModel);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userStr = objectMapper.writeValueAsString(userModel);
+        Object result = userController.updateUser(apiVersion,userStr);
         assertTrue("修改失败！" , result != null);
     }
 
