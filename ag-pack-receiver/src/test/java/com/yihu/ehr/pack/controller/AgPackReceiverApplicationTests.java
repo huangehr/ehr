@@ -1,4 +1,4 @@
-package com.yihu.ehr.pack.receiver;
+package com.yihu.ehr.pack.controller;
 
 import com.yihu.ehr.pack.PackReceiverGatewayApp;
 import org.junit.Test;
