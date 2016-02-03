@@ -122,7 +122,7 @@ public class OrgService {
                 System.out.println(e.getMessage());
             }
         }
-        MUserSecurity userSecurity = securityClient.createSecurityByOrgCode(org.getOrgCode());
+        MUserSecurity userSecurity = securityClient.createSecurityByOrgCode(apiVersion,org.getOrgCode());
         if (userSecurity != null) {
             orgModel.setPublicKey(userSecurity.getPublicKey());
             String validTime = DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd")
