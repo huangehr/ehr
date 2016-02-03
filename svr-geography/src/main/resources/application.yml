@@ -4,12 +4,12 @@ server:
 
 #security:
 #  user:
-#    password: address
+#    password: geography
 
 info:
   app:
-    name: AddressService
-    description: EHR platform json address service.
+    name: GeographyService
+    description: EHR platform json geography service.
     version: 1.0.0
 
 ---

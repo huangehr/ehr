@@ -1,5 +1,6 @@
-package com.yihu.ehr.user.feignClient.address;
+package com.yihu.ehr.user.feign;
 
+import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.address.MAddress;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,21 +14,21 @@ import java.util.List;
 /**
  * Created by Administrator on 2016/1/4.
  */
-@FeignClient("svr-address")
-public interface AddressClient {
+@FeignClient(MicroServices.Geography)
+public interface GeographyClient {
 
-    @RequestMapping(value = "/rest/{api_version}/address/", method = RequestMethod.GET )
+    @RequestMapping(value = "/rest/{api_version}/geography", method = RequestMethod.GET )
     MAddress getAddressById(
             @PathVariable(value = "api_version") String apiVersion,
             @RequestParam(value = "id") String id);
 
 
-    @RequestMapping(value = "/rest/{api_version}/address/canonicalAddress", method = RequestMethod.GET )
+    @RequestMapping(value = "/rest/{api_version}/geography/canonical", method = RequestMethod.GET )
     String getCanonicalAddress(
             @PathVariable(value = "api_version") String apiVersion,
             @RequestParam(value = "id") String id);
 
-    @RequestMapping(value = "/rest/{api_version}/address/", method =  RequestMethod.PUT,consumes = "application/json")
+    @RequestMapping(value = "/rest/{api_version}/geography", method =  RequestMethod.PUT,consumes = "application/json")
     String saveAddress(
             @PathVariable(value = "api_version") String apiVersion,
             @RequestParam(value = "country") String country,
@@ -40,7 +41,7 @@ public interface AddressClient {
             @RequestParam(value = "postalCode") String postalCode);
 
 
-    @RequestMapping(value = "/rest/{api_version}/address/search", method = RequestMethod.GET )
+    @RequestMapping(value = "/rest/{api_version}/geography/search", method = RequestMethod.GET )
     List<String> search(
             @PathVariable(value = "api_version") String apiVersion,
             @RequestParam(value = "province") String province,
@@ -48,7 +49,7 @@ public interface AddressClient {
             @RequestParam(value = "district") String district
     );
 
-    @RequestMapping(value = "/rest/{api_version}/address/", method = RequestMethod.DELETE )
+    @RequestMapping(value = "/rest/{api_version}/geography", method = RequestMethod.DELETE )
     void deleteByOrgCode(
             @PathVariable(value = "api_version") String apiVersion,
             @RequestParam(value = "id") String id);

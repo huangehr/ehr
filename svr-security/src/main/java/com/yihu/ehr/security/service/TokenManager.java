@@ -1,8 +1,6 @@
 package com.yihu.ehr.security.service;
 
 
-import com.yihu.ehr.security.feignClient.app.AppClient;
-import com.yihu.ehr.security.feignClient.user.UserClient;
 import com.yihu.ehr.util.token.TokenUtil;
 import org.hibernate.Criteria;
 import org.hibernate.Query;

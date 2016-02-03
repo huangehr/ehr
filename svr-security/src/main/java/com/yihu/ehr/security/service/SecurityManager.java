@@ -1,7 +1,7 @@
 package com.yihu.ehr.security.service;
 
 import com.yihu.ehr.model.user.MUser;
-import com.yihu.ehr.security.feignClient.user.UserClient;
+import com.yihu.ehr.security.feign.UserClient;
 import com.yihu.ehr.util.DateUtil;
 import com.yihu.ehr.util.encrypt.RSA;
 import org.hibernate.Criteria;
@@ -116,7 +116,7 @@ public class SecurityManager {
         return userSecurityRepository.findOne(securityId);
     }
 
-    public UserSecurity getUserSecurityByUserName(String apiVersion,String loginCode) throws Exception {
+    public UserSecurity getUserSecurityByLoginCode(String apiVersion,String loginCode) throws Exception {
 
         //1-1根据用户登陆名获取用户信息。
         MUser userInfo = userClient.getUserByLoginCode(apiVersion,loginCode);
