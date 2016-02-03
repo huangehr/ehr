@@ -1,6 +1,8 @@
 package com.yihu.ehr.address.service;
 
 
+import com.yihu.ehr.address.dao.XGeographyDictRepository;
+import com.yihu.ehr.address.dao.XGeographyRepository;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -212,9 +214,6 @@ public class GeographyService {
     }
 
 	public void updateAddrDict(GeographyDict addrdict){
-		if (addrdict.getName()==null){
-			throw new GeographyException("名称不能为空");
-		}
         addressDictRepository.save(addrdict);
 	}
 

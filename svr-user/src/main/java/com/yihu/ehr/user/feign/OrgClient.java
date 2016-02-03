@@ -1,5 +1,6 @@
-package com.yihu.ehr.user.feignClient.org;
+package com.yihu.ehr.user.feign;
 
+import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.org.MOrganization;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,17 +14,17 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 /**
  * Created by Administrator on 2016/1/4.
  */
-@FeignClient("svr-org")
+@FeignClient(MicroServices.OrganizationMgr)
 public interface OrgClient {
 
-    @RequestMapping(value = "/rest/{api_version}/org/", method = GET )
-    MOrganization getOrg(
+    @RequestMapping(value = "/rest/{api_version}/org", method = GET )
+    MOrganization getOrgByCode(
             @PathVariable(value = "api_version") String apiVersion,
-            @RequestParam(value = "orgCode") String orgCode);
+            @RequestParam(value = "org_code") String orgCode);
 
-    @RequestMapping(value = "/rest/{api_version}/org/name", method = GET ,consumes = "application/json")
+    @RequestMapping(value = "/rest/{api_version}/org/{name}", method = GET ,consumes = "application/json")
     List<String> getIdsByName(
             @PathVariable(value = "api_version") String apiVersion,
-            @RequestParam(value = "name") String name);
+            @PathVariable(value = "name") String name);
 
 }
