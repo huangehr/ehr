@@ -1,5 +1,6 @@
 package com.yihu.ehr.org;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.SvrOrgApplication;
 import com.yihu.ehr.org.controller.OrganizationController;
 import com.yihu.ehr.org.service.OrgModel;
@@ -49,19 +50,14 @@ public class SvrOrgApplicationTests {
 	@Test
 	public void ctestupdateOrg() throws Exception{
 		String orgCode = "341321234";
-		OrgModel org = (OrgModel) organizationController.getOrgModel(apiVersion,orgCode);
-		org.setUpdateFlg("0");
-		Object result = organizationController.updateOrg(apiVersion,org);
+		OrgModel model = (OrgModel) organizationController.getOrgModel(apiVersion,orgCode);
+		model.setUpdateFlg("0");
+        model.setAdmin("admin");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String orgStr = objectMapper.writeValueAsString(model);
+		Object result = organizationController.updateOrg(apiVersion,orgStr);
 		assertTrue("修改失败！" , result != null);
 	}
-
-	@Test
-	public void aaa() throws Exception{
-		OrgModel org = new OrgModel();
-		Object result = organizationController.updateOrg(apiVersion,org);
-		assertTrue("修改失败！" , result != null);
-	}
-
 
 
 	@Test

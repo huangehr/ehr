@@ -30,11 +30,11 @@ public class SecurityRestControllerTests {
 
 
     @Test
-    public void atestGetUserSecurityByOrgName() throws Exception{
+    public void atestGetUserSecurityByLoginCode() throws Exception{
         applicationContext = new SpringApplicationBuilder()
                 .web(false).sources(SvrSecurityApplication.class).run();
-        String userNmae = "admin";
-        Object userSecurity = securityRestController.getUserSecurityByOrgName(apiVersion,userNmae);
+        String loginCode = "admin";
+        Object userSecurity = securityRestController.getUserSecurityByLoginCode(apiVersion,loginCode);
         assertTrue("查询失败！" , userSecurity != null);
     }
 

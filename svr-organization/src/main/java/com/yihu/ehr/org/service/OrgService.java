@@ -3,8 +3,8 @@ package com.yihu.ehr.org.service;
 import com.yihu.ehr.model.address.MAddress;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MUserSecurity;
-import com.yihu.ehr.org.feignClient.address.AddressClient;
-import com.yihu.ehr.org.feignClient.security.SecurityClient;
+import com.yihu.ehr.org.feign.GeographyClient;
+import com.yihu.ehr.org.feign.SecurityClient;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -27,10 +27,10 @@ import java.util.Map;
  */
 @Transactional
 @Service
-public class OrgManagerService  {
+public class OrgService {
 
     @Autowired
-    AddressClient addressClient;
+    GeographyClient addressClient;
 
     @Autowired
     SecurityClient securityClient;
@@ -52,7 +52,7 @@ public class OrgManagerService  {
         return model;
     }
 
-    public OrgManagerService(){
+    public OrgService(){
     }
 
     public Organization register(String orgCode, String fullName, String shortName){
@@ -122,7 +122,7 @@ public class OrgManagerService  {
                 System.out.println(e.getMessage());
             }
         }
-        MUserSecurity userSecurity = securityClient.createSecurityByOrgCode(org.getOrgCode());
+        MUserSecurity userSecurity = securityClient.createSecurityByOrgCode(apiVersion,org.getOrgCode());
         if (userSecurity != null) {
             orgModel.setPublicKey(userSecurity.getPublicKey());
             String validTime = DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd")

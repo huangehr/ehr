@@ -2,12 +2,11 @@ package com.yihu.ehr.org.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersionPrefix;
-import com.yihu.ehr.constants.Result;
 import com.yihu.ehr.model.address.MAddress;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MUserSecurity;
-import com.yihu.ehr.org.feignClient.security.SecurityClient;
-import com.yihu.ehr.org.service.OrgManagerService;
+import com.yihu.ehr.org.feign.SecurityClient;
+import com.yihu.ehr.org.service.OrgService;
 import com.yihu.ehr.org.service.OrgModel;
 import com.yihu.ehr.org.service.Organization;
 import com.yihu.ehr.util.controller.BaseRestController;
@@ -28,17 +27,15 @@ import java.util.Map;
  * @created 2015.08.10 17:57
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/org")
+@RequestMapping(ApiVersionPrefix.Version1_0 + "/org")
 @Api(protocols = "https", value = "org", description = "组织机构管理接口", tags = {"机构管理"})
 public class OrganizationController extends BaseRestController {
 
     @Autowired
-    private OrgManagerService orgManagerService;
+    private OrgService orgManagerService;
 
     @Autowired
     private SecurityClient securityClient;
-
-
 
 
     /**
@@ -74,7 +71,7 @@ public class OrganizationController extends BaseRestController {
             @ApiParam(name = "page", value = "页面号，从0开始", defaultValue = "0")
             @RequestParam(value = "page") int page,
             @ApiParam(name = "rows", value = "页面记录数", defaultValue = "10")
-            @RequestParam(value = "rows") int rows) {
+            @RequestParam(value = "rows") int rows) throws Exception{
 
         Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("orgCode", orgCode);
@@ -86,7 +83,6 @@ public class OrganizationController extends BaseRestController {
         conditionMap.put("district", district);
         conditionMap.put("page", page);
         conditionMap.put("pageSize", rows);
-
 
         List<MOrganization> organizationList = orgManagerService.searchOrgDetailModel(apiVersion,conditionMap);
         Integer totalCount = orgManagerService.searchCount(apiVersion,conditionMap);
@@ -102,14 +98,14 @@ public class OrganizationController extends BaseRestController {
      * @param orgCode
      * @return
      */
-    @RequestMapping(value = "/", method = RequestMethod.DELETE)
+    @RequestMapping(value = "", method = RequestMethod.DELETE)
     public Object deleteOrg(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
-            @RequestParam(value = "orgCode") String orgCode) {
+            @RequestParam(value = "orgCode") String orgCode) throws Exception{
         orgManagerService.delete(orgCode);
-        return "删除机构成功！";
+        return true;
     }
 
 
@@ -118,14 +114,14 @@ public class OrganizationController extends BaseRestController {
      * @param orgCode
      * @return
      */
-    @RequestMapping(value = "/activity" , method = RequestMethod.PUT)
-    public Object activity(
+    @RequestMapping(value = "/{activity_flag}" , method = RequestMethod.PUT)
+    public boolean activity(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
             @RequestParam(value = "orgCode") String orgCode,
-            @ApiParam(name = "activityFlag", value = "状态", defaultValue = "")
-            @RequestParam(value = "activityFlag") String activityFlag) {
+            @ApiParam(name = "activity_flag", value = "状态", defaultValue = "")
+            @PathVariable(value = "activity_flag") String activityFlag) throws Exception{
         Organization org = orgManagerService.getOrg(orgCode);
         if("1".equals(activityFlag)){
             org.setActivityFlag(0);
@@ -134,7 +130,7 @@ public class OrganizationController extends BaseRestController {
             org.setActivityFlag(1);
             orgManagerService.update(org);
         }
-        return "success";
+        return true;
     }
 
 
@@ -144,29 +140,21 @@ public class OrganizationController extends BaseRestController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/" , method = RequestMethod.PUT)
+    @RequestMapping(value = "" , method = RequestMethod.PUT)
     public Object updateOrg(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
-            /*String orgModelJsonData*/
-            OrgModel orgModel) throws Exception{
-        Result result = new Result();
-        OrgModel model = new OrgModel();
-        model.setOrgCode("aaaa");
-        model.setAdmin("aa");
+            String orgModelJsonData ) throws Exception{
+
         ObjectMapper objectMapper = new ObjectMapper();
-        String aaa = objectMapper.writeValueAsString(model);
-        OrgModel orgModel1 = objectMapper.readValue(aaa, OrgModel.class);
+        OrgModel orgModel = objectMapper.readValue(orgModelJsonData, OrgModel.class);
 
         if (orgModel.getUpdateFlg().equals("0")){
             if(orgManagerService.isExistOrg(orgModel.getOrgCode())){
-                result.setSuccessFlg(false);
-                result.setErrorMsg("改机构不存在");
+                return false;
             }
             Organization org = orgManagerService.register(orgModel.getOrgCode(), orgModel.getFullName(), orgModel.getShortName());
-
             org.setActivityFlag(1);
-            //这里做个服务调用更改地址信息
             MAddress location =  new MAddress();
             location.setCity(orgModel.getCity());
             location.setDistrict(orgModel.getDistrict());
@@ -183,8 +171,7 @@ public class OrganizationController extends BaseRestController {
             org.setSettledWay(orgModel.getSettledWay());
             org.addTag(orgModel.getTags());
             orgManagerService.update(org);
-            result.setSuccessFlg(true);
-            return result;
+            return true;
         }else{
             Organization org = null;
             if (orgModel.getUpdateFlg().equals("0")) {
@@ -193,9 +180,7 @@ public class OrganizationController extends BaseRestController {
                 org = orgManagerService.getOrg(orgModel.getOrgCode());
             }
             if (org == null) {
-                result.setSuccessFlg(false);
-                result.setErrorMsg("该机构不存在。");
-                return result;
+                return false;
             }
             org.setSettledWay(orgModel.getSettledWay());
             org.setOrgType(orgModel.getOrgType());
@@ -203,7 +188,6 @@ public class OrganizationController extends BaseRestController {
             org.setFullName(orgModel.getFullName());
             org.setAdmin(orgModel.getAdmin());
             org.setTel(orgModel.getTel());
-            //org.getTags().clear();
             org.setTags("");
             org.addTag(orgModel.getTags());
             MAddress location = new MAddress();
@@ -213,20 +197,19 @@ public class OrganizationController extends BaseRestController {
             location.setTown(orgModel.getTown());
             orgManagerService.saveAddress(apiVersion,location);
             orgManagerService.update(org);
-            result.setSuccessFlg(true);
-            return result;
+            return true;
         }
     }
 
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping(value = "", method = RequestMethod.GET)
     public Object getOrgByCode(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
-            @RequestParam(value = "orgCode") String orgCode) {
-        Organization org = orgManagerService.getOrg(orgCode);
-        return org;
+            @ApiParam(name = "org_code", value = "机构代码", defaultValue = "")
+            @RequestParam(value = "org_code") String orgCode) {
+        Organization organization = orgManagerService.getOrg(orgCode);
+        return convertToModel(organization,MOrganization.class);
     }
 
     /**
@@ -255,12 +238,12 @@ public class OrganizationController extends BaseRestController {
      * @return
      */
     @ApiOperation(value = "根据地名称取机构ids")
-    @RequestMapping(value = "/name", method = RequestMethod.GET)
+    @RequestMapping(value = "/{name}", method = RequestMethod.GET)
     public Object getIdsByName(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "name", value = "机构名称", defaultValue = "")
-            @RequestParam(value = "name") String name) {
+            @PathVariable(value = "name") String name) {
         OrgModel orgModel = new OrgModel();
         List<String> ids = orgManagerService.getIdsByName(name);
         return ids;
@@ -274,14 +257,14 @@ public class OrganizationController extends BaseRestController {
      * @param city
      * @return
      */
-    @RequestMapping(value = "/search" , method = RequestMethod.GET)
+    @RequestMapping(value = "/search/{province}/{city}" , method = RequestMethod.GET)
     public Object getOrgsByAddress(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "province", value = "省")
-            @RequestParam(value = "province") String province,
+            @PathVariable(value = "province") String province,
             @ApiParam(name = "city", value = "市")
-            @RequestParam(value = "city") String city) {
+            @PathVariable(value = "city") String city) {
 
         List<Organization> orgList = orgManagerService.searchByAddress(apiVersion,province,city);
         Map<String, String> orgMap = new HashMap<>();
@@ -291,23 +274,23 @@ public class OrganizationController extends BaseRestController {
         return orgMap;
     }
 
-    @RequestMapping( value = "distributeKey" , method = RequestMethod.POST)
+    @RequestMapping( value = "/distributeKey" , method = RequestMethod.POST)
     public Object distributeKey(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "orgCode", value = "机构代码")
             @RequestParam(value = "orgCode") String orgCode) {
-        MUserSecurity userSecurity = securityClient.getUserSecurityByOrgCode(orgCode);
+        MUserSecurity userSecurity = securityClient.getUserSecurityByOrgCode(apiVersion,orgCode);
         Map<String, String> keyMap = new HashMap<>();
         if (userSecurity == null) {
-            userSecurity = securityClient.createSecurityByOrgCode(orgCode);
+            userSecurity = securityClient.createSecurityByOrgCode(apiVersion,orgCode);
         }else{
             //result.setErrorMsg("公钥信息已存在。");
             //这里删除原有的公私钥重新分配
-            String userKeyId = securityClient.getUserKeyIdByOrgCd(orgCode);
-            securityClient.deleteSecurity(userSecurity.getId());
-            securityClient.deleteUserKey(userKeyId);
-            userSecurity = securityClient.createSecurityByOrgCode(orgCode);
+            String userKeyId = securityClient.getUserKeyIdByOrgCd(apiVersion,orgCode);
+            securityClient.deleteSecurity(apiVersion,userSecurity.getId());
+            securityClient.deleteUserKey(apiVersion,userKeyId);
+            userSecurity = securityClient.createSecurityByOrgCode(apiVersion,orgCode);
         }
 
         //String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT);

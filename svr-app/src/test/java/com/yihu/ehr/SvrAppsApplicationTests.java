@@ -69,12 +69,12 @@ public class SvrAppsApplicationTests {
 
 
 
-	@Test
-	public void dtestGetAppDetail() throws Exception{
-		String appId = "yYkKALLwUO";
-		Object appDetail = appController.getAppDetail(apiVersion,appId);
-		assertTrue("查询失败！" , appDetail != null);
-	}
+//	@Test
+//	public void dtestGetAppDetail() throws Exception{
+//		String appId = "yYkKALLwUO";
+//		Object appDetail = appController.getAppDetail(apiVersion,appId);
+//		assertTrue("查询失败！" , appDetail != null);
+//	}
 
 
 

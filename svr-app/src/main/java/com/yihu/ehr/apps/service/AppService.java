@@ -1,6 +1,7 @@
 package com.yihu.ehr.apps.service;
 
-import com.yihu.ehr.apps.feignClient.dict.ConventionalDictClient;
+import com.yihu.ehr.apps.dao.XAppRepository;
+import com.yihu.ehr.apps.feign.ConventionalDictClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -20,7 +21,7 @@ import java.util.*;
  */
 @Service
 @Transactional
-public class AppManager  {
+public class AppService {
     private static final int AppIdLength = 10;
     private static final int AppSecretLength = 16;
 
@@ -34,7 +35,7 @@ public class AppManager  {
     private ConventionalDictClient conventionalDictClient;
 
 
-    public AppManager() {
+    public AppService() {
     }
 
 
@@ -101,7 +102,6 @@ public class AppManager  {
     }
 
     public boolean validationApp(String id, String secret) {
-
         App app = getApp(id);
         if(app == null){
             return false;
@@ -227,40 +227,40 @@ public class AppManager  {
         return query.list().size();
     }
 
-    /**
-     * 根据条件搜索APP.
-     *
-     * @param appId
-     */
-    public AppDetailModel searchAppDetailModel(String apiVersion,String appId) {
-
-        Session session =  entityManager.unwrap(org.hibernate.Session.class);
-        //动态SQL文拼接
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("   from App 	   ");
-        sb.append("  where 1=1     ");
-        sb.append("    and id= '" + appId + "' ");
-
-        String hql = sb.toString();
-        Query query = session.createQuery(hql);
-
-        List<App> appList = query.list();
-        App app = appList.get(0);
-
-        AppDetailModel detailModel = new AppDetailModel();
-
-        detailModel.setId(app.getId());
-        detailModel.setSecret(app.getSecret());
-        detailModel.setName(app.getName());
-        detailModel.setCatalog(conventionalDictClient.getAppCatalog(apiVersion,app.getCatalog()));
-        detailModel.setStatus(conventionalDictClient.getAppStatus(apiVersion,app.getStatus()));
-        detailModel.setUrl(app.getUrl());
-        detailModel.setDescription(app.getDescription());
-        detailModel.setStrTags(app.getTags());
-
-        return detailModel;
-    }
+//    /**
+//     * 根据条件搜索APP.
+//     *
+//     * @param appId
+//     */
+//    public AppDetailModel searchAppDetailModel(String apiVersion,String appId) {
+//
+//        Session session =  entityManager.unwrap(org.hibernate.Session.class);
+//        //动态SQL文拼接
+//        StringBuilder sb = new StringBuilder();
+//
+//        sb.append("   from App 	   ");
+//        sb.append("  where 1=1     ");
+//        sb.append("    and id= '" + appId + "' ");
+//
+//        String hql = sb.toString();
+//        Query query = session.createQuery(hql);
+//
+//        List<App> appList = query.list();
+//        App app = appList.get(0);
+//
+//        AppDetailModel detailModel = new AppDetailModel();
+//
+//        detailModel.setId(app.getId());
+//        detailModel.setSecret(app.getSecret());
+//        detailModel.setName(app.getName());
+//        detailModel.setCatalog(conventionalDictClient.getAppCatalog(apiVersion,app.getCatalog()));
+//        detailModel.setStatus(conventionalDictClient.getAppStatus(apiVersion,app.getStatus()));
+//        detailModel.setUrl(app.getUrl());
+//        detailModel.setDescription(app.getDescription());
+//        detailModel.setStrTags(app.getTags());
+//
+//        return detailModel;
+//    }
 
 
 
