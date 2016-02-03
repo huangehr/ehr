@@ -1,5 +1,5 @@
 server:
-  port: 7021
+  port: 10000
 
 security:
   user:

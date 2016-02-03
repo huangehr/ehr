@@ -2,7 +2,7 @@ package com.yihu.ehr.org.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersionPrefix;
-import com.yihu.ehr.constants.Result;
+import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.model.address.MAddress;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MUserSecurity;
@@ -150,7 +150,7 @@ public class OrganizationController extends BaseRestController {
             @PathVariable( value = "api_version") String apiVersion,
             /*String orgModelJsonData*/
             OrgModel orgModel) throws Exception{
-        Result result = new Result();
+        Envelop envelop = new Envelop();
         OrgModel model = new OrgModel();
         model.setOrgCode("aaaa");
         model.setAdmin("aa");
@@ -160,8 +160,8 @@ public class OrganizationController extends BaseRestController {
 
         if (orgModel.getUpdateFlg().equals("0")){
             if(orgManagerService.isExistOrg(orgModel.getOrgCode())){
-                result.setSuccessFlg(false);
-                result.setErrorMsg("改机构不存在");
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("改机构不存在");
             }
             Organization org = orgManagerService.register(orgModel.getOrgCode(), orgModel.getFullName(), orgModel.getShortName());
 
@@ -183,8 +183,8 @@ public class OrganizationController extends BaseRestController {
             org.setSettledWay(orgModel.getSettledWay());
             org.addTag(orgModel.getTags());
             orgManagerService.update(org);
-            result.setSuccessFlg(true);
-            return result;
+            envelop.setSuccessFlg(true);
+            return envelop;
         }else{
             Organization org = null;
             if (orgModel.getUpdateFlg().equals("0")) {
@@ -193,9 +193,9 @@ public class OrganizationController extends BaseRestController {
                 org = orgManagerService.getOrg(orgModel.getOrgCode());
             }
             if (org == null) {
-                result.setSuccessFlg(false);
-                result.setErrorMsg("该机构不存在。");
-                return result;
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("该机构不存在。");
+                return envelop;
             }
             org.setSettledWay(orgModel.getSettledWay());
             org.setOrgType(orgModel.getOrgType());
@@ -213,8 +213,8 @@ public class OrganizationController extends BaseRestController {
             location.setTown(orgModel.getTown());
             orgManagerService.saveAddress(apiVersion,location);
             orgManagerService.update(org);
-            result.setSuccessFlg(true);
-            return result;
+            envelop.setSuccessFlg(true);
+            return envelop;
         }
     }
 
