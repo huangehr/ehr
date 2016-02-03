@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * »ú¹¹Êı¾İÔªÊµÏÖÀà.
+ * æœºæ„æ•°æ®å…ƒ
  *
  * @author lincl
  * @version 1.0

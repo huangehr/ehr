@@ -7,7 +7,9 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 /**
- * Created by Administrator on 2016/1/28.
+ * @author lincl
+ * @version 1.0
+ * @created 2016.2.1
  */
 public class PageModel {
     private int page;
@@ -16,7 +18,6 @@ public class PageModel {
     private Map<String, FieldCondition> filters;
     private String[] result;
     private Class modelClass;
-
     public PageModel() {
 
     }
@@ -204,22 +205,6 @@ public class PageModel {
         for (String key : map.keySet()) {
             map.get(key).setTableCol(getTableCol(key));
         }
-//        List<String> result = new ArrayList<>();
-//        String tableCol = "";
-//        for (String key : getResult()){
-//            tableCol = getTableCol(key);
-//            if(!StringUtils.isEmpty(tableCol))
-//                result.add(tableCol);
-//        }
-//        setResult((String[]) result.toArray());
-//
-//        result.clear();
-//        for (String key : getOrder()){
-//            tableCol = getTableCol(key);
-//            if(!StringUtils.isEmpty(tableCol))
-//                result.add(tableCol);
-//        }
-//        setOrder((String[]) result.toArray());
     }
 
     public static String firstLetterToUpper(String str) {
@@ -227,10 +212,6 @@ public class PageModel {
             return "";
         }
         return str.replaceFirst(("" + str.charAt(0)), ("" + str.charAt(0)).toUpperCase());
-    }
-
-    public static void main(String[] args) {
-
     }
 
 }

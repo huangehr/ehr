@@ -6,11 +6,11 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * »ú¹¹×ÖµäÏîÊµÏÖÀà.
+ * æœºæ„å­—å…¸é¡¹
  *
  * @author lincl
  * @version 1.0
- * @created 23-10ÔÂ-2015 10:19:06
+ * @created 2016.2.3
  */
 @Entity
 @Table(name = "org_std_dictentry")

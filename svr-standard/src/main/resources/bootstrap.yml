@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-stdandard
+    name: svr-standard
 
   cloud:
     config:

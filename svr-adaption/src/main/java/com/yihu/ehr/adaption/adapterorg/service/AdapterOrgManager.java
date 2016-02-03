@@ -1,9 +1,12 @@
 package com.yihu.ehr.adaption.adapterorg.service;
 
-import com.yihu.ehr.adaption.commons.BaseManager;
 import com.yihu.ehr.adaption.feignclient.AddressClient;
+import com.yihu.ehr.adaption.orgdataset.service.OrgDataSetManager;
+import com.yihu.ehr.adaption.orgdict.service.OrgDictManager;
+import com.yihu.ehr.adaption.orgdictitem.service.OrgDictItemManager;
+import com.yihu.ehr.adaption.orgmetaset.service.OrgMetaDataManager;
 import com.yihu.ehr.model.address.MAddress;
-import com.yihu.ehr.util.parm.PageModel;
+import com.yihu.ehr.util.service.BaseManager;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 /**
- * 适配机构
- * Created by lincl on 2016.1.29
+ * @author lincl
+ * @version 1.0
+ * @created 2016.2.3
  */
 @Transactional
 @Service
@@ -23,78 +25,38 @@ public class AdapterOrgManager extends BaseManager<AdapterOrg, XAdapterOrgReposi
 
     @Autowired
     AddressClient addressClient;
-
     @Autowired
-    XAdapterOrgRepository adapterOrgRepository;
-
-    public List<AdapterOrg> searchAdapterOrg(PageModel pageModel) {
-        Session session = currentSession();
-        String hql = "select org from AdapterOrg org  ";
-        String wh = pageModel.format();
-        hql += wh.equals("") ? "" : wh;
-        Query query = setQueryVal(session.createQuery(hql), pageModel);
-        int page = pageModel.getPage();
-        if (page > 0) {
-            query.setMaxResults(pageModel.getRows());
-            query.setFirstResult((page - 1) * pageModel.getRows());
-        }
-        return query.list();
-    }
-
-    public int searchAdapterOrgInt(PageModel pageModel) {
-        Session session = currentSession();
-        String hql = "select count(*) from AdapterOrg ";
-        String wh = pageModel.format();
-        hql += wh.equals("") ? "" : wh;
-        Query query = setQueryVal(session.createQuery(hql), pageModel);
-        return ((Long) query.list().get(0)).intValue();
-    }
-
-    public AdapterOrg getAdapterOrg(String code) {
-        return adapterOrgRepository.findOne(code);
-    }
+    OrgDataSetManager orgDataSetManager;
+    @Autowired
+    OrgMetaDataManager orgMetaDataManager;
+    @Autowired
+    OrgDictItemManager orgDictItemManager;
+    @Autowired
+    OrgDictManager orgDictManager;
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public boolean addAdapterOrg(AdapterOrg adapterOrg, String apiVersion) {
+    public void addAdapterOrg(AdapterOrg adapterOrg, String apiVersion) {
         //地址检查并保存
         MAddress address = adapterOrg.getMAddress();
         if (address != null) {
-            address.setCity("TEST");
-            address.setProvince("TEST");
-            address.setDistrict("TEST");
-            address.setTown("TEST");
-            address.setStreet("TEST");
-            address.setExtra("TEST");
-            address.setPostalCode("TEST");
-//            Object addressId = addressClient.saveAddress(apiVersion, address.getCountry(), address.getProvince(), address.getCity(), address.getDistrict(), address.getTown(),
-//                    address.getStreet(), address.getExtra(), address.getPostalCode());
-//            adapterOrg.setArea((String)addressId);
+            Object addressId =
+                    addressClient.saveAddress(
+                            apiVersion, address.getCountry(), address.getProvince(), address.getCity(), address.getDistrict(), address.getTown(),
+                            address.getStreet(), address.getExtra(), address.getPostalCode());
+            adapterOrg.setArea((String) addressId);
         }
-        saveAdapterOrg(adapterOrg);
+        save(adapterOrg);
         //拷贝采集标准
         String parent = adapterOrg.getParent();
         if (parent != null && !parent.equals("")) {
             copy(adapterOrg.getCode(), parent);
         }
-        return true;
-    }
-
-    @Transactional(propagation = Propagation.REQUIRED)
-    public boolean saveAdapterOrg(AdapterOrg adapterOrg) {
-        adapterOrgRepository.save(adapterOrg);
-        return true;
-    }
-
-    @Transactional(propagation = Propagation.REQUIRED)
-    public void deleteAdapterOrg(String code) {
-        adapterOrgRepository.delete(code);
-        deleteData(code);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void deleteAdapterOrg(String[] codes) {
         for (String code : codes) {
-            deleteAdapterOrg(code);
+            delete(code);
         }
     }
 
@@ -125,13 +87,18 @@ public class AdapterOrgManager extends BaseManager<AdapterOrg, XAdapterOrgReposi
         query.executeUpdate();
     }
 
-//    public boolean isExistData(String org){
-//        return orgDataSetManager.getMaxSeq(org)+orgMetaDataManager.getMaxSeq(org)+ orgDictManager.getMaxSeq(org)+orgDictItemManager.getMaxSeq(org)>0;
-//    }
+    /**
+     * 机构是否存在采集数据
+     *
+     * @param org
+     * @return
+     */
+    public boolean isExistData(String org) {
+        return orgDataSetManager.getMaxSeq(org) + orgMetaDataManager.getMaxSeq(org) + orgDictManager.getMaxSeq(org) + orgDictItemManager.getMaxSeq(org) > 0;
+    }
 
     /**
      * 拷贝
-     * 2015-12-31  速度优化以及添加事务控制
      *
      * @param code
      * @param parent

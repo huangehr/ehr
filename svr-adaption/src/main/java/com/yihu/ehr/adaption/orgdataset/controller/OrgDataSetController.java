@@ -14,10 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
-import java.util.List;
 
 /**
- * Created by lincl on 2016.1.29
+ * @author lincl
+ * @version 1.0
+ * @created 2016.2.1
  */
 @RestController
 @RequestMapping(ApiVersionPrefix.CommonVersion + "/orgdataset")
@@ -28,20 +29,14 @@ public class OrgDataSetController extends BaseRestController {
     @Autowired
     private OrgDataSetManager orgDataSetManager;
 
-    /**
-     * 根据id查询实体
-     *
-     * @param id
-     * @return
-     */
     @RequestMapping(value = "/info", method = RequestMethod.GET)
     @ApiOperation(value = "根据id查询实体")
-    public Object getOrgDataSet(
+    public Result getOrgDataSet(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") long id) {
         Result result = new Result();
         try {
-            OrgDataSet orgDataSet = orgDataSetManager.getOrgDataSet(id);
+            OrgDataSet orgDataSet = orgDataSetManager.findOne(id);
             result.setObj(orgDataSet);
             result.setSuccessFlg(true);
         } catch (Exception es) {
@@ -50,20 +45,9 @@ public class OrgDataSetController extends BaseRestController {
         return result;
     }
 
-    /**
-     * 创建机构数据集
-     *
-     * @param apiVersion
-     * @param code
-     * @param name
-     * @param description
-     * @param orgCode
-     * @param userId
-     * @return
-     */
     @RequestMapping(value = "", method = RequestMethod.POST)
     @ApiOperation(value = "创建机构数据集")
-    public Object createOrgDataSet(
+    public Result createOrgDataSet(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
             @ApiParam(name = "code", value = "code", defaultValue = "")
@@ -77,11 +61,10 @@ public class OrgDataSetController extends BaseRestController {
             @ApiParam(name = "userId", value = "userId", defaultValue = "")
             @RequestParam(value = "userId") String userId) {
 
-        Result result = new Result();
+        Result result = getSuccessResult(false);
         try {
             boolean isExist = orgDataSetManager.isExistOrgDataSet(orgCode, code, name);   //重复校验
             if (isExist) {
-                result.setSuccessFlg(false);
                 result.setErrorMsg("该数据集已存在！");
                 return result;
             }
@@ -93,25 +76,20 @@ public class OrgDataSetController extends BaseRestController {
             orgDataSet.setCreateDate(new Date());
             orgDataSet.setCreateUser(userId);
             orgDataSetManager.createOrgDataSet(orgDataSet);
-            return true;
+            result.setSuccessFlg(true);
         } catch (Exception ex) {
-            return false;
+
         }
+        return result;
     }
 
-    /**
-     * 删除机构数据集
-     *
-     * @param id
-     * @return
-     */
+
     @RequestMapping(value = "", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除机构数据集")
-    public Object deleteOrgDataSet(
+    public boolean deleteOrgDataSet(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") long id) {
 
-        Result result = new Result();
         try {
             orgDataSetManager.deleteOrgDataSet(id);
             return true;
@@ -120,21 +98,10 @@ public class OrgDataSetController extends BaseRestController {
         }
     }
 
-    /**
-     * 修改机构数据集
-     *
-     * @param apiVersion
-     * @param orgCode
-     * @param id
-     * @param code
-     * @param name
-     * @param description
-     * @param userId
-     * @return
-     */
+
     @RequestMapping(value = "", method = RequestMethod.PUT)
     @ApiOperation(value = "修改机构数据集")
-    public Object updateOrgDataSet(
+    public Result updateOrgDataSet(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
             @ApiParam(name = "orgCode", value = "orgCode", defaultValue = "")
@@ -150,13 +117,12 @@ public class OrgDataSetController extends BaseRestController {
             @ApiParam(name = "userId", value = "userId", defaultValue = "")
             @RequestParam(value = "userId") String userId) {
 
-        Result result = new Result();
+        Result result = getSuccessResult(false);
         try {
-            OrgDataSet orgDataSet = orgDataSetManager.getOrgDataSet(id);
+            OrgDataSet orgDataSet = orgDataSetManager.findOne(id);
             if (orgDataSet == null) {
-                result.setSuccessFlg(false);
                 result.setErrorMsg("该数据集不存在！");
-                return false;
+                return result;
             } else {
                 //重复校验
                 boolean updateFlg = orgDataSet.getCode().equals(code) || !orgDataSetManager.isExistOrgDataSet(orgCode, code, name);
@@ -166,42 +132,30 @@ public class OrgDataSetController extends BaseRestController {
                     orgDataSet.setDescription(description);
                     orgDataSet.setUpdateDate(new Date());
                     orgDataSet.setUpdateUser(userId);
-                    orgDataSetManager.updateOrgDataSet(orgDataSet);
-                    return true;
-                } else {
-                    result.setSuccessFlg(false);
+                    orgDataSetManager.save(orgDataSet);
+                    result.setSuccessFlg(true);
+                } else
                     result.setErrorMsg("该数据集已存在！");
-                    return false;
-                }
+
             }
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg("修改数据集失败！");
-            return false;
+
         }
+        return result;
     }
 
 
-    /**
-     * 条件查询
-     *
-     * @param parmJson
-     * @return
-     */
+
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @ApiOperation(value = "条件查询")
-    public Object searchOrgDataSets(
+    public Result searchOrgDataSets(
             @ApiParam(name = "parmJson", value = "查询条件", defaultValue = "")
             @RequestParam(value = "parmJson", required = false) String parmJson) {
         Result result = new Result();
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             PageModel pageModel = objectMapper.readValue(parmJson, PageModel.class);
-            pageModel.setModelClass(OrgDataSet.class);
-            List<OrgDataSet> orgDataSets = orgDataSetManager.searchOrgDataSets(pageModel);
-            Integer totalCount = orgDataSetManager.searchTotalCount(pageModel);
-            result = getResult(orgDataSets, totalCount, pageModel.getPage(), pageModel.getRows());
-            result.setSuccessFlg(true);
+            result = orgDataSetManager.pagesToResult(pageModel);
         } catch (Exception ex) {
             result.setSuccessFlg(false);
         }

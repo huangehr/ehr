@@ -1,9 +1,8 @@
 package com.yihu.ehr.adaption.orgdataset.service;
 
 
-import com.yihu.ehr.adaption.commons.BaseManager;
+import com.yihu.ehr.util.service.BaseManager;
 import com.yihu.ehr.adaption.orgmetaset.service.OrgMetaDataManager;
-import com.yihu.ehr.util.parm.PageModel;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,31 +10,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 /**
  * 机构数据集管理器。
  *
- * @author linaz
+ * @author lincl
  * @version 1.0
- * @created 23-10月-2015 10:19:06
+ * @created 2016.2.3
  */
 @Transactional
 @Service
 public class OrgDataSetManager extends BaseManager<OrgDataSet, XOrgDataSetRepository> {
     @Autowired
-    XOrgDataSetRepository orgDataSetRepository;
-    @Autowired
     OrgMetaDataManager orgMetaDataManager;
 
-    @Transactional(propagation = Propagation.SUPPORTS)
-    public OrgDataSet getOrgDataSet(long id) {
-        return orgDataSetRepository.findOne(id);
-    }
 
     @Transactional(propagation = Propagation.SUPPORTS)
     public boolean isExistOrgDataSet(String orgCode, String code, String name) {
-        return orgDataSetRepository.isExistOrgDataSet(code, name).size() != 0;
+        return getRepository().isExistOrgDataSet(code, name).size() != 0;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -63,20 +54,15 @@ public class OrgDataSetManager extends BaseManager<OrgDataSet, XOrgDataSetReposi
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public int deleteOrgDataSet(long id) {
-        OrgDataSet orgDataSet = orgDataSetRepository.findOne(id);
+    public void deleteOrgDataSet(long id) {
+        OrgDataSet orgDataSet = findOne(id);
         if (orgDataSet == null)
-            return 0;
-        Query query = currentSession().createQuery("delete from OrgDataSet where id = :id");
-        query.setLong("id", id);
-        int rs = query.executeUpdate();
-        if (rs > 0) {
-            //删除关联的数据元
-            orgMetaDataManager.deleteOrgMetaDataBySet(orgDataSet);
-        }
-        return rs;
+            return;
+        delete(orgDataSet);
+        orgMetaDataManager.deleteOrgMetaDataBySet(orgDataSet);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public int getMaxSeq(String orgCode) {
         Session session = currentSession();
         Query query = session.createQuery("select max(sequence) from OrgDataSet where organization = :orgCode");
@@ -86,36 +72,6 @@ public class OrgDataSetManager extends BaseManager<OrgDataSet, XOrgDataSetReposi
             seq = 0;
         }
         return seq;
-    }
-
-    @Transactional(propagation = Propagation.REQUIRED)
-    public OrgDataSet updateOrgDataSet(OrgDataSet orgDataSet) {
-        return orgDataSetRepository.save(orgDataSet);
-    }
-
-    @Transactional(propagation = Propagation.SUPPORTS)
-    public List<OrgDataSet> searchOrgDataSets(PageModel pageModel) {
-        Session session = currentSession();
-        String hql = "select dataset from OrgDataSet dataset  ";
-        String wh = pageModel.format();
-        hql += wh.equals("") ? "" : wh;
-        Query query = setQueryVal(session.createQuery(hql), pageModel);
-        int page = pageModel.getPage();
-        if (page > 0) {
-            query.setMaxResults(pageModel.getRows());
-            query.setFirstResult((page - 1) * pageModel.getRows());
-        }
-        return query.list();
-    }
-
-    @Transactional(propagation = Propagation.SUPPORTS)
-    public int searchTotalCount(PageModel pageModel) {
-        Session session = currentSession();
-        String hql = "select count(*) from OrgDataSet ";
-        String wh = pageModel.format();
-        hql += wh.equals("") ? "" : wh;
-        Query query = setQueryVal(session.createQuery(hql), pageModel);
-        return ((Long) query.list().get(0)).intValue();
     }
 
 }

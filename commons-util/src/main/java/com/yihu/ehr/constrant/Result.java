@@ -36,7 +36,7 @@ public class Result implements Serializable{
 	private int errorCode;
 
 	public String toJson(){
-        ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
+        ObjectMapper objectMapper = new ObjectMapper();
         try {
             return objectMapper.writeValueAsString(this);
         } catch (JsonProcessingException e) {

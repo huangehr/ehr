@@ -6,7 +6,9 @@ import com.yihu.ehr.standard.dict.service.DictForInterface;
 import java.util.List;
 
 /**
- * Created by wq on 2015/9/22.
+ * @author lincl
+ * @version 1.0
+ * @created 2016.2.3
  */
 public class MetaDataModel {
 

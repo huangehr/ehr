@@ -7,6 +7,7 @@ import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constrant.Result;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.operator.StringUtil;
+import com.yihu.ehr.util.parm.FieldCondition;
 import com.yihu.ehr.util.parm.PageModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,34 +15,29 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
- * Created by lincl on 2016.1.29
+ * @author lincl
+ * @version 1.0
+ * @created 2016.2.1
  */
 @RestController
 @RequestMapping(ApiVersionPrefix.CommonVersion + "/orgdictitem")
-@Api(protocols = "https", value = "orgdictitem", description = "»ú¹¹×ÖµäÏî¹ÜÀí½Ó¿Ú", tags = {"»ú¹¹×ÖµäÏî"})
+@Api(protocols = "https", value = "orgdictitem", description = "æœºæ„å­—å…¸é¡¹", tags = {"æœºæ„å­—å…¸é¡¹"})
 public class OrgDictItemController extends BaseRestController {
 
     @Autowired
     private OrgDictItemManager orgDictItemManager;
 
-    /**
-     * ¸ù¾İid²éÑ¯ÊµÌå
-     *
-     * @param id
-     * @return
-     */
     @RequestMapping(value = "/info", method = RequestMethod.GET)
-    @ApiOperation(value = "¸ù¾İid²éÑ¯ÊµÌå")
-    public Object getOrgDictItem(
-            @ApiParam(name = "id", value = "²éÑ¯Ìõ¼ş", defaultValue = "")
+    @ApiOperation(value = "è·å–å­—å…¸é¡¹ä¿¡æ¯")
+    public Result getOrgDictItem(
+            @ApiParam(name = "id", value = "ç¼–å·", defaultValue = "")
             @RequestParam(value = "id", required = false) long id) {
         Result result = new Result();
         try {
-            OrgDictItem orgDictItem = orgDictItemManager.getOrgDictItem(id);
+            OrgDictItem orgDictItem = orgDictItemManager.findOne(id);
             result.setObj(orgDictItem);
             result.setSuccessFlg(true);
         } catch (Exception ex) {
@@ -50,25 +46,9 @@ public class OrgDictItemController extends BaseRestController {
         return result;
     }
 
-
-    /**
-     * ´´½¨»ú¹¹×ÖµäÊı¾İ
-     *
-     * @param apiVersion
-     * @param orgDictSeq
-     * @param orgCode
-     * @param code
-     * @param name
-     * @param description
-     * @param sort
-     * @param userId
-     * @return
-     */
     @RequestMapping(value = "", method = RequestMethod.POST)
-    @ApiOperation(value = "´´½¨»ú¹¹×ÖµäÊı¾İ")
-    public Object createOrgDictItem(
-            @ApiParam(name = "api_version", value = "API°æ±¾ºÅ", defaultValue = "v1.0")
-            @PathVariable(value = "api_version") String apiVersion,
+    @ApiOperation(value = "æ–°å¢å­—å…¸é¡¹")
+    public Result createOrgDictItem(
             @ApiParam(name = "orgDictSeq", value = "orgDictSeq", defaultValue = "")
             @RequestParam(value = "orgDictSeq") int orgDictSeq,
             @ApiParam(name = "orgCode", value = "orgCode", defaultValue = "")
@@ -84,14 +64,13 @@ public class OrgDictItemController extends BaseRestController {
             @ApiParam(name = "userId", value = "userId", defaultValue = "")
             @RequestParam(value = "userId") String userId) {
 
-        Result result = new Result();
+        Result result = getSuccessResult(false);
         try {
-            boolean isExist = orgDictItemManager.isExistOrgDictItem(orgDictSeq, orgCode, code);   //ÖØ¸´Ğ£Ñé
+            boolean isExist = orgDictItemManager.isExistOrgDictItem(orgDictSeq, orgCode, code);   //é‡å¤éªŒè¯
 
             if (isExist) {
-                result.setSuccessFlg(false);
-                result.setErrorMsg("¸Ã×ÖµäÏîÒÑ´æÔÚ£¡");
-                return false;
+                result.setErrorMsg("è¯¥å­—å…¸é¡¹å·²å­˜åœ¨");
+                return result;
             }
             OrgDictItem orgDictItem = new OrgDictItem();
             int nextSort;
@@ -109,82 +88,53 @@ public class OrgDictItemController extends BaseRestController {
             orgDictItem.setDescription(description);
             orgDictItem.setOrganization(orgCode);
             orgDictItemManager.createOrgDictItem(orgDictItem);
-            return true;
+            result.setSuccessFlg(true);
         } catch (Exception ex) {
-            result.setSuccessFlg(false);
-            return false;
+
         }
+        return result;
     }
 
-    /**
-     * É¾³ı»ú¹¹×ÖµäÊı¾İ
-     *
-     * @param id
-     * @return
-     */
+
     @RequestMapping(value = "", method = RequestMethod.DELETE)
-    @ApiOperation(value = "É¾³ı»ú¹¹×ÖµäÊı¾İ")
-    public Object deleteOrgDictItem(
-            @ApiParam(name = "id", value = "²éÑ¯Ìõ¼ş", defaultValue = "")
+    @ApiOperation(value = "åˆ é™¤å­—å…¸é¡¹")
+    public boolean deleteOrgDictItem(
+            @ApiParam(name = "id", value = "ç¼–å·", defaultValue = "")
             @RequestParam(value = "id", required = false) long id) {
 
-        Result result = new Result();
         try {
-            orgDictItemManager.deleteOrgDictItem(id);
+            orgDictItemManager.delete(id);
             return true;
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg("É¾³ı×ÖµäÏîÊ§°Ü£¡");
             return false;
         }
     }
 
-    /**
-     * ÅúÁ¿É¾³ı»ú¹¹×ÖµäÊı¾İ
-     *
-     * @param ids
-     * @return
-     */
-    @RequestMapping(value = "/batch", method = RequestMethod.DELETE)
-    @ApiOperation(value = "ÅúÁ¿É¾³ı»ú¹¹×ÖµäÊı¾İ")
-    public Object deleteOrgDictItemList(
-            @ApiParam(name = "ids", value = "±àºÅ¼¯", defaultValue = "")
-            @RequestParam(value = "ids[]") Long[] ids) {
-        Result result = new Result();
 
+    @RequestMapping(value = "/batch", method = RequestMethod.DELETE)
+    @ApiOperation(value = "æ‰¹é‡åˆ é™¤å­—å…¸é¡¹")
+    public boolean deleteOrgDictItemList(
+            @ApiParam(name = "ids", value = "ç¼–å·é›†", defaultValue = "")
+            @RequestParam(value = "ids[]") Long[] ids) {
+
+        Result result = new Result();
         if (ids == null || ids.length == 0) {
             return true;
         } else {
             try {
-                orgDictItemManager.deleteOrgDictItemList(ids);
+                orgDictItemManager.delete(ids, "id");
                 return true;
             } catch (Exception e) {
-                result.setSuccessFlg(false);
-                result.setErrorMsg("É¾³ı×ÖµäÏîÊ§°Ü£¡");
+
                 return false;
             }
         }
     }
 
-    /**
-     * ĞŞ¸Ä»ú¹¹×ÖµäÊı¾İ
-     *
-     * @param apiVersion
-     * @param id
-     * @param orgDictSeq
-     * @param orgCode
-     * @param code
-     * @param name
-     * @param description
-     * @param sort
-     * @param userId
-     * @return
-     */
+
     @RequestMapping(value = "", method = RequestMethod.PUT)
-    @ApiOperation(value = "ĞŞ¸Ä»ú¹¹×ÖµäÊı¾İ")
-    public Object updateDictItem(
-            @ApiParam(name = "api_version", value = "API°æ±¾ºÅ", defaultValue = "v1.0")
-            @PathVariable(value = "api_version") String apiVersion,
+    @ApiOperation(value = "ä¿®æ”¹å­—å…¸é¡¹")
+    public Result updateDictItem(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @RequestParam(value = "id") Long id,
             @ApiParam(name = "orgDictSeq", value = "orgDictSeq", defaultValue = "")
@@ -202,15 +152,14 @@ public class OrgDictItemController extends BaseRestController {
             @ApiParam(name = "userId", value = "userId", defaultValue = "")
             @RequestParam(value = "userId") String userId) {
 
-        Result result = new Result();
+        Result result = getSuccessResult(false);
         try {
-            OrgDictItem orgDictItem = orgDictItemManager.getOrgDictItem(id);
+            OrgDictItem orgDictItem = orgDictItemManager.findOne(id);
             if (orgDictItem == null) {
-                result.setSuccessFlg(false);
-                result.setErrorMsg("¸Ã×ÖµäÏî²»´æÔÚ£¡");
-                return false;
+                result.setErrorMsg("è¯¥å­—å…¸é¡¹ä¸å­˜åœ¨");
+                return result;
             } else {
-                //ÖØ¸´Ğ£Ñé
+                //é‡å¤éªŒè¯
                 boolean updateFlg = orgDictItem.getCode().equals(code) || !orgDictItemManager.isExistOrgDictItem(orgDictSeq, orgCode, code);
                 if (updateFlg) {
                     orgDictItem.setCode(code);
@@ -220,42 +169,54 @@ public class OrgDictItemController extends BaseRestController {
                     orgDictItem.setUpdateUser(userId);
                     orgDictItem.setSort(Integer.parseInt(sort));
                     orgDictItem.setOrganization(orgCode);
-                    orgDictItemManager.updateOrgDictItem(orgDictItem);
-                    return true;
+                    orgDictItemManager.save(orgDictItem);
+                    result.setSuccessFlg(true);
                 }
-                result.setSuccessFlg(false);
-                result.setErrorMsg("¸Ã×ÖµäÏîÒÑ´æÔÚ£¡");
-                return false;
+                result.setErrorMsg("è¯¥å­—å…¸é¡¹å·²å­˜åœ¨");
             }
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg("ĞŞ¸Ä×ÖµäÏîÊ§°Ü£¡");
-            return false;
+            result.setErrorMsg("ä¿®æ”¹å¤±è´¥");
         }
+        return result;
     }
 
 
-    /**
-     * Ìõ¼ş²éÑ¯
-     *
-     * @param parmJson
-     * @return
-     */
     @RequestMapping(value = "/page", method = RequestMethod.GET)
-    @ApiOperation(value = "Ìõ¼ş²éÑ¯")
+    @ApiOperation(value = "åˆ†é¡µæŸ¥è¯¢")
     public Object searchOrgDictItems(
-            @ApiParam(name = "parmJson", value = "²éÑ¯Ìõ¼ş", defaultValue = "")
+            @ApiParam(name = "parmJson", value = "åˆ†é¡µæŸ¥è¯¢æ¡ä»¶æ¨¡å‹", defaultValue = "")
             @RequestParam(value = "parmJson", required = false) String parmJson) {
         Result result = new Result();
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             PageModel pageModel = objectMapper.readValue(parmJson, PageModel.class);
-            pageModel.setModelClass(OrgDictItem.class);
-            List<OrgDictItem> detailModelList = orgDictItemManager.searchOrgDictItems(pageModel);
-            Integer totalCount = orgDictItemManager.searchTotalCount(pageModel);
-            result = getResult(detailModelList, totalCount, pageModel.getPage(), pageModel.getRows());
-            result.setSuccessFlg(true);
+            result = orgDictItemManager.pagesToResult(pageModel);
         } catch (Exception ex) {
+            result.setSuccessFlg(false);
+        }
+        return result;
+    }
+
+    @RequestMapping(value = "/combo", method = RequestMethod.GET)
+    @ApiOperation(value = "æœºæ„å­—å…¸é¡¹ä¸‹æ‹‰")
+    public Result getOrgDictEntry(
+            @ApiParam(name = "orgDictSeq", value = "å­—å…¸seq", defaultValue = "")
+            @RequestParam(value = "orgDictSeq") Integer orgDictSeq,
+            @ApiParam(name = "orgCode", value = "æœºæ„ä»£ç ", defaultValue = "")
+            @RequestParam(value = "orgCode") Long orgCode){
+        Result result = new Result();
+        try {
+            PageModel pageModel = new PageModel();
+            pageModel.addFieldCondition(new FieldCondition("orgDict", "=", orgDictSeq));
+            pageModel.addFieldCondition(new FieldCondition("organization", "=", orgCode));
+            List<OrgDictItem> orgDictItemList = orgDictItemManager.pages(pageModel);
+            List<String> orgDictItems = new ArrayList<>();
+            for (OrgDictItem orgDictItem : orgDictItemList) {
+                orgDictItems.add(String.valueOf(orgDictItem.getSequence()) + ',' + orgDictItem.getName());
+            }
+            result.setSuccessFlg(true);
+            result.setDetailModelList(orgDictItems);
+        } catch (Exception e) {
             result.setSuccessFlg(false);
         }
         return result;

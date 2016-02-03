@@ -14,34 +14,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
-import java.util.List;
 
 /**
- * Created by lincl on 2016.1.29
+ * @author lincl
+ * @version 1.0
+ * @created 2016.2.1
  */
 @RestController
 @RequestMapping(ApiVersionPrefix.CommonVersion + "/orgmetadata")
-@Api(protocols = "https", value = "orgmetadata", description = "»ú¹¹Êı¾İÔª¹ÜÀí½Ó¿Ú", tags = {"»ú¹¹Êı¾İÔª"})
+@Api(protocols = "https", value = "orgmetadata", description = "æœºæ„æ•°æ®å…ƒ", tags = {"æœºæ„æ•°æ®å…ƒ"})
 public class OrgMetaDataController extends BaseRestController {
 
     @Autowired
     private OrgMetaDataManager orgMetaDataManager;
 
 
-    /**
-     * ¸ù¾İid²éÑ¯ÊµÌå
-     *
-     * @param id
-     * @return
-     */
     @RequestMapping(value = "", method = RequestMethod.GET)
-    @ApiOperation(value = "¸ù¾İid²éÑ¯ÊµÌå")
-    public Object getOrgMetaData(
-            @ApiParam(name = "id", value = "±àºÅ", defaultValue = "")
+    @ApiOperation(value = "æ ¹æ®idè·å–æœºæ„æ•°æ®å…ƒ")
+    public Result getOrgMetaData(
+            @ApiParam(name = "id", value = "ç¼–å·", defaultValue = "")
             @RequestParam(value = "id") long id) {
         Result result = new Result();
         try {
-            OrgMetaData orgMetaData = orgMetaDataManager.getOrgMetaData(id);
+            OrgMetaData orgMetaData = orgMetaDataManager.findOne(id);
             result.setObj(orgMetaData);
             result.setSuccessFlg(true);
         } catch (Exception ex) {
@@ -51,20 +46,10 @@ public class OrgMetaDataController extends BaseRestController {
     }
 
 
-    /**
-     * ´´½¨»ú¹¹Êı¾İÔª
-     *
-     * @param orgDataSetSeq
-     * @param code
-     * @param name
-     * @param description
-     * @param userId
-     * @return
-     */
     @RequestMapping(value = "", method = RequestMethod.POST)
-    @ApiOperation(value = "´´½¨»ú¹¹Êı¾İÔª")
-    public Object createOrgMetaData(
-            @ApiParam(name = "api_version", value = "API°æ±¾ºÅ", defaultValue = "v1.0")
+    @ApiOperation(value = "æ–°å¢æ•°æ®å…ƒ")
+    public Result createOrgMetaData(
+            @ApiParam(name = "api_version", value = "API?æ±¾??", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
             @ApiParam(name = "orgDataSetSeq", value = "orgDataSetSeq", defaultValue = "")
             @RequestParam(value = "orgDataSetSeq") int orgDataSetSeq,
@@ -83,12 +68,12 @@ public class OrgMetaDataController extends BaseRestController {
 
         Result result = new Result();
         try {
-            boolean isExist = orgMetaDataManager.isExistOrgMetaData(orgDataSetSeq, orgCode, code);   //ÖØ¸´Ğ£Ñé
+            boolean isExist = orgMetaDataManager.isExistOrgMetaData(orgDataSetSeq, orgCode, code);//é‡å¤éªŒè¯
 
             if (isExist) {
                 result.setSuccessFlg(false);
-                result.setErrorMsg("¸ÃÊı¾İÔªÒÑ´æÔÚ£¡");
-                return false;
+                result.setErrorMsg("è¯¥æ•°æ®å…ƒå·²å­˜åœ¨");
+                return result;
             }
             OrgMetaData orgMetaData = new OrgMetaData();
             orgMetaData.setCode(code);
@@ -99,79 +84,50 @@ public class OrgMetaDataController extends BaseRestController {
             orgMetaData.setOrganization(orgCode);
             orgMetaData.setDescription(description);
             orgMetaDataManager.createOrgMetaData(orgMetaData);
-            return true;
+            result.setSuccessFlg(true);
         } catch (Exception ex) {
-            return false;
+            result.setSuccessFlg(true);
         }
+        return result;
     }
 
 
-    /**
-     * É¾³ı»ú¹¹Êı¾İÔª
-     *
-     * @param id
-     * @return
-     */
     @RequestMapping(value = "", method = RequestMethod.DELETE)
-    @ApiOperation(value = "É¾³ı»ú¹¹Êı¾İÔª")
-    public Object deleteOrgMetaData(
-            @ApiParam(name = "id", value = "±àºÅ", defaultValue = "")
+    @ApiOperation(value = "åˆ é™¤æ•°æ®å…ƒ")
+    public boolean deleteOrgMetaData(
+            @ApiParam(name = "id", value = "ç¼–å·", defaultValue = "")
             @RequestParam(value = "id") long id) {
 
-        Result result = new Result();
         try {
-            orgMetaDataManager.deleteOrgMetaData(id);
+            orgMetaDataManager.delete(id);
             return true;
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg("É¾³ıÊı¾İÔªÊ§°Ü£¡");
+
             return false;
         }
     }
 
-    /**
-     * ÅúÁ¿É¾³ı»ú¹¹Êı¾İÔª
-     *
-     * @param ids
-     * @return
-     */
     @RequestMapping(value = "/batch", method = RequestMethod.DELETE)
-    @ApiOperation(value = "ÅúÁ¿É¾³ı»ú¹¹Êı¾İÔª")
-    public Object deleteOrgMetaDataList(
-            @ApiParam(name = "ids", value = "±àºÅ¼¯", defaultValue = "")
+    @ApiOperation(value = "æ‰¹é‡åˆ é™¤æ•°æ®å…ƒ")
+    public boolean deleteOrgMetaDataList(
+            @ApiParam(name = "ids", value = "ç¼–å·é›†", defaultValue = "")
             @RequestParam(value = "ids[]") Long[] ids) {
 
-        Result result = new Result();
         if (ids == null || ids.length == 0)
             return true;
 
         try {
-            orgMetaDataManager.deleteOrgMetaDataList(ids);
+            orgMetaDataManager.delete(ids, "id");
             return true;
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg("É¾³ıÊı¾İÔªÊ§°Ü£¡");
             return false;
         }
     }
 
-    /**
-     * ĞŞ¸Ä»ú¹¹Êı¾İÔª
-     *
-     * @param apiVersion
-     * @param orgDataSetSeq
-     * @param orgCode
-     * @param id
-     * @param code
-     * @param name
-     * @param description
-     * @param userId
-     * @return
-     */
     @RequestMapping(value = "/orgMetaData", method = RequestMethod.PUT)
-    @ApiOperation(value = "ĞŞ¸Ä»ú¹¹Êı¾İÔª")
-    public Object updateOrgMetaData(
-            @ApiParam(name = "api_version", value = "API°æ±¾ºÅ", defaultValue = "v1.0")
+    @ApiOperation(value = "ä¿®æ”¹æ•°æ®å…ƒ")
+    public Result updateOrgMetaData(
+            @ApiParam(name = "api_version", value = "APIç‰ˆæœ¬å·", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
             @ApiParam(name = "orgDataSetSeq", value = "orgDataSetSeq", defaultValue = "")
             @RequestParam(value = "orgDataSetSeq") Integer orgDataSetSeq,
@@ -190,13 +146,13 @@ public class OrgMetaDataController extends BaseRestController {
 
         Result result = new Result();
         try {
-            OrgMetaData orgMetaData = orgMetaDataManager.getOrgMetaData(id);
+            OrgMetaData orgMetaData = orgMetaDataManager.findOne(id);
             if (orgMetaData == null) {
                 result.setSuccessFlg(false);
-                result.setErrorMsg("¸ÃÊı¾İÔª²»´æÔÚ£¡");
-                return false;
+                result.setErrorMsg("ä¸å­˜åœ¨è¯¥æ•°æ®å…ƒ");
+                return result;
             } else {
-                //ÖØ¸´Ğ£Ñé
+                //é‡å¤éªŒè¯
                 boolean updateFlg = orgMetaData.getCode().equals(code) || !orgMetaDataManager.isExistOrgMetaData(orgDataSetSeq, orgCode, code);
                 if (updateFlg) {
                     orgMetaData.setCode(code);
@@ -205,38 +161,30 @@ public class OrgMetaDataController extends BaseRestController {
                     orgMetaData.setUpdateDate(new Date());
                     orgMetaData.setUpdateUser(userId);
                     orgMetaData.setOrganization(orgCode);
-                    orgMetaDataManager.updateOrgMetaData(orgMetaData);
-                    return true;
+                    orgMetaDataManager.save(orgMetaData);
+                    result.setSuccessFlg(true);
                 }
-                return false;
+                else {
+                    result.setSuccessFlg(false);
+                    result.setErrorMsg("æ•°æ®å…ƒä»£ç é‡å¤ï¼");
+                }
             }
         } catch (Exception e) {
             result.setSuccessFlg(false);
-            result.setErrorMsg("ĞŞ¸ÄÊı¾İÔªÊ§°Ü£¡");
-            return false;
         }
+        return result;
     }
 
-    /**
-     * Ìõ¼ş²éÑ¯
-     *
-     * @param parmJson
-     * @return
-     */
     @RequestMapping(value = "/page", method = RequestMethod.GET)
-    @ApiOperation(value = "Ìõ¼ş²éÑ¯")
-    public Object searchOrgMetaDatas(
-            @ApiParam(name = "parmJson", value = "²éÑ¯Ìõ¼ş", defaultValue = "")
+    @ApiOperation(value = "åˆ†é¡µæŸ¥è¯¢")
+    public Result searchOrgMetaDatas(
+            @ApiParam(name = "parmJson", value = "åˆ†é¡µæ¨¡å‹", defaultValue = "")
             @RequestParam(value = "parmJson", required = false) String parmJson) {
         Result result = new Result();
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             PageModel pageModel = objectMapper.readValue(parmJson, PageModel.class);
-            pageModel.setModelClass(OrgMetaData.class);
-            List<OrgMetaData> orgMetaDatas = orgMetaDataManager.searchOrgMetaDatas(pageModel);
-            Integer totalCount = orgMetaDataManager.searchTotalCount(pageModel);
-            result = getResult(orgMetaDatas, totalCount, pageModel.getPage(), pageModel.getRows());
-            result.setSuccessFlg(true);
+            result = orgMetaDataManager.pagesToResult(pageModel);
         } catch (Exception ex) {
             result.setSuccessFlg(false);
         }
