@@ -3,21 +3,25 @@ package com.yihu.ehr.ha.geography.controller;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.ha.geography.service.AddressClient;
 import com.yihu.ehr.util.controller.BaseRestController;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * Created by AndyCai on 2016/1/20.
  */
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/address")
+@EnableFeignClients
+@RequestMapping(ApiVersionPrefix.CommonVersion)
 @RestController
+@Api(value = "address", description = "地址信息管理接口，用于地址信息管理", tags = {"地址信息管理接口"})
 public class AddressController extends BaseRestController {
     @Autowired
     private AddressClient addressClient;
 
-    @RequestMapping(value = "/level", method = RequestMethod.GET)
+    @RequestMapping(value = "/address/level", method = RequestMethod.GET)
     @ApiOperation(value = "根据地址等级查询地址信息")
     public Object getAddressByLevel(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                                     @PathVariable(value = "api_version") String apiVersion,
@@ -27,7 +31,7 @@ public class AddressController extends BaseRestController {
         return addressClient.getAddressByLevel(apiVersion, level);
     }
 
-    @RequestMapping(value = "/pid", method = RequestMethod.GET)
+    @RequestMapping(value = "/address/pid", method = RequestMethod.GET)
     @ApiOperation(value = "根据父id查询地址信息")
     public Object getAddressDictByPid(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                                       @PathVariable(value = "api_version") String apiVersion,
@@ -37,7 +41,7 @@ public class AddressController extends BaseRestController {
         return addressClient.getAddressDictByPid(apiVersion, pid);
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping(value = "/address/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据id查询地址信息")
     public Object getAddressById(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                                  @PathVariable(value = "api_version") String apiVersion,
@@ -47,7 +51,7 @@ public class AddressController extends BaseRestController {
         return addressClient.getAddressById(apiVersion, id);
     }
 
-    @RequestMapping(value = "/canonical", method = RequestMethod.GET)
+    @RequestMapping(value = "/address/canonical", method = RequestMethod.GET)
     @ApiOperation(value = "根据地址代码获取机构详细信息")
     public Object getCanonicalAddress(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                                       @PathVariable(value = "api_version") String apiVersion,
@@ -57,7 +61,7 @@ public class AddressController extends BaseRestController {
         return addressClient.getCanonicalAddress(apiVersion, id);
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.PUT)
+    @RequestMapping(value = "/address", method = RequestMethod.PUT)
     @ApiOperation(value = "地址检查并保存")
     public Object saveAddress(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                               @PathVariable(value = "api_version") String apiVersion,
@@ -95,7 +99,7 @@ public class AddressController extends BaseRestController {
         return addressClient.search(apiVersion, province, city, district);
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/address/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除地址")
     public Object delete(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                          @PathVariable(value = "api_version") String apiVersion,
@@ -104,7 +108,7 @@ public class AddressController extends BaseRestController {
 
        return addressClient.delete(apiVersion,id);
     }
-    @RequestMapping(value = "/is_address" , method = RequestMethod.GET)
+    @RequestMapping(value = "/address/is_address" , method = RequestMethod.GET)
     @ApiOperation(value = "判断是否是个地址")
     public boolean isNullAddress(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")

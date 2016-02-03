@@ -3,22 +3,26 @@ package com.yihu.ehr.ha.organization.controller;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.ha.organization.service.OrganizationClient;
 import com.yihu.ehr.util.controller.BaseRestController;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * Created by AndyCai on 2016/1/21.
  */
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/organization")
+@EnableFeignClients
+@RequestMapping(ApiVersionPrefix.CommonVersion)
 @RestController
+@Api(value = "organization", description = "机构信息管理接口，用于机构信息管理", tags = {"机构信息管理接口"})
 public class OrganizationController extends BaseRestController {
 
     @Autowired
     private OrganizationClient orgClient;
 
-    @RequestMapping(value = "/search", method = RequestMethod.GET)
+    @RequestMapping(value = "/organization/search", method = RequestMethod.GET)
     public Object searchOrgs(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
@@ -51,12 +55,12 @@ public class OrganizationController extends BaseRestController {
      * @param orgCode
      * @return
      */
-    @RequestMapping(value = "/", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/organization/org_code", method = RequestMethod.DELETE)
     public Object deleteOrg(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
-            @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
-            @RequestParam(value = "orgCode") String orgCode) {
+            @ApiParam(name = "org_code", value = "机构代码", defaultValue = "")
+            @PathVariable(value = "org_code") String orgCode) {
 
         return orgClient.deleteOrg(apiVersion, orgCode);
     }
@@ -68,12 +72,12 @@ public class OrganizationController extends BaseRestController {
      * @param orgCode
      * @return
      */
-    @RequestMapping(value = "/activity", method = RequestMethod.PUT)
+    @RequestMapping(value = "/organization/activity/{org_code}", method = RequestMethod.PUT)
     public Object activity(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
-            @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
-            @RequestParam(value = "orgCode") String orgCode,
+            @ApiParam(name = "org_code", value = "机构代码", defaultValue = "")
+            @PathVariable(value = "org_code") String orgCode,
             @ApiParam(name = "activityFlag", value = "状态", defaultValue = "")
             @RequestParam(value = "activityFlag") String activityFlag) {
 
@@ -88,7 +92,7 @@ public class OrganizationController extends BaseRestController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/", method = RequestMethod.PUT)
+    @RequestMapping(value = "/organization", method = RequestMethod.PUT)
     public Object updateOrg(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
@@ -98,12 +102,12 @@ public class OrganizationController extends BaseRestController {
     }
 
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping(value = "/organization/{org_code}", method = RequestMethod.GET)
     public Object getOrgByCode(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
-            @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
-            @RequestParam(value = "orgCode") String orgCode) {
+            @ApiParam(name = "org_code", value = "机构代码", defaultValue = "")
+            @PathVariable(value = "org_code") String orgCode) {
 
         return orgClient.getOrgByCode(apiVersion, orgCode);
     }
@@ -115,12 +119,12 @@ public class OrganizationController extends BaseRestController {
      * @return
      */
     @ApiOperation(value = "根据机构代码获取model")
-    @RequestMapping(value = "/org_model", method = RequestMethod.GET)
+    @RequestMapping(value = "/organization/org_model/{org_code}", method = RequestMethod.GET)
     public Object getOrgModel(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
-            @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
-            @RequestParam(value = "orgCode") String orgCode) {
+            @ApiParam(name = "org_code", value = "机构代码", defaultValue = "")
+            @PathVariable(value = "org_code") String orgCode) {
 
         return orgClient.getOrgModel(apiVersion, orgCode);
     }
@@ -132,7 +136,7 @@ public class OrganizationController extends BaseRestController {
      * @return
      */
     @ApiOperation(value = "根据地名称取机构ids")
-    @RequestMapping(value = "/name", method = RequestMethod.GET)
+    @RequestMapping(value = "/organization/name", method = RequestMethod.GET)
     public Object getIdsByName(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
@@ -150,7 +154,7 @@ public class OrganizationController extends BaseRestController {
      * @param city
      * @return
      */
-    @RequestMapping(value = "/search", method = RequestMethod.GET)
+    @RequestMapping(value = "/organization/address", method = RequestMethod.GET)
     public Object getOrgsByAddress(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
@@ -162,17 +166,17 @@ public class OrganizationController extends BaseRestController {
         return orgClient.getOrgsByAddress(apiVersion, province, city);
     }
 
-    @RequestMapping(value = "distributeKey", method = RequestMethod.POST)
+    @RequestMapping(value = "/organization/distributeKey/{org_code}", method = RequestMethod.POST)
     public Object distributeKey(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
-            @ApiParam(name = "orgCode", value = "机构代码")
-            @RequestParam(value = "orgCode") String orgCode) {
+            @ApiParam(name = "org_code", value = "机构代码")
+            @PathVariable(value = "org_code") String orgCode) {
 
         return orgClient.distributeKey(apiVersion, orgCode);
     }
 
-    @RequestMapping(value = "/validation", method = RequestMethod.GET)
+    @RequestMapping(value = "/organization/validation", method = RequestMethod.GET)
     public Object validationOrg(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                                 @PathVariable(value = "api_version") String apiVersion,
                                 @ApiParam(name = "orgCode", value = "机构代码")

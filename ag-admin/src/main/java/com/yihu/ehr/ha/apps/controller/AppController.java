@@ -6,15 +6,19 @@ import com.yihu.ehr.ha.apps.service.AppClient;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.app.MAppDetail;
 import com.yihu.ehr.util.controller.BaseRestController;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * Created by AndyCai on 2016/1/19.
  */
-@RequestMapping(ApiVersionPrefix.CommonVersion +"/appcon")
+@EnableFeignClients
+@RequestMapping(ApiVersionPrefix.CommonVersion )
 @RestController
+@Api(value = "app", description = "应用管理接口，用于接入应用管理", tags = {"应用管理接口"})
 public class AppController extends BaseRestController {
     @Autowired
     private AppClient appClient;
@@ -32,7 +36,7 @@ public class AppController extends BaseRestController {
      * @param rows    数量
      * @return APP列表
      */
-    @RequestMapping(value = "search", method = RequestMethod.GET)
+    @RequestMapping(value = "/app/search", method = RequestMethod.GET)
     public Object getAppList(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                              @PathVariable(value = "api_version") String apiVersion,
                              @ApiParam(name = "appId", value = "appId", defaultValue = "")
@@ -58,11 +62,11 @@ public class AppController extends BaseRestController {
      * @param appId APPId
      * @return 操作结果
      */
-    @RequestMapping(value = "/id", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/app/{app_id}", method = RequestMethod.DELETE)
     public Object deleteApp(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                             @PathVariable(value = "api_version") String apiVersion,
-                            @ApiParam(name = "appId", value = "appid", defaultValue = "")
-                            @RequestParam(value = "appId") String appId) {
+                            @ApiParam(name = "app_id", value = "应用ID", defaultValue = "")
+                            @PathVariable(value = "app_id") String appId) {
         return appClient.deleteApp(apiVersion, appId);
     }
 
@@ -72,11 +76,11 @@ public class AppController extends BaseRestController {
      * @param appId APPId
      * @return APP明细
      */
-    @RequestMapping(value = "/id", method = RequestMethod.GET)
+    @RequestMapping(value = "/app/{app_id}", method = RequestMethod.GET)
     public MAppDetail getAppDetail(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                                @PathVariable(value = "api_version") String apiVersion,
-                               @ApiParam(name = "appId", value = "appid", defaultValue = "")
-                               @RequestParam(value = "appId") String appId) throws Exception {
+                               @ApiParam(name = "app_id", value = "应用ID", defaultValue = "")
+                               @PathVariable(value = "app_id") String appId) throws Exception {
 
         Object object = appClient.getAppDetail(apiVersion, appId);
 
@@ -97,7 +101,7 @@ public class AppController extends BaseRestController {
      * @param userId      用户ID
      * @return 操作结果
      */
-    @RequestMapping(value = "", method = RequestMethod.POST)
+    @RequestMapping(value = "/app", method = RequestMethod.POST)
     public MApp createApp(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                             @PathVariable(value = "api_version") String apiVersion,
                             @ApiParam(name = "name", value = "名称", defaultValue = "")
@@ -133,11 +137,11 @@ public class AppController extends BaseRestController {
      * @param tags        标记
      * @return 操作结果
      */
-    @RequestMapping(value = "", method = RequestMethod.PUT)
+    @RequestMapping(value = "/app/{app_id}", method = RequestMethod.PUT)
     public MApp updateApp(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                             @PathVariable(value = "api_version") String apiVersion,
-                            @ApiParam(name = "appId", value = "名id", defaultValue = "")
-                            @RequestParam(value = "appId") String appId,
+                            @ApiParam(name = "app_id", value = "应用id", defaultValue = "")
+                            @PathVariable(value = "app_id") String appId,
                             @ApiParam(name = "name", value = "名称", defaultValue = "")
                             @RequestParam(value = "name") String name,
                             @ApiParam(name = "catalog", value = "类别", defaultValue = "")
@@ -166,7 +170,7 @@ public class AppController extends BaseRestController {
      * @param status 状态
      * @return 操作结果
      */
-    @RequestMapping(value = "/check", method = RequestMethod.PUT)
+    @RequestMapping(value = "/app/check", method = RequestMethod.PUT)
     public Object checkStatus(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                         @PathVariable(value = "api_version") String apiVersion,
                         @ApiParam(name = "appId", value = "名id", defaultValue = "")
@@ -185,7 +189,7 @@ public class AppController extends BaseRestController {
      * @return 操作结果
      * @throws Exception
      */
-    @RequestMapping(value = "/validation", method = RequestMethod.GET)
+    @RequestMapping(value = "/app/validation", method = RequestMethod.GET)
     public Object validationApp(@ApiParam(name = "apiVersion", value = "API版本号", defaultValue = "v1.0")
                                 @PathVariable(value = "apiVersion") String apiVersion,
                                 @ApiParam(name = "id", value = "名id", defaultValue = "")

@@ -3,21 +3,25 @@ package com.yihu.ehr.ha.SystemDict.controller;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.ha.SystemDict.service.SystemDictClient;
 import com.yihu.ehr.util.controller.BaseRestController;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * Created by AndyCai on 2016/1/21.
  */
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/sysDict")
+@EnableFeignClients
+@RequestMapping(ApiVersionPrefix.CommonVersion)
 @RestController
+@Api(value = "sys_dict", description = "系统字典接口，用于系统全局字典管理", tags = {"系统字典接口"})
 public class SystemDictController extends BaseRestController {
 
     @Autowired
     private static SystemDictClient systemDictClient;
 
-    @RequestMapping(value = "/",method = RequestMethod.POST)
+    @RequestMapping(value = "/sys_dict",method = RequestMethod.POST)
     public Object createDict(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                              @PathVariable(value = "api_version") String apiVersion,
                              @ApiParam(name = "name", value = "字典名称")
@@ -28,29 +32,29 @@ public class SystemDictController extends BaseRestController {
                              @RequestParam(value = "userId") String userId) {
         return systemDictClient.createDict(apiVersion,name,reference,userId);
     }
-    @RequestMapping(value = "/",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/sys_dict/{dict_id}",method = RequestMethod.DELETE)
     @ResponseBody
     public Object deleteDict(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                              @PathVariable(value = "api_version") String apiVersion,
-                             @ApiParam(name = "dictId", value = "字典ID")
-                             @RequestParam(value = "dictId") long dictId) {
+                             @ApiParam(name = "dict_id", value = "字典ID")
+                             @PathVariable(value = "dict_id") long dictId) {
 
         return systemDictClient.deleteDict(apiVersion,dictId);
     }
 
-    @RequestMapping(value = "/",method = RequestMethod.PUT)
+    @RequestMapping(value = "/sys_dict/{dict_id}",method = RequestMethod.PUT)
     public Object updateDict(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
-            @ApiParam(name = "dictId",value = "字典ID")
-            @RequestParam(value = "dictId")long dictId,
+            @ApiParam(name = "dict_id",value = "字典ID")
+            @PathVariable(value = "dict_id")long dictId,
             @ApiParam(name = "name",value = "字典名称")
             @RequestParam(value = "name")String name){
 
         return systemDictClient.updateDict(apiVersion,dictId,name);
     }
 
-    @RequestMapping(value = "/search",method = RequestMethod.GET)
+    @RequestMapping(value = "/sys_dict/search",method = RequestMethod.GET)
     public Object getDictsByName(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                                  @PathVariable(value = "api_version") String apiVersion,
                                  @ApiParam(name = "name", value = "字典名称")
@@ -64,7 +68,7 @@ public class SystemDictController extends BaseRestController {
         return systemDictClient.searchSysDicts(apiVersion,dictName,phoneticCode,page,rows);
     }
 
-    @RequestMapping(value = "/dictEntry",method = RequestMethod.POST)
+    @RequestMapping(value = "/sys_dict/dictEntry",method = RequestMethod.POST)
     public Object createDictEntry(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                                   @PathVariable(value = "api_version") String apiVersion,
                                   @ApiParam(name = "dictId", value = "字典ID")
@@ -81,24 +85,24 @@ public class SystemDictController extends BaseRestController {
         return systemDictClient.createDictEntry(apiVersion,dictId,code,value,sort,catalog);
     }
 
-    @RequestMapping(value = "/dictEntry",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/sys_dict/{dict_id}/dictEntry/{code}",method = RequestMethod.DELETE)
     public Object deleteDictEntry(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                                       @PathVariable(value = "api_version") String apiVersion,
-                                  @ApiParam(name = "dictId", value = "字典ID")
-                                  @RequestParam(value = "dictId") Long dictId,
+                                  @ApiParam(name = "dict_id", value = "字典ID")
+                                  @PathVariable(value = "dict_id") Long dictId,
                                   @ApiParam(name = "code", value = "字典项代码")
-                                      @RequestParam(value = "code") String code){
+                                      @PathVariable(value = "code") String code){
 
         return systemDictClient.deleteDictEntry(apiVersion,dictId,code);
     }
 
-    @RequestMapping(value = "/dictEntry",method = RequestMethod.POST)
+    @RequestMapping(value = "/sys_dict/{dict_id}/dictEntry/{code}",method = RequestMethod.POST)
     public Object updateDictEntry(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                                   @PathVariable(value = "api_version") String apiVersion,
-                                  @ApiParam(name = "dictId", value = "字典ID")
-                                  @RequestParam(value = "dictId") Long dictId,
+                                  @ApiParam(name = "dict_id", value = "字典ID")
+                                  @PathVariable(value = "dict_id") Long dictId,
                                   @ApiParam(name = "code", value = "字典项代码")
-                                  @RequestParam(value = "code") String code,
+                                  @PathVariable(value = "code") String code,
                                   @ApiParam(name = "value", value = "值")
                                   @RequestParam(value = "value") String value,
                                   @ApiParam(name = "sort", value = "排序")
@@ -108,11 +112,11 @@ public class SystemDictController extends BaseRestController {
         return systemDictClient.updateDictEntry(apiVersion,dictId,code,value,sort,catalog);
     }
 
-    @RequestMapping(value = "/dictEntrys",method = RequestMethod.GET)
+    @RequestMapping(value = "/sys_dict/{dict_id}/dictEntrys/search",method = RequestMethod.GET)
     public Object getDictEntrysByDictId(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                                         @PathVariable(value = "api_version") String apiVersion,
-                                        @ApiParam(name = "dictId", value = "字典ID")
-                                        @RequestParam(value = "dictId") long dictId,
+                                        @ApiParam(name = "dict_id", value = "字典ID")
+                                        @PathVariable(value = "dict_id") long dictId,
                                         @ApiParam(name = "page", value = "当前页", defaultValue = "")
                                         @RequestParam(value = "page") int page,
                                         @ApiParam(name = "rows", value = "页数", defaultValue = "")
@@ -121,16 +125,16 @@ public class SystemDictController extends BaseRestController {
         return systemDictClient.searchDictEntryList(apiVersion,dictId,page,rows);
     }
 
-    @RequestMapping(value = "/allDictEntry",method = RequestMethod.GET)
+    @RequestMapping(value = "/sys_dict/{dict_id}/allDictEntry/search",method = RequestMethod.GET)
     public Object getDictEntrysByDictId(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                                  @PathVariable(value = "api_version") String apiVersion,
-                                 @ApiParam(name = "dictId", value = "字典ID")
-                                 @RequestParam(value = "dictId") Long dictId){
+                                 @ApiParam(name = "dict_id", value = "字典ID")
+                                 @PathVariable(value = "dict_id") Long dictId){
 
         return systemDictClient.searchDictEntryListForDDL(apiVersion,dictId);
     }
 
-    @RequestMapping(value = "/validator",method = RequestMethod.GET)
+    @RequestMapping(value = "/sys_dict/{dict_id}/validator",method = RequestMethod.GET)
     public Object validator(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                               @PathVariable(value = "api_version") String apiVersion,
                               @ApiParam(name = "code", value = "字典名称")
@@ -138,11 +142,11 @@ public class SystemDictController extends BaseRestController {
         return systemDictClient.validator(apiVersion,code);
     }
 
-    @RequestMapping(value = "/autoSearchDictEntryList", method = RequestMethod.GET)
+    @RequestMapping(value = "/sys_dict/{dict_id}/autoSearchDictEntryList", method = RequestMethod.GET)
     public Object autoSearchDictEntryList(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
                                       @PathVariable(value = "api_version") String apiVersion,
-                                      @ApiParam(name = "dictId", value = "字典ID")
-                                      @RequestParam(value = "dictId") Long dictId,
+                                      @ApiParam(name = "dict_id", value = "字典ID")
+                                      @PathVariable(value = "dict_id") Long dictId,
                                       @ApiParam(name = "dictValue", value = "字典项值")
                                       @RequestParam(value = "dictValue") String dictValue) {
 
