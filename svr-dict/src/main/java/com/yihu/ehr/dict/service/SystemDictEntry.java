@@ -1,7 +1,6 @@
 package com.yihu.ehr.dict.service;
 
 
-import com.yihu.ehr.dict.service.common.DictPk;
 import com.yihu.ehr.util.PinyinUtil;
 
 import javax.persistence.*;
@@ -18,7 +17,7 @@ import java.io.Serializable;
 @Table(name = "system_dict_entries")
 @Access(value = AccessType.PROPERTY)
 @Embeddable
-@IdClass(DictPk.class)
+@IdClass(DictEntryKey.class)
 public class SystemDictEntry  implements Serializable {
     private static final long serialVersionUID = 1L;
 

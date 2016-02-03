@@ -9,6 +9,7 @@ import org.springframework.web.servlet.mvc.AbstractController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 import java.util.Iterator;
@@ -50,13 +51,14 @@ public class BaseRestController extends AbstractController {
      * @return
      */
     public <T> Collection<T> convertToModels(Collection sources, Collection<T> targets, String... ignoreProperties) {
-        Class<T> targetCls = (Class<T>)((ParameterizedType)targets.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+        Class targetCls = null;
 
         Iterator iterator = sources.iterator();
         while(iterator.hasNext()){
             Object source = iterator.next();
+            if (targetCls == null) targetCls = source.getClass();
 
-            T target = BeanUtils.instantiate(targetCls);
+            T target = (T)BeanUtils.instantiate(targetCls);
             BeanUtils.copyProperties(source, target, ignoreProperties);
             targets.add(target);
         }
