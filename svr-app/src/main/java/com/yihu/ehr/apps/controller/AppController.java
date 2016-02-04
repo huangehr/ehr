@@ -17,6 +17,7 @@ import io.swagger.annotations.ResponseHeader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,6 @@ public class AppController extends BaseRestController {
      */
     @RequestMapping(value = "/apps", method = RequestMethod.GET)
     @ApiOperation(value = "获取App列表")
-    @ResponseHeader
     public List<MApp> getApps(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
@@ -53,12 +53,12 @@ public class AppController extends BaseRestController {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page,
+            HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         //List<App> appList = appService.searchApps(conditionMap);
         //int totalCount = appService.getAppCount(conditionMap);
 
-        //echoCollection(response, "", totalCount, page, size);
-        //ConventionalDictClient conventionalDictClient = SpringContext.getService(ConventionalDictClient.class);
+        echoCollection(request, response, 100, page, size);
         return null;//convertToModels(appList, new ArrayList<MApp>(appList.size()), fields == null ? null : fields.split(","));
     }
 

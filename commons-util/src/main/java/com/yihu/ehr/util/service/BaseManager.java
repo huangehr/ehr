@@ -1,6 +1,6 @@
 package com.yihu.ehr.util.service;
 
-import com.yihu.ehr.constrant.Result;
+import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.parm.FieldCondition;
 import com.yihu.ehr.util.parm.PageModel;
 import org.hibernate.Query;
@@ -58,11 +58,11 @@ public class BaseManager<T, RESP> {
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public Result pagesToResult(PageModel pageModel) {
+    public Envelop pagesToEnvelop(PageModel pageModel) {
         pageModel.setModelClass(getModelClass());
         List ls = pages(pageModel);
         Integer totalCount = totalCountForPage(pageModel);
-        return getResult(ls, totalCount, pageModel.getPage(), pageModel.getRows());
+        return getEnvelop(ls, totalCount, pageModel.getPage(), pageModel.getRows());
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
@@ -134,20 +134,18 @@ public class BaseManager<T, RESP> {
         return resp;
     }
 
-    protected Result getResult(List detaiModelList, int totalCount, int currPage, int rows) {
-        Result result = new Result();
-        result.setSuccessFlg(true);
-        result.setDetailModelList(detaiModelList);
-        result.setTotalCount(totalCount);
-        result.setCurrPage(currPage);
-        result.setPageSize(rows);
-        if (result.getPageSize() == 0)
-            return result;
-        if (result.getTotalCount() % result.getPageSize() > 0) {
-            result.setTotalPage((result.getTotalCount() / result.getPageSize()) + 1);
-        } else {
-            result.setTotalPage(result.getTotalCount() / result.getPageSize());
-        }
-        return result;
+    protected Envelop getEnvelop(List detaiModelList, int totalCount, int currPage, int rows) {
+        Envelop Envelop = new Envelop();
+        Envelop.setSuccessFlg(true);
+        Envelop.setDetailModelList(detaiModelList);
+        Envelop.setTotalCount(totalCount);
+//        if (Envelop.getPageSize() == 0)
+//            return Envelop;
+//        if (Envelop.getTotalCount() % Envelop.getPageSize() > 0) {
+//            Envelop.setTotalPage((Envelop.getTotalCount() / Envelop.getPageSize()) + 1);
+//        } else {
+//            Envelop.setTotalPage(Envelop.getTotalCount() / Envelop.getPageSize());
+//        }
+        return Envelop;
     }
 }

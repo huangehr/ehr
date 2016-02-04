@@ -80,21 +80,26 @@ public class BaseRestController extends AbstractController {
      *
      * @return
      */
-    public void echoCollection(HttpServletResponse response, String baseUri, long resourceCount, long currentPage, long pageSize) {
+    public void echoCollection(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            long resourceCount, long currentPage, long pageSize) {
         response.setHeader(ResourceCount, Long.toString(resourceCount));
 
-        baseUri = "<" + baseUri + "page=:page&size=" + Long.toString(pageSize) + ">";
+        String baseUri = "<" + request.getRequestURL().append("/").toString() + request.getQueryString() + ">";
 
-        long firstPage = currentPage == 1 ? -1 : new Long(1);
-        long lastPage = currentPage == (resourceCount / pageSize + 1) ? -1 : resourceCount / pageSize + 1;
-        long nextPage = currentPage == (resourceCount / pageSize + 1) ? -1 : currentPage + 1;
-        long previousPage = currentPage == firstPage ? -1 : currentPage - 1;
+        long firstPage = currentPage == 1 ? -1 : 1;
+        long lastPage = resourceCount % pageSize == 0 ? resourceCount / pageSize : resourceCount / pageSize + 1;
+        lastPage = currentPage == lastPage ? -1 : lastPage;
+
+        long previousPage = currentPage == 1 ? -1 : currentPage - 1;
+        long nextPage = currentPage == lastPage ? -1 : currentPage + 1;
 
         Map<String, String> map = new HashMap<>();
-        if(firstPage != -1) map.put(baseUri.replace(":page", Long.toString(firstPage)), "rel=\"first\",");
-        if(previousPage != -1) map.put(baseUri.replace(":page", Long.toString(firstPage)), "rel=\"prev\",");
-        if(nextPage != -1) map.put(baseUri.replace(":page", Long.toString(firstPage)), "rel=\"next\",");
-        if(lastPage != -1) map.put(baseUri.replace(":page", Long.toString(firstPage)), "rel=\"last\",");
+        if(firstPage != -1) map.put("rel='first',", baseUri.replace("page=(\\d+)", "page=" + Long.toString(firstPage)));
+        if(previousPage != -1) map.put("rel='prev',", baseUri.replace("page=(\\d+)", "page=" + Long.toString(previousPage)));
+        if(nextPage != -1) map.put("rel='next',", baseUri.replace("page=(\\d+)", "page=" + Long.toString(nextPage)));
+        if(lastPage != -1) map.put("rel='last',", baseUri.replace("page=(\\d+)", "page=" + Long.toString(lastPage)));
 
         response.setHeader(ResourceLink, linkMap(map));
     }
@@ -102,7 +107,7 @@ public class BaseRestController extends AbstractController {
     private String linkMap(Map<String, String> map){
         StringBuffer links = new StringBuffer("");
         for (String key : map.keySet()){
-            links.append(key).append("; ").append(map.get(key));
+            links.append(map.get(key)).append("; ").append(key);
         }
 
         return links.toString();
