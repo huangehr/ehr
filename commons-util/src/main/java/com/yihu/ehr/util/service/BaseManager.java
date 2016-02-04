@@ -96,6 +96,11 @@ public class BaseManager<T, RESP> {
         for (String k : filters.keySet()) {
             if (filters.get(k).getLogic().equals("in"))
                 query.setParameterList(k, (Object[]) filters.get(k).formatVal());
+            else if(filters.get(k).getLogic().equals("between")){
+                List ls = filters.get(k).getVal();
+                query.setParameter(k + "1", ls.get(0));
+                query.setParameter(k + "2", ls.get(1));
+            }
             else
                 query.setParameter(k, filters.get(k).formatVal());
         }
