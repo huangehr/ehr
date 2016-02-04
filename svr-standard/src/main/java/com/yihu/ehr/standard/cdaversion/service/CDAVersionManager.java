@@ -6,8 +6,9 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -35,7 +36,7 @@ public class CDAVersionManager extends BaseManager{
      * @param baseVersion
      * @param author
      */
-    @Transactional(Transactional.TxType.REQUIRED)
+    @Transactional(propagation = Propagation.REQUIRED)
     public CDAVersion createStageVersion(CDAVersion baseVersion, String author) {
         if (author == null || author.length() == 0) throw new IllegalArgumentException("作者不能为空");
 
@@ -75,7 +76,7 @@ public class CDAVersionManager extends BaseManager{
      * @param version
      * @return
      */
-    @Transactional(Transactional.TxType.SUPPORTS)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public CDAVersion getVersion(String version) {
         return  cdaVersionRepository.findOne(version);
     }
@@ -84,7 +85,7 @@ public class CDAVersionManager extends BaseManager{
      * 获取最新的已发布版本
      * @return
      */
-    @Transactional(Transactional.TxType.SUPPORTS)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public CDAVersion getLatestVersion() {
         Session session = currentSession();
 
@@ -102,7 +103,7 @@ public class CDAVersionManager extends BaseManager{
      * 获取所有版本
      * @return
      */
-    @Transactional(Transactional.TxType.SUPPORTS)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public CDAVersion[] getVersionList() {
         Session session = currentSession();
         Query query = session.createQuery("from CDAVersion order by commitTime");
@@ -114,7 +115,7 @@ public class CDAVersionManager extends BaseManager{
      * 发布版本
      * @param version
      */
-    @Transactional(Transactional.TxType.REQUIRED)
+    @Transactional(propagation = Propagation.REQUIRED)
     public void commitVersion(CDAVersion version) {
         if (!version.isInStage()) {
             throw new IllegalArgumentException("此版本未处于版本化编辑状态");
@@ -125,7 +126,7 @@ public class CDAVersionManager extends BaseManager{
     }
 
 
-    @Transactional(Transactional.TxType.REQUIRED)
+    @Transactional(propagation = Propagation.REQUIRED)
     public void revertVersion(CDAVersion version) {
         if (!version.isInStage()) {
             throw new IllegalArgumentException("此版本未处于版本化编辑状态");
@@ -134,7 +135,7 @@ public class CDAVersionManager extends BaseManager{
         cdaVersionRepository.delete(version);
     }
 
-    @Transactional(Transactional.TxType.REQUIRED)
+    @Transactional(propagation = Propagation.REQUIRED)
     public void dropVersion(CDAVersion version) {
         Session session = currentSession();
         Query query = session.createQuery("from CDAVersion where baseVersion = :version");
@@ -152,7 +153,7 @@ public class CDAVersionManager extends BaseManager{
      * 回滚到编辑状态
      * @param version
      */
-    @Transactional(Transactional.TxType.REQUIRED)
+    @Transactional(propagation = Propagation.REQUIRED)
     public void rollbackToStage(CDAVersion version) {
         // 已经是编辑状态，直接返回
         if (version.isInStage()) {
@@ -171,7 +172,7 @@ public class CDAVersionManager extends BaseManager{
         cdaVersionRepository.save(version);
     }
 
-    @Transactional(Transactional.TxType.REQUIRED)
+    @Transactional(propagation = Propagation.REQUIRED)
     private void dropVersionTables(CDAVersion version) {
         String datasetTable = version.getDataSetTableName();
         String metadataTable = version.getMetaDataTableName();
@@ -189,7 +190,7 @@ public class CDAVersionManager extends BaseManager{
         }
     }
 
-    @Transactional(Transactional.TxType.REQUIRED)
+    @Transactional(propagation = Propagation.REQUIRED)
     private void buildVersionTables(CDAVersion version) {
         //为空表示这是一个初始版本，不需要再创建表
         if (version.getBaseVersion() == null) return;
@@ -222,7 +223,7 @@ public class CDAVersionManager extends BaseManager{
     }
 
     //1多条件查询
-    @Transactional(Transactional.TxType.REQUIRED)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public List<CDAVersion> searchVersions(Map<String, Object> args) {
         Session session = currentSession();
         String version = (String) args.get("version");
@@ -241,7 +242,7 @@ public class CDAVersionManager extends BaseManager{
     }
 
     //2查询符合条件记录数
-    @Transactional(Transactional.TxType.REQUIRED)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public Integer searchVersionInt(Map<String,Object> args){
         Session session = currentSession();
         String version = (String) args.get("version");
@@ -254,12 +255,12 @@ public class CDAVersionManager extends BaseManager{
     }
 
     //3修改操作后更新到数据库
-    @Transactional(Transactional.TxType.REQUIRED)
+    @Transactional(propagation = Propagation.REQUIRED)
     public void updateVersion(CDAVersion xcdaVersion){
         cdaVersionRepository.save(xcdaVersion);
     }
 
-    @Transactional(Transactional.TxType.REQUIRED)
+    @Transactional(propagation = Propagation.REQUIRED)
     public Integer checkVersionName(String versionName){
         Session session = currentSession();
         String hql = "SELECT count(*) FROM CDAVersion WHERE versionName =:versionName";
@@ -269,7 +270,7 @@ public class CDAVersionManager extends BaseManager{
 
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public Integer searchInStage() {
         Session session = currentSession();
         Query query = session.createQuery("SELECT count(*) FROM CDAVersion WHERE inStage = true");

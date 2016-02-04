@@ -1,18 +1,16 @@
 package com.yihu.ehr.standard.standardsource.service;
 
-import com.yihu.ehr.standard.commons.BaseManager;
 import com.yihu.ehr.standard.standardsource.model.StandardSourceModel;
 import com.yihu.ehr.util.operator.DateUtil;
 import com.yihu.ehr.util.operator.StringUtil;
+import com.yihu.ehr.util.service.BaseManager;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import org.springframework.transaction.annotation.Transactional;
+import javax.transaction.Transactional;
 import java.util.List;
 
 /**
@@ -22,14 +20,12 @@ import java.util.List;
  */
 @Service
 @Transactional
-public class StandardSourceManager extends BaseManager{
+public class StandardSourceManager extends BaseManager<StandardSource, XStandardSourceRepository>{
     public static final String StandardSourceTableName = "std_standard_source";
 
     @Autowired
     XStandardSourceRepository standardSourceRepository;
 
-    @PersistenceContext
-    EntityManager entityManager;
     /**
      * 根据ID删除标准来源
      *

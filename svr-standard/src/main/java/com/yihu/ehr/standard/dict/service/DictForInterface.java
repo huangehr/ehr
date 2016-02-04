@@ -1,7 +1,9 @@
 package com.yihu.ehr.standard.dict.service;
 
 /**
- * Created by AndyCai on 2015/8/11.
+ * @author lincl
+ * @version 1.0
+ * @created 2016.2.3
  */
 public class DictForInterface{
 

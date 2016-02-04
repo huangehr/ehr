@@ -19,9 +19,9 @@ import java.util.List;
 /**
  * 数据元管理接口实现。
  *
- * @author Sand
+ * @author lincl
  * @version 1.0
- * @created 2015.07.10 15:22
+ * @created 2016.2.3
  */
 @Transactional
 @Service

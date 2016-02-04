@@ -4,8 +4,6 @@ package com.yihu.ehr.standard.datasets.service;
 import com.yihu.ehr.standard.cdaversion.service.CDAVersion;
 import com.yihu.ehr.standard.cdaversion.service.CDAVersionManager;
 import com.yihu.ehr.standard.commons.BaseManager;
-import com.yihu.ehr.standard.dict.service.DictManager;
-import com.yihu.ehr.standard.standardsource.service.StandardSourceManager;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -31,10 +31,6 @@ public class DataSetManager extends BaseManager {
 
     @Autowired
     private CDAVersionManager cdaVersionManager;
-    @Autowired
-    private StandardSourceManager standardSourceManager;
-    @Autowired
-    private DictManager dictManager;
     @Autowired
     MetaDataManager metaDataManager;
 
@@ -119,6 +115,7 @@ public class DataSetManager extends BaseManager {
 
         return dataSets;
     }
+
 
     @Transactional(propagation = Propagation.SUPPORTS)
     public DataSet getDataSet(String dataSetCode, String version) {
@@ -403,15 +400,6 @@ public class DataSetManager extends BaseManager {
             dataSetModel.setId((Integer) record[0]);
             dataSetModel.setCode((String) record[1]);
             dataSetModel.setName((String) record[2]);
-/*            dataSetModel.setPublisher((int)record[3]);
-            dataSetModel.setRefStandard((String)record[4]);
-            dataSetModel.setStdVersion((String)record[5]);
-            dataSetModel.setLang((int)record[6]);
-            dataSetModel.setCatalog((int)record[7]);
-            dataSetModel.setHash((int)record[8]);
-            dataSetModel.setDocumentId((int) record[9]);
-            dataSetModel.setSummary((String)record[10]);*/
-
             dataSetModels.add(dataSetModel);
         }
 
@@ -419,209 +407,62 @@ public class DataSetManager extends BaseManager {
     }
 
 
-    /********************************************/
-    /************* 以下为Excel导入方法 ***********/
-    /**********************************************/
-    //TODO 后面做
+    /*************************************************************************/
+    /************   以下新增                                    *************/
+    /*************************************************************************/
 
-    //从excel导入数据集、数据元
-//    public void importFromExcel(String filePath, CDAVersion cdaVersion){
-//        try {
-//            InputStream is = new FileInputStream(filePath);
-//            Workbook rwb = Workbook.getWorkbook(is);
-//            Sheet[] sheets = rwb.getSheets();
-//            for (Sheet sheet : sheets) {
-//                XDataSet dataSet = createDataSet(cdaVersion);
-//                //获取数据集信息
-//                String dataSetNname = sheet.getCell(1, 0).getContents();//名称
-//                String dataSetCode = sheet.getCell(1, 1).getContents();//标识
-//                String reference = sheet.getCell(1, 2).getContents();//参考
-//                //todo：test--测试时备注做区别，方便删除测试，summary变量区别
-//                String summary = sheet.getCell(1, 3).getContents();//备注
-//                //String summary="测试excel导入";
-//                //插入数据集信息
-//                //todo：test--测试时code区别，否则测试不成功，因为code唯一
-//                //dataSet.setCode(dataSetCode+"excel");//code唯一
-//                dataSet.setCode(dataSetCode);//code唯一
-//                dataSet.setName(dataSetNname);
-//                dataSet.setPublisher(0);
-//                dataSet.setReference("0");//标准来源
-//                if (!StringUtil.isEmpty(reference)) {
-//                    XStandardSource[] standardSources = standardSourceManager.getSourceByKey(reference);
-//                    if (standardSources != null && standardSources.length > 0) {
-//                        dataSet.setReference(standardSources[0].getId());//标准来源
-//                    }
-//                }
-//                dataSet.setStdVersion(cdaVersion.getVersionName());
-//                dataSet.setCatalog(0);
-//                dataSet.setSummary(summary);
-//                saveDataSet(dataSet);//保存数据集信息
-//                //获取数据元信息
-//                int rows = sheet.getRows();
-//                for (int j = 0; j < rows - 5; j++) {
-//                    MetaData metaData = new MetaData();
-//                    int row = j + 5;
-//                    String innerCode = sheet.getCell(1, row).getContents();//内部标识
-//                    String code = sheet.getCell(2, row).getContents();//数据元编码
-//                    String name = sheet.getCell(3, row).getContents();//数据元名称
-//                    //todo：test--测试时备注做区别，方便删除测试，definition变量区别
-//                    String definition = sheet.getCell(4, row).getContents();//数据元定义
-//                    //String definition="测试excel导入";
-//                    String type = sheet.getCell(5, row).getContents();//数据类型
-//                    String format = sheet.getCell(6, row).getContents();//表示形式
-//                    String dictCode = sheet.getCell(7, row).getContents();//术语范围值
-//                    String columnName = sheet.getCell(8, row).getContents();//列名
-//                    String columnType = sheet.getCell(9, row).getContents();//列类型
-//                    String columnLength = sheet.getCell(10, row).getContents();//列长度
-//                    String primaryKey = sheet.getCell(11, row).getContents();//主键
-//                    String nullable = sheet.getCell(12, row).getContents();//可为空
-//
-//                    //插入数据元信息
-//                    metaData.setId(0);//为0内部自增
-//                    metaData.setDataSet(dataSet);
-//                    metaData.setCode(code);
-//                    metaData.setName(name);
-//                    metaData.setInnerCode(innerCode);
-//                    metaData.setType(type);
-//                    if (!StringUtil.isEmpty(dictCode)) {
-//                        XDict[] dicts = dictManager.getDictListForInter(0, 0, cdaVersion, dictCode);
-//                        if (dicts != null && dicts.length > 0) {
-//                            metaData.setDictId(dicts[0].getId()); //字典id
-//                        }
-//                    }
-//                    metaData.setFormat(format);
-//                    metaData.setDefinition(definition);
-//                    metaData.setColumnName(columnName);
-//                    metaData.setColumnLength(columnLength);
-//                    metaData.setColumnType(columnType);
-//                    metaData.setPrimaryKey(primaryKey.equals("1"));
-//                    metaData.setNullable(nullable.equals("1"));
-//                    metaDataManager.saveMetaData(dataSet, metaData);//保存数据元
-//                }
-//
-//            }
-//
-//            //关闭
-//            rwb.close();
-//            is.close();
-//
-//        } catch (Exception e){
-//            e.printStackTrace();
-//        }
-//
-//    }
-//
-//    //数据集、数据元导出到excel
-//    public void exportToExcel(String filePath,XDataSet[] dataSets){
-//        XStandardSourceManager standardSourceManager = ServiceFactory.getService(Services.StandardSourceManager);
-//        XMetaDataManager metaDataManager = ServiceFactory.getService(Services.MetaDataManager);
-//        try {
-//            File fileWrite = new File(filePath);
-//            fileWrite.createNewFile();
-//            OutputStream os = new FileOutputStream(fileWrite);
-//
-//            WritableWorkbook wwb = Workbook.createWorkbook(os);
-//
-//            for(int i=0;i<dataSets.length;i++){
-//                XDataSet dataSet=dataSets[i];
-//                //创建Excel工作表 指定名称和位置
-//                WritableSheet ws = wwb.createSheet(dataSet.getName(),i);
-//                addStaticCell(ws);//添加固定信息，题头等
-//                //添加数据集信息
-//                addCell(ws,1,0,dataSet.getName());//名称
-//                addCell(ws,1,1,dataSet.getCode());//标识
-//                String reference = dataSet.getReference();
-//                if (!StringUtil.isEmpty(reference)){
-//                    XStandardSource standardSource=standardSourceManager.getSourceBySingleId(reference);
-//                    if (standardSource!=null){
-//                        addCell(ws,1,2,standardSource.getName());//参考
-//                    }
-//                }
-//                addCell(ws,1,3,dataSet.getSummary());//备注
-//
-//                //添加数据元信息
-//                List<XMetaData> metaDataList = metaDataManager.getMetaDataList(dataSet);
-//                WritableCellFormat wc = new WritableCellFormat();
-//                wc.setBorder(jxl.format.Border.ALL, jxl.format.BorderLineStyle.THIN, Colour.SKY_BLUE);//边框
-//                for(int j=0;j<metaDataList.size();j++){
-//                    MetaData metaData = (MetaData)metaDataList.get(j);
-//                    int row=j+5;
-//                    addCell(ws,0,row,j+1+"",wc);//序号
-//                    addCell(ws,1,row,metaData.getInnerCode(),wc);//内部标识
-//                    addCell(ws,2,row,metaData.getCode(),wc);//数据元编码
-//                    addCell(ws,3,row,metaData.getName(),wc);//数据元名称
-//                    addCell(ws,4,row,metaData.getDefinition(),wc);//数据元定义
-//                    addCell(ws,5,row,metaData.getType(),wc);//数据类型
-//                    addCell(ws,6,row,metaData.getFormat(),wc);//表示形式
-//                    XDict dict = metaData.getDict();
-//                    if (dict!=null){
-//                        addCell(ws,7,row,dict.getCode(),wc);//术语范围值
-//                    }else{
-//                        addCell(ws,7,row,"",wc);//术语范围值
-//                    }
-//                    addCell(ws,8,row,metaData.getColumnName(),wc);//列名
-//                    addCell(ws,9,row,metaData.getColumnType(),wc);//列类型
-//                    addCell(ws,10,row,metaData.getColumnLength(),wc);//列长度
-//                    addCell(ws,11,row,metaData.isPrimaryKey()?"1":"0",wc);//主键
-//                    addCell(ws,12,row,metaData.isNullable()?"1":"0",wc);//可为空
-//                }
-//            }
-//            //写入工作表
-//            wwb.write();
-//            wwb.close();
-//            os.close();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    //excel中添加固定内容
-//    private void addStaticCell(WritableSheet ws){
-//        try {
-//            addCell(ws,0,0,"名称");
-//            addCell(ws,0,1,"标识");
-//            addCell(ws,0,2,"参考");
-//            addCell(ws,0,3,"备注");
-//            //--------------------
-//            WritableFont wfc = new WritableFont(WritableFont.ARIAL,12,WritableFont.NO_BOLD,false,
-//                    UnderlineStyle.NO_UNDERLINE,jxl.format.Colour.WHITE);//字体：大小，加粗，颜色
-//            WritableCellFormat wcfFC = new WritableCellFormat(wfc);
-//            wcfFC.setBackground(jxl.format.Colour.LIGHT_BLUE);//北京色
-//            addCell(ws,0,4,"序号",wcfFC);
-//            addCell(ws,1,4,"内部标识",wcfFC);
-//            addCell(ws,2,4,"数据元编码",wcfFC);
-//            addCell(ws,3,4,"数据元名称",wcfFC);
-//            addCell(ws,4,4,"数据元定义",wcfFC);
-//            addCell(ws,5,4,"数据类型",wcfFC);
-//            addCell(ws,6,4,"表示形式",wcfFC);
-//            addCell(ws,7,4,"术语范围值",wcfFC);
-//            addCell(ws,8,4,"列名",wcfFC);
-//            addCell(ws,9,4,"列类型",wcfFC);
-//            addCell(ws,10,4,"列长度",wcfFC);
-//            addCell(ws,11,4,"主键",wcfFC);
-//            addCell(ws,12,4,"可为空",wcfFC);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    //添加单元格内容
-//    private void addCell(WritableSheet ws,int column,int row,String data){
-//        try {
-//            Label label = new Label(column,row,data);
-//            ws.addCell(label);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//    //添加单元格内容带样式
-//    private void addCell(WritableSheet ws,int column,int row,String data,CellFormat cellFormat){
-//        try {
-//            Label label = new Label(column,row,data,cellFormat);
-//            ws.addCell(label);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public Map<Integer, String> getDataSetMapByIds(Object[] ids, String versionid) {
+        Session session = currentSession();
+        String dataSetTable = CDAVersion.getDataSetTableName(versionid);
+        String sql = "select id, name from " + dataSetTable;
+        if (ids.length > 0)
+            sql += " where id in(:ids) ";
+        Query query = session.createSQLQuery(sql);
+        if (ids.length > 0)
+            query.setParameterList("ids", ids);
+        List<Object> records = query.list();
+        Map<Integer, String> rs = new HashMap<>();
+        for (int i = 0; i < records.size(); ++i) {
+            Object[] record = (Object[]) records.get(i);
+            rs.put((Integer) record[0], (String) record[1]);
+        }
+        return rs;
+    }
 
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public Map getMetaDataMapByIds(Object[] ids, String versionid, Object[] dataSetIds) {
+        Session session = currentSession();
+        String metaDataTableName = CDAVersion.getMetaDataTableName(versionid);
+        String sql = "select id, name, dataset_id from " + metaDataTableName + "  ";
+        String wh = "";
+        if (dataSetIds != null && dataSetIds.length != 0)
+            wh += " where dataset_id in(:dataSetIds) ";
+        if (ids != null && ids.length != 0) {
+            wh += wh.equals("") ? " where " : " and ";
+            wh += " id in (:ids) ";
+        }
+        sql += wh;
+        Query query = session.createSQLQuery(sql);
+        if (dataSetIds != null && dataSetIds.length != 0)
+            query.setParameterList("dataSetIds", dataSetIds);
+        if (ids != null && ids.length != 0)
+            query.setParameterList("ids", ids);
+
+        List<Object> records = query.list();
+        Map<Integer, Map<Integer, String>> rs = new HashMap<>();
+        Map<Integer, String> ch;
+        Integer k;
+        for (int i = 0; i < records.size(); ++i) {
+            Object[] record = (Object[]) records.get(i);
+            k = (Integer) record[2];
+            ch = rs.get(k);
+            if (ch == null) {
+                ch = new HashMap<>();
+                rs.put(k, ch);
+            }
+            ch.put(((Integer) record[0]), ((String) record[1]));
+        }
+        return rs;
+    }
 }
