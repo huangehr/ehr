@@ -218,7 +218,6 @@ public class SystemDictController extends BaseRestController {
         if (page != null && rows != null){
             conditionMap.put("page", page);
             conditionMap.put("rows", rows);
-
             systemDictEntryList = systemDictService.searchEntryList(conditionMap);
         } else {
             systemDictEntryList = systemDictService.getDictEntries(dictId, value);

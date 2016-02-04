@@ -103,7 +103,6 @@ public class SecurityRestController extends BaseRestController {
         if (!appResult) {
             return false;
         }
-
         UserSecurity userSecurity = securityManager.getUserSecurityByLoginCode(apiVersion,userName);
         String privateKey = userSecurity.getPrivateKey();
         Key priKey = RSA.genPrivateKey(privateKey);
@@ -188,13 +187,13 @@ public class SecurityRestController extends BaseRestController {
      * "access_token": "f67b9646bcdaa60c647dfe7bc26231293847"
      * }
      */
-    @RequestMapping(value = "/token", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/token/{access_token}", method = RequestMethod.DELETE)
     @ApiOperation(value = "作废临时会话Token",  produces = "application/json", notes = "用户或App要退出时，调用此方法作废临时会话Token。")
     public Object revokeToken(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(required = true, name = "access_token", value = "要作废的会话Token")
-            @RequestParam(value = "access_token", required = true) String accessToken) throws Exception {
+            @PathVariable(value = "access_token") String accessToken) throws Exception {
         return tokenManager.revokeToken(accessToken);
     }
 
@@ -237,13 +236,13 @@ public class SecurityRestController extends BaseRestController {
      * 根据id删除security
      * @param id
      */
-    @RequestMapping(value = "", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除security",  produces = "application/json")
     public Object deleteSecurity(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "id", value = "security代码")
-            @RequestParam( value = "id") String id) {
+            @PathVariable( value = "id") String id) {
         securityManager.deleteSecurity(id);
         return true;
     }
@@ -252,13 +251,13 @@ public class SecurityRestController extends BaseRestController {
      * UserKey
      * @param userKeyId
      */
-    @RequestMapping(value = "/user_key", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/user_key/{user_key_id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除userKey",  produces = "application/json")
     public Object deleteUserKey(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "user_key_id", value = "userKey代码")
-            @RequestParam( value = "user_key_id") String userKeyId) {
+            @PathVariable( value = "user_key_id") String userKeyId) {
         securityManager.deleteUserKey(userKeyId);
         return true;
     }

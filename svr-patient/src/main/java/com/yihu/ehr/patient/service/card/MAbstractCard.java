@@ -13,23 +13,27 @@ import java.util.Date;
  * @version 1.0
  * @updated 11-6月-2015 9:51:15
  */
-public abstract class AbstractCardModel {
-	protected String id;				    // 卡ID
-	protected String number;				// 卡号
-	protected MUser ownerName;			// 持有人姓名
-	protected MConventionalDict status;			// 状态 CardStatus
-	protected MConventionalDict type;				// 类型 CardType
-	protected String description;			// 描述
-	protected Date createDate;				// 创建日期
-	protected String demographicId;	// 人口学ID
-	protected MAddress local;				// 发行地/归属地
-	protected MOrganization releaseOrg;				// 发行机构
-	protected Date releaseDate;			// 发行时间
-	protected Date validityDateBegin;		// 有效期起始时间
-	protected Date validityDateEnd;		// 有效期结束时间
+public class MAbstractCard {
 
 
-	public AbstractCardModel(){;
+	String id;				    // 卡ID
+	String number;				// 卡号
+	String ownerName;			// 持有人姓名
+	MConventionalDict status;			// 状态 CardStatus
+	MConventionalDict type;				// 类型 CardType
+	String description;			// 描述
+	Date createDate;				// 创建日期
+	String idCardNo;
+	String DType;
+	//特殊字段
+	MAddress local;				// 发行地/归属地
+	MOrganization releaseOrg;				// 发行机构
+	Date releaseDate;			// 发行时间
+	Date validityDateBegin;		// 有效期起始时间
+	Date validityDateEnd;		// 有效期结束时间
+
+
+	public MAbstractCard(){;
 	}
 
 
@@ -57,11 +61,11 @@ public abstract class AbstractCardModel {
 		this.number = number;
 	}
 
-	public MUser getOwnerName() {
+	public String getOwnerName() {
 		return ownerName;
 	}
 
-	public void setOwnerName(MUser ownerName) {
+	public void setOwnerName(String ownerName) {
 		this.ownerName = ownerName;
 	}
 
@@ -97,12 +101,20 @@ public abstract class AbstractCardModel {
 		this.createDate = createDate;
 	}
 
-	public String getDemographicId() {
-		return demographicId;
+	public String getIdCardNo() {
+		return idCardNo;
 	}
 
-	public void setDemographicId(String demographicId) {
-		this.demographicId = demographicId;
+	public void setIdCardNo(String idCardNo) {
+		this.idCardNo = idCardNo;
+	}
+
+	public String getDType() {
+		return DType;
+	}
+
+	public void setDType(String DType) {
+		this.DType = DType;
 	}
 
 	public MAddress getLocal() {

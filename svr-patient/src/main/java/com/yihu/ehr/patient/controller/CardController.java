@@ -1,12 +1,10 @@
 package com.yihu.ehr.patient.controller;
 
+import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constants.Result;
-import com.yihu.ehr.patient.service.card.AbstractCard;
-import com.yihu.ehr.patient.service.card.CardBrowseModel;
-import com.yihu.ehr.patient.service.card.CardManager;
-import com.yihu.ehr.patient.service.card.CardModel;
-import com.yihu.ehr.patient.service.demographic.DemographicId;
+import com.yihu.ehr.patient.service.card.*;
 import com.yihu.ehr.util.controller.BaseRestController;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -20,43 +18,59 @@ import java.util.Map;
  * Created by zqb on 2015/8/20.
  */
 @RestController
-@RequestMapping("/card")
+@RequestMapping(ApiVersionPrefix.Version1_0 + "/card")
+@Api(protocols = "https", value = "card", description = "卡管理", tags = {"卡管理"})
 public class CardController extends BaseRestController {
     @Autowired
     private CardManager cardManager;
 
-    public CardController(){}
-
-
-    @RequestMapping("searchCard")
+    /**
+     * 已绑定的卡
+     * @param idCardNo
+     * @param searchNm
+     * @param cardType
+     * @param page
+     * @param rows
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("own_cards")
     public Object searchCard(String idCardNo,String searchNm, String cardType, int page, int rows) throws Exception{
         Map<String, Object> conditionMap = new HashMap<>();
+        conditionMap.put("cardType","bound_card");
         conditionMap.put("idCardNo",idCardNo);
         conditionMap.put("number",searchNm);
         conditionMap.put("type",cardType);
         conditionMap.put("page",page);
         conditionMap.put("rows",rows);
 
-        List<CardBrowseModel> cardBrowseModelList = cardManager.searchCardBrowseModel(conditionMap);
+        List<AbstractCard> cardAbstractCardList = cardManager.searchAbstractCard(conditionMap);
         Integer totalCount = cardManager.searchCardInt(conditionMap, false);
         Result result = new Result();
-        result.setObj(cardBrowseModelList);
+        result.setObj(cardAbstractCardList);
         result.setTotalCount(totalCount);
-        return getResult(cardBrowseModelList,totalCount,page,rows);
+        return getResult(cardAbstractCardList,totalCount,page,rows);
     }
 
-    @RequestMapping("searchNewCard")
+    /**
+     * 未绑定的卡
+     * @param searchNm
+     * @param searchType
+     * @param page
+     * @param rows
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("un_bind_cards")
     @ResponseBody
-    public Object searchNewCard(String idCardNo,String searchNm,String searchType, int page, int rows) throws Exception{
+    public Object searchNewCard(String searchNm,String searchType, int page, int rows) throws Exception{
         Map<String, Object> conditionMap = new HashMap<>();
-        Map<String, Object> infoMap = null;
-        conditionMap.put("searchIdCardNo",idCardNo);
+        conditionMap.put("cardType","not_bound_card");
         conditionMap.put("number",searchNm);
         conditionMap.put("type",searchType);
         conditionMap.put("page",page);
         conditionMap.put("rows",rows);
-
-        List<CardBrowseModel> cardBrowseModelList = cardManager.searchCardBrowseModel(conditionMap);
+        List<AbstractCard> cardBrowseModelList = cardManager.searchAbstractCard(conditionMap);
         Integer totalCount = cardManager.searchCardInt(conditionMap, false);
         return getResult(cardBrowseModelList, totalCount, page, rows);
     }
@@ -74,19 +88,15 @@ public class CardController extends BaseRestController {
     }
 
     @RequestMapping("detachCard")
-    public Object detachCard(String objectId,String type){
-        AbstractCard card = cardManager.getCard(objectId, type);
-        if(cardManager.detachCard(card)){
-            return true;
-        }else{
-            return false;
-        }
+    public boolean detachCard(String id,String type){
+        AbstractCard card = cardManager.getCard(id, type);
+        return cardManager.detachCard(card);
     }
 
     @RequestMapping("attachCard")
-    public Object attachCard(String idCardNo,String objectId,String type){
-        AbstractCard card = cardManager.getCard(objectId, type);
-        if(cardManager.attachCardWith(card, new DemographicId(idCardNo))){
+    public Object attachCard(String idCardNo,String id,String type){
+        AbstractCard card = cardManager.getCard(id, type);
+        if(cardManager.attachCardWith(card, idCardNo)){
             return true;
         }else{
             return false;

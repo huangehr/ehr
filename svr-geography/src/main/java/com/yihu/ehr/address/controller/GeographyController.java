@@ -95,7 +95,7 @@ public class GeographyController extends BaseRestController{
      * @return
      */
     @RequestMapping(value = "", method = RequestMethod.PUT)
-    @ApiOperation(value = "地址检查并保存")
+    @ApiOperation(value = "地址检查,如果地址在数据库中不存在，这新增这条记录，否则返回地址id")
     public String saveAddress(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -139,8 +139,8 @@ public class GeographyController extends BaseRestController{
      * @return
      */
     @RequestMapping(value = "/search" , method = RequestMethod.GET)
-    @ApiOperation(value = "根据省市县查询地址")
-    public Object search(
+    @ApiOperation(value = "根据省市县查询地址并返回地址编号列表")
+    public List<String> search(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "province", value = "省", defaultValue = "")

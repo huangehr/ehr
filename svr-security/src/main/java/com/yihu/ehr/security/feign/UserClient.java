@@ -18,7 +18,7 @@ public interface UserClient {
     @RequestMapping(value = "/rest/{api_version}/user", method = GET )
     MUser getUser(
             @PathVariable(value = "api_version") String apiVersion,
-            @RequestParam(value = "userId") String userId);
+            @RequestParam(value = "user_id") String userId);
 
     @RequestMapping(value = "/rest/{api_version}/{login_code}", method = GET )
     MUser getUserByLoginCode(

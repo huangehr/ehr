@@ -1,9 +1,10 @@
 package com.yihu.ehr.patient.paientIdx.model;
 
 import com.yihu.ehr.model.address.MAddress;
+import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.patient.dao.XDemographicInfoRepository;
-import com.yihu.ehr.patient.feignClient.AddressClient;
-import com.yihu.ehr.patient.feignClient.ConventionalDictClient;
+import com.yihu.ehr.patient.feign.AddressClient;
+import com.yihu.ehr.patient.feign.ConventionalDictClient;
 import com.yihu.ehr.patient.service.demographic.DemographicId;
 import com.yihu.ehr.patient.service.demographic.DemographicInfo;
 import com.yihu.ehr.patient.service.demographic.PatientBrowseModel;
@@ -13,6 +14,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -50,23 +52,6 @@ public class DemographicIndex{
     private DemographicIndexStragety stragety;
 
     public DemographicIndex() {
-    }
-
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public DemographicInfo createDemographicInfo(String idCardNo, String name) {
-//        if (!id.isAvailable()) {
-//            throw new IllegalArgumentException("人口学索引无效.");
-//        }
-
-        if (name == null || name.length() <= 1) {
-            throw new IllegalArgumentException("姓名不能少于一个字符");
-        }
-
-        DemographicInfo demoInfo = new DemographicInfo();
-        demoInfo.setIdCardNo(idCardNo);
-        demoInfo.setName(name);
-
-        return demoInfo;
     }
 
     @Transactional(Transactional.TxType.SUPPORTS)
@@ -175,45 +160,8 @@ public class DemographicIndex{
 
 
     @Transactional(Transactional.TxType.SUPPORTS)
-    public boolean updatePatient(PatientModel patientModel) throws Exception{
-        DemographicInfo demographicInfo = null;
-        boolean isRegistered = false;
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        String date = null;
-        isRegistered = isRegistered(new DemographicId(patientModel.getIdCardNo()));
-        if (!isRegistered) {
-            demographicInfo = createDemographicInfo(patientModel.getIdCardNo(), patientModel.getName());
-            //demographicInfo = createDemographicInfo(new DemographicId(patientModel.getIdCardNo()), patientModel.getName());
-        } else {
-            demographicInfo = getDemographicInfo(new DemographicId(patientModel.getIdCardNo()));
-        }
-        if (patientModel.getGender() != null && !patientModel.getGender().isEmpty()) {
-            demographicInfo.setGender(patientModel.getGender());
-        }
-        if (patientModel.getNation() != null && !patientModel.getNation().isEmpty()) {
-            demographicInfo.setNation(patientModel.getNation());
-        }
-        demographicInfo.setNativePlace(patientModel.getNativePlace());
-        if (patientModel.getMartialStatus() != null && !patientModel.getMartialStatus().isEmpty()) {
-            demographicInfo.setMartialStatus(patientModel.getMartialStatus());
-        }
-        date = patientModel.getBirthday();
-        if (date != null && !date.isEmpty()) {
-            demographicInfo.setBirthday(format.parse(date));
-        }
-        demographicInfo.setBirthPlace(patientModel.getBirthPlace().getId());
-        demographicInfo.setHomeAddress(patientModel.getHomeAddress().getId());
-        demographicInfo.setWorkAddress(patientModel.getWorkAddress().getId());
-        if (patientModel.getResidenceType() != null && !patientModel.getResidenceType().isEmpty()) {
-            demographicInfo.setResidenceType(patientModel.getResidenceType());
-        }
-        if(patientModel.getPassword()!=null&&!patientModel.getPassword().equals("")){
-            demographicInfo.setPassword(patientModel.getPassword());
-        }
-        //TODO：Map类型的电话号码还要处理，如何展示问题
-        demographicInfo.setTelphoneNo(patientModel.getTel());
-        demographicInfo.setEmail(patientModel.getEmail());
-
+    public boolean updatePatient(DemographicInfo demographicInfo) throws Exception{
+        boolean isRegistered  = isRegistered(new DemographicId(demographicInfo.getIdCardNo()));
         if (isRegistered) {
             String pwd = "123456";
             demographicInfo.setPassword(HashUtil.hashStr(pwd));
@@ -230,67 +178,37 @@ public class DemographicIndex{
     }
 
     @Transactional(Transactional.TxType.SUPPORTS)
-    public List<PatientBrowseModel> searchPatientBrowseModel(Map<String, Object> args) {
+    public List<DemographicInfo> searchPatientBrowseModel(Map<String, Object> args) {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         String name = (String) args.get("name");
         String idCardNo = (String) args.get("idCardNo");
         Integer page = (Integer) args.get("page");
         Integer pageSize = (Integer) args.get("pageSize");
 
-//        String province = (String) args.get("province");
-//        String city = (String) args.get("city");
-//        String district = (String) args.get("district");
+        String province = (String) args.get("province");
+        String city = (String) args.get("city");
+        String district = (String) args.get("district");
+        List<String> addressIdList = addressClient.search(province,city,district);
 
         String hql = "from DemographicInfo where (name like :name or id like :idCardNo)";
-//        if (!StringUtils.isEmpty(province)) {
-//            hql += " and homeAddress.province = :province";
-//        }
-//        if (!StringUtils.isEmpty(city)) {
-//            hql += " and homeAddress.city = :city";
-//        }
-//        if (!StringUtils.isEmpty(district)) {
-//            hql += " and homeAddress.district = :district";
-//        }
 
+        if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
+            hql += " and homeAddress in (:addressIdList)";
+        }
         Query query = session.createQuery(hql);
-
-//        if (!StringUtils.isEmpty(province)) {
-//            query.setString("province", province);
-//        }
-//        if (!StringUtils.isEmpty(city)) {
-//            query.setString("city", city);
-//        }
-//        if (!StringUtils.isEmpty(district)) {
-//            query.setString("district", district);
-//        }
 
         query.setString("name", "%" + name + "%");
         query.setString("idCardNo", "%" + idCardNo + "%");
+
+        if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
+            query.setParameterList("addressIdList", addressIdList);
+        }
         query.setMaxResults(pageSize);
         query.setFirstResult((page - 1) * pageSize);
         List<DemographicInfo> demographicInfos = query.list();
 
-        List<PatientBrowseModel> patientBrowseModelList = new ArrayList<>();
-        Integer order = 1;
 
-        for (DemographicInfo demoinfo : demographicInfos) {
-            PatientBrowseModel patientBrowseModel = new PatientBrowseModel();
-            patientBrowseModel.setOrder(order++);
-            patientBrowseModel.setName(demoinfo.getName());
-            patientBrowseModel.setIdCardNo(demoinfo.getIdCardNo().toString());
-            if (demoinfo.getGender() != null) {
-                patientBrowseModel.setGender(demoinfo.getGender());
-                patientBrowseModel.setGenderValue(conventionalDictClient.getGender(demoinfo.getGender()).getValue());
-            } else {
-                patientBrowseModel.setGenderValue("");
-            }
-            patientBrowseModel.setTel(demoinfo.getTelphoneNo());
-            patientBrowseModel.setHomeAddress(demoinfo.getHomeAddress());
-
-            patientBrowseModelList.add(patientBrowseModel);
-        }
-
-        return patientBrowseModelList;
+        return demographicInfos;
     }
 
     public Integer searchPatientInt(Map<String, Object> args) {

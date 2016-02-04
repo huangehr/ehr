@@ -15,35 +15,22 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @FeignClient(MicroServices.DictMgr)
 public interface ConventionalDictClient {
 
-    @RequestMapping(value = "/rest/{api_version}/conventional_dict/org_type", method = GET )
-    MConventionalDict getOrgType(
+
+
+
+    @RequestMapping(value = "/rest/{api_version}/conventional_dict/martial_status", method = GET )
+    MConventionalDict getMartialStatus(
             @PathVariable(value = "api_version") String apiVersion,
             @RequestParam(value = "code") String code);
 
-    @RequestMapping(value = "/rest/{api_version}/conventional_dict/settled_way", method = GET )
-    MConventionalDict getSettledWay(
+    @RequestMapping(value = "/rest/{api_version}/conventional_dict/gender", method = GET )
+    MConventionalDict getGender(
             @PathVariable(value = "api_version") String apiVersion,
             @RequestParam(value = "code") String code);
 
-    @RequestMapping(value = "/rest/{api_version}/conventional_dict/app_catalog", method = GET )
-    MConventionalDict getAppCatalog(
-            @PathVariable(value = "api_version") String apiVersion,
-            @RequestParam(value = "code") String code);
-
-    @RequestMapping(value = "/rest/{api_version}/conventional_dict/app_status", method = GET )
-    MConventionalDict getAppStatus(
-            @PathVariable(value = "api_version") String apiVersion,
-            @RequestParam(value = "code") String code);
 
     @RequestMapping(value = "/rest/{api_version}/conventional_dict/user_type", method = GET )
     MConventionalDict getUserType(
             @PathVariable(value = "api_version") String apiVersion,
             @RequestParam(value = "code") String code);
-
-    @RequestMapping(value = "/rest/{api_version}/conventional_dict/yes_no", method = GET )
-    MConventionalDict getYesNo(
-            @PathVariable(value = "api_version") String apiVersion,
-            @RequestParam(value = "code") Boolean code);
-
-
 }

@@ -20,15 +20,15 @@ public interface SecurityClient {
             @PathVariable(value = "api_version") String apiVersion,
             @PathVariable(value = "login_code") String loginCode);
 
-    @RequestMapping(value = "/rest/{api_version}/security", method = DELETE )
+    @RequestMapping(value = "/rest/{api_version}/security/{id]", method = DELETE )
     void deleteSecurity(
             @PathVariable(value = "api_version") String apiVersion,
-            @RequestParam(value = "id") String id);
+            @PathVariable(value = "id") String id);
 
-    @RequestMapping(value = "/rest/{api_version}/user_key", method = DELETE )
+    @RequestMapping(value = "/rest/{api_version}/user_key/{user_key_id}", method = DELETE )
     void deleteUserKey(
             @PathVariable(value = "api_version") String apiVersion,
-            @RequestParam(value = "user_key_id") String userKeyId);
+            @PathVariable(value = "user_key_id") String userKeyId);
 
     @RequestMapping(value = "/rest/{api_version}/security/{user_id}", method = POST )
     MUserSecurity createSecurityByUserId(

@@ -2,14 +2,12 @@ package com.yihu.ehr.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersionPrefix;
-import com.yihu.ehr.model.address.MAddress;
-import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MUserSecurity;
 import com.yihu.ehr.model.user.MUser;
+import com.yihu.ehr.user.feign.ConventionalDictClient;
 import com.yihu.ehr.user.feign.OrgClient;
 import com.yihu.ehr.user.feign.SecurityClient;
 import com.yihu.ehr.user.service.User;
-import com.yihu.ehr.user.service.UserDetailModel;
 import com.yihu.ehr.user.service.UserManager;
 import com.yihu.ehr.user.service.UserModel;
 import com.yihu.ehr.util.controller.BaseRestController;
@@ -17,10 +15,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.time.DateFormatUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,10 +37,13 @@ public class UserController extends BaseRestController {
     private UserManager userManager;
 
     @Autowired
-    private SecurityClient securityClient;
+    private ConventionalDictClient conventionalDictClient;
 
     @Autowired
     private OrgClient organizationClient;
+
+    @Autowired
+    SecurityClient securityClient;
 
     @RequestMapping(value = "/search" , method = RequestMethod.GET)
     @ApiOperation(value = "获取用户列表",produces = "application/json", notes = "根据查询条件获取用户列表在前端表格展示")
@@ -67,10 +68,26 @@ public class UserController extends BaseRestController {
         conditionMap.put("page", page);
         conditionMap.put("pageSize", rows);
 
-        List<UserDetailModel> detailModelList = userManager.searchUserDetailModel(apiVersion,conditionMap);
-
+        List<User> userList = userManager.searchUser(apiVersion,conditionMap);
+        List<MUser> userModelList = new ArrayList<MUser>();
+        for (User user: userList){
+            MUser userModel = convertToModel(user,MUser.class);
+            if(user.getUserType()!=null){
+                userModel.setUserType(conventionalDictClient.getUserType(apiVersion,user.getUserType()));
+            }
+            if(user.getMartialStatus()!=null){
+                userModel.setMartialStatus(conventionalDictClient.getMartialStatus(apiVersion,user.getMartialStatus()));
+            }
+            if(user.getGender()!=null){
+                userModel.setGender(conventionalDictClient.getGender(apiVersion,user.getGender()));
+            }
+            if(user.getOrganization()!=null){
+                userModel.setOrganization(organizationClient.getOrgByCode(apiVersion,user.getOrganization()));
+            }
+            userModelList.add(userModel);
+        }
         Integer totalCount = userManager.searchUserInt(apiVersion,conditionMap);
-        return getResult(detailModelList,totalCount,page,rows);
+        return getResult(userModelList,totalCount,page,rows);
     }
 
     @RequestMapping(value = "" , method = RequestMethod.DELETE)
@@ -84,18 +101,6 @@ public class UserController extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(value = "/{user_id}/{activity}" , method = RequestMethod.PUT)
-    @ApiOperation(value = "改变用户状态",produces = "application/json", notes = "根据用户状态改变当前用户状态")
-    public boolean  activityUser (
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "user_id", value = "id", defaultValue = "")
-            @PathVariable(value = "user_id") String userId,
-            @ApiParam(name = "activity", value = "激活状态", defaultValue = "")
-            @PathVariable(value = "activity") boolean activity) throws Exception{
-        userManager.activityUser(userId, activity);
-        return true;
-    }
 
     @RequestMapping(value = "" , method = RequestMethod.PUT)
     @ApiOperation(value = "修改用户",produces = "application/json", notes = "重新绑定用户信息")
@@ -110,6 +115,46 @@ public class UserController extends BaseRestController {
 
     }
 
+
+    @RequestMapping(value = "" , method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户信息",produces = "application/json", notes = "包括地址信息等")
+    public MUser getUser(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
+            @ApiParam(name = "user_id", value = "", defaultValue = "")
+            @RequestParam(value = "user_id") String userId) {
+        User user = userManager.getUser(userId);
+        MUser userModel = convertToModel(user,MUser.class);
+        if(user.getUserType()!=null){
+            userModel.setUserType(conventionalDictClient.getUserType(apiVersion,user.getUserType()));
+        }
+        if(user.getMartialStatus()!=null){
+            userModel.setMartialStatus(conventionalDictClient.getMartialStatus(apiVersion,user.getMartialStatus()));
+        }
+        if(user.getGender()!=null){
+            userModel.setGender(conventionalDictClient.getGender(apiVersion,user.getGender()));
+        }
+        if(user.getOrganization()!=null){
+            userModel.setOrganization(organizationClient.getOrgByCode(apiVersion,user.getOrganization()));
+        }
+        return userModel;
+    }
+
+
+    @RequestMapping(value = "/{user_id}/{activity}" , method = RequestMethod.PUT)
+    @ApiOperation(value = "改变用户状态",produces = "application/json", notes = "根据用户状态改变当前用户状态")
+    public boolean  activityUser (
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
+            @ApiParam(name = "user_id", value = "id", defaultValue = "")
+            @PathVariable(value = "user_id") String userId,
+            @ApiParam(name = "activity", value = "激活状态", defaultValue = "")
+            @PathVariable(value = "activity") boolean activity) throws Exception{
+        userManager.activityUser(userId, activity);
+        return true;
+    }
+
+
     @RequestMapping(value = "/reset_pass/{user_id}" , method = RequestMethod.PUT)
     @ApiOperation(value = "重设密码",produces = "application/json", notes = "用户忘记密码管理员帮助重新还原密码，初始密码123456")
     public Object resetPass(
@@ -122,47 +167,10 @@ public class UserController extends BaseRestController {
 
     }
 
-    @RequestMapping(value = "" , method = RequestMethod.GET)
-    @ApiOperation(value = "获取用户",produces = "application/json", notes = "根据用户id获取用户信息")
-    public Object getUser(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "userId", value = "", defaultValue = "")
-            @RequestParam(value = "userId") String userId) {
-        User user = userManager.getUser(userId);
-        return convertToModel(user,MUser.class);
-    }
 
-
-    @RequestMapping(value = "/user_model" , method = RequestMethod.GET)
-    @ApiOperation(value = "获取用户对象详细信息",produces = "application/json", notes = "包括地址信息等")
-    public Object getUserModel(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "userId", value = "", defaultValue = "")
-            @RequestParam(value = "userId") String userId) {
-        Map<String,Object> map = new HashMap<>();
-        User user = userManager.getUser(userId);
-        UserModel userModel = userManager.getUser(apiVersion,user);
-        MOrganization org = null;
-        if(userModel.getOrgCode()!=null){
-            org = organizationClient.getOrgByCode(apiVersion,userModel.getOrgCode());
-        }
-        MAddress addressModel;
-        if(org!=null){
-            String locarion = org.getLocation();
-            if(!"".equals(locarion)){
-                addressModel = userManager.getAddressById(apiVersion,locarion);
-                map.put("orgLocation",addressModel);
-            }
-        }
-        map.put("user",userModel);
-        return map;
-    }
-
-    @RequestMapping(value = "/bunding/{user_id}/{type}" , method = RequestMethod.PUT)
+    @RequestMapping(value = "/un_binding/{user_id}/{type}" , method = RequestMethod.PUT)
     @ApiOperation(value = "取消关联绑定",produces = "application/json", notes = "取消相关信息绑定")
-    public Object unbundling(
+    public Object unBinding (
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "user_id", value = "", defaultValue = "")
@@ -177,7 +185,7 @@ public class UserController extends BaseRestController {
         } else {
             user.setEmail("");
         }
-        userManager.updateUser(user);
+        userManager.saveUser(user);
         return true;
     }
 
@@ -221,16 +229,16 @@ public class UserController extends BaseRestController {
      * @param loginCode
      * @param psw
      */
-    @RequestMapping(value = "/{login_code}/{psw}" , method = RequestMethod.GET)
+    @RequestMapping(value = "login_verification/{login_code}/{psw}" , method = RequestMethod.GET)
     @ApiOperation(value = "根据登陆用户名及密码验证用户",produces = "application/json", notes = "根据登陆用户名及密码验证用户")
-    public User loginIndetification(
+    public User loginVerification(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
             @PathVariable(value = "login_code") String loginCode,
             @ApiParam(name = "psw", value = "密码", defaultValue = "")
             @PathVariable(value = "psw") String psw) {
-        return  userManager.loginIndetification(loginCode,psw);
+        return  userManager.loginVerification(loginCode,psw);
     }
 
     /**

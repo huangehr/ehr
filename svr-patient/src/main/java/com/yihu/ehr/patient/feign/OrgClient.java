@@ -1,4 +1,4 @@
-package com.yihu.ehr.patient.feignClient;
+package com.yihu.ehr.patient.feign;
 
 import com.yihu.ehr.model.org.MOrganization;
 import org.springframework.cloud.netflix.feign.FeignClient;

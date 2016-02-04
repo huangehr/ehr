@@ -21,7 +21,7 @@ public class AbstractCardStragety extends AbstractSearchStragety {
             if (cards.size()>0) {
                 criteria = session.createCriteria(DemographicInfo.class);
                 for (int i = 0; i < cards.size(); i++) {
-                    criteria.add(Restrictions.or(Restrictions.eq("id", cards.get(i).getDemographicId())));
+//                    criteria.add(Restrictions.or(Restrictions.eq("id", cards.get(i).getDemographicId())));
                 }
             }else {
                 criteria=null;

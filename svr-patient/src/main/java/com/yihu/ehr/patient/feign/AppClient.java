@@ -1,4 +1,4 @@
-package com.yihu.ehr.patient.feignClient;
+package com.yihu.ehr.patient.feign;
 import com.yihu.ehr.model.app.MApp;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;

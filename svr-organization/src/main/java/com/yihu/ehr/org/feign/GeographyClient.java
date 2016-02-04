@@ -48,10 +48,6 @@ public interface GeographyClient {
             @RequestParam(value = "city") String city,
             @RequestParam(value = "district") String district);
 
-    @RequestMapping(value = "/rest/{api_version}/geography", method = RequestMethod.DELETE )
-    void deleteByOrgCode(
-            @PathVariable(value = "api_version") String apiVersion,
-            @RequestParam(value = "id") String id);
 
 
 }

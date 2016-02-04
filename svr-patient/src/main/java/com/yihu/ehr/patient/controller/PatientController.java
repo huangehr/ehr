@@ -1,13 +1,13 @@
 package com.yihu.ehr.patient.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
-import com.yihu.ehr.patient.feignClient.AddressClient;
+import com.yihu.ehr.model.patient.MDemographicInfo;
+import com.yihu.ehr.patient.feign.AddressClient;
+import com.yihu.ehr.patient.feign.ConventionalDictClient;
 import com.yihu.ehr.patient.paientIdx.model.DemographicIndex;
 import com.yihu.ehr.patient.service.demographic.DemographicId;
 import com.yihu.ehr.patient.service.demographic.DemographicInfo;
-import com.yihu.ehr.patient.service.demographic.PatientBrowseModel;
 import com.yihu.ehr.patient.service.demographic.PatientModel;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.log.LogService;
@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.InputStream;
-import java.net.URLDecoder;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +43,8 @@ public class PatientController extends BaseRestController {
     @Autowired
     private AddressClient addressClient;
 
-    public PatientController(){}
+    @Autowired
+    private ConventionalDictClient conventionalDictClient;
 
 
 
@@ -58,10 +59,21 @@ public class PatientController extends BaseRestController {
         conditionMap.put("province", province);
         conditionMap.put("city", city);
         conditionMap.put("district", district);
-
-        List<PatientBrowseModel> patientBrowseModel = demographicIndex.searchPatientBrowseModel(conditionMap);
+        List<DemographicInfo> demographicInfos = demographicIndex.searchPatientBrowseModel(conditionMap);
+        List<MDemographicInfo> demographicModels = new ArrayList<>();
+        for(DemographicInfo demographicInfo:demographicInfos){
+            MDemographicInfo demographicModel = convertToModel(demographicInfo,MDemographicInfo.class);
+            demographicModel.setBirthPlace(addressClient.getAddressById(demographicInfo.getBirthPlace()));
+            demographicModel.setNativePlace(addressClient.getAddressById(demographicInfo.getNativePlace()));
+            demographicModel.setWorkAddress(addressClient.getAddressById(demographicInfo.getWorkAddress()));
+            demographicModel.setHomeAddress(addressClient.getAddressById(demographicInfo.getHomeAddress()));
+            demographicModel.setGender(conventionalDictClient.getGender(demographicInfo.getGender()));
+            demographicModel.setMartialStatus(conventionalDictClient.getMartialStatus(demographicInfo.getMartialStatus()));
+            demographicModel.setResidenceType(conventionalDictClient.getResidenceType(demographicInfo.getResidenceType()));
+            demographicModels.add(demographicModel);
+        }
         Integer totalCount = demographicIndex.searchPatientInt(conditionMap);
-        return getResult(patientBrowseModel,totalCount,page,rows);
+        return getResult(demographicModels,totalCount,page,rows);
     }
 
 
@@ -92,53 +104,36 @@ public class PatientController extends BaseRestController {
      * 检查身份证是否已经存在
      */
     @RequestMapping("/demographicInfo/idCardNo")
-    @ResponseBody
     public Object checkIdCardNo(String IdCardNo){
         DemographicInfo demographicInfo = demographicIndex.getDemographicInfo(new DemographicId(IdCardNo));
-        if(demographicInfo==null){
-            return true;
-        }else{
-            return false;
-        }
+        return demographicInfo!=null;
 
     }
 
-    @RequestMapping("updatePatient")
-    //注册或更新病人信息
+    @RequestMapping(value="updatePatient")
+    @ResponseBody
+    //注册或更新病人信息Header("Content-type: text/html; charset=UTF-8")
     public Object updatePatient(String patientJsonData,HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        String idCardNo = "350425198506080016";
-        DemographicInfo demographicInfoIn = demographicIndex.getDemographicInfo(new DemographicId(idCardNo));
-        demographicInfoIn.setEmail("10086@qq.com");
+        String IdCardNo = "";
+        DemographicInfo demographicInfo = demographicIndex.getDemographicInfo(new DemographicId(IdCardNo));
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String patientJsonDataIn = objectMapper.writeValueAsString(demographicInfoIn);
-        patientJsonDataIn = URLDecoder.decode(patientJsonDataIn,"UTF-8");
-        DemographicInfo demographicInfoOut = objectMapper.readValue(patientJsonDataIn, DemographicInfo.class);
-
-        PatientModel patientModel = new PatientModel();
-        patientModel.setIdCardNo(demographicInfoOut.getIdCardNo());
-        patientModel.setEmail(demographicInfoOut.getEmail());
-        patientModel.setBirthPlace(addressClient.getAddressById(demographicInfoOut.getBirthPlace()));
-        patientModel.setHomeAddress(addressClient.getAddressById(demographicInfoOut.getHomeAddress()));
-        patientModel.setWorkAddress(addressClient.getAddressById(demographicInfoOut.getWorkAddress()));
-        patientModel.setPicPath(demographicInfoOut.getPicPath());
-
-        String patientModelIn = objectMapper.writeValueAsString(patientModel);
-        patientModelIn = URLDecoder.decode(patientModelIn,"UTF-8");
-
-        PatientModel patientModels = objectMapper.readValue(patientModelIn, PatientModel.class);
-
-        //将文件保存至服务器，返回文件的path，
+//        String patientData = URLDecoder.decode(patientJsonData,"UTF-8");
+//
+//        //将文件保存至服务器，返回文件的path，
         String picPath = webupload(request, response);
-
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        PatientModel patientModels = objectMapper.readValue(patientData, PatientModel.class);
         //将文件path保存至数据库
-        patientModels.setPicPath(picPath);
+        demographicInfo.setPicPath(picPath);
         if(picPath != null){
-            patientModels.setLocalPath("");
+            demographicInfo.setLocalPath("");
         }
-        demographicIndex.updatePatient(patientModels);
-        return patientModels;
+        if (demographicIndex.updatePatient(demographicInfo)) {
+            return true;
+        } else {
+            return true;
+        }
     }
 
     @RequestMapping("/resetPass")
@@ -148,10 +143,18 @@ public class PatientController extends BaseRestController {
     }
 
 
-    @RequestMapping(value = "/webupload")
-    public String webupload(HttpServletRequest request,HttpServletResponse respons) throws Exception {
-
-        request.setCharacterEncoding("UTF-8");
+    /**
+     * 人口信息头像图片上传
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     */
+    public String webupload(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            request.setCharacterEncoding("UTF-8");
+        } catch (UnsupportedEncodingException e1) {
+        }
         InputStream inputStearm = request.getInputStream();
         String fileName = (String) request.getParameter("name");
         if(fileName == null){
@@ -165,7 +168,7 @@ public class PatientController extends BaseRestController {
                 description = fileName.substring(0, dot);
             }
         }
-        ObjectNode objectNode;
+        ObjectNode objectNode = null;
         String path = null;
         try {
             objectNode = fastDFSUtil.upload(inputStearm, fileExtension, description);
@@ -177,6 +180,45 @@ public class PatientController extends BaseRestController {
         }
         //返回文件路径
         return path;
+    }
+
+
+    /**
+     * 注：因直接访问文件路径，无法显示文件信息
+     * 将文件路径解析成字节流，通过字节流的方式读取文件
+     * @param request
+     * @param response
+     * @param localImgPath       文件路径
+     * @throws Exception
+     */
+    @RequestMapping("showImage")
+    @ResponseBody
+    public void showImage(HttpServletRequest request, HttpServletResponse response, String localImgPath) throws Exception {
+        response.setContentType("text/html; charset=UTF-8");
+        response.setContentType("image/jpeg");
+        FileInputStream fis = null;
+        OutputStream os = null;
+        try {
+            File file = new File(localImgPath);
+            if (!file.exists()) {
+                LogService.getLogger(PatientController.class).error("人口头像不存在：" + localImgPath);
+                return;
+            }
+            fis = new FileInputStream(localImgPath);
+            os = response.getOutputStream();
+            int count = 0;
+            byte[] buffer = new byte[1024 * 1024];
+            while ((count = fis.read(buffer)) != -1)
+                os.write(buffer, 0, count);
+            os.flush();
+        } catch (IOException e) {
+            LogService.getLogger(PatientController.class).error(e.getMessage());
+        } finally {
+            if (os != null)
+                os.close();
+            if (fis != null)
+                fis.close();
+        }
     }
 
 

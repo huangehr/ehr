@@ -213,9 +213,6 @@ public class GeographyService {
         return newAddr.toArray(new String[newAddr.size()]);
     }
 
-	public void updateAddrDict(GeographyDict addrdict){
-        addressDictRepository.save(addrdict);
-	}
 
     public Geography getAddressById(String Id) {
         return addressRepository.findOne(Id);

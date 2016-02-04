@@ -30,14 +30,14 @@ public class userControllerTest {
     private UserController userController;
 
 
-    @Test
-    public void atestGetUserModel() throws Exception{
-        applicationContext = new SpringApplicationBuilder()
-                .web(false).sources(UserServiceApp.class).run();
-        String userId = "0dae0003561cc415c72d9111e8cb88aa";
-        Object userModel = userController.getUserModel(apiVersion,userId);
-        assertTrue("查询失败！" , userModel != null);
-    }
+//    @Test
+//    public void atestGetUserModel() throws Exception{
+//        applicationContext = new SpringApplicationBuilder()
+//                .web(false).sources(UserServiceApp.class).run();
+//        String userId = "0dae0003561cc415c72d9111e8cb88aa";
+//        Object userModel = userController.getUserModel(apiVersion,userId);
+//        assertTrue("查询失败！" , userModel != null);
+//    }
 
     @Test
     public void atestGetUserSecurityByOrgName() throws Exception{
@@ -65,18 +65,18 @@ public class userControllerTest {
         assertTrue("操作失败！" , result != null);
     }
 
-    @Test
-    public void atestUpdateUser() throws Exception{
-        String userId = "0dae0003561cc415c72d9111e8cb88aa";
-        User user = (User) userController.getUser(apiVersion,userId);
-        UserModel userModel = new UserModel();
-        BeanUtils.copyProperties(user,userModel);
-        userModel.setEmail("9898987@jkzl.com");
-        ObjectMapper objectMapper = new ObjectMapper();
-        String userStr = objectMapper.writeValueAsString(userModel);
-        Object result = userController.updateUser(apiVersion,userStr);
-        assertTrue("修改失败！" , result != null);
-    }
+//    @Test
+//    public void atestUpdateUser() throws Exception{
+//        String userId = "0dae0003561cc415c72d9111e8cb88aa";
+//        User user = (User) userController.getUser(apiVersion,userId);
+//        UserModel userModel = new UserModel();
+//        BeanUtils.copyProperties(user,userModel);
+//        userModel.setEmail("9898987@jkzl.com");
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        String userStr = objectMapper.writeValueAsString(userModel);
+//        Object result = userController.updateUser(apiVersion,userStr);
+//        assertTrue("修改失败！" , result != null);
+//    }
 
     @Test
     public void atestResetPass() throws Exception{
@@ -112,10 +112,10 @@ public class userControllerTest {
     }
 
     @Test
-    public void atestLoginIndetification() throws Exception{
+    public void atestLoginVerification() throws Exception{
         String loginCode = "admin";
         String psw = "123456";
-        Object result = userController.loginIndetification(apiVersion,loginCode,psw);
+        Object result = userController.loginVerification(apiVersion,loginCode,psw);
         assertTrue("查询失败！" , result != null);
     }
 

@@ -3,6 +3,7 @@ package com.yihu.ehr.user.service;
 import com.yihu.ehr.model.address.MAddress;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.security.MUserSecurity;
+import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.user.feign.GeographyClient;
 import com.yihu.ehr.user.feign.ConventionalDictClient;
 import com.yihu.ehr.user.feign.OrgClient;
@@ -121,49 +122,6 @@ public class UserManager  {
         return addressClient.getAddressById(apiVersion,locarion);
 
     }
-    /**
-     * 根据User获取用户页面信息.
-     *
-     * @param user
-     */
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public UserModel getUser(String apiVersion,User user) {
-
-        UserModel userModel = new UserModel();
-        userModel.setId(user.getId());
-        userModel.setLoginCode(user.getLoginCode());
-        userModel.setEmail(user.getEmail());
-        userModel.setRealName(user.getRealName());
-        userModel.setTel(user.getTelephone());
-        userModel.setIdCard(user.getIdCardNo());
-        if (user.getGender() != null) {
-            userModel.setSex(user.getGender());
-        }
-        if (user.getMartialStatus() != null) {
-            userModel.setMarriage(user.getMartialStatus());
-        }
-        if (user.getOrganization() != null) {
-            userModel.setOrgCode(user.getOrganization());
-            userModel.setOrgName(organizationClient.getOrgByCode(apiVersion,user.getOrganization()).getFullName());
-        }
-        if (user.getUserType() != null) {
-            userModel.setUserType(user.getUserType());
-        }
-        if (user instanceof MedicalUser) {
-            userModel.setMajor((user).getMajor());
-        }
-
-        MUserSecurity userSecurity = securityClient.getUserSecurityByUserId(apiVersion,user.getId());
-        if (userSecurity != null) {
-            userModel.setPublicKey(userSecurity.getPublicKey());
-            String validTime = DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd")
-                    + "~" + DateFormatUtils.format(userSecurity.getExpiryDate(),"yyyy-MM-dd");
-            userModel.setValidTime(validTime);
-            userModel.setStartTime(DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd"));
-        }
-
-        return userModel;
-    }
 
 
     /**
@@ -225,7 +183,7 @@ public class UserManager  {
      * @param psw
      */
     @Transactional(Transactional.TxType.SUPPORTS)
-    public User loginIndetification(String loginCode,String psw) {
+    public User loginVerification(String loginCode,String psw) {
 
         User user = getUserByLoginCode(loginCode);
         boolean result = isPasswordRight(user,psw);
@@ -341,52 +299,6 @@ public class UserManager  {
     }
 
 
-
-
-
-    /**
-     * 根据条件搜索用户.
-     *
-     * @param args
-     */
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public List<UserDetailModel> searchUserDetailModel(String apiVersion,Map<String, Object> args) {
-
-        List<User> userList = searchUser (apiVersion,args);
-        List<UserDetailModel> detailModelList = new ArrayList<>();
-        Integer order = 1;
-
-        for (User user : userList) {
-            UserDetailModel detailModel = new UserDetailModel();
-            detailModel.setOrder(order++);
-            detailModel.setId(user.getId());
-            detailModel.setEmail(user.getEmail());
-            detailModel.setLoginCode(user.getLoginCode());
-            detailModel.setRealName(user.getRealName());
-            detailModel.setTelephone(user.getTelephone());
-            detailModel.setActivated(user.getActivated());
-            if (user.getOrganization() != null) {
-                //detailModel.setOrganization(user.getOrganization().getFullName());
-                detailModel.setOrganization(organizationClient.getOrgByCode(apiVersion,user.getOrganization()).getFullName());
-            }
-            if (user.getLastLoginTime() != null) {
-                detailModel.setLastLoginTime(DateFormatUtils.format(user.getLastLoginTime(),"yyyy-MM-dd HH:mm:ss"));
-            }
-            if (user.getUserType() != null) {
-                detailModel.setUserType(user.getUserType());
-                detailModel.setUserTypeValue(conventionalDictClient.getUserType(apiVersion,user.getUserType()).getValue());
-            }
-            detailModelList.add(detailModel);
-        }
-
-        return detailModelList;
-    }
-
-
-
-
-
-
     /**
      * 更新用户信息.
      *
@@ -441,7 +353,7 @@ public class UserManager  {
     }
 
 
-    public void updateUser(User user) {
+    public void saveUser(User user) {
         userRepository.save(user);
     }
 
