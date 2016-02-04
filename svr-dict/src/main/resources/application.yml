@@ -1,15 +1,15 @@
 
 server:
-  port: 9001
+  port: 10150
 
-#security:
-#  user:
-#    password: dict
+security:
+  user:
+    password: dict
 
 info:
   app:
-    name: BaseDictService
-    description: EHR platform json dict service.
+    name: SystemDictionaryService
+    description: EHR platform system dictionary service.
     version: 1.0.0
 
 ---

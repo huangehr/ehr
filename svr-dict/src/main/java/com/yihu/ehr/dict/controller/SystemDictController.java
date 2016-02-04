@@ -2,18 +2,18 @@ package com.yihu.ehr.dict.controller;
 
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.dict.service.SystemDict;
 import com.yihu.ehr.dict.service.SystemDictEntry;
 import com.yihu.ehr.dict.service.SystemDictService;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.dict.MSystemDict;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -21,75 +21,18 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Administrator on 2015/8/12.
+ * Created by linaz on 2015/8/12.
  */
-@EnableFeignClients
 @RestController
-@RequestMapping(ApiVersionPrefix.CommonVersion)
-@Api(value = "system_dict", description = "系统字典接口，用于系统全局字典管理", tags = {"系统字典接口"})
+@RequestMapping(ApiVersionPrefix.Version1_0)
+@Api(value = "dictionary", description = "系统字典接口，用于系统全局字典管理", tags = {"系统字典接口"})
 public class SystemDictController extends BaseRestController {
     @Autowired
     private SystemDictService systemDictService;
 
-    @ApiOperation(value = "创建字典", response = MSystemDict.class, produces = "application/json")
-    @RequestMapping(value = "/system_dict", method = RequestMethod.POST)
-    public Object createDict(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable(value = "api_version") String apiVersion,
-            @ApiParam(name = "name", value = "名称", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "reference", value = "", defaultValue = "")
-            @RequestParam(value = "reference") String reference,
-            @ApiParam(name = "userId", value = "创建人", defaultValue = "")
-            @RequestParam(value = "userId") String userId) {
-        boolean isExist = systemDictService.isDictExists(name);
-        if(isExist) throw new ApiException(ErrorCode.InvalidCreateSysDict, name);
-
-        SystemDict systemDict = systemDictService.createDict(name, reference, userId);
-        return convertToModel(systemDict, MSystemDict.class, null);
-    }
-
-    @ApiOperation(value = "删除字典")
-    @RequestMapping(value = "/system_dict/{dict_id}", method = RequestMethod.DELETE)
-    public Object deleteDict(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable(value = "api_version") String apiVersion,
-            @ApiParam(name = "dict_id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "dict_id") long dictId) {
-        systemDictService.deleteDict(dictId);
-        return "success";
-    }
-
-    @ApiOperation(value = "修改字典")
-    @RequestMapping(value = "/system_dict/{dict_id}", method = RequestMethod.PUT)
-    public Object updateDict(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable(value = "api_version") String apiVersion,
-            @ApiParam(name = "dict_id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "dict_id") long dictId,
-            @ApiParam(name = "name", value = "字典名称", defaultValue = "")
-            @RequestParam(value = "name") String name) {
-        SystemDict systemDict = systemDictService.getDict(dictId);
-        systemDict.setName(name);
-        systemDictService.updateDict(systemDict);
-
-        return systemDict;
-    }
-
-    /**
-     * * 1-1 根据查询条件查询系统字典。
-     * {
-     * "name"  : "App分类"
-     *
-     * @param name
-     * @param phoneticCode
-     * @param page
-     * @param rows
-     * @return
-     */
-    @ApiOperation(value = "查询字典列表")
-    @RequestMapping(value = "/system_dict/search", method = RequestMethod.GET)
-    public Object searchSystemDict(
+    @ApiOperation(value = "获取字典列表")
+    @RequestMapping(value = "/dictionaries", method = RequestMethod.GET)
+    public Envelop getDictionaries(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
             @ApiParam(name = "name", value = "字典名称", defaultValue = "")
@@ -106,18 +49,102 @@ public class SystemDictController extends BaseRestController {
         conditionMap.put("page", page);
         conditionMap.put("rows", rows);
 
-        List<SystemDict> systemDicts = systemDictService.searchDict(conditionMap);
+        List<SystemDict> systemDicts = systemDictService.getDictionaries(conditionMap);
         Integer totalCount = systemDictService.dictCount(conditionMap);
         return getResult(systemDicts, totalCount, page, rows);
     }
 
+    @ApiOperation(value = "创建字典", response = MSystemDict.class, produces = "application/json")
+    @RequestMapping(value = "/dictionaries", method = RequestMethod.POST)
+    public Object createDictionary(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable(value = "api_version") String apiVersion,
+            @ApiParam(name = "name", value = "名称", defaultValue = "")
+            @RequestParam(value = "name") String name,
+            @ApiParam(name = "reference", value = "", defaultValue = "")
+            @RequestParam(value = "reference") String reference,
+            @ApiParam(name = "userId", value = "创建人", defaultValue = "")
+            @RequestParam(value = "userId") String userId) {
+        boolean isExist = systemDictService.isDictExists(name);
+        if(isExist) throw new ApiException(ErrorCode.InvalidCreateSysDict, name);
+
+        SystemDict systemDict = systemDictService.createDict(name, reference, userId);
+        return convertToModel(systemDict, MSystemDict.class, null);
+    }
+
+    @ApiOperation(value = "获取字典", response = MSystemDict.class, produces = "application/json")
+    @RequestMapping(value = "/dictionaries/{id}", method = RequestMethod.GET)
+    public Object getDictionary(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable(value = "api_version") String apiVersion,
+            @ApiParam(name = "id", value = "字典ID", defaultValue = "")
+            @PathVariable(value = "id") long id){
+        return convertToModel(systemDictService.getDict(id), MSystemDict.class);
+    }
+
+    @ApiOperation(value = "修改字典")
+    @RequestMapping(value = "/dictionaries/{id}", method = RequestMethod.PUT)
+    public Object updateDictionary(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable(value = "api_version") String apiVersion,
+            @ApiParam(name = "id", value = "字典ID", defaultValue = "")
+            @PathVariable(value = "id") long id,
+            @ApiParam(name = "name", value = "字典名称", defaultValue = "")
+            @RequestParam(value = "name") String name) {
+        SystemDict systemDict = systemDictService.getDict(id);
+        systemDict.setName(name);
+        systemDictService.updateDict(systemDict);
+
+        return systemDict;
+    }
+
+    @ApiOperation(value = "删除字典")
+    @RequestMapping(value = "/dictionaries/{id}", method = RequestMethod.DELETE)
+    public Object deleteDictionary(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable(value = "api_version") String apiVersion,
+            @ApiParam(name = "id", value = "字典ID", defaultValue = "")
+            @PathVariable(value = "id") long id) {
+        systemDictService.deleteDict(id);
+        return "success";
+    }
+
+    @ApiOperation(value = "获取字典项列表")
+    @RequestMapping(value = "/dictionaries/{id}/entries", method = RequestMethod.GET)
+    public Object getDictEntries(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable(value = "api_version") String apiVersion,
+            @ApiParam(name = "id", value = "字典ID", defaultValue = "")
+            @PathVariable(value = "id") long id,
+            @ApiParam(name = "value", value = "字典项值", defaultValue = "")
+            @RequestParam(value = "value", required = false) String value,
+            @ApiParam(name = "page", value = "当前页", defaultValue = "")
+            @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam(name = "rows", value = "行数", defaultValue = "")
+            @RequestParam(value = "rows", required = false) Integer rows) {
+        Map<String, Object> conditionMap = new HashMap<>();
+        conditionMap.put("id", id);
+
+        List<SystemDictEntry> systemDictEntryList = null;
+        if (page != null && rows != null){
+            conditionMap.put("page", page);
+            conditionMap.put("rows", rows);
+
+            systemDictEntryList = systemDictService.searchEntryList(conditionMap);
+        } else {
+            systemDictEntryList = systemDictService.getDictEntries(id, value);
+        }
+
+        return getResult(systemDictEntryList, systemDictEntryList.size(), page, rows);
+    }
+
     @ApiOperation(value = "创建字典项")
-    @RequestMapping(value = "/system_dict/{dict_id}/system_dict_entry", method = RequestMethod.POST)
+    @RequestMapping(value = "/dictionaries/{id}/entries", method = RequestMethod.POST)
     public Object createDictEntry(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
-            @ApiParam(name = "dict_id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "dict_id") long dictId,
+            @ApiParam(name = "id", value = "字典ID", defaultValue = "")
+            @PathVariable(value = "id") long id,
             @ApiParam(name = "code", value = "字典ID", defaultValue = "")
             @RequestParam(value = "code") String code,
             @ApiParam(name = "value", value = "字典名称", defaultValue = "")
@@ -126,12 +153,12 @@ public class SystemDictController extends BaseRestController {
             @RequestParam(value = "sort") Integer sort,
             @ApiParam(name = "catalog", value = "类别", defaultValue = "")
             @RequestParam(value = "catalog") String catalog) {
-        SystemDict systemDict = systemDictService.getDict(dictId);
+        SystemDict systemDict = systemDictService.getDict(id);
         if (systemDict == null) {
             return null;
         }
 
-        if (systemDictService.isDictContainEntry(dictId, code)) {
+        if (systemDictService.isDictContainEntry(id, code)) {
             return null;
         }
 
@@ -139,7 +166,7 @@ public class SystemDictController extends BaseRestController {
         if (sort != null) {
             nextSort = sort;
         } else {
-            nextSort = systemDictService.getNextSort(dictId);
+            nextSort = systemDictService.getNextSort(id);
         }
 
         SystemDictEntry systemDictEntry = new SystemDictEntry();
@@ -152,35 +179,49 @@ public class SystemDictController extends BaseRestController {
         return systemDictEntry;
     }
 
+    @ApiOperation(value = "获取字典项")
+    @RequestMapping(value = "/dictionaries/{id}/entries/{code}", method = RequestMethod.POST)
+    public MDictionaryEntry getDictEntry(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable(value = "api_version") String apiVersion,
+            @ApiParam(name = "id", value = "字典ID", defaultValue = "")
+            @PathVariable(value = "id") long id,
+            @ApiParam(name = "code", value = "字典项代码", defaultValue = "")
+            @PathVariable(value = "code") String code) {
+        SystemDictEntry systemDictEntry = systemDictService.getDictEntry(id, code);
+
+        return convertToModel(systemDictEntry, MDictionaryEntry.class);
+    }
+
     @ApiOperation(value = "删除字典项")
-    @RequestMapping(value = "/system_dict/{dict_id}/system_dict_entry/{code}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/dictionaries/{id}/entries/{code}", method = RequestMethod.DELETE)
     public Object deleteDictEntry(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
-            @ApiParam(name = "dict_id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "dict_id") long dictId,
+            @ApiParam(name = "id", value = "字典ID", defaultValue = "")
+            @PathVariable(value = "id") long id,
             @ApiParam(name = "code", value = "字典ID", defaultValue = "")
             @PathVariable(value = "code") String code) {
-        SystemDict systemDict = systemDictService.getDict(dictId);
+        SystemDict systemDict = systemDictService.getDict(id);
         if (systemDict == null) {
             return null;
         }
 
-        if (!systemDictService.isDictContainEntry(dictId, code)) {
+        if (!systemDictService.isDictContainEntry(id, code)) {
             return null;
         }
 
-        systemDictService.deleteDictEntry(dictId, code);
+        systemDictService.deleteDictEntry(id, code);
         return "success";
     }
 
     @ApiOperation(value = "修改字典项")
-    @RequestMapping(value = "/system_dict/{dict_id}/system_dict_entry/{code}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/dictionaries/{id}/entries/{code}", method = RequestMethod.PUT)
     public Object updateDictEntry(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
-            @ApiParam(name = "dict_id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "dict_id") long dictId,
+            @ApiParam(name = "id", value = "字典ID", defaultValue = "")
+            @PathVariable(value = "id") long id,
             @ApiParam(name = "code", value = "字典ID", defaultValue = "")
             @PathVariable(value = "code") String code,
             @ApiParam(name = "value", value = "字典名称", defaultValue = "")
@@ -196,33 +237,5 @@ public class SystemDictController extends BaseRestController {
         systemDictEntry.setCatalog(catalog);
         systemDictService.saveSystemDictEntry(systemDictEntry);
         return systemDictEntry;
-    }
-
-    @ApiOperation(value = "字典项搜索")
-    @RequestMapping(value = "/system_dict/{dict_id}/system_dict_entry/search", method = RequestMethod.GET)
-    public Object searchDictEntries(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable(value = "api_version") String apiVersion,
-            @ApiParam(name = "dict_id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "dict_id") long dictId,
-            @ApiParam(name = "value", value = "字典项值", defaultValue = "")
-            @RequestParam(value = "value", required = false) String value,
-            @ApiParam(name = "page", value = "当前页", defaultValue = "")
-            @RequestParam(value = "page", required = false) Integer page,
-            @ApiParam(name = "rows", value = "行数", defaultValue = "")
-            @RequestParam(value = "rows", required = false) Integer rows) {
-        Map<String, Object> conditionMap = new HashMap<>();
-        conditionMap.put("dictId", dictId);
-
-        List<SystemDictEntry> systemDictEntryList = null;
-        if (page != null && rows != null){
-            conditionMap.put("page", page);
-            conditionMap.put("rows", rows);
-            systemDictEntryList = systemDictService.searchEntryList(conditionMap);
-        } else {
-            systemDictEntryList = systemDictService.getDictEntries(dictId, value);
-        }
-
-        return getResult(systemDictEntryList, systemDictEntryList.size(), page, rows);
     }
 }

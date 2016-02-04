@@ -1,17 +1,13 @@
 package com.yihu.ehr.apps.service;
 
-import com.yihu.ehr.apps.dao.XAppRepository;
-import com.yihu.ehr.apps.feign.ConventionalDictClient;
+import com.yihu.ehr.apps.feignClient.dict.ConventionalDictClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 /**
@@ -26,23 +22,16 @@ public class AppService {
     private static final int AppSecretLength = 16;
 
     @Autowired
-    private XAppRepository appRepository;
-
-    @PersistenceContext
-    protected EntityManager entityManager;
+    private XAppRepository appRepo;
 
     @Autowired
     private ConventionalDictClient conventionalDictClient;
 
-
     public AppService() {
     }
 
-
-
     public App createApp(String apiVersion, String name, MConventionalDict catalog, String url, String tags, String description, String creator) {
-
-        MConventionalDict status = conventionalDictClient.getAppStatus(apiVersion,"WaitingForApprove");
+        MConventionalDict status = conventionalDictClient.getAppStatus(apiVersion, "WaitingForApprove");
 
         App app = new App();
         app.setId(getRandomString(AppIdLength));
@@ -57,65 +46,40 @@ public class AppService {
         app.setDescription(description);
         app.setCreateTime(new Date());
         app.setStatus(status.getCode());
-        appRepository.save(app);
+        appRepo.save(app);
 
         return app;
     }
 
     public void deleteApp(String id) {
-        App app = appRepository.findOne(id);
-        appRepository.delete(app);
+        appRepo.delete(id);
     }
 
     public App getApp(String id) {
-        App app = appRepository.findOne(id);
+        App app = appRepo.findOne(id);
+
         return app;
     }
 
-    public Object getAppList(int from, int count) {
-        Session session = entityManager.unwrap(org.hibernate.Session.class);
-        Criteria criteria = session.createCriteria(App.class);
-        if (from >= 0 && count > 0) {
-            criteria.setFirstResult(from);
-            criteria.setMaxResults(count);
-        }
-
-        List<App> list = criteria.list();
-        return list;
-    }
-
     public void updateApp(App app) {
-        appRepository.save(app);
-    }
-
-    static String getRandomString(int length) {
-        String str = "abcdefghigklmnopkrstuvwxyzABCDEFGHIGKLMNOPQRSTUVWXYZ0123456789";
-        StringBuffer buffer = new StringBuffer();
-
-        Random random = new Random();
-        for (int i = 0; i < length; i++) {
-            int number = random.nextInt(str.length() - 1);//0~61
-            buffer.append(str.charAt(number));
-        }
-
-        return buffer.toString();
-    }
-
-    public boolean validationApp(String id, String secret) {
-        App app = getApp(id);
-        if(app == null){
-            return false;
-        }else{
-            if (getApp(id).getSecret().equals(secret)) {
-                return true;
-            } else {
-                return false;
-            }
-        }
+        appRepo.save(app);
     }
 
     /**
-     * 根据条件搜索应用列表.
+     * 检验App是否合法.
+     *
+     * @param id
+     * @param secret
+     * @return
+     */
+    public boolean verifyApp(String id, String secret) {
+        App app = getApp(id);
+
+        return app != null && getApp(id).getSecret().equals(secret);
+    }
+
+    /**
+     * 搜索应用列表，并以列表形式返回。
      *
      * @param args
      */
@@ -126,7 +90,7 @@ public class AppService {
         String appName = (String) args.get("appName");
         String catalog = (String) args.get("catalog");
         String status = (String) args.get("status");
-        Integer page =  Integer.parseInt(args.get("page").toString());
+        Integer page = Integer.parseInt(args.get("page").toString());
         Integer pageSize = Integer.parseInt(args.get("rows").toString());
         //动态SQL文拼接
         StringBuilder sb = new StringBuilder();
@@ -157,41 +121,12 @@ public class AppService {
         return query.list();
     }
 
-    public List<AppDetailModel> searchAppDetailModels(String apiVersion,Map<String, Object> args) {
-
-        //参数获取处理
-        List<App> appList = searchApps(args);
-        List<AppDetailModel> appDetailModels = new ArrayList<>();
-
-        for (App app : appList) {
-
-            AppDetailModel appDetailModel = new AppDetailModel();
-            appDetailModel.setId(app.getId());
-            appDetailModel.setName(app.getName());
-            appDetailModel.setSecret(app.getSecret());
-            appDetailModel.setUrl(app.getUrl());
-            appDetailModel.setCreator(app.getCreator());
-            appDetailModel.setCreate_time(app.getCreateTime());
-            appDetailModel.setAudit_time(app.getAuditTime());
-            appDetailModel.setCatalog(conventionalDictClient.getAppCatalog(apiVersion,app.getCatalog()));
-            appDetailModel.setStatus(conventionalDictClient.getAppStatus(apiVersion,app.getStatus()));
-            appDetailModel.setDescription(app.getDescription());
-            appDetailModel.setStrTags(app.getTags());
-
-            appDetailModels.add(appDetailModel);
-        }
-
-        return appDetailModels;
-    }
-
-
     /**
      * 根据条件搜索应用总数量
      *
      * @param args
      */
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public Integer searchAppsInt(Map<String, Object> args) {
+    public Integer getAppCount(Map<String, Object> args) {
 
         Session session = entityManager.unwrap(org.hibernate.Session.class);
 
@@ -227,50 +162,16 @@ public class AppService {
         return query.list().size();
     }
 
-//    /**
-//     * 根据条件搜索APP.
-//     *
-//     * @param appId
-//     */
-//    public AppDetailModel searchAppDetailModel(String apiVersion,String appId) {
-//
-//        Session session =  entityManager.unwrap(org.hibernate.Session.class);
-//        //动态SQL文拼接
-//        StringBuilder sb = new StringBuilder();
-//
-//        sb.append("   from App 	   ");
-//        sb.append("  where 1=1     ");
-//        sb.append("    and id= '" + appId + "' ");
-//
-//        String hql = sb.toString();
-//        Query query = session.createQuery(hql);
-//
-//        List<App> appList = query.list();
-//        App app = appList.get(0);
-//
-//        AppDetailModel detailModel = new AppDetailModel();
-//
-//        detailModel.setId(app.getId());
-//        detailModel.setSecret(app.getSecret());
-//        detailModel.setName(app.getName());
-//        detailModel.setCatalog(conventionalDictClient.getAppCatalog(apiVersion,app.getCatalog()));
-//        detailModel.setStatus(conventionalDictClient.getAppStatus(apiVersion,app.getStatus()));
-//        detailModel.setUrl(app.getUrl());
-//        detailModel.setDescription(app.getDescription());
-//        detailModel.setStrTags(app.getTags());
-//
-//        return detailModel;
-//    }
+    static String getRandomString(int length) {
+        String str = "abcdefghigklmnopkrstuvwxyzABCDEFGHIGKLMNOPQRSTUVWXYZ0123456789";
+        StringBuffer buffer = new StringBuffer();
 
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            int number = random.nextInt(str.length() - 1);//0~61
+            buffer.append(str.charAt(number));
+        }
 
-
-    /**
-     * 审核app状态的方法
-     */
-    public void checkStatus(String appId,String appStatus) {
-        App app = appRepository.findOne(appId);
-        app.setStatus(appStatus);
-        appRepository.save(app);
+        return buffer.toString();
     }
-
 }

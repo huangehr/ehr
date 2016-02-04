@@ -733,7 +733,7 @@ public class DataSetsController extends BaseController {
             @PathVariable(value = "api_version") String apiVersion,
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @RequestParam(value = "version") String version) {
-//        Result result = new Result();
+//        Envelop result = new Envelop();
 //        String strJson = "";
 //        try {
 //            if (version == null || version == "") {

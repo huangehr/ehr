@@ -33,7 +33,7 @@ public class OrgDataSetController extends BaseRestController {
     @RequestMapping(value = "/orgDataSet" , method = RequestMethod.GET)
     @ApiOperation(value = "根据id查询实体")
     public Object getOrgDataSet(String id) {
-//        Result result = new Result();
+//        Envelop result = new Envelop();
 //        try{
 //            OrgDataSet orgDataSet = (OrgDataSet) orgDataSetManager.getOrgDataSet(Long.parseLong(id));
 //            OrgDataSetModel model = new OrgDataSetModel();
@@ -76,7 +76,7 @@ public class OrgDataSetController extends BaseRestController {
             @ApiParam(name = "userId", value = "userId", defaultValue = "")
             @RequestParam(value = "userId") String userId) {
 
-//        Result result = new Result();
+//        Envelop result = new Envelop();
 //
 //        try {
 //            boolean isExist = orgDataSetManager.isExistOrgDataSet(orgCode, code, name);   //重复校验
@@ -122,7 +122,7 @@ public class OrgDataSetController extends BaseRestController {
     @ApiOperation(value = "删除机构数据集")
     public Object deleteOrgDataSet(long id) {
 
-//        Result result = new Result();
+//        Envelop result = new Envelop();
 //        XOrgDataSet orgDataSet = orgDataSetManager.getOrgDataSet(id);
 //
 //        if (orgDataSet == null) {
@@ -171,7 +171,7 @@ public class OrgDataSetController extends BaseRestController {
             @ApiParam(name = "userId", value = "userId", defaultValue = "")
             @RequestParam(value = "userId") String userId) {
 
-//        Result result = new Result();
+//        Envelop result = new Envelop();
 //        try{
 //            XOrgDataSet orgDataSet = orgDataSetManager.getOrgDataSet(id);
 //            if(orgDataSet == null){
@@ -214,7 +214,7 @@ public class OrgDataSetController extends BaseRestController {
     @RequestMapping(value = "/orgDataSets" , method = RequestMethod.GET)
     @ApiOperation(value = "条件查询")
     public Object searchOrgDataSets(String orgCode, String codename, int page, int rows) {
-//        Result result = new Result();
+//        Envelop result = new Envelop();
 //        try {
 //            Map<String, Object> conditionMap = new HashMap<>();
 //            conditionMap.put("orgCode", orgCode);
@@ -245,7 +245,7 @@ public class OrgDataSetController extends BaseRestController {
     @RequestMapping(value = "/orgMetaData" , method = RequestMethod.GET)
     @ApiOperation(value = "根据id查询实体")
     public Object getOrgMetaData(String id) {
-//        Result result = new Result();
+//        Envelop result = new Envelop();
 //        try{
 //            OrgMetaData orgMetaData = (OrgMetaData) orgMetaDataManager.getOrgMetaData(Long.parseLong(id));
 //            OrgMetaDataModel model = new OrgMetaDataModel();
@@ -293,7 +293,7 @@ public class OrgDataSetController extends BaseRestController {
             @ApiParam(name = "userId", value = "userId", defaultValue = "")
             @RequestParam(value = "userId") String userId) {
 
-//        Result result = new Result();
+//        Envelop result = new Envelop();
 //        try {
 //            boolean isExist = orgMetaDataManager.isExistOrgMetaData(orgDataSetSeq,orgCode, code, name);   //重复校验
 //
@@ -333,7 +333,7 @@ public class OrgDataSetController extends BaseRestController {
     @ApiOperation(value = "删除机构数据元")
     public Object deleteOrgMetaData(long id) {
 
-//        Result result = new Result();
+//        Envelop result = new Envelop();
 //        try {
 //            XOrgMetaData orgMetaData = orgMetaDataManager.getOrgMetaData(id);
 //
@@ -363,7 +363,7 @@ public class OrgDataSetController extends BaseRestController {
     @RequestMapping(value = "/orgMetaDataList" , method = RequestMethod.DELETE)
     @ApiOperation(value = "批量删除机构数据元")
     public Object deleteOrgMetaDataList(@RequestParam("ids[]") Long[] ids) {
-//        Result result = new Result();
+//        Envelop result = new Envelop();
 //
 //        if (StringUtil.isEmpty(ids)) {
 //            result.setSuccessFlg(false);
@@ -416,7 +416,7 @@ public class OrgDataSetController extends BaseRestController {
             @RequestParam(value = "userId") String userId) {
 
 
-//        Result result = new Result();
+//        Envelop result = new Envelop();
 //        try{
 //            XOrgMetaData orgMetaData = orgMetaDataManager.getOrgMetaData(id);
 //            if(orgMetaData == null){
@@ -459,7 +459,7 @@ public class OrgDataSetController extends BaseRestController {
     @RequestMapping(value = "/orgMetaDatas" , method = RequestMethod.GET)
     @ApiOperation(value = "条件查询")
     public Object searchOrgMetaDatas(String orgCode,Integer orgDataSetSeq, String codename, int page, int rows) {
-//        Result result =new Result();
+//        Envelop result =new Envelop();
 //        try {
 //            Map<String, Object> conditionMap = new HashMap<>();
 //            conditionMap.put("orgCode", orgCode);
