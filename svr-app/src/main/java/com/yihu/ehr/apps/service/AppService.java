@@ -1,9 +1,7 @@
 package com.yihu.ehr.apps.service;
 
-import com.yihu.ehr.apps.feignClient.dict.ConventionalDictClient;
+import com.yihu.ehr.apps.feign.ConventionalDictClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import org.hibernate.Query;
-import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,14 +22,14 @@ public class AppService {
     @Autowired
     private XAppRepository appRepo;
 
-    @Autowired
+    //@Autowired
     private ConventionalDictClient conventionalDictClient;
 
     public AppService() {
     }
 
-    public App createApp(String apiVersion, String name, MConventionalDict catalog, String url, String tags, String description, String creator) {
-        MConventionalDict status = conventionalDictClient.getAppStatus(apiVersion, "WaitingForApprove");
+    public App createApp(String name, MConventionalDict catalog, String url, String tags, String description, String creator) {
+        MConventionalDict status = conventionalDictClient.getAppStatus("WaitingForApprove");
 
         App app = new App();
         app.setId(getRandomString(AppIdLength));
@@ -66,7 +64,7 @@ public class AppService {
     }
 
     /**
-     * 检验App是否合法.
+     * 检验App与密码是否正确。
      *
      * @param id
      * @param secret
@@ -84,7 +82,7 @@ public class AppService {
      * @param args
      */
     public List<App> searchApps(Map<String, Object> args) {
-        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        /*Session session = entityManager.unwrap(org.hibernate.Session.class);
         //参数获取处理
         String appId = (String) args.get("appId");
         String appName = (String) args.get("appName");
@@ -118,7 +116,8 @@ public class AppService {
         query.setMaxResults(pageSize);
         query.setFirstResult((page - 1) * pageSize);
 
-        return query.list();
+        return query.list();*/
+        return  null;
     }
 
     /**
@@ -128,7 +127,7 @@ public class AppService {
      */
     public Integer getAppCount(Map<String, Object> args) {
 
-        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        /*Session session = entityManager.unwrap(org.hibernate.Session.class);
 
         //参数获取处理
         String appId = (String) args.get("appId");
@@ -159,7 +158,7 @@ public class AppService {
 
         Query query = session.createQuery(hql);
 
-        return query.list().size();
+        return query.list().size();*/ return null;
     }
 
     static String getRandomString(int length) {

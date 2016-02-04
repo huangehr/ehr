@@ -1,4 +1,4 @@
-package com.yihu.ehr.apps.dao;
+package com.yihu.ehr.apps.service;
 
 import com.yihu.ehr.apps.service.App;
 import org.springframework.data.jpa.repository.Query;
@@ -15,6 +15,4 @@ import java.util.List;
  * @created 2015.12.16 15:10
  */
 public interface XAppRepository extends PagingAndSortingRepository<App, String> {
-    @Query("select app from Apps app where app.id = :id or app.name like '%:name%' or app.catlog")
-    List<App> searchApps();
 }
