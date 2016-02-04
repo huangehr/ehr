@@ -9,11 +9,10 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * @author Sand
+ * @author lincl
  * @version 1.0
- * @created 02-7月-2015 14:36:32
+ * @created 2016.2.3
  */
-//@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "std_cda_versions")
 @Access(value = AccessType.PROPERTY)

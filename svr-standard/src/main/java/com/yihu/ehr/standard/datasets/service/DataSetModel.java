@@ -1,7 +1,9 @@
 package com.yihu.ehr.standard.datasets.service;
 
 /**
- * Created by wq on 2015/9/16.
+ * @author lincl
+ * @version 1.0
+ * @created 2016.2.3
  */
 public class DataSetModel {
 
