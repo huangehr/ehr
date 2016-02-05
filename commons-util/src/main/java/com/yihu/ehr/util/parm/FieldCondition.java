@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Administrator on 2016/1/28.
+ * @author lincl
+ * @version 1.0
+ * @created 2016.2.1
  */
 public class FieldCondition {
     private String col;
@@ -38,13 +40,27 @@ public class FieldCondition {
     public String format(String modelName, boolean isSql){
         if(getCol()==null || getCol().equals(""))
             return "";
-        String val = ":" + getCol();
-        if(getLogic().equals("in"))
-            val = "("+val+") ";
+        String val = getValMapping();
+        if(val==null)
+            return "";
         String rs = (isSql ? getTableCol() : getCol()) + " " + getLogic() + " " + val;
         if(modelName.trim().equals(""))
             return " " + rs;
         return " " +modelName + "." + rs;
+    }
+
+    private String getValMapping(){
+        String logic = getLogic();
+        String val = ":" + getCol();
+        if(logic.equals("in"))
+            return  "("+val+") ";
+        if(logic.equals("between"))
+            return val + "1 and " +val+"2 ";
+        if(logic.equals("=") || logic.equals("like") || logic.equals("sw") || logic.equals("ew") ||
+                logic.equals("<") || logic.equals(">") || logic.equals(">=") || logic.equals("<=")){
+            return val;
+        }
+        return null;
     }
 
     public String format(){

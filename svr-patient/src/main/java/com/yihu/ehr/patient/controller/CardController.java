@@ -1,6 +1,6 @@
 package com.yihu.ehr.patient.controller;
 
-import com.yihu.ehr.constants.Result;
+import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.patient.service.card.AbstractCard;
 import com.yihu.ehr.patient.service.card.CardBrowseModel;
 import com.yihu.ehr.patient.service.card.CardManager;
@@ -39,9 +39,9 @@ public class CardController extends BaseRestController {
 
         List<CardBrowseModel> cardBrowseModelList = cardManager.searchCardBrowseModel(conditionMap);
         Integer totalCount = cardManager.searchCardInt(conditionMap, false);
-        Result result = new Result();
-        result.setObj(cardBrowseModelList);
-        result.setTotalCount(totalCount);
+        Envelop envelop = new Envelop();
+        envelop.setObj(cardBrowseModelList);
+        envelop.setTotalCount(totalCount);
         return getResult(cardBrowseModelList,totalCount,page,rows);
     }
 
@@ -67,10 +67,10 @@ public class CardController extends BaseRestController {
         CardModel cardModel = cardManager.getCard(card);
         Map<String,CardModel> data = new HashMap<>();
         data.put("cardModel", cardModel);
-        Result result = new Result();
-        result.setObj(data);
+        Envelop envelop = new Envelop();
+        envelop.setObj(data);
 
-        return result;
+        return envelop;
     }
 
     @RequestMapping("detachCard")

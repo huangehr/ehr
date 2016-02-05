@@ -1,19 +1,10 @@
 package com.yihu.ehr.dict.service;
 
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -77,13 +68,17 @@ public class SystemDictService {
         systemDictRepository.delete(dictId);
     }
 
-    public List<SystemDict> searchDict(Map<String, Object> args) {
+    public List<SystemDict> getDictionaries(Map<String, Object> args) {
         String name = (String) args.get("name");
         String phoneticCode = (String) args.get("phoneticCode");
         Integer page = (Integer) args.get("page");
         Integer pageSize = (Integer) args.get("rows");
 
         return systemDictRepository.findAll(name, phoneticCode, new PageRequest(page, pageSize));
+    }
+
+    public SystemDictEntry getDictEntry(long dictId, String code){
+        return systemDictEntryRepository.findOne(new DictEntryKey(code, dictId));
     }
 
     /**

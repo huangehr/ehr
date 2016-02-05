@@ -558,7 +558,7 @@ public class CdaController{
     * 根据CDA ID 获取数据集信息
     * @param strVersionCode 版本号
     * @param strCdaId CDAID
-    * @return Result
+    * @return Envelop
     * */
     @RequestMapping("/getDatasetByCdaId")
     @ApiOperation(value = "根据CDA ID 获取数据集信息")

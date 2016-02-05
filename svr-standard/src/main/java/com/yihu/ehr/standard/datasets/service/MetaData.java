@@ -7,19 +7,20 @@ import java.util.Objects;
 
 /**
  * 抽象数据元类.
- * @author Witness
+ *
+ * @author lincl
  * @version 1.0
- * @created 06-7月-2015 15:47:27
+ * @created 2016.2.3
  */
 public class MetaData {
 
     long id;                    // 数据元ID
-	String code;                 // 标准元编码
-	String definition;          // 标准元定义, 即说明
-	String format;              // 表示格式
-	String innerCode;           // 内部代码
-	String name;                // 名称
-	String type;                // 数据元数据类型
+    String code;                 // 标准元编码
+    String definition;          // 标准元定义, 即说明
+    String format;              // 表示格式
+    String innerCode;           // 内部代码
+    String name;                // 名称
+    String type;                // 数据元数据类型
 
     DataSet dataSet;           // 所属数据集
 
@@ -66,9 +67,9 @@ public class MetaData {
 
     String OperationType;
 
-    public MetaData(){
-        this.OperationType="";
-	}
+    public MetaData() {
+        this.OperationType = "";
+    }
 
     public long getDictId() {
         return dictId;
@@ -87,143 +88,140 @@ public class MetaData {
     }
 
     // XMetaDataMapping
-	public String getColumnLength(){
-		return columnLength;
-	}
+    public String getColumnLength() {
+        return columnLength;
+    }
 
-	public String getColumnType(){
-		return columnType;
-	}
+    public String getColumnType() {
+        return columnType;
+    }
 
-    public String getColumnName() { return columnName; }
+    public String getColumnName() {
+        return columnName;
+    }
 
-	public boolean isNullable(){
-		return nullable;
-	}
+    public boolean isNullable() {
+        return nullable;
+    }
 
-	public boolean isPrimaryKey(){
-		return primaryKey;
-	}
+    public boolean isPrimaryKey() {
+        return primaryKey;
+    }
 
-	public void setColumnLength(String length){
+    public void setColumnLength(String length) {
         this.columnLength = length;
-	}
+    }
 
-	public void setColumnType(String type){
+    public void setColumnType(String type) {
         this.columnType = type;
-	}
+    }
 
-    public void setColumnName(String columnName){
+    public void setColumnName(String columnName) {
         this.columnName = columnName;
     }
 
-	public void setNullable(boolean nullable){
+    public void setNullable(boolean nullable) {
         this.nullable = nullable;
-	}
+    }
 
-	public void setPrimaryKey(boolean isPrimaryKey){
+    public void setPrimaryKey(boolean isPrimaryKey) {
         this.primaryKey = isPrimaryKey;
-	}
+    }
 
     // XMetaData
-	public String getCode(){
-		return code;
-	}
+    public String getCode() {
+        return code;
+    }
 
-	public DataSet getDataSet(){
-		return dataSet;
-	}
+    public DataSet getDataSet() {
+        return dataSet;
+    }
 
-	public String getDefinition(){
-		return definition;
-	}
+    public String getDefinition() {
+        return definition;
+    }
 
-//    @Override
-//	public XDict getDict(){
-//        XDictManager dictManager = ServiceFactory.getService(Services.DictManager);
-//        return dictManager.getDict(dictId, getDataSet().getInnerVersion());
-//	}
 
-	public String getFormat(){
-		return format;
-	}
+    public String getFormat() {
+        return format;
+    }
 
-	public int getHashCode(){
+    public int getHashCode() {
         hashCode = Objects.hash(dataSet.getId(), dictId, code, definition, format, innerCode, name,
                 type, columnLength, columnType, nullable, primaryKey);
 
         return hashCode;
-	}
+    }
 
-	public long getId(){
-		return id;
-	}
+    public long getId() {
+        return id;
+    }
 
-	public String getInnerCode(){
-		return innerCode;
-	}
+    public String getInnerCode() {
+        return innerCode;
+    }
 
-	public String getName(){
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getType(){
-		return type;
-	}
+    public String getType() {
+        return type;
+    }
 
-    public void setId(long id){
+    public void setId(long id) {
         this.id = id;
     }
 
-	public void setCode(String code){
+    public void setCode(String code) {
         this.code = code;
-	}
+    }
 
-	public void setDefinition(String definition){
+    public void setDefinition(String definition) {
         this.definition = definition;
-	}
+    }
 
-	public void setDict(Dict dict){
+    public void setDict(Dict dict) {
         this.dictId = dict.getId();
-	}
+    }
 
-    public void setDataSet(DataSet dataSet){
+    public void setDataSet(DataSet dataSet) {
         this.dataSet = dataSet;
     }
 
-	public void setFormat(String format){
+    public void setFormat(String format) {
         this.format = format;
-	}
+    }
 
-	public void setName(String name){
+    public void setName(String name) {
         this.name = name;
-	}
+    }
 
-	public void setType(String type){
+    public void setType(String type) {
         this.type = type;
-	}
+    }
 
-    public void setInnerCode(String innerCode){
+    public void setInnerCode(String innerCode) {
         this.innerCode = innerCode;
     }
 
-    public void setHashCode(int hashCode){
+    public void setHashCode(int hashCode) {
         this.hashCode = hashCode;
     }
 
-    public boolean isHbaseFullTextRetrieval(){
+    public boolean isHbaseFullTextRetrieval() {
         return isHbaseFullTextRetrieval;
     }
 
-    public void setHbaseFullTextRetrieval(boolean as){
+    public void setHbaseFullTextRetrieval(boolean as) {
         isHbaseFullTextRetrieval = as;
     }
 
-    public boolean isHbasePrimaryKey(){
+    public boolean isHbasePrimaryKey() {
         return isHbasePrimaryKey;
     }
 
-    public void setHbasePrimaryKey(boolean as){
+    public void setHbasePrimaryKey(boolean as) {
         isHbasePrimaryKey = as;
     }
 }

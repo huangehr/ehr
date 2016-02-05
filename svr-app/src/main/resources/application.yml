@@ -1,15 +1,15 @@
 server:
-   port: 9002
+   port: 10050
 
 
-#security:
-#  user:
-#    password: app
+security:
+  user:
+    password: app
 
 info:
   app:
     name: AppService
-    description: EHR platform json app service.
+    description: EHR platform open service applicate administrative service.
     version: 1.0.0
 
 ---

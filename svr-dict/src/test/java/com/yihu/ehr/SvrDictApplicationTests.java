@@ -32,7 +32,7 @@ public class SvrDictApplicationTests {
         String userId = "0dae0003561cc415c72d9111e8cb88aa";
         String name = "应用app";
         String reference = "应用app";
-        Object dict = systemDictController.createDict(apiVersion, name, reference, userId);
+        Object dict = systemDictController.createDictionary(name, reference, userId);
         assertTrue("查询失败！", dict != null);
     }
 
@@ -40,7 +40,7 @@ public class SvrDictApplicationTests {
     @Test
     public void btestDeleteDict() throws Exception {
         long dictId = 1;
-        Object result = systemDictController.deleteDict(apiVersion, dictId);
+        Object result = systemDictController.deleteDictionary(dictId);
         assertTrue("删除失败！", "success".equals(result));
     }
 
@@ -48,7 +48,7 @@ public class SvrDictApplicationTests {
     public void ctestUpdateDict() throws Exception {
         long dictId = 1;
         String name = "App1";
-        Object systemDict = systemDictController.updateDict(apiVersion, dictId, name);
+        Object systemDict = systemDictController.updateDictionary(dictId, name);
         assertTrue("修改失败！", systemDict != null);
     }
 
@@ -59,7 +59,7 @@ public class SvrDictApplicationTests {
         String phoneticCode = "APP";
         int page = 1;
         int rows = 10;
-        Object result = systemDictController.searchSystemDict(apiVersion, name, phoneticCode, page, rows);
+        Object result = systemDictController.getDictionary(dictId);
         assertTrue("修改失败！", result != null);
     }
 
@@ -70,7 +70,7 @@ public class SvrDictApplicationTests {
         String value = "APP";
         int sort = 10;
         String catalog = "";
-        Object result = systemDictController.createDictEntry(apiVersion, dictId, code, value, sort, catalog);
+        Object result = systemDictController.createDictEntry(dictId, code, value, sort, catalog);
         assertTrue("创建失败！", result != null);
     }
 
@@ -78,7 +78,7 @@ public class SvrDictApplicationTests {
     public void ftestDeleteDictEntry() throws Exception {
         long dictId = 1;
         String code = "ChildHealth";
-        Object result = systemDictController.deleteDictEntry(apiVersion, dictId, code);
+        Object result = systemDictController.deleteDictEntry(dictId, code);
         assertTrue("删除失败！", "success".equals(result));
     }
 
@@ -89,7 +89,7 @@ public class SvrDictApplicationTests {
         String value = "APP32";
         int sort = 101;
         String catalog = "APP32";
-        Object result = systemDictController.updateDictEntry(apiVersion, dictId, code, value, sort, catalog);
+        Object result = systemDictController.updateDictEntry(dictId, code, value, sort, catalog);
         assertTrue("修改失败！", result != null);
     }
 
@@ -98,20 +98,20 @@ public class SvrDictApplicationTests {
         long dictId = 1;
         int page = 1;
         int rows = 10;
-        Object result = systemDictController.searchDictEntries(apiVersion, dictId, "", page, rows);
+        Object result = systemDictController.getDictEntries(dictId, "", page, rows);
         assertTrue("查询失败！", result != null);
     }
 
     @Test
     public void itestelectTags() throws Exception {
-        Object result = conventionalDictController.getTagsList(apiVersion);
+        Object result = conventionalDictController.getTagsList();
         assertTrue("查询失败！", result != null);
     }
 
     @Test
     public void jtestSearchDictEntryListForDDL() throws Exception {
         long dictId = 1;
-        Object result = systemDictController.searchDictEntries(apiVersion, dictId, "", null, null);
+        Object result = systemDictController.getDictEntries(dictId, "", null, null);
         assertTrue("查询失败！", result != null);
     }
 
@@ -119,7 +119,7 @@ public class SvrDictApplicationTests {
     public void ltestAutoSearchDictEntryList() throws Exception {
         long dictId = 1;
         String value = "儿童保健";
-        Object result = systemDictController.searchDictEntries(apiVersion, dictId, "", null, null);
+        Object result = systemDictController.getDictEntries(dictId, "", null, null);
         assertTrue("查询失败！", result != null);
     }
 

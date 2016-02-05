@@ -156,27 +156,4 @@ public class Dict{
         this.sourceId = sourceId;
     }
 
-
-//    public void setInnerVersion(CDAVersion innerVersion) {
-//        this.innerVersion = innerVersion.getVersion();
-//    }
-
-
-
-//    public XDictEntry getDictEntry(String code) {
-//        return dictManager.getDictEntries(this,code);
-//    }
-
-//    public XDictEntry[] getDictEntries(List<Integer> ids) {
-//        return dictManager.getDictEntries(this, ids);
-//    }
-
-//    public XDictEntry[] getDictEntries() {
-//        return dictManager.getDictEntries(this);
-//    }
-
-//    public CDAVersion getInnerVersion() {
-//        XCDAVersionManager cdaVersionManager = ServiceFactory.getService(Services.CDAVersionManager);
-//        return cdaVersionManager.getVersion(innerVersion);
-//    }
 }
