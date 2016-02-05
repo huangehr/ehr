@@ -2,7 +2,7 @@ package com.yihu.ehr.adaption.dict.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adaption.dict.service.AdapterDict;
-import com.yihu.ehr.adaption.dict.service.AdapterDictManager;
+import com.yihu.ehr.adaption.dict.service.AdapterDictService;
 import com.yihu.ehr.adaption.dict.service.AdapterDictModel;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constrant.Result;
@@ -11,7 +11,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -27,7 +26,7 @@ import java.util.*;
 public class AdapterDictController extends BaseRestController {
 
     @Autowired
-    AdapterDictManager adapterDictManager;
+    AdapterDictService adapterDictManager;
 
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @ApiOperation(value = "字典适配关系分页查询")

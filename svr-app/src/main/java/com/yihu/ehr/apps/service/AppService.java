@@ -2,12 +2,14 @@ package com.yihu.ehr.apps.service;
 
 import com.yihu.ehr.apps.feign.ConventionalDictClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.util.parm.PageModel;
-import com.yihu.ehr.util.service.BaseManager;
+import com.yihu.ehr.util.ObjectId;
+import com.yihu.ehr.util.query.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.criteria.CriteriaQuery;
 import java.util.*;
 
 /**
@@ -17,7 +19,7 @@ import java.util.*;
  */
 @Service
 @Transactional
-public class AppService extends BaseManager<App, XAppRepository> {
+public class AppService extends BaseService<App, XAppRepository> {
     private static final int AppIdLength = 10;
     private static final int AppSecretLength = 16;
 
@@ -81,10 +83,14 @@ public class AppService extends BaseManager<App, XAppRepository> {
     /**
      * 搜索应用列表，并以列表形式返回。
      *
-     * @param pageModel
+     * @param query
      */
-    public List<App> searchApps(PageModel pageModel) {
-        return pages(pageModel);
+    public List<App> searchApps(CriteriaQuery query, int page, int size) {
+        return entityManager
+                .createQuery(query)
+                .setFirstResult((page - 1) * size)
+                .setMaxResults(size)
+                .getResultList();
         /*Session session = entityManager.unwrap(org.hibernate.Session.class);
         //参数获取处理
         String appId = (String) args.get("appId");
@@ -125,10 +131,11 @@ public class AppService extends BaseManager<App, XAppRepository> {
     /**
      * 根据条件搜索应用总数量
      *
-     * @param pageModel
+     * @param query
      */
-    public Integer getAppCount(PageModel pageModel) {
-        return totalCountForPage(pageModel);
+    public Long getAppCount(CriteriaQuery query) {
+        Object value = entityManager.createQuery(query).getSingleResult();
+        return (Long)value;
     }
 
     static String getRandomString(int length) {

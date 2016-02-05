@@ -6,7 +6,7 @@ import com.yihu.ehr.model.dict.MBaseDict;
 import com.yihu.ehr.standard.standardsource.Client.ConventionalDictClient;
 import com.yihu.ehr.standard.standardsource.model.StandardSourceModel;
 import com.yihu.ehr.standard.standardsource.service.StandardSource;
-import com.yihu.ehr.standard.standardsource.service.StandardSourceManager;
+import com.yihu.ehr.standard.standardsource.service.StandardSourceService;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,7 +31,7 @@ import java.util.List;
 public class StandardSourceController extends BaseController {
 
     @Autowired
-    private StandardSourceManager standardSourceManager;
+    private StandardSourceService standardSourceManager;
     @Autowired
     ConventionalDictClient conventionalDictClient;
 

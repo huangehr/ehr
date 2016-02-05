@@ -3,14 +3,14 @@ package com.yihu.ehr.adaption.adapterplan.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adaption.adapterplan.service.AdapterCustomize;
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlan;
-import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanManager;
+import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanService;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSet;
-import com.yihu.ehr.adaption.dataset.service.AdapterDataSetManager;
+import com.yihu.ehr.adaption.dataset.service.AdapterDataSetService;
 import com.yihu.ehr.adaption.feignclient.DataSetClient;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constrant.Result;
 import com.yihu.ehr.util.controller.BaseRestController;
-import com.yihu.ehr.util.parm.PageModel;
+import com.yihu.ehr.util.query.PageModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -29,9 +29,9 @@ import java.util.*;
 @Api(protocols = "https", value = "adapter", description = "适配器管理接口", tags = {"适配器管理"})
 public class OrgAdapterPlanController extends BaseRestController {
     @Autowired
-    private OrgAdapterPlanManager orgAdapterPlanManager;
+    private OrgAdapterPlanService orgAdapterPlanManager;
     @Autowired
-    private AdapterDataSetManager adapterDataSetManager;
+    private AdapterDataSetService adapterDataSetManager;
     @Autowired
     private DataSetClient dataSetClient;
 
@@ -45,7 +45,7 @@ public class OrgAdapterPlanController extends BaseRestController {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             PageModel pageModel = objectMapper.readValue(parmJson, PageModel.class);
-            result = orgAdapterPlanManager.pagesToResult(pageModel);
+            result = orgAdapterPlanManager.getEnvelop(pageModel);
         } catch (Exception ex) {
             result.setSuccessFlg(false);
         }

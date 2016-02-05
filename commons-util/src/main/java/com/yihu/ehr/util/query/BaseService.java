@@ -1,7 +1,6 @@
-package com.yihu.ehr.util.service;
+package com.yihu.ehr.util.query;
 
 import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.parm.FieldCondition;
 import com.yihu.ehr.util.parm.PageModel;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -23,26 +22,26 @@ import java.util.Map;
  * @version 1.0
  * @created 2016.2.3
  */
-public class BaseManager<T, RESP> {
+public class BaseService<T, R> {
     @Autowired
-    RESP resp;
+    R repo;
 
     @PersistenceContext
-    EntityManager entityManager;
+    protected EntityManager entityManager;
 
 
     public T findOne(Serializable id) {
-        return (T) getResp().findOne(id);
+        return (T) getRepo().findOne(id);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void delete(Serializable id) {
-        getResp().delete(id);
+        getRepo().delete(id);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void delete(T entity) {
-        getResp().delete(entity);
+        getRepo().delete(entity);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -54,7 +53,7 @@ public class BaseManager<T, RESP> {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void save(T entity) {
-        getResp().save(entity);
+        getRepo().save(entity);
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
@@ -126,12 +125,12 @@ public class BaseManager<T, RESP> {
         return entityManager.unwrap(Session.class);
     }
 
-    protected PagingAndSortingRepository getResp() {
-        return (PagingAndSortingRepository) resp;
+    protected PagingAndSortingRepository getRepo() {
+        return (PagingAndSortingRepository) repo;
     }
 
-    protected RESP getRepository() {
-        return resp;
+    protected R getRepository() {
+        return repo;
     }
 
     protected Envelop getEnvelop(List detaiModelList, int totalCount, int currPage, int rows) {

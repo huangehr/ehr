@@ -2,12 +2,12 @@ package com.yihu.ehr.adaption.orgdict.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adaption.orgdict.service.OrgDict;
-import com.yihu.ehr.adaption.orgdict.service.OrgDictManager;
+import com.yihu.ehr.adaption.orgdict.service.OrgDictService;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constrant.Result;
 import com.yihu.ehr.util.controller.BaseRestController;
-import com.yihu.ehr.util.parm.FieldCondition;
-import com.yihu.ehr.util.parm.PageModel;
+import com.yihu.ehr.util.query.FieldCondition;
+import com.yihu.ehr.util.query.PageModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -27,7 +27,7 @@ import java.util.*;
 public class OrgDictController extends BaseRestController {
 
     @Autowired
-    private OrgDictManager orgDictManager;
+    private OrgDictService orgDictManager;
 
     @RequestMapping(value = "/info", method = RequestMethod.GET)
     @ApiOperation(value = "根据id查询实体")
@@ -155,7 +155,7 @@ public class OrgDictController extends BaseRestController {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             PageModel pageModel = objectMapper.readValue(parmJson, PageModel.class);
-            result = orgDictManager.pagesToResult(pageModel);
+            result = orgDictManager.getEnvelop(pageModel);
         } catch (Exception ex) {
             result.setSuccessFlg(false);
         }
@@ -170,8 +170,8 @@ public class OrgDictController extends BaseRestController {
         Result result = new Result();
         try {
             PageModel pageModel = new PageModel();
-            pageModel.addFieldCondition(new FieldCondition("organization", "=", orgCode));
-            List<OrgDict> orgDictList = orgDictManager.pages(pageModel);
+            pageModel.addFilter(new FieldCondition("organization", "=", orgCode));
+            List<OrgDict> orgDictList = orgDictManager.getPage(pageModel);
             List<String> orgDicts = new ArrayList<>();
             for (OrgDict orgDict : orgDictList) {
                 orgDicts.add(String.valueOf(orgDict.getSequence())+','+orgDict.getName());

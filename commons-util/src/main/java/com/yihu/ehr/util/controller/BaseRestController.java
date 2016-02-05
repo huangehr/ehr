@@ -2,11 +2,13 @@ package com.yihu.ehr.util.controller;
 
 import com.yihu.ehr.util.Envelop;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
+import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
@@ -22,11 +24,12 @@ import java.util.*;
  * @author zhiyong
  * @author Sand
  */
-@Controller
-@RequestMapping("/rest")
 public class BaseRestController extends AbstractController {
     private final static String ResourceCount = "X-Total-Count";
     private final static String ResourceLink = "Link";
+
+    @Autowired
+    protected EntityManager entityManager;
 
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
@@ -58,13 +61,10 @@ public class BaseRestController extends AbstractController {
      * @param <T>
      * @return
      */
-    public <T> Collection<T> convertToModels(Collection sources, Collection<T> targets, String... ignoreProperties) {
-        Class targetCls = null;
-
+    public <T> Collection<T> convertToModels(Collection sources, Collection<T> targets, Class<T> targetCls, String[] ignoreProperties) {
         Iterator iterator = sources.iterator();
         while (iterator.hasNext()) {
             Object source = iterator.next();
-            if (targetCls == null) targetCls = source.getClass();
 
             T target = (T) BeanUtils.instantiate(targetCls);
             BeanUtils.copyProperties(source, target, ignoreProperties);
@@ -119,11 +119,9 @@ public class BaseRestController extends AbstractController {
      *
      * @param modelList
      * @param totalCount
-     * @param currPage
-     * @param rows
      * @return
      */
-    protected Envelop getResult(List modelList, int totalCount, int currPage, int rows) {
+    protected Envelop getResult(List modelList, int totalCount) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(modelList);

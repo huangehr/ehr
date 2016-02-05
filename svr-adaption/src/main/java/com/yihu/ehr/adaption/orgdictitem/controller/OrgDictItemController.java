@@ -2,13 +2,13 @@ package com.yihu.ehr.adaption.orgdictitem.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adaption.orgdictitem.service.OrgDictItem;
-import com.yihu.ehr.adaption.orgdictitem.service.OrgDictItemManager;
+import com.yihu.ehr.adaption.orgdictitem.service.OrgDictItemService;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constrant.Result;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.operator.StringUtil;
-import com.yihu.ehr.util.parm.FieldCondition;
-import com.yihu.ehr.util.parm.PageModel;
+import com.yihu.ehr.util.query.FieldCondition;
+import com.yihu.ehr.util.query.PageModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -28,7 +28,7 @@ import java.util.*;
 public class OrgDictItemController extends BaseRestController {
 
     @Autowired
-    private OrgDictItemManager orgDictItemManager;
+    private OrgDictItemService orgDictItemManager;
 
     @RequestMapping(value = "/info", method = RequestMethod.GET)
     @ApiOperation(value = "获取字典项信息")
@@ -190,7 +190,7 @@ public class OrgDictItemController extends BaseRestController {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             PageModel pageModel = objectMapper.readValue(parmJson, PageModel.class);
-            result = orgDictItemManager.pagesToResult(pageModel);
+            result = orgDictItemManager.getEnvelop(pageModel);
         } catch (Exception ex) {
             result.setSuccessFlg(false);
         }
@@ -207,9 +207,9 @@ public class OrgDictItemController extends BaseRestController {
         Result result = new Result();
         try {
             PageModel pageModel = new PageModel();
-            pageModel.addFieldCondition(new FieldCondition("orgDict", "=", orgDictSeq));
-            pageModel.addFieldCondition(new FieldCondition("organization", "=", orgCode));
-            List<OrgDictItem> orgDictItemList = orgDictItemManager.pages(pageModel);
+            pageModel.addFilter(new FieldCondition("orgDict", "=", orgDictSeq));
+            pageModel.addFilter(new FieldCondition("organization", "=", orgCode));
+            List<OrgDictItem> orgDictItemList = orgDictItemManager.getPage(pageModel);
             List<String> orgDictItems = new ArrayList<>();
             for (OrgDictItem orgDictItem : orgDictItemList) {
                 orgDictItems.add(String.valueOf(orgDictItem.getSequence()) + ',' + orgDictItem.getName());

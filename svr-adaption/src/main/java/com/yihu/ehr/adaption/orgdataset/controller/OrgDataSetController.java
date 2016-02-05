@@ -2,11 +2,11 @@ package com.yihu.ehr.adaption.orgdataset.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adaption.orgdataset.service.OrgDataSet;
-import com.yihu.ehr.adaption.orgdataset.service.OrgDataSetManager;
+import com.yihu.ehr.adaption.orgdataset.service.OrgDataSetService;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constrant.Result;
 import com.yihu.ehr.util.controller.BaseRestController;
-import com.yihu.ehr.util.parm.PageModel;
+import com.yihu.ehr.util.query.PageModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -27,7 +27,7 @@ import java.util.Date;
 public class OrgDataSetController extends BaseRestController {
 
     @Autowired
-    private OrgDataSetManager orgDataSetManager;
+    private OrgDataSetService orgDataSetManager;
 
     @RequestMapping(value = "/info", method = RequestMethod.GET)
     @ApiOperation(value = "根据id查询实体")
@@ -155,7 +155,7 @@ public class OrgDataSetController extends BaseRestController {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             PageModel pageModel = objectMapper.readValue(parmJson, PageModel.class);
-            result = orgDataSetManager.pagesToResult(pageModel);
+            result = orgDataSetManager.getEnvelop(pageModel);
         } catch (Exception ex) {
             result.setSuccessFlg(false);
         }

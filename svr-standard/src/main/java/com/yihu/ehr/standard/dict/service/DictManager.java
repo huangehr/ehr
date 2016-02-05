@@ -5,7 +5,7 @@ import com.yihu.ehr.standard.cdaversion.service.CDAVersion;
 import com.yihu.ehr.standard.cdaversion.service.CDAVersionManager;
 import com.yihu.ehr.standard.commons.BaseManager;
 import com.yihu.ehr.standard.standardsource.service.StandardSource;
-import com.yihu.ehr.standard.standardsource.service.StandardSourceManager;
+import com.yihu.ehr.standard.standardsource.service.StandardSourceService;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.transform.Transformers;
@@ -27,7 +27,7 @@ import java.util.*;
 public class DictManager extends BaseManager {
 
     @Autowired
-    private StandardSourceManager standardSourceManager;
+    private StandardSourceService standardSourceManager;
 
     @Autowired
     private CDAVersionManager cdaVersionManager;

@@ -1,7 +1,7 @@
 package com.yihu.ehr.adaption.orgdict.service;
 
-import com.yihu.ehr.util.service.BaseManager;
-import com.yihu.ehr.adaption.orgdictitem.service.OrgDictItemManager;
+import com.yihu.ehr.util.query.BaseService;
+import com.yihu.ehr.adaption.orgdictitem.service.OrgDictItemService;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
  * @created 2016.1.29
  */
 @Service
-public class OrgDictManager extends BaseManager<OrgDict, XOrgDictRepository> {
+public class OrgDictService extends BaseService<OrgDict, XOrgDictRepository> {
 
     @Autowired
-    OrgDictItemManager orgDictItemManager;
+    OrgDictItemService orgDictItemManager;
 
     @Transactional(propagation = Propagation.SUPPORTS)
     public boolean isExistOrgDict(String orgCode, String code) {

@@ -3,16 +3,17 @@ package com.yihu.ehr.adaption.adapterorg.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adaption.adapterorg.service.AdapterOrg;
-import com.yihu.ehr.adaption.adapterorg.service.AdapterOrgManager;
+import com.yihu.ehr.adaption.adapterorg.service.AdapterOrgService;
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlan;
-import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanManager;
+import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanService;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constrant.Result;
 import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseRestController;
-import com.yihu.ehr.util.parm.FieldCondition;
-import com.yihu.ehr.util.parm.PageModel;
+import com.yihu.ehr.util.query.FieldCondition;
+import com.yihu.ehr.util.query.PageModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -34,9 +35,9 @@ import java.util.Map;
 @Api(protocols = "https", value = "adapterorg", description = "第三方标准管理接口", tags = {"第三方标准"})
 public class AdapterOrgController extends BaseRestController {
     @Autowired
-    private AdapterOrgManager adapterOrgManager;
+    private AdapterOrgService adapterOrgManager;
     @Autowired
-    private OrgAdapterPlanManager orgAdapterPlanManager;
+    private OrgAdapterPlanService orgAdapterPlanManager;
 
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @ApiOperation(value = "适配采集标准")
@@ -48,7 +49,7 @@ public class AdapterOrgController extends BaseRestController {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             PageModel pageModel = objectMapper.readValue(parmJson, PageModel.class);
-            result = adapterOrgManager.pagesToResult(pageModel);
+            result = adapterOrgManager.getEnvelop(pageModel);
         } catch (Exception ex) {
             result.setSuccessFlg(false);
         }
@@ -130,9 +131,7 @@ public class AdapterOrgController extends BaseRestController {
             @RequestParam(value = "code") String code) {
         try {
             adapterOrgManager.delete(code.split(","), code);
-//            adapterOrgManager.deleteAdapterOrg(code.split(","));
         } catch (Exception e) {
-//            failed(ErrorCode.SaveFailed, "删除失败！", e.getMessage());
             return false;
         }
         return true;
@@ -141,7 +140,7 @@ public class AdapterOrgController extends BaseRestController {
     //获取初始标准列表  重复
 //    @RequestMapping(value = "/list" , method = RequestMethod.GET)
 //    @ApiOperation(value = "获取初始标准列表")
-    public Result getAdapterOrgList(
+    public Envelop getAdapterOrgList(
             @ApiParam(name = "type", value = "类型", defaultValue = "")
             @RequestParam(value = "type") String type,
             @ApiParam(name = "page", value = "当前页", defaultValue = "")
@@ -149,7 +148,7 @@ public class AdapterOrgController extends BaseRestController {
             @ApiParam(name = "rows", value = "每页行数", defaultValue = "")
             @RequestParam(value = "rows") int rows) {
         //根据类型获取所有采集标准
-        Result result = new Result();
+        Envelop result = new Envelop();
         try {
             PageModel pageModel = new PageModel(page, rows);
             FieldCondition fieldCondition = new FieldCondition("type", "in", "1");
@@ -161,14 +160,14 @@ public class AdapterOrgController extends BaseRestController {
                 //区域,初始标准只能选择厂商或区域
                 fieldCondition.addVal("1");
             }
-            pageModel.addFieldCondition(fieldCondition);
-            List<AdapterOrg> ls = adapterOrgManager.pages(pageModel);
+            pageModel.addFilter(fieldCondition);
+            List<AdapterOrg> ls = adapterOrgManager.getPage(pageModel);
             Integer totalCount = adapterOrgManager.totalCountForPage(pageModel);
             List<String> adapterOrgs = new ArrayList<>();
             for (AdapterOrg adapterOrg : ls) {
                 adapterOrgs.add(adapterOrg.getCode() + ',' + adapterOrg.getName());
             }
-            result = getResult(adapterOrgs, totalCount, pageModel.getPage(), pageModel.getRows());
+            result = getResult(adapterOrgs, totalCount, pageModel.getPage(), pageModel.getSize());
         } catch (Exception ex) {
             result.setSuccessFlg(false);
         }
@@ -213,9 +212,9 @@ public class AdapterOrgController extends BaseRestController {
             }
 
             PageModel pageModel = new PageModel();
-            pageModel.addFieldCondition(new FieldCondition("type", "=", type));
-            pageModel.addFieldCondition(new FieldCondition("orgCode", "in", orgList));
-            adapterOrgList = adapterOrgManager.pages(pageModel);
+            pageModel.addFilter(new FieldCondition("type", "=", type));
+            pageModel.addFilter(new FieldCondition("orgCode", "in", orgList));
+            adapterOrgList = adapterOrgManager.getPage(pageModel);
 
             List<Map> adapterOrgs = new ArrayList<>();
             if (!adapterOrgList.isEmpty()) {

@@ -1,5 +1,6 @@
 package com.yihu.ehr.util.parm;
 
+import com.yihu.ehr.util.query.FieldCondition;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.Column;

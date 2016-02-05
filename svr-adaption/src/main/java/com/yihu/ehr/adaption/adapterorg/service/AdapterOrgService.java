@@ -1,12 +1,12 @@
 package com.yihu.ehr.adaption.adapterorg.service;
 
 import com.yihu.ehr.adaption.feignclient.AddressClient;
-import com.yihu.ehr.adaption.orgdataset.service.OrgDataSetManager;
-import com.yihu.ehr.adaption.orgdict.service.OrgDictManager;
-import com.yihu.ehr.adaption.orgdictitem.service.OrgDictItemManager;
-import com.yihu.ehr.adaption.orgmetaset.service.OrgMetaDataManager;
+import com.yihu.ehr.adaption.orgdataset.service.OrgDataSetService;
+import com.yihu.ehr.adaption.orgdict.service.OrgDictService;
+import com.yihu.ehr.adaption.orgdictitem.service.OrgDictItemService;
+import com.yihu.ehr.adaption.orgmetaset.service.OrgMetaDataService;
 import com.yihu.ehr.model.address.MAddress;
-import com.yihu.ehr.util.service.BaseManager;
+import com.yihu.ehr.util.query.BaseService;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,18 +21,18 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 @Service
-public class AdapterOrgManager extends BaseManager<AdapterOrg, XAdapterOrgRepository> {
+public class AdapterOrgService extends BaseService<AdapterOrg, XAdapterOrgRepository> {
 
     @Autowired
     AddressClient addressClient;
     @Autowired
-    OrgDataSetManager orgDataSetManager;
+    OrgDataSetService orgDataSetManager;
     @Autowired
-    OrgMetaDataManager orgMetaDataManager;
+    OrgMetaDataService orgMetaDataManager;
     @Autowired
-    OrgDictItemManager orgDictItemManager;
+    OrgDictItemService orgDictItemManager;
     @Autowired
-    OrgDictManager orgDictManager;
+    OrgDictService orgDictManager;
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void addAdapterOrg(AdapterOrg adapterOrg, String apiVersion) {

@@ -2,11 +2,11 @@ package com.yihu.ehr.adaption.orgmetaset.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adaption.orgmetaset.service.OrgMetaData;
-import com.yihu.ehr.adaption.orgmetaset.service.OrgMetaDataManager;
+import com.yihu.ehr.adaption.orgmetaset.service.OrgMetaDataService;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constrant.Result;
 import com.yihu.ehr.util.controller.BaseRestController;
-import com.yihu.ehr.util.parm.PageModel;
+import com.yihu.ehr.util.query.PageModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -26,7 +26,7 @@ import java.util.Date;
 public class OrgMetaDataController extends BaseRestController {
 
     @Autowired
-    private OrgMetaDataManager orgMetaDataManager;
+    private OrgMetaDataService orgMetaDataManager;
 
 
     @RequestMapping(value = "", method = RequestMethod.GET)
@@ -184,7 +184,7 @@ public class OrgMetaDataController extends BaseRestController {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             PageModel pageModel = objectMapper.readValue(parmJson, PageModel.class);
-            result = orgMetaDataManager.pagesToResult(pageModel);
+            result = orgMetaDataManager.getEnvelop(pageModel);
         } catch (Exception ex) {
             result.setSuccessFlg(false);
         }

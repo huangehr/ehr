@@ -9,14 +9,14 @@ import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.util.controller.BaseRestController;
-import com.yihu.ehr.util.parm.PageModel;
-import com.yihu.ehr.util.parm.URLQueryParser;
+import com.yihu.ehr.util.query.URLQueryParser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.criteria.CriteriaQuery;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
@@ -56,12 +56,17 @@ public class AppController extends BaseRestController {
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        PageModel pageModel = new URLQueryParser(fields, filters, sorts, page, size).makePageModel();
+        URLQueryParser queryParser = new URLQueryParser<App>(fields, filters, sorts)
+                .setEntityManager(entityManager)
+                .setEntityClass(App.class);
 
-        List<App> appList = appService.searchApps(pageModel);
-        pagedResponse(request, response, appService.getAppCount(pageModel), page, size);
+        CriteriaQuery query = queryParser.makeCriteriaQuery();
+        CriteriaQuery countQuery = queryParser.makeCriteriaCountQuery();
 
-        return convertToModels(appList, new ArrayList<MApp>(appList.size()), null);
+        List<App> appList = appService.searchApps(query, page, size);
+        pagedResponse(request, response, appService.getAppCount(countQuery), page, size);
+
+        return convertToModels(appList, new ArrayList<MApp>(appList.size()), MApp.class, null);
     }
 
     /**

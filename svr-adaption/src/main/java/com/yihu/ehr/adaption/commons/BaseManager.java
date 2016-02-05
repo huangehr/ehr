@@ -1,9 +1,8 @@
 package com.yihu.ehr.adaption.commons;
 
-import com.yihu.ehr.adaption.adapterorg.service.AdapterOrg;
 import com.yihu.ehr.constrant.Result;
-import com.yihu.ehr.util.parm.FieldCondition;
-import com.yihu.ehr.util.parm.PageModel;
+import com.yihu.ehr.util.query.FieldCondition;
+import com.yihu.ehr.util.query.PageModel;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,15 +59,15 @@ public class BaseManager<T, RESP> {
 
     @Transactional(propagation = Propagation.SUPPORTS)
     public Result pagesToResult(PageModel pageModel) {
-        pageModel.setModelClass(getModelClass());
+        pageModel.setEntityClass(getModelClass());
         List ls = pages(pageModel);
         Integer totalCount = totalCountForPage(pageModel);
-        return getResult(ls, totalCount, pageModel.getPage(), pageModel.getRows());
+        return getResult(ls, totalCount, pageModel.getPage(), pageModel.getSize());
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
     public List pages(PageModel pageModel) {
-        pageModel.setModelClass(getModelClass());
+        pageModel.setEntityClass(getModelClass());
         Session session = currentSession();
         String hql = "select tb from " + getModelName() + " tb ";
         String wh = pageModel.format();
@@ -76,14 +75,14 @@ public class BaseManager<T, RESP> {
         Query query = setQueryVal(session.createQuery(hql), pageModel);
         int page = pageModel.getPage();
         if (page > 0) {
-            query.setMaxResults(pageModel.getRows());
-            query.setFirstResult((page - 1) * pageModel.getRows());
+            query.setMaxResults(pageModel.getSize());
+            query.setFirstResult((page - 1) * pageModel.getSize());
         }
         return query.list();
     }
 
     public int totalCountForPage(PageModel pageModel) {
-        pageModel.setModelClass(getModelClass());
+        pageModel.setEntityClass(getModelClass());
         Session session = currentSession();
         String hql = "select count(*) from " + getModelName() + " ";
         String wh = pageModel.format();

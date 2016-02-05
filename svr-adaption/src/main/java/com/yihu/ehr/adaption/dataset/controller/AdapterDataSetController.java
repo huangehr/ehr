@@ -1,9 +1,9 @@
 package com.yihu.ehr.adaption.dataset.controller;
 
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlan;
-import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanManager;
+import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanService;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSet;
-import com.yihu.ehr.adaption.dataset.service.AdapterDataSetManager;
+import com.yihu.ehr.adaption.dataset.service.AdapterDataSetService;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSetModel;
 import com.yihu.ehr.adaption.dataset.service.DataSetModel;
 import com.yihu.ehr.constants.ApiVersionPrefix;
@@ -30,9 +30,9 @@ import java.util.List;
 public class AdapterDataSetController extends BaseRestController {
 
     @Autowired
-    AdapterDataSetManager adapterDataSetManager;
+    AdapterDataSetService adapterDataSetManager;
     @Autowired
-    OrgAdapterPlanManager orgAdapterPlanManager;
+    OrgAdapterPlanService orgAdapterPlanManager;
 
     @RequestMapping("/adapterDataSet")
     @ApiOperation(value = "根据方案ID及查询条件查询数据集适配关系")
