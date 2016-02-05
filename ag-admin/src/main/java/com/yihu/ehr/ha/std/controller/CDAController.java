@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * Created by AndyCai on 2016/1/21.
  */
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/cda")
+@RequestMapping(ApiVersionPrefix.Version1_0 + "/cda")
 @RestController
 public class CDAController extends BaseRestController {
 

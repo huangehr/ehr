@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * Created by AndyCai on 2016/1/25.
  */
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/dict")
+@RequestMapping(ApiVersionPrefix.Version1_0 + "/dict")
 @RestController
 public class DictController extends BaseRestController {
 

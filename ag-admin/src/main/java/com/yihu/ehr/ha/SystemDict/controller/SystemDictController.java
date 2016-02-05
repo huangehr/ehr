@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
  * Created by AndyCai on 2016/1/21.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersionPrefix.CommonVersion)
+@RequestMapping(ApiVersionPrefix.Version1_0)
 @RestController
 @Api(value = "sys_dict", description = "系统字典接口，用于系统全局字典管理", tags = {"系统字典接口"})
 public class SystemDictController extends BaseRestController {

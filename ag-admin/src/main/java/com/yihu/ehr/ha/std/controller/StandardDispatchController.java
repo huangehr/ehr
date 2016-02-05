@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
  * Created by AndyCai on 2016/1/26.
  */
 
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/dispatch")
+@RequestMapping(ApiVersionPrefix.Version1_0 + "/dispatch")
 @RestController
 public class StandardDispatchController extends BaseRestController {
 

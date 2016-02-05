@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * Created by AndyCai on 2016/1/25.
  */
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/stdSource")
+@RequestMapping(ApiVersionPrefix.Version1_0 + "/stdSource")
 @RestController
 public class StandardSourceController extends BaseRestController {
 

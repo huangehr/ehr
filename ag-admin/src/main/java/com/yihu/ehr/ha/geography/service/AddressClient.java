@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient("svr-address")
 public interface AddressClient {
 
-    @RequestMapping(value = "/rest/{api_version}/address/level", method = RequestMethod.GET, consumes = "application/json")
+    @RequestMapping(value = "/rest/{api_version}/geography/{level}", method = RequestMethod.GET, consumes = "application/json")
     @ApiOperation(value = "根据地址等级查询地址信息")
     Object getAddressByLevel(@PathVariable(value = "api_version") String apiVersion,
                              @RequestParam(value = "level") Integer level);
 
-    @RequestMapping(value = "/rest/{api_version}/address/pid", method = RequestMethod.GET, consumes = "application/json")
+    @RequestMapping(value = "/rest/{api_version}/geography/{pid}", method = RequestMethod.GET, consumes = "application/json")
     @ApiOperation(value = "根据父id查询地址信息")
     Object getAddressDictByPid(@PathVariable(value = "api_version") String apiVersion,
                                @RequestParam(value = "pid") Integer pid);

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
  * Created by AndyCai on 2016/1/20.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersionPrefix.CommonVersion)
+@RequestMapping(ApiVersionPrefix.Version1_0)
 @RestController
 @Api(value = "address", description = "地址信息管理接口，用于地址信息管理", tags = {"地址信息管理接口"})
 public class AddressController extends BaseRestController {

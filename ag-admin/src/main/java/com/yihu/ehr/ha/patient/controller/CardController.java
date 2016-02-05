@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * Created by AndyCai on 2016/1/21.
  */
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/card")
+@RequestMapping(ApiVersionPrefix.Version1_0 + "/card")
 @RestController
 public class CardController extends BaseRestController {
 
