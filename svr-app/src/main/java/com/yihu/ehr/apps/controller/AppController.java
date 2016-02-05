@@ -6,20 +6,21 @@ import com.yihu.ehr.apps.service.AppService;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.util.parm.PageModel;
+import com.yihu.ehr.util.parm.URLQueryParser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ResponseHeader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -42,24 +43,25 @@ public class AppController extends BaseRestController {
      */
     @RequestMapping(value = "/apps", method = RequestMethod.GET)
     @ApiOperation(value = "获取App列表")
-    public List<MApp> getApps(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+    public Collection<MApp> getApps(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
-            @ApiParam(name = "filter", value = "过滤器，规则参见说明文档", defaultValue = "id,name,secret,url,createTime")
-            @RequestParam(value = "filter", required = false) String filter,
-            @ApiParam(name = "sort", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
-            @RequestParam(value = "sort", required = false) String sort,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        //List<App> appList = appService.searchApps(conditionMap);
-        //int totalCount = appService.getAppCount(conditionMap);
+        PageModel pageModel = new URLQueryParser(fields, filters, sorts, page, size).makePageModel();
 
-        echoCollection(request, response, 100, page, size);
-        return null;//convertToModels(appList, new ArrayList<MApp>(appList.size()), fields == null ? null : fields.split(","));
+        List<App> appList = appService.searchApps(pageModel);
+        pagedResponse(request, response, appService.getAppCount(pageModel), page, size);
+
+        return convertToModels(appList, new ArrayList<MApp>(appList.size()), null);
     }
 
     /**

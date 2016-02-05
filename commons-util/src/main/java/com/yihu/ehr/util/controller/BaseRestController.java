@@ -80,26 +80,27 @@ public class BaseRestController extends AbstractController {
      *
      * @return
      */
-    public void echoCollection(
+    public void pagedResponse(
             HttpServletRequest request,
             HttpServletResponse response,
             long resourceCount, long currentPage, long pageSize) {
         response.setHeader(ResourceCount, Long.toString(resourceCount));
 
-        String baseUri = "<" + request.getRequestURL().append("/").toString() + request.getQueryString() + ">";
+        String baseUri = "<" + request.getRequestURL().append("?").toString() + request.getQueryString() + ">";
 
         long firstPage = currentPage == 1 ? -1 : 1;
-        long lastPage = resourceCount % pageSize == 0 ? resourceCount / pageSize : resourceCount / pageSize + 1;
-        lastPage = currentPage == lastPage ? -1 : lastPage;
+        long prevPage = currentPage == 1 ? -1 : currentPage - 1;
 
-        long previousPage = currentPage == 1 ? -1 : currentPage - 1;
+        long lastPage = resourceCount % pageSize == 0 ? resourceCount / pageSize : resourceCount / pageSize + 1;
         long nextPage = currentPage == lastPage ? -1 : currentPage + 1;
 
+        lastPage = currentPage == lastPage ? -1 : lastPage;
+
         Map<String, String> map = new HashMap<>();
-        if(firstPage != -1) map.put("rel='first',", baseUri.replace("page=(\\d+)", "page=" + Long.toString(firstPage)));
-        if(previousPage != -1) map.put("rel='prev',", baseUri.replace("page=(\\d+)", "page=" + Long.toString(previousPage)));
-        if(nextPage != -1) map.put("rel='next',", baseUri.replace("page=(\\d+)", "page=" + Long.toString(nextPage)));
-        if(lastPage != -1) map.put("rel='last',", baseUri.replace("page=(\\d+)", "page=" + Long.toString(lastPage)));
+        if(firstPage != -1) map.put("rel='first',", baseUri.replaceAll("page=\\d+", "page=" + Long.toString(firstPage)));
+        if(prevPage != -1) map.put("rel='prev',", baseUri.replaceAll("page=\\d+", "page=" + Long.toString(prevPage)));
+        if(nextPage != -1) map.put("rel='next',", baseUri.replaceAll("page=\\d+", "page=" + Long.toString(nextPage)));
+        if(lastPage != -1) map.put("rel='last',", baseUri.replaceAll("page=\\d+", "page=" + Long.toString(lastPage)));
 
         response.setHeader(ResourceLink, linkMap(map));
     }

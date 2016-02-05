@@ -2,6 +2,8 @@ package com.yihu.ehr.apps.service;
 
 import com.yihu.ehr.apps.feign.ConventionalDictClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.util.parm.PageModel;
+import com.yihu.ehr.util.service.BaseManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,14 +17,14 @@ import java.util.*;
  */
 @Service
 @Transactional
-public class AppService {
+public class AppService extends BaseManager<App, XAppRepository> {
     private static final int AppIdLength = 10;
     private static final int AppSecretLength = 16;
 
     @Autowired
     private XAppRepository appRepo;
 
-    //@Autowired
+    @Autowired
     private ConventionalDictClient conventionalDictClient;
 
     public AppService() {
@@ -79,9 +81,10 @@ public class AppService {
     /**
      * 搜索应用列表，并以列表形式返回。
      *
-     * @param args
+     * @param pageModel
      */
-    public List<App> searchApps(Map<String, Object> args) {
+    public List<App> searchApps(PageModel pageModel) {
+        return pages(pageModel);
         /*Session session = entityManager.unwrap(org.hibernate.Session.class);
         //参数获取处理
         String appId = (String) args.get("appId");
@@ -117,48 +120,15 @@ public class AppService {
         query.setFirstResult((page - 1) * pageSize);
 
         return query.list();*/
-        return  null;
     }
 
     /**
      * 根据条件搜索应用总数量
      *
-     * @param args
+     * @param pageModel
      */
-    public Integer getAppCount(Map<String, Object> args) {
-
-        /*Session session = entityManager.unwrap(org.hibernate.Session.class);
-
-        //参数获取处理
-        String appId = (String) args.get("appId");
-        String appName = (String) args.get("appName");
-        String catalog = (String) args.get("catalog");
-        String status = (String) args.get("status");
-
-        //动态SQL文拼接
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("select 1  from App 	   ");
-        sb.append("  where 1=1     ");
-
-        if (!(args.get("catalog") == null || args.get("catalog").equals("") || args.get("catalog").equals("0"))) {
-
-            sb.append("    and catalog= '" + catalog + "' ");
-        }
-        if (!(args.get("status") == null || args.get("status").equals("") || args.get("status").equals("0"))) {
-
-            sb.append("    and status= '" + status + "' ");
-        }
-        if (!(args.get("appId") == null || args.get("appId").equals("") || args.get("appId").equals("0"))) {
-
-            sb.append("    and (id like '%" + appId + "%' or name like '%" + appName + "%')   ");
-        }
-
-        String hql = sb.toString();
-
-        Query query = session.createQuery(hql);
-
-        return query.list().size();*/ return null;
+    public Integer getAppCount(PageModel pageModel) {
+        return totalCountForPage(pageModel);
     }
 
     static String getRandomString(int length) {

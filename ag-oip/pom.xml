@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-	<artifactId>ag-pack-receiver</artifactId>
+	<artifactId>ag-oip</artifactId>
 	<packaging>jar</packaging>
-	<name>ag-pack-receiver</name>
-	<description>EHR platform package receiver gateway.</description>
+	<name>ag-oip</name>
+	<description>EHR集成开放平台专用网关</description>
 
 	<properties>
 	</properties>
