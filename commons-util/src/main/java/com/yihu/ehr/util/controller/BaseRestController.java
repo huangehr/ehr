@@ -113,11 +113,9 @@ public class BaseRestController extends AbstractController {
      *
      * @param modelList
      * @param totalCount
-     * @param currPage
-     * @param rows
      * @return
      */
-    protected Envelop getResult(List modelList, int totalCount, int currPage, int rows) {
+    protected Envelop getResult(List modelList, int totalCount) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(modelList);

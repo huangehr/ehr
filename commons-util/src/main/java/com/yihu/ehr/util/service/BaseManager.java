@@ -1,6 +1,6 @@
 package com.yihu.ehr.util.service;
 
-import com.yihu.ehr.constrant.Result;
+import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.parm.FieldCondition;
 import com.yihu.ehr.util.parm.PageModel;
 import org.hibernate.Query;
@@ -58,7 +58,7 @@ public class BaseManager<T, RESP> {
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public Result pagesToResult(PageModel pageModel) {
+    public Envelop pagesToResult(PageModel pageModel) {
         pageModel.setModelClass(getModelClass());
         List ls = pages(pageModel);
         Integer totalCount = totalCountForPage(pageModel);
@@ -69,9 +69,7 @@ public class BaseManager<T, RESP> {
     public List pages(PageModel pageModel) {
         pageModel.setModelClass(getModelClass());
         Session session = currentSession();
-        String hql = "select tb from " + getModelName() + " tb ";
-        String wh = pageModel.format();
-        hql += wh.equals("") ? "" : wh;
+        String hql = pageModel.formatAll();
         Query query = setQueryVal(session.createQuery(hql), pageModel);
         int page = pageModel.getPage();
         if (page > 0) {
@@ -84,18 +82,22 @@ public class BaseManager<T, RESP> {
     public int totalCountForPage(PageModel pageModel) {
         pageModel.setModelClass(getModelClass());
         Session session = currentSession();
-        String hql = "select count(*) from " + getModelName() + " ";
+        String hql = "select count(*) from " + getModelName();
         String wh = pageModel.format();
-        hql += wh.equals("") ? "" : wh;
+        hql += wh.equals("") ? "" : " where " + wh;
         Query query = setQueryVal(session.createQuery(hql), pageModel);
         return ((Long) query.list().get(0)).intValue();
     }
 
     protected Query setQueryVal(Query query, PageModel pageModel) {
         Map<String, FieldCondition> filters = pageModel.getFilters();
+        FieldCondition fieldCondition;
         for (String k : filters.keySet()) {
-            if (filters.get(k).getLogic().equals("in"))
-                query.setParameterList(k, (Object[]) filters.get(k).formatVal());
+            fieldCondition = filters.get(k);
+            if(!fieldCondition.isValid())
+                continue;
+            if (fieldCondition.getLogic().equals("in") || fieldCondition.getLogic().equals("not in"))
+                query.setParameterList(k, (List) filters.get(k).formatVal());
             else if(filters.get(k).getLogic().equals("between")){
                 List ls = filters.get(k).getVal();
                 query.setParameter(k + "1", ls.get(0));
@@ -134,20 +136,12 @@ public class BaseManager<T, RESP> {
         return resp;
     }
 
-    protected Result getResult(List detaiModelList, int totalCount, int currPage, int rows) {
-        Result result = new Result();
-        result.setSuccessFlg(true);
-        result.setDetailModelList(detaiModelList);
-        result.setTotalCount(totalCount);
-        result.setCurrPage(currPage);
-        result.setPageSize(rows);
-        if (result.getPageSize() == 0)
-            return result;
-        if (result.getTotalCount() % result.getPageSize() > 0) {
-            result.setTotalPage((result.getTotalCount() / result.getPageSize()) + 1);
-        } else {
-            result.setTotalPage(result.getTotalCount() / result.getPageSize());
-        }
-        return result;
+    protected Envelop getResult(List detaiModelList, int totalCount, int currPage, int rows) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(detaiModelList);
+        envelop.setTotalCount(totalCount);
+
+        return envelop;
     }
 }

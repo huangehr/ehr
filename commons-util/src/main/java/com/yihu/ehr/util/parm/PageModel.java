@@ -18,6 +18,8 @@ public class PageModel {
     private Map<String, FieldCondition> filters;
     private String[] result;
     private Class modelClass;
+
+
     public PageModel() {
 
     }
@@ -27,6 +29,43 @@ public class PageModel {
         this.rows = rows;
     }
 
+    /**
+     * 格式化完整的语句， jap形式
+     * @return
+     */
+    public String formatAll(){
+        if (modelClass == null) {
+            System.err.print("NullPoint: modelClass");
+            return "";
+        }
+        String sql = " select ";
+        if (result == null || result.length == 0)
+            sql += "tb";
+        else {
+            List<String> ls = new ArrayList<>();
+            for (String item : result) {
+                if (!StringUtils.isEmpty(getTableCol(item)))
+                    ls.add(item);
+            }
+            sql += arrayJoin(ls, ",", 1);
+        }
+        sql += " from "+modelClass.getSimpleName()+" tb ";
+        String wh = format("", false);
+        if(!StringUtils.isEmpty(wh))
+            sql += " where " + wh;
+
+        String order = formatOrder("", false);
+        if(!StringUtils.isEmpty(order))
+            sql += " order by " + order;
+        return sql;
+    }
+
+    /**
+     * 格式化查询语句， 不包含order by
+     * @param modelName  视图名
+     * @param isSql true：返回sql形式， false：返回jpa形式
+     * @return
+     */
     public String format(String modelName, boolean isSql) {
         if (modelClass == null) {
             System.err.print("NullPoint: modelClass");
@@ -62,31 +101,91 @@ public class PageModel {
         return wh;
     }
 
-    private String getTableCol(String field) {
-        try {
-            Method method = modelClass.getMethod("get" + firstLetterToUpper(field));
-            Column column = method.getDeclaredAnnotation(Column.class);
-            if (column != null) {
-                return column.name();
-            }
-            return null;
-        } catch (Exception e) {
-            return null;
-        }
+    /**
+     * 格式化查询语句， 不包含order by
+     * @return 返回jpa形式语句
+     */
+    public String format() {
+        return format("", false);
     }
 
+    /**
+     * 格式化查询语句， 不包含order by
+     * @param modelName 视图名
+     * @return 返回sql形式语句
+     */
+    public String formatSql(String modelName) {
+        return format(modelName, true);
+    }
+
+    /**
+     * 格式化查询语句， 不包含order by
+     * @return 返回sql形式语句
+     */
+    public String formatSql() {
+        return formatSql("");
+    }
+
+    /**
+     * 格式化查询语句， 包含order by
+     * @param modelName 视图名
+     * @return 返回jpa形式语句
+     */
+    public String formatWithOrder(String modelName) {
+        String order = formatOrder(modelName, false);
+        if(!order.equals(""))
+            return format(modelName, false) + " order by " + order;
+        return format(modelName, false);
+    }
+
+    /**
+     * 格式化查询语句， 包含order by
+     * @param modelName 视图名
+     * @return 返回sql形式语句
+     */
+    public String formatSqlWithOrder(String modelName) {
+        String order = formatSqlOrder(modelName);
+        if(!order.equals(""))
+            return formatSql(modelName) + " order by " + order;
+        return formatSql(modelName);
+    }
+
+
+    /************************************************************************************/
+    /***************            格式化order by 语句的方法                    ************/
+    /***************                                                         ************/
+    /************************************************************************************/
+    /**
+     * 格式化oder by，返回sql形式语句
+     * @param modelName  视图名
+     * @return
+     */
     public String formatSqlOrder(String modelName) {
         return formatOrder(modelName, true);
     }
 
+    /**
+     * 格式化oder by，返回sql形式语句
+     * @return
+     */
     public String formatSqlOrder() {
         return formatSqlOrder("");
     }
 
+    /**
+     * 格式化oder by，返回jpa形式语句
+     * @return
+     */
     public String formatOrder() {
         return formatOrder("", false);
     }
 
+    /**
+     * 格式化oder by
+     * @param modelName 视图名
+     * @param isSql true：返回sql形式， false：返回jpa形式
+     * @return
+     */
     public String formatOrder(String modelName, boolean isSql) {
         if (modelClass == null) {
             System.err.print("NullPoint: modelClass");
@@ -100,18 +199,103 @@ public class PageModel {
             for (String item : order) {
                 tmp = getTableCol(item);
                 if (!StringUtils.isEmpty(tmp))
-                    ls.add(tmp);
+                    ls.add(formatOneOrder(tmp));
+
             }
         } else
             for (String item : order) {
                 tmp = getTableCol(item);
                 if (!StringUtils.isEmpty(tmp))
-                    ls.add(item);
+                    ls.add(formatOneOrder(item));
             }
         return arrayJoin(ls, StringUtils.isEmpty(modelName) ? "," : "," + modelName + ".", 1);
     }
 
-    public String arrayJoin(Collection<String> ls, String joinStr, int offer) {
+
+
+    /************************************************************************************/
+    /***************            工具                                         ************/
+    /***************                                                         ************/
+    /************************************************************************************/
+    /**
+     * 获取过略字段值
+     * @param field 名称
+     * @return 值
+     */
+    public Object getFieldVal(String field) {
+        return filters.get(field).getVal();
+    }
+
+    /**
+     * 设置字段值
+     * @param field 名称
+     * @param val 值
+     */
+    public void setFieldVal(String field, List val) {
+        filters.get(field).setVal(val);
+    }
+
+    /**
+     * 添加过滤器
+     * @param fieldCondition
+     */
+    public void addFieldCondition(FieldCondition fieldCondition) {
+        if (filters == null)
+            filters = new HashMap<>();
+        filters.put(fieldCondition.getCol(), fieldCondition);
+    }
+
+    /**
+     * 首字母转换为大写
+     * @param str
+     * @return
+     */
+    private static String firstLetterToUpper(String str) {
+        if (str == null || "".equals(str.trim())) {
+            return "";
+        }
+        return str.replaceFirst(("" + str.charAt(0)), ("" + str.charAt(0)).toUpperCase());
+    }
+
+    /**
+     * 确认数据表是否包含有该过滤字段
+     * @param field
+     * @return
+     */
+    private String getTableCol(String field) {
+        try {
+            Method method = modelClass.getMethod("get" + firstLetterToUpper(field));
+            Column column = method.getDeclaredAnnotation(Column.class);
+            if (column != null) {
+                return column.name();
+            }
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * 解析排序字段
+     * @param srcOrder
+     * @return
+     */
+    private String formatOneOrder(String srcOrder){
+        if(srcOrder.startsWith("-"))
+            return srcOrder.substring(1) +" desc ";
+        if(srcOrder.startsWith("+"))
+            return srcOrder.substring(1) +" asc ";
+        return srcOrder + " asc ";
+    }
+
+    /**
+     * 数组转换为字符串，
+     * @param ls
+     * @param joinStr
+     * @param offer
+     * @return
+     */
+    private String arrayJoin(Collection<String> ls, String joinStr, int offer) {
         if (ls == null || ls.size() == 0)
             return "";
         String tmp = "";
@@ -121,33 +305,12 @@ public class PageModel {
         return tmp.substring(offer);
     }
 
-    public String formatWithOrder(String modelName) {
-        return format(modelName, false) + " order by " + formatOrder(modelName, false);
-    }
 
-    public String formatSqlWithOrder(String modelName) {
-        return formatSql(modelName) + " order by " + formatSqlOrder(modelName);
-    }
 
-    public String format() {
-        return format("", false);
-    }
-
-    public String formatSql(String modelName) {
-        return format(modelName, true);
-    }
-
-    public String formatSql() {
-        return formatSql("");
-    }
-
-    public Object getFieldVal(String field) {
-        return filters.get(field).getVal();
-    }
-
-    public void setFieldVal(String field, List val) {
-        filters.get(field).setVal(val);
-    }
+    /************************************************************************************/
+    /***************            getter  &  setter                            ************/
+    /***************                                                         ************/
+    /************************************************************************************/
 
     public int getPage() {
         return page;
@@ -171,12 +334,6 @@ public class PageModel {
 
     public void setFilters(Map<String, FieldCondition> filters) {
         this.filters = filters;
-    }
-
-    public void addFieldCondition(FieldCondition fieldCondition) {
-        if (filters == null)
-            filters = new HashMap<>();
-        filters.put(fieldCondition.getCol(), fieldCondition);
     }
 
     public String[] getOrder() {
@@ -206,12 +363,4 @@ public class PageModel {
             map.get(key).setTableCol(getTableCol(key));
         }
     }
-
-    public static String firstLetterToUpper(String str) {
-        if (str == null || "".equals(str.trim())) {
-            return "";
-        }
-        return str.replaceFirst(("" + str.charAt(0)), ("" + str.charAt(0)).toUpperCase());
-    }
-
 }
