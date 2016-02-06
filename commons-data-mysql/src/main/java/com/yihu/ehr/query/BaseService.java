@@ -1,7 +1,8 @@
-package com.yihu.ehr.util.query;
+package com.yihu.ehr.query;
 
+import com.yihu.ehr.XCustomRepository;
 import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.parm.PageModel;
+import com.yihu.ehr.parm.PageModel;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaQuery;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -18,7 +20,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Service基础类。此类基于Spring Data JPA进行封装（Spring Data JPA又是基于JPA封装，EHR平台使用Hibernate作为JPA实现者）。
+ * 需要注意的是，部分功能会跳过JPA接口而直接使用Hibernate接口，比如访问Hibernate的Session接口，因为它把JPA的EntityManager功能强大。
+ *
  * @author lincl
+ * @author Sand
  * @version 1.0
  * @created 2016.2.3
  */
@@ -28,7 +34,6 @@ public class BaseService<T, R> {
 
     @PersistenceContext
     protected EntityManager entityManager;
-
 
     public T findOne(Serializable id) {
         return (T) getRepo().findOne(id);
@@ -45,10 +50,10 @@ public class BaseService<T, R> {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public int delete(Object[] ids, String col) {
-        Query q = currentSession().createQuery(" delete from " + getModelName() + " where " + col + " in(:ids)");
-        q.setParameter("ids", ids);
-        return q.executeUpdate();
+    public int delete(Iterable ids) {
+        getRepo().deleteCollection(ids);
+
+        return 0;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -125,8 +130,8 @@ public class BaseService<T, R> {
         return entityManager.unwrap(Session.class);
     }
 
-    protected PagingAndSortingRepository getRepo() {
-        return (PagingAndSortingRepository) repo;
+    protected XCustomRepository getRepo() {
+        return (XCustomRepository) repo;
     }
 
     protected R getRepository() {
@@ -138,13 +143,29 @@ public class BaseService<T, R> {
         Envelop.setSuccessFlg(true);
         Envelop.setDetailModelList(detaiModelList);
         Envelop.setTotalCount(totalCount);
-//        if (Envelop.getPageSize() == 0)
-//            return Envelop;
-//        if (Envelop.getTotalCount() % Envelop.getPageSize() > 0) {
-//            Envelop.setTotalPage((Envelop.getTotalCount() / Envelop.getPageSize()) + 1);
-//        } else {
-//            Envelop.setTotalPage(Envelop.getTotalCount() / Envelop.getPageSize());
-//        }
+
         return Envelop;
+    }
+
+    public <T> URLQueryParser createQueryParser(String fields, String filters, String orders, Class<T> entityClass){
+        URLQueryParser queryParser = new URLQueryParser<T>(fields, filters, orders)
+                .setEntityManager(entityManager)
+                .setEntityClass(entityClass);
+
+        return queryParser;
+    }
+
+    public List<T> search(CriteriaQuery query, int page, int size){
+        return entityManager
+                .createQuery(query)
+                .setFirstResult((page - 1) * size)
+                .setMaxResults(size)
+                .getResultList();
+    }
+
+    public long getCount(CriteriaQuery countQuery){
+        String sqlString = entityManager.createQuery(countQuery).unwrap(org.hibernate.Query.class).getQueryString();
+
+        return (long)entityManager.createQuery(countQuery).getSingleResult();
     }
 }

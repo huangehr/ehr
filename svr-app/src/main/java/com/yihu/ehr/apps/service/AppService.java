@@ -2,15 +2,13 @@ package com.yihu.ehr.apps.service;
 
 import com.yihu.ehr.apps.feign.ConventionalDictClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.util.ObjectId;
-import com.yihu.ehr.util.query.BaseService;
+import com.yihu.ehr.query.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.criteria.CriteriaQuery;
-import java.util.*;
+import java.util.Date;
+import java.util.Random;
 
 /**
  * @author Sand
@@ -78,64 +76,6 @@ public class AppService extends BaseService<App, XAppRepository> {
         App app = getApp(id);
 
         return app != null && getApp(id).getSecret().equals(secret);
-    }
-
-    /**
-     * 搜索应用列表，并以列表形式返回。
-     *
-     * @param query
-     */
-    public List<App> searchApps(CriteriaQuery query, int page, int size) {
-        return entityManager
-                .createQuery(query)
-                .setFirstResult((page - 1) * size)
-                .setMaxResults(size)
-                .getResultList();
-        /*Session session = entityManager.unwrap(org.hibernate.Session.class);
-        //参数获取处理
-        String appId = (String) args.get("appId");
-        String appName = (String) args.get("appName");
-        String catalog = (String) args.get("catalog");
-        String status = (String) args.get("status");
-        Integer page = Integer.parseInt(args.get("page").toString());
-        Integer pageSize = Integer.parseInt(args.get("rows").toString());
-        //动态SQL文拼接
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("   from App 	   ");
-        sb.append("  where 1=1     ");
-
-        if (!(args.get("catalog") == null || args.get("catalog").equals("") || args.get("catalog").equals("0"))) {
-
-            sb.append("    and catalog= '" + catalog + "' ");
-        }
-        if (!(args.get("status") == null || args.get("status").equals("") || args.get("status").equals("0"))) {
-
-            sb.append("    and status= '" + status + "' ");
-        }
-        if (!(args.get("appId") == null || args.get("appId").equals(""))) {
-
-            sb.append("    and (id like '%" + appId + "%' or name like '%" + appName + "%')   ");
-        }
-        sb.append("    order by name  ");
-        String hql = sb.toString();
-
-        Query query = session.createQuery(hql);
-
-        query.setMaxResults(pageSize);
-        query.setFirstResult((page - 1) * pageSize);
-
-        return query.list();*/
-    }
-
-    /**
-     * 根据条件搜索应用总数量
-     *
-     * @param query
-     */
-    public Long getAppCount(CriteriaQuery query) {
-        Object value = entityManager.createQuery(query).getSingleResult();
-        return (Long)value;
     }
 
     static String getRandomString(int length) {

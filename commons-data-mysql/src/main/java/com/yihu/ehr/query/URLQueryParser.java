@@ -1,4 +1,4 @@
-package com.yihu.ehr.util.query;
+package com.yihu.ehr.query;
 
 import org.apache.commons.lang.StringUtils;
 

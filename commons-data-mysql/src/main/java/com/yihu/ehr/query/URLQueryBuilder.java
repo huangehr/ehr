@@ -1,4 +1,4 @@
-package com.yihu.ehr.util.query;
+package com.yihu.ehr.query;
 
 import java.util.ArrayList;
 import java.util.List;

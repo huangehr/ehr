@@ -9,7 +9,7 @@ import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.util.controller.BaseRestController;
-import com.yihu.ehr.util.query.URLQueryParser;
+import com.yihu.ehr.query.URLQueryParser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -56,15 +56,13 @@ public class AppController extends BaseRestController {
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        URLQueryParser queryParser = new URLQueryParser<App>(fields, filters, sorts)
-                .setEntityManager(entityManager)
-                .setEntityClass(App.class);
+        URLQueryParser queryParser = appService.createQueryParser(fields, filters, sorts, App.class);
 
         CriteriaQuery query = queryParser.makeCriteriaQuery();
         CriteriaQuery countQuery = queryParser.makeCriteriaCountQuery();
 
-        List<App> appList = appService.searchApps(query, page, size);
-        pagedResponse(request, response, appService.getAppCount(countQuery), page, size);
+        List<App> appList = appService.search(query, page, size);
+        pagedResponse(request, response, appService.getCount(countQuery), page, size);
 
         return convertToModels(appList, new ArrayList<MApp>(appList.size()), MApp.class, null);
     }
