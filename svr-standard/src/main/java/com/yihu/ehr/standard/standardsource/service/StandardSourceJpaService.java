@@ -1,9 +1,9 @@
 package com.yihu.ehr.standard.standardsource.service;
 
+import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.standard.standardsource.model.StandardSourceModel;
 import com.yihu.ehr.util.operator.DateUtil;
 import com.yihu.ehr.util.operator.StringUtil;
-import com.yihu.ehr.query.BaseService;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import java.util.List;
  */
 @Service
 @Transactional
-public class StandardSourceService extends BaseService<StandardSource, XStandardSourceRepository> {
+public class StandardSourceJpaService extends BaseJpaService<StandardSource, XStandardSourceRepository> {
     public static final String StandardSourceTableName = "std_standard_source";
 
     @Autowired

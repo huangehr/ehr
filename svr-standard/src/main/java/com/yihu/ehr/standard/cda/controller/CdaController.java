@@ -118,7 +118,7 @@ public class CdaController{
 //            List<CDAForInterface> resultInfos = GetCDAForInterface(xcdaDocuments);
 //
 //            result.setSuccessFlg(true);
-//            result.setObj(resultInfos.get(0));
+//            result.setObj(resultInfos.retrieve(0));
 //        } catch (Exception ex) {
 //            LogService.getLogger(CdaController.class).error(ex.getMessage());
 //            result.setSuccessFlg(false);
@@ -409,7 +409,7 @@ public class CdaController{
 //
 //            XCdaDatasetRelationship[] infos = new CdaDatasetRelationship[datasetIds.size()];
 //            for (int i = 0; i < infos.length; i++) {
-//                String datasetId = datasetIds.get(i);
+//                String datasetId = datasetIds.retrieve(i);
 //                XCdaDatasetRelationship info = new CdaDatasetRelationship();
 //                info.setCdaId(strCdaId);
 //                info.setDatasetId(datasetId);
@@ -427,8 +427,8 @@ public class CdaController{
 //            //将文件上传到服务器中
 //            ObjectNode msg = FastDFSUtil.upload(strFilePath, "");
 //
-//            String strFileGroup = msg.get(FastDFSUtil.GroupField).asText();//setFilePath
-//            String strSchemePath = msg.get(FastDFSUtil.RemoteFileField).asText();//setFileName
+//            String strFileGroup = msg.retrieve(FastDFSUtil.GroupField).asText();//setFilePath
+//            String strSchemePath = msg.retrieve(FastDFSUtil.RemoteFileField).asText();//setFileName
 //
 //            File file = new File(strFilePath);
 //            // 路径为文件且不为空则进行删除

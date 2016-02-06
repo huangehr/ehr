@@ -32,6 +32,10 @@ public class URLQueryParser<T> {
         this.orders = orders;
     }
 
+    public URLQueryParser(String filters){
+        this.filters = filters;
+    }
+
     public URLQueryParser setEntityManager(EntityManager entityManager) {
         this.entityManager = entityManager;
         builder = entityManager.getCriteriaBuilder();
@@ -61,11 +65,16 @@ public class URLQueryParser<T> {
         return query;
     }
 
+    /**
+     * 生成count语句。
+     *
+     * @return
+     */
     public CriteriaQuery makeCriteriaCountQuery() {
-        CriteriaQuery query = builder.createQuery();
+        CriteriaQuery<Long> query = builder.createQuery(Long.class);
         Root<T> root = query.from(entityCls);
 
-        query.select(builder.count(query.from(entityCls)));
+        query.select(builder.count(root));
 
         makeWhere(builder, query, root);
 
@@ -80,7 +89,7 @@ public class URLQueryParser<T> {
      * @param root
      */
     private void makeSelection(CriteriaBuilder criteriaBuilder, CriteriaQuery query, Root<T> root) {
-        if (StringUtils.isNotEmpty(fields)) {
+        if (false/*StringUtils.isNotEmpty(fields)*/) {
             String[] fieldArray = fields.split(",");
 
             List<Selection<T>> selections = new ArrayList<>(fieldArray.length);

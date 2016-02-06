@@ -2,8 +2,11 @@ package com.yihu.ehr.util.controller;
 
 import com.yihu.ehr.util.Envelop;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
@@ -11,6 +14,9 @@ import org.springframework.web.servlet.mvc.AbstractController;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 /**
@@ -41,13 +47,13 @@ public class BaseRestController extends AbstractController {
      *
      * @param source
      * @param targetCls
-     * @param ignoreProperties
+     * @param properties
      * @param <T>
      * @return
      */
-    public <T> T convertToModel(Object source, Class<T> targetCls, String... ignoreProperties) {
+    public <T> T convertToModel(Object source, Class<T> targetCls, String... properties) {
         T target = BeanUtils.instantiate(targetCls);
-        BeanUtils.copyProperties(source, target, ignoreProperties);
+        BeanUtils.copyProperties(source, target, propertyDiffer(properties, targetCls));
 
         return target;
     }
@@ -57,21 +63,42 @@ public class BaseRestController extends AbstractController {
      *
      * @param sources
      * @param targets
-     * @param ignoreProperties
+     * @param properties
      * @param <T>
      * @return
      */
-    public <T> Collection<T> convertToModels(Collection sources, Collection<T> targets, Class<T> targetCls, String[] ignoreProperties) {
+    public <T> Collection<T> convertToModels(Collection sources, Collection<T> targets, Class<T> targetCls, String[] properties) {
         Iterator iterator = sources.iterator();
         while (iterator.hasNext()) {
             Object source = iterator.next();
 
             T target = (T) BeanUtils.instantiate(targetCls);
-            BeanUtils.copyProperties(source, target, ignoreProperties);
+            BeanUtils.copyProperties(source, target, propertyDiffer(properties, targetCls));
             targets.add(target);
         }
 
         return targets;
+    }
+
+    /**
+     * 计算不在类中的属性。
+     *
+     * @return
+     */
+    protected String[] propertyDiffer(String[] properties, Class targetCls){
+        PropertyDescriptor[] targetPds = BeanUtils.getPropertyDescriptors(targetCls);
+        List<String> propertiesList = Arrays.asList(properties);
+        List<String> arrayList = new ArrayList<>();
+
+        for (PropertyDescriptor targetPd : targetPds) {
+            Method writeMethod = targetPd.getWriteMethod();
+
+            if (writeMethod != null && !propertiesList.contains(targetPd.getName())){
+                arrayList.add(targetPd.getName());
+            }
+        }
+
+        return arrayList.toArray(new String[arrayList.size()]);
     }
 
     /**

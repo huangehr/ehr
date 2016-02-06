@@ -2,7 +2,7 @@ package com.yihu.ehr.apps.controller;
 
 import com.yihu.ehr.apps.feign.ConventionalDictClient;
 import com.yihu.ehr.apps.service.App;
-import com.yihu.ehr.apps.service.AppService;
+import com.yihu.ehr.apps.service.AppJpaService;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
@@ -33,7 +33,7 @@ import java.util.List;
 @Api(protocols = "https", value = "Application", description = "EHR应用管理及鉴权", tags = {"应用管理"})
 public class AppController extends BaseRestController {
     @Autowired
-    private AppService appService;
+    private AppJpaService appService;
 
     @Autowired
     private ConventionalDictClient conventionalDictClient;
@@ -56,15 +56,10 @@ public class AppController extends BaseRestController {
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        URLQueryParser queryParser = appService.createQueryParser(fields, filters, sorts, App.class);
+        List<App> appList = appService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, appService.getCount(filters), page, size);
 
-        CriteriaQuery query = queryParser.makeCriteriaQuery();
-        CriteriaQuery countQuery = queryParser.makeCriteriaCountQuery();
-
-        List<App> appList = appService.search(query, page, size);
-        pagedResponse(request, response, appService.getCount(countQuery), page, size);
-
-        return convertToModels(appList, new ArrayList<MApp>(appList.size()), MApp.class, null);
+        return convertToModels(appList, new ArrayList<MApp>(appList.size()), MApp.class, fields.split(","));
     }
 
     /**
@@ -103,7 +98,7 @@ public class AppController extends BaseRestController {
     public MApp getApp(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
             @PathVariable(value = "app_id") String appId) throws Exception {
-        App app = appService.getApp(appId);
+        App app = appService.retrieve(appId);
         return convertToModel(app, MApp.class);
     }
 
@@ -128,7 +123,7 @@ public class AppController extends BaseRestController {
         App app;
         MConventionalDict appCatalog = conventionalDictClient.getAppCatalog(catalog);
         MConventionalDict appStatus = conventionalDictClient.getAppStatus(status);
-        app = appService.getApp(appId);
+        app = appService.retrieve(appId);
         if (app == null) throw new ApiException(ErrorCode.InvalidAppId);
 
         app.setName(name);
@@ -137,7 +132,7 @@ public class AppController extends BaseRestController {
         app.setUrl(url);
         app.setDescription(description);
         app.setTags(tags);
-        appService.updateApp(app);
+        appService.save(app);
 
         return convertToModel(app, MApp.class);
     }
@@ -147,6 +142,6 @@ public class AppController extends BaseRestController {
     public void deleteApp(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
             @PathVariable(value = "app_id") String appId) throws Exception {
-        appService.deleteApp(appId);
+        appService.delete(appId);
     }
 }

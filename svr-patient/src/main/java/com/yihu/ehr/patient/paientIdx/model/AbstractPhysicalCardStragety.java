@@ -41,7 +41,7 @@ public abstract class AbstractPhysicalCardStragety extends AbstractCardStragety{
         for (int j=cards.size() -1,i = j; i>=0; i--) {
             if (column.equals("local")) {
                 //// TODO: 2016/1/21 调用地址服务 
-                //addr = cards.get(i).getLocal().getCanonicalAddress();//取出当前记录的地址信息
+                //addr = cards.retrieve(i).getLocal().getCanonicalAddress();//取出当前记录的地址信息
                 //判断地址是否有匹配的
                 if (!addr.contains(keyVal)) {
                     //地址不包含的移除记录
@@ -62,7 +62,7 @@ public abstract class AbstractPhysicalCardStragety extends AbstractCardStragety{
             if (column.equals("releaseOrg")) {
                 if (cards.get(i).getReleaseOrg()!=null) {
                     //// TODO: 2016/1/21  调用机构服务
-                    //org = cards.get(i).getReleaseOrg().getFullName();//取出当前记录的机构名
+                    //org = cards.retrieve(i).getReleaseOrg().getFullName();//取出当前记录的机构名
                     if (!org.contains(keyVal)) {
                         //机构不包含的移除记录
                         criteria.add(Restrictions.not(Restrictions.eq(column,cards.get(i).getReleaseOrg())));

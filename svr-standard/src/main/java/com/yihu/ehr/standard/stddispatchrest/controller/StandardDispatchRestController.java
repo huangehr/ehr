@@ -65,12 +65,12 @@ public class StandardDispatchRestController  {
 //
 //            if (schema == null) return failed(ErrorCode.GenerateArchiveFailed);
 //
-//            String group = (String) schema.get(FastDFSUtil.GroupField);
-//            String remoteFile = (String) schema.get(FastDFSUtil.RemoteFileField);
+//            String group = (String) schema.retrieve(FastDFSUtil.GroupField);
+//            String remoteFile = (String) schema.retrieve(FastDFSUtil.RemoteFileField);
 //
 //            if (group == null || remoteFile == null) return failed(ErrorCode.GenerateArchiveFailed);
 //
-//            password = (String) schema.get("password");
+//            password = (String) schema.retrieve("password");
 //            byte[] bytes = FastDFSUtil.download(group, remoteFile);
 //            fileBytes = Base64.encode(bytes);
 //        }catch (Exception e) {

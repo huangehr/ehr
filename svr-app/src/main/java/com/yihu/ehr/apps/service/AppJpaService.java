@@ -2,7 +2,7 @@ package com.yihu.ehr.apps.service;
 
 import com.yihu.ehr.apps.feign.ConventionalDictClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.query.BaseService;
+import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +17,7 @@ import java.util.Random;
  */
 @Service
 @Transactional
-public class AppService extends BaseService<App, XAppRepository> {
+public class AppJpaService extends BaseJpaService<App, XAppRepository> {
     private static final int AppIdLength = 10;
     private static final int AppSecretLength = 16;
 
@@ -27,7 +27,7 @@ public class AppService extends BaseService<App, XAppRepository> {
     @Autowired
     private ConventionalDictClient conventionalDictClient;
 
-    public AppService() {
+    public AppJpaService() {
     }
 
     public App createApp(String name, MConventionalDict catalog, String url, String tags, String description, String creator) {
@@ -51,20 +51,6 @@ public class AppService extends BaseService<App, XAppRepository> {
         return app;
     }
 
-    public void deleteApp(String id) {
-        appRepo.delete(id);
-    }
-
-    public App getApp(String id) {
-        App app = appRepo.findOne(id);
-
-        return app;
-    }
-
-    public void updateApp(App app) {
-        appRepo.save(app);
-    }
-
     /**
      * 检验App与密码是否正确。
      *
@@ -73,12 +59,12 @@ public class AppService extends BaseService<App, XAppRepository> {
      * @return
      */
     public boolean verifyApp(String id, String secret) {
-        App app = getApp(id);
+        App app = appRepo.findOne(id);
 
-        return app != null && getApp(id).getSecret().equals(secret);
+        return app != null && app.getSecret().equals(secret);
     }
 
-    static String getRandomString(int length) {
+    private static String getRandomString(int length) {
         String str = "abcdefghigklmnopkrstuvwxyzABCDEFGHIGKLMNOPQRSTUVWXYZ0123456789";
         StringBuffer buffer = new StringBuffer();
 
