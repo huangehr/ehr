@@ -1,17 +1,12 @@
 package com.yihu.ehr.user;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.UserServiceApp;
 import com.yihu.ehr.user.controller.UserController;
-import com.yihu.ehr.user.service.User;
-import com.yihu.ehr.user.service.UserModel;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -94,13 +89,13 @@ public class userControllerTest {
 
 
 
-    @Test
-    public void atestUnbundling() throws Exception{
-        String userId = "0dae0003561cc415c72d9111e8cb88aa";
-        String type = "tel";
-        Object result = userController.unbundling(apiVersion,userId,type);
-        assertTrue("查询失败！" , result != null);
-    }
+//    @Test
+//    public void atestUnbundling() throws Exception{
+//        String userId = "0dae0003561cc415c72d9111e8cb88aa";
+//        String type = "tel";
+//        Object result = userController.unbundling(apiVersion,userId,type);
+//        assertTrue("查询失败！" , result != null);
+//    }
 
     @Test
     public void atestDistributeKey() throws Exception{

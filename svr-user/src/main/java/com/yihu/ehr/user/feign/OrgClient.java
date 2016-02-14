@@ -17,12 +17,12 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @FeignClient(MicroServices.OrganizationMgr)
 public interface OrgClient {
 
-    @RequestMapping(value = "/rest/{api_version}/org", method = GET )
+    @RequestMapping(value = "/rest/{api_version}/organizations/{org_code}", method = GET )
     MOrganization getOrgByCode(
             @PathVariable(value = "api_version") String apiVersion,
-            @RequestParam(value = "org_code") String orgCode);
+            @PathVariable(value = "org_code") String orgCode);
 
-    @RequestMapping(value = "/rest/{api_version}/org/{name}", method = GET ,consumes = "application/json")
+    @RequestMapping(value = "/rest/{api_version}/organizations/{name}", method = GET)
     List<String> getIdsByName(
             @PathVariable(value = "api_version") String apiVersion,
             @PathVariable(value = "name") String name);

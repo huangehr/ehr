@@ -1,29 +1,21 @@
 package com.yihu.ehr.user.service;
 
-import com.yihu.ehr.model.address.MAddress;
-import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.security.MUserSecurity;
-import com.yihu.ehr.model.user.MUser;
-import com.yihu.ehr.user.feign.GeographyClient;
-import com.yihu.ehr.user.feign.ConventionalDictClient;
 import com.yihu.ehr.user.feign.OrgClient;
-import com.yihu.ehr.user.feign.SecurityClient;
-import com.yihu.ehr.user.model.MedicalUser;
-import com.yihu.ehr.util.ApiErrorEcho;
 import com.yihu.ehr.util.encode.HashUtil;
-import org.apache.commons.lang.time.DateFormatUtils;
 import org.hibernate.Query;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import org.springframework.transaction.annotation.Transactional;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 用户管理接口实现类.
@@ -41,71 +33,15 @@ public class UserManager  {
     private XUserRepository userRepository;
 
     @Autowired
-    private ConventionalDictClient conventionalDictClient;
-
-    @Autowired
     private OrgClient organizationClient;
 
-    @Autowired
-    private GeographyClient addressClient;
-
-    @Autowired
-    SecurityClient securityClient;
-
     @PersistenceContext
-    protected EntityManager entityManager;
+    private EntityManager entityManager;
 
     @Value("default.password")
     private String default_password = "123456";
 
     public UserManager() {
-    }
-
-
-    @Transactional(Transactional.TxType.SUPPORTS)
-    private int countRecordByField(String fieldName, String value){
-        String hql = "select count(*) from User where " + fieldName + " = :value";
-
-        Session session = entityManager.unwrap(org.hibernate.Session.class);
-        Query query = session.createQuery(hql);
-        query.setString("value", value);
-
-        Object ret = query.uniqueResult();
-        if(ret == null) return 0;
-
-        return Integer.parseInt(ret.toString());
-    }
-
-
-
-    /**
-     * 创建一个用户, 并返用户接口.
-     *
-     * @param userType
-     * @param loginCode
-     * @param nickName
-     * @param pwd
-     * @param email
-     */
-    public User registerUser(MConventionalDict userType, String loginCode, String nickName, String pwd, String email) {
-
-        User user = new User();
-        user.setUserType(userType.getCode());
-        user.setCreateDate(new Date());
-        user.setLoginCode(loginCode);
-        user.setRealName(nickName);
-        user.setPassword(HashUtil.hashStr(pwd));
-        user.setEmail(email);
-        user.setActivated(true);
-        userRepository.save(user);
-        return user;
-    }
-
-    /**
-     * 获取超级用户.
-     */
-    public User getSuperUser(){
-        return getUser("00000000000000000000000000000000");
     }
 
     /**
@@ -118,52 +54,20 @@ public class UserManager  {
         return user;
     }
 
-    public MAddress getAddressById(String apiVersion,String locarion) {
-        return addressClient.getAddressById(apiVersion,locarion);
-
-    }
-
 
     /**
      * 根据登陆用户名获取用户接口.
      *
      * @param loginCode
      */
-    @Transactional(Transactional.TxType.SUPPORTS)
     public User getUserByLoginCode(String loginCode) {
-
         Map<String,String> map =new HashMap<>();
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         Query query = session.createQuery("from User where loginCode = :loginCode");
-
         List<User> userList = query.setString("loginCode", loginCode).list();
-
         if(userList.size()== 0) {
             return null;
         }else {
-            return userList.get(0);
-        }
-    }
-
-    /**
-     * 根据登陆用户名获取用户接口.
-     *
-     * @param loginCode
-     * @param email
-     */
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public User getUserByCodeAndEmail(String loginCode, String email) {
-
-        Map<String,String> map =new HashMap<>();
-        Session session = entityManager.unwrap(org.hibernate.Session.class);
-        Query query = session.createQuery("from User where loginCode = :loginCode and email = :email");
-        query.setString("loginCode", loginCode);
-        query.setString("email", email);
-        List<User> userList = query.list();
-
-        if(userList.size()== 0) {
-            return null;
-        } else {
             return userList.get(0);
         }
     }
@@ -182,7 +86,6 @@ public class UserManager  {
      * @param loginCode
      * @param psw
      */
-    @Transactional(Transactional.TxType.SUPPORTS)
     public User loginVerification(String loginCode,String psw) {
 
         User user = getUserByLoginCode(loginCode);
@@ -194,27 +97,11 @@ public class UserManager  {
         }
     }
 
-
-
-
-    /**
-     * 判断电子邮箱是否已被占用.
-     *
-     * @param email
-     */
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public boolean isEmailExists(String email) {
-        return countRecordByField("email", email) > 0;
-    }
-
-    @Transactional(Transactional.TxType.SUPPORTS)
     public Integer searchUserInt(String apiVersion,Map<String, Object> args) {
 
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         String realName = (String) args.get("realName");
         String type = (String) args.get("type");
-        Integer page = (Integer) args.get("page");
-        Integer pageSize = (Integer) args.get("pageSize");
         String name = (String) args.get("organization");
         List<String> orgIds = new ArrayList<>();
         try{
@@ -238,7 +125,7 @@ public class UserManager  {
         }
         Query query = session.createQuery(hql);
         query.setString("realName", "%"+realName+"%");
-        if (orgIds.size()>0 && !"00000".equals(orgIds.get(0))) {
+        if (orgIds.size()>0) {
             query.setParameterList("orgIds", orgIds);
         }
         if (!StringUtils.isEmpty(type)) {
@@ -254,7 +141,6 @@ public class UserManager  {
      *
      * @param args
      */
-    @Transactional(Transactional.TxType.SUPPORTS)
     public List<User> searchUser(String apiVersion,Map<String, Object> args) {
 
         Session session = entityManager.unwrap(org.hibernate.Session.class);
@@ -262,14 +148,13 @@ public class UserManager  {
         String type = (String) args.get("type");
         Integer page = (Integer) args.get("page");
         Integer pageSize = (Integer) args.get("pageSize");
-        String name = (String) args.get("organization");
+        String organizationName = (String) args.get("organizationName");
         List<String> orgIds = new ArrayList<>();
         try{
-            orgIds = organizationClient.getIdsByName(apiVersion,name);
+            orgIds = organizationClient.getIdsByName(apiVersion,organizationName);
         }catch (Exception e){
             orgIds.add("null");
         }
-        orgIds = organizationClient.getIdsByName(apiVersion,name);
         String hql = "";
         if(orgIds.size()>0 && !orgIds.get(0).equals("null")){
             hql += "from User where (realName like :realName or  location in (:orgIds) ";
@@ -285,60 +170,16 @@ public class UserManager  {
         }
         Query query = session.createQuery(hql);
         query.setString("realName", "%"+realName+"%");
-        if (orgIds.size()>0 && !"00000".equals(orgIds.get(0))) {
+        if (orgIds.size()>0 && !orgIds.get(0).equals("null")) {
             query.setParameterList("orgIds", orgIds);
         }
         if (!StringUtils.isEmpty(type)) {
             query.setParameter("userType", type);
         }
-
         query.setMaxResults(pageSize);
         query.setFirstResult((page - 1) * pageSize);
 
         return query.list();
-    }
-
-
-    /**
-     * 更新用户信息.
-     *
-     * @param userModel
-     */
-    public void updateUser(String apiVersion,UserModel userModel) {
-
-        User user;
-        Map<String, Object> message = new HashMap<>();
-        if (StringUtils.isEmpty(userModel.getId())) {
-            String password = default_password;
-            user = registerUser(conventionalDictClient.getUserType(apiVersion,userModel.getUserType()), userModel.getLoginCode(), userModel.getRealName(), default_password, userModel.getEmail());
-        } else {
-            user = getUser(userModel.getId());
-        }
-        if (user == null) {
-            ApiErrorEcho apiErrorEcho = new ApiErrorEcho();
-            apiErrorEcho.putMessage("用户不存在");
-            return;
-        }
-        user.setEmail(userModel.getEmail());
-        user.setRealName(userModel.getRealName());
-        if (userModel.getUserType() != null) {
-            user.setUserType(userModel.getUserType());
-        }
-        user.setOrganization(userModel.getOrgCode()==null?"":userModel.getOrgCode());
-        if (userModel.getSex() != null) {
-            user.setGender(userModel.getSex());
-        }
-        user.setIdCardNo(userModel.getIdCard());
-        if (userModel.getMarriage() != null) {
-            user.setMartialStatus(userModel.getMarriage());
-        }
-        user.setTelephone(userModel.getTel());
-        if(user instanceof MedicalUser){
-            ((MedicalUser)user).setMajor(userModel.getMajor());
-        }
-        userRepository.save(user);
-
-
     }
 
     public User resetPassword(User user){
@@ -365,31 +206,6 @@ public class UserManager  {
         User user = userRepository.findOne(userId);
         user.setActivated(activity);
         userRepository.save(user);
-    }
-
-    /**
-     * 记录用户的最近登入时间
-     * @param userId
-     * @param lastLoginTime
-     */
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public boolean lastLoginTime(String userId,Date lastLoginTime) {
-        if (StringUtils.isEmpty(userId)) {
-            return false;
-        } else {
-            User user = userRepository.findOne(userId);
-            user.setLastLoginTime(lastLoginTime);
-            userRepository.save(user);
-            return true;
-        }
-    }
-
-    public List<User> searchUser(String loginCode, String searchNm){
-        Session session = entityManager.unwrap(org.hibernate.Session.class);
-        String sql = "select * from users where "+loginCode+" ="+ "'"+searchNm+"'";
-        SQLQuery sqlQuery = session.createSQLQuery(sql);
-        List userList = sqlQuery.list();
-        return userList;
     }
 
 

@@ -15,21 +15,18 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @FeignClient(MicroServices.DictMgr)
 public interface ConventionalDictClient {
 
-
-
-
-    @RequestMapping(value = "/rest/{api_version}/conventional_dict/martial_status", method = GET )
+    @RequestMapping(value = "/rest/{api_version}/dictionaries/martial_status", method = GET )
     MConventionalDict getMartialStatus(
             @PathVariable(value = "api_version") String apiVersion,
             @RequestParam(value = "code") String code);
 
-    @RequestMapping(value = "/rest/{api_version}/conventional_dict/gender", method = GET )
+    @RequestMapping(value = "/rest/{api_version}/dictionaries/gender", method = GET )
     MConventionalDict getGender(
             @PathVariable(value = "api_version") String apiVersion,
             @RequestParam(value = "code") String code);
 
 
-    @RequestMapping(value = "/rest/{api_version}/conventional_dict/user_type", method = GET )
+    @RequestMapping(value = "/rest/{api_version}/dictionaries/user_type", method = GET )
     MConventionalDict getUserType(
             @PathVariable(value = "api_version") String apiVersion,
             @RequestParam(value = "code") String code);
