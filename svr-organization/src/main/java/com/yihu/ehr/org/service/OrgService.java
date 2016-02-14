@@ -1,12 +1,11 @@
 package com.yihu.ehr.org.service;
 
-import com.yihu.ehr.model.address.MAddress;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.model.address.MGeography;
 import com.yihu.ehr.model.org.MOrganization;
-import com.yihu.ehr.model.security.MUserSecurity;
 import com.yihu.ehr.org.feign.ConventionalDictClient;
 import com.yihu.ehr.org.feign.GeographyClient;
 import com.yihu.ehr.org.feign.SecurityClient;
-import org.apache.commons.lang.time.DateFormatUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,7 @@ import org.springframework.util.StringUtils;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.Date;
+
 import java.util.List;
 import java.util.Map;
 
@@ -37,9 +36,6 @@ public class OrgService {
     SecurityClient securityClient;
 
     @Autowired
-    private ConventionalDictClient conventionalDictClient;
-
-    @Autowired
     private XOrganizationRepository organizationRepository;
 
 
@@ -51,15 +47,6 @@ public class OrgService {
         return organizationRepository.findOne(orgCode);
     }
 
-    public List<String> getIdsByName(String name) {
-        Session session = entityManager.unwrap(org.hibernate.Session.class);
-        Query query = session.createQuery("select org.orgCode from Organization org where org.fullName like :name or org.shortName like :name");
-        query.setString("name", "%"+name+"%");
-        List<String> ids = query.list();
-        return ids;
-    }
-
-
 
     public void save(Organization org) {
         organizationRepository.save(org);
@@ -70,8 +57,6 @@ public class OrgService {
         Organization org = organizationRepository.findOne(orgCode);
         return org!=null;
     }
-
-
 
     public int searchCount(String apiVersion,Map<String, Object> args) {
 
@@ -113,8 +98,7 @@ public class OrgService {
         return query.list().size();
     }
 
-    public List<MOrganization> search(String apiVersion,Map<String, Object> args) {
-
+    public List<Organization> search(String apiVersion,Map<String, Object> args) {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         String orgCode = (String) args.get("orgCode");
         String fullName = (String) args.get("fullName");
@@ -140,7 +124,6 @@ public class OrgService {
         if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
             hql += " and location in (:addressIdList)";
         }
-
         Query query = session.createQuery(hql);
         query.setString("orgCode", "%"+orgCode+"%");
         query.setString("fullName", "%"+fullName+"%");
@@ -153,7 +136,6 @@ public class OrgService {
         if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
             query.setParameterList("addressIdList", addressIdList);
         }
-
         query.setMaxResults(pageSize);
         query.setFirstResult((page - 1) * pageSize);
 
@@ -168,24 +150,26 @@ public class OrgService {
 
     public List<Organization> searchByAddress(String apiVersion,String province, String city) {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
-        List<String> addressIds = addressClient.search(apiVersion,province,city,"");
-        String hql = "from Organization where location in (:addressIds)";
+        List<String> geographyIds = addressClient.search(apiVersion,province,city,"");
+        String hql = "from Organization where location in (:geographyIds)";
         Query query = session.createQuery(hql);
-        query.setParameterList("addressIds", addressIds);
+        query.setParameterList("geographyIds", geographyIds);
         return query.list();
     }
 
 
-    public String saveAddress(String apiVersion,MAddress location) {
-        String country = location.getCountry();
-        String province = location.getProvince()!=null ? location.getProvince() :"";
-        String city = location.getCity()!=null ? location.getCity() :"";
-        String district = location.getDistrict()!=null ? location.getDistrict() :"";
-        String town = location.getTown()!=null ? location.getTown() :"";
-        String street = location.getStreet()!=null ? location.getStreet() :"";
-        String extra = location.getExtra()!=null ? location.getExtra() :"";
-        String postalCode = location.getPostalCode()!=null ? location.getPostalCode() :"";
-        return addressClient.saveAddress(apiVersion,country,province,city,district,town,street,extra,postalCode);
+    public String saveAddress(String apiVersion,MGeography location) throws Exception{
+        ObjectMapper objectMapper = new ObjectMapper();
+        String GeographyModelJsonData =objectMapper.writeValueAsString(location);
+        return addressClient.saveAddress(apiVersion,GeographyModelJsonData);
+    }
+
+    public List<String> getIdsByName(String name) {
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        Query query = session.createQuery("select org.orgCode from Organization org where org.fullName like :name or org.shortName like :name");
+        query.setString("name", "%"+name+"%");
+        List<String> ids = query.list();
+        return ids;
     }
 
 

@@ -3,7 +3,7 @@ package com.yihu.ehr.org.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.model.address.MAddress;
+import com.yihu.ehr.model.address.MGeography;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MUserSecurity;
 import com.yihu.ehr.org.feign.ConventionalDictClient;
@@ -20,6 +20,7 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,7 @@ import java.util.Map;
  * @created 2015.08.10 17:57
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0 + "/org")
+@RequestMapping(ApiVersionPrefix.Version1_0 )
 @Api(protocols = "https", value = "org", description = "组织机构管理接口", tags = {"机构管理"})
 public class OrganizationController extends BaseRestController {
 
@@ -59,8 +60,8 @@ public class OrganizationController extends BaseRestController {
      * @param rows
      * @return
      */
-    @RequestMapping(value = "/search", method = RequestMethod.GET)
-    @ResponseBody
+    @RequestMapping(value = "/organizations", method = RequestMethod.GET)
+    @ApiOperation(value = "根据条件查询机构列表")
     public Object searchOrgs(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -68,16 +69,16 @@ public class OrganizationController extends BaseRestController {
             @RequestParam(value = "orgCode") String orgCode,
             @ApiParam(name = "fullName", value = "全称")
             @RequestParam(value = "fullName") String fullName,
-            @ApiParam(name = "settledWay", value = "接入方式",defaultValue = "")
-            @RequestParam(value = "settledWay") String settledWay,
+            @ApiParam(name = "settledWay", value = "接入方式")
+            @RequestParam(value = "settledWay",required = false) String settledWay,
             @ApiParam(name = "orgType", value = "机构类型")
-            @RequestParam(value = "orgType") String orgType,
+            @RequestParam(value = "orgType",required = false) String orgType,
             @ApiParam(name = "province", value = "省、自治区、直辖市")
-            @RequestParam(value = "province") String province,
+            @RequestParam(value = "province",required = false) String province,
             @ApiParam(name = "city", value = "市、自治州、自治县、县")
-            @RequestParam(value = "city") String city,
+            @RequestParam(value = "city",required = false) String city,
             @ApiParam(name = "district", value = "区/县")
-            @RequestParam(value = "district") String district,
+            @RequestParam(value = "district",required = false) String district,
             @ApiParam(name = "page", value = "页面号，从0开始", defaultValue = "0")
             @RequestParam(value = "page") int page,
             @ApiParam(name = "rows", value = "页面记录数", defaultValue = "10")
@@ -93,10 +94,14 @@ public class OrganizationController extends BaseRestController {
         conditionMap.put("district", district);
         conditionMap.put("page", page);
         conditionMap.put("pageSize", rows);
-
-        List<MOrganization> organizationList = orgManagerService.search(apiVersion,conditionMap);
+        List<Organization> organizationList = orgManagerService.search(apiVersion,conditionMap);
+        List<MOrganization> organizationModels = new ArrayList<>();
+        for(Organization organization:organizationList){
+            MOrganization organizationModel = convertToModel(organization,MOrganization.class);
+            organizationModels.add(organizationModel);
+        }
         Integer totalCount = orgManagerService.searchCount(apiVersion,conditionMap);
-        return getResult(organizationList,totalCount,page,rows);
+        return getResult(organizationModels,totalCount,page,rows);
 
     }
 
@@ -105,7 +110,8 @@ public class OrganizationController extends BaseRestController {
      * @param orgCode
      * @return
      */
-    @RequestMapping(value = "/{org_code}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/organizations/{org_code}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "根基机构代码删除机构")
     public Object deleteOrg(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -116,9 +122,15 @@ public class OrganizationController extends BaseRestController {
     }
 
 
-
-
-    @RequestMapping(value = "" , method = RequestMethod.POST)
+    /**
+     * 创建机构
+     * @param apiVersion
+     * @param orgModelJsonData
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/organizations" , method = RequestMethod.POST)
+    @ApiOperation(value = "创建机构")
     public Object create(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -130,13 +142,14 @@ public class OrganizationController extends BaseRestController {
         }
         Organization org = convertToModel(orgModel,Organization.class);
         org.setActivityFlag(1);
-        MAddress location =  orgModel.getLocation();
+        MGeography location =  orgModel.getLocation();
         orgManagerService.saveAddress(apiVersion,location);
         orgManagerService.save(org);
         return org;
     }
 
-    @RequestMapping(value = "" , method = RequestMethod.PUT)
+    @RequestMapping(value = "organizations" , method = RequestMethod.PUT)
+    @ApiOperation(value = "修改机构")
     public Object update(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -147,7 +160,7 @@ public class OrganizationController extends BaseRestController {
             return new ApiErrorEcho(ErrorCode.ExistOrgForCreate, "该机构已存在");
         }
         Organization org = convertToModel(OrganizationModel,Organization.class);
-        MAddress location =  OrganizationModel.getLocation();
+        MGeography location =  OrganizationModel.getLocation();
         orgManagerService.saveAddress(apiVersion,location);
         orgManagerService.save(org);
         return true;
@@ -155,18 +168,17 @@ public class OrganizationController extends BaseRestController {
 
 
     /**
-     * 根据code获取机构信息
+     * 根据机构代码获取机构
      * @param orgCode
      * @return
      */
-    @ApiOperation(value = "根据地址代码获取机构")
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public Object getOrg(
+    @RequestMapping(value = "/organizations", method = RequestMethod.GET)
+    @ApiOperation(value = "根据机构代码获取机构")
+    public MOrganization getOrg(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
-            @RequestParam(value = "orgCode") String orgCode) {
-
+            @ApiParam(name = "org_code", value = "机构代码", defaultValue = "")
+            @RequestParam(value = "org_code") String orgCode) throws Exception{
         Organization org = orgManagerService.getOrg(orgCode);
         MOrganization orgModel = convertToModel(org,MOrganization.class);
         orgModel.setOrgType(conventionalDictClient.getOrgType(apiVersion,org.getOrgType()));
@@ -177,11 +189,29 @@ public class OrganizationController extends BaseRestController {
 
 
     /**
-     * 激活机构
+     * 根据name获取机构ids
+     * @param name
+     * @return
+     */
+    @ApiOperation(value = "根据地名称取机构ids")
+    @RequestMapping(value = "/organizations/{name}", method = RequestMethod.GET)
+    public Object getIdsByName(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
+            @ApiParam(name = "name", value = "机构名称", defaultValue = "")
+            @PathVariable(value = "name") String name) {
+        List<String> ids = orgManagerService.getIdsByName(name);
+        return ids;
+    }
+
+
+    /**
+     * 跟新机构激活状态
      * @param orgCode
      * @return
      */
-    @RequestMapping(value = "/{org_code}/{activity_flag}" , method = RequestMethod.PUT)
+    @RequestMapping(value = "organizations/{org_code}/{activity_flag}" , method = RequestMethod.PUT)
+    @ApiOperation(value = "跟新机构激活状态")
     public boolean activity(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -201,12 +231,13 @@ public class OrganizationController extends BaseRestController {
 
 
     /**
-     * 根据地址获取机构
+     * 根据地址获取机构下拉列表
      * @param province
      * @param city
      * @return
      */
-    @RequestMapping(value = "/search/{province}/{city}" , method = RequestMethod.GET)
+    @RequestMapping(value = "organizations/{province}/{city}" , method = RequestMethod.GET)
+    @ApiOperation(value = "根据地址获取机构下拉列表")
     public Map<String, Object> getOrgsByAddress(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
@@ -223,12 +254,13 @@ public class OrganizationController extends BaseRestController {
         return orgMap;
     }
 
-    @RequestMapping( value = "/distributeKey" , method = RequestMethod.POST)
+    @RequestMapping( value = "organizations/key" , method = RequestMethod.POST)
+    @ApiOperation(value = "机构分发密钥")
     public Object distributeKey(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "orgCode", value = "机构代码")
-            @RequestParam(value = "orgCode") String orgCode) {
+            @ApiParam(name = "org_code", value = "机构代码")
+            @RequestParam(value = "org_code") String orgCode) {
         MUserSecurity userSecurity = securityClient.getUserSecurityByOrgCode(apiVersion,orgCode);
         Map<String, String> keyMap = new HashMap<>();
         if (userSecurity == null) {

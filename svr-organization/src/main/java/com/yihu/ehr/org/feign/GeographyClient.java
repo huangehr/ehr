@@ -1,7 +1,8 @@
 package com.yihu.ehr.org.feign;
 
 import com.yihu.ehr.constants.MicroServices;
-import com.yihu.ehr.model.address.MAddress;
+import com.yihu.ehr.model.address.MGeography;
+import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,37 +18,23 @@ import java.util.List;
 @FeignClient(MicroServices.Geography)
 public interface GeographyClient {
 
-    @RequestMapping(value = "/rest/{api_version}/geography", method = RequestMethod.GET)
-    MAddress getAddressById(
+    @RequestMapping(value = "/rest/{api_version}/geographies/{id}", method = RequestMethod.GET)
+    MGeography getAddressById(
             @PathVariable(value = "api_version") String apiVersion,
-            @RequestParam(value = "id") String id);
+            @PathVariable(value = "id") String id);
 
-
-    @RequestMapping(value = "/rest/{api_version}/geography/canonical", method = RequestMethod.GET )
-    String getCanonicalAddress(
-            @PathVariable(value = "api_version") String apiVersion,
-            @RequestParam(value = "id") String id);
-
-    @RequestMapping(value = "/rest/{api_version}/geography", method =  RequestMethod.PUT)
+    @RequestMapping(value = "/rest/{api_version}/geographies", method =  RequestMethod.PUT)
     String saveAddress(
             @PathVariable(value = "api_version") String apiVersion,
-            @RequestParam(value = "country") String country,
-            @RequestParam(value = "province") String province,
-            @RequestParam(value = "city") String city,
-            @RequestParam(value = "district") String district,
-            @RequestParam(value = "town") String town,
-            @RequestParam(value = "street") String street,
-            @RequestParam(value = "extra") String extra,
-            @RequestParam(value = "postalCode") String postalCode);
+            @RequestParam( value = "geography_model_json_data") String GeographyModelJsonData);
 
 
-    @RequestMapping(value = "/rest/{api_version}/geography/search", method = RequestMethod.GET )
+    @RequestMapping(value = "/rest/{api_version}/geographies/{province}/{city}/{district}", method = RequestMethod.GET )
     List<String> search(
             @PathVariable(value = "api_version") String apiVersion,
-            @RequestParam(value = "province") String province,
-            @RequestParam(value = "city") String city,
-            @RequestParam(value = "district") String district);
-
+            @PathVariable(value = "province") String province,
+            @PathVariable(value = "city") String city,
+            @PathVariable(value = "district") String district);
 
 
 }

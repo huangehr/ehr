@@ -1,15 +1,12 @@
 package com.yihu.ehr.org;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.SvrOrgApplication;
 import com.yihu.ehr.org.controller.OrganizationController;
-import com.yihu.ehr.org.service.OrgModel;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
