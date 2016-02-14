@@ -7,7 +7,10 @@ import javax.persistence.*;
 
 /**
  * 适配管理映射机构
- * Created by zqb on 2015/11/18.
+ *
+ * @author lincl
+ * @version 1.0
+ * @created 2016.2.3
  */
 @Entity
 @Table(name = "adapter_org")
@@ -99,6 +102,7 @@ public class AdapterOrg {
     public void setMAddress(MGeography mAddress) {
         this.mAddress = mAddress;
     }
+
     @Transient
     public String getOrgValue() {
         return orgValue;
@@ -107,6 +111,7 @@ public class AdapterOrg {
     public void setOrgValue(String orgValue) {
         this.orgValue = orgValue;
     }
+
     @Transient
     public String getParentValue() {
         return parentValue;
@@ -115,6 +120,7 @@ public class AdapterOrg {
     public void setParentValue(String parentValue) {
         this.parentValue = parentValue;
     }
+
     @Transient
     public String getTypeValue() {
         return typeValue;

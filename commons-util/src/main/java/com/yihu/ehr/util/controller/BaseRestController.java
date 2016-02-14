@@ -2,13 +2,21 @@ package com.yihu.ehr.util.controller;
 
 import com.yihu.ehr.util.Envelop;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.FatalBeanException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
+import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 /**
@@ -22,11 +30,12 @@ import java.util.*;
  * @author zhiyong
  * @author Sand
  */
-@Controller
-@RequestMapping("/rest")
 public class BaseRestController extends AbstractController {
     private final static String ResourceCount = "X-Total-Count";
     private final static String ResourceLink = "Link";
+
+    @Autowired
+    protected EntityManager entityManager;
 
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
@@ -38,13 +47,13 @@ public class BaseRestController extends AbstractController {
      *
      * @param source
      * @param targetCls
-     * @param ignoreProperties
+     * @param properties
      * @param <T>
      * @return
      */
-    public <T> T convertToModel(Object source, Class<T> targetCls, String... ignoreProperties) {
+    public <T> T convertToModel(Object source, Class<T> targetCls, String... properties) {
         T target = BeanUtils.instantiate(targetCls);
-        BeanUtils.copyProperties(source, target, ignoreProperties);
+        BeanUtils.copyProperties(source, target, propertyDiffer(properties, targetCls));
 
         return target;
     }
@@ -54,24 +63,42 @@ public class BaseRestController extends AbstractController {
      *
      * @param sources
      * @param targets
-     * @param ignoreProperties
+     * @param properties
      * @param <T>
      * @return
      */
-    public <T> Collection<T> convertToModels(Collection sources, Collection<T> targets, String... ignoreProperties) {
-        Class targetCls = null;
-
+    public <T> Collection<T> convertToModels(Collection sources, Collection<T> targets, Class<T> targetCls, String[] properties) {
         Iterator iterator = sources.iterator();
         while (iterator.hasNext()) {
             Object source = iterator.next();
-            if (targetCls == null) targetCls = source.getClass();
 
             T target = (T) BeanUtils.instantiate(targetCls);
-            BeanUtils.copyProperties(source, target, ignoreProperties);
+            BeanUtils.copyProperties(source, target, propertyDiffer(properties, targetCls));
             targets.add(target);
         }
 
         return targets;
+    }
+
+    /**
+     * 计算不在类中的属性。
+     *
+     * @return
+     */
+    protected String[] propertyDiffer(String[] properties, Class targetCls){
+        PropertyDescriptor[] targetPds = BeanUtils.getPropertyDescriptors(targetCls);
+        List<String> propertiesList = Arrays.asList(properties);
+        List<String> arrayList = new ArrayList<>();
+
+        for (PropertyDescriptor targetPd : targetPds) {
+            Method writeMethod = targetPd.getWriteMethod();
+
+            if (writeMethod != null && !propertiesList.contains(targetPd.getName())){
+                arrayList.add(targetPd.getName());
+            }
+        }
+
+        return arrayList.toArray(new String[arrayList.size()]);
     }
 
     /**
@@ -80,21 +107,27 @@ public class BaseRestController extends AbstractController {
      *
      * @return
      */
-    public void echoCollection(HttpServletResponse response, String baseUri, long resourceCount, long currentPage, long pageSize) {
+    public void pagedResponse(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            long resourceCount, long currentPage, long pageSize) {
         response.setHeader(ResourceCount, Long.toString(resourceCount));
 
-        baseUri = "<" + baseUri + "page=:page&size=" + Long.toString(pageSize) + ">";
+        String baseUri = "<" + request.getRequestURL().append("?").toString() + request.getQueryString() + ">";
 
-        long firstPage = currentPage == 1 ? -1 : new Long(1);
-        long lastPage = currentPage == (resourceCount / pageSize + 1) ? -1 : resourceCount / pageSize + 1;
-        long nextPage = currentPage == (resourceCount / pageSize + 1) ? -1 : currentPage + 1;
-        long previousPage = currentPage == firstPage ? -1 : currentPage - 1;
+        long firstPage = currentPage == 1 ? -1 : 1;
+        long prevPage = currentPage == 1 ? -1 : currentPage - 1;
+
+        long lastPage = resourceCount % pageSize == 0 ? resourceCount / pageSize : resourceCount / pageSize + 1;
+        long nextPage = currentPage == lastPage ? -1 : currentPage + 1;
+
+        lastPage = currentPage == lastPage ? -1 : lastPage;
 
         Map<String, String> map = new HashMap<>();
-        if(firstPage != -1) map.put(baseUri.replace(":page", Long.toString(firstPage)), "rel=\"first\",");
-        if(previousPage != -1) map.put(baseUri.replace(":page", Long.toString(firstPage)), "rel=\"prev\",");
-        if(nextPage != -1) map.put(baseUri.replace(":page", Long.toString(firstPage)), "rel=\"next\",");
-        if(lastPage != -1) map.put(baseUri.replace(":page", Long.toString(firstPage)), "rel=\"last\",");
+        if(firstPage != -1) map.put("rel='first',", baseUri.replaceAll("page=\\d+", "page=" + Long.toString(firstPage)));
+        if(prevPage != -1) map.put("rel='prev',", baseUri.replaceAll("page=\\d+", "page=" + Long.toString(prevPage)));
+        if(nextPage != -1) map.put("rel='next',", baseUri.replaceAll("page=\\d+", "page=" + Long.toString(nextPage)));
+        if(lastPage != -1) map.put("rel='last',", baseUri.replaceAll("page=\\d+", "page=" + Long.toString(lastPage)));
 
         response.setHeader(ResourceLink, linkMap(map));
     }
@@ -102,7 +135,7 @@ public class BaseRestController extends AbstractController {
     private String linkMap(Map<String, String> map){
         StringBuffer links = new StringBuffer("");
         for (String key : map.keySet()){
-            links.append(key).append("; ").append(map.get(key));
+            links.append(map.get(key)).append("; ").append(key);
         }
 
         return links.toString();
@@ -113,11 +146,9 @@ public class BaseRestController extends AbstractController {
      *
      * @param modelList
      * @param totalCount
-     * @param currPage
-     * @param rows
      * @return
      */
-    protected Envelop getResult(List modelList, int totalCount, int currPage, int rows) {
+    protected Envelop getResult(List modelList, int totalCount) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(modelList);

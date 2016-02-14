@@ -21,8 +21,8 @@ import java.io.Serializable;
 public class SystemDictEntry  implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    String code;
     long dictId;
+    String code;
     String value;
     Integer sort;
     String phoneticCode;

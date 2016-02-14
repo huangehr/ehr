@@ -2,26 +2,26 @@ package com.yihu.ehr.apps.controller;
 
 import com.yihu.ehr.apps.feign.ConventionalDictClient;
 import com.yihu.ehr.apps.service.App;
-import com.yihu.ehr.apps.service.AppService;
+import com.yihu.ehr.apps.service.AppJpaService;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.query.URLQueryParser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ResponseHeader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.criteria.CriteriaQuery;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author linaz
@@ -30,10 +30,10 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(ApiVersionPrefix.Version1_0)
-@Api(protocols = "https", value = "Application", description = "EHR应用管理中心接口", tags = {"app"})
+@Api(protocols = "https", value = "Application", description = "EHR应用管理及鉴权", tags = {"应用管理"})
 public class AppController extends BaseRestController {
     @Autowired
-    private AppService appService;
+    private AppJpaService appService;
 
     @Autowired
     private ConventionalDictClient conventionalDictClient;
@@ -43,27 +43,23 @@ public class AppController extends BaseRestController {
      */
     @RequestMapping(value = "/apps", method = RequestMethod.GET)
     @ApiOperation(value = "获取App列表")
-    @ResponseHeader
-    public List<MApp> getApps(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable(value = "api_version") String apiVersion,
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+    public Collection<MApp> getApps(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
-            @ApiParam(name = "filter", value = "过滤器，规则参见说明文档", defaultValue = "")
-            @RequestParam(value = "filter") String filter,
-            @ApiParam(name = "sort", value = "排序，规则参见说明文档", defaultValue = "")
-            @RequestParam(value = "sort") String sort,
-            @ApiParam(name = "size", value = "分页大小", defaultValue = "")
-            @RequestParam(value = "size") int size,
-            @ApiParam(name = "page", value = "页码", defaultValue = "")
-            @RequestParam(value = "page") int page,
-            @Response HttpServletResponse response) throws Exception {
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        List<App> appList = appService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, appService.getCount(filters), page, size);
 
-        List<App> appList = appService.searchApps(conditionMap);
-        int totalCount = appService.getAppCount(conditionMap);
-
-        echoCollection(response, "", totalCount, page, size);
-        return convertToModels(appList, new ArrayList<MApp>(appList.size()), fields);
+        return convertToModels(appList, new ArrayList<MApp>(appList.size()), MApp.class, fields.split(","));
     }
 
     /**
@@ -79,8 +75,6 @@ public class AppController extends BaseRestController {
     @RequestMapping(value = "/apps", method = RequestMethod.POST)
     @ApiOperation(value = "创建App")
     public MApp createApp(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable(value = "api_version") String apiVersion,
             @ApiParam(name = "name", value = "名称", defaultValue = "")
             @RequestParam(value = "name") String name,
             @ApiParam(name = "catalog", value = "类别", defaultValue = "")
@@ -93,8 +87,8 @@ public class AppController extends BaseRestController {
             @RequestParam(value = "tags") String tags,
             @ApiParam(name = "user_id", value = "用户", defaultValue = "")
             @RequestParam(value = "user_id") String userId) throws Exception {
-        MConventionalDict appCatalog = conventionalDictClient.getAppCatalog(apiVersion, catalog);
-        App app = appService.createApp(apiVersion, name, appCatalog, url, tags, description, userId);
+        MConventionalDict appCatalog = conventionalDictClient.getAppCatalog(catalog);
+        App app = appService.createApp(name, appCatalog, url, tags, description, userId);
 
         return convertToModel(app, MApp.class);
     }
@@ -102,19 +96,15 @@ public class AppController extends BaseRestController {
     @RequestMapping(value = "/apps/{app_id}", method = RequestMethod.GET)
     @ApiOperation(value = "获取App")
     public MApp getApp(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable(value = "api_version") String apiVersion,
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
             @PathVariable(value = "app_id") String appId) throws Exception {
-        App app = appService.getApp(appId);
+        App app = appService.retrieve(appId);
         return convertToModel(app, MApp.class);
     }
 
     @RequestMapping(value = "/apps/{app_id}", method = RequestMethod.PUT)
     @ApiOperation(value = "更新App")
     public MApp updateApp(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable(value = "api_version") String apiVersion,
             @ApiParam(name = "app_id", value = "appId", defaultValue = "")
             @PathVariable(value = "app_id") String appId,
             @ApiParam(name = "name", value = "名称", defaultValue = "")
@@ -131,9 +121,9 @@ public class AppController extends BaseRestController {
             @RequestParam(value = "tags") String tags) throws Exception {
 
         App app;
-        MConventionalDict appCatalog = conventionalDictClient.getAppCatalog(apiVersion, catalog);
-        MConventionalDict appStatus = conventionalDictClient.getAppStatus(apiVersion, status);
-        app = appService.getApp(appId);
+        MConventionalDict appCatalog = conventionalDictClient.getAppCatalog(catalog);
+        MConventionalDict appStatus = conventionalDictClient.getAppStatus(status);
+        app = appService.retrieve(appId);
         if (app == null) throw new ApiException(ErrorCode.InvalidAppId);
 
         app.setName(name);
@@ -142,20 +132,16 @@ public class AppController extends BaseRestController {
         app.setUrl(url);
         app.setDescription(description);
         app.setTags(tags);
-        appService.updateApp(app);
+        appService.save(app);
 
         return convertToModel(app, MApp.class);
     }
 
     @RequestMapping(value = "/apps/{app_id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除app")
-    public boolean deleteApp(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable(value = "api_version") String apiVersion,
+    public void deleteApp(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
             @PathVariable(value = "app_id") String appId) throws Exception {
-
-        appService.deleteApp(appId);
-        return true;
+        appService.delete(appId);
     }
 }

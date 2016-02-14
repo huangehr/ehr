@@ -18,8 +18,7 @@ import static springfox.documentation.builders.PathSelectors.regex;
 
 @Configuration
 @EnableSwagger2
-@EnableWebMvc
-@ComponentScan("com.yihu.ehr")
+@ComponentScan("com.yihu.ehr.*.controller")
 public class SwaggerConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -39,7 +38,7 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter {
                 .forCodeGeneration(true)
                 .pathMapping("/")
                 .select()
-                .paths(or(regex("/rest/\\{api_version.*")))
+                .paths(or(regex("/rest.*")))
                 .build()
                 .apiInfo(bizApiInfo());
     }

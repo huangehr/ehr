@@ -1,6 +1,7 @@
 package com.yihu.ehr.dict.service;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -18,11 +19,13 @@ interface XSystemDictEntryRepository extends PagingAndSortingRepository<SystemDi
     @Query("select entry from SystemDictEntry entry where entry.dictId = :dictId")
     List<SystemDictEntry> getByDictId(@Param("dictId") Long dictId);
 
+    @Modifying
     @Query("delete from SystemDictEntry entry where entry.dictId = :dictId")
     void deleteByDictId(@Param("dictId") long dictId);
 
+    @Modifying
     @Query("delete from SystemDictEntry entry where entry.dictId = :dictId and entry.code = :code")
-    void deleteByDictIdAndCode(@Param("dictId") long dictId,@Param("code") String code);
+    void deleteByEntryCode(@Param("dictId") long dictId, @Param("code") String code);
 
     @Query("select max(entry.sort) from SystemDictEntry entry where entry.dictId = :dictId")
     Integer getNextEntrySort(@Param("dictId") long dictId);
