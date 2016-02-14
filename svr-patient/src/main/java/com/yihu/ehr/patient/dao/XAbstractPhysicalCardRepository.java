@@ -14,7 +14,4 @@ import java.util.List;
  */
 public interface XAbstractPhysicalCardRepository extends PagingAndSortingRepository<AbstractPhysicalCard, String> {
 
-    @Query("select abstractPhysicalCard from AbstractPhysicalCard abstractPhysicalCard where 1=1")
-    public List<AbstractPhysicalCard> getOrgByCode(@Param("orgCode") String orgCode);
-
 }

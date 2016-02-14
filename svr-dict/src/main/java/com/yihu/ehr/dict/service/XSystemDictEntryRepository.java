@@ -39,8 +39,8 @@ interface XSystemDictEntryRepository extends PagingAndSortingRepository<SystemDi
     @Query("select entry from SystemDictEntry entry where entry.dictId  =:dictId order by entry.sort asc")
     List<SystemDictEntry> getConventionalDictList(@Param("dictId") long dictId);
 
-    @Query("select entry from SystemDictEntry entry where entry.dictId = :dictId and entry.code in ( :codes) order by entry.sort asc")
-    List<SystemDictEntry> getConventionalDictList(@Param("dictId") long dictId, @Param("codes") String codes);
+    @Query("select entry from SystemDictEntry entry where entry.dictId = :dictId and entry.code in (:codes) order by entry.sort asc")
+    List<SystemDictEntry> getConventionalDictList(@Param("dictId") long dictId, @Param("codes") String[] codes);
 
     @Query("select entry from SystemDictEntry entry where entry.dictId = :dictId order by entry.sort asc")
     List<SystemDictEntry> findAll(@Param("dictId") long dictId, Pageable pageable);

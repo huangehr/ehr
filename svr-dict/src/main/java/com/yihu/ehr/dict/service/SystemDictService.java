@@ -126,6 +126,6 @@ public class SystemDictService {
     }
 
     public List<SystemDictEntry> getConvertionalDicts(long dictId, String[] codes) {
-        return systemDictEntryRepository.getConventionalDictList(dictId, String.join(",", codes));
+        return systemDictEntryRepository.getConventionalDictList(dictId, codes);
     }
 }
