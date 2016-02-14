@@ -38,16 +38,6 @@ public class GeographyService {
 
 	public GeographyService(){}
 
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public GeographyDict createAddrDict() {
-        GeographyDict addressDict = new GeographyDict();
-        return addressDict;
-    }
-
-    public void deleteAddrDict(int id) {
-        addressDictRepository.delAddressDict(id);
-    }
-
     /**
      * 根据地址字典id获取地址字典
      * @param id
@@ -57,15 +47,6 @@ public class GeographyService {
         GeographyDict addressDict = addressDictRepository.getAddressDictById(id);
         return addressDict;
 	}
-
-    /**
-     * 根据地址id获取地址
-     * @param id
-     * @return
-     */
-    public Geography getAddr(String id) {
-        return addressRepository.findOne(id);
-    }
 
 	public List<GeographyDict> getLevelToAddr(Integer level){
         List<GeographyDict> addressDictList = addressDictRepository.getAddrDictByLevel(level);
@@ -77,16 +58,10 @@ public class GeographyService {
         return addressDictList;
 	}
 
-    public GeographyDict saveAddrDict(GeographyDict addressDict) {
-        addressDictRepository.save(addressDict);
-        return addressDict;
-    }
-
     /**
 	 * 地址检查并保存
 	 * @param address
 	 */
-    @Transactional(Transactional.TxType.REQUIRED)
 	public String saveAddress(Geography address) {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         Criteria criteria = session.createCriteria(Geography.class);
@@ -159,58 +134,13 @@ public class GeographyService {
         return address.getId();
     }
 
-    /**
-     * 传入一个id，获取最上级到此地址的完整地址（如：传入厦门的id，返回address中国、福建省、厦门市）
-     * @param id
-     * @param address
-     * */
-    public Geography getFullAddress(Integer id, Geography address){
-        if (address==null){
-            address=new Geography();
-        }
-        GeographyDict addressDict = getAddrDict(id.toString());
-        int level = addressDict.getLevel();
-        switch (level) {
-            case 0: address.setCountry(addressDict.getName());break;
-            case 1: address.setProvince(addressDict.getName()); break;
-            case 2: address.setCity(addressDict.getName()); break;
-            case 3: address.setDistrict(addressDict.getName()); break;
-            case 4: address.setTown(addressDict.getName()); break;
-            case 5: address.setStreet(addressDict.getName()); break;
-            default:
-        }
-        String postCode = addressDict.getPostcode();
-        if(StringUtils.isEmpty(address.getPostalCode()) && !StringUtils.isEmpty(postCode)) {
-            address.setPostalCode(postCode);
-        }
-        if (level>0){
-            getFullAddress(addressDict.getPid(),address);
-        }
-        return address;
-    }
-
-    public boolean isNullAddress(Geography address) {
-        return address.getProvince() == null
-                && address.getCity() == null
-                && address.getDistrict() == null
-                && address.getTown() == null
-                && address.getCountry() == null
-                && address.getStreet() == null;
-    }
-
-    /**
-     *  地址从字典导入
-     */
-    public String[] importDict(){
-        Session session = entityManager.unwrap(org.hibernate.Session.class);
-        List<String> newAddr=new ArrayList<>();
-        String hql = " from AddressDict a where a.id not in (select a.id from AddressDict b where a.id=b.pid)";
-        Query query = session.createQuery(hql);
-        List<GeographyDict> addressDictList =query.list();
-        for (GeographyDict loop:addressDictList){
-            newAddr.add(saveAddress(getFullAddress(loop.getId(), null)));
-        }
-        return newAddr.toArray(new String[newAddr.size()]);
+    public boolean isNullAddress(Geography geography) {
+        return geography.getProvince() == null
+                && geography.getCity() == null
+                && geography.getDistrict() == null
+                && geography.getTown() == null
+                && geography.getCountry() == null
+                && geography.getStreet() == null;
     }
 
 
@@ -250,7 +180,6 @@ public class GeographyService {
     }
 
     public List<String> search(String province, String city, String district) {
-
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         String hql =
                 "SELECT " +
@@ -274,11 +203,7 @@ public class GeographyService {
 
     }
 
-
-
-
-    @Transactional(Transactional.TxType.REQUIRED)
-    public void deleteAddres(Geography address) {
+    public void deleteAddress(Geography address) {
         addressRepository.delete(address);
     }
 }
