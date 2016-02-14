@@ -25,9 +25,9 @@ public class DemographicInfo {
     private String email;                            // 邮箱
     private String gender;                            // 性别
     private String name;                            // 姓名
-    private String martialStatus;            // 婚姻情况
+    private String martialStatus;                  // 婚姻情况
     private String nation;                            // 民族
-    private String residenceType;            // 户口性质（农村、城镇）
+    private String residenceType;                  // 户口性质（农村、城镇）
     private String workAddress;                    // 工作地址
     private String homeAddress;                    // 家庭地址
     private String password;                        //密码

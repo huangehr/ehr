@@ -1,22 +1,23 @@
 package com.yihu.ehr.patient.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.patient.MDemographicInfo;
-import com.yihu.ehr.patient.feign.AddressClient;
+import com.yihu.ehr.patient.feign.GeographyClient;
 import com.yihu.ehr.patient.feign.ConventionalDictClient;
-import com.yihu.ehr.patient.paientIdx.model.DemographicIndex;
+import com.yihu.ehr.patient.service.demographic.DemographicIndex;
 import com.yihu.ehr.patient.service.demographic.DemographicId;
 import com.yihu.ehr.patient.service.demographic.DemographicInfo;
-import com.yihu.ehr.patient.service.demographic.PatientModel;
 import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.util.encode.HashUtil;
 import com.yihu.ehr.util.log.LogService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.netflix.feign.EnableFeignClients;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,8 +31,8 @@ import java.util.Map;
  * Created by zqb on 2015/8/14.
  */
 @RestController
-@RequestMapping("/patient")
-@EnableFeignClients
+@RequestMapping(ApiVersionPrefix.Version1_0)
+@Api(protocols = "https", value = "patient", description = "人口管理", tags = {"人口管理"})
 public class PatientController extends BaseRestController {
 
     @Autowired
@@ -41,16 +42,43 @@ public class PatientController extends BaseRestController {
     private FastDFSUtil fastDFSUtil;
 
     @Autowired
-    private AddressClient addressClient;
-
-    @Autowired
     private ConventionalDictClient conventionalDictClient;
 
+    @Autowired
+    private GeographyClient addressClient;
 
-
-    @RequestMapping("/search")
-    @ResponseBody
-    public Object searchPatient(String name,String idCardNo,String province, String city, String district, int page, int rows){
+    /**
+     * 根据条件查询人口信息
+     * @param apiVersion
+     * @param name
+     * @param idCardNo
+     * @param province
+     * @param city
+     * @param district
+     * @param page
+     * @param rows
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/populations",method = RequestMethod.GET)
+    @ApiOperation(value = "根据条件查询人")
+    public Object searchPatient(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
+            @ApiParam(name = "name", value = "姓名", defaultValue = "")
+            @RequestParam(value = "name") String name,
+            @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
+            @RequestParam(value = "id_card_no") String idCardNo,
+            @ApiParam(name = "province", value = "省", defaultValue = "")
+            @RequestParam(value = "province") String province,
+            @ApiParam(name = "city", value = "市", defaultValue = "")
+            @RequestParam(value = "city") String city,
+            @ApiParam(name = "district", value = "县", defaultValue = "")
+            @RequestParam(value = "district") String district,
+            @ApiParam(name = "page", value = "当前页", defaultValue = "")
+            @RequestParam(value = "page") Integer page,
+            @ApiParam(name = "rows", value = "行数", defaultValue = "")
+            @RequestParam(value = "rows") Integer rows) throws Exception{
         Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("name", name);
         conditionMap.put("idCardNo", idCardNo);
@@ -59,89 +87,151 @@ public class PatientController extends BaseRestController {
         conditionMap.put("province", province);
         conditionMap.put("city", city);
         conditionMap.put("district", district);
-        List<DemographicInfo> demographicInfos = demographicIndex.searchPatientBrowseModel(conditionMap);
+        List<DemographicInfo> demographicInfos = demographicIndex.searchPatient(apiVersion,conditionMap);
         List<MDemographicInfo> demographicModels = new ArrayList<>();
         for(DemographicInfo demographicInfo:demographicInfos){
             MDemographicInfo demographicModel = convertToModel(demographicInfo,MDemographicInfo.class);
-            demographicModel.setBirthPlace(addressClient.getAddressById(demographicInfo.getBirthPlace()));
-            demographicModel.setNativePlace(addressClient.getAddressById(demographicInfo.getNativePlace()));
-            demographicModel.setWorkAddress(addressClient.getAddressById(demographicInfo.getWorkAddress()));
-            demographicModel.setHomeAddress(addressClient.getAddressById(demographicInfo.getHomeAddress()));
-            demographicModel.setGender(conventionalDictClient.getGender(demographicInfo.getGender()));
-            demographicModel.setMartialStatus(conventionalDictClient.getMartialStatus(demographicInfo.getMartialStatus()));
-            demographicModel.setResidenceType(conventionalDictClient.getResidenceType(demographicInfo.getResidenceType()));
+            demographicModel.setBirthPlace(addressClient.getAddressById(apiVersion,demographicInfo.getBirthPlace()));
+            demographicModel.setNativePlace(addressClient.getAddressById(apiVersion,demographicInfo.getNativePlace()));
+            demographicModel.setWorkAddress(addressClient.getAddressById(apiVersion,demographicInfo.getWorkAddress()));
+            demographicModel.setHomeAddress(addressClient.getAddressById(apiVersion,demographicInfo.getHomeAddress()));
+            demographicModel.setGender(conventionalDictClient.getGender(apiVersion,demographicInfo.getGender()));
+            demographicModel.setMartialStatus(conventionalDictClient.getMartialStatus(apiVersion,demographicInfo.getMartialStatus()));
+            demographicModel.setResidenceType(conventionalDictClient.getResidenceType(apiVersion,demographicInfo.getResidenceType()));
             demographicModels.add(demographicModel);
         }
-        Integer totalCount = demographicIndex.searchPatientInt(conditionMap);
+        Integer totalCount = demographicIndex.searchPatientTotalCount(apiVersion,conditionMap);
         return getResult(demographicModels,totalCount,page,rows);
     }
 
 
-    /* 删除病人信息 requestBody格式:
-    * "idCardNo":""  //身份证号
-    */
-    @RequestMapping("deletePatient")
-    @ResponseBody
-    public Object deletePatient(String idCardNo) {
+    /**
+     * 根据身份证号删除人
+     * @param apiVersion
+     * @param idCardNo
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/populations/{id_card_no}",method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据身份证号删除人")
+    public Object deletePatient(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
+            @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
+            @PathVariable(value = "id_card_no") String idCardNo) throws Exception{
         demographicIndex.delete(new DemographicId(idCardNo));
         return true;
     }
 
 
     /**
-     * 获取病人信息
+     * 根据身份证号查找人
+     * @param apiVersion
      * @param idCardNo
      * @return
+     * @throws Exception
      */
-    @RequestMapping(value = "getPatient" ,method = RequestMethod.GET)
-    public Object getPatient(String idCardNo) {
+    @RequestMapping(value = "/populations/{id_card_no}",method = RequestMethod.GET)
+    @ApiOperation(value = "根据身份证号查找人")
+    public MDemographicInfo getPatient(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
+            @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
+            @PathVariable(value = "id_card_no") String idCardNo) throws Exception{
         DemographicInfo demographicInfo = demographicIndex.getDemographicInfo(new DemographicId(idCardNo));
-        PatientModel patientModel = demographicIndex.getPatient(demographicInfo);
-        return patientModel;
+        MDemographicInfo demographicModel = convertToModel(demographicInfo,MDemographicInfo.class);
+        demographicModel.setBirthPlace(addressClient.getAddressById(apiVersion,demographicInfo.getBirthPlace()));
+        demographicModel.setNativePlace(addressClient.getAddressById(apiVersion,demographicInfo.getNativePlace()));
+        demographicModel.setWorkAddress(addressClient.getAddressById(apiVersion,demographicInfo.getWorkAddress()));
+        demographicModel.setHomeAddress(addressClient.getAddressById(apiVersion,demographicInfo.getHomeAddress()));
+        demographicModel.setGender(conventionalDictClient.getGender(apiVersion,demographicInfo.getGender()));
+        demographicModel.setMartialStatus(conventionalDictClient.getMartialStatus(apiVersion,demographicInfo.getMartialStatus()));
+        demographicModel.setResidenceType(conventionalDictClient.getResidenceType(apiVersion,demographicInfo.getResidenceType()));
+        return demographicModel;
     }
 
     /**
      * 检查身份证是否已经存在
+     * @param apiVersion
+     * @param idCardNo
+     * @return
+     * @throws Exception
      */
-    @RequestMapping("/demographicInfo/idCardNo")
-    public Object checkIdCardNo(String IdCardNo){
-        DemographicInfo demographicInfo = demographicIndex.getDemographicInfo(new DemographicId(IdCardNo));
+    @RequestMapping(value = "/populations/{id_card_no}",method = RequestMethod.GET)
+    @ApiOperation(value = "检查身份证是否已经存在")
+    public boolean checkIdCardNo(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
+            @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
+            @PathVariable(value = "id_card_no") String idCardNo) throws Exception{
+        DemographicInfo demographicInfo = demographicIndex.getDemographicInfo(new DemographicId(idCardNo));
         return demographicInfo!=null;
 
     }
 
-    @RequestMapping(value="updatePatient")
-    @ResponseBody
-    //注册或更新病人信息Header("Content-type: text/html; charset=UTF-8")
-    public Object updatePatient(String patientJsonData,HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        String IdCardNo = "";
-        DemographicInfo demographicInfo = demographicIndex.getDemographicInfo(new DemographicId(IdCardNo));
-
-//        String patientData = URLDecoder.decode(patientJsonData,"UTF-8");
-//
-//        //将文件保存至服务器，返回文件的path，
+    /**
+     * 根据前端传回来的json新增一个人口信息
+     * @param patientModelJsonData
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/populations",method = RequestMethod.POST)
+    @ApiOperation(value = "根据前端传回来的json创建一个人口信息")
+    public boolean createPatient(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
+            @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
+            @RequestParam(value = "patient_model_json_data") String patientModelJsonData,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception{
+        //将文件保存至服务器，返回文件的path，
         String picPath = webupload(request, response);
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        PatientModel patientModels = objectMapper.readValue(patientData, PatientModel.class);
+        ObjectMapper objectMapper = new ObjectMapper();
+        MDemographicInfo demographicInfoModel = objectMapper.readValue(patientModelJsonData, MDemographicInfo.class);
         //将文件path保存至数据库
-        demographicInfo.setPicPath(picPath);
+        demographicInfoModel.setPicPath(picPath);
         if(picPath != null){
-            demographicInfo.setLocalPath("");
+            demographicInfoModel.setLocalPath("");
         }
-        if (demographicIndex.updatePatient(demographicInfo)) {
-            return true;
-        } else {
-            return true;
-        }
-    }
-
-    @RequestMapping("/resetPass")
-    public Object resetPass(String idCardNo) {
-        demographicIndex.resetPass(new DemographicId(idCardNo));
+        String pwd = "123456";
+        demographicInfoModel.setPassword(HashUtil.hashStr(pwd));
+        demographicIndex.savePatient(apiVersion,demographicInfoModel);
         return true;
     }
 
+    /**
+     * 根据前端传回来的json修改人口信息
+     * @param patientModelJsonData
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/populations",method = RequestMethod.PUT)
+    @ApiOperation(value = "根据前端传回来的json修改人口信息")
+    public boolean updatePatient(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
+            @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
+            @RequestParam(value = "patient_model_json_data") String patientModelJsonData,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception{
+
+        //将文件保存至服务器，返回文件的path，
+        String picPath = webupload(request, response);
+        ObjectMapper objectMapper = new ObjectMapper();
+        MDemographicInfo demographicInfoModel = objectMapper.readValue(patientModelJsonData, MDemographicInfo.class);
+        //将文件path保存至数据库
+        demographicInfoModel.setPicPath(picPath);
+        if(picPath != null){
+            demographicInfoModel.setLocalPath("");
+        }
+        demographicIndex.savePatient(apiVersion,demographicInfoModel);
+        return true;
+    }
 
     /**
      * 人口信息头像图片上传
@@ -182,6 +272,27 @@ public class PatientController extends BaseRestController {
         return path;
     }
 
+    /**
+     * 初始化密码
+     * @param apiVersion
+     * @param idCardNo
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/populations/password/{id_card_no}",method = RequestMethod.PUT)
+    @ApiOperation(value = "初始化密码",notes = "用户忘记密码时重置密码，初始密码为123456")
+    public Object resetPass(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
+            @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
+            @PathVariable(value = "id_card_no") String idCardNo) throws Exception{
+        demographicIndex.resetPass(new DemographicId(idCardNo));
+        return true;
+    }
+
+
+
+
 
     /**
      * 注：因直接访问文件路径，无法显示文件信息
@@ -191,9 +302,15 @@ public class PatientController extends BaseRestController {
      * @param localImgPath       文件路径
      * @throws Exception
      */
-    @RequestMapping("showImage")
-    @ResponseBody
-    public void showImage(HttpServletRequest request, HttpServletResponse response, String localImgPath) throws Exception {
+    @RequestMapping(value = "/populations/images/{local_img_path}",method = RequestMethod.PUT)
+    @ApiOperation(value = "显示头像")
+    public void showImage(
+            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @PathVariable( value = "api_version") String apiVersion,
+            @ApiParam(name = "local_img_path", value = "身份证号", defaultValue = "")
+            @PathVariable(value = "local_img_path") String localImgPath,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception{
         response.setContentType("text/html; charset=UTF-8");
         response.setContentType("image/jpeg");
         FileInputStream fis = null;

@@ -1,9 +1,8 @@
 package com.yihu.ehr.patient.service.card;
 
-import com.yihu.ehr.model.address.MAddress;
+import com.yihu.ehr.model.address.MGeography;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.org.MOrganization;
-import com.yihu.ehr.model.user.MUser;
 
 import java.util.Date;
 
@@ -26,7 +25,7 @@ public class MAbstractCard {
 	String idCardNo;
 	String DType;
 	//特殊字段
-	MAddress local;				// 发行地/归属地
+	MGeography local;				// 发行地/归属地
 	MOrganization releaseOrg;				// 发行机构
 	Date releaseDate;			// 发行时间
 	Date validityDateBegin;		// 有效期起始时间
@@ -117,11 +116,11 @@ public class MAbstractCard {
 		this.DType = DType;
 	}
 
-	public MAddress getLocal() {
+	public MGeography getLocal() {
 		return local;
 	}
 
-	public void setLocal(MAddress local) {
+	public void setLocal(MGeography local) {
 		this.local = local;
 	}
 
