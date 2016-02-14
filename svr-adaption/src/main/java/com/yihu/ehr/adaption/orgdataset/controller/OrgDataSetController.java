@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adaption.orgdataset.service.OrgDataSet;
 import com.yihu.ehr.adaption.orgdataset.service.OrgDataSetManager;
 import com.yihu.ehr.constants.ApiVersionPrefix;
-import com.yihu.ehr.constrant.Result;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.parm.PageModel;
 import io.swagger.annotations.Api;
@@ -21,7 +20,7 @@ import java.util.Date;
  * @created 2016.2.1
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/orgdataset")
+@RequestMapping(ApiVersionPrefix.CommonVersion + "adapter/org")
 @Api(protocols = "https", value = "orgdataset", description = "机构数据集管理接口", tags = {"机构数据集"})
 
 public class OrgDataSetController extends BaseRestController {
@@ -29,7 +28,7 @@ public class OrgDataSetController extends BaseRestController {
     @Autowired
     private OrgDataSetManager orgDataSetManager;
 
-    @RequestMapping(value = "/info", method = RequestMethod.GET)
+    @RequestMapping(value = "/dataset", method = RequestMethod.GET)
     @ApiOperation(value = "根据id查询实体")
     public Result getOrgDataSet(
             @ApiParam(name = "id", value = "编号", defaultValue = "")

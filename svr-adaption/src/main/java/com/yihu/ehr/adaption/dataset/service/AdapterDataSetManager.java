@@ -3,6 +3,10 @@ package com.yihu.ehr.adaption.dataset.service;
 
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlan;
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanManager;
+import com.yihu.ehr.model.adaption.MAdapterDataSet;
+import com.yihu.ehr.model.adaption.MDataSet;
+import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.parm.PageModel;
 import com.yihu.ehr.util.service.BaseManager;
 import com.yihu.ehr.adaption.dict.service.AdapterDictManager;
 import com.yihu.ehr.adaption.feignclient.DictClient;
@@ -10,10 +14,12 @@ import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -32,16 +38,16 @@ public class AdapterDataSetManager extends BaseManager<AdapterDataSet, XAdapterD
     @Autowired
     DictClient dictClient;
 
+
     /**
      * 根据方案ID及查询条件查询数据集适配关系
      *
      * @param planId
-     * @param strKey
+     * @param pageModel
      */
-    public List<DataSetModel> searchAdapterDataSet(long planId, String strKey, int page, int rows) {
+    public List<MDataSet> searchAdapterDataSet(long planId, String version, PageModel pageModel) {
 
-        OrgAdapterPlan orgAdapterPlan = orgAdapterPlanManager.findOne(planId);
-        String dsTableName = CDAVersionUtil.getDataSetTableName(orgAdapterPlan.getVersion());
+        String dsTableName = CDAVersionUtil.getDataSetTableName(version);
         Session session = currentSession();
         StringBuilder sb = new StringBuilder();
 
@@ -51,96 +57,75 @@ public class AdapterDataSetManager extends BaseManager<AdapterDataSet, XAdapterD
         sb.append("   from adapter_dataset ads     ");
         sb.append("        left join " + dsTableName + " on ads.std_dataset = " + dsTableName + ".id  ");
         sb.append("  where ads.plan_id = " + planId);
-        if (!(strKey == null || strKey.equals(""))) {
-            sb.append(" and (" + dsTableName + ".code like '%" + strKey + "%' or " + dsTableName + ".name like '%" + strKey + "%')");
-        }
-        sb.append(" order by " + dsTableName + ".code");
-
+        sb.append(pageModel.formatSqlWithOrder(dsTableName));
 
         String sql = sb.toString();
         SQLQuery sqlQuery = session.createSQLQuery(sql);
-
-        sqlQuery.setMaxResults(rows);
-        sqlQuery.setFirstResult((page - 1) * rows);
-
-        List<Object> records = sqlQuery.list();
-
-        if (records.size() == 0) {
-            return null;
-        } else {
-            List<DataSetModel> dataSetModels = new ArrayList<>();
-            for (int i = 0; i < records.size(); ++i) {
-                Object[] record = (Object[]) records.get(i);
-                DataSetModel dataSet = new DataSetModel();
-                dataSet.setId((Integer) record[0]);
-                dataSet.setCode((String) record[1]);
-                dataSet.setName((String) record[2]);
-                dataSetModels.add(dataSet);
-            }
-            return dataSetModels;
+        setQueryVal(sqlQuery, pageModel);
+        if(pageModel.getPage()>0){
+            sqlQuery.setMaxResults(pageModel.getRows());
+            sqlQuery.setFirstResult((pageModel.getPage() - 1) * pageModel.getRows());
         }
+        sqlQuery.setResultTransformer(Transformers.aliasToBean(MDataSet.class));
+        return sqlQuery.list();
     }
 
-
     /**
-     * 查询适配数据集的总条数
+     * 查询适配数据集的总数
      *
      * @return
      */
-    public int searchDataSetInt(long planId, String strKey) {
+    public int searchDataSetInt(long planId, String version, PageModel pageModel) {
         Session session = currentSession();
         StringBuilder sb = new StringBuilder();
-        OrgAdapterPlan orgAdapterPlan = orgAdapterPlanManager.findOne(planId);
-        String dsTableName = CDAVersionUtil.getDataSetTableName(orgAdapterPlan.getVersion());
-        sb.append(" select distinct " + dsTableName + ".id    ");
+        String dsTableName = CDAVersionUtil.getDataSetTableName(version);
+        sb.append(" select count(*) from ");
+        sb.append(" (select distinct " + dsTableName + ".id ");
         sb.append("       ," + dsTableName + ".code  ");
         sb.append("       ," + dsTableName + ".name  ");
         sb.append("   from adapter_dataset ads     ");
         sb.append("        left join " + dsTableName + " on ads.std_dataset = " + dsTableName + ".id  ");
         sb.append("  where ads.plan_id = " + planId);
-        if (!(strKey == null || strKey.equals(""))) {
-            sb.append(" and (" + dsTableName + ".code like '%" + strKey + "%' or " + dsTableName + ".name like '%" + strKey + "%')");
-        }
-        sb.append(" order by " + dsTableName + ".code");
+        sb.append(pageModel.formatSql(dsTableName));
+        sb.append(") t");
         String sql = sb.toString();
         SQLQuery sqlQuery = session.createSQLQuery(sql);
-        int i=  sqlQuery.list().size();
-        return i;
+        setQueryVal(sqlQuery, pageModel);
+        return ((BigInteger)sqlQuery.list().get(0)).intValue();
     }
 
 
     /**
      * 根据datasetId搜索数据元适配关系
      *
-     * @param planId
+     * @param orgAdapterPlan
      * @param dataSetId
-     * @param strKey
+     * @param pageModel
      */
-    public List<AdapterDataSetModel> searchAdapterMetaData(long planId, long dataSetId, String strKey, int page, int rows) {
+    public List<AdapterDataSetModel> searchAdapterMetaData(OrgAdapterPlan orgAdapterPlan, long dataSetId, PageModel pageModel) {
 
-        OrgAdapterPlan orgAdapterPlan = orgAdapterPlanManager.findOne(planId);
         String orgCode = orgAdapterPlan.getOrg();
         String dsTableName = CDAVersionUtil.getDataSetTableName(orgAdapterPlan.getVersion());
         String mdTableName = CDAVersionUtil.getMetaDataTableName(orgAdapterPlan.getVersion());
-
+        long planId = orgAdapterPlan.getId();
         Session session = currentSession();
         StringBuilder sb = new StringBuilder();
 
-        sb.append(" select ads.id                    ");
-        sb.append("       ,ads.plan_id               ");
-        sb.append("       ," + dsTableName + ".id   as dsid  ");
-        sb.append("       ," + dsTableName + ".code  as dscode ");
-        sb.append("       ," + dsTableName + ".name  as dsname ");
-        sb.append("       ," + mdTableName + ".id    as mdid ");
-        sb.append("       ," + mdTableName + ".inner_code  as mdcode ");
-        sb.append("       ," + mdTableName + ".name   as mdname ");
-        sb.append("       ," + mdTableName + ".column_type  as mdcolumn_type ");
-        sb.append("       ,  orgDS.id   as orgDSid ");
-        sb.append("       ,  orgDS.code as orgDScode ");
-        sb.append("       ,  orgDS.name as orgDSname ");
-        sb.append("       ,  orgMD.id as orgMDid  ");
-        sb.append("       ,  orgMD.code as orgMDcode ");
-        sb.append("       ,  orgMD.name as orgMDname ");
+        sb.append(" select ads.id                               ");
+        sb.append("       ,ads.plan_id as adapterPlanId         ");
+        sb.append("       ," + dsTableName + ".id   as dataSetId  ");
+        sb.append("       ," + dsTableName + ".code as dataSetCode ");
+        sb.append("       ," + dsTableName + ".name as dataSetName ");
+        sb.append("       ," + mdTableName + ".id   as metaDataId ");
+        sb.append("       ," + mdTableName + ".inner_code  as metaDataCode ");
+        sb.append("       ," + mdTableName + ".name as metaDataName ");
+        sb.append("       ," + mdTableName + ".column_type as dataTypeName ");
+        sb.append("       ,  orgDS.id   as orgDataSetSeq   ");
+        sb.append("       ,  orgDS.code as orgDataSetCode  ");
+        sb.append("       ,  orgDS.name as orgDataSetName  ");
+        sb.append("       ,  orgMD.id   as orgMetaDataSeq  ");
+        sb.append("       ,  orgMD.code as orgMetaDataCode ");
+        sb.append("       ,  orgMD.name as orgMetaDataName ");
         sb.append("   from adapter_dataset ads ");
         sb.append("        left join " + dsTableName + " on ads.std_dataset = " + dsTableName + ".id  ");
         sb.append("        left join " + mdTableName + " on ads.std_metadata = " + mdTableName + ".id ");
@@ -148,86 +133,35 @@ public class AdapterDataSetManager extends BaseManager<AdapterDataSet, XAdapterD
         sb.append("        left join org_std_metadata orgMD on (orgMD.sequence = ads.org_metadata and orgMD.organization='" + orgCode + "')  ");
         sb.append("  where ads.plan_id = " + planId);
         sb.append("    and ads.std_dataset = " + dataSetId);
-        if (!(strKey == null || strKey.equals(""))) {
-            sb.append("    and (" + mdTableName + ".code like '%" + strKey + "%' or " + mdTableName + ".name like '%" + strKey + "%')");
-        }
-        sb.append(" order by " + mdTableName + ".code");
+        sb.append(pageModel.formatSqlWithOrder(mdTableName));
 
         String sql = sb.toString();
         SQLQuery sqlQuery = session.createSQLQuery(sql);
-
-        if(rows>0){
-            sqlQuery.setMaxResults(rows);
-            sqlQuery.setFirstResult((page - 1) * rows);
+        setQueryVal(sqlQuery, pageModel);
+        if(pageModel.getPage()>0){
+            sqlQuery.setMaxResults(pageModel.getRows());
+            sqlQuery.setFirstResult((pageModel.getPage() - 1) * pageModel.getPage());
         }
-
-        List<Object> records = sqlQuery.list();
-
-        if (records.size() == 0) {
-            return null;
-
-        } else {
-
-            List<AdapterDataSetModel> adapterDataSetModels = new ArrayList<>();
-            for (int i = 0; i < records.size(); ++i) {
-                Object[] record = (Object[]) records.get(i);
-                AdapterDataSetModel adapterDataSetModel = new AdapterDataSetModel();
-
-                adapterDataSetModel.setId(Long.parseLong(record[0].toString()));
-                adapterDataSetModel.setAdapterPlanId(Long.parseLong(record[1].toString()));
-                adapterDataSetModel.setDataSetId(Long.parseLong(record[2].toString()));
-                adapterDataSetModel.setDataSetCode(record[3].toString());
-                adapterDataSetModel.setDataSetName(record[4].toString());
-                adapterDataSetModel.setMetaDataId(Long.parseLong(record[5].toString()));
-                adapterDataSetModel.setMetaDataCode(record[6].toString());
-                adapterDataSetModel.setMetaDataName(record[7].toString());
-                if (record[8] != null) {
-                    adapterDataSetModel.setDataTypeName(record[8].toString());
-                }
-                if (record[9] != null) {
-                    adapterDataSetModel.setOrgDataSetSeq(Long.parseLong(record[9].toString()));
-                }
-                if (record[10] != null) {
-                    adapterDataSetModel.setOrgDataSetCode(record[10].toString());
-                }
-                if (record[11] != null) {
-                    adapterDataSetModel.setOrgDataSetName(record[11].toString());
-                }
-                if (record[12] != null) {
-                    adapterDataSetModel.setOrgMetaDataSeq(Long.parseLong(record[12].toString()));
-                }
-                if (record[13] != null) {
-                    adapterDataSetModel.setOrgMetaDataCode(record[13].toString());
-                }
-                if (record[14] != null) {
-                    adapterDataSetModel.setOrgMetaDataName(record[14].toString());
-                }
-
-                adapterDataSetModels.add(adapterDataSetModel);
-            }
-
-            return adapterDataSetModels;
-        }
+        sqlQuery.setResultTransformer(Transformers.aliasToBean(MAdapterDataSet.class));
+        return sqlQuery.list();
     }
 
 
-    public int searchMetaDataInt(long planId, long dataSetId, String strKey) {
+    public int searchMetaDataInt(OrgAdapterPlan orgAdapterPlan, long dataSetId, PageModel pageModel) {
+        long planId = orgAdapterPlan.getId();
         Session session = currentSession();
         StringBuilder sb = new StringBuilder();
-        OrgAdapterPlan orgAdapterPlan = orgAdapterPlanManager.findOne(planId);
         String mdTableName = CDAVersionUtil.getMetaDataTableName(orgAdapterPlan.getVersion());
         sb.append(" select count(*)    ");
         sb.append("   from adapter_dataset ads     ");
         sb.append("        left join " + mdTableName + " on ads.std_metadata = " + mdTableName + ".id ");
         sb.append("  where ads.plan_id = " + planId);
         sb.append("    and ads.std_dataset = " + dataSetId);
-        if (!(strKey == null || strKey.equals(""))) {
-            sb.append("    and (" + mdTableName + ".code like '%" + strKey + "%' or " + mdTableName + ".name like '%" + strKey + "%')");
-        }
+        sb.append(pageModel.formatSql(mdTableName));
         String sql = sb.toString();
         SQLQuery sqlQuery = session.createSQLQuery(sql);
-        BigInteger i=  (BigInteger)sqlQuery.list().get(0);
-        return i.intValue();
+        setQueryVal(sqlQuery, pageModel);
+        return ((BigInteger)sqlQuery.list().get(0)).intValue();
     }
 
 
@@ -281,7 +215,7 @@ public class AdapterDataSetManager extends BaseManager<AdapterDataSet, XAdapterD
      *
      * @param ids return >0 success
      */
-    public int deleteAdapterDataSet(Long[] ids) {
+    public int deleteAdapterDataSet(Object[] ids) {
         if (ids == null || ids.length == 0) {
             return 0;
         }
@@ -290,8 +224,8 @@ public class AdapterDataSetManager extends BaseManager<AdapterDataSet, XAdapterD
         List<Long> value = null;
         Long stdDictId, planId;
         //要先删除数据字典映射
-        for (Long id : ids) {
-            AdapterDataSet ds = findOne(id);
+        for (Object id : ids) {
+            AdapterDataSet ds = findOne(Long.parseLong((String)id));
             stdDictId = ds.getStdDict();
             if(stdDictId!=null){
                 planId = ds.getAdapterPlanId();
