@@ -21,10 +21,10 @@ public interface AppClient {
             @PathVariable(value = "secret") String appSecret);
 
 
-    @RequestMapping(value = "/rest/{api_version}/app", method = GET )
+    @RequestMapping(value = "/rest/{api_version}/apps/{app_id}", method = GET )
     MApp getApp(
             @PathVariable(value = "api_version") String apiVersion,
-            @RequestParam(value = "appId") String appId);
+            @PathVariable(value = "app_id") String appId);
 
 
 }

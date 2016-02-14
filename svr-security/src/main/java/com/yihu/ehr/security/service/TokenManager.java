@@ -31,7 +31,6 @@ public class TokenManager {
     @Autowired
     private XUserTokenRepository userTokenRepository;
 
-    @Transactional(Transactional.TxType.SUPPORTS)
     public UserToken createUserToken(String userId, String appId) throws Exception {
 
         //生成token信息
@@ -57,13 +56,11 @@ public class TokenManager {
     /**
      * 根据授权ID查询用户授权信息
      */
-    @Transactional(Transactional.TxType.SUPPORTS)
     public UserToken getUserToken(String tokenId) {
         UserToken token = userTokenRepository.findOne(tokenId);
         return token;
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
     public UserToken getUserTokenByUserId(String userId,String appId) {
 
         //这里获取User服务和App服务
@@ -111,7 +108,6 @@ public class TokenManager {
         }
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
     public List<UserToken> getUserTokenList(int from, int count) {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         Criteria criteria = session.createCriteria(UserToken.class);
@@ -124,23 +120,10 @@ public class TokenManager {
         return list;
     }
 
-    /**
-     * 删除授权信息
-     */
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public void deleteUserToken(String tokenId) {
-        userTokenRepository.delete(tokenId);
-    }
-
-    @Transactional(Transactional.TxType.SUPPORTS)
     public boolean revokeToken(String accessToken) {
-
-        Map map = new HashMap<>();
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         Query query = session.createQuery("from UserToken where accessToken= :accessToken");
-
         List<UserToken> userTokens = query.setString("accessToken", accessToken).list();
-
         if (userTokens.size() == 0) {
             return false;
         } else {
@@ -149,28 +132,23 @@ public class TokenManager {
         }
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
     public void updateUserToken(UserToken userToken) {
         userTokenRepository.save(userToken);
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
     public UserToken refreshAccessToken(String userId, String refreshToken,String appId) throws Exception {
 
         UserToken userToken = getUserTokenByUserId(userId,appId);
 
         //如果用户的更新授权正确，则重新生成访问授权，并返回
         if (userToken.getRefreshToken().equals(refreshToken)) {
-
             String accessToken = TokenUtil.genToken();
             String newRefreshToken = TokenUtil.genToken();
 
             userToken.setAccessToken(accessToken);
             userToken.setRefreshToken(newRefreshToken);
             userToken.setUpdateDate(new Date());
-
             updateUserToken(userToken);
-
             return userToken;
 
         } else {
