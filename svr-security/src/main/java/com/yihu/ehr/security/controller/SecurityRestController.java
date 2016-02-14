@@ -26,7 +26,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping(ApiVersionPrefix.Version1_0)
-@Api(protocols = "https", value = "securityEhr", description = "安全管理接口", tags = {"用户", "企业", "应用", "安全"})
+@Api(protocols = "https", value = "security", description = "安全管理接口", tags = {"用户", "企业", "应用", "安全"})
 public class SecurityRestController extends BaseRestController {
 
     @Autowired
