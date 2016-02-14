@@ -22,7 +22,7 @@ import java.text.ParseException;
  */
 @RestController
 @RequestMapping(value = ApiVersionPrefix.Version1_0 + "/patient")
-public class PatientRegistrationController {
+public class PatientController {
     @Autowired
     ObjectMapper objectMapper;
 

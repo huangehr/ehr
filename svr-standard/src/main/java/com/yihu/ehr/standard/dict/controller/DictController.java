@@ -8,7 +8,7 @@ import com.yihu.ehr.standard.cdaversion.service.CDAVersionManager;
 import com.yihu.ehr.standard.dict.service.Dict;
 import com.yihu.ehr.standard.dict.service.DictForInterface;
 import com.yihu.ehr.standard.dict.service.DictManager;
-import com.yihu.ehr.standard.standardsource.service.StandardSourceManager;
+import com.yihu.ehr.standard.standardsource.service.StandardSourceJpaService;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -40,7 +40,7 @@ public class DictController extends BaseController{
     @Autowired
     private CDAVersionManager cdaVersionManager;
     @Autowired
-    private StandardSourceManager standardSourceManager;
+    private StandardSourceJpaService standardSourceManager;
     @Autowired
     private DictManager dictManager;
 

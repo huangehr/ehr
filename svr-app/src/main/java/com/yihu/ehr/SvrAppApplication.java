@@ -10,7 +10,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.web.bind.annotation.RestController;
 
-@EnableFeignClients(clients = {ConventionalDictClient.class})
+@EnableFeignClients
 @SpringBootApplication
 @EnableDiscoveryClient
 public class SvrAppApplication implements ApplicationContextAware {

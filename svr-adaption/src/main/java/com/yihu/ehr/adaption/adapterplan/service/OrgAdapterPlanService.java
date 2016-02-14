@@ -1,10 +1,10 @@
 package com.yihu.ehr.adaption.adapterplan.service;
 
 
-import com.yihu.ehr.adaption.adapterorg.service.AdapterOrgManager;
-import com.yihu.ehr.util.service.BaseManager;
+import com.yihu.ehr.adaption.adapterorg.service.AdapterOrgService;
+import com.yihu.ehr.util.query.BaseService;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSet;
-import com.yihu.ehr.adaption.dataset.service.AdapterDataSetManager;
+import com.yihu.ehr.adaption.dataset.service.AdapterDataSetService;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +22,12 @@ import java.util.List;
  * @created 2016.2.3
  */
 @Service
-public class OrgAdapterPlanManager extends BaseManager<OrgAdapterPlan, XOrgAdapterPlanRepository> {
+public class OrgAdapterPlanService extends BaseService<OrgAdapterPlan, XOrgAdapterPlanRepository> {
 
     @Autowired
-    AdapterDataSetManager adapterDataSetManager;
+    AdapterDataSetService adapterDataSetManager;
     @Autowired
-    AdapterOrgManager adapterOrgManager;
+    AdapterOrgService adapterOrgManager;
 
 
     /**

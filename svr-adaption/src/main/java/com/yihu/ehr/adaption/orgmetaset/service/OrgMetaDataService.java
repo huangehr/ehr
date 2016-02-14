@@ -1,7 +1,7 @@
 package com.yihu.ehr.adaption.orgmetaset.service;
 
 import com.yihu.ehr.adaption.orgdataset.service.OrgDataSet;
-import com.yihu.ehr.util.service.BaseManager;
+import com.yihu.ehr.util.query.BaseService;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @created 2016.1.29
  */
 @Service
-public class OrgMetaDataManager extends BaseManager<OrgMetaData, XOrgMetaDataRepository> {
+public class OrgMetaDataService extends BaseService<OrgMetaData, XOrgMetaDataRepository> {
 
 
     @Transactional(propagation = Propagation.REQUIRED)

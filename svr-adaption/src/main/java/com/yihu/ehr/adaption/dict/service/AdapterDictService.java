@@ -2,8 +2,8 @@ package com.yihu.ehr.adaption.dict.service;
 
 
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlan;
-import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanManager;
-import com.yihu.ehr.util.service.BaseManager;
+import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanService;
+import com.yihu.ehr.util.query.BaseService;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -24,10 +24,10 @@ import java.util.List;
  * @created 2016.2.1
  */
 @Service
-public class AdapterDictManager extends BaseManager<AdapterDict, XAdapterDictRepository> {
+public class AdapterDictService extends BaseService<AdapterDict, XAdapterDictRepository> {
 
     @Autowired
-    OrgAdapterPlanManager orgAdapterPlanManager;
+    OrgAdapterPlanService orgAdapterPlanManager;
 
 
     /**

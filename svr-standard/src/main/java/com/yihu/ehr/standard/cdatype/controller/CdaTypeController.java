@@ -57,7 +57,7 @@ public class CdaTypeController {
 //
 //        try {
 //            for (int i = 0; i < info.size(); i++) {
-//                CDAType typeInfo = (CDAType) info.get(i);
+//                CDAType typeInfo = (CDAType) info.retrieve(i);
 //                CDATypeTreeModel tree = new CDATypeTreeModel();
 //                tree.setId(typeInfo.getId());
 //                tree.setCode(typeInfo.getCode());
@@ -87,7 +87,7 @@ public class CdaTypeController {
 //    public String getCdaTypeChildId(List<XCDAType> info,String childrenIds) {
 //        try {
 //            for (int i = 0; i < info.size(); i++) {
-//                CDAType typeInfo = (CDAType) info.get(i);
+//                CDAType typeInfo = (CDAType) info.retrieve(i);
 //                childrenIds+=typeInfo.getId()+",";
 //                List<XCDAType> listChild = xcdaTypeManager.getCDATypeListByParentId(typeInfo.getId());
 //                if(listChild.size()>0)
@@ -156,7 +156,7 @@ public class CdaTypeController {
 //
 //                List<CDATypeForInterface> listInfo = getTypeForInterface(listType);
 //
-//                result.setObj(listInfo.get(0));
+//                result.setObj(listInfo.retrieve(0));
 //            }
 //        } catch (Exception ex) {
 //            LogService.getLogger(CdaController.class).error(ex.getMessage());
@@ -230,7 +230,7 @@ public class CdaTypeController {
 //            if (!StringUtil.isEmpty(info.getId())) {
 //                List<XCDAType> listType = xcdaTypeManager.getCdatypeInfoByIds(info.getId());
 //                if (listType.size() > 0) {
-//                    xcdaType = listType.get(0);
+//                    xcdaType = listType.retrieve(0);
 //                }
 //                if(!info.getCode().equals(xcdaType.getCode()) && xcdaTypeManager.isCodeExist(info.getCode())){
 //                    strErrorMsg = "代码已存在!";
@@ -345,7 +345,7 @@ public class CdaTypeController {
 //        }
 //        List<CDATypeForInterface> listInfo = new ArrayList<>();
 //        for (int i = 0; i < listType.size(); i++) {
-//            CDAType cdaType = (CDAType) listType.get(i);
+//            CDAType cdaType = (CDAType) listType.retrieve(i);
 //            CDATypeForInterface info = new CDATypeForInterface();
 //            info.setId(cdaType.getId());
 //            info.setCode(cdaType.getCode());

@@ -1,7 +1,7 @@
 package com.yihu.ehr.adaption.orgdictitem.service;
 
 import com.yihu.ehr.adaption.orgdict.service.OrgDict;
-import com.yihu.ehr.util.service.BaseManager;
+import com.yihu.ehr.util.query.BaseService;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 
 @Service
-public class OrgDictItemManager extends BaseManager<OrgDictItem, XOrgDictItemRepository> {
+public class OrgDictItemService extends BaseService<OrgDictItem, XOrgDictItemRepository> {
 
 
     @Transactional(propagation = Propagation.SUPPORTS)

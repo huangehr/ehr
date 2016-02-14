@@ -173,7 +173,7 @@ public class CardManager {
                 String extra = local.getExtra();
                 String postalCode = local.getPostalCode();
                 addressClient.saveAddress(country,province,city,district,town,street,extra,postalCode);
-                //get set
+                //retrieve set
                 AbstractPhysicalCard abstractPhysicalCard = new AbstractPhysicalCard();
                 abstractPhysicalCard.setId(card.getId());
                 abstractPhysicalCard.setLocal(card.getLocal().getId());

@@ -2,23 +2,25 @@ package com.yihu.ehr.apps.controller;
 
 import com.yihu.ehr.apps.feign.ConventionalDictClient;
 import com.yihu.ehr.apps.service.App;
-import com.yihu.ehr.apps.service.AppService;
+import com.yihu.ehr.apps.service.AppJpaService;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.query.URLQueryParser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ResponseHeader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.criteria.CriteriaQuery;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -31,7 +33,7 @@ import java.util.List;
 @Api(protocols = "https", value = "Application", description = "EHR应用管理及鉴权", tags = {"应用管理"})
 public class AppController extends BaseRestController {
     @Autowired
-    private AppService appService;
+    private AppJpaService appService;
 
     @Autowired
     private ConventionalDictClient conventionalDictClient;
@@ -41,25 +43,23 @@ public class AppController extends BaseRestController {
      */
     @RequestMapping(value = "/apps", method = RequestMethod.GET)
     @ApiOperation(value = "获取App列表")
-    @ResponseHeader
-    public List<MApp> getApps(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+    public Collection<MApp> getApps(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
-            @ApiParam(name = "filter", value = "过滤器，规则参见说明文档", defaultValue = "id,name,secret,url,createTime")
-            @RequestParam(value = "filter", required = false) String filter,
-            @ApiParam(name = "sort", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
-            @RequestParam(value = "sort", required = false) String sort,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page,
+            HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        //List<App> appList = appService.searchApps(conditionMap);
-        //int totalCount = appService.getAppCount(conditionMap);
+        List<App> appList = appService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, appService.getCount(filters), page, size);
 
-        //echoCollection(response, "", totalCount, page, size);
-        //ConventionalDictClient conventionalDictClient = SpringContext.getService(ConventionalDictClient.class);
-        return null;//convertToModels(appList, new ArrayList<MApp>(appList.size()), fields == null ? null : fields.split(","));
+        return convertToModels(appList, new ArrayList<MApp>(appList.size()), MApp.class, fields.split(","));
     }
 
     /**
@@ -98,7 +98,7 @@ public class AppController extends BaseRestController {
     public MApp getApp(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
             @PathVariable(value = "app_id") String appId) throws Exception {
-        App app = appService.getApp(appId);
+        App app = appService.retrieve(appId);
         return convertToModel(app, MApp.class);
     }
 
@@ -123,7 +123,7 @@ public class AppController extends BaseRestController {
         App app;
         MConventionalDict appCatalog = conventionalDictClient.getAppCatalog(catalog);
         MConventionalDict appStatus = conventionalDictClient.getAppStatus(status);
-        app = appService.getApp(appId);
+        app = appService.retrieve(appId);
         if (app == null) throw new ApiException(ErrorCode.InvalidAppId);
 
         app.setName(name);
@@ -132,7 +132,7 @@ public class AppController extends BaseRestController {
         app.setUrl(url);
         app.setDescription(description);
         app.setTags(tags);
-        appService.updateApp(app);
+        appService.save(app);
 
         return convertToModel(app, MApp.class);
     }
@@ -142,6 +142,6 @@ public class AppController extends BaseRestController {
     public void deleteApp(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
             @PathVariable(value = "app_id") String appId) throws Exception {
-        appService.deleteApp(appId);
+        appService.delete(appId);
     }
 }

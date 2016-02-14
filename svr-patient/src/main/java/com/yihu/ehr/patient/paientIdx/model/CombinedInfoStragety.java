@@ -56,13 +56,13 @@ public class CombinedInfoStragety extends AbstractSearchStragety  {
 		for (int j=demographicInfoList.size() -1, i = j; i>=0; i--) {
 			if (column.equals("birthPlace")){
 				//// TODO: 2016/1/21
-//				address= (MAddress) demographicInfoList.get(i).getBirthPlace();
+//				address= (MAddress) demographicInfoList.retrieve(i).getBirthPlace();
 //				addr=address.getCanonicalAddress();
 			} else if (column.equals("workAddress")){
-//				address= (Address) demographicInfoList.get(i).getWorkAddress();
+//				address= (Address) demographicInfoList.retrieve(i).getWorkAddress();
 //				addr=address.getCanonicalAddress();
 			} else if (column.equals("homeAddress")){
-//				address= (Address) demographicInfoList.get(i).getWorkAddress();
+//				address= (Address) demographicInfoList.retrieve(i).getWorkAddress();
 //				addr=address.getCanonicalAddress();
 			}else{
 				continue;

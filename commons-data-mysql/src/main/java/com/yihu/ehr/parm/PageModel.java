@@ -1,5 +1,6 @@
-package com.yihu.ehr.util.parm;
+package com.yihu.ehr.parm;
 
+import com.yihu.ehr.query.FieldCondition;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.Column;
@@ -7,19 +8,20 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 /**
+ * 实体查询模型。将前端的查询转换为实体查询。
+ *
  * @author lincl
  * @version 1.0
  * @created 2016.2.1
  */
 public class PageModel {
-    private int page;
-    private int rows;
-    private String[] order;
-    private Map<String, FieldCondition> filters;
-    private String[] result;
-    private Class modelClass;
+    private int page;                               // 页码
+    private int rows;                               // 页大小
+    private String[] order;                         // 排序，格式为 +f1,-f2
+    private Map<String, FieldCondition> filters;    // 记录过滤器
+    private String[] result;                        // 实际返回的字段
+    private Class modelClass;                       // JPA实体类
     public PageModel() {
-
     }
 
     public PageModel(int page, int rows) {

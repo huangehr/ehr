@@ -237,9 +237,9 @@ public class DemographicIndex{
         Integer page = (Integer) args.get("page");
         Integer pageSize = (Integer) args.get("pageSize");
 
-//        String province = (String) args.get("province");
-//        String city = (String) args.get("city");
-//        String district = (String) args.get("district");
+//        String province = (String) args.retrieve("province");
+//        String city = (String) args.retrieve("city");
+//        String district = (String) args.retrieve("district");
 
         String hql = "from DemographicInfo where (name like :name or id like :idCardNo)";
 //        if (!StringUtils.isEmpty(province)) {
