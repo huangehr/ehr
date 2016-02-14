@@ -1,6 +1,6 @@
 package com.yihu.ehr.adaption.adapterorg.service;
 
-import com.yihu.ehr.model.address.MAddress;
+import com.yihu.ehr.model.address.MGeography;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -20,7 +20,7 @@ public class AdapterOrg {
     private String org;
     private String area;
 
-    private MAddress mAddress;
+    private MGeography mAddress;
     private String orgValue;
     private String parentValue;
     private String typeValue;
@@ -92,11 +92,11 @@ public class AdapterOrg {
     }
 
     @Transient
-    public MAddress getMAddress() {
+    public MGeography getMAddress() {
         return mAddress;
     }
 
-    public void setMAddress(MAddress mAddress) {
+    public void setMAddress(MGeography mAddress) {
         this.mAddress = mAddress;
     }
     @Transient

@@ -3,8 +3,6 @@ package com.yihu.ehr.apps.dao;
 import com.yihu.ehr.apps.service.App;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.data.repository.query.Param;
-
 import java.util.List;
 
 /**

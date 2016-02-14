@@ -16,7 +16,8 @@ public enum BizObject {
     JsonPackage((short)0x0005),
     StdArchive((short)0x0006),
     HealthEvent((short)0x0007),
-    ADAPTER((short)0x0008);
+    ADAPTER((short)0x0008),
+    STANDARD((short)0x0009);
 
     public short getBizObject(){
         return bizObject;

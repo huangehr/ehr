@@ -1,6 +1,6 @@
 package com.yihu.ehr.model.org;
 
-import com.yihu.ehr.model.address.MAddress;
+import com.yihu.ehr.model.address.MGeography;
 import com.yihu.ehr.model.dict.MConventionalDict;
 
 import java.io.Serializable;
@@ -26,7 +26,7 @@ public class MOrganization implements Serializable{
     private Set<String> tags;        // 标签
     private String tel;                // 机构电话
     private String createDate;        // 创建日期
-    private MAddress location;        // 地址
+    private MGeography location;        // 地址
     private String activityFlag;
 
     public MOrganization() {
@@ -126,11 +126,11 @@ public class MOrganization implements Serializable{
         this.orgType = orgType;
     }
 
-    public MAddress getLocation() {
+    public MGeography getLocation() {
         return location;
     }
 
-    public void setLocation(MAddress location) {
+    public void setLocation(MGeography location) {
         this.location = location;
     }
 

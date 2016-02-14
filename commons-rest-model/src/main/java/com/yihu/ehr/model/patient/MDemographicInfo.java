@@ -1,6 +1,6 @@
 package com.yihu.ehr.model.patient;
 
-import com.yihu.ehr.model.address.MAddress;
+import com.yihu.ehr.model.address.MGeography;
 import com.yihu.ehr.model.dict.MConventionalDict;
 
 import java.util.Date;
@@ -16,16 +16,16 @@ public class MDemographicInfo {
 
     private String idCardNo;                       // 身份证
     private Date birthday;                            // 出生日期
-    private MAddress birthPlace;                    // 出生地
-    private MAddress nativePlace;                    // 籍贯
+    private MGeography birthPlace;                    // 出生地
+    private MGeography nativePlace;                    // 籍贯
     private String email;                            // 邮箱
     private MConventionalDict gender;                            // 性别
     private String name;                            // 姓名
     private MConventionalDict martialStatus;            // 婚姻情况
     private MConventionalDict nation;                            // 民族
     private MConventionalDict residenceType;            // 户口性质（农村、城镇）
-    private MAddress workAddress;                    // 工作地址
-    private MAddress homeAddress;                    // 家庭地址
+    private MGeography workAddress;                    // 工作地址
+    private MGeography homeAddress;                    // 家庭地址
     private String password;                        //密码
     private String telphoneNo ;                     // 电话号码，之前是个电话号码列表
     private String picPath = "";
@@ -50,19 +50,19 @@ public class MDemographicInfo {
         this.birthday = birthday;
     }
 
-    public MAddress getBirthPlace() {
+    public MGeography getBirthPlace() {
         return birthPlace;
     }
 
-    public void setBirthPlace(MAddress birthPlace) {
+    public void setBirthPlace(MGeography birthPlace) {
         this.birthPlace = birthPlace;
     }
 
-    public MAddress getNativePlace() {
+    public MGeography getNativePlace() {
         return nativePlace;
     }
 
-    public void setNativePlace(MAddress nativePlace) {
+    public void setNativePlace(MGeography nativePlace) {
         this.nativePlace = nativePlace;
     }
 
@@ -114,19 +114,19 @@ public class MDemographicInfo {
         this.residenceType = residenceType;
     }
 
-    public MAddress getWorkAddress() {
+    public MGeography getWorkAddress() {
         return workAddress;
     }
 
-    public void setWorkAddress(MAddress workAddress) {
+    public void setWorkAddress(MGeography workAddress) {
         this.workAddress = workAddress;
     }
 
-    public MAddress getHomeAddress() {
+    public MGeography getHomeAddress() {
         return homeAddress;
     }
 
-    public void setHomeAddress(MAddress homeAddress) {
+    public void setHomeAddress(MGeography homeAddress) {
         this.homeAddress = homeAddress;
     }
 

@@ -2,7 +2,7 @@ package com.yihu.ehr.adaption.adapterorg.service;
 
 import com.yihu.ehr.adaption.commons.BaseManager;
 import com.yihu.ehr.adaption.feignclient.AddressClient;
-import com.yihu.ehr.model.address.MAddress;
+import com.yihu.ehr.model.address.MGeography;
 import com.yihu.ehr.util.parm.FieldCondition;
 import com.yihu.ehr.util.parm.PageModel;
 import org.hibernate.Query;
@@ -77,7 +77,7 @@ public class AdapterOrgManager extends BaseManager {
     @Transactional(propagation = Propagation.REQUIRED)
     public boolean addAdapterOrg(AdapterOrg adapterOrg, String apiVersion) {
         //地址检查并保存
-        MAddress address = adapterOrg.getMAddress();
+        MGeography address = adapterOrg.getMAddress();
         if (address!=null){
             address.setCity("TEST");
             address.setProvince("TEST");

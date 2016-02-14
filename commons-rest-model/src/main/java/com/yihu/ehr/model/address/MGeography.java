@@ -8,7 +8,7 @@ import java.io.Serializable;
  * @version 1.0
  * @updated 25-05-2015 19:56:00
  */
-public class MAddress implements Serializable {
+public class MGeography implements Serializable {
     private String id;
     private String country;
     private String province;
@@ -18,7 +18,7 @@ public class MAddress implements Serializable {
     private String street;
     private String extra;
     private String postalCode;
-    public MAddress() {
+    public MGeography() {
     }
 
     public String getId() {
