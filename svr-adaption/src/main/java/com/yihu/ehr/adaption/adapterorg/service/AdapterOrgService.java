@@ -55,6 +55,7 @@ public class AdapterOrgService extends BaseService<AdapterOrg, XAdapterOrgReposi
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void deleteAdapterOrg(String[] codes) {
+
         for (String code : codes) {
             delete(code);
         }
