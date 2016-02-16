@@ -58,30 +58,30 @@ public class DemographicIndex{
 
 
 
-    public void save(String apiVersion,MDemographicInfo demographicInfoModel) throws JsonProcessingException {
+    public void save(MDemographicInfo demographicInfoModel) throws JsonProcessingException {
         //地址检查并保存
         DemographicInfo demographicInfo = new DemographicInfo();
         BeanUtils.copyProperties(demographicInfoModel,DemographicInfo.class);
         //出生地
         MGeography birthPlace = demographicInfoModel.getBirthPlace();
-        if (!isNullAddress(apiVersion,birthPlace)) {
-            String addressId = savaAddress(apiVersion,birthPlace);
+        if (!isNullAddress(birthPlace)) {
+            String addressId = savaAddress(birthPlace);
             demographicInfo.setBirthPlace(addressId);
         }else{
             demographicInfo.setBirthPlace(null);
         }
         //工作地址
         MGeography workAddress = demographicInfoModel.getWorkAddress();
-        if (!isNullAddress(apiVersion,workAddress)) {
-            String addressid = savaAddress(apiVersion,workAddress);
+        if (!isNullAddress(workAddress)) {
+            String addressid = savaAddress(workAddress);
             demographicInfo.setWorkAddress(addressid);
         }else{
             demographicInfo.setWorkAddress(null);
         }
         //家庭地址
         MGeography homeAddress = demographicInfoModel.getHomeAddress();
-        if (!isNullAddress(apiVersion,homeAddress)) {
-            String addressId = savaAddress(apiVersion,homeAddress);
+        if (!isNullAddress(homeAddress)) {
+            String addressId = savaAddress(homeAddress);
             demographicInfo.setHomeAddress(addressId);
         }else{
             demographicInfo.setHomeAddress(null);
@@ -90,12 +90,12 @@ public class DemographicIndex{
     }
 
 
-    public boolean savePatient(String apiVersion,MDemographicInfo demographicInfoModel) throws Exception{
-        save(apiVersion,demographicInfoModel);
+    public boolean savePatient(MDemographicInfo demographicInfoModel) throws Exception{
+        save(demographicInfoModel);
         return true;
     }
 
-    public List<DemographicInfo> searchPatient(String apiVersion,Map<String, Object> args) {
+    public List<DemographicInfo> searchPatient(Map<String, Object> args) {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         String name = (String) args.get("name");
         String idCardNo = (String) args.get("idCardNo");
@@ -105,7 +105,7 @@ public class DemographicIndex{
         String province = (String) args.get("province");
         String city = (String) args.get("city");
         String district = (String) args.get("district");
-        List<String> addressIdList = addressClient.search(apiVersion,province,city,district);
+        List<String> addressIdList = addressClient.search(province,city,district);
 
         String hql = "from DemographicInfo where (name like :name or id like :idCardNo)";
 
@@ -128,14 +128,14 @@ public class DemographicIndex{
         return demographicInfos;
     }
 
-    public Integer searchPatientTotalCount(String apiVersion,Map<String, Object> args) {
+    public Integer searchPatientTotalCount(Map<String, Object> args) {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         String name = (String) args.get("name");
         String idCardNo = (String) args.get("idCardNo");
         String province = (String) args.get("province");
         String city = (String) args.get("city");
         String district = (String) args.get("district");
-        List<String> addressIdList = addressClient.search(apiVersion,province,city,district);
+        List<String> addressIdList = addressClient.search(province,city,district);
         String hql = "from DemographicInfo where (name like :name or id like :idCardNo)";
         if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
             hql += " and homeAddress in (:addressIdList)";
@@ -149,17 +149,17 @@ public class DemographicIndex{
         return query.list().size();
     }
 
-    public Boolean isNullAddress(String apiVersion,MGeography address) throws JsonProcessingException {
+    public Boolean isNullAddress(MGeography address) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         String geographyModelJsonData = objectMapper.writeValueAsString(address);
-        return addressClient.isNullAddress(apiVersion,geographyModelJsonData);
+        return addressClient.isNullAddress(geographyModelJsonData);
     }
 
 
-    public String savaAddress(String apiVersion,MGeography address) throws JsonProcessingException {
+    public String savaAddress(MGeography address) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         String GeographyModelJsonData = objectMapper.writeValueAsString(address);
-        return addressClient.saveAddress(apiVersion,GeographyModelJsonData);
+        return addressClient.saveAddress(GeographyModelJsonData);
     }
 
 
