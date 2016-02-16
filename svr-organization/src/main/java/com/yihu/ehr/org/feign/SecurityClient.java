@@ -12,32 +12,28 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
  * Created by Administrator on 2016/1/4.
  */
 @FeignClient(MicroServices.Security)
+@RequestMapping(value = "/rest/v1.0")
 public interface SecurityClient {
 
-    @RequestMapping(value = "/rest/{api_version}/securities/{org_code}", method = POST, consumes = "application/json")
+    @RequestMapping(value = "/securities/{org_code}", method = POST, consumes = "application/json")
     MUserSecurity createSecurityByOrgCode(
-            @PathVariable(value = "api_version") String apiVersion,
             @PathVariable(value = "org_code") String orgCode);
 
-    @RequestMapping(value = "/rest/{api_version}/securities/{org_code}", method = GET )
+    @RequestMapping(value = "/securities/{org_code}", method = GET )
     MUserSecurity getUserSecurityByOrgCode(
-            @PathVariable(value = "api_version") String apiVersion,
             @PathVariable(value = "org_code") String orgCode);
 
-    @RequestMapping(value = "/rest/{api_version}/securities/{id}", method = DELETE  )
+    @RequestMapping(value = "/securities/{id}", method = DELETE  )
     void deleteSecurity(
-            @PathVariable(value = "api_version") String apiVersion,
             @PathVariable(value = "id") String id);
 
-    @RequestMapping(value = "/rest/{api_version}/user_keys/{user_key_id}", method = DELETE  )
+    @RequestMapping(value = "/user_keys/{user_key_id}", method = DELETE  )
     void deleteUserKey(
-            @PathVariable(value = "api_version") String apiVersion,
             @PathVariable(value = "user_key_id") String userKeyId);
 
 //
-    @RequestMapping(value = "/rest/{api_version}/user_keys/{org_code}", method = GET  )
+    @RequestMapping(value = "/user_keys/{org_code}", method = GET  )
     String getUserKeyIdByOrgCd(
-            @PathVariable(value = "api_version") String apiVersion,
             @PathVariable(value = "org_code") String orgCode);
 
 }
