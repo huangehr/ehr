@@ -41,9 +41,9 @@ public class CardManager {
     @Autowired
     private XAbstractVirtualCardRepository abstractVirtualCardRepository;
 
-    public AbstractCard getCard(String apiVersion,String id, String cardType) {
+    public AbstractCard getCard(String id, String cardType) {
         AbstractCard card = null;
-        MConventionalDict cardTypeDict = conventionalDictClient.getCardType(apiVersion,cardType);
+        MConventionalDict cardTypeDict = conventionalDictClient.getCardType(cardType);
         if (!cardTypeDict.checkIsVirtualCard()) {
             card = abstractPhysicalCardRepository.findOne(id);
         } else {
@@ -151,28 +151,28 @@ public class CardManager {
     }
 
 
-    public boolean detachCard(String apiVersion,AbstractCard card) {
+    public boolean detachCard(AbstractCard card) {
         if (StringUtils.isEmpty(card.getIdCardNo())) {
             return true;
         }
         card.setIdCardNo(null);
-        return  saveCard(apiVersion,card);
+        return  saveCard(card);
     }
 
     public boolean isAvailableIdCardNo(String idCardNo){
         return idCardNo != null && idCardNo.length() > 0;
     }
 
-    public boolean attachCardWith(String apiVersion,AbstractCard card, String idCardNo) {
+    public boolean attachCardWith(AbstractCard card, String idCardNo) {
         if (!isAvailableIdCardNo(idCardNo)) {
             throw new IllegalArgumentException("无效人口学索引.");
         }
         card.setIdCardNo(idCardNo);
-        return save(apiVersion,card);
+        return save(card);
     }
 
-    public boolean save(String apiVersion,AbstractCard card){
-        if(conventionalDictClient.getCardType(apiVersion,card.getType()).checkIsVirtualCard()){
+    public boolean save(AbstractCard card){
+        if(conventionalDictClient.getCardType(card.getType()).checkIsVirtualCard()){
             AbstractVirtualCard abstractVirtualCard = (AbstractVirtualCard) card;
             abstractVirtualCardRepository.save(abstractVirtualCard);
         }else {
@@ -182,12 +182,12 @@ public class CardManager {
         return true;
     }
 
-    public boolean saveCard(String apiVersion,AbstractCard card) {
+    public boolean saveCard(AbstractCard card) {
         if (card.getNumber().length() == 0 || card.getType() == null) {
             throw new CardException("卡信息不全, 无法更新");
-        } else if (card.getStatus() == conventionalDictClient.getCardStatus(apiVersion,"Invalid").getValue()) {
+        } else if (card.getStatus() == conventionalDictClient.getCardStatus("Invalid").getValue()) {
             throw new CardException("卡已作废, 无法更新");
         }
-        return save(apiVersion,card);
+        return save(card);
     }
 }
