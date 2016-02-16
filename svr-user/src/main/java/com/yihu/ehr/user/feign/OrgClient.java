@@ -15,16 +15,15 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  * Created by Administrator on 2016/1/4.
  */
 @FeignClient(MicroServices.OrganizationMgr)
+@RequestMapping(value = "/rest/v1.0")
 public interface OrgClient {
 
-    @RequestMapping(value = "/rest/{api_version}/organizations/{org_code}", method = GET )
+    @RequestMapping(value = "/organizations/{org_code}", method = GET )
     MOrganization getOrgByCode(
-            @PathVariable(value = "api_version") String apiVersion,
             @PathVariable(value = "org_code") String orgCode);
 
-    @RequestMapping(value = "/rest/{api_version}/organizations/{name}", method = GET)
+    @RequestMapping(value = "/organizations/{name}", method = GET)
     List<String> getIdsByName(
-            @PathVariable(value = "api_version") String apiVersion,
             @PathVariable(value = "name") String name);
 
 }
