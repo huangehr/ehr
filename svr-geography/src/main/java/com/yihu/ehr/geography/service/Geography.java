@@ -1,4 +1,4 @@
-package com.yihu.ehr.address.service;
+package com.yihu.ehr.geography.service;
 
 import org.hibernate.annotations.GenericGenerator;
 

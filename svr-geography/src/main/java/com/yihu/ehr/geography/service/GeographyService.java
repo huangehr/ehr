@@ -1,8 +1,8 @@
-package com.yihu.ehr.address.service;
+package com.yihu.ehr.geography.service;
 
 
-import com.yihu.ehr.address.dao.XGeographyDictRepository;
-import com.yihu.ehr.address.dao.XGeographyRepository;
+import com.yihu.ehr.geography.dao.XGeographyDictRepository;
+import com.yihu.ehr.geography.dao.XGeographyRepository;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -14,7 +14,7 @@ import org.springframework.util.StringUtils;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.ArrayList;
+
 import java.util.List;
 
 /**
