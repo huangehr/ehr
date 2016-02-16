@@ -1,6 +1,6 @@
-package com.yihu.ehr.address.dao;
+package com.yihu.ehr.geography.dao;
 
-import com.yihu.ehr.address.service.Geography;
+import com.yihu.ehr.geography.service.Geography;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;

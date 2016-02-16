@@ -227,14 +227,13 @@ public class ConventionalDictController extends BaseRestController {
     public Collection<MConventionalDict> getUserTypeList() {
         List<SystemDictEntry> list = baseAbstractDictEntry.getDictEntries(15, null);
 
-        return convertToModels(list, new ArrayList<MConventionalDict>(list.size()), MConventionalDict.class, null);
+        return convertToModels(list, new ArrayList<MConventionalDict>(list.size()), MConventionalDict.class,null);
     }
 
     @RequestMapping(value = "/dictionaries/tags", method = RequestMethod.GET)
     @ApiOperation(value = "获取标签字典项", response = MConventionalDict.class, produces = "application/json")
     public Collection<MConventionalDict> getTagsList() {
         List<SystemDictEntry> list = baseAbstractDictEntry.getDictEntries(17, null);
-
-        return convertToModels(list, new ArrayList<MConventionalDict>(list.size()), MConventionalDict.class, null);
+        return convertToModels(list, new ArrayList<MConventionalDict>(list.size()), MConventionalDict.class,null);
     }
 }

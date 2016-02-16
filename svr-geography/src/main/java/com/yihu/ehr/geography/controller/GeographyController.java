@@ -1,9 +1,11 @@
-package com.yihu.ehr.address.controller;
+package com.yihu.ehr.geography.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.address.service.Geography;
-import com.yihu.ehr.address.service.GeographyDict;
-import com.yihu.ehr.address.service.GeographyService;
+import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.geography.service.Geography;
+import com.yihu.ehr.geography.service.GeographyDict;
+import com.yihu.ehr.geography.service.GeographyService;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.model.address.MGeography;
 import com.yihu.ehr.util.controller.BaseRestController;
@@ -36,42 +38,27 @@ public class GeographyController extends BaseRestController{
      * @return
      */
     @RequestMapping(value = "/geographies/{level}", method = RequestMethod.GET)
-    @ApiOperation(value = "根据地址等级查询地址信息")
-    public Object getAddressByLevel(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
+    @ApiOperation(value = "根据地址等级查询地址字典")
+    public List<GeographyDict> getAddressByLevel(
             @ApiParam(name = "level", value = "地址级别", defaultValue = "")
             @PathVariable(value = "level") Integer level) {
         List<GeographyDict> addressDictList = addressService.getLevelToAddr(level);
-        Map<Integer, String> parentMap = new HashMap<>();
-        for (GeographyDict addressDict : addressDictList) {
-            parentMap.put(addressDict.getId(), addressDict.getName());
-        }
-        return parentMap;
+        return addressDictList;
     }
 
     @RequestMapping(value = "/geographies/{pid}", method = RequestMethod.GET)
-    @ApiOperation(value = "根据父id查询地址信息")
-    public Object getAddressDictByPid(
-        @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-        @PathVariable( value = "api_version") String apiVersion,
+    @ApiOperation(value = "根据父id查询地址字典")
+    public List<GeographyDict> getAddressDictByPid(
         @ApiParam(name = "pid", value = "上级id", defaultValue = "")
         @PathVariable(value = "pid") Integer pid) {
-
         List<GeographyDict> addressDictList = addressService.getPidToAddr(pid);
-        Map<Integer, String> childMap = new HashMap<>();
-        for (GeographyDict addressDict : addressDictList) {
-            childMap.put(addressDict.getId(), addressDict.getName());
-        }
-        return childMap;
+        return addressDictList;
     }
 
 
     @RequestMapping(value = "/geographies/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据id查询地址")
     public MGeography getAddressById(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "id", value = "地址编号", defaultValue = "")
             @PathVariable(value = "id") String id) {
         Geography address =  addressService.getAddressById(id);
@@ -80,10 +67,8 @@ public class GeographyController extends BaseRestController{
 
 
     @RequestMapping(value = "geographies/canonical/{id}", method = RequestMethod.GET)
-    @ApiOperation(value = "根据地址编号获取地址")
+    @ApiOperation(value = "根据地址编号获取地址中文字符串全拼")
     public String getCanonicalAddress(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "id", value = "地址代码", defaultValue = "")
             @PathVariable(value = "id") String id) {
         Geography address = addressService.getAddressById(id);
@@ -98,8 +83,6 @@ public class GeographyController extends BaseRestController{
     @RequestMapping(value = "/geographies", method = RequestMethod.POST)
     @ApiOperation(value = "地址检查,如果地址在数据库中不存在，这新增这条记录，否则返回地址id")
     public String saveAddress(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "geography_model_json_data", value = "地址json字符串")
             @RequestParam( value = "geography_model_json_data") String GeographyModelJsonData) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
@@ -119,8 +102,6 @@ public class GeographyController extends BaseRestController{
     @RequestMapping(value = "/geographies/{province}/{city}/{district}" , method = RequestMethod.GET)
     @ApiOperation(value = "根据省市县查询地址并返回地址编号列表")
     public List<String> search(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "province", value = "省", defaultValue = "")
             @PathVariable(value = "province") String province,
             @ApiParam(name = "city", value = "市", defaultValue = "")
@@ -139,14 +120,13 @@ public class GeographyController extends BaseRestController{
     @RequestMapping(value = "geographies/{id}" , method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除地址")
     public boolean delete(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "/id" , value = "地址代码" ,defaultValue = "")
             @PathVariable (value = "id") String id) {
         Geography address = addressService.getAddressById(id);
-        if(address!=null){
-            addressService.deleteAddress(address);
+        if(address==null){
+            throw new ApiException(ErrorCode.GetGeographyFailed,"获取地址失败");
         }
+        addressService.deleteAddress(address);
         return true;
     }
 
@@ -154,8 +134,6 @@ public class GeographyController extends BaseRestController{
     @RequestMapping(value = "/geographies/existence" , method = RequestMethod.GET)
     @ApiOperation(value = "判断是否是个地址")
     public boolean isNullAddress(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "geography_model_json_data", value = "地址json字符串")
             @RequestParam( value = "geography_model_json_data") String geographyModelJsonData) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
