@@ -1,7 +1,5 @@
 package com.yihu.ehr.apps.service;
 
-import com.yihu.ehr.apps.feign.ConventionalDictClient;
-import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,45 +22,18 @@ public class AppJpaService extends BaseJpaService<App, XAppRepository> {
     @Autowired
     private XAppRepository appRepo;
 
-    @Autowired
-    private ConventionalDictClient conventionalDictClient;
-
     public AppJpaService() {
     }
 
-    public App createApp(String name, MConventionalDict catalog, String url, String tags, String description, String creator) {
-        MConventionalDict status = conventionalDictClient.getAppStatus("WaitingForApprove");
-
-        App app = new App();
+    public App createApp(App app) {
         app.setId(getRandomString(AppIdLength));
-        app.setName(name);
-        app.setCatalog(catalog.getCode());
-        app.setCreator(creator);
         app.setSecret(getRandomString(AppSecretLength));
-        app.setName(name);
-        app.setCatalog(catalog.getCode());
-        app.setUrl(url);
-        app.setTags(tags);
-        app.setDescription(description);
         app.setCreateTime(new Date());
-        app.setStatus(status.getCode());
+        app.setStatus("WaitingForApprove");
         appRepo.save(app);
-
         return app;
     }
 
-    /**
-     * 检验App与密码是否正确。
-     *
-     * @param id
-     * @param secret
-     * @return
-     */
-    public boolean verifyApp(String id, String secret) {
-        App app = appRepo.findOne(id);
-
-        return app != null && app.getSecret().equals(secret);
-    }
 
     private static String getRandomString(int length) {
         String str = "abcdefghigklmnopkrstuvwxyzABCDEFGHIGKLMNOPQRSTUVWXYZ0123456789";
