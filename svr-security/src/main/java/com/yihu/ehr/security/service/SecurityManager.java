@@ -83,11 +83,11 @@ public class SecurityManager {
         return  userSecurity;
     }
 
-    public UserSecurity createSecurityByUserId(String apiVersion,String userId) throws Exception {
+    public UserSecurity createSecurityByUserId(String userId) throws Exception {
 
         //1-1根据用户登陆名获取用户信息。
 
-        MUser userInfo = userClient.getUser(apiVersion,userId);
+        MUser userInfo = userClient.getUser(userId);
         if(userInfo==null) {
             return null;
         }
@@ -108,10 +108,10 @@ public class SecurityManager {
     }
 
 
-    public UserSecurity getUserSecurityByLoginCode(String apiVersion,String loginCode) throws Exception {
+    public UserSecurity getUserSecurityByLoginCode(String loginCode) throws Exception {
 
         //1-1根据用户登陆名获取用户信息。
-        MUser userInfo = userClient.getUserByLoginCode(apiVersion,loginCode);
+        MUser userInfo = userClient.getUserByLoginCode(loginCode);
         if(userInfo==null) {
             return null;
         } else {
