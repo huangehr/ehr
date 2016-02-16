@@ -4,6 +4,9 @@ import com.yihu.ehr.apps.feign.ConventionalDictClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +20,7 @@ import java.util.Random;
  */
 @Service
 @Transactional
-public class AppJpaService extends BaseJpaService<App, XAppRepository> {
+public class AppService extends BaseJpaService<App, XAppRepository> {
     private static final int AppIdLength = 10;
     private static final int AppSecretLength = 16;
 
@@ -27,25 +30,23 @@ public class AppJpaService extends BaseJpaService<App, XAppRepository> {
     @Autowired
     private ConventionalDictClient conventionalDictClient;
 
-    public AppJpaService() {
+    public AppService() {
     }
 
-    public App createApp(String name, MConventionalDict catalog, String url, String tags, String description, String creator) {
-        MConventionalDict status = conventionalDictClient.getAppStatus("WaitingForApprove");
+    public Page<App> getAppList(String sorts, int page, int size){
+        XAppRepository repo = (XAppRepository)getJpaRepository();
+        Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
 
-        App app = new App();
+        return repo.findAll(pageable);
+    }
+
+    public App createApp(App app) {
+        String status = conventionalDictClient.getAppStatus("WaitingForApprove").getCode();
+
         app.setId(getRandomString(AppIdLength));
-        app.setName(name);
-        app.setCatalog(catalog.getCode());
-        app.setCreator(creator);
         app.setSecret(getRandomString(AppSecretLength));
-        app.setName(name);
-        app.setCatalog(catalog.getCode());
-        app.setUrl(url);
-        app.setTags(tags);
-        app.setDescription(description);
         app.setCreateTime(new Date());
-        app.setStatus(status.getCode());
+        app.setStatus(status);
         appRepo.save(app);
 
         return app;
@@ -62,6 +63,12 @@ public class AppJpaService extends BaseJpaService<App, XAppRepository> {
         App app = appRepo.findOne(id);
 
         return app != null && app.getSecret().equals(secret);
+    }
+
+    public boolean isAppNameExists(String name){
+        App app = appRepo.findByName(name);
+
+        return app != null;
     }
 
     private static String getRandomString(int length) {
