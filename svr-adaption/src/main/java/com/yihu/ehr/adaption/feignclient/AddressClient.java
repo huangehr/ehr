@@ -1,6 +1,7 @@
 package com.yihu.ehr.adaption.feignclient;
 
-import com.yihu.ehr.constrant.Result;
+
+import com.yihu.ehr.model.address.MAddress;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 
 /**
