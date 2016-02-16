@@ -1,6 +1,5 @@
 package com.yihu.ehr.ha.apps.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.ha.apps.service.AppClient;
 import com.yihu.ehr.model.app.MApp;
@@ -26,9 +25,6 @@ import java.util.List;
 public class AppController extends BaseRestController {
     @Autowired
     private AppClient appClient;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @RequestMapping(value = "/apps", method = RequestMethod.GET)
     @ApiOperation(value = "获取App列表")
@@ -108,10 +104,11 @@ public class AppController extends BaseRestController {
 
     @RequestMapping(value = "/apps/{app_id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除app")
-    public void deleteApp(
+    public Object deleteApp(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
             @PathVariable(value = "app_id") String appId) throws Exception {
         appClient.deleteApp(appId);
+        return true;
     }
 
 }

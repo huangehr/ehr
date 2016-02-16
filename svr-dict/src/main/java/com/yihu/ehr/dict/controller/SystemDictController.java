@@ -49,7 +49,7 @@ public class SystemDictController extends BaseRestController {
 
         List<SystemDict> systemDicts = systemDictService.getDictionaries(conditionMap);
         Integer totalCount = systemDictService.dictCount(conditionMap);
-        return getResult(systemDicts, totalCount, page, rows);
+        return null;// getResult(systemDicts, totalCount, page, rows);
     }
 
     @ApiOperation(value = "创建字典", response = MSystemDict.class, produces = "application/json")
@@ -99,7 +99,7 @@ public class SystemDictController extends BaseRestController {
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") long id) {
         systemDictService.deleteDict(id);
-        return "success";
+        return true;
     }
 
     @ApiOperation(value = "获取字典项列表")
@@ -126,7 +126,7 @@ public class SystemDictController extends BaseRestController {
             systemDictEntryList = systemDictService.getDictEntries(id, value);
         }
 
-        return getResult(systemDictEntryList, systemDictEntryList.size(), page, rows);
+        return getResult(systemDictEntryList, systemDictEntryList.size());
     }
 
     @ApiOperation(value = "创建字典项")
@@ -187,17 +187,9 @@ public class SystemDictController extends BaseRestController {
             @PathVariable(value = "id") long id,
             @ApiParam(name = "code", value = "字典ID", defaultValue = "")
             @PathVariable(value = "code") String code) {
-        SystemDict systemDict = systemDictService.getDict(id);
-        if (systemDict == null) {
-            return null;
-        }
-
-        if (!systemDictService.isDictContainEntry(id, code)) {
-            return null;
-        }
 
         systemDictService.deleteDictEntry(id, code);
-        return "success";
+        return true;
     }
 
     @ApiOperation(value = "修改字典项")

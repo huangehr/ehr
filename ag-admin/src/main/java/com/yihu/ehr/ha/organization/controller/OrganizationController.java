@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
  * Created by AndyCai on 2016/1/21.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersionPrefix.CommonVersion)
+@RequestMapping(ApiVersionPrefix.Version1_0)
 @RestController
 @Api(value = "organization", description = "机构信息管理接口，用于机构信息管理", tags = {"机构信息管理接口"})
 public class OrganizationController extends BaseRestController {

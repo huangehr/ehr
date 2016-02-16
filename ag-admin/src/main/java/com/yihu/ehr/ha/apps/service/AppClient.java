@@ -18,7 +18,7 @@ import java.util.List;
 @FeignClient("svr-app")
 public interface AppClient {
 
-    @RequestMapping(value = "/apps", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/v1.0/apps", method = RequestMethod.GET)
     @ApiOperation(value = "获取App列表")
     List<MApp> getApps(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -43,7 +43,7 @@ public interface AppClient {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/apps", method = RequestMethod.POST)
+    @RequestMapping(value = "/rest/v1.0/apps", method = RequestMethod.POST)
     @ApiOperation(value = "创建App")
     MApp createApp(
             @ApiParam(name = "name", value = "名称", defaultValue = "")
@@ -59,13 +59,13 @@ public interface AppClient {
             @ApiParam(name = "user_id", value = "用户", defaultValue = "")
             @RequestParam(value = "user_id") String userId);
 
-    @RequestMapping(value = "/apps/{app_id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/v1.0/apps/{app_id}", method = RequestMethod.GET)
     @ApiOperation(value = "获取App")
     MApp getApp(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
             @PathVariable(value = "app_id") String appId);
 
-    @RequestMapping(value = "/apps/{app_id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/rest/v1.0/apps/{app_id}", method = RequestMethod.PUT)
     @ApiOperation(value = "更新App")
     MApp updateApp(
             @ApiParam(name = "app_id", value = "appId", defaultValue = "")
@@ -83,7 +83,7 @@ public interface AppClient {
             @ApiParam(name = "tags", value = "标记", defaultValue = "")
             @RequestParam(value = "tags") String tags);
 
-    @RequestMapping(value = "/apps/{app_id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/rest/v1.0/apps/{app_id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除app")
     void deleteApp(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
