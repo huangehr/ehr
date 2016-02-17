@@ -30,7 +30,6 @@ public class App {
     private String catalog;
     private String status;
     private String description;
-    private Set<String> tags = new HashSet<>();
 
 	public App(){
         id  = new ObjectVersion().toString();
@@ -126,26 +125,4 @@ public class App {
     public void setDescription(String description) {
         this.description = description;
     }
-
-    @Column(name = "tags",  nullable = true)
-    public String getTags() {
-        return String.join(",", tags);
-    }
-    public void setTags(String tags) {
-        if(tags == null) return;
-        String[] tagToken = tags.split(",");
-        for (String token: tagToken){
-            token = token.trim();
-            if(token.length() == 0) continue;
-            this.tags.add(token);
-        }
-    }
-    public void addTag(String tag) {
-        if(tag == null || tag.length() == 0) return;
-        if (tags.contains(tag)) return;
-        tags.add(tag);
-    }
-//    public void removeTag(String tag) {
-//        this.tags.remove(tag);
-//    }
 }

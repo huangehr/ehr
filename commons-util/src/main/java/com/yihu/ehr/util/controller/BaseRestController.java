@@ -1,13 +1,12 @@
 package com.yihu.ehr.util.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.constants.PageArg;
+import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.util.Envelop;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
@@ -15,8 +14,8 @@ import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.beans.PropertyDescriptor;
+import java.io.IOException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.*;
 
 /**
@@ -36,6 +35,9 @@ public class BaseRestController extends AbstractController {
 
     @Autowired
     protected EntityManager entityManager;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
@@ -58,6 +60,15 @@ public class BaseRestController extends AbstractController {
         return target;
     }
 
+    public <T> T toEntity(String json, Class<T> entityCls) {
+        try {
+            T entity = objectMapper.readValue(json, entityCls);
+            return entity;
+        } catch (IOException ex) {
+            throw new ApiException(ErrorCode.SystemError,  "无法转换json, " + ex.getMessage());
+        }
+    }
+
     /**
      * 将实体集合转换为模型集合。
      *
@@ -67,13 +78,13 @@ public class BaseRestController extends AbstractController {
      * @param <T>
      * @return
      */
-    public <T> Collection<T> convertToModels(Collection sources, Collection<T> targets, Class<T> targetCls, String[] properties) {
+    public <T> Collection<T> convertToModels(Collection sources, Collection<T> targets, Class<T> targetCls, String properties) {
         Iterator iterator = sources.iterator();
         while (iterator.hasNext()) {
             Object source = iterator.next();
 
             T target = (T) BeanUtils.instantiate(targetCls);
-            BeanUtils.copyProperties(source, target, propertyDiffer(properties, targetCls));
+            BeanUtils.copyProperties(source, target, propertyDiffer(properties == null ? null : properties.split(","), targetCls));
             targets.add(target);
         }
 
@@ -85,7 +96,9 @@ public class BaseRestController extends AbstractController {
      *
      * @return
      */
-    protected String[] propertyDiffer(String[] properties, Class targetCls){
+    protected String[] propertyDiffer(String[] properties, Class targetCls) {
+        if (properties == null || properties.length == 0) return null;
+
         PropertyDescriptor[] targetPds = BeanUtils.getPropertyDescriptors(targetCls);
         List<String> propertiesList = Arrays.asList(properties);
         List<String> arrayList = new ArrayList<>();
@@ -93,7 +106,7 @@ public class BaseRestController extends AbstractController {
         for (PropertyDescriptor targetPd : targetPds) {
             Method writeMethod = targetPd.getWriteMethod();
 
-            if (writeMethod != null && !propertiesList.contains(targetPd.getName())){
+            if (writeMethod != null && !propertiesList.contains(targetPd.getName())) {
                 arrayList.add(targetPd.getName());
             }
         }
@@ -110,11 +123,17 @@ public class BaseRestController extends AbstractController {
     public void pagedResponse(
             HttpServletRequest request,
             HttpServletResponse response,
-            long resourceCount, long currentPage, long pageSize) {
+            Long resourceCount, Integer currentPage, Integer pageSize) {
+        if (request == null || response == null) return;
+
         response.setHeader(ResourceCount, Long.toString(resourceCount));
+        if (resourceCount == 0) return;
+
+        if (currentPage == null) currentPage = new Integer(PageArg.DefaultPage);
+        if (pageSize == null) pageSize = new Integer(PageArg.DefaultSize);
+
 
         String baseUri = "<" + request.getRequestURL().append("?").toString() + request.getQueryString() + ">";
-
         long firstPage = currentPage == 1 ? -1 : 1;
         long prevPage = currentPage == 1 ? -1 : currentPage - 1;
 
@@ -124,21 +143,31 @@ public class BaseRestController extends AbstractController {
         lastPage = currentPage == lastPage ? -1 : lastPage;
 
         Map<String, String> map = new HashMap<>();
-        if(firstPage != -1) map.put("rel='first',", baseUri.replaceAll("page=\\d+", "page=" + Long.toString(firstPage)));
-        if(prevPage != -1) map.put("rel='prev',", baseUri.replaceAll("page=\\d+", "page=" + Long.toString(prevPage)));
-        if(nextPage != -1) map.put("rel='next',", baseUri.replaceAll("page=\\d+", "page=" + Long.toString(nextPage)));
-        if(lastPage != -1) map.put("rel='last',", baseUri.replaceAll("page=\\d+", "page=" + Long.toString(lastPage)));
+        if (firstPage != -1)
+            map.put("rel='first',", baseUri.replaceAll("page=\\d+", "page=" + Long.toString(firstPage)));
+        if (prevPage != -1) map.put("rel='prev',", baseUri.replaceAll("page=\\d+", "page=" + Long.toString(prevPage)));
+        if (nextPage != -1) map.put("rel='next',", baseUri.replaceAll("page=\\d+", "page=" + Long.toString(nextPage)));
+        if (lastPage != -1) map.put("rel='last',", baseUri.replaceAll("page=\\d+", "page=" + Long.toString(lastPage)));
 
         response.setHeader(ResourceLink, linkMap(map));
     }
 
-    private String linkMap(Map<String, String> map){
+    private String linkMap(Map<String, String> map) {
         StringBuffer links = new StringBuffer("");
-        for (String key : map.keySet()){
+        for (String key : map.keySet()) {
             links.append(map.get(key)).append("; ").append(key);
         }
 
         return links.toString();
+    }
+
+    protected Integer reducePage(Integer page) {
+        if (page != null) {
+            page = page - 1;
+            return page;
+        }
+
+        return 1;
     }
 
     /**
