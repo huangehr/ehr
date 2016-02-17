@@ -7,9 +7,7 @@ import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ResponseHeader;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -18,7 +16,7 @@ import java.util.List;
 /**
  * Created by AndyCai on 2016/1/19.
  */
-@EnableFeignClients
+
 @RequestMapping(ApiVersionPrefix.Version1_0 )
 @RestController
 @Api(value = "app", description = "应用管理接口，用于接入应用管理", tags = {"应用管理接口"})
@@ -28,7 +26,6 @@ public class AppController extends BaseRestController {
 
     @RequestMapping(value = "/apps", method = RequestMethod.GET)
     @ApiOperation(value = "获取App列表")
-    @ResponseHeader
     public List<MApp> getApps(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,

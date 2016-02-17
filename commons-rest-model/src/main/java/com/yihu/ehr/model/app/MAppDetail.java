@@ -1,6 +1,6 @@
 package com.yihu.ehr.model.app;
 
-import com.yihu.ehr.model.dict.MBaseDict;
+import com.yihu.ehr.model.dict.MConventionalDict;
 
 import java.util.Date;
 
@@ -17,9 +17,9 @@ public class MAppDetail {
     String auditor;
     Date create_time;
     Date audit_time;
-    MBaseDict catalog;
+    MConventionalDict catalog;
     String catalogValue;
-    MBaseDict status;
+    MConventionalDict status;
     String statusValue;
     String description;
     String strTags;
@@ -88,11 +88,11 @@ public class MAppDetail {
         this.audit_time = audit_time;
     }
 
-    public MBaseDict getCatalog() {
+    public MConventionalDict getCatalog() {
         return catalog;
     }
 
-    public void setCatalog(MBaseDict catalog) {
+    public void setCatalog(MConventionalDict catalog) {
         this.catalog = catalog;
     }
 
@@ -104,11 +104,11 @@ public class MAppDetail {
         this.catalogValue = catalogValue;
     }
 
-    public MBaseDict getStatus() {
+    public MConventionalDict getStatus() {
         return status;
     }
 
-    public void setStatus(MBaseDict status) {
+    public void setStatus(MConventionalDict status) {
         this.status = status;
     }
 

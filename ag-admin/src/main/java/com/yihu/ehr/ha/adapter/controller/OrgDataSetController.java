@@ -1,7 +1,6 @@
 package com.yihu.ehr.ha.adapter.controller;
 
 import com.yihu.ehr.constants.ApiVersionPrefix;
-import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
@@ -9,9 +8,9 @@ import org.springframework.web.bind.annotation.*;
 /**
  * Created by AndyCai on 2016/1/27.
  */
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/orgDataSet")
+@RequestMapping(ApiVersionPrefix.Version1_0 + "/orgDataSet")
 @RestController
-public class OrgDataSetController extends BaseRestController {
+public class OrgDataSetController   {
 
     @RequestMapping(value = "/orgDataSet",method = RequestMethod.GET)
     public Object getOrgDataSetById(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")

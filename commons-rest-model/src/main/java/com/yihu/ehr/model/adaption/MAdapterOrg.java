@@ -1,6 +1,6 @@
 package com.yihu.ehr.model.adaption;
 
-import com.yihu.ehr.model.address.MAddress;
+import com.yihu.ehr.model.address.MGeography;
 
 /**
  * 适配管理映射机构
@@ -20,7 +20,7 @@ public class MAdapterOrg {
     private String org;
     private String orgValue;
     private String area;
-    private MAddress mAddress;
+    private MGeography mAddress;
 
     public String getCode() {
         return code;
@@ -102,11 +102,11 @@ public class MAdapterOrg {
         this.area = area;
     }
 
-    public MAddress getmAddress() {
+    public MGeography getmAddress() {
         return mAddress;
     }
 
-    public void setmAddress(MAddress mAddress) {
+    public void setmAddress(MGeography mAddress) {
         this.mAddress = mAddress;
     }
 }
