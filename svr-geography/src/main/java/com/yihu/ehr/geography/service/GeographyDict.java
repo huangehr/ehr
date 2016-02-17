@@ -1,7 +1,6 @@
-package com.yihu.ehr.address.service;
+package com.yihu.ehr.geography.service;
 
 import javax.persistence.*;
-import java.util.UUID;
 
 /**
  * 地址字典

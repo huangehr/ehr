@@ -6,6 +6,7 @@ import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.org.feign.ConventionalDictClient;
 import com.yihu.ehr.org.feign.GeographyClient;
 import com.yihu.ehr.org.feign.SecurityClient;
+import com.yihu.ehr.query.BaseJpaService;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +27,7 @@ import java.util.Map;
  * @version 1.0
  */
 @Transactional
-@Service
-public class OrgService {
+public class OrgService  extends BaseJpaService<Organization, XOrganizationRepository> {
 
     @Autowired
     GeographyClient addressClient;
@@ -58,89 +58,89 @@ public class OrgService {
         return org!=null;
     }
 
-    public int searchCount(String apiVersion,Map<String, Object> args) {
+//    public int searchCount(Map<String, Object> args) {
+//
+//        Session session = entityManager.unwrap(org.hibernate.Session.class);
+//        String orgCode = (String) args.get("orgCode");
+//        String fullName = (String) args.get("fullName");
+//        String settledWay = (String) args.get("settledWay");
+//        String orgType = (String) args.get("orgType");
+//        String province = (String) args.get("province");
+//        String city = (String) args.get("city");
+//        String district = (String) args.get("district");
+//        List<String> addressIdList = addressClient.search(province,city,district);
+//
+//
+//        String hql = "from Organization where (orgCode like :orgCode or fullName like :fullName)";
+//        if (!StringUtils.isEmpty(settledWay)) {
+//            hql += " and settledWay = :settledWay";
+//        }
+//        if (!StringUtils.isEmpty(orgType)) {
+//            hql += " and orgType = :orgType";
+//        }
+//        if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
+//            hql += " and location in (:addressIdList)";
+//        }
+//
+//        Query query = session.createQuery(hql);
+//        query.setString("orgCode", "%"+orgCode+"%");
+//        query.setString("fullName", "%"+fullName+"%");
+//        if (!StringUtils.isEmpty(settledWay)) {
+//            query.setParameter("settledWay", settledWay);
+//        }
+//        if (!StringUtils.isEmpty(orgType)) {
+//            query.setParameter("orgType", orgType);
+//        }
+//        if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
+//            query.setParameterList("addressIdList", addressIdList);
+//        }
+//
+//        return query.list().size();
+//    }
 
-        Session session = entityManager.unwrap(org.hibernate.Session.class);
-        String orgCode = (String) args.get("orgCode");
-        String fullName = (String) args.get("fullName");
-        String settledWay = (String) args.get("settledWay");
-        String orgType = (String) args.get("orgType");
-        String province = (String) args.get("province");
-        String city = (String) args.get("city");
-        String district = (String) args.get("district");
-        List<String> addressIdList = addressClient.search(apiVersion,province,city,district);
-
-
-        String hql = "from Organization where (orgCode like :orgCode or fullName like :fullName)";
-        if (!StringUtils.isEmpty(settledWay)) {
-            hql += " and settledWay = :settledWay";
-        }
-        if (!StringUtils.isEmpty(orgType)) {
-            hql += " and orgType = :orgType";
-        }
-        if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
-            hql += " and location in (:addressIdList)";
-        }
-
-        Query query = session.createQuery(hql);
-        query.setString("orgCode", "%"+orgCode+"%");
-        query.setString("fullName", "%"+fullName+"%");
-        if (!StringUtils.isEmpty(settledWay)) {
-            query.setParameter("settledWay", settledWay);
-        }
-        if (!StringUtils.isEmpty(orgType)) {
-            query.setParameter("orgType", orgType);
-        }
-        if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
-            query.setParameterList("addressIdList", addressIdList);
-        }
-
-        return query.list().size();
-    }
-
-    public List<Organization> search(String apiVersion,Map<String, Object> args) {
-        Session session = entityManager.unwrap(org.hibernate.Session.class);
-        String orgCode = (String) args.get("orgCode");
-        String fullName = (String) args.get("fullName");
-        String settledWay = (String) args.get("settledWay");
-        String orgType = (String) args.get("orgType");
-        String province = (String) args.get("province");
-        String city = (String) args.get("city");
-        String district = (String) args.get("district");
-
-        Integer page = (Integer) args.get("page");
-        Integer pageSize = (Integer) args.get("pageSize");
-
-        List<String> addressIdList = addressClient.search(apiVersion,province,city,district);
-
-
-        String hql = "from Organization where (orgCode like :orgCode or fullName like :fullName)";
-        if (!StringUtils.isEmpty(settledWay)) {
-            hql += " and settledWay = :settledWay";
-        }
-        if (!StringUtils.isEmpty(orgType)) {
-            hql += " and orgType = :orgType";
-        }
-        if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
-            hql += " and location in (:addressIdList)";
-        }
-        Query query = session.createQuery(hql);
-        query.setString("orgCode", "%"+orgCode+"%");
-        query.setString("fullName", "%"+fullName+"%");
-        if (!StringUtils.isEmpty(settledWay)) {
-            query.setParameter("settledWay", settledWay);
-        }
-        if (!StringUtils.isEmpty(orgType)) {
-            query.setParameter("orgType", orgType);
-        }
-        if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
-            query.setParameterList("addressIdList", addressIdList);
-        }
-        query.setMaxResults(pageSize);
-        query.setFirstResult((page - 1) * pageSize);
-
-        return query.list();
-    }
+//    public List<Organization> search(Map<String, Object> args) {
+//        Session session = entityManager.unwrap(org.hibernate.Session.class);
+//        String orgCode = (String) args.get("orgCode");
+//        String fullName = (String) args.get("fullName");
+//        String settledWay = (String) args.get("settledWay");
+//        String orgType = (String) args.get("orgType");
+//        String province = (String) args.get("province");
+//        String city = (String) args.get("city");
+//        String district = (String) args.get("district");
+//
+//        Integer page = (Integer) args.get("page");
+//        Integer pageSize = (Integer) args.get("pageSize");
+//
+//        List<String> addressIdList = addressClient.search(province,city,district);
+//
+//
+//        String hql = "from Organization where (orgCode like :orgCode or fullName like :fullName)";
+//        if (!StringUtils.isEmpty(settledWay)) {
+//            hql += " and settledWay = :settledWay";
+//        }
+//        if (!StringUtils.isEmpty(orgType)) {
+//            hql += " and orgType = :orgType";
+//        }
+//        if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
+//            hql += " and location in (:addressIdList)";
+//        }
+//        Query query = session.createQuery(hql);
+//        query.setString("orgCode", "%"+orgCode+"%");
+//        query.setString("fullName", "%"+fullName+"%");
+//        if (!StringUtils.isEmpty(settledWay)) {
+//            query.setParameter("settledWay", settledWay);
+//        }
+//        if (!StringUtils.isEmpty(orgType)) {
+//            query.setParameter("orgType", orgType);
+//        }
+//        if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
+//            query.setParameterList("addressIdList", addressIdList);
+//        }
+//        query.setMaxResults(pageSize);
+//        query.setFirstResult((page - 1) * pageSize);
+//
+//        return query.list();
+//    }
 
 
 
@@ -148,9 +148,9 @@ public class OrgService {
         organizationRepository.delete(orgCode);
     }
 
-    public List<Organization> searchByAddress(String apiVersion,String province, String city) {
+    public List<Organization> searchByAddress(String province, String city,String district) {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
-        List<String> geographyIds = addressClient.search(apiVersion,province,city,"");
+        List<String> geographyIds = addressClient.search(province,city,district);
         String hql = "from Organization where location in (:geographyIds)";
         Query query = session.createQuery(hql);
         query.setParameterList("geographyIds", geographyIds);
@@ -158,10 +158,10 @@ public class OrgService {
     }
 
 
-    public String saveAddress(String apiVersion,MGeography location) throws Exception{
+    public String saveAddress(MGeography location) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
         String GeographyModelJsonData =objectMapper.writeValueAsString(location);
-        return addressClient.saveAddress(apiVersion,GeographyModelJsonData);
+        return addressClient.saveAddress(GeographyModelJsonData);
     }
 
     public List<String> getIdsByName(String name) {
