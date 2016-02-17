@@ -8,6 +8,7 @@ package com.yihu.ehr.constants;
  */
 public enum ErrorCode {
 
+
     MissMethod("ehr.common.miss.method"),
     MissTimestamp("ehr.common.miss.timestamp"),
     MissAppKey("ehr.common.miss.appid"),
@@ -29,6 +30,8 @@ public enum ErrorCode {
 
     QueryNoData("ehr.common.query.null"),
     QueryTotalCount("ehr.common.query.count"),
+    NotFoundObj("ehr.common.query.not.found"),
+    RepeatCode("ehr.commons.repeat.code"),
 
     SuccessSave("ehr.common.success.update"),
     InvalidUpdate("ehr.common.invalid.update"),
@@ -154,6 +157,9 @@ public enum ErrorCode {
     GetJobDetailFailed("ehr.scheduler.get.job.failed"),
     GetTriggerFailed("ehr.scheduler.get.trigger.failed"),
 
+
+    //adaption
+    RepeatAdapterOrg("ehr.adpter.org.repeat"),
     //Other
     SystemError("ehr.system.error");
 

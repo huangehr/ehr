@@ -237,7 +237,7 @@ public class OrgAdapterPlanService extends BaseService<OrgAdapterPlan, XOrgAdapt
      * @param ids
      */
     @Transactional(propagation = Propagation.REQUIRED)
-    public int deleteOrgAdapterPlan(Long[] ids) {
+    public int deleteOrgAdapterPlan(Object[] ids) {
         if (ids == null || ids.length == 0) {
             return 0;
         }
