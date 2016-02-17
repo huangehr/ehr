@@ -19,14 +19,17 @@ import java.util.UUID;
 
 public class AbstractVirtualCard extends AbstractCard {
 
-	protected String id;				    // 卡ID
-	protected String number;				// 卡号
-	protected String ownerName;			// 持有人姓名
-	protected String status;			// 状态 CardStatus
-	protected String type;				// 类型 CardType
-	protected String description;			// 描述
-	protected Date createDate;				// 创建日期
-	protected DemographicId demographicId;	// 人口学ID
+
+	String id;				    // 卡ID
+	String number;				// 卡号
+	String ownerName;			// 持有人姓名
+	String status;			// 状态 CardStatus
+	String type;				// 类型 CardType
+	String description;			// 描述
+	Date createDate;				// 创建日期
+	String idCardNo;          //身份证号
+	String DType;
+	String platform;
 
 	public AbstractVirtualCard() {
 		id  = UUID.randomUUID().toString().replace("-","");
@@ -43,7 +46,7 @@ public class AbstractVirtualCard extends AbstractCard {
 		this.id = id;
 	}
 
-	@Column(name = "number", unique = true, nullable = false ,insertable = false, updatable = false)
+	@Column(name = "number", nullable = false)
 	public String getNumber() {
 		return number;
 	}
@@ -51,7 +54,7 @@ public class AbstractVirtualCard extends AbstractCard {
 		this.number = number;
 	}
 
-	@Column(name = "owner_name", unique = true, nullable = false ,insertable = false, updatable = false)
+	@Column(name = "owner_name",  nullable = true)
 	public String getOwnerName() {
 		return ownerName;
 	}
@@ -59,7 +62,7 @@ public class AbstractVirtualCard extends AbstractCard {
 		this.ownerName = ownerName;
 	}
 
-	@Column(name = "card_status", unique = true, nullable = false ,insertable = false, updatable = false)
+	@Column(name = "card_status", nullable = true)
 	public String getStatus() {
 		return status;
 	}
@@ -67,7 +70,7 @@ public class AbstractVirtualCard extends AbstractCard {
 		this.status = status;
 	}
 
-	@Column(name = "card_type", unique = true, nullable = false ,insertable = false, updatable = false)
+	@Column(name = "card_type",  nullable = true)
 	public String getType() {
 		return type;
 	}
@@ -75,7 +78,7 @@ public class AbstractVirtualCard extends AbstractCard {
 		this.type = type;
 	}
 
-	@Column(name = "description", unique = true, nullable = false ,insertable = false, updatable = false)
+	@Column(name = "description",  nullable = true)
 	public String getDescription() {
 		return description;
 	}
@@ -83,7 +86,7 @@ public class AbstractVirtualCard extends AbstractCard {
 		this.description = description;
 	}
 
-	@Column(name = "create_date", unique = true, nullable = false ,insertable = false, updatable = false)
+	@Column(name = "create_date",  nullable = true)
 	public Date getCreateDate() {
 		return createDate;
 	}
@@ -91,14 +94,28 @@ public class AbstractVirtualCard extends AbstractCard {
 		this.createDate = createDate;
 	}
 
-	@Column(name = "id_card_no", unique = true, nullable = false ,insertable = false, updatable = false)
-	public DemographicId getDemographicId() {
-		return demographicId;
+	@Column(name = "id_card_no", nullable = true)
+	public String getIdCardNo() {
+		return idCardNo;
 	}
-	public void setDemographicId(DemographicId demographicId) {
-		this.demographicId = demographicId;
+	public void setIdCardNo(String idCardNo) {
+		this.idCardNo = idCardNo;
 	}
 
+	@Column(name = "DType",  nullable = true )
+	public String getDType() {
+		return DType;
+	}
+	public void setDType(String DType) {
+		this.DType = DType;
+	}
 
+	@Column(name = "platform",  nullable = false )
+	public String getPlatform() {
+		return platform;
+	}
+	public void setPlatform(String platform) {
+		this.platform = platform;
+	}
 }
 

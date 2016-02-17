@@ -1,6 +1,6 @@
 package com.yihu.ehr.adaption.feignclient;
 
-import com.yihu.ehr.constrant.Result;
+
 import com.yihu.ehr.model.address.MAddress;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

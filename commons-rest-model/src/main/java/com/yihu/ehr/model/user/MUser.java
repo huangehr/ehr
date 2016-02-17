@@ -1,6 +1,9 @@
 package com.yihu.ehr.model.user;
 
 
+import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.model.org.MOrganization;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -15,12 +18,12 @@ public class MUser implements Serializable{
     private String password;
     private Boolean activated;
     private String validateCode;
-    private String userType;
+    private MConventionalDict userType;
     private String telephone;
-    private String martialStatus;
-    private String gender;
+    private MConventionalDict martialStatus;
+    private MConventionalDict gender;
     private String idCardNo;
-    private String organization;
+    private MOrganization organization;
     // 未绑定属性
     private String orgPost;
     private String privilege;
@@ -28,7 +31,7 @@ public class MUser implements Serializable{
 
     //特殊属性
     private String major;
-    private String medicalRole;
+    private MConventionalDict medicalRole;
     private String techTitle;
     private String adminTitle;
 
@@ -107,11 +110,11 @@ public class MUser implements Serializable{
         this.validateCode = validateCode;
     }
 
-    public String getUserType() {
+    public MConventionalDict getUserType() {
         return userType;
     }
 
-    public void setUserType(String userType) {
+    public void setUserType(MConventionalDict userType) {
         this.userType = userType;
     }
 
@@ -123,19 +126,19 @@ public class MUser implements Serializable{
         this.telephone = telephone;
     }
 
-    public String getMartialStatus() {
+    public MConventionalDict getMartialStatus() {
         return martialStatus;
     }
 
-    public void setMartialStatus(String martialStatus) {
+    public void setMartialStatus(MConventionalDict martialStatus) {
         this.martialStatus = martialStatus;
     }
 
-    public String getGender() {
+    public MConventionalDict getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
+    public void setGender(MConventionalDict gender) {
         this.gender = gender;
     }
 
@@ -147,11 +150,11 @@ public class MUser implements Serializable{
         this.idCardNo = idCardNo;
     }
 
-    public String getOrganization() {
+    public MOrganization getOrganization() {
         return organization;
     }
 
-    public void setOrganization(String organization) {
+    public void setOrganization(MOrganization organization) {
         this.organization = organization;
     }
 
@@ -187,11 +190,11 @@ public class MUser implements Serializable{
         this.major = major;
     }
 
-    public String getMedicalRole() {
+    public MConventionalDict getMedicalRole() {
         return medicalRole;
     }
 
-    public void setMedicalRole(String medicalRole) {
+    public void setMedicalRole(MConventionalDict medicalRole) {
         this.medicalRole = medicalRole;
     }
 
