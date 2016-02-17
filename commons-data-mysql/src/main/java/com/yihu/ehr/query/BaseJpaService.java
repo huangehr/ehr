@@ -1,7 +1,11 @@
 package com.yihu.ehr.query;
 
+import com.yihu.ehr.constants.PageArg;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +16,8 @@ import javax.persistence.criteria.CriteriaQuery;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -49,11 +54,8 @@ public class BaseJpaService<T, R> {
     }
 
     public void delete(Iterable ids) {
-        Iterator iterator = ids.iterator();
-        while (iterator.hasNext()) {
-            Serializable id = (Serializable) iterator.next();
-            getRepository().delete(id);
-        }
+        List<T> list = getJpaRepository().findAll(ids);
+        getJpaRepository().deleteInBatch(list);
     }
 
     public Class<T> getEntityClass() {
@@ -62,9 +64,12 @@ public class BaseJpaService<T, R> {
         return (Class) parameters[0];
     }
 
-    public List search(String fields, String filters, String sorts, int page, int size) {
+    public List search(String fields, String filters, String sorts, Integer page, Integer size) {
         URLQueryParser queryParser = createQueryParser(fields, filters, sorts);
         CriteriaQuery query = queryParser.makeCriteriaQuery();
+
+        if (page == null || page <= 0) page = PageArg.DefaultPage;
+        if (size == null || size <= 0 || size >= 1000) size = PageArg.DefaultSize;
 
         return entityManager
                 .createQuery(query)
@@ -77,23 +82,7 @@ public class BaseJpaService<T, R> {
         URLQueryParser queryParser = createQueryParser(filters);
         CriteriaQuery query = queryParser.makeCriteriaCountQuery();
 
-        if (true) {
-            System.out.println(getSQLQueryString(query));
-        }
-
         return (long) entityManager.createQuery(query).getSingleResult();
-    }
-
-    /**
-     * 因为底层使用的是Hibernate，所以对Query解封之后可以得到Hibernate的Query对象，并取得原始SQL查询语句。
-     *
-     * @param query
-     * @return
-     */
-    protected String getSQLQueryString(CriteriaQuery query) {
-        String sqlString = entityManager.createQuery(query).unwrap(org.hibernate.Query.class).getQueryString();
-
-        return sqlString;
     }
 
     protected <T> URLQueryParser createQueryParser(String fields, String filters, String orders) {
@@ -112,11 +101,31 @@ public class BaseJpaService<T, R> {
         return queryParser;
     }
 
+    protected Sort parseSorts(String sorter){
+        if (StringUtils.isNotEmpty(sorter)) {
+            String[] orderArray = sorter.split(",");
+
+            List<Sort.Order> orderList = new ArrayList<>(orderArray.length);
+            Arrays.stream(orderArray).forEach(
+                    elem -> orderList.add(
+                            elem.startsWith("+") ? new Sort.Order(Sort.Direction.ASC, elem.substring(1)):
+                                    new Sort.Order(Sort.Direction.DESC, elem.substring(1))));
+
+            return new Sort(orderList);
+        }
+
+        return null;
+    }
+
     protected Session currentSession() {
         return entityManager.unwrap(Session.class);
     }
 
-    protected PagingAndSortingRepository getRepository() {
+    public PagingAndSortingRepository getRepository() {
         return (PagingAndSortingRepository) repo;
+    }
+
+    public JpaRepository getJpaRepository(){
+        return (JpaRepository)repo;
     }
 }

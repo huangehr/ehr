@@ -14,7 +14,6 @@ import java.util.Date;
 @Entity
 @Table(name = "system_dicts")
 @Access(value = AccessType.PROPERTY)
-
 public class SystemDict {
     long id;
     String name;

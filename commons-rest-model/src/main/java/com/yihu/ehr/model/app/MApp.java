@@ -8,7 +8,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * APP对象。
+ * APP Model。
+ *
  * @author Sand
  * @version 1.0
  * @created 03_8月_2015 16:53:21
@@ -19,17 +20,15 @@ public class MApp implements Serializable {
     private String name;
     private String secret;
     private String url;
-    private MUser creator;
-    private MUser auditor;
+    private String creator;
+    private String auditor;
     private Date createTime;
     private Date auditTime;
-    private MConventionalDict catalog;
-    private MConventionalDict status;
+    private String catalog;
+    private String status;
     private String description;
-    private Set<String> tags = new HashSet<>();
 
 	public MApp(){
-
     }
 
     public String getId() {
@@ -64,19 +63,19 @@ public class MApp implements Serializable {
         this.url = url;
     }
 
-    public MUser getCreator() {
+    public String getCreator() {
         return creator;
     }
 
-    public void setCreator(MUser creator) {
+    public void setCreator(String creator) {
         this.creator = creator;
     }
 
-    public MUser getAuditor() {
+    public String getAuditor() {
         return auditor;
     }
 
-    public void setAuditor(MUser auditor) {
+    public void setAuditor(String auditor) {
         this.auditor = auditor;
     }
 
@@ -96,19 +95,19 @@ public class MApp implements Serializable {
         this.auditTime = auditTime;
     }
 
-    public MConventionalDict getCatalog() {
+    public String getCatalog() {
         return catalog;
     }
 
-    public void setCatalog(MConventionalDict catalog) {
+    public void setCatalog(String catalog) {
         this.catalog = catalog;
     }
 
-    public MConventionalDict getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(MConventionalDict status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
@@ -118,13 +117,5 @@ public class MApp implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Set<String> getTags() {
-        return tags;
-    }
-
-    public void setTags(Set<String> tags) {
-        this.tags = tags;
     }
 }

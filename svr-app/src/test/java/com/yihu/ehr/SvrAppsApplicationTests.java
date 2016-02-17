@@ -1,14 +1,21 @@
 package com.yihu.ehr;
 
 import com.yihu.ehr.apps.controller.AppController;
+import com.yihu.ehr.apps.service.App;
+import com.yihu.ehr.model.app.MApp;
+import com.yihu.ehr.model.user.MUser;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
 
@@ -27,15 +34,20 @@ public class SvrAppsApplicationTests {
     public void atestSaveApp() throws Exception {
         applicationContext = new SpringApplicationBuilder()
                 .web(false).sources(SvrAppApplication.class).run();
-        String name = "ehrTest";
-        String catalog = "ChildHealth";
-        String url = "103";
-        String description = "ehrTest";
-        String tags = "app";
-        String userId = "0dae0003561cc415c72d9111e8cb88aa";  //admin
-//        Object app = appController.createApp(name, catalog, url, description, tags, userId);
-//        appId = ((App) app).getId();
-//        assertTrue("查询失败！", appId != null);
+        MApp mapp = new MApp();
+        mapp.setName("ehrTest");
+        mapp.setCatalog("ChildHealth");
+        mapp.setUrl("http://192.168.1.103");
+        mapp.setDescription("ehrTest");
+
+        Set<String> tags = new HashSet<>();
+        tags.add("app");
+        mapp.setCreator("0dae0003561cc415c72d9111e8cb88aa");
+
+        mapp = appController.createApp("");
+        appId = ((MApp) mapp).getId();
+
+        assertTrue("查询失败！", appId != null);
     }
 
     @Test
@@ -86,8 +98,8 @@ public class SvrAppsApplicationTests {
         String url = "104";
         String description = "yYkKALLwUO";
         String tags = "appss";
-//        Object result = appController.updateApp(appId, name, catalog, status, url, description, tags);
-//        assertTrue("修改失败！", "success".equals(result));
+        Object result = appController.updateApp("");
+        assertTrue("修改失败！", "success".equals(result));
     }
 
 
