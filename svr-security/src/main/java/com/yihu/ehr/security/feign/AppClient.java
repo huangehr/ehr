@@ -12,19 +12,18 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  * Created by Administrator on 2016/1/4.
  */
 @FeignClient(MicroServices.AppMgr)
+@RequestMapping(value = "/rest/v1.0")
 public interface AppClient {
 
-    @RequestMapping(value = "/rest/{api_version}/app/validation/{app_id}/{secret}", method = GET )
+    @RequestMapping(value = "/app/validation/{app_id}/{secret}", method = GET )
     Boolean validationApp(
-            @PathVariable(value = "api_version") String apiVersion,
             @PathVariable(value = "app_id") String appId,
             @PathVariable(value = "secret") String appSecret);
 
 
-    @RequestMapping(value = "/rest/{api_version}/app", method = GET )
+    @RequestMapping(value = "/apps/{app_id}", method = GET )
     MApp getApp(
-            @PathVariable(value = "api_version") String apiVersion,
-            @RequestParam(value = "appId") String appId);
+            @PathVariable(value = "app_id") String appId);
 
 
 }

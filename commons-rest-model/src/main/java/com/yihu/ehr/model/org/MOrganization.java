@@ -1,5 +1,8 @@
 package com.yihu.ehr.model.org;
 
+import com.yihu.ehr.model.address.MGeography;
+import com.yihu.ehr.model.dict.MConventionalDict;
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,17 +18,16 @@ public class MOrganization implements Serializable{
     private String orgCode;         // 机构代码,对医院编码属性需要调研
     private String admin;            // 机构管理员
     private String settled;        // 是否已接入,对第三方平台有效.
-    private String settledWay;    // 接入方式：直连/平台接入
+    private MConventionalDict settledWay;    // 接入方式：直连/平台接入
     private String fullName;        // 全名
-    private String orgType;        // 机构类型,如:行政\科研等
+    private MConventionalDict orgType;        // 机构类型,如:行政\科研等
     private String pyCode;            // 拼音码
     private String shortName;        // 简称
     private Set<String> tags;        // 标签
     private String tel;                // 机构电话
     private String createDate;        // 创建日期
-    private String location;        // 地址
+    private MGeography location;        // 地址
     private String activityFlag;
-
 
     public MOrganization() {
         tags = new HashSet();
@@ -69,27 +71,7 @@ public class MOrganization implements Serializable{
         this.tags.remove(tag);
     }
 
-    public String getSettledWay() {
-        return settledWay;
-    }
 
-    public void setSettledWay(String settledWay) {
-        this.settledWay = settledWay;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-    public void setLocation(String location) {
-        this.location = location;
-    }
 
     public String getPyCode() {
         return pyCode;
@@ -120,11 +102,36 @@ public class MOrganization implements Serializable{
         this.tel = tel;
     }
 
-    public String getOrgType() {
+    public MConventionalDict getSettledWay() {
+        return settledWay;
+    }
+
+    public void setSettledWay(MConventionalDict settledWay) {
+        this.settledWay = settledWay;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public MConventionalDict getOrgType() {
         return orgType;
     }
-    public void setOrgType(String orgType) {
+
+    public void setOrgType(MConventionalDict orgType) {
         this.orgType = orgType;
+    }
+
+    public MGeography getLocation() {
+        return location;
+    }
+
+    public void setLocation(MGeography location) {
+        this.location = location;
     }
 
     public String getSettled() {
@@ -141,4 +148,5 @@ public class MOrganization implements Serializable{
     public void setActivityFlag(String activityFlag) {
         this.activityFlag = activityFlag;
     }
+
 }

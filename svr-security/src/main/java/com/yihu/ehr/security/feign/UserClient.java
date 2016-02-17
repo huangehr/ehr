@@ -13,22 +13,20 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  * Created by Administrator on 2016/1/4.
  */
 @FeignClient(MicroServices.User)
+@RequestMapping(value = "/rest/v1.0")
 public interface UserClient {
 
-    @RequestMapping(value = "/rest/{api_version}/user", method = GET )
+    @RequestMapping(value = "/user", method = GET )
     MUser getUser(
-            @PathVariable(value = "api_version") String apiVersion,
-            @RequestParam(value = "userId") String userId);
+            @RequestParam(value = "user_id") String userId);
 
-    @RequestMapping(value = "/rest/{api_version}/{login_code}", method = GET )
+    @RequestMapping(value = "/{login_code}", method = GET )
     MUser getUserByLoginCode(
-            @PathVariable(value = "api_version") String apiVersion,
             @PathVariable(value = "login_code") String loginCode);
 
 
-    @RequestMapping(value = "/rest/{api_version}/login_indetify/{login_code}/{psw}", method = GET )
+    @RequestMapping(value = "/login_indetify/{login_code}/{psw}", method = GET )
     MUser loginIndetification(
-            @PathVariable(value = "api_version") String apiVersion,
             @PathVariable(value = "login_code") String loginCode,
             @PathVariable(value = "psw") String psw);
 

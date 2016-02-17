@@ -1,25 +1,26 @@
 package com.yihu.ehr.adaption.adapterorg.controller;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adaption.adapterorg.service.AdapterOrg;
-import com.yihu.ehr.adaption.adapterorg.service.AdapterOrgService;
+import com.yihu.ehr.adaption.adapterorg.service.AdapterOrgManager;
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlan;
-import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanService;
+import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanManager;
+import com.yihu.ehr.adaption.commons.ExtendController;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.constrant.Result;
 import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.model.adaption.MAdapterOrg;
 import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.controller.BaseRestController;
-import com.yihu.ehr.util.query.FieldCondition;
-import com.yihu.ehr.util.query.PageModel;
+import com.yihu.ehr.util.parm.FieldCondition;
+import com.yihu.ehr.util.parm.PageModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,177 +32,135 @@ import java.util.Map;
  * @created 2016.2.3
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/adapterorg")
+@RequestMapping(ApiVersionPrefix.CommonVersion)
 @Api(protocols = "https", value = "adapterorg", description = "第三方标准管理接口", tags = {"第三方标准"})
-public class AdapterOrgController extends BaseRestController {
+public class AdapterOrgController extends ExtendController<MAdapterOrg> {
     @Autowired
-    private AdapterOrgService adapterOrgManager;
+    private AdapterOrgManager adapterOrgManager;
     @Autowired
-    private OrgAdapterPlanService orgAdapterPlanManager;
+    private OrgAdapterPlanManager orgAdapterPlanManager;
 
-    @RequestMapping(value = "/page", method = RequestMethod.GET)
+    @RequestMapping(value = "/adapterorgs/page", method = RequestMethod.GET)
     @ApiOperation(value = "适配采集标准")
-    public Result searchAdapterOrg(
+    public Envelop searchAdapterOrg(
             @ApiParam(name = "parmJson", value = "查询条件", defaultValue = "")
             @RequestParam(value = "parmJson", required = false) String parmJson) {
 
-        Result result = new Result();
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            PageModel pageModel = objectMapper.readValue(parmJson, PageModel.class);
-            result = adapterOrgManager.getEnvelop(pageModel);
-        } catch (Exception ex) {
-            result.setSuccessFlg(false);
+            return adapterOrgManager.pagesToResult(jsonToObj(parmJson, PageModel.class));
+        } catch (IOException e) {
+            throw errParm();
+        } catch (Exception e) {
+            throw errSystem();
         }
-        return result;
     }
 
 
-    @RequestMapping(value = "/info", method = RequestMethod.GET)
+    @RequestMapping(value = "/adapterorg/{code}", method = RequestMethod.GET)
     @ApiOperation(value = "适配采集标准")
-    public Result getAdapterOrg(
+    public MAdapterOrg getAdapterOrg(
             @ApiParam(name = "code", value = "代码", defaultValue = "")
-            @RequestParam(value = "code") String code) {
+            @PathVariable(value = "code") String code) {
 
-        Result result = new Result();
         try {
-            AdapterOrg adapterOrg = adapterOrgManager.findOne(code);
-            result.setObj(adapterOrg);
-            result.setSuccessFlg(true);
+            if (StringUtils.isEmpty(code))
+                throw errMissCode();
+            return getModel(adapterOrgManager.findOne(code));
         } catch (Exception ex) {
-            result.setSuccessFlg(false);
+            throw errSystem();
         }
-        return result;
     }
 
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
+    @RequestMapping(value = "/adapterorg", method = RequestMethod.POST)
     @ApiOperation(value = "新增采集标准")
     public boolean addAdapterOrg(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
             @ApiParam(name = "adapterOrgModel", value = "采集机构json模型", defaultValue = "")
             @RequestParam(value = "adapterOrgModel", required = false) String adapterOrgModel) {
+
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            AdapterOrg adapterOrg = objectMapper.readValue(adapterOrgModel, AdapterOrg.class);
+            AdapterOrg adapterOrg = jsonToObj(adapterOrgModel, AdapterOrg.class);
             if (adapterOrgManager.findOne(adapterOrg.getCode()) != null) {
-                failed(ErrorCode.ExistOrgForCreate, "该机构已存在采集标准！");
+                throw new ApiException(ErrorCode.RepeatAdapterOrg, "该机构已存在采集标准！");
             }
             adapterOrgManager.addAdapterOrg(adapterOrg, apiVersion);
             return true;
-        } catch (ApiException e) {
-            failed(e.getErrorCode(), e.getErrMsg());
-            return false;
+        } catch (IOException e) {
+            throw errParm();
         } catch (Exception e) {
-//            failed(ErrorCode.SaveFailed, "保存失败！", e.getMessage());
-            return false;
+            throw errSystem();
         }
     }
 
-    @RequestMapping(value = "", method = RequestMethod.PUT)
+
+    @RequestMapping(value = "/adapterorg/{code}", method = RequestMethod.PUT)
     @ApiOperation(value = "更新采集标准")
     public boolean updateAdapterOrg(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable(value = "api_version") String apiVersion,
             @ApiParam(name = "code", value = "代码", defaultValue = "")
-            @RequestParam(value = "code") String code,
+            @PathVariable(value = "code") String code,
             @ApiParam(name = "name", value = "名称", defaultValue = "")
             @RequestParam(value = "name") String name,
             @ApiParam(name = "description", value = "描述", defaultValue = "")
-            @RequestParam(value = "description") String description) {
+            @RequestParam(value = "description", required = false) String description) {
+
         try {
             AdapterOrg adapterOrg = adapterOrgManager.findOne(code);
+            if (adapterOrg == null)
+                throw errNotFound();
             adapterOrg.setName(name);
             adapterOrg.setDescription(description);
             adapterOrgManager.save(adapterOrg);
             return true;
         } catch (Exception e) {
-//            failed(ErrorCode.SaveFailed, "更新失败！", e.getMessage());
-            return false;
+            throw errSystem();
         }
     }
 
-    @RequestMapping(value = "", method = RequestMethod.DELETE)
+
+    @RequestMapping(value = "/adapterorg/{code}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除采集标准")
     public boolean delAdapterOrg(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable(value = "api_version") String apiVersion,
             @ApiParam(name = "code", value = "代码", defaultValue = "")
-            @RequestParam(value = "code") String code) {
+            @PathVariable(value = "code") String code) {
         try {
+            if (StringUtils.isEmpty(code))
+                throw errMissCode();
             adapterOrgManager.delete(code.split(","), code);
+            return true;
         } catch (Exception e) {
-            return false;
+            throw errSystem();
         }
-        return true;
     }
 
-    //获取初始标准列表  重复
-//    @RequestMapping(value = "/list" , method = RequestMethod.GET)
-//    @ApiOperation(value = "获取初始标准列表")
-    public Envelop getAdapterOrgList(
-            @ApiParam(name = "type", value = "类型", defaultValue = "")
-            @RequestParam(value = "type") String type,
-            @ApiParam(name = "page", value = "当前页", defaultValue = "")
-            @RequestParam(value = "page") int page,
-            @ApiParam(name = "rows", value = "每页行数", defaultValue = "")
-            @RequestParam(value = "rows") int rows) {
-        //根据类型获取所有采集标准
-        Envelop result = new Envelop();
-        try {
-            PageModel pageModel = new PageModel(page, rows);
-            FieldCondition fieldCondition = new FieldCondition("type", "in", "1");
-            //厂商，初始标准只能是厂商
-            if ("2".equals(type)) {
-                //医院，初始标准没有限制
-                fieldCondition.addVal("1", "3");
-            } else if ("3".equals(type)) {
-                //区域,初始标准只能选择厂商或区域
-                fieldCondition.addVal("1");
-            }
-            pageModel.addFilter(fieldCondition);
-            List<AdapterOrg> ls = adapterOrgManager.getPage(pageModel);
-            Integer totalCount = adapterOrgManager.totalCountForPage(pageModel);
-            List<String> adapterOrgs = new ArrayList<>();
-            for (AdapterOrg adapterOrg : ls) {
-                adapterOrgs.add(adapterOrg.getCode() + ',' + adapterOrg.getName());
-            }
-            result = getResult(adapterOrgs, totalCount, pageModel.getPage(), pageModel.getSize());
-        } catch (Exception ex) {
-            result.setSuccessFlg(false);
-        }
-        return result;
-    }
 
-    @RequestMapping(value = "/orgIsExistData", method = RequestMethod.GET)
-    @ApiOperation(value = "判断是否存在")
+    @RequestMapping(value = "/adapterorg/{org}/isExistAdapterData", method = RequestMethod.GET)
+    @ApiOperation(value = "判断采集机构是否存在采集数据")
     public boolean orgIsExistData(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable(value = "api_version") String apiVersion,
             @ApiParam(name = "org", value = "机构", defaultValue = "")
-            @RequestParam(value = "org") String org) {
+            @PathVariable(value = "org") String org) {
+
         try {
             return adapterOrgManager.isExistData(org);
         } catch (Exception ex) {
-            return false;
+            throw errSystem();
         }
     }
 
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
-    @ApiOperation(value = "获取适配方案机构列表")
-    public String getAdapterOrgList(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable(value = "api_version") String apiVersion,
+    @RequestMapping(value = "/adapterorgs/{type}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据类型获取所有采集标准")
+    public List getAdapterOrgList(
             @ApiParam(name = "type", value = "类型", defaultValue = "")
             @PathVariable(value = "type") String type,
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
-            @PathVariable(value = "version") String version,
+            @RequestParam(value = "version") String version,
             @ApiParam(name = "mode", value = "新增或修改", defaultValue = "")
-            @PathVariable(value = "mode") String mode) {
-        //根据类型获取所有采集标准
-        Result result = new Result();
+            @RequestParam(value = "mode") String mode) {
+
         try {
+            if (StringUtils.isEmpty(version))
+                throw errMissVersion();
             List<AdapterOrg> adapterOrgList = null;
             List<OrgAdapterPlan> orgAdapterPlans = orgAdapterPlanManager.findList("", version);
             List<String> orgList = new ArrayList<>();
@@ -212,9 +171,9 @@ public class AdapterOrgController extends BaseRestController {
             }
 
             PageModel pageModel = new PageModel();
-            pageModel.addFilter(new FieldCondition("type", "=", type));
-            pageModel.addFilter(new FieldCondition("orgCode", "in", orgList));
-            adapterOrgList = adapterOrgManager.getPage(pageModel);
+            pageModel.addFieldCondition(new FieldCondition("type", "=", type));
+            pageModel.addFieldCondition(new FieldCondition("orgCode", "not in", orgList));
+            adapterOrgList = adapterOrgManager.pages(pageModel);
 
             List<Map> adapterOrgs = new ArrayList<>();
             if (!adapterOrgList.isEmpty()) {
@@ -225,13 +184,9 @@ public class AdapterOrgController extends BaseRestController {
                     adapterOrgs.add(map);
                 }
             }
-            result.setSuccessFlg(true);
-            result.setDetailModelList(adapterOrgs);
+            return adapterOrgs;
         } catch (Exception ex) {
-            result.setSuccessFlg(false);
+            throw errSystem();
         }
-        return result.toJson();
     }
-
-
 }

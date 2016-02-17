@@ -1,5 +1,6 @@
 package com.yihu.ehr.patient.service.card;
 
+import com.yihu.ehr.patient.service.demographic.DemographicId;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -25,11 +26,10 @@ public class AbstractPhysicalCard extends AbstractCard implements Serializable {
 	  String type;				// 类型 CardType
 	  String description;			// 描述
 	  Date createDate;				// 创建日期
-	  //DemographicId demographicId;	// 人口学ID
-	  String idCardNo;
+	  String idCardNo;          //身份证号
 	  String DType;
 
-	//特殊字段
+	  //特殊字段
 	  String local;				// 发行地/归属地
 	  String releaseOrg;				// 发行机构
 	  Date releaseDate;			// 发行时间
@@ -39,7 +39,6 @@ public class AbstractPhysicalCard extends AbstractCard implements Serializable {
 	public AbstractPhysicalCard() {
 		id  = UUID.randomUUID().toString().replace("-","");
 	}
-
 
 	@Id
 	@GeneratedValue(generator = "Generator")
@@ -99,14 +98,6 @@ public class AbstractPhysicalCard extends AbstractCard implements Serializable {
 	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
 	}
-
-//	@Column(name = "id_card_no", nullable = true)
-//	public DemographicId getDemographicId() {
-//		return demographicId;
-//	}
-//	public void setDemographicId(DemographicId demographicId) {
-//		this.demographicId = demographicId;
-//	}
 
 
 	@Column(name = "id_card_no", nullable = true)

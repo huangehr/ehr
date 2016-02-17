@@ -4,7 +4,6 @@ import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.security.feign.UserClient;
 import com.yihu.ehr.util.DateUtil;
 import com.yihu.ehr.util.encrypt.RSA;
-import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -85,11 +83,11 @@ public class SecurityManager {
         return  userSecurity;
     }
 
-    public UserSecurity createSecurityByUserId(String apiVersion,String userId) throws Exception {
+    public UserSecurity createSecurityByUserId(String userId) throws Exception {
 
         //1-1根据用户登陆名获取用户信息。
 
-        MUser userInfo = userClient.getUser(apiVersion,userId);
+        MUser userInfo = userClient.getUser(userId);
         if(userInfo==null) {
             return null;
         }
@@ -102,24 +100,18 @@ public class SecurityManager {
         }
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
     public UserSecurity createSecurityByOrgCode(String orgCode) throws Exception {
-
         UserSecurity userSecurity = createSecurity();
         //1-2-1-2 与用户进行关联，user_key数据增加。
         createUserKeyByOrg(userSecurity, orgCode, orgKeyType);
-
         return userSecurity;
     }
 
-    public UserSecurity getUserSecurity(String securityId) throws Exception {
-        return userSecurityRepository.findOne(securityId);
-    }
 
-    public UserSecurity getUserSecurityByLoginCode(String apiVersion,String loginCode) throws Exception {
+    public UserSecurity getUserSecurityByLoginCode(String loginCode) throws Exception {
 
         //1-1根据用户登陆名获取用户信息。
-        MUser userInfo = userClient.getUserByLoginCode(apiVersion,loginCode);
+        MUser userInfo = userClient.getUserByLoginCode(loginCode);
         if(userInfo==null) {
             return null;
         } else {
@@ -142,25 +134,6 @@ public class SecurityManager {
         }
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public List<UserSecurity> getUserSecurityList(int from, int count) {
-        Session session = entityManager.unwrap(org.hibernate.Session.class);
-        Criteria criteria = session.createCriteria(UserSecurity.class);
-        if (from >= 0 && count > 0) {
-            criteria.setFirstResult(from);
-            criteria.setMaxResults(count);
-        }
-        List<UserSecurity> list = criteria.list();
-
-        return list;
-    }
-
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public void updateSecurity(UserSecurity security) {
-        userSecurityRepository.save(security);
-    }
-
-    @Transactional(Transactional.TxType.SUPPORTS)
     public void deleteSecurity(String id) {
 
         UserSecurity userSecurity = userSecurityRepository.findOne(id);
@@ -179,7 +152,6 @@ public class SecurityManager {
         return userKey;
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
     public UserKey createUserKeyByOrg(UserSecurity security, String orgCode, String keyType) {
 
         UserKey userKey = new UserKey();
@@ -219,7 +191,6 @@ public class SecurityManager {
         }
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
     public String getUserKeyByOrgCd(String orgCode) {
 
         Session session = entityManager.unwrap(org.hibernate.Session.class);
@@ -264,18 +235,13 @@ public class SecurityManager {
     }
 
 
-    @Transactional(Transactional.TxType.SUPPORTS)
     public UserSecurity getUserPublicKeyByOrgCd(String orgCode) {
 
         String userKeyId = getUserKeyByOrgCd(orgCode);
         return findByUserKey(userKeyId);
     }
 
-    public void updateUserKey(UserKey userKey) {
-        userKeyRepository.save(userKey);
-    }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
     public void deleteUserKey(String userKeyId) {
         userKeyRepository.delete(userKeyId);
     }
