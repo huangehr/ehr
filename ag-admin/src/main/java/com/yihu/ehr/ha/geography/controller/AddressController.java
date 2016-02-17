@@ -3,6 +3,7 @@ package com.yihu.ehr.ha.geography.controller;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.ha.geography.service.AddressClient;
 import com.yihu.ehr.model.address.MGeography;
+import com.yihu.ehr.model.address.MGeographyDict;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,19 +26,18 @@ public class AddressController extends BaseRestController {
     private AddressClient addressClient;
 
     @RequestMapping(value = "/geographies/{level}", method = RequestMethod.GET)
-    @ApiOperation(value = "根据地址等级查询地址信息")
-    public Object getAddressByLevel(
+    @ApiOperation(value = "根据地址等级查询地址字典")
+    public List<MGeographyDict> getAddressByLevel(
             @ApiParam(name = "level", value = "地址级别", defaultValue = "")
             @PathVariable(value = "level") Integer level) {
-       return addressClient.getAddressByLevel(level);
+        return addressClient.getAddressByLevel(level);
     }
 
     @RequestMapping(value = "/geographies/{pid}", method = RequestMethod.GET)
-    @ApiOperation(value = "根据父id查询地址信息")
-    public Object getAddressDictByPid(
+    @ApiOperation(value = "根据父id查询地址字典")
+    public List<MGeographyDict> getAddressDictByPid(
             @ApiParam(name = "pid", value = "上级id", defaultValue = "")
             @PathVariable(value = "pid") Integer pid) {
-
         return addressClient.getAddressDictByPid(pid);
     }
 
@@ -52,7 +52,7 @@ public class AddressController extends BaseRestController {
 
 
     @RequestMapping(value = "geographies/canonical/{id}", method = RequestMethod.GET)
-    @ApiOperation(value = "根据地址编号获取地址")
+    @ApiOperation(value = "根据地址编号获取地址中文字符串全拼")
     public String getCanonicalAddress(
             @ApiParam(name = "id", value = "地址代码", defaultValue = "")
             @PathVariable(value = "id") String id) {
@@ -82,8 +82,6 @@ public class AddressController extends BaseRestController {
     @RequestMapping(value = "/geographies/{province}/{city}/{district}" , method = RequestMethod.GET)
     @ApiOperation(value = "根据省市县查询地址并返回地址编号列表")
     public List<String> search(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "province", value = "省", defaultValue = "")
             @PathVariable(value = "province") String province,
             @ApiParam(name = "city", value = "市", defaultValue = "")

@@ -9,107 +9,104 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+
 /**
  * Created by AndyCai on 2016/1/29.
  */
 @FeignClient("svr-user")
 public interface UserClient {
 
-    @RequestMapping(value = "/rest/{api_version}/user/search" , method = RequestMethod.GET)
-    @ApiOperation(value = "获取用户列表",produces = "application/json", notes = "根据查询条件获取用户列表在前端表格展示")
-    Object searchUsers(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "realName", value = "查询条件", defaultValue = "")
-            @RequestParam(value = "realName") String realName,
-            @ApiParam(name = "organization", value = "查询条件", defaultValue = "")
-            @RequestParam(value = "organization") String organization,
-            @ApiParam(name = "searchType", value = "类别", defaultValue = "")
-            @RequestParam(value = "searchType") String searchType,
-            @ApiParam(name = "page", value = "当前页", defaultValue = "")
-            @RequestParam(value = "page") int page,
-            @ApiParam(name = "rows", value = "页数", defaultValue = "")
-            @RequestParam(value = "rows") int rows) ;
+    @RequestMapping(value = "/rest/v1.0/users" , method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户列表",notes = "根据查询条件获取用户列表在前端表格展示")
+    List<MUser> searchUsers(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            HttpServletRequest request,
+            HttpServletResponse response) ;
 
-    @RequestMapping(value = "/rest/{api_version}/user/" , method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除用户",produces = "application/json", notes = "根据用户id删除用户")
+    @RequestMapping(value = "/rest/v1.0/users/{user_id}" , method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除用户",notes = "根据用户id删除用户")
     Object deleteUser(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "userId", value = "id", defaultValue = "")
-            @RequestParam(value = "userId") String userId) ;
+            @ApiParam(name = "user_id", value = "用户编号", defaultValue = "")
+            @PathVariable(value = "user_id") String userId) ;
 
-    @RequestMapping(value = "/rest/{api_version}/user/activity" , method = RequestMethod.PUT)
-    @ApiOperation(value = "改变用户状态",produces = "application/json", notes = "根据用户状态改变当前用户状态")
-    Object  activityUser (
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "userId", value = "id", defaultValue = "")
-            @RequestParam(value = "userId") String userId,
-            @ApiParam(name = "activated", value = "激活状态", defaultValue = "")
-            @RequestParam(value = "activated") boolean activated);
 
-    @RequestMapping(value = "/rest/{api_version}/user/" , method = RequestMethod.PUT)
-    @ApiOperation(value = "修改用户",produces = "application/json", notes = "重新绑定用户信息")
+    @RequestMapping(value = "/rest/v1.0/users" , method = RequestMethod.POST)
+    @ApiOperation(value = "创建用户",notes = "重新绑定用户信息")
+    Object createUser(
+            @ApiParam(name = "user_json_data", value = "", defaultValue = "")
+            @RequestParam(value = "user_json_data") String userJsonData);
+
+
+    @RequestMapping(value = "/rest/v1.0/users" , method = RequestMethod.PUT)
+    @ApiOperation(value = "修改用户",notes = "重新绑定用户信息")
     Object updateUser(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "userModel", value = "用户对象", defaultValue = "")
-            @RequestParam(value = "userModel") String userModelJson);
+            @ApiParam(name = "user_json_data", value = "", defaultValue = "")
+            @RequestParam(value = "user_json_data") String userJsonData);
 
-    @RequestMapping(value = "/rest/{api_version}/user/resetPass" , method = RequestMethod.PUT)
-    @ApiOperation(value = "重设密码",produces = "application/json", notes = "用户忘记密码管理员帮助重新还原密码，初始密码123456")
+
+    @RequestMapping(value = "/rest/v1.0/users/{user_id}" , method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户信息",notes = "包括地址信息等")
+    MUser getUser(
+            @ApiParam(name = "user_id", value = "", defaultValue = "")
+            @PathVariable(value = "user_id") String userId) ;
+
+
+    @RequestMapping(value = "/rest/v1.0/users/{user_id}/{activity}" , method = RequestMethod.PUT)
+    @ApiOperation(value = "改变用户状态",notes = "根据用户状态改变当前用户状态")
+    boolean  activityUser (
+            @ApiParam(name = "user_id", value = "id", defaultValue = "")
+            @PathVariable(value = "user_id") String userId,
+            @ApiParam(name = "activity", value = "激活状态", defaultValue = "")
+            @PathVariable(value = "activity") boolean activity) ;
+
+
+    @RequestMapping(value = "/rest/v1.0/users/password/{user_id}" , method = RequestMethod.PUT)
+    @ApiOperation(value = "重设密码",notes = "用户忘记密码管理员帮助重新还原密码，初始密码123456")
     Object resetPass(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "userId", value = "id", defaultValue = "")
-            @RequestParam(value = "userId") String userId) ;
-
-    @RequestMapping(value = "/rest/{api_version}/user/" , method = RequestMethod.GET)
-    @ApiOperation(value = "获取用户",produces = "application/json", notes = "根据用户id获取用户信息")
-    Object getUser(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "userId", value = "", defaultValue = "")
-            @RequestParam(value = "userId") String userId) ;
+            @ApiParam(name = "user_id", value = "id", defaultValue = "")
+            @PathVariable(value = "user_id") String userId) ;
 
 
-    @RequestMapping(value = "/rest/{api_version}/user/user_model" , method = RequestMethod.GET)
-    @ApiOperation(value = "获取用户对象详细信息",produces = "application/json", notes = "包括地址信息等")
-    Object getUserModel(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "userId", value = "", defaultValue = "")
-            @RequestParam(value = "userId") String userId) ;
-
-    @RequestMapping(value = "/rest/{api_version}/user/unbundling" , method = RequestMethod.PUT)
-    @ApiOperation(value = "取消关联绑定",produces = "application/json", notes = "取消相关信息绑定")
-    Object unbundling(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "userId", value = "", defaultValue = "")
-            @RequestParam(value = "userId") String userId,
+    @RequestMapping(value = "/rest/v1.0/users/binding/{user_id}/{type}" , method = RequestMethod.DELETE)
+    @ApiOperation(value = "取消关联绑定",notes = "取消相关信息绑定")
+    Object unBinding (
+            @ApiParam(name = "user_id", value = "", defaultValue = "")
+            @PathVariable(value = "user_id") String userId,
             @ApiParam(name = "type", value = "", defaultValue = "")
-            @RequestParam(value = "type") String type) ;
+            @PathVariable(value = "type") String type);
 
-    @RequestMapping("/rest/{api_version}/user/distributeKey")
-    @ApiOperation(value = "重新分配密钥",produces = "application/json", notes = "重新分配密钥")
+    @RequestMapping(value = "/rest/v1.0/users/users/key/{login_code}", method = RequestMethod.PUT)
+    @ApiOperation(value = "重新分配密钥",notes = "重新分配密钥")
     Object distributeKey(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "loginCode", value = "登录帐号", defaultValue = "")
-            @RequestParam(value = "loginCode") String loginCode) ;
+            @ApiParam(name = "login_code", value = "登录帐号", defaultValue = "")
+            @PathVariable(value = "login_code") String loginCode);
 
 
-    @RequestMapping(value = "/rest/{api_version}/user/login_indetification" , method = RequestMethod.GET)
-    @ApiOperation(value = "根据登陆用户名及密码验证用户",produces = "application/json", notes = "根据登陆用户名及密码验证用户")
-    Object loginIndetification(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "loginCode", value = "登录账号", defaultValue = "")
-            @RequestParam(value = "loginCode") String loginCode,
+    /**
+     * 根据登陆用户名及密码验证用户.
+     *
+     * @param loginCode
+     * @param psw
+     */
+    @RequestMapping(value = "/rest/v1.0/users/verification/{login_code}/{psw}" , method = RequestMethod.GET)
+    @ApiOperation(value = "根据登陆用户名及密码验证用户",notes = "根据登陆用户名及密码验证用户")
+    MUser loginVerification(
+            @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
+            @PathVariable(value = "login_code") String loginCode,
             @ApiParam(name = "psw", value = "密码", defaultValue = "")
-            @RequestParam(value = "psw") String psw);
+            @PathVariable(value = "psw") String psw);
 
     /**
      *
@@ -117,11 +114,9 @@ public interface UserClient {
      * @param loginCode
      * @return
      */
-    @RequestMapping(value = "/rest/{api_version}/user/login_code" , method = RequestMethod.GET)
-    @ApiOperation(value = "根据登录账号获取当前用户",produces = "application/json", notes = "根据登陆用户名及密码验证用户")
+    @RequestMapping(value = "/rest/v1.0/users/{login_code}" , method = RequestMethod.GET)
+    @ApiOperation(value = "根据登录账号获取当前用户",notes = "根据登陆用户名及密码验证用户")
     MUser getUserByLoginCode(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "loginCode", value = "登录账号", defaultValue = "")
-            @RequestParam(value = "loginCode") String loginCode) ;
+            @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
+            @PathVariable(value = "login_code") String loginCode);
 }

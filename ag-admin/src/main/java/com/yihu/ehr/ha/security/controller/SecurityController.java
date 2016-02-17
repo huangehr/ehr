@@ -2,6 +2,7 @@ package com.yihu.ehr.ha.security.controller;
 
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.ha.security.service.SecurityClient;
+import com.yihu.ehr.model.security.MUserSecurity;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,26 +23,23 @@ public class SecurityController extends BaseRestController {
     @Autowired
     private static SecurityClient securityClient;
 
-    @RequestMapping(value = "/sec/user_name", method = RequestMethod.GET)
-    @ApiOperation(value = "获取用户公钥",  produces = "application/json", notes = "用户在平台注册时，会分配一个公钥，此公钥用于与健康档案平台加密传输数据使用")
-    public Object getUserSecurityByOrgName(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(required = true, name = "userName", value = "用户名")
-            @RequestParam(value = "userName") String userName) {
-       return securityClient.getUserSecurityByOrgName(apiVersion, userName);
+
+    @RequestMapping(value = "/securities/{login_code}", method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户公钥" , notes = "用户在平台注册时，会分配一个公钥，此公钥用于与健康档案平台加密传输数据使用")
+    public MUserSecurity getUserSecurityByLoginCode(
+            @ApiParam(name = "login_code", value = "用户名")
+            @PathVariable(value = "login_code") String loginCode) throws Exception {
+       return securityClient.getUserSecurityByLoginCode(loginCode);
     }
 
 
 
-    @RequestMapping(value = "/sec/org_code", method = RequestMethod.GET)
+    @RequestMapping(value = "/securities/{org_code}", method = RequestMethod.GET)
     @ApiOperation(value = "获取企业公钥", produces = "application/json", notes = "企业公钥，用于与健康档案平台之间传输数据的加密。")
-    public Object getUserSecurityByOrgCode(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(required = true, name = "orgCode", value = "机构代码")
-            @RequestParam(value = "orgCode") String orgCode) {
-       return securityClient.getUserSecurityByOrgCode(apiVersion,orgCode);
+    public MUserSecurity getUserSecurityByOrgCode(
+            @ApiParam(name = "org_code", value = "机构代码")
+            @PathVariable(value = "org_code") String orgCode) {
+        return securityClient.getUserSecurityByOrgCode(orgCode);
     }
 
     /**
@@ -61,11 +59,9 @@ public class SecurityController extends BaseRestController {
      * }
      *
      */
-    @RequestMapping(value = "/sec/token", method = RequestMethod.GET)
+    @RequestMapping(value = "/tokens", method = RequestMethod.GET)
     @ApiOperation(value = "获取用户登录用的临时会话Token",produces = "application/json", notes = "此Token用于客户与平台之间的会话，时效性时差为20分钟")
     public Object getUserToken(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(required = true, name = "user_name", value = "用户名")
             @RequestParam(value = "user_name", required = true) String userName,
             @ApiParam(required = true, name = "rsa_pw", value = "用户密码，以RSA加密")
@@ -73,9 +69,9 @@ public class SecurityController extends BaseRestController {
             @ApiParam(required = true, name = "app_id", value = "APP ID")
             @RequestParam(value = "app_id", required = true) String appId,
             @ApiParam(required = true, name = "app_secret", value = "APP 密码")
-            @RequestParam(value = "app_secret", required = true) String appSecret){
+            @RequestParam(value = "app_secret", required = true) String appSecret) throws Exception {
 
-        return securityClient.getUserToken(apiVersion,userName,rsaPWD,appId,appSecret);
+        return securityClient.getUserToken(userName,rsaPWD,appId,appSecret);
     }
 
     /**
@@ -87,19 +83,17 @@ public class SecurityController extends BaseRestController {
      * "app_id" :"AnG4G4zIz1"
      * }
      */
-    @RequestMapping(value = "/sec/token", method = RequestMethod.PUT)
-    @ApiOperation(value = "刷新用户临时会话Token",  produces = "application/json", notes = "若用户的会话Token已失效，调用此方法刷新。")
+    @RequestMapping(value = "/tokens/{user_id}/{refresh_token}/{app_id}", method = RequestMethod.PUT)
+    @ApiOperation(value = "刷新用户临时会话Token" , notes = "若用户的会话Token已失效，调用此方法刷新。")
     public Object refreshToken(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(required = true, name = "user_id", value = "用户名")
-            @RequestParam(value = "user_id", required = true) String userId,
+            @PathVariable(value = "user_id") String userId,
             @ApiParam(required = true, name = "refresh_token", value = "已过期的Token")
-            @RequestParam(value = "refresh_token", required = true) String refreshToken,
+            @PathVariable(value = "refresh_token") String refreshToken,
             @ApiParam(required = true, name = "app_id", value = "App Id")
-            @RequestParam(value = "app_id", required = true) String appId) {
+            @PathVariable(value = "app_id") String appId) throws Exception {
 
-        return securityClient.refreshToken(apiVersion,userId,refreshToken,appId);
+        return securityClient.refreshToken(userId,refreshToken,appId);
     }
 
     /**
@@ -109,14 +103,12 @@ public class SecurityController extends BaseRestController {
      * "access_token": "f67b9646bcdaa60c647dfe7bc26231293847"
      * }
      */
-    @RequestMapping(value = "/sec/token", method = RequestMethod.DELETE)
-    @ApiOperation(value = "作废临时会话Token",  produces = "application/json", notes = "用户或App要退出时，调用此方法作废临时会话Token。")
-    public Object revokeToken(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
+    @RequestMapping(value = "/tokens/{access_token}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "作废临时会话Token", notes = "用户或App要退出时，调用此方法作废临时会话Token。")
+    public boolean revokeToken(
             @ApiParam(required = true, name = "access_token", value = "要作废的会话Token")
-            @RequestParam(value = "access_token", required = true) String accessToken){
-        return securityClient.revokeToken(apiVersion,accessToken);
+            @PathVariable(value = "access_token") String accessToken) throws Exception {
+        return securityClient.revokeToken(accessToken);
     }
 
     /**
@@ -126,14 +118,12 @@ public class SecurityController extends BaseRestController {
      * @throws Exception
      */
 
-    @RequestMapping(value = "/sec/org_code", method = RequestMethod.POST)
-    @ApiOperation(value = "根据orgCode创建security",  produces = "application/json")
-    public Object createSecurityByOrgCode(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "orgCode", value = "机构代码")
-            @RequestParam( value = "orgCode") String orgCode) {
-       return securityClient.createSecurityByOrgCode(apiVersion,orgCode);
+    @RequestMapping(value = "/securities/{org_code}", method = RequestMethod.POST)
+    @ApiOperation(value = "根据orgCode创建security")
+    public MUserSecurity createSecurityByOrgCode(
+            @ApiParam(name = "org_code", value = "机构代码")
+            @PathVariable( value = "org_code") String orgCode) throws Exception {
+        return securityClient.createSecurityByOrgCode(orgCode);
     }
 
     /**
@@ -143,67 +133,62 @@ public class SecurityController extends BaseRestController {
      * @throws Exception
      */
 
-    @RequestMapping(value = "/sec/user_key/org_code", method = RequestMethod.GET)
-    @ApiOperation(value = "根据orgCode创建security",  produces = "application/json")
-    public String getUserKeyIdByOrgCode(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "orgCode", value = "机构代码")
-            @RequestParam( value = "orgCode") String orgCode) {
-        return securityClient.getUserKeyIdByOrgCd(apiVersion,orgCode);
+    @RequestMapping(value = "/user_keys/{org_code}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据orgCode创建security")
+    public Object getUserKeyIdByOrgCd(
+            @ApiParam(name = "org_code", value = "机构代码")
+            @PathVariable( value = "org_code") String orgCode) throws Exception {
+        return securityClient.getUserKeyIdByOrgCd(orgCode);
     }
 
     /**
      * 根据id删除security
      * @param id
      */
-    @RequestMapping(value = "/sec/{id}", method = RequestMethod.DELETE)
-    @ApiOperation(value = "根据id删除security",  produces = "application/json")
-    public Object deleteSecurity(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
+    @RequestMapping(value = "securities/{id}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据id删除security")
+    public boolean deleteSecurity(
             @ApiParam(name = "id", value = "security代码")
             @PathVariable( value = "id") String id) {
-        return securityClient.deleteSecurity(apiVersion,id);
+        return securityClient.deleteSecurity(id);
     }
 
     /**
      * UserKey
      * @param userKeyId
      */
-    @RequestMapping(value = "/sec/user_key", method = RequestMethod.DELETE)
-    @ApiOperation(value = "根据id删除userKey",  produces = "application/json")
-    public Object deleteUserKey(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "userKeyId", value = "userKey代码")
-            @RequestParam( value = "userKeyId") String userKeyId) {
-        return securityClient.deleteUserKey(apiVersion,userKeyId);
+    @RequestMapping(value = "/user_keys/{user_key_id}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据id删除userKey" )
+    public boolean deleteUserKey(
+            @ApiParam(name = "user_key_id", value = "userKey代码")
+            @PathVariable( value = "user_key_id") String userKeyId) {
+        return securityClient.deleteUserKey(userKeyId);
     }
 
     /**
      * 根据loginCode删除Security
      * @param loginCode
      */
-    @RequestMapping(value = "/sec/login_code", method = RequestMethod.GET)
-    @ApiOperation(value = "根据loginCode获取Security",  produces = "application/json")
-    public Object getUserSecurityByUserName(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "loginCode", value = "用户登录代码")
-            @RequestParam( value = "loginCode") String loginCode) {
-        return securityClient.getUserSecurityByUserName(apiVersion,loginCode);
+    @RequestMapping(value = "/securities/{login_code}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据loginCode获取Security" )
+    public MUserSecurity getUserSecurityByUserName(
+            @ApiParam(name = "login_code", value = "用户登录代码")
+            @PathVariable( value = "login_code") String loginCode) throws Exception{
+        return securityClient.getUserSecurityByUserName(loginCode);
     }
 
-
-    @RequestMapping(value = "/sec/{user_id}", method = RequestMethod.POST)
-    @ApiOperation(value = "根据userId创建Security",  produces = "application/json")
-    public Object createSecurityByUserId(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
+    /**
+     * 根据userId创建Security
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/securities/{user_id}", method = RequestMethod.POST)
+    @ApiOperation(value = "根据userId创建Security" )
+    public MUserSecurity createSecurityByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
-            @PathVariable( value = "user_id") String userId) {
-        return securityClient.createSecurityByUserId(apiVersion,userId);
+            @PathVariable( value = "user_id") String userId) throws Exception {
+        return securityClient.createSecurityByUserId(userId);
     }
 
 
@@ -212,14 +197,12 @@ public class SecurityController extends BaseRestController {
      * @param userId
      * @return
      */
-    @RequestMapping(value = "/sec/user_key/{user_id}", method = RequestMethod.GET)
-    @ApiOperation(value = "根据userId获取Security",  produces = "application/json")
-    public String getUserKeyByUserId(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
+    @RequestMapping(value = "/user_keys/{user_id}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据userId获取user_key" )
+    public Object getUserKeyByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
             @PathVariable( value = "user_id") String userId) {
-        return securityClient.getUserKeyByUserId(apiVersion,userId);
+        return securityClient.getUserKeyByUserId(userId);
     }
 
 
@@ -228,14 +211,11 @@ public class SecurityController extends BaseRestController {
      * @param userId
      * @return
      */
-    @RequestMapping(value = "/sec/{user_id}", method = RequestMethod.GET)
-    @ApiOperation(value = "根据userId获取UserPublicKey",  produces = "application/json")
-    public Object getUserSecurityByUserId(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
+    @RequestMapping(value = "/securities/{user_id}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据userId获取UserSecurity" )
+    public MUserSecurity getUserSecurityByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
             @PathVariable( value = "user_id") String userId) {
-        return securityClient.getUserSecurityByUserId(apiVersion,userId);
-
+        return securityClient.getUserSecurityByUserId(userId);
     }
 }

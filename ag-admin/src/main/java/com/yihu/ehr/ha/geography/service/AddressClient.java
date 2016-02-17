@@ -1,6 +1,7 @@
 package com.yihu.ehr.ha.geography.service;
 
 import com.yihu.ehr.model.address.MGeography;
+import com.yihu.ehr.model.address.MGeographyDict;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -18,16 +19,16 @@ import java.util.List;
 public interface AddressClient {
 
     @RequestMapping(value = "/rest/v1.0/geographies/{level}", method = RequestMethod.GET)
-    @ApiOperation(value = "根据地址等级查询地址信息")
-    Object getAddressByLevel(
+    @ApiOperation(value = "根据地址等级查询地址字典")
+    List<MGeographyDict> getAddressByLevel(
             @ApiParam(name = "level", value = "地址级别", defaultValue = "")
-            @PathVariable(value = "level") Integer level);
+            @PathVariable(value = "level") Integer level) ;
 
     @RequestMapping(value = "/rest/v1.0/geographies/{pid}", method = RequestMethod.GET)
-    @ApiOperation(value = "根据父id查询地址信息")
-    Object getAddressDictByPid(
+    @ApiOperation(value = "根据父id查询地址字典")
+    List<MGeographyDict> getAddressDictByPid(
             @ApiParam(name = "pid", value = "上级id", defaultValue = "")
-            @PathVariable(value = "pid") Integer pid);
+            @PathVariable(value = "pid") Integer pid) ;
 
 
     @RequestMapping(value = "/rest/v1.0/geographies/{id}", method = RequestMethod.GET)
@@ -38,7 +39,7 @@ public interface AddressClient {
 
 
     @RequestMapping(value = "/rest/v1.0/geographies/canonical/{id}", method = RequestMethod.GET)
-    @ApiOperation(value = "根据地址编号获取地址")
+    @ApiOperation(value = "根据地址编号获取地址中文字符串全拼")
     String getCanonicalAddress(
             @ApiParam(name = "id", value = "地址代码", defaultValue = "")
             @PathVariable(value = "id") String id) ;
@@ -69,7 +70,7 @@ public interface AddressClient {
             @ApiParam(name = "city", value = "市", defaultValue = "")
             @PathVariable(value = "city") String city,
             @ApiParam(name = "district", value = "县", defaultValue = "")
-            @PathVariable(value = "district") String district);
+            @PathVariable(value = "district") String district) ;
 
     /**
      * 删除地址
@@ -87,5 +88,5 @@ public interface AddressClient {
     @ApiOperation(value = "判断是否是个地址")
     boolean isNullAddress(
             @ApiParam(name = "geography_model_json_data", value = "地址json字符串")
-            @RequestParam( value = "geography_model_json_data") String geographyModelJsonData);
+            @RequestParam( value = "geography_model_json_data") String geographyModelJsonData) ;
 }

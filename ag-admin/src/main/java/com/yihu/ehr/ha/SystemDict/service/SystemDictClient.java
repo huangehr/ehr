@@ -1,5 +1,6 @@
 package com.yihu.ehr.ha.SystemDict.service;
 
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.dict.MSystemDict;
 import com.yihu.ehr.util.Envelop;
@@ -27,41 +28,41 @@ public interface SystemDictClient {
             @ApiParam(name = "page", value = "当前页", defaultValue = "")
             @RequestParam(value = "page") int page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
-            @RequestParam(value = "rows") int rows);
+            @RequestParam(value = "rows") int rows) ;
 
     @ApiOperation(value = "创建字典", response = MSystemDict.class, produces = "application/json")
     @RequestMapping(value = "/rest/v1.0/dictionaries", method = RequestMethod.POST)
-    Object createDictionary(
+    MSystemDict createDictionary(
             @ApiParam(name = "name", value = "名称", defaultValue = "")
             @RequestParam(value = "name") String name,
             @ApiParam(name = "reference", value = "", defaultValue = "")
             @RequestParam(value = "reference") String reference,
             @ApiParam(name = "userId", value = "创建人", defaultValue = "")
-            @RequestParam(value = "userId") String userId);
+            @RequestParam(value = "userId") String userId) ;
 
     @ApiOperation(value = "获取字典", response = MSystemDict.class, produces = "application/json")
     @RequestMapping(value = "/rest/v1.0/dictionaries/{id}", method = RequestMethod.GET)
-    Object getDictionary(
+    MSystemDict getDictionary(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") long id);
 
     @ApiOperation(value = "修改字典")
     @RequestMapping(value = "/rest/v1.0/dictionaries/{id}", method = RequestMethod.PUT)
-    Object updateDictionary(
+    MSystemDict updateDictionary(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") long id,
             @ApiParam(name = "name", value = "字典名称", defaultValue = "")
-            @RequestParam(value = "name") String name);
+            @RequestParam(value = "name") String name) ;
 
     @ApiOperation(value = "删除字典")
     @RequestMapping(value = "/rest/v1.0/dictionaries/{id}", method = RequestMethod.DELETE)
-    Object deleteDictionary(
+    boolean deleteDictionary(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") long id);
 
     @ApiOperation(value = "获取字典项列表")
     @RequestMapping(value = "/rest/v1.0/dictionaries/{id}/entries", method = RequestMethod.GET)
-    Object getDictEntries(
+    Envelop getDictEntries(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") long id,
             @ApiParam(name = "value", value = "字典项值", defaultValue = "")
@@ -69,11 +70,11 @@ public interface SystemDictClient {
             @ApiParam(name = "page", value = "当前页", defaultValue = "")
             @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
-            @RequestParam(value = "rows", required = false) Integer rows);
+            @RequestParam(value = "rows", required = false) Integer rows) ;
 
     @ApiOperation(value = "创建字典项")
     @RequestMapping(value = "/rest/v1.0/dictionaries/{id}/entries", method = RequestMethod.POST)
-    Object createDictEntry(
+    MConventionalDict createDictEntry(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") long id,
             @ApiParam(name = "code", value = "字典ID", defaultValue = "")
@@ -83,7 +84,7 @@ public interface SystemDictClient {
             @ApiParam(name = "sort", value = "排序号", defaultValue = "")
             @RequestParam(value = "sort") Integer sort,
             @ApiParam(name = "catalog", value = "类别", defaultValue = "")
-            @RequestParam(value = "catalog") String catalog);
+            @RequestParam(value = "catalog") String catalog) ;
 
     @ApiOperation(value = "获取字典项")
     @RequestMapping(value = "/rest/v1.0/dictionaries/{id}/entries/{code}", method = RequestMethod.POST)
@@ -91,7 +92,7 @@ public interface SystemDictClient {
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") long id,
             @ApiParam(name = "code", value = "字典项代码", defaultValue = "")
-            @PathVariable(value = "code") String code);
+            @PathVariable(value = "code") String code) ;
 
     @ApiOperation(value = "删除字典项")
     @RequestMapping(value = "/rest/v1.0/dictionaries/{id}/entries/{code}", method = RequestMethod.DELETE)
@@ -99,11 +100,11 @@ public interface SystemDictClient {
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") long id,
             @ApiParam(name = "code", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "code") String code);
+            @PathVariable(value = "code") String code) ;
 
     @ApiOperation(value = "修改字典项")
     @RequestMapping(value = "/rest/v1.0/dictionaries/{id}/entries/{code}", method = RequestMethod.PUT)
-    Object updateDictEntry(
+    MConventionalDict updateDictEntry(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") long id,
             @ApiParam(name = "code", value = "字典ID", defaultValue = "")
