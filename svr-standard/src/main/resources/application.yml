@@ -1,9 +1,9 @@
 server:
   port: 7020
 
-security:
-  user:
-    password: standard
+#security:
+#  user:
+#    password: standard
 
 info:
   app:
