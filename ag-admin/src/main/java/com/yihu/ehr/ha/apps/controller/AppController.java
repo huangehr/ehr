@@ -2,178 +2,109 @@ package com.yihu.ehr.ha.apps.controller;
 
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.ha.apps.service.AppClient;
-import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.model.app.MApp;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+
 /**
  * Created by AndyCai on 2016/1/19.
  */
-@RequestMapping(ApiVersionPrefix.CommonVersion +"/appcon")
+
+@RequestMapping(ApiVersionPrefix.Version1_0 )
 @RestController
-public class AppController extends BaseRestController {
+@Api(value = "app", description = "应用管理接口，用于接入应用管理", tags = {"应用管理接口"})
+public class AppController {
     @Autowired
     private AppClient appClient;
 
-    /**
-     * 根据查询条件获取APP列表
-     *
-     * @param appName 查询条件
-     * @param catalog 类别
-     * @param status  状态
-     * @param page    当前页
-     * @param rows    数量
-     * @return APP列表
-     */
-    @RequestMapping(value = "search", method = RequestMethod.GET)
-    public Object getAppList(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                             @PathVariable(value = "api_version") String apiVersion,
-                             @ApiParam(name = "appId", value = "appId", defaultValue = "")
-                             @RequestParam(value = "appId") String appId,
-                             @ApiParam(name = "appName", value = "appName", defaultValue = "")
-                             @RequestParam(value = "appName") String appName,
-                             @ApiParam(name = "catalog", value = "类别", defaultValue = "")
-                             @RequestParam(value = "catalog") String catalog,
-                             @ApiParam(name = "status", value = "状态", defaultValue = "")
-                             @RequestParam(value = "status") String status,
-                             @ApiParam(name = "page", value = "当前页", defaultValue = "")
-                             @RequestParam(value = "page") int page,
-                             @ApiParam(name = "rows", value = "页数", defaultValue = "")
-                             @RequestParam(value = "rows") int rows) {
+    @RequestMapping(value = "/apps", method = RequestMethod.GET)
+    @ApiOperation(value = "获取App列表")
+    public List<MApp> getApps(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filter", value = "过滤器，规则参见说明文档", defaultValue = "id,name,secret,url,createTime")
+            @RequestParam(value = "filter", required = false) String filter,
+            @ApiParam(name = "sort", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sort", required = false) String sort,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            HttpServletResponse response) throws Exception {
 
-
-        Object object = appClient.getAppList(apiVersion, appId, appName, catalog, status, page, rows);
-        return object;
+        return appClient.getApps(fields,filter,sort,size,page,response);
     }
 
     /**
-     * 删除APP信息
-     *
-     * @param appId APPId
-     * @return 操作结果
-     */
-    @RequestMapping(value = "/", method = RequestMethod.DELETE)
-    public Object deleteApp(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                            @PathVariable(value = "api_version") String apiVersion,
-                            @ApiParam(name = "appId", value = "appid", defaultValue = "")
-                            @RequestParam(value = "appId") String appId) {
-        return appClient.deleteApp(apiVersion, appId);
-    }
-
-    /**
-     * 获取APP明细
-     *
-     * @param appId APPId
-     * @return APP明细
-     */
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public Object getAppDetail(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                               @PathVariable(value = "api_version") String apiVersion,
-                               @ApiParam(name = "appId", value = "appid", defaultValue = "")
-                               @RequestParam(value = "appId") String appId) {
-        return appClient.getAppDetail(apiVersion, appId);
-    }
-
-    /**
-     * 创建APP信息
-     *
-     * @param name        名称
-     * @param catalog     类别
-     * @param url         URL地址
-     * @param description 说明
-     * @param tags        标记
-     * @param userId      用户ID
-     * @return 操作结果
-     */
-    @RequestMapping(value = "/", method = RequestMethod.POST)
-    public Object createApp(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                            @PathVariable(value = "api_version") String apiVersion,
-                            @ApiParam(name = "name", value = "名称", defaultValue = "")
-                            @RequestParam(value = "name") String name,
-                            @ApiParam(name = "catalog", value = "类别", defaultValue = "")
-                            @RequestParam(value = "catalog") String catalog,
-                            @ApiParam(name = "url", value = "url", defaultValue = "")
-                            @RequestParam(value = "url") String url,
-                            @ApiParam(name = "description", value = "描述", defaultValue = "")
-                            @RequestParam(value = "description") String description,
-                            @ApiParam(name = "tags", value = "标记", defaultValue = "")
-                            @RequestParam(value = "tags") String tags,
-                            @ApiParam(name = "userId", value = "用户", defaultValue = "")
-                            @RequestParam(value = "userId") String userId) {
-
-        Object object = appClient.createApp(apiVersion, name, catalog, url, description, tags, userId);
-
-        return object;
-    }
-
-    /**
-     * 修改APP信息
-     *
-     * @param appId       APPId
-     * @param name        名称
-     * @param catalog     类别
-     * @param status      状态
-     * @param url         URL地址
-     * @param description 说明
-     * @param tags        标记
-     * @return 操作结果
-     */
-    @RequestMapping(value = "/", method = RequestMethod.PUT)
-    public Object updateApp(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                            @PathVariable(value = "api_version") String apiVersion,
-                            @ApiParam(name = "appId", value = "名id", defaultValue = "")
-                            @RequestParam(value = "appId") String appId,
-                            @ApiParam(name = "name", value = "名称", defaultValue = "")
-                            @RequestParam(value = "name") String name,
-                            @ApiParam(name = "catalog", value = "类别", defaultValue = "")
-                            @RequestParam(value = "catalog") String catalog,
-                            @ApiParam(name = "status", value = "状态", defaultValue = "")
-                            @RequestParam(value = "status") String status,
-                            @ApiParam(name = "url", value = "url", defaultValue = "")
-                            @RequestParam(value = "url") String url,
-                            @ApiParam(name = "description", value = "描述", defaultValue = "")
-                            @RequestParam(value = "description") String description,
-                            @ApiParam(name = "tags", value = "标记", defaultValue = "")
-                            @RequestParam(value = "tags") String tags) {
-        return appClient.updateApp(apiVersion, appId, name, catalog, status, url, description, tags);
-    }
-
-    /**
-     * 修改APP状态
-     *
-     * @param appId  APPID
-     * @param status 状态
-     * @return 操作结果
-     */
-    @RequestMapping(value = "/check", method = RequestMethod.PUT)
-    public Object checkStatus(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                        @PathVariable(value = "api_version") String apiVersion,
-                        @ApiParam(name = "appId", value = "名id", defaultValue = "")
-                        @RequestParam(value = "appId") String appId,
-                        @ApiParam(name = "status", value = "状态", defaultValue = "")
-                        @RequestParam(value = "status") String status) {
-        Object object =appClient.checkStatus(apiVersion, appId, status);
-        return object;
-    }
-
-    /**
-     * 判断秘钥是否存在
-     *
-     * @param id     id
-     * @param secret 秘钥
-     * @return 操作结果
+     * @param name
+     * @param catalog
+     * @param url
+     * @param description
+     * @param tags
+     * @param userId
+     * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/validation", method = RequestMethod.GET)
-    public Object validationApp(@ApiParam(name = "apiVersion", value = "API版本号", defaultValue = "v1.0")
-                                @PathVariable(value = "apiVersion") String apiVersion,
-                                @ApiParam(name = "id", value = "名id", defaultValue = "")
-                                @RequestParam(value = "id") String id,
-                                @ApiParam(name = "secret", value = "状态", defaultValue = "")
-                                @RequestParam(value = "secret") String secret) {
+    @RequestMapping(value = "/apps", method = RequestMethod.POST)
+    @ApiOperation(value = "创建App")
+    public MApp createApp(
+            @ApiParam(name = "name", value = "名称", defaultValue = "")
+            @RequestParam(value = "name") String name,
+            @ApiParam(name = "catalog", value = "类别", defaultValue = "")
+            @RequestParam(value = "catalog") String catalog,
+            @ApiParam(name = "url", value = "url", defaultValue = "")
+            @RequestParam(value = "url") String url,
+            @ApiParam(name = "description", value = "描述", defaultValue = "")
+            @RequestParam(value = "description") String description,
+            @ApiParam(name = "tags", value = "标记", defaultValue = "")
+            @RequestParam(value = "tags") String tags,
+            @ApiParam(name = "user_id", value = "用户", defaultValue = "")
+            @RequestParam(value = "user_id") String userId) throws Exception {
+      return appClient.createApp(name,catalog,url,description,tags,userId);
+    }
 
-        return appClient.validationApp(apiVersion, id, secret);
+    @RequestMapping(value = "/apps/{app_id}", method = RequestMethod.GET)
+    @ApiOperation(value = "获取App")
+    public MApp getApp(
+            @ApiParam(name = "app_id", value = "id", defaultValue = "")
+            @PathVariable(value = "app_id") String appId) throws Exception {
+        return appClient.getApp(appId);
+    }
+
+    @RequestMapping(value = "/apps/{app_id}", method = RequestMethod.PUT)
+    @ApiOperation(value = "更新App")
+    public MApp updateApp(
+            @ApiParam(name = "app_id", value = "appId", defaultValue = "")
+            @PathVariable(value = "app_id") String appId,
+            @ApiParam(name = "name", value = "名称", defaultValue = "")
+            @RequestParam(value = "name") String name,
+            @ApiParam(name = "catalog", value = "类别", defaultValue = "")
+            @RequestParam(value = "catalog") String catalog,
+            @ApiParam(name = "status", value = "状态", defaultValue = "")
+            @RequestParam(value = "status") String status,
+            @ApiParam(name = "url", value = "url", defaultValue = "")
+            @RequestParam(value = "url") String url,
+            @ApiParam(name = "description", value = "描述", defaultValue = "")
+            @RequestParam(value = "description") String description,
+            @ApiParam(name = "tags", value = "标记", defaultValue = "")
+            @RequestParam(value = "tags") String tags) throws Exception {
+
+        return appClient.updateApp(appId,name,catalog,status,url,description,tags);
+    }
+
+    @RequestMapping(value = "/apps/{app_id}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除app")
+    public Object deleteApp(
+            @ApiParam(name = "app_id", value = "id", defaultValue = "")
+            @PathVariable(value = "app_id") String appId) throws Exception {
+        appClient.deleteApp(appId);
+        return true;
     }
 
 }

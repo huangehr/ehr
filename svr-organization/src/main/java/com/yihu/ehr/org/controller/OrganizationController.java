@@ -145,11 +145,11 @@ public class OrganizationController extends BaseRestController {
      * @param orgCode
      * @return
      */
-    @RequestMapping(value = "/organizations", method = RequestMethod.GET)
+    @RequestMapping(value = "/organizations/{org_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据机构代码获取机构")
     public MOrganization getOrg(
             @ApiParam(name = "org_code", value = "机构代码", defaultValue = "")
-            @RequestParam(value = "org_code") String orgCode) throws Exception{
+            @PathVariable(value = "org_code") String orgCode) throws Exception{
         Organization org = orgManagerService.getOrg(orgCode);
         MOrganization orgModel = convertToModel(org,MOrganization.class);
         orgModel.setOrgType(conventionalDictClient.getOrgType(org.getOrgType()));

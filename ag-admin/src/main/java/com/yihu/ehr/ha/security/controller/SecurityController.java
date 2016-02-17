@@ -1,47 +1,26 @@
-package com.yihu.ehr.security.controller;
+package com.yihu.ehr.ha.security.controller;
 
 import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.ha.security.service.SecurityClient;
 import com.yihu.ehr.model.security.MUserSecurity;
-import com.yihu.ehr.model.user.MUser;
-import com.yihu.ehr.security.feign.AppClient;
-import com.yihu.ehr.security.feign.UserClient;
-import com.yihu.ehr.security.service.SecurityManager;
-import com.yihu.ehr.security.service.TokenManager;
-import com.yihu.ehr.security.service.UserSecurity;
-import com.yihu.ehr.security.service.UserToken;
-import com.yihu.ehr.util.DateUtil;
-import com.yihu.ehr.util.controller.BaseRestController;
-import com.yihu.ehr.util.encrypt.RSA;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URLDecoder;
-import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
+/**
+ * Created by AndyCai on 2016/2/1.
+ */
+@EnableFeignClients
+@RequestMapping(ApiVersionPrefix.Version1_0 )
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0)
-@Api(protocols = "https", value = "security", description = "安全管理接口", tags = {"用户", "企业", "应用", "安全"})
-public class SecurityRestController extends BaseRestController {
+@Api(value = "sec", description = "安全管理接口，用于安全验证管理", tags = {"安全管理接口"})
+public class SecurityController {
 
     @Autowired
-    private SecurityManager securityManager;
-
-    @Autowired
-    private UserClient userClient;
-
-    @Autowired
-    private TokenManager tokenManager;
-
-    @Autowired
-    private AppClient appClient;
-
-
+    private static SecurityClient securityClient;
 
 
     @RequestMapping(value = "/securities/{login_code}", method = RequestMethod.GET)
@@ -49,8 +28,7 @@ public class SecurityRestController extends BaseRestController {
     public MUserSecurity getUserSecurityByLoginCode(
             @ApiParam(name = "login_code", value = "用户名")
             @PathVariable(value = "login_code") String loginCode) throws Exception {
-        UserSecurity userSecurity = securityManager.getUserSecurityByLoginCode(loginCode);
-        return convertToModel(userSecurity,MUserSecurity.class);
+       return securityClient.getUserSecurityByLoginCode(loginCode);
     }
 
 
@@ -60,8 +38,7 @@ public class SecurityRestController extends BaseRestController {
     public MUserSecurity getUserSecurityByOrgCode(
             @ApiParam(name = "org_code", value = "机构代码")
             @PathVariable(value = "org_code") String orgCode) {
-        UserSecurity userSecurity = securityManager.getUserPublicKeyByOrgCd(orgCode);
-        return convertToModel(userSecurity,MUserSecurity.class);
+        return securityClient.getUserSecurityByOrgCode(orgCode);
     }
 
     /**
@@ -93,51 +70,7 @@ public class SecurityRestController extends BaseRestController {
             @ApiParam(required = true, name = "app_secret", value = "APP 密码")
             @RequestParam(value = "app_secret", required = true) String appSecret) throws Exception {
 
-        boolean appResult = appClient.validationApp(appId, appSecret);
-        if (!appResult) {
-            return false;
-        }
-        UserSecurity userSecurity = securityManager.getUserSecurityByLoginCode(userName);
-        String privateKey = userSecurity.getPrivateKey();
-        Key priKey = RSA.genPrivateKey(privateKey);
-        String psw = RSA.decrypt(rsaPWD, priKey);
-
-        userName = URLDecoder.decode(userName, "UTF-8");
-        appId = URLDecoder.decode(appId, "UTF-8");
-
-        MUser user = userClient.loginIndetification(userName, psw);
-        if (user == null) {
-            return false;
-        }
-        UserToken userToken = tokenManager.getUserTokenByUserId(user.getId(), appId);
-
-        if (userToken == null) {
-            userToken = tokenManager.createUserToken(user.getId(), appId);
-
-            Map<String,Object> map = new HashMap<>();
-            map.put("access_token",userToken.getAccessToken());
-            map.put("refresh_token",userToken.getRefreshToken());
-            map.put("expires_in",userToken.getExpiresIn());
-            map.put("token_id",userToken.getTokenId());
-            return map;
-        }
-
-        Date currentDate = new Date();
-        boolean result = DateUtil.isExpire(userToken.getUpdateDate(), currentDate, userToken.getExpiresIn());
-
-        if (result == true) {
-            userToken = tokenManager.refreshAccessToken(user.getId(), userToken.getRefreshToken(), appId);
-            Map<String,Object> map = new HashMap<>();
-            map.put("access_token",userToken.getAccessToken());
-            map.put("refresh_token",userToken.getRefreshToken());
-            map.put("expires_in",userToken.getExpiresIn());
-            return map;
-        }
-        Map<String,Object> map = new HashMap<>();
-        map.put("access_token",userToken.getAccessToken());
-        map.put("refresh_token",userToken.getRefreshToken());
-        map.put("expires_in",userToken.getExpiresIn());
-        return map;
+        return securityClient.getUserToken(userName,rsaPWD,appId,appSecret);
     }
 
     /**
@@ -159,16 +92,7 @@ public class SecurityRestController extends BaseRestController {
             @ApiParam(required = true, name = "app_id", value = "App Id")
             @PathVariable(value = "app_id") String appId) throws Exception {
 
-        UserToken userToken = tokenManager.refreshAccessToken(userId, refreshToken, appId);
-        if (userToken == null) {
-            return "ehr.security.token.refreshError";
-        } else {
-            Map<String,Object> map = new HashMap<>();
-            map.put("access_token",userToken.getAccessToken());
-            map.put("refresh_token",userToken.getRefreshToken());
-            map.put("expires_in",userToken.getExpiresIn());
-            return map;
-        }
+        return securityClient.refreshToken(userId,refreshToken,appId);
     }
 
     /**
@@ -183,7 +107,7 @@ public class SecurityRestController extends BaseRestController {
     public boolean revokeToken(
             @ApiParam(required = true, name = "access_token", value = "要作废的会话Token")
             @PathVariable(value = "access_token") String accessToken) throws Exception {
-        return tokenManager.revokeToken(accessToken);
+        return securityClient.revokeToken(accessToken);
     }
 
     /**
@@ -198,8 +122,7 @@ public class SecurityRestController extends BaseRestController {
     public MUserSecurity createSecurityByOrgCode(
             @ApiParam(name = "org_code", value = "机构代码")
             @PathVariable( value = "org_code") String orgCode) throws Exception {
-        UserSecurity userSecurity = securityManager.createSecurityByOrgCode(orgCode);
-        return convertToModel(userSecurity,MUserSecurity.class);
+        return securityClient.createSecurityByOrgCode(orgCode);
     }
 
     /**
@@ -214,7 +137,7 @@ public class SecurityRestController extends BaseRestController {
     public Object getUserKeyIdByOrgCd(
             @ApiParam(name = "org_code", value = "机构代码")
             @PathVariable( value = "org_code") String orgCode) throws Exception {
-        return securityManager.getUserKeyByOrgCd(orgCode);
+        return securityClient.getUserKeyIdByOrgCd(orgCode);
     }
 
     /**
@@ -226,8 +149,7 @@ public class SecurityRestController extends BaseRestController {
     public boolean deleteSecurity(
             @ApiParam(name = "id", value = "security代码")
             @PathVariable( value = "id") String id) {
-        securityManager.deleteSecurity(id);
-        return true;
+        return securityClient.deleteSecurity(id);
     }
 
     /**
@@ -239,8 +161,7 @@ public class SecurityRestController extends BaseRestController {
     public boolean deleteUserKey(
             @ApiParam(name = "user_key_id", value = "userKey代码")
             @PathVariable( value = "user_key_id") String userKeyId) {
-        securityManager.deleteUserKey(userKeyId);
-        return true;
+        return securityClient.deleteUserKey(userKeyId);
     }
 
     /**
@@ -252,8 +173,7 @@ public class SecurityRestController extends BaseRestController {
     public MUserSecurity getUserSecurityByUserName(
             @ApiParam(name = "login_code", value = "用户登录代码")
             @PathVariable( value = "login_code") String loginCode) throws Exception{
-        UserSecurity userSecurity = securityManager.getUserSecurityByLoginCode(loginCode);
-        return convertToModel(userSecurity,MUserSecurity.class);
+        return securityClient.getUserSecurityByUserName(loginCode);
     }
 
     /**
@@ -267,8 +187,7 @@ public class SecurityRestController extends BaseRestController {
     public MUserSecurity createSecurityByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
             @PathVariable( value = "user_id") String userId) throws Exception {
-        UserSecurity userSecurity = securityManager.createSecurityByUserId(userId);
-        return convertToModel(userSecurity,MUserSecurity.class);
+        return securityClient.createSecurityByUserId(userId);
     }
 
 
@@ -282,7 +201,7 @@ public class SecurityRestController extends BaseRestController {
     public Object getUserKeyByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
             @PathVariable( value = "user_id") String userId) {
-        return securityManager.getUserKeyByUserId(userId);
+        return securityClient.getUserKeyByUserId(userId);
     }
 
 
@@ -296,9 +215,6 @@ public class SecurityRestController extends BaseRestController {
     public MUserSecurity getUserSecurityByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
             @PathVariable( value = "user_id") String userId) {
-        UserSecurity userSecurity = securityManager.getUserPublicKeyByUserId(userId);
-        return convertToModel(userSecurity,MUserSecurity.class);
+        return securityClient.getUserSecurityByUserId(userId);
     }
-
-
 }
