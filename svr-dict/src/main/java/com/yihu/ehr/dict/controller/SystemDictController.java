@@ -1,5 +1,6 @@
 package com.yihu.ehr.dict.controller;
 
+import com.netflix.discovery.converters.Auto;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.PageArg;
@@ -10,10 +11,17 @@ import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
@@ -83,7 +91,7 @@ public class SystemDictController extends BaseRestController {
             @RequestParam(value = "dictionary") String dictJson) {
         SystemDict dict = toEntity(dictJson, SystemDict.class);
         if (null == dictService.retrieve(dict.getId())) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
-        if (!dictService.retrieve(dict.getId()).equals(dict.getName()) && dictService.isDictNameExists(dict.getName())){
+        if (!dictService.retrieve(dict.getId()).equals(dict.getName()) && dictService.isDictNameExists(dict.getName())) {
             throw new ApiException(ErrorCode.InvalidUpdateSysDict, "字典名称已存在");
         }
 
