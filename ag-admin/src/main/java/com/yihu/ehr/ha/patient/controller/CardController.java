@@ -4,7 +4,6 @@ import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.ha.patient.service.CardClient;
 import com.yihu.ehr.model.patient.MAbstractCard;
 import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RequestMapping(ApiVersionPrefix.Version1_0 )
 @RestController
-public class CardController extends BaseRestController {
+public class CardController {
 
     @Autowired
     private CardClient cardClient;

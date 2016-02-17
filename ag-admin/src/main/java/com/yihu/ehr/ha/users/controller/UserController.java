@@ -3,7 +3,6 @@ package com.yihu.ehr.ha.users.controller;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.ha.users.service.UserClient;
 import com.yihu.ehr.model.user.MUser;
-import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -11,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -22,7 +19,7 @@ import java.util.List;
 @RequestMapping(ApiVersionPrefix.Version1_0 )
 @RestController
 @Api(value = "user", description = "用户管理接口，用于用户信息管理", tags = {"用户管理接口"})
-public class UserController extends BaseRestController {
+public class UserController {
 
     @Autowired
     private UserClient userClient;
@@ -39,10 +36,8 @@ public class UserController extends BaseRestController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) {
-        return userClient.searchUsers(fields,filters,sorts,size,page,request,response);
+            @RequestParam(value = "page", required = false) int page) {
+        return userClient.searchUsers(fields,filters,sorts,size,page);
     }
 
     @RequestMapping(value = "/users/{user_id}" , method = RequestMethod.DELETE)

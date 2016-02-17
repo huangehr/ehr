@@ -6,7 +6,6 @@ import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.dict.MSystemDict;
 import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -21,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(ApiVersionPrefix.Version1_0)
 @RestController
 @Api(value = "sys_dict", description = "系统字典接口，用于系统全局字典管理", tags = {"系统字典接口"})
-public class SystemDictController extends BaseRestController {
+public class SystemDictController {
 
     @Autowired
     private static SystemDictClient systemDictClient;

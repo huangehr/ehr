@@ -124,7 +124,7 @@ public interface SecurityClient {
      * 根据loginCode删除Security
      * @param loginCode
      */
-    @RequestMapping(value = "/rest/v1.0/securities/{login_code}", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/v1.0/securities/user/{login_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据loginCode获取Security" )
     MUserSecurity getUserSecurityByUserName(
             @ApiParam(name = "login_code", value = "用户登录代码")

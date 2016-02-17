@@ -247,7 +247,7 @@ public class SecurityRestController extends BaseRestController {
      * 根据loginCode删除Security
      * @param loginCode
      */
-    @RequestMapping(value = "/securities/{login_code}", method = RequestMethod.GET)
+    @RequestMapping(value = "/securities/user/{login_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据loginCode获取Security" )
     public MUserSecurity getUserSecurityByUserName(
             @ApiParam(name = "login_code", value = "用户登录代码")

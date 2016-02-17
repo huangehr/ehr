@@ -3,7 +3,6 @@ package com.yihu.ehr.ha.apps.controller;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.ha.apps.service.AppClient;
 import com.yihu.ehr.model.app.MApp;
-import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -20,7 +19,7 @@ import java.util.List;
 @RequestMapping(ApiVersionPrefix.Version1_0 )
 @RestController
 @Api(value = "app", description = "应用管理接口，用于接入应用管理", tags = {"应用管理接口"})
-public class AppController extends BaseRestController {
+public class AppController {
     @Autowired
     private AppClient appClient;
 

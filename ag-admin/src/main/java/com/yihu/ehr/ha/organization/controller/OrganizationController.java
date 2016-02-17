@@ -3,7 +3,6 @@ package com.yihu.ehr.ha.organization.controller;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.ha.organization.service.OrganizationClient;
 import com.yihu.ehr.model.org.MOrganization;
-import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -11,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +21,7 @@ import java.util.Map;
 @RequestMapping(ApiVersionPrefix.Version1_0)
 @RestController
 @Api(value = "organization", description = "机构信息管理接口，用于机构信息管理", tags = {"机构信息管理接口"})
-public class OrganizationController extends BaseRestController {
+public class OrganizationController {
 
     @Autowired
     private OrganizationClient orgClient;
@@ -41,10 +38,8 @@ public class OrganizationController extends BaseRestController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception{
-        return orgClient.searchOrgs(fields,filters,sorts,size,page,request,response);
+            @RequestParam(value = "page", required = false) int page) throws Exception{
+        return orgClient.searchOrgs(fields,filters,sorts,size,page);
     }
 
 
@@ -87,7 +82,7 @@ public class OrganizationController extends BaseRestController {
      * @param orgCode
      * @return
      */
-    @RequestMapping(value = "/organizations", method = RequestMethod.GET)
+    @RequestMapping(value = "/organizations/{org_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据机构代码获取机构")
     public MOrganization getOrg(
             @ApiParam(name = "org_code", value = "机构代码", defaultValue = "")
@@ -146,7 +141,7 @@ public class OrganizationController extends BaseRestController {
     @ApiOperation(value = "机构分发密钥")
     public Map<String, String> distributeKey(
             @ApiParam(name = "org_code", value = "机构代码")
-            @RequestParam(value = "org_code") String orgCode) {
+            @PathVariable(value = "org_code") String orgCode) {
         return orgClient.distributeKey(orgCode);
     }
 }

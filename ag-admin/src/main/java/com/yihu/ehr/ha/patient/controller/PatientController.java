@@ -3,21 +3,17 @@ package com.yihu.ehr.ha.patient.controller;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.ha.patient.service.PatientClient;
 import com.yihu.ehr.model.patient.MDemographicInfo;
-import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Created by AndyCai on 2016/1/21.
  */
 @RequestMapping(ApiVersionPrefix.Version1_0)
 @RestController
-public class PatientController extends BaseRestController {
+public class PatientController{
 
     @Autowired
     private PatientClient patientClient;
@@ -76,8 +72,6 @@ public class PatientController extends BaseRestController {
     /**
      * 根据前端传回来的json新增一个人口信息
      * @param patientModelJsonData
-     * @param request
-     * @param response
      * @return
      * @throws Exception
      */
@@ -85,17 +79,13 @@ public class PatientController extends BaseRestController {
     @ApiOperation(value = "根据前端传回来的json创建一个人口信息")
     public boolean createPatient(
             @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
-            @RequestParam(value = "patient_model_json_data") String patientModelJsonData,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception{
-        return patientClient.createPatient(patientModelJsonData,request,response);
+            @RequestParam(value = "patient_model_json_data") String patientModelJsonData) throws Exception{
+        return patientClient.createPatient(patientModelJsonData);
     }
 
     /**
      * 根据前端传回来的json修改人口信息
      * @param patientModelJsonData
-     * @param request
-     * @param response
      * @return
      * @throws Exception
      */
@@ -103,11 +93,9 @@ public class PatientController extends BaseRestController {
     @ApiOperation(value = "根据前端传回来的json修改人口信息")
     public boolean updatePatient(
             @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
-            @RequestParam(value = "patient_model_json_data") String patientModelJsonData,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception{
+            @RequestParam(value = "patient_model_json_data") String patientModelJsonData) throws Exception{
 
-        return patientClient.updatePatient(patientModelJsonData,request,response);
+        return patientClient.updatePatient(patientModelJsonData);
     }
 
     /**
@@ -127,8 +115,6 @@ public class PatientController extends BaseRestController {
     /**
      * 注：因直接访问文件路径，无法显示文件信息
      * 将文件路径解析成字节流，通过字节流的方式读取文件
-     * @param request
-     * @param response
      * @param localImgPath       文件路径
      * @throws Exception
      */
@@ -136,9 +122,7 @@ public class PatientController extends BaseRestController {
     @ApiOperation(value = "显示头像")
     public void showImage(
             @ApiParam(name = "local_img_path", value = "身份证号", defaultValue = "")
-            @PathVariable(value = "local_img_path") String localImgPath,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception{
-        patientClient.showImage(localImgPath,request,response);
+            @PathVariable(value = "local_img_path") String localImgPath) throws Exception{
+        patientClient.showImage(localImgPath);
     }
 }

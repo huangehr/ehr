@@ -3,7 +3,6 @@ package com.yihu.ehr.ha.SystemDict.controller;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersionPrefix.Version1_0 )
 @RestController
-public class ConventionalDictEntryController extends BaseRestController {
+public class ConventionalDictEntryController {
 
     @Autowired
     private ConventionalDictEntryClient dictEntryClient;

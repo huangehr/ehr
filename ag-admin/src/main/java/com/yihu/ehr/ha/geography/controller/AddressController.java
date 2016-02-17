@@ -4,7 +4,6 @@ import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.ha.geography.service.AddressClient;
 import com.yihu.ehr.model.address.MGeography;
 import com.yihu.ehr.model.address.MGeographyDict;
-import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -21,7 +20,7 @@ import java.util.List;
 @RequestMapping(ApiVersionPrefix.Version1_0)
 @RestController
 @Api(value = "address", description = "地址信息管理接口，用于地址信息管理", tags = {"地址信息管理接口"})
-public class AddressController extends BaseRestController {
+public class AddressController {
     @Autowired
     private AddressClient addressClient;
 

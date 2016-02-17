@@ -3,7 +3,6 @@ package com.yihu.ehr.ha.security.controller;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.ha.security.service.SecurityClient;
 import com.yihu.ehr.model.security.MUserSecurity;
-import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(ApiVersionPrefix.Version1_0 )
 @RestController
 @Api(value = "sec", description = "安全管理接口，用于安全验证管理", tags = {"安全管理接口"})
-public class SecurityController extends BaseRestController {
+public class SecurityController {
 
     @Autowired
     private static SecurityClient securityClient;
@@ -169,7 +168,7 @@ public class SecurityController extends BaseRestController {
      * 根据loginCode删除Security
      * @param loginCode
      */
-    @RequestMapping(value = "/securities/{login_code}", method = RequestMethod.GET)
+    @RequestMapping(value = "/securities/user/{login_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据loginCode获取Security" )
     public MUserSecurity getUserSecurityByUserName(
             @ApiParam(name = "login_code", value = "用户登录代码")

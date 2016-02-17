@@ -1,7 +1,6 @@
 package com.yihu.ehr.ha.std.controller;
 
 import com.yihu.ehr.constants.ApiVersionPrefix;
-import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RequestMapping(ApiVersionPrefix.Version1_0 + "/dataSet")
 @RestController
-public class DataSetController extends BaseRestController {
+public class DataSetController {
 
     @RequestMapping(value = "/dataSets",method = RequestMethod.GET)
     public String getDataSetByCodeName(@ApiParam(name = "apiVersion", value = "API版本号", defaultValue = "v1.0")

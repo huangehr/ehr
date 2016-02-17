@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -31,9 +29,7 @@ public interface UserClient {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) ;
+            @RequestParam(value = "page", required = false) int page) ;
 
     @RequestMapping(value = "/rest/v1.0/users/{user_id}" , method = RequestMethod.DELETE)
     @ApiOperation(value = "删除用户",notes = "根据用户id删除用户")

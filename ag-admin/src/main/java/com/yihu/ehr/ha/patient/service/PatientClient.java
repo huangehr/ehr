@@ -66,8 +66,6 @@ public interface PatientClient {
     /**
      * 根据前端传回来的json新增一个人口信息
      * @param patientModelJsonData
-     * @param request
-     * @param response
      * @return
      * @throws Exception
      */
@@ -75,9 +73,7 @@ public interface PatientClient {
     @ApiOperation(value = "根据前端传回来的json创建一个人口信息")
     boolean createPatient(
             @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
-            @RequestParam(value = "patient_model_json_data") String patientModelJsonData,
-            HttpServletRequest request,
-            HttpServletResponse response) ;
+            @RequestParam(value = "patient_model_json_data") String patientModelJsonData) ;
 
     /**
      * 根据前端传回来的json修改人口信息
@@ -91,9 +87,7 @@ public interface PatientClient {
     @ApiOperation(value = "根据前端传回来的json修改人口信息")
     boolean updatePatient(
             @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
-            @RequestParam(value = "patient_model_json_data") String patientModelJsonData,
-            HttpServletRequest request,
-            HttpServletResponse response);
+            @RequestParam(value = "patient_model_json_data") String patientModelJsonData);
 
     @RequestMapping(value = "/rest/v1.0/populations/password/{id_card_no}",method = RequestMethod.PUT)
     @ApiOperation(value = "初始化密码",notes = "用户忘记密码时重置密码，初始密码为123456")
@@ -103,8 +97,6 @@ public interface PatientClient {
     /**
      * 注：因直接访问文件路径，无法显示文件信息
      * 将文件路径解析成字节流，通过字节流的方式读取文件
-     * @param request
-     * @param response
      * @param localImgPath       文件路径
      * @throws Exception
      */
@@ -112,7 +104,5 @@ public interface PatientClient {
     @ApiOperation(value = "显示头像")
     void showImage(
             @ApiParam(name = "local_img_path", value = "身份证号", defaultValue = "")
-            @PathVariable(value = "local_img_path") String localImgPath,
-            HttpServletRequest request,
-            HttpServletResponse response);
+            @PathVariable(value = "local_img_path") String localImgPath);
 }

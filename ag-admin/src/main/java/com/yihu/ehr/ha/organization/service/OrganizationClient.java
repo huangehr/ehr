@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -33,9 +31,7 @@ public interface OrganizationClient {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) ;
+            @RequestParam(value = "page", required = false) int page) ;
 
 
     /**
@@ -70,7 +66,7 @@ public interface OrganizationClient {
      * @param orgCode
      * @return
      */
-    @RequestMapping(value = "/rest/v1.0/organizations", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/v1.0/organizations/{org_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据机构代码获取机构")
     MOrganization getOrg(
             @ApiParam(name = "org_code", value = "机构代码", defaultValue = "")
