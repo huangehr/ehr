@@ -88,7 +88,7 @@ public class SystemDictController extends BaseRestController {
     }
 
     @ApiOperation(value = "更新字典")
-    @RequestMapping(value = "/dictionaries/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/dictionaries", method = RequestMethod.PUT)
     public MSystemDict updateDictionary(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
             @RequestParam(value = "dictionary") String dictJson) {

@@ -5,13 +5,14 @@ import com.yihu.ehr.ha.SystemDict.service.SystemDictClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.dict.MSystemDict;
-import com.yihu.ehr.util.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Created by AndyCai on 2016/1/21.
@@ -23,11 +24,11 @@ import org.springframework.web.bind.annotation.*;
 public class SystemDictController {
 
     @Autowired
-    private static SystemDictClient systemDictClient;
+    private SystemDictClient systemDictClient;
 
     @ApiOperation(value = "获取字典列表")
     @RequestMapping(value = "/dictionaries", method = RequestMethod.GET)
-    public Envelop getDictionaries(
+    public List<MSystemDict> getDictionaries(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器", defaultValue = "")
@@ -38,7 +39,7 @@ public class SystemDictController {
             @RequestParam(value = "size", required = false) Integer size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) Integer page) {
-       return systemDictClient.getDictionaries(fields,filters,sorts,size,page);
+       return (List<MSystemDict>)systemDictClient.getDictionaries(fields,filters,sorts,size,page);
     }
 
     @ApiOperation(value = "创建字典", response = MSystemDict.class, produces = "application/json")
@@ -58,13 +59,11 @@ public class SystemDictController {
     }
 
     @ApiOperation(value = "修改字典")
-    @RequestMapping(value = "/dictionaries/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/dictionaries", method = RequestMethod.PUT)
     public MSystemDict updateDictionary(
-            @ApiParam(name = "id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "id") long id,
-            @ApiParam(name = "name", value = "字典名称", defaultValue = "")
-            @RequestParam(value = "name") String name) {
-        return systemDictClient.updateDictionary(id,name);
+            @ApiParam(name = "dictionary", value = "字典JSON结构")
+            @RequestParam(value = "dictionary") String dictJson) {
+        return systemDictClient.updateDictionary(dictJson);
     }
 
     @ApiOperation(value = "删除字典")
@@ -77,7 +76,7 @@ public class SystemDictController {
 
     @ApiOperation(value = "获取字典项列表")
     @RequestMapping(value = "/dictionaries/{id}/entries", method = RequestMethod.GET)
-    public Envelop getDictEntries(
+    public List<MDictionaryEntry> getDictEntries(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") long id,
             @ApiParam(name = "value", value = "字典项值", defaultValue = "")
@@ -86,11 +85,11 @@ public class SystemDictController {
             @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
             @RequestParam(value = "rows", required = false) Integer rows) {
-        return systemDictClient.getDictEntries(id,value,page,rows);
+        return (List<MDictionaryEntry>)systemDictClient.getDictEntries(id,value,page,rows);
     }
 
     @ApiOperation(value = "创建字典项")
-    @RequestMapping(value = "/dictionaries/{id}/entries", method = RequestMethod.POST)
+    @RequestMapping(value = "/dictionaries/entries", method = RequestMethod.POST)
     public MConventionalDict createDictEntry(
             @ApiParam(name = "entry", value = "字典JSON结构")
             @RequestParam(value = "entry") String entryJson) {
@@ -118,7 +117,7 @@ public class SystemDictController {
     }
 
     @ApiOperation(value = "修改字典项")
-    @RequestMapping(value = "/dictionaries/{id}/entries/{code}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/dictionaries/entries", method = RequestMethod.PUT)
     public MConventionalDict updateDictEntry(
             @ApiParam(name = "entry", value = "字典JSON结构")
             @RequestParam(value = "entry") String entryJson) {
