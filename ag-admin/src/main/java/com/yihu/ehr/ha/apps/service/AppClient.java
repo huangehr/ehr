@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletResponse;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -30,8 +30,7 @@ public interface AppClient {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletResponse response);
+            @RequestParam(value = "page", required = false) int page);
 
     /**
      * @param name
@@ -46,18 +45,8 @@ public interface AppClient {
     @RequestMapping(value = "/rest/v1.0/apps", method = RequestMethod.POST)
     @ApiOperation(value = "创建App")
     MApp createApp(
-            @ApiParam(name = "name", value = "名称", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "catalog", value = "类别", defaultValue = "")
-            @RequestParam(value = "catalog") String catalog,
-            @ApiParam(name = "url", value = "url", defaultValue = "")
-            @RequestParam(value = "url") String url,
-            @ApiParam(name = "description", value = "描述", defaultValue = "")
-            @RequestParam(value = "description") String description,
-            @ApiParam(name = "tags", value = "标记", defaultValue = "")
-            @RequestParam(value = "tags") String tags,
-            @ApiParam(name = "user_id", value = "用户", defaultValue = "")
-            @RequestParam(value = "user_id") String userId);
+            @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true, defaultValue = "{\"name\": \"\", \"url\": \"\", \"catalog\": \"\", \"description\": \"\", \"creator\":\"\"}")
+            @RequestParam(value = "app", required = false) String appJson);
 
     @RequestMapping(value = "/rest/v1.0/apps/{app_id}", method = RequestMethod.GET)
     @ApiOperation(value = "获取App")
@@ -65,27 +54,29 @@ public interface AppClient {
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
             @PathVariable(value = "app_id") String appId);
 
-    @RequestMapping(value = "/rest/v1.0/apps/{app_id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/rest/v1.0/apps", method = RequestMethod.PUT)
     @ApiOperation(value = "更新App")
     MApp updateApp(
-            @ApiParam(name = "app_id", value = "appId", defaultValue = "")
-            @PathVariable(value = "app_id") String appId,
-            @ApiParam(name = "name", value = "名称", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "catalog", value = "类别", defaultValue = "")
-            @RequestParam(value = "catalog") String catalog,
-            @ApiParam(name = "status", value = "状态", defaultValue = "")
-            @RequestParam(value = "status") String status,
-            @ApiParam(name = "url", value = "url", defaultValue = "")
-            @RequestParam(value = "url") String url,
-            @ApiParam(name = "description", value = "描述", defaultValue = "")
-            @RequestParam(value = "description") String description,
-            @ApiParam(name = "tags", value = "标记", defaultValue = "")
-            @RequestParam(value = "tags") String tags);
+            @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true)
+            @RequestParam(value = "app", required = false) String appJson);
 
     @RequestMapping(value = "/rest/v1.0/apps/{app_id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除app")
     void deleteApp(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
             @PathVariable(value = "app_id") String appId);
+
+    @RequestMapping(value = "/apps/search", method = RequestMethod.GET)
+    @ApiOperation(value = "获取App列表")
+    Collection<MApp> searchApps(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page);
 }
