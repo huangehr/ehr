@@ -12,8 +12,8 @@
 	<artifactId>docs-micro-service</artifactId>
 	<packaging>jar</packaging>
 
-	<name>EHR微服务平台文档</name>
-	<description>EHR平台微服务帮助文档API</description>
+	<name>EHR平台微服务文档</name>
+	<description>EHR平台微服务文档</description>
 
 	<properties>
 	</properties>
