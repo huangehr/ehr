@@ -11,6 +11,7 @@ import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -56,6 +57,36 @@ public class SystemDictController extends BaseRestController {
         pagedResponse(request, response, dictPage.getTotalElements(), page, size);
 
         return convertToModels(dictPage.getContent(), new ArrayList<>(dictPage.getContent().size()), MSystemDict.class, fields);
+    }
+
+    @ApiOperation(value = "获取字典列表", response = MSystemDict.class, responseContainer = "List")
+    @RequestMapping(value = "/dictionaries", method = RequestMethod.GET)
+    private Collection<MSystemDict> getDictionaries(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序", defaultValue = "")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) Integer size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) Integer page,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        page = reducePage(page);
+
+        if (StringUtils.isEmpty(filters)) {
+            Page<SystemDict> systemDictPage = dictService.getDictList(sorts, page, size);
+
+            pagedResponse(request, response, systemDictPage.getTotalElements(), page, size);
+            return convertToModels(systemDictPage.getContent(), new ArrayList<>(systemDictPage.getNumber()), MSystemDict.class, fields);
+        } else {
+            List<SystemDict> systemDictList = dictService.search(fields, filters, sorts, page, size);
+
+            pagedResponse(request, response, dictService.getCount(filters), page, size);
+            return convertToModels(systemDictList, new ArrayList<>(systemDictList.size()), MSystemDict.class, fields);
+        }
     }
 
     @ApiOperation(value = "创建字典", response = MSystemDict.class, produces = "application/json")
@@ -106,28 +137,5 @@ public class SystemDictController extends BaseRestController {
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") long id) {
         dictService.deleteDict(id);
-    }
-
-    @ApiOperation(value = "搜索字典", response = MSystemDict.class, responseContainer = "List")
-    @RequestMapping(value = "/dictionaries/search", method = RequestMethod.GET)
-    private Collection<MSystemDict> searchDictionaries(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
-            @RequestParam(value = "fields", required = false) String fields,
-            @ApiParam(name = "filters", value = "过滤器", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序", defaultValue = "")
-            @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
-            @RequestParam(value = "size", required = false) Integer size,
-            @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) Integer page,
-            HttpServletRequest request,
-            HttpServletResponse response) {
-        page = reducePage(page);
-
-        List<SystemDict> systemDictList = dictService.search(fields, filters, sorts, page, size);
-        pagedResponse(request, response, dictService.getCount(filters), page, size);
-
-        return convertToModels(systemDictList, new ArrayList<>(systemDictList.size()), MSystemDict.class, fields);
     }
 }
