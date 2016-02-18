@@ -1,6 +1,7 @@
 package com.yihu.ehr.patient.controller;
 
 import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.model.patient.MAbstractCard;
 import com.yihu.ehr.patient.feign.GeographyClient;
 import com.yihu.ehr.patient.feign.ConventionalDictClient;
 import com.yihu.ehr.patient.feign.OrgClient;
