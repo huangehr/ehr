@@ -247,9 +247,9 @@ public class SecurityRestController extends BaseRestController {
      * 根据loginCode删除Security
      * @param loginCode
      */
-    @RequestMapping(value = "/securities/{login_code}", method = RequestMethod.GET)
+    @RequestMapping(value = "/securities/user/{login_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据loginCode获取Security" )
-    public Object getUserSecurityByUserName(
+    public MUserSecurity getUserSecurityByUserName(
             @ApiParam(name = "login_code", value = "用户登录代码")
             @PathVariable( value = "login_code") String loginCode) throws Exception{
         UserSecurity userSecurity = securityManager.getUserSecurityByLoginCode(loginCode);
@@ -264,7 +264,7 @@ public class SecurityRestController extends BaseRestController {
      */
     @RequestMapping(value = "/securities/{user_id}", method = RequestMethod.POST)
     @ApiOperation(value = "根据userId创建Security" )
-    public Object createSecurityByUserId(
+    public MUserSecurity createSecurityByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
             @PathVariable( value = "user_id") String userId) throws Exception {
         UserSecurity userSecurity = securityManager.createSecurityByUserId(userId);
@@ -293,7 +293,7 @@ public class SecurityRestController extends BaseRestController {
      */
     @RequestMapping(value = "/securities/{user_id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据userId获取UserSecurity" )
-    public Object getUserSecurityByUserId(
+    public MUserSecurity getUserSecurityByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
             @PathVariable( value = "user_id") String userId) {
         UserSecurity userSecurity = securityManager.getUserPublicKeyByUserId(userId);

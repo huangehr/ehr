@@ -2,7 +2,6 @@ package com.yihu.ehr.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersionPrefix;
-import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.security.MUserSecurity;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.user.feign.ConventionalDictClient;
@@ -235,12 +234,14 @@ public class UserController extends BaseRestController {
      */
     @RequestMapping(value = "/users/verification/{login_code}/{psw}" , method = RequestMethod.GET)
     @ApiOperation(value = "根据登陆用户名及密码验证用户",notes = "根据登陆用户名及密码验证用户")
-    public User loginVerification(
+    public MUser loginVerification(
             @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
             @PathVariable(value = "login_code") String loginCode,
             @ApiParam(name = "psw", value = "密码", defaultValue = "")
             @PathVariable(value = "psw") String psw) {
-        return  userManager.loginVerification(loginCode,psw);
+        User user =  userManager.loginVerification(loginCode,psw);
+        MUser userModel = convertToModel(user,MUser.class);
+        return userModel;
     }
 
     /**

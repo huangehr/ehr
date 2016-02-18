@@ -1,16 +1,15 @@
 package com.yihu.ehr.ha.std.controller;
 
 import com.yihu.ehr.constants.ApiVersionPrefix;
-import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * Created by AndyCai on 2016/1/25.
  */
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/cdaType")
+@RequestMapping(ApiVersionPrefix.Version1_0 + "/cdaType")
 @RestController
-public class CDATypeController extends BaseRestController {
+public class CDATypeController {
 
     @RequestMapping(value = "/getTreeGridData",method = RequestMethod.GET)
     public String getTreeGridData(@ApiParam(name = "apiVersion", value = "API版本号", defaultValue = "v1.0")
