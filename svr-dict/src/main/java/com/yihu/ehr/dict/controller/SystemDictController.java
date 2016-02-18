@@ -1,10 +1,9 @@
 package com.yihu.ehr.dict.controller;
 
-import com.netflix.discovery.converters.Auto;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.constants.PageArg;
-import com.yihu.ehr.dict.service.*;
+import com.yihu.ehr.dict.service.SystemDict;
+import com.yihu.ehr.dict.service.SystemDictService;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.dict.MSystemDict;
 import com.yihu.ehr.util.controller.BaseRestController;
@@ -12,20 +11,15 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by linaz on 2015/8/12.
@@ -36,28 +30,6 @@ import java.util.*;
 public class SystemDictController extends BaseRestController {
     @Autowired
     SystemDictService dictService;
-
-    @ApiOperation(value = "获取字典列表", response = MSystemDict.class, responseContainer = "List")
-    @RequestMapping(value = "/dictionaries", method = RequestMethod.GET)
-    private Collection<MSystemDict> getDictionaries(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
-            @RequestParam(value = "fields", required = false) String fields,
-            @ApiParam(name = "sorts", value = "排序", defaultValue = "")
-            @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "size", value = "分页大小", defaultValue = PageArg.DefaultSizeS)
-            @RequestParam(value = "size", required = false) Integer size,
-            @ApiParam(name = "page", value = "页码", defaultValue = PageArg.DefaultPageS)
-            @RequestParam(value = "page", required = false) Integer page,
-            HttpServletRequest request,
-            HttpServletResponse response) {
-        page = reducePage(page);
-
-        Page<SystemDict> dictPage = dictService.getDictList(sorts, page, size);
-
-        pagedResponse(request, response, dictPage.getTotalElements(), page, size);
-
-        return convertToModels(dictPage.getContent(), new ArrayList<>(dictPage.getContent().size()), MSystemDict.class, fields);
-    }
 
     @ApiOperation(value = "获取字典列表", response = MSystemDict.class, responseContainer = "List")
     @RequestMapping(value = "/dictionaries", method = RequestMethod.GET)

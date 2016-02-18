@@ -9,7 +9,6 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -28,8 +27,8 @@ public class AppController {
     public List<MApp> getApps(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
-            @ApiParam(name = "filter", value = "过滤器，规则参见说明文档", defaultValue = "id,name,secret,url,createTime")
-            @RequestParam(value = "filter", required = false) String filter,
+            @ApiParam(name = "filters", value = "过滤器，规则参见说明文档", defaultValue = "id,name,secret,url,createTime")
+            @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "sort", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
             @RequestParam(value = "sort", required = false) String sort,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
@@ -37,7 +36,7 @@ public class AppController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) throws Exception {
 
-        return appClient.getApps(fields,filter,sort,size,page);
+        return (List<MApp>)appClient.getApps(fields,filters,sort,size,page);
     }
 
     /**
@@ -78,21 +77,4 @@ public class AppController {
         appClient.deleteApp(appId);
         return true;
     }
-
-    @RequestMapping(value = "/apps/search", method = RequestMethod.GET)
-    @ApiOperation(value = "获取App列表")
-    public Collection<MApp> searchApps(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
-            @RequestParam(value = "fields", required = false) String fields,
-            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
-            @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
-            @RequestParam(value = "size", required = false) int size,
-            @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page) throws Exception {
-        return null;
-    }
-
 }

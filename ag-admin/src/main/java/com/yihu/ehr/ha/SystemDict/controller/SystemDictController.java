@@ -28,27 +28,25 @@ public class SystemDictController {
     @ApiOperation(value = "获取字典列表")
     @RequestMapping(value = "/dictionaries", method = RequestMethod.GET)
     public Envelop getDictionaries(
-            @ApiParam(name = "name", value = "字典名称", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "phoneticCode", value = "首字母全拼", defaultValue = "")
-            @RequestParam(value = "phoneticCode") String phoneticCode,
-            @ApiParam(name = "page", value = "当前页", defaultValue = "")
-            @RequestParam(value = "page") int page,
-            @ApiParam(name = "rows", value = "行数", defaultValue = "")
-            @RequestParam(value = "rows") int rows) {
-       return systemDictClient.getDictionaries(name,phoneticCode,page,rows);
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序", defaultValue = "")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) Integer size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) Integer page) {
+       return systemDictClient.getDictionaries(fields,filters,sorts,size,page);
     }
 
     @ApiOperation(value = "创建字典", response = MSystemDict.class, produces = "application/json")
     @RequestMapping(value = "/dictionaries", method = RequestMethod.POST)
     public MSystemDict createDictionary(
-            @ApiParam(name = "name", value = "名称", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "reference", value = "", defaultValue = "")
-            @RequestParam(value = "reference") String reference,
-            @ApiParam(name = "userId", value = "创建人", defaultValue = "")
-            @RequestParam(value = "userId") String userId) {
-        return systemDictClient.createDictionary(name,reference,userId);
+            @ApiParam(name = "dictionary", value = "字典JSON结构")
+            @RequestParam(value = "dictionary") String dictJson) {
+        return systemDictClient.createDictionary(dictJson);
     }
 
     @ApiOperation(value = "获取字典", response = MSystemDict.class, produces = "application/json")
@@ -94,17 +92,9 @@ public class SystemDictController {
     @ApiOperation(value = "创建字典项")
     @RequestMapping(value = "/dictionaries/{id}/entries", method = RequestMethod.POST)
     public MConventionalDict createDictEntry(
-            @ApiParam(name = "id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "id") long id,
-            @ApiParam(name = "code", value = "字典ID", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "value", value = "字典名称", defaultValue = "")
-            @RequestParam(value = "value") String value,
-            @ApiParam(name = "sort", value = "排序号", defaultValue = "")
-            @RequestParam(value = "sort") Integer sort,
-            @ApiParam(name = "catalog", value = "类别", defaultValue = "")
-            @RequestParam(value = "catalog") String catalog) {
-        return systemDictClient.createDictEntry(id,code,value,sort,catalog);
+            @ApiParam(name = "entry", value = "字典JSON结构")
+            @RequestParam(value = "entry") String entryJson) {
+        return systemDictClient.createDictEntry(entryJson);
     }
 
     @ApiOperation(value = "获取字典项")
@@ -130,16 +120,8 @@ public class SystemDictController {
     @ApiOperation(value = "修改字典项")
     @RequestMapping(value = "/dictionaries/{id}/entries/{code}", method = RequestMethod.PUT)
     public MConventionalDict updateDictEntry(
-            @ApiParam(name = "id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "id") long id,
-            @ApiParam(name = "code", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "code") String code,
-            @ApiParam(name = "value", value = "字典名称", defaultValue = "")
-            @RequestParam(value = "value") String value,
-            @ApiParam(name = "sort", value = "排序号", defaultValue = "")
-            @RequestParam(value = "sort") Integer sort,
-            @ApiParam(name = "catalog", value = "类别", defaultValue = "")
-            @RequestParam(value = "catalog") String catalog) {
-        return systemDictClient.updateDictEntry(id,code,value,sort,catalog);
+            @ApiParam(name = "entry", value = "字典JSON结构")
+            @RequestParam(value = "entry") String entryJson) {
+        return systemDictClient.updateDictEntry(entryJson);
     }
 }

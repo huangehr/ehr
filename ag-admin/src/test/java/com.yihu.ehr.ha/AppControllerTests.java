@@ -58,14 +58,13 @@ public class AppControllerTests {
 
             assertNotEquals("APP新增失败", mApp, null);
 
-            String fields = "id,code,name,status,catalog,url,description,tags";
-            String filter = "";
-            String sorts = "code";
+            String fields = "id,name,status,catalog,url,description,tags";
+            String filter = "name=测试APP";
+            String sorts = "name";
             int page = 1;
             int rows = 15;
-            List<MApp> mApps = appController.getApps(fields, "", sorts, page, rows);
-            assertNotEquals("机构列表获取失败", mApps, null);
-
+            List<MApp> mApps = appController.getApps(fields, filter, sorts, page, rows);
+            assertTrue("机构列表获取失败", mApps.size()==1);
 
            // String tags = "";//mApp.getTags().toString();
 

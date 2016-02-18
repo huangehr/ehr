@@ -101,8 +101,8 @@ public class SvrDictApplicationTests {
         long dictId = 1;
         int page = 1;
         int rows = 10;
-        Object result = entryController.getDictEntries(dictId, rows, page, null, null);
-        assertTrue("查询失败！", result != null);
+//        Object result = entryController.getDictEntries(dictId, rows, page, null, null);
+//        assertTrue("查询失败！", result != null);
     }
 
     @Test
@@ -114,16 +114,16 @@ public class SvrDictApplicationTests {
     @Test
     public void jtestSearchDictEntryListForDDL() throws Exception {
         long dictId = 1;
-        Object result = entryController.getDictEntries(dictId, 0, 0, null, null);
-        assertTrue("查询失败！", result != null);
+//        Object result = entryController.getDictEntries(dictId, 0, 0, null, null);
+//        assertTrue("查询失败！", result != null);
     }
 
     @Test
     public void ltestAutoSearchDictEntryList() throws Exception {
         long dictId = 1;
         String value = "儿童保健";
-        Object result = entryController.getDictEntries(dictId, 0, 0, null, null);
-        assertTrue("查询失败！", result != null);
+//        Object result = entryController.getDictEntries(dictId, 0, 0, null, null);
+//        assertTrue("查询失败！", result != null);
     }
 
 
