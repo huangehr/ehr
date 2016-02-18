@@ -1,0 +1,19 @@
+server:
+  port: 11111
+
+security:
+  user:
+    password: doc
+
+---
+spring:
+  profiles: dev
+
+
+---
+spring:
+  profiles: test
+
+---
+spring:
+  profiles: prod

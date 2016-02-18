@@ -1,6 +1,7 @@
 #project files
 ehr.ipr
 ehr.iws
+ehr.ids
 */*.iml
 */target
 
