@@ -1,0 +1,58 @@
+
+
+.ms-page-bar{
+    display: inline-block;
+    overflow: hidden;
+    height: 30px;
+    /*padding-top:30px;*/
+    /*border-radius:4px;*/
+}
+
+.ms-page{
+    float: left;
+}
+.ms-page-num{
+    float: left;
+    display: inline;
+    width: 24px;
+    height: 24px;
+    padding-top: 5px;
+    color: #000;
+    font-weight: bold;
+    margin: 0px 5px 5px 5px;
+}
+.ms-page-num-active{
+    border: 1px solid #E6E6E6;
+    color: #787878;
+}
+.ms-page-pre{
+    margin-top: 5px;
+    margin-right: 10px;
+}
+.ms-page-next{
+    margin-top: 5px;
+    margin-left: 10px;
+}
+
+.ms-left, .ms-right{
+    float: left;
+    width: 10px;
+    height: 14px;
+    display: block;
+}
+.ms-left{
+    background: url('imgs/left01_btn.png') no-repeat scroll 0 0 transparent;
+    cursor: default;
+}
+.ms-right{
+    background: url('imgs/right01_btn.png') no-repeat scroll 0 0 transparent;
+    cursor: default;
+}
+.ms-left-active{
+    background: url('imgs/left01_btn_pre.png') no-repeat scroll 0 0 transparent;
+    cursor: pointer;
+}
+.ms-right-active{
+    background: url('imgs/right01_btn_pre.png') no-repeat scroll 0 0 transparent;
+    cursor: pointer;
+}

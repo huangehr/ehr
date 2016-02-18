@@ -1,0 +1,95 @@
+#dataGrid .u-grid {
+    border: 0;
+}
+#dataGrid .u-grid .grid-body tr:not(.jqgfirstrow) { height: 40px; font-size: 12px; text-align: center; }
+.condition-select{width: 140px;}
+.modal-header{background-color:#2d9bd2;}
+.modal-body .table tr td{border: solid 0;padding: 5px;}
+.modal-body td label{float: right;font-family: SimSun;font-size: 12px;}
+.modal-body textarea{width: 380px;background-color: #edf6fa!important;border: solid 0;margin-left: 5px;}
+.msg-modal {
+    border-radius: 2px;
+}
+
+.msg-dialog {
+    width: 322px;
+}
+
+.msg-body {
+    height: 116px;
+}
+input{
+    font-family: SimSun;
+    font-size: 12px;
+    height: 30px;
+    width: 240px;
+}
+input[type="radio"]{
+    width: 20px;
+    margin-left: 20px;
+}
+select{
+    font-family: SimSun;
+    font-size: 12px;
+    height: 30px;
+    width: 240px;
+}
+input[disabled] {
+    color: #848484!important;
+    background-color: #edf6fa!important;
+    border: solid 0;
+}
+input[readonly] {
+    color: #848484 !important;
+    background-color: #edf6fa !important;
+    border: solid 0;
+}
+fieldset {
+    margin:1em 0;
+    padding:1em;
+    border:1px solid #c8c8c8;
+}
+legend {
+    font-weight: bold;
+    border: 0;
+    width: 44px;
+    margin: 0;
+}
+.modal-width{
+    width: 416px;
+}
+.index-first{
+    z-index: 1051;
+}
+.index-second{
+    z-index: 1052;
+}
+.modal-body fieldset textarea{
+    width: 474px;
+}
+.modal-body .table tr .radio-line-height{
+    line-height: 35px;
+}
+
+.modal-footer {
+    border-top: 0;
+    background-color:#fff;
+}
+.modal-footer button {
+    width: 84px;
+}
+#validTimeRead{
+    margin-left:5px;
+}
+#startTimeRead{
+    margin-left:5px;
+}
+.key-title{
+    margin-top: 25px;
+}
+.key-area{
+    height: 66px
+}
+.condition button{
+    width: 84px;
+}

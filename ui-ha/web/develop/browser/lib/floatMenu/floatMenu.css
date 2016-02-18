@@ -1,0 +1,132 @@
+/*div{*/
+    /*margin: auto;*/
+    /*font-size: 12px;*/
+/*}*/
+
+.sec-detail .left{
+    float: left;
+    margin: 0;
+    width: 260px;
+    border-radius: 5px;
+    background-color: #FFFFFF;
+}
+
+.float-menu-tree{
+    overflow: hidden;
+    z-index: 9000;
+}
+
+.float-menu{
+    overflow: hidden;
+    float: left;
+    width: 260px;
+    position: relative;
+
+}
+
+.float-menu-detail{
+    width: 240px;
+    border-radius: 5px;
+    border: 1px solid #E6E6E6;
+    float: left;
+    background-color: #fff;
+    /*position: relative;*/
+}
+
+.float-menu ul.tree-root{
+    margin: 20px 0px 20px 0px;
+}
+
+.float-menu ul.tree-root li{
+    height:40px;
+}
+
+.float-menu ul.tree-root div.li-ico{
+    float: left;
+    margin: 3px 10px 3px 10px;
+    height:34px;
+    width: 34px;
+    background: url("imgs/archives_btn_pre.png") no-repeat scroll 0 0 transparent;
+}
+
+.float-menu ul.tree-root li div.title{
+    float: left;
+    height:34px;
+    line-height: 34px;
+    margin: 3px 10px 3px 5px;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.float-menu ul.tree-root ul{
+    margin: 13px 0px 13px 0px;
+    text-align: left;
+    padding-left: 40px;
+}
+
+.float-menu ul.tree-root ul li{
+    line-height: 35px;
+}
+
+.float-menu ul.tree-root  div.li-a-ico{
+    float: left;
+    width: 6px;
+    height: 6px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #ffffff #ffffff #ffffff #323232;
+    background: none;
+    margin: 11px 6px 0px 0px;
+}
+
+.float-menu ul.tree-root ul li a,.float-menu  ul.tree-root ul li a:hover{
+    color: #323232;
+}
+
+.float-menu ul.tree-root ul li a.active div.li-a-ico{
+    border-color: #ffffff #ffffff #ffffff #23AFFF;
+}
+
+.float-menu ul.tree-root ul li a.active,.float-menu  ul.tree-root ul li a.active:hover{
+    color: #23AFFF;
+}
+
+.float-menu-tree div.expand-btn{
+    position: relative;
+    height: 0;
+    top: 200px;
+    left: -1px;
+    float: left
+}
+
+.float-menu-tree .expand-btn div{
+    background: url('imgs/la_btn_pre.png') no-repeat scroll 0 0 transparent;
+    width: 20px;
+    height: 100px;
+    cursor: pointer;
+}
+
+.float-menu-tree .expand-btn div.over{
+    background: url('imgs/la_btn.png') no-repeat scroll 0 0 transparent;
+
+}
+
+.float-menu-tree .expand-btn div.active{
+    background: url('imgs/tui_btn_pre.png') no-repeat scroll 0 0 transparent;
+}
+
+.float-menu-tree .expand-btn div.active.over{
+    background: url('imgs/tui_btn.png') no-repeat scroll 0 0 transparent;
+
+}
+
+.r-loading{
+    padding-top: 100px;
+    position: absolute;
+    width: 900px;
+    height: 540px;
+    background: url('imgs/loading.gif') no-repeat scroll 50% 150px transparent;
+}
+.c-mt2{
+    margin-top: 1px;
+}
