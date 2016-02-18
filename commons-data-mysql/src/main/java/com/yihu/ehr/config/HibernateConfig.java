@@ -68,22 +68,4 @@ public class HibernateConfig {
 
         return basicDataSource;
     }
-
-    @Bean
-    public LocalSessionFactoryBean sessionFactory(BasicDataSource dataSource){
-        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
-        sessionFactory.setDataSource(dataSource);
-        //sessionFactory.getHibernateProperties().setProperty("hibernate.show_sql", "true");
-        //sessionFactory.getHibernateProperties().setProperty("hibernate.format_sql", formatSQL);
-
-        return sessionFactory;
-    }
-
-    @Bean
-    public HibernateTransactionManager transactionManager(SessionFactory sessionFactory){
-        HibernateTransactionManager transactionManager = new HibernateTransactionManager();
-        transactionManager.setSessionFactory(sessionFactory);
-
-        return transactionManager;
-    }
 }

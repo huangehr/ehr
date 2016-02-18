@@ -12,6 +12,7 @@ import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -34,25 +35,34 @@ public class AppController extends BaseRestController {
     @Autowired
     private AppService appService;
 
-    @Autowired
-    private ConventionalDictClient conventionalDictClient;
-
     @RequestMapping(value = "/apps", method = RequestMethod.GET)
     @ApiOperation(value = "获取App列表")
     public Collection<MApp> getApps(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
             @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
-            @RequestParam(value = "size", required = false, defaultValue = "15") int size,
+            @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        Page<App> apps = appService.getAppList(sorts, page, size);
-        pagedResponse(request, response, apps.getTotalElements(), page, size);
+        page = reducePage(page);
 
-        return convertToModels(apps.getContent(), new ArrayList<>(apps.getNumber()), MApp.class, fields);
+        if (StringUtils.isEmpty(filters)){
+            Page<App> appPages = appService.getAppList(sorts, page, size);
+
+            pagedResponse(request, response, appPages.getTotalElements(), page, size);
+            return convertToModels(appPages.getContent(), new ArrayList<>(appPages.getNumber()), MApp.class, fields);
+        } else {
+            List<App> appList = appService.search(fields, filters, sorts, page, size);
+
+            pagedResponse(request, response, appService.getCount(filters), page, size);
+            return convertToModels(appList, new ArrayList<>(appList.size()), MApp.class, fields);
+        }
     }
 
     /**
@@ -105,26 +115,5 @@ public class AppController extends BaseRestController {
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
             @PathVariable(value = "app_id") String appId) throws Exception {
         appService.delete(appId);
-    }
-
-    @RequestMapping(value = "/apps/search", method = RequestMethod.GET)
-    @ApiOperation(value = "获取App列表")
-    public Collection<MApp> searchApps(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
-            @RequestParam(value = "fields", required = false) String fields,
-            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
-            @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
-            @RequestParam(value = "size", required = false) int size,
-            @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-        List<App> appList = appService.search(fields, filters, sorts, page, size);
-        pagedResponse(request, response, appService.getCount(filters), page, size);
-
-        return convertToModels(appList, new ArrayList<MApp>(appList.size()), MApp.class, fields);
     }
 }

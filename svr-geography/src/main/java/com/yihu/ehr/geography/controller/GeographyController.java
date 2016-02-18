@@ -1,13 +1,12 @@
 package com.yihu.ehr.geography.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.geography.service.Geography;
 import com.yihu.ehr.geography.service.GeographyDict;
 import com.yihu.ehr.geography.service.GeographyService;
-import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.model.address.MGeography;
+import com.yihu.ehr.model.address.MGeographyDict;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -15,9 +14,8 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author zlf
@@ -39,20 +37,44 @@ public class GeographyController extends BaseRestController{
      */
     @RequestMapping(value = "/geographies/{level}", method = RequestMethod.GET)
     @ApiOperation(value = "根据地址等级查询地址字典")
-    public List<GeographyDict> getAddressByLevel(
+    public List<MGeographyDict> getAddressByLevel(
             @ApiParam(name = "level", value = "地址级别", defaultValue = "")
             @PathVariable(value = "level") Integer level) {
         List<GeographyDict> addressDictList = addressService.getLevelToAddr(level);
-        return addressDictList;
+        List<MGeographyDict> infoList = new ArrayList<>();
+        for(GeographyDict info :addressDictList )
+        {
+            MGeographyDict dictInfo = new MGeographyDict();
+            dictInfo.setId(info.getId());
+            dictInfo.setAbbreviation(info.getAbbreviation());
+            dictInfo.setLevel(info.getLevel());
+            dictInfo.setName(info.getName());
+            dictInfo.setPid(info.getPid());
+            dictInfo.setPostCode(info.getPostcode());
+            infoList.add(dictInfo);
+        }
+        return infoList;
     }
 
     @RequestMapping(value = "/geographies/{pid}", method = RequestMethod.GET)
     @ApiOperation(value = "根据父id查询地址字典")
-    public List<GeographyDict> getAddressDictByPid(
+    public List<MGeographyDict> getAddressDictByPid(
         @ApiParam(name = "pid", value = "上级id", defaultValue = "")
         @PathVariable(value = "pid") Integer pid) {
         List<GeographyDict> addressDictList = addressService.getPidToAddr(pid);
-        return addressDictList;
+        List<MGeographyDict> infoList = new ArrayList<>();
+        for(GeographyDict info :addressDictList )
+        {
+            MGeographyDict dictInfo = new MGeographyDict();
+            dictInfo.setId(info.getId());
+            dictInfo.setAbbreviation(info.getAbbreviation());
+            dictInfo.setLevel(info.getLevel());
+            dictInfo.setName(info.getName());
+            dictInfo.setPid(info.getPid());
+            dictInfo.setPostCode(info.getPostcode());
+            infoList.add(dictInfo);
+        }
+        return infoList;
     }
 
 
@@ -124,7 +146,7 @@ public class GeographyController extends BaseRestController{
             @PathVariable (value = "id") String id) {
         Geography address = addressService.getAddressById(id);
         if(address==null){
-            throw new ApiException(ErrorCode.GetGeographyFailed,"获取地址失败");
+            //throw new ApiException(ErrorCode.GetGeographyFailed,"获取地址失败");
         }
         addressService.deleteAddress(address);
         return true;

@@ -1,4 +1,4 @@
-package com.yihu.ehr.patient.service.card;
+package com.yihu.ehr.model.patient;
 
 import com.yihu.ehr.model.address.MGeography;
 import com.yihu.ehr.model.dict.MConventionalDict;
