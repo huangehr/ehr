@@ -4,9 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class DocMsApiApplication {
+public class MicroServiceDocApp {
 
 	public static void main(String[] args) {
-		SpringApplication.run(DocMsApiApplication.class, args);
+		SpringApplication.run(MicroServiceDocApp.class, args);
 	}
 }
