@@ -3,15 +3,12 @@ package com.yihu.ehr.org;
 import com.yihu.ehr.SvrOrgApplication;
 import com.yihu.ehr.org.controller.OrganizationController;
 import org.junit.FixMethodOrder;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SvrOrgApplication.class)
@@ -78,20 +75,20 @@ public class SvrOrgApplicationTests {
 //		assertTrue("查询失败！" , org != null);
 //	}
 
-	@Test
-	public void gtestGetOrgsByAddress() throws Exception{
-		String province = "广东省";
-		String city = "广州市";
-		Object org = organizationController.getOrgsByAddress(apiVersion,province,city);
-		assertTrue("查询失败！" , org != null);
-	}
-
-	@Test
-	public void htestDistributeKey() throws Exception{
-		String orgCode = "341321234";
-		Object org = organizationController.distributeKey(apiVersion,orgCode);
-		assertTrue("操作失败！" , org != null);
-	}
+//	@Test
+//	public void gtestGetOrgsByAddress() throws Exception{
+//		String province = "广东省";
+//		String city = "广州市";
+//		Object org = organizationController.getOrgsByAddress(apiVersion,province,city);
+//		assertTrue("查询失败！" , org != null);
+//	}
+//
+//	@Test
+//	public void htestDistributeKey() throws Exception{
+//		String orgCode = "341321234";
+//		Object org = organizationController.distributeKey(apiVersion,orgCode);
+//		assertTrue("操作失败！" , org != null);
+//	}
 
 //	@Test
 //	public void itestValidationOrg() throws Exception{
