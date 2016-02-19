@@ -3,6 +3,8 @@ package com.yihu.ehr.ha.users.controller;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.ha.users.service.UserClient;
 import com.yihu.ehr.model.user.MUser;
+import com.yihu.ehr.model.user.UIModels.UsersModel;
+import com.yihu.ehr.util.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -10,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,7 +30,7 @@ public class UserController {
 
     @RequestMapping(value = "/users" , method = RequestMethod.GET)
     @ApiOperation(value = "获取用户列表",notes = "根据查询条件获取用户列表在前端表格展示")
-    public List<MUser> searchUsers(
+    public Envelop searchUsers(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -37,26 +41,66 @@ public class UserController {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) {
-        return userClient.searchUsers(fields,filters,sorts,size,page);
+
+        Envelop envelop = new Envelop();
+
+        List<MUser> mUsers = userClient.searchUsers(fields,filters,sorts,size,page);
+        List<UsersModel> usersModels = new ArrayList<>();
+        SimpleDateFormat sdf =   new SimpleDateFormat( " yyyy-MM-dd HH:mm:ss " );
+        for(MUser mUser : mUsers)
+        {
+            UsersModel usersModel = new UsersModel();
+            usersModel.setId(mUser.getId());
+            usersModel.setCode(mUser.getLoginCode());
+            usersModel.setName(mUser.getRealName());
+            usersModel.setEmail(mUser.getEmail());
+            usersModel.setTelephone(mUser.getTelephone());
+            usersModel.setLastLoginTime(sdf.format(mUser.getLastLoginTime()));
+          //  String userType = mUser.getUserType();
+            //TODO:获取用户类别字典
+
+            usersModels.add(usersModel);
+        }
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(usersModels);
+
+        //TODO:缺失 获取总条数
+
+        return envelop;
     }
 
     @RequestMapping(value = "/users/{user_id}" , method = RequestMethod.DELETE)
     @ApiOperation(value = "删除用户",notes = "根据用户id删除用户")
-    public Object deleteUser(
+    public Envelop deleteUser(
             @ApiParam(name = "user_id", value = "用户编号", defaultValue = "")
             @PathVariable(value = "user_id") String userId) throws Exception{
-        return userClient.deleteUser(userId);
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        Object object = userClient.deleteUser(userId);
+        if(!object.toString().equals("true"))
+        {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("删除失败!");
+        }
+        return envelop;
     }
 
 
     @RequestMapping(value = "/users" , method = RequestMethod.POST)
     @ApiOperation(value = "创建用户",notes = "重新绑定用户信息")
-    public Object createUser(
+    public Envelop createUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData) throws Exception{
 
-        return userClient.createUser(userJsonData);
-
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        Object object = userClient.createUser(userJsonData);
+        if(!object.toString().equals("true"))
+        {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("删除失败!");
+        }
+        return envelop;
     }
 
 
@@ -65,6 +109,7 @@ public class UserController {
     public Object updateUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData) throws Exception{
+
 
         return userClient.updateUser(userJsonData);
     }
