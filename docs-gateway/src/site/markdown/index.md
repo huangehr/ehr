@@ -1,21 +1,57 @@
-健康档案(EHR)平台网关
+健康档案(EHR)开放平台
 ====================
 
-> 作者：温富建，2016.02.18
+- 作者：温富建，2016.02.19
 
-引言
+平台概况
 ---------------------
 
-本文档为EHR平台网关，属于EHR平台文档体系的一部分，涉及EHR平台网关的具体介绍、开发约定、业务术语及API参考。
-下文中健康档案平台简称为“平台”。
+> [平台简介](overview/index.html)
 
+> 合作模式
 
-目录
+> 服务条款
+
+开发指南
 ---------------------
 
-> [约定](convention/index.html)
->
-> [网关](gateway/index.html)
->
-> [API参考](api-reference/index.html)
+> 应用开发流程
+
+> 数据通信机制
+
+> 服务稳定性要求及监控方式
+
+> 应用UI设计与审核规范
+
+开发规范
+---------------------
+
+> [REST API规范](specification/api-specification.html)
+
+> Thrift API规范
+
+开发教程
+---------------------
+
+> [认证与鉴权](tutorial/authoritarian/index.html)
+
+> [数据标准](tutorial/standard/index.html)
+
+> [档案接收与调阅](tutorial/health-profiles/index.html)
+
+> [基础数据管理](tutorial/admin/index.html)
+
+资源下载
+---------------------
+
+> Java版SDK
+
+FQA
+---------------------
+
+> 开发过程FQA
+
+> 应用审核FQA
+
+> 开放平台FQA
 
