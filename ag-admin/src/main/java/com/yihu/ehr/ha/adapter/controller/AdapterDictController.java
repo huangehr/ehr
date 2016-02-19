@@ -1,7 +1,6 @@
 package com.yihu.ehr.ha.adapter.controller;
 
 import com.yihu.ehr.constants.ApiVersionPrefix;
-import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
@@ -9,10 +8,10 @@ import org.springframework.web.bind.annotation.*;
 /**
  * Created by AndyCai on 2016/1/26.
  */
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/adapterDict")
+@RequestMapping(ApiVersionPrefix.Version1_0 + "/adapterDict")
 @RestController
-public class AdapterDictController extends BaseRestController {
-
+public class AdapterDictController{
+// extends BaseRestController
     @RequestMapping(value = "/adapterDict",method = RequestMethod.GET)
     public Object getAdapterDictById(@ApiParam(name = "apiVersion", value = "API版本号", defaultValue = "v1.0")
                                      @PathVariable(value = "apiVersion") String apiVersion,

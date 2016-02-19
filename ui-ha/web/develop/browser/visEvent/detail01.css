@@ -1,0 +1,46 @@
+.evt-1{
+    height: 60px;
+    border-bottom: 1px solid #e6e6e6;
+    margin: 0px 10px;
+    padding-top: 15px;
+    text-align: right;
+}
+
+.evt-1-c{
+    /*width: 916px;*/
+    margin: 30px 10px 0px 10px;
+}
+
+.evt_1_large_prev{
+    display: block;
+    position: absolute;
+    margin-top: 200px;
+    margin-left: 16px;
+    width: 20px;
+    height: 36px;
+    background: url("../imgs/left02_btn_pre.png") no-repeat scroll 0 0 transparent;
+}
+.evt_1_large_prev.disabled{
+    background: url("../imgs/left02_btn.png") no-repeat scroll 0 0 transparent;
+}
+.evt_1_large_next{
+    display: block;
+    position: absolute;
+    margin-top: 200px;
+    margin-left: 900px;
+    width: 20px;
+    height: 36px;
+    background: url("../imgs/right02_btn_pre.png") no-repeat scroll 0 0 transparent;
+}
+.evt_1_large_next.disabled{
+    background: url("../imgs/right02_btn.png") no-repeat scroll 0 0 transparent;
+}
+
+.calendar_picker{
+    width: 160px;
+    padding-left: 32px;
+    padding-right: 3px;
+    height: 30px;
+    border: 1px solid #e6e6e6;
+    background: url("../imgs/calendar_icon_1.png") no-repeat scroll 0 0 transparent;
+}

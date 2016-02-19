@@ -1,5 +1,9 @@
 package com.yihu.ehr.query;
 
+import org.apache.commons.lang.StringUtils;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,8 +19,9 @@ import java.util.List;
  */
 public class URLQueryBuilder {
     private List<String> fields = new ArrayList<>();
+    private List<String> filters = new ArrayList<>();
     private List<String> sorter = new ArrayList<>();
-    private int pageSize = 20;      // default page size
+    private int pageSize = 15;      // default page size
     private int pageNo = 1;         // default page number
 
     public URLQueryBuilder() {
@@ -43,7 +48,9 @@ public class URLQueryBuilder {
      * @param group    为空表示与其他的过滤条件之间的关系为 and. 若组名已存在，则与同名的过滤条件之间的关系为 or.
      * @return
      */
-    public URLQueryBuilder addFilter(String field, String operator, Object value, String group) {
+    public URLQueryBuilder addFilter(String field, String operator, String value, String group) {
+        filters.add(field + operator + value + (StringUtils.isNotEmpty(group) ? " " + group : ""));
+
         return this;
     }
 
@@ -70,10 +77,17 @@ public class URLQueryBuilder {
         StringBuilder stringBuilder = new StringBuilder();
 
         if (fields.size() > 0) stringBuilder.append(String.join(",", fields)).append("&");
+        if (filters.size() > 0) stringBuilder.append(String.join(",", filters)).append("&");
         if (sorter.size() > 0) stringBuilder.append(String.join(",", sorter)).append("&");
 
         stringBuilder.append("page=").append(pageNo).append("&").append("size=").append(pageSize);
 
-        return stringBuilder.toString();
+        try {
+            return URLEncoder.encode(stringBuilder.toString(), "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return null;
     }
 }

@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.*;
 /**
  * Created by AndyCai on 2016/1/26.
  */
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/adapterDispatch")
+@RequestMapping(ApiVersionPrefix.Version1_0 + "/adapterDispatch")
 @RestController
-public class AdapterDispatchRestController extends BaseRestController {
+public class AdapterDispatchRestController  {
 
     @RequestMapping(value = "/schemaMappingPlan", method = RequestMethod.GET)
     @ApiOperation(value = "获取适配方案映射信息", produces = "application/json", notes = "获取采集标准适配方案信息，文件以Base64编码，压缩格式为zip")

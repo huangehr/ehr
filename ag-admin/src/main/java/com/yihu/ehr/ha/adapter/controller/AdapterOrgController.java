@@ -1,16 +1,15 @@
 package com.yihu.ehr.ha.adapter.controller;
 
 import com.yihu.ehr.constants.ApiVersionPrefix;
-import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * Created by AndyCai on 2016/1/26.
  */
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/adapterOrg")
+@RequestMapping(ApiVersionPrefix.Version1_0 + "/adapterOrg")
 @RestController
-public class AdapterOrgController extends BaseRestController {
+public class AdapterOrgController {
 
     @RequestMapping(value = "/adapterOrg",method = RequestMethod.GET)
     public Object getAdapterOrgByCode(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")

@@ -1,0 +1,71 @@
+﻿/*update by CMS ie7闪动*/
+html, body, .frame-list-layout { display:block; /*position:relative;*/ width:100%; height:100%;}
+
+
+/*章节*/
+.list-section { display:block; clear:both; width:100%; height:auto;}
+.list-section .list-section-head { height:29px; padding-right:18px; border-bottom:1px solid #ccc;}
+.list-section .list-section-head h4 { display:inline-block;*display:inline;*zoom:1;/*update by lqh IE7*/ height:22px; padding:4px 0 3px 10px; line-height:22px; font-size:14px; font-weight:bold;}
+
+
+.pane-search { padding:5px 18px 5px;}
+.pane-search span {}
+.pane-search input { width:300px; height:23px; padding:3px 5px 2px; /*border:1px solid #ccc;*/ line-height:18px;}
+
+
+#pane-list { display:block; width:auto; height:222px; border-top:1px solid #ccc; border-bottom:1px solid #ccc;}
+
+
+#pane-list-selected { 
+    position:relative;/*update by lqh IE7*/
+    display:block; 
+    overflow:hidden; overflow-y:auto;
+    width:auto; height:110px; 
+    margin:0 18px 4px; 
+    border:1px solid #ccc; border-top-width:0;
+}
+
+#pane-list-selected .item { 
+    display:inline-block; 
+    *display:inline;
+    *zoom:1;
+    position:relative;
+    width:auto;
+    /*height:18px;*/
+    margin:5px 1px 0 5px; padding:3px 7px 2px; 
+    background-color:#016CBA; 
+    line-height:18px;
+    white-space:nowrap; 
+    color:#fff;
+}
+#pane-list-selected .item .close { 
+    display:none; 
+    position:absolute; top:0; right:0; 
+    width:23px; height:23px;
+    cursor:pointer;
+    background-color:#005d9d;    
+    border-left:1px solid #005d9d;
+    line-height:23px;
+    text-align:center;
+    text-decoration:none;
+    color:#fff;
+}
+#pane-list-selected .item:hover .close { display:block;}
+#pane-list-selected .item .close:hover { background-color:#004D83; border-left-color:#00406C;}
+
+
+.pane-list-toolbar { 
+    display:block; 
+    position:absolute; bottom:0; left:0; 
+    width:100%;
+    height:46px;
+    padding:6px 0 4px; 
+    background-color:#fff;
+    border-top:1px solid #ccc; 
+    text-align:right;
+}
+.pane-list-toolbar .btn { margin-right:18px;}
+
+/*#btn-submit{background:url(../image/frame/true.gif) no-repeat; width:60px; height:23px; padding:0px;}*/
+/*#btn-cancel{background:url(../image/frame/cancel.gif) no-repeat; width:60px; height:23px;padding:0px;}*/
+/*#btn-submit:hover,#btn-cancel:hover{background-position:0px -23px;}*/

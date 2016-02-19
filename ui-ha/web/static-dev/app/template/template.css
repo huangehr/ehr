@@ -1,0 +1,69 @@
+#dataGrid .u-grid {
+    border: 0;
+}
+
+#dataGrid .u-grid .grid-body tr:not(.jqgfirstrow) {
+    height: 40px;
+    font-size: 12px;
+    text-align: center;
+}
+.modal-header{background-color:#2d9bd2;}
+.modal-body .table tr td{border: solid 0;padding: 5px;}
+.modal-body td label{float: right;font-family: SimSun;font-size: 12px;}
+.modal-body textarea{height: 600px;width: 500px;background-color: #edf6fa!important;border: solid 0;}
+.modal-body .table input{
+    font-family: SimSun;
+    font-size: 12px;
+    height: 30px;
+    width: 240px;
+}
+.modal-body .table select{
+    font-family: SimSun;
+    font-size: 12px;
+    height: 30px;
+    width: 240px;
+}
+.modal-body .table input[disabled] {
+    color: #848484!important;
+    background-color: #edf6fa!important;
+    border: solid 0;
+}
+.modal-footer {
+    border-top: 0;
+    background-color:#fff;
+}
+.index-second{
+    z-index: 1052;
+}
+.version{
+    margin-right: 20px;margin-top: -40px;
+}
+.condition{
+    border-top: 1px solid #d3d3d3;
+}
+.condition input{
+    font-family: SimSun;
+    font-size: 12px;
+    height: 30px;
+    width: 240px;
+}
+.image-search{
+    margin-left:210px;
+    margin-top: -25px;
+    width: 20px;
+    height: 20px;
+    background: url(../../images/Search_btn.png);
+}
+.image-search:hover{
+    margin-left:210px;
+    margin-top: -25px;
+    width: 20px;
+    height: 20px;
+    background: url(../../images/Search_btn_pre.png);
+}
+.condition button{
+    width: 84px;
+}
+.modal-footer button {
+    width: 84px;
+}

@@ -2,21 +2,24 @@ package com.yihu.ehr.dict.controller;
 
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.constants.PageArg;
-import com.yihu.ehr.dict.service.*;
+import com.yihu.ehr.dict.service.SystemDict;
+import com.yihu.ehr.dict.service.SystemDictService;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.dict.MSystemDict;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by linaz on 2015/8/12.
@@ -33,21 +36,29 @@ public class SystemDictController extends BaseRestController {
     public Collection<MSystemDict> getDictionaries(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "sorts", value = "排序", defaultValue = "")
             @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "size", value = "分页大小", defaultValue = PageArg.DefaultSizeS)
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) Integer size,
-            @ApiParam(name = "page", value = "页码", defaultValue = PageArg.DefaultPageS)
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) Integer page,
             HttpServletRequest request,
             HttpServletResponse response) {
         page = reducePage(page);
 
-        Page<SystemDict> dictPage = dictService.getDictList(sorts, page, size);
+        if (StringUtils.isEmpty(filters)) {
+            Page<SystemDict> systemDictPage = dictService.getDictList(sorts, page, size);
 
-        pagedResponse(request, response, dictPage.getTotalElements(), page, size);
+            pagedResponse(request, response, systemDictPage.getTotalElements(), page, size);
+            return convertToModels(systemDictPage.getContent(), new ArrayList<>(systemDictPage.getNumber()), MSystemDict.class, fields);
+        } else {
+            List<SystemDict> systemDictList = dictService.search(fields, filters, sorts, page, size);
 
-        return convertToModels(dictPage.getContent(), new ArrayList<>(dictPage.getContent().size()), MSystemDict.class, fields);
+            pagedResponse(request, response, dictService.getCount(filters), page, size);
+            return convertToModels(systemDictList, new ArrayList<>(systemDictList.size()), MSystemDict.class, fields);
+        }
     }
 
     @ApiOperation(value = "创建字典", response = MSystemDict.class)
@@ -76,13 +87,13 @@ public class SystemDictController extends BaseRestController {
     }
 
     @ApiOperation(value = "更新字典")
-    @RequestMapping(value = "/dictionaries/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/dictionaries", method = RequestMethod.PUT)
     public MSystemDict updateDictionary(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
             @RequestParam(value = "dictionary") String dictJson) {
         SystemDict dict = toEntity(dictJson, SystemDict.class);
         if (null == dictService.retrieve(dict.getId())) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
-        if (!dictService.retrieve(dict.getId()).equals(dict.getName()) && dictService.isDictNameExists(dict.getName())){
+        if (!dictService.retrieve(dict.getId()).equals(dict.getName()) && dictService.isDictNameExists(dict.getName())) {
             throw new ApiException(ErrorCode.InvalidUpdateSysDict, "字典名称已存在");
         }
 
@@ -93,32 +104,10 @@ public class SystemDictController extends BaseRestController {
 
     @ApiOperation(value = "删除字典")
     @RequestMapping(value = "/dictionaries/{id}", method = RequestMethod.DELETE)
-    public void deleteDictionary(
+    public Object deleteDictionary(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "id") long id) {
+            @PathVariable(value = "id") long id) throws Exception{
         dictService.deleteDict(id);
-    }
-
-    @ApiOperation(value = "搜索字典", response = MSystemDict.class, responseContainer = "List")
-    @RequestMapping(value = "/dictionaries/search", method = RequestMethod.GET)
-    public Collection<MSystemDict> searchDictionaries(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
-            @RequestParam(value = "fields", required = false) String fields,
-            @ApiParam(name = "filters", value = "过滤器", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序", defaultValue = "")
-            @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
-            @RequestParam(value = "size", required = false) Integer size,
-            @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) Integer page,
-            HttpServletRequest request,
-            HttpServletResponse response) {
-        page = reducePage(page);
-
-        List<SystemDict> systemDictList = dictService.search(fields, filters, sorts, page, size);
-        pagedResponse(request, response, dictService.getCount(filters), page, size);
-
-        return convertToModels(systemDictList, new ArrayList<>(systemDictList.size()), MSystemDict.class, fields);
+        return true;
     }
 }
