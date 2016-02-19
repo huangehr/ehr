@@ -13,15 +13,15 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableDiscoveryClient
 @RestController
 @EnableFeignClients
-public class SvrSecurityApplication implements ApplicationContextAware{
+public class SvrSecurityApplication /*implements ApplicationContextAware*/{
 
 	public static void main(String[] args) {
 		SpringApplication.run(SvrSecurityApplication.class, args);
 	}
 
-	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		//force the bean to get loaded as soon as possible
-		applicationContext.getBean("requestMappingHandlerAdapter");
-	}
+//	@Override
+//	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+//		//force the bean to get loaded as soon as possible
+//		applicationContext.getBean("requestMappingHandlerAdapter");
+//	}
 }

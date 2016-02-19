@@ -67,9 +67,7 @@ public class SystemDictEntryController extends BaseRestController {
         if (systemDictEntryService.isDictContainEntry(entry.getDictId(), entry.getCode())){
             throw new ApiException(ErrorCode.InvalidSysDictEntry, "字典项代码已存在");
         }
-
         int nextSort = systemDictEntryService.getNextSN(entry.getDictId());
-
         entry.setSort(nextSort);
         SystemDictEntry systemDictEntry = new SystemDictEntry();
         systemDictEntry.setSort(nextSort);

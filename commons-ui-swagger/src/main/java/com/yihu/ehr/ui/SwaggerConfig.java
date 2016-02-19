@@ -16,7 +16,7 @@ import static com.google.common.base.Predicates.not;
 import static com.google.common.base.Predicates.or;
 import static springfox.documentation.builders.PathSelectors.regex;
 
-@Configuration
+//@Configuration
 @EnableSwagger2
 @ComponentScan("com.yihu.ehr.*.controller")
 public class SwaggerConfig extends WebMvcConfigurerAdapter {

@@ -1,13 +1,11 @@
 package com.yihu.ehr.apps.controller;
 
-import com.yihu.ehr.apps.feign.ConventionalDictClient;
 import com.yihu.ehr.apps.service.App;
 import com.yihu.ehr.apps.service.AppService;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.app.MApp;
-import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,8 +32,6 @@ public class AppController extends BaseRestController {
     @Autowired
     private AppService appService;
 
-    @Autowired
-    private ConventionalDictClient conventionalDictClient;
 
     @RequestMapping(value = "/apps", method = RequestMethod.GET)
     @ApiOperation(value = "获取App列表")
@@ -67,9 +63,7 @@ public class AppController extends BaseRestController {
             @RequestParam(value = "app", required = false) String appJson) throws Exception {
         App app = toEntity(appJson, App.class);
         if(appService.isAppNameExists(app.getName())) throw new ApiException(ErrorCode.InvalidAppRegister, "应用程序名称已存在");
-
         app = appService.createApp(app);
-
         return convertToModel(app, MApp.class);
     }
 
@@ -82,7 +76,7 @@ public class AppController extends BaseRestController {
         return convertToModel(app, MApp.class);
     }
 
-    @RequestMapping(value = "/apps/{app_id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/apps", method = RequestMethod.PUT)
     @ApiOperation(value = "更新App")
     public MApp updateApp(
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true)
@@ -109,9 +103,9 @@ public class AppController extends BaseRestController {
 
     @RequestMapping(value = "/apps/search", method = RequestMethod.GET)
     @ApiOperation(value = "获取App列表")
-    public Collection<MApp> searchApps(
+    public List<MApp> searchApps(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
-            @RequestParam(value = "fields", required = false) String fields,
+                    @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
@@ -125,6 +119,28 @@ public class AppController extends BaseRestController {
         List<App> appList = appService.search(fields, filters, sorts, page, size);
         pagedResponse(request, response, appService.getCount(filters), page, size);
 
-        return convertToModels(appList, new ArrayList<MApp>(appList.size()), MApp.class, fields);
+        return (List<MApp>)convertToModels(appList, new ArrayList<MApp>(appList.size()), MApp.class, fields);
+    }
+
+
+    @RequestMapping(value = "apps/status" , method = RequestMethod.PUT)
+    @ApiOperation(value = "修改状态")
+    public boolean updateSatus(
+            @ApiParam(name = "app_id", value = "id", defaultValue = "")
+            @RequestParam(value = "app_id") String appId,
+            @ApiParam(name = "status", value = "状态", defaultValue = "")
+            @RequestParam(value = "app_status") String appStatus) throws Exception{
+        appService.checkStatus(appId, appStatus);
+        return true;
+    }
+
+    @RequestMapping(value = "apps/existence/{app_id}" , method = RequestMethod.GET)
+    @ApiOperation(value = "验证")
+    public boolean isAppExistence(
+            @ApiParam(name = "app_id", value = "id", defaultValue = "")
+            @PathVariable(value = "app_id") String appId,
+            @ApiParam(name = "secret", value = "", defaultValue = "")
+            @RequestParam(value = "secret") String secret) throws Exception{
+        return appService.findByIdAndSecret(appId, secret)!=null;
     }
 }

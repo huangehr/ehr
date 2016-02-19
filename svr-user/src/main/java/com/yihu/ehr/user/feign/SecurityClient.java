@@ -15,7 +15,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
 @RequestMapping(value = "/rest/v1.0")
 public interface SecurityClient {
 
-    @RequestMapping(value = "/securities/{login_code}", method = GET )
+    @RequestMapping(value = "/securities/login/{login_code}", method = GET )
     MUserSecurity getUserSecurityByLoginCode(
             @PathVariable(value = "login_code") String loginCode);
 
@@ -27,16 +27,16 @@ public interface SecurityClient {
     void deleteUserKey(
             @PathVariable(value = "user_key_id") String userKeyId);
 
-    @RequestMapping(value = "/securities/{user_id}", method = POST )
+    @RequestMapping(value = "/securities/user/{user_id}", method = POST )
     MUserSecurity createSecurityByUserId(
             @PathVariable(value = "user_id") String userId);
 
-    @RequestMapping(value = "/securities/{user_id}", method = GET )
+    @RequestMapping(value = "/securities/user/{user_id}", method = GET )
     MUserSecurity getUserSecurityByUserId(
             @PathVariable(value = "user_id") String userId);
 
 
-    @RequestMapping(value = "/user_keys/{user_id}", method = GET )
+    @RequestMapping(value = "/user_keys/user/{user_id}", method = GET )
     String getUserKeyByUserId(
             @PathVariable(value = "user_id") String userId);
 

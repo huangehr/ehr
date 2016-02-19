@@ -35,11 +35,14 @@ import java.util.*;
 public class OrganizationController extends BaseRestController {
 
     @Autowired
-    private OrgService orgManagerService;
+    private OrgService orgService;
+    
     @Autowired
-    GeographyClient addressClient;
+    private GeographyClient geographyClient;
+
     @Autowired
-    SecurityClient securityClient;
+    private SecurityClient securityClient;
+
     @Autowired
     private ConventionalDictClient conventionalDictClient;
 
@@ -71,17 +74,17 @@ public class OrganizationController extends BaseRestController {
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
-        List<Organization> organizationList = orgManagerService.search(fields, filters, sorts, page, size);
-        pagedResponse(request, response, orgManagerService.getCount(filters), page, page);
-        List<MOrganization> organizationModels = new ArrayList<>();
-        for(Organization organization:organizationList){
-            MOrganization organizationModel = convertToModel(organization,MOrganization.class);
-            organizationModel.setSettledWay(conventionalDictClient.getSettledWay(organization.getSettledWay()));
-            organizationModel.setOrgType(conventionalDictClient.getOrgType(organization.getOrgType()));
-            organizationModel.setLocation(addressClient.getAddressById(organization.getLocation()));
-            organizationModels.add(organizationModel);
-        }
-        return organizationModels;
+        List<Organization> organizationList = orgService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, orgService.getCount(filters), page, page);
+        return (List<MOrganization>)convertToModels(organizationList, new ArrayList<MOrganization>(organizationList.size()), MOrganization.class, fields);
+//        List<MOrganization> organizationModels = new ArrayList<MOrganization>();
+//        for(Organization organization:organizationList){
+//            MOrganization organizationModel = convertToModel(organization,MOrganization.class);
+//            organizationModel.setSettledWay(conventionalDictClient.getSettledWay(organization.getSettledWay()));
+//            organizationModel.setOrgType(conventionalDictClient.getOrgType(organization.getOrgType()));
+//            organizationModel.setLocation(geographyClient.getAddressById(organization.getLocation()));
+//            organizationModels.add(organizationModel);
+//        }
 
     }
 
@@ -96,30 +99,28 @@ public class OrganizationController extends BaseRestController {
     public boolean deleteOrg(
             @ApiParam(name = "org_code", value = "机构代码", defaultValue = "")
             @PathVariable(value = "org_code") String orgCode) throws Exception{
-        orgManagerService.delete(orgCode);
+        orgService.delete(orgCode);
         return true;
     }
 
 
     /**
      * 创建机构
-     * @param orgModelJsonData
+     * @param orgJsonData
      * @return
      * @throws Exception
      */
     @RequestMapping(value = "/organizations" , method = RequestMethod.POST)
     @ApiOperation(value = "创建机构")
-    public Object create(String orgModelJsonData ) throws Exception{
+    public Object create(String orgJsonData ) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
-        MOrganization orgModel = objectMapper.readValue(orgModelJsonData, MOrganization.class);
-        if(orgManagerService.isExistOrg(orgModel.getOrgCode())){
+        MOrganization orgModel = objectMapper.readValue(orgJsonData, MOrganization.class);
+        if(orgService.isExistOrg(orgModel.getOrgCode())){
             return new ApiErrorEcho(ErrorCode.ExistOrgForCreate, "该机构已存在");
         }
         Organization org = convertToModel(orgModel,Organization.class);
         org.setActivityFlag(1);
-        MGeography location =  orgModel.getLocation();
-        orgManagerService.saveAddress(location);
-        orgManagerService.save(org);
+        orgService.save(org);
         return org;
     }
 
@@ -129,13 +130,11 @@ public class OrganizationController extends BaseRestController {
             String orgModelJsonData ) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
         MOrganization OrganizationModel = objectMapper.readValue(orgModelJsonData, MOrganization.class);
-        if(orgManagerService.isExistOrg(OrganizationModel.getOrgCode())){
+        if(orgService.isExistOrg(OrganizationModel.getOrgCode())){
             return new ApiErrorEcho(ErrorCode.ExistOrgForCreate, "该机构已存在");
         }
         Organization org = convertToModel(OrganizationModel,Organization.class);
-        MGeography location =  OrganizationModel.getLocation();
-        orgManagerService.saveAddress(location);
-        orgManagerService.save(org);
+        orgService.save(org);
         return true;
     }
 
@@ -145,16 +144,16 @@ public class OrganizationController extends BaseRestController {
      * @param orgCode
      * @return
      */
-    @RequestMapping(value = "/organizations", method = RequestMethod.GET)
+    @RequestMapping(value = "/organizations/{org_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据机构代码获取机构")
     public MOrganization getOrg(
             @ApiParam(name = "org_code", value = "机构代码", defaultValue = "")
-            @RequestParam(value = "org_code") String orgCode) throws Exception{
-        Organization org = orgManagerService.getOrg(orgCode);
+            @PathVariable(value = "org_code") String orgCode) throws Exception{
+        Organization org = orgService.getOrg(orgCode);
         MOrganization orgModel = convertToModel(org,MOrganization.class);
-        orgModel.setOrgType(conventionalDictClient.getOrgType(org.getOrgType()));
-        orgModel.setSettledWay(conventionalDictClient.getSettledWay(org.getSettledWay()));
-        orgModel.setLocation(addressClient.getAddressById(org.getLocation()));
+//        orgModel.setOrgType(conventionalDictClient.getOrgType(org.getOrgType()));
+//        orgModel.setSettledWay(conventionalDictClient.getSettledWay(org.getSettledWay()));
+//        orgModel.setLocation(geographyClient.getAddressById(org.getLocation()));
         return orgModel;
     }
 
@@ -164,12 +163,12 @@ public class OrganizationController extends BaseRestController {
      * @param name
      * @return
      */
-    @ApiOperation(value = "根据地名称取机构ids")
+    @ApiOperation(value = "根据地名称取机构编号列表")
     @RequestMapping(value = "/organizations/{name}", method = RequestMethod.GET)
     public List<String> getIdsByName(
             @ApiParam(name = "name", value = "机构名称", defaultValue = "")
             @PathVariable(value = "name") String name) {
-        List<String> ids = orgManagerService.getIdsByName(name);
+        List<String> ids = orgService.getIdsByName(name);
         return ids;
     }
 
@@ -186,13 +185,13 @@ public class OrganizationController extends BaseRestController {
             @PathVariable(value = "org_code") String orgCode,
             @ApiParam(name = "activity_flag", value = "状态", defaultValue = "")
             @PathVariable(value = "activity_flag") int activityFlag) throws Exception{
-        Organization org = orgManagerService.getOrg(orgCode);
+        Organization org = orgService.getOrg(orgCode);
         if("1".equals(activityFlag)){
             org.setActivityFlag(0);
         }else{
             org.setActivityFlag(1);
         }
-        orgManagerService.save(org);
+        orgService.save(org);
         return true;
     }
 
@@ -203,15 +202,17 @@ public class OrganizationController extends BaseRestController {
      * @param city
      * @return
      */
-    @RequestMapping(value = "organizations/{province}/{city}" , method = RequestMethod.GET)
+    @RequestMapping(value = "organizations/{province}/{city}/{district}" , method = RequestMethod.GET)
     @ApiOperation(value = "根据地址获取机构下拉列表")
-    public Collection<MOrganization> getOrgsByAddress(
+    public List<MOrganization> getOrgsByAddress(
             @ApiParam(name = "province", value = "省")
             @PathVariable(value = "province") String province,
             @ApiParam(name = "city", value = "市")
-            @PathVariable(value = "city") String city) {
-        List<Organization> orgList = orgManagerService.searchByAddress(province,city,"");
-        return convertToModels(orgList, new ArrayList<MOrganization>(orgList.size()), MOrganization.class,null);
+            @PathVariable(value = "city") String city,
+            @ApiParam(name = "district", value = "市")
+            @PathVariable(value = "district") String district) {
+        List<Organization> orgList = orgService.searchByAddress(province,city,district);
+        return (List<MOrganization>)convertToModels(orgList, new ArrayList<MOrganization>(orgList.size()), MOrganization.class,null);
     }
 
     @RequestMapping( value = "organizations/key" , method = RequestMethod.POST)

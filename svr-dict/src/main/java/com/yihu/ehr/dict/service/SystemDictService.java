@@ -35,7 +35,6 @@ public class SystemDictService extends BaseJpaService<SystemDict, XSystemDictRep
     public SystemDict createDict(SystemDict dict) {
         dict.setCreateDate(new Date());
         dict.setName(dict.getName());
-
         dictRepo.save(dict);
 
         return dict;
@@ -58,5 +57,10 @@ public class SystemDictService extends BaseJpaService<SystemDict, XSystemDictRep
 
     public Page<SystemDict> searchDict(String name, String phoneticCode, int page, int size) {
         return dictRepo.findByNameOrPhoneticCodeOrderByNameAsc(name, phoneticCode, new PageRequest(page, size));
+    }
+
+    public long getNextId() {
+        long id = dictRepo.getNextId()+1;
+        return id;
     }
 }

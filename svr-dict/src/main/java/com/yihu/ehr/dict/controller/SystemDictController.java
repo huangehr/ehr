@@ -30,7 +30,7 @@ public class SystemDictController extends BaseRestController {
 
     @ApiOperation(value = "获取字典列表", response = MSystemDict.class, responseContainer = "List")
     @RequestMapping(value = "/dictionaries", method = RequestMethod.GET)
-    private Collection<MSystemDict> getDictionaries(
+    public Collection<MSystemDict> getDictionaries(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "sorts", value = "排序", defaultValue = "")
@@ -50,22 +50,21 @@ public class SystemDictController extends BaseRestController {
         return convertToModels(dictPage.getContent(), new ArrayList<>(dictPage.getContent().size()), MSystemDict.class, fields);
     }
 
-    @ApiOperation(value = "创建字典", response = MSystemDict.class, produces = "application/json")
+    @ApiOperation(value = "创建字典", response = MSystemDict.class)
     @RequestMapping(value = "/dictionaries", method = RequestMethod.POST)
     public MSystemDict createDictionary(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
             @RequestParam(value = "dictionary") String dictJson) {
         SystemDict dict = toEntity(dictJson, SystemDict.class);
-
         if (dictService.isDictNameExists(dict.getName()))
             throw new ApiException(ErrorCode.InvalidCreateSysDict, dict.getName());
-
+        Long id = dictService.getNextId();
+        dict.setId(id);
         SystemDict systemDict = dictService.createDict(dict);
-
         return convertToModel(systemDict, MSystemDict.class, null);
     }
 
-    @ApiOperation(value = "获取字典", response = MSystemDict.class, produces = "application/json")
+    @ApiOperation(value = "获取字典", response = MSystemDict.class)
     @RequestMapping(value = "/dictionaries/{id}", method = RequestMethod.GET)
     public MSystemDict getDictionary(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
@@ -102,7 +101,7 @@ public class SystemDictController extends BaseRestController {
 
     @ApiOperation(value = "搜索字典", response = MSystemDict.class, responseContainer = "List")
     @RequestMapping(value = "/dictionaries/search", method = RequestMethod.GET)
-    private Collection<MSystemDict> searchDictionaries(
+    public Collection<MSystemDict> searchDictionaries(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器", defaultValue = "")

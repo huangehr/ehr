@@ -1,6 +1,7 @@
 package com.yihu.ehr.util.encrypt;
 
 import com.yihu.ehr.util.encode.Base64;
+import com.yihu.ehr.util.encode.HexEncode;
 import com.yihu.ehr.util.log.LogService;
 
 import javax.crypto.Cipher;
@@ -99,7 +100,7 @@ public class RSA {
         Cipher cipher = Cipher.getInstance(KEY_ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, key);
 
-//        return new String(cipher.doFinal(HexEncode.toBytes(data)));
+        //return new String(cipher.doFinal(HexEncode.toBytes(data)));
         return new String(cipher.doFinal(Base64.decode(data)));
     }
 
