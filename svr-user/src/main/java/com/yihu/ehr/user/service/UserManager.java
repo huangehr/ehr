@@ -1,7 +1,6 @@
 package com.yihu.ehr.user.service;
 
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.user.feign.OrgClient;
 import com.yihu.ehr.util.encode.HashUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -9,11 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,91 +85,6 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
             return null;
         }
     }
-
-//    public Integer searchUserInt(Map<String, Object> args) {
-//
-//        Session session = entityManager.unwrap(org.hibernate.Session.class);
-//        String realName = (String) args.get("realName");
-//        String type = (String) args.get("type");
-//        String name = (String) args.get("organization");
-//        List<String> orgIds = new ArrayList<>();
-//        try{
-//            orgIds = organizationClient.getIdsByName(name);
-//        }catch (Exception e){
-//            orgIds.add("null");
-//        }
-//        orgIds = organizationClient.getIdsByName(name);
-//        String hql = "";
-//        if(orgIds.size()>0 && !orgIds.get(0).equals("null")){
-//            hql += "from User where (realName like :realName or  location in (:orgIds) ";
-//
-//        }else{
-//            hql += "from User where realName like :realName ";
-//        }
-//        if (!StringUtils.isEmpty(type)) {
-//            hql += " and userType = :userType";
-//        }
-//        if (!StringUtils.isEmpty(type)) {
-//            hql += " and userType = :userType";
-//        }
-//        Query query = session.createQuery(hql);
-//        query.setString("realName", "%"+realName+"%");
-//        if (orgIds.size()>0) {
-//            query.setParameterList("orgIds", orgIds);
-//        }
-//        if (!StringUtils.isEmpty(type)) {
-//            query.setParameter("userType", type);
-//        }
-//
-//        return query.list().size();
-//    }
-
-
-//    /**
-//     * 根据条件搜索用户.
-//     *
-//     * @param args
-//     */
-//    public List<User> searchUser(Map<String, Object> args) {
-//
-//        Session session = entityManager.unwrap(org.hibernate.Session.class);
-//        String realName = (String) args.get("realName");
-//        String type = (String) args.get("type");
-//        Integer page = (Integer) args.get("page");
-//        Integer pageSize = (Integer) args.get("pageSize");
-//        String organizationName = (String) args.get("organizationName");
-//        List<String> orgIds = new ArrayList<>();
-//        try{
-//            orgIds = organizationClient.getIdsByName(organizationName);
-//        }catch (Exception e){
-//            orgIds.add("null");
-//        }
-//        String hql = "";
-//        if(orgIds.size()>0 && !orgIds.get(0).equals("null")){
-//            hql += "from User where (realName like :realName or  location in (:orgIds) ";
-//
-//        }else{
-//            hql += "from User where realName like :realName ";
-//        }
-//        if (!StringUtils.isEmpty(type)) {
-//            hql += " and userType = :userType";
-//        }
-//        if (!StringUtils.isEmpty(type)) {
-//            hql += " and userType = :userType";
-//        }
-//        Query query = session.createQuery(hql);
-//        query.setString("realName", "%"+realName+"%");
-//        if (orgIds.size()>0 && !orgIds.get(0).equals("null")) {
-//            query.setParameterList("orgIds", orgIds);
-//        }
-//        if (!StringUtils.isEmpty(type)) {
-//            query.setParameter("userType", type);
-//        }
-//        query.setMaxResults(pageSize);
-//        query.setFirstResult((page - 1) * pageSize);
-//
-//        return query.list();
-//    }
 
     public User resetPassword(User user){
         user.setPassword(hashPassword(default_password));

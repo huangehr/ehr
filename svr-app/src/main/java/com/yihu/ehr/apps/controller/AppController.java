@@ -1,6 +1,5 @@
 package com.yihu.ehr.apps.controller;
 
-import com.yihu.ehr.apps.feign.ConventionalDictClient;
 import com.yihu.ehr.apps.service.App;
 import com.yihu.ehr.apps.service.AppService;
 import com.yihu.ehr.constants.ApiVersionPrefix;
@@ -33,6 +32,7 @@ import java.util.List;
 public class AppController extends BaseRestController {
     @Autowired
     private AppService appService;
+
 
     @RequestMapping(value = "/apps", method = RequestMethod.GET)
     @ApiOperation(value = "获取App列表")
@@ -76,9 +76,7 @@ public class AppController extends BaseRestController {
             @RequestParam(value = "app", required = false) String appJson) throws Exception {
         App app = toEntity(appJson, App.class);
         if(appService.isAppNameExists(app.getName())) throw new ApiException(ErrorCode.InvalidAppRegister, "应用程序名称已存在");
-
         app = appService.createApp(app);
-
         return convertToModel(app, MApp.class);
     }
 
@@ -114,5 +112,27 @@ public class AppController extends BaseRestController {
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
             @PathVariable(value = "app_id") String appId) throws Exception {
         appService.delete(appId);
+    }
+
+
+    @RequestMapping(value = "apps/status" , method = RequestMethod.PUT)
+    @ApiOperation(value = "修改状态")
+    public boolean updateSatus(
+            @ApiParam(name = "app_id", value = "id", defaultValue = "")
+            @RequestParam(value = "app_id") String appId,
+            @ApiParam(name = "status", value = "状态", defaultValue = "")
+            @RequestParam(value = "app_status") String appStatus) throws Exception{
+        appService.checkStatus(appId, appStatus);
+        return true;
+    }
+
+    @RequestMapping(value = "apps/existence/{app_id}" , method = RequestMethod.GET)
+    @ApiOperation(value = "验证")
+    public boolean isAppExistence(
+            @ApiParam(name = "app_id", value = "id", defaultValue = "")
+            @PathVariable(value = "app_id") String appId,
+            @ApiParam(name = "secret", value = "", defaultValue = "")
+            @RequestParam(value = "secret") String secret) throws Exception{
+        return appService.findByIdAndSecret(appId, secret)!=null;
     }
 }

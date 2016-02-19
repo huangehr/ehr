@@ -1,6 +1,7 @@
 package com.yihu.ehr.dict.service;
 
 
+import com.yihu.ehr.util.ObjectVersion;
 import com.yihu.ehr.util.PinyinUtil;
 
 import javax.persistence.*;
@@ -22,7 +23,8 @@ public class SystemDict {
     String phoneticCode;
     Date createDate = new Date();
 
-    SystemDict(){}
+    public SystemDict(){
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
