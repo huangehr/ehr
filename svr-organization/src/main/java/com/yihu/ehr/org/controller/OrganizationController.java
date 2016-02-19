@@ -2,7 +2,6 @@ package com.yihu.ehr.org.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersionPrefix;
-import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.model.address.MGeography;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MUserSecurity;
@@ -11,7 +10,6 @@ import com.yihu.ehr.org.feign.GeographyClient;
 import com.yihu.ehr.org.feign.SecurityClient;
 import com.yihu.ehr.org.service.OrgService;
 import com.yihu.ehr.org.service.Organization;
-import com.yihu.ehr.util.ApiErrorEcho;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -109,34 +107,36 @@ public class OrganizationController extends BaseRestController {
      */
     @RequestMapping(value = "/organizations" , method = RequestMethod.POST)
     @ApiOperation(value = "创建机构")
-    public Object create(String orgModelJsonData ) throws Exception{
+    public MOrganization create(String orgModelJsonData ) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
         MOrganization orgModel = objectMapper.readValue(orgModelJsonData, MOrganization.class);
-        if(orgManagerService.isExistOrg(orgModel.getOrgCode())){
-            return new ApiErrorEcho(ErrorCode.ExistOrgForCreate, "该机构已存在");
-        }
+//        if(orgManagerService.isExistOrg(orgModel.getOrgCode())){
+//            return new ApiErrorEcho(ErrorCode.ExistOrgForCreate, "该机构已存在");
+//        }
         Organization org = convertToModel(orgModel,Organization.class);
         org.setActivityFlag(1);
         MGeography location =  orgModel.getLocation();
         orgManagerService.saveAddress(location);
         orgManagerService.save(org);
-        return org;
+        orgModel = convertToModel(org, MOrganization.class);
+        return orgModel;
     }
 
     @RequestMapping(value = "organizations" , method = RequestMethod.PUT)
     @ApiOperation(value = "修改机构")
-    public Object update(
+    public MOrganization update(
             String orgModelJsonData ) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
         MOrganization OrganizationModel = objectMapper.readValue(orgModelJsonData, MOrganization.class);
-        if(orgManagerService.isExistOrg(OrganizationModel.getOrgCode())){
-            return new ApiErrorEcho(ErrorCode.ExistOrgForCreate, "该机构已存在");
-        }
+//        if(orgManagerService.isExistOrg(OrganizationModel.getOrgCode())){
+//            return new ApiErrorEcho(ErrorCode.ExistOrgForCreate, "该机构已存在");
+//        }
         Organization org = convertToModel(OrganizationModel,Organization.class);
         MGeography location =  OrganizationModel.getLocation();
         orgManagerService.saveAddress(location);
         orgManagerService.save(org);
-        return true;
+        OrganizationModel = convertToModel(org, MOrganization.class);
+        return OrganizationModel;
     }
 
 
