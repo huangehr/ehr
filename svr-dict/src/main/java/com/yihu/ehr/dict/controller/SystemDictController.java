@@ -105,9 +105,10 @@ public class SystemDictController extends BaseRestController {
 
     @ApiOperation(value = "删除字典")
     @RequestMapping(value = "/dictionaries/{id}", method = RequestMethod.DELETE)
-    public void deleteDictionary(
+    public Object deleteDictionary(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "id") long id) {
+            @PathVariable(value = "id") long id) throws Exception{
         dictService.deleteDict(id);
+        return true;
     }
 }

@@ -98,21 +98,22 @@ public class SystemDictEntryController extends BaseRestController {
 
     @ApiOperation(value = "删除字典项")
     @RequestMapping(value = "/dictionaries/{dict_id}/entries/{code}", method = RequestMethod.DELETE)
-    public void deleteDictEntry(
+    public Object deleteDictEntry(
             @ApiParam(name = "dict_id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "dict_id") long dictId,
             @ApiParam(name = "code", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "code") String code) {
-        SystemDict systemDict = dictService.retrieve(dictId);
-        if (systemDict == null) {
-            return;
-        }
-
-        if (!systemDictEntryService.isDictContainEntry(dictId, code)) {
-            return;
-        }
+            @PathVariable(value = "code") String code) throws Exception{
+//        SystemDict systemDict = dictService.retrieve(dictId);
+//        if (systemDict == null) {
+//            return;
+//        }
+//
+//        if (!systemDictEntryService.isDictContainEntry(dictId, code)) {
+//            return;
+//        }
 
         systemDictEntryService.deleteDictEntry(dictId, code);
+        return true;
     }
 
     @ApiOperation(value = "修改字典项")
