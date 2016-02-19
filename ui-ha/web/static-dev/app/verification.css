@@ -1,0 +1,44 @@
+.m-verify { position: absolute; width: 100%; height:100%;}
+.m-verify .box { position: absolute; left: 50%; top: 295px; width: 560px; height: 286px;  margin-left: -280px; z-index: 1;}
+.m-verify .box-form { height: 180px; margin-left: 118px;}
+.m-verify .confirm-btn{ position: absolute; left: 0; bottom: 15px; width: 100%; text-align: center; }
+.m-verify .confirm-btn .btn { width: 145px; border-radius: 4px; background: #2d9bd2; color:#FFFFFF}
+
+.f-icon-vbg { background: url(../images/login_bg.jpg) 50% 0px no-repeat; }
+.f-icon-vbbg { background: url(../images/pas_btn_bg.png) 5px 5px no-repeat; }
+.f-icon-bb { position: absolute; top: 545px; width:100%; height: 59px; }
+.f-icon-bbp { background: url(../images/login_Projection.png) center no-repeat;}
+.f-icon-step1 { background: url(../images/schedule01.png) center no-repeat;}
+.f-icon-step2 { background: url(../images/schedule02.png) center no-repeat;}
+.f-icon-step3 { background: url(../images/schedule03.png) center no-repeat;}
+
+#step { height: 85px; padding-top: 60px; padding-left: 80px;}
+#step .gap { margin-left: 122px; }
+#step1-form .user-valid { width: 240px; }
+#step1-form .user-valid .form-control { width: 190px;}
+
+#step1-form .row { margin: 10px 0 0 0; }
+#step2-form .row { margin: 5px 0 0 0; }
+#step3-form .row {margin-right: -15px; margin-left: 125px;   margin-top: 20px;}
+#step1-form .form-group { margin-left: -5px; }
+#step1-form .btn { height: 30px; }
+#step1-form .input-group-btn { margin-left: -5px; }
+#step1-form .btn { padding: 4px 6px; border-radius: 0; }
+#step1-form .input-group-btn > .btn { width: 50px; padding: 4px 2px;}
+#step1-form input.form-control { height: 30px; border-radius: 0; padding: 0 5px;}
+
+#step1-form label {  font-weight: normal; }
+#step2-form label {  font-weight: normal; }
+#step1-form .message { margin-left: 61px; line-height: 25px; }
+#step2-form { display: none; }
+#step3-form { display: none; }
+#step2-form .form-control{  width: 240px;height: 30px; margin-bottom: 10px; padding-left: 5px; border-radius: 0;}
+
+#updatepass{  margin-top: 10px; margin-left: 125px;}
+#code { width: 120px; }
+#m_msg{color:red;  margin-left: 65px;}
+#Create_newPwd { width: 240px; }
+
+#code-btn { width: 110px; margin-left: 3px; background: #4bb941; color:#FFFFFF}
+/* 覆盖validate验证时的消息提示样式 */
+#login-form .has-erro label.error { display: none !important; }
