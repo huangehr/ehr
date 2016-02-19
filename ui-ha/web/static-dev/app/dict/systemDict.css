@@ -1,0 +1,52 @@
+.left-gmenu {
+    width:400px;
+    border: 1px solid #d3d3d3;
+    border-left:0 ;
+    border-bottom: 0;
+    margin-left: 0;
+}
+.right-gmenu{
+    top:53px;
+    position: absolute;
+    border: 1px solid #d3d3d3;
+    border-right:0 ;
+    border-bottom: 0;
+    margin-left: 420px;
+}
+.left-gmenu .u-grid,
+.right-gmenu .u-grid{
+    border: 0;
+}
+.left-gmenu .u-grid .grid-body tr:not(.jqgfirstrow) { height: 40px; font-size: 12px; text-align: center; }
+.right-gmenu .u-grid .grid-body tr:not(.jqgfirstrow) { height: 40px; font-size: 12px; text-align: center; }
+input {
+    font-family: SimSun;
+    font-size: 14px;
+    height: 30px;
+    width: 240px;
+}
+.msg-modal {
+    border-radius: 2px;
+}
+
+.msg-dialog {
+    width: 322px;
+}
+
+.msg-body {
+    height: 116px;
+}
+.modal-header {
+    background-color: #2d9bd2;
+    height: 40px;
+}
+.modal-footer button {
+    width: 84px;
+}
+.modal-footer {
+    border-top: 0;
+    background-color:#fff;
+}
+#conditionArea button {
+    width: 84px;
+}

@@ -2,7 +2,6 @@ package com.yihu.ehr.dict.controller;
 
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.constants.PageArg;
 import com.yihu.ehr.dict.service.*;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
@@ -62,7 +61,7 @@ public class SystemDictEntryController extends BaseRestController {
     }
 
     @ApiOperation(value = "创建字典项")
-    @RequestMapping(value = "/dictionaries/{dict_id}/entries", method = RequestMethod.POST)
+    @RequestMapping(value = "/dictionaries/entries", method = RequestMethod.POST)
     public MDictionaryEntry createDictEntry(
             @ApiParam(name = "entry", value = "字典JSON结构")
             @RequestParam(value = "entry") String entryJson) {
@@ -78,11 +77,11 @@ public class SystemDictEntryController extends BaseRestController {
         int nextSort = systemDictEntryService.getNextSN(entry.getDictId());
 
         entry.setSort(nextSort);
-        SystemDictEntry systemDictEntry = new SystemDictEntry();
-        systemDictEntry.setSort(nextSort);
+//        SystemDictEntry systemDictEntry = new SystemDictEntry();
+       // entry.setSort(nextSort);
         systemDictEntryService.createDictEntry(entry);
 
-        return convertToModel(systemDictEntry, MDictionaryEntry.class, null);
+        return convertToModel(entry, MDictionaryEntry.class, null);
     }
 
     @ApiOperation(value = "获取字典项")
@@ -99,25 +98,26 @@ public class SystemDictEntryController extends BaseRestController {
 
     @ApiOperation(value = "删除字典项")
     @RequestMapping(value = "/dictionaries/{dict_id}/entries/{code}", method = RequestMethod.DELETE)
-    public void deleteDictEntry(
+    public Object deleteDictEntry(
             @ApiParam(name = "dict_id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "dict_id") long dictId,
             @ApiParam(name = "code", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "code") String code) {
-        SystemDict systemDict = dictService.retrieve(dictId);
-        if (systemDict == null) {
-            return;
-        }
-
-        if (!systemDictEntryService.isDictContainEntry(dictId, code)) {
-            return;
-        }
+            @PathVariable(value = "code") String code) throws Exception{
+//        SystemDict systemDict = dictService.retrieve(dictId);
+//        if (systemDict == null) {
+//            return;
+//        }
+//
+//        if (!systemDictEntryService.isDictContainEntry(dictId, code)) {
+//            return;
+//        }
 
         systemDictEntryService.deleteDictEntry(dictId, code);
+        return true;
     }
 
     @ApiOperation(value = "修改字典项")
-    @RequestMapping(value = "/dictionaries/{dict_id}/entries/{code}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/dictionaries/entries", method = RequestMethod.PUT)
     public MDictionaryEntry updateDictEntry(
             @ApiParam(name = "entry", value = "字典JSON结构")
             @RequestParam(value = "entry") String entryJson) {

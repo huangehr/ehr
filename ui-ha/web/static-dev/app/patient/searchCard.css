@@ -1,0 +1,20 @@
+.search-card-header{ border: 1px solid #d3d3d3; height: 74px;width: 572px;margin-left: 0;border-bottom: 0;}
+.search-card-header .search-card-title{ margin-top: -10px;font-size: 12px;}
+.search-card-header .search-card-type{ width: 130px;}
+.attach-card-modal{ z-index: 1052;}
+.search-card-table{ height:481px;}
+.J_detailTable .detail-textarea{ height: 170px;width: 240px;color: #848484!important;background-color: #edf6fa!important;border: solid 0;}
+#grid-search-card {
+    border-left: 1px solid #d3d3d3;
+    border-right: 1px solid #d3d3d3;
+    height: 523px;
+    width: 572px
+}
+#grid-search-card .u-grid { width: 570px; overflow: hidden;border: 0;}
+#grid-search-card .u-grid .grid-body tr:not(.jqgfirstrow) { height: 48px; font-size: 12px; text-align: center; }
+#grid-search-card .u-grid .grid-body tr td { white-space: normal }
+#grid-search-card .u-grid .ui-jqgrid .ui-jqgrid-pager .ui-pager-control { height: 50px; }
+#grid-search-card .u-grid .ui-jqgrid .ui-pg-selbox { border: 1px solid #CCC; }
+.search-card-header button {
+    width: 84px;
+}

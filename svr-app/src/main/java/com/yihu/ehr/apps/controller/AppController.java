@@ -7,7 +7,6 @@ import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.app.MApp;
-import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -92,7 +91,7 @@ public class AppController extends BaseRestController {
         return convertToModel(app, MApp.class);
     }
 
-    @RequestMapping(value = "/apps/{app_id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/apps", method = RequestMethod.PUT)
     @ApiOperation(value = "更新App")
     public MApp updateApp(
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true)
