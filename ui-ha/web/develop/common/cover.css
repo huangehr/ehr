@@ -1,0 +1,13 @@
+body {
+    font:12px/1.14 \5b8b\4f53,Sim sun,"宋体";
+    color: #323232;
+}
+
+.validation-failed {border: 1px solid #f09784 !important;}
+.validation-failed[type="radio"],.validation-failed[type="checkbox"] {border:0px; background: none;}
+.validation-failed-span{border:1px solid red; padding: 1px 0px 0px 0px;}
+.validation-advice {color: #FF6666; background-color: white; margin: 0px 0;padding: 0px; margin-left: 5px; vertical-align: middle; color: #CC6666; display: inline; line-height: 35px !important; font: 12px/14px Geneva, "����", Tahoma, sans-serif;}
+.validation-success-advice {color: #FF6666; background-color: white; margin: 0px 0; padding: 0px; margin-left: 5px; vertical-align: middle; color: #CC6666; display: inline; line-height: 35px; font: 12px/14px Geneva, "����", Tahoma, sans-serif;}
+
+a:hover{color: #000000;text-decoration: none;}
+a:focus{color:#ffffff;text-decoration: none;}

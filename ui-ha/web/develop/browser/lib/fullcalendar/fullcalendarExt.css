@@ -1,0 +1,56 @@
+.fc th{
+    height: 30px;
+    vertical-align: middle;
+    border-width:0px;
+    background-color: #D0EAFB;
+}
+
+.fc-ltr .fc-basic-view .fc-day-number{
+    text-align: center;
+    height: 60px;
+    vertical-align: bottom;
+    cursor: pointer;
+}
+
+.fc-fl-bg-active{
+    background-color: #FF6400;
+}
+
+.fc-fl-bg-normal{
+    background-color: #fff;
+}
+
+
+.fixed-table-pagination .pagination, .fixed-table-pagination .pagination-detail{
+    margin-top: 0px!important;
+    margin-bottom: 10px;
+}
+
+.fixed-table-body{
+    /*overflow: hidden!important;*/
+    /*height: auto!important;*/
+}
+/*.fc-row .fc-bg{*/
+    /*z-index: 1000;*/
+/*}*/
+
+/*.fc-row .fc-content-skeleton tbody td, .fc-row .fc-helper-skeleton tbody td{*/
+    /*height: 80px;*/
+    /*vertical-align: top;*/
+/*}*/
+
+/**  add    **/
+.fc-state-select{
+    color: #fff;
+}
+.fc-day-number{
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    font-family: "ËÎÌו";
+}
+.fc-day-header{
+    font-size: 14px;
+    font-weight: bold;
+    font-family: "ËÎÌו";
+}

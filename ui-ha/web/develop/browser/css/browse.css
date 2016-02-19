@@ -1,0 +1,254 @@
+body { font-size: 14px; }
+
+.f-fw980 { width: 980px; }
+.f-fs50 { font-size: 50px; }
+.f-fs18 { font-size: 18px; }
+
+.s-c0 { color: #FFF; }
+.s-c1 { color: #23AFFF; }
+.s-c2 { color: #414141; }
+.s-c3 { color: #5FBE55; }
+.s-c4 { color: #FA8787; }
+.s-c5 { color: #FF6400; }
+.s-c6 { color: #FFC30F; }
+.s-c7 { color: #EE9D34; }
+.s-c8 { color: #A073D2; }
+.s-c9 { color: #8755BE; }
+.s-c10 { color: #69D7DC; }
+.s-c11 { color: #23AFB9; }
+.s-c12 { color: #F57364; }
+.s-c13 { color: #DC4637; }
+.s-c14 { color: #5FBE55; }
+.s-c15 { color: #37A528; }
+.s-c16 { color: #323232; }
+.s-c17 { color: #787878; }
+.s-c18 { color: #E6E6E6; }
+.s-c19 { color: #F5F5F5; }
+.s-c20 { color: #D0EAFB; }
+
+.s-bc0 { background-color: #FFF; }
+.s-bc1 { background-color: #23AFFF; }
+.s-bc2 { background-color: #414141; }
+.s-bc3 { background-color: #5FBE55; }
+.s-bc4 { background-color: #FA8787; }
+.s-bc5 { background-color: #FF6400; }
+.s-bc6 { background-color: #FFC30F; }
+.s-bc7 { background-color: #EE9D34; }
+.s-bc8 { background-color: #A073D2; }
+.s-bc9 { background-color: #8755BE; }
+.s-bc10 { background-color: #69D7DC; }
+.s-bc11 { background-color: #23AFB9; }
+.s-bc12 { background-color: #F57364; }
+.s-bc13 { background-color: #DC4637; }
+.s-bc14 { background-color: #5FBE55; }
+.s-bc15 { background-color: #37A528; }
+.s-bc16 { background-color: #323232; }
+.s-bc17 { background-color: #787878; }
+.s-bc18 { background-color: #E6E6E6; }
+.s-bc19 { background-color: #F5F5F5; }
+.s-bc20 { background-color: #D0EAFB; }
+
+.back:hover{
+    color: #fff;
+}
+.sec-detail{
+    margin: auto;
+    width:980px;
+    background-color: #F5F5F5;
+    padding: 10px;
+    font-size: 12px;
+}
+
+.sec-detail .top{
+    width: 960px;
+    height: 100px;
+    background-color: #FFFFFF;
+    border-radius: 5px;
+}
+.sec-detail .top .local{
+    height: 40px;
+    margin: 0px 10px 0px 10px;
+    border-bottom: 1px solid #E6E6E6;
+}
+.sec-detail .top .local .ico{
+    height: 24px;
+    width: 18px;
+    float: left;
+    margin: 8px 10px 8px 10px;
+    background: url("../imgs/location_icon.png") no-repeat scroll 0 0 transparent;
+}
+.sec-detail .top .local .content{
+    float: left;
+    line-height: 24px;
+    height: 24px;
+    margin: 8px 10px 8px 10px;
+    font-size: 12px;
+    color: #888;
+}
+.sec-detail .top .title{
+    height: 60px;
+}
+
+.sec-detail .top .title .ico{
+    float: left;
+    height: 40px;
+    width: 80px;
+    line-height: 40px;
+    margin: 10px 0px 10px 0px;
+    padding-left: 20px;
+    background: url("../imgs/return_btn.png") no-repeat scroll 0 0 transparent;
+}
+.sec-detail .top .title .content{
+    float: left;
+    line-height: 40px;
+    height: 40px;
+    margin: 10px 10px 10px 10px;
+    font-size: 24px;
+    font-weight: 700;
+    color: #5b5b5b;
+    text-align: center;
+    width: 840px;
+}
+
+.sec-detail .cut-line{
+    height: 10px;
+}
+
+/* bootstrap */
+
+.pagination {
+    display: inline-block;
+    padding-left: 0;
+    margin: 20px 0;
+    border-radius: 4px
+}
+
+.pagination > li {
+    display: inline
+}
+/*   �޸�  */
+.pagination > li > a, .pagination > li > span {
+    position: relative;
+    float: left;
+    padding: 6px 12px;
+    margin-left: -1px;
+    line-height: 1.42857143;
+    /*color: #428bca;*/
+    text-decoration: none;
+    background-color: #fff;
+    /*border: 1px solid #ddd*/
+    width: 40px;
+    font-size: 14px;
+    font-weight: 700;
+    color: black;
+}
+/*   �޸�  */
+.pagination > li:first-child > a, .pagination > li:first-child > span {
+    margin-left: 0;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px
+}
+
+.pagination > li:last-child > a, .pagination > li:last-child > span {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px
+}
+
+.pagination > li > a:hover, .pagination > li > span:hover, .pagination > li > a:focus, .pagination > li > span:focus {
+    color: #2a6496;
+    background-color: #eee;
+    border-color: #ddd
+}
+
+.pagination > .active > a, .pagination > .active > span, .pagination > .active > a:hover, .pagination > .active > span:hover, .pagination > .active > a:focus, .pagination > .active > span:focus {
+    z-index: 2;
+    color: #fff;
+    cursor: default;
+    background-color: #428bca;
+    border-color: #428bca
+}
+/* �޸� */
+.pagination > .disabled > span, .pagination > .disabled > span:hover, .pagination > .disabled > span:focus, .pagination > .disabled > a, .pagination > .disabled > a:hover, .pagination > .disabled > a:focus {
+    color: #777;
+    cursor: not-allowed;
+    background-color: #fff;
+    border: 1px solid #ddd
+}
+/* �޸� */
+
+/* ���� */
+.pagination > .disabled-nb > span, .pagination > .disabled-nb > span:hover, .pagination > .disabled-nb > span:focus, .pagination > .disabled-nb > a, .pagination > .disabled-nb > a:hover, .pagination > .disabled-nb > a:focus {
+    color: #777;
+    cursor: default;
+    background-color: #fff;
+    /*border: 1px solid #ddd*/
+}
+/* ���� */
+
+.pagination-lg > li > a, .pagination-lg > li > span {
+    padding: 10px 16px;
+    font-size: 18px
+}
+
+.pagination-lg > li:first-child > a, .pagination-lg > li:first-child > span {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px
+}
+
+.pagination-lg > li:last-child > a, .pagination-lg > li:last-child > span {
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px
+}
+
+.pagination-sm > li > a, .pagination-sm > li > span {
+    padding: 5px 10px;
+    font-size: 12px
+}
+
+.pagination-sm > li:first-child > a, .pagination-sm > li:first-child > span {
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px
+}
+
+.pagination-sm > li:last-child > a, .pagination-sm > li:last-child > span {
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px
+}
+
+.pager {
+    padding-left: 0;
+    margin: 20px 0;
+    text-align: center;
+    list-style: none
+}
+
+.pager li {
+    display: inline
+}
+
+.pager li > a, .pager li > span {
+    display: inline-block;
+    padding: 5px 14px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 15px
+}
+
+.pager li > a:hover, .pager li > a:focus {
+    text-decoration: none;
+    background-color: #eee
+}
+
+.pager .next > a, .pager .next > span {
+    float: right
+}
+
+.pager .previous > a, .pager .previous > span {
+    float: left
+}
+
+.pager .disabled > a, .pager .disabled > a:hover, .pager .disabled > a:focus, .pager .disabled > span {
+    color: #777;
+    cursor: not-allowed;
+    background-color: #fff
+}

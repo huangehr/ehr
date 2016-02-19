@@ -12,7 +12,7 @@
        http://www.springframework.org/schema/context/spring-context.xsd">
 
     <!--业务Beans, 使用注解方式配置-->
-    <context:component-scan base-package="com.yihu.ha">
+    <context:component-scan base-package="com.yihu.ehr">
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
     </context:component-scan>
 
