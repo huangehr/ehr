@@ -7,6 +7,7 @@
 ---------------------
 
 此文档描述健康档案网关接收档案的业务逻辑，包括标准档案，非结构化档案及轻量级档案，各种档案接收后的处理有所不同，在传递档案的时候请根据具体的档案类型提供相应的档案包。
+客户端需要根据业务场景，构建相应的JSON包再提交给健康档案平台。
 
 API规范参见：[API规范](../../specification/index.html)
 
@@ -52,7 +53,6 @@ API规范参见：[API规范](../../specification/index.html)
           "HDSD00_01_010": null,
           "HDSD00_01_008": "0",
           "HDSD00_01_009": null,
-          "PATIENT_ID": "10295514",
           "HDSB05_02_009": "未婚",
           "HDSD00_12_166": "1",
           "HDSD00_01_007": "郸城县特种合金厂<411625000319>",
@@ -99,9 +99,12 @@ API规范参见：[API规范](../../specification/index.html)
 		"create_date": "2015-12-11 14:46:20",
 		"event_time": "2015-09-30 10:08:01",
 		"resource": {
-			"url": "/api/v1.0/archives/patient/HDSC01_02/11644159/1001271179", //档案请求路径
+			//档案请求路径
+			"url": "/api/v1.0/archives/patient/HDSC01_02/11644159/1001271179",
+			
+			//过期时间
 			"expiry_date": {
-				"$date": 1450075583469					   //过期时间（时间格式再定）
+				"$date": 1450075583469					   
 			}
 		}
 	}
@@ -125,23 +128,44 @@ API规范参见：[API规范](../../specification/index.html)
 		"event_no": "1001271179",
 		"org_code": "test001",
 		"inner_version": 000000000000,
-		"visit_type": "outpatient",		//就诊类型 （门诊或住院）
+		
+		//就诊类型 （门诊或住院）
+		"visit_type": "outpatient",		
 		"event_time": "2015-09-30 10:08:01",
+		
+		//档案请求路径
 		"resource": {
-			"url": "/api/v1.0/archives/patient/HDSC01_02/11644159/1001271179", //档案请求路径
+			"url": "/api/v1.0/archives/patient/HDSC01_02/11644159/1001271179", 
+			
+			//过期时间
 			"expiry_date": {
-				"$date": 1450075583469					   //过期时间（时间格式再定）
+				"$date": 1450075583469					   
 			}
 		},
 		summary:{
-			"org_code": "test001",		//机构编码	
-			"HDSD03.HDSD03_01_031": "1001305971",	//事件号
-			"HDSC01.HDSD00_01_560": null,		//就诊机构
-			"HDSD00.JDSC01_02_03" : "119“,		//就诊科室代码
-			"HDSD00.HDSD00_01_561": "病区门诊",	//就诊科室名称
-			"HDSD00.HDSD00_01_457": "2015-10-05 15:42:05", //就诊/挂号时间
-			"HDSD00.HDSD00_01_550": "11",		//诊断代码
-			"HDSD00.HDSD00_01_549": "癌症"		//诊断名称
+			//机构编码	
+			"org_code": "test001",
+					
+			//事件号
+			"HDSD03.HDSD03_01_031": "1001305971",		
+				
+			//就诊机构
+			"HDSC01.HDSD00_01_560": null,
+			
+			//就诊科室代码"
+			HDSD00.JDSC01_02_03" : "119",
+			
+			//就诊科室名称
+			"HDSD00.HDSD00_01_561": "病区门诊",
+			
+			//事件时间
+			"HDSD00.HDSD00_01_457": "2015-10-05 15:42:05",
+			
+			//诊断代码
+			"HDSD00.HDSD00_01_550": " J18.101 ",
+			
+			//诊断名称
+			"HDSD00.HDSD00_01_549": "大叶性肺炎"
 		}
 	}
 
@@ -159,19 +183,75 @@ API规范参见：[API规范](../../specification/index.html)
 
 以下为当前开放的档案接收接口，后续将会开放更多的接口。
 
-### 档案包
+### 档案包接收
+
+接收第三方应用传送过来的患者健康档案。档案类型包含普通档案包，非结构化档案包与轻量级档案包。
+
+	POST /json_package
+	
+**参数**
+
+<table>
+	<tr>
+		<td>名称</td>
+		<td>类型</td>
+		<td>描述</td>
+	</tr>
+	<tr>
+		<td>package</td>
+		<td>MultipartHttpServletRequest</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>user_name</td>
+		<td>string</td>
+		<td>用户ID</td>
+	</tr>
+	<tr>
+		<td>package_crypto</td>
+		<td>string</td>
+		<td>档案包密码，使用公钥加密</td>
+	</tr>
+	<tr>
+		<td>md5</td>
+		<td>string</td>
+		<td>档案包MD5</td>
+	</tr>
+</table>
 
 ### 转诊数据包
 
+接收转诊数据包，转诊数据包格式请按标准档案封装。
 
+	curl /patient/referral/json_package
+	
+**参数**
 
+<table>
+	<tr>
+		<td>名称</td>
+		<td>类型</td>
+		<td>描述</td>
+	</tr>
+	<tr>
+		<td>package</td>
+		<td>MultipartHttpServletRequest</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>user_name</td>
+		<td>string</td>
+		<td>用户ID</td>
+	</tr>
+	<tr>
+		<td>package_crypto</td>
+		<td>string</td>
+		<td>档案包密码，使用公钥加密</td>
+	</tr>
+	<tr>
+		<td>md5</td>
+		<td>string</td>
+		<td>档案包MD5</td>
+	</tr>
+</table>
 
-### 病人注册
-
-## 数据标准
-
-### CDA标准数据下载
-
-### 机构适配数据下载
-
-### CDA展示模板下载

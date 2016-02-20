@@ -33,7 +33,7 @@
 开发教程
 ---------------------
 
-> [认证与鉴权](tutorial/authoritarian/index.html)
+> [授权](tutorial/authoritarian/index.html)
 
 > [数据标准](tutorial/standard/index.html)
 

@@ -1,17 +1,74 @@
-授权与认证
+授权
 ====================
 
 > 作者：温富建，2016.02.18
 
-安全认证分为App认证，用户认证与机构认证，其中App认证需要提供App Key与App Secret，用户认证需要提供用户名与密码，机构认证需要提供机构代码与公钥。
-认证之后服务端会返回一个token，每次调用客户端调用服务端均需要提供此token作为身份依据，
-调用时token的传递方式参见[REST API规范](../../convention/api-specification-rest.html)
-
-App认证
+概述
 ---------------------
 
-用户认证
+平台使用OAuth2作为协议。应用需要提供注册时平台为开发者分配的App Key，App Secret及用户名，获取一个临时Token，每次请求时均需要
+携带此Token，具体规则参见[REST API规范](../../convention/rest-specification.html)。
+
+Web页面授权流程
 ---------------------
 
-机构认证
+非Web页面授权流程
 ---------------------
+
+URL重定向
+---------------------
+
+权限作用域
+---------------------
+
+常见鉴权错误
+---------------------
+
+常见token访问错误
+---------------------
+
+用户权限检查与审核
+---------------------
+
+API列表
+---------------------
+
+### 获取权限列表
+
+	GET /authorizations
+
+### 获取应用权限
+
+	GET /authorizations/:id
+
+### 授权
+
+	POST /authorizations
+	
+### 为应用授权
+
+	PUT /authorizations/clients/:client_id
+	
+### 为应用及指纹授权
+
+	PUT /authorizations/clients/:client_id/:fingerprint
+	
+### 更新授权信息
+
+	PATCH /authorizations/:id
+	
+### 删除授权信息
+
+	DELETE /authorizations/:id
+	
+### 检查权限
+	
+	GET /applications/:client_id/tokens/:access_token
+	
+### 重置权限
+
+	POST /applications/:client_id/tokens/:access_token
+	
+### 删除应用授权信息
+
+	DELETE /applications/:client_id/tokens/:access_token

@@ -12,8 +12,8 @@
 	<artifactId>docs-ehr-gateway</artifactId>
 	<packaging>jar</packaging>
 
-	<name>EHR平台网关文档</name>
-	<description>EHR平台网关文档</description>
+	<name>健康档案开放平台</name>
+	<description>健康档案开放平台</description>
 
 	<properties>
 	</properties>
