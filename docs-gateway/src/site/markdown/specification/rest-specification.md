@@ -315,7 +315,7 @@ Link字段包含一个或多个超媒体链接关系。*rel*可能值如下：
 	</tr>
 </table>
 
-请求频率限制
+请求频率与限制
 ---------------------
 
 对认证过的请求，客户端每个小时的请求频率限制为5000次，对于未认证过的请求，客户端的请求频率限制为60次/小时。未认证的请求与IP绑定而不是与用户名绑定。
@@ -376,7 +376,7 @@ Link字段包含一个或多个超媒体链接关系。*rel*可能值如下：
 
 若想增加未授权的应用请求次数，你需要在查询字段串中传递客户端的App Key与Secret：
 
-	curl -i 'https://api.github.com/users/whatever?client_id=xxxx&client_secret=yyyy'
+	curl -i 'https://ehr.yihu.com/rest/v1/users/whatever?client_id=xxxx&client_secret=yyyy'
     HTTP/1.1 200 OK
     Date: Mon, 01 Jul 2013 17:27:06 GMT
     Status: 200 OK
@@ -386,4 +386,130 @@ Link字段包含一个或多个超媒体链接关系。*rel*可能值如下：
     
 这个方法应该仅用于服务端-服务端的请求，请务必不要泄漏App Secret。
 
- 
+使用User Agent
+---------------------
+
+所有的API都需要在请求头中包含User-Agent。没有User-Agent的请求将被拒绝。请在此字段中使用您的用户名或应用名称。
+这样做可以在出现问题的时候方便联系你们。
+
+例如：
+	
+	User-Agent: Health-Profile-Browser
+	
+如果提供的User-Agent是无效值，你将收到以下错误信息：
+
+	curl -iH 'User-Agent: ' https://ehr.yihu.com/rest/v1/meta
+	
+    HTTP/1.0 403 Forbidden
+    Connection: close
+    Content-Type: text/html
+    
+    Request forbidden by administrative rules.
+    Please make sure your request has a User-Agent header.
+    Check https://ehr.yihu.com/rest for other possible causes.
+    
+条件式请求
+---------------------
+	
+未实现。
+
+跨域资源共享（Cross-Origin Resource Sharing，CORS）
+---------------------
+
+未实现。
+
+JSON-P回调
+---------------------
+
+你可以在GET请求参数中添加?callback参数以将请求结果包装成JSON函数。这种方式经常用在向Web页面中嵌入跨域的平台内容。
+这种请求包含一些内容作为及HTTP头信息作为API返回值。
+
+	curl https://ehr.yihu.com/rest/v1?callback=foo
+    
+    /**/foo({
+      "meta": {
+        "status": 200,
+        "X-RateLimit-Limit": "5000",
+        "X-RateLimit-Remaining": "4966",
+        "X-RateLimit-Reset": "1372700873",
+        "Link": [ // pagination headers and other links
+          ["https://ehr.yihu.com/rest/v1?page=2", {"rel": "next"}]
+        ]
+      },
+      "data": {
+        // the data
+      }
+    })
+    
+你可以编写JavaScript代码处理这种回调结果。以下是一个简单的示例：
+
+	<html>
+    <head>
+    <script type="text/javascript">
+    function foo(response) {
+      var meta = response.meta;
+      var data = response.data;
+      console.log(meta);
+      console.log(data);
+    }
+    
+    var script = document.createElement('script');
+    script.src = 'https://ehr.yihu.com?callback=foo';
+    
+    document.getElementsByTagName('head')[0].appendChild(script);
+    </script>
+    </head>
+    
+    <body>
+      <p>Open up your browser's console.</p>
+    </body>
+    </html>
+    
+所有的响应头内容均与HTTP响应头一致，除了一个：LInk字段。此处的Link字段已经提前为你解析好，并且以*[url, options]*元组作为数组元素。
+
+例如，正常的HTTP响应头中，Link结构如下：
+
+	Link: <url1>; rel="next", <url2>; rel="foo"; bar="baz"
+	
+JSON-P中的Link结构如下：
+
+	{
+      "Link": [
+        [
+          "url1",
+          {
+            "rel": "next"
+          }
+        ],
+        [
+          "url2",
+          {
+            "rel": "foo",
+            "bar": "baz"
+          }
+        ]
+      ]
+    }
+    
+时区
+---------------------
+
+部分API需要提供时间戳参数，部分API会生成含时区的时间戳。我们根据以下规则，优先级从大到小，以获取此类型的API的时区信息：
+
+**显示使用ISO 8601格式的时间戳，即包含时区信息的时间戳**
+
+对于允许显示指定时间戳的API，我们将使用指定的时区。这种时间戳看起像这样：*2014-02-27T15:05:06+01:00*。
+
+**在HTTP请求头中使用Time-Zone参数**
+
+在HTTP请求头中附加Time-Zone参数，其值使用[时区数据库中的名称](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)。
+
+	curl -H "Time-Zone: Asia/Shanghai" -X POST https://ehr.yihu.com/linguist/contents/new_file.md
+
+**使用上一次的时区信息**
+
+如果找不到Time-Zone参数，并且你生成了一个授权请求，我们将使用上次授权用户所在的时区。每次你浏览健康档案的时候都会更新这个值。
+
+**UTC**
+
+如果上述几种情况中均不包含任何时区信息，我们使用UTC作为时区。

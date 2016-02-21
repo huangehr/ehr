@@ -31,18 +31,18 @@
 	</tr>
 	<tr>
 		<td>demographic_id</td>
+		<td>string</td>
 		<td>患者身份证号</td>
-		<td></td>
 	</tr>
 	<tr>
 		<td>from</td>
-		<td>起始日期</td>
-		<td>格式：yyyy-MM-dd</td>
+		<td>string</td>
+		<td>起始日期，格式：yyyy-MM-dd</td>
 	</tr>
 	<tr>
 		<td>to</td>
-		<td>结束日期</td>
-		<td>格式：yyyy-MM-dd</td>
+		<td>string</td>
+		<td>结束日期，格式：yyyy-MM-dd</td>
 	</tr>
 </table>
 
@@ -72,18 +72,18 @@
 	</tr>
 	<tr>
 		<td>demographic_id</td>
+		<td>string</td>
 		<td>患者身份证号</td>
-		<td></td>
 	</tr>
 	<tr>
 		<td>from</td>
-		<td>起始日期</td>
-		<td>格式：yyyy-MM-dd</td>
+		<td>string</td>
+		<td>起始日期，格式：yyyy-MM-dd</td>
 	</tr>
 	<tr>
 		<td>to</td>
-		<td>结束日期</td>
-        <td>格式：yyyy-MM-dd</td>
+		<td>string</td>
+        <td>结束日期，格式：yyyy-MM-dd</td>
 	</tr>
 </table>
 
@@ -130,18 +130,18 @@
 	</tr>
 	<tr>
 		<td>demographic_id</td>
+		<td>string</td>
 		<td>患者身份证号</td>
-		<td></td>
 	</tr>
 	<tr>
 		<td>from</td>
-		<td>起始日期</td>
-		<td>格式：yyyy-MM-dd</td>
+		<td>string</td>
+		<td>起始日期，格式：yyyy-MM-dd</td>
 	</tr>
 	<tr>
 		<td>to</td>
-		<td>结束日期</td>
-		<td>格式：yyyy-MM-dd</td>
+		<td>string</td>
+		<td>结束日期，格式：yyyy-MM-dd</td>
 	</tr>
 </table>
 
