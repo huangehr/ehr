@@ -1,6 +1,10 @@
 package com.yihu.ehr.org.service;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 /**
  * @author Sand
@@ -9,5 +13,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  */
 public interface XOrganizationRepository extends PagingAndSortingRepository<Organization, String> {
 
-
+    @Query("select org from Organization org where org.location in (:geographyIds)")
+    List<Organization> searchByAddress(@RequestParam List<String> geographyIds);
 }

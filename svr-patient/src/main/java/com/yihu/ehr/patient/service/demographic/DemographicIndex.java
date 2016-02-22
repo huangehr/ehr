@@ -2,13 +2,11 @@ package com.yihu.ehr.patient.service.demographic;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.model.address.MGeography;
+import com.yihu.ehr.model.geogrephy.MGeography;
 import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.patient.dao.XDemographicInfoRepository;
 import com.yihu.ehr.patient.feign.GeographyClient;
 import com.yihu.ehr.patient.feign.ConventionalDictClient;
-import com.yihu.ehr.patient.service.demographic.DemographicId;
-import com.yihu.ehr.patient.service.demographic.DemographicInfo;
 import com.yihu.ehr.util.encode.HashUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;

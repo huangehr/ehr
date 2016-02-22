@@ -1,7 +1,6 @@
 package com.yihu.ehr.util.encrypt;
 
 import com.yihu.ehr.util.encode.Base64;
-import com.yihu.ehr.util.encode.HexEncode;
 import com.yihu.ehr.util.log.LogService;
 
 import javax.crypto.Cipher;

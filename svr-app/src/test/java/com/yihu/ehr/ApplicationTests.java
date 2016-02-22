@@ -71,7 +71,7 @@ public class ApplicationTests {
         String sorts = "";
         int size = 10;
         int page = 1;
-        Object result = appController.searchApps(fields,filters,sorts,size,page,null,null);
+        Object result = appController.getApps(fields,filters,sorts,size,page,null,null);
         assertTrue("操作失败！", result != null);
     }
 

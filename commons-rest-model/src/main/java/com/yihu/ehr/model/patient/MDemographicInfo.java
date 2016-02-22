@@ -1,7 +1,6 @@
 package com.yihu.ehr.model.patient;
 
-import com.yihu.ehr.model.address.MGeography;
-import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.model.geogrephy.MGeography;
 
 import java.util.Date;
 
@@ -19,11 +18,11 @@ public class MDemographicInfo {
     private MGeography birthPlace;                    // 出生地
     private MGeography nativePlace;                    // 籍贯
     private String email;                            // 邮箱
-    private MConventionalDict gender;                            // 性别
+    private String gender;                            // 性别
     private String name;                            // 姓名
-    private MConventionalDict martialStatus;            // 婚姻情况
-    private MConventionalDict nation;                            // 民族
-    private MConventionalDict residenceType;            // 户口性质（农村、城镇）
+    private String martialStatus;            // 婚姻情况
+    private String nation;                            // 民族
+    private String residenceType;            // 户口性质（农村、城镇）
     private MGeography workAddress;                    // 工作地址
     private MGeography homeAddress;                    // 家庭地址
     private String password;                        //密码
@@ -74,11 +73,11 @@ public class MDemographicInfo {
         this.email = email;
     }
 
-    public MConventionalDict getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(MConventionalDict gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 
@@ -90,27 +89,27 @@ public class MDemographicInfo {
         this.name = name;
     }
 
-    public MConventionalDict getMartialStatus() {
+    public String getMartialStatus() {
         return martialStatus;
     }
 
-    public void setMartialStatus(MConventionalDict martialStatus) {
+    public void setMartialStatus(String martialStatus) {
         this.martialStatus = martialStatus;
     }
 
-    public MConventionalDict getNation() {
+    public String getNation() {
         return nation;
     }
 
-    public void setNation(MConventionalDict nation) {
+    public void setNation(String nation) {
         this.nation = nation;
     }
 
-    public MConventionalDict getResidenceType() {
+    public String getResidenceType() {
         return residenceType;
     }
 
-    public void setResidenceType(MConventionalDict residenceType) {
+    public void setResidenceType(String residenceType) {
         this.residenceType = residenceType;
     }
 

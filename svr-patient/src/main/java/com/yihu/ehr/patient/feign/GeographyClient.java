@@ -1,7 +1,7 @@
 package com.yihu.ehr.patient.feign;
 
 import com.yihu.ehr.constants.MicroServices;
-import com.yihu.ehr.model.address.MGeography;
+import com.yihu.ehr.model.geogrephy.MGeography;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
