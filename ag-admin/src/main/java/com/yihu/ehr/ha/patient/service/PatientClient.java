@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * Created by AndyCai on 2016/2/16.
@@ -20,7 +21,7 @@ public interface PatientClient {
 
     @RequestMapping(value = "/rest/v1.0/populations",method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询人")
-    Object searchPatient(
+    List<MDemographicInfo> searchPatient(
             @ApiParam(name = "name", value = "姓名", defaultValue = "")
             @RequestParam(value = "name") String name,
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")

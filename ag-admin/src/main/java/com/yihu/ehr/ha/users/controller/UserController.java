@@ -1,5 +1,6 @@
 package com.yihu.ehr.ha.users.controller;
 
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.ha.organization.service.OrganizationClient;
@@ -16,10 +17,12 @@ import com.yihu.ehr.util.operator.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +60,8 @@ public class UserController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page) {
+            @RequestParam(value = "page", required = false) int page,
+            HttpServletResponse response) {
 
         Envelop envelop = new Envelop();
 
@@ -90,8 +94,13 @@ public class UserController {
         }
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(usersModels);
+        envelop.setCurrPage(page);
+        envelop.setPageSize(size);
 
-        //TODO:缺失 获取总条数
+        //TODO:获取总条数
+        String count = response.getHeader(AgAdminConstants.ResourceCount);
+        int totalCount = StringUtils.isNotEmpty(count)?Integer.parseInt(count):0;
+        envelop.setTotalCount(totalCount);
 
         return envelop;
     }
@@ -125,7 +134,7 @@ public class UserController {
         if(!object.toString().equals("true"))
         {
             envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("删除失败!");
+            envelop.setErrorMsg("保存失败!");
         }
         return envelop;
     }

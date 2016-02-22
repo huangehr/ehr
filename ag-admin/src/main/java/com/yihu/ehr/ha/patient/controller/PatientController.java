@@ -1,12 +1,22 @@
 package com.yihu.ehr.ha.patient.controller;
 
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.ha.geography.service.AddressClient;
 import com.yihu.ehr.ha.patient.service.PatientClient;
+import com.yihu.ehr.model.geogrephy.MGeography;
 import com.yihu.ehr.model.patient.MDemographicInfo;
+import com.yihu.ehr.model.patient.UIModels.PatientModel;
+import com.yihu.ehr.util.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by AndyCai on 2016/1/21.
@@ -18,9 +28,12 @@ public class PatientController{
     @Autowired
     private PatientClient patientClient;
 
+    @Autowired
+    private AddressClient addressClient;
+
     @RequestMapping(value = "/populations",method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询人")
-    public Object searchPatient(
+    public Envelop searchPatient(
             @ApiParam(name = "name", value = "姓名", defaultValue = "")
             @RequestParam(value = "name") String name,
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
@@ -34,8 +47,46 @@ public class PatientController{
             @ApiParam(name = "page", value = "当前页", defaultValue = "")
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
-            @RequestParam(value = "rows") Integer rows) throws Exception{
-        return patientClient.searchPatient(name,idCardNo,province,city,district,page,rows);
+            @RequestParam(value = "rows") Integer rows,
+            HttpServletResponse response) throws Exception{
+
+        Envelop envelop = new Envelop();
+
+        List<MDemographicInfo> demographicInfos = patientClient.searchPatient(name,idCardNo,province,city,district,page,rows);
+        List<PatientModel> patients = new ArrayList<>();
+        for(MDemographicInfo patientInfo : demographicInfos)
+        {
+            PatientModel patient = new PatientModel();
+            patient.setIdCardNo(patientInfo.getIdCardNo());
+            patient.setName(patientInfo.getName());
+            //TODO:获取家庭地址信息
+            String homeAddressId = "";//patientInfo.getHomeAddress()
+            MGeography geography = addressClient.getAddressById(homeAddressId);
+            String homeAddress = "";
+            if(geography!=null)
+            {
+                if(StringUtils.isNotEmpty(geography.getProvince())) homeAddress+=geography.getProvince();
+                if(StringUtils.isNotEmpty(geography.getCity()))homeAddress+=geography.getCity();
+                if(StringUtils.isNotEmpty(geography.getDistrict()))homeAddress+=geography.getDistrict();
+                if(StringUtils.isNotEmpty(geography.getTown()))homeAddress+=geography.getTown();
+                if(StringUtils.isNotEmpty(geography.getStreet()))homeAddress+=geography.getStreet();
+                if(StringUtils.isNotEmpty(geography.getExtra()))homeAddress+=geography.getExtra();
+
+            }
+            patient.setAddress(homeAddress);
+            patients.add(patient);
+        }
+
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(patients);
+        envelop.setCurrPage(page);
+        envelop.setPageSize(rows);
+        //TODO:获取总条数
+        String count = response.getHeader(AgAdminConstants.ResourceCount);
+        int totalCount = StringUtils.isNotEmpty(count)?Integer.parseInt(count):0;
+        envelop.setTotalCount(totalCount);
+
+        return envelop;
     }
 
 

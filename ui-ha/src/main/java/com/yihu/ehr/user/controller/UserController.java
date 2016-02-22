@@ -5,7 +5,6 @@ import com.yihu.ehr.constrant.ErrorCode;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.ResourceProperties;
-import com.yihu.ehr.util.controller.BaseController;
 import com.yihu.ehr.util.fastdfs.FastDFSUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

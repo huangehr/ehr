@@ -5,8 +5,6 @@ import com.yihu.ehr.constrant.Result;
 import com.yihu.ehr.log.LogService;
 import com.yihu.ehr.standard.cdaversion.service.CDAVersion;
 import com.yihu.ehr.standard.cdaversion.service.CDAVersionManager;
-import com.yihu.ehr.standard.dict.service.*;
-import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
