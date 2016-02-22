@@ -1,4 +1,4 @@
-授权
+OAuth2授权
 ====================
 
 > 作者：温富建，2016.02.18
@@ -11,8 +11,8 @@
 所有的开发者都需要在应用开发中心中注册成为开发者，并提交应用。成功之后平台会为应用分配一个App Key与Secret，请不要泄漏Secret信息。
 用户可以创建一个仅供个人使用的Token，也可以实现Web页面授权流程以允许其他用户能够对你的应用进行授权。
 
-平台OAuth2实现支持[授权许可代码标准](https://tools.ietf.org/html/rfc6749#section-4.1)。开发者需要实现下文中描述的“Web页面授权流程”，
-并取得Token（平台不支持隐式授权类型）。
+平台OAuth2仅支持[授权许可代码模式](https://tools.ietf.org/html/rfc6749#section-4.1)。开发者需要实现下文中描述的“Web页面授权流程”，
+并取得Token（平台不支持[隐式授权模式](https://tools.ietf.org/html/rfc6749#section-4.2)）。
 
 Web页面授权流程
 ---------------------
@@ -38,7 +38,7 @@ Web页面授权流程
 	<tr>
 		<td>redirect_uri</td>
 		<td>string</td>
-		<td>授权成功之后，将用户重定向到哪里。参见重定向URL</td>
+		<td>授权成功之后，将用户重定向到哪里。参见下文“重定向URL”。</td>
 	</tr>
 	<tr>
 		<td>scope</td>
@@ -53,15 +53,15 @@ Web页面授权流程
 		<td>state</td>
 		<td>string</td>
 		<td>
-			随机串，用于防止XSS攻击。
+			随机串，平台将原样回去。用于防XSS攻击。
 		</td>
 	</tr>
 </table>
 
-**2 将用户引导回你的应用**
+**2 平台将用户重定向回你的应用**
 
 在用户成功对应用授权之后，健康档案平台会用户重定向到你的应用，并在返回参数中添加一个验证码:code及上一步调用时使用的state参数。
-如果state参数不匹配，应用应该取消本次授权过程。
+验证码有效期为10分钟且仅能使用一次。如果state参数不匹配，应用应该取消本次授权过程。
 
 使用验证码获取Token：
 
@@ -111,17 +111,21 @@ Web页面授权流程
 
 默认返回值格式如下：
 
-	access_token=e72e16c7e42f292c6912e7710c838347ae178b4a&scope=user%2Cgist&token_type=bearer
+	access_token=e72e16c7e42f292c6912e7710c838347ae178b4a&scope=user%2Cprofile&token_type=bearer
 	
-其他时候根据情况，返回值格式如下：
+根据请求头的格式，其返回值格式也可能如下：
 
 	Accept: application/json
-	{"access_token":"e72e16c7e42f292c6912e7710c838347ae178b4a", "scope":"repo,gist", "token_type":"bearer"}
+	{
+		"access_token":"e72e16c7e42f292c6912e7710c838347ae178b4a",
+		 "scope":"user,profile",
+		 "token_type":"bearer"
+	}
 	
 	Accept: application/xml
 	<OAuth>
 	  <token_type>bearer</token_type>
-	  <scope>repo,gist</scope>
+	  <scope>user,profile</scope>
 	  <access_token>e72e16c7e42f292c6912e7710c838347ae178b4a</access_token>
 	</OAuth>
 	
@@ -252,7 +256,7 @@ scope属性包含此Token由用户所授权的有效作用域。正常情况下�
 
 	{
       "error": "incorrect_client_credentials",
-      "error_description": "The client_id and/or client_secret passed are incorrect.",
+      "error_description": "The app_key and/or client_secret passed are incorrect.",
       "error_uri": "https://ehr.yihu.com/rest/v1/oauth/#incorrect-client-credentials"
     }
     
@@ -294,10 +298,14 @@ scope属性包含此Token由用户所授权的有效作用域。正常情况下�
 
 用户可以在平台“应用授权设置中心”检查与取消应用授权。你的应用可以通过以下链接集成此审核页面（未完成）：
 
-	https://ehr.yihu.com/settings/connections/applications/:client_id
+	https://ehr.yihu.com/settings/connections/applications/:app_key
 	
 API列表
 ---------------------
+
+你可以使以下API管理OAuth应用，但这些API只能通过[用户名/密码授权](basic-auth.html)模式调用，而不是Token。
+
+若用户启用两阶段授权（未实现），你可能需要多做一些工作才能调用API。
 
 ### 获取权限列表
 
@@ -313,11 +321,11 @@ API列表
 	
 ### 为应用授权
 
-	PUT /authorizations/clients/:client_id
+	PUT /authorizations/clients/:app_key
 	
 ### 为应用及指纹授权
 
-	PUT /authorizations/clients/:client_id/:fingerprint
+	PUT /authorizations/clients/:app_key/:fingerprint
 	
 ### 更新授权信息
 
@@ -329,12 +337,14 @@ API列表
 	
 ### 检查权限
 	
-	GET /applications/:client_id/tokens/:access_token
+	GET /applications/:app_key/tokens/:access_token
 	
-### 刷新权限
+### 更新Token
 
-	POST /applications/:client_id/tokens/:access_token
+你的应用访问的时候，如果服务端提示“Token Expired”，则需要更新
+
+	POST /applications/:app_key/tokens/:access_token
 	
 ### 删除应用授权信息
 
-	DELETE /applications/:client_id/tokens/:access_token
+	DELETE /applications/:app_key/tokens/:access_token

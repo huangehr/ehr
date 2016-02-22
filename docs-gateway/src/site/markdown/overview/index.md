@@ -50,13 +50,3 @@
 
 ![健康档案(EHR)开放平台注册流程](../images/注册流程.jpg)
 
-目录
-------------------
-
-> [约定](convention/index.html)
-
-> [网关](gateway/index.html)
-
-> [数据标准](standard/index.html)
-
-> [API参考](api-reference/index.html)

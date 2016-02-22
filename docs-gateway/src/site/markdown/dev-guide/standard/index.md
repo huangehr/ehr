@@ -29,10 +29,15 @@
 API列表
 ---------------------
 
-## 数据标准
-
 ### CDA标准数据下载
+
+	GET /standard/cda
 
 ### 机构适配数据下载
 
-### CDA展示模板下载
+	GET /org/adaption/
+
+### 机构CDA展示模板下载
+
+	GET	/org/adaption/view
+	

@@ -5,7 +5,7 @@
 
 	https://ds1.yihu.com/rest/
 	
-档案接收与调阅均需要通过安全认证为方可使用，使用前请先通过认证再使用具体的接口参见：[认证与鉴权](../authoritarian/index.html)。
+档案接收与调阅均需要通过安全认证为方可使用，使用前请先通过认证再使用具体的接口参见：[授权](../authoritarian/index.html)。
 
 - [档案接收](receive-profile.html)
 - [档案调阅](request-profile.html)
