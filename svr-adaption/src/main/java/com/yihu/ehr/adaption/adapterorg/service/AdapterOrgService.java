@@ -5,7 +5,7 @@ import com.yihu.ehr.adaption.orgdataset.service.OrgDataSetService;
 import com.yihu.ehr.adaption.orgdict.service.OrgDictService;
 import com.yihu.ehr.adaption.orgdictitem.service.OrgDictItemService;
 import com.yihu.ehr.adaption.orgmetaset.service.OrgMetaDataService;
-import com.yihu.ehr.model.address.MAddress;
+import com.yihu.ehr.model.geogrephy.MAddress;
 import com.yihu.ehr.util.query.BaseService;
 import org.hibernate.Query;
 import org.hibernate.Session;

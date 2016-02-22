@@ -65,14 +65,17 @@ public class OrganizationController {
      */
     @RequestMapping(value = "/organizations" , method = RequestMethod.POST)
     @ApiOperation(value = "创建机构")
-    public Object create(String orgModelJsonData ) throws Exception{
+    public Object create(
+            @ApiParam(name = "orgModelJsonData", value = "机构信息Json", defaultValue = "")
+            @RequestParam(value = "orgModelJsonData", required = false) String orgModelJsonData ) throws Exception{
         return orgClient.create(orgModelJsonData);
     }
 
     @RequestMapping(value = "organizations" , method = RequestMethod.PUT)
     @ApiOperation(value = "修改机构")
     public Object update(
-            String orgModelJsonData ) throws Exception{
+            @ApiParam(name = "orgModelJsonData", value = "机构信息Json", defaultValue = "")
+            @RequestParam(value = "orgModelJsonData", required = false) String orgModelJsonData ) throws Exception{
         return orgClient.update(orgModelJsonData);
     }
 

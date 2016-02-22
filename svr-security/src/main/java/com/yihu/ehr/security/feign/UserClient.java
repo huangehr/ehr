@@ -16,17 +16,15 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @RequestMapping(value = "/rest/v1.0")
 public interface UserClient {
 
-    @RequestMapping(value = "/user", method = GET )
-    MUser getUser(
-            @RequestParam(value = "user_id") String userId);
+    @RequestMapping(value = "users/{user_id}", method = GET )
+    MUser getUser(@PathVariable(value = "user_id") String userId);
 
-    @RequestMapping(value = "/{login_code}", method = GET )
-    MUser getUserByLoginCode(
-            @PathVariable(value = "login_code") String loginCode);
+    @RequestMapping(value = "users/login/{login_code}", method = GET )
+    MUser getUserByLoginCode(@PathVariable(value = "login_code") String loginCode);
 
 
-    @RequestMapping(value = "/login_indetify/{login_code}/{psw}", method = GET )
-    MUser loginIndetification(
+    @RequestMapping(value = "/users/verification/{login_code}", method = GET )
+    MUser loginVerification(
             @PathVariable(value = "login_code") String loginCode,
             @PathVariable(value = "psw") String psw);
 

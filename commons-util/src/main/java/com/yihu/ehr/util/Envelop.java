@@ -22,6 +22,12 @@ public class Envelop implements Serializable{
 
     private boolean successFlg;
 
+    private int pageSize = 10;
+
+    private int currPage;
+
+    private int totalPage;
+
     private int totalCount;
 
     private List detailModelList;
@@ -78,5 +84,34 @@ public class Envelop implements Serializable{
 
     public void setErrorCode(int errorCode) {
         this.errorCode = errorCode;
+    }
+
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    public int getCurrPage() {
+        return currPage;
+    }
+
+    public void setCurrPage(int currPage) {
+        this.currPage = currPage;
+    }
+
+    public int getTotalPage() {
+        if (totalCount % pageSize == 0) {
+            totalPage = totalCount / pageSize;
+        } else {
+            totalPage = totalCount / pageSize + 1;
+        }
+        return totalPage;
+    }
+
+    public void setTotalPage(int totalPage) {
+        this.totalPage = totalPage;
     }
 }

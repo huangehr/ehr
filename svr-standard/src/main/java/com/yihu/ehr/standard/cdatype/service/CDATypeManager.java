@@ -1,0 +1,180 @@
+package com.yihu.ehr.standard.cdatype.service;
+
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @author AndyCai
+ * @version 1.0
+ * @created 11-12月-2015 15:53:02
+ */
+@Transactional
+@Service
+public class CDATypeManager{
+
+    @PersistenceContext
+    private EntityManager entityManager;
+    @Autowired
+    private XcdaTypeRepository xcdaTypeRepository;
+
+    Session currentSession(){
+        return entityManager.unwrap(org.hibernate.Session.class);
+    }
+
+
+    /**
+     * 根据查询条件获取cda类别
+     * @param code
+     * @param name
+     * @return
+     */
+    @Transactional(Transactional.TxType.SUPPORTS)
+    public List<CDAType> getCDATypeListByKey(String code,String name) {
+
+        Session session = currentSession();
+        String strSql = "from CDAType a where 1=1";
+        if (!StringUtils.isEmpty(code)) {
+            strSql += " and a.code like :code";
+        }
+        if (!StringUtils.isEmpty(name)) {
+            strSql += " and a.name like :name";
+        }
+        Query query = session.createQuery(strSql);
+        if (!StringUtils.isEmpty(code)) {
+            query.setString("code", "%" + code + "%");
+        }
+        if (!StringUtils.isEmpty(name)) {
+            query.setString("name", "%" + name + "%");
+        }
+        List<CDAType> listInfo = query.list();
+
+        return listInfo;
+    }
+
+
+    /**
+     * @param info
+     */
+    @Transactional(Transactional.TxType.SUPPORTS)
+    public boolean save(CDAType info) {
+        xcdaTypeRepository.save(info);
+        return true;
+    }
+
+    /**
+     * 根据ID删除类别
+     *
+     * @param ids (批量删除时id以逗号隔开)
+     * @return boolResult 操作结果
+     */
+    public boolean deleteCdaType(String ids) {
+        String[] strIds = ids.split(",");
+        Session session = currentSession();
+        String strSql = "delete CDAType a where a.id in(:strIds)";
+        Query query = session.createQuery(strSql);
+        query.setParameterList("strIds",strIds);
+        query.executeUpdate();
+        return true;
+    }
+
+    /**
+     * 根据id 获取类别信息
+     *
+     * @param ids
+     */
+    public List<CDAType> getCdatypeInfoByIds(String[] ids) {
+        Session session = currentSession();
+        String strSql = "from CDAType a where a.id in(:ids)";
+        Query query = session.createQuery(strSql);
+        query.setParameterList("ids",ids);
+        List<CDAType> listInfo = query.list();
+        return listInfo;
+    }
+    /**
+     * 判断代码是否重复
+     *
+     * @param code
+     */
+    @Transactional(Transactional.TxType.SUPPORTS)
+    public boolean isCodeExist(String code) {
+        List<CDAType> listInfo = null;
+        Session session = currentSession();
+
+        String strSql = "from CDAType a where a.code = :code";
+
+        Query query = session.createQuery(strSql);
+        query.setParameter("code", code);
+
+        return query.list().size()>0;
+    }
+
+    /**
+     * 根据父级ID获取下级类别
+     *
+     * @param strparentId
+     */
+    @Transactional(Transactional.TxType.SUPPORTS)
+    public List<CDAType> getCDATypeListByParentId(String strparentId) {
+        Session session = currentSession();
+        String strSql = "from CDAType a where 1=1";
+        if (strparentId.equals("")) {
+            strSql += " and (a.parentId is null or a.parentId='')";
+        } else {
+            strSql += " and a.parentId =:parent_id";
+        }
+        Query query = session.createQuery(strSql);
+        if (!strparentId.equals("")) {
+            query.setString("parent_id", strparentId);
+        }
+        return query.list();
+    }
+
+    public CDAType getParentTypeById(String configId) {
+        Session session = currentSession();
+        String strSql = "from CDAType a where 1=1 and a.id =(select a.parentId from CDAType a where a.id = '"+configId+"')";
+        Query query = session.createQuery(strSql);
+        List<CDAType> cdaTypeList =  query.list();
+        if(cdaTypeList!=null&&cdaTypeList.size()>0){
+            return cdaTypeList.get(0);
+        }else {
+            return null;
+        }
+    }
+
+    @Transactional(Transactional.TxType.SUPPORTS)
+    public List<CDAType> getParentType(String strId, String strKey) {
+        List<CDAType> listType = null;
+
+        Session session = currentSession();
+
+        String strSql = "from CDAType a where 1=1 ";
+        if (strId != null && !strId.equals("")) {
+            strId="'"+strId.replaceAll(",","','")+"'";
+            strSql += " and a.id not in ("+strId+")";
+        }
+
+        if (strKey != null && !strKey.equals("")) {
+            strSql += " and (a.code like :strkey or a.name like :strkey)";
+        }
+
+        Query query = session.createQuery(strSql);
+
+        if (strKey != null && !strKey.equals("")) {
+            query.setString("strkey", "%" + strKey + "%");
+        }
+
+        listType = query.list();
+        return listType;
+    }
+
+
+}

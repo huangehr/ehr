@@ -30,7 +30,7 @@ public class    App {
     private String description;
 
 	public App(){
-        id  = new ObjectVersion().toString();
+//        id  = new ObjectVersion().toString();
     }
 
     @Id
