@@ -85,7 +85,7 @@ public interface SystemDictClient {
 
     @ApiOperation(value = "删除字典项")
     @RequestMapping(value = "/rest/v1.0/dictionaries/{id}/entries/{code}", method = RequestMethod.DELETE)
-    Object deleteDictEntry(
+    boolean deleteDictEntry(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") long id,
             @ApiParam(name = "code", value = "字典ID", defaultValue = "")
