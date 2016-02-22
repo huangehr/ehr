@@ -22,6 +22,7 @@ public class MOrganization implements Serializable{
     private String createDate;        // 创建日期
     private String location;        // 地址
     private String activityFlag;
+    private String tags;
 
     public MOrganization() {
     }
@@ -40,16 +41,12 @@ public class MOrganization implements Serializable{
         this.admin = admin;
     }
 
-
-
-
     public String getPyCode() {
         return pyCode;
     }
     public void setPyCode(String pyCode) {
         this.pyCode = pyCode;
     }
-
 
     public String getCreateDate() {
         return createDate;
@@ -119,4 +116,11 @@ public class MOrganization implements Serializable{
         this.activityFlag = activityFlag;
     }
 
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
 }
