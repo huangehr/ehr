@@ -41,6 +41,8 @@
 
 > [随访](dev-tutorial/follow.html)
 
+> [康赛项目](dev-tutorial/sanofi.html)
+
 资源下载
 ---------------------
 

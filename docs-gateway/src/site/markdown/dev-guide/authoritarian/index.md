@@ -8,7 +8,8 @@
 
 平台支持两种授权模式：
 
-- [用户名/密码授权](basic-auth.html)
-- [OAuth2授权](oauth2-auth.html)
+> [用户名/密码授权](basic-auth.html)
+
+> [OAuth2授权](oauth2-auth.html)
 
 两种授权模式各用于不同的业务场景。
