@@ -159,7 +159,7 @@ public class UserController extends BaseRestController {
 
     @RequestMapping(value = "/users/binding/{user_id}" , method = RequestMethod.DELETE)
     @ApiOperation(value = "取消关联绑定",notes = "取消相关信息绑定")
-    public Object unBinding (
+    public boolean unBinding (
             @ApiParam(name = "user_id", value = "", defaultValue = "")
             @PathVariable(value = "user_id") String userId,
             @ApiParam(name = "type", value = "", defaultValue = "")
