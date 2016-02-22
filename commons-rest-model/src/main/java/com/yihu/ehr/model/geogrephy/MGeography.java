@@ -1,4 +1,4 @@
-package com.yihu.ehr.model.address;
+package com.yihu.ehr.model.geogrephy;
 
 
 import java.io.Serializable;

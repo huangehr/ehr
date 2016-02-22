@@ -3,7 +3,6 @@ package com.yihu.ehr.org.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.model.address.MGeography;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MUserSecurity;
 import com.yihu.ehr.org.feign.ConventionalDictClient;

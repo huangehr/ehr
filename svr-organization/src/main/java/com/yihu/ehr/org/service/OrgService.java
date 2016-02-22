@@ -1,7 +1,5 @@
 package com.yihu.ehr.org.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.model.address.MGeography;
 import com.yihu.ehr.org.feign.GeographyClient;
 import com.yihu.ehr.query.BaseJpaService;
 import org.hibernate.Query;
@@ -56,12 +54,9 @@ public class OrgService extends BaseJpaService<Organization, XOrganizationReposi
     }
 
     public List<Organization> searchByAddress(String province, String city,String district) {
-        Session session = entityManager.unwrap(org.hibernate.Session.class);
         List<String> geographyIds = geographyClient.search(province,city,district);
-        String hql = "from Organization where location in (:geographyIds)";
-        Query query = session.createQuery(hql);
-        query.setParameterList("geographyIds", geographyIds);
-        return query.list();
+        List<Organization> orgs = organizationRepository.searchByAddress(geographyIds);
+        return orgs;
     }
 
 
