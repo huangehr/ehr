@@ -2,7 +2,7 @@ package com.yihu.ehr;
 
 import com.eureka2.shading.codehaus.jackson.map.ObjectMapper;
 import com.yihu.ehr.geography.controller.GeographyController;
-import com.yihu.ehr.model.address.MGeography;
+import com.yihu.ehr.model.geogrephy.MGeography;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;

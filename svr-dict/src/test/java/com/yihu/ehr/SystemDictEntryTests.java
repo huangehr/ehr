@@ -31,9 +31,10 @@ public class SystemDictEntryTests {
     @Test
     public void atestGetDictionaries() throws Exception {
         long dictId = 2;
+        String code = "Approved";
         int page = 1;
         int size = 10;
-        Object result = systemDictEntryController.getDictEntries(dictId,size,page,null,null);
+        Object result = systemDictEntryController.getDictEntries(dictId,code,size,page,null,null);
         assertTrue("查询失败！", result != null);
     }
 
@@ -79,16 +80,6 @@ public class SystemDictEntryTests {
         String jsonData = new ObjectMapper().writeValueAsString(dictEntry);
         Object result = systemDictEntryController.updateDictEntry(jsonData);
         assertTrue("执行失败！", result != null);
-    }
-
-    @Test
-    public void testGetDictionaries() throws Exception {
-        long dictId = 2;
-        String code = "Approved";
-        int page = 1;
-        int size = 10;
-        Object result = systemDictEntryController.searchDictEntries(dictId,code,size,page,null,null);
-        assertTrue("查询失败！", result != null);
     }
 
 }

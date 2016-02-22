@@ -1,6 +1,6 @@
 package com.yihu.ehr.model.adaption;
 
-import com.yihu.ehr.model.address.MGeography;
+import com.yihu.ehr.model.geogrephy.MGeography;
 
 /**
  * 适配管理映射机构

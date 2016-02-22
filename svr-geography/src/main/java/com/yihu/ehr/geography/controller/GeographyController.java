@@ -6,7 +6,7 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.geography.service.Geography;
 import com.yihu.ehr.geography.service.GeographyService;
-import com.yihu.ehr.model.address.MGeography;
+import com.yihu.ehr.model.geogrephy.MGeography;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -107,10 +107,10 @@ public class GeographyController extends BaseRestController{
     @RequestMapping(value = "/geographies/existence" , method = RequestMethod.GET)
     @ApiOperation(value = "判断是否是个地址")
     public boolean isNullAddress(
-            @ApiParam(name = "geography_model_json_data", value = "地址json字符串")
-            @RequestParam( value = "geography_model_json_data") String geographyModelJsonData) throws Exception{
+            @ApiParam(name = "json_data", value = "地址json字符串")
+            @RequestParam( value = "json_data") String jsonData) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
-        Geography geography = objectMapper.readValue(geographyModelJsonData,Geography.class);
+        Geography geography = objectMapper.readValue(jsonData,Geography.class);
         return addressService.isNullAddress(geography);
     }
 
