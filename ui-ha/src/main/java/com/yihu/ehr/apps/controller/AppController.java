@@ -11,7 +11,6 @@ import com.yihu.ehr.factory.ServiceFactory;
 import com.yihu.ehr.user.model.XUser;
 import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.ResourceProperties;
-import com.yihu.ehr.util.controller.BaseController;
 import com.yihu.ehr.util.log.LogService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
