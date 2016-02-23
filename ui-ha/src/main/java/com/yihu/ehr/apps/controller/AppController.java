@@ -1,17 +1,12 @@
 package com.yihu.ehr.apps.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.apps.model.App;
-import com.yihu.ehrapps.model.XApp;
-import com.yihu.ehr.apps.model.XAppManager;
-import com.yihu.ehr.constrant.*;
-import com.yihu.ehr.dict.model.common.AppStatus;
-import com.yihu.ehr.dict.model.common.XConventionalDictEntry;
-import com.yihu.ehr.factory.ServiceFactory;
-import com.yihu.ehr.user.model.XUser;
+import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.constants.RestAPI;
+import com.yihu.ehr.constants.SessionAttributeKeys;
+import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.ResourceProperties;
-import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.log.LogService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,16 +24,7 @@ import java.util.Map;
 @RequestMapping("/app")
 @Controller(RestAPI.AppManagerController)
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
-public class AppController extends BaseController {
-
-    @Resource(name = Services.AppManager)
-    private XAppManager appManager;
-
-    @Resource(name = Services.ConventionalDictEntry)
-    private XConventionalDictEntry absDictEManage;
-
-    private XApp app;
-
+public class AppController extends BaseRestController {
     private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
     private static   String username = ResourceProperties.getProperty("username");
     private static   String password = ResourceProperties.getProperty("password");
@@ -51,25 +36,11 @@ public class AppController extends BaseController {
         String result ="";
         try {
             //mode定义：new modify view三种模式，新增，修改，查看
-
-            switch (mode) {
-                case "view":
-                case "modify":
-                    String url = "/rest/" + version + "/appcon/app";
-                    Map<String, Object> conditionMap = new HashMap<>();
-                    conditionMap.put("appId", appId);
-                    // appManager.deleteApp(appId);
-                    result = HttpClientUtil.doGet(host + url, conditionMap, username, password);
-                    break;
-                default:
-                    app = new App();
-                    AppStatus appStatus = new AppStatus();
-                    appStatus.setCode("WaitingForApprove");
-                    app.setStatus(appStatus);
-                    ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-                    result = objectMapper.writeValueAsString(app);
-                    break;
-            }
+            String url = "/rest/"+version+"/appcon/app";
+            Map<String, Object> conditionMap = new HashMap<>();
+            conditionMap.put("appId", appId);
+            conditionMap.put("mode", mode);
+            result = HttpClientUtil.doGet(host + url, conditionMap, username, password);
         }
         catch (Exception ex)
         {
@@ -135,20 +106,20 @@ public class AppController extends BaseController {
 
     @RequestMapping("/deleteApp")
     @ResponseBody
-    public String deleteApp(String appId) {
-        Result result = null;
+    public Object deleteApp(String appId) {
+        Envelop result = new Envelop();
         try {
             String url = "/rest/"+version+"/appcon/app";
             Map<String, Object> conditionMap = new HashMap<>();
             conditionMap.put("appId", appId);
            // appManager.deleteApp(appId);
             String _res = HttpClientUtil.doDelete(host + url, conditionMap, username, password);
-            result = getSuccessResult(true);
+            result.setSuccessFlg(true);
         } catch (Exception ex) {
-            result = getSuccessResult(false);
+            result.setSuccessFlg(false);
             LogService.getLogger(AppController.class).error(ex.getMessage());
         }
-        return result.toJson();
+        return result;
     }
 
     @RequestMapping("createApp")
@@ -159,7 +130,7 @@ public class AppController extends BaseController {
                             String description,
                             String tags,
                             @ModelAttribute(SessionAttributeKeys.CurrentUser) XUser user) {
-        Result result = new Result();
+        Envelop result = new Envelop();
 
         try {
             String urlPath = "/rest/" + version + "/appcon/app";
@@ -184,13 +155,13 @@ public class AppController extends BaseController {
         } catch (Exception ex) {
             LogService.getLogger(AppController.class).error(ex.getMessage());
         }
-        return result.toJson();
+        return result;
     }
 
     @RequestMapping("getAppDetail")
     @ResponseBody
-    public String getAppDetail(String appId) {
-        Result result = new Result();
+    public Object getAppDetail(String appId) {
+        Envelop result = new Envelop();
 
         try {
             String url = "/rest/"+version+"/appcon/app";
@@ -208,14 +179,14 @@ public class AppController extends BaseController {
             result.setSuccessFlg(false);
             LogService.getLogger(AppController.class).error(ex.getMessage());
         }
-        return result.toJson();
+        return result;
     }
 
     @RequestMapping("updateApp")
     @ResponseBody
     public Object updateApp(String appId, String name, String catalog, String status, String url, String description, String tags) {
 
-        Result result = new Result();
+        Envelop result = new Envelop();
         try {
             String urlPath = "/rest/" + version + "/appcon/app";
             Map<String, Object> conditionMap = new HashMap<>();
@@ -247,8 +218,8 @@ public class AppController extends BaseController {
 
     @RequestMapping("check")
     @ResponseBody
-    public String check(String appId, String status) {
-        Result result = new Result();
+    public Object check(String appId, String status) {
+        Envelop result = new Envelop();
 
         try {
             String urlPath = "/rest/" + version + "/appcon/check";
@@ -266,7 +237,7 @@ public class AppController extends BaseController {
         } catch (Exception e) {
             result.setSuccessFlg(false);
         }
-        return result.toJson();
+        return result;
     }
 
 }

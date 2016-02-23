@@ -1,23 +1,15 @@
 package com.yihu.ehr.adapter.controller;
 
-import com.yihu.ha.adapter.model.AdapterOrgModel;
-import com.yihu.ha.adapter.model.XAdapterOrgManager;
-import com.yihu.ha.constrant.ErrorCode;
-import com.yihu.ha.constrant.Result;
-import com.yihu.ha.constrant.Services;
-import com.yihu.ha.dict.model.common.XConventionalDictEntry;
-import com.yihu.ha.geography.model.Address;
-import com.yihu.ha.organization.model.XOrgManager;
-import com.yihu.ha.util.HttpClientUtil;
-import com.yihu.ha.util.ResourceProperties;
-import com.yihu.ha.util.controller.BaseController;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.HttpClientUtil;
+import com.yihu.ehr.util.ResourceProperties;
+import com.yihu.ehr.util.controller.BaseRestController;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -29,14 +21,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/adapterorg")
-public class AdapterOrgController extends BaseController {
-    @Resource(name = Services.AdapterOrgManager)
-    private XAdapterOrgManager adapterOrgManager;
-    @Resource(name = Services.OrgManager)
-    private XOrgManager orgManager;
-    @Resource(name = Services.ConventionalDictEntry)
-    private XConventionalDictEntry conventionalDictEntry;
-
+public class AdapterOrgController extends BaseRestController {
     private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
     private static   String username = ResourceProperties.getProperty("username");
     private static   String password = ResourceProperties.getProperty("password");
@@ -56,10 +41,10 @@ public class AdapterOrgController extends BaseController {
     }
 
     @RequestMapping("template/adapterOrgInfo")
-    public String adapterOrgInfoTemplate(Model model, String code, String type, String mode) {
+    public Object adapterOrgInfoTemplate(Model model, String code, String type, String mode) {
         String url = "/adapterOrg/adapterOrg";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("code",code);
 //      params.put("mode",mode);
@@ -79,10 +64,10 @@ public class AdapterOrgController extends BaseController {
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        AdapterOrgModel adapterOrgModel = new AdapterOrgModel();
-//        //mode定义：new modify view三种模式，新增，修改，查�?
+//        //mode定义：new modify view三种模式，新增，修改，查看
 //        if (mode.equals("view") || mode.equals("modify")) {
 //            try {
 //                XAdapterOrg adapterOrg = adapterOrgManager.getAdapterOrg(code);
@@ -117,10 +102,10 @@ public class AdapterOrgController extends BaseController {
     @RequestMapping("searchAdapterOrg")
     @ResponseBody
     //适配采集标准
-    public String searchAdapterOrg(String searchNm, int page, int rows, String type) {
+    public Object searchAdapterOrg(String searchNm, int page, int rows, String type) {
         String url = "/adapterOrg/adapterOrgs";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("code",searchNm);
         params.put("name",searchNm);
@@ -134,7 +119,7 @@ public class AdapterOrgController extends BaseController {
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Map<String, Object> conditionMap = new HashMap<>();
 //        conditionMap.put("key", searchNm);
@@ -168,26 +153,26 @@ public class AdapterOrgController extends BaseController {
     @RequestMapping("getAdapterOrg")
     @ResponseBody
     //获取采集标准
-    public String getAdapterOrg(String code) {
+    public Object getAdapterOrg(String code) {
         String url = "/adapterOrg/adapterOrg";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("code",code);
         try{
             //todo 后台转换成model后传前台
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            ObjectMapper mapper = new ObjectMapper();
-            AdapterOrgModel adapterOrgModel = mapper.readValue(resultStr, AdapterOrgModel.class);
-            Map<String, AdapterOrgModel> data = new HashMap<>();
-            data.put("adapterOrg", adapterOrgModel);
-            result.setObj(data);
+//            ObjectMapper mapper = new ObjectMapper();
+//            AdapterOrgModel adapterOrgModel = mapper.readValue(resultStr, AdapterOrgModel.class);
+//            Map<String, AdapterOrgModel> data = new HashMap<>();
+//            data.put("adapterOrg", adapterOrgModel);
+            result.setObj(resultStr);
             result.setSuccessFlg(true);
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //        try {
@@ -206,17 +191,17 @@ public class AdapterOrgController extends BaseController {
     @RequestMapping("addAdapterOrg")
     @ResponseBody
     //新增采集标准
-    public String addAdapterOrg(AdapterOrgModel adapterOrgModel) {
-        String code = adapterOrgModel.getCode();
-        String name = adapterOrgModel.getName();
-        String description = adapterOrgModel.getDescription();
-        String parent = adapterOrgModel.getParent();
-        String org = adapterOrgModel.getOrg();
-        String type = adapterOrgModel.getType();
-        Address area = adapterOrgModel.getArea();
+    public Object addAdapterOrg(String code,String name,String description,String parent,String org,String type,String area) {
+//        String code = adapterOrgModel.getCode();
+//        String name = adapterOrgModel.getName();
+//        String description = adapterOrgModel.getDescription();
+//        String parent = adapterOrgModel.getParent();
+//        String org = adapterOrgModel.getOrg();
+//        String type = adapterOrgModel.getType();
+//        Address area = adapterOrgModel.getArea();
         String url="";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         try{
             url="/adapterOrg/isAdapterOrgExist";//todo:网关没有该对应的接口
@@ -224,11 +209,11 @@ public class AdapterOrgController extends BaseController {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             if(Boolean.parseBoolean(resultStr)){
                 result.setSuccessFlg(false);
-                result.setErrorMsg("该标准已存在�?");
-                return result.toJson();
+                result.setErrorMsg("该标准已存在！");
+                return result;
             }
 
-            //todo ：网关有orgName属�?�，没有area属�??
+            //todo ：网关有orgName属性，没有area属性
             url="/adapterOrg/addAdapterOrg";
             params.put("name", name);
             params.put("description",description);
@@ -236,17 +221,17 @@ public class AdapterOrgController extends BaseController {
             params.put("orgCode",org);
             params.put("type",type);
             params.put("area",area);
-            //todo 失败，返回的错误信息怎么体现�?
-            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//创建第三方标�?
-            ObjectMapper mapper = new ObjectMapper();
-            AdapterOrgModel adapterOrgModelNew = mapper.readValue(resultStr, AdapterOrgModel.class);
-            result.setObj(adapterOrgModelNew);
+            //todo 失败，返回的错误信息怎么体现？
+            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//创建第三方标准
+//            ObjectMapper mapper = new ObjectMapper();
+//            AdapterOrgModel adapterOrgModelNew = mapper.readValue(resultStr, AdapterOrgModel.class);
+            result.setObj(resultStr);
             result.setSuccessFlg(true);
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //        try {
@@ -276,25 +261,25 @@ public class AdapterOrgController extends BaseController {
     @RequestMapping("updateAdapterOrg")
     @ResponseBody
     //更新采集标准
-    public String updateAdapterOrg(String code, String name, String description) {
+    public Object updateAdapterOrg(String code, String name, String description) {
         String url="/adapterOrg/updateAdapterOrg";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("code",code);
         params.put("name",name);
         params.put("description",description);
         try {
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
-            ObjectMapper mapper = new ObjectMapper();
-            AdapterOrgModel adapterOrgModelNew = mapper.readValue(resultStr, AdapterOrgModel.class);
-            result.setObj(adapterOrgModelNew);
+//            ObjectMapper mapper = new ObjectMapper();
+//            AdapterOrgModel adapterOrgModelNew = mapper.readValue(resultStr, AdapterOrgModel.class);
+            result.setObj(resultStr);
             result.setSuccessFlg(true);
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        try {
 //            XAdapterOrg adapterOrg = adapterOrgManager.getAdapterOrg(code);
@@ -312,13 +297,13 @@ public class AdapterOrgController extends BaseController {
     @RequestMapping("delAdapterOrg")
     @ResponseBody
     //删除采集标准
-    public String delAdapterOrg(String code) {
+    public Object delAdapterOrg(String code) {
         String codeTemp[] = code.split(",");
         List<String> codes = Arrays.asList(codeTemp);
 
         String url = "/adapterOrg/adapterOrg";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("code",codes);
         try {
@@ -330,11 +315,11 @@ public class AdapterOrgController extends BaseController {
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.InvalidDelete.toString());
             }
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        String codeTemp[] = code.split(",");
 //        List<String> codes = Arrays.asList(codeTemp);
@@ -346,25 +331,25 @@ public class AdapterOrgController extends BaseController {
     @RequestMapping("getAdapterOrgList")
     @ResponseBody
     //获取初始标准列表
-    public String getAdapterOrgList(String type) {
+    public Object getAdapterOrgList(String type) {
         String url = "/adapterOrg/getAdapterOrgList";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("type",type);
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            ObjectMapper mapper = new ObjectMapper();
-            List<String> adapterOrgList = Arrays.asList(mapper.readValue(resultStr, String[].class));
-            result.setObj(adapterOrgList);
+//            ObjectMapper mapper = new ObjectMapper();
+//            List<String> adapterOrgList = Arrays.asList(mapper.readValue(resultStr, String[].class));
+            result.setObj(resultStr);
             result.setSuccessFlg(true);
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
-//        //根据类型获取�?有采集标�?
+//        //根据类型获取所有采集标准
 //        Result result = new Result();
 //        List<String> orglist = new ArrayList<>();
 //        try {
@@ -374,12 +359,12 @@ public class AdapterOrgController extends BaseController {
 //                    //厂商，初始标准只能是厂商
 //                    break;
 //                case "2":
-//                    //医院，初始标准没有限�?
+//                    //医院，初始标准没有限制
 //                    adapterOrgList.addAll(adapterOrgManager.searchAdapterOrg(conventionalDictEntry.getAdapterType("1"), orglist));
 //                    adapterOrgList.addAll(adapterOrgManager.searchAdapterOrg(conventionalDictEntry.getAdapterType("3"), orglist));
 //                    break;
 //                case "3":
-//                    //区域,初始标准只能选择厂商或区�?
+//                    //区域,初始标准只能选择厂商或区域
 //                    adapterOrgList.addAll(adapterOrgManager.searchAdapterOrg(conventionalDictEntry.getAdapterType("1"), orglist));
 //                    break;
 //            }
@@ -397,27 +382,27 @@ public class AdapterOrgController extends BaseController {
 //        return result.toJson();
     }
 
-    //todo：前端请求方法已被注释，目前没有用到该方�?
+    //todo：前端请求方法已被注释，目前没有用到该方法
     @RequestMapping("getOrgList")
     @ResponseBody
     //机构列表
-    public String getOrgList(String type) {
+    public Object getOrgList(String type) {
         String url = "/adapterOrg/getAdapterOrgList";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("type",type);
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            ObjectMapper mapper = new ObjectMapper();
-            List<String> orgList = Arrays.asList(mapper.readValue(resultStr, String[].class));
-            result.setObj(orgList);
+//            ObjectMapper mapper = new ObjectMapper();
+//            List<String> orgList = Arrays.asList(mapper.readValue(resultStr, String[].class));
+            result.setObj(resultStr);
             result.setSuccessFlg(true);
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //        String searchWay = "";
@@ -447,10 +432,10 @@ public class AdapterOrgController extends BaseController {
     @RequestMapping("searchOrgList")
     @ResponseBody
     //查询机构列表
-    public String searchOrgList(String type, String param, int page, int rows) {
+    public Object searchOrgList(String type, String param, int page, int rows) {
         String url = "/adapterOrg/searchOrgList";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("type",type);
         params.put("orgCode",param);
@@ -463,7 +448,7 @@ public class AdapterOrgController extends BaseController {
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        List typeLs = new ArrayList<>();
 //        Map<String, Object> adapterOrgMap = new HashMap<>();
@@ -494,7 +479,7 @@ public class AdapterOrgController extends BaseController {
 //
 //        Result result = new Result();
 //        try {
-//            //排除已经存在的第三方标准的机�?   adapterOrgs == 已经存在的第三方标准的机构列�?
+//            //排除已经存在的第三方标准的机构   adapterOrgs == 已经存在的第三方标准的机构列表
 //            List<AdapterOrgModel> adapterOrgs = adapterOrgManager.searchAdapterOrgs(adapterOrgMap);
 //            List<XOrganization> organizations = orgManager.search(conditionMap,adapterOrgs);
 //            conditionMap.put("adapterOrgs", adapterOrgs);
@@ -509,10 +494,10 @@ public class AdapterOrgController extends BaseController {
 
     @RequestMapping("searchAdapterOrgList")
     @ResponseBody
-    public String searchAdapterOrgList(String type, String param, int page, int rows) {
+    public Object searchAdapterOrgList(String type, String param, int page, int rows) {
         String url = "/adapterOrg/searchAdapterOrgList";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("type",type);
         params.put("code",param);
@@ -526,7 +511,7 @@ public class AdapterOrgController extends BaseController {
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
     }
 //        Result result = new Result();
@@ -544,13 +529,13 @@ public class AdapterOrgController extends BaseController {
 //                    typeLs.add(conventionalDictEntry.getAdapterType("1"));
 //                    break;
 //                case "2":
-//                    //医院，初始标准没有限�?
+//                    //医院，初始标准没有限制
 //                    typeLs.add(conventionalDictEntry.getAdapterType("1"));
 //                    typeLs.add(conventionalDictEntry.getAdapterType("2"));
 //                    typeLs.add(conventionalDictEntry.getAdapterType("3"));
 //                    break;
 //                case "3":
-//                    //区域,初始标准只能选择厂商或区�?
+//                    //区域,初始标准只能选择厂商或区域
 //                    typeLs.add(conventionalDictEntry.getAdapterType("1"));
 //                    typeLs.add(conventionalDictEntry.getAdapterType("3"));
 //                    break;
