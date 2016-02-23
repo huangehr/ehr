@@ -6,7 +6,6 @@ import com.yihu.ehr.model.geogrephy.MGeography;
 import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.patient.dao.XDemographicInfoRepository;
 import com.yihu.ehr.patient.feign.GeographyClient;
-import com.yihu.ehr.patient.feign.ConventionalDictClient;
 import com.yihu.ehr.util.encode.HashUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -31,21 +30,17 @@ import java.util.Map;
  */
 @Transactional
 @Service
-public class DemographicIndex{
+public class DemographicService {
 
     @PersistenceContext
     protected EntityManager entityManager;
 
     @Autowired
     private XDemographicInfoRepository demographicInfoRepository;
-
-    @Autowired
-    private ConventionalDictClient conventionalDictClient;
-
     @Autowired
     private GeographyClient addressClient;
 
-    public DemographicIndex() {
+    public DemographicService() {
     }
 
 
@@ -103,26 +98,21 @@ public class DemographicIndex{
         String province = (String) args.get("province");
         String city = (String) args.get("city");
         String district = (String) args.get("district");
-        List<String> addressIdList = addressClient.search(province,city,district);
-
+        List<String> homeAddressIdList = addressClient.search(province,city,district);
         String hql = "from DemographicInfo where (name like :name or id like :idCardNo)";
-
         if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
-            hql += " and homeAddress in (:addressIdList)";
+            hql += " and homeAddress in (:homeAddressIdList)";
         }
         Query query = session.createQuery(hql);
-
         query.setString("name", "%" + name + "%");
         query.setString("idCardNo", "%" + idCardNo + "%");
 
         if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
-            query.setParameterList("addressIdList", addressIdList);
+            query.setParameterList("homeAddressIdList", homeAddressIdList);
         }
         query.setMaxResults(pageSize);
         query.setFirstResult((page - 1) * pageSize);
         List<DemographicInfo> demographicInfos = query.list();
-
-
         return demographicInfos;
     }
 
