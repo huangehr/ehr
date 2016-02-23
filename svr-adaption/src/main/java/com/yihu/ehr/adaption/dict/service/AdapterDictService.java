@@ -2,10 +2,9 @@ package com.yihu.ehr.adaption.dict.service;
 
 
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlan;
-import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanManager;
+import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanService;
 import com.yihu.ehr.model.adaption.MAdapterDict;
-import com.yihu.ehr.util.parm.PageModel;
-import com.yihu.ehr.util.service.BaseManager;
+import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -15,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -27,10 +27,10 @@ import java.util.List;
  * @created 2016.2.1
  */
 @Service
-public class AdapterDictManager extends BaseManager<AdapterDict, XAdapterDictRepository> {
+public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDictRepository> {
 
     @Autowired
-    OrgAdapterPlanManager orgAdapterPlanManager;
+    OrgAdapterPlanService orgAdapterPlanManager;
 
 
     /**
@@ -38,38 +38,57 @@ public class AdapterDictManager extends BaseManager<AdapterDict, XAdapterDictRep
      *
      */
     @Transactional(propagation = Propagation.NEVER)
-    public List<AdapterDictModel> searchAdapterDict(OrgAdapterPlan orgAdapterPlan, PageModel pageModel) {
+    public List<MAdapterDict> searchAdapterDict(OrgAdapterPlan orgAdapterPlan, String code, String name, String orders, int page, int rows) {
         long planId = orgAdapterPlan.getId();
         String dictTableName = CDAVersionUtil.getDictTableName(orgAdapterPlan.getVersion());
-
         Session session = currentSession();
+
         StringBuilder sb = new StringBuilder();
-
-        sb.append(" select distinct  " + dictTableName + ".id    ");
-        sb.append("       ," + dictTableName + ".code  ");
-        sb.append("       ," + dictTableName + ".name  ");
+        sb.append(" select distinct  ds.id    ");
+        sb.append("       ,ds.code  ");
+        sb.append("       ,ds.name  ");
         sb.append("   from adapter_dict ad          ");
-        sb.append("        left join " + dictTableName + " on ad.std_dict = " + dictTableName + ".id  ");
+        sb.append("        left join " + dictTableName + " ds on ad.std_dict = ds.id  ");
         sb.append("  where ad.plan_id = " + planId);
-        sb.append(pageModel.formatSqlWithOrder(dictTableName));
-
-        String sql = sb.toString();
-        SQLQuery sqlQuery = session.createSQLQuery(sql);
-        setQueryVal(sqlQuery, pageModel);
+        if (!StringUtils.isEmpty(code))
+            sb.append("     and ds.code like :code");
+        if (!StringUtils.isEmpty(name))
+            sb.append("     and ds.name like :name");
+        sb.append(makeOrder(orders));
+        SQLQuery sqlQuery = session.createSQLQuery(sb.toString());
+        if (!StringUtils.isEmpty(code))
+            sqlQuery.setParameter("code", "%" + code + "%");
+        if (!StringUtils.isEmpty(name))
+            sqlQuery.setParameter("name", "%" + name + "%");
+        page = page == 0 ? 1 : page;
+        sqlQuery.setMaxResults(rows);
+        sqlQuery.setFirstResult((page - 1) * rows);
         sqlQuery.setResultTransformer(Transformers.aliasToBean(MAdapterDict.class));
         return sqlQuery.list();
     }
 
+    private String makeOrder(String orders) {
+        String sql = "";
+        for (String order : orders.split(",")) {
+            if (order.startsWith("+"))
+                sql += "," + order.substring(1);
+            else if (order.startsWith("-"))
+                sql += "," + order.substring(1) + " desc";
+        }
+        return StringUtils.isEmpty(sql) ?
+                "" :
+                " order by " + sql.substring(1);
+    }
     /**
      * 查询适配字典的总条数
      *
      * @return
      */
-    public int searchDictInt(OrgAdapterPlan orgAdapterPlan, PageModel pageModel) {
+    public int searchDictInt(OrgAdapterPlan orgAdapterPlan, String code, String name) {
         long planId = orgAdapterPlan.getId();
         String dictTableName = CDAVersionUtil.getDictTableName(orgAdapterPlan.getVersion());
-
         Session session = currentSession();
+
         StringBuilder sb = new StringBuilder();
         sb.append(" select count(*) from (");
         sb.append(" select distinct  " + dictTableName + ".id    ");
@@ -78,12 +97,17 @@ public class AdapterDictManager extends BaseManager<AdapterDict, XAdapterDictRep
         sb.append("   from adapter_dict ad          ");
         sb.append("        left join " + dictTableName + " on ad.std_dict = " + dictTableName + ".id  ");
         sb.append("  where ad.plan_id = " + planId);
-        sb.append(pageModel.formatSql(dictTableName));
+        if (!StringUtils.isEmpty(code))
+            sb.append("     and ds.code like :code");
+        if (!StringUtils.isEmpty(name))
+            sb.append("     and ds.name like :name");
         sb.append(" ) t");
 
-        String sql = sb.toString();
-        SQLQuery sqlQuery = session.createSQLQuery(sql);
-        setQueryVal(sqlQuery, pageModel);
+        SQLQuery sqlQuery = session.createSQLQuery(sb.toString());
+        if (!StringUtils.isEmpty(code))
+            sqlQuery.setParameter("code", "%" + code + "%");
+        if (!StringUtils.isEmpty(name))
+            sqlQuery.setParameter("name", "%" + name + "%");
         return ((BigInteger) sqlQuery.list().get(0)).intValue();
     }
 
@@ -91,11 +115,8 @@ public class AdapterDictManager extends BaseManager<AdapterDict, XAdapterDictRep
     /**
      * 根据条件搜索字典项适配关系
      *
-     * @param orgAdapterPlan
-     * @param dictId
-     * @param pageModel
      */
-    public List<AdapterDictModel> searchAdapterDictEntry(OrgAdapterPlan orgAdapterPlan, long dictId, PageModel pageModel) {
+    public List<MAdapterDict> searchAdapterDictEntry(OrgAdapterPlan orgAdapterPlan, long dictId, String code, String name, String orders, int page, int rows) {
         String orgCode = orgAdapterPlan.getOrg();
         String dictTableName = CDAVersionUtil.getDictTableName(orgAdapterPlan.getVersion());
         String deTableName = CDAVersionUtil.getDictEntryTableName(orgAdapterPlan.getVersion());
@@ -104,29 +125,38 @@ public class AdapterDictManager extends BaseManager<AdapterDict, XAdapterDictRep
         StringBuilder sb = new StringBuilder();
         sb.append(" select ad.id                       ");
         sb.append("       ,ad.plan_id                  ");
-        sb.append("       ," + dictTableName + ".id   as dictId ");
-        sb.append("       ," + dictTableName + ".code as dictCode ");
-        sb.append("       ," + dictTableName + ".name as dictName ");
-        sb.append("       ," + deTableName + ".id  as dictEntryId    ");
-        sb.append("       ," + deTableName + ".code as DictEntrycode   ");
-        sb.append("       ," + deTableName + ".value as DictEntryName   ");
-        sb.append("       ,  orgDict.id as orgDictId  ");
-        sb.append("       ,  orgDict.code as orgDictCode");
-        sb.append("       ,  orgDict.name as orgDictNanme");
-        sb.append("       ,  orgDE.id as orgDictEntryId  ");
-        sb.append("       ,  orgDE.code as orgDictEntryCode");
-        sb.append("       ,  orgDE.name as orgDictEntryName");
+        sb.append("       ,ds.id   as dictId ");
+        sb.append("       ,ds.code as dictCode ");
+        sb.append("       ,ds.name as dictName ");
+        sb.append("       ,de.id  as dictEntryId    ");
+        sb.append("       ,de.code as DictEntrycode   ");
+        sb.append("       ,de.value as DictEntryName   ");
+        sb.append("       ,orgDict.id as orgDictId  ");
+        sb.append("       ,orgDict.code as orgDictCode");
+        sb.append("       ,orgDict.name as orgDictNanme");
+        sb.append("       ,orgDE.id as orgDictEntryId  ");
+        sb.append("       ,orgDE.code as orgDictEntryCode");
+        sb.append("       ,orgDE.name as orgDictEntryName");
         sb.append("   from adapter_dict ad ");
-        sb.append("        left join " + dictTableName + " on ad.std_dict = " + dictTableName + ".id  ");
-        sb.append("        left join " + deTableName + " on ad.std_dictentry = " + deTableName + ".id ");
+        sb.append("        left join " + dictTableName + " ds on ad.std_dict = ds.id  ");
+        sb.append("        left join " + deTableName + " de on ad.std_dictentry = de.id ");
         sb.append("        left join org_std_dict orgDict on ( orgDict.sequence = ad.org_dict and orgDict.organization='" + orgCode + "' )   ");
         sb.append("        left join org_std_dictentry orgDE on ( orgDE.sequence = ad.org_dictentry and orgDE.organization='" + orgCode + "' ) ");
         sb.append("  where ad.plan_id = " + orgAdapterPlan.getId());
         sb.append("    and ad.std_dict = " + dictId);
-        sb.append(pageModel.formatSqlWithOrder(dictTableName));
-
+        if (!StringUtils.isEmpty(code))
+            sb.append("     and de.code like :code");
+        if (!StringUtils.isEmpty(name))
+            sb.append("     and de.name like :name");
+        sb.append(makeOrder(orders));
         SQLQuery sqlQuery = session.createSQLQuery(sb.toString());
-        setQueryVal(sqlQuery, pageModel);
+        if (!StringUtils.isEmpty(code))
+            sqlQuery.setParameter("code", "%" + code + "%");
+        if (!StringUtils.isEmpty(name))
+            sqlQuery.setParameter("name", "%" + name + "%");
+        page = page == 0 ? 1 : page;
+        sqlQuery.setMaxResults(rows);
+        sqlQuery.setFirstResult((page - 1) * rows);
         sqlQuery.setResultTransformer(Transformers.aliasToBean(MAdapterDict.class));
         return sqlQuery.list();
     }
@@ -136,19 +166,25 @@ public class AdapterDictManager extends BaseManager<AdapterDict, XAdapterDictRep
      *
      * @return
      */
-    public int searchDictEntryInt(OrgAdapterPlan orgAdapterPlan, long dictId, PageModel pageModel) {
+    public int searchDictEntryInt(OrgAdapterPlan orgAdapterPlan, long dictId, String code, String name) {
         Session session = currentSession();
-        StringBuilder sb = new StringBuilder();
         String deTableName = CDAVersionUtil.getDictEntryTableName(orgAdapterPlan.getVersion());
 
+        StringBuilder sb = new StringBuilder();
         sb.append(" select count(*)    ");
         sb.append("   from adapter_dict ad     ");
         sb.append("        left join " + deTableName + " on ad.std_dictentry = " + deTableName + ".id ");
         sb.append("  where ad.plan_id = " + orgAdapterPlan.getId());
         sb.append("    and ad.std_dict = " + dictId);
-        sb.append(pageModel.formatSql(deTableName));
-
+        if (!StringUtils.isEmpty(code))
+            sb.append("     and md.inner_code like :code");
+        if (!StringUtils.isEmpty(name))
+            sb.append("     and md.name like :name");
         SQLQuery sqlQuery = session.createSQLQuery(sb.toString());
+        if (!StringUtils.isEmpty(code))
+            sqlQuery.setParameter("code", "%" + code + "%");
+        if (!StringUtils.isEmpty(name))
+            sqlQuery.setParameter("name", "%" + name + "%");
         return ((BigInteger)sqlQuery.list().get(0)).intValue();
     }
 
@@ -185,7 +221,7 @@ public class AdapterDictManager extends BaseManager<AdapterDict, XAdapterDictRep
         if (ids == null || ids.length == 0) {
             return 0;
         }else{
-            AdapterDict adapterDict = findOne(ids[0]);
+            AdapterDict adapterDict = retrieve(ids[0]);
             List<Long> lst = new ArrayList<>();
             lst = Arrays.asList(ids);
             Session session = currentSession();

@@ -1,11 +1,12 @@
 package com.yihu.ehr.patient.controller;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.constrant.ErrorCode;
-import com.yihu.ehr.constrant.Result;
+import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.ResourceProperties;
-import com.yihu.ehr.util.fastdfs.FastDFSUtil;
+import com.yihu.ehr.fastdfs.FastDFSUtil;
+import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.log.LogService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,7 +24,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/patient")
-public class PatientController extends BaseController {
+public class PatientController extends BaseRestController {
     private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
     private static   String username = ResourceProperties.getProperty("username");
     private static   String password = ResourceProperties.getProperty("password");
@@ -47,10 +48,10 @@ public class PatientController extends BaseController {
     }
 
     @RequestMapping("patientDialogType")
-    public String patientDialogType(String idCardNo, String patientDialogType, Model model) throws IOException {
+    public Object patientDialogType(String idCardNo, String patientDialogType, Model model) throws IOException {
         String url = "";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("idCardNo",idCardNo);
         try {
@@ -77,7 +78,7 @@ public class PatientController extends BaseController {
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 
 
@@ -117,10 +118,10 @@ public class PatientController extends BaseController {
 
     @RequestMapping("searchPatient")
     @ResponseBody
-    public String searchPatient(String searchNm, String province, String city, String district, int page, int rows) {
+    public Object searchPatient(String searchNm, String province, String city, String district, int page, int rows) {
         String url = "/patient/patients";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("name", searchNm);
         params.put("idCardNo", searchNm);
@@ -136,7 +137,7 @@ public class PatientController extends BaseController {
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Map<String, Object> conditionMap = new HashMap<>();
 //        conditionMap.put("name", searchNm);
@@ -160,10 +161,10 @@ public class PatientController extends BaseController {
     /* 删除病人信息 requestBody格式:
     * "idCardNo":""  //身份证号
     */
-    public String deletePatient(String idCardNo) {
+    public Object deletePatient(String idCardNo) {
         String url = "/patient/deletePatient";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("idCardNo",idCardNo);
         try {
@@ -175,11 +176,11 @@ public class PatientController extends BaseController {
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.InvalidDelete.toString());
             }
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        try {
 //            demographicIndex.delete(new DemographicId(idCardNo));
@@ -214,10 +215,10 @@ public class PatientController extends BaseController {
     //todo 因暂时无法从后台获取到错误信息，所以网关中还要添加此方法来做判断是否存在身份证
     @RequestMapping("checkIdCardNo")
     @ResponseBody
-    public String checkIdCardNo(String searchNm) {
+    public Object checkIdCardNo(String searchNm) {
         String url = "/patient/checkIdCardNo";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("searchNm",searchNm);
         try {
@@ -227,11 +228,11 @@ public class PatientController extends BaseController {
             }else{
                 result.setSuccessFlg(false);
             }
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        XDemographicInfo demographicInfo = demographicIndex.getDemographicInfo(new DemographicId(searchNm));
 //        if (demographicInfo == null) {
@@ -245,12 +246,12 @@ public class PatientController extends BaseController {
     @RequestMapping(value="updatePatient")
     @ResponseBody
     //注册或更新病人信息Header("Content-type: text/html; charset=UTF-8")
-    public String updatePatient(String patientJsonData,HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public Object updatePatient(String patientJsonData,HttpServletRequest request, HttpServletResponse response) throws IOException {
         //将文件保存至服务器，返回文件的path，
         String picPath = webupload(request, response);
         String url = "/patient/updatePatient";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("patientJsonData",patientJsonData);
         params.put("picPath",picPath);//todo:网关调整添加参数
@@ -259,11 +260,11 @@ public class PatientController extends BaseController {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             result.setObj(resultStr);
             result.setSuccessFlg(true);
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        //String patientData = request.getParameter("patientJsonData");
 //        String patientData = URLDecoder.decode(patientJsonData,"UTF-8");
@@ -292,10 +293,10 @@ public class PatientController extends BaseController {
 
     @RequestMapping("resetPass")
     @ResponseBody
-    public String resetPass(String idCardNo) {
+    public Object resetPass(String idCardNo) {
         String url = "/patient/resetPass";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("idCardNo",idCardNo);
         try {
@@ -305,11 +306,11 @@ public class PatientController extends BaseController {
             }else{
                 result.setSuccessFlg(false);
             }
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        try {
 //            demographicIndex.resetPass(new DemographicId(idCardNo));
@@ -324,21 +325,21 @@ public class PatientController extends BaseController {
 
     @RequestMapping("getParent")
     @ResponseBody
-    public String getParent(Integer level) {
+    public Object getParent(Integer level) {
         String url = "/address/address/level";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("level",level);
         try {
             //todo 返回Map<Integer, String>
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             result.setObj(resultStr);
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        XAddressDict[] addrArray = addressManager.getLevelToAddr(level);
 //        Map<Integer, String> parentMap = new HashMap<>();
@@ -353,21 +354,21 @@ public class PatientController extends BaseController {
 
     @RequestMapping("getChildByParent")
     @ResponseBody
-    public String getChildByParent(Integer pid) {
+    public Object getChildByParent(Integer pid) {
         String url = "/address/address/pid";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("pid",pid);
         try {
             //todo 返回Map<Integer, String>
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             result.setObj(resultStr);
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        XAddressDict[] addrArray = addressManager.getPidToAddr(pid);
 //        Map<Integer, String> childMap = new HashMap<>();
@@ -406,9 +407,10 @@ public class PatientController extends BaseController {
             }
         }
         ObjectNode objectNode = null;
+        FastDFSUtil dfsUtil = new FastDFSUtil();
         String path = null;
         try {
-            objectNode = FastDFSUtil.upload(inputStearm, fileExtension, description);
+            objectNode = dfsUtil.upload(inputStearm, fileExtension, description);
             String groupName = objectNode.get("groupName").toString();
             String remoteFileName = objectNode.get("remoteFileName").toString();
             path = "{groupName:" + groupName + ",remoteFileName:" + remoteFileName + "}";

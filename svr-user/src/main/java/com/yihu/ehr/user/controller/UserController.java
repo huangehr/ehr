@@ -2,11 +2,13 @@ package com.yihu.ehr.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.security.MUserSecurity;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.user.feign.SecurityClient;
 import com.yihu.ehr.user.service.User;
 import com.yihu.ehr.user.service.UserManager;
+import com.yihu.ehr.util.ObjectId;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.encode.HashUtil;
 import io.swagger.annotations.Api;
@@ -14,6 +16,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -53,27 +56,11 @@ public class UserController extends BaseRestController {
         List<User> userList = userManager.search(fields, filters, sorts, page, size);
         pagedResponse(request, response, userManager.getCount(filters), page, size);
         return (List<MUser>) convertToModels(userList, new ArrayList<MUser>(userList.size()), MUser.class, fields);
-//        for (User user: userList){
-//            MUser userModel = convertToModel(user,MUser.class);
-//            if(user.getUserType()!=null){
-//                userModel.setUserType(conventionalDictClient.getUserType(user.getUserType()));
-//            }
-//            if(user.getMartialStatus()!=null){
-//                userModel.setMartialStatus(conventionalDictClient.getMartialStatus(user.getMartialStatus()));
-//            }
-//            if(user.getGender()!=null){
-//                userModel.setGender(conventionalDictClient.getGender(user.getGender()));
-//            }
-//            if(user.getOrganization()!=null){
-//                userModel.setOrganization(organizationClient.getOrgByCode(user.getOrganization()));
-//            }
-//            userModelList.add(userModel);
-//        }
     }
 
     @RequestMapping(value = "/users/{user_id}" , method = RequestMethod.DELETE)
     @ApiOperation(value = "删除用户",notes = "根据用户id删除用户")
-    public Object deleteUser(
+    public boolean deleteUser(
             @ApiParam(name = "user_id", value = "用户编号", defaultValue = "")
             @PathVariable(value = "user_id") String userId) throws Exception{
         userManager.deleteUser(userId);
@@ -83,30 +70,28 @@ public class UserController extends BaseRestController {
 
     @RequestMapping(value = "/users" , method = RequestMethod.POST)
     @ApiOperation(value = "创建用户",notes = "重新绑定用户信息")
-    public Object createUser(
+    public MUser createUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData) throws Exception{
-        ObjectMapper objectMapper = new ObjectMapper();
-        User user = objectMapper.readValue(userJsonData, User.class);
+        User user = new ObjectMapper().readValue(userJsonData, User.class);
+        user.setId(getObjectId(BizObject.User));
         user.setCreateDate(new Date());
         user.setPassword(HashUtil.hashStr(user.getPassword()));
         user.setActivated(true);
         userManager.saveUser(user);
-        return true;
-
+        return convertToModel(user,MUser.class,null);
     }
 
 
     @RequestMapping(value = "/users" , method = RequestMethod.PUT)
     @ApiOperation(value = "修改用户",notes = "重新绑定用户信息")
-    public Object updateUser(
+    public MUser updateUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
         User user = objectMapper.readValue(userJsonData, User.class);
         userManager.saveUser(user);
-        return true;
-
+        return convertToModel(user,MUser.class,null);
     }
 
 
@@ -117,19 +102,6 @@ public class UserController extends BaseRestController {
             @PathVariable(value = "user_id") String userId) {
         User user = userManager.getUser(userId);
         MUser userModel = convertToModel(user,MUser.class);
-//        if(user.getUserType()!=null){
-//            userModel.setUserType(conventionalDictClient.getUserType(user.getUserType()));
-//        }
-//        if(user.getMartialStatus()!=null){
-//            userModel.setMartialStatus(conventionalDictClient.getMartialStatus(user.getMartialStatus()));
-//        }
-//        if(user.getGender()!=null){
-//            userModel.setGender(conventionalDictClient.getGender(user.getGender()));
-//        }
-//        if(user.getOrganization()!=null){
-//            userModel.setOrganization(organizationClient.getOrgByCode(user.getOrganization()));
-//        }
-//        return userModel;
         return userModel;
     }
 
@@ -176,7 +148,7 @@ public class UserController extends BaseRestController {
 
     @RequestMapping(value = "/users/key/{login_code}", method = RequestMethod.PUT)
     @ApiOperation(value = "重新分配密钥",notes = "重新分配密钥")
-    public Object distributeKey(
+    public Map<String, String> distributeKey(
             @ApiParam(name = "login_code", value = "登录帐号", defaultValue = "")
             @PathVariable(value = "login_code") String loginCode) {
         MUserSecurity userSecurity = securityClient.getUserSecurityByLoginCode(loginCode);

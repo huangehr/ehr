@@ -1,13 +1,15 @@
 package com.yihu.ehr.adaption.orgdict.service;
 
-import com.yihu.ehr.util.query.BaseService;
 import com.yihu.ehr.adaption.orgdictitem.service.OrgDictItemService;
+import com.yihu.ehr.query.BaseJpaService;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * 机构字典管理器。
@@ -17,14 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
  * @created 2016.1.29
  */
 @Service
-public class OrgDictService extends BaseService<OrgDict, XOrgDictRepository> {
+public class OrgDictService extends BaseJpaService<OrgDict, XOrgDictRepository> {
 
     @Autowired
     OrgDictItemService orgDictItemManager;
 
     @Transactional(propagation = Propagation.SUPPORTS)
     public boolean isExistOrgDict(String orgCode, String code) {
-        return getRepository().isExistOrgDict(orgCode, code).size() != 0;
+        return ((XOrgDictRepository) getRepository()).isExistOrgDict(orgCode, code).size() != 0;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -65,10 +67,18 @@ public class OrgDictService extends BaseService<OrgDict, XOrgDictRepository> {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void deleteOrgDict(long id) {
-        OrgDict orgDict = findOne(id);
+        OrgDict orgDict = retrieve(id);
         if (orgDict == null)
             return;
         delete(orgDict);
         orgDictItemManager.deleteOrgDictItemByDict(orgDict);
+    }
+
+    public List<OrgDict> findByField(Object val, String field){
+        String hql = "select orgDict from OrgDict where "+ field + "=:val";
+        Session session = currentSession();
+        Query query = session.createQuery(hql);
+        query.setParameter("val", val);
+        return query.list();
     }
 }

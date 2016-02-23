@@ -2,9 +2,6 @@ package com.yihu.ehr.patient.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.patient.MAbstractCard;
-import com.yihu.ehr.patient.feign.GeographyClient;
-import com.yihu.ehr.patient.feign.ConventionalDictClient;
-import com.yihu.ehr.patient.feign.OrgClient;
 import com.yihu.ehr.patient.service.card.*;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseRestController;
@@ -28,17 +25,8 @@ public class CardController extends BaseRestController {
     @Autowired
     private CardManager cardManager;
 
-    @Autowired
-    private ConventionalDictClient conventionalDictClient;
-
-    @Autowired
-    private GeographyClient addressClient;
-
-    @Autowired
-    private OrgClient orgClient;
-
     /**
-     * 已绑定的卡
+     * 根据身份证好查询相对应的卡列表
      * @param idCardNo
      * @param number
      * @param cardType
@@ -48,7 +36,7 @@ public class CardController extends BaseRestController {
      * @throws Exception
      */
     @RequestMapping(value = "/cards/bound_card",method = RequestMethod.GET)
-    @ApiOperation(value = "获取已绑定的卡列表")
+    @ApiOperation(value = "根据身份证好查询相对应的卡列表")
     public Envelop searchCard(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @RequestParam(value = "id_card_no") String idCardNo,
@@ -73,7 +61,7 @@ public class CardController extends BaseRestController {
     }
 
     /**
-     * 未绑定的卡
+     * 查询未绑定的卡列表
      * @param number
      * @param cardType
      * @param page
@@ -82,7 +70,7 @@ public class CardController extends BaseRestController {
      * @throws Exception
      */
     @RequestMapping(value = "/cards/not_bound_card",method = RequestMethod.GET)
-    @ApiOperation(value = "未绑定的卡")
+    @ApiOperation(value = "查询未绑定的卡列表")
     public Envelop searchNewCard(
             @ApiParam(name = "number", value = "卡号", defaultValue = "")
             @RequestParam(value = "number") String number,

@@ -1,34 +1,24 @@
 package com.yihu.ehr.template.controller;
 
-import com.yihu.ha.constrant.ErrorCode;
-import com.yihu.ha.constrant.Result;
-import com.yihu.ha.constrant.Services;
-import com.yihu.ha.organization.model.OrgDetailModel;
-import com.yihu.ha.organization.model.XOrgManager;
-import com.yihu.ha.organization.model.XOrganization;
-import com.yihu.ha.std.model.*;
-import com.yihu.ha.template.model.ArchiveTpl;
-import com.yihu.ha.template.model.TemplateDetailModel;
-import com.yihu.ha.template.model.TemplateModel;
-import com.yihu.ha.template.model.XArchiveTpl;
-import com.yihu.ha.template.model.XArchiveTplManager;
-import com.yihu.ha.util.HttpClientUtil;
-import com.yihu.ha.util.ResourceProperties;
-import com.yihu.ha.util.controller.BaseController;
-import com.yihu.ha.util.operator.StringUtil;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.HttpClientUtil;
+import com.yihu.ehr.util.ResourceProperties;
+import com.yihu.ehr.util.controller.BaseRestController;
+import freemarker.template.TemplateModel;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * 鍋ュ悍妗ｆ娴忚鍣ㄦā鏉跨鐞嗘帶鍒跺櫒銆?
+ * 健康档案浏览器模板管理控制器。
  *
  * @author Sand
  * @version 1.0
@@ -36,23 +26,11 @@ import java.util.*;
  */
 @Controller
 @RequestMapping("/template")
-public class ArchiveTplMgrController extends BaseController {
-    @Resource(name = Services.ArchiveTemplateManager)
-    private XArchiveTplManager tplManager;
-
-    @Resource(name = Services.CDADocumentManager)
-    private XCDADocumentManager cdaDocumentManager;
-
-    @Resource(name = Services.CDAVersionManager)
-    private XCDAVersionManager cdaVersionManager;
-
-    @Resource(name = Services.OrgManager)
-    private XOrgManager orgManager;
-
+public class ArchiveTplMgrController extends BaseRestController {
     private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
     private static   String username = ResourceProperties.getProperty("username");
     private static   String password = ResourceProperties.getProperty("password");
-    private static   String module = ResourceProperties.getProperty("module");  //鐩墠瀹氫箟涓簉est
+    private static   String module = ResourceProperties.getProperty("module");  //目前定义为rest
     private static   String version = ResourceProperties.getProperty("version");
     private static   String comUrl = host + module + version;
 
@@ -63,56 +41,28 @@ public class ArchiveTplMgrController extends BaseController {
         return "pageView";
     }
     @RequestMapping("template/tplInfo")
-    public String tplInfo(Model model,String mode,String idNo ) {
+    public Object tplInfo(Model model,String mode,String idNo ) {
         String url = "/template/tplInfo";
         String resultStr = "";
-        XArchiveTpl archiveTpl = null;
-        XOrganization org = null;
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        ObjectMapper mapper = new ObjectMapper();
-
+        params.put("mode",mode);
         params.put("id",idNo);
-        if(mode.equals("view")){
-
-            try {
-                resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-                archiveTpl = mapper.readValue(resultStr,XArchiveTpl.class);
-                org = archiveTpl!=null?archiveTpl.getOrg():null;
-            } catch (Exception e) {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.SystemError.toString());
-                return result.toJson();
-            }
-        }else if(mode.equals("modify") || mode.equals("copy")){
-            try {
-                resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-                archiveTpl = mapper.readValue(resultStr,XArchiveTpl.class);
-                org = archiveTpl!=null?archiveTpl.getOrg():null;
-            } catch (Exception e) {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.SystemError.toString());
-                return result.toJson();
-            }
-        }else{
-            archiveTpl = new ArchiveTpl();
+        try {
+            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+            model.addAttribute("tpl", resultStr);
+            //todo: province + city + orgCode组装，前台解析
+            url = "/template/local";
+            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+            model.addAttribute("local", resultStr);
+            model.addAttribute("mode",mode);
+            model.addAttribute("contentPage","/template/archiveTplDialog");
+            return "generalView";
+        } catch (Exception e) {
+            result.setSuccessFlg(false);
+            result.setErrorMsg(ErrorCode.SystemError.toString());
+            return result;
         }
-        if(org!=null && org.getLocation()!=null){
-            model.addAttribute("province", org.getLocation().getProvince());
-            model.addAttribute("city", org.getLocation().getCity());
-            model.addAttribute("orgCode", org.getOrgCode());
-        }
-        else {
-            model.addAttribute("province", "");
-            model.addAttribute("city", "");
-            model.addAttribute("orgCode", "");
-        }
-
-        model.addAttribute("tpl", archiveTpl);
-        model.addAttribute("mode",mode);
-        model.addAttribute("contentPage","/template/archiveTplDialog");
-        return "generalView";
-
 
 //        XOrganization org = null;
 //        XArchiveTpl tpl = null;
@@ -120,7 +70,7 @@ public class ArchiveTplMgrController extends BaseController {
 //        if(!StringUtil.isEmpty(idNo)){
 //             id = Integer.valueOf(idNo);
 //        }
-//        //mode瀹氫箟锛歯ew modify view copy妯″紡锛屾柊澧烇紝淇敼锛屾煡鐪? 澶嶅埗
+//        //mode定义：new modify view copy模式，新增，修改，查看 复制
 //        if(mode.equals("view")){
 //            tpl = tplManager.getArchiveTemplate(id);
 //            org = tpl!=null?tpl.getOrg():null;
@@ -151,25 +101,26 @@ public class ArchiveTplMgrController extends BaseController {
 
     @RequestMapping("getTemplateHtml")
     @ResponseBody
-    public String getTemplateHtml(Integer templateId) {
+    public Object getTemplateHtml(Integer templateId) {
         String url = "/template/getTemplateHtml";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         ObjectMapper mapper = new ObjectMapper();
 
         params.put("templateId",templateId);
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            XArchiveTpl archiveTpl = mapper.readValue(resultStr,XArchiveTpl.class);
-            result.setObj(archiveTpl);
+            //todo: result转model
+//            XArchiveTpl archiveTpl = mapper.readValue(resultStr,XArchiveTpl.class);
+//            result.setObj(archiveTpl);
             result.setSuccessFlg(true);
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
-        return result.toJson();
+        return result;
 
 //        try {
 //            XArchiveTpl template = tplManager.getArchiveTemplate(templateId);
@@ -185,10 +136,10 @@ public class ArchiveTplMgrController extends BaseController {
 
     @RequestMapping("updateTemplate")
     @ResponseBody
-    public String updateTemplate(int id, String title, String version, String cdaType, String orgCode) {
+    public Object updateTemplate(int id, String title, String version, String cdaType, String orgCode) {
         String url = "/template/updateTemplate";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         ObjectMapper mapper = new ObjectMapper();
 
@@ -199,15 +150,16 @@ public class ArchiveTplMgrController extends BaseController {
         params.put("orgCode",orgCode);
         try {
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
-            XArchiveTpl archiveTpl = mapper.readValue(resultStr,XArchiveTpl.class);
-            result.setObj(archiveTpl);
+            //todo: result转model
+//            XArchiveTpl archiveTpl = mapper.readValue(resultStr,XArchiveTpl.class);
+//            result.setObj(archiveTpl);
             result.setSuccessFlg(true);
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
-        return result.toJson();
+        return result;
 
 //
 //        try {
@@ -230,24 +182,25 @@ public class ArchiveTplMgrController extends BaseController {
 
     @RequestMapping("addTemplate")
     @ResponseBody
-    public String addTemplate(TemplateModel templateModel) {
+    public Object addTemplate(TemplateModel templateModel) {
         String url = "/template/addTemplate";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         ObjectMapper mapper = new ObjectMapper();
         params.put("templateModel",templateModel);
         try {
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
-            XArchiveTpl archiveTpl = mapper.readValue(resultStr,XArchiveTpl.class);
-            result.setObj(archiveTpl);
+            //todo: result转model
+//            XArchiveTpl archiveTpl = mapper.readValue(resultStr,XArchiveTpl.class);
+//            result.setObj(archiveTpl);
             result.setSuccessFlg(true);
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
-        return result.toJson();
+        return result;
 //
 //        try {
 //            tplManager.addArchiveTpl(templateModel);
@@ -261,12 +214,11 @@ public class ArchiveTplMgrController extends BaseController {
 
     @RequestMapping("copyTemplate")
     @ResponseBody
-    public String copyTemplate(int id, String title, String version, String cdaType, String orgCode){
+    public Object copyTemplate(int id, String title, String version, String cdaType, String orgCode){
         String url = "/template/copyTemplate";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        ObjectMapper mapper = new ObjectMapper();
         params.put("id",id);
         params.put("title",title);
         params.put("version",version);
@@ -274,15 +226,17 @@ public class ArchiveTplMgrController extends BaseController {
         params.put("orgCode",orgCode);
         try {
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
-            XArchiveTpl archiveTpl = mapper.readValue(resultStr,XArchiveTpl.class);
-            result.setObj(archiveTpl);
+            //todo: result转model
+//            ObjectMapper mapper = new ObjectMapper();
+//            XArchiveTpl archiveTpl = mapper.readValue(resultStr,XArchiveTpl.class);
+//            result.setObj(archiveTpl);
             result.setSuccessFlg(true);
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
-        return result.toJson();
+        return result;
 
 //        try {
 //            XArchiveTpl tplNew = new ArchiveTpl();
@@ -301,24 +255,25 @@ public class ArchiveTplMgrController extends BaseController {
 
     @RequestMapping("getTemplateModel")
     @ResponseBody
-    public String getTemplateModel(String templateId) {
+    public Object getTemplateModel(String templateId) {
         String url = "/template/getTemplateModel";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         ObjectMapper mapper = new ObjectMapper();
         params.put("templateId",templateId);
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            TemplateModel templateModel = mapper.readValue(resultStr,TemplateModel.class);
-            result.setObj(templateModel);
+            //todo: result转model
+//            TemplateModel templateModel = mapper.readValue(resultStr,TemplateModel.class);
+//            result.setObj(templateModel);
             result.setSuccessFlg(true);
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
-        return result.toJson();
+        return result;
 
 //        try {
 //            TemplateModel templateModel = tplManager.getTemplateById(templateId);
@@ -332,20 +287,21 @@ public class ArchiveTplMgrController extends BaseController {
     }
 
     @RequestMapping("archiveTplManager")
-    public String archiveTplManager(Model model) {
+    public Object archiveTplManager(Model model) {
         String url = "/template/archiveTplManager";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        ObjectMapper mapper = new ObjectMapper();
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            List<String> templateList = Arrays.asList(mapper.readValue(resultStr,String[].class));
-            model.addAttribute("versionList", templateList);
+            //todo: result转model
+//            ObjectMapper mapper = new ObjectMapper();
+//            List<String> templateList = Arrays.asList(mapper.readValue(resultStr,String[].class));
+//            model.addAttribute("versionList", templateList);
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
         return "/template/archiveTplManager";
 
@@ -362,12 +318,12 @@ public class ArchiveTplMgrController extends BaseController {
 
     @RequestMapping("searchTemplate")
     @ResponseBody
-    public String searchTemplate(String version, String orgName, int page, int rows) {
+    public Object searchTemplate(String version, String orgName, int page, int rows) {
         String url = "/template/searchTemplate";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        ObjectMapper mapper = new ObjectMapper();
+
         params.put("version",version);
         params.put("orgName",orgName);
         params.put("page",page);
@@ -375,15 +331,17 @@ public class ArchiveTplMgrController extends BaseController {
 
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            TemplateDetailModel templateList = mapper.readValue(resultStr,TemplateDetailModel.class);
-            result.setObj(templateList);
+            //todo: result转model
+//            ObjectMapper mapper = new ObjectMapper();
+//            TemplateDetailModel templateList = mapper.readValue(resultStr,TemplateDetailModel.class);
+//            result.setObj(templateList);
             result.setSuccessFlg(true);
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
-        return result.toJson();
+        return result;
 
 
 //        Map<String, Object> conditionMap = new HashMap<>();
@@ -409,10 +367,10 @@ public class ArchiveTplMgrController extends BaseController {
     }
     @RequestMapping("validateTitle")
     @ResponseBody
-    public String validateTitle(String version, String title){
+    public Object validateTitle(String version, String title){
         String url = "/template/validateTitle";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("version",version);
         params.put("title",title);
@@ -423,7 +381,7 @@ public class ArchiveTplMgrController extends BaseController {
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 
 //
@@ -438,10 +396,10 @@ public class ArchiveTplMgrController extends BaseController {
 
     @RequestMapping(value = "update_tpl_content")
     @ResponseBody
-    public String updateTplContent(HttpServletRequest request, HttpServletResponse response){
+    public Object updateTplContent(HttpServletRequest request, HttpServletResponse response){
         String url = "/template/updateTplContent";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("request",request);
 
@@ -451,7 +409,7 @@ public class ArchiveTplMgrController extends BaseController {
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 
 
@@ -471,29 +429,31 @@ public class ArchiveTplMgrController extends BaseController {
 
     @RequestMapping("/searchOrg")
     @ResponseBody
-    public String searchOrg(String key){
+    public Object searchOrg(String key){
         String url = "/template/searchOrg";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        ObjectMapper mapper = new ObjectMapper();
+
         params.put("orgCode",key);
         params.put("fullName",key);
 
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            if(resultStr == null){
-                result.setSuccessFlg(true);
-                return result.toJson();
-            }
-            List<OrgDetailModel> datailModelList = Arrays.asList(mapper.readValue(resultStr,OrgDetailModel.class));
-            result.setDetailModelList(datailModelList);
+            //todo: result转model
+//            if(resultStr == null){
+//                result.setSuccessFlg(true);
+//                return result;
+//            }
+//            ObjectMapper mapper = new ObjectMapper();
+//            List<OrgDetailModel> datailModelList = Arrays.asList(mapper.readValue(resultStr,OrgDetailModel.class));
+//            result.setDetailModelList(datailModelList);
             result.setSuccessFlg(true);
             return resultStr;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 
 
@@ -515,28 +475,29 @@ public class ArchiveTplMgrController extends BaseController {
     }
     @RequestMapping("/getCDAListByVersionAndKey")
     @ResponseBody
-    public String getCDAListByVersionAndKey(String value){
+    public Object getCDAListByVersionAndKey(String value){
         String url = "/template/getCDAListByVersionAndKey";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        ObjectMapper mapper = new ObjectMapper();
         params.put("value",value);
 
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            if(resultStr == null){
-                result.setSuccessFlg(true);
-                return result.toJson();
-            }
-            List<String> datailModelList = Arrays.asList(mapper.readValue(resultStr,String[].class));
-            result.setDetailModelList(datailModelList);
+            //todo: result转model
+//            if(resultStr == null){
+//                result.setSuccessFlg(true);
+//                return result;
+//            }
+//            ObjectMapper mapper = new ObjectMapper();
+//            List<String> datailModelList = Arrays.asList(mapper.readValue(resultStr,String[].class));
+//            result.setDetailModelList(datailModelList);
             result.setSuccessFlg(true);
             return resultStr;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 
 //        if(value.equals("")||value == null){

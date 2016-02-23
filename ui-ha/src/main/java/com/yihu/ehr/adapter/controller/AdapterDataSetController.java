@@ -1,23 +1,20 @@
 package com.yihu.ehr.adapter.controller;
 
-import com.yihu.ha.adapter.model.*;
-import com.yihu.ha.constrant.ErrorCode;
-import com.yihu.ha.constrant.Result;
-import com.yihu.ha.constrant.Services;
-import com.yihu.ha.std.model.*;
-import com.yihu.ha.util.HttpClientUtil;
-import com.yihu.ha.util.ResourceProperties;
-import com.yihu.ha.util.controller.BaseController;
-import org.codehaus.jackson.map.ObjectMapper;
+
+import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.HttpClientUtil;
+import com.yihu.ehr.util.ResourceProperties;
+import com.yihu.ehr.util.controller.BaseRestController;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /** 适配管理方案适配管理
  * Created by wq on 2015/11/1.
@@ -25,25 +22,7 @@ import java.util.*;
 
 @RequestMapping("/adapterDataSet")
 @Controller
-public class AdapterDataSetController extends BaseController{
-    @Resource(name = Services.OrgAdapterPlanManager)
-    XOrgAdapterPlanManager orgAdapterPlanManager;
-
-    @Resource(name=Services.AdapterDataSetManager)
-    private XAdapterDataSetManager adapterDataSetManager;
-
-    @Resource(name = Services.OrgDataSetManager)
-    private XOrgDataSetManager orgDataSetManager;
-
-    @Resource(name = Services.OrgMetaDataManager)
-     private XOrgMetaDataManager orgMetaDataManager;
-
-    @Resource(name= Services.DataSetManager)
-    private XDataSetManager dataSetManager;
-
-    @Resource(name=Services.MetaDataManager)
-    private XMetaDataManager metaDataManager;
-
+public class AdapterDataSetController extends BaseRestController{
     private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
     private static   String username = ResourceProperties.getProperty("username");
     private static   String password = ResourceProperties.getProperty("password");
@@ -66,10 +45,10 @@ public class AdapterDataSetController extends BaseController{
     }
 
     @RequestMapping("template/adapterMetaDataInfo")
-    public String adapterMetaDataInfoTemplate(Model model, Long id, String mode) {
+    public Object adapterMetaDataInfoTemplate(Model model, Long id, String mode) {
         String url = "/adapterSet/adapterMetaData";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("id",id);
         try {
@@ -86,7 +65,7 @@ public class AdapterDataSetController extends BaseController{
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        XAdapterDataSet adapterDataSet = new AdapterDataSet();
 //        if(mode.equals("view") || mode.equals("modify")){
@@ -113,10 +92,10 @@ public class AdapterDataSetController extends BaseController{
      */
     @RequestMapping("/searchAdapterDataSet")
     @ResponseBody
-    public String searchAdapterDataSet(Long adapterPlanId, String strKey,int page, int rows){
+    public Object searchAdapterDataSet(Long adapterPlanId, String strKey,int page, int rows){
         String url = "/adapterSet/adapterDataSets";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("planId", adapterPlanId);
         params.put("code", strKey);
@@ -130,7 +109,7 @@ public class AdapterDataSetController extends BaseController{
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //
@@ -147,7 +126,7 @@ public class AdapterDataSetController extends BaseController{
     }
 
     /**
-     * 根据dataSetId搜索数据元�?�配关系
+     * 根据dataSetId搜索数据元适配关系
      * @param adapterPlanId
      * @param dataSetId
      * @param page
@@ -156,10 +135,10 @@ public class AdapterDataSetController extends BaseController{
      */
     @RequestMapping("/searchAdapterMetaData")
     @ResponseBody
-    public String searchAdapterMetaData(Long adapterPlanId, Long dataSetId,String strKey,int page, int rows){
+    public Object searchAdapterMetaData(Long adapterPlanId, Long dataSetId,String strKey,int page, int rows){
         String url = "/adapterSet/adapterMetaDatas";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("planId", adapterPlanId);
         params.put("dataSetId", dataSetId);
@@ -174,7 +153,7 @@ public class AdapterDataSetController extends BaseController{
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //
@@ -193,31 +172,31 @@ public class AdapterDataSetController extends BaseController{
     }
 
     /**
-     * 根据数据集ID获取数据元�?�配关系明细
+     * 根据数据集ID获取数据元适配关系明细
      * @param id
      * @return
      */
 //    todo:前端没有找到该路径的请求
     @RequestMapping("/getAdapterMetaData")
     @ResponseBody
-    public String getAdapterMetaData(Long id){
+    public Object getAdapterMetaData(Long id){
         String url = "/adapterSet/adapterMetaData";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("id",id);
         try{
             //todo 后台转换成model后传前台
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            ObjectMapper mapper = new ObjectMapper();
-            XAdapterDataSet adapterDataSet = mapper.readValue(resultStr, XAdapterDataSet.class);
-            result.setObj(adapterDataSet);
+//            ObjectMapper mapper = new ObjectMapper();
+//            XAdapterDataSet adapterDataSet = mapper.readValue(resultStr, XAdapterDataSet.class);
+            result.setObj(resultStr);
             result.setSuccessFlg(true);
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //        try {
@@ -232,25 +211,25 @@ public class AdapterDataSetController extends BaseController{
 //        }
     }
 
-    private XAdapterDataSet getAdapterDataSet(Long id) {
-        return id==null? new AdapterDataSet(): adapterDataSetManager.getAdapterMetaData(id);
-    }
+//    private XAdapterDataSet getAdapterDataSet(Long id) {
+//        return id==null? new AdapterDataSet(): adapterDataSetManager.getAdapterMetaData(id);
+//    }
 
     /**
-     * 修改数据元映射关�?
+     * 修改数据元映射关系
      * @param
      * @return
      */
     @RequestMapping("/updateAdapterMetaData")
     @ResponseBody
-    public String updateAdapterMetaData(AdapterDataSetModel adapterDataSetModel){
+    public Object updateAdapterMetaData(String adapterDataSetModel){
         String url = "";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("adapterDataSetModel",adapterDataSetModel);
         try {
-            //更新或新�? todo:可放内部去做判断
+            //更新或新增 todo:可放内部去做判断
 //            if (adapterDataSetModel.getId()==null) {
 //                url = "/adapterSet/addAdapterMetaData";
 //                params.put("adapterPlanId",adapterDataSetModel.getAdapterPlanId());
@@ -258,17 +237,17 @@ public class AdapterDataSetController extends BaseController{
 //                url = "/adapterSet/updateAdapterMetaData";
 //            }
             url="/adapterSet/adapterMetaData";
-            //todo 失败，返回的错误信息怎么体现�?
+            //todo 失败，返回的错误信息怎么体现？
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
-            ObjectMapper mapper = new ObjectMapper();
-            AdapterDataSetModel adapterDataSetModelNew = mapper.readValue(resultStr, AdapterDataSetModel.class);
-            result.setObj(adapterDataSetModelNew);
+//            ObjectMapper mapper = new ObjectMapper();
+//            AdapterDataSetModel adapterDataSetModelNew = mapper.readValue(resultStr, AdapterDataSetModel.class);
+            result.setObj(resultStr);
             result.setSuccessFlg(true);
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //        try {
@@ -300,10 +279,10 @@ public class AdapterDataSetController extends BaseController{
      */
     @RequestMapping("/delMetaData")
     @ResponseBody
-    public String delMetaData(@RequestParam("id") Long[] id){
+    public Object delMetaData(@RequestParam("id") Long[] id){
         String url = "/adapterSet/adapterMetaData";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("ids",id);
         try {
@@ -315,11 +294,11 @@ public class AdapterDataSetController extends BaseController{
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.InvalidDelete.toString());
             }
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        int rtn = adapterDataSetManager.deleteAdapterDataSet(id);
 //        Result result = rtn>0?getSuccessResult(true):getSuccessResult(false);
@@ -335,24 +314,24 @@ public class AdapterDataSetController extends BaseController{
     public Object getStdMetaData(Long adapterPlanId,Long dataSetId,String mode){
         String url = "/adapterSet/getStdMetaData";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("adapterPlanId",adapterPlanId);
         params.put("dataSetId",dataSetId);
         params.put("mode",mode);
         try {
-            //todo 失败，返回的错误信息怎么体现�?
+            //todo 失败，返回的错误信息怎么体现？
             //todo 新增时要过滤掉已经存在的标准
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            ObjectMapper mapper = new ObjectMapper();
-            List<String> stdMetaData = Arrays.asList(mapper.readValue(resultStr, String[].class));
+//            ObjectMapper mapper = new ObjectMapper();
+//            List<String> stdMetaData = Arrays.asList(mapper.readValue(resultStr, String[].class));
             result.setSuccessFlg(true);
-            result.setDetailModelList(stdMetaData);
-            return result.toJson();
+            result.setObj(resultStr);
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //        try {
@@ -393,7 +372,7 @@ public class AdapterDataSetController extends BaseController{
     }
 
     /**
-     * 机构数据集下�?
+     * 机构数据集下拉
      * @return
      */
     @RequestMapping("/getOrgDataSet")
@@ -401,20 +380,20 @@ public class AdapterDataSetController extends BaseController{
     public Object getOrgDataSet(Long adapterPlanId){
         String url = "/adapterSet/getOrgDataSet";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("adapterPlanId",adapterPlanId);
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            ObjectMapper mapper = new ObjectMapper();
-            List<String> orgDataSet = Arrays.asList(mapper.readValue(resultStr, String[].class));
+//            ObjectMapper mapper = new ObjectMapper();
+//            List<String> orgDataSet = Arrays.asList(mapper.readValue(resultStr, String[].class));
             result.setSuccessFlg(true);
-            result.setDetailModelList(orgDataSet);
-            return result.toJson();
+            result.setObj(resultStr);
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //        try {
@@ -440,7 +419,7 @@ public class AdapterDataSetController extends BaseController{
     }
 
     /**
-     * 机构数据元下�?
+     * 机构数据元下拉
      * @param orgDataSetSeq
      * @return
      */
@@ -449,22 +428,22 @@ public class AdapterDataSetController extends BaseController{
     public Object getOrgMetaData(Integer orgDataSetSeq,Long adapterPlanId){
         String url = "/adapterSet/getOrgMetaData";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("orgDataSetSeq",orgDataSetSeq);
         params.put("adapterPlanId",adapterPlanId);
         try {
             //网关没有url没有请求方式
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            ObjectMapper mapper = new ObjectMapper();
-            List<String> orgMetaData = Arrays.asList(mapper.readValue(resultStr, String[].class));
+//            ObjectMapper mapper = new ObjectMapper();
+//            List<String> orgMetaData = Arrays.asList(mapper.readValue(resultStr, String[].class));
             result.setSuccessFlg(true);
-            result.setDetailModelList(orgMetaData);
-            return result.toJson();
+            result.setObj(resultStr);
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //        try {
