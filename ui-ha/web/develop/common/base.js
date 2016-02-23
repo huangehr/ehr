@@ -1,0 +1,1 @@
+var JKZL = window.JKZL = (window.JKZL || {});

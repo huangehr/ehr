@@ -1,0 +1,17 @@
+/* Example wrapper */
+.m-wrap { width: 360px; padding: 10px 0; }
+
+/* Frame */
+.m-base-page { position: absolute; top: 10px; height: 40px; width: 20px;line-height: 40px; }
+.m-base-page.pre-page { left: 0; }
+.m-base-page.next-page { right: 0; }
+.m-base-page.disabled { display: none; }
+.m-base-page>span { display: inline-block;width:11px;height:11px; }
+.m-base-page.pre-page>span { background: url(../../../images/browser/left_arrow01_btn.png) no-repeat; }
+.m-base-page.pre-page>span:hover { background: url(../../../images/browser/left_arrow01_btn_pre.png) no-repeat; }
+.m-base-page.next-page>span { background: url(../../../images/browser/right_arrow01_btn.png) no-repeat; }
+.m-base-page.next-page>span:hover { background: url(../../../images/browser/right_arrow01_btn_pre.png) no-repeat; }
+.m-frame { display: inline-block; width: 300px; height: 40px; line-height: 40px; margin: 0 20px; overflow: hidden;  }
+.m-frame ul { list-style: none; margin: 0; padding: 0; height: 100%; font-size: 12px; }
+.m-frame ul li { float: left; width: 100px; height: 100%; margin: 0 1px 0 0; padding: 0; font-weight: bold; color: #232323; text-align: center; cursor: pointer;  }
+.m-frame ul li.active { color: #23AFFF; }

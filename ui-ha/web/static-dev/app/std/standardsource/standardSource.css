@@ -1,0 +1,87 @@
+#data-grid .u-grid {
+    border: 0;
+}
+
+#data-grid .u-grid .grid-body tr:not(.jqgfirstrow) {
+    height: 40px;
+    font-size: 12px;
+    text-align: center;
+}
+.modal-header {
+    background-color: #2d9bd2;
+    height: 40px;
+}
+
+.modal-body .table tr td {
+    font-size: 12px;
+    border: solid 0;
+    padding: 5px;
+}
+
+.msg-modal {
+    border-radius: 2px;
+}
+
+.msg-dialog {
+    width: 322px;
+}
+
+.msg-body {
+    height: 116px;
+}
+
+.modal-body .table input {
+    font-family: SimSun;
+    font-size: 12px;
+    height: 30px;
+    width: 240px;
+}
+
+.modal-body .table select {
+    font-family: SimSun;
+    font-size: 12px;
+    height: 30px;
+    width: 240px;
+}
+.modal-body .table textarea { height: 170px;width: 240px;}
+.modal-footer {
+    border-top: 0;
+    background-color:#fff;
+}
+.version{
+    margin-right: 20px;margin-top: -40px;
+}
+.condition{
+    border-top: 1px solid #d3d3d3;
+}
+.condition input{
+    font-family: SimSun;
+    font-size: 12px;
+    height: 30px;
+    width: 240px;
+}
+#data-grid table input{
+    height: 15px;
+    width: 15px;
+}
+
+.image-search{
+    margin-left:210px;
+    margin-top: -25px;
+    width: 20px;
+    height: 20px;
+    background: url(../../../images/Search_btn.png);
+}
+.image-search:hover{
+    margin-left:210px;
+    margin-top: -25px;
+    width: 20px;
+    height: 20px;
+    background: url(../../../images/Search_btn_pre.png);
+}
+.condition button{
+    width: 84px;
+}
+.modal-footer button {
+    width: 84px;
+}

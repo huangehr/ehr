@@ -15,15 +15,14 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @RequestMapping(value = "/rest/v1.0")
 public interface AppClient {
 
-    @RequestMapping(value = "/app/validation/{app_id}/{secret}", method = GET )
-    Boolean validationApp(
+    @RequestMapping(value = "/apps/existence/{app_id}", method = GET )
+    Boolean isAppExistence(
             @PathVariable(value = "app_id") String appId,
-            @PathVariable(value = "secret") String appSecret);
+            @RequestParam(value = "secret") String appSecret);
 
 
     @RequestMapping(value = "/apps/{app_id}", method = GET )
-    MApp getApp(
-            @PathVariable(value = "app_id") String appId);
+    MApp getApp(@PathVariable(value = "app_id") String appId);
 
 
 }

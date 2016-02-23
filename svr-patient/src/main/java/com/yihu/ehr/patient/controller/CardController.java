@@ -118,12 +118,7 @@ public class CardController extends BaseRestController {
             @ApiParam(name = "card_type", value = "卡类别", defaultValue = "")
             @PathVariable(value = "card_type") String cardType) throws Exception{
         AbstractCard card = cardManager.getCard(id, cardType);
-        MAbstractCard abstractCardModel = convertToModel(card,MAbstractCard.class);
-        abstractCardModel.setStatus(conventionalDictClient.getCardStatus(card.getStatus()));
-        abstractCardModel.setType(conventionalDictClient.getCardType(card.getType()));
-        abstractCardModel.setLocal(addressClient.getAddressById(card.getLocal()));
-        abstractCardModel.setReleaseOrg(orgClient.getOrg(card.getReleaseOrg()));
-        return abstractCardModel;
+        return convertToModel(card,MAbstractCard.class);
     }
 
     /**

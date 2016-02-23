@@ -1,0 +1,22 @@
+.u-menu { margin: 0; }
+
+.u-menu .item { position: relative;}
+.u-menu .item a,
+.u-menu .item a:hover { color: #fff; }
+.u-menu .item.active { background-color: #204d74; }
+.u-menu.vertical { background-color: #E7E6E6; }
+.u-menu.vertical .item { border-left: 5px solid transparent; }
+.u-menu.vertical .item.active { border-left: 5px solid #204d74; }
+.u-menu.vertical .item a,
+.u-menu.vertical .item a:hover { color: #000; }
+.u-menu.vertical .item.active { background-color: #6091BB; }
+
+.u-menu.vertical .item-icon:before { display: block; position: absolute; top: 12px; left: 20px; width: 1.2em; height: 1.2em; border-radius: 50rem; line-height: 1; content: ''; background: #fff; cursor: pointer; z-index: 1; }
+.u-menu.vertical .item-icon:after { display: block; position: absolute; top: 16px; left: 24px; width: .5em; height: .5em; border-radius: 50rem; line-height: 1; content: ''; background-color: #A6A4A4; cursor: pointer; z-index: 1;  }
+.u-menu.vertical .item.active .item-icon:after { background-color: #d95c5c; }
+
+/**设置菜单项的分割符
+.u-menu .item:after {   content: "."; width: 20px; height: 40px; line-height: 40px; background: url(../../images/icon_es.png) center no-repeat; display: inline-block;}
+    **/
+
+.f-icon-1 {  }

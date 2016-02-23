@@ -36,17 +36,6 @@ public class GeographyService {
     @Autowired
     private XGeographyDictRepository addressDictRepository;
 
-	public GeographyService(){}
-
-    /**
-     * 根据地址字典id获取地址字典
-     * @param id
-     * @return
-     */
-	public GeographyDict getAddrDict(String id){
-        GeographyDict addressDict = addressDictRepository.getAddressDictById(id);
-        return addressDict;
-	}
 
 	public List<GeographyDict> getLevelToAddr(Integer level){
         List<GeographyDict> addressDictList = addressDictRepository.getAddrDictByLevel(level);

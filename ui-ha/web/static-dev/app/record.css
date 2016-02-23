@@ -1,0 +1,12 @@
+body {
+    background-color: rgb(236, 233, 216);
+}
+
+.m-record { text-align: center; margin: 10px;}
+.m-record .title { font-family: "楷体"; font-size: 23px; font-weight: bold;}
+.m-record .subtitle {   font-family: "黑体"; font-size: 14px; margin-top: 10px;}
+
+.m-record .body { margin-top: 10px;   font-size: 14px;}
+.m-record  [class^="col-"] { padding: 5px 0; }
+.m-record .row.divline { border-bottom:  1px solid #d5d5d5;}
+.m-record .row .column { margin-top: 7px; }

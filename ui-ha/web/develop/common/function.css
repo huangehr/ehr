@@ -1,0 +1,153 @@
+﻿/* function */
+
+/* 文字排版 */
+.f-ff0 { font-family:arial,\5b8b\4f53; }
+.f-ff1 { font-family:"Microsoft YaHei",\5fae\8f6f\96c5\9ed1,arial,\5b8b\4f53; }
+.f-fs12 { font-size:12px; }
+.f-fs13 { font-size:13px; }
+.f-fs14 { font-size:14px; }
+.f-fs16 { font-size:16px; }
+.f-fs20 { font-size:20px; }
+.f-fwn { font-weight:normal; }
+.f-fwb { font-weight:bold; }
+.f-tdu,
+.f-tdu:hover { text-decoration:underline; }
+.f-tdn,
+.f-tdn:link,
+.f-tdn:visited,
+.f-tdn:hover,
+.f-tdn:active { text-decoration:none; }
+.f-ti { overflow:hidden; text-indent:-30000px; }
+.f-ti2 { text-indent:2em; }
+.f-lhn { line-height:normal; }
+.f-wsn { word-wrap:normal; white-space:nowrap; }
+.f-pre { overflow:hidden; text-align:left; white-space:pre-wrap; word-wrap:break-word; word-break:break-all; }
+.f-wwb { white-space:normal; word-wrap:break-word; word-break:break-all; }
+.f-toe{overflow:hidden;word-wrap:normal;white-space:nowrap;text-overflow:ellipsis;}
+
+/* 定位 */
+.f-tal { text-align:left; }
+.f-tac { text-align:center; }
+.f-tar { text-align:right; }
+.f-taj { text-align:justify; text-justify:inter-ideograph; }
+.f-vam,
+.f-vama *{ vertical-align:middle; }
+.f-cb:after,
+.f-cbli li:after { display:block; clear:both; visibility:hidden; height:0; overflow:hidden; content:"."; }
+.f-cb,
+.f-cbli li { zoom:1; }
+.f-ib { display:inline-block; *display:inline; *zoom:1; }
+.f-dn { display:none; }
+.f-db { display:block; }
+.f-fl { float:left; }
+.f-fr { float:right; }
+.f-pa { position:absolute; }
+.f-pr { position:relative; }
+.f-prz { position:relative; zoom:1; }
+.f-oh { overflow:hidden; }
+
+/* 长度高度*/
+.f-w10 { width:10px; }
+.f-w20 { width:20px; }
+.f-w30 { width:30px; }
+.f-w40 { width:40px; }
+.f-w50 { width:50px; }
+.f-w60 { width:60px; }
+.f-w70 { width:70px; }
+.f-w80 { width:80px; }
+.f-w90 { width:90px; }
+.f-w100 { width:100px; }
+.f-w200 { width:200px; }
+.f-w240 { width:240px; }
+.f-w300 { width:300px; }
+.f-w400 { width:400px; }
+.f-w500 { width:500px; }
+.f-w600 { width:600px; }
+.f-w700 { width:700px; }
+.f-w800 { width:800px; }
+.f-ww { width:100% }
+.f-h10 { height:10px; }
+.f-h20 { height:20px; }
+.f-h28 { height:28px; }
+.f-h30 { height:30px; }
+.f-h40 { height:40px; }
+.f-h50 { height:50px; }
+.f-h80 { height:80px; }
+.f-h100 { height:100px; }
+.f-h200 { height:200px; }
+.f-hh { height:100% }
+
+.f-lh30 { line-height:30px; }
+
+/* 边距 */
+.f-m10 {  margin:10px; }
+.f-m15 {  margin:15px; }
+.f-m30 {  margin:30px; }
+.f-mt5 {  margin-top:5px; }
+.f-mt10 { margin-top:10px; }
+.f-mt15 { margin-top:15px; }
+.f-mt20 { margin-top:20px; }
+.f-mt30 { margin-top:30px; }
+.f-mt50 { margin-top:50px; }
+.f-mt100 { margin-top:100px; }
+.f-mb5 { margin-bottom:5px; }
+.f-mb10 { margin-bottom:10px; }
+.f-mb15 { margin-bottom:15px; }
+.f-mb20 { margin-bottom:20px; }
+.f-mb30 { margin-bottom:30px; }
+.f-mb50 { margin-bottom:50px; }
+.f-mb100 { margin-bottom:100px; }
+.f-ml5 { margin-left:5px; }
+.f-ml10 { margin-left:10px; }
+.f-ml15 { margin-left:15px; }
+.f-ml20 { margin-left:20px; }
+.f-ml30 { margin-left:30px; }
+.f-ml50 { margin-left:50px; }
+.f-ml100 { margin-left:100px; }
+.f-mr5 { margin-right:5px; }
+.f-mr10 { margin-right:10px; }
+.f-mr15 { margin-right:15px; }
+.f-mr20 { margin-right:20px; }
+.f-mr30 { margin-right:30px; }
+.f-mr50 { margin-right:50px; }
+.f-mr100 { margin-right:100px; }
+.f-p10 { padding:10px; }
+.f-p15 { padding:15px; }
+.f-p30 { padding:30px; }
+.f-pt5 { padding-top:5px; }
+.f-pt10 { padding-top:10px; }
+.f-pt15 { padding-top:15px; }
+.f-pt20 { padding-top:20px; }
+.f-pt30 { padding-top:30px; }
+.f-pt50 { padding-top:50px; }
+.f-pt100 { padding-top:100px; }
+.f-pb5 { padding-bottom:5px; }
+.f-pb10 { padding-bottom:10px; }
+.f-pb15 { padding-bottom:15px; }
+.f-pb20 { padding-bottom:20px; }
+.f-pb30 { padding-bottom:30px; }
+.f-pb50 { padding-bottom:50px; }
+.f-pb100 { padding-bottom:100px; }
+.f-pl5 { padding-left:5px; }
+.f-pl10 { padding-left:10px; }
+.f-pl15 { padding-left:15px; }
+.f-pl20 { padding-left:20px; }
+.f-pl30 { padding-left:30px; }
+.f-pl50 { padding-left:50px; }
+.f-pl100 { padding-left:100px; }
+.f-pr5 { padding-right:5px; }
+.f-pr10 { padding-right:10px; }
+.f-pr15 { padding-right:15px; }
+.f-pr20 { padding-right:20px; }
+.f-pr30 { padding-right:30px; }
+.f-pr50 { padding-right:50px; }
+.f-pr100 { padding-right:100px; }
+
+
+/* 其它 */
+.f-csp{cursor:pointer;}
+.f-csd{cursor:default;}
+.f-csh{cursor:help;}
+.f-csm{cursor:move;}
+.f-usn{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;user-select:none;}
+

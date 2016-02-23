@@ -19,5 +19,8 @@ interface XSystemDictRepository extends JpaRepository<SystemDict, Long> {
     SystemDict findByName(String name);
 
     Page<SystemDict> findByNameOrPhoneticCodeOrderByNameAsc(String name, String phoneticCode, Pageable pageable);
+
+    @Query("select max(dict.id) from SystemDict dict where 1=1")
+    long getNextId();
 }
 

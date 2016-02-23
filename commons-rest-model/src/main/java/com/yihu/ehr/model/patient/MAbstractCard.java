@@ -1,9 +1,5 @@
 package com.yihu.ehr.model.patient;
 
-import com.yihu.ehr.model.address.MGeography;
-import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.org.MOrganization;
-
 import java.util.Date;
 
 /**
@@ -18,15 +14,15 @@ public class MAbstractCard {
 	String id;				    // 卡ID
 	String number;				// 卡号
 	String ownerName;			// 持有人姓名
-	MConventionalDict status;			// 状态 CardStatus
-	MConventionalDict type;				// 类型 CardType
+	String status;			// 状态 CardStatus
+	String type;				// 类型 CardType
 	String description;			// 描述
 	Date createDate;				// 创建日期
 	String idCardNo;
 	String DType;
 	//特殊字段
-	MGeography local;				// 发行地/归属地
-	MOrganization releaseOrg;				// 发行机构
+	String local;				// 发行地/归属地
+	String releaseOrg;				// 发行机构
 	Date releaseDate;			// 发行时间
 	Date validityDateBegin;		// 有效期起始时间
 	Date validityDateEnd;		// 有效期结束时间
@@ -68,19 +64,19 @@ public class MAbstractCard {
 		this.ownerName = ownerName;
 	}
 
-	public MConventionalDict getStatus() {
+	public String getStatus() {
 		return status;
 	}
 
-	public void setStatus(MConventionalDict status) {
+	public void setStatus(String status) {
 		this.status = status;
 	}
 
-	public MConventionalDict getType() {
+	public String getType() {
 		return type;
 	}
 
-	public void setType(MConventionalDict type) {
+	public void setType(String type) {
 		this.type = type;
 	}
 
@@ -116,19 +112,19 @@ public class MAbstractCard {
 		this.DType = DType;
 	}
 
-	public MGeography getLocal() {
+	public String getLocal() {
 		return local;
 	}
 
-	public void setLocal(MGeography local) {
+	public void setLocal(String local) {
 		this.local = local;
 	}
 
-	public MOrganization getReleaseOrg() {
+	public String getReleaseOrg() {
 		return releaseOrg;
 	}
 
-	public void setReleaseOrg(MOrganization releaseOrg) {
+	public void setReleaseOrg(String releaseOrg) {
 		this.releaseOrg = releaseOrg;
 	}
 

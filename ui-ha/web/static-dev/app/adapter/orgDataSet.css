@@ -1,0 +1,131 @@
+#orgDataSetGrid .u-grid,
+#orgMetaDataGrid .u-grid,
+#orgDictGrid .u-grid,
+#orgDictItemGrid .u-grid{
+    border: 0;
+}
+
+#orgDataSetGrid .u-grid .grid-body tr:not(.jqgfirstrow),
+#orgMetaDataGrid .u-grid .grid-body tr:not(.jqgfirstrow),
+#orgDictGrid .u-grid .grid-body tr:not(.jqgfirstrow),
+#orgDictItemGrid .u-grid .grid-body tr:not(.jqgfirstrow)
+{
+    height: 40px;
+    font-size: 12px;
+    text-align: center;
+}
+
+.modal-header {
+    background-color: #2d9bd2;
+    height: 40px;
+}
+
+.modal-body .table tr td {
+    font-size: 12px;
+    border: solid 0;
+    padding: 5px 3px 5px 3px;
+}
+.modal-body td label{float: right;font-family: SimSun;font-size: 12px;padding-top: 4px;}
+.modal-footer button {
+    width: 84px;
+}
+.modal-footer {
+    border-top: 0;
+    background-color:#fff;
+}
+.msg-modal {
+    border-radius: 2px;
+}
+
+.msg-dialog {
+    width: 322px;
+}
+
+.msg-body {
+    height: 116px;
+}
+.modal-body .table input{
+    font-family: SimSun;
+    font-size: 12px;
+    height: 30px;
+    width: 240px;
+}
+.modal-body .table input[type="checkbox"] {
+    height: 20px;
+    width: 20px;
+    margin-top: 0;
+    margin-left: 10px;
+}
+.modal-body .table select {
+    font-family: SimSun;
+    font-size: 12px;
+    height: 30px;
+    width: 240px;
+}
+.modal-body .table textarea {
+    color: inherit;
+}
+.addImg{
+    margin-left:340px;
+    margin-top: -25px;
+    width: 22px;
+    height: 22px;
+    background: url(../../images/add_btn_pre.png);
+}
+.image-search{
+    margin-left:210px;
+    margin-top: -25px;
+    width: 20px;
+    height: 20px;
+    background: url(../../images/Search_btn.png);
+}
+.image-search:hover{
+    margin-left:210px;
+    margin-top: -25px;
+    width: 20px;
+    height: 20px;
+    background: url(../../images/Search_btn_pre.png);
+}
+
+.switch{
+    border-top: 1px solid #d3d3d3;
+    margin-top: 0;
+}
+.left-gmenu {
+    width:400px;
+    border: 1px solid #d3d3d3;
+    border-left:0 ;
+    border-bottom: 0;
+    margin-left: 0;
+}
+.right-gmenu{
+    top:100px;
+    position: absolute;
+    border: 1px solid #d3d3d3;
+    border-right:0 ;
+    border-bottom: 0;
+    margin-left: 420px;
+}
+
+.description{
+    height: 180px;
+    width: 240px;
+}
+.condition input,
+.condition select{
+    font-family: SimSun;
+    font-size: 12px;
+    height: 30px;
+    width: 240px;
+}
+.condition button {
+    width: 84px;
+}
+.body-head input{
+    border: 0;
+}
+.back{
+    border-right: 1px solid #d3d3d3;
+}
+
+

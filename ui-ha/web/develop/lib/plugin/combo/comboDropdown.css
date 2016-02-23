@@ -1,0 +1,26 @@
+.m-combo-dropdown { position: relative; width: 100%; padding-bottom: 0; background: #FFF; font-size: 12px; outline: 0; cursor: pointer  }
+.m-combo-dropdown>.m-input-box { border: 1px solid #ccc; }
+.m-combo-dropdown>.m-input-box.l-text-focus { border: 1px solid #3094d5; }
+.m-combo-dropdown>.m-input-box .u-input-search { width: 210px; height: 28px;padding-left: 5px; border: none; }
+.m-combo-dropdown .u-dropdown-icon { position: absolute; top: 1px; right: 1px; width: 29px; height: 28px; background: url(images/Eject_btn.png) no-repeat; }
+
+.u-select-tab { border-bottom: 1px solid #ccc; border-right: 1px solid #ccc; border-top: 1px solid #ccc; height: 35px; background: #f0f0f0 }
+.u-select-tab a { float: left; display: inline; margin-bottom: -1px; padding: 10px 2px; width: 58px; border-left: 1px solid #ccc; border-bottom: 1px solid transparent; color: #4D4D4D; text-align: center; outline: 0 }
+
+.u-select-tab .current { background: #fff; border-bottom: 1px solid #fff; color: #f60 }
+.u-select-title { margin-right: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ccc }
+.u-select-title { position: absolute; height: 30px; line-height: 30px; color: #333; padding-left: 5px; }
+
+.m-select-panel { border: 1px solid #ccc; border-top: none; padding: 5px; width: 240px; background: #fff; font-size: 12px }
+.m-select-panel dl { line-height: 2; clear: both; padding: 3px 0; margin: 0 }
+.m-select-panel dl:after { display: block; clear: both; content: " ";  font-size: 0; height: 0; visibility: hidden }
+.m-select-panel dt { display: inline-block; width: 35px; float: left; line-height: 25px; padding-right: 10px; font-weight: 700; text-align: right }
+.m-select-panel dd { display: inline; float: left; width: 190px; line-height: 25px; margin-left: 0 }
+.m-select-panel a { display: inline-block; color: #4D4D4D; padding: 0 6px; outline: 0; text-decoration: none; white-space: nowrap; margin-right: 2px }
+.m-select-panel a:focus,.m-select-panel a:hover { background-color: #fff8f3; border-radius: 2px; color: #f60 }
+.m-select-panel a.current { background-color: #f60; color: #fff; border-radius: 2px }
+.m-select-panel .border-top { border-top: 1px solid #ccc }
+
+.m-combo-tab { position: absolute; left: 0; top: 28px; width: 240px; z-index: 999 }
+.m-combo-dropdown { float: left; margin-right: 10px }
+

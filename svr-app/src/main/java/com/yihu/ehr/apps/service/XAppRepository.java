@@ -2,6 +2,8 @@ package com.yihu.ehr.apps.service;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 /**
  * App 操作接口。
  *
@@ -11,4 +13,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface XAppRepository extends JpaRepository<App, String> {
     App findByName(String name);
+
+    List<App> findByIdAndSecret(String appId,String secret);
 }
