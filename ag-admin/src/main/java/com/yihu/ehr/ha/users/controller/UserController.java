@@ -1,5 +1,6 @@
 package com.yihu.ehr.ha.users.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.dict.MConventionalDict;
 import com.yihu.ehr.agModel.org.MOrganization;
 import com.yihu.ehr.agModel.user.UserDetailModel;
@@ -27,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by AndyCai on 2016/1/21.
@@ -48,6 +50,10 @@ public class UserController extends BaseController {
 
     @Autowired
     private SecurityClient securityClient;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
 
     @RequestMapping(value = "/users" , method = RequestMethod.GET)
     @ApiOperation(value = "获取用户列表",notes = "根据查询条件获取用户列表在前端表格展示")
@@ -114,12 +120,16 @@ public class UserController extends BaseController {
 
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
-        Object object = userClient.createUser(userJsonData);
-        if(!object.toString().equals("true"))
+        UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
+        MUser  mUser = convertToModel(detailModel,MUser.class);
+        mUser = userClient.createUser(objectMapper.writeValueAsString(mUser));
+        if(mUser==null)
         {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("保存失败!");
         }
+        detailModel = convertToModel(mUser,UserDetailModel.class);
+        envelop.setObj(detailModel);
         return envelop;
     }
 
@@ -132,12 +142,16 @@ public class UserController extends BaseController {
 
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
-        Object object = userClient.updateUser(userJsonData);
-        if(!object.toString().equals("true"))
+        UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
+        MUser  mUser = convertToModel(detailModel,MUser.class);
+        mUser = userClient.updateUser(objectMapper.writeValueAsString(mUser));
+        if(mUser==null)
         {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("保存失败!");
         }
+        detailModel = convertToModel(mUser,UserDetailModel.class);
+        envelop.setObj(detailModel);
         return envelop;
     }
 
@@ -204,7 +218,7 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "/users/users/key/{login_code}", method = RequestMethod.PUT)
     @ApiOperation(value = "重新分配密钥",notes = "重新分配密钥")
-    public Object distributeKey(
+    public Map<String, String> distributeKey(
             @ApiParam(name = "login_code", value = "登录帐号", defaultValue = "")
             @PathVariable(value = "login_code") String loginCode) {
         return userClient.distributeKey(loginCode);

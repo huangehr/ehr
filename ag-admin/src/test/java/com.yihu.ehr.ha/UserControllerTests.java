@@ -1,6 +1,6 @@
 package com.yihu.ehr.ha;
 
-import com.eureka2.shading.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.ha.users.controller.UserController;
 import com.yihu.ehr.util.Envelop;
@@ -25,10 +25,10 @@ import static org.junit.Assert.assertTrue;
 public class UserControllerTests {
 
     @Autowired
-    private static UserController userController;
+    private UserController userController;
 
     @Autowired
-    private static ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     private static String version ="v1.0";
 
@@ -37,7 +37,8 @@ public class UserControllerTests {
     @Test
     public void atestUser() throws Exception{
 
-        applicationContext = new SpringApplicationBuilder().web(false).sources(AgAdminApplication.class).run();
+        applicationContext = new SpringApplicationBuilder()
+                .web(false).sources(AgAdminApplication.class).run();
 
         UserDetailModel userModel = new UserDetailModel();
         userModel.setLoginCode("test_cms");

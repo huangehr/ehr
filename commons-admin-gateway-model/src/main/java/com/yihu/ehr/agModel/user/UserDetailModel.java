@@ -12,7 +12,7 @@ public class UserDetailModel {
     private String email;
     private String loginCode;
     private String realName;
-    private String password;
+    private String password="123456";
     private Boolean activated;
     private String validateCode;
     private String userType;

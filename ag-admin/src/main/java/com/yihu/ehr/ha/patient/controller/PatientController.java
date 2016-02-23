@@ -2,7 +2,6 @@ package com.yihu.ehr.ha.patient.controller;
 
 import com.yihu.ehr.agModel.geogrephy.MGeography;
 import com.yihu.ehr.agModel.patient.PatientModel;
-import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.ha.geography.service.AddressClient;
 import com.yihu.ehr.ha.patient.service.PatientClient;
@@ -51,7 +50,8 @@ public class PatientController extends BaseController{
             @RequestParam(value = "rows") Integer rows,
             HttpServletResponse response) throws Exception{
 
-        List<MDemographicInfo> demographicInfos = patientClient.searchPatient(name,idCardNo,province,city,district,page,rows);
+        Envelop envelop = patientClient.searchPatient(name,idCardNo,province,city,district,page,rows);
+        List<MDemographicInfo> demographicInfos = (List<MDemographicInfo>)envelop.getDetailModelList();
         List<PatientModel> patients = new ArrayList<>();
         for(MDemographicInfo patientInfo : demographicInfos)
         {
@@ -73,11 +73,7 @@ public class PatientController extends BaseController{
             patients.add(patient);
         }
 
-        //TODO:获取总条数
-        String count = response.getHeader(AgAdminConstants.ResourceCount);
-        int totalCount = StringUtils.isNotEmpty(count)?Integer.parseInt(count):0;
-
-        Envelop envelop = getResult(patients,totalCount,page,rows);
+        envelop = getResult(patients,envelop.getTotalCount(),page,rows);
         return envelop;
     }
 
@@ -90,10 +86,17 @@ public class PatientController extends BaseController{
      */
     @RequestMapping(value = "/populations/{id_card_no}",method = RequestMethod.DELETE)
     @ApiOperation(value = "根据身份证号删除人")
-    public Object deletePatient(
+    public Envelop deletePatient(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @PathVariable(value = "id_card_no") String idCardNo) throws Exception{
-        return patientClient.deletePatient(idCardNo);
+        Envelop envelop = new Envelop();
+        boolean result = patientClient.deletePatient(idCardNo);
+        envelop.setSuccessFlg(result);
+        if(!result)
+        {
+            envelop.setErrorMsg("删除失败!");
+        }
+        return envelop;
     }
 
 
