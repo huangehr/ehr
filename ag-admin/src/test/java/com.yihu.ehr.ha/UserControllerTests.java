@@ -9,7 +9,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertTrue;
@@ -30,8 +32,12 @@ public class UserControllerTests {
 
     private static String version ="v1.0";
 
+    ApplicationContext applicationContext;
+
     @Test
     public void atestUser() throws Exception{
+
+        applicationContext = new SpringApplicationBuilder().web(false).sources(AgAdminApplication.class).run();
 
         UserDetailModel userModel = new UserDetailModel();
         userModel.setLoginCode("test_cms");
