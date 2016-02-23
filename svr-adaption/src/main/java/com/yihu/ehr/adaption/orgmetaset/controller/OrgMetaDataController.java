@@ -155,7 +155,7 @@ public class OrgMetaDataController extends ExtendController<MOrgMetaData> {
 
         List appList = orgMetaDataService.search(fields, filters, sorts, page, size);
         pagedResponse(request, response, orgMetaDataService.getCount(filters), page, size);
-        return convertToModels(appList, new ArrayList<MOrgMetaData>(appList.size()), MOrgMetaData.class, fields.split(","));
+        return convertToModels(appList, new ArrayList<>(appList.size()), MOrgMetaData.class, fields);
     }
 
 }

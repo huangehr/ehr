@@ -59,7 +59,7 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
         if (orgAdapterPlan==null)
             throw errNotFound();
         List ls = adapterDataSetService.searchAdapterDataSet(orgAdapterPlan, code, name, sorts, page, size);
-        pagedResponse(request, response, adapterDataSetService.searchDataSetInt(orgAdapterPlan, code, name), page, size);
+        pagedResponse(request, response,(long) adapterDataSetService.searchDataSetInt(orgAdapterPlan, code, name), page, size);
         return ls;
     }
 
@@ -87,7 +87,7 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
         if (orgAdapterPlan==null)
             throw errNotFound();
         List ls = adapterDataSetService.searchAdapterMetaData(orgAdapterPlan, dataSetId, code, name, sorts, page, size);
-        pagedResponse(request, response, adapterDataSetService.searchMetaDataInt(orgAdapterPlan, dataSetId, code, name), page, size);
+        pagedResponse(request, response, (long) adapterDataSetService.searchMetaDataInt(orgAdapterPlan, dataSetId, code, name), page, size);
         return ls;
     }
 

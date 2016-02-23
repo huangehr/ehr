@@ -161,7 +161,7 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
         Class entityClass = getServiceEntity(version);
         List ls = dictEntryService.search(entityClass, fields, filters, sorts, page, size);
         pagedResponse(request, response, dictEntryService.getCount(entityClass, filters), page, size);
-        return convertToModels(ls, new ArrayList<MStdDictEntry>(ls.size()), MStdDictEntry.class, fields.split(","));
+        return convertToModels(ls, new ArrayList<>(ls.size()), MStdDictEntry.class, fields);
     }
 
     @RequestMapping(value = "/entry/{id}", method = RequestMethod.GET)

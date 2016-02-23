@@ -48,7 +48,7 @@ public class CdaVersionController extends ExtendController<MCDAVersion>{
 
         List appList = cdaVersionService.search(fields, filters, sorts, page, size);
         pagedResponse(request, response, cdaVersionService.getCount(filters), page, size);
-        return convertToModels(appList, new ArrayList<MCDAVersion>(appList.size()), MCDAVersion.class, fields.split(","));
+        return convertToModels(appList, new ArrayList<>(appList.size()), MCDAVersion.class, fields);
     }
 
 

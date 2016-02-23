@@ -166,7 +166,7 @@ public class OrgDictItemController extends ExtendController<MOrgDictItem> {
 
         List appList = orgDictItemService.search(fields, filters, sorts, page, size);
         pagedResponse(request, response, orgDictItemService.getCount(filters), page, size);
-        return convertToModels(appList, new ArrayList<MOrgDictItem>(appList.size()), MOrgDictItem.class, fields.split(","));
+        return convertToModels(appList, new ArrayList<>(appList.size()), MOrgDictItem.class, fields);
     }
 
     @RequestMapping(value = "/items/combo", method = RequestMethod.GET)

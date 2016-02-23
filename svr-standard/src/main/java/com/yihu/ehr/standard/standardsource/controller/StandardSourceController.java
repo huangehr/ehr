@@ -57,7 +57,7 @@ public class StandardSourceController extends ExtendController<MStdSource>{
 
         List appList = stdSourceService.search(fields, filters, sorts, page, size);
         pagedResponse(request, response, stdSourceService.getCount(filters), page, size);
-        return convertToModels(appList, new ArrayList<MStdSource>(appList.size()), MStdSource.class, fields.split(","));
+        return convertToModels(appList, new ArrayList<>(appList.size()), MStdSource.class, fields);
     }
 
 

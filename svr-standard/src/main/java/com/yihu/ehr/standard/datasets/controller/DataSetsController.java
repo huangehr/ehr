@@ -66,7 +66,7 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
         Class entityClass = getServiceEntity(version);
         List ls = dataSetService.search(entityClass, fields, filters, sorts, page, size);
         pagedResponse(request, response, dataSetService.getCount(entityClass, filters), page, size);
-        return convertToModels(ls, new ArrayList<MStdDataSet>(ls.size()), MStdDataSet.class, fields.split(","));
+        return convertToModels(ls, new ArrayList<>(ls.size()), MStdDataSet.class, fields);
     }
 
 

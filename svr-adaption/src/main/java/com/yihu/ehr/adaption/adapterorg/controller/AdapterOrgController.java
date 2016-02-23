@@ -52,7 +52,7 @@ public class AdapterOrgController extends ExtendController<MAdapterOrg> {
 
         List appList = adapterOrgService.search(fields, filters, sorts, page, size);
         pagedResponse(request, response, adapterOrgService.getCount(filters), page, size);
-        return convertToModels(appList, new ArrayList<MAdapterOrg>(appList.size()), MAdapterOrg.class, fields.split(","));
+        return convertToModels(appList, new ArrayList<>(appList.size()), MAdapterOrg.class, fields);
     }
 
 
