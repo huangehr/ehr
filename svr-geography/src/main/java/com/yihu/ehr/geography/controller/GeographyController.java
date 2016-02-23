@@ -39,7 +39,7 @@ public class GeographyController extends BaseRestController{
     }
 
 
-    @RequestMapping(value = "geographies/canonical/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "geographies/{id}/canonical", method = RequestMethod.GET)
     @ApiOperation(value = "根据地址编号获取地址中文字符串全拼")
     public String getCanonicalAddress(
             @ApiParam(name = "id", value = "地址代码", defaultValue = "")
