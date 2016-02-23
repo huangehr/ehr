@@ -4,6 +4,7 @@ import com.eureka2.shading.codehaus.jackson.JsonGenerationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.ha.geography.controller.AddressController;
 import com.yihu.ehr.model.geogrephy.MGeography;
+import com.yihu.ehr.model.geogrephy.UIModels.GeographyDictModel;
 import com.yihu.ehr.util.Envelop;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -16,6 +17,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
@@ -48,28 +50,27 @@ public class AddressControllerTests {
 
         MGeography mGeography = new MGeography();
 
-        mGeography.setId("sdfasdfasdfe32132123a");
-        mGeography.setCountry("test_country1");
-        mGeography.setProvince("test_province1");
-        mGeography.setCity("test_cit1y");
-        mGeography.setDistrict("test_d1istrict");
-        mGeography.setTown("test_tow1n");
-        mGeography.setStreet("test_str1eet");
-        mGeography.setExtra("test_ext1ra");
-        mGeography.setPostalCode("3630100");
+        mGeography.setCountry("中国test");
+        mGeography.setProvince("福建省");
+        mGeography.setCity("厦门市");
+        mGeography.setDistrict("test_district");
+        mGeography.setTown("test_town");
+        mGeography.setStreet("test_street");
+        mGeography.setExtra("test_extra");
+        mGeography.setPostalCode("363000");
 
-        String address = addressController.saveAddress(objectMapper.writeValueAsString(mGeography));
-        assertNotEquals("地址新增失败", address, null);
+        envelop = addressController.saveAddress(objectMapper.writeValueAsString(mGeography));
+        assertNotEquals("地址新增失败", envelop, null);
 
-        String id = "0dae000155fb8a553c5d6125d8610b86";
+        String id = ((GeographyDictModel)envelop.getObj()).getId();
         envelop = addressController.getAddressById(id);
         assertNotEquals("地址明细获取失败", envelop, null);
 
-        envelop = addressController.search("test_province","test_city","test_district");
+        envelop = addressController.search("福建省","厦门市","test_district");
         assertNotEquals("地址搜索失败", envelop, null);
 
-        Boolean bo = addressController.delete(id);
-        assertTrue("地址删除失败",bo);
+        envelop = addressController.delete(id);
+        assertNotEquals("地址删除失败", envelop,null);
 
     }
 
@@ -77,16 +78,31 @@ public class AddressControllerTests {
     public void btestGetAddressByLevel()
     {
 //        Integer level = 1;
-//        Object object = addressController.getAddressByLevel(apiVersion,level);
-//        assertNotEquals("地址信息查询失败",object,null);
+//        envelop = addressController.getAddressByLevel(level);
+//        assertNotEquals("地址等级查询地址字典失败",envelop,null);
     }
 
     @Test
-    public void cgetAddressDictByPid()
+    public void ctestgetAddressDictByPid()
     {
-//        Integer level = 2;
-//        Object object = addressController.getAddressDictByPid(apiVersion, level);
-//        assertNotEquals("地址信息查询失败",object,null);
+//        Integer pid = 156;
+//        envelop = addressController.getAddressDictByPid(pid);
+//        assertNotEquals("父id查询地址字典失败",envelop,null);
     }
 
+    @Test
+    public void dtestgetCanonicalAddress(){
+        String id = "0dae000155fb8a553c5d6125d8610b86";
+        envelop = addressController.getCanonicalAddress(id);
+        assertNotEquals("根据地址编号获取地址中文字符串全拼失败",envelop,null);
+    }
+
+    @Test
+    public void ztestisNullAddress() throws Exception {
+//        "{'id':'1231232434345wef','province':'河北省','city':'保定市','district':'安国市'}"
+        String address = "{\"id\": \"1231232434345wef\", \"province\": \"河北省\", \"city\": \"保定市\",\"district\": \"安国市\"}";
+
+        envelop = addressController.isNullAddress(address);
+        assertNotEquals("判断是否是个地址 失败",envelop,null);
+    }
 }

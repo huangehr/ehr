@@ -1,27 +1,32 @@
-package com.yihu.ehr.model.geogrephy;
+package com.yihu.ehr.model.geogrephy.UIModels;
 
 
 import java.io.Serializable;
-import java.util.UUID;
 
 /**
  * @author Sand
  * @version 1.0
  * @updated 25-05-2015 19:56:00
  */
-public class MGeography implements Serializable {
+public class GeographyModel implements Serializable {
+
     private String id;
+
     private String country;
+
     private String province;
+
     private String city;
+
     private String district;
+
     private String town;
+
     private String street;
+
     private String extra;
+
     private String postalCode;
-    public MGeography() {
-        id  = UUID.randomUUID().toString().replace("-","");
-    }
 
     public String getId() {
         return id;
