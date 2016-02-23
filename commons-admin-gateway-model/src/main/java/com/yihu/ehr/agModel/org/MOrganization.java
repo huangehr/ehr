@@ -1,4 +1,4 @@
-package com.yihu.ehr.model.org;
+package com.yihu.ehr.agModel.org;
 
 import java.io.Serializable;
 

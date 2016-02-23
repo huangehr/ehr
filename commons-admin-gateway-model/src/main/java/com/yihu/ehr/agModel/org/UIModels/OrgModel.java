@@ -1,4 +1,4 @@
-package com.yihu.ehr.model.org.UIModels;
+package com.yihu.ehr.agModel.org.UIModels;
 /**
  * 用于Grid显示
  * Created by yww on 2016/2/22.

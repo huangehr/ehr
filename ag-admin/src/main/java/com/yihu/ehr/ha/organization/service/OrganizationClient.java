@@ -1,6 +1,6 @@
 package com.yihu.ehr.ha.organization.service;
 
-import com.yihu.ehr.model.org.MOrganization;
+import com.yihu.ehr.agModel.org.MOrganization;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;

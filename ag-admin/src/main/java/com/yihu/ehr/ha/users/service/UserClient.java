@@ -85,7 +85,7 @@ public interface UserClient {
 
     @RequestMapping(value = "/rest/v1.0/users/users/key/{login_code}", method = RequestMethod.PUT)
     @ApiOperation(value = "重新分配密钥",notes = "重新分配密钥")
-    Object distributeKey(
+    boolean distributeKey(
             @ApiParam(name = "login_code", value = "登录帐号", defaultValue = "")
             @PathVariable(value = "login_code") String loginCode);
 

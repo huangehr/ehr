@@ -1,4 +1,4 @@
-package com.yihu.ehr.model.geogrephy;
+package com.yihu.ehr.agModel.geogrephy;
 
 /**
  * Created by AndyCai on 2016/2/16.

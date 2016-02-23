@@ -1,6 +1,6 @@
 package com.yihu.ehr.ha.SystemDict.service;
 
-import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.agModel.dict.MConventionalDict;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;

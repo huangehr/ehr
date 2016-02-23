@@ -1,4 +1,4 @@
-package com.yihu.ehr.model.packs;
+package com.yihu.ehr.agModel.packs;
 
 import com.yihu.ehr.constants.ArchiveStatus;
 

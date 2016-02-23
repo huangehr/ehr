@@ -1,4 +1,4 @@
-package com.yihu.ehr.model.dict;
+package com.yihu.ehr.agModel.dict;
 
 import java.io.Serializable;
 

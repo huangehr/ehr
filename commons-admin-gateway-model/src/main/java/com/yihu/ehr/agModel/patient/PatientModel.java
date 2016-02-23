@@ -1,4 +1,4 @@
-package com.yihu.ehr.model.patient.UIModels;
+package com.yihu.ehr.agModel.patient;
 
 /**
  * Created by AndyCai on 2016/2/22.

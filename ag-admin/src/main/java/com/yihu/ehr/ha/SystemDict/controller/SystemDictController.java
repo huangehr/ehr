@@ -2,9 +2,9 @@ package com.yihu.ehr.ha.SystemDict.controller;
 
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.ha.SystemDict.service.SystemDictClient;
-import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.dict.MDictionaryEntry;
-import com.yihu.ehr.model.dict.MSystemDict;
+import com.yihu.ehr.agModel.dict.MConventionalDict;
+import com.yihu.ehr.agModel.dict.MDictionaryEntry;
+import com.yihu.ehr.agModel.dict.MSystemDict;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
