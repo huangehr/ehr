@@ -2,11 +2,13 @@ package com.yihu.ehr.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.security.MUserSecurity;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.user.feign.SecurityClient;
 import com.yihu.ehr.user.service.User;
 import com.yihu.ehr.user.service.UserManager;
+import com.yihu.ehr.util.ObjectId;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.encode.HashUtil;
 import io.swagger.annotations.Api;
@@ -14,6 +16,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -70,8 +73,8 @@ public class UserController extends BaseRestController {
     public MUser createUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData) throws Exception{
-        ObjectMapper objectMapper = new ObjectMapper();
-        User user = objectMapper.readValue(userJsonData, User.class);
+        User user = new ObjectMapper().readValue(userJsonData, User.class);
+        user.setId(getObjectId(BizObject.User));
         user.setCreateDate(new Date());
         user.setPassword(HashUtil.hashStr(user.getPassword()));
         user.setActivated(true);

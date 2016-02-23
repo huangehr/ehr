@@ -2,15 +2,13 @@ package com.yihu.ehr.adaption.adapterplan.controller;
 
 import com.yihu.ehr.adaption.adapterplan.service.AdapterCustomize;
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlan;
-import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanManager;
+import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanService;
 import com.yihu.ehr.adaption.commons.ExtendController;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSet;
-import com.yihu.ehr.adaption.dataset.service.AdapterDataSetManager;
+import com.yihu.ehr.adaption.dataset.service.AdapterDataSetService;
 import com.yihu.ehr.adaption.feignclient.DataSetClient;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.model.adaption.MAdapterPlan;
-import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.parm.PageModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -18,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 
@@ -27,31 +27,36 @@ import java.util.*;
  * @created 2016.2.3
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/adapter")
-@Api(protocols = "https", value = "adapter", description = "适配器管理接口", tags = {"适配器管理"})
+@RequestMapping(ApiVersionPrefix.Version1_0 + "/adapter")
+@Api(protocols = "https", value = "plan", description = "适配器管理接口", tags = {"适配器管理"})
 public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
     @Autowired
-    private OrgAdapterPlanManager orgAdapterPlanManager;
+    private OrgAdapterPlanService orgAdapterPlanService;
     @Autowired
-    private AdapterDataSetManager adapterDataSetManager;
+    private AdapterDataSetService adapterDataSetService;
     @Autowired
     private DataSetClient dataSetClient;
 
 
-
-    @RequestMapping(value = "/plans/page", method = RequestMethod.GET)
+    @RequestMapping(value = "/plans", method = RequestMethod.GET)
     @ApiOperation(value = "适配方案搜索")
-    public Envelop searchAdapterPlan(
-            @ApiParam(name = "parmJson", value = "分页模型", defaultValue = "")
-            @RequestParam(value = "parmJson", required = false) String parmJson) {
+    public Collection searchAdapterPlan(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
 
-        try {
-            return orgAdapterPlanManager.pagesToResult(jsonToObj(parmJson, PageModel.class));
-        } catch (IOException e){
-            throw errParm();
-        } catch (Exception ex) {
-            throw errSystem();
-        }
+        List appList = orgAdapterPlanService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, orgAdapterPlanService.getCount(filters), page, size);
+        return convertToModels(appList, new ArrayList<>(appList.size()), MAdapterPlan.class, fields);
     }
 
 
@@ -59,15 +64,11 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
     @ApiOperation(value = "获取适配方案信息")
     public MAdapterPlan getAdapterPlanById(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @PathVariable(value = "id") Long id) {
+            @PathVariable(value = "id") Long id) throws Exception {
 
-        try {
-            if(id==null)
-                throw errMissId();
-            return getModel(orgAdapterPlanManager.findOne(id));
-        } catch (Exception es) {
-            throw errSystem();
-        }
+        if (id == null)
+            throw errMissId();
+        return getModel(orgAdapterPlanService.retrieve(id));
     }
 
 
@@ -77,14 +78,9 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
             @ApiParam(name = "parmJson", value = "数据模型", defaultValue = "")
             @RequestParam(value = "parmJson") String parmJson,
             @ApiParam(name = "isCover", value = "是否覆盖", defaultValue = "")
-            @RequestParam(value = "isCover") String isCover) {
-        try {
-            return saveModel(parmJson, isCover, 0l);
-        } catch (IOException e) {
-            throw errParm();
-        } catch (Exception e) {
-            throw errSystem();
-        }
+            @RequestParam(value = "isCover") String isCover) throws Exception {
+
+        return saveModel(parmJson, isCover, 0l);
     }
 
 
@@ -94,15 +90,9 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") Long id,
             @ApiParam(name = "parmJson", value = "数据模型", defaultValue = "")
-            @RequestParam(value = "parmJson") String parmJson) {
+            @RequestParam(value = "parmJson") String parmJson) throws Exception {
 
-        try {
-            return saveModel(parmJson, "", id);
-        } catch (IOException e) {
-            throw errParm();
-        } catch (Exception e) {
-            throw errSystem();
-        }
+        return saveModel(parmJson, "", id);
     }
 
 
@@ -110,15 +100,12 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
     @ApiOperation(value = "删除适配方案")
     public boolean delAdapterPlan(
             @ApiParam(name = "ids", value = "编号列表", defaultValue = "")
-            @RequestParam("ids") String ids) {
-        try {
-            if(StringUtils.isEmpty(ids))
-                errMissId();
-            orgAdapterPlanManager.deleteOrgAdapterPlan(ids.split(","));
-            return true;
-        } catch (Exception e) {
-            throw errSystem();
-        }
+            @RequestParam("ids") String ids) throws Exception {
+
+        if (StringUtils.isEmpty(ids))
+            errMissId();
+        orgAdapterPlanService.deleteOrgAdapterPlan(ids.split(","));
+        return true;
     }
 
 
@@ -128,48 +115,39 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
             @ApiParam(name = "type", value = "类型", defaultValue = "")
             @RequestParam("type") String type,
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
-            @PathVariable(value = "version") String version) {
-        try {
-            List<OrgAdapterPlan> orgAdapterPlans = orgAdapterPlanManager.findList(type, version);
-            List<Map> adapterPlan = new ArrayList<>();
-            if (!orgAdapterPlans.isEmpty()) {
-                Map<String, String> map = null;
-                for (OrgAdapterPlan plan : orgAdapterPlans) {
-                    map = new HashMap<>();
-                    map.put("code", plan.getId().toString());
-                    map.put("value", plan.getName());
-                    adapterPlan.add(map);
-                }
+            @PathVariable(value = "version") String version) throws Exception {
+
+        List<OrgAdapterPlan> orgAdapterPlans = orgAdapterPlanService.findList(type, version);
+        List<Map> adapterPlan = new ArrayList<>();
+        if (!orgAdapterPlans.isEmpty()) {
+            Map<String, String> map = null;
+            for (OrgAdapterPlan plan : orgAdapterPlans) {
+                map = new HashMap<>();
+                map.put("code", plan.getId().toString());
+                map.put("value", plan.getName());
+                adapterPlan.add(map);
             }
-            return adapterPlan;
-        } catch (Exception ex) {
-            throw errSystem();
         }
+        return adapterPlan;
     }
 
 
     @RequestMapping(value = "/plan/{planId}/adapterCustomizes", method = RequestMethod.GET)
     @ApiOperation(value = "获取定制信息")
     public Map getAdapterCustomize(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable(value = "api_version") String apiVersion,
             @ApiParam(name = "planId", value = "编号", defaultValue = "")
             @PathVariable("planId") Long planId,
             @ApiParam(name = "version", value = "版本", defaultValue = "")
-            @RequestParam("version") String version) {
+            @RequestParam("version") String version) throws Exception {
 
-        try {
-            //获取所有定制数据集
-            List<AdapterCustomize> adapterCustomizeList = findAdapterCustomize(apiVersion, planId, version);
-            //获取所有标准数据集
-            List<AdapterCustomize> stdCustomizeList = findStdCustomize(apiVersion, version, adapterCustomizeList);
-            Map map = new HashMap<>();
-            map.put("stdDataSet", stdCustomizeList);
-            map.put("adapterDataSet", adapterCustomizeList);
-            return map;
-        }catch (Exception e){
-            throw errSystem();
-        }
+        //获取所有定制数据集
+        List<AdapterCustomize> adapterCustomizeList = findAdapterCustomize(planId, version);
+        //获取所有标准数据集
+        List<AdapterCustomize> stdCustomizeList = findStdCustomize(version, adapterCustomizeList);
+        Map map = new HashMap<>();
+        map.put("stdDataSet", stdCustomizeList);
+        map.put("adapterDataSet", adapterCustomizeList);
+        return map;
     }
 
 
@@ -181,17 +159,15 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
             @ApiParam(name = "planId", value = "编号", defaultValue = "")
             @PathVariable("planId") Long planId,
             @ApiParam(name = "customizeData", value = "customizeData", defaultValue = "")
-            @RequestParam("customizeData") String customizeData) {
+            @RequestParam("customizeData") String customizeData) throws Exception {
 
         try {
             customizeData = customizeData.replace("DataSet", "").replace("MetaData", "");
             List<AdapterCustomize> adapterDataSetList = Arrays.asList(jsonToObj(customizeData, AdapterCustomize[].class));
-            orgAdapterPlanManager.adapterDataSet(apiVersion, planId, adapterDataSetList);
+            orgAdapterPlanService.adapterDataSet(apiVersion, planId, adapterDataSetList);
             return true;
         } catch (IOException ex) {
             throw errParm();
-        } catch (Exception ex) {
-            throw errSystem();
         }
     }
 
@@ -201,15 +177,15 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
     /**************************************************************************************************/
 
     //获取所有标准数据集
-    private List<AdapterCustomize> findStdCustomize(String apiVersion, String version, List<AdapterCustomize> adapterCustomizeList) {
+    private List<AdapterCustomize> findStdCustomize(String version, List<AdapterCustomize> adapterCustomizeList) {
         String id;
         boolean std = false;
         boolean check = false;
         long childCheckCount;
         List<AdapterCustomize> stdCustomizeList = new ArrayList<>();
 
-        Map<String, String> map = (Map<String, String>) dataSetClient.getDataSetMapByIds(apiVersion, version, "");
-        Map<String, Map> metaDatas = (Map<String, Map>) dataSetClient.getMetaDataMapByIds(apiVersion, version, "", "");
+        Map<String, String> map = (Map<String, String>) dataSetClient.getDataSetMapByIds(version, "");
+        Map<String, Map> metaDatas = (Map<String, Map>) dataSetClient.getMetaDataMapByIds(version, "", "");
         for (String dataSetId : map.keySet()) {
             AdapterCustomize parent = new AdapterCustomize();
             parent.setId("stdDataSet" + dataSetId);
@@ -257,16 +233,16 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
     }
 
     //获取所有定制数据集
-    private List<AdapterCustomize> findAdapterCustomize(String apiVersion, Long planId, String version) {
+    private List<AdapterCustomize> findAdapterCustomize(Long planId, String version) {
         boolean adapter = false;  //定制是否添加根节点
         List<AdapterCustomize> adapterCustomizeList = new ArrayList<>();
         //获取所有定制数据集
-        List<Long> adapterDataSetList = adapterDataSetManager.getAdapterDataSet(planId);
-        List<AdapterDataSet> adapterMetaDataList = adapterDataSetManager.getAdapterMetaData(planId);
+        List<Long> adapterDataSetList = adapterDataSetService.getAdapterDataSet(planId);
+        List<AdapterDataSet> adapterMetaDataList = adapterDataSetService.getAdapterMetaData(planId);
         //数据集
         String ids = adapterDataSetList.toString();
         ids = ids.substring(1, ids.length() - 1);
-        Map<Integer, String> map = (Map<Integer, String>) dataSetClient.getDataSetMapByIds(apiVersion, version, ids);
+        Map<Integer, String> map = (Map<Integer, String>) dataSetClient.getDataSetMapByIds(version, ids);
         for (Long adapterDataSet : adapterDataSetList) {
             AdapterCustomize parent = new AdapterCustomize();
             parent.setId("adapterDataSet" + adapterDataSet);
@@ -282,7 +258,7 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
         for (AdapterDataSet adapterDataSet : adapterMetaDataList) {
             metaDataIds += "," + adapterDataSet.getMetaDataId();
         }
-        Map metaDatas = (Map) dataSetClient.getMetaDataMapByIds(apiVersion, version, ids, metaDataIds.substring(1));
+        Map metaDatas = (Map) dataSetClient.getMetaDataMapByIds(version, ids, metaDataIds.substring(1));
         Map tmp;
         for (AdapterDataSet adapterDataSet : adapterMetaDataList) {
             AdapterCustomize child = new AdapterCustomize();
@@ -306,13 +282,18 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
         return adapterCustomizeList;
     }
 
-    private boolean saveModel(String parmJson, String isCover, Long id) throws IOException {
-        OrgAdapterPlan plan = jsonToObj(parmJson, OrgAdapterPlan.class);
-        OrgAdapterPlan orgAdapterPlan = orgAdapterPlanManager.findOne(id);
+    private boolean saveModel(String parmJson, String isCover, Long id) {
+        OrgAdapterPlan plan = null;
+        try {
+            plan = jsonToObj(parmJson, OrgAdapterPlan.class);
+        } catch (IOException e) {
+            throw errParm();
+        }
+        OrgAdapterPlan orgAdapterPlan = orgAdapterPlanService.retrieve(id);
         boolean checkCode = true;
         if (plan.getId() != null && plan.getCode().equals(orgAdapterPlan.getCode()))
             checkCode = false;
-        if (checkCode && orgAdapterPlanManager.isAdapterCodeExist(plan.getCode())) {
+        if (checkCode && orgAdapterPlanService.isAdapterCodeExist(plan.getCode())) {
             throw errRepeatCode();
         }
         orgAdapterPlan.setCode(plan.getCode());
@@ -323,9 +304,9 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
         orgAdapterPlan.setOrg(plan.getOrg());
         orgAdapterPlan.setParentId(plan.getParentId());
         if (plan.getId() == null) {
-            orgAdapterPlanManager.addOrgAdapterPlan(orgAdapterPlan, isCover);
+            orgAdapterPlanService.addOrgAdapterPlan(orgAdapterPlan, isCover);
         } else {
-            orgAdapterPlanManager.save(orgAdapterPlan);
+            orgAdapterPlanService.save(orgAdapterPlan);
         }
         return true;
     }

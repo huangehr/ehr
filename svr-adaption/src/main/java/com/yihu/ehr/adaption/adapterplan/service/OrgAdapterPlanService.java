@@ -2,9 +2,9 @@ package com.yihu.ehr.adaption.adapterplan.service;
 
 
 import com.yihu.ehr.adaption.adapterorg.service.AdapterOrgService;
-import com.yihu.ehr.util.query.BaseService;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSet;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSetService;
+import com.yihu.ehr.query.BaseJpaService;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +22,12 @@ import java.util.List;
  * @created 2016.2.3
  */
 @Service
-public class OrgAdapterPlanService extends BaseService<OrgAdapterPlan, XOrgAdapterPlanRepository> {
+public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAdapterPlanRepository> {
 
     @Autowired
-    AdapterDataSetService adapterDataSetManager;
+    AdapterDataSetService adapterDataSetService;
     @Autowired
-    AdapterOrgService adapterOrgManager;
+    AdapterOrgService adapterOrgService;
 
 
     /**
@@ -57,15 +57,15 @@ public class OrgAdapterPlanService extends BaseService<OrgAdapterPlan, XOrgAdapt
         //拷贝父级方案映射
         Long parentId = orgAdapterPlan.getParentId();
         if (parentId != null) {
-            OrgAdapterPlan parentAdapterPlan = findOne(parentId);
+            OrgAdapterPlan parentAdapterPlan = retrieve(parentId);
             if (parentAdapterPlan != null) {
                 String parentOrg = parentAdapterPlan.getOrg();
                 //是否拷贝采集标准
                 if (!org.equals(parentOrg) && "true".equals(isCover)) {
-                    if (adapterOrgManager.isExistData(org)) {
-                        adapterOrgManager.deleteData(org);//清除数据
+                    if (adapterOrgService.isExistData(org)) {
+                        adapterOrgService.deleteData(org);//清除数据
                     }
-                    adapterOrgManager.copy(org, parentOrg);
+                    adapterOrgService.copy(org, parentOrg);
                 }
                 //拷贝映射方案
                 copyPlan(orgAdapterPlan.getId(), parentId, isCover);
@@ -116,8 +116,8 @@ public class OrgAdapterPlanService extends BaseService<OrgAdapterPlan, XOrgAdapt
         int rs = unselectAdapterDataSet(planId, adapterCustomizes);
 
         Session session = currentSession();
-        OrgAdapterPlan orgAdapterPlan = findOne(planId);
-        List<AdapterDataSet> adapterMetaDataList = adapterDataSetManager.getAdapterMetaData(planId);
+        OrgAdapterPlan orgAdapterPlan = retrieve(planId);
+        List<AdapterDataSet> adapterMetaDataList = adapterDataSetService.getAdapterMetaData(planId);
         List<Long> lst = new ArrayList<>();
         Long metaDataId;
         boolean adapterFlag = true;
@@ -144,7 +144,7 @@ public class OrgAdapterPlanService extends BaseService<OrgAdapterPlan, XOrgAdapt
                 if (metaDataId != null) {
                     dataSet.setMetaDataId(metaDataId);
                 }
-                adapterDataSetManager.addAdapterDataSet(apiVersion, dataSet, orgAdapterPlan);
+                adapterDataSetService.addAdapterDataSet(apiVersion, dataSet, orgAdapterPlan);
             }
             adapterFlag = true;
         }
@@ -221,8 +221,8 @@ public class OrgAdapterPlanService extends BaseService<OrgAdapterPlan, XOrgAdapt
     public boolean deleteOrgAdapterPlan(OrgAdapterPlan orgAdapterPlan) {
         try {
             //要先删除数据集映射
-            List<Long> adapterMetaDatas = adapterDataSetManager.getAdapterMetaDataIds(orgAdapterPlan.getId());
-            adapterDataSetManager.deleteAdapterDataSet(adapterMetaDatas.toArray(new Long[adapterMetaDatas.size()]));
+            List<Long> adapterMetaDatas = adapterDataSetService.getAdapterMetaDataIds(orgAdapterPlan.getId());
+            adapterDataSetService.deleteAdapterDataSet(adapterMetaDatas.toArray(new Long[adapterMetaDatas.size()]));
             delete(orgAdapterPlan);
         } catch (Exception e) {
             return false;

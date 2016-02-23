@@ -2,6 +2,7 @@ package com.yihu.ehr.geography.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.geography.service.Geography;
@@ -27,14 +28,14 @@ import java.util.List;
 public class GeographyController extends BaseRestController{
 
     @Autowired
-    private GeographyService addressService;
+    private GeographyService geographyService;
 
     @RequestMapping(value = "/geographies/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据地址编号查询地址")
     public MGeography getAddressById(
             @ApiParam(name = "id", value = "地址编号", defaultValue = "")
             @PathVariable(value = "id") String id) {
-        Geography address =  addressService.getAddressById(id);
+        Geography address =  geographyService.getAddressById(id);
         return convertToModel(address, MGeography.class);
     }
 
@@ -44,8 +45,8 @@ public class GeographyController extends BaseRestController{
     public String getCanonicalAddress(
             @ApiParam(name = "id", value = "地址代码", defaultValue = "")
             @PathVariable(value = "id") String id) {
-        Geography address = addressService.getAddressById(id);
-        String addressStr = addressService.getCanonicalAddress(address);
+        Geography address = geographyService.getAddressById(id);
+        String addressStr = geographyService.getCanonicalAddress(address);
         return addressStr;
     }
 
@@ -56,11 +57,13 @@ public class GeographyController extends BaseRestController{
     @RequestMapping(value = "/geographies", method = RequestMethod.POST)
     @ApiOperation(value = "地址检查,如果地址在数据库中不存在，这新增这条记录，否则返回地址id")
     public String saveAddress(
-            @ApiParam(name = "geography_model_json_data", value = "地址json字符串")
-            @RequestParam( value = "geography_model_json_data") String GeographyModelJsonData) throws Exception{
+            @ApiParam(name = "json_data", value = "地址json字符串")
+            @RequestParam( value = "json_data") String jsonData) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
-        Geography geography = objectMapper.readValue(GeographyModelJsonData, Geography.class);
-        String addressId = addressService.saveAddress(geography);
+        Geography geography = objectMapper.readValue(jsonData, Geography.class);
+        geography.setId(getObjectId(BizObject.Geography));
+
+        String addressId = geographyService.saveAddress(geography);
         return addressId;
     }
 
@@ -81,7 +84,7 @@ public class GeographyController extends BaseRestController{
             @RequestParam(value = "city") String city,
             @ApiParam(name = "district", value = "县", defaultValue = "")
             @RequestParam(value = "district") String district) {
-        List<String> idList =  addressService.search(province,city,district);
+        List<String> idList =  geographyService.search(province,city,district);
         return idList;
     }
 
@@ -95,11 +98,11 @@ public class GeographyController extends BaseRestController{
     public boolean delete(
             @ApiParam(name = "/id" , value = "地址代码" ,defaultValue = "")
             @PathVariable (value = "id") String id) {
-        Geography address = addressService.getAddressById(id);
+        Geography address = geographyService.getAddressById(id);
         if(address==null){
             throw new ApiException(ErrorCode.GetGeographyFailed,"获取地址失败");
         }
-        addressService.deleteAddress(address);
+        geographyService.deleteAddress(address);
         return true;
     }
 
@@ -111,7 +114,7 @@ public class GeographyController extends BaseRestController{
             @RequestParam( value = "json_data") String jsonData) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
         Geography geography = objectMapper.readValue(jsonData,Geography.class);
-        return addressService.isNullAddress(geography);
+        return geographyService.isNullAddress(geography);
     }
 
 }

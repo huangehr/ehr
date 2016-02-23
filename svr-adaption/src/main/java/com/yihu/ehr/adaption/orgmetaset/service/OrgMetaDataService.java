@@ -1,7 +1,7 @@
 package com.yihu.ehr.adaption.orgmetaset.service;
 
 import com.yihu.ehr.adaption.orgdataset.service.OrgDataSet;
-import com.yihu.ehr.util.query.BaseService;
+import com.yihu.ehr.query.BaseJpaService;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @created 2016.1.29
  */
 @Service
-public class OrgMetaDataService extends BaseService<OrgMetaData, XOrgMetaDataRepository> {
+public class OrgMetaDataService extends BaseJpaService<OrgMetaData, XOrgMetaDataRepository> {
 
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -28,7 +28,7 @@ public class OrgMetaDataService extends BaseService<OrgMetaData, XOrgMetaDataRep
 
     @Transactional(propagation = Propagation.SUPPORTS)
     public boolean isExistOrgMetaData(int orgDataSetSeq, String orgCode, String code) {
-        return getRepository().isExistOrgMetaData(orgDataSetSeq, orgCode, code).size() != 0;
+        return ((XOrgMetaDataRepository) getRepository()).isExistOrgMetaData(orgDataSetSeq, orgCode, code).size() != 0;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

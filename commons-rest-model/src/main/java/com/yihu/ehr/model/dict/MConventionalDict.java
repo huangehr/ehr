@@ -7,8 +7,7 @@ import java.io.Serializable;
  * @version 1.0
  * @created 2015.07.30 14:43
  */
-public class MConventionalDict implements  Serializable {
-    private static final long serialVersionUID = 1L;
+public class MConventionalDict {
 
     String code;
     long dictId;

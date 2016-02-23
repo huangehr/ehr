@@ -1,12 +1,15 @@
 package com.yihu.ehr.util.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.PageArg;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.ObjectId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
@@ -33,9 +36,10 @@ public class BaseRestController extends AbstractController {
     private final static String ResourceCount = "X-Total-Count";
     private final static String ResourceLink = "Link";
 
+    @Value("${admin.region}")
+    Short adminRegion = 3502;
     @Autowired
     protected EntityManager entityManager;
-
     @Autowired
     ObjectMapper objectMapper;
 
@@ -184,5 +188,9 @@ public class BaseRestController extends AbstractController {
         envelop.setTotalCount(totalCount);
 
         return envelop;
+    }
+
+    protected String getObjectId(BizObject bizObject){
+        return new ObjectId(adminRegion, bizObject).toString();
     }
 }
