@@ -1,29 +1,20 @@
 package com.yihu.ehr.std.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ha.browser.model.*;
-import com.yihu.ha.constrant.ErrorCode;
-import com.yihu.ha.constrant.Result;
-import com.yihu.ha.constrant.Services;
-import com.yihu.ha.factory.ServiceFactory;
-import com.yihu.ha.std.model.*;
-import com.yihu.ha.std.model.DataSetModel;
-import com.yihu.ha.util.HttpClientUtil;
-import com.yihu.ha.util.ResourceProperties;
-import com.yihu.ha.util.RestEcho;
-import com.yihu.ha.util.controller.BaseController;
-import com.yihu.ha.util.log.LogService;
-import com.yihu.ha.util.operator.StringUtil;
+import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.HttpClientUtil;
+import com.yihu.ehr.util.ResourceProperties;
+import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.util.log.LogService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
-import static com.yihu.ha.util.controller.BaseRestController.failed;
-import static com.yihu.ha.util.controller.BaseRestController.missParameter;
 
 /**
  * @author Sand
@@ -32,29 +23,13 @@ import static com.yihu.ha.util.controller.BaseRestController.missParameter;
  */
 @Controller
 @RequestMapping("/std/dataset")
-public class DataSetsController extends BaseController {
+public class DataSetsController extends BaseRestController {
     private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
     private static   String username = ResourceProperties.getProperty("username");
     private static   String password = ResourceProperties.getProperty("password");
     private static   String module = ResourceProperties.getProperty("module");
     private static   String version = ResourceProperties.getProperty("version");
     private static   String comUrl = host + module + version;
-
-    @Resource(name = Services.DictManager)
-    private XDictManager dictManager;
-
-    @Resource(name = Services.DataSetManager)
-    private XDataSetManager dataSetManager;
-
-    @Resource(name = Services.StandardSourceManager)
-    private XStandardSourceManager xStandardSourceManager;
-
-    @Resource(name = Services.CDAVersionManager)
-    private XCDAVersionManager xcdaVersionManager;
-
-    @Resource(name = Services.MetaDataManager)
-    private XMetaDataManager metaDataManager;
-
 //    @RequestMapping("/initial")
 //    public String dataSetInitial() {
 //        return "/std/dataset/dataSet";
@@ -79,30 +54,32 @@ public class DataSetsController extends BaseController {
     }
 
     /**
-     * 鏁版嵁闆嗙増鏈彿鏌ヨ鐨勬柟娉?
+     * 数据集版本号查询的方法
      *
      * @return
      */
     @RequestMapping("/searchVersion")
     @ResponseBody
-    public String searchVersion() {
-        Result result = new Result();
+    public Object searchVersion() {
+        Envelop result = new Envelop();
         try {
             String url = "/version/allVersions";
             String  _rus = HttpClientUtil.doGet(comUrl+url,username,password);
-            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-            CDAVersionModel[] cdaVersionModels = objectMapper.readValue(_rus, CDAVersionModel[].class);
-            List<String> cdaVersionslist = new ArrayList<>();
-            for (CDAVersionModel cdaVersionModel : cdaVersionModels) {
-                cdaVersionslist.add(cdaVersionModel.getVersion());
-            }
-            result.setObj(cdaVersionslist);
+            //todo:转成MAP
+//            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
+//            CDAVersionModel[] cdaVersionModels = objectMapper.readValue(_rus, CDAVersionModel[].class);
+//            List<String> cdaVersionslist = new ArrayList<>();
+//            for (CDAVersionModel cdaVersionModel : cdaVersionModels) {
+//                cdaVersionslist.add(cdaVersionModel.getVersion());
+//            }
+//            result.setObj(cdaVersionslist);
+            result.setObj(_rus);
             result.setSuccessFlg(true);
         } catch (Exception ex) {
             LogService.getLogger(DataSetsController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
         }
-        return result.toJson();
+        return result;
 
         /*Result result = new Result();
         try {
@@ -121,7 +98,7 @@ public class DataSetsController extends BaseController {
     }
 
     /**
-     * 鏌ヨ鏁版嵁闆嗙殑鏂规硶
+     * 查询数据集的方法
      *
      * @param codename
      * @param page
@@ -130,16 +107,16 @@ public class DataSetsController extends BaseController {
      */
     @RequestMapping("/searchDataSets")
     @ResponseBody
-    public String searchDataSets(String codename, String version, int page, int rows) {
-        Result result = new Result();
+    public Object searchDataSets(String codename, String version, int page, int rows) {
+        Envelop result = new Envelop();
         String strErrMessage = "";
-        if (StringUtil.isEmpty(version)) {
-            strErrMessage += "璇烽?夋嫨鐗堟湰鍙?!";
+        if (StringUtils.isEmpty(version)) {
+            strErrMessage += "请选择版本号!";
         }
-        if (strErrMessage != "") {
+        if (!StringUtils.isEmpty(strErrMessage)) {
             result.setSuccessFlg(false);
             result.setErrorMsg(strErrMessage);
-            return result.toJson();
+            return result;
         }
         String url = "/dataSet/dataSets";
         try{
@@ -150,7 +127,7 @@ public class DataSetsController extends BaseController {
             params.put("page",page);
             params.put("rows",rows);
             String _rus = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            if(StringUtil.isEmpty(_rus)){
+            if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.GetDataSetListFailed.toString());
             }else{
@@ -161,13 +138,13 @@ public class DataSetsController extends BaseController {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result.toJson();
+        return result;
 
         /*CDAVersion cdaVersion = new CDAVersion();
         Result result = new Result();
         String strErrMessage = "";
         if (version == null || version == "") {
-            strErrMessage += "璇烽?夋嫨鐗堟湰鍙?!";
+            strErrMessage += "请选择版本号!";
         }
         if (strErrMessage != "") {
             result.setSuccessFlg(false);
@@ -196,19 +173,19 @@ public class DataSetsController extends BaseController {
     }
 
     /**
-     * 鍒犻櫎鏁版嵁闆嗕俊鎭殑鏂规硶
+     * 删除数据集信息的方法
      *
      * @param dataSetId
      * @return
      */
     @RequestMapping("/deleteDataSet")
     @ResponseBody
-    public String deleteDataSet(Long dataSetId, String version) {
-        Result result = new Result();
-        if (StringUtil.isEmpty(dataSetId) || dataSetId.equals(0)) {
+    public Object deleteDataSet(Long dataSetId, String version) {
+        Envelop result = new Envelop();
+        if (StringUtils.isEmpty(dataSetId) || dataSetId.equals(0)) {
             result.setSuccessFlg(false);
-            result.setErrorMsg("鏁版嵁闆唅d鍜岀増鏈彿涓嶈兘涓虹┖锛?");
-            return result.toJson();
+            result.setErrorMsg("数据集id和版本号不能为空！");
+            return result;
         }
         String url = "/dataSet/dataSet";
         try{
@@ -217,7 +194,7 @@ public class DataSetsController extends BaseController {
             params.put("dataSetId",dataSetId);
             String _msg = HttpClientUtil.doDelete(comUrl + url, params, username, password);
             if(Boolean.parseBoolean(_msg)){
-               result.setSuccessFlg(true);
+                result.setSuccessFlg(true);
             }else{
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.DeleteDataSetFailed.toString());
@@ -227,7 +204,7 @@ public class DataSetsController extends BaseController {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result.toJson();
+        return result;
 
 
         /*Result result = new Result();
@@ -254,12 +231,12 @@ public class DataSetsController extends BaseController {
 
     @RequestMapping(value = "/getDataSet", produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public String getDataSet(Long dataSetId,String versionCode) {
-        Result result = new Result();
-        if (StringUtil.isEmpty(dataSetId) || dataSetId.equals(0)) {
+    public Object getDataSet(Long dataSetId,String versionCode) {
+        Envelop result = new Envelop();
+        if (StringUtils.isEmpty(dataSetId) || dataSetId.equals(0)) {
             result.setSuccessFlg(false);
-            result.setErrorMsg("鏁版嵁闆咺d鍜岀増鏈彿涓嶈兘涓虹┖锛?");
-            return result.toJson();
+            result.setErrorMsg("数据集Id和版本号不能为空！");
+            return result;
         }
         String url = "/dataSet/dataSet";
         try{
@@ -267,22 +244,20 @@ public class DataSetsController extends BaseController {
             params.put("versionCode",versionCode);
             params.put("dataSetId",dataSetId);
             String _rus = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            if(StringUtil.isEmpty(_rus)){
+            if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.GetDataSetFailed.toString());
             }else {
                 result.setSuccessFlg(true);
-                //TODO 鏈夎浆鍖栦负瀵硅薄鍦ㄥ瓨鍌ㄥ埌result涓?
-                ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-                DataSetModel dataSetModel = objectMapper.readValue(_rus,DataSetModel.class);
-                result.setObj(dataSetModel);
+                //TODO 有转化为对象在存储到result中
+                result.setObj(_rus);
             }
         }catch(Exception ex){
             LogService.getLogger(DataSetsController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result.toJson();
+        return result;
 
        /* CDAVersion cdaVersion = new CDAVersion();
         cdaVersion.setVersion(versionCode);
@@ -307,7 +282,7 @@ public class DataSetsController extends BaseController {
     }
 
     /**
-     * 鏁版嵁闆嗕俊鎭慨鏀圭殑鏂规硶
+     * 数据集信息修改的方法
      *
      * @param id
      * @param code
@@ -319,39 +294,39 @@ public class DataSetsController extends BaseController {
      */
     @RequestMapping("/saveDataSet")
     @ResponseBody
-    public String saveDataSet(long id, String code, String name, String type, String refStandard, String summary, String versionCode) {
-        Result result = new Result();
+    public Object saveDataSet(long id, String code, String name, String type, String refStandard, String summary, String versionCode) {
+        Envelop result = new Envelop();
         String strErrorMsg = "";
-        if(StringUtil.isEmpty(code)) {
-            strErrorMsg += "浠ｇ爜涓嶈兘涓虹┖锛?";
+        if(StringUtils.isEmpty(code)) {
+            strErrorMsg += "代码不能为空！";
         }
-        if (StringUtil.isEmpty(name)) {
-            strErrorMsg += "鍚嶇О涓嶈兘涓虹┖锛?";
+        if (StringUtils.isEmpty(name)) {
+            strErrorMsg += "名称不能为空！";
         }
-        if (StringUtil.isEmpty(type)) {
-            strErrorMsg += "鏍囧噯鏉ユ簮涓嶈兘涓虹┖锛?";
+        if (StringUtils.isEmpty(type)) {
+            strErrorMsg += "标准来源不能为空！";
         }
-        if (StringUtil.isEmpty(refStandard)) {
-            strErrorMsg += "鏍囧噯鐗堟湰涓嶈兘涓虹┖锛?";
+        if (StringUtils.isEmpty(refStandard)) {
+            strErrorMsg += "标准版本不能为空！";
         }
-        if (StringUtil.isEmpty(strErrorMsg)) {
+        if (StringUtils.isEmpty(strErrorMsg)) {
             result.setSuccessFlg(false);
             result.setErrorMsg(strErrorMsg);
-            return result.toJson();
+            return result;
         }
         String url = "/dataSet/dataSet";
         try{
             Map<String,Object> params = new HashMap<>();
             params.put("id",id);
             params.put("code",code);
-            //TODO 鎻愪緵code涓嶈兘浠庡楠岃瘉api
+            //TODO 提供code不能从复验证api
             params.put("name",name);
             params.put("type",type);
             params.put("refStandard",refStandard);
             params.put("summary",summary);
             params.put("versionCode",versionCode);
             String _rus = HttpClientUtil.doPost(comUrl+url,params,username,password);
-            if(StringUtil.isEmpty(_rus)){
+            if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.SavedatasetFailed.toString());
             }else{
@@ -362,7 +337,7 @@ public class DataSetsController extends BaseController {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result.toJson();
+        return result;
 
         /*CDAVersion cdaVersion = new CDAVersion();
         cdaVersion.setVersion(versionCode);
@@ -370,29 +345,29 @@ public class DataSetsController extends BaseController {
         String strErrorMsg = "";
         try {
             if (code == null || code == "") {
-                strErrorMsg += "浠ｇ爜涓嶈兘涓虹┖锛?";
+                strErrorMsg += "代码不能为空！";
             }
             if (name == null || name == "") {
-                strErrorMsg += "鍚嶇О涓嶈兘涓虹┖锛?";
+                strErrorMsg += "名称不能为空！";
             }
             if (refStandard == null || refStandard == "") {
-                strErrorMsg += "鏍囧噯鏉ユ簮涓嶈兘涓虹┖锛?";
+                strErrorMsg += "标准来源不能为空！";
             }
             if (cdaVersion == null || cdaVersion.getVersion() == "") {
-                strErrorMsg += "鏍囧噯鐗堟湰涓嶈兘涓虹┖锛?";
+                strErrorMsg += "标准版本不能为空！";
             }
             XDataSet dataSet = new DataSet();
-            //鏂板鏃朵唬鐮佷笉鑳介噸澶?
+            //新增时代码不能重复
             if (id == 0) {
                 XDataSet dataSetCode = (XDataSet) dataSetManager.getDataSet(code, cdaVersion.getVersion());
                 if (dataSetCode != null) {
-                    strErrorMsg += "浠ｇ爜涓嶈兘閲嶅锛?";
+                    strErrorMsg += "代码不能重复！";
                 }
             } else {
-                //淇敼鏃朵唬鐮佷笉鑳介噸澶?
+                //修改时代码不能重复
                 dataSet = (XDataSet) dataSetManager.getDataSet(code, cdaVersion.getVersion());
                 if (dataSet != null && dataSet.getId() != id) {
-                    strErrorMsg += "浠ｇ爜涓嶈兘閲嶅锛?";
+                    strErrorMsg += "代码不能重复！";
                 }
                 else {
                     dataSet = dataSetManager.getDataSet(id, cdaVersion);
@@ -422,7 +397,7 @@ public class DataSetsController extends BaseController {
     }
 
     /**
-     * 鏌ヨ鏁版嵁婧愮殑鏂规硶
+     * 查询数据源的方法
      *
      * @param id
      * @param version
@@ -433,12 +408,12 @@ public class DataSetsController extends BaseController {
      */
     @RequestMapping("/searchMetaData")
     @ResponseBody
-    public String searchMetaData(Long id, String version, String metaDataCode, int page, int rows) {
-        Result result = new Result();
-        if (StringUtil.isEmpty(id) || id.equals(0) || StringUtil.isEmpty(version)|| version.equals(0)) {
+    public Object searchMetaData(Long id, String version, String metaDataCode, int page, int rows) {
+        Envelop result = new Envelop();
+        if (StringUtils.isEmpty(id) || id.equals(0) || StringUtils.isEmpty(version)|| version.equals(0)) {
             result.setSuccessFlg(false);
-            result.setErrorMsg("鏁版嵁鍏僫d銆佹爣鍑嗙増鏈笉鑳戒负绌?");
-            return result.toJson();
+            result.setErrorMsg("数据元id、标准版本不能为空");
+            return result;
         }
         String url = "/dataSet/metaDatas";
         try{
@@ -450,7 +425,7 @@ public class DataSetsController extends BaseController {
             params.put("page",page);
             params.put("rows",rows);
             String _rus = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            if(StringUtil.isEmpty(_rus)){
+            if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.SavedatasetFailed.toString());
             }else{
@@ -461,7 +436,7 @@ public class DataSetsController extends BaseController {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result.toJson();
+        return result;
 
         /*List<MetaDataModel> metaDataModel = new ArrayList<>();
         CDAVersion cdaVersion = new CDAVersion();
@@ -491,31 +466,31 @@ public class DataSetsController extends BaseController {
     }
 
     /**
-     * 鍒犻櫎鏁版嵁鍏冪殑鏂规硶
+     * 删除数据元的方法
      *
      * @param ids
      * @return
      */
     @RequestMapping("/deleteMetaData")
     @ResponseBody
-    public String deleteMetaData(String ids, String version) {
-        Result result = new Result();
+    public Object deleteMetaData(String ids, String version) {
+        Envelop result = new Envelop();
         String strErrMessage = "";
-        if (StringUtil.isEmpty(ids)) {
-            strErrMessage += "璇烽?夋嫨鏁版嵁鍏?!";
+        if (StringUtils.isEmpty(ids)) {
+            strErrMessage += "请选择数据元!";
         }
-        if (StringUtil.isEmpty(version)) {
-            strErrMessage += "璇烽?夋嫨鏍囧噯鐗堟湰!";
+        if (StringUtils.isEmpty(version)) {
+            strErrMessage += "请选择标准版本!";
         }
         if (!strErrMessage.equals("")) {
             result.setErrorMsg(strErrMessage);
             result.setSuccessFlg(false);
-            return result.toJson();
+            return result;
         }
         try {
             String url = "/dataSet/metaData";
             Map<String,Object> params = new HashMap<>();
-            params.put("ids",ids);// TODO api鍙傛暟涓篖ong ids  ---鎵归噺鍒犻櫎浼犻?掕繃鏉ョ殑鏄痠ds瀛楃涓?
+            params.put("ids",ids);// TODO api参数为Long ids  ---批量删除传递过来的是ids字符串
             params.put("versionCode",version);
             String _msg = HttpClientUtil.doDelete(comUrl+url,params,username,password);
             if(Boolean.parseBoolean(_msg)){
@@ -529,15 +504,15 @@ public class DataSetsController extends BaseController {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result.toJson();
+        return result;
 
         /*Result result = new Result();
         String strErrMessage = "";
         if (ids == null || ids.equals("")) {
-            strErrMessage += "璇烽?夋嫨鏁版嵁鍏?!";
+            strErrMessage += "请选择数据元!";
         }
         if (version == null || version.equals("")) {
-            strErrMessage += "璇烽?夋嫨鏍囧噯鐗堟湰!";
+            strErrMessage += "请选择标准版本!";
         }
         if (!strErrMessage.equals("")) {
             result.setErrorMsg(strErrMessage);
@@ -561,22 +536,22 @@ public class DataSetsController extends BaseController {
 
     @RequestMapping(value = "/getMetaData", produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public String getMetaData(Long dataSetId, Long metaDataId, String version) {
-        Result result = new Result();
+    public Object getMetaData(Long dataSetId, Long metaDataId, String version) {
+        Envelop result = new Envelop();
         String strErrMessage = "";
-        if (StringUtil.isEmpty(dataSetId) || dataSetId.equals(0)) {
-            strErrMessage += "璇峰厛閫夋嫨鏁版嵁闆?!";
+        if (StringUtils.isEmpty(dataSetId) || dataSetId.equals(0)) {
+            strErrMessage += "请先选择数据集!";
         }
-        if (StringUtil.isEmpty(metaDataId) || metaDataId.equals(0)) {
-            strErrMessage += "璇峰厛閫夋嫨鏁版嵁鍏?!";
+        if (StringUtils.isEmpty(metaDataId) || metaDataId.equals(0)) {
+            strErrMessage += "请先选择数据元!";
         }
-        if (StringUtil.isEmpty(version) || version.equals(0)) {
-            strErrMessage += "璇峰厛閫夋嫨鏍囧噯鐗堟湰!";
+        if (StringUtils.isEmpty(version) || version.equals(0)) {
+            strErrMessage += "请先选择标准版本!";
         }
         if (strErrMessage != "") {
             result.setSuccessFlg(false);
             result.setErrorMsg(strErrMessage);
-            return result.toJson();
+            return result;
         }
         try {
             String url = "/dataSet/getMetaData";
@@ -585,37 +560,37 @@ public class DataSetsController extends BaseController {
             params.put("metaDataId",metaDataId);
             params.put("versionCode",version);
             String _rus = HttpClientUtil.doGet(comUrl+url,params,username,password);
-            if(StringUtil.isEmpty(_rus)){
+            if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.GetMetaDataFailed.toString());
             }else {
-                ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-                //TODO 鏈夎浆鍖栨垚涓哄璞″湪瀛樺叆result涓?
-                XMetaDataForInterface metaData = objectMapper.readValue(_rus,XMetaDataForInterface.class);
-                List<XMetaDataForInterface> elementList = new ArrayList<>();
-                elementList.add(metaData);
+                //TODO 有转化成为对象在存入result中
+//                ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
+//                XMetaDataForInterface metaData = objectMapper.readValue(_rus,XMetaDataForInterface.class);
+//                List<XMetaDataForInterface> elementList = new ArrayList<>();
+//                elementList.add(metaData);
                 result.setSuccessFlg(true);
-                result.setDetailModelList(elementList);
+                result.setObj(_rus);
             }
         } catch (Exception ex) {
             LogService.getLogger(DataSetsController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
-            return result.toJson();
+            return result;
         }
-        return result.toJson();
+        return result;
 
 
         /*CDAVersion cdaVersion = new CDAVersion();
         Result result = new Result();
         String strErrMessage = "";
         if (dataSetId == null || dataSetId.equals(0) || dataSetId.equals("")) {
-            strErrMessage += "璇峰厛閫夋嫨鏁版嵁闆?!";
+            strErrMessage += "请先选择数据集!";
         }
         if (metaDataId == null || metaDataId.equals(0) || metaDataId.equals("")) {
-            strErrMessage += "璇峰厛閫夋嫨鏁版嵁鍏?!";
+            strErrMessage += "请先选择数据元!";
         }
         if (version == null || version.equals(0) || version.equals("")) {
-            strErrMessage += "璇峰厛閫夋嫨鏍囧噯鐗堟湰!";
+            strErrMessage += "请先选择标准版本!";
         }
         if (strErrMessage != "") {
             result.setSuccessFlg(false);
@@ -668,41 +643,42 @@ public class DataSetsController extends BaseController {
 
     @RequestMapping(value = "/updataMetaSet", produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public String updataMetaSet(MetaDataForInterface info) {
-        Result result = new Result();
+    public Object updataMetaSet(String info) {
+        Envelop result = new Envelop();
         try {
             String strErrMessage = "";
-            if (StringUtil.isEmpty(info.getVersion()) || info.getVersion().equals(0)) {
-                strErrMessage += "璇峰厛閫夋嫨鏍囧噯鐗堟湰!";
-            }
-            if (StringUtil.isEmpty(info.getDatasetId())|| info.getDatasetId().equals(0)) {
-                strErrMessage += "璇峰厛閫夋嫨鏁版嵁闆?!";
-            }
-            if (StringUtil.isEmpty(info.getCode())|| info.getCode().equals(0)) {
-                strErrMessage += "浠ｇ爜涓嶈兘涓虹┖!";
-            }
-            if (StringUtil.isEmpty(info.getName())|| info.getName().equals(0)) {
-                strErrMessage += "鍚嶇О涓嶈兘涓虹┖!";
-            }
-            if (StringUtil.isEmpty(info.getInnerCode()) || info.getInnerCode().equals(0)) {
-                strErrMessage += "鍐呴儴浠ｇ爜涓嶈兘涓虹┖!";
-            }
-            if (StringUtil.isEmpty(info.getColumnName())|| info.getColumnName().equals(0)) {
-                strErrMessage += "瀛楁鍚嶇О涓嶈兘涓虹┖!";
-            }
+            //todo: 前台js不能为空判断
+//            if (StringUtil.isEmpty(info.getVersion()) || info.getVersion().equals(0)) {
+//                strErrMessage += "请先选择标准版本!";
+//            }
+//            if (StringUtil.isEmpty(info.getDatasetId())|| info.getDatasetId().equals(0)) {
+//                strErrMessage += "请先选择数据集!";
+//            }
+//            if (StringUtil.isEmpty(info.getCode())|| info.getCode().equals(0)) {
+//                strErrMessage += "代码不能为空!";
+//            }
+//            if (StringUtil.isEmpty(info.getName())|| info.getName().equals(0)) {
+//                strErrMessage += "名称不能为空!";
+//            }
+//            if (StringUtil.isEmpty(info.getInnerCode()) || info.getInnerCode().equals(0)) {
+//                strErrMessage += "内部代码不能为空!";
+//            }
+//            if (StringUtil.isEmpty(info.getColumnName())|| info.getColumnName().equals(0)) {
+//                strErrMessage += "字段名称不能为空!";
+//            }
             if (!strErrMessage.equals("")) {
                 result.setErrorMsg(strErrMessage);
                 result.setSuccessFlg(false);
-                return result.toJson();
+                return result;
             }
             String url = "/dataSet/updataMetaSet";
-            // TODO 鏈墂riteValueAsString(info);鎿嶄綔
-            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-            String _MetaDataForInterface = objectMapper.writeValueAsString(info);
+            // TODO 有writeValueAsString(info);操作
+//            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
+//            String _MetaDataForInterface = objectMapper.writeValueAsString(info);
             Map<String,Object> params = new HashMap<>();
-            params.put("metaDataJson",_MetaDataForInterface);
+            params.put("metaDataJson",info);
             String _rus = HttpClientUtil.doPost(comUrl+url,params,username,password);
-            if (StringUtil.isEmpty(_rus)) {
+            if (StringUtils.isEmpty(_rus)) {
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.SaveMetaDataFailed.toString());
             } else {
@@ -713,36 +689,36 @@ public class DataSetsController extends BaseController {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result.toJson();
+        return result;
 
         /*CDAVersion cdaVersion = new CDAVersion();
         Result result = new Result();
         try {
             String strErrMessage = "";
             if (info.getVersion() == null || info.getVersion().equals(0) || info.getVersion().equals("")) {
-                strErrMessage += "璇峰厛閫夋嫨鏍囧噯鐗堟湰!";
+                strErrMessage += "请先选择标准版本!";
             }
             if (info.getDatasetId() == null || info.getDatasetId().equals(0) || info.getDatasetId().equals("")) {
-                strErrMessage += "璇峰厛閫夋嫨鏁版嵁闆?!";
+                strErrMessage += "请先选择数据集!";
             }
             if (info.getCode() == null || info.getCode().equals(0) || info.getCode().equals("")) {
-                strErrMessage += "浠ｇ爜涓嶈兘涓虹┖!";
+                strErrMessage += "代码不能为空!";
             }
             if (info.getName() == null || info.getName().equals(0) || info.getName().equals("")) {
-                strErrMessage += "鍚嶇О涓嶈兘涓虹┖!";
+                strErrMessage += "名称不能为空!";
             }
             if (info.getInnerCode() == null || info.getInnerCode().equals(0) || info.getInnerCode().equals("")) {
-                strErrMessage += "鍐呴儴浠ｇ爜涓嶈兘涓虹┖!";
+                strErrMessage += "内部代码不能为空!";
             }
             if (info.getColumnName() == null || info.getColumnName().equals(0) || info.getColumnName().equals("")) {
-                strErrMessage += "瀛楁鍚嶇О涓嶈兘涓虹┖!";
+                strErrMessage += "字段名称不能为空!";
             }
             if (info.getId().equals("0")) {
                 if (metaDataManager.getCountByCode(info.getVersion(), info.getInnerCode(), info.getDatasetId()) > 0) {
-                    strErrMessage += "浠ｇ爜涓嶈兘閲嶅!";
+                    strErrMessage += "代码不能重复!";
                 }
                 if (metaDataManager.getCountByColumnName(info.getVersion(), info.getColumnName(), info.getDatasetId()) > 0) {
-                    strErrMessage += "瀛楁鍚嶄笉鑳介噸澶?!";
+                    strErrMessage += "字段名不能重复!";
                 }
             }else {
                 //if ()
@@ -793,7 +769,7 @@ public class DataSetsController extends BaseController {
     }
 
     /**
-     * 鏍囧噯鏉ユ簮涓嬫媺妗嗙殑鏌ヨ
+     * 标准来源下拉框的查询
      *
      * @param version
      * @return
@@ -801,31 +777,34 @@ public class DataSetsController extends BaseController {
     @RequestMapping("getStdSourceList")
     @ResponseBody
     public Object getStdSourceList(String version) {
-
+        Envelop result = new Envelop();
         String strJson = "";
         try {
-            if (StringUtil.isEmpty(version)) {
-                return missParameter("version_code");
+            if (StringUtils.isEmpty(version)) {
+                result.setSuccessFlg(false);
+                result.setErrorMsg("版本不能为空！");
+                return result;
             }
             String url = "/stdSource/standardSources";
             Map<String,Object> params = new HashMap<>();
             params.put("",version);
             String _rus = HttpClientUtil.doGet(comUrl+url,params,username,password);
-            if (StringUtil.isEmpty(_rus)) {
-                return failed(ErrorCode.GetStandardSourceFailed);
+            if (StringUtils.isEmpty(_rus)) {
+                result.setSuccessFlg(false);
+                result.setErrorMsg("查找不到标准来源！");
+                return result;
             }
-            //TODO 鏈? writeValueAsString(resultInfos);鎿嶄綔
-            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-            List<StandardSourceForInterface> resultInfos = Arrays.asList(objectMapper.readValue(_rus,StandardSourceForInterface[].class));
-            strJson = objectMapper.writeValueAsString(resultInfos);
+            //TODO 有 writeValueAsString(resultInfos);操作
+//            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
+//            List<StandardSourceForInterface> resultInfos = Arrays.asList(objectMapper.readValue(_rus,StandardSourceForInterface[].class));
+//            strJson = objectMapper.writeValueAsString(resultInfos);
         } catch (Exception ex) {
-            LogService.getLogger(StdManagerRestController.class).error(ex.getMessage());
-            return failed(ErrorCode.GetStandardSourceFailed);
+            LogService.getLogger(DataSetsController.class).error(ex.getMessage());
+            result.setSuccessFlg(false);
+            result.setErrorMsg("获取标准来源失败！");
+            return result;
         }
-        RestEcho echo = new RestEcho().success();
-        echo.putResultToList(strJson);
-        return echo;
-
+        return result;
         /*Result result = new Result();
         String strJson = "";
         try {
@@ -866,7 +845,7 @@ public class DataSetsController extends BaseController {
 */
 
     /**
-     * 妫?楠屽瓧鍏告煡璇㈢殑鏂规硶
+     * 检验字典查询的方法
      *
      * @param version
      * @param key
@@ -877,20 +856,21 @@ public class DataSetsController extends BaseController {
     public String getMetaDataDict(String version, String key) {
         String strResult = "[]";
         try {
-            //TODO 鏃犲搴?
+            //TODO 无对应
             String url = "/******";
             Map<String,Object> params = new HashMap<>();
             params.put("versionCode",version);
             params.put("code",key);
             params.put("name",key);
             String _rus = HttpClientUtil.doGet(comUrl+url,params,username,password);
-            if (StringUtil.isEmpty(_rus)) {
-                ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-                List<XDictForInterface> xDictForInterfaces = Arrays.asList(objectMapper.readValue(_rus,XDictForInterface.class));
-                strResult = objectMapper.writeValueAsString(xDictForInterfaces);
+            if (!StringUtils.isEmpty(_rus)) {
+//                ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
+//                List<XDictForInterface> xDictForInterfaces = Arrays.asList(objectMapper.readValue(_rus,XDictForInterface.class));
+//                strResult = objectMapper.writeValueAsString(xDictForInterfaces);
+                return _rus;
             }
         } catch (Exception ex) {
-            LogService.getLogger(StdManagerRestController.class).error(ex.getMessage());
+            LogService.getLogger(DataSetsController.class).error(ex.getMessage());
         }
         return strResult;
 
@@ -930,8 +910,8 @@ public class DataSetsController extends BaseController {
 
     @RequestMapping("/validatorMetadata")
     @ResponseBody
-    public String validatorMetadata(String version, String datasetId, String searchNm, String metaDataCodeMsg) {
-        Result result = new Result();
+    public Object validatorMetadata(String version, String datasetId, String searchNm, String metaDataCodeMsg) {
+        Envelop result = new Envelop();
         String url ="/dataSet/validatorMetadata";
         String _msg = "";
         try{
@@ -945,14 +925,14 @@ public class DataSetsController extends BaseController {
                 result.setSuccessFlg(true);
             }else{
                 result.setSuccessFlg(false);
-                result.setErrorMsg("楠岃瘉澶辫触");
+                result.setErrorMsg("验证失败");
             }
         }catch(Exception ex){
             LogService.getLogger(DataSetsController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result.toJson();
+        return result;
 
 
        /* if (metaDataCodeMsg.equals("metaDataCodeMsg")) {
@@ -969,24 +949,24 @@ public class DataSetsController extends BaseController {
     }
 
     /**
-      * 灏咰DA褰掑睘鐨勬暟鎹泦淇℃伅杞崲鐨刋ML淇℃伅
-      * @param setId 鏁版嵁闆咺D
-      * @param versionCode 鐗堟湰鍙?
-      * @return xml淇℃伅*/
+     * 将CDA归属的数据集信息转换的XML信息
+     * @param setId 数据集ID
+     * @param versionCode 版本号
+     * @return xml信息*/
     @RequestMapping("/getXMLInfoByDataSetId")
     @ResponseBody
     public Object getXMLInfoByDataSetId(String setId, String versionCode) {
-        //TODO 娌℃湁瀵瑰簲
-        Result result = new Result();
+        //TODO 没有对应
+        Envelop result = new Envelop();
         try {
             String url = "/dataSet/*******";
             Map<String,Object> params = new  HashMap<>();
             params.put("setId",setId);
             params.put("versionCode",versionCode);
             String _rus = HttpClientUtil.doGet(comUrl+url,params,username,password);
-            if(StringUtil.isEmpty(_rus)){
+            if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
-                result.setErrorMsg("鏁版嵁鑾峰彇澶辫触锛?");
+                result.setErrorMsg("数据获取失败！");
             }else{
                 result.setSuccessFlg(true);
                 result.setObj(_rus);
@@ -1027,18 +1007,18 @@ public class DataSetsController extends BaseController {
         return result;*/
     }
 
-    public void exportToExcel(){
-        //todo锛歵est 瀵煎嚭娴嬭瘯
-        List<String> ids = new ArrayList<>();
-        ids.add("1");
-        ids.add("2");
-        ids.add("3");
-        XDataSet[] dataSets = dataSetManager.getDataSetByIds(ids, xcdaVersionManager.getLatestVersion().getVersion());
-        dataSetManager.exportToExcel("E:/workspaces/excel/testExport.xls",dataSets);
-    }
-
-    public void importFromExcel(){
-        //todo锛歵est瀵煎叆娴嬭瘯
-        dataSetManager.importFromExcel("E:/workspaces/excel/娴嬭瘯excel瀵煎叆.xls", xcdaVersionManager.getLatestVersion());
-    }
+//    public void exportToExcel(){
+//        //todo：test 导出测试
+//        List<String> ids = new ArrayList<>();
+//        ids.add("1");
+//        ids.add("2");
+//        ids.add("3");
+//        XDataSet[] dataSets = dataSetManager.getDataSetByIds(ids, xcdaVersionManager.getLatestVersion().getVersion());
+//        dataSetManager.exportToExcel("E:/workspaces/excel/testExport.xls",dataSets);
+//    }
+//
+//    public void importFromExcel(){
+//        //todo：test导入测试
+//        dataSetManager.importFromExcel("E:/workspaces/excel/测试excel导入.xls", xcdaVersionManager.getLatestVersion());
+//    }
 }

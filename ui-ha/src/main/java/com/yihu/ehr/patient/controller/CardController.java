@@ -1,9 +1,10 @@
 package com.yihu.ehr.patient.controller;
 
-import com.yihu.ehr.constrant.ErrorCode;
-import com.yihu.ehr.constrant.Result;
+import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.ResourceProperties;
+import com.yihu.ehr.util.controller.BaseRestController;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +18,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/card")
-public class CardController extends BaseController {
+public class CardController extends BaseRestController {
     private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
     private static   String username = ResourceProperties.getProperty("username");
     private static   String password = ResourceProperties.getProperty("password");
@@ -43,10 +44,10 @@ public class CardController extends BaseController {
 
     @RequestMapping("searchCard")
     @ResponseBody
-    public String searchCard(String idCardNo,String searchNm, String cardType, int page, int rows){
+    public Object searchCard(String idCardNo,String searchNm, String cardType, int page, int rows){
         String url = "/card/getCards";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("idCardNo", idCardNo);
         params.put("cardNo", searchNm);
@@ -60,7 +61,7 @@ public class CardController extends BaseController {
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Map<String, Object> conditionMap = new HashMap<>();
 //        Map<String, Object> infoMap = null;
@@ -81,10 +82,10 @@ public class CardController extends BaseController {
     @RequestMapping("searchNewCard")
     @ResponseBody
     //搜索新卡
-    public String searchNewCard(String idCardNo,String searchNm,String searchType, int page, int rows){
+    public Object searchNewCard(String idCardNo,String searchNm,String searchType, int page, int rows){
         String url = "/card/newCards";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("idCardNo", idCardNo);
         params.put("cardNo", searchNm);
@@ -98,7 +99,7 @@ public class CardController extends BaseController {
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Map<String, Object> conditionMap = new HashMap<>();
 //        Map<String, Object> infoMap = null;
@@ -118,10 +119,10 @@ public class CardController extends BaseController {
 
     @RequestMapping("getCard")
     @ResponseBody
-    public String getCard(String objectId,String type){
+    public Object getCard(String objectId,String type){
         String url = "/card/cardDetail";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("cardId",objectId);
         params.put("cardType",type);
@@ -130,11 +131,11 @@ public class CardController extends BaseController {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             result.setObj(resultStr);
             result.setSuccessFlg(true);
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        XCard card = cardManager.getCard(objectId, absDictEManage.getCardType(type));
 //        CardModel cardModel = cardManager.getCard(card);
@@ -149,10 +150,10 @@ public class CardController extends BaseController {
 
     @RequestMapping("detachCard")
     @ResponseBody
-    public String detachCard(String objectId,String type){
+    public Object detachCard(String objectId,String type){
         String url = "/card/detachCard";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("cardId",objectId);
         params.put("cardType",type);
@@ -165,11 +166,11 @@ public class CardController extends BaseController {
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.InvalidUpdate.toString());
             }
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        XCard card = cardManager.getCard(objectId, absDictEManage.getCardType(type));
 //        Result result = getSuccessResult(cardManager.detachCard(card));
@@ -178,10 +179,10 @@ public class CardController extends BaseController {
 
     @RequestMapping("attachCard")
     @ResponseBody
-    public String attachCard(String idCardNo,String objectId,String type){
+    public Object attachCard(String idCardNo,String objectId,String type){
         String url = "/card/attachCard";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("idCardNo",idCardNo);
         params.put("cardId",objectId);
@@ -195,11 +196,11 @@ public class CardController extends BaseController {
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.InvalidUpdate.toString());
             }
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        XCard card = cardManager.getCard(objectId, absDictEManage.getCardType(type));
 //        Result result = getSuccessResult(cardManager.attachCardWith(card, new DemographicId(idCardNo)));
