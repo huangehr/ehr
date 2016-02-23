@@ -3,7 +3,6 @@ package com.yihu.ehr.patient.service.card;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.patient.dao.XAbstractPhysicalCardRepository;
 import com.yihu.ehr.patient.dao.XAbstractVirtualCardRepository;
-import com.yihu.ehr.patient.feign.GeographyClient;
 import com.yihu.ehr.patient.feign.ConventionalDictClient;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -31,13 +30,10 @@ public class CardManager {
 
     @PersistenceContext
     protected EntityManager entityManager;
-
     @Autowired
     private ConventionalDictClient conventionalDictClient;
-
     @Autowired
     private XAbstractPhysicalCardRepository abstractPhysicalCardRepository;
-
     @Autowired
     private XAbstractVirtualCardRepository abstractVirtualCardRepository;
 
