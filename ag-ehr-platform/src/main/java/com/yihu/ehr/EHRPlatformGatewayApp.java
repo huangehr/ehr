@@ -23,7 +23,7 @@ public class EHRPlatformGatewayApp {
 
     @Bean
     public EmbeddedServletContainerCustomizer containerCustomizer() throws FileNotFoundException {
-        final String absoluteKeystoreFile = ResourceUtils.getFile("D:/Server/tomcat8.0/tomcat.keystore").getAbsolutePath();
+        final String absoluteKeystoreFile = ResourceUtils.getFile("C:/Windows/tomcat.keystore").getAbsolutePath();
 
         final TomcatConnectorCustomizer customizer = new EHRTomcatConnectionCustomizer(absoluteKeystoreFile, "123456", port);
 
