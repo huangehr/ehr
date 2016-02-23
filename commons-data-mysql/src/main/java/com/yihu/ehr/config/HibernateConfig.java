@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
+import org.springframework.orm.jpa.LocalEntityManagerFactoryBean;
 
 import java.sql.SQLException;
 
@@ -75,21 +76,21 @@ public class HibernateConfig {
         return basicDataSource;
     }
 
-    @Bean
-    public LocalSessionFactoryBean sessionFactory(BasicDataSource dataSource){
-        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
-        sessionFactory.setDataSource(dataSource);
-        sessionFactory.getHibernateProperties().setProperty("hibernate.show_sql", showSQL);
-        sessionFactory.getHibernateProperties().setProperty("hibernate.format_sql", formatSQL);
+//    @Bean
+//    public LocalSessionFactoryBean sessionFactory(BasicDataSource dataSource){
+//        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
+//        sessionFactory.setDataSource(dataSource);
+//        sessionFactory.getHibernateProperties().setProperty("hibernate.show_sql", showSQL);
+//        sessionFactory.getHibernateProperties().setProperty("hibernate.format_sql", formatSQL);
+//        return sessionFactory;
+//    }
+//
+//    @Bean
+//    public HibernateTransactionManager transactionManager(SessionFactory sessionFactory){
+//        HibernateTransactionManager transactionManager = new HibernateTransactionManager();
+//        transactionManager.setSessionFactory(sessionFactory);
+//
+//        return transactionManager;
+//    }
 
-        return sessionFactory;
-    }
-
-    @Bean
-    public HibernateTransactionManager transactionManager(SessionFactory sessionFactory){
-        HibernateTransactionManager transactionManager = new HibernateTransactionManager();
-        transactionManager.setSessionFactory(sessionFactory);
-
-        return transactionManager;
-    }
 }

@@ -1,69 +1,63 @@
-package com.yihu.ehr.standard.cda.service;
+package com.yihu.ehr.model.standard;
 
 /**
- * 数据集实现类. ID与版本联合起来表示一个主键。此数据集用于表示一个已经版本好的对象。
- * @author Sand
+ * 数据集
+ * @author lincl
  * @version 1.0
- * @created 30-6月-2015 16:19:03
+ * @created 2016.2.1
  */
-public class DataSetForInterface {
-    public String id;
-
-    String documentId;
-    String catalog;
-
-    String hashCode;
-    String lang;
+public class MStdDataSet {
+    public long id;
+    long documentId;
+    int catalog;
+    int hashCode;
+    int lang;
     String reference;
-    String publisher;
+    int publisher;
     String stdVersion;
     String code;
     String name;
     String summary;
     String innerVersionId;
-
     String OperationType;
 
-    public DataSetForInterface(){
-    }
-
-    public String getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(long id) {
         this.id = id;
     }
 
-    public String getDocumentId() {
+    public long getDocumentId() {
         return documentId;
     }
 
-    public void setDocumentId(String documentId) {
+    public void setDocumentId(long documentId) {
         this.documentId = documentId;
     }
 
-    public String getCatalog() {
+    public int getCatalog() {
         return catalog;
     }
 
-    public void setCatalog(String catalog) {
+    public void setCatalog(int catalog) {
         this.catalog = catalog;
     }
 
-    public String getHashCode() {
+    public int getHashCode() {
         return hashCode;
     }
 
-    public void setHashCode(String hashCode) {
+    public void setHashCode(int hashCode) {
         this.hashCode = hashCode;
     }
 
-    public String getLang() {
+    public int getLang() {
         return lang;
     }
 
-    public void setLang(String lang) {
+    public void setLang(int lang) {
         this.lang = lang;
     }
 
@@ -75,11 +69,11 @@ public class DataSetForInterface {
         this.reference = reference;
     }
 
-    public String getPublisher() {
+    public int getPublisher() {
         return publisher;
     }
 
-    public void setPublisher(String publisher) {
+    public void setPublisher(int publisher) {
         this.publisher = publisher;
     }
 

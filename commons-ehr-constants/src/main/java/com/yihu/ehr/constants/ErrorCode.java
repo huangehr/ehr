@@ -100,22 +100,28 @@ public enum ErrorCode {
     SaveCDAVersionFailed("ehr.cda.version.save.failed"),
     GetCDAInfoFailed("ehr.std.get.CDA.list.failed"),
 
+    NotFoundDataSetView("ehr.dataset.view.notfound"),
     GetDataSetListFailed("ehr.datasetlist.Get.failed"),
     GetDataSetFailed("ehr.dataset.Get.failed"),
     SavedatasetFailed("ehr.dataset.Save.failed"),
     DeleteDataSetFailed("ehr.dataset.delete.failed"),
+    RapeatDataSetCode("ehr.dataset.repeat.code"),
 
+    NotFoundMetaDataView("ehr.metadata.view.notfound"),
     GetMetaDataListFaield("ehr.metadatalist.Get.failed"),
     GetMetaDataFailed("ehr.metadata.Get.failed"),
     SaveMetaDataFailed("ehr.metadata.save.failed"),
     DeleteMetaDataFailed("ehr.metadata.delete.failed"),
 
+    NotFoundStdDictView("ehr.std.dict.view.notfound"),
     GetDictListFaild("ehr.dictlist.Get.failed"),
     GetDictFaild("ehr.dict.Get.failed"),
-    GetDictEntryListFailed("ehr.dict.entries.get.failed"),
-    GetDictEntryFailed("ehr.dict.entry.get.failed"),
     SaveDictFailed("ehr.dict.Save.failed"),
     DeleteDictFailed("ehr.dict.delete.failed"),
+
+    NotFoundDictEntryView("ehr.dict.entry.view.notfound"),
+    GetDictEntryListFailed("ehr.dict.entries.get.failed"),
+    GetDictEntryFailed("ehr.dict.entry.get.failed"),
     saveDictEntryFailed("ehr.dict.entry.save.failed"),
     DeleteDictEntryFailed("ehr.dict.entry.delete.failed"),
 
