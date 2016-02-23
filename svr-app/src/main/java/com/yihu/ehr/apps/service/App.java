@@ -5,8 +5,6 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * APP对象。
@@ -18,7 +16,7 @@ import java.util.Set;
 @Entity
 @Table(name = "apps")
 @Access(value = AccessType.PROPERTY)
-public class App {
+public class    App {
     private String id;
     private String name;
     private String secret;
@@ -30,10 +28,9 @@ public class App {
     private String catalog;
     private String status;
     private String description;
-    private Set<String> tags = new HashSet<>();
 
 	public App(){
-        id  = new ObjectVersion().toString();
+//        id  = new ObjectVersion().toString();
     }
 
     @Id
@@ -126,26 +123,4 @@ public class App {
     public void setDescription(String description) {
         this.description = description;
     }
-
-    @Column(name = "tags",  nullable = true)
-    public String getTags() {
-        return String.join(",", tags);
-    }
-    public void setTags(String tags) {
-        if(tags == null) return;
-        String[] tagToken = tags.split(",");
-        for (String token: tagToken){
-            token = token.trim();
-            if(token.length() == 0) continue;
-            this.tags.add(token);
-        }
-    }
-    public void addTag(String tag) {
-        if(tag == null || tag.length() == 0) return;
-        if (tags.contains(tag)) return;
-        tags.add(tag);
-    }
-//    public void removeTag(String tag) {
-//        this.tags.remove(tag);
-//    }
 }

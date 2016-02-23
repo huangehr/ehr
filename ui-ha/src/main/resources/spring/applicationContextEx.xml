@@ -12,7 +12,7 @@
        http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
     <!--业务Beans, 使用注解方式-->
-    <context:component-scan base-package="com.yihu.ha"/>
+    <context:component-scan base-package="com.yihu.ehr"/>
 
     <!--Hadoop配置-->
     <hdp:configuration resources="classpath:hadoop/client/hbase-site.xml"/>

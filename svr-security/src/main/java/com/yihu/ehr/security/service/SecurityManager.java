@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -30,26 +31,17 @@ import java.util.Map;
 @Service
 public class SecurityManager {
 
-
     @Autowired
     private XUserSecurityRepository userSecurityRepository;
-
     @Autowired
     private  XUserKeyRepository userKeyRepository;
-
     @Autowired
     private UserClient userClient;
-
-
-    @PersistenceContext
-    protected EntityManager entityManager;
-
 
     HashMap<String, Key> hashMap;
 
     static String persenalKeyType  = "Personal";
     static String orgKeyType = "Org";
-
 
     public Map setUp() throws Exception {
         hashMap = RSA.generateKeys();
@@ -83,11 +75,11 @@ public class SecurityManager {
         return  userSecurity;
     }
 
-    public UserSecurity createSecurityByUserId(String apiVersion,String userId) throws Exception {
+    public UserSecurity createSecurityByUserId(String userId) throws Exception {
 
         //1-1根据用户登陆名获取用户信息。
 
-        MUser userInfo = userClient.getUser(apiVersion,userId);
+        MUser userInfo = userClient.getUser(userId);
         if(userInfo==null) {
             return null;
         }
@@ -108,10 +100,10 @@ public class SecurityManager {
     }
 
 
-    public UserSecurity getUserSecurityByLoginCode(String apiVersion,String loginCode) throws Exception {
+    public UserSecurity getUserSecurityByLoginCode(String loginCode) throws Exception {
 
         //1-1根据用户登陆名获取用户信息。
-        MUser userInfo = userClient.getUserByLoginCode(apiVersion,loginCode);
+        MUser userInfo = userClient.getUserByLoginCode(loginCode);
         if(userInfo==null) {
             return null;
         } else {
@@ -165,54 +157,21 @@ public class SecurityManager {
     public UserKey getUserKey(String userKeyId) {
         return userKeyRepository.findOne(userKeyId);
     }
-
     public String getUserKeyByUserId(String userId) {
-        Session session = entityManager.unwrap(org.hibernate.Session.class);
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(" select id		                ");
-        sb.append("       ,user_id		            ");
-        sb.append("       ,key_id		            ");
-        sb.append("       ,key_type		            ");
-        sb.append("   from user_key 	            ");
-        sb.append("  where user_id = '" + userId + "' ");
-        sb.append("    and key_type = 'Personal' ");
-
-        String sql = sb.toString();
-
-        SQLQuery sqlQuery = session.createSQLQuery(sql);
-
-        if (sqlQuery.list().size() == 0) {
+        List<UserKey> userKeys = userKeyRepository.findByUserId(userId);
+        if(userKeys!=null && userKeys.size()>0){
+            return userKeys.get(0).getId();
+        }else {
             return null;
-        } else {
-            Object[] userKeyInfo = (Object[]) sqlQuery.list().get(0);
-            String userKeyId = userKeyInfo[0].toString();
-            return userKeyId;
         }
     }
 
     public String getUserKeyByOrgCd(String orgCode) {
-
-        Session session = entityManager.unwrap(org.hibernate.Session.class);
-        StringBuilder sb = new StringBuilder();
-        sb.append(" select id		                ");
-        sb.append("       ,org_code		            ");
-        sb.append("       ,key_id		            ");
-        sb.append("       ,key_type		            ");
-        sb.append("   from user_key 	            ");
-        sb.append("  where org_code = '" + orgCode + "' ");
-        sb.append("    and key_type = 'Org' ");
-
-        String sql = sb.toString();
-
-        SQLQuery sqlQuery = session.createSQLQuery(sql);
-
-        if (sqlQuery.list().size() == 0) {
-            return null;
+        List<UserKey> userKeys  = userKeyRepository.findByOrgCdode(orgCode);
+        if(userKeys!=null && userKeys.size()>0){
+            return userKeys.get(0).getId();
         } else {
-            Object[] userKeyInfo = (Object[]) sqlQuery.list().get(0);
-            String userKeyId = userKeyInfo[0].toString();
-            return userKeyId;
+            return null;
         }
     }
 
@@ -236,7 +195,6 @@ public class SecurityManager {
 
 
     public UserSecurity getUserPublicKeyByOrgCd(String orgCode) {
-
         String userKeyId = getUserKeyByOrgCd(orgCode);
         return findByUserKey(userKeyId);
     }

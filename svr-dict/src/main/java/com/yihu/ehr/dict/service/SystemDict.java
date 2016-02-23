@@ -1,6 +1,7 @@
 package com.yihu.ehr.dict.service;
 
 
+import com.yihu.ehr.util.ObjectVersion;
 import com.yihu.ehr.util.PinyinUtil;
 
 import javax.persistence.*;
@@ -14,7 +15,6 @@ import java.util.Date;
 @Entity
 @Table(name = "system_dicts")
 @Access(value = AccessType.PROPERTY)
-
 public class SystemDict {
     long id;
     String name;
@@ -23,7 +23,8 @@ public class SystemDict {
     String phoneticCode;
     Date createDate = new Date();
 
-    SystemDict(){}
+    public SystemDict(){
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

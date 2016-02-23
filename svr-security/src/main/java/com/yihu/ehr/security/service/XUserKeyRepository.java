@@ -1,6 +1,10 @@
 package com.yihu.ehr.security.service;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 /**
  * @author Sand
@@ -9,5 +13,9 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  */
 public interface XUserKeyRepository extends PagingAndSortingRepository<UserKey, String> {
 
+    @Query("select userKey from UserKey userKey where userKey.user =:userId and userKey.keyType = 'Personal'")
+    List<UserKey> findByUserId(@Param("userId") String userId);
 
+    @Query("select userKey from UserKey userKey where userKey.org =:orgCode and userKey.keyType = 'Org'")
+    List<UserKey> findByOrgCdode(@Param("orgCode") String orgCode);
 }

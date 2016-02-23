@@ -1,8 +1,9 @@
 package com.yihu.ehr.dict.service;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
@@ -14,15 +15,12 @@ import java.util.List;
  * @version 1.0
  * @created 2015.07.30 14:43
  */
-interface XSystemDictRepository extends PagingAndSortingRepository<SystemDict, Long> {
-    @Query("select dict from SystemDict dict where dict.name = :name")
-    SystemDict getDictByName(@Param("name") String name);
+interface XSystemDictRepository extends JpaRepository<SystemDict, Long> {
+    SystemDict findByName(String name);
 
-    @Query(value = "select dict from SystemDict dict where dict.name like '%:name%' or dict.phoneticCode like '%:phoneticCode%' order by dict.name asc",
-            countQuery = "SELECT COUNT(dict) FROM SystemDict dict where dict.name like '%:name%' or dict.phoneticCode like '%:phoneticCode%'")
-    List<SystemDict> findAll(@Param("name") String name, @Param("phoneticCode") String phoneticCode, Pageable pageable);
+    Page<SystemDict> findByNameOrPhoneticCodeOrderByNameAsc(String name, String phoneticCode, Pageable pageable);
 
-    @Query("select count(*) from SystemDict dict where dict.name like '%:name%' or dict.phoneticCode like '%:phoneticCode%'")
-    Integer countByNameOrPhoneticCode(@Param("name") String name, @Param("phoneticCode") String phoneticCode);
+    @Query("select max(dict.id) from SystemDict dict where 1=1")
+    long getNextId();
 }
 

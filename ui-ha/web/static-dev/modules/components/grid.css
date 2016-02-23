@@ -1,0 +1,5 @@
+.u-grid { overflow: hidden;border: 1px solid #d3d3d3;}
+.u-grid .grid-body tr:not(.jqgfirstrow) { height: 40px; font-size: 12px; text-align: center; }
+.u-grid .grid-body tr td { white-space: normal }
+.u-grid .ui-jqgrid .ui-jqgrid-pager .ui-pager-control { height: 50px; }
+.u-grid .ui-jqgrid .ui-pg-selbox { border: 1px solid #CCC; }

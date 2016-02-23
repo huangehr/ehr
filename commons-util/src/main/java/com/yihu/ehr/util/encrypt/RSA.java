@@ -99,7 +99,7 @@ public class RSA {
         Cipher cipher = Cipher.getInstance(KEY_ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, key);
 
-//        return new String(cipher.doFinal(HexEncode.toBytes(data)));
+        //return new String(cipher.doFinal(HexEncode.toBytes(data)));
         return new String(cipher.doFinal(Base64.decode(data)));
     }
 

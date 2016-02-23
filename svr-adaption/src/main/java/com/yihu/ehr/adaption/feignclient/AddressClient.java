@@ -1,6 +1,7 @@
 package com.yihu.ehr.adaption.feignclient;
 
 
+
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

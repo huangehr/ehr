@@ -6,6 +6,10 @@ security:
   user:
     password: dict
 
+spring:
+  jpa:
+    show-sql: true
+
 info:
   app:
     name: SystemDictionaryService

@@ -1,16 +1,15 @@
 package com.yihu.ehr.ha.std.controller;
 
 import com.yihu.ehr.constants.ApiVersionPrefix;
-import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * Created by AndyCai on 2016/1/25.
  */
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/stdSource")
+@RequestMapping(ApiVersionPrefix.Version1_0 + "/stdSource")
 @RestController
-public class StandardSourceController extends BaseRestController {
+public class StandardSourceController {
 
     @RequestMapping(value = "/standardSources",method = RequestMethod.GET)
     public Object getStdSourceList(@ApiParam(name = "apiVersion", value = "API版本号", defaultValue = "v1.0")

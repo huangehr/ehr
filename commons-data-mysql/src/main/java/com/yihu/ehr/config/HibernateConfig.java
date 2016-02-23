@@ -49,12 +49,6 @@ public class HibernateConfig {
     @Value("${data-source.remove-abandoned-timeout}")
     int removeAbandonedTimeout;
 
-//    @Value("${hibernate.dialect}")
-//    String dialect;
-
-    @Value("${hibernate.show-sql}")
-    String showSQL;
-
     @Value("${hibernate.format-sql}")
     String formatSQL;
 
@@ -75,22 +69,5 @@ public class HibernateConfig {
 
         return basicDataSource;
     }
-
-//    @Bean
-//    public LocalSessionFactoryBean sessionFactory(BasicDataSource dataSource){
-//        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
-//        sessionFactory.setDataSource(dataSource);
-//        sessionFactory.getHibernateProperties().setProperty("hibernate.show_sql", showSQL);
-//        sessionFactory.getHibernateProperties().setProperty("hibernate.format_sql", formatSQL);
-//        return sessionFactory;
-//    }
-//
-//    @Bean
-//    public HibernateTransactionManager transactionManager(SessionFactory sessionFactory){
-//        HibernateTransactionManager transactionManager = new HibernateTransactionManager();
-//        transactionManager.setSessionFactory(sessionFactory);
-//
-//        return transactionManager;
-//    }
 
 }

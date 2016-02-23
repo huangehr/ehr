@@ -1,0 +1,135 @@
+.m-form-readonly .l-text,
+.m-form-readonly input,
+.m-form-readonly textarea,
+.m-form-readonly .u-checkbox-wrap,
+.m-form-readonly .m-combo-dropdown,
+.u-ui-readonly .l-text,
+.u-ui-readonly input,
+.u-ui-readonly.u-radio-wrap,
+.u-ui-readonly.u-checkbox-wrap,
+.u-ui-readonly .m-combo-dropdown { background: #EDF6FA !important; pointer-events: none; }
+/* ligerui-dialog.css 样式覆盖 */
+.l-dialog {  border: none; }
+.l-dialog-title { color: #FFF; }
+.l-dialog-tc{ background: #2D9BD2; filter: none;}
+.l-dialog-tc { height: 40px; line-height: 40px; }
+.l-dialog-close { width: 22px; height: 22px;   margin-right: 10px; background: url(../images/Close_btn.png) no-repeat;}
+.l-dialog-collapse { display: none; }
+.l-dialog-winbtns { top: 0; }
+
+/* common.css 样式覆盖 */
+.l-button { height: 30px; line-height: 30px; border: none; border-radius: 3px;}
+.u-btn { color: #FFF; font-weight: bold; }
+.u-btn-primary {  background: #2D9BD2; }
+.u-btn-primary:hover,
+.u-btn-primary:active { background: #0082BE; }
+.u-btn-cancel:hover,
+.u-btn-cancel:active { background: #A5B9C8; }
+.u-btn-success { background: #4BB941; }
+.u-btn-success:hover,
+.u-btn-success:active { background: #32a023; }
+.u-btn-cancel { background: #B9C8D2; }
+.u-btn-small { width: 84px !important; height: 30px; }
+.u-btn-large { width: 98px !important; height: 35px; line-height: 35px; }
+
+/* form.css 样式覆盖 */
+.l-form li,
+.l-text-field {  padding-left: 5px; line-height: 26px; }
+.l-text { width: 240px; height: 30px; line-height: 30px }
+.l-text-focus { border-color:#3094d5; }
+.l-text-field {  width: 238px; padding-right:17px; }
+
+    /*---文本框搜索----*/
+.l-trigger, .l-trigger-hover, .l-trigger-pressed {margin-right: 5px;}
+.l-trigger-search .l-trigger-icon { background:url(../images/Search-btn.png) no-repeat 50% 50% transparent; }
+.l-trigger-search .l-trigger-icon:hover { background:url(../images/Search-btn-pre.png) no-repeat 50% 50% transparent; }
+.l-text-trigger-cancel { right:0;}
+
+/*--下拉框--*/
+
+.l-text-combobox .l-trigger:not(.l-trigger-cancel) .l-trigger-icon,
+.l-text-combobox .l-trigger-pressed .l-trigger-icon:not(.l-trigger-cancel),
+.l-text-combobox .l-trigger-hover:not(.l-trigger-cancel) .l-trigger-icon{background:url(../images/Eject_btn.png);}
+
+.l-text-combobox .l-trigger,
+.l-text-combobox .l-trigger-hover,
+.l-text-combobox .l-trigger-pressed { position: absolute; top: 0; right: 0; width: 29px; height: 28px;  border:0; margin-right: 0; }
+
+.l-text-combobox .l-trigger-cancel {right: 25px;border: 0;}
+.l-text-combobox .l-box-select{border: 1px solid #c8c8c8;}
+.l-text-combobox .l-trigger-icon{border: 0;}
+.l-box-select-absolute{margin-top: 1px;}
+div.mCS-3d div.mCSB_scrollTools div.mCSB_draggerRail{box-shadow: inset 0 0 0, inset -0 0 0;background-color: #ededed;}
+.l-box-select-inner .mCSB_draggerContainer{background-color: #ededed;}
+.l-box-select-inner .mCSB_scrollTools{width: 12px;}
+.l-box-select-inner .mCSB_dragger_onDrag{height: 50px;}
+.l-box-select-inner .mCSB_container{width: 100%;}
+.l-box-select-inner .mCS-3d.mCSB_scrollTools .mCSB_dragger .mCSB_dragger_bar{background-color: #FFF;}
+.l-box-select .mCSB_container .l-box-select-table>tbody>tr{ height: 30px;}
+
+    /*---单选框----*/
+a.l-radio{  width: 20px;  height: 20px;  background:url(../images/Click_btn.png)  }
+.l-over a.l-radio {background-position:0 0;}
+.l-over a.l-radio-checked {  background-position:0; }
+a.l-radio-checked { background:url(../images/Click_btn_pre.png); }
+.u-checkbox-wrap { height: 30px; line-height: 30px; }
+    /*---复选框----*/
+a.l-checkbox{ height: 15px; width: 15px; background:url(../images/guoxuan_btn.png);  }
+a.l-checkbox-checked{ background:url(../images/gouxuan.png)  }
+.l-over a.l-checkbox { background-position: 0; }
+
+/*----日期控件----*/
+.l-box-dateeditor { width: 240px; }
+.l-box-dateeditor-header-text { background-color: #EDF6FA; margin:0 auto; color:#1542B3; line-height: 25px; font-weight:lighter; text-align:center;  }
+.l-box-dateeditor-body td{ width: 34px; height: 25px; line-height: 25px;}
+.l-box-dateeditor-toolbar .l-button-today { margin-left: 50px; }
+.l-box-dateeditor-toolbar{ background: #EDF6FA url('') repeat-x top; }
+.l-box-dateeditor-header { background: #eff3f8; }
+.l-box-dateeditor-header-text a { color: #000; }
+.l-box-dateeditor-body thead tr{ background-color: #2d9bd2; }
+.l-box-dateeditor-body tbody td.l-box-dateeditor-today { background-color: #FFF; }
+.l-box-dateeditor-body tbody td.l-box-dateeditor-over,
+.l-box-dateeditor-body tbody td.l-box-dateeditor-selected { background-color: #2D9BD2; color: #fff;}
+.l-box-dateeditor-body thead td { border-bottom: none; background: none;  }
+.l-box-dateeditor-over{}
+.l-box-dateeditor-toolbar .l-button-today{ background-color: #2D9BD2; color: #fff; }
+.l-box-dateeditor-toolbar .l-button-close{ background-color: #B9C8D2;color: #fff;  }
+.l-box-dateeditor-toolbar .l-button-today:hover{ background-image: url(''); background-color: #0082BE; }
+.l-box-dateeditor-toolbar .l-button-close:hover{ background-image: url(''); background-color: #A5B9C8; }
+.l-box-dateeditor-toolbar .l-button{ background-image: url(''); }
+
+
+/* dialog.css 样式覆盖 */
+.l-dialog-body{ overflow: auto;}
+.l-dialog td,.l-dialog tr,.l-dialog td div{font-size:15px; }
+.l-dialog-loading { top: 50%; left: 50%; width: 48px; height: 48px; margin-top: -24px; margin-left: -24px; }
+
+.l-dialog-image.l-dialog-image-donne { background: url('../images/chengong.png') no-repeat; }
+.l-dialog-image.l-dialog-image-question { background: url('../images/queren.png') no-repeat; }
+.l-dialog-image.l-dialog-image-warn { background: url('../images/jingao.png') no-repeat; }
+.l-dialog-image.l-dialog-image-error { background: url('../images/shibai.png') no-repeat; }
+.l-dialog-image.l-dialog-image-waitting { background: url('../images/loading002.gif') no-repeat; background-size: 48px; }
+.l-dialog-btn { color: #FFF; border: none; border-radius: 3px; filter: none; }
+.l-dialog-btn,
+.l-dialog-btn.l-dialog-btn-ok { background: #2D9BD2; }
+.l-dialog-btn:hover,
+.l-dialog-btn.l-dialog-btn-ok:hover { background: #0082BE; color: #FFF; }
+.l-dialog-btn.l-dialog-btn-no { background: #B9C8D2; }
+.l-dialog-btn.l-dialog-btn-no:hover { background: #A5B9C8; color: #FFF; }
+    /* grid.css 样式覆盖 */
+.l-bar-group { height: 30px; }
+.l-bar-group input { height: 18px; line-height: 18px; }
+.l-bar-group input { height: 18px; line-height: 18px; }
+.l-panel-bbar-inner { margin-top: 0; }
+
+.m-form-group:after { display: table; content: " "; clear: both; }
+.m-form-inline .m-form-group label { display: block; position: relative; float: left; width: 150px;  height: 30px; line-height: 30px;text-align: right; min-height: 1px; padding-right: 10px; padding-left: 10px; font-weight: normal; }
+.m-form-inline .m-form-group { padding-bottom: 10px; }
+.m-form-inline .m-form-group .m-form-control{ float: left; }
+.m-form-inline .m-form-group .l-text-wrapper {  vertical-align: middle; }
+.m-form-inline .m-form-group .l-text {  vertical-align: middle; }
+.m-form-inline .m-form-group .l-text-date .l-trigger-icon { background-repeat: no-repeat; }
+.m-form-inline .m-form-group .u-checkbox-wrap { display: inline-block; }
+.m-form-control.essential>div { display: inline-block; }
+.m-form-control.essential:after { display: inline-block; content: '*'; color: #FF0000; }
+

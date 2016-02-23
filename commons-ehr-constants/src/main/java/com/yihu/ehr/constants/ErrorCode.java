@@ -85,6 +85,9 @@ public enum ErrorCode {
     InvalidDelSysDictEntry("ehr.sysDictEntry.del.invalid"),
     InvalidUpdateSysDictEntry("ehr.sysDictEntry.update.invalid"),
 
+
+    GetGeographyFailed("ehr.geography.ger.invalid"),
+
     ParamError("ehr.std.param.error"),
     InvalidStdVersion("ehr.std.invalid.version"),
     GenerateArchiveFailed("ehr.std.generate.schema.file.failed"),
@@ -101,6 +104,7 @@ public enum ErrorCode {
     GetCDAInfoFailed("ehr.std.get.CDA.list.failed"),
 
     NotFoundDataSetView("ehr.dataset.view.notfound"),
+    GetCDATypeFailed("ehr.cda.type.get.failed"),
     GetDataSetListFailed("ehr.datasetlist.Get.failed"),
     GetDataSetFailed("ehr.dataset.Get.failed"),
     SavedatasetFailed("ehr.dataset.Save.failed"),

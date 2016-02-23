@@ -1,0 +1,128 @@
+[
+  {
+    "text" : "门诊",
+    "children" : [
+      {
+        "text" : "门诊基本诊疗信息",
+        "url" : "/ha/browser/personal-profile/index?demographic_id=412726198711060437&from=2015-01-01&to=2015-12-19"
+      },
+      {
+        "text" : "门诊费用明细",
+        "url" : "2"
+      },
+      {
+        "text" : "门诊检验报告",
+        "url" : "3"
+      },
+      {
+        "text" : "门诊用药记录",
+        "url" : "4"
+      }
+    ]
+  },
+  {
+    "text" : "住院",
+    "children" : [
+      {
+        "text" : "住院摘要",
+        "url" : "/browser/personal-profile/document"
+      },
+      {
+        "text" : "长期医嘱",
+        "url" : "/browser/personal-profile/document"
+      },
+      {
+        "text" : "临时医嘱",
+        "url" : "/browser/personal-profile/document"
+      },
+      {
+        "text" : "住院病案首页",
+        "url" : "/browser/personal-profile/document"
+      }
+    ]
+  },
+  {
+    "text" : "影像",
+    "children" : [
+      {
+        "text" : "检查报告",
+        "url" : "7"
+      },
+      {
+        "text" : "检验报告",
+        "url" : "8"
+      },
+      {
+        "text" : "门诊检验报告",
+        "url" : "3"
+      },
+      {
+        "text" : "门诊用药记录",
+        "url" : "4"
+      }
+    ]
+  },
+  {
+    "text" : "体检",
+    "children" : [
+      {
+        "text" : "检查报告",
+        "url" : "7"
+      },
+      {
+        "text" : "检验报告",
+        "url" : "8"
+      },
+      {
+        "text" : "门诊检验报告",
+        "url" : "3"
+      },
+      {
+        "text" : "门诊用药记录",
+        "url" : "4"
+      }
+    ]
+  },
+  {
+    "text" : "妇幼",
+    "children" : [
+      {
+        "text" : "检查报告",
+        "url" : "7"
+      },
+      {
+        "text" : "检验报告",
+        "url" : "8"
+      },
+      {
+        "text" : "门诊检验报告",
+        "url" : "3"
+      },
+      {
+        "text" : "门诊用药记录",
+        "url" : "4"
+      }
+    ]
+  },
+  {
+    "text" : "社区",
+    "children" : [
+      {
+        "text" : "检查报告",
+        "url" : "7"
+      },
+      {
+        "text" : "检验报告",
+        "url" : "8"
+      },
+      {
+        "text" : "门诊检验报告",
+        "url" : "3"
+      },
+      {
+        "text" : "门诊用药记录",
+        "url" : "4"
+      }
+    ]
+  }
+]

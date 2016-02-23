@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+        "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+        "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+    <!-- 主布局 -->
+    <definition name="layout" template="/WEB-INF/ehr/commons/jsp/mainLayout.jsp">
+    </definition>
+    <!-- 主布局 -->
+    <!-- 项目 -->
+    <definition name="generalView" extends="layout">
+        <put-attribute name="header" value="/WEB-INF/ehr/commons/jsp/commonHead.jsp" />
+        <put-attribute name="pageCss" expression="/WEB-INF/ehr/jsp/${contentPage}Css.jsp" />
+        <put-attribute name="contentPage" expression="/WEB-INF/ehr/jsp/${contentPage}.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/ehr/commons/jsp/commonFoot.jsp" />
+        <put-attribute name="pageJs" expression="/WEB-INF/ehr/jsp/${contentPage}Js.jsp" />
+    </definition>
+    <!--项目-->
+    <!-- 项目 -->
+    <definition name="frameView" extends="generalView" template="/WEB-INF/ehr/commons/jsp/frameLayout.jsp">
+        <put-attribute name="layoutCss" value="/WEB-INF/ehr/commons/jsp/frameLayoutCss.jsp" />
+        <put-attribute name="layoutJs" value="/WEB-INF/ehr/commons/jsp/frameLayoutJs.jsp" />
+    </definition>
+    <!--项目-->
+    <!-- 项目 -->
+    <definition name="pageView"  template="/WEB-INF/ehr/commons/jsp/simpleLayout.jsp">
+        <!--template="/WEB-INF/ehr/commons/jsp/frameLayout.jsp"-->
+        <!--<put-attribute name="layoutCss" value="/WEB-INF/ehr/commons/jsp/frameLayoutCss.jsp" />-->
+        <!--<put-attribute name="layoutJs" value="/WEB-INF/ehr/commons/jsp/frameLayoutJs.jsp" />-->
+        <put-attribute name="pageCss" expression="/WEB-INF/ehr/jsp/${contentPage}Css.jsp" />
+        <put-attribute name="contentPage" expression="/WEB-INF/ehr/jsp/${contentPage}.jsp" />
+        <put-attribute name="pageJs" expression="/WEB-INF/ehr/jsp/${contentPage}Js.jsp" />
+    </definition>
+    <!--项目-->
+    <!-- 项目 -->
+    <definition name="simpleView"  template="/WEB-INF/ehr/commons/jsp/simpleLayout.jsp">
+        <put-attribute name="pageCss" expression="/WEB-INF/ehr/jsp/${contentPage}Css.jsp" />
+        <put-attribute name="contentPage" expression="/WEB-INF/ehr/jsp/${contentPage}.jsp" />
+        <put-attribute name="pageJs" expression="/WEB-INF/ehr/jsp/${contentPage}Js.jsp" />
+    </definition>
+    <!--项目-->
+    <!-- 项目 选择器模板页 -->
+    <definition name="listView" extends="generalView" template="/WEB-INF/ehr/commons/jsp/list.jsp">
+        <put-attribute name="listCss" value="/WEB-INF/ehr/commons/jsp/listCss.jsp" />
+        <put-attribute name="listJs" value="/WEB-INF/ehr/commons/jsp/listJs.jsp" />
+    </definition>
+    <!--项目-->
+
+</tiles-definitions>

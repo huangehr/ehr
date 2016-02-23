@@ -1,12 +1,15 @@
 package com.yihu.ehr.dict.service;
 
+import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 系统字典管理器.
@@ -17,115 +20,47 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class SystemDictService {
+public class SystemDictService extends BaseJpaService<SystemDict, XSystemDictRepository> {
     @Autowired
-    private XSystemDictRepository systemDictRepository;
+    private XSystemDictRepository dictRepo;
 
     @Autowired
-    private XSystemDictEntryRepository systemDictEntryRepository;
+    private XSystemDictEntryRepository entryRepo;
 
-    public SystemDict getDict(long dictId) {
-        return systemDictRepository.findOne(dictId);
+    public Page<SystemDict> getDictList(String sorts, int page, int size) {
+        Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
+        return dictRepo.findAll(pageable);
     }
 
-    public List<SystemDictEntry> getDictEntries(long dictId, String name) {
-        if (null == name){
-            return systemDictEntryRepository.getByDictId(dictId);
-        } else {
-            return systemDictEntryRepository.getEntryList(dictId, name);
-        }
+    public SystemDict createDict(SystemDict dict) {
+        dict.setCreateDate(new Date());
+        dict.setName(dict.getName());
+        dictRepo.save(dict);
+
+        return dict;
     }
 
-    public int getNextSort(long dictId) {
-        Integer nextSort = systemDictEntryRepository.getNextEntrySort(dictId);
-        if (null == nextSort) return 1;
-
-        return nextSort + 1;
+    public void updateDict(SystemDict dict) {
+        dictRepo.save(dict);
     }
 
-    public boolean isDictExists(String name) {
-        SystemDict systemDict = systemDictRepository.getDictByName(name);
+    public void deleteDict(long dictId) {
+        entryRepo.deleteByDictId(dictId);
+        dictRepo.delete(dictId);
+    }
+
+    public boolean isDictNameExists(String name) {
+        SystemDict systemDict = dictRepo.findByName(name);
 
         return systemDict != null;
     }
 
-    public SystemDict createDict(String name, String reference, String author) {
-        SystemDict systemDict = new SystemDict();
-        systemDict.setName(name);
-        systemDict.setReference(reference);
-        systemDict.setAuthorId(author);
-        systemDictRepository.save(systemDict);
-
-        return systemDict;
+    public Page<SystemDict> searchDict(String name, String phoneticCode, int page, int size) {
+        return dictRepo.findByNameOrPhoneticCodeOrderByNameAsc(name, phoneticCode, new PageRequest(page, size));
     }
 
-    public void updateDict(SystemDict dict) {
-        systemDictRepository.save(dict);
-    }
-
-    public void deleteDict(long dictId) {
-        systemDictEntryRepository.deleteByDictId(dictId);
-        systemDictRepository.delete(dictId);
-    }
-
-    public List<SystemDict> getDictionaries(Map<String, Object> args) {
-        String name = (String) args.get("name");
-        String phoneticCode = (String) args.get("phoneticCode");
-        Integer page = (Integer) args.get("page");
-        Integer pageSize = (Integer) args.get("rows");
-
-        return systemDictRepository.findAll(name, phoneticCode, new PageRequest(page, pageSize));
-    }
-
-    public SystemDictEntry getDictEntry(long dictId, String code){
-        return systemDictEntryRepository.findOne(new DictEntryKey(code, dictId));
-    }
-
-    /**
-     * 获取符合特定名称的字典数量。
-     *
-     * @param args
-     * @return
-     */
-    public Integer dictCount(Map<String, Object> args) {
-        String name = (String) args.get("name");
-        String phoneticCode = (String) args.get("phoneticCode");
-
-        return systemDictRepository.countByNameOrPhoneticCode(name, phoneticCode);
-    }
-
-    public List<SystemDictEntry> searchEntryList(Map<String, Object> args) {
-        Long dictId = (Long) args.get("dictId");
-        Integer page = (Integer) args.get("page");
-        Integer pageSize = (Integer) args.get("rows");
-
-        return systemDictEntryRepository.findAll(dictId, new PageRequest(page, pageSize));
-    }
-
-
-    public SystemDictEntry saveSystemDictEntry(SystemDictEntry systemDictEntry) {
-        return systemDictEntryRepository.save(systemDictEntry);
-    }
-
-    public boolean isDictContainEntry(long dictId, String code) {
-        SystemDictEntry systemDictEntry = systemDictEntryRepository.findOne(new DictEntryKey(code, dictId));
-
-        return systemDictEntry != null;
-    }
-
-    public void createDictEntry(SystemDictEntry systemDictEntry) {
-        systemDictEntryRepository.save(systemDictEntry);
-    }
-
-    public void deleteDictEntry(long dictId, String code) {
-        systemDictEntryRepository.delete(new DictEntryKey(code, dictId));
-    }
-
-    public SystemDictEntry getConvertionalDict(long dictId, String entryCode){
-        return systemDictEntryRepository.getConvertionalDict(dictId, entryCode);
-    }
-
-    public List<SystemDictEntry> getConvertionalDicts(long dictId, String[] codes) {
-        return systemDictEntryRepository.getConventionalDictList(dictId, codes);
+    public long getNextId() {
+        long id = dictRepo.getNextId()+1;
+        return id;
     }
 }

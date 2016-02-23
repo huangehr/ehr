@@ -5,11 +5,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.patient.MDemographicInfo;
-import com.yihu.ehr.patient.feign.GeographyClient;
-import com.yihu.ehr.patient.feign.ConventionalDictClient;
-import com.yihu.ehr.patient.service.demographic.DemographicIndex;
+import com.yihu.ehr.patient.service.demographic.DemographicService;
 import com.yihu.ehr.patient.service.demographic.DemographicId;
 import com.yihu.ehr.patient.service.demographic.DemographicInfo;
+import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.encode.HashUtil;
 import com.yihu.ehr.util.log.LogService;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,20 +34,12 @@ import java.util.Map;
 public class PatientController extends BaseRestController {
 
     @Autowired
-    private DemographicIndex demographicIndex;
-
+    private DemographicService demographicService;
     @Autowired
     private FastDFSUtil fastDFSUtil;
 
-    @Autowired
-    private ConventionalDictClient conventionalDictClient;
-
-    @Autowired
-    private GeographyClient addressClient;
-
     /**
      * 根据条件查询人口信息
-     * @param apiVersion
      * @param name
      * @param idCardNo
      * @param province
@@ -62,9 +52,7 @@ public class PatientController extends BaseRestController {
      */
     @RequestMapping(value = "/populations",method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询人")
-    public Object searchPatient(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
+    public Envelop searchPatient(
             @ApiParam(name = "name", value = "姓名", defaultValue = "")
             @RequestParam(value = "name") String name,
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
@@ -87,27 +75,14 @@ public class PatientController extends BaseRestController {
         conditionMap.put("province", province);
         conditionMap.put("city", city);
         conditionMap.put("district", district);
-        List<DemographicInfo> demographicInfos = demographicIndex.searchPatient(apiVersion,conditionMap);
-        List<MDemographicInfo> demographicModels = new ArrayList<>();
-        for(DemographicInfo demographicInfo:demographicInfos){
-            MDemographicInfo demographicModel = convertToModel(demographicInfo,MDemographicInfo.class);
-            demographicModel.setBirthPlace(addressClient.getAddressById(apiVersion,demographicInfo.getBirthPlace()));
-            demographicModel.setNativePlace(addressClient.getAddressById(apiVersion,demographicInfo.getNativePlace()));
-            demographicModel.setWorkAddress(addressClient.getAddressById(apiVersion,demographicInfo.getWorkAddress()));
-            demographicModel.setHomeAddress(addressClient.getAddressById(apiVersion,demographicInfo.getHomeAddress()));
-            demographicModel.setGender(conventionalDictClient.getGender(apiVersion,demographicInfo.getGender()));
-            demographicModel.setMartialStatus(conventionalDictClient.getMartialStatus(apiVersion,demographicInfo.getMartialStatus()));
-            demographicModel.setResidenceType(conventionalDictClient.getResidenceType(apiVersion,demographicInfo.getResidenceType()));
-            demographicModels.add(demographicModel);
-        }
-        Integer totalCount = demographicIndex.searchPatientTotalCount(apiVersion,conditionMap);
-        return getResult(demographicModels,totalCount,page,rows);
+        List<DemographicInfo> demographicInfos = demographicService.searchPatient(conditionMap);
+        Integer totalCount = demographicService.searchPatientTotalCount(conditionMap);
+        return getResult(demographicInfos,totalCount);
     }
 
 
     /**
      * 根据身份证号删除人
-     * @param apiVersion
      * @param idCardNo
      * @return
      * @throws Exception
@@ -115,18 +90,15 @@ public class PatientController extends BaseRestController {
     @RequestMapping(value = "/populations/{id_card_no}",method = RequestMethod.DELETE)
     @ApiOperation(value = "根据身份证号删除人")
     public Object deletePatient(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @PathVariable(value = "id_card_no") String idCardNo) throws Exception{
-        demographicIndex.delete(new DemographicId(idCardNo));
+        demographicService.delete(new DemographicId(idCardNo));
         return true;
     }
 
 
     /**
      * 根据身份证号查找人
-     * @param apiVersion
      * @param idCardNo
      * @return
      * @throws Exception
@@ -134,39 +106,11 @@ public class PatientController extends BaseRestController {
     @RequestMapping(value = "/populations/{id_card_no}",method = RequestMethod.GET)
     @ApiOperation(value = "根据身份证号查找人")
     public MDemographicInfo getPatient(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @PathVariable(value = "id_card_no") String idCardNo) throws Exception{
-        DemographicInfo demographicInfo = demographicIndex.getDemographicInfo(new DemographicId(idCardNo));
+        DemographicInfo demographicInfo = demographicService.getDemographicInfo(new DemographicId(idCardNo));
         MDemographicInfo demographicModel = convertToModel(demographicInfo,MDemographicInfo.class);
-        demographicModel.setBirthPlace(addressClient.getAddressById(apiVersion,demographicInfo.getBirthPlace()));
-        demographicModel.setNativePlace(addressClient.getAddressById(apiVersion,demographicInfo.getNativePlace()));
-        demographicModel.setWorkAddress(addressClient.getAddressById(apiVersion,demographicInfo.getWorkAddress()));
-        demographicModel.setHomeAddress(addressClient.getAddressById(apiVersion,demographicInfo.getHomeAddress()));
-        demographicModel.setGender(conventionalDictClient.getGender(apiVersion,demographicInfo.getGender()));
-        demographicModel.setMartialStatus(conventionalDictClient.getMartialStatus(apiVersion,demographicInfo.getMartialStatus()));
-        demographicModel.setResidenceType(conventionalDictClient.getResidenceType(apiVersion,demographicInfo.getResidenceType()));
         return demographicModel;
-    }
-
-    /**
-     * 检查身份证是否已经存在
-     * @param apiVersion
-     * @param idCardNo
-     * @return
-     * @throws Exception
-     */
-    @RequestMapping(value = "/populations/{id_card_no}",method = RequestMethod.GET)
-    @ApiOperation(value = "检查身份证是否已经存在")
-    public boolean checkIdCardNo(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
-            @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
-            @PathVariable(value = "id_card_no") String idCardNo) throws Exception{
-        DemographicInfo demographicInfo = demographicIndex.getDemographicInfo(new DemographicId(idCardNo));
-        return demographicInfo!=null;
-
     }
 
 
@@ -181,14 +125,12 @@ public class PatientController extends BaseRestController {
     @RequestMapping(value = "/populations",method = RequestMethod.POST)
     @ApiOperation(value = "根据前端传回来的json创建一个人口信息")
     public boolean createPatient(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
             @RequestParam(value = "patient_model_json_data") String patientModelJsonData,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
         //将文件保存至服务器，返回文件的path，
-        String picPath = webupload(request, response);
+        String picPath = webupload(request);
         ObjectMapper objectMapper = new ObjectMapper();
         MDemographicInfo demographicInfoModel = objectMapper.readValue(patientModelJsonData, MDemographicInfo.class);
         //将文件path保存至数据库
@@ -198,7 +140,7 @@ public class PatientController extends BaseRestController {
         }
         String pwd = "123456";
         demographicInfoModel.setPassword(HashUtil.hashStr(pwd));
-        demographicIndex.savePatient(apiVersion,demographicInfoModel);
+        demographicService.savePatient(demographicInfoModel);
         return true;
     }
 
@@ -206,22 +148,18 @@ public class PatientController extends BaseRestController {
      * 根据前端传回来的json修改人口信息
      * @param patientModelJsonData
      * @param request
-     * @param response
      * @return
      * @throws Exception
      */
     @RequestMapping(value = "/populations",method = RequestMethod.PUT)
     @ApiOperation(value = "根据前端传回来的json修改人口信息")
     public boolean updatePatient(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
             @RequestParam(value = "patient_model_json_data") String patientModelJsonData,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception{
+            HttpServletRequest request) throws Exception{
 
         //将文件保存至服务器，返回文件的path，
-        String picPath = webupload(request, response);
+        String picPath = webupload(request);
         ObjectMapper objectMapper = new ObjectMapper();
         MDemographicInfo demographicInfoModel = objectMapper.readValue(patientModelJsonData, MDemographicInfo.class);
         //将文件path保存至数据库
@@ -229,18 +167,17 @@ public class PatientController extends BaseRestController {
         if(picPath != null){
             demographicInfoModel.setLocalPath("");
         }
-        demographicIndex.savePatient(apiVersion,demographicInfoModel);
+        demographicService.savePatient(demographicInfoModel);
         return true;
     }
 
     /**
      * 人口信息头像图片上传
      * @param request
-     * @param response
      * @return
      * @throws IOException
      */
-    public String webupload(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public String webupload(HttpServletRequest request) throws IOException {
         try {
             request.setCharacterEncoding("UTF-8");
         } catch (UnsupportedEncodingException e1) {
@@ -274,7 +211,6 @@ public class PatientController extends BaseRestController {
 
     /**
      * 初始化密码
-     * @param apiVersion
      * @param idCardNo
      * @return
      * @throws Exception
@@ -282,11 +218,9 @@ public class PatientController extends BaseRestController {
     @RequestMapping(value = "/populations/password/{id_card_no}",method = RequestMethod.PUT)
     @ApiOperation(value = "初始化密码",notes = "用户忘记密码时重置密码，初始密码为123456")
     public Object resetPass(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @PathVariable(value = "id_card_no") String idCardNo) throws Exception{
-        demographicIndex.resetPass(new DemographicId(idCardNo));
+        demographicService.resetPass(new DemographicId(idCardNo));
         return true;
     }
 
@@ -305,8 +239,6 @@ public class PatientController extends BaseRestController {
     @RequestMapping(value = "/populations/images/{local_img_path}",method = RequestMethod.PUT)
     @ApiOperation(value = "显示头像")
     public void showImage(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
             @ApiParam(name = "local_img_path", value = "身份证号", defaultValue = "")
             @PathVariable(value = "local_img_path") String localImgPath,
             HttpServletRequest request,

@@ -1,0 +1,13 @@
+/* unit */
+
+.f-icon-0 { background: url(../images/icon_Standard.png) center no-repeat; }
+.f-icon-1 { background: url(../images/icon_Task.png) center no-repeat; }
+.f-icon-2 { background: url(../images/icon_es.png) center no-repeat; }
+.f-icon-3 { background: url(../images/icon_configure.png) center no-repeat; }
+.f-icon-4 { background: url(../images/icon_Journal.png) center no-repeat; }
+.f-icon-5 { background: url(../images/icon_Resources.png) center no-repeat; }
+.f-icon-6 { background: url(../images/icon_Safety.png) center no-repeat; }
+
+.f-color-0 { color: #fff;}
+
+.f-bc100 { background-color:  #2d9bd2;}

@@ -1,4 +1,7 @@
 package com.yihu.ehr.standard.cda.service;
+import com.yihu.ehr.standard.cdaversion.service.CDAVersion;
+import com.yihu.ehr.standard.datasets.service.DataSet;
+import com.yihu.ehr.standard.datasets.service.MetaData;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +23,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author AndyCai
@@ -45,50 +47,50 @@ public class CDADocumentManager {
     /**
      * 同时删除多个时 CDAID用逗号隔开
      *
-     * @param strVersionId
+     * @param versionCode
      * @param ids
      */
     @Transactional(Transactional.TxType.SUPPORTS)
-    public int deleteDocument(String strVersionId, List<String> ids) {
-        int result = 0;
-        String strIds = org.apache.commons.lang.StringUtils.join(ids, "','");
-        strIds = "'" + strIds + "'";
-
-        result = cdaDatasetRelationshipManager.deleteRelationshipByCdaId(strVersionId, ids);
-        if (result > -1) {
-            Session session = currentSession();
-            String sql = "delete from " + CDAVersion.getCDATableName(strVersionId) + " where id in(" + strIds + ")";
-            result = session.createSQLQuery(sql).executeUpdate();
-        }
-        return result;
+    public boolean deleteDocument(String versionCode,String[] ids) {
+        cdaDatasetRelationshipManager.deleteRelationshipByCdaId(versionCode,ids);
+        Session session = currentSession();
+        String sql = "delete from " + CDAVersion.getCDATableName(versionCode) + " where id in(:ids)";
+        Query query = session.createSQLQuery(sql);
+        query.setParameterList("ids",ids);
+        query.executeUpdate();
+        return true;
     }
 
     /**
      * 根据CDAID获取CDA内容
      *
-     * @param strVersionId
+     * @param versionCode
      * @param ids
      */
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public CDADocument[] getDocumentList(String strVersionId, List<String> ids) {
+    public List<CDADocument> getDocumentList(String versionCode, String[] ids) {
 
         Session session = currentSession();
-        String strTableName = CDAVersion.getCDATableName(strVersionId);
-
-
-        String strIds = org.apache.commons.lang.StringUtils.join(ids, "','");
-        strIds = "'" + strIds + "'";
-
-        Query query = session.createSQLQuery("SELECT t.id, t.`code`, t.create_date, t.create_user, t.`name`, t.print_out, t.`schema_path`, t.source_id, t.update_date, t.update_user,t.description,t.file_group,t.type " +
-                "FROM " + strTableName + " t where t.id in (" + strIds + ")");
-
+        String strTableName = CDAVersion.getCDATableName(versionCode);
+        Query query = session.createSQLQuery("SELECT " +
+                "t.id," +
+                "t.code," +
+                "t.create_date," +
+                "t.create_user," +
+                "t.name," +
+                "t.print_out," +
+                "t.schema_path," +
+                "t.source_id," +
+                "t.update_date," +
+                "t.update_user," +
+                "t.description," +
+                "t.file_group," +
+                "t.type " +
+                "FROM " + strTableName + " t where t.id in (:ids)");
+        query.setParameterList("ids",ids);
         List<Object> records = query.list();
-
-        CDADocument[] xcdaDocuments = new CDADocument[records.size()];
-
+        List<CDADocument> xcdaDocuments = new ArrayList<>();
         for (int i = 0; i < records.size(); ++i) {
             Object[] record = (Object[]) records.get(i);
-
             CDADocument cdaDocument = new CDADocument();
             cdaDocument.setId(record[0].toString());
             cdaDocument.setCode(record[1].toString());
@@ -103,10 +105,9 @@ public class CDADocumentManager {
             cdaDocument.setDescription(record[10] == null ? null : record[10].toString());
             cdaDocument.setFileGroup(record[11] == null ? null : record[11].toString());
             cdaDocument.setTypeId(record[12] == null ? null : record[12].toString());
-            cdaDocument.setVersionCode(strVersionId);
-            xcdaDocuments[i] = cdaDocument;
+            cdaDocument.setVersionCode(versionCode);
+            xcdaDocuments.add(cdaDocument);
         }
-
         return xcdaDocuments;
     }
 
@@ -139,118 +140,72 @@ public class CDADocumentManager {
     }
 
     @Transactional(Transactional.TxType.SUPPORTS)
-    public int getDocumentCount(String strVersionId, String strKey,String cdaType) {
+    public int getDocumentCount(String versionCode,String code,String name,String type) {
         Session session = currentSession();
-        String strTableName = CDAVersion.getCDATableName(strVersionId);
-
+        String strTableName = CDAVersion.getCDATableName(versionCode);
         String strSql = "SELECT t.id, t.`code`, t.create_date, t.create_user, t.`name`, t.print_out, t.`schema_path`, t.source_id, t.update_date, t.update_user,t.description,t.type,t.file_group " +
                 "FROM " + strTableName + " t where 1=1 and t.type=:type";
-        if (strKey != null && strKey != "") {
-            strSql += " and (t.code like :key or t.`name` like :key)";
+        if (!StringUtils.isEmpty(code)) {
+            strSql += " and t.code like :code";
         }
-
+        if (!StringUtils.isEmpty(name)) {
+            strSql += " and t.name like :name";
+        }
         Query query = session.createSQLQuery(strSql);
-        if (strKey != null && strKey != "")
-            query.setString("key", "%" + strKey + "%");
-
-        query.setString("type", cdaType);
-
-        if (query == null)
-            return 0;
-
-        List<Object> records = query.list();
-
-        return records.size();
+        if (!StringUtils.isEmpty(code)){
+            query.setString("code", "%" + code + "%");
+        }
+        if (!StringUtils.isEmpty(name)){
+            query.setString("name", "%" + name + "%");
+        }
+        query.setString("type", type);
+        return query.list().size();
     }
+
 
     /**
      * 根据查询条件获取CDA信息
      * 参数Key支持 Code/Name
-     *
-     * @param strVersionId
-     * @param strKey
      */
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public CDADocument[] getDocumentList(String strVersionId, String strKey) {
-
+    public List<CDADocument> getDocumentList(String versionCode,String code,String name,String type,int page,int pageSize) {
         Session session = currentSession();
-        String strTableName = CDAVersion.getCDATableName(strVersionId);
-
-        String strSql = "SELECT t.id, t.`code`, t.create_date, t.create_user, t.`name`, t.print_out, t.`schema_path`, t.source_id, t.update_date, t.update_user,t.description,t.type,t.file_group " +
-                "FROM " + strTableName + " t where 1=1 ";
-        if (strKey != null && strKey != "") {
-            strSql += " and t.code like ':key' or t.`name` like ':key'";
-        }
-
-        Query query = session.createSQLQuery(strSql);
-        if (strKey != null && strKey != "")
-            query.setString("key", "%" + strKey + "%");
-
-        List<Object> records = query.list();
-
-        CDADocument[] xcdaDocuments = new CDADocument[records.size()];
-
-        for (int i = 0; i < records.size(); ++i) {
-            Object[] record = (Object[]) records.get(i);
-
-            CDADocument cdaDocument = new CDADocument();
-            cdaDocument.setId(record[0].toString());
-            cdaDocument.setCode(record[1].toString());
-            cdaDocument.setCreateDate((Date) record[2]);
-            cdaDocument.setCreateUser(record[3].toString());
-            cdaDocument.setName(record[4].toString());
-            cdaDocument.setPrintOut(record[5] == null ? null : record[5].toString());
-            cdaDocument.setSchema(record[6] == null ? null : record[6].toString());
-            cdaDocument.setSourceId(record[7].toString());
-            cdaDocument.setUpdateDate(record[8] == null ? null : (Date) record[8]);
-            cdaDocument.setUpdateUser(record[9] == null ? null : record[9].toString());
-            cdaDocument.setDescription(record[10] == null ? null : record[10].toString());
-            cdaDocument.setVersionCode(strVersionId);
-            cdaDocument.setTypeId(record[11] == null ? null : record[11].toString());
-            cdaDocument.setFileGroup(record[12] == null ? null : record[12].toString());
-            xcdaDocuments[i] = cdaDocument;
-        }
-
-        return xcdaDocuments;
-    }
-
-    /**
-     * 根据查询条件获取CDA信息
-     * 参数Key支持 Code/Name
-     *
-     * @param strVersionId
-     * @param strKey
-     * @param page
-     * @param pageSize
-     */
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public List<CDADocument> getDocumentList(String strVersionId, String strKey, String strType, int page, int pageSize) {
-
-        Session session = currentSession();
-        String strTableName = CDAVersion.getCDATableName(strVersionId);
-
-        String strSql = "SELECT t.id, t.`code`, t.create_date, t.create_user, t.`name`, t.print_out, t.`schema_path`, t.source_id, t.update_date, t.update_user,t.description,t.type,t.file_group " +
+        String strTableName = CDAVersion.getCDATableName(versionCode);
+        String strSql = "SELECT t.id," +
+                "t.code," +
+                "t.create_date," +
+                "t.create_user," +
+                "t.name," +
+                "t.print_out," +
+                "t.schema_path," +
+                "t.source_id," +
+                "t.update_date," +
+                "t.update_user," +
+                "t.description," +
+                "t.type," +
+                "t.file_group " +
                 "FROM " + strTableName + " t where 1=1 and t.type=:type";
-        if (strKey != null && strKey != "") {
-            strSql += " and (t.code like :key or t.`name` like :key)";
+        if (!StringUtils.isEmpty(code)) {
+            strSql += " and t.code like :code";
         }
-
+        if (!StringUtils.isEmpty(name)) {
+            strSql += " and t.name like :name";
+        }
         Query query = session.createSQLQuery(strSql);
-        if (strKey != null && strKey != "")
-            query.setString("key", "%" + strKey + "%");
-
-        query.setString("type", strType);
+        if (!StringUtils.isEmpty(code)){
+            query.setString("code", "%" + code + "%");
+        }
+        if (!StringUtils.isEmpty(name)){
+            query.setString("name", "%" + name + "%");
+        }
+        query.setString("type", type);
         if (pageSize != 0) {
             query.setMaxResults(pageSize);
             query.setFirstResult((page - 1) * pageSize);
         }
         List<Object> records = query.list();
-
-        List<CDADocument> xcdaDocuments = new ArrayList<>();
-
+        List<CDADocument> cdaDocuments = new ArrayList<>();
         for (int i = 0; i < records.size(); ++i) {
             Object[] record = (Object[]) records.get(i);
-
             CDADocument cdaDocument = new CDADocument();
             cdaDocument.setId(record[0].toString());
             cdaDocument.setCode(record[1].toString());
@@ -263,13 +218,12 @@ public class CDADocumentManager {
             cdaDocument.setUpdateDate(record[8] == null ? null : (Date) record[8]);
             cdaDocument.setUpdateUser(record[9] == null ? null : record[9].toString());
             cdaDocument.setDescription(record[10] == null ? null : record[10].toString());
-            cdaDocument.setVersionCode(strVersionId);
+            cdaDocument.setVersionCode(versionCode);
             cdaDocument.setTypeId(record[11] == null ? null : record[11].toString());
             cdaDocument.setFileGroup(record[12] == null ? null : record[12].toString());
-            xcdaDocuments.add(cdaDocument);
+            cdaDocuments.add(cdaDocument);
         }
-
-        return xcdaDocuments;
+        return cdaDocuments;
     }
 
 
@@ -308,15 +262,38 @@ public class CDADocumentManager {
         String strTableName = CDAVersion.getCDATableName(cdaDocument.getVersionCode());
         String sql;
         Query query;
-
-        List<String> ids = new ArrayList<>();
-        ids.add(cdaDocument.getId());
-        CDADocument[] xCda = getDocumentList(cdaDocument.getVersionCode(), ids);
-
-        if (xCda.length == 0) {
-            sql = "insert into " + strTableName +
-                    " ( id, code, create_date, create_user, name, print_out, schema_path, source_id, update_date, update_user,hash,description,file_group,type)  " +
-                    "values(:id, :code, :create_date, :create_user, :name, :print_out, :schema_path, :source_id, :update_date,:update_user,:hash,:description,:file_group,:type)";
+        String[] ids = new String[]{cdaDocument.getId()};
+        List<CDADocument> xCda = getDocumentList(cdaDocument.getVersionCode(), ids);
+        if (xCda.size() == 0) {
+            sql = "insert into " + strTableName +" "+
+                    "(id," +
+                    "code," +
+                    "create_date," +
+                    "create_user," +
+                    "name," +
+                    "print_out," +
+                    "schema_path," +
+                    "source_id," +
+                    "update_date," +
+                    "update_user," +
+                    "hash," +
+                    "description," +
+                    "file_group," +
+                    "type)  " +
+                    "values(:id," +
+                    ":code," +
+                    ":create_date," +
+                    ":create_user," +
+                    ":name," +
+                    ":print_out," +
+                    ":schema_path," +
+                    ":source_id," +
+                    ":update_date," +
+                    ":update_user," +
+                    ":hash," +
+                    ":description," +
+                    ":file_group," +
+                    ":type)";
         } else {
             sql = "update " + strTableName +
                     " set " +
@@ -357,36 +334,13 @@ public class CDADocumentManager {
         return true;
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public List<DataSet> getDatasetNotInCda(String codename, int from, int count, String version, String strCdaId) {
-        String dataSetTable = CDAVersion.getDataSetTableName(version);
-        String relationTable = CDAVersion.getCDADatasetRelationshipTableName(version);
-        Session session = currentSession();
-        String sql = " select id, code, name, publisher, ref_standard, std_version, lang, catalog, hash, document_id, summary " +
-                " from " + dataSetTable + " where 1=1 ";
-        if (codename != null && !codename.equals(0) && !codename.equals("")) {
-            sql += " and code LIKE :codename or name LIKE :codename ";
-        }
-        Query query = session.createSQLQuery(sql);
-        if (codename != null && !codename.equals(0) && !codename.equals(""))
-            query.setString("codename", "%" + codename + "%");
-
-        if (count > 0) {
-            query.setMaxResults(count);
-            query.setFirstResult((from - 1) * count);
-        }
-        return query.list();
-    }
-
 
     /**
      * 判断文件是否存在
      */
-    public boolean isFileExists(String strCdaId, String strVersionCode) {
-        int iResult = 0;
-        String strFilePath = FilePath(strVersionCode) + strCdaId + ".xml";
+    public boolean isFileExists(String cdaId, String strVersionCode) {
+        String strFilePath = FilePath(strVersionCode) + cdaId + ".xml";
         File file = new File(strFilePath);
-
         return file.exists();
     }
 
@@ -394,41 +348,39 @@ public class CDADocumentManager {
         //文件服务器路径
         String strPath = System.getProperty("java.io.tmpdir");
         strPath += "StandardFiles";
-
         //路径分割符
         String splitMark = System.getProperty("file.separator");
-
         //文件路径
         String strXMLFilePath = strPath + splitMark + "xml" + splitMark + strVersionCode + splitMark;
-
         return strXMLFilePath;
     }
 
-    /*
-    *  根据CDA Id 和 版本编码 生成CDA文档
-    * param strCdaId cdaId
-    * param strVersionCode 版本编号
-    * */
-    public int createCDASchemaFile(String strCdaId, String strVersionCode) throws TransformerException, ParserConfigurationException, FileNotFoundException, UnsupportedEncodingException {
+    /**
+     * 根据CDA Id 和 版本编码 生成CDA文档
+     * @param cdaId
+     * @param versionCode
+     * @return
+     * @throws TransformerException
+     * @throws ParserConfigurationException
+     * @throws FileNotFoundException
+     * @throws UnsupportedEncodingException
+     */
+    public boolean createCDASchemaFile(String cdaId, String versionCode) throws TransformerException, ParserConfigurationException, FileNotFoundException, UnsupportedEncodingException {
         //操作结果：0：现在失败 1：新增成功
-        int result = 1;
-        int iSetCount = cdaDatasetRelationshipManager.getRelationshipCountByCdaId(strCdaId, strVersionCode, "");
-        List<CdaDatasetRelationship> relationshipsList = cdaDatasetRelationshipManager.getRelationshipByCdaId(strCdaId, strVersionCode, "", 1, iSetCount);
+        int iSetCount = cdaDatasetRelationshipManager.getRelationshipCountByCdaId(cdaId, versionCode);
+        List<CdaDataSetRelationship> relationshipsList = cdaDatasetRelationshipManager.getCDADataSetRelationshipByCDAId(cdaId, versionCode, 1, iSetCount);
 
         String strPath = System.getProperty("java.io.tmpdir");
         strPath += "StandardFiles";
         String splitMark = System.getProperty("file.separator");
-        String strXMLFilePath = strPath + splitMark + "xml" + splitMark + strVersionCode + splitMark;
+        String strXMLFilePath = strPath + splitMark + "xml" + splitMark + versionCode + splitMark;
         File file = new File(strXMLFilePath);
         if (!file.exists()) {
             file.mkdirs();
         }
-
-        String strFilepath = strXMLFilePath + strCdaId + ".xsd";
-
+        String strFilepath = strXMLFilePath + cdaId + ".xsd";
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
-
         Document doc = builder.newDocument();
         Element root = doc.createElement("xs:schema");
         root.setAttribute("xmlns:xs", "http://www.w3.org/2001/XMLSchema");
@@ -436,10 +388,10 @@ public class CDADocumentManager {
         root.setAttribute("xmlns", "http://www.w3schools.com");
         root.setAttribute("elementFormDefault", "qualified");
         doc.appendChild(root);
-
         for (int i = 0; i < relationshipsList.size(); i++) {
             //获取数据集
-            DataSet dataSet = relationshipsList.get(i).getDataset();
+//            DataSet dataSet = relationshipsList.get(i).getDataset();
+            DataSet dataSet = new DataSet();
             Element rowSet = doc.createElement("xs:table");
             rowSet.setAttribute("code", dataSet.getCode());
             root.appendChild(rowSet);
@@ -459,10 +411,9 @@ public class CDADocumentManager {
                 rowSet.appendChild(rowEle);
             }
         }
-
         //生成XML文件
         outputXml(doc, strFilepath);
-        return result;
+        return true;
     }
 
     private void outputXml(Document doc, String fileName) throws TransformerException, FileNotFoundException, UnsupportedEncodingException {
@@ -478,58 +429,5 @@ public class CDADocumentManager {
         transformer.transform(source, result);
     }
 
-    /*
-    * 根据CDA类别 版本号 查询条件 获取CDA
-    * @Parma mapKey strVersionId:版本号;strKey:查询条件;type:类别
-    *
-    * */
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public List<CDADocument> getDocumentListByType(Map<String, Object> mapKey) {
-
-        String strVersionId = mapKey.get("cda_version").toString();
-        String strKey = mapKey.get("search_key").toString();
-        String strType = mapKey.get("type").toString();
-
-        Session session = currentSession();
-        String strTableName = CDAVersion.getCDATableName(strVersionId);
-
-        String strSql = "SELECT t.id, t.`code`, t.create_date, t.create_user, t.`name`, t.print_out, t.`schema_path`, t.source_id, t.update_date, t.update_user,t.description,t.file_group,t.type " +
-                "FROM " + strTableName + " t where 1=1 and t.type=:type";
-        if (strKey != null && strKey != "") {
-            strSql += " and (t.code like :key or t.`name` like :key)";
-        }
-
-        Query query = session.createSQLQuery(strSql);
-        query.setString("type", strType);
-        if (strKey != null && strKey != "")
-            query.setString("key", "%" + strKey + "%");
-
-        List<Object> records = query.list();
-
-        List<CDADocument> xcdaDocuments = new ArrayList<>();
-
-        for (int i = 0; i < records.size(); ++i) {
-            Object[] record = (Object[]) records.get(i);
-
-            CDADocument cdaDocument = new CDADocument();
-            cdaDocument.setId(record[0].toString());
-            cdaDocument.setCode(record[1].toString());
-            cdaDocument.setCreateDate((Date) record[2]);
-            cdaDocument.setCreateUser(record[3].toString());
-            cdaDocument.setName(record[4].toString());
-            cdaDocument.setPrintOut(record[5] == null ? null : record[5].toString());
-            cdaDocument.setSchema(record[6] == null ? null : record[6].toString());
-            cdaDocument.setSourceId(record[7].toString());
-            cdaDocument.setUpdateDate(record[8] == null ? null : (Date) record[8]);
-            cdaDocument.setUpdateUser(record[9] == null ? null : record[9].toString());
-            cdaDocument.setDescription(record[10] == null ? null : record[10].toString());
-            cdaDocument.setFileGroup(record[11] == null ? null : record[11].toString());
-            cdaDocument.setTypeId(record[12] == null ? null : record[12].toString());
-            cdaDocument.setVersionCode(strVersionId);
-            xcdaDocuments.add(cdaDocument);
-        }
-
-        return xcdaDocuments;
-    }
 
 }//end CDADocumentManager
