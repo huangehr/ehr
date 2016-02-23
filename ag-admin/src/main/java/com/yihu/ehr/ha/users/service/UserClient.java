@@ -70,14 +70,14 @@ public interface UserClient {
 
     @RequestMapping(value = "/rest/v1.0/users/password/{user_id}" , method = RequestMethod.PUT)
     @ApiOperation(value = "重设密码",notes = "用户忘记密码管理员帮助重新还原密码，初始密码123456")
-    Object resetPass(
+    boolean resetPass(
             @ApiParam(name = "user_id", value = "id", defaultValue = "")
             @PathVariable(value = "user_id") String userId) ;
 
 
     @RequestMapping(value = "/rest/v1.0/users/binding/{user_id}/{type}" , method = RequestMethod.DELETE)
     @ApiOperation(value = "取消关联绑定",notes = "取消相关信息绑定")
-    Object unBinding (
+    boolean unBinding (
             @ApiParam(name = "user_id", value = "", defaultValue = "")
             @PathVariable(value = "user_id") String userId,
             @ApiParam(name = "type", value = "", defaultValue = "")
