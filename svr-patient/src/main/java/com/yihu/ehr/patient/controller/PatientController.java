@@ -89,7 +89,7 @@ public class PatientController extends BaseRestController {
      */
     @RequestMapping(value = "/populations/{id_card_no}",method = RequestMethod.DELETE)
     @ApiOperation(value = "根据身份证号删除人")
-    public Object deletePatient(
+    public boolean deletePatient(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @PathVariable(value = "id_card_no") String idCardNo) throws Exception{
         demographicService.delete(new DemographicId(idCardNo));
@@ -124,7 +124,7 @@ public class PatientController extends BaseRestController {
      */
     @RequestMapping(value = "/populations",method = RequestMethod.POST)
     @ApiOperation(value = "根据前端传回来的json创建一个人口信息")
-    public boolean createPatient(
+    public MDemographicInfo createPatient(
             @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
             @RequestParam(value = "patient_model_json_data") String patientModelJsonData,
             HttpServletRequest request,
@@ -141,7 +141,7 @@ public class PatientController extends BaseRestController {
         String pwd = "123456";
         demographicInfoModel.setPassword(HashUtil.hashStr(pwd));
         demographicService.savePatient(demographicInfoModel);
-        return true;
+        return convertToModel(demographicInfoModel,MDemographicInfo.class,null);
     }
 
     /**
@@ -153,7 +153,7 @@ public class PatientController extends BaseRestController {
      */
     @RequestMapping(value = "/populations",method = RequestMethod.PUT)
     @ApiOperation(value = "根据前端传回来的json修改人口信息")
-    public boolean updatePatient(
+    public MDemographicInfo updatePatient(
             @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
             @RequestParam(value = "patient_model_json_data") String patientModelJsonData,
             HttpServletRequest request) throws Exception{
@@ -168,7 +168,7 @@ public class PatientController extends BaseRestController {
             demographicInfoModel.setLocalPath("");
         }
         demographicService.savePatient(demographicInfoModel);
-        return true;
+        return convertToModel(demographicInfoModel,MDemographicInfo.class,null);
     }
 
     /**
@@ -217,7 +217,7 @@ public class PatientController extends BaseRestController {
      */
     @RequestMapping(value = "/populations/password/{id_card_no}",method = RequestMethod.PUT)
     @ApiOperation(value = "初始化密码",notes = "用户忘记密码时重置密码，初始密码为123456")
-    public Object resetPass(
+    public boolean resetPass(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @PathVariable(value = "id_card_no") String idCardNo) throws Exception{
         demographicService.resetPass(new DemographicId(idCardNo));
