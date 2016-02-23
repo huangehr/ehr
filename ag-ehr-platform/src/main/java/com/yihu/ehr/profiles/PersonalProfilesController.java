@@ -1,4 +1,4 @@
-package com.yihu.ehr.personal;
+package com.yihu.ehr.profiles;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -31,7 +31,7 @@ import java.util.List;
 public class PersonalProfilesController extends BaseRestController {
 
     @RequestMapping(value = "/profiles", method = RequestMethod.GET)
-    @ApiOperation(value = "获取档案列表", response = RestEcho.class, produces = "application/json", notes = "获取档案列表")
+    @ApiOperation(value = "获取档案列表", produces = "application/json", notes = "获取档案列表")
     public Object getProfiles(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
@@ -45,32 +45,11 @@ public class PersonalProfilesController extends BaseRestController {
             @RequestParam(value = "load_std_data_set", required = true) boolean loadStdDataSet,
             @ApiParam(required = true, name = "load_origin_data_set", value = "是否加载原始数据集")
             @RequestParam(value = "load_origin_data_set", required = true) boolean loadOriginDataSet) {
-        try {
-            XEhrArchiveManager archiveManager = ServiceFactory.getService(Services.EhrArchiveManager);
-            List<XEhrArchive> archiveList = archiveManager.getArchiveList(
-                    new DemographicId(demographicId),
-                    from,
-                    to,
-                    loadStdDataSet,
-                    loadOriginDataSet);
-
-            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-            ObjectNode root = objectMapper.createObjectNode();
-            ArrayNode archiveArray = root.putArray("list");
-            for (XEhrArchive healthArchive : archiveList) {
-                archiveArray.addPOJO(healthArchive.toJson());
-            }
-
-            return succeed(root.toString());
-        } catch (ParseException e) {
-            return failed(ErrorCode.GetEhrArchiveFailed, e.getMessage());
-        } catch (IOException e) {
-            return failed(ErrorCode.GetEhrArchiveFailed, e.getMessage());
-        }
+        return  null;
     }
 
     @RequestMapping(value = "/profile", method = RequestMethod.GET)
-    @ApiOperation(value = "获取档案", response = RestEcho.class, produces = "application/json", notes = "指定档案")
+    @ApiOperation(value = "获取档案", produces = "application/json", notes = "指定档案")
     public Object getProfile(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
@@ -79,32 +58,17 @@ public class PersonalProfilesController extends BaseRestController {
             @RequestParam(value = "load_std_data_set", required = true) boolean loadStdDataSet,
             @ApiParam(required = true, name = "load_origin_data_set", value = "是否加载原始数据集")
             @RequestParam(value = "load_origin_data_set", required = true) boolean loadOriginDataSet) {
-        try {
-            XEhrArchiveManager archiveManager = ServiceFactory.getService(Services.EhrArchiveManager);
-            XEhrArchive archive = archiveManager.getArchive(archiveId, loadStdDataSet, loadOriginDataSet);
-
-            return succeed(archive.toJson());
-        } catch (Exception e) {
-            return failed(ErrorCode.GetEhrArchiveFailed, e.getMessage());
-        }
+        return  null;
     }
 
     @RequestMapping(value = "/data_set", method = RequestMethod.GET)
-    @ApiOperation(value = "获取数据集", response = RestEcho.class, produces = "application/json", notes = "返回指定数据集对象，若key不存在，返回错误信息")
+    @ApiOperation(value = "获取数据集", produces = "application/json", notes = "返回指定数据集对象，若key不存在，返回错误信息")
     public Object getDateSet(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
             @RequestParam(value = "cda_version", required = true) String cda_version,
             @RequestParam(value = "data_set_code", required = true) String dataSetCode,
             @RequestParam(value = "row_keys", required = true) String rowKeyList) {
-        try {
-            String[] rowKeys = rowKeyList.split(File.pathSeparator);
-            XEhrArchiveManager archiveManager = ServiceFactory.getService(Services.EhrArchiveManager);
-            XEhrDataSet dataSet = archiveManager.getDataSet(cda_version, dataSetCode, rowKeys);
-
-            return succeed(dataSet.toJson(false).toString());
-        } catch (Exception e) {
-            return failed(ErrorCode.GetDataSetFailed, e.getMessage());
-        }
+        return  null;
     }
 }

@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <url>http://localhost:11112</url>
-	<artifactId>docs-ehr-gateway</artifactId>
+	<artifactId>docs-ehr-platform</artifactId>
 	<packaging>jar</packaging>
 
 	<name>健康档案开放平台</name>

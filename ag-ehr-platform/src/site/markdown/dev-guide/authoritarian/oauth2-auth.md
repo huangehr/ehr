@@ -21,7 +21,7 @@ Web页面授权流程
 
 **1 你的应用将用户引导到健康档案平台**
 
-	GET https://ehr.yihu.com/rest/v1/login/oauth/authorize
+	GET https://ehr.yihu.com/login/oauth/authorize
 	
 **参数**
 <table>
