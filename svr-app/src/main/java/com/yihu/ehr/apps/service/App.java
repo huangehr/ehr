@@ -5,8 +5,6 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * APP对象。
@@ -18,7 +16,7 @@ import java.util.Set;
 @Entity
 @Table(name = "apps")
 @Access(value = AccessType.PROPERTY)
-public class App {
+public class    App {
     private String id;
     private String name;
     private String secret;
@@ -32,7 +30,7 @@ public class App {
     private String description;
 
 	public App(){
-        id  = new ObjectVersion().toString();
+//        id  = new ObjectVersion().toString();
     }
 
     @Id

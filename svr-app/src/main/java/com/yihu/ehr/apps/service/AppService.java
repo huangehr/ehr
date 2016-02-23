@@ -1,7 +1,6 @@
 package com.yihu.ehr.apps.service;
 
 import com.yihu.ehr.apps.feign.ConventionalDictClient;
-import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -26,7 +26,6 @@ public class AppService extends BaseJpaService<App, XAppRepository> {
 
     @Autowired
     private XAppRepository appRepo;
-
     @Autowired
     private ConventionalDictClient conventionalDictClient;
 
@@ -83,4 +82,15 @@ public class AppService extends BaseJpaService<App, XAppRepository> {
 
         return buffer.toString();
     }
+
+    public void checkStatus(String appId, String status) {
+        App app = appRepo.getOne(appId);
+        app.setStatus(status);
+        appRepo.save(app);
+    }
+
+    public List<App> findByIdAndSecret(String appId, String secret) {
+        return appRepo.findByIdAndSecret(appId,secret);
+    }
+
 }

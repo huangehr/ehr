@@ -14,14 +14,7 @@ import java.util.List;
  */
 public interface XGeographyRepository extends PagingAndSortingRepository<Geography, String> {
 
-
-    @Query("select address from Address address where 1=1")
-    List<Geography> findAddressList();
-
-    @Query("delete from Address address where address.id = :id")
-    void delAddress(@Param("id") String id);
-
-    @Query("select address from Address address where address.country = :country")
+    @Query("select geography from Geography geography where geography.country = :country")
     List<Geography> findAddressListByCountry(@Param("country") String country);
 
 }

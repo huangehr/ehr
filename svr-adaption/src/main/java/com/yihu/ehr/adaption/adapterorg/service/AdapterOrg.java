@@ -1,6 +1,6 @@
 package com.yihu.ehr.adaption.adapterorg.service;
 
-import com.yihu.ehr.model.address.MGeography;
+import com.yihu.ehr.model.geogrephy.MGeography;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
