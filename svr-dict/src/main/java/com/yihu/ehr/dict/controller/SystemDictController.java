@@ -1,6 +1,6 @@
 package com.yihu.ehr.dict.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.dict.service.SystemDict;
 import com.yihu.ehr.dict.service.SystemDictService;
@@ -25,7 +25,7 @@ import java.util.List;
  * Created by linaz on 2015/8/12.
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0)
+@RequestMapping(ApiVersion.Version1_0)
 @Api(protocols = "https", value = "Dictionary", description = "系统全局字典管理", tags = {"系统字典"})
 public class SystemDictController extends BaseRestController {
     @Autowired

@@ -22,7 +22,7 @@ API模式提供档案数据模型，由第三方自行组织展示。
 - API方式（参见：API列表），此方式返回与患者档案相关的数据，第三方需要自行组织展示。
 - 在第三方应用中嵌入健康档案浏览器页面。访问URL如下：
 
-	GET /browser/personal-profile/index
+	GET /patient/profiles
 
 **参数**
 
@@ -69,7 +69,7 @@ API列表
 
 ### 健康事件列表（时间轴）与事件文档列表
 
-	GET /personal-profile/timeline
+	GET /patient/profiles/timeline
 	
 **参数**
 
@@ -151,7 +151,7 @@ API列表
 
 ### 获取文档
 
-	GET /personal-profile/document/datasets
+	GET /patient/profiles/document/datasets
 
 **参数**
 

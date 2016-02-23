@@ -6,7 +6,7 @@ import com.yihu.ehr.adaption.commons.ExtendController;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSet;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSetManager;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSetModel;
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.adaption.MAdapterDataSet;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.parm.PageModel;
@@ -28,7 +28,7 @@ import java.util.List;
  * @created 2016.2.3
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/adapter")
+@RequestMapping(ApiVersion.CommonVersion + "/adapter")
 @Api(protocols = "https", value = "adapterDataSet", description = "适配数据集接口", tags = {"适配数据集"})
 public class AdapterDataSetController extends ExtendController<MAdapterDataSet> {
 

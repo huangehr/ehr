@@ -158,7 +158,7 @@ API列表
 
 ### 接收转诊数据包
 
-	POST /json_package/referral
+	POST /package/referral
 	
 **参数**
 

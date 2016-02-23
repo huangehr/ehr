@@ -1,18 +1,12 @@
 package com.yihu.ehr.adaption.orgmetaset.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.adaption.orgmetaset.service.OrgMetaData;
 import com.yihu.ehr.adaption.orgmetaset.service.OrgMetaDataManager;
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.parm.PageModel;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Date;
 
 /**
  * @author lincl
@@ -20,7 +14,7 @@ import java.util.Date;
  * @created 2016.2.1
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/orgmetadata")
+@RequestMapping(ApiVersion.CommonVersion + "/orgmetadata")
 @Api(protocols = "https", value = "orgmetadata", description = "机构数据元", tags = {"机构数据元"})
 public class OrgMetaDataController extends BaseRestController {
 

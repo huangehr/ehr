@@ -2,7 +2,7 @@ package com.yihu.ehr.apps.controller;
 
 import com.yihu.ehr.apps.service.App;
 import com.yihu.ehr.apps.service.AppService;
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.app.MApp;
@@ -27,7 +27,7 @@ import java.util.List;
  * @created 2015.8.12 16:53:06
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0)
+@RequestMapping(ApiVersion.Version1_0)
 @Api(protocols = "https", value = "Application", description = "EHR应用管理", tags = {"应用管理"})
 public class AppController extends BaseRestController {
     @Autowired

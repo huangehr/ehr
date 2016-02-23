@@ -1,19 +1,13 @@
 package com.yihu.ehr.adaption.orgdictitem.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.adaption.orgdictitem.service.OrgDictItem;
 import com.yihu.ehr.adaption.orgdictitem.service.OrgDictItemManager;
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.parm.FieldCondition;
 import com.yihu.ehr.util.parm.PageModel;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.*;
 
 /**
  * @author lincl
@@ -21,7 +15,7 @@ import java.util.*;
  * @created 2016.2.1
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/orgdictitem")
+@RequestMapping(ApiVersion.CommonVersion + "/orgdictitem")
 @Api(protocols = "https", value = "orgdictitem", description = "机构字典项", tags = {"机构字典项"})
 public class OrgDictItemController extends BaseRestController {
 

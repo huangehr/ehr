@@ -1,7 +1,7 @@
 package com.yihu.ehr.standard.datasets.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constrant.Result;
 import com.yihu.ehr.log.LogService;
 import com.yihu.ehr.standard.cdaversion.service.CDAVersion;
@@ -24,7 +24,7 @@ import java.util.List;
  * @created 2016.2.3
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/std/metadata")
+@RequestMapping(ApiVersion.CommonVersion + "/std/metadata")
 @Api(protocols = "https", value = "std/dataset", description = "标准数据元", tags = {"标准数据元"})
 public class MetaDataController extends BaseController {
 

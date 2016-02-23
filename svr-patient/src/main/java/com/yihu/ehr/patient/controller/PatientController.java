@@ -2,7 +2,7 @@ package com.yihu.ehr.patient.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.patient.feign.GeographyClient;
@@ -31,7 +31,7 @@ import java.util.Map;
  * Created by zqb on 2015/8/14.
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0)
+@RequestMapping(ApiVersion.Version1_0)
 @Api(protocols = "https", value = "patient", description = "人口管理", tags = {"人口管理"})
 public class PatientController extends BaseRestController {
 

@@ -32,9 +32,10 @@ REST API调用规范
 模式
 ---------------------
 
-所有API请求均通过HTTPS协议。API服务器地址为：
+所有API请求均通过HTTPS协议。API服务器地址：
 
-	https://ehr.yihu.com
+- [https://ehr.yihu.com/rest](https://ehr.yihu.com/rest)：数据服务地址
+- [https://da.yihu.com/rest](https://da.yihu.com/rest)：档案包接收/采集地址
 
 数据发送与接收均以JSON作为载体。例如：数组参数array。普通字符串直接使用URL。
 

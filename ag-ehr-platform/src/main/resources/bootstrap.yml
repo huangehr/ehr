@@ -1,6 +1,6 @@
 spring:
   application:
-    name: gateway-ehr-browser
+    name: ag-ehr-platform
 
   cloud:
     config:

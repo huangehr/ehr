@@ -1,6 +1,6 @@
 package com.yihu.ehr.standard.dict.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constrant.Result;
 import com.yihu.ehr.log.LogService;
 import com.yihu.ehr.standard.cdaversion.service.CDAVersion;
@@ -20,7 +20,7 @@ import java.util.List;
  * @created 2016.2.1
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/cdadictitem")
+@RequestMapping(ApiVersion.CommonVersion + "/cdadictitem")
 @Api(protocols = "https", value = "cdadictitem", description = "标准字典项", tags = {"标准字典项"})
 public class DictItemController extends BaseController{
     private final String VERSION_NOT_FINT = "没有找到对应版本！";

@@ -1,11 +1,11 @@
-package com.yihu.ehr.pack.controller;
+package com.yihu.ehr.pack;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.packs.MJsonPackage;
-import com.yihu.ehr.pack.feign.SecurityClient;
+import com.yihu.ehr.feign.SecurityClient;
 import com.yihu.ehr.pack.service.JsonPackage;
 import com.yihu.ehr.pack.service.JsonPackageService;
 import com.yihu.ehr.util.controller.BaseRestController;
@@ -33,7 +33,7 @@ import java.util.List;
  * @version 1.0
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0)
+@RequestMapping(ApiVersion.Version1_0)
 @Api(protocols = "https", value = "json_package_service", description = "Json数据包归档接口", tags = {"JSON", "健康档案包"})
 public class JsonPackageController extends BaseRestController {
     @Autowired

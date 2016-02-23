@@ -1,7 +1,7 @@
 package com.yihu.ehr.ha.patient.controller;
 
 import com.yihu.ehr.constants.AgAdminConstants;
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.geography.service.AddressClient;
 import com.yihu.ehr.ha.patient.service.PatientClient;
 import com.yihu.ehr.model.geogrephy.MGeography;
@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * Created by AndyCai on 2016/1/21.
  */
-@RequestMapping(ApiVersionPrefix.Version1_0)
+@RequestMapping(ApiVersion.Version1_0)
 @RestController
 public class PatientController{
 

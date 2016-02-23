@@ -1,9 +1,9 @@
 package com.yihu.ehr.patient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.ApiVersionPrefix;
-import com.yihu.ehr.pack.feign.ConventionalDictClient;
-import com.yihu.ehr.pack.feign.DemographicIndexClient;
+import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.feign.DemographicIndexClient;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +21,13 @@ import java.text.ParseException;
  * @created 2016.02.03 14:15
  */
 @RestController
-@RequestMapping(value = ApiVersionPrefix.Version1_0 + "/patient")
+@RequestMapping(value = ApiVersion.Version1_0 + "/patients")
+@Api(protocols = "https", value = "patients", description = "患者服务")
 public class PatientController {
     @Autowired
     ObjectMapper objectMapper;
 
-    @Autowired
+    //@Autowired
     private DemographicIndexClient demographicIndex;
 
     protected boolean isPatientRegistered(String demographicId) {

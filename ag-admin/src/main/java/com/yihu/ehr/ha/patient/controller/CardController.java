@@ -1,6 +1,6 @@
 package com.yihu.ehr.ha.patient.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.patient.service.CardClient;
 import com.yihu.ehr.model.patient.MAbstractCard;
 import com.yihu.ehr.util.Envelop;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * Created by AndyCai on 2016/1/21.
  */
-@RequestMapping(ApiVersionPrefix.Version1_0 )
+@RequestMapping(ApiVersion.Version1_0 )
 @RestController
 public class CardController {
 

@@ -1,4 +1,4 @@
-package com.yihu.ehr.pack.feign;
+package com.yihu.ehr.feign;
 
 import com.yihu.ehr.constants.MicroServices;
 import org.springframework.cloud.netflix.feign.FeignClient;

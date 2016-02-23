@@ -3,7 +3,7 @@ package com.yihu.ehr.adaption.orgdataset.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adaption.orgdataset.service.OrgDataSet;
 import com.yihu.ehr.adaption.orgdataset.service.OrgDataSetService;
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.query.PageModel;
 import io.swagger.annotations.Api;
@@ -20,7 +20,7 @@ import java.util.Date;
  * @created 2016.2.1
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.CommonVersion + "adapter/org")
+@RequestMapping(ApiVersion.CommonVersion + "adapter/org")
 @Api(protocols = "https", value = "orgdataset", description = "机构数据集管理接口", tags = {"机构数据集"})
 
 public class OrgDataSetController extends BaseRestController {
