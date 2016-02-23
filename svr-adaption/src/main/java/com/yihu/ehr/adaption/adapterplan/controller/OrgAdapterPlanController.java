@@ -56,7 +56,7 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
 
         List appList = orgAdapterPlanService.search(fields, filters, sorts, page, size);
         pagedResponse(request, response, orgAdapterPlanService.getCount(filters), page, size);
-        return convertToModels(appList, new ArrayList<MAdapterPlan>(appList.size()), MAdapterPlan.class, fields.split(","));
+        return convertToModels(appList, new ArrayList<>(appList.size()), MAdapterPlan.class, fields);
     }
 
 

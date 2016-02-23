@@ -57,7 +57,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
         Class entityClass = getServiceEntity(version);
         List ls = metaDataService.search(entityClass, fields, filters, sorts, page, size);
         pagedResponse(request, response, metaDataService.getCount(entityClass, filters), page, size);
-        return convertToModels(ls, new ArrayList<MStdMetaData>(ls.size()), MStdMetaData.class, fields.split(","));
+        return convertToModels(ls, new ArrayList<>(ls.size()), MStdMetaData.class, fields);
     }
 
 

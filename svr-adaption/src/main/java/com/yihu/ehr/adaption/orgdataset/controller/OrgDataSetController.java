@@ -138,6 +138,6 @@ public class OrgDataSetController extends ExtendController<MOrgDataSet> {
 
         List appList = orgDataSetService.search(fields, filters, sorts, page, size);
         pagedResponse(request, response, orgDataSetService.getCount(filters), page, size);
-        return convertToModels(appList, new ArrayList<MOrgDataSet>(appList.size()), MOrgDataSet.class, fields.split(","));
+        return convertToModels(appList, new ArrayList<>(appList.size()), MOrgDataSet.class, fields);
     }
 }

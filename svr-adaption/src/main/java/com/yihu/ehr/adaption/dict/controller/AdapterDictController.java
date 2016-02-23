@@ -58,7 +58,7 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
         if (orgAdapterPlan == null)
             throw errNotFound();
         List ls = adapterDictService.searchAdapterDict(orgAdapterPlan, code, name, sorts, page, size);
-        pagedResponse(request, response, adapterDictService.searchDictInt(orgAdapterPlan, code, name), page, size);
+        pagedResponse(request, response, (long) adapterDictService.searchDictInt(orgAdapterPlan, code, name), page, size);
         return ls;
     }
 
@@ -86,7 +86,7 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
         if (orgAdapterPlan == null)
             throw errNotFound();
         List ls = adapterDictService.searchAdapterDictEntry(orgAdapterPlan, dictId, code, name, sorts, page, size);
-        pagedResponse(request, response, adapterDictService.searchDictEntryInt(orgAdapterPlan, dictId, code, name), page, size);
+        pagedResponse(request, response, (long) adapterDictService.searchDictEntryInt(orgAdapterPlan, dictId, code, name), page, size);
         return ls;
     }
 

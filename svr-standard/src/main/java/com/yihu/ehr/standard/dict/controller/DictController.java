@@ -70,7 +70,7 @@ public class DictController extends ExtendController<MStdDict> {
         Class entityClass = getServiceEntity(version);
         List ls = dictService.search(entityClass, fields, filters, sorts, page, size);
         pagedResponse(request, response, dictService.getCount(entityClass, filters), page, size);
-        return convertToModels(ls, new ArrayList<MStdDict>(ls.size()), MStdDict.class, fields.split(","));
+        return convertToModels(ls, new ArrayList<>(ls.size()), MStdDict.class, fields);
     }
 
 

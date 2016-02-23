@@ -133,7 +133,7 @@ public class OrgDictController extends ExtendController<MOrgDict> {
 
         List appList = orgDictService.search(fields, filters, sorts, page, size);
         pagedResponse(request, response, orgDictService.getCount(filters), page, size);
-        return convertToModels(appList, new ArrayList<MOrgDict>(appList.size()), MOrgDict.class, fields.split(","));
+        return convertToModels(appList, new ArrayList<>(appList.size()), MOrgDict.class, fields);
     }
 
 
