@@ -1,15 +1,13 @@
 package com.yihu.ehr.adaption.dict.controller;
 
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlan;
-import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanManager;
+import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanService;
 import com.yihu.ehr.adaption.commons.ExtendController;
 import com.yihu.ehr.adaption.dict.service.AdapterDict;
-import com.yihu.ehr.adaption.dict.service.AdapterDictManager;
 import com.yihu.ehr.adaption.dict.service.AdapterDictModel;
+import com.yihu.ehr.adaption.dict.service.AdapterDictService;
 import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.model.adaption.MAdapterDict;
-import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.parm.PageModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -17,7 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -26,87 +27,88 @@ import java.util.List;
  * @created 2016.2.1
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/adapter")
+@RequestMapping(ApiVersionPrefix.Version1_0 + "/adapter")
 @Api(protocols = "https", value = "adapterDict", description = "适配字典管理接口", tags = {"适配字典管理"})
 public class AdapterDictController extends ExtendController<MAdapterDict> {
 
     @Autowired
-    AdapterDictManager adapterDictManager;
+    AdapterDictService adapterDictService;
     @Autowired
-    OrgAdapterPlanManager orgAdapterPlanManager;
-    @RequestMapping(value = "/plan/{planId}/dicts/page", method = RequestMethod.GET)
-    @ApiOperation(value = "字典适配关系分页查询")
-    public Envelop searchAdapterDict(
-            @ApiParam(name = "planId", value = "方案编号", defaultValue = "")
-            @PathVariable(value = "planId") Long planId,
-            @ApiParam(name = "jsonParm", value = "查询条件", defaultValue = "")
-            @RequestParam(value = "jsonParm") String jsonParm){
+    OrgAdapterPlanService orgAdapterPlanService;
 
-        try {
-            OrgAdapterPlan orgAdapterPlan = orgAdapterPlanManager.findOne(planId);
-            if(orgAdapterPlan==null)
-                throw errNotFound();
-            PageModel pageModel = jsonToObj(jsonParm, PageModel.class);
-            pageModel.setModelClass(AdapterDict.class);
-            List<AdapterDictModel> dict = adapterDictManager.searchAdapterDict(orgAdapterPlan, pageModel);
-            int totalCount = adapterDictManager.searchDictInt(orgAdapterPlan, pageModel);
-            return getResult(dict,totalCount);
-        } catch (IOException e) {
-            throw errParm();
-        }catch (Exception e) {
-            throw errSystem();
-        }
+    @RequestMapping(value = "/plan/{planId}/dicts", method = RequestMethod.GET)
+    @ApiOperation(value = "字典适配关系分页查询")
+    public Collection searchAdapterDict(
+            @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
+            @PathVariable(value = "planId") Long planId,
+            @ApiParam(name = "code", value = "代码查询值", defaultValue = "")
+            @RequestParam(value = "code", required = false) String code,
+            @ApiParam(name = "name", value = "名称查询值", defaultValue = "")
+            @RequestParam(value = "name", required = false) String name,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+
+        OrgAdapterPlan orgAdapterPlan = orgAdapterPlanService.retrieve(planId);
+        if (orgAdapterPlan == null)
+            throw errNotFound();
+        List ls = adapterDictService.searchAdapterDict(orgAdapterPlan, code, name, sorts, page, size);
+        pagedResponse(request, response, adapterDictService.searchDictInt(orgAdapterPlan, code, name), page, size);
+        return ls;
     }
 
-    @RequestMapping(value = "/plan/{planId}/dict/{dictId}/items/page", method = RequestMethod.GET)
+    @RequestMapping(value = "/plan/{planId}/dict/{dictId}/items", method = RequestMethod.GET)
     @ApiOperation(value = "字典项适配关系分页查询")
-    public Envelop searchAdapterDictEntry(
-            @ApiParam(name = "planId", value = "方案编号", defaultValue = "")
+    public Collection searchAdapterDictEntry(
+            @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "dictId", value = "字典编号", defaultValue = "")
             @PathVariable(value = "dictId") Long dictId,
-            @ApiParam(name = "jsonParm", value = "查询条件", defaultValue = "")
-            @RequestParam(value = "jsonParm") String jsonParm){
+            @ApiParam(name = "code", value = "代码查询值", defaultValue = "")
+            @RequestParam(value = "code", required = false) String code,
+            @ApiParam(name = "name", value = "名称查询值", defaultValue = "")
+            @RequestParam(value = "name", required = false) String name,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
 
-        try {
-            OrgAdapterPlan orgAdapterPlan = orgAdapterPlanManager.findOne(planId);
-            if(orgAdapterPlan==null)
-                throw errNotFound();
-            PageModel pageModel = jsonToObj(jsonParm, PageModel.class);
-            pageModel.setModelClass(AdapterDict.class);
-            List<AdapterDictModel> adapterDictModels = adapterDictManager.searchAdapterDictEntry(orgAdapterPlan, dictId, pageModel);
-            int totalCount = adapterDictManager.searchDictEntryInt(orgAdapterPlan, dictId, pageModel);
-            return getResult(adapterDictModels,totalCount);
-        } catch (Exception e) {
-            throw errSystem();
-        }
+        OrgAdapterPlan orgAdapterPlan = orgAdapterPlanService.retrieve(planId);
+        if (orgAdapterPlan == null)
+            throw errNotFound();
+        List ls = adapterDictService.searchAdapterDictEntry(orgAdapterPlan, dictId, code, name, sorts, page, size);
+        pagedResponse(request, response, adapterDictService.searchDictEntryInt(orgAdapterPlan, dictId, code, name), page, size);
+        return ls;
     }
 
     @RequestMapping(value = "/items/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据字典ID获取字典项适配关系明细")
     public MAdapterDict getAdapterDictEntry(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @PathVariable(value = "id") Long id){
+            @PathVariable(value = "id") Long id) {
 
-        try {
-            return getAdapterDict(id);
-        } catch (Exception e) {
-            throw errSystem();
-        }
+        return getAdapterDict(id);
     }
 
     @RequestMapping(value = "/item", method = RequestMethod.POST)
     @ApiOperation(value = "保存字典项映射关系")
     public boolean createAdapterDictEntry(
             @ApiParam(name = "adapterDictModel", value = "字典数据模型", defaultValue = "")
-            @RequestParam(value = "adapterDictModel") String dictJsonModel){
+            @RequestParam(value = "adapterDictModel") String dictJsonModel) throws Exception {
 
         try {
             return save(jsonToObj(dictJsonModel, AdapterDictModel.class), new AdapterDict());
         } catch (IOException e) {
             throw errParm();
-        } catch (Exception e) {
-            throw errSystem();
         }
     }
 
@@ -116,37 +118,33 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") Long id,
             @ApiParam(name = "adapterDictModel", value = "字典数据模型", defaultValue = "")
-            @RequestParam(value = "adapterDictModel") String dictJsonModel){
+            @RequestParam(value = "adapterDictModel") String dictJsonModel) throws Exception {
 
         try {
-            AdapterDict adapterDict = adapterDictManager.findOne(id);
-            if(adapterDict==null)
+            AdapterDict adapterDict = adapterDictService.retrieve(id);
+            if (adapterDict == null)
                 throw errNotFound();
             return save(jsonToObj(dictJsonModel, AdapterDictModel.class), adapterDict);
-        } catch (Exception e) {
-            throw errSystem();
+        } catch (IOException e) {
+            throw errParm();
         }
     }
 
     @RequestMapping(value = "/items", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除字典项映射")
     public boolean delDictEntry(
-            @RequestParam("ids") String ids){
-        try {
-            if (StringUtils.isEmpty(ids))
-                throw errMissId();
-            adapterDictManager.delete(ids.split(","), "id");
-            return true;
-        }catch (Exception e){
-            throw errSystem();
-        }
+            @RequestParam("ids") String ids) throws Exception {
+        if (StringUtils.isEmpty(ids))
+            throw errMissId();
+        adapterDictService.delete(ids.split(","));
+        return true;
     }
 
-    private MAdapterDict getAdapterDict(long id){
-        return convertToModel(adapterDictManager.findOne(id), MAdapterDict.class);
+    private MAdapterDict getAdapterDict(long id) {
+        return convertToModel(adapterDictService.retrieve(id), MAdapterDict.class);
     }
 
-    private boolean save(AdapterDictModel adapterDictModel, AdapterDict adapterDict){
+    private boolean save(AdapterDictModel adapterDictModel, AdapterDict adapterDict) {
 
         adapterDict.setAdapterPlanId(adapterDictModel.getAdapterPlanId());
         adapterDict.setDictEntryId(adapterDictModel.getDictEntryId());
@@ -154,10 +152,10 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
         adapterDict.setOrgDictSeq(adapterDictModel.getOrgDictSeq());
         adapterDict.setOrgDictItemSeq(adapterDictModel.getOrgDictEntrySeq());
         adapterDict.setDescription(adapterDictModel.getDescription());
-        if (adapterDictModel.getId()==null){
-            adapterDictManager.addAdapterDict(adapterDict);
-        }else {
-            adapterDictManager.save(adapterDict);
+        if (adapterDictModel.getId() == null) {
+            adapterDictService.addAdapterDict(adapterDict);
+        } else {
+            adapterDictService.save(adapterDict);
         }
         return true;
     }
