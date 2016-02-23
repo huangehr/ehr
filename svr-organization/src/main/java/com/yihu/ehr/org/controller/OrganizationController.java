@@ -36,7 +36,6 @@ public class OrganizationController extends BaseRestController {
 
     @Autowired
     private OrgService orgService;
-
     @Autowired
     private SecurityClient securityClient;
 
@@ -100,7 +99,6 @@ public class OrganizationController extends BaseRestController {
     public MOrganization create(String orgJsonData ) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
         Organization org = objectMapper.readValue(orgJsonData, Organization.class);
-        if(orgService.isExistOrg(org.getOrgCode())) throw new ApiException(ErrorCode.ExistOrgForCreate, "该机构已存在");
         org.setActivityFlag(1);
         orgService.save(org);
         return convertToModel(org,MOrganization.class);
@@ -112,7 +110,6 @@ public class OrganizationController extends BaseRestController {
             String jsonData ) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
         Organization org = objectMapper.readValue(jsonData, Organization.class);
-        if(orgService.isExistOrg(org.getOrgCode())) throw new ApiException(ErrorCode.ExistOrgForCreate, "该机构已存在");
         orgService.save(org);
         return convertToModel(org,MOrganization.class);
     }
@@ -215,5 +212,12 @@ public class OrganizationController extends BaseRestController {
         return keyMap;
     }
 
+    @RequestMapping(value = "/organizations/org_code" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断提交的机构代码是否已经存在")
+    boolean isOrgCodeExists(
+            @ApiParam(name = "org_code", value = "org_code", defaultValue = "")
+            @RequestParam(value = "org_code") String orgCode){
+        return orgService.isExistOrg(orgCode);
+    }
 
 }

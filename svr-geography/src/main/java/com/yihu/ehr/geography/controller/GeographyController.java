@@ -62,7 +62,6 @@ public class GeographyController extends BaseRestController{
         ObjectMapper objectMapper = new ObjectMapper();
         Geography geography = objectMapper.readValue(jsonData, Geography.class);
         geography.setId(getObjectId(BizObject.Geography));
-
         String addressId = geographyService.saveAddress(geography);
         return addressId;
     }
