@@ -91,7 +91,6 @@ public class OrganizationController extends BaseRestController {
     /**
      * 创建机构
      * @param orgJsonData
-     * @return
      * @throws Exception
      */
     @RequestMapping(value = "/organizations" , method = RequestMethod.POST)
@@ -101,7 +100,6 @@ public class OrganizationController extends BaseRestController {
         Organization org = objectMapper.readValue(orgJsonData, Organization.class);
         org.setActivityFlag(1);
         orgService.save(org);
-        
         return convertToModel(org,MOrganization.class);
     }
 
