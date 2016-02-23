@@ -46,6 +46,7 @@ public class SystemDictControllerTests {
     ApplicationContext applicationContext;
 
     Envelop envelop = new Envelop();
+
     @Test
     public void atestSystemDict() throws Exception{
 
@@ -63,7 +64,7 @@ public class SystemDictControllerTests {
         assertNotEquals("字典明细获取失败", envelop, null);
 
         String fields = "";//"id,name,phonetic_code,reference,author,create_date";
-        String filter = "name=test_dict_cms";
+        String filter = "";
         String sorts = "";
         int page = 1;
         int rows = 15;
@@ -72,7 +73,7 @@ public class SystemDictControllerTests {
         assertNotEquals("字典列表获取失败", envelop, null);
 
         systemDict.setName("test_dict_cms_c");
-        systemDict.setId(163);
+        systemDict.setId(175);
         systemDict.setPhoneticCode("TEST_DICT_CMS_C");
         systemDict.setCreateDate(new Date());
 
