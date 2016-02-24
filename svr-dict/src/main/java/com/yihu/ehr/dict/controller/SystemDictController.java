@@ -50,12 +50,10 @@ public class SystemDictController extends BaseRestController {
 
         if (StringUtils.isEmpty(filters)) {
             Page<SystemDict> systemDictPage = dictService.getDictList(sorts, page, size);
-
             pagedResponse(request, response, systemDictPage.getTotalElements(), page, size);
             return convertToModels(systemDictPage.getContent(), new ArrayList<>(systemDictPage.getNumber()), MSystemDict.class, fields);
         } else {
             List<SystemDict> systemDictList = dictService.search(fields, filters, sorts, page, size);
-
             pagedResponse(request, response, dictService.getCount(filters), page, size);
             return convertToModels(systemDictList, new ArrayList<>(systemDictList.size()), MSystemDict.class, fields);
         }
@@ -67,8 +65,6 @@ public class SystemDictController extends BaseRestController {
             @ApiParam(name = "dictionary", value = "字典JSON结构")
             @RequestParam(value = "dictionary") String dictJson) {
         SystemDict dict = toEntity(dictJson, SystemDict.class);
-        if (dictService.isDictNameExists(dict.getName()))
-            throw new ApiException(ErrorCode.InvalidCreateSysDict, dict.getName());
         Long id = dictService.getNextId();
         dict.setId(id);
         SystemDict systemDict = dictService.createDict(dict);
@@ -82,7 +78,6 @@ public class SystemDictController extends BaseRestController {
             @PathVariable(value = "id") long id) {
         SystemDict dict = dictService.retrieve(id);
         if (dict == null) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
-
         return convertToModel(dict, MSystemDict.class);
     }
 
@@ -93,12 +88,7 @@ public class SystemDictController extends BaseRestController {
             @RequestParam(value = "dictionary") String dictJson) {
         SystemDict dict = toEntity(dictJson, SystemDict.class);
         if (null == dictService.retrieve(dict.getId())) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
-        if (!dictService.retrieve(dict.getId()).equals(dict.getName()) && dictService.isDictNameExists(dict.getName())) {
-            throw new ApiException(ErrorCode.InvalidUpdateSysDict, "字典名称已存在");
-        }
-
         dictService.updateDict(dict);
-
         return convertToModel(dict, MSystemDict.class);
     }
 
@@ -109,5 +99,13 @@ public class SystemDictController extends BaseRestController {
             @PathVariable(value = "id") long id) throws Exception{
         dictService.deleteDict(id);
         return true;
+    }
+
+    @RequestMapping(value = "/dictionaries/name" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断提交的字典名称是否已经存在")
+    boolean isAppNameExists(
+            @ApiParam(name = "app_name", value = "id", defaultValue = "")
+            @RequestParam(value = "app_name") String appName){
+        return dictService.isDictNameExists(appName);
     }
 }
