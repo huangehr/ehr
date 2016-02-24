@@ -187,8 +187,7 @@ public class SecurityManager {
     }
 
 
-    public UserSecurity getUserPublicKeyByUserId(String userId) {
-
+    public UserSecurity getUserSecurityByUserId(String userId) {
         String userKeyId = getUserKeyByUserId(userId);
         return findByUserKey(userKeyId);
     }
