@@ -1,42 +1,26 @@
 package com.yihu.ehr.security.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.security.MUserSecurity;
-import com.yihu.ehr.model.user.MUser;
-import com.yihu.ehr.security.feign.AppClient;
-import com.yihu.ehr.security.feign.UserClient;
 import com.yihu.ehr.security.service.SecurityManager;
-import com.yihu.ehr.security.service.TokenManager;
 import com.yihu.ehr.security.service.UserSecurity;
-import com.yihu.ehr.security.service.UserToken;
-import com.yihu.ehr.util.DateUtil;
 import com.yihu.ehr.util.controller.BaseRestController;
-import com.yihu.ehr.util.encrypt.RSA;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.net.URLDecoder;
-import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0)
+@RequestMapping(ApiVersion.Version1_0)
 @Api(protocols = "https", value = "security", description = "安全管理接口", tags = {"用户", "企业", "应用", "安全"})
 public class SecurityRestController extends BaseRestController {
 
     @Autowired
     private SecurityManager securityManager;
-    @Autowired
-    private UserClient userClient;
-    @Autowired
-    private TokenManager tokenManager;
-    @Autowired
-    private AppClient appClient;
 
 
     @RequestMapping(value = "/securities/login/{login_code}", method = RequestMethod.GET)
@@ -206,7 +190,7 @@ public class SecurityRestController extends BaseRestController {
 
     @RequestMapping(value = "/user_keys/org/{org_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据orgCode创建security")
-    public Object getUserKeyIdByOrgCd(
+    public String getUserKeyIdByOrgCd(
             @ApiParam(name = "org_code", value = "机构代码")
             @PathVariable( value = "org_code") String orgCode) throws Exception {
         return securityManager.getUserKeyByOrgCd(orgCode);
@@ -247,7 +231,7 @@ public class SecurityRestController extends BaseRestController {
      */
     @RequestMapping(value = "/securities/user/{user_id}", method = RequestMethod.POST)
     @ApiOperation(value = "根据userId创建Security" )
-    public Object createSecurityByUserId(
+    public MUserSecurity createSecurityByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
             @PathVariable( value = "user_id") String userId) throws Exception {
         UserSecurity userSecurity = securityManager.createSecurityByUserId(userId);
@@ -262,7 +246,7 @@ public class SecurityRestController extends BaseRestController {
      */
     @RequestMapping(value = "/user_keys/user/{user_id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据userId获取user_key" )
-    public Object getUserKeyByUserId(
+    public String getUserKeyByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
             @PathVariable( value = "user_id") String userId) {
         return securityManager.getUserKeyByUserId(userId);
@@ -276,10 +260,10 @@ public class SecurityRestController extends BaseRestController {
      */
     @RequestMapping(value = "/securities/user/{user_id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据userId获取UserSecurity" )
-    public Object getUserSecurityByUserId(
+    public MUserSecurity getUserSecurityByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
             @PathVariable( value = "user_id") String userId) {
-        UserSecurity userSecurity = securityManager.getUserPublicKeyByUserId(userId);
+        UserSecurity userSecurity = securityManager.getUserSecurityByUserId(userId);
         return convertToModel(userSecurity,MUserSecurity.class);
     }
 

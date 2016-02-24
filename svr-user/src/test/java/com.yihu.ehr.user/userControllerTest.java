@@ -4,6 +4,7 @@ import com.eureka2.shading.codehaus.jackson.map.ObjectMapper;
 import com.yihu.ehr.UserServiceApp;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.user.controller.UserController;
+import com.yihu.ehr.user.service.User;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,12 +14,14 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = UserServiceApp.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@Transactional
 public class userControllerTest {
 
     ApplicationContext applicationContext;
@@ -50,7 +53,10 @@ public class userControllerTest {
 
     @Test
     public void cCreateUser() throws Exception{
-        Object user = userController.getUser("0dae0003561cc415c72d9111e8cb88aa");
+        applicationContext = new SpringApplicationBuilder()
+                .web(false).sources(UserServiceApp.class).run();
+        MUser user = userController.getUser("0dae0003561cc415c72d9111e8cb88aa");
+        user.setId(null);
         String jsobData = new ObjectMapper().writeValueAsString(user);
         Object result = userController.createUser(jsobData);
         assertTrue("创建失败！" , result != null);

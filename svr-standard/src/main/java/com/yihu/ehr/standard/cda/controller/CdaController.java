@@ -1,5 +1,5 @@
 package com.yihu.ehr.standard.cda.controller;
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.standard.cda.service.*;
 import com.yihu.ehr.standard.datasets.service.DataSet;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@RequestMapping(ApiVersionPrefix.Version1_0)
+@RequestMapping(ApiVersion.Version1_0)
 @RestController
 @Api(protocols = "https", value = "cda", description = "cda管理", tags = {"cda管理"})
 public class CdaController extends BaseRestController{

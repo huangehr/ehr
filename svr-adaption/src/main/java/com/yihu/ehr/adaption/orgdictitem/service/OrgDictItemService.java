@@ -1,12 +1,14 @@
 package com.yihu.ehr.adaption.orgdictitem.service;
 
 import com.yihu.ehr.adaption.orgdict.service.OrgDict;
-import com.yihu.ehr.util.query.BaseService;
+import com.yihu.ehr.query.BaseJpaService;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * 机构字典项
@@ -17,12 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
  */
 
 @Service
-public class OrgDictItemService extends BaseService<OrgDictItem, XOrgDictItemRepository> {
+public class OrgDictItemService extends BaseJpaService<OrgDictItem, XOrgDictItemRepository> {
 
 
     @Transactional(propagation = Propagation.SUPPORTS)
     public boolean isExistOrgDictItem(int orgDictSeq, String orgCode, String code) {
-        return getRepository().isExistOrgDictItem(orgDictSeq, orgCode, code).size() != 0;
+        return ((XOrgDictItemRepository) getRepository()).isExistOrgDictItem(orgDictSeq, orgCode, code).size() != 0;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -88,4 +90,13 @@ public class OrgDictItemService extends BaseService<OrgDictItem, XOrgDictItemRep
         }
         return result;
     }
+
+    public List findByDict(int orgDictSeq, String orgCode) {
+        String hql = " from OrgDictItem where orgDictSeq=:orgDictSeq and orgCode=:orgCode";
+        Query query = currentSession().createQuery(hql);
+        query.setParameter("orgDictSeq", orgDictSeq);
+        query.setParameter("orgCode", orgCode);
+        return query.list();
+    }
+
 }

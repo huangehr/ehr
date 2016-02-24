@@ -1,10 +1,10 @@
 package com.yihu.ehr.organization.controller;
 
-import com.yihu.ehr.constrant.ErrorCode;
-import com.yihu.ehr.constrant.Result;
+import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.ResourceProperties;
-import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.util.controller.BaseRestController;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +20,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/organization")
-public class OrganizationController extends BaseController {
+public class OrganizationController extends BaseRestController {
     private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
     private static   String username = ResourceProperties.getProperty("username");
     private static   String password = ResourceProperties.getProperty("password");
@@ -78,11 +78,11 @@ public class OrganizationController extends BaseController {
 
     @RequestMapping(value = "searchOrgs",produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public String searchOrgs(String searchNm, String searchWay,String orgType, String province, String city, String district, int page, int rows) {
+    public Object searchOrgs(String searchNm, String searchWay,String orgType, String province, String city, String district, int page, int rows) {
 
         String url = "/organization/organizations";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("orgCode", searchNm);
         params.put("fullName", searchNm);
@@ -102,7 +102,7 @@ public class OrganizationController extends BaseController {
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 
         /*
@@ -128,11 +128,11 @@ public class OrganizationController extends BaseController {
 
     @RequestMapping("deleteOrg")
     @ResponseBody
-    public String deleteOrg(String orgCode) {
+    public Object deleteOrg(String orgCode) {
 
         String getOrgUrl = "/organization/organization";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
 
         Map<String, Object> params = new HashMap<>();
         params.put("orgCode",orgCode);
@@ -147,13 +147,13 @@ public class OrganizationController extends BaseController {
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.InvalidDelete.toString());
             }
-            return result.toJson();
+            return result;
 
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
 
-            return result.toJson();
+            return result;
         }
         /*
         try {
@@ -173,11 +173,11 @@ public class OrganizationController extends BaseController {
      */
     @RequestMapping("activity")
     @ResponseBody
-    public String activity(String orgCode,String activityFlag) {
+    public Object activity(String orgCode,String activityFlag) {
 
         String url = "/organization/activity";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
 
         Map<String, Object> params = new HashMap<>();
         params.put("orgCode",orgCode);
@@ -191,10 +191,10 @@ public class OrganizationController extends BaseController {
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.InvalidUpdate.toString());
             }
-            return result.toJson();
+            return result;
         } catch (Exception e) {
-            result = getSuccessResult(false);
-            return result.toJson();
+            result.setSuccessFlg(false);
+            return result;
         }
 
         /*
@@ -218,11 +218,11 @@ public class OrganizationController extends BaseController {
 
     @RequestMapping("updateOrg")
     @ResponseBody
-    public String updateOrg(String orgModel) {
+    public Object updateOrg(String orgModel) {
 
         String url = "/organization/org";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("orgModel",orgModel);
         try {
@@ -230,11 +230,11 @@ public class OrganizationController extends BaseController {
             //todo: 需要在后台追加唯一性判断
             result.setObj(resultStr);
             result.setSuccessFlg(true);
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 
         /*
@@ -282,24 +282,24 @@ public class OrganizationController extends BaseController {
 
     @RequestMapping("getOrg")
     @ResponseBody
-    public String getOrg(String orgCode) {
+    public Object getOrg(String orgCode) {
 
         String getOrgUrl = "/organization/org_model";
         Map<String, Object> params = new HashMap<>();
         params.put("orgCode",orgCode);
 
-        Result result = new Result();
+        Envelop result = new Envelop();
         String resultStr = "";
 
         try{
             resultStr = HttpClientUtil.doGet(comUrl + getOrgUrl, params, username, password);
             result.setObj(resultStr);
             result.setSuccessFlg(true);
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 
         /*
@@ -315,11 +315,11 @@ public class OrganizationController extends BaseController {
 
     @RequestMapping("distributeKey")
     @ResponseBody
-    public String distributeKey(String orgCode) {
+    public Object distributeKey(String orgCode) {
 
         String getOrgUrl = "/organization/distributeKey";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("orgCode",orgCode);
         try {
@@ -331,11 +331,11 @@ public class OrganizationController extends BaseController {
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.InvalidUpdate.toString());
             }
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 
         /*
@@ -373,11 +373,11 @@ public class OrganizationController extends BaseController {
 
     @RequestMapping("validationOrg")
     @ResponseBody
-    public String validationOrg(String orgCode){
+    public Object validationOrg(String orgCode){
 
         String getOrgUrl = "/organization/isOrgCodeExist";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("orgCode",orgCode);
         try {
@@ -389,11 +389,11 @@ public class OrganizationController extends BaseController {
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.InvalidUpdate.toString());
             }
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 
         /*

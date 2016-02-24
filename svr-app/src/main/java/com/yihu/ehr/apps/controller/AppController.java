@@ -2,7 +2,8 @@ package com.yihu.ehr.apps.controller;
 
 import com.yihu.ehr.apps.service.App;
 import com.yihu.ehr.apps.service.AppService;
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.app.MApp;
@@ -27,7 +28,7 @@ import java.util.List;
  * @created 2015.8.12 16:53:06
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0)
+@RequestMapping(ApiVersion.Version1_0)
 @Api(protocols = "https", value = "Application", description = "EHR应用管理", tags = {"应用管理"})
 public class AppController extends BaseRestController {
     @Autowired
@@ -75,7 +76,7 @@ public class AppController extends BaseRestController {
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true, defaultValue = "{\"name\": \"\", \"url\": \"\", \"catalog\": \"\", \"description\": \"\", \"creator\":\"\"}")
             @RequestParam(value = "app", required = false) String appJson) throws Exception {
         App app = toEntity(appJson, App.class);
-        if(appService.isAppNameExists(app.getName())) throw new ApiException(ErrorCode.InvalidAppRegister, "应用程序名称已存在");
+        app.setId(getObjectId(BizObject.App));
         app = appService.createApp(app);
         return convertToModel(app, MApp.class);
     }
@@ -95,14 +96,9 @@ public class AppController extends BaseRestController {
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true)
             @RequestParam(value = "app", required = false) String appJson) throws Exception {
         App app = toEntity(appJson, App.class);
+        app.setId(getObjectId(BizObject.App));
         if (appService.retrieve(app.getId()) == null) throw new ApiException(ErrorCode.InvalidAppId, "应用不存在");
-
-        if(!appService.retrieve(app.getId()).getName().equals(app.getName()) && appService.isAppNameExists(app.getName())){
-            throw new ApiException(ErrorCode.InvalidAppRegister, "应用程序名称已存在");
-        }
-
         appService.save(app);
-
         return convertToModel(app, MApp.class);
     }
 
@@ -115,7 +111,7 @@ public class AppController extends BaseRestController {
     }
 
 
-    @RequestMapping(value = "apps/status" , method = RequestMethod.PUT)
+    @RequestMapping(value = "/apps/status" , method = RequestMethod.PUT)
     @ApiOperation(value = "修改状态")
     public boolean updateSatus(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
@@ -126,7 +122,7 @@ public class AppController extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(value = "apps/existence/{app_id}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/apps/existence/{app_id}" , method = RequestMethod.GET)
     @ApiOperation(value = "验证")
     public boolean isAppExistence(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
@@ -134,5 +130,13 @@ public class AppController extends BaseRestController {
             @ApiParam(name = "secret", value = "", defaultValue = "")
             @RequestParam(value = "secret") String secret) throws Exception{
         return appService.findByIdAndSecret(appId, secret)!=null;
+    }
+
+    @RequestMapping(value = "/apps/existence/{app_name}" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断提交的app名称是否已经存在")
+    boolean isAppNameExists(
+            @PathVariable(value = "app_name")
+            @RequestParam(value = "app_name") String appName){
+        return appService.isAppNameExists(appName);
     }
 }

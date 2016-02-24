@@ -1,6 +1,6 @@
 package com.yihu.ehr.pack.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.util.ObjectId;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
  * @created 2016.02.03 14:15
  */
 @RestController
-@RequestMapping(value = ApiVersionPrefix.Version1_0 + "/adapter-dispatcher")
+@RequestMapping(value = ApiVersion.Version1_0 + "/adapter-dispatcher")
 public class AdaptionController {
     @RequestMapping(value = "/versionplan", method = {RequestMethod.GET})
     @ApiOperation(value = "获取标准最新版本", produces = "application/text")

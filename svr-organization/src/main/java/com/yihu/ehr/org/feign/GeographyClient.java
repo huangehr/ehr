@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 /**
@@ -14,15 +15,18 @@ import java.util.List;
  */
 @FeignClient(MicroServices.Geography)
 @RequestMapping(value = "/rest/v1.0")
+@ApiIgnore
 public interface GeographyClient {
 
+    @ApiIgnore
     @RequestMapping(value = "/geographies/{id}", method = RequestMethod.GET)
     MGeography getAddressById(@PathVariable(value = "id") String id);
 
+    @ApiIgnore
     @RequestMapping(value = "/geographies", method =  RequestMethod.PUT)
     String saveAddress(@RequestParam( value = "geography_model_json_data") String GeographyModelJsonData);
 
-
+    @ApiIgnore
     @RequestMapping(value = "/geographies", method = RequestMethod.GET )
     List<String> search(
             @RequestParam(value = "province") String province,

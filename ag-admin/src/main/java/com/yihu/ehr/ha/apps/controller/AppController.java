@@ -1,6 +1,6 @@
 package com.yihu.ehr.ha.apps.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.apps.service.AppClient;
 import com.yihu.ehr.model.app.MApp;
 import io.swagger.annotations.Api;
@@ -15,7 +15,7 @@ import java.util.List;
  * Created by AndyCai on 2016/1/19.
  */
 
-@RequestMapping(ApiVersionPrefix.Version1_0 )
+@RequestMapping(ApiVersion.Version1_0 )
 @RestController
 @Api(value = "app", description = "应用管理接口，用于接入应用管理", tags = {"应用管理接口"})
 public class AppController {

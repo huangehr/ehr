@@ -1,42 +1,32 @@
 package com.yihu.ehr.std.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ha.constrant.ErrorCode;
-import com.yihu.ha.constrant.Result;
-import com.yihu.ha.constrant.Services;
-import com.yihu.ha.dict.model.common.XConventionalDictEntry;
-import com.yihu.ha.factory.ServiceFactory;
-import com.yihu.ha.std.model.*;
-import com.yihu.ha.user.model.UserModel;
-import com.yihu.ha.util.HttpClientUtil;
-import com.yihu.ha.util.ResourceProperties;
-import com.yihu.ha.util.controller.BaseController;
-import com.yihu.ha.util.log.LogService;
-import com.yihu.ha.util.operator.StringUtil;
-import net.sf.json.JSONArray;
+import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.HttpClientUtil;
+import com.yihu.ehr.util.ResourceProperties;
+import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.util.log.LogService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by zqb on 2015/9/18.
  */
 @Controller
 @RequestMapping("/standardsource")
-public class StdSourceManagerController extends BaseController {
+public class StdSourceManagerController extends BaseRestController {
     private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
     private static   String username = ResourceProperties.getProperty("username");
     private static   String password = ResourceProperties.getProperty("password");
     private static   String module = ResourceProperties.getProperty("module");
     private static   String version = ResourceProperties.getProperty("version");
     private static   String comUrl = host + module + version;
-
-    @Resource(name = Services.ConventionalDictEntry)
-    XConventionalDictEntry conventionalDictEntry;
 
     public StdSourceManagerController() {
     }
@@ -58,13 +48,13 @@ public class StdSourceManagerController extends BaseController {
         }catch(Exception ex){
             LogService.getLogger(StdSourceManagerController.class).error(ex.getMessage());
         }
-        model.addAttribute("std", _rus); // 宸蹭慨鏀筳sp椤甸潰 var std = $.parseJSON('${std}');
+        model.addAttribute("std", _rus); // 已修改jsp页面 var std = $.parseJSON('${std}');
         model.addAttribute("mode",mode);
         model.addAttribute("contentPage","/std/standardsource/stdInfoDialog");
         return "simpleView";
 
         /*XStandardSource standardSource = null;
-        //mode瀹氫箟锛歯ew modify view涓夌妯″紡锛屾柊澧烇紝淇敼锛屾煡鐪?
+        //mode定义：new modify view三种模式，新增，修改，查看
         if(mode.equals("view") || mode.equals("modify")){
             List ls = new ArrayList<>();
             ls.add(id);
@@ -85,8 +75,8 @@ public class StdSourceManagerController extends BaseController {
 
     @RequestMapping("searchStdSource")
     @ResponseBody
-    public String searchStdSource(String searchNm, String searchType, Integer page, Integer rows) {
-        Result result = new Result();
+    public Object searchStdSource(String searchNm, String searchType, Integer page, Integer rows) {
+        Envelop result = new Envelop();
         String url = "/stdSource/getStdSource";
         try{
             Map<String,Object> params = new HashMap<>();
@@ -96,7 +86,7 @@ public class StdSourceManagerController extends BaseController {
             params.put("page",page);
             params.put("rows",rows);
             String _rus = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            if(StringUtil.isEmpty(_rus)){
+            if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.GetStandardSourceFailed.toString());
             }else{
@@ -107,7 +97,7 @@ public class StdSourceManagerController extends BaseController {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result.toJson();
+        return result;
 
         /*List<XStandardSource> standardSources = xStandardSourceManager.getSourceByKey(searchNm,searchType, page, rows);
         List<StandardSourceModel> standardSourceModels = new ArrayList<>();
@@ -122,26 +112,26 @@ public class StdSourceManagerController extends BaseController {
 
     @RequestMapping("getStdSource")
     @ResponseBody
-    //鑾峰彇鏍囧噯鏉ユ簮淇℃伅
-    public String getStdSource(String id) {
-        Result result = new Result();
-        if(StringUtil.isEmpty(id)){
+    //获取标准来源信息
+    public Object getStdSource(String id) {
+        Envelop result = new Envelop();
+        if(StringUtils.isEmpty(id)){
             result.setSuccessFlg(false);
-            result.setErrorMsg("鏍囧噯鏉ユ簮id涓虹┖锛?");
-            return result.toJson();
+            result.setErrorMsg("标准来源id为空！");
+            return result;
         }
         String url = "/stdSource/standardSource";
         try{
             Map<String,Object> params = new HashMap<>();
             params.put("id",id);
             String _rus = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            //TODO 鎴栦慨鏀归〉闈㈡樉绀猴紵
-            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-            StandardSourceModel[] stdSourcesModel = objectMapper.readValue(_rus, StandardSourceModel[].class);
-            Map<String,StandardSourceModel> data = new HashMap<>();
-            data.put("stdSourceModel",stdSourcesModel[0]);
-            result.setObj(data);
-            if(StringUtil.isEmpty(_rus)){
+            //TODO 或修改页面显示？
+//            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
+//            StandardSourceModel[] stdSourcesModel = objectMapper.readValue(_rus, StandardSourceModel[].class);
+//            Map<String,StandardSourceModel> data = new HashMap<>();
+//            data.put("stdSourceModel",stdSourcesModel[0]);
+            result.setObj(_rus);
+            if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.GetStandardSourceFailed.toString());
             }else{
@@ -152,7 +142,7 @@ public class StdSourceManagerController extends BaseController {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result.toJson();
+        return result;
 
         /*List<String> ids = new ArrayList<>();
         ids.add(id);
@@ -166,14 +156,14 @@ public class StdSourceManagerController extends BaseController {
 
     @RequestMapping("updateStdSource")
     @ResponseBody
-    //鏇存柊鏍囧噯鏉ユ簮
-    public String updateStdSource(String id,String code, String name, String type, String description) {
-        //TODO 璇ユ柟娉曞吋鏈夋柊澧?/淇敼鎿嶄綔
-        Result result = new Result();
-        if (StringUtil.isEmpty(code)){
+    //更新标准来源
+    public Object updateStdSource(String id,String code, String name, String type, String description) {
+        //TODO 该方法兼有新增/修改操作
+        Envelop result = new Envelop();
+        if (StringUtils.isEmpty(code)){
             result.setSuccessFlg(false);
-            result.setErrorMsg("鏍囧噯鏉ユ簮缂栫爜涓嶈兘涓虹┖锛?");
-            return result.toJson();
+            result.setErrorMsg("标准来源编码不能为空！");
+            return result;
         }
         try{
             String urlCheckCode = "/stdSource/isCodeExist***";
@@ -182,14 +172,14 @@ public class StdSourceManagerController extends BaseController {
             String _msg = HttpClientUtil.doGet(comUrl+urlCheckCode,args,username,password);
             Map<String,Object> params = new HashMap<>();
             params.put("id",id);
-            String urlCheckSource = "/stdSource/standardSource";
+            String urlCheckSource = "/stdSource/isStandardSourceExist";
             String _rusSource = HttpClientUtil.doGet(comUrl+urlCheckSource,params,username,password);
-            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-            StandardSourceModel stdSources = objectMapper.readValue(_rusSource,StandardSourceModel.class);
-            if (Boolean.parseBoolean(_msg) && !code.equals(stdSources.getCode())) {
+//            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
+//            StandardSourceModel stdSources = objectMapper.readValue(_rusSource,StandardSourceModel.class);
+            if (Boolean.parseBoolean(_rusSource)) {
                 result.setSuccessFlg(false);
-                result.setErrorMsg("缂栫爜宸插瓨鍦?!");
-                return result.toJson();
+                result.setErrorMsg("编码已存在!");
+                return result;
             }
             params.put("code",code);
             String url = "/stdSource/standardSource";
@@ -197,9 +187,9 @@ public class StdSourceManagerController extends BaseController {
             params.put("type",type);
             params.put("description",description);
             String _rus = HttpClientUtil.doPost(comUrl + url, params, username, password);
-            if(StringUtil.isEmpty(_rus)){
+            if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
-                result.setErrorMsg("鏍囧噯鏉ユ簮鏇存柊澶辫触");
+                result.setErrorMsg("标准来源更新失败");
             }else{
                 result.setSuccessFlg(true);
             }
@@ -208,7 +198,7 @@ public class StdSourceManagerController extends BaseController {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result.toJson();
+        return result;
 
         /*try {
             Result result = new Result();
@@ -246,9 +236,9 @@ public class StdSourceManagerController extends BaseController {
 
     @RequestMapping("delStdSource")
     @ResponseBody
-    //鍒犻櫎鏍囧噯鏉ユ簮-鍙壒閲忓垹闄?
-    public String delStdSource(String id) {
-        Result result = new Result();
+    //删除标准来源-可批量删除
+    public Object delStdSource(String id) {
+        Envelop result = new Envelop();
         String url = "/stdSource/standardSource";
         try{
             Map<String,Object> params = new HashMap<>();
@@ -258,14 +248,14 @@ public class StdSourceManagerController extends BaseController {
                 result.setSuccessFlg(true);
             }else{
                 result.setSuccessFlg(false);
-                result.setErrorMsg("鏍囧噯鏉ユ簮鍒犻櫎澶辫触");
+                result.setErrorMsg("标准来源删除失败");
             }
         }catch(Exception ex){
             LogService.getLogger(StdSourceManagerController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result.toJson();
+        return result;
 
        /* String idTemp[] = id.split(",");
         List<String> ids = Arrays.asList(idTemp);
@@ -276,26 +266,29 @@ public class StdSourceManagerController extends BaseController {
 
     @RequestMapping("getVersionList")
     @ResponseBody
-    //鑾峰彇鐗堟湰鍙风敤浜庝笅鎷夋
-    public String getVersionList() {
-        Result result = new Result();
+    //获取版本号用于下拉框
+    public Object getVersionList() {
+        Envelop result = new Envelop();
         String url = "/version/allVersions";
         try{
             String  _rus = HttpClientUtil.doGet(comUrl+url,username,password);
-            List<Map> versions = new ArrayList<>();
-            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-            CDAVersionModel[] cdaVersionModels = objectMapper.readValue(_rus, CDAVersionModel[].class);
-            for (CDAVersionModel cdaVersion : cdaVersionModels) {
-                Map<String,String> map = new HashMap<>();
-                map.put("code",cdaVersion.getVersion());
-                map.put("value",cdaVersion.getVersionName());
-                versions.add(map);
-            }
-            result.setDetailModelList(versions);
+            //todo:后台转MAP
+//            List<Map> versions = new ArrayList<>();
+//            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
+//            CDAVersionModel[] cdaVersionModels = objectMapper.readValue(_rus, CDAVersionModel[].class);
+//            for (CDAVersionModel cdaVersion : cdaVersionModels) {
+//                Map<String,String> map = new HashMap<>();
+//                map.put("code",cdaVersion.getVersion());
+//                map.put("value",cdaVersion.getVersionName());
+//                versions.add(map);
+//            }
+//            result.setDetailModelList(versions);
+            result.setSuccessFlg(true);
+            result.setObj(_rus);
         }catch (Exception ex){
             LogService.getLogger(StdSourceManagerController.class).error(ex.getMessage());
         }
-        return result.toJson();
+        return result;
 
        /* XCDAVersion[] cdaVersions = cdaVersionManager.getVersionList();
         List<Map> versions = new ArrayList<>();

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by AndyCai on 2016/1/29.
@@ -40,14 +41,14 @@ public interface UserClient {
 
     @RequestMapping(value = "/rest/v1.0/users" , method = RequestMethod.POST)
     @ApiOperation(value = "创建用户",notes = "重新绑定用户信息")
-    Object createUser(
+    MUser createUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData);
 
 
     @RequestMapping(value = "/rest/v1.0/users" , method = RequestMethod.PUT)
     @ApiOperation(value = "修改用户",notes = "重新绑定用户信息")
-    Object updateUser(
+    MUser updateUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData);
 
@@ -85,7 +86,7 @@ public interface UserClient {
 
     @RequestMapping(value = "/rest/v1.0/users/users/key/{login_code}", method = RequestMethod.PUT)
     @ApiOperation(value = "重新分配密钥",notes = "重新分配密钥")
-    Object distributeKey(
+    Map<String, String> distributeKey(
             @ApiParam(name = "login_code", value = "登录帐号", defaultValue = "")
             @PathVariable(value = "login_code") String loginCode);
 
