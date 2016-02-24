@@ -78,11 +78,11 @@ public class UserController extends BaseController {
             UsersModel usersModel = convertToModel(mUser,UsersModel.class);
             //TODO:获取用户类别字典
             MConventionalDict dict = conventionalDictClient.getUserType(mUser.getUserType());
-            usersModel.setUserTypeName(dict.getValue());
+            usersModel.setUserTypeName(dict==null?"":dict.getValue());
 
             //TODO:获取机构信息
             MOrganization organization = orgClient.getOrg(mUser.getOrganization());
-            usersModel.setOrganizationName(organization.getFullName());
+            usersModel.setOrganizationName(organization==null?"":organization.getFullName());
 
             usersModels.add(usersModel);
         }
@@ -259,7 +259,7 @@ public class UserController extends BaseController {
      * @param loginCode
      * @return
      */
-    @RequestMapping(value = "/users/{login_code}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/users/login/{login_code}" , method = RequestMethod.GET)
     @ApiOperation(value = "根据登录账号获取当前用户",notes = "根据登陆用户名及密码验证用户")
     public Envelop getUserByLoginCode(
             @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
@@ -293,26 +293,27 @@ public class UserController extends BaseController {
         //TODO:获取婚姻状态代码
         String marryCode = mUser.getMartialStatus();
         MConventionalDict dict = conventionalDictClient.getMartialStatus(marryCode);
-        detailModel.setMartialStatusName(dict.getValue());
+        detailModel.setMartialStatusName(dict==null?"":dict.getValue());
 
         //TODO:获取用户类型
         String userType =mUser.getUserType();
         dict = conventionalDictClient.getUserType(userType);
-        detailModel.setUserTypeName(dict.getValue());
+        detailModel.setUserTypeName(dict==null?"":dict.getValue());
 
         //TODO:获取归属机构
         String orgCode= mUser.getOrganization();
         MOrganization orgModel = orgClient.getOrg(orgCode);
-        detailModel.setOrganizationName(orgModel.getFullName());
+        detailModel.setOrganizationName(orgModel==null?"":orgModel.getFullName());
 
         //TODO:获取秘钥信息
         MUserSecurity userSecurity = securityClient.getUserSecurityByUserId(mUser.getId());
-        detailModel.setPublicKey(userSecurity.getPublicKey());
-        String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT)
-                + "~" + DateUtil.toString(userSecurity.getExpiryDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT);
-        detailModel.setValidTime(validTime);
-        detailModel.setStartTime(DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT));
-
+        if(userSecurity!=null) {
+            detailModel.setPublicKey(userSecurity.getPublicKey());
+            String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT)
+                    + "~" + DateUtil.toString(userSecurity.getExpiryDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT);
+            detailModel.setValidTime(validTime);
+            detailModel.setStartTime(DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT));
+        }
         return detailModel;
     }
 }

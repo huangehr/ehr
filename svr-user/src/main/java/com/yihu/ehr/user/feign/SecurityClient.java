@@ -12,7 +12,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
  * Created by Administrator on 2016/1/4.
  */
 @FeignClient(MicroServices.Security)
-@RequestMapping(value = "/rest/v1.0")
+@RequestMapping(value = "/api/v1.0")
 public interface SecurityClient {
 
     @RequestMapping(value = "/securities/login/{login_code}", method = GET )

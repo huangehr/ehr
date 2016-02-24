@@ -2,7 +2,6 @@ package com.yihu.ehr.security.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.security.MUserSecurity;
-import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.security.feign.AppClient;
 import com.yihu.ehr.security.feign.UserClient;
 import com.yihu.ehr.security.service.SecurityManager;
@@ -13,7 +12,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
@@ -267,7 +269,7 @@ public class SecurityRestController extends BaseRestController {
      */
     @RequestMapping(value = "/securities/user/{user_id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据userId获取UserSecurity" )
-    public Object getUserSecurityByUserId(
+    public MUserSecurity getUserSecurityByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
             @PathVariable( value = "user_id") String userId) {
         UserSecurity userSecurity = securityManager.getUserPublicKeyByUserId(userId);

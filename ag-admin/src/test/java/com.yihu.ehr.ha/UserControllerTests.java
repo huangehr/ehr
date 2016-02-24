@@ -54,18 +54,21 @@ public class UserControllerTests {
 
         String userModelJson = objectMapper.writeValueAsString(userModel);
         Envelop envelop = userController.createUser(userModelJson);
-        assertTrue("新增失败", !envelop.isSuccessFlg());
+        assertTrue("新增失败", envelop.isSuccessFlg());
+
+        Object object1 = userController.distributeKey(userModel.getLoginCode());
+        assertTrue("秘钥分发失败", object1!=null);
 
         userModel = (UserDetailModel)envelop.getObj();
         String id= userModel.getId();
         envelop = userController.getUser(id);
-        assertTrue("用户明细获取失败！",!envelop.isSuccessFlg() || envelop.getObj()==null);
+        assertTrue("用户明细获取失败！",envelop.isSuccessFlg() && envelop.getObj()!=null);
 
         userModel = (UserDetailModel)envelop.getObj();
         userModel.setRealName("test_cms_1");
         userModelJson = objectMapper.writeValueAsString(userModel);
         envelop = userController.updateUser(userModelJson);
-        assertTrue("修改失败", !envelop.isSuccessFlg() || !((UserDetailModel)envelop.getObj()).getRealName().equals("test_cms_1"));
+        assertTrue("修改失败", envelop.isSuccessFlg() && ((UserDetailModel)envelop.getObj()).getRealName().equals("test_cms_1"));
 
         String fields = "";
         String filter = "realName=test_cms_1";
@@ -73,25 +76,22 @@ public class UserControllerTests {
         int rows = 15;
 
         envelop = userController.searchUsers(fields,filter,"",rows,page,null);
-        assertTrue("列表获取失败", !envelop.isSuccessFlg() || envelop.getDetailModelList()==null);
+        assertTrue("列表获取失败", envelop.isSuccessFlg() && envelop.getDetailModelList()!=null);
 
         boolean status = true;
         boolean object = userController.activityUser(id,status);
-        assertTrue("激活失败", !object);
+        assertTrue("激活失败", object);
 
         object = userController.resetPass(id);
-        assertTrue("密码重置失败", !object);
+        assertTrue("密码重置失败", object);
 
 
         String bingType ="tel";
         object=userController.unBinding(id,bingType);
-        assertTrue("解绑失败："+bingType, !object);
-
-        Object object1 = userController.distributeKey(userModel.getLoginCode());
-        assertTrue("秘钥分发失败", object1==null);
+        assertTrue("解绑失败："+bingType, object);
 
          envelop = userController.loginVerification(userModel.getLoginCode(), userModel.getPassword());
-        assertTrue("登陆失败", !envelop.isSuccessFlg() || envelop.getObj()==null);
+        assertTrue("登陆失败", envelop.isSuccessFlg() && envelop.getObj()!=null);
 
     }
 }
