@@ -8,7 +8,6 @@ package com.yihu.ehr.constants;
  */
 public enum ErrorCode {
 
-
     MissMethod("ehr.common.miss.method"),
     MissTimestamp("ehr.common.miss.timestamp"),
     MissAppKey("ehr.common.miss.appid"),
@@ -32,6 +31,7 @@ public enum ErrorCode {
     QueryTotalCount("ehr.common.query.count"),
     NotFoundObj("ehr.common.query.not.found"),
     RepeatCode("ehr.commons.repeat.code"),
+    RepeatName("ehr.commons.repeat.name"),  // add by cws 20160223
 
     SuccessSave("ehr.common.success.update"),
     InvalidUpdate("ehr.common.invalid.update"),
