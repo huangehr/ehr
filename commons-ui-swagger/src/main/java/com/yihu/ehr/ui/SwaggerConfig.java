@@ -14,10 +14,13 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import static com.google.common.base.Predicates.or;
 import static springfox.documentation.builders.PathSelectors.regex;
 
-@Configuration
+//@Configuration
 @EnableSwagger2
 @ComponentScan("com.yihu.ehr.*.controller")
 public class SwaggerConfig extends WebMvcConfigurerAdapter {
+    public static final String PUBLIC_API = "Public";
+    public static final String ADMIN_API = "Admin";
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("swagger-ui.html")
@@ -28,22 +31,23 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter {
     }
 
     @Bean
-    public Docket bizApi(){
+    public Docket publicAPI(){
         return new Docket(DocumentationType.SWAGGER_2)
-                .groupName("Biz")
+                .groupName(PUBLIC_API)
                 .genericModelSubstitutes(DeferredResult.class)
                 .useDefaultResponseMessages(false)
                 .forCodeGeneration(true)
                 .pathMapping("/")
                 .select()
-                .paths(or(regex("/rest.*")))
+                .paths(or(regex("/api.*")))
                 .build()
-                .apiInfo(bizApiInfo());
+                .apiInfo(publicApiInfo());
     }
 
-    public Docket adminApi(){
+    @Bean
+    public Docket adminAPI(){
         return new Docket(DocumentationType.SWAGGER_2)
-                .groupName("Admin")
+                .groupName(ADMIN_API)
                 .genericModelSubstitutes(DeferredResult.class)
                 .useDefaultResponseMessages(false)
                 .forCodeGeneration(false)
@@ -54,10 +58,10 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter {
                 .apiInfo(adminApiInfo());
     }
 
-    private ApiInfo bizApiInfo() {
-        ApiInfo apiInfo = new ApiInfo("Electronic Health Record(EHR) Platform API",
-                "EHR Platform's REST API, all the applications could access the object model data via JSON.",
-                "0.1",
+    private ApiInfo publicApiInfo() {
+        ApiInfo apiInfo = new ApiInfo("健康档案平台API",
+                "健康档案平台开放API，提供健康档案服务。",
+                "1.0",
                 "NO terms of service",
                 "wenfujian@jkzl.com",
                 "The Apache License, Version 2.0",
@@ -68,8 +72,8 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter {
     }
 
     private ApiInfo adminApiInfo() {
-        ApiInfo apiInfo = new ApiInfo("Electronic Health Record(EHR) Platform API",
-                "EHR Platform's REST API, for service administrator",
+        ApiInfo apiInfo = new ApiInfo("健康档案平台API",
+                "健康档案平台管理API，平台管理服务。",
                 "1.0",
                 "NO terms of service",
                 "wenfujian@jkzl.com",

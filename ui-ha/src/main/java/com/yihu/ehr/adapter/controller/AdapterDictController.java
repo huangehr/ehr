@@ -1,45 +1,25 @@
 package com.yihu.ehr.adapter.controller;
 
-import com.yihu.ha.adapter.model.*;
-import com.yihu.ha.constrant.ErrorCode;
-import com.yihu.ha.constrant.Result;
-import com.yihu.ha.constrant.Services;
-import com.yihu.ha.std.model.*;
-import com.yihu.ha.util.HttpClientUtil;
-import com.yihu.ha.util.ResourceProperties;
-import com.yihu.ha.util.controller.BaseController;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.HttpClientUtil;
+import com.yihu.ehr.util.ResourceProperties;
+import com.yihu.ehr.util.controller.BaseRestController;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by zqb on 2015/11/13.
  */
 @RequestMapping("/adapterDict")
 @Controller
-public class AdapterDictController extends BaseController {
-    @Resource(name = Services.OrgAdapterPlanManager)
-    XOrgAdapterPlanManager orgAdapterPlanManager;
-
-    @Resource(name=Services.AdapterDictManager)
-    private XAdapterDictManager adapterDictManager;
-
-    @Resource(name = Services.OrgDictManager)
-    private XOrgDictManager orgDictManager;
-
-    @Resource(name = Services.OrgDictItemManager)
-    private XOrgDictItemManager orgDictItemManager;
-
-
-    @Resource(name=Services.DictManager)
-    private XDictManager dictManager;
-
+public class AdapterDictController extends BaseRestController {
     private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
     private static   String username = ResourceProperties.getProperty("username");
     private static   String password = ResourceProperties.getProperty("password");
@@ -48,10 +28,10 @@ public class AdapterDictController extends BaseController {
     private static   String comUrl = host + module + version;
 
     @RequestMapping("template/adapterMetaDataInfo")
-    public String adapterMetaDataInfoTemplate(Model model, Long id, String mode) {
+    public Object adapterMetaDataInfoTemplate(Model model, Long id, String mode) {
         String url = "/adapterDict/adapterDict";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("id",id);
         try {
@@ -68,7 +48,7 @@ public class AdapterDictController extends BaseController {
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 
 //        XAdapterDict adapterDict = new AdapterDict();
@@ -87,7 +67,7 @@ public class AdapterDictController extends BaseController {
     }
 
     /**
-     * 根据方案ID及查询条件查询字典�?�配关系
+     * 根据方案ID及查询条件查询字典适配关系
      * @param adapterPlanId
      * @param strKey
      * @param page
@@ -96,10 +76,10 @@ public class AdapterDictController extends BaseController {
      */
     @RequestMapping("/searchAdapterDict")
     @ResponseBody
-    public String searchAdapterDict(Long adapterPlanId, String strKey,int page, int rows){
+    public Object searchAdapterDict(Long adapterPlanId, String strKey,int page, int rows){
         String url = "/adapterDict/adapterDicts";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("adapterPlanId", adapterPlanId);
         params.put("code", strKey);
@@ -113,7 +93,7 @@ public class AdapterDictController extends BaseController {
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //
@@ -130,7 +110,7 @@ public class AdapterDictController extends BaseController {
     }
 
     /**
-     * 根据dictId搜索字典项�?�配关系
+     * 根据dictId搜索字典项适配关系
      * @param adapterPlanId
      * @param dictId
      * @param page
@@ -139,10 +119,10 @@ public class AdapterDictController extends BaseController {
      */
     @RequestMapping("/searchAdapterDictEntry")
     @ResponseBody
-    public String searchAdapterDictEntry(Long adapterPlanId, Long dictId,String strKey,int page, int rows){
+    public Object searchAdapterDictEntry(Long adapterPlanId, Long dictId,String strKey,int page, int rows){
         String url = "/adapterDict/adapterDictEntrys";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("adapterPlanId", adapterPlanId);
         params.put("dictId", dictId);
@@ -157,7 +137,7 @@ public class AdapterDictController extends BaseController {
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //
@@ -176,31 +156,31 @@ public class AdapterDictController extends BaseController {
     }
 
     /**
-     * 根据字典ID获取字典项�?�配关系明细
+     * 根据字典ID获取字典项适配关系明细
      * @param id
      * @return
      */
     //    todo:前端没有找到该路径的请求
     @RequestMapping("/getAdapterDictEntry")
     @ResponseBody
-    public String getAdapterDictEntry(Long id){
+    public Object getAdapterDictEntry(Long id){
         String url = "/adapterDict/adapterDictEntry";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("id",id);
         try{
             //todo 后台转换成model后传前台
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            ObjectMapper mapper = new ObjectMapper();
-            XAdapterDict adapterDict = mapper.readValue(resultStr, XAdapterDict.class);
-            result.setObj(adapterDict);
+//            ObjectMapper mapper = new ObjectMapper();
+//            XAdapterDict adapterDict = mapper.readValue(resultStr, XAdapterDict.class);
+            result.setObj(resultStr);
             result.setSuccessFlg(true);
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //        try {
@@ -216,42 +196,42 @@ public class AdapterDictController extends BaseController {
 
     }
 
-    private XAdapterDict getAdapterDict(Long id) {
-        return id==null? new AdapterDict(): adapterDictManager.getAdapterDict(id);
-    }
+//    private XAdapterDict getAdapterDict(Long id) {
+//        return id==null? new AdapterDict(): adapterDictManager.getAdapterDict(id);
+//    }
 
     /**
-     * 修改字典项映射关�?
+     * 修改字典项映射关系
      * @param
      * @return
      */
     @RequestMapping("/updateAdapterDictEntry")
     @ResponseBody
-    public String updateAdapterDictEntry(AdapterDictModel adapterDictModel){
+    public Object updateAdapterDictEntry(String adapterDictModel){
         String url = "";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("adapterDictModel",adapterDictModel);
         try {
-            //更新或新�? todo:可放内部去做判断
+            //更新或新增 todo:可放内部去做判断
 //            if (adapterDictModel.getId()==null) {
 //                url = "/adapterDict/addAdapterDictEntry";
 //            }else {
 //                url = "/adapterDict/updateAdapterDictEntry";
 //            }
             url="/adapterDict/adapterDictEntry";
-            //todo 失败，返回的错误信息怎么体现�?
+            //todo 失败，返回的错误信息怎么体现？
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
-            ObjectMapper mapper = new ObjectMapper();
-            AdapterDictModel adapterDictModelNew = mapper.readValue(resultStr, AdapterDictModel.class);
-            result.setObj(adapterDictModelNew);
+//            ObjectMapper mapper = new ObjectMapper();
+//            AdapterDictModel adapterDictModelNew = mapper.readValue(resultStr, AdapterDictModel.class);
+            result.setObj(resultStr);
             result.setSuccessFlg(true);
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //        try {
@@ -281,10 +261,10 @@ public class AdapterDictController extends BaseController {
      */
     @RequestMapping("/delDictEntry")
     @ResponseBody
-    public String delDictEntry(@RequestParam("id") Long[] id){
+    public Object delDictEntry(@RequestParam("id") Long[] id){
         String url = "/adapterDict/adapterDictEntry";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("ids",id);
         try {
@@ -296,11 +276,11 @@ public class AdapterDictController extends BaseController {
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.InvalidDelete.toString());
             }
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //        if (id == null || id.length == 0) {
@@ -308,7 +288,7 @@ public class AdapterDictController extends BaseController {
 //            result.setSuccessFlg(false);
 //        }else{
 //            if (adapterDictManager.deleteAdapterDictRemain(id)<1){
-//                result.setErrorMsg("至少保留�?条！");//适配的字典由数据元关联得来，字典不能全部删除
+//                result.setErrorMsg("至少保留一条！");//适配的字典由数据元关联得来，字典不能全部删除
 //                result.setSuccessFlg(false);
 //            }else{
 //                int rtn = adapterDictManager.deleteAdapterDict(id);
@@ -328,24 +308,24 @@ public class AdapterDictController extends BaseController {
     public Object getStdDictEntry(Long adapterPlanId,Long dictId,String mode){
         String url = "/adapterDict/getStdDictEntry";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("adapterPlanId",adapterPlanId);
         params.put("dictId",dictId);
         params.put("mode",mode);
         try {
-            //todo 失败，返回的错误信息怎么体现�?
+            //todo 失败，返回的错误信息怎么体现？
             //todo 新增时要过滤掉已经存在的标准
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            ObjectMapper mapper = new ObjectMapper();
-            List<String> stdDict = Arrays.asList(mapper.readValue(resultStr, String[].class));
+//            ObjectMapper mapper = new ObjectMapper();
+//            List<String> stdDict = Arrays.asList(mapper.readValue(resultStr, String[].class));
             result.setSuccessFlg(true);
-            result.setDetailModelList(stdDict);
-            return result.toJson();
+            result.setObj(resultStr);
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //        try {
@@ -395,20 +375,20 @@ public class AdapterDictController extends BaseController {
     public Object getOrgDict(Long adapterPlanId){
         String url = "/adapterDict/getOrgDict";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("adapterPlanId",adapterPlanId);
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            ObjectMapper mapper = new ObjectMapper();
-            List<String> orgDict = Arrays.asList(mapper.readValue(resultStr, String[].class));
+//            ObjectMapper mapper = new ObjectMapper();
+//            List<String> orgDict = Arrays.asList(mapper.readValue(resultStr, String[].class));
             result.setSuccessFlg(true);
-            result.setDetailModelList(orgDict);
-            return result.toJson();
+            result.setObj(resultStr);
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //        try {
@@ -434,31 +414,31 @@ public class AdapterDictController extends BaseController {
     }
 
     /**
-     * 机构字典项下�?
+     * 机构字典项下拉
      * @param orgDictSeq
      * @return
      */
     @RequestMapping("/getOrgDictEntry")
     @ResponseBody
     public Object getOrgDictEntry(Integer orgDictSeq,Long adapterPlanId){
-        //网关没有url的请求方�?
+        //网关没有url的请求方式
         String url = "/adapterDict/getOrgDictEntry";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("orgDictId",orgDictSeq);
         params.put("adapterPlanId",adapterPlanId);
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            ObjectMapper mapper = new ObjectMapper();
-            List<String> orgMetaData = Arrays.asList(mapper.readValue(resultStr, String[].class));
+//            ObjectMapper mapper = new ObjectMapper();
+//            List<String> orgMetaData = Arrays.asList(mapper.readValue(resultStr, String[].class));
             result.setSuccessFlg(true);
-            result.setDetailModelList(orgMetaData);
-            return result.toJson();
+            result.setObj(resultStr);
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //        try {

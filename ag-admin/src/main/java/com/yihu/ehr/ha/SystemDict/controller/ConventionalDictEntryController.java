@@ -1,6 +1,6 @@
 package com.yihu.ehr.ha.SystemDict.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.util.Envelop;
@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Created by AndyCai on 2016/1/19.
  */
-@RequestMapping(ApiVersionPrefix.Version1_0 )
+@RequestMapping(ApiVersion.Version1_0 )
 @RestController
 public class ConventionalDictEntryController {
 

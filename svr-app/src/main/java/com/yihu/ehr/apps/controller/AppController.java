@@ -2,7 +2,8 @@ package com.yihu.ehr.apps.controller;
 
 import com.yihu.ehr.apps.service.App;
 import com.yihu.ehr.apps.service.AppService;
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.app.MApp;
@@ -27,7 +28,7 @@ import java.util.List;
  * @created 2015.8.12 16:53:06
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0)
+@RequestMapping(ApiVersion.Version1_0)
 @Api(protocols = "https", value = "Application", description = "EHR应用管理", tags = {"应用管理"})
 public class AppController extends BaseRestController {
     @Autowired
@@ -75,6 +76,7 @@ public class AppController extends BaseRestController {
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true, defaultValue = "{\"name\": \"\", \"url\": \"\", \"catalog\": \"\", \"description\": \"\", \"creator\":\"\"}")
             @RequestParam(value = "app", required = false) String appJson) throws Exception {
         App app = toEntity(appJson, App.class);
+        app.setId(getObjectId(BizObject.App));
         if(appService.isAppNameExists(app.getName())) throw new ApiException(ErrorCode.InvalidAppRegister, "应用程序名称已存在");
         app = appService.createApp(app);
         return convertToModel(app, MApp.class);
@@ -95,6 +97,7 @@ public class AppController extends BaseRestController {
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true)
             @RequestParam(value = "app", required = false) String appJson) throws Exception {
         App app = toEntity(appJson, App.class);
+        app.setId(getObjectId(BizObject.App));
         if (appService.retrieve(app.getId()) == null) throw new ApiException(ErrorCode.InvalidAppId, "应用不存在");
 
         if(!appService.retrieve(app.getId()).getName().equals(app.getName()) && appService.isAppNameExists(app.getName())){

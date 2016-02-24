@@ -1,25 +1,22 @@
 package com.yihu.ehr.std.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ha.constrant.*;
-import com.yihu.ha.factory.ServiceFactory;
-import com.yihu.ha.std.model.*;
-import com.yihu.ha.user.model.XUser;
-import com.yihu.ha.util.HttpClientUtil;
-import com.yihu.ha.util.ObjectId;
-import com.yihu.ha.util.ResourceProperties;
-import com.yihu.ha.util.XEnvironmentOption;
-import com.yihu.ha.util.controller.BaseController;
-import com.yihu.ha.util.log.LogService;
-import com.yihu.ha.util.operator.StringUtil;
+import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.constants.RestAPI;
+import com.yihu.ehr.constants.SessionAttributeKeys;
+import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.HttpClientUtil;
+import com.yihu.ehr.util.ResourceProperties;
+import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.util.log.LogService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import javax.annotation.Resource;
 import java.util.*;
 
 /**
@@ -28,16 +25,13 @@ import java.util.*;
 @RequestMapping("/cdatype")
 @Controller(RestAPI.StandardCDATypeController)
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
-public class CdaTypeController extends BaseController {
+public class CdaTypeController extends BaseRestController {
     private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
     private static   String username = ResourceProperties.getProperty("username");
     private static   String password = ResourceProperties.getProperty("password");
     private static   String module = ResourceProperties.getProperty("module");
     private static   String version = ResourceProperties.getProperty("version");
     private static   String comUrl = host + module + version;
-
-    @Resource(name = Services.CDATypeManager)
-    private XCDATypeManager xcdaTypeManager;
 
     @RequestMapping("index")
     public String cdaTypeInitial(Model model) {
@@ -77,57 +71,57 @@ public class CdaTypeController extends BaseController {
         return strResult;*/
     }
 
-    /**
-     * 鏍规嵁鐖剁骇淇℃伅鑾峰彇鍏ㄩ儴鐨勫瓙绾т俊鎭?
-     * @param info 鐖剁骇淇℃伅
-     * @return 鍏ㄩ儴瀛愮骇淇℃伅
-     */
-   public List<CDATypeTreeModel> getCdaTypeChild(List<XCDAType> info) {
-        List<CDATypeTreeModel> treeInfo = new ArrayList<>();
-        try {
-            for (int i = 0; i < info.size(); i++) {
-                CDAType typeInfo = (CDAType) info.get(i);
-                CDATypeTreeModel tree = new CDATypeTreeModel();
-                tree.setId(typeInfo.getId());
-                tree.setCode(typeInfo.getCode());
-                tree.setName(typeInfo.getName());
-                tree.setDescription(typeInfo.getDescription());
-                List<XCDAType> listChild = xcdaTypeManager.getCDATypeListByParentId(typeInfo.getId());
-                List<CDATypeTreeModel> listChildTree = getCdaTypeChild(listChild);
-                tree.setChildren(listChildTree);
-                treeInfo.add(tree);
-            }
-        } catch (Exception ex) {
-            LogService.getLogger(CdaTypeController.class).error(ex.getMessage());
-        }
-        return treeInfo;
-   }
+//    /**
+//     * 根据父级信息获取全部的子级信息
+//     * @param info 父级信息
+//     * @return 全部子级信息
+//     */
+//    public List<CDATypeTreeModel> getCdaTypeChild(List<XCDAType> info) {
+//        List<CDATypeTreeModel> treeInfo = new ArrayList<>();
+//        try {
+//            for (int i = 0; i < info.size(); i++) {
+//                CDAType typeInfo = (CDAType) info.get(i);
+//                CDATypeTreeModel tree = new CDATypeTreeModel();
+//                tree.setId(typeInfo.getId());
+//                tree.setCode(typeInfo.getCode());
+//                tree.setName(typeInfo.getName());
+//                tree.setDescription(typeInfo.getDescription());
+//                List<XCDAType> listChild = xcdaTypeManager.getCDATypeListByParentId(typeInfo.getId());
+//                List<CDATypeTreeModel> listChildTree = getCdaTypeChild(listChild);
+//                tree.setChildren(listChildTree);
+//                treeInfo.add(tree);
+//            }
+//        } catch (Exception ex) {
+//            LogService.getLogger(CdaTypeController_w.class).error(ex.getMessage());
+//        }
+//        return treeInfo;
+//    }
 
-    /**
-     * 鏍规嵁鐖剁骇绫诲埆鑾峰彇鍏ㄩ儴鐨勫瓙绫诲埆ID锛岃繑鍥炲?煎寘鎷埗绾х殑ID
-
-     * @return 鍏ㄩ儴瀛愮骇
-     */
-    public String getCdaTypeChildId(List<XCDAType> info,String childrenIds) {
-        try {
-            for (int i = 0; i < info.size(); i++) {
-                CDAType typeInfo = (CDAType) info.get(i);
-                childrenIds+=typeInfo.getId()+",";
-                List<XCDAType> listChild = xcdaTypeManager.getCDATypeListByParentId(typeInfo.getId());
-                if(listChild.size()>0)
-                    childrenIds=getCdaTypeChildId(listChild,childrenIds);
-            }
-        } catch (Exception ex) {
-            LogService.getLogger(CdaTypeController.class).error(ex.getMessage());
-        }
-        return childrenIds;
-    }
+//    /**
+//     * 根据父级类别获取全部的子类别ID，返回值包括父级的ID
+//
+//     * @return 全部子级
+//     */
+//    public String getCdaTypeChildId(List<XCDAType> info,String childrenIds) {
+//        try {
+//            for (int i = 0; i < info.size(); i++) {
+//                CDAType typeInfo = (CDAType) info.get(i);
+//                childrenIds+=typeInfo.getId()+",";
+//                List<XCDAType> listChild = xcdaTypeManager.getCDATypeListByParentId(typeInfo.getId());
+//                if(listChild.size()>0)
+//                    childrenIds=getCdaTypeChildId(listChild,childrenIds);
+//            }
+//        } catch (Exception ex) {
+//            LogService.getLogger(CdaTypeController_w.class).error(ex.getMessage());
+//        }
+//        return childrenIds;
+//    }
 
     @RequestMapping("GetCdaTypeListByKey")
     @ResponseBody
     public Object GetCdaTypeListByKey(String strKey, Integer page, Integer rows) {
-        // TODO 鏃犲搴?
-        Result result = new Result();
+        // TODO 无对应
+        Envelop result = new Envelop();
         String url = "/cdaType/***********";
         try{
             Map<String,Object> params = new HashMap<>();
@@ -135,9 +129,9 @@ public class CdaTypeController extends BaseController {
             params.put("page",page);
             params.put("rows",rows);
             String _rus = HttpClientUtil.doGet(comUrl+url,params,username,password);
-            if(StringUtil.isEmpty(_rus)){
+            if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
-                result.setErrorMsg("cda绫诲埆鑾峰彇澶辫触");
+                result.setErrorMsg("cda类别获取失败");
             }else{
                 //result.setSuccessFlg(true);
                 return _rus;
@@ -147,7 +141,7 @@ public class CdaTypeController extends BaseController {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result.toJson();
+        return result;
 
         /*Result result = new Result();
         try {
@@ -158,7 +152,7 @@ public class CdaTypeController extends BaseController {
             List<XCDAType> listType = xcdaTypeManager.getCDATypeListByKey(mapKey);
             if (listType == null) {
                 result.setSuccessFlg(false);
-                result.setErrorMsg("鏁版嵁鑾峰彇澶辫触!");
+                result.setErrorMsg("数据获取失败!");
                 return result;
             }
             List<CDATypeForInterface> listInfo = getTypeForInterface(listType);
@@ -170,7 +164,7 @@ public class CdaTypeController extends BaseController {
         } catch (Exception ex) {
             LogService.getLogger(CdaTypeController_w.class).error(ex.getMessage());
             result.setSuccessFlg(false);
-            result.setErrorMsg("绯荤粺閿欒锛岃鑱旂郴绠＄悊鍛?!");
+            result.setErrorMsg("系统错误，请联系管理员!");
         }
         return result;*/
     }
@@ -178,27 +172,25 @@ public class CdaTypeController extends BaseController {
     @RequestMapping("getCdaTypeById")
     @ResponseBody
     public Object getCdaTypeById(String strIds) {
-        Result result = new Result();
+        Envelop result = new Envelop();
         String url = "/cdaType/cdaType";
         try{
             Map<String,Object> params = new HashMap<>();
             params.put("typeId",strIds);
             String _rus = HttpClientUtil.doGet(comUrl+url,params,username,password);
-            if(StringUtil.isEmpty(_rus)){
+            if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
-                result.setErrorMsg("cda绫诲埆鑾峰彇澶辫触");
+                result.setErrorMsg("cda类别获取失败");
             }else{
                 result.setSuccessFlg(true);
-                ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-                List<CDATypeForInterface> listInfo = Arrays.asList(objectMapper.readValue(_rus, CDATypeForInterface[].class));
-                result.setObj(listInfo.get(0));
+                result.setObj(_rus);
             }
         }catch (Exception ex){
             LogService.getLogger(CdaTypeController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result.toJson();
+        return result;
 
        /* Result result = new Result();
         result.setSuccessFlg(false);
@@ -211,7 +203,7 @@ public class CdaTypeController extends BaseController {
             }
         } catch (Exception ex) {
             LogService.getLogger(CdaController.class).error(ex.getMessage());
-            result.setErrorMsg("绯荤粺閿欒锛岃鑱旂郴绠＄悊鍛?!");
+            result.setErrorMsg("系统错误，请联系管理员!");
         }
         return result;*/
     }
@@ -219,18 +211,18 @@ public class CdaTypeController extends BaseController {
     @RequestMapping("delteCdaTypeInfo")
     @ResponseBody
     /**
-     * 鍒犻櫎CDA绫诲埆锛岃嫢璇ョ被鍒瓨鍦ㄥ瓙绫诲埆锛屽皢涓?骞跺垹闄ゅ瓙绫诲埆
-     * 鍏堟牴鎹綋鍓嶇殑绫诲埆ID鑾峰彇鍏ㄩ儴瀛愮被鍒獻D锛屽啀杩涜鍒犻櫎
+     * 删除CDA类别，若该类别存在子类别，将一并删除子类别
+     * 先根据当前的类别ID获取全部子类别ID，再进行删除
      * @param  ids  cdaType Id
-     *  @return result 鎿嶄綔缁撴灉
+     *  @return result 操作结果
      */
     public Object delteCdaTypeInfo(String ids) {
-        Result result = new Result();
+        Envelop result = new Envelop();
         String url = "/cdaType/cdaType";
-        if (StringUtil.isEmpty(ids)){
-            result.setErrorMsg("璇烽?夋嫨瑕佸垹闄ょ殑鏁版嵁");
+        if (StringUtils.isEmpty(ids)){
+            result.setErrorMsg("请选择要删除的数据");
             result.setSuccessFlg(false);
-            return result.toJson();
+            return result;
         }
         try{
             Map<String,Object> params = new HashMap<>();
@@ -240,20 +232,20 @@ public class CdaTypeController extends BaseController {
                 result.setSuccessFlg(true);
             }else{
                 result.setSuccessFlg(false);
-                result.setErrorMsg("cda绫诲埆鍒犻櫎澶辫触");
+                result.setErrorMsg("cda类别删除失败");
             }
         }catch (Exception ex){
             LogService.getLogger(CdaTypeController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result.toJson();
+        return result;
 
 
        /* try {
             String strErrorMsg = "";
             if (ids == null || ids == "") {
-                strErrorMsg += "璇峰厛閫夋嫨灏嗚鍒犻櫎鐨勬暟鎹紒";
+                strErrorMsg += "请先选择将要删除的数据！";
             }
             if (strErrorMsg != "") {
                 result.setSuccessFlg(false);
@@ -269,43 +261,41 @@ public class CdaTypeController extends BaseController {
                 result.setSuccessFlg(true);
             } else {
                 result.setSuccessFlg(false);
-                result.setErrorMsg("鍒犻櫎澶辫触!");
+                result.setErrorMsg("删除失败!");
             }
         } catch (Exception ex) {
             LogService.getLogger(CdaController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
-            result.setErrorMsg("绯荤粺閿欒锛岃鑱旂郴绠＄悊鍛?!");
+            result.setErrorMsg("系统错误，请联系管理员!");
         }
         return result;*/
     }
 
     @RequestMapping("SaveCdaType")
     @ResponseBody
-    public Object SaveCdaType(CDATypeForInterface info) {
-        Result result = new Result();
+    public Object SaveCdaType(String info) {
+        Envelop result = new Envelop();
         String url = "/cdaType/SaveCdaType";
-        String strErrorMsg = "";
-        if(StringUtil.isEmpty(info.getCode())){
-            strErrorMsg += "浠ｇ爜涓嶈兘涓虹┖! ";
-        }
-        if(StringUtil.isEmpty(info.getParentName())){
-            strErrorMsg += "鍚嶇О涓嶈兘涓虹┖锛?";
-        }
-        if(!StringUtil.isEmpty(strErrorMsg)){
-            result.setSuccessFlg(false);
-            result.setErrorMsg(strErrorMsg);
-            return result.toJson();
-        }
+        //todo：前台js判断不能为空
+//        if(StringUtil.isEmpty(info.getCode())){
+//            strErrorMsg += "代码不能为空! ";
+//        }
+//        if(StringUtil.isEmpty(info.getParentName())){
+//            strErrorMsg += "名称不能为空！";
+//        }
+//        if(!StringUtil.isEmpty(strErrorMsg)){
+//            result.setSuccessFlg(false);
+//            result.setErrorMsg(strErrorMsg);
+//            return result.toJson();
+//        }
         try {
-            //TODO 鎻愪緵code鍞竴鎬ч獙璇乤pi
+            //TODO 提供code唯一性验证api
             Map<String, Object> params = new HashMap<>();
-            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-            String typeJson = objectMapper.writeValueAsString(info);
-            params.put("typeJson", typeJson);
+            params.put("typeJson", info);
             String _rus = HttpClientUtil.doPost(comUrl+url,params,username,password);
-            if(StringUtil.isEmpty(_rus)){
+            if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
-                result.setErrorMsg("cadtype淇濆瓨澶辫触");
+                result.setErrorMsg("cadtype保存失败");
             }else{
                 result.setSuccessFlg(true);
             }
@@ -314,32 +304,32 @@ public class CdaTypeController extends BaseController {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result.toJson();
+        return result;
 
 
        /* try {
             String strErrorMsg = "";
             if (info.getCode() == null || info.getCode() == "") {
-                strErrorMsg += "浠ｇ爜涓嶈兘涓虹┖!";
+                strErrorMsg += "代码不能为空!";
             }
             if (info.getName() == null || info.getName() == "") {
-                strErrorMsg += "鍚嶇О涓嶈兘涓虹┖!";
+                strErrorMsg += "名称不能为空!";
             }
             XCDAType xcdaType = new CDAType();
-            //id 涓嶄负绌哄垯鍏堣幏鍙栨暟鎹紝鍐嶈繘琛屼慨鏀?
+            //id 不为空则先获取数据，再进行修改
             if (!StringUtil.isEmpty(info.getId())) {
                 List<XCDAType> listType = xcdaTypeManager.getCdatypeInfoByIds(info.getId());
                 if (listType.size() > 0) {
                     xcdaType = listType.get(0);
                 }
                 if(!info.getCode().equals(xcdaType.getCode()) && xcdaTypeManager.isCodeExist(info.getCode())){
-                    strErrorMsg = "浠ｇ爜宸插瓨鍦?!";
+                    strErrorMsg = "代码已存在!";
                 }
                 xcdaType.setUpdateUser(info.getUserId());
                 xcdaType.setUpdateDate(new Date());
             } else {
                 if(xcdaTypeManager.isCodeExist(info.getCode())){
-                    strErrorMsg = "浠ｇ爜宸插瓨鍦?!";
+                    strErrorMsg = "代码已存在!";
                 }
                 xcdaType.setCreateUser(info.getUserId());
                 xcdaType.setCreateDate(new Date());
@@ -366,12 +356,12 @@ public class CdaTypeController extends BaseController {
                 result.setSuccessFlg(true);
             } else {
                 result.setSuccessFlg(false);
-                result.setErrorMsg("淇濆瓨澶辫触!");
+                result.setErrorMsg("保存失败!");
             }
         } catch (Exception ex) {
             LogService.getLogger(CdaController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
-            result.setErrorMsg("绯荤粺閿欒锛岃鑱旂郴绠＄悊鍛?!");
+            result.setErrorMsg("系统错误，请联系管理员!");
         }
         return result;*/
     }
@@ -441,26 +431,26 @@ public class CdaTypeController extends BaseController {
     }*/
 
 
-    public List<CDATypeForInterface> getTypeForInterface(List<XCDAType> listType) {
-        if (listType == null) {
-            return null;
-        }
-        List<CDATypeForInterface> listInfo = new ArrayList<>();
-        for (int i = 0; i < listType.size(); i++) {
-            CDAType cdaType = (CDAType) listType.get(i);
-            CDATypeForInterface info = new CDATypeForInterface();
-            info.setId(cdaType.getId());
-            info.setCode(cdaType.getCode());
-            info.setName(cdaType.getName());
-            info.setParentId(cdaType.getParentId());
-            String strParentName = "";
-            if (cdaType.getParentId() != null && !cdaType.getParentId().equals("")) {
-                strParentName = cdaType.getParentCdaType()!=null?cdaType.getParentCdaType().getName():"";
-            }
-            info.setParentName(strParentName);
-            info.setDescription(cdaType.getDescription());
-            listInfo.add(info);
-        }
-        return listInfo;
-    }
+//    public List<CDATypeForInterface> getTypeForInterface(List<XCDAType> listType) {
+//        if (listType == null) {
+//            return null;
+//        }
+//        List<CDATypeForInterface> listInfo = new ArrayList<>();
+//        for (int i = 0; i < listType.size(); i++) {
+//            CDAType cdaType = (CDAType) listType.get(i);
+//            CDATypeForInterface info = new CDATypeForInterface();
+//            info.setId(cdaType.getId());
+//            info.setCode(cdaType.getCode());
+//            info.setName(cdaType.getName());
+//            info.setParentId(cdaType.getParentId());
+//            String strParentName = "";
+//            if (cdaType.getParentId() != null && !cdaType.getParentId().equals("")) {
+//                strParentName = cdaType.getParentCdaType()!=null?cdaType.getParentCdaType().getName():"";
+//            }
+//            info.setParentName(strParentName);
+//            info.setDescription(cdaType.getDescription());
+//            listInfo.add(info);
+//        }
+//        return listInfo;
+//    }
 }

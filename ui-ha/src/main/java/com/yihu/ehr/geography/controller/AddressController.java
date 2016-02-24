@@ -1,10 +1,10 @@
 package com.yihu.ehr.geography.controller;
 
-import com.yihu.ehr.constrant.ErrorCode;
-import com.yihu.ehr.constrant.Result;
+import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.ResourceProperties;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.yihu.ehr.util.controller.BaseRestController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -19,7 +19,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/address")
-public class AddressController extends BaseController {
+public class AddressController extends BaseRestController {
     private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
     private static   String username = ResourceProperties.getProperty("username");
     private static   String password = ResourceProperties.getProperty("password");
@@ -29,10 +29,10 @@ public class AddressController extends BaseController {
 
     @RequestMapping("getParent")
     @ResponseBody
-    public String getParent(Integer level) {
+    public Object getParent(Integer level) {
         String url = "/address/address/level";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("level",level);
         try{
@@ -40,11 +40,11 @@ public class AddressController extends BaseController {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             result.setObj(resultStr);
             result.setSuccessFlg(true);
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        XAddressDict[] addrArray = addressManager.getLevelToAddr(level);
 //        Map<Integer, String> parentMap = new HashMap<>();
@@ -59,24 +59,22 @@ public class AddressController extends BaseController {
 
     @RequestMapping("getChildByParent")
     @ResponseBody
-    public String getChildByParent(Integer pid) {
+    public Object getChildByParent(Integer pid) {
         String url = "/address/address/pid";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("pid",pid);
         try{
             //todo 后台转换成Map后传前台
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            ObjectMapper mapper = new ObjectMapper();
-            Map<Integer, String> map = mapper.readValue(resultStr, Map.class);
-            result.setObj(map);
+            result.setObj(resultStr);
             result.setSuccessFlg(true);
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        XAddressDict[] addrArray = addressManager.getPidToAddr(pid);
 //        Map<Integer, String> childMap = new HashMap<>();
@@ -91,25 +89,23 @@ public class AddressController extends BaseController {
 
     @RequestMapping("getOrgs")
     @ResponseBody
-    public String getOrgs(String province, String city) {
+    public Object getOrgs(String province, String city) {
         String url = "/address/search";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("province",province);
         params.put("city",city);
         try{
             //todo 后台转换成Map后传前台
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, String> map = mapper.readValue(resultStr, Map.class);
-            result.setObj(map);
+            result.setObj(resultStr);
             result.setSuccessFlg(true);
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Map<String, Object> conditionMap = new HashMap<>();
 //        conditionMap.put("province", province);
