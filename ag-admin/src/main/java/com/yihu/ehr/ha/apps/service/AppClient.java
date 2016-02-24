@@ -60,4 +60,20 @@ public interface AppClient {
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
             @PathVariable(value = "app_id") String appId);
 
+    @RequestMapping(value = "/rest/v1.0/apps/status",method = RequestMethod.PUT)
+    @ApiOperation(value = "修改状态")
+    boolean updateStatus(
+            @ApiParam(name = "app_id",value = "id",defaultValue = "")
+            @RequestParam(value = "app_id") String appId,
+            @ApiParam(name = "status",value = "状态",defaultValue = "")
+            @RequestParam(value = "app_status") String appStatus);
+
+    @RequestMapping(value = "/rest/v1.0/apps/existence/{app_id}",method = RequestMethod.GET)
+    @ApiOperation(value = "验证")
+    boolean isAppExistence(
+            @ApiParam(name = "app_id",value = "id",defaultValue = "")
+            @RequestParam(value = "app_id") String appId,
+            @ApiParam(name = "secret",value = "",defaultValue = "")
+            @RequestParam(value = "secret") String secret);
+
 }
