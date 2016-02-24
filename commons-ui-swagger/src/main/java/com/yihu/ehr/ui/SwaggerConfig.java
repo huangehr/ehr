@@ -14,7 +14,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import static com.google.common.base.Predicates.or;
 import static springfox.documentation.builders.PathSelectors.regex;
 
-//@Configuration
+@Configuration
 @EnableSwagger2
 @ComponentScan("com.yihu.ehr.*.controller")
 public class SwaggerConfig extends WebMvcConfigurerAdapter {
@@ -44,7 +44,7 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter {
                 .apiInfo(publicApiInfo());
     }
 
-    @Bean
+    //@Bean
     public Docket adminAPI(){
         return new Docket(DocumentationType.SWAGGER_2)
                 .groupName(ADMIN_API)
@@ -53,7 +53,7 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter {
                 .forCodeGeneration(false)
                 .pathMapping("/")
                 .select()
-                .paths(or(regex("/rest/\\{api_version.*")))
+                .paths(or(regex("/admin.*")))
                 .build()
                 .apiInfo(adminApiInfo());
     }

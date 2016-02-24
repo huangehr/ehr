@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <url>https://ehr.yihu.com:10000</url>
+    <url>https://ehr.yihu.com</url>
 	<artifactId>ag-ehr-platform</artifactId>
 	<packaging>jar</packaging>
 
@@ -84,6 +84,10 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
             <plugin>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.7</version>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
                 <version>3.3</version>
@@ -93,7 +97,20 @@
                         <artifactId>doxia-module-markdown</artifactId>
                         <version>1.5</version>
                     </dependency>
+                    <dependency>
+                        <groupId>lt.velykis.maven.skins</groupId>
+                        <artifactId>reflow-velocity-tools</artifactId>
+                        <version>1.1.1</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.velocity</groupId>
+                        <artifactId>velocity</artifactId>
+                        <version>1.7</version>
+                    </dependency>
                 </dependencies>
+                <configuration>
+                    <locales>zh_CN</locales>
+                </configuration>
             </plugin>
         </plugins>
     </build>

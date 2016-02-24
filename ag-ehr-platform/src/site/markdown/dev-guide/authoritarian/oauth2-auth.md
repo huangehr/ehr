@@ -180,9 +180,44 @@ scope属性包含此Token由用户所授权的有效作用域。正常情况下�
 作用域
 ---------------------
 
-[作用域](scope.html)用于限定Token能够访问的资源范围，没有附加其他与授权用户本身有关的权限。
+作用域于限定Token能够访问的资源范围，没有附加其他与授权用户本身有关的权限。用户可根据需要修改作用域，以限制应用的资源访问范围。
 
-对于Web页面授权流程，应用在请求用户授权时会在授权页面表单上显示要授权的资源作用域。
+对于Web页面授权流程，应用在请求用户授权时会在授权页面表单上显示要授权的资源作用域。下表为平台当前开放的作用域：
+
+<table>
+   <tr>
+      <td>名称</td>
+      <td>描述</td>
+   </tr>
+   <tr>
+      <td>(no scope)</td>
+      <td>应用仅可以访问公开的信息，如：用户信息，机构信息。</td>
+   </tr>
+   <tr>
+      <td>read,write:user</td>
+      <td>授予用户信息的读/写权限，user:demographic_id与user:health_profile为只读。</td>
+   </tr>
+   <tr>
+      <td>read:user:demographic_id</td>
+      <td>授予用户身份证号的读取权限。</td>
+   </tr>
+   <tr>
+      <td>read:user:health_profile</td>
+      <td>授予用户健康档案的读取权限。</td>
+   </tr>
+   <tr>
+      <td>read,write:organization</td>
+      <td>授予机构信息的读/写权限，organization:standard与organization:adaption为只读。</td>
+   </tr>
+   <tr>
+      <td>read:organization:standard</td>
+      <td>授予机构数据标准的读取权限。</td>
+   </tr>
+   <tr>
+      <td>read:organization:adaption</td>
+      <td>授予机构适配数据的读取权限。</td>
+   </tr>
+</table>
 
 检查响应头可知道你的作用域范围及API需要什么样的作用域作为条件
 
@@ -194,21 +229,6 @@ scope属性包含此Token由用户所授权的有效作用域。正常情况下�
     
 - X-OAuth-Scopes：此Token被授权的作用域列表
 - X-Accepted-OAuth-Scopes：API检查的作用域列表
-
-<table>
-	<tr>
-		<td>名称</td>
-		<td>描述</td>
-	</tr>
-	<tr>
-		<td>(no scope)</td>
-		<td>对公共数据仅有只读权限（包括公开的用户档案信息，机构信息等）</td>
-	</tr>
-	<tr>
-		<td>user</td>
-		<td>具有患者数据的读/写权限，包括：user:email</td>
-	</tr>
-</table>
 
 常见授权错误
 ---------------------
@@ -310,7 +330,7 @@ API列表
 
 若用户启用两阶段授权（未实现），你可能需要多做一些工作才能调用API。
 
-### 获取授权列表
+### 获取你的授权列表
 
 	GET /authorizations
 	
@@ -343,9 +363,9 @@ API列表
 	  }
 	]
 
-### 获取应用授权
+### 获取授权Token
 
-	GET /authorizations/:client_id
+	GET /authorizations/:id
 	
 **返回值**
 	
@@ -375,7 +395,8 @@ API列表
 
 ### 批量创建授权
 	
-若你的应用需要一次创建多个Token，那使用Web页面流程将变得非常冗长。相反，通用简易授权你就可以调用OAuth授权API一次创建多个Token。
+若你的应用需要一次创建多个Token，那使用Web页面流程将变得非常冗长。相反，通过简易授权你可以为你旗下的多个应用一次性创建多个Token。
+
 
 	POST /authorizations
 	
@@ -398,19 +419,19 @@ API列表
       <td>必选。对Token做备注以免你忘了这是要干嘛的。</td>
    </tr>
    <tr>
-      <td>note_url </td>
+      <td>note_url</td>
       <td>string </td>
       <td>使用URL提醒你这是哪个应用的Token</td>
    </tr>
    <tr>
       <td>client_id</td>
       <td>string </td>
-      <td>用于创建Token的Client ID</td>
+      <td>用于创建Token的Client ID，用分号分开。为空时，为你的所有应用创建Token，否则只为指定应用的创建Token</td>
    </tr>
    <tr>
       <td>client_secret </td>
       <td>string </td>
-      <td>用于创建Token的Client secret</td>
+      <td>用于创建Token的Client secret。与client_id相对应。</td>
    </tr>
 </table>
 

@@ -3,12 +3,13 @@ package com.yihu.ehr.authorization;
 import com.yihu.ehr.constants.ApiVersion;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 /**
- * OAuth2 认证控制器。
+ * OAuth2 认证控制器。此控制器基于用户名/密码认证，即Basic Authorization，需要在HTTP中提供用户名与密码。
  *
  * @author Sand
  * @version 1.0
@@ -19,24 +20,46 @@ import java.util.List;
 @Api(protocols = "https", value = "authorizations", description = "OAuth2授权服务")
 public class OAuth2Controller {
 
-    @ApiOperation(value = "", response = String.class)
-    @RequestMapping(value = "/authorizations", produces = "application/text", method = RequestMethod.POST)
-    public List<String> createAuthorization(@RequestParam(value = "json")
-                                            String json) {
+    @ApiOperation(value = "获取用户所有应用授权", response = String.class)
+    @RequestMapping(value = "", produces = "application/json", method = RequestMethod.GET)
+    public List<String> getAuthorizations() {
         return null;
     }
 
-    @ApiOperation(value = "/{client_id}", response = String.class)
-    @RequestMapping(value = "/{client_id}", produces = "application/text", method = RequestMethod.GET)
-    public List<String> getAuthorizations(@PathVariable("client_id")
-                                          String clientId) {
+    @ApiOperation(value = "获取单个授权", response = String.class)
+    @RequestMapping(value = "/{token_id}", produces = "application/json", method = RequestMethod.GET)
+    public List<String> getAuthorization(@ApiParam(value = "token_id")
+                                         @PathVariable("token_id") long tokenId) {
         return null;
     }
 
-    @ApiOperation(value = "", response = String.class)
-    @RequestMapping(value = "/{client_id}", produces = "application/text", method = RequestMethod.GET)
-    public List<String> getAuthorization(@PathVariable("client_id")
-                                         String clientId) {
+    @ApiOperation(value = "更新授权", response = String.class)
+    @RequestMapping(value = "/{token_id}", produces = "application/json", method = RequestMethod.PUT)
+    public List<String> updateAuthorization(@ApiParam(value = "token_id")
+                                            @PathVariable(value = "token_id") long id,
+                                            @ApiParam(value = "json")
+                                            @RequestParam("json") String json) {
+        return null;
+    }
+
+    @ApiOperation(value = "删除授权", response = String.class)
+    @RequestMapping(value = "/{token_id}", produces = "application/json", method = RequestMethod.DELETE)
+    public void deleteAuthorization(@ApiParam(value = "token_id")
+                                    @PathVariable(value = "token_id") long id) {
+
+    }
+
+    @ApiOperation(value = "为用户的多个应用创建授权", response = String.class)
+    @RequestMapping(value = "", produces = "application/json", method = RequestMethod.POST)
+    public List<String> createAuthorizations(@ApiParam(value = "json")
+                                             @RequestParam(value = "json") String json) {
+        return null;
+    }
+
+    @ApiOperation(value = "为指定应用创建授权", response = String.class)
+    @RequestMapping(value = "/clients/{client_id}", produces = "application/json", method = RequestMethod.PUT)
+    public List<String> createAuthorization(@ApiParam(value = "json")
+                                            @RequestParam("json") String json) {
         return null;
     }
 

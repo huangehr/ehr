@@ -1,22 +1,15 @@
-package com.yihu.ehr.profiles;
+package com.yihu.ehr.patient;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 健康档案接口。
@@ -26,21 +19,11 @@ import java.util.Map;
  * @created 2015.08.05 11:06
  */
 @RestController
-@RequestMapping(ApiVersion.Version1_0 + "/patient/profiles")
-@Api(protocols = "https", value = "profiles", description = "健康档案服务")
-public class ProfilesController {
+@RequestMapping(ApiVersion.Version1_0 + "/patient/health_profiles")
+@Api(protocols = "https", value = "health_profiles", description = "健康档案服务")
+public class HealthProfilesController {
     @Autowired
     ObjectMapper objectMapper;
-
-    @ApiIgnore
-    @RequestMapping(value="", produces = "application/json", method = RequestMethod.GET)
-    public ResponseEntity<String> help() throws JsonProcessingException {
-        Map<String, String> map = new HashMap<>();
-        map.put("message", "需要认证");
-        map.put("document_url", "www.baidu.com");
-
-        return new ResponseEntity<>(objectMapper.writeValueAsString(map), HttpStatus.OK);
-    }
 
     @RequestMapping(value = "/{demographic_id}", method = RequestMethod.GET)
     @ApiOperation(value = "获取档案列表", produces = "application/json", notes = "获取档案列表")

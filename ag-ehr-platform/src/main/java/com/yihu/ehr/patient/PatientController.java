@@ -7,6 +7,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,7 +16,7 @@ import java.io.IOException;
 import java.text.ParseException;
 
 /**
- * 病人注册接口。
+ * 患者注册接口。患者注册之后，若在平台上设置密码将成为平台的用户，若需要访问与用户相关的数据，请调用users接口。
  *
  * @author Sand
  * @version 1.0
@@ -27,22 +29,21 @@ public class PatientController {
     @Autowired
     ObjectMapper objectMapper;
 
-    //@Autowired
     private DemographicIndexClient demographicIndex;
 
     protected boolean isPatientRegistered(String demographicId) {
         return demographicIndex.isRegistered(demographicId);
     }
 
-    @RequestMapping(value = "/registration", method = {RequestMethod.GET})
-    @ApiOperation(value = "判断病人是否已注册", response = boolean.class, produces = "application/json", notes = "根据病人的身份证号判断病人是否已在健康档案平台中注册")
-    public boolean isRegistered(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable(value = "api_version") String apiVersion,
-            @ApiParam(name = "demographic_id", value = "用户名")
-            @RequestParam(value = "demographic_id", required = true) String demographicId) {
+    @RequestMapping(value = "/{demographic_id}", method = {RequestMethod.GET})
+    @ApiOperation(value = "判断病人是否已注册", response = boolean.class, produces = "application/json", notes = "使用身份证号判断患者是否已在健康档案平台中注册")
+    public ResponseEntity<String> getPatient(@ApiParam(name = "demographic_id", value = "用户名")
+                                             @PathVariable(value = "demographic_id") String demographicId) {
+        if (isPatientRegistered(demographicId)) {
+            return null;
+        }
 
-        return isPatientRegistered(demographicId);
+        return new ResponseEntity<String>("", HttpStatus.NOT_FOUND);
     }
 
     /**
@@ -92,15 +93,16 @@ public class PatientController {
      * <p>
      * 病人注册信息
      */
-    @ApiOperation(value = "注册病人", response = boolean.class, produces = "application/json", notes = "根据病人的身份证号及其他病人信息在健康档案平台中注册病人")
-    @RequestMapping(value = "/registration", method = {RequestMethod.POST})
-    public boolean patientRegister(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable(value = "api_version") String apiVersion,
-            @ApiParam(name = "user_info", value = "用户名")
-            @RequestParam(value = "user_info", required = true) String userInfo,
-            HttpServletRequest request) throws IOException, ParseException {
-        return false;
+    @ApiOperation(value = "注册", response = boolean.class, produces = "application/json", notes = "根据病人的身份证号及其他病人信息在健康档案平台中注册病人")
+    @RequestMapping(value = "", method = {RequestMethod.POST})
+    public String registerPatient(@ApiParam(name = "json", value = "患者人口学数据集")
+                                  @RequestParam(value = "json", required = true) String patientInfo) throws IOException, ParseException {
+        String demographicId = null;
+        if (isPatientRegistered(demographicId)) {
+            return null;
+        }
+
+        return "";
     }
 }
 
