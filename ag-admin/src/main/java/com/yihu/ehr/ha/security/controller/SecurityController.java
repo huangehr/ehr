@@ -1,8 +1,11 @@
 package com.yihu.ehr.ha.security.controller;
 
+import com.sun.xml.internal.messaging.saaj.soap.Envelope;
+import com.yihu.ehr.agModel.security.UserSecurityModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.security.service.SecurityClient;
 import com.yihu.ehr.model.security.MUserSecurity;
+import com.yihu.ehr.util.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -20,25 +23,51 @@ import org.springframework.web.bind.annotation.*;
 public class SecurityController {
 
     @Autowired
-    private static SecurityClient securityClient;
+    private SecurityClient securityClient;
 
 
     @RequestMapping(value = "/securities/{login_code}", method = RequestMethod.GET)
     @ApiOperation(value = "获取用户公钥" , notes = "用户在平台注册时，会分配一个公钥，此公钥用于与健康档案平台加密传输数据使用")
-    public MUserSecurity getUserSecurityByLoginCode(
+    public Envelop getUserSecurityByLoginCode(
             @ApiParam(name = "login_code", value = "用户名")
             @PathVariable(value = "login_code") String loginCode) throws Exception {
-       return securityClient.getUserSecurityByLoginCode(loginCode);
+
+        Envelop envelop = new Envelop();
+
+        MUserSecurity mUserSecurity = securityClient.getUserSecurityByLoginCode(loginCode);
+
+        if(mUserSecurity != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(mUserSecurity);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("获取用户公钥失败");
+        }
+
+       return envelop;
     }
 
 
 
     @RequestMapping(value = "/securities/{org_code}", method = RequestMethod.GET)
     @ApiOperation(value = "获取企业公钥", produces = "application/json", notes = "企业公钥，用于与健康档案平台之间传输数据的加密。")
-    public MUserSecurity getUserSecurityByOrgCode(
+    public Envelop getUserSecurityByOrgCode(
             @ApiParam(name = "org_code", value = "机构代码")
             @PathVariable(value = "org_code") String orgCode) {
-        return securityClient.getUserSecurityByOrgCode(orgCode);
+
+        Envelop envelop = new Envelop();
+
+        MUserSecurity mUserSecurity = securityClient.getUserSecurityByOrgCode(orgCode);
+
+        if(mUserSecurity != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(mUserSecurity);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("获取企业公钥失败");
+        }
+
+        return envelop;
     }
 
     /**
@@ -60,7 +89,7 @@ public class SecurityController {
      */
     @RequestMapping(value = "/tokens", method = RequestMethod.GET)
     @ApiOperation(value = "获取用户登录用的临时会话Token",produces = "application/json", notes = "此Token用于客户与平台之间的会话，时效性时差为20分钟")
-    public Object getUserToken(
+    public Envelop getUserToken(
             @ApiParam(required = true, name = "user_name", value = "用户名")
             @RequestParam(value = "user_name", required = true) String userName,
             @ApiParam(required = true, name = "rsa_pw", value = "用户密码，以RSA加密")
@@ -70,7 +99,19 @@ public class SecurityController {
             @ApiParam(required = true, name = "app_secret", value = "APP 密码")
             @RequestParam(value = "app_secret", required = true) String appSecret) throws Exception {
 
-        return securityClient.getUserToken(userName,rsaPWD,appId,appSecret);
+        Envelop envelop = new Envelop();
+
+        UserSecurityModel userSecurityModel = (UserSecurityModel) securityClient.getUserToken(userName,rsaPWD,appId,appSecret);
+
+        if(userSecurityModel != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(userSecurityModel);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("用户登录临时会话Token获取失败");
+        }
+
+        return envelop;
     }
 
     /**
@@ -84,7 +125,7 @@ public class SecurityController {
      */
     @RequestMapping(value = "/tokens/{user_id}/{refresh_token}/{app_id}", method = RequestMethod.PUT)
     @ApiOperation(value = "刷新用户临时会话Token" , notes = "若用户的会话Token已失效，调用此方法刷新。")
-    public Object refreshToken(
+    public Envelop refreshToken(
             @ApiParam(required = true, name = "user_id", value = "用户名")
             @PathVariable(value = "user_id") String userId,
             @ApiParam(required = true, name = "refresh_token", value = "已过期的Token")
@@ -92,7 +133,19 @@ public class SecurityController {
             @ApiParam(required = true, name = "app_id", value = "App Id")
             @PathVariable(value = "app_id") String appId) throws Exception {
 
-        return securityClient.refreshToken(userId,refreshToken,appId);
+        Envelop envelop = new Envelop();
+
+        UserSecurityModel userSecurityModel = (UserSecurityModel)securityClient.refreshToken(userId,refreshToken,appId);
+
+        if(userSecurityModel != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(userSecurityModel);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("刷新用户临时会话Token失败");
+        }
+
+        return envelop;
     }
 
     /**
@@ -104,10 +157,21 @@ public class SecurityController {
      */
     @RequestMapping(value = "/tokens/{access_token}", method = RequestMethod.DELETE)
     @ApiOperation(value = "作废临时会话Token", notes = "用户或App要退出时，调用此方法作废临时会话Token。")
-    public boolean revokeToken(
+    public Envelop revokeToken(
             @ApiParam(required = true, name = "access_token", value = "要作废的会话Token")
             @PathVariable(value = "access_token") String accessToken) throws Exception {
-        return securityClient.revokeToken(accessToken);
+
+        Envelop envelop = new Envelop();
+
+        Boolean bo = securityClient.revokeToken(accessToken);
+
+        envelop.setSuccessFlg(true);
+        if(!bo){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("作废临时会话Token失败");
+        }
+
+        return envelop;
     }
 
     /**
@@ -119,10 +183,23 @@ public class SecurityController {
 
     @RequestMapping(value = "/securities/{org_code}", method = RequestMethod.POST)
     @ApiOperation(value = "根据orgCode创建security")
-    public MUserSecurity createSecurityByOrgCode(
+    public Envelop createSecurityByOrgCode(
             @ApiParam(name = "org_code", value = "机构代码")
             @PathVariable( value = "org_code") String orgCode) throws Exception {
-        return securityClient.createSecurityByOrgCode(orgCode);
+
+        Envelop envelop = new Envelop();
+
+        MUserSecurity mUserSecurity = securityClient.createSecurityByOrgCode(orgCode);
+
+        if(mUserSecurity != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(mUserSecurity);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("创建机构security失败");
+        }
+
+        return envelop;
     }
 
     /**
@@ -134,10 +211,23 @@ public class SecurityController {
 
     @RequestMapping(value = "/user_keys/{org_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据orgCode创建security")
-    public Object getUserKeyIdByOrgCd(
+    public Envelop getUserKeyIdByOrgCd(
             @ApiParam(name = "org_code", value = "机构代码")
             @PathVariable( value = "org_code") String orgCode) throws Exception {
-        return securityClient.getUserKeyIdByOrgCd(orgCode);
+
+        Envelop envelop = new Envelop();
+
+        UserSecurityModel userSecurityModel = (UserSecurityModel)securityClient.getUserKeyIdByOrgCd(orgCode);
+
+        if(userSecurityModel != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(userSecurityModel);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("创建机构security失败");
+        }
+
+        return envelop;
     }
 
     /**
@@ -146,10 +236,21 @@ public class SecurityController {
      */
     @RequestMapping(value = "securities/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除security")
-    public boolean deleteSecurity(
+    public Envelop deleteSecurity(
             @ApiParam(name = "id", value = "security代码")
             @PathVariable( value = "id") String id) {
-        return securityClient.deleteSecurity(id);
+
+        Envelop envelop = new Envelop();
+
+        Boolean bo = securityClient.deleteSecurity(id);
+
+        envelop.setSuccessFlg(true);
+        if(!bo){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("security删除失败");
+        }
+
+        return envelop;
     }
 
     /**
@@ -158,10 +259,20 @@ public class SecurityController {
      */
     @RequestMapping(value = "/user_keys/{user_key_id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除userKey" )
-    public boolean deleteUserKey(
+    public Envelop deleteUserKey(
             @ApiParam(name = "user_key_id", value = "userKey代码")
             @PathVariable( value = "user_key_id") String userKeyId) {
-        return securityClient.deleteUserKey(userKeyId);
+
+        Envelop envelop = new Envelop();
+
+        Boolean bo = securityClient.deleteUserKey(userKeyId);
+
+        envelop.setSuccessFlg(true);
+        if(!bo){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("security删除失败");
+        }
+        return envelop;
     }
 
     /**
@@ -170,10 +281,23 @@ public class SecurityController {
      */
     @RequestMapping(value = "/securities/user/{login_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据loginCode获取Security" )
-    public MUserSecurity getUserSecurityByUserName(
+    public Envelop getUserSecurityByUserName(
             @ApiParam(name = "login_code", value = "用户登录代码")
             @PathVariable( value = "login_code") String loginCode) throws Exception{
-        return securityClient.getUserSecurityByUserName(loginCode);
+
+        Envelop envelop = new Envelop();
+
+        MUserSecurity mUserSecurity = securityClient.getUserSecurityByUserName(loginCode);
+
+        if(mUserSecurity != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(mUserSecurity);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("获取Security失败");
+        }
+
+        return envelop;
     }
 
     /**
@@ -184,10 +308,23 @@ public class SecurityController {
      */
     @RequestMapping(value = "/securities/{user_id}", method = RequestMethod.POST)
     @ApiOperation(value = "根据userId创建Security" )
-    public MUserSecurity createSecurityByUserId(
+    public Envelop createSecurityByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
             @PathVariable( value = "user_id") String userId) throws Exception {
-        return securityClient.createSecurityByUserId(userId);
+
+        Envelop envelop = new Envelop();
+
+        MUserSecurity mUserSecurity = securityClient.createSecurityByUserId(userId);
+
+        if(mUserSecurity != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(mUserSecurity);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("创建Security失败");
+        }
+
+        return envelop;
     }
 
 
@@ -198,10 +335,23 @@ public class SecurityController {
      */
     @RequestMapping(value = "/user_keys/{user_id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据userId获取user_key" )
-    public Object getUserKeyByUserId(
+    public Envelop getUserKeyByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
             @PathVariable( value = "user_id") String userId) {
-        return securityClient.getUserKeyByUserId(userId);
+
+        Envelop envelop = new Envelop();
+
+        UserSecurityModel userSecurityModel = (UserSecurityModel)securityClient.getUserKeyByUserId(userId);
+
+        if(userSecurityModel != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(userSecurityModel);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("获取user_key失败");
+        }
+
+        return envelop;
     }
 
 
@@ -212,9 +362,22 @@ public class SecurityController {
      */
     @RequestMapping(value = "/securities/{user_id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据userId获取UserSecurity" )
-    public MUserSecurity getUserSecurityByUserId(
+    public Envelop getUserSecurityByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
             @PathVariable( value = "user_id") String userId) {
-        return securityClient.getUserSecurityByUserId(userId);
+
+        Envelop envelop = new Envelop();
+
+        MUserSecurity mUserSecurity = securityClient.getUserSecurityByUserId(userId);
+
+        if(mUserSecurity != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(mUserSecurity);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("获取UserSecurity失败");
+        }
+
+        return envelop;
     }
 }

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface SecurityClient {
 
 
-    @RequestMapping(value = "/rest/v1.0/securities/{login_code}", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/v1.0/securities/{login_code}", method = RequestMethod.GET)
     @ApiOperation(value = "获取用户公钥" , notes = "用户在平台注册时，会分配一个公钥，此公钥用于与健康档案平台加密传输数据使用")
     MUserSecurity getUserSecurityByLoginCode(
             @ApiParam(name = "login_code", value = "用户名")
@@ -24,13 +24,13 @@ public interface SecurityClient {
 
 
 
-    @RequestMapping(value = "/rest/v1.0/securities/{org_code}", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/v1.0/securities/{org_code}", method = RequestMethod.GET)
     @ApiOperation(value = "获取企业公钥", produces = "application/json", notes = "企业公钥，用于与健康档案平台之间传输数据的加密。")
     MUserSecurity getUserSecurityByOrgCode(
             @ApiParam(name = "org_code", value = "机构代码")
             @PathVariable(value = "org_code") String orgCode);
 
-    @RequestMapping(value = "/rest/v1.0/tokens", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/v1.0/tokens", method = RequestMethod.GET)
     @ApiOperation(value = "获取用户登录用的临时会话Token",produces = "application/json", notes = "此Token用于客户与平台之间的会话，时效性时差为20分钟")
     Object getUserToken(
             @ApiParam(required = true, name = "user_name", value = "用户名")
@@ -51,7 +51,7 @@ public interface SecurityClient {
      * "app_id" :"AnG4G4zIz1"
      * }
      */
-    @RequestMapping(value = "/rest/v1.0/tokens/{user_id}/{refresh_token}/{app_id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/api/v1.0/tokens/{user_id}/{refresh_token}/{app_id}", method = RequestMethod.PUT)
     @ApiOperation(value = "刷新用户临时会话Token" , notes = "若用户的会话Token已失效，调用此方法刷新。")
     Object refreshToken(
             @ApiParam(required = true, name = "user_id", value = "用户名")
@@ -68,7 +68,7 @@ public interface SecurityClient {
      * "access_token": "f67b9646bcdaa60c647dfe7bc26231293847"
      * }
      */
-    @RequestMapping(value = "/rest/v1.0/tokens/{access_token}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/api/v1.0/tokens/{access_token}", method = RequestMethod.DELETE)
     @ApiOperation(value = "作废临时会话Token", notes = "用户或App要退出时，调用此方法作废临时会话Token。")
     boolean revokeToken(
             @ApiParam(required = true, name = "access_token", value = "要作废的会话Token")
@@ -81,7 +81,7 @@ public interface SecurityClient {
      * @throws Exception
      */
 
-    @RequestMapping(value = "/rest/v1.0/securities/{org_code}", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/v1.0/securities/{org_code}", method = RequestMethod.POST)
     @ApiOperation(value = "根据orgCode创建security")
     MUserSecurity createSecurityByOrgCode(
             @ApiParam(name = "org_code", value = "机构代码")
@@ -94,7 +94,7 @@ public interface SecurityClient {
      * @throws Exception
      */
 
-    @RequestMapping(value = "/rest/v1.0/user_keys/{org_code}", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/v1.0/user_keys/{org_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据orgCode创建security")
     Object getUserKeyIdByOrgCd(
             @ApiParam(name = "org_code", value = "机构代码")
@@ -104,7 +104,7 @@ public interface SecurityClient {
      * 根据id删除security
      * @param id
      */
-    @RequestMapping(value = "/rest/v1.0/securities/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/api/v1.0/securities/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除security")
     boolean deleteSecurity(
             @ApiParam(name = "id", value = "security代码")
@@ -114,7 +114,7 @@ public interface SecurityClient {
      * UserKey
      * @param userKeyId
      */
-    @RequestMapping(value = "/rest/v1.0/user_keys/{user_key_id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/api/v1.0/user_keys/{user_key_id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除userKey" )
     boolean deleteUserKey(
             @ApiParam(name = "user_key_id", value = "userKey代码")
@@ -124,7 +124,7 @@ public interface SecurityClient {
      * 根据loginCode删除Security
      * @param loginCode
      */
-    @RequestMapping(value = "/rest/v1.0/securities/user/{login_code}", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/v1.0/securities/user/{login_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据loginCode获取Security" )
     MUserSecurity getUserSecurityByUserName(
             @ApiParam(name = "login_code", value = "用户登录代码")
@@ -136,7 +136,7 @@ public interface SecurityClient {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/rest/v1.0/securities/{user_id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/v1.0/securities/user/{user_id}", method = RequestMethod.POST)
     @ApiOperation(value = "根据userId创建Security" )
     MUserSecurity createSecurityByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
@@ -148,7 +148,7 @@ public interface SecurityClient {
      * @param userId
      * @return
      */
-    @RequestMapping(value = "/rest/v1.0/user_keys/{user_id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/v1.0/user_keys/{user_id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据userId获取user_key" )
     Object getUserKeyByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
@@ -160,7 +160,7 @@ public interface SecurityClient {
      * @param userId
      * @return
      */
-    @RequestMapping(value = "/rest/v1.0/securities/{user_id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/v1.0/securities/{user_id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据userId获取UserSecurity" )
     MUserSecurity getUserSecurityByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
