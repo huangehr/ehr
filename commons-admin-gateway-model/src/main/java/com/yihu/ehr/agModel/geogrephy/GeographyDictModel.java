@@ -1,6 +1,4 @@
-package com.yihu.ehr.model.geogrephy.UIModels;
-
-import java.util.UUID;
+package com.yihu.ehr.agModel.geogrephy;
 
 /**
  * Created by AndyCai on 2016/2/16.

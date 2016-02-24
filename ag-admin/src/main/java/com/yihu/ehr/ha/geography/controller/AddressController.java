@@ -4,7 +4,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.geography.service.AddressClient;
 import com.yihu.ehr.model.geogrephy.MGeography;
 import com.yihu.ehr.model.geogrephy.MGeographyDict;
-import com.yihu.ehr.model.geogrephy.UIModels.GeographyDictModel;
+import com.yihu.ehr.agModel.geogrephy.GeographyDictModel;
 import com.yihu.ehr.util.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

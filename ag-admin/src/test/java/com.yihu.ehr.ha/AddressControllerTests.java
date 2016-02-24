@@ -1,10 +1,9 @@
 package com.yihu.ehr.ha;
 
-import com.eureka2.shading.codehaus.jackson.JsonGenerationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.ha.geography.controller.AddressController;
 import com.yihu.ehr.model.geogrephy.MGeography;
-import com.yihu.ehr.model.geogrephy.UIModels.GeographyDictModel;
+import com.yihu.ehr.agModel.geogrephy.GeographyDictModel;
 import com.yihu.ehr.util.Envelop;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -15,9 +14,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.io.IOException;
-import java.util.UUID;
 
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
