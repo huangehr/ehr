@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
  * Created by AndyCai on 2016/2/1.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersion.Version1_0 )
+@RequestMapping(ApiVersion.Version1_0+"/admin" )
 @RestController
 @Api(value = "sec", description = "安全管理接口，用于安全验证管理", tags = {"安全管理接口"})
 public class SecurityController {

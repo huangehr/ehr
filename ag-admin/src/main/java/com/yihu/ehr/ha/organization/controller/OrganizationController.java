@@ -18,7 +18,7 @@ import java.util.Map;
  * Created by AndyCai on 2016/1/21.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersion.Version1_0)
+@RequestMapping(ApiVersion.Version1_0+"/admin")
 @RestController
 @Api(value = "organization", description = "机构信息管理接口，用于机构信息管理", tags = {"机构信息管理接口"})
 public class OrganizationController {

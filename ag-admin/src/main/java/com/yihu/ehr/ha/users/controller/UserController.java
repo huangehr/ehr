@@ -1,16 +1,15 @@
 package com.yihu.ehr.ha.users.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.agModel.user.UsersModel;
-import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.ha.organization.service.OrganizationClient;
 import com.yihu.ehr.ha.security.service.SecurityClient;
 import com.yihu.ehr.ha.users.service.UserClient;
+import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MUserSecurity;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.util.Envelop;
@@ -24,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +32,7 @@ import java.util.Map;
  * Created by AndyCai on 2016/1/21.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersion.Version1_0 )
+@RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
 @Api(value = "user", description = "用户管理接口，用于用户信息管理", tags = {"用户管理接口"})
 public class UserController extends BaseController {
@@ -55,8 +53,8 @@ public class UserController extends BaseController {
     private ObjectMapper objectMapper;
 
 
-    @RequestMapping(value = "/users" , method = RequestMethod.GET)
-    @ApiOperation(value = "获取用户列表",notes = "根据查询条件获取用户列表在前端表格展示")
+    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户列表", notes = "根据查询条件获取用户列表在前端表格展示")
     public Envelop searchUsers(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
@@ -67,44 +65,53 @@ public class UserController extends BaseController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletResponse response) {
+            @RequestParam(value = "page", required = false) int page) {
 
-        List<MUser> mUsers = userClient.searchUsers(fields,filters,sorts,size,page);
-        List<UsersModel> usersModels = new ArrayList<>();
-        SimpleDateFormat sdf =   new SimpleDateFormat( " yyyy-MM-dd HH:mm:ss " );
-        for(MUser mUser : mUsers)
+        if(StringUtils.isEmpty(fields))
         {
-            UsersModel usersModel = convertToModel(mUser,UsersModel.class);
+            fields = null;
+        }
+        List<MUser> mUsers = userClient.searchUsers(fields, filters, sorts, size, page);
+        List<UsersModel> usersModels = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss ");
+        for (MUser mUser : mUsers) {
+            UsersModel usersModel = convertToModel(mUser, UsersModel.class);
             //TODO:获取用户类别字典
             MConventionalDict dict = conventionalDictClient.getUserType(mUser.getUserType());
-            usersModel.setUserTypeName(dict==null?"":dict.getValue());
+            usersModel.setUserTypeName(dict == null ? "" : dict.getValue());
 
             //TODO:获取机构信息
             MOrganization organization = orgClient.getOrg(mUser.getOrganization());
-            usersModel.setOrganizationName(organization==null?"":organization.getFullName());
+            usersModel.setOrganizationName(organization == null ? "" : organization.getFullName());
 
             usersModels.add(usersModel);
         }
 
         //TODO:获取总条数
-        String count = response.getHeader(AgAdminConstants.ResourceCount);
-        int totalCount = StringUtils.isNotEmpty(count)?Integer.parseInt(count):0;
+//        String count = response.getHeader(AgAdminConstants.ResourceCount);
+//        int totalCount = StringUtils.isNotEmpty(count) ? Integer.parseInt(count) : 0;
 
-        Envelop envelop = getResult(usersModels,totalCount,page,size);
+        Envelop envelop = getResult(usersModels, 0, page, size);
         return envelop;
     }
 
-    @RequestMapping(value = "/users/{user_id}" , method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除用户",notes = "根据用户id删除用户")
+    @RequestMapping(value = "/users/{user_id}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除用户", notes = "根据用户id删除用户")
     public Envelop deleteUser(
             @ApiParam(name = "user_id", value = "用户编号", defaultValue = "")
-            @PathVariable(value = "user_id") String userId) throws Exception{
+            @PathVariable(value = "user_id") String userId) throws Exception {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
-        Object object = userClient.deleteUser(userId);
-        if(!object.toString().equals("true"))
-        {
+
+        MUserSecurity userSecurity = securityClient.getUserSecurityByUserId(userId);
+        if (userSecurity != null) {
+            String userKeyId = securityClient.getUserKeyByUserId(userId);
+            securityClient.deleteSecurity(userSecurity.getId());
+            securityClient.deleteUserKey(userKeyId);
+        }
+
+        boolean result = userClient.deleteUser(userId);
+        if (!result) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("删除失败!");
         }
@@ -112,59 +119,56 @@ public class UserController extends BaseController {
     }
 
 
-    @RequestMapping(value = "/users" , method = RequestMethod.POST)
-    @ApiOperation(value = "创建用户",notes = "重新绑定用户信息")
+    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    @ApiOperation(value = "创建用户", notes = "重新绑定用户信息")
     public Envelop createUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "user_json_data") String userJsonData) throws Exception{
+            @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
 
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
         UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
-        MUser  mUser = convertToModel(detailModel,MUser.class);
+        MUser mUser = convertToModel(detailModel, MUser.class);
         mUser = userClient.createUser(objectMapper.writeValueAsString(mUser));
-        if(mUser==null)
-        {
+        if (mUser == null) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("保存失败!");
         }
-        detailModel = convertToModel(mUser,UserDetailModel.class);
+        detailModel = convertToModel(mUser, UserDetailModel.class);
         envelop.setObj(detailModel);
         return envelop;
     }
 
 
-    @RequestMapping(value = "/users" , method = RequestMethod.PUT)
-    @ApiOperation(value = "修改用户",notes = "重新绑定用户信息")
+    @RequestMapping(value = "/users", method = RequestMethod.PUT)
+    @ApiOperation(value = "修改用户", notes = "重新绑定用户信息")
     public Envelop updateUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "user_json_data") String userJsonData) throws Exception{
+            @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
 
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
         UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
-        MUser  mUser = convertToModel(detailModel,MUser.class);
+        MUser mUser = convertToModel(detailModel, MUser.class);
         mUser = userClient.updateUser(objectMapper.writeValueAsString(mUser));
-        if(mUser==null)
-        {
+        if (mUser == null) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("保存失败!");
         }
-        detailModel = convertToModel(mUser,UserDetailModel.class);
+        detailModel = convertToModel(mUser, UserDetailModel.class);
         envelop.setObj(detailModel);
         return envelop;
     }
 
 
-    @RequestMapping(value = "users/{user_id}" , method = RequestMethod.GET)
-    @ApiOperation(value = "获取用户信息",notes = "包括地址信息等")
+    @RequestMapping(value = "users/{user_id}", method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户信息", notes = "包括地址信息等")
     public Envelop getUser(
             @ApiParam(name = "user_id", value = "", defaultValue = "")
             @PathVariable(value = "user_id") String userId) {
         Envelop envelop = new Envelop();
         MUser mUser = userClient.getUser(userId);
-        if(mUser==null)
-        {
+        if (mUser == null) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("用户信息获取失败!");
             return envelop;
@@ -179,49 +183,54 @@ public class UserController extends BaseController {
     }
 
 
-    @RequestMapping(value = "/users/{user_id}/{activity}" , method = RequestMethod.PUT)
-    @ApiOperation(value = "改变用户状态",notes = "根据用户状态改变当前用户状态")
-    public boolean  activityUser (
+    @RequestMapping(value = "/users/{user_id}", method = RequestMethod.PUT)
+    @ApiOperation(value = "改变用户状态", notes = "根据用户状态改变当前用户状态")
+    public boolean activityUser(
             @ApiParam(name = "user_id", value = "id", defaultValue = "")
             @PathVariable(value = "user_id") String userId,
             @ApiParam(name = "activity", value = "激活状态", defaultValue = "")
-            @PathVariable(value = "activity") boolean activity) throws Exception{
-        return userClient.activityUser(userId,activity);
+            @RequestParam(value = "activity") boolean activity) throws Exception {
+        return userClient.activityUser(userId, activity);
     }
 
 
-    @RequestMapping(value = "users/password/{user_id}" , method = RequestMethod.PUT)
-    @ApiOperation(value = "重设密码",notes = "用户忘记密码管理员帮助重新还原密码，初始密码123456")
+    @RequestMapping(value = "users/password/{user_id}", method = RequestMethod.PUT)
+    @ApiOperation(value = "重设密码", notes = "用户忘记密码管理员帮助重新还原密码，初始密码123456")
     public boolean resetPass(
             @ApiParam(name = "user_id", value = "id", defaultValue = "")
-            @PathVariable(value = "user_id") String userId) throws Exception{
+            @PathVariable(value = "user_id") String userId) throws Exception {
 
         return userClient.resetPass(userId);
     }
 
 
-    @RequestMapping(value = "/users/binding/{user_id}/{type}" , method = RequestMethod.DELETE)
-    @ApiOperation(value = "取消关联绑定",notes = "取消相关信息绑定")
-    public boolean unBinding (
+    @RequestMapping(value = "/users/binding/{user_id}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "取消关联绑定", notes = "取消相关信息绑定")
+    public boolean unBinding(
             @ApiParam(name = "user_id", value = "", defaultValue = "")
             @PathVariable(value = "user_id") String userId,
             @ApiParam(name = "type", value = "", defaultValue = "")
-            @PathVariable(value = "type") String type) {
+            @RequestParam(value = "type") String type) {
 
-        return userClient.unBinding(userId,type);
+        return userClient.unBinding(userId, type);
     }
 
     /**
      * 重新分配秘钥
+     *
      * @param loginCode 账号
      * @return map  key{publicKey:公钥；validTime：有效时间; startTime：生效时间}
      */
     @RequestMapping(value = "/users/users/key/{login_code}", method = RequestMethod.PUT)
-    @ApiOperation(value = "重新分配密钥",notes = "重新分配密钥")
+    @ApiOperation(value = "重新分配密钥", notes = "重新分配密钥")
     public Map<String, String> distributeKey(
             @ApiParam(name = "login_code", value = "登录帐号", defaultValue = "")
             @PathVariable(value = "login_code") String loginCode) {
-        return userClient.distributeKey(loginCode);
+        MUser mUser = userClient.getUserByLoginCode(loginCode);
+        if (mUser == null) {
+            return null;
+        }
+        return userClient.distributeKey(mUser.getId());
     }
 
 
@@ -231,17 +240,16 @@ public class UserController extends BaseController {
      * @param loginCode
      * @param psw
      */
-    @RequestMapping(value = "/users/verification/{login_code}/{psw}" , method = RequestMethod.GET)
-    @ApiOperation(value = "根据登陆用户名及密码验证用户",notes = "根据登陆用户名及密码验证用户")
+    @RequestMapping(value = "/users/verification/{login_code}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据登陆用户名及密码验证用户", notes = "根据登陆用户名及密码验证用户")
     public Envelop loginVerification(
             @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
             @PathVariable(value = "login_code") String loginCode,
             @ApiParam(name = "psw", value = "密码", defaultValue = "")
-            @PathVariable(value = "psw") String psw) {
+            @RequestParam(value = "psw") String psw) {
         Envelop envelop = new Envelop();
-        MUser mUser = userClient.loginVerification(loginCode,psw);
-        if(mUser==null)
-        {
+        MUser mUser = userClient.loginVerification(loginCode, psw);
+        if (mUser == null) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("用户信息获取失败!");
             return envelop;
@@ -254,21 +262,20 @@ public class UserController extends BaseController {
     }
 
     /**
-     *
      * 根据loginCode 获取user
+     *
      * @param loginCode
      * @return
      */
-    @RequestMapping(value = "/users/login/{login_code}" , method = RequestMethod.GET)
-    @ApiOperation(value = "根据登录账号获取当前用户",notes = "根据登陆用户名及密码验证用户")
+    @RequestMapping(value = "/users/login/{login_code}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据登录账号获取当前用户", notes = "根据登陆用户名及密码验证用户")
     public Envelop getUserByLoginCode(
             @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
             @PathVariable(value = "login_code") String loginCode) {
 
         Envelop envelop = new Envelop();
         MUser mUser = userClient.getUserByLoginCode(loginCode);
-        if(mUser==null)
-        {
+        if (mUser == null) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("用户信息获取失败!");
             return envelop;
@@ -282,32 +289,32 @@ public class UserController extends BaseController {
 
     /**
      * 将 MUser 转为 UserDetailModel
+     *
      * @param mUser
      * @return UserDetailModel
      */
-    public UserDetailModel MUserToUserDetailModel(MUser mUser)
-    {
+    public UserDetailModel MUserToUserDetailModel(MUser mUser) {
 
-        UserDetailModel detailModel = convertToModel(mUser,UserDetailModel.class);
+        UserDetailModel detailModel = convertToModel(mUser, UserDetailModel.class);
 
         //TODO:获取婚姻状态代码
         String marryCode = mUser.getMartialStatus();
         MConventionalDict dict = conventionalDictClient.getMartialStatus(marryCode);
-        detailModel.setMartialStatusName(dict==null?"":dict.getValue());
+        detailModel.setMartialStatusName(dict == null ? "" : dict.getValue());
 
         //TODO:获取用户类型
-        String userType =mUser.getUserType();
+        String userType = mUser.getUserType();
         dict = conventionalDictClient.getUserType(userType);
-        detailModel.setUserTypeName(dict==null?"":dict.getValue());
+        detailModel.setUserTypeName(dict == null ? "" : dict.getValue());
 
         //TODO:获取归属机构
-        String orgCode= mUser.getOrganization();
+        String orgCode = mUser.getOrganization();
         MOrganization orgModel = orgClient.getOrg(orgCode);
-        detailModel.setOrganizationName(orgModel==null?"":orgModel.getFullName());
+        detailModel.setOrganizationName(orgModel == null ? "" : orgModel.getFullName());
 
         //TODO:获取秘钥信息
         MUserSecurity userSecurity = securityClient.getUserSecurityByUserId(mUser.getId());
-        if(userSecurity!=null) {
+        if (userSecurity != null) {
             detailModel.setPublicKey(userSecurity.getPublicKey());
             String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT)
                     + "~" + DateUtil.toString(userSecurity.getExpiryDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT);

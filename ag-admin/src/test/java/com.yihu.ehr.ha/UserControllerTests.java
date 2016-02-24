@@ -75,12 +75,15 @@ public class UserControllerTests {
         int page = 1;
         int rows = 15;
 
-        envelop = userController.searchUsers(fields,filter,"",rows,page,null);
+        envelop = userController.searchUsers(fields,filter,"",rows,page);
         assertTrue("列表获取失败", envelop.isSuccessFlg() && envelop.getDetailModelList()!=null);
 
         boolean status = true;
         boolean object = userController.activityUser(id,status);
         assertTrue("激活失败", object);
+
+        envelop = userController.loginVerification(userModel.getLoginCode(),"123456");
+        assertTrue("登陆失败", envelop.isSuccessFlg() && envelop.getObj()!=null);
 
         object = userController.resetPass(id);
         assertTrue("密码重置失败", object);
@@ -90,8 +93,7 @@ public class UserControllerTests {
         object=userController.unBinding(id,bingType);
         assertTrue("解绑失败："+bingType, object);
 
-         envelop = userController.loginVerification(userModel.getLoginCode(), userModel.getPassword());
-        assertTrue("登陆失败", envelop.isSuccessFlg() && envelop.getObj()!=null);
-
+        envelop = userController.deleteUser(userModel.getId());
+        assertTrue("删除失败", envelop.isSuccessFlg());
     }
 }
