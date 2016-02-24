@@ -2,8 +2,8 @@ package com.yihu.ehr.ha.geography.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.geography.service.AddressClient;
-import com.yihu.ehr.agModel.geogrephy.MGeography;
-import com.yihu.ehr.agModel.geogrephy.MGeographyDict;
+import com.yihu.ehr.model.geogrephy.MGeography;
+import com.yihu.ehr.model.geogrephy.MGeographyDict;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

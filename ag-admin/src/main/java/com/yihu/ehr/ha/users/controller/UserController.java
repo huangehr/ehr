@@ -1,8 +1,8 @@
 package com.yihu.ehr.ha.users.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.agModel.dict.MConventionalDict;
-import com.yihu.ehr.agModel.org.MOrganization;
+import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.agModel.user.UsersModel;
 import com.yihu.ehr.constants.AgAdminConstants;

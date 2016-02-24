@@ -2,7 +2,7 @@ package com.yihu.ehr.ha.organization.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.organization.service.OrganizationClient;
-import com.yihu.ehr.agModel.org.MOrganization;
+import com.yihu.ehr.model.org.MOrganization;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
