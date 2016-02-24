@@ -1,4 +1,4 @@
-package com.yihu.ehr.model.org.UIModels;
+package com.yihu.ehr.agModel.org.UIModels;
 
 import java.util.HashSet;
 

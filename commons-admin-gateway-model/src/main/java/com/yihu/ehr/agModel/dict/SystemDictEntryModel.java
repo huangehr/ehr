@@ -1,4 +1,4 @@
-package com.yihu.ehr.model.dict.UIModels;
+package com.yihu.ehr.agModel.dict;
 
 /**
  * Created by wq on 2016/2/19.

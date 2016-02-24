@@ -1,4 +1,4 @@
-package com.yihu.ehr.model.patient.UIModels;
+package com.yihu.ehr.agModel.patient;
 
 /**
  * Created by AndyCai on 2016/2/22.
@@ -6,7 +6,7 @@ package com.yihu.ehr.model.patient.UIModels;
 public class PatientModel {
     private String idCardNo;
     private String name;
-    private String sex;
+    private String gender;
     private String telephone;
     private String address;
 
@@ -26,12 +26,12 @@ public class PatientModel {
         this.name = name;
     }
 
-    public String getSex() {
-        return sex;
+    public String getGender() {
+        return gender;
     }
 
-    public void setSex(String sex) {
-        this.sex = sex;
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public String getTelephone() {

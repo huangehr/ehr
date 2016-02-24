@@ -1,7 +1,7 @@
 package com.yihu.ehr.model.adaption;
 
 /**
- * ·½°¸×ÖµäÓ³Éä
+ * ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½Ó³ï¿½ï¿½
  * @author lincl
  * @version 1.0
  * @created 2016.2.3
@@ -12,35 +12,35 @@ public class MAdapterDict {
 	private Long adapterPlanId;
 
 	/**
-	 * ËùÊô±ê×¼×Öµä
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×¼ï¿½Öµï¿½
 	 */
 	private Long dictId;
 	private String dictCode;
 	private String dictName;
 
 	/**
-	 * ±ê×¼×ÖµäÏî
+	 * ï¿½ï¿½×¼ï¿½Öµï¿½ï¿½ï¿½
 	 */
 	private Long dictEntryId;
 	private String dictEntryCode;
 	private String dictEntryName;
 
 	/**
-	 * ËùÊô»ú¹¹×Öµä
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½
 	 */
 	private Long orgDictSeq;
 	private String orgDictCode;
 	private String orgDictName;
 
 	/**
-	 * »ú¹¹×ÖµäÏî
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½
 	 */
 	private Long orgDictEntrySeq;
 	private String orgDictEntryCode;
 	private String orgDictEntryName;
 
 	/**
-	 * ËµÃ÷
+	 * Ëµï¿½ï¿½
 	 */
 	private String description;
 

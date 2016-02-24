@@ -1,11 +1,11 @@
-package com.yihu.ehr.model.geogrephy;
+package com.yihu.ehr.agModel.geogrephy;
 
 /**
  * Created by AndyCai on 2016/2/16.
  */
-public class MGeographyDict {
+public class GeographyDictModel {
 
-    private int id;   //序号
+    private String id;   //序号
 
     private String abbreviation;    //简称
 
@@ -17,15 +17,15 @@ public class MGeographyDict {
 
     private String postCode;  //邮政编码
 
-    public MGeographyDict(){
-        //id  = Integer.parseInt(UUID.randomUUID().toString());
+    public GeographyDictModel(){
+
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
