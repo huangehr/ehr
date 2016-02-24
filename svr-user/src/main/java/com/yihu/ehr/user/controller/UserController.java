@@ -209,4 +209,13 @@ public class UserController extends BaseRestController {
         User user = userManager.getUserByLoginCode(loginCode);
         return convertToModel(user,MUser.class);
     }
+
+
+    @RequestMapping(value = "/dictionaries/existence/{login_code}" , method = RequestMethod.GET)
+    @ApiOperation(value = "根基dictId和code判断提交的字典项名称是否已经存在")
+    boolean isLoginCodeExists(
+            @ApiParam(name = "login_code", value = "login_code", defaultValue = "")
+            @PathVariable(value = "login_code") String loginCode){
+        return userManager.getUserByLoginCode(loginCode)!=null;
+    }
 }

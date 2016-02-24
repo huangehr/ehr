@@ -6,6 +6,7 @@ import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import springfox.documentation.annotations.ApiIgnore;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
@@ -14,6 +15,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  */
 @FeignClient(MicroServices.User)
 @RequestMapping(value = "/rest/v1.0")
+@ApiIgnore
 public interface UserClient {
 
     @RequestMapping(value = "users/{user_id}", method = GET )

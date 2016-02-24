@@ -1,33 +1,26 @@
 package com.yihu.ehr.security.controller;
 
-import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ApiVersionPrefix;
 import com.yihu.ehr.model.security.MUserSecurity;
-import com.yihu.ehr.model.user.MUser;
-import com.yihu.ehr.security.feign.AppClient;
-import com.yihu.ehr.security.feign.UserClient;
 import com.yihu.ehr.security.service.SecurityManager;
-import com.yihu.ehr.security.service.TokenManager;
 import com.yihu.ehr.security.service.UserSecurity;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(ApiVersion.Version1_0)
+@RequestMapping(ApiVersionPrefix.Version1_0)
 @Api(protocols = "https", value = "security", description = "安全管理接口", tags = {"用户", "企业", "应用", "安全"})
 public class SecurityRestController extends BaseRestController {
 
     @Autowired
     private SecurityManager securityManager;
-    @Autowired
-    private UserClient userClient;
-    @Autowired
-    private TokenManager tokenManager;
-    @Autowired
-    private AppClient appClient;
 
 
     @RequestMapping(value = "/securities/login/{login_code}", method = RequestMethod.GET)

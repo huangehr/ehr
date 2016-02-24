@@ -20,15 +20,13 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @Api(protocols = "https", value = "dict", hidden = true , description = "获取常用字典项", tags = {"惯用字典"})
 public interface ConventionalDictClient {
 
+    @ApiIgnore
     @RequestMapping(value = "/dictionaries/org_type", method = GET )
-    @ApiOperation(value = "根据前端传回来的json创建一个人口信息")
-    MConventionalDict getOrgType(
-            @RequestParam(value = "code") String code);
+    MConventionalDict getOrgType(@RequestParam(value = "code") String code);
 
-
+    @ApiIgnore
     @RequestMapping(value = "/dictionaries/settled_way", method = GET )
-    MConventionalDict getSettledWay(
-            @RequestParam(value = "code") String code);
+    MConventionalDict getSettledWay(@RequestParam(value = "code") String code);
 
 
 

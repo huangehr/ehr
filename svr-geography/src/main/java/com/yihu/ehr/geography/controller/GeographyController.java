@@ -61,9 +61,18 @@ public class GeographyController extends BaseRestController{
             @RequestParam( value = "json_data") String jsonData) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
         Geography geography = objectMapper.readValue(jsonData, Geography.class);
-        geography.setId(getObjectId(BizObject.Geography));
-        String addressId = geographyService.saveAddress(geography);
-        return addressId;
+        if (geography.getCountry() == null) {
+            geography.setCountry("中国");
+        }
+        List<Geography> geographys = geographyService.isGeographyExist(geography);
+        if(geographys.size()==0){
+            geography.setId(getObjectId(BizObject.Geography));
+            String addressId = geographyService.saveAddress(geography);
+            return addressId;
+        }else {
+            return geographys.get(0).getId();
+        }
+
     }
 
 
