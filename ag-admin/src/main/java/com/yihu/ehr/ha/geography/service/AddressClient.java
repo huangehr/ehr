@@ -1,5 +1,6 @@
 package com.yihu.ehr.ha.geography.service;
 
+import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.geogrephy.MGeography;
 import com.yihu.ehr.model.geogrephy.MGeographyDict;
 import io.swagger.annotations.ApiOperation;
@@ -15,7 +16,7 @@ import java.util.List;
 /**
  * Created by AndyCai on 2016/1/20.
  */
-@FeignClient("svr-address")
+@FeignClient(MicroServices.Geography)
 public interface AddressClient {
 
     @RequestMapping(value = "/rest/v1.0/geographies/{level}", method = RequestMethod.GET)
@@ -62,15 +63,15 @@ public interface AddressClient {
      * @param district
      * @return
      */
-    @RequestMapping(value = "/rest/v1.0/geographies/{province}/{city}/{district}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/v1.0/geographies" , method = RequestMethod.GET)
     @ApiOperation(value = "根据省市县查询地址并返回地址编号列表")
     List<String> search(
             @ApiParam(name = "province", value = "省", defaultValue = "")
-            @PathVariable(value = "province") String province,
+            @RequestParam(value = "province") String province,
             @ApiParam(name = "city", value = "市", defaultValue = "")
-            @PathVariable(value = "city") String city,
+            @RequestParam(value = "city") String city,
             @ApiParam(name = "district", value = "县", defaultValue = "")
-            @PathVariable(value = "district") String district) ;
+            @RequestParam(value = "district") String district) ;
 
     /**
      * 删除地址
@@ -87,6 +88,6 @@ public interface AddressClient {
     @RequestMapping(value = "/rest/v1.0/geographies/existence" , method = RequestMethod.GET)
     @ApiOperation(value = "判断是否是个地址")
     boolean isNullAddress(
-            @ApiParam(name = "geography_model_json_data", value = "地址json字符串")
-            @RequestParam( value = "geography_model_json_data") String geographyModelJsonData) ;
+            @ApiParam(name = "json_data", value = "地址json字符串")
+            @RequestParam( value = "json_data") String jsonData) ;
 }
