@@ -1,5 +1,6 @@
 package com.yihu.ehr.ha.apps.service;
 
+import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.app.MApp;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -14,10 +15,10 @@ import java.util.Collection;
 /**
  * Created by AndyCai on 2016/1/19.
  */
-@FeignClient("svr-app")
+@FeignClient(MicroServices.AppMgr)
 public interface AppClient {
 
-    @RequestMapping(value = "/rest/v1.0/apps", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/v1.0/apps", method = RequestMethod.GET)
     @ApiOperation(value = "获取App列表")
     Collection<MApp> getApps(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -36,31 +37,31 @@ public interface AppClient {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/rest/v1.0/apps", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/v1.0/apps", method = RequestMethod.POST)
     @ApiOperation(value = "创建App")
     MApp createApp(
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true, defaultValue = "{\"name\": \"\", \"url\": \"\", \"catalog\": \"\", \"description\": \"\", \"creator\":\"\"}")
             @RequestParam(value = "app", required = false) String appJson);
 
-    @RequestMapping(value = "/rest/v1.0/apps/{app_id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/v1.0/apps/{app_id}", method = RequestMethod.GET)
     @ApiOperation(value = "获取App")
     MApp getApp(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
             @PathVariable(value = "app_id") String appId);
 
-    @RequestMapping(value = "/rest/v1.0/apps", method = RequestMethod.PUT)
+    @RequestMapping(value = "/api/v1.0/apps", method = RequestMethod.PUT)
     @ApiOperation(value = "更新App")
     MApp updateApp(
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true)
             @RequestParam(value = "app", required = false) String appJson);
 
-    @RequestMapping(value = "/rest/v1.0/apps/{app_id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/api/v1.0/apps/{app_id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除app")
     void deleteApp(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
             @PathVariable(value = "app_id") String appId);
 
-    @RequestMapping(value = "/rest/v1.0/apps/status",method = RequestMethod.PUT)
+    @RequestMapping(value = "/api/v1.0/apps/status",method = RequestMethod.PUT)
     @ApiOperation(value = "修改状态")
     boolean updateStatus(
             @ApiParam(name = "app_id",value = "id",defaultValue = "")
@@ -68,7 +69,7 @@ public interface AppClient {
             @ApiParam(name = "status",value = "状态",defaultValue = "")
             @RequestParam(value = "app_status") String appStatus);
 
-    @RequestMapping(value = "/rest/v1.0/apps/existence/{app_id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/api/v1.0/apps/existence/{app_id}",method = RequestMethod.GET)
     @ApiOperation(value = "验证")
     boolean isAppExistence(
             @ApiParam(name = "app_id",value = "id",defaultValue = "")

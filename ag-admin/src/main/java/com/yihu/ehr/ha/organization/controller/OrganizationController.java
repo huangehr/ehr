@@ -13,6 +13,7 @@ import com.yihu.ehr.model.geogrephy.MGeography;
 import com.yihu.ehr.agModel.org.OrgDetailModel;
 import com.yihu.ehr.model.security.MUserSecurity;
 import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.controller.BaseController;
 import com.yihu.ehr.util.operator.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -35,7 +36,7 @@ import java.util.Map;
 @RequestMapping(ApiVersion.Version1_0)
 @RestController
 @Api(value = "organization", description = "机构信息管理接口，用于机构信息管理", tags = {"机构信息管理接口"})
-public class OrganizationController {
+public class OrganizationController extends BaseController {
 
     @Autowired
     private OrganizationClient orgClient;
@@ -63,10 +64,8 @@ public class OrganizationController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page,
             HttpServletResponse response) throws Exception{
-        Envelop envelop = new Envelop();
         List<OrgModel> orgModelList = new ArrayList<>();
         List<MOrganization> organizations = orgClient.searchOrgs(fields,filters,sorts,size,page);
-        int i = 1;
         for(MOrganization org : organizations){
             OrgModel orgModel = new OrgModel();
             orgModel.setOrgCode(org.getOrgCode());
@@ -90,13 +89,12 @@ public class OrganizationController {
             orgModel.setActivityFlagName(activityFlag=="1"?"是":"否");
 
             orgModelList.add(orgModel);
-            i++;
         }
         //获取符合条件总条数
         String count = response.getHeader(AgAdminConstants.ResourceCount);
         int totalCount = StringUtils.isNotEmpty(count)?Integer.parseInt(count):0;
-        envelop.setTotalCount(totalCount);
-        return envelop;
+
+        return getResult(orgModelList,totalCount,page,size);
     }
 
 
@@ -162,7 +160,6 @@ public class OrganizationController {
         Envelop envelop = new Envelop();
         ObjectMapper objectMapper = new ObjectMapper();
         String locationId = addressClient.saveAddress(geographyModelJsonData);
-        //TODO 返回地址id非空
         MOrganization mOrganization = objectMapper.readValue(mOrganizationJsonData,MOrganization.class);
         mOrganization.setLocation(locationId);
         String mOrganizationJson = objectMapper.writeValueAsString(mOrganization);
