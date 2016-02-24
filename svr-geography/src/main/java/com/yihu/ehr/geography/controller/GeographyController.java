@@ -1,7 +1,7 @@
 package com.yihu.ehr.geography.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
@@ -23,7 +23,7 @@ import java.util.List;
  * @created 2015.08.10 17:57
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0)
+@RequestMapping(ApiVersion.Version1_0)
 @Api(protocols = "https", value = "Geography", description = "获取常用地址，根据选择地址判断数据库中是否存在，否则保存为新地址", tags = {"地址"})
 public class GeographyController extends BaseRestController{
 

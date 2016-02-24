@@ -4,7 +4,7 @@ package com.yihu.ehr.adaption.adapterorg.controller;
 import com.yihu.ehr.adaption.adapterorg.service.AdapterOrg;
 import com.yihu.ehr.adaption.adapterorg.service.AdapterOrgService;
 import com.yihu.ehr.adaption.commons.ExtendController;
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.adaption.MAdapterOrg;
@@ -28,7 +28,7 @@ import java.util.List;
  * @created 2016.2.3
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0 + "/adapter")
+@RequestMapping(ApiVersion.Version1_0 + "/adapter")
 @Api(protocols = "https", value = "adapterorg", description = "第三方标准管理接口", tags = {"第三方标准"})
 public class AdapterOrgController extends ExtendController<MAdapterOrg> {
     @Autowired

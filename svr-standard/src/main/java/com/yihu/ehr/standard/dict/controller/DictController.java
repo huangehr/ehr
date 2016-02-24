@@ -1,6 +1,6 @@
 package com.yihu.ehr.standard.dict.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.standard.MStdDict;
@@ -26,7 +26,7 @@ import java.util.List;
  * @created 2016.2.1
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0 + "/std/")
+@RequestMapping(ApiVersion.Version1_0 + "/std/")
 @Api(protocols = "https", value = "dict", description = "标准字典", tags = {"标准字典", "标准字典项"})
 public class DictController extends ExtendController<MStdDict> {
 

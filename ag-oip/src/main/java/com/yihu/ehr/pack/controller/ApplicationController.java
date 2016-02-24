@@ -1,6 +1,6 @@
 package com.yihu.ehr.pack.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
  * @created 2016.02.05 10:53
  */
 @RestController
-@RequestMapping(value = ApiVersionPrefix.Version1_0 + "/apps")
+@RequestMapping(value = ApiVersion.Version1_0 + "/apps")
 public class ApplicationController {
     @RequestMapping(value = "/{appId}", method = RequestMethod.POST)
     public String getToken(

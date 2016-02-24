@@ -1,6 +1,6 @@
 package com.yihu.ehr.ha.organization.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.organization.service.OrganizationClient;
 import com.yihu.ehr.agModel.org.MOrganization;
 import io.swagger.annotations.Api;
@@ -18,7 +18,7 @@ import java.util.Map;
  * Created by AndyCai on 2016/1/21.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersionPrefix.Version1_0)
+@RequestMapping(ApiVersion.Version1_0)
 @RestController
 @Api(value = "organization", description = "机构信息管理接口，用于机构信息管理", tags = {"机构信息管理接口"})
 public class OrganizationController {

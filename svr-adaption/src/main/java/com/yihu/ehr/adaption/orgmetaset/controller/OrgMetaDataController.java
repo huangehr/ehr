@@ -3,7 +3,7 @@ package com.yihu.ehr.adaption.orgmetaset.controller;
 import com.yihu.ehr.adaption.commons.ExtendController;
 import com.yihu.ehr.adaption.orgmetaset.service.OrgMetaData;
 import com.yihu.ehr.adaption.orgmetaset.service.OrgMetaDataService;
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.adaption.MOrgMetaData;
@@ -26,7 +26,7 @@ import java.util.List;
  * @created 2016.2.1
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0 + "/adapter/org")
+@RequestMapping(ApiVersion.Version1_0 + "/adapter/org")
 @Api(protocols = "https", value = "orgmetadata", description = "机构数据元", tags = {"机构数据元"})
 public class OrgMetaDataController extends ExtendController<MOrgMetaData> {
 

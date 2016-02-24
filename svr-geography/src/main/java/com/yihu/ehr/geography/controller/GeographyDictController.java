@@ -1,6 +1,6 @@
 package com.yihu.ehr.geography.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.geography.service.GeographyDict;
 import com.yihu.ehr.geography.service.GeographyDictService;
 import com.yihu.ehr.util.controller.BaseRestController;
@@ -19,7 +19,7 @@ import java.util.List;
  *
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0)
+@RequestMapping(ApiVersion.Version1_0)
 @Api(protocols = "https", value = "Geography-Dict", description = "行政区划地址", tags = {"行政区划地址"})
 public class GeographyDictController extends BaseRestController{
 

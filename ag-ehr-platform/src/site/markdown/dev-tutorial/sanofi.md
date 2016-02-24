@@ -27,7 +27,7 @@ API列表
 
 ### 提取体征数据
 
-	GET /profiles/search
+	GET /patient/profiles/search
 	
 **参数**
 

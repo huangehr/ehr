@@ -6,7 +6,7 @@ import com.yihu.ehr.adaption.commons.ExtendController;
 import com.yihu.ehr.adaption.dict.service.AdapterDict;
 import com.yihu.ehr.adaption.dict.service.AdapterDictModel;
 import com.yihu.ehr.adaption.dict.service.AdapterDictService;
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.adaption.MAdapterDict;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,7 +27,7 @@ import java.util.List;
  * @created 2016.2.1
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0 + "/adapter")
+@RequestMapping(ApiVersion.Version1_0 + "/adapter")
 @Api(protocols = "https", value = "adapterDict", description = "适配字典管理接口", tags = {"适配字典管理"})
 public class AdapterDictController extends ExtendController<MAdapterDict> {
 

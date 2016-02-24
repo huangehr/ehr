@@ -1,6 +1,6 @@
 package com.yihu.ehr.ha.geography.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.geography.service.AddressClient;
 import com.yihu.ehr.agModel.geogrephy.MGeography;
 import com.yihu.ehr.agModel.geogrephy.MGeographyDict;
@@ -17,7 +17,7 @@ import java.util.List;
  * Created by AndyCai on 2016/1/20.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersionPrefix.Version1_0)
+@RequestMapping(ApiVersion.Version1_0)
 @RestController
 @Api(value = "address", description = "地址信息管理接口，用于地址信息管理", tags = {"地址信息管理接口"})
 public class AddressController {

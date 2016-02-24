@@ -6,7 +6,7 @@ import com.yihu.ehr.agModel.org.MOrganization;
 import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.agModel.user.UsersModel;
 import com.yihu.ehr.constants.AgAdminConstants;
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.ha.organization.service.OrganizationClient;
 import com.yihu.ehr.ha.security.service.SecurityClient;
@@ -34,7 +34,7 @@ import java.util.Map;
  * Created by AndyCai on 2016/1/21.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersionPrefix.Version1_0 )
+@RequestMapping(ApiVersion.Version1_0 )
 @RestController
 @Api(value = "user", description = "用户管理接口，用于用户信息管理", tags = {"用户管理接口"})
 public class UserController extends BaseController {

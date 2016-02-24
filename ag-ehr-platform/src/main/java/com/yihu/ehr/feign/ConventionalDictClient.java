@@ -1,4 +1,4 @@
-package com.yihu.ehr.pack.feign;
+package com.yihu.ehr.feign;
 
 /**
  * @author Sand

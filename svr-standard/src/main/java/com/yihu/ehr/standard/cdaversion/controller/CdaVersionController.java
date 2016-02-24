@@ -1,6 +1,6 @@
 package com.yihu.ehr.standard.cdaversion.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.MCDAVersion;
 import com.yihu.ehr.standard.cdaversion.service.CDAVersion;
 import com.yihu.ehr.standard.cdaversion.service.CDAVersionService;
@@ -23,7 +23,7 @@ import java.util.List;
  * @created 2016.2.3
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0 + "/std")
+@RequestMapping(ApiVersion.Version1_0 + "/std")
 @Api(protocols = "https", value = "cdaVersion", description = "cda版本", tags = {"cda版本"})
 public class CdaVersionController extends ExtendController<MCDAVersion>{
 

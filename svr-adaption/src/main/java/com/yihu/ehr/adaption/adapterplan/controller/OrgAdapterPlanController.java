@@ -7,7 +7,7 @@ import com.yihu.ehr.adaption.commons.ExtendController;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSet;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSetService;
 import com.yihu.ehr.adaption.feignclient.DataSetClient;
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.adaption.MAdapterPlan;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,7 +27,7 @@ import java.util.*;
  * @created 2016.2.3
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0 + "/adapter")
+@RequestMapping(ApiVersion.Version1_0 + "/adapter")
 @Api(protocols = "https", value = "plan", description = "适配器管理接口", tags = {"适配器管理"})
 public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
     @Autowired

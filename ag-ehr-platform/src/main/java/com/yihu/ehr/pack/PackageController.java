@@ -1,28 +1,26 @@
-package com.yihu.ehr.pack.controller;
+package com.yihu.ehr.pack;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
-import com.yihu.ehr.pack.feign.JsonPackageClient;
-import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.feign.JsonPackageClient;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 /**
- * JSON 档案接收器。用于接收来自集成开放平台的健康档案包。
+ * 档案接收器。用于接收来自第三方应用的档案包。
  *
  * @author Sand
  * @version 1.0
  * @created 2015.09.17 14:22
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0 + "/json_package")
-@Api(protocols = "https", value = "json-package-receiver", description = "Json数据包归档接口", tags = {"JSON", "数据集", "健康档案"})
-public class JsonPackageReceiveController extends BaseRestController {
-    @Autowired
-    private JsonPackageClient jsonPackageClient;
+@RequestMapping(ApiVersion.Version1_0 + "/packages")
+@Api(protocols = "https", value = "packages", description = "数据包服务")
+public class PackageController {
+    //@Autowired
+    JsonPackageClient jsonPackageClient;
 
     /**
      * 归档病人档案-数据上传
