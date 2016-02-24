@@ -36,8 +36,8 @@ public class BaseRestController extends AbstractController {
     private final static String ResourceCount = "X-Total-Count";
     private final static String ResourceLink = "Link";
 
-    @Value("${admin.region}")
-    Short adminRegion = 3502;
+    @Value("${deploy.region}")
+    Short deployRegion = 3502;
     @Autowired
     protected EntityManager entityManager;
     @Autowired
@@ -58,9 +58,11 @@ public class BaseRestController extends AbstractController {
      * @return
      */
     public <T> T convertToModel(Object source, Class<T> targetCls, String... properties) {
+        if(source==null){
+            return null;
+        }
         T target = BeanUtils.instantiate(targetCls);
         BeanUtils.copyProperties(source, target, propertyDiffer(properties, targetCls));
-
         return target;
     }
 
@@ -83,6 +85,9 @@ public class BaseRestController extends AbstractController {
      * @return
      */
     public <T> Collection<T> convertToModels(Collection sources, Collection<T> targets, Class<T> targetCls, String properties) {
+        if(sources==null){
+            return null;
+        }
         Iterator iterator = sources.iterator();
         while (iterator.hasNext()) {
             Object source = iterator.next();
@@ -109,7 +114,6 @@ public class BaseRestController extends AbstractController {
 
         for (PropertyDescriptor targetPd : targetPds) {
             Method writeMethod = targetPd.getWriteMethod();
-
             if (writeMethod != null && !propertiesList.contains(targetPd.getName())) {
                 arrayList.add(targetPd.getName());
             }
@@ -191,6 +195,6 @@ public class BaseRestController extends AbstractController {
     }
 
     protected String getObjectId(BizObject bizObject){
-        return new ObjectId(adminRegion, bizObject).toString();
+        return new ObjectId(deployRegion, bizObject).toString();
     }
 }

@@ -18,18 +18,23 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
 @ApiIgnore
 public interface SecurityClient {
 
+    @ApiIgnore
     @RequestMapping(value = "/securities/org/{org_code}", method = POST, consumes = "application/json")
     MUserSecurity createSecurityByOrgCode(@PathVariable(value = "org_code") String orgCode);
 
+    @ApiIgnore
     @RequestMapping(value = "/securities/org/{org_code}", method = GET )
     MUserSecurity getUserSecurityByOrgCode(@PathVariable(value = "org_code") String orgCode);
 
+    @ApiIgnore
     @RequestMapping(value = "/securities/{id}", method = DELETE  )
     void deleteSecurity(@PathVariable(value = "id") String id);
 
+    @ApiIgnore
     @RequestMapping(value = "/user_keys/{user_key_id}", method = DELETE  )
     void deleteUserKey(@PathVariable(value = "user_key_id") String userKeyId);
 
+    @ApiIgnore
     @RequestMapping(value = "/user_keys/org/{org_code}", method = GET  )
     String getUserKeyIdByOrgCd(@PathVariable(value = "org_code") String orgCode);
 

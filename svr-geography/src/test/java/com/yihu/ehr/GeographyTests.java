@@ -17,8 +17,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SvrGeographyApplication.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-@Transactional(transactionManager="transactionManager")
-
+@Transactional
 public class GeographyTests {
 
     @Autowired

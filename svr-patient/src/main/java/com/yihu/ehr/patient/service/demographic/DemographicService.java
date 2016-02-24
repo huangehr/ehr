@@ -98,15 +98,24 @@ public class DemographicService {
         String province = (String) args.get("province");
         String city = (String) args.get("city");
         String district = (String) args.get("district");
-        List<String> homeAddressIdList = addressClient.search(province,city,district);
-        String hql = "from DemographicInfo where (name like :name or id like :idCardNo)";
+        String[] homeAddressIdList = addressClient.search(province,city,district);
+        String hql = "from DemographicInfo where 1=1";
+        if (!StringUtils.isEmpty(idCardNo)) {
+            hql += " and id like :idCardNo)";
+        }
+        if (!StringUtils.isEmpty(name)) {
+            hql += " and name like :name)";
+        }
         if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
             hql += " and homeAddress in (:homeAddressIdList)";
         }
         Query query = session.createQuery(hql);
-        query.setString("name", "%" + name + "%");
-        query.setString("idCardNo", "%" + idCardNo + "%");
-
+        if (!StringUtils.isEmpty(idCardNo)) {
+            query.setString("idCardNo", "%" + idCardNo + "%");
+        }
+        if (!StringUtils.isEmpty(name)) {
+            query.setString("name", "%" + name + "%");
+        }
         if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
             query.setParameterList("homeAddressIdList", homeAddressIdList);
         }
@@ -120,19 +129,30 @@ public class DemographicService {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         String name = (String) args.get("name");
         String idCardNo = (String) args.get("idCardNo");
+
         String province = (String) args.get("province");
         String city = (String) args.get("city");
         String district = (String) args.get("district");
-        List<String> addressIdList = addressClient.search(province,city,district);
-        String hql = "from DemographicInfo where (name like :name or id like :idCardNo)";
+        String[] homeAddressIdList = addressClient.search(province,city,district);
+        String hql = "from DemographicInfo where 1=1";
+        if (!StringUtils.isEmpty(idCardNo)) {
+            hql += " and id like :idCardNo)";
+        }
+        if (!StringUtils.isEmpty(name)) {
+            hql += " and name like :name)";
+        }
         if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
-            hql += " and homeAddress in (:addressIdList)";
+            hql += " and homeAddress in (:homeAddressIdList)";
         }
         Query query = session.createQuery(hql);
-        query.setString("name", "%" + name + "%");
-        query.setString("idCardNo", "%" + idCardNo + "%");
+        if (!StringUtils.isEmpty(idCardNo)) {
+            query.setString("idCardNo", "%" + idCardNo + "%");
+        }
+        if (!StringUtils.isEmpty(name)) {
+            query.setString("name", "%" + name + "%");
+        }
         if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
-            query.setParameterList("addressIdList", addressIdList);
+            query.setParameterList("homeAddressIdList", homeAddressIdList);
         }
         return query.list().size();
     }

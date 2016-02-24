@@ -14,6 +14,7 @@ import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
@@ -22,6 +23,7 @@ import static org.springframework.test.util.AssertionErrors.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SvrDictApplication.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@Transactional
 public class SystemDictEntryTests {
 
     @Autowired
@@ -30,7 +32,7 @@ public class SystemDictEntryTests {
 
     @Test
     public void atestGetDictionaries() throws Exception {
-        long dictId = 2;
+        long dictId = 3;
         String code = "Approved";
         int page = 1;
         int size = 10;
@@ -42,7 +44,7 @@ public class SystemDictEntryTests {
     public void btestCreateDictEntry() throws Exception {
         SystemDictEntry systemDictEntry = new SystemDictEntry();
         systemDictEntry.setCode("test");
-        systemDictEntry.setDictId(2);
+        systemDictEntry.setDictId(3);
         systemDictEntry.setValue("test");
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonDate = objectMapper.writeValueAsString(systemDictEntry);
@@ -50,11 +52,22 @@ public class SystemDictEntryTests {
         assertTrue("查询失败！", dict != null);
     }
 
+    @Test
+    public void dtestUpdateDictEntry() throws Exception {
+        int dictId = 3;
+        String code = "Female";
+        MDictionaryEntry dictEntry = systemDictEntryController.getDictEntry(dictId,code);
+        dictEntry.setValue("Female111");
+        String jsonData = new ObjectMapper().writeValueAsString(dictEntry);
+        Object result = systemDictEntryController.updateDictEntry(jsonData);
+        assertTrue("修改失败！", result != null);
+    }
+
 
     @Test
     public void btestGetDictEntry() throws Exception {
-        int dictId = 2;
-        String code = "Approved";
+        int dictId = 3;
+        String code = "Female";
         Object result = systemDictEntryController.getDictEntry(dictId,code);
         assertTrue("查询失败！", result != null);
     }
@@ -62,8 +75,8 @@ public class SystemDictEntryTests {
 
     @Test
     public void ctestDeleteDictEntry() throws Exception {
-        int dictId = 2;
-        String code = "Approved";
+        int dictId = 3;
+        String code = "Female";
         try {
             systemDictEntryController.deleteDictEntry(dictId,code);
         }catch (Exception e){
@@ -71,15 +84,6 @@ public class SystemDictEntryTests {
         }
     }
 
-    @Test
-    public void dtestUpdateDictEntry() throws Exception {
-        int dictId = 2;
-        String code = "Approved";
-        MDictionaryEntry dictEntry = systemDictEntryController.getDictEntry(dictId,code);
-        dictEntry.setValue("test");
-        String jsonData = new ObjectMapper().writeValueAsString(dictEntry);
-        Object result = systemDictEntryController.updateDictEntry(jsonData);
-        assertTrue("执行失败！", result != null);
-    }
+
 
 }
