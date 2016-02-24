@@ -1,13 +1,13 @@
 package com.yihu.ehr.ha.patient.controller;
 
-import com.yihu.ehr.constants.AgAdminConstants;
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.model.geogrephy.MGeography;
+import com.yihu.ehr.agModel.patient.PatientModel;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.geography.service.AddressClient;
 import com.yihu.ehr.ha.patient.service.PatientClient;
-import com.yihu.ehr.model.geogrephy.MGeography;
 import com.yihu.ehr.model.patient.MDemographicInfo;
-import com.yihu.ehr.model.patient.UIModels.PatientModel;
 import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
@@ -21,9 +21,9 @@ import java.util.List;
 /**
  * Created by AndyCai on 2016/1/21.
  */
-@RequestMapping(ApiVersionPrefix.Version1_0)
+@RequestMapping(ApiVersion.Version1_0)
 @RestController
-public class PatientController{
+public class PatientController extends BaseController{
 
     @Autowired
     private PatientClient patientClient;
@@ -50,15 +50,12 @@ public class PatientController{
             @RequestParam(value = "rows") Integer rows,
             HttpServletResponse response) throws Exception{
 
-        Envelop envelop = new Envelop();
-
-        List<MDemographicInfo> demographicInfos = patientClient.searchPatient(name,idCardNo,province,city,district,page,rows);
+        Envelop envelop = patientClient.searchPatient(name,idCardNo,province,city,district,page,rows);
+        List<MDemographicInfo> demographicInfos = (List<MDemographicInfo>)envelop.getDetailModelList();
         List<PatientModel> patients = new ArrayList<>();
         for(MDemographicInfo patientInfo : demographicInfos)
         {
-            PatientModel patient = new PatientModel();
-            patient.setIdCardNo(patientInfo.getIdCardNo());
-            patient.setName(patientInfo.getName());
+            PatientModel patient = convertToModel(patientInfo,PatientModel.class);
             //TODO:获取家庭地址信息
             String homeAddressId = "";//patientInfo.getHomeAddress()
             MGeography geography = addressClient.getAddressById(homeAddressId);
@@ -71,21 +68,12 @@ public class PatientController{
                 if(StringUtils.isNotEmpty(geography.getTown()))homeAddress+=geography.getTown();
                 if(StringUtils.isNotEmpty(geography.getStreet()))homeAddress+=geography.getStreet();
                 if(StringUtils.isNotEmpty(geography.getExtra()))homeAddress+=geography.getExtra();
-
             }
             patient.setAddress(homeAddress);
             patients.add(patient);
         }
 
-        envelop.setSuccessFlg(true);
-        envelop.setDetailModelList(patients);
-        envelop.setCurrPage(page);
-        envelop.setPageSize(rows);
-        //TODO:获取总条数
-        String count = response.getHeader(AgAdminConstants.ResourceCount);
-        int totalCount = StringUtils.isNotEmpty(count)?Integer.parseInt(count):0;
-        envelop.setTotalCount(totalCount);
-
+        envelop = getResult(patients,envelop.getTotalCount(),page,rows);
         return envelop;
     }
 
@@ -98,10 +86,17 @@ public class PatientController{
      */
     @RequestMapping(value = "/populations/{id_card_no}",method = RequestMethod.DELETE)
     @ApiOperation(value = "根据身份证号删除人")
-    public Object deletePatient(
+    public Envelop deletePatient(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @PathVariable(value = "id_card_no") String idCardNo) throws Exception{
-        return patientClient.deletePatient(idCardNo);
+        Envelop envelop = new Envelop();
+        boolean result = patientClient.deletePatient(idCardNo);
+        envelop.setSuccessFlg(result);
+        if(!result)
+        {
+            envelop.setErrorMsg("删除失败!");
+        }
+        return envelop;
     }
 
 

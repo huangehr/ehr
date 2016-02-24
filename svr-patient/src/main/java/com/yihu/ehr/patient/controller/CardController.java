@@ -1,6 +1,6 @@
 package com.yihu.ehr.patient.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.patient.MAbstractCard;
 import com.yihu.ehr.patient.service.card.*;
 import com.yihu.ehr.util.Envelop;
@@ -19,7 +19,7 @@ import java.util.Map;
  * Created by zqb on 2015/8/20.
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0)
+@RequestMapping(ApiVersion.Version1_0)
 @Api(protocols = "https", value = "cards", description = "卡管理", tags = {"卡管理"})
 public class CardController extends BaseRestController {
     @Autowired

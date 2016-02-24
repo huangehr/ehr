@@ -1,20 +1,16 @@
 package com.yihu.ehr.adapter.controller;
 
-import com.yihu.ha.adapter.model.OrgDataSetModel;
-import com.yihu.ha.adapter.model.OrgMetaDataModel;
-import com.yihu.ha.adapter.model.XOrgDataSetManager;
-import com.yihu.ha.adapter.model.XOrgMetaDataManager;
-import com.yihu.ha.constrant.*;
-import com.yihu.ha.user.model.XUser;
-import com.yihu.ha.util.HttpClientUtil;
-import com.yihu.ha.util.ResourceProperties;
-import com.yihu.ha.util.controller.BaseController;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.constants.RestAPI;
+import com.yihu.ehr.constants.SessionAttributeKeys;
+import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.HttpClientUtil;
+import com.yihu.ehr.util.ResourceProperties;
+import com.yihu.ehr.util.controller.BaseRestController;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,14 +21,7 @@ import java.util.Map;
 @RequestMapping("/orgdataset")
 @Controller(RestAPI.OrgDataSetController)
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
-public class OrgDataSetController extends BaseController {
-
-    @Resource(name = Services.OrgDataSetManager)
-    private XOrgDataSetManager orgDataSetManager;
-
-    @Resource(name = Services.OrgMetaDataManager)
-    private XOrgMetaDataManager orgMetaDataManager;
-
+public class OrgDataSetController extends BaseRestController {
     private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
     private static   String username = ResourceProperties.getProperty("username");
     private static   String password = ResourceProperties.getProperty("password");
@@ -42,7 +31,7 @@ public class OrgDataSetController extends BaseController {
 
     @RequestMapping("/initialOld")
     public String orgDataSetInitOld(HttpServletRequest request,String adapterOrg){
-        request.setAttribute("adapterOrg",encodeStr(adapterOrg));
+        request.setAttribute("adapterOrg",adapterOrg);
         return "/adapter/orgCollection";
     }
 
@@ -54,20 +43,19 @@ public class OrgDataSetController extends BaseController {
     }
 
     @RequestMapping("template/orgDataInfo")
-    public String orgDataInfoTemplate(Model model, String id, String mode) {
+    public Object orgDataInfoTemplate(Model model, String id, String mode) {
         String url = "/orgDataSet/orgDataSet";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("id",id);
         try {
-            OrgDataSetModel orgDataSetModel =null;
             if(mode.equals("view") || mode.equals("modify")) {
                 //todo 后台转换成model后传前台
                 resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
                 model.addAttribute("rs", "success");
             }else{
-                orgDataSetModel = new OrgDataSetModel();
+                resultStr="";
             }
             model.addAttribute("sort","");
             model.addAttribute("info", resultStr);
@@ -78,10 +66,10 @@ public class OrgDataSetController extends BaseController {
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        OrgDataSetModel orgDataSetModel = new OrgDataSetModel();
-//        //mode定义：new modify view三种模式，新增，修改，查�?
+//        //mode定义：new modify view三种模式，新增，修改，查看
 //        if(mode.equals("view") || mode.equals("modify")){
 //            try{
 //                OrgDataSet orgDataSet = (OrgDataSet) orgDataSetManager.getOrgDataSet(Long.parseLong(id));
@@ -102,10 +90,10 @@ public class OrgDataSetController extends BaseController {
     }
 
     @RequestMapping("template/orgMetaDataInfo")
-    public String orgMetaDataInfoTemplate(Model model, String id, String mode) {
+    public Object orgMetaDataInfoTemplate(Model model, String id, String mode) {
         String url = "/orgDataSet/orgMetaData";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("metaDataId",id);
         try {
@@ -123,10 +111,10 @@ public class OrgDataSetController extends BaseController {
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        OrgMetaDataModel orgMetaDataModel = new OrgMetaDataModel();
-//        //mode定义：new modify view三种模式，新增，修改，查�?
+//        //mode定义：new modify view三种模式，新增，修改，查看
 //        if(mode.equals("view") || mode.equals("modify")){
 //            try{
 //                OrgMetaData orgMetaData = (OrgMetaData) orgMetaDataManager.getOrgMetaData(Long.parseLong(id));
@@ -154,24 +142,24 @@ public class OrgDataSetController extends BaseController {
      */
     @RequestMapping("getOrgDataSet")
     @ResponseBody
-    public String getOrgDataSet(String id) {
+    public Object getOrgDataSet(String id) {
         String url = "/orgDataSet/orgDataSet";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("id",id);
         try{
             //todo 后台转换成model后传前台
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            ObjectMapper mapper = new ObjectMapper();
-            OrgDataSetModel orgDataSetModel = mapper.readValue(resultStr, OrgDataSetModel.class);
-            result.setObj(orgDataSetModel);
+//            ObjectMapper mapper = new ObjectMapper();
+//            OrgDataSetModel orgDataSetModel = mapper.readValue(resultStr, OrgDataSetModel.class);
+            result.setObj(resultStr);
             result.setSuccessFlg(true);
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //        try{
@@ -190,7 +178,7 @@ public class OrgDataSetController extends BaseController {
     }
 
     /**
-     * 创建机构数据�?
+     * 创建机构数据集
      *
      * @param code
      * @param name
@@ -201,7 +189,7 @@ public class OrgDataSetController extends BaseController {
      */
     @RequestMapping(value = "createOrgDataSet", produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public String createOrgDataSet(String code,
+    public Object createOrgDataSet(String code,
                                    String name,
                                    String description,
                                    String orgCode,
@@ -209,7 +197,7 @@ public class OrgDataSetController extends BaseController {
 
         String url="";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         try{
             url="/orgDataSet/isOrgDataSetExist";//todo:网关没有重复校验接口
@@ -219,24 +207,24 @@ public class OrgDataSetController extends BaseController {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);//重复校验
             if(Boolean.parseBoolean(resultStr)){
                 result.setSuccessFlg(false);
-                result.setErrorMsg("数据集已存在�?");
-                return result.toJson();
+                result.setErrorMsg("数据集已存在！");
+                return result;
             }
 
             url="/orgDataSet/orgDataSet";
             params.put("description", description);
             params.put("userId",user.getId());
-            //todo 失败，返回的错误信息怎么体现�?
-            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//创建数据�?
-            ObjectMapper mapper = new ObjectMapper();
-            OrgDataSetModel orgDataSetModel = mapper.readValue(resultStr, OrgDataSetModel.class);
-            result.setObj(orgDataSetModel);
+            //todo 失败，返回的错误信息怎么体现？
+            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//创建数据集
+//            ObjectMapper mapper = new ObjectMapper();
+//            OrgDataSetModel orgDataSetModel = mapper.readValue(resultStr, OrgDataSetModel.class);
+            result.setObj(resultStr);
             result.setSuccessFlg(true);
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //
@@ -274,21 +262,21 @@ public class OrgDataSetController extends BaseController {
     }
 
     /**
-     * 删除机构数据�?
+     * 删除机构数据集
      *
      * @param id
      * @return
      */
     @RequestMapping("deleteOrgDataSet")
     @ResponseBody
-    public String deleteOrgDataSet(long id) {
+    public Object deleteOrgDataSet(long id) {
         String url = "/orgDataSet/deleteOrgDataSet";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("id",id);
         try {
-            //todo:内部做级联删�?(删除关联的数据元)
+            //todo:内部做级联删除(删除关联的数据元)
             resultStr = HttpClientUtil.doDelete(comUrl + url, params, username, password);
             if(Boolean.parseBoolean(resultStr)){
                 result.setSuccessFlg(true);
@@ -297,11 +285,11 @@ public class OrgDataSetController extends BaseController {
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.InvalidDelete.toString());
             }
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //        XOrgDataSet orgDataSet = orgDataSetManager.getOrgDataSet(id);
@@ -325,7 +313,7 @@ public class OrgDataSetController extends BaseController {
     }
 
     /**
-     * 修改机构数据�?
+     * 修改机构数据集
      *
      * @param id
      * @param code
@@ -336,7 +324,7 @@ public class OrgDataSetController extends BaseController {
      */
     @RequestMapping(value = "updateOrgDataSet", produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public String updateOrgDataSet(String orgCode,
+    public Object updateOrgDataSet(String orgCode,
                                    long id,
                                    String code,
                                    String name,
@@ -345,7 +333,7 @@ public class OrgDataSetController extends BaseController {
 
         String url="";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         try{
             url="/orgDataSet/orgDataSet";
@@ -355,7 +343,7 @@ public class OrgDataSetController extends BaseController {
             if(resultStr==null){
                 result.setSuccessFlg(false);
                 result.setErrorMsg("该数据集已不存在，请刷新后重试！");
-                return result.toJson();
+                return result;
             }
             url="/orgDataSet/isOrgDataSetExist";//todo:网关没有重复校验接口
             params.put("orgCode",orgCode);
@@ -364,24 +352,24 @@ public class OrgDataSetController extends BaseController {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);//重复校验
             if(Boolean.parseBoolean(resultStr)){
                 result.setSuccessFlg(false);
-                result.setErrorMsg("数据集已存在�?");
-                return result.toJson();
+                result.setErrorMsg("数据集已存在！");
+                return result;
             }
 
             url="/orgDataSet/updateOrgDataSet";
             params.put("description", description);
             params.put("userId",user.getId());
-            //todo 失败，返回的错误信息怎么体现�?
-            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//更新数据�?
-            ObjectMapper mapper = new ObjectMapper();
-            OrgDataSetModel orgDataSetModel = mapper.readValue(resultStr, OrgDataSetModel.class);
-            result.setObj(orgDataSetModel);
+            //todo 失败，返回的错误信息怎么体现？
+            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//更新数据集
+//            ObjectMapper mapper = new ObjectMapper();
+//            OrgDataSetModel orgDataSetModel = mapper.readValue(resultStr, OrgDataSetModel.class);
+            result.setObj(resultStr);
             result.setSuccessFlg(true);
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //        try{
@@ -424,10 +412,10 @@ public class OrgDataSetController extends BaseController {
      */
     @RequestMapping("searchOrgDataSets")
     @ResponseBody
-    public String searchOrgDataSets(String orgCode, String codename, int page, int rows) {
+    public Object searchOrgDataSets(String orgCode, String codename, int page, int rows) {
         String url = "/orgDataSet/orgDataSets";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("orgCode", orgCode);
         params.put("code", codename);
@@ -441,7 +429,7 @@ public class OrgDataSetController extends BaseController {
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 
 //        Result result = new Result();
@@ -462,7 +450,7 @@ public class OrgDataSetController extends BaseController {
     }
 
 
-    //---------------------------以上是机构数据集部分，以下是机构数据元详情部�?---------------------------
+    //---------------------------以上是机构数据集部分，以下是机构数据元详情部分---------------------------
 
 
     /**
@@ -473,24 +461,24 @@ public class OrgDataSetController extends BaseController {
      */
     @RequestMapping("getOrgMetaData")
     @ResponseBody
-    public String getOrgMetaData(String id) {
+    public Object getOrgMetaData(String id) {
         String url = "/orgMetaData/orgMetaData";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("metaDataId",id);
         try{
             //todo 后台转换成model后传前台
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            ObjectMapper mapper = new ObjectMapper();
-            OrgMetaDataModel orgMetaDataModel = mapper.readValue(resultStr, OrgMetaDataModel.class);
-            result.setObj(orgMetaDataModel);
+//            ObjectMapper mapper = new ObjectMapper();
+//            OrgMetaDataModel orgMetaDataModel = mapper.readValue(resultStr, OrgMetaDataModel.class);
+            result.setObj(resultStr);
             result.setSuccessFlg(true);
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //        try{
@@ -510,7 +498,7 @@ public class OrgDataSetController extends BaseController {
 
 
     /**
-     * 创建机构数据�?
+     * 创建机构数据元
      *
      * @param orgDataSetSeq
      * @param code
@@ -521,7 +509,7 @@ public class OrgDataSetController extends BaseController {
      */
     @RequestMapping(value = "createOrgMetaData", produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public String createOrgMetaData(Integer orgDataSetSeq,
+    public Object createOrgMetaData(Integer orgDataSetSeq,
                                     String orgCode,
                                     String code,
                                     String name,
@@ -530,7 +518,7 @@ public class OrgDataSetController extends BaseController {
 
         String url;
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         try{
             url="/orgMetaData/isOrgMetaDataExist";//todo:网关没有重复校验接口
@@ -541,24 +529,24 @@ public class OrgDataSetController extends BaseController {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);//重复校验
             if(Boolean.parseBoolean(resultStr)){
                 result.setSuccessFlg(false);
-                result.setErrorMsg("数据元已存在�?");
-                return result.toJson();
+                result.setErrorMsg("数据元已存在！");
+                return result;
             }
 
             url="/orgDataSet/createOrgMetaData";
             params.put("description", description);
             params.put("userId",user.getId());
-            //todo 失败，返回的错误信息怎么体现�?
-            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//创建数据�?
-            ObjectMapper mapper = new ObjectMapper();
-            OrgMetaDataModel orgMetaDataModel = mapper.readValue(resultStr, OrgMetaDataModel.class);
-            result.setObj(orgMetaDataModel);
+            //todo 失败，返回的错误信息怎么体现？
+            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//创建数据元
+//            ObjectMapper mapper = new ObjectMapper();
+//            OrgMetaDataModel orgMetaDataModel = mapper.readValue(resultStr, OrgMetaDataModel.class);
+            result.setObj(resultStr);
             result.setSuccessFlg(true);
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //        try {
@@ -590,18 +578,18 @@ public class OrgDataSetController extends BaseController {
     }
 
     /**
-     * 删除机构数据�?
+     * 删除机构数据元
      *
      * @param id
      * @return
      */
     @RequestMapping("deleteOrgMetaData")
     @ResponseBody
-    public String deleteOrgMetaData(long id) {
-        //todo 可与批量删除整合�?�?
+    public Object deleteOrgMetaData(long id) {
+        //todo 可与批量删除整合一起
         String url = "/orgDataSet/deleteOrgMetaData";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("ids",id);
         try {
@@ -612,11 +600,11 @@ public class OrgDataSetController extends BaseController {
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.InvalidDelete.toString());
             }
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 
 //        Result result = new Result();
@@ -640,17 +628,17 @@ public class OrgDataSetController extends BaseController {
     }
 
     /**
-     * 批量删除机构数据�?
+     * 批量删除机构数据元
      *
      * @param ids
      * @return
      */
     @RequestMapping("deleteOrgMetaDataList")
     @ResponseBody
-    public String deleteOrgMetaDataList(@RequestParam("ids[]") Long[] ids) {
+    public Object deleteOrgMetaDataList(@RequestParam("ids[]") Long[] ids) {
         String url = "/orgDataSet/deleteOrgMetaData";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("ids",ids);
         try {
@@ -661,11 +649,11 @@ public class OrgDataSetController extends BaseController {
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.InvalidDelete.toString());
             }
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result = new Result();
 //
@@ -687,7 +675,7 @@ public class OrgDataSetController extends BaseController {
     }
 
     /**
-     * 修改机构数据�?
+     * 修改机构数据元
      *
      * @param id
      * @param code
@@ -698,7 +686,7 @@ public class OrgDataSetController extends BaseController {
      */
     @RequestMapping(value = "updateOrgMetaData", produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public String updateOrgMetaData(Integer orgDataSetSeq,
+    public Object updateOrgMetaData(Integer orgDataSetSeq,
                                     String orgCode,
                                     long id,
                                     String code,
@@ -708,7 +696,7 @@ public class OrgDataSetController extends BaseController {
 
         String url="";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         try{
             url="/orgDataSet/orgMetaData";
@@ -718,7 +706,7 @@ public class OrgDataSetController extends BaseController {
             if(resultStr==null){
                 result.setSuccessFlg(false);
                 result.setErrorMsg("该数据元已不存在，请刷新后重试！");
-                return result.toJson();
+                return result;
             }
             url="/orgMetaData/isOrgMetaDataExist";//todo:网关没有重复校验接口
             params.put("orgDataSetSeq",orgDataSetSeq);
@@ -728,24 +716,24 @@ public class OrgDataSetController extends BaseController {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);//重复校验
             if(Boolean.parseBoolean(resultStr)){
                 result.setSuccessFlg(false);
-                result.setErrorMsg("数据元已存在�?");
-                return result.toJson();
+                result.setErrorMsg("数据元已存在！");
+                return result;
             }
 
             url="/orgDataSet/updateOrgMetaData";
             params.put("description", description);
             params.put("userId",user.getId());
-            //todo 失败，返回的错误信息怎么体现�?
-            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//更新数据�?
-            ObjectMapper mapper = new ObjectMapper();
-            OrgMetaDataModel orgMetaDataModel = mapper.readValue(resultStr, OrgMetaDataModel.class);
-            result.setObj(orgMetaDataModel);
+            //todo 失败，返回的错误信息怎么体现？
+            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//更新数据元
+//            ObjectMapper mapper = new ObjectMapper();
+//            OrgMetaDataModel orgMetaDataModel = mapper.readValue(resultStr, OrgMetaDataModel.class);
+            result.setObj(resultStr);
             result.setSuccessFlg(true);
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 
 //        Result result = new Result();
@@ -789,10 +777,10 @@ public class OrgDataSetController extends BaseController {
      */
     @RequestMapping("searchOrgMetaDatas")
     @ResponseBody
-    public String searchOrgMetaDatas(String orgCode,Integer orgDataSetSeq, String codename, int page, int rows) {
+    public Object searchOrgMetaDatas(String orgCode,Integer orgDataSetSeq, String codename, int page, int rows) {
         String url = "/orgDataSet/orgMetaDatas";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("orgCode", orgCode);
         params.put("orgDataSetSeq", orgDataSetSeq);
@@ -807,7 +795,7 @@ public class OrgDataSetController extends BaseController {
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Result result =new Result();
 //        try {

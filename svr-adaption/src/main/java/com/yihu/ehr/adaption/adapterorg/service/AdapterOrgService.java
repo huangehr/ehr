@@ -5,14 +5,15 @@ import com.yihu.ehr.adaption.orgdataset.service.OrgDataSetService;
 import com.yihu.ehr.adaption.orgdict.service.OrgDictService;
 import com.yihu.ehr.adaption.orgdictitem.service.OrgDictItemService;
 import com.yihu.ehr.adaption.orgmetaset.service.OrgMetaDataService;
-import com.yihu.ehr.model.geogrephy.MAddress;
-import com.yihu.ehr.util.query.BaseService;
+import com.yihu.ehr.query.BaseJpaService;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * @author lincl
@@ -21,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 @Service
-public class AdapterOrgService extends BaseService<AdapterOrg, XAdapterOrgRepository> {
+public class AdapterOrgService extends BaseJpaService<AdapterOrg, XAdapterOrgRepository> {
 
     @Autowired
     AddressClient addressClient;
@@ -35,16 +36,16 @@ public class AdapterOrgService extends BaseService<AdapterOrg, XAdapterOrgReposi
     OrgDictService orgDictManager;
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void addAdapterOrg(AdapterOrg adapterOrg, String apiVersion) {
+    public void addAdapterOrg(AdapterOrg adapterOrg) {
         //地址检查并保存
-        MAddress address = adapterOrg.getMAddress();
-        if (address != null) {
-            Object addressId =
-                    addressClient.saveAddress(
-                            apiVersion, address.getCountry(), address.getProvince(), address.getCity(), address.getDistrict(), address.getTown(),
-                            address.getStreet(), address.getExtra(), address.getPostalCode());
-            adapterOrg.setArea((String) addressId);
-        }
+//        MAddress address = adapterOrg.getMAddress();
+//        if (address != null) {
+//            Object addressId =
+//                    addressClient.saveAddress(
+//                            apiVersion, address.getCountry(), address.getProvince(), address.getCity(), address.getDistrict(), address.getTown(),
+//                            address.getStreet(), address.getExtra(), address.getPostalCode());
+//            adapterOrg.setArea((String) addressId);
+//        }
         save(adapterOrg);
         //拷贝采集标准
         String parent = adapterOrg.getParent();
@@ -55,9 +56,11 @@ public class AdapterOrgService extends BaseService<AdapterOrg, XAdapterOrgReposi
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void deleteAdapterOrg(String[] codes) {
-
+        AdapterOrg adapterOrg;
         for (String code : codes) {
-            delete(code);
+            adapterOrg = retrieve(code);
+            deleteData(adapterOrg.getOrg());
+            delete(adapterOrg);
         }
     }
 

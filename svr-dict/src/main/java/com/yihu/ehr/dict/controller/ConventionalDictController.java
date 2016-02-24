@@ -1,6 +1,6 @@
 package com.yihu.ehr.dict.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.dict.service.SystemDictEntry;
 import com.yihu.ehr.dict.service.SystemDictEntryService;
@@ -24,7 +24,7 @@ import java.util.List;
  * 惯用字典接口，用于快速提取常用的字典项。
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0)
+@RequestMapping(ApiVersion.Version1_0)
 @Api(protocols = "https", value = "Conventional-Dictionaries", description = "获取常用字典项", tags = {"惯用字典"})
 public class ConventionalDictController extends BaseRestController {
 

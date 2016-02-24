@@ -15,7 +15,7 @@ import java.util.Map;
  * @created 2015.07.14 17:59
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.CommonVersion + "/standard-dispatcher")
+@RequestMapping(ApiVersion.CommonVersion + "/standard-dispatcher")
 @Api(protocols = "https", value = "Standard-Dispatch", description = "标准分发接口", tags = {"标准化", "适配方案", "分发"})
 public class StandardDispatchRestController extends BaseRestController {
     @Resource(name = Services.SecurityManager)

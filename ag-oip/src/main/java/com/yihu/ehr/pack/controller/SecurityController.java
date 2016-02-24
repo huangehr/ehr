@@ -1,6 +1,6 @@
 package com.yihu.ehr.pack.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @created 2016.02.03 14:15
  */
 @RestController
-@RequestMapping(value = ApiVersionPrefix.Version1_0 + "/security")
+@RequestMapping(value = ApiVersion.Version1_0 + "/security")
 public class SecurityController {
 
     @ApiOperation(value = "/user_key", response = String.class)

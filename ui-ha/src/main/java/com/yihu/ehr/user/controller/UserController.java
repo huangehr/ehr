@@ -1,11 +1,12 @@
 package com.yihu.ehr.user.controller;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.constrant.ErrorCode;
+import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.ResourceProperties;
-import com.yihu.ehr.util.fastdfs.FastDFSUtil;
+import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.fastdfs.FastDFSUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +25,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/user")
-public class UserController extends BaseController {
+public class UserController extends BaseRestController {
     private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
     private static   String username = ResourceProperties.getProperty("username");
     private static   String password = ResourceProperties.getProperty("password");
@@ -46,11 +47,11 @@ public class UserController extends BaseController {
 
     @RequestMapping("searchUsers")
     @ResponseBody
-    public String searchUsers(String searchNm, String searchType, int page, int rows) {
+    public Object searchUsers(String searchNm, String searchType, int page, int rows) {
 
         String url = "/user/user";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("realName", searchNm);
         params.put("orgCode", searchNm);
@@ -63,7 +64,7 @@ public class UserController extends BaseController {
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        Map<String, Object> conditionMap = new HashMap<>();
 //        conditionMap.put("realName", searchNm);
@@ -81,10 +82,10 @@ public class UserController extends BaseController {
 
     @RequestMapping("deleteUser")
     @ResponseBody
-    public String deleteUser(String userId) {
+    public Object deleteUser(String userId) {
         String url = "/user/user";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("userId",userId);
         try {
@@ -96,11 +97,11 @@ public class UserController extends BaseController {
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.InvalidDelete.toString());
             }
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        try {
 //            userManager.deleteUser(userId);
@@ -114,10 +115,10 @@ public class UserController extends BaseController {
 
     @RequestMapping("activityUser")
     @ResponseBody
-    public String activityUser(String userId, boolean activated) {
+    public Object activityUser(String userId, boolean activated) {
         String url = "/user/userStatus";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("userId",userId);
         params.put("status",activated);
@@ -130,11 +131,11 @@ public class UserController extends BaseController {
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.InvalidUpdate.toString());
             }
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        try {
 //            userManager.activityUser(userId, activated);
@@ -149,6 +150,7 @@ public class UserController extends BaseController {
     @RequestMapping(value = "updateUser", produces = "text/html;charset=UTF-8")
     @ResponseBody
     public Object updateUser(String userModelJsonData, HttpServletRequest request, HttpServletResponse response) throws IOException {
+
         String remotePath = upload(request, response);
         String url = "/user/updateUser";
         String resultStr = "";
@@ -194,10 +196,10 @@ public class UserController extends BaseController {
 
     @RequestMapping("resetPass")
     @ResponseBody
-    public String resetPass(String userId) {
+    public Object resetPass(String userId) {
         String url = "/user/resetPass";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("userId",userId);
         try {
@@ -208,11 +210,11 @@ public class UserController extends BaseController {
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.InvalidUpdate.toString());
             }
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        try {
 //            userManager.resetPass(userId);
@@ -227,11 +229,11 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping("getUser")
-    public String getUser(Model model, String userId, String mode) throws IOException {
+    public Object getUser(Model model, String userId, String mode) throws IOException {
         //todo:jsp展示需调整
         String url = "/user/user";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("userId",userId);
         try {
@@ -245,7 +247,7 @@ public class UserController extends BaseController {
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        XUser user = userManager.getUser(userId);
 //        UserModel userModel = userManager.getUser(user);
@@ -267,10 +269,10 @@ public class UserController extends BaseController {
 
     @RequestMapping("unbundling")
     @ResponseBody
-    public String unbundling(String userId, String type) {
+    public Object unbundling(String userId, String type) {
         String getUserUrl = "/user/unBundling";//解绑 todo 网关中需添加此方法
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("userId",userId);
         params.put("type",type);
@@ -283,11 +285,11 @@ public class UserController extends BaseController {
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.InvalidUpdate.toString());
             }
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 //        XUser user = userManager.getUser(userId);
 //
@@ -302,10 +304,10 @@ public class UserController extends BaseController {
 
     @RequestMapping("distributeKey")
     @ResponseBody
-    public String distributeKey(String loginCode) {
+    public Object distributeKey(String loginCode) {
         String getUserUrl = "/user/distributeKey";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("loginCode",loginCode);
         try {
@@ -317,11 +319,11 @@ public class UserController extends BaseController {
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.InvalidUpdate.toString());
             }
-            return result.toJson();
+            return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 
 //        try {
@@ -363,10 +365,10 @@ public class UserController extends BaseController {
 
     @RequestMapping("/searchUser")
     @ResponseBody
-    public String searchUser(String type, String searchNm) {
+    public Object searchUser(String type, String searchNm) {
         String getUserUrl = "/user/isUserExist";
         String resultStr = "";
-        Result result = new Result();
+        Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("type",type);
         params.put("value",searchNm);
@@ -377,7 +379,7 @@ public class UserController extends BaseController {
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result.toJson();
+            return result;
         }
 
 //        boolean bo = userManager.searchUser(type, searchNm);
@@ -407,16 +409,17 @@ public class UserController extends BaseController {
         String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
         //获取文件名
         String description = null;
-        if ((fileName != null) && (fileName.length() > 0)) {
+        if ((fileName.length() > 0)) {
             int dot = fileName.lastIndexOf('.');
             if ((dot > -1) && (dot < (fileName.length()))) {
                 description = fileName.substring(0, dot);
             }
         }
         ObjectNode objectNode = null;
+        FastDFSUtil dfsUtil = new FastDFSUtil();
         String path = null;
         try {
-            objectNode = FastDFSUtil.upload(inputStream, fileExtension, description);
+            objectNode = dfsUtil.upload(inputStream, fileExtension, description);
             String groupName = objectNode.get("groupName").toString();
             String remoteFileName = objectNode.get("remoteFileName").toString();
             path = "{groupName:" + groupName + ",remoteFileName:" + remoteFileName + "}";

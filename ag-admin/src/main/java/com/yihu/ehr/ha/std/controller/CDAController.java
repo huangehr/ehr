@@ -1,13 +1,13 @@
 package com.yihu.ehr.ha.std.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * Created by AndyCai on 2016/1/21.
  */
-@RequestMapping(ApiVersionPrefix.Version1_0 + "/cda")
+@RequestMapping(ApiVersion.Version1_0 + "/cda")
 @RestController
 public class CDAController   {
 

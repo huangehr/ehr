@@ -1,6 +1,7 @@
 package com.yihu.ehr.ha.patient.service;
 
 import com.yihu.ehr.model.patient.MDemographicInfo;
+import com.yihu.ehr.util.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -21,7 +22,7 @@ public interface PatientClient {
 
     @RequestMapping(value = "/rest/v1.0/populations",method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询人")
-    List<MDemographicInfo> searchPatient(
+    Envelop searchPatient(
             @ApiParam(name = "name", value = "姓名", defaultValue = "")
             @RequestParam(value = "name") String name,
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
@@ -46,7 +47,7 @@ public interface PatientClient {
      */
     @RequestMapping(value = "/rest/v1.0/populations/{id_card_no}",method = RequestMethod.DELETE)
     @ApiOperation(value = "根据身份证号删除人")
-    Object deletePatient(
+    boolean deletePatient(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @PathVariable(value = "id_card_no") String idCardNo) ;
 

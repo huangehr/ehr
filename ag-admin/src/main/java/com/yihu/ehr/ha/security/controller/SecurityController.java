@@ -1,6 +1,6 @@
 package com.yihu.ehr.ha.security.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.security.service.SecurityClient;
 import com.yihu.ehr.model.security.MUserSecurity;
 import io.swagger.annotations.Api;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
  * Created by AndyCai on 2016/2/1.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersionPrefix.Version1_0 )
+@RequestMapping(ApiVersion.Version1_0 )
 @RestController
 @Api(value = "sec", description = "安全管理接口，用于安全验证管理", tags = {"安全管理接口"})
 public class SecurityController {

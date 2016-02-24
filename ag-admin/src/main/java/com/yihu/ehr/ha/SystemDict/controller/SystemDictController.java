@@ -1,10 +1,11 @@
 package com.yihu.ehr.ha.SystemDict.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.SystemDict.service.SystemDictClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.dict.MSystemDict;
+import com.yihu.ehr.util.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -18,7 +19,7 @@ import java.util.List;
  * Created by AndyCai on 2016/1/21.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersionPrefix.Version1_0)
+@RequestMapping(ApiVersion.Version1_0)
 @RestController
 @Api(value = "sys_dict", description = "系统字典接口，用于系统全局字典管理", tags = {"系统字典接口"})
 public class SystemDictController {
@@ -26,9 +27,12 @@ public class SystemDictController {
     @Autowired
     private SystemDictClient systemDictClient;
 
+//    @Autowired
+//    private BaseRestController baseRestController;
+
     @ApiOperation(value = "获取字典列表")
     @RequestMapping(value = "/dictionaries", method = RequestMethod.GET)
-    public List<MSystemDict> getDictionaries(
+    public Envelop getDictionaries(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器", defaultValue = "")
@@ -39,44 +43,77 @@ public class SystemDictController {
             @RequestParam(value = "size", required = false) Integer size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) Integer page) {
-       return (List<MSystemDict>)systemDictClient.getDictionaries(fields,filters,sorts,size,page);
+
+        Envelop envelop = new Envelop();
+
+        //todo: 微服务缺少获取字典总条数的接口
+        //todo： 前端的分页需要用到ListModel，totalCount，page，rows属性，但是 Envelop 工具类没有page，rows属性？
+        List<MSystemDict> systemDicts =(List<MSystemDict>)systemDictClient.getDictionaries(fields,filters,sorts,size,page);
+
+        envelop.setDetailModelList(systemDicts);
+
+
+       return envelop;
     }
 
     @ApiOperation(value = "创建字典", response = MSystemDict.class, produces = "application/json")
     @RequestMapping(value = "/dictionaries", method = RequestMethod.POST)
-    public MSystemDict createDictionary(
+    public Envelop createDictionary(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) {
-        return systemDictClient.createDictionary(dictJson);
+            @RequestParam(value = "dictionary") String dictJson){
+
+        Envelop envelop = new Envelop();
+        MSystemDict systemDict = systemDictClient.createDictionary(dictJson);
+
+        envelop.setObj(systemDict);
+
+        return envelop;
     }
+
 
     @ApiOperation(value = "获取字典", response = MSystemDict.class, produces = "application/json")
     @RequestMapping(value = "/dictionaries/{id}", method = RequestMethod.GET)
-    public MSystemDict getDictionary(
+    public Envelop getDictionary(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") long id){
-        return systemDictClient.getDictionary(id);
+        Envelop envelop = new Envelop();
+
+        MSystemDict systemDict = systemDictClient.getDictionary(id);
+
+        envelop.setObj(systemDict);
+        return envelop;
     }
 
     @ApiOperation(value = "修改字典")
     @RequestMapping(value = "/dictionaries", method = RequestMethod.PUT)
-    public MSystemDict updateDictionary(
+    public Envelop updateDictionary(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
             @RequestParam(value = "dictionary") String dictJson) {
-        return systemDictClient.updateDictionary(dictJson);
+        Envelop envelop = new Envelop();
+
+        MSystemDict systemDict = systemDictClient.updateDictionary(dictJson);
+
+        envelop.setObj(systemDict);
+
+        return envelop;
     }
 
     @ApiOperation(value = "删除字典")
     @RequestMapping(value = "/dictionaries/{id}", method = RequestMethod.DELETE)
-    public boolean deleteDictionary(
+    public Envelop deleteDictionary(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") long id) {
-        return systemDictClient.deleteDictionary(id);
+        Envelop envelop = new Envelop();
+
+        Boolean bo = systemDictClient.deleteDictionary(id);
+
+        envelop.setSuccessFlg(bo);
+        return envelop;
     }
 
     @ApiOperation(value = "获取字典项列表")
     @RequestMapping(value = "/dictionaries/{id}/entries", method = RequestMethod.GET)
-    public List<MDictionaryEntry> getDictEntries(
+    public Envelop getDictEntries(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") long id,
             @ApiParam(name = "value", value = "字典项值", defaultValue = "")
@@ -85,42 +122,70 @@ public class SystemDictController {
             @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
             @RequestParam(value = "rows", required = false) Integer rows) {
-        return (List<MDictionaryEntry>)systemDictClient.getDictEntries(id,value,page,rows);
+
+        Envelop envelop = new Envelop();
+        List<MDictionaryEntry> dictionaryEntries = (List<MDictionaryEntry>)systemDictClient.getDictEntries(id,value,page,rows);
+        //todo: 微服务缺少获取字典项总条数的接口
+
+        envelop.setDetailModelList(dictionaryEntries);
+
+        return envelop;
     }
 
     @ApiOperation(value = "创建字典项")
     @RequestMapping(value = "/dictionaries/entries", method = RequestMethod.POST)
-    public MConventionalDict createDictEntry(
+    public Envelop createDictEntry(
             @ApiParam(name = "entry", value = "字典JSON结构")
             @RequestParam(value = "entry") String entryJson) {
-        return systemDictClient.createDictEntry(entryJson);
+        Envelop envelop = new Envelop();
+
+        MConventionalDict mConventionalDict= systemDictClient.createDictEntry(entryJson);
+
+        envelop.setObj(mConventionalDict);
+        return envelop;
     }
 
     @ApiOperation(value = "获取字典项")
     @RequestMapping(value = "/dictionaries/{id}/entries/{code}", method = RequestMethod.POST)
-    public MDictionaryEntry getDictEntry(
+    public Envelop getDictEntry(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") long id,
             @ApiParam(name = "code", value = "字典项代码", defaultValue = "")
             @PathVariable(value = "code") String code) {
-        return systemDictClient.getDictEntry(id,code);
+        Envelop envelop = new Envelop();
+
+        MDictionaryEntry mDictionaryEntry= systemDictClient.getDictEntry(id, code);
+
+        envelop.setObj(mDictionaryEntry);
+        return envelop;
     }
 
     @ApiOperation(value = "删除字典项")
     @RequestMapping(value = "/dictionaries/{id}/entries/{code}", method = RequestMethod.DELETE)
-    public Object deleteDictEntry(
+    public Envelop deleteDictEntry(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") long id,
             @ApiParam(name = "code", value = "字典ID", defaultValue = "")
             @PathVariable(value = "code") String code) {
-        return systemDictClient.deleteDictEntry(id,code);
+        Envelop envelop = new Envelop();
+
+        Boolean bo= systemDictClient.deleteDictEntry(id, code);
+
+        envelop.setSuccessFlg(bo);
+        return envelop;
     }
 
     @ApiOperation(value = "修改字典项")
     @RequestMapping(value = "/dictionaries/entries", method = RequestMethod.PUT)
-    public MConventionalDict updateDictEntry(
+    public Envelop updateDictEntry(
             @ApiParam(name = "entry", value = "字典JSON结构")
             @RequestParam(value = "entry") String entryJson) {
-        return systemDictClient.updateDictEntry(entryJson);
+        Envelop envelop = new Envelop();
+
+        MConventionalDict mConventionalDict= systemDictClient.updateDictEntry(entryJson);
+
+        envelop.setObj(mConventionalDict);
+
+        return envelop;
     }
 }
