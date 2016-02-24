@@ -8,6 +8,7 @@ import com.yihu.ehr.agModel.app.AppDetailModel;
 import com.yihu.ehr.agModel.app.AppModel;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -26,7 +27,7 @@ import java.util.List;
 @RequestMapping(ApiVersion.Version1_0 )
 @RestController
 @Api(value = "app", description = "应用管理接口，用于接入应用管理", tags = {"应用管理接口"})
-public class AppController {
+public class AppController extends BaseController {
     @Autowired
     private AppClient appClient;
     @Autowired
@@ -46,18 +47,14 @@ public class AppController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page,
             HttpServletResponse response) throws Exception {
-        Envelop envelop = new Envelop();
         List<AppModel> appModelList = new ArrayList<>();
         List<MApp> mAppList = (List<MApp>)appClient.getApps(fields,filters,sort,size,page);
         for(MApp app :mAppList){
             appModelList.add(changeToAppModel(app));
         }
-        envelop.setDetailModelList(appModelList);
-        // 获取符合条件记录总数
-        String count = response.getHeader(AgAdminConstants.ResourceCount);
-        int totalCount = StringUtils.isNotEmpty(count)?Integer.parseInt(count):0;
-        envelop.setTotalCount(totalCount);
-        // TODO Envelop需要四个参数的方法
+        // TODO 获取符合条件记录总数
+        Integer totalCount = 1;
+        Envelop envelop = getResult(appModelList,totalCount,page,size);
         return envelop;
     }
 
@@ -161,13 +158,13 @@ public class AppController {
         appModel.setName(app.getName());
         appModel.setUrl(app.getUrl());
         //获取app类别字典值
-        String catalogCode = app.getCatalog();
-        String catalogValue = conDictEntryClient.getAppCatalog(catalogCode).getValue();
-        appModel.setCatalogName(catalogValue);
+//        String catalogCode = app.getCatalog();
+//        String catalogValue = conDictEntryClient.getAppCatalog(catalogCode).getValue();
+//        appModel.setCatalogName(catalogValue);
         //获取状态字典值
-        String statusCode = app.getStatus();
-        String statusValue = conDictEntryClient.getAppStatus(statusCode).getValue();
-        appModel.setStatusName(statusValue);
+//        String statusCode = app.getStatus();
+//        String statusValue = conDictEntryClient.getAppStatus(statusCode).getValue();
+//        appModel.setStatusName(statusValue);
         return appModel;
     }
 
