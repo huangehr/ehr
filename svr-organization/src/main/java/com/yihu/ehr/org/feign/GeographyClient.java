@@ -18,13 +18,15 @@ import java.util.List;
 @ApiIgnore
 public interface GeographyClient {
 
+    @ApiIgnore
     @RequestMapping(value = "/geographies/{id}", method = RequestMethod.GET)
     MGeography getAddressById(@PathVariable(value = "id") String id);
 
+    @ApiIgnore
     @RequestMapping(value = "/geographies", method =  RequestMethod.PUT)
     String saveAddress(@RequestParam( value = "geography_model_json_data") String GeographyModelJsonData);
 
-
+    @ApiIgnore
     @RequestMapping(value = "/geographies", method = RequestMethod.GET )
     List<String> search(
             @RequestParam(value = "province") String province,

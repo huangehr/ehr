@@ -101,11 +101,11 @@ public class SystemDictController extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(value = "/dictionaries/name" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dictionaries/existence/{app_name}" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典名称是否已经存在")
     boolean isAppNameExists(
-            @ApiParam(name = "app_name", value = "id", defaultValue = "")
-            @RequestParam(value = "app_name") String appName){
+            @ApiParam(name = "app_name", value = "app_name", defaultValue = "")
+            @PathVariable(value = "app_name") String appName){
         return dictService.isDictNameExists(appName);
     }
 }

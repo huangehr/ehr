@@ -29,8 +29,8 @@ public class SvrPaientApplicationTests {
 		String name = "";
 		String idCardNo = "";
 		String province = "河北省";
-		String city = "唐山市";
-		String district = "遵化市";
+		String city = "衡水市";
+		String district = "安平县";
 		int size = 10;
 		int page = 1;
 		Object org = patientController.searchPatient(name,idCardNo,province,city,district,size,page);

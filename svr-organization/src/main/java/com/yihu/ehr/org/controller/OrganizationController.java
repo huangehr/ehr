@@ -211,12 +211,13 @@ public class OrganizationController extends BaseRestController {
         return keyMap;
     }
 
-    @RequestMapping(value = "/organizations/org_code" , method = RequestMethod.GET)
+    @RequestMapping(value = "/organizations/existence/{org_code}" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的机构代码是否已经存在")
     boolean isOrgCodeExists(
             @ApiParam(name = "org_code", value = "org_code", defaultValue = "")
-            @RequestParam(value = "org_code") String orgCode){
+            @PathVariable(value = "org_code") String orgCode){
         return orgService.isExistOrg(orgCode);
     }
+
 
 }

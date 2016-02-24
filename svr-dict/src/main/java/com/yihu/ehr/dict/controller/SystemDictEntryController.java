@@ -115,13 +115,13 @@ public class SystemDictEntryController extends BaseRestController {
         return convertToModel(entry, MDictionaryEntry.class, null);
     }
 
-    @RequestMapping(value = "/dictionaries/dict_id/code" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dictionaries/existence/{dict_id}/{code}" , method = RequestMethod.GET)
     @ApiOperation(value = "根基dictId和code判断提交的字典项名称是否已经存在")
     boolean isAppNameExists(
             @ApiParam(name = "dict_id", value = "dict_id", defaultValue = "")
-            @RequestParam(value = "dict_id") long dictId,
+            @PathVariable(value = "dict_id") long dictId,
             @ApiParam(name = "code", value = "code", defaultValue = "")
-            @RequestParam(value = "code") String code){
+            @PathVariable(value = "code") String code){
         return systemDictEntryService.isDictContainEntry(dictId, code);
     }
 }

@@ -132,10 +132,10 @@ public class AppController extends BaseRestController {
         return appService.findByIdAndSecret(appId, secret)!=null;
     }
 
-    @RequestMapping(value = "/apps/name" , method = RequestMethod.GET)
+    @RequestMapping(value = "/apps/existence/{app_name}" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的app名称是否已经存在")
     boolean isAppNameExists(
-            @ApiParam(name = "app_name", value = "id", defaultValue = "")
+            @PathVariable(value = "app_name")
             @RequestParam(value = "app_name") String appName){
         return appService.isAppNameExists(appName);
     }

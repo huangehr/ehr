@@ -36,8 +36,8 @@ public class BaseRestController extends AbstractController {
     private final static String ResourceCount = "X-Total-Count";
     private final static String ResourceLink = "Link";
 
-    @Value("${admin.region}")
-    Short adminRegion = 3502;
+    @Value("${deploy.region}")
+    Short deployRegion = 3502;
     @Autowired
     protected EntityManager entityManager;
     @Autowired
@@ -191,6 +191,6 @@ public class BaseRestController extends AbstractController {
     }
 
     protected String getObjectId(BizObject bizObject){
-        return new ObjectId(adminRegion, bizObject).toString();
+        return new ObjectId(deployRegion, bizObject).toString();
     }
 }
