@@ -1,6 +1,6 @@
 package com.yihu.ehr.security.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.security.MUserSecurity;
 import com.yihu.ehr.security.service.SecurityManager;
 import com.yihu.ehr.security.service.UserSecurity;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0)
+@RequestMapping(ApiVersion.Version1_0)
 @Api(protocols = "https", value = "security", description = "安全管理接口", tags = {"用户", "企业", "应用", "安全"})
 public class SecurityRestController extends BaseRestController {
 
@@ -190,7 +190,7 @@ public class SecurityRestController extends BaseRestController {
 
     @RequestMapping(value = "/user_keys/org/{org_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据orgCode创建security")
-    public Object getUserKeyIdByOrgCd(
+    public String getUserKeyIdByOrgCd(
             @ApiParam(name = "org_code", value = "机构代码")
             @PathVariable( value = "org_code") String orgCode) throws Exception {
         return securityManager.getUserKeyByOrgCd(orgCode);
@@ -231,7 +231,7 @@ public class SecurityRestController extends BaseRestController {
      */
     @RequestMapping(value = "/securities/user/{user_id}", method = RequestMethod.POST)
     @ApiOperation(value = "根据userId创建Security" )
-    public Object createSecurityByUserId(
+    public MUserSecurity createSecurityByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
             @PathVariable( value = "user_id") String userId) throws Exception {
         UserSecurity userSecurity = securityManager.createSecurityByUserId(userId);
@@ -246,7 +246,7 @@ public class SecurityRestController extends BaseRestController {
      */
     @RequestMapping(value = "/user_keys/user/{user_id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据userId获取user_key" )
-    public Object getUserKeyByUserId(
+    public String getUserKeyByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
             @PathVariable( value = "user_id") String userId) {
         return securityManager.getUserKeyByUserId(userId);
@@ -260,10 +260,10 @@ public class SecurityRestController extends BaseRestController {
      */
     @RequestMapping(value = "/securities/user/{user_id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据userId获取UserSecurity" )
-    public Object getUserSecurityByUserId(
+    public MUserSecurity getUserSecurityByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
             @PathVariable( value = "user_id") String userId) {
-        UserSecurity userSecurity = securityManager.getUserPublicKeyByUserId(userId);
+        UserSecurity userSecurity = securityManager.getUserSecurityByUserId(userId);
         return convertToModel(userSecurity,MUserSecurity.class);
     }
 
