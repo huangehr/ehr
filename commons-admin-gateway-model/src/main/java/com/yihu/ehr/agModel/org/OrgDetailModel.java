@@ -10,14 +10,15 @@ public class OrgDetailModel{
     String fullName="";
     String shortName="";
     String pyCode = "";
-    String orgTypeCode="";
+    String orgType="";
     String orgTypeName="";
-    String settledWayCode="";
+    String settled = "";
+    String settledWay="";
     String settledWayName="";
-    String activityFlgCode = "";
+    String activityFlg = "";
     String activityFlgName = "";
     String createDate = "";
-    String locationId="";
+    String location="";
     String province="";
     String city="";
     String district="";
@@ -64,12 +65,12 @@ public class OrgDetailModel{
         this.pyCode = pyCode;
     }
 
-    public String getOrgTypeCode() {
-        return orgTypeCode;
+    public String getOrgType() {
+        return orgType;
     }
 
-    public void setOrgTypeCode(String orgTypeCode) {
-        this.orgTypeCode = orgTypeCode;
+    public void setOrgType(String orgType) {
+        this.orgType = orgType;
     }
 
     public String getOrgTypeName() {
@@ -80,12 +81,20 @@ public class OrgDetailModel{
         this.orgTypeName = orgTypeName;
     }
 
-    public String getSettledWayCode() {
-        return settledWayCode;
+    public String getSettled() {
+        return settled;
     }
 
-    public void setSettledWayCode(String settledWayCode) {
-        this.settledWayCode = settledWayCode;
+    public void setSettled(String settled) {
+        this.settled = settled;
+    }
+
+    public String getSettledWay() {
+        return settledWay;
+    }
+
+    public void setSettledWay(String settledWay) {
+        this.settledWay = settledWay;
     }
 
     public String getSettledWayName() {
@@ -96,12 +105,12 @@ public class OrgDetailModel{
         this.settledWayName = settledWayName;
     }
 
-    public String getActivityFlgCode() {
-        return activityFlgCode;
+    public String getActivityFlg() {
+        return activityFlg;
     }
 
-    public void setActivityFlgCode(String activityFlgCode) {
-        this.activityFlgCode = activityFlgCode;
+    public void setActivityFlg(String activityFlg) {
+        this.activityFlg = activityFlg;
     }
 
     public String getActivityFlgName() {
@@ -120,12 +129,12 @@ public class OrgDetailModel{
         this.createDate = createDate;
     }
 
-    public String getLocationId() {
-        return locationId;
+    public String getLocation() {
+        return location;
     }
 
-    public void setLocationId(String locationId) {
-        this.locationId = locationId;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public String getProvince() {

@@ -7,10 +7,10 @@ public class AppModel {
     String id;
     String name;
     String secret;
-    String catalogCode;
+    String catalog;
     String catalogName;
     String url;
-    String statusCode;
+    String status;
     String statusName;
 
     public String getId() {
@@ -37,12 +37,12 @@ public class AppModel {
         this.secret = secret;
     }
 
-    public String getCatalogCode() {
-        return catalogCode;
+    public String getCatalog() {
+        return catalog;
     }
 
-    public void setCatalogCode(String catalogCode) {
-        this.catalogCode = catalogCode;
+    public void setCatalog(String catalog) {
+        this.catalog = catalog;
     }
 
     public String getCatalogName() {
@@ -61,12 +61,12 @@ public class AppModel {
         this.url = url;
     }
 
-    public String getStatusCode() {
-        return statusCode;
+    public String getStatus() {
+        return status;
     }
 
-    public void setStatusCode(String statusCode) {
-        this.statusCode = statusCode;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getStatusName() {

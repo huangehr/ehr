@@ -96,7 +96,6 @@ public class AppController extends BaseRestController {
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true)
             @RequestParam(value = "app", required = false) String appJson) throws Exception {
         App app = toEntity(appJson, App.class);
-        app.setId(getObjectId(BizObject.App));
         if (appService.retrieve(app.getId()) == null) throw new ApiException(ErrorCode.InvalidAppId, "应用不存在");
         appService.save(app);
         return convertToModel(app, MApp.class);

@@ -12,12 +12,12 @@ public class AppDetailModel {
     String auditor;
     String create_time;
     String audit_time;
-    String catalogCode;
+    String catalog;
     String catalogName;
-    String statusCode;
-    String statusValue;
+    String status;
+    String statusName;
     String description;
-    String strTags;
+    String tags;
 
     public String getId() {
         return id;
@@ -83,12 +83,12 @@ public class AppDetailModel {
         this.audit_time = audit_time;
     }
 
-    public String getCatalogCode() {
-        return catalogCode;
+    public String getCatalog() {
+        return catalog;
     }
 
-    public void setCatalogCode(String catalogCode) {
-        this.catalogCode = catalogCode;
+    public void setCatalog(String catalog) {
+        this.catalog = catalog;
     }
 
     public String getCatalogName() {
@@ -99,20 +99,20 @@ public class AppDetailModel {
         this.catalogName = catalogName;
     }
 
-    public String getStatusCode() {
-        return statusCode;
+    public String getStatus() {
+        return status;
     }
 
-    public void setStatusCode(String statusCode) {
-        this.statusCode = statusCode;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
-    public String getStatusValue() {
-        return statusValue;
+    public String getStatusName() {
+        return statusName;
     }
 
-    public void setStatusValue(String statusValue) {
-        this.statusValue = statusValue;
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
     }
 
     public String getDescription() {
@@ -123,11 +123,11 @@ public class AppDetailModel {
         this.description = description;
     }
 
-    public String getStrTags() {
-        return strTags;
+    public String getTags() {
+        return tags;
     }
 
-    public void setStrTags(String strTags) {
-        this.strTags = strTags;
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 }

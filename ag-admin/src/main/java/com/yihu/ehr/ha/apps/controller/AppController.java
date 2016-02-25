@@ -1,5 +1,6 @@
 package com.yihu.ehr.ha.apps.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.constants.ApiVersion;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -32,6 +34,9 @@ public class AppController extends BaseController {
     private AppClient appClient;
     @Autowired
     private ConventionalDictEntryClient conDictEntryClient;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @RequestMapping(value = "/apps", method = RequestMethod.GET)
     @ApiOperation(value = "获取App列表")
@@ -68,11 +73,13 @@ public class AppController extends BaseController {
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true, defaultValue = "{\"name\": \"\", \"url\": \"\", \"catalog\": \"\", \"description\": \"\", \"creator\":\"\"}")
             @RequestParam(value = "app", required = false) String appJson) throws Exception {
         Envelop envelop = new Envelop();
-        //TODO 新增用户id参数，读取json串，设置model的creator，转化为json串。
-        MApp mApp = appClient.createApp(appJson);
+        //传入的appJson里包含userId
+        AppDetailModel appDetailModel = objectMapper.readValue(appJson,AppDetailModel.class);
+        MApp app = convertToModel(appDetailModel,MApp.class);
+        MApp mApp = appClient.createApp(objectMapper.writeValueAsString(app));
         if(mApp==null){
             envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("未找到相应的app！");
+            envelop.setErrorMsg("app创建失败！");
         }else{
             envelop.setSuccessFlg(true);
             envelop.setObj(changeToAppDetailModel(mApp));
@@ -104,8 +111,9 @@ public class AppController extends BaseController {
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true)
             @RequestParam(value = "app", required = false) String appJson) throws Exception {
         Envelop envelop = new Envelop();
-        //TODO 新增用户id参数，读取json串，设置model的autor？，转化为json串。
-        MApp mApp = appClient.updateApp(appJson);
+        AppDetailModel appDetailModel = objectMapper.readValue(appJson,AppDetailModel.class);
+        MApp app = convertToModel(appDetailModel,MApp.class);
+        MApp mApp = appClient.updateApp(objectMapper.writeValueAsString(app));
         if(mApp==null){
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("app更新失败！");
@@ -122,7 +130,7 @@ public class AppController extends BaseController {
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
             @PathVariable(value = "app_id") String appId) throws Exception {
         Envelop envelop = new Envelop();
-        //TODO api无返回值
+        //TODO 微服务无返回值
         appClient.deleteApp(appId);
         envelop.setSuccessFlg(true);
         return envelop;
@@ -168,12 +176,12 @@ public class AppController extends BaseController {
         appModel.setUrl(app.getUrl());
         appModel.setSecret(app.getSecret());
         //获取app类别字典值
-        String catalogCode = app.getCatalog();
-        String catalogValue = conDictEntryClient.getAppCatalog(catalogCode).getValue();
+        String catalog = app.getCatalog();
+        String catalogValue = conDictEntryClient.getAppCatalog(catalog).getValue();
         appModel.setCatalogName(catalogValue);
         //获取状态字典值
-        String statusCode = app.getStatus();
-        String statusValue = conDictEntryClient.getAppStatus(statusCode).getValue();
+        String status = app.getStatus();
+        String statusValue = conDictEntryClient.getAppStatus(status).getValue();
         appModel.setStatusName(statusValue);
         return appModel;
     }
@@ -191,15 +199,15 @@ public class AppController extends BaseController {
         app.setUrl(mApp.getUrl());
         app.setDescription(mApp.getDescription());
         //TODO 微服务提供的model缺少tags标签属性
-        //app.setStrTags();
+        //app.setTags();
         //获取app类别字典值
-        String catalogCode = mApp.getCatalog();
-        app.setCatalogCode(catalogCode);
-        app.setCatalogName(conDictEntryClient.getAppCatalog(catalogCode).getValue());
+        String catalog = mApp.getCatalog();
+        app.setCatalog(catalog);
+        app.setCatalogName(conDictEntryClient.getAppCatalog(catalog).getValue());
         //获取app状态字典值
-        String statusCode = mApp.getStatus();
-        app.setStatusCode(statusCode);
-        app.setStatusValue(conDictEntryClient.getAppStatus(statusCode).getValue());
+        String status = mApp.getStatus();
+        app.setStatus(status);
+        app.setStatusName(conDictEntryClient.getAppStatus(status).getValue());
         return app;
     }
 }
