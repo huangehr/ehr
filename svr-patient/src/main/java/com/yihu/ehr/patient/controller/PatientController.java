@@ -118,7 +118,6 @@ public class PatientController extends BaseRestController {
      * 根据前端传回来的json新增一个人口信息
      * @param patientModelJsonData
      * @param request
-     * @param response
      * @return
      * @throws Exception
      */
@@ -127,8 +126,7 @@ public class PatientController extends BaseRestController {
     public MDemographicInfo createPatient(
             @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
             @RequestParam(value = "patient_model_json_data") String patientModelJsonData,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception{
+            HttpServletRequest request) throws Exception{
         //将文件保存至服务器，返回文件的path，
         String picPath = webupload(request);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -171,6 +169,24 @@ public class PatientController extends BaseRestController {
         return convertToModel(demographicInfoModel,MDemographicInfo.class,null);
     }
 
+
+
+    /**
+     * 初始化密码
+     * @param idCardNo
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/populations/password/{id_card_no}",method = RequestMethod.PUT)
+    @ApiOperation(value = "初始化密码",notes = "用户忘记密码时重置密码，初始密码为123456")
+    public boolean resetPass(
+            @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
+            @PathVariable(value = "id_card_no") String idCardNo) throws Exception{
+        demographicService.resetPass(new DemographicId(idCardNo));
+        return true;
+    }
+
+
     /**
      * 人口信息头像图片上传
      * @param request
@@ -208,24 +224,6 @@ public class PatientController extends BaseRestController {
         //返回文件路径
         return path;
     }
-
-    /**
-     * 初始化密码
-     * @param idCardNo
-     * @return
-     * @throws Exception
-     */
-    @RequestMapping(value = "/populations/password/{id_card_no}",method = RequestMethod.PUT)
-    @ApiOperation(value = "初始化密码",notes = "用户忘记密码时重置密码，初始密码为123456")
-    public boolean resetPass(
-            @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
-            @PathVariable(value = "id_card_no") String idCardNo) throws Exception{
-        demographicService.resetPass(new DemographicId(idCardNo));
-        return true;
-    }
-
-
-
 
 
     /**
