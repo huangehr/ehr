@@ -1,11 +1,10 @@
-package com.yihu.ehr.agModel.org.UIModels;
+package com.yihu.ehr.agModel.org;
 /**
  * 用于Grid显示
  * Created by yww on 2016/2/22.
  */
 
 public class OrgModel {
-    //TODO 原model有个order属性用于排序
     String orgCode = "";
     String orgTypeCode = "";
     String orgTypeName = "";

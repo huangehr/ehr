@@ -1,4 +1,4 @@
-package com.yihu.ehr.agModel.org.UIModels;
+package com.yihu.ehr.agModel.org;
 
 import java.util.HashSet;
 
@@ -27,6 +27,11 @@ public class OrgDetailModel{
     String admin = "";
     String tel="";
     String tags="";
+    //公钥信息
+    String publicKey="";
+    String validTime="";
+    String startTime="";
+
     public String getOrgCode() {
         return orgCode;
     }
@@ -193,5 +198,29 @@ public class OrgDetailModel{
 
     public void setTags(String tags) {
         this.tags = tags;
+    }
+
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    public String getValidTime() {
+        return validTime;
+    }
+
+    public void setValidTime(String validTime) {
+        this.validTime = validTime;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
     }
 }
