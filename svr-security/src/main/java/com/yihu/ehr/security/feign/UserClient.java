@@ -14,11 +14,11 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  * Created by Administrator on 2016/1/4.
  */
 @FeignClient(MicroServices.User)
-@RequestMapping(value = "/rest/v1.0")
+@RequestMapping(value = "/api/v1.0")
 @ApiIgnore
 public interface UserClient {
 
-    @RequestMapping(value = "users/{user_id}", method = GET )
+    @RequestMapping(value = "/users/{user_id}", method = GET )
     MUser getUser(@PathVariable(value = "user_id") String userId);
 
     @RequestMapping(value = "users/login/{login_code}", method = GET )
