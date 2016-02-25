@@ -98,7 +98,7 @@ public interface SecurityClient {
      */
 
     @RequestMapping(value = "/user_keys/org/{org_code}", method = RequestMethod.GET)
-    @ApiOperation(value = "根据orgCode创建security")
+    @ApiOperation(value = "根据orgCode获取security")
     String getUserKeyIdByOrgCd(
             @ApiParam(name = "org_code", value = "机构代码")
             @PathVariable( value = "org_code") String orgCode) ;
