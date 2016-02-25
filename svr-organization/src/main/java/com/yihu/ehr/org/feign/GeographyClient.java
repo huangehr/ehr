@@ -14,7 +14,7 @@ import java.util.List;
  * Created by Administrator on 2016/1/4.
  */
 @FeignClient(MicroServices.Geography)
-@RequestMapping(value = "/rest/v1.0")
+@RequestMapping(value = "/api/v1.0")
 @ApiIgnore
 public interface GeographyClient {
 

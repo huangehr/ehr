@@ -14,7 +14,7 @@ public class AbstractCard {
 	String number;				// 卡号
 	String ownerName;			// 持有人姓名
 	String status;			// 状态 CardStatus
-    String type;				// 类型 CardType
+    String cardType;				// 类型 CardType
 	String description;			// 描述
 	Date createDate;				// 创建日期
 	String idCardNo;
@@ -33,7 +33,7 @@ public class AbstractCard {
 	}
 
 	public boolean checkIsVirtualCard(){
-		if(this.getType().equals("VirtualCard")){
+		if(this.getCardType().equals("VirtualCard")){
 			return true;
 		}else{
 			return false;
@@ -72,12 +72,12 @@ public class AbstractCard {
         this.status = status;
     }
 
-    public String getType() {
-        return type;
+    public String getCardType() {
+        return cardType;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setCardType(String cardType) {
+        this.cardType = cardType;
     }
 
     public String getDescription() {
