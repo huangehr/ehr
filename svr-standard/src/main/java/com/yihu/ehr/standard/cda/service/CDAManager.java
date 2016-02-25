@@ -28,7 +28,7 @@ import java.util.List;
 public class CDAManager {
 
     @Autowired
-    private CdaDatasetRelationshipManager cdaDatasetRelationshipManager;
+    private CdaDataSetRelationshipManager cdaDataSetRelationshipManager;
 
     @Autowired
     private CDADocumentManager cdaDocumentManager;
@@ -48,7 +48,7 @@ public class CDAManager {
      */
     public boolean SaveDataSetRelationship(String[] dataSetIds,String cdaId,String versionCode, String xmlInfo) throws Exception {
 
-        cdaDatasetRelationshipManager.deleteRelationshipByCdaId(versionCode,new String[]{cdaId});
+        cdaDataSetRelationshipManager.deleteRelationshipByCdaId(versionCode,new String[]{cdaId});
         List<CDADocument> cdaDocuments = cdaDocumentManager.getDocumentList(versionCode,new String[]{cdaId});
         if (cdaDocuments.size() <= 0) {
             return false;
@@ -73,12 +73,11 @@ public class CDAManager {
             info.setDataSetId(dataSetId);
             infos.add(info);
         }
-        cdaDatasetRelationshipManager.addRelationship(infos,versionCode);
+        cdaDataSetRelationshipManager.addRelationship(infos,versionCode);
         if(infos.size()>0){
-            cdaDatasetRelationshipManager.addRelationship(infos,versionCode);
+            cdaDataSetRelationshipManager.addRelationship(infos,versionCode);
         }else{
-            throw new ApiException(ErrorCode.GetStdVersionFailed)
-            return false;
+            throw new ApiException(ErrorCode.GetStdVersionFailed);
         }
         String strFilePath = SaveCdaFile(xmlInfo, versionCode, cdaId);
         //将文件上传到服务器中
@@ -143,7 +142,7 @@ public class CDAManager {
         return cdaDocumentManager.saveDocument(cdaDocument);
     }
 
-    public CDADocument SaveCdaInfo(String cdaDocumentJsonData) throws Exception {
+    public CDADocument saveCdaInfo(String cdaDocumentJsonData) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         CDADocument cdaInfo = objectMapper.readValue(cdaDocumentJsonData, CDADocument.class);
         if(cdaDocumentManager.isDocumentExist(cdaInfo.getVersionCode(), cdaInfo.getCode(), cdaInfo.getId())){

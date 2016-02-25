@@ -34,7 +34,7 @@ import java.util.List;
 public class CDADocumentManager {
 
     @Autowired
-    private CdaDatasetRelationshipManager cdaDatasetRelationshipManager;
+    private CdaDataSetRelationshipManager cdaDataSetRelationshipManager;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -51,8 +51,8 @@ public class CDADocumentManager {
      * @param ids
      */
     @Transactional(Transactional.TxType.SUPPORTS)
-    public boolean deleteDocument(String versionCode,String[] ids) {
-        cdaDatasetRelationshipManager.deleteRelationshipByCdaId(versionCode,ids);
+    public boolean deleteDocument(String[] ids,String versionCode) {
+        cdaDataSetRelationshipManager.deleteRelationshipByCdaId(versionCode,ids);
         Session session = currentSession();
         String sql = "delete from " + CDAVersionUtil.getCDATableName(versionCode) + " where id in(:ids)";
         Query query = session.createSQLQuery(sql);
@@ -67,7 +67,7 @@ public class CDADocumentManager {
      * @param versionCode
      * @param ids
      */
-    public List<CDADocument> getDocumentList(String versionCode, String[] ids) {
+    public List<CDADocument> getDocumentList(String[] ids,String versionCode) {
 
         Session session = currentSession();
         String strTableName = CDAVersionUtil.getCDATableName(versionCode);
@@ -263,7 +263,7 @@ public class CDADocumentManager {
         String sql;
         Query query;
         String[] ids = new String[]{cdaDocument.getId()};
-        List<CDADocument> xCda = getDocumentList(cdaDocument.getVersionCode(), ids);
+        List<CDADocument> xCda = getDocumentList(ids,cdaDocument.getVersionCode());
         if (xCda.size() == 0) {
             sql = "insert into " + strTableName +" "+
                     "(id," +
@@ -367,8 +367,8 @@ public class CDADocumentManager {
      */
     public boolean createCDASchemaFile(String cdaId, String versionCode) throws TransformerException, ParserConfigurationException, FileNotFoundException, UnsupportedEncodingException {
         //操作结果：0：现在失败 1：新增成功
-        int iSetCount = cdaDatasetRelationshipManager.getRelationshipCountByCdaId(cdaId, versionCode);
-        List<CdaDataSetRelationship> relationshipsList = cdaDatasetRelationshipManager.getCDADataSetRelationshipByCDAId(cdaId, versionCode, 1, iSetCount);
+        int iSetCount = cdaDataSetRelationshipManager.getRelationshipCountByCdaId(cdaId, versionCode);
+        List<CdaDataSetRelationship> relationshipsList = cdaDataSetRelationshipManager.getCDADataSetRelationshipByCDAId(cdaId, versionCode, 1, iSetCount);
 
         String strPath = System.getProperty("java.io.tmpdir");
         strPath += "StandardFiles";

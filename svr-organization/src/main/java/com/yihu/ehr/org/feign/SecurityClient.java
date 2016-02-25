@@ -1,5 +1,6 @@
 package com.yihu.ehr.org.feign;
 
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.security.MUserSecurity;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -14,28 +15,22 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
  * Created by Administrator on 2016/1/4.
  */
 @FeignClient(MicroServices.Security)
-@RequestMapping(value = "/api/v1.0")
 @ApiIgnore
 public interface SecurityClient {
 
-    @ApiIgnore
-    @RequestMapping(value = "/securities/org/{org_code}", method = POST, consumes = "application/json")
+    @RequestMapping(value = ApiVersion.Version1_0+"/securities/org/{org_code}", method = POST, consumes = "application/json")
     MUserSecurity createSecurityByOrgCode(@PathVariable(value = "org_code") String orgCode);
 
-    @ApiIgnore
-    @RequestMapping(value = "/securities/org/{org_code}", method = GET )
+    @RequestMapping(value = ApiVersion.Version1_0+"/securities/org/{org_code}", method = GET )
     MUserSecurity getUserSecurityByOrgCode(@PathVariable(value = "org_code") String orgCode);
 
-    @ApiIgnore
-    @RequestMapping(value = "/securities/{id}", method = DELETE  )
+    @RequestMapping(value = ApiVersion.Version1_0+"/securities/{id}", method = DELETE  )
     void deleteSecurity(@PathVariable(value = "id") String id);
 
-    @ApiIgnore
-    @RequestMapping(value = "/user_keys/{user_key_id}", method = DELETE  )
+    @RequestMapping(value = ApiVersion.Version1_0+"/user_keys/{user_key_id}", method = DELETE  )
     void deleteUserKey(@PathVariable(value = "user_key_id") String userKeyId);
 
-    @ApiIgnore
-    @RequestMapping(value = "/user_keys/org/{org_code}", method = GET  )
+    @RequestMapping(value = ApiVersion.Version1_0+"/user_keys/org/{org_code}", method = GET  )
     String getUserKeyIdByOrgCd(@PathVariable(value = "org_code") String orgCode);
 
 }
