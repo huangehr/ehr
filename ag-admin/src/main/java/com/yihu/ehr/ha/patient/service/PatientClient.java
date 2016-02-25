@@ -73,38 +73,26 @@ public interface PatientClient {
      */
     @RequestMapping(value = "/populations",method = RequestMethod.POST)
     @ApiOperation(value = "根据前端传回来的json创建一个人口信息")
-    boolean createPatient(
+    MDemographicInfo createPatient(
             @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
             @RequestParam(value = "patient_model_json_data") String patientModelJsonData) ;
 
     /**
      * 根据前端传回来的json修改人口信息
      * @param patientModelJsonData
-     * @param request
-     * @param response
+
      * @return
      * @throws Exception
      */
     @RequestMapping(value = "/populations",method = RequestMethod.PUT)
     @ApiOperation(value = "根据前端传回来的json修改人口信息")
-    boolean updatePatient(
+    MDemographicInfo updatePatient(
             @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
             @RequestParam(value = "patient_model_json_data") String patientModelJsonData);
 
     @RequestMapping(value = "/populations/password/{id_card_no}",method = RequestMethod.PUT)
     @ApiOperation(value = "初始化密码",notes = "用户忘记密码时重置密码，初始密码为123456")
-    Object resetPass(
+    boolean resetPass(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @PathVariable(value = "id_card_no") String idCardNo);
-    /**
-     * 注：因直接访问文件路径，无法显示文件信息
-     * 将文件路径解析成字节流，通过字节流的方式读取文件
-     * @param localImgPath       文件路径
-     * @throws Exception
-     */
-    @RequestMapping(value = "/populations/images/{local_img_path}",method = RequestMethod.PUT)
-    @ApiOperation(value = "显示头像")
-    void showImage(
-            @ApiParam(name = "local_img_path", value = "身份证号", defaultValue = "")
-            @PathVariable(value = "local_img_path") String localImgPath);
 }
