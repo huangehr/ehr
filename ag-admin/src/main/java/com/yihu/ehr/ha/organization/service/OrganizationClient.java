@@ -19,7 +19,7 @@ import java.util.Map;
 @FeignClient("svr-org")
 public interface OrganizationClient {
 
-    @RequestMapping(value = "/rest/v1.0/organizations", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/v1.0/organizations", method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询机构列表")
     List<MOrganization> searchOrgs(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
@@ -39,7 +39,7 @@ public interface OrganizationClient {
      * @param orgCode
      * @return
      */
-    @RequestMapping(value = "/rest/v1.0/organizations/{org_code}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/api/v1.0/organizations/{org_code}", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据机构代码删除机构")
     boolean deleteOrg(
             @ApiParam(name = "org_code", value = "机构代码", defaultValue = "")
@@ -52,11 +52,11 @@ public interface OrganizationClient {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/rest/v1.0/organizations" , method = RequestMethod.POST)
+    @RequestMapping(value = "/api/v1.0/organizations" , method = RequestMethod.POST)
     @ApiOperation(value = "创建机构")
     Object create(String orgModelJsonData ) ;
 
-    @RequestMapping(value = "/rest/v1.0/organizations" , method = RequestMethod.PUT)
+    @RequestMapping(value = "/api/v1.0/organizations" , method = RequestMethod.PUT)
     @ApiOperation(value = "修改机构")
     Object update(String orgModelJsonData ) ;
 
@@ -66,7 +66,7 @@ public interface OrganizationClient {
      * @param orgCode
      * @return
      */
-    @RequestMapping(value = "/rest/v1.0/organizations/{org_code}", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/v1.0/organizations/{org_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据机构代码获取机构")
     MOrganization getOrg(
             @ApiParam(name = "org_code", value = "机构代码", defaultValue = "")
@@ -79,7 +79,7 @@ public interface OrganizationClient {
      * @return
      */
     @ApiOperation(value = "根据地名称取机构ids")
-    @RequestMapping(value = "/rest/v1.0/organizations/{name}", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/v1.0/organizations/{name}", method = RequestMethod.GET)
     List<String> getIdsByName(
             @ApiParam(name = "name", value = "机构名称", defaultValue = "")
             @PathVariable(value = "name") String name);
@@ -90,7 +90,7 @@ public interface OrganizationClient {
      * @param orgCode
      * @return
      */
-    @RequestMapping(value = "/rest/v1.0/organizations/{org_code}/{activity_flag}" , method = RequestMethod.PUT)
+    @RequestMapping(value = "/api/v1.0/organizations/{org_code}/{activity_flag}" , method = RequestMethod.PUT)
     @ApiOperation(value = "跟新机构激活状态")
     boolean activity(
             @ApiParam(name = "org_code", value = "机构代码", defaultValue = "")
@@ -105,7 +105,7 @@ public interface OrganizationClient {
      * @param city
      * @return
      */
-    @RequestMapping(value = "/rest/v1.0/organizations/{province}/{city}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/api/v1.0/organizations/{province}/{city}" , method = RequestMethod.GET)
     @ApiOperation(value = "根据地址获取机构下拉列表")
     Collection<MOrganization> getOrgsByAddress(
             @ApiParam(name = "province", value = "省")
@@ -113,7 +113,7 @@ public interface OrganizationClient {
             @ApiParam(name = "city", value = "市")
             @PathVariable(value = "city") String city) ;
 
-    @RequestMapping( value = "/rest/v1.0/organizations/key" , method = RequestMethod.POST)
+    @RequestMapping( value = "/api/v1.0/organizations/key" , method = RequestMethod.POST)
     @ApiOperation(value = "机构分发密钥")
     Map<String, String> distributeKey(
             @ApiParam(name = "org_code", value = "机构代码")

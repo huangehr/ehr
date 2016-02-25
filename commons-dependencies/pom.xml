@@ -63,6 +63,11 @@
                 <version>Brixton.M4</version>
                 <type>pom</type>
                 <scope>import</scope>
+                <!--<groupId>org.springframework.cloud</groupId>-->
+                <!--<artifactId>spring-cloud-starter-parent</artifactId>-->
+                <!--<version>Angel.SR6</version>-->
+                <!--<type>pom</type>-->
+                <!--<scope>import</scope>-->
             </dependency>
         </dependencies>
     </dependencyManagement>
