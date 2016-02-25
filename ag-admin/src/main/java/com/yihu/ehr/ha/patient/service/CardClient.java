@@ -1,5 +1,6 @@
 package com.yihu.ehr.ha.patient.service;
 
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.patient.MAbstractCard;
 import com.yihu.ehr.util.Envelop;
 import io.swagger.annotations.ApiOperation;
@@ -9,14 +10,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * Created by AndyCai on 2016/2/16.
  */
 @FeignClient("svr-patient")
+@RequestMapping(ApiVersion.Version1_0)
+@ApiIgnore
 public interface CardClient {
 
-    @RequestMapping(value = "/rest/v1.0/cards/bound_card",method = RequestMethod.GET)
+    @RequestMapping(value = "/cards/bound_card",method = RequestMethod.GET)
     @ApiOperation(value = "获取已绑定的卡列表")
     Envelop searchCard(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
@@ -39,7 +43,7 @@ public interface CardClient {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/rest/v1.0/cards/not_bound_card",method = RequestMethod.GET)
+    @RequestMapping(value = "/cards/not_bound_card",method = RequestMethod.GET)
     @ApiOperation(value = "未绑定的卡")
     Envelop searchNewCard(
             @ApiParam(name = "number", value = "卡号", defaultValue = "")
@@ -58,7 +62,7 @@ public interface CardClient {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/rest/v1.0/cards/{id}/{card_type}",method = RequestMethod.GET)
+    @RequestMapping(value = "/cards/{id}/{card_type}",method = RequestMethod.GET)
     @ApiOperation(value = "根据卡号和卡类型查找卡")
     MAbstractCard getCard(
             @ApiParam(name = "id", value = "卡号", defaultValue = "")
@@ -73,7 +77,7 @@ public interface CardClient {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/rest/v1.0/cards/detach/{id}/{card_type}",method = RequestMethod.PUT)
+    @RequestMapping(value = "/cards/detach/{id}/{card_type}",method = RequestMethod.PUT)
     @ApiOperation(value = "根据卡号和卡类型解绑卡")
     boolean detachCard(
             @ApiParam(name = "id", value = "卡号", defaultValue = "")
@@ -89,7 +93,7 @@ public interface CardClient {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/rest/v1.0/cards/attach/{id}/{id_card_no}/{card_type}",method = RequestMethod.PUT)
+    @RequestMapping(value = "/cards/attach/{id}/{id_card_no}/{card_type}",method = RequestMethod.PUT)
     @ApiOperation(value = "根据卡编号(卡主键，卡的唯一标识)，身份证号，卡类型绑定卡")
     boolean attachCard(
             @ApiParam(name = "id", value = "卡号", defaultValue = "")

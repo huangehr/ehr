@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * Created by AndyCai on 2016/1/21.
  */
-@RequestMapping(ApiVersion.Version1_0 )
+@RequestMapping(ApiVersion.Version1_0 +"/admin")
 @RestController
 public class CardController {
 

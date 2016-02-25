@@ -39,6 +39,10 @@ public class BaseController extends AbstractController {
      * @return
      */
     public <T> T convertToModel(Object source, Class<T> targetCls, String... properties) {
+        if(source==null)
+        {
+            return null;
+        }
         T target = BeanUtils.instantiate(targetCls);
         BeanUtils.copyProperties(source, target, propertyDiffer(properties, targetCls));
 
@@ -64,6 +68,10 @@ public class BaseController extends AbstractController {
      * @return
      */
     public <T> Collection<T> convertToModels(Collection sources, Collection<T> targets, Class<T> targetCls, String properties) {
+        if(sources==null)
+        {
+            return null;
+        }
         Iterator iterator = sources.iterator();
         while (iterator.hasNext()) {
             Object source = iterator.next();
