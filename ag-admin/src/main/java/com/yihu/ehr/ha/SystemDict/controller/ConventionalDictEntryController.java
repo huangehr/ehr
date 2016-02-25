@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Created by AndyCai on 2016/1/19.
  */
-@RequestMapping(ApiVersion.Version1_0 )
+@RequestMapping(ApiVersion.Version1_0 +"/admin")
 @RestController
 public class ConventionalDictEntryController {
 
