@@ -1,5 +1,7 @@
 package com.yihu.ehr.patient.service.card;
 
+import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.patient.dao.XAbstractPhysicalCardRepository;
 import com.yihu.ehr.patient.dao.XAbstractVirtualCardRepository;
@@ -53,22 +55,22 @@ public class CardManager {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         String idCardNo = (String) args.get("idCardNo");
         String number = (String)args.get("number");
-        String searchType = (String) args.get("type");
+        String type = (String) args.get("type");
         String cardType = (String)args.get("cardType");   //","otherCard
         int rows = (Integer)args.get("rows");
         int page = (Integer)args.get("page");
         String sqlPhysical="from AbstractPhysicalCard a where (a.number like :number)";
         String sqlVirtual="from AbstractVirtualCard a where (a.number like :number)";
-        if ("bound_card".equals(cardType) && !StringUtils.isEmpty(idCardNo)){
+        if ("bind_card".equals(type) && !StringUtils.isEmpty(idCardNo)){
             sqlPhysical += " and (idCardNo=:idCardNo)";
             sqlVirtual += " and (idCardNo=:idCardNo)";
         }else{
             sqlPhysical += " and (idCardNo=null or trim(idCardNo)='')";
             sqlVirtual += " and (idCardNo=null or trim(idCardNo)='')";
         }
-        if (!StringUtils.isEmpty(searchType)){
-            sqlPhysical += " and (type=:searchType)";
-            sqlVirtual += " and (type=:searchType)";
+        if (!StringUtils.isEmpty(cardType)){
+            sqlPhysical += " and (cardType=:cardType)";
+            sqlVirtual += " and (cardType=:cardType)";
         }
         Query queryPhysical = session.createQuery(sqlPhysical);
         Query queryVirtual = session.createQuery(sqlVirtual);
@@ -78,11 +80,10 @@ public class CardManager {
             queryPhysical.setParameter("idCardNo", idCardNo);
             queryVirtual.setParameter("idCardNo", idCardNo);
         }
-        if (!StringUtils.isEmpty(searchType)){
-            queryPhysical.setParameter("searchType", searchType);
-            queryVirtual.setParameter("searchType", searchType);
+        if (!StringUtils.isEmpty(cardType)){
+            queryPhysical.setParameter("cardType", cardType);
+            queryVirtual.setParameter("cardType", cardType);
         }
-
         List<AbstractCard> cards;
         queryPhysical.setMaxResults(rows);
         queryPhysical.setFirstResult((page - 1) * rows);
@@ -113,21 +114,22 @@ public class CardManager {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         String idCardNo = (String) args.get("idCardNo");
         String number = (String)args.get("number");
-        String searchType = (String) args.get("type");
-        String searchIdCardNo = (String)args.get("searchIdCardNo");
+        String type = (String) args.get("type");
+        String cardType = (String)args.get("cardType");   //","otherCard
+        int rows = (Integer)args.get("rows");
+        int page = (Integer)args.get("page");
         String sqlPhysical="from AbstractPhysicalCard a where (a.number like :number)";
         String sqlVirtual="from AbstractVirtualCard a where (a.number like :number)";
-        if (!StringUtils.isEmpty(idCardNo)){
+        if ("bind_card".equals(type) && !StringUtils.isEmpty(idCardNo)){
             sqlPhysical += " and (idCardNo=:idCardNo)";
             sqlVirtual += " and (idCardNo=:idCardNo)";
-        }
-        if (!StringUtils.isEmpty(searchType)){
-            sqlPhysical += " and (type=:searchType)";
-            sqlVirtual += " and (type=:searchType)";
-        }
-        if (!StringUtils.isEmpty(searchIdCardNo)){
+        }else{
             sqlPhysical += " and (idCardNo=null or trim(idCardNo)='')";
             sqlVirtual += " and (idCardNo=null or trim(idCardNo)='')";
+        }
+        if (!StringUtils.isEmpty(cardType)){
+            sqlPhysical += " and (cardType=:cardType)";
+            sqlVirtual += " and (cardType=:cardType)";
         }
         Query queryPhysical = session.createQuery(sqlPhysical);
         Query queryVirtual = session.createQuery(sqlVirtual);
@@ -137,12 +139,13 @@ public class CardManager {
             queryPhysical.setParameter("idCardNo", idCardNo);
             queryVirtual.setParameter("idCardNo", idCardNo);
         }
-        if (!StringUtils.isEmpty(searchType)){
-            queryPhysical.setParameter("searchType", searchType);
-            queryVirtual.setParameter("searchType", searchType);
+        if (!StringUtils.isEmpty(cardType)){
+            queryPhysical.setParameter("cardType", cardType);
+            queryVirtual.setParameter("cardType", cardType);
         }
-        List<AbstractCard> cards = queryPhysical.list();
-        return cards.size();
+        List<AbstractCard> physicalCards = queryPhysical.list();
+        List<AbstractCard> virtualCards = queryVirtual.list();
+        return physicalCards.size()+virtualCards.size();
 
     }
 
@@ -168,7 +171,7 @@ public class CardManager {
     }
 
     public boolean save(AbstractCard card){
-        if(conventionalDictClient.getCardType(card.getType()).checkIsVirtualCard()){
+        if(conventionalDictClient.getCardType(card.getCardType()).checkIsVirtualCard()){
             AbstractVirtualCard abstractVirtualCard = (AbstractVirtualCard) card;
             abstractVirtualCardRepository.save(abstractVirtualCard);
         }else {
@@ -179,10 +182,10 @@ public class CardManager {
     }
 
     public boolean saveCard(AbstractCard card) {
-        if (card.getNumber().length() == 0 || card.getType() == null) {
-            throw new CardException("卡信息不全, 无法更新");
+        if (card.getNumber().length() == 0 || card.getCardType() == null) {
+            throw new ApiException(ErrorCode.RepeatCode,"卡信息不全, 无法更新");
         } else if (card.getStatus() == conventionalDictClient.getCardStatus("Invalid").getValue()) {
-            throw new CardException("卡已作废, 无法更新");
+            throw new ApiException(ErrorCode.CardIsToVoid,"卡已作废, 无法更新");
         }
         return save(card);
     }

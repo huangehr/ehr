@@ -14,7 +14,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  * Created by Administrator on 2016/1/4.
  */
 @FeignClient(MicroServices.DictMgr)
-@RequestMapping(value = "/rest/v1.0")
+@RequestMapping(value = "/api/v1.0")
 public interface ConventionalDictClient {
 
     @ApiIgnore

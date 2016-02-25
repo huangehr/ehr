@@ -13,20 +13,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.management.BufferPoolMXBean;
 import java.util.List;
 
 /**
  * Created by AndyCai on 2016/1/20.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersion.Version1_0)
+@RequestMapping(ApiVersion.Version1_0+"/admin")
 @RestController
 @Api(value = "address", description = "地址信息管理接口，用于地址信息管理", tags = {"地址信息管理接口"})
 public class AddressController {
     @Autowired
     private AddressClient addressClient;
 
-    @RequestMapping(value = "/geographies/{level}", method = RequestMethod.GET)
+    @RequestMapping(value = "/geography_entries/level/{level}", method = RequestMethod.GET)
     @ApiOperation(value = "根据地址等级查询地址字典")
     public Envelop getAddressByLevel(
             @ApiParam(name = "level", value = "地址级别", defaultValue = "")
@@ -36,12 +37,19 @@ public class AddressController {
 
         List<MGeographyDict> mGeographyDictList = addressClient.getAddressByLevel(level);
 
-        envelop.setDetailModelList(mGeographyDictList);
+        if(mGeographyDictList.size()>0){
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(mGeographyDictList);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("根据地址等级查询地址字典失败");
+        }
+
         return envelop;
     }
 
-    @RequestMapping(value = "/geographies/{pid}", method = RequestMethod.GET)
-    @ApiOperation(value = "根据父id查询地址字典")
+    @RequestMapping(value = "/geography_entries/pid/{pid}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据上级编号查询行政区划地址")
     public Envelop getAddressDictByPid(
             @ApiParam(name = "pid", value = "上级id", defaultValue = "")
             @PathVariable(value = "pid") Integer pid) {
@@ -50,7 +58,14 @@ public class AddressController {
 
         List<MGeographyDict> mGeographyDictList = addressClient.getAddressDictByPid(pid);
 
-        envelop.setDetailModelList(mGeographyDictList);
+        if(mGeographyDictList.size()>0){
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(mGeographyDictList);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("根据上级编号查询行政区划地址失败");
+        }
+
         return envelop;
     }
 
@@ -63,7 +78,14 @@ public class AddressController {
         Envelop envelop = new Envelop();
 
         MGeography mGeography = addressClient.getAddressById(id);
-        envelop.setObj(mGeography);
+
+        if(mGeography != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(mGeography);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("地址查询失败");
+        }
 
         return envelop;
     }
@@ -78,8 +100,16 @@ public class AddressController {
         Envelop envelop = new Envelop();
         GeographyDictModel geographyDictModel = new GeographyDictModel();
 
-        geographyDictModel.setName(addressClient.getCanonicalAddress(id));
-        envelop.setObj(geographyDictModel);
+        String address = addressClient.getCanonicalAddress(id);
+
+        if(address != null){
+            geographyDictModel.setName(address);
+            envelop.setSuccessFlg(true);
+            envelop.setObj(geographyDictModel);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("地址查询失败");
+        }
 
         return envelop;
     }
@@ -96,9 +126,16 @@ public class AddressController {
 
         Envelop envelop = new Envelop();
         GeographyDictModel geographyDictModel = new GeographyDictModel();
+
         String id = addressClient.saveAddress(geographyModelJsonData);
 
-        geographyDictModel.setId(id);
+        if(id != null){
+            envelop.setSuccessFlg(true);
+            geographyDictModel.setId(id);
+        }else{
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("地址新增失败");
+        }
         envelop.setObj(geographyDictModel);
 
         return envelop;
@@ -124,7 +161,14 @@ public class AddressController {
         Envelop envelop = new Envelop();
 
         List<String> mGeographyList = addressClient.search(province,city,district);
-        envelop.setDetailModelList(mGeographyList);
+
+        if(mGeographyList.size()>0){
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(mGeographyList);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("地址查询失败");
+        }
 
         return envelop;
     }
@@ -142,7 +186,14 @@ public class AddressController {
 
         Envelop envelop = new Envelop();
 
-        envelop.setSuccessFlg(addressClient.delete(id));
+        Boolean bo = addressClient.delete(id);
+
+        if(bo){
+            envelop.setSuccessFlg(true);
+        }else{
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("地址删除失败");
+        }
 
         return envelop;
     }
@@ -155,6 +206,7 @@ public class AddressController {
             @RequestParam( value = "json_data") String jsonData) throws Exception{
 
         Envelop envelop = new Envelop();
+
         Boolean bo = addressClient.isNullAddress(jsonData);
         envelop.setSuccessFlg(bo);
 

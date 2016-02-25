@@ -107,9 +107,9 @@ public class CdaController extends BaseRestController{
     * 判断文件是否存在*/
     @RequestMapping("/FileExists")
     @ResponseBody
-    public String FileExists(String cdaId, String versionCode) {
+    public boolean FileExists(String cdaId, String versionCode) {
         //1：已存在文件
-        return cdaDocumentManager.isFileExists(cdaId, versionCode)
+        return cdaDocumentManager.isFileExists(cdaId, versionCode);
     }
 
     /**
@@ -133,8 +133,8 @@ public class CdaController extends BaseRestController{
      */
     @RequestMapping("/getDatasetByCdaId")
     @ResponseBody
-    public List<CdaDataSetRelationship> getCdaDatasetRelationship(String cdaId) {
-        List<CdaDataSetRelationship> relations = cdaDatasetRelationshipManager.getCDADataSetRelationshipByCDAId(cdaId);
+    public List<CdaDataSetRelationship> getCdaDatasetRelationship(String cdaId, String strVersionCode) {
+        List<CdaDataSetRelationship> relations = cdaDatasetRelationshipManager.getCDADataSetRelationshipByCDAId(cdaId,strVersionCode,0,0);
         return relations;
     }
 
@@ -162,7 +162,7 @@ public class CdaController extends BaseRestController{
         List<String> listIds = new ArrayList<>();
         listIds.add(cdaId);
 
-        List<CDADocument> xcdaDocuments = cdaDocumentManager.getDocumentList(versionCode, listIds);
+        List<CDADocument> xcdaDocuments = cdaDocumentManager.getDocumentList(versionCode, new String[]{cdaId});
         String strFileGroup = "";
         String strSchemePath = "";
         if (xcdaDocuments.size() > 0) {

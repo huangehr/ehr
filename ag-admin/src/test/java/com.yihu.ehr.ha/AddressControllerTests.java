@@ -15,8 +15,10 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by AndyCai on 2016/1/20.
@@ -73,17 +75,17 @@ public class AddressControllerTests {
     @Test
     public void btestGetAddressByLevel()
     {
-//        Integer level = 1;
-//        envelop = addressController.getAddressByLevel(level);
-//        assertNotEquals("地址等级查询地址字典失败",envelop,null);
+        Integer level = 3;
+        envelop = addressController.getAddressByLevel(level);
+        assertNotEquals("地址等级查询地址字典失败",envelop,null);
     }
 
     @Test
     public void ctestgetAddressDictByPid()
     {
-//        Integer pid = 156;
-//        envelop = addressController.getAddressDictByPid(pid);
-//        assertNotEquals("父id查询地址字典失败",envelop,null);
+        Integer pid = 0;
+        envelop = addressController.getAddressDictByPid(pid);
+        assertNotEquals("父id查询地址字典失败",envelop,null);
     }
 
     @Test
@@ -95,10 +97,14 @@ public class AddressControllerTests {
 
     @Test
     public void ztestisNullAddress() throws Exception {
-//        "{'id':'1231232434345wef','province':'河北省','city':'保定市','district':'安国市'}"
-        String address = "{\"id\": \"1231232434345wef\", \"province\": \"河北省\", \"city\": \"保定市\",\"district\": \"安国市\"}";
+        Map<String,Object> mapper = new HashMap<>();
+        mapper.put("province","河北省");
+        mapper.put("city","保定市");
+        mapper.put("district","安国市");
 
-        envelop = addressController.isNullAddress(address);
+        ObjectMapper map = new ObjectMapper();
+        String addressJson = map.writeValueAsString(mapper);
+        envelop = addressController.isNullAddress(addressJson);
         assertNotEquals("判断是否是个地址 失败",envelop,null);
     }
 }
