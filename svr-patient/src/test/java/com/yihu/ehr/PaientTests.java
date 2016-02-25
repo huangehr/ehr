@@ -14,13 +14,15 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
+
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SvrPatientApplication.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @Transactional
-public class SvrPaientApplicationTests {
+public class PaientTests {
 
 	ApplicationContext applicationContext;
 
@@ -52,7 +54,7 @@ public class SvrPaientApplicationTests {
 	}
 
 	@Test
-	public void gcreatePatient() throws Exception{
+	public void gCreatePatient() throws Exception{
 		String idCardNo = "412726195002150030";
 		MDemographicInfo info = patientController.getPatient(idCardNo);
 		info.setIdCardNo("3522251991828317218");
@@ -73,10 +75,7 @@ public class SvrPaientApplicationTests {
 
 	@Test
 	public void kResetPass() throws Exception{
-		applicationContext = new SpringApplicationBuilder()
-				.web(false).sources(SvrPatientApplication.class).run();
 		String idCardNo = "412726195002150030";
-
 		boolean resut = patientController.resetPass(idCardNo);
 		assertTrue("修改失败！" , resut == true);
 	}

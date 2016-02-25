@@ -12,12 +12,11 @@ import org.hibernate.Session;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Map;
 
@@ -51,40 +50,13 @@ public class DemographicService {
 
 
 
-    public void save(MDemographicInfo demographicInfoModel) throws JsonProcessingException {
-        //地址检查并保存
-        DemographicInfo demographicInfo = new DemographicInfo();
-        BeanUtils.copyProperties(demographicInfoModel,DemographicInfo.class);
-        //出生地
-        MGeography birthPlace = demographicInfoModel.getBirthPlace();
-        if (!isNullAddress(birthPlace)) {
-            String addressId = savaAddress(birthPlace);
-            demographicInfo.setBirthPlace(addressId);
-        }else{
-            demographicInfo.setBirthPlace(null);
-        }
-        //工作地址
-        MGeography workAddress = demographicInfoModel.getWorkAddress();
-        if (!isNullAddress(workAddress)) {
-            String addressid = savaAddress(workAddress);
-            demographicInfo.setWorkAddress(addressid);
-        }else{
-            demographicInfo.setWorkAddress(null);
-        }
-        //家庭地址
-        MGeography homeAddress = demographicInfoModel.getHomeAddress();
-        if (!isNullAddress(homeAddress)) {
-            String addressId = savaAddress(homeAddress);
-            demographicInfo.setHomeAddress(addressId);
-        }else{
-            demographicInfo.setHomeAddress(null);
-        }
+    public void save(DemographicInfo demographicInfo) throws JsonProcessingException {
         demographicInfoRepository.save(demographicInfo);
     }
 
 
-    public boolean savePatient(MDemographicInfo demographicInfoModel) throws Exception{
-        save(demographicInfoModel);
+    public boolean savePatient(DemographicInfo demographicInfo) throws Exception{
+        save(demographicInfo);
         return true;
     }
 
@@ -98,7 +70,7 @@ public class DemographicService {
         String province = (String) args.get("province");
         String city = (String) args.get("city");
         String district = (String) args.get("district");
-        String[] homeAddressIdList = addressClient.search(province,city,district);
+        List<String> homeAddressIdList = addressClient.search(province,city,district);
         String hql = "from DemographicInfo where 1=1";
         if (!StringUtils.isEmpty(idCardNo)) {
             hql += " and id like :idCardNo)";
@@ -133,7 +105,7 @@ public class DemographicService {
         String province = (String) args.get("province");
         String city = (String) args.get("city");
         String district = (String) args.get("district");
-        String[] homeAddressIdList = addressClient.search(province,city,district);
+        List<String> homeAddressIdList = addressClient.search(province,city,district);
         String hql = "from DemographicInfo where 1=1";
         if (!StringUtils.isEmpty(idCardNo)) {
             hql += " and id like :idCardNo)";

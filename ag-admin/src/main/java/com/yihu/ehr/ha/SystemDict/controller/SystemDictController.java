@@ -52,7 +52,6 @@ public class SystemDictController {
 
         envelop.setDetailModelList(systemDicts);
 
-
        return envelop;
     }
 
