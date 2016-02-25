@@ -17,7 +17,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @ApiIgnore
 public interface UserClient {
 
-    @RequestMapping(value = "users/{user_id}", method = GET )
+    @RequestMapping(value = "/users/{user_id}", method = GET )
     MUser getUser(@PathVariable(value = "user_id") String userId);
 
     @RequestMapping(value = "users/login/{login_code}", method = GET )
