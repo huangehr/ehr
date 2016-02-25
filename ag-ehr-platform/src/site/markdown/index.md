@@ -26,7 +26,7 @@
 开发指南
 ---------------------
 
-> [授权](dev-guide/authoritarian/index.html)
+> [认证与授权](dev-guide/authoritarian/index.html)
 
 > [数据标准](dev-guide/standard/index.html)
 
