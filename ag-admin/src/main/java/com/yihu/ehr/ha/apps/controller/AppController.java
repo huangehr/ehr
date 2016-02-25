@@ -7,6 +7,7 @@ import com.yihu.ehr.ha.apps.service.AppClient;
 import com.yihu.ehr.agModel.app.AppDetailModel;
 import com.yihu.ehr.agModel.app.AppModel;
 import com.yihu.ehr.model.app.MApp;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
@@ -45,8 +46,7 @@ public class AppController extends BaseController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletResponse response) throws Exception {
+            @RequestParam(value = "page", required = false) int page) throws Exception {
         List<AppModel> appModelList = new ArrayList<>();
         List<MApp> mAppList = (List<MApp>)appClient.getApps(fields,filters,sort,size,page);
         for(MApp app :mAppList){
@@ -69,6 +69,7 @@ public class AppController extends BaseController {
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true, defaultValue = "{\"name\": \"\", \"url\": \"\", \"catalog\": \"\", \"description\": \"\", \"creator\":\"\"}")
             @RequestParam(value = "app", required = false) String appJson) throws Exception {
         Envelop envelop = new Envelop();
+        //TODO 新增用户id参数，读取json串，设置model的creator，转化为json串。
         MApp mApp = appClient.createApp(appJson);
         if(mApp==null){
             envelop.setSuccessFlg(false);
@@ -104,6 +105,7 @@ public class AppController extends BaseController {
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true)
             @RequestParam(value = "app", required = false) String appJson) throws Exception {
         Envelop envelop = new Envelop();
+        //TODO 新增用户id参数，读取json串，设置model的autor？，转化为json串。
         MApp mApp = appClient.updateApp(appJson);
         if(mApp==null){
             envelop.setSuccessFlg(false);
@@ -157,14 +159,17 @@ public class AppController extends BaseController {
         appModel.setId(app.getId());
         appModel.setName(app.getName());
         appModel.setUrl(app.getUrl());
+        appModel.setSecret(app.getSecret());
         //获取app类别字典值
-//        String catalogCode = app.getCatalog();
-//        String catalogValue = conDictEntryClient.getAppCatalog(catalogCode).getValue();
-//        appModel.setCatalogName(catalogValue);
+        String catalogCode = app.getCatalog();
+        //String catalogValue = conDictEntryClient.getAppCatalog(catalogCode).getValue();
+        MConventionalDict d = conDictEntryClient.getAppCatalog(catalogCode);
+        String catalogValue = d.getValue();
+        appModel.setCatalogName(catalogValue);
         //获取状态字典值
-//        String statusCode = app.getStatus();
-//        String statusValue = conDictEntryClient.getAppStatus(statusCode).getValue();
-//        appModel.setStatusName(statusValue);
+        String statusCode = app.getStatus();
+        String statusValue = conDictEntryClient.getAppStatus(statusCode).getValue();
+        appModel.setStatusName(statusValue);
         return appModel;
     }
 

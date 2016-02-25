@@ -46,15 +46,41 @@ public class AppControllerTests {
 
         Object object = new Object();
         Envelop envelop = new Envelop();
+        //列表查询（size、page）---------1 ok
 
-        String fields = "id,name,status,catalog,url,description";
-        String filter = "";
-        String sorts = "name";
-        int page = 1;
-        int rows = 15;
-        envelop = appController.getApps(fields, filter, sorts, page, rows,null);
-        assertTrue("app列表获取失败", !envelop.isSuccessFlg() || envelop.getDetailModelList()==null);
+//        String fields = "id,name,status,catalog,url,description";
+//        String filter = null;
+//        String sorts = "create_time";
+//        int page = 2;
+//        int size = 15;
+//        envelop = appController.getApps(fields, filter, sorts, size, page);
+//        assertTrue("app列表获取失败", envelop.isSuccessFlg() || envelop.getDetailModelList()!=null);
 
+        //创建app----------2
+
+        //String appJsonCreate = "{\"name\": \"wwcs\", \"url\": \"www.baidu.com\", \"catalog\": \"ChildHealth\", \"description\": \"firstTest\", \"creator\":\"0dae0003561cc415c72d9111e8cb88aa\"}";
+        //envelop = appController.createApp(appJsonCreate);
+
+        //根据id获取app------------3 ok
+
+//        String appId = "33nuGNdwGl";
+//        envelop = appController.getApp(appId);
+
+        //更新app-----------------4
+
+//        String appJsonUpdate = "{\"id\":\"33nuGNdwGl1\",\"name\": \"wwcs111\", \"catalog\":\"ChildHealth\",\"description\":\"firstTestsecond\",\"url\": \"www.baidu.com\",\"creator\": \"0dae0003561cc415c72d9111e8cb88aa\"}";
+//        envelop = appController.updateApp(appJsonUpdate);
+
+        //更新app状态-------------------5 ok
+
+        Boolean flag = appController.updateStatus("QzHmvMDFVd","Approved");
+
+        //判断app是否存在（id、secret）-----------6
+       //Boolean flag2 = appController.isAppExistence("QzHmvMDFVd","XEYbrGmWWvIl5xFG");
+
+        //删除刚创建的app
+
+        //envelop = appController.deleteApp("");
 
 //            mApp = new MApp();
 //            mApp.setName("测试APP");
