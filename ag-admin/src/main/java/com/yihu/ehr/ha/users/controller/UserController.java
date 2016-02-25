@@ -18,7 +18,6 @@ import com.yihu.ehr.util.operator.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
@@ -67,10 +66,6 @@ public class UserController extends BaseController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) {
 
-        if(StringUtils.isEmpty(fields))
-        {
-            fields = null;
-        }
         List<MUser> mUsers = userClient.searchUsers(fields, filters, sorts, size, page);
         List<UsersModel> usersModels = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss ");
