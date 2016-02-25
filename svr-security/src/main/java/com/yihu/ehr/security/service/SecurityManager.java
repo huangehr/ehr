@@ -4,15 +4,11 @@ import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.security.feign.UserClient;
 import com.yihu.ehr.util.DateUtil;
 import com.yihu.ehr.util.encrypt.RSA;
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import org.springframework.transaction.annotation.Transactional;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -79,17 +75,17 @@ public class SecurityManager {
 
         //1-1根据用户登陆名获取用户信息。
 
-        MUser userInfo = userClient.getUser(userId);
-        if(userInfo==null) {
-            return null;
-        }
-        else {
+//        MUser userInfo = userClient.getUser(userId);
+//        if(userInfo==null) {
+//            return null;
+//        }
+//        else {
             UserSecurity userSecurity = createSecurity();
             //1-2-1-2 与用户进行关联，user_key数据增加。
-            createUserKey(userSecurity, userInfo, persenalKeyType);
+            createUserKey(userSecurity.getId(), userId, persenalKeyType);
 
             return userSecurity;
-        }
+      //  }
     }
 
     public UserSecurity createSecurityByOrgCode(String orgCode) throws Exception {
@@ -115,7 +111,7 @@ public class SecurityManager {
                 //1-2-1-1 公私钥生成
                 UserSecurity userSecurity = createSecurity();
                 //1-2-1-2 与用户进行关联，user_key数据增加。
-                createUserKey(userSecurity, userInfo, persenalKeyType);
+                createUserKey(userSecurity.getId(), userInfo.getId(), persenalKeyType);
                 return userSecurity;
             }else{
                 //1-2-2当UserKey存在的情况下，查询用户关联的用户密钥信息。
@@ -132,13 +128,13 @@ public class SecurityManager {
         userSecurityRepository.delete(userSecurity);
     }
 
-    public UserKey createUserKey(UserSecurity security, MUser user, String keyType) {
+    public UserKey createUserKey(String securityId,String userId, String keyType) {
 
         UserKey userKey = new UserKey();
 
         userKey.setKeyType(keyType);
-        userKey.setUser(user.getId());
-        userKey.setKey(security.getId());
+        userKey.setUser(userId);
+        userKey.setKey(securityId);
 
         userKeyRepository.save(userKey);
         return userKey;

@@ -7,6 +7,7 @@ import com.yihu.ehr.constants.PageArg;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.ObjectId;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -93,7 +94,7 @@ public class BaseRestController extends AbstractController {
             Object source = iterator.next();
 
             T target = (T) BeanUtils.instantiate(targetCls);
-            BeanUtils.copyProperties(source, target, propertyDiffer(properties == null ? null : properties.split(","), targetCls));
+            BeanUtils.copyProperties(source, target, propertyDiffer(StringUtils.isEmpty(properties) ? null : properties.split(","), targetCls));
             targets.add(target);
         }
 
