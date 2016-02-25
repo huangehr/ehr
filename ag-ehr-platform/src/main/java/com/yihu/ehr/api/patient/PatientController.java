@@ -1,4 +1,4 @@
-package com.yihu.ehr.patient;
+package com.yihu.ehr.api.patient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;

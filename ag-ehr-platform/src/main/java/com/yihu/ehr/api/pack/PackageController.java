@@ -1,4 +1,4 @@
-package com.yihu.ehr.pack;
+package com.yihu.ehr.api.pack;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.feign.JsonPackageClient;

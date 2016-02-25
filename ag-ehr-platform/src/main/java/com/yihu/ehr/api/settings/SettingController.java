@@ -1,4 +1,4 @@
-package com.yihu.ehr.settings;
+package com.yihu.ehr.api.settings;
 
 /**
  * @author Sand

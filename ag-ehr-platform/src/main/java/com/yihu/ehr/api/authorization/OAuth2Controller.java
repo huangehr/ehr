@@ -1,4 +1,4 @@
-package com.yihu.ehr.authorization;
+package com.yihu.ehr.api.authorization;
 
 import com.yihu.ehr.constants.ApiVersion;
 import io.swagger.annotations.Api;

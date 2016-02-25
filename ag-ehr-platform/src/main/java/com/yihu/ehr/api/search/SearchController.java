@@ -1,4 +1,4 @@
-package com.yihu.ehr.search;
+package com.yihu.ehr.api.search;
 
 import com.yihu.ehr.constants.ApiVersion;
 import io.swagger.annotations.Api;
