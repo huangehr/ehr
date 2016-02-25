@@ -1,6 +1,7 @@
 package com.yihu.ehr.ha;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.app.AppModel;
 import com.yihu.ehr.ha.apps.controller.AppController;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.util.Envelop;
@@ -58,8 +59,12 @@ public class AppControllerTests {
 
         //创建app----------2
 
-        //String appJsonCreate = "{\"name\": \"wwcs\", \"url\": \"www.baidu.com\", \"catalog\": \"ChildHealth\", \"description\": \"firstTest\", \"creator\":\"0dae0003561cc415c72d9111e8cb88aa\"}";
-        //envelop = appController.createApp(appJsonCreate);
+        String appJsonCreate = "{\"name\": \"wwcs\", \"url\": \"www.baidu.com\", \"catalog\": \"ChildHealth\", \"description\": \"firstTest\", \"creator\":\"0dae0003561cc415c72d9111e8cb88aa\"}";
+        ObjectMapper objectMapper = new ObjectMapper();
+        MApp appModel = objectMapper.readValue(appJsonCreate,MApp.class);
+
+
+        envelop = appController.createApp(appJsonCreate);
 
         //根据id获取app------------3 ok
 
@@ -73,10 +78,19 @@ public class AppControllerTests {
 
         //更新app状态-------------------5 ok
 
-        Boolean flag = appController.updateStatus("QzHmvMDFVd","Approved");
+        //Boolean flag = appController.updateStatus("QzHmvMDFVd","Approved");
 
-        //判断app是否存在（id、secret）-----------6
-       //Boolean flag2 = appController.isAppExistence("QzHmvMDFVd","XEYbrGmWWvIl5xFG");
+        //判断app是否存在（id、secret）-----------6 ok
+
+//        Boolean flag2 = appController.isAppExistence("QzHmvMDFVd","XEYbrGmWWvIl5xFG");
+//        object = flag2;
+
+        //判断指定name的app是否存在-----------7 ok
+
+//        Boolean flag3 = appController.isAppNameExists("测试应用1112001");
+//        object = flag3;
+
+
 
         //删除刚创建的app
 

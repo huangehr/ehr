@@ -17,7 +17,6 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -139,14 +138,22 @@ public class AppController extends BaseController {
         return appClient.updateStatus(appId, appStatus);
     }
 
-    @RequestMapping(value = "apps/existence/{app_id}",method = RequestMethod.GET)
-    @ApiOperation(value = "验证")
+    @RequestMapping(value = "apps/existence/app_id/{app_id}",method = RequestMethod.GET)
+    @ApiOperation(value = "验证app")
     public boolean isAppExistence(
             @ApiParam(name= "app_id",value = "app_id",defaultValue = "")
-            @RequestParam(value = "app_id") String appId,
+            @PathVariable(value = "app_id") String appId,
             @ApiParam(name = "secret",value = "密钥",defaultValue = "")
             @RequestParam(value = "secret") String secret)throws Exception{
         return appClient.isAppExistence(appId, secret);
+    }
+
+    @RequestMapping(value = "apps/existence/app_name/{app_name}",method = RequestMethod.GET)
+    @ApiOperation(value = "验证app名字是否存在")
+    public boolean isAppNameExists(
+            @PathVariable(value = "app_name")
+            @RequestParam(value = "app_name") String appName){
+        return appClient.isAppNameExists(appName);
     }
 
     /**
@@ -162,9 +169,7 @@ public class AppController extends BaseController {
         appModel.setSecret(app.getSecret());
         //获取app类别字典值
         String catalogCode = app.getCatalog();
-        //String catalogValue = conDictEntryClient.getAppCatalog(catalogCode).getValue();
-        MConventionalDict d = conDictEntryClient.getAppCatalog(catalogCode);
-        String catalogValue = d.getValue();
+        String catalogValue = conDictEntryClient.getAppCatalog(catalogCode).getValue();
         appModel.setCatalogName(catalogValue);
         //获取状态字典值
         String statusCode = app.getStatus();

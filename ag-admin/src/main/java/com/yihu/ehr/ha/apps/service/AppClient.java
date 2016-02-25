@@ -69,12 +69,18 @@ public interface AppClient {
             @ApiParam(name = "status",value = "状态",defaultValue = "")
             @RequestParam(value = "app_status") String appStatus);
 
-    @RequestMapping(value = "/api/v1.0/apps/existence/{app_id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/api/v1.0/apps/existence/app_id/{app_id}",method = RequestMethod.GET)
     @ApiOperation(value = "验证")
     boolean isAppExistence(
             @ApiParam(name = "app_id",value = "id",defaultValue = "")
-            @RequestParam(value = "app_id") String appId,
+            @PathVariable(value = "app_id") String appId,
             @ApiParam(name = "secret",value = "",defaultValue = "")
             @RequestParam(value = "secret") String secret);
+
+    @RequestMapping(value = "/api/v1.0/apps/existence/app_name/{app_name}",method = RequestMethod.GET)
+    @ApiOperation(value = "验证")
+    boolean isAppNameExists(
+           @PathVariable(value = "app_name")
+           @RequestParam(value = "app_name") String appName);
 
 }
