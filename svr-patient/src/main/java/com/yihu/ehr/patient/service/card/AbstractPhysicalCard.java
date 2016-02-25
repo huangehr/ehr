@@ -23,7 +23,7 @@ public class AbstractPhysicalCard extends AbstractCard implements Serializable {
 	  String number;				// 卡号
 	  String ownerName;			// 持有人姓名
 	  String status;			// 状态 CardStatus
-	  String type;				// 类型 CardType
+	  String cardType;				// 类型 CardType
 	  String description;			// 描述
 	  Date createDate;				// 创建日期
 	  String idCardNo;          //身份证号
@@ -76,11 +76,11 @@ public class AbstractPhysicalCard extends AbstractCard implements Serializable {
 	}
 
 	@Column(name = "card_type", nullable = true)
-	public String getType() {
-		return type;
+	public String getCardType() {
+		return cardType;
 	}
-	public void setType(String type) {
-		this.type = type;
+	public void setCardType(String cardType) {
+		this.cardType = cardType;
 	}
 
 	@Column(name = "description", nullable = true)

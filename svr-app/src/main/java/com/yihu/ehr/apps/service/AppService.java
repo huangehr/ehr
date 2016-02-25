@@ -1,6 +1,5 @@
 package com.yihu.ehr.apps.service;
 
-import com.yihu.ehr.apps.feign.ConventionalDictClient;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -26,9 +25,6 @@ public class AppService extends BaseJpaService<App, XAppRepository> {
 
     @Autowired
     private XAppRepository appRepo;
-    @Autowired
-    private ConventionalDictClient conventionalDictClient;
-
     public AppService() {
     }
 
@@ -40,12 +36,10 @@ public class AppService extends BaseJpaService<App, XAppRepository> {
     }
 
     public App createApp(App app) {
-        String status = conventionalDictClient.getAppStatus("WaitingForApprove").getCode();
-
         app.setId(getRandomString(AppIdLength));
         app.setSecret(getRandomString(AppSecretLength));
         app.setCreateTime(new Date());
-        app.setStatus(status);
+        app.setStatus("WaitingForApprove");
         appRepo.save(app);
 
         return app;
