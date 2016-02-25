@@ -27,6 +27,8 @@ public class UserSecurityControllerTests {
 
     private static String apiVersion = "v1.0";
 
+    private static String userId = "0dae0003561cc415c72d9111e8cb88aa";
+
     @Autowired
     private SecurityController securityController;
 
@@ -42,12 +44,17 @@ public class UserSecurityControllerTests {
 
         applicationContext = new SpringApplicationBuilder().web(false).sources(AgAdminApplication.class).run();
 
-        String userId = "0dae0003561cc415c72d9111e8cb88aa";
         envelop = securityController.createSecurityByUserId(userId);
         assertNotEquals("用户创建Security失败",envelop,null);
 
-        envelop = securityController.getUserKeyByUserId(((UserSecurityModel)envelop.getObj()).getId());
+        envelop = securityController.getUserSecurityByUserId(userId);
         assertNotEquals("查询用户Security失败",envelop,null);
+
+//        envelop = securityController.getUserSecurityByUserName();
+//        assertNotEquals("查询用户Security失败",envelop,null);
+
+        envelop = securityController.deleteSecurity(((UserSecurityModel) envelop.getObj()).getId());
+        assertNotEquals("删除用户Security失败",envelop,null);
 
 
 

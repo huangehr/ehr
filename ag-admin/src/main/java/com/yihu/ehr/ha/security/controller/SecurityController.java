@@ -203,7 +203,7 @@ public class SecurityController {
     }
 
     /**
-     * 根据orgCode创建security
+     * 根据orgCode获取security
      * @param orgCode
      * @return
      * @throws Exception
@@ -233,6 +233,7 @@ public class SecurityController {
     /**
      * 根据id删除security
      * @param id
+     * 3
      */
     @RequestMapping(value = "securities/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除security")
@@ -270,14 +271,15 @@ public class SecurityController {
         envelop.setSuccessFlg(true);
         if(!bo){
             envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("security删除失败");
+            envelop.setErrorMsg("userKey删除失败");
         }
         return envelop;
     }
 
     /**
-     * 根据loginCode删除Security
+     * 根据loginCode获取Security
      * @param loginCode
+     * 2-1
      */
     @RequestMapping(value = "/securities/user/{login_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据loginCode获取Security" )
@@ -305,6 +307,7 @@ public class SecurityController {
      * @param userId
      * @return
      * @throws Exception
+     * 1
      */
     @RequestMapping(value = "/securities/{user_id}", method = RequestMethod.POST)
     @ApiOperation(value = "根据userId创建Security" )
@@ -332,6 +335,7 @@ public class SecurityController {
      * 根据userId获取UserKey
      * @param userId
      * @return
+     *
      */
     @RequestMapping(value = "/user_keys/{user_id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据userId获取user_key" )
@@ -356,9 +360,10 @@ public class SecurityController {
 
 
     /**
-     * 根据userId获取UserKey
+     * 根据userId获取UserSecurity
      * @param userId
      * @return
+     * 2
      */
     @RequestMapping(value = "/securities/{user_id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据userId获取UserSecurity" )
