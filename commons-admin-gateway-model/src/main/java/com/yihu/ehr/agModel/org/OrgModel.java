@@ -5,20 +5,20 @@ package com.yihu.ehr.agModel.org;
  */
 
 public class OrgModel {
-    String orgCode = "";
-    String orgType = "";
-    String orgTypeName = "";
-    String orgCodeName = "";
-    String fullName = "";
-    String admin ="";
-    String tel = "";
-    String location="";
-    String locationStrName = "";
-    String activityFlag = "1";
-    String activityFlagName = "";
-    String settledWay = "";
-    String settledWayName = "";
-    String createDate = "";
+    private String orgCode;
+    private String orgType;
+    private String orgTypeName;
+    private String orgCodeName;
+    private String fullName;
+    private String admin;
+    private String tel;
+    private String location;
+    private String locationStrName;
+    private String activityFlag;
+    private String activityFlagName;
+    private String settledWay;
+    private String settledWayName;
+    private String createDate;
 
     public String getOrgCode() {
         return orgCode;

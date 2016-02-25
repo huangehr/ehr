@@ -134,8 +134,8 @@ public class AppController extends BaseRestController {
     @RequestMapping(value = "/apps/existence/app_name/{app_name}" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的app名称是否已经存在")
     boolean isAppNameExists(
-            @PathVariable(value = "app_name")
-            @RequestParam(value = "app_name") String appName){
+            @ApiParam(value = "app_name")
+            @PathVariable(value = "app_name") String appName){
         return appService.isAppNameExists(appName);
     }
 }

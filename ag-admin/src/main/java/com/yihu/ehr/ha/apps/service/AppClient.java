@@ -80,7 +80,7 @@ public interface AppClient {
     @RequestMapping(value = "/api/v1.0/apps/existence/app_name/{app_name}",method = RequestMethod.GET)
     @ApiOperation(value = "验证")
     boolean isAppNameExists(
-           @PathVariable(value = "app_name")
-           @RequestParam(value = "app_name") String appName);
+           @ApiParam(value = "app_name")
+           @PathVariable(value = "app_name") String appName);
 
 }

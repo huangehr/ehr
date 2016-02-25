@@ -8,13 +8,11 @@ import com.yihu.ehr.ha.apps.service.AppClient;
 import com.yihu.ehr.agModel.app.AppDetailModel;
 import com.yihu.ehr.agModel.app.AppModel;
 import com.yihu.ehr.model.app.MApp;
-import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,7 +55,7 @@ public class AppController extends BaseController {
             appModelList.add(changeToAppModel(app));
         }
         // TODO 获取符合条件记录总数
-        Integer totalCount = 1;
+        Integer totalCount = 10;
         Envelop envelop = getResult(appModelList,totalCount,page,size);
         return envelop;
     }
@@ -159,8 +157,8 @@ public class AppController extends BaseController {
     @RequestMapping(value = "apps/existence/app_name/{app_name}",method = RequestMethod.GET)
     @ApiOperation(value = "验证app名字是否存在")
     public boolean isAppNameExists(
-            @PathVariable(value = "app_name")
-            @RequestParam(value = "app_name") String appName){
+            @ApiParam(value = "app_name")
+            @PathVariable(value = "app_name") String appName){
         return appClient.isAppNameExists(appName);
     }
 
@@ -177,8 +175,8 @@ public class AppController extends BaseController {
         appModel.setSecret(app.getSecret());
         //获取app类别字典值
         String catalog = app.getCatalog();
-        String catalogValue = conDictEntryClient.getAppCatalog(catalog).getValue();
-        appModel.setCatalogName(catalogValue);
+        String catalogName = conDictEntryClient.getAppCatalog(catalog).getValue();
+        appModel.setCatalogName(catalogName);
         //获取状态字典值
         String status = app.getStatus();
         String statusValue = conDictEntryClient.getAppStatus(status).getValue();
@@ -198,6 +196,7 @@ public class AppController extends BaseController {
         app.setSecret(mApp.getSecret());
         app.setUrl(mApp.getUrl());
         app.setDescription(mApp.getDescription());
+        app.setCreateTime(mApp.getCreateTime());
         //TODO 微服务提供的model缺少tags标签属性
         //app.setTags();
         //获取app类别字典值

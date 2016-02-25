@@ -1,37 +1,38 @@
 package com.yihu.ehr.agModel.org;
 
+import java.util.Date;
 import java.util.HashSet;
 
 /**
  * Created by yww on 2016/2/22.
  */
 public class OrgDetailModel{
-    String orgCode="";
-    String fullName="";
-    String shortName="";
-    String pyCode = "";
-    String orgType="";
-    String orgTypeName="";
-    String settled = "";
-    String settledWay="";
-    String settledWayName="";
-    String activityFlg = "";
-    String activityFlgName = "";
-    String createDate = "";
-    String location="";
-    String province="";
-    String city="";
-    String district="";
-    String town="";
-    String street = "";
-    String extra = "";
-    String admin = "";
-    String tel="";
-    String tags="";
+    private String orgCode;
+    private String fullName;
+    private String shortName;
+    private String pyCode;
+    private String orgType;
+    private String orgTypeName;
+    private String settled;
+    private String settledWay;
+    private String settledWayName;
+    private String activityFlg;
+    private String activityFlgName;
+    private Date createDate;
+    private String location;
+    private String province;
+    private String city;
+    private String district;
+    private String town;
+    private String street;
+    private String extra;
+    private String admin;
+    private String tel;
+    private String tags;
     //公钥信息
-    String publicKey="";
-    String validTime="";
-    String startTime="";
+    String publicKey;
+    String validTime;
+    String startTime;
 
     public String getOrgCode() {
         return orgCode;
@@ -121,11 +122,11 @@ public class OrgDetailModel{
         this.activityFlgName = activityFlgName;
     }
 
-    public String getCreateDate() {
+    public Date getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(String createDate) {
+    public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
 
