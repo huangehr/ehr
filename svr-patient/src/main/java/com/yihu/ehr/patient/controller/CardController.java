@@ -2,7 +2,8 @@ package com.yihu.ehr.patient.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.patient.MAbstractCard;
-import com.yihu.ehr.patient.service.card.*;
+import com.yihu.ehr.patient.service.card.AbstractCard;
+import com.yihu.ehr.patient.service.card.CardManager;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
@@ -11,6 +12,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +59,9 @@ public class CardController extends BaseRestController {
         conditionMap.put("rows",rows);
         List<AbstractCard> cardAbstractCardList = cardManager.searchAbstractCard(conditionMap);
         Integer totalCount = cardManager.searchCardInt(conditionMap, false);
-        return getResult(cardAbstractCardList,totalCount);
+
+        List<MAbstractCard> mAbstractCards = (List<MAbstractCard>)convertToModels(cardAbstractCardList,new ArrayList<MAbstractCard>(cardAbstractCardList.size()), MAbstractCard.class, null);
+        return getResult(mAbstractCards,totalCount);
     }
 
     /**
