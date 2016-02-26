@@ -136,7 +136,6 @@ public class OrganizationController extends BaseController {
         String location = addressClient.saveAddress(geographyModelJsonData);
         MOrganization mOrganization = objectMapper.readValue(mOrganizationJsonData,MOrganization.class);
         mOrganization.setLocation(location);
-        mOrganization.setCreateDate(new Date());
         String mOrganizationJson = objectMapper.writeValueAsString(mOrganization);
         MOrganization mOrgNew = orgClient.create(mOrganizationJson);
         if(mOrgNew==null){
@@ -249,12 +248,13 @@ public class OrganizationController extends BaseController {
      * @return
      */
     @ApiOperation(value = "根据名称获取机构编号列表ids")
-    @RequestMapping(value = "/organizations/{name}", method = RequestMethod.GET)
+    @RequestMapping(value = "/organizations/name", method = RequestMethod.GET)
     public Envelop getIdsByName(
             @ApiParam(name = "name", value = "机构名称", defaultValue = "")
-            @PathVariable(value = "name") String name) {
+            @RequestParam(value = "name") String name) {
         Envelop envelop = new Envelop();
         envelop.setDetailModelList(orgClient.getIdsByName(name));
+        envelop.setSuccessFlg(true);
         return envelop;
     }
 
@@ -295,6 +295,7 @@ public class OrganizationController extends BaseController {
         Envelop envelop = new Envelop();
         Collection<MOrganization> mOrganizations = orgClient.getOrgsByAddress(province,city,district);
         envelop.setObj(mOrganizations);
+        envelop.setSuccessFlg(true);
         return envelop;
     }
 
@@ -306,7 +307,12 @@ public class OrganizationController extends BaseController {
             @RequestParam(value = "org_code") String orgCode) {
         Envelop envelop = new Envelop();
         Map<String,String> key = orgClient.distributeKey(orgCode);
-        envelop.setObj(key);
+        if(key!=null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(key);
+        }else{
+            envelop.setSuccessFlg(false);
+        }
         return envelop;
     }
 

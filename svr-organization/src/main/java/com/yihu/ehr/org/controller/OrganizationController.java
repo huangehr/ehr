@@ -19,10 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author zlf
@@ -100,6 +97,7 @@ public class OrganizationController extends BaseRestController {
             @RequestParam(value = "mOrganizationJsonData") String orgJsonData) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
         Organization org = objectMapper.readValue(orgJsonData, Organization.class);
+        org.setCreateDate(new Date());
         org.setActivityFlag(1);
         orgService.save(org);
         return convertToModel(org,MOrganization.class);
