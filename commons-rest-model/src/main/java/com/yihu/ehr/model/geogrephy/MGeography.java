@@ -2,6 +2,7 @@ package com.yihu.ehr.model.geogrephy;
 
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * @author Sand
@@ -19,11 +20,13 @@ public class MGeography implements Serializable {
     private String extra;
     private String postalCode;
     public MGeography() {
+        id  = UUID.randomUUID().toString().replace("-","");
     }
 
     public String getId() {
-        return id.toString();
+        return id;
     }
+
     public void setId(String id) {
         this.id = id;
     }
@@ -31,6 +34,7 @@ public class MGeography implements Serializable {
     public String getCountry() {
         return country;
     }
+
     public void setCountry(String country) {
         this.country = country;
     }
@@ -38,6 +42,7 @@ public class MGeography implements Serializable {
     public String getProvince() {
         return province;
     }
+
     public void setProvince(String province) {
         this.province = province;
     }
@@ -45,6 +50,7 @@ public class MGeography implements Serializable {
     public String getCity() {
         return city;
     }
+
     public void setCity(String city) {
         this.city = city;
     }
@@ -52,6 +58,7 @@ public class MGeography implements Serializable {
     public String getDistrict() {
         return district;
     }
+
     public void setDistrict(String district) {
         this.district = district;
     }
@@ -59,6 +66,7 @@ public class MGeography implements Serializable {
     public String getTown() {
         return town;
     }
+
     public void setTown(String town) {
         this.town = town;
     }
@@ -66,6 +74,7 @@ public class MGeography implements Serializable {
     public String getStreet() {
         return street;
     }
+
     public void setStreet(String street) {
         this.street = street;
     }
@@ -73,6 +82,7 @@ public class MGeography implements Serializable {
     public String getExtra() {
         return extra;
     }
+
     public void setExtra(String extra) {
         this.extra = extra;
     }
@@ -80,9 +90,8 @@ public class MGeography implements Serializable {
     public String getPostalCode() {
         return postalCode;
     }
+
     public void setPostalCode(String postalCode) {
         this.postalCode = postalCode;
     }
-
-
 }

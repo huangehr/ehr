@@ -1,6 +1,6 @@
 package com.yihu.ehr.pack.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.pack.feign.JsonPackageClient;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
  * @created 2015.09.17 14:22
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0 + "/json_package")
+@RequestMapping(ApiVersion.Version1_0 + "/json_package")
 @Api(protocols = "https", value = "json-package-receiver", description = "Json数据包归档接口", tags = {"JSON", "数据集", "健康档案"})
 public class JsonPackageReceiveController extends BaseRestController {
     @Autowired

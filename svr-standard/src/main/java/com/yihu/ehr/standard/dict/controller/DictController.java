@@ -1,6 +1,6 @@
 package com.yihu.ehr.standard.dict.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.standard.MStdDict;
@@ -11,7 +11,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +26,7 @@ import java.util.List;
  * @created 2016.2.1
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0 + "/std")
+@RequestMapping(ApiVersion.Version1_0 + "/std/")
 @Api(protocols = "https", value = "dict", description = "标准字典", tags = {"标准字典", "标准字典项"})
 public class DictController extends ExtendController<MStdDict> {
 
@@ -144,7 +143,7 @@ public class DictController extends ExtendController<MStdDict> {
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") long id) throws Exception{
 
-        return dictService.removeDicts(new Long[]{id}, version) > 0;
+        return dictService.removeDicts(new Object[]{id}, version) > 0;
     }
 
     @RequestMapping(value = "/dicts", method = RequestMethod.DELETE)
@@ -155,15 +154,15 @@ public class DictController extends ExtendController<MStdDict> {
             @ApiParam(name = "ids", value = "编号", defaultValue = "")
             @RequestParam(value = "ids") String ids) throws Exception{
 
-        return dictService.removeDicts(strToLongArr(ids), version) > 0;
+        return dictService.removeDicts(ids.split(","), version) > 0;
     }
 
 
     @RequestMapping(value = "/dict/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据CdaVersion及字典ID查询相应版本的字典详细信息")
-    public MStdDict getCdaDictInfo(
+    public Object getCdaDictInfo(
             @ApiParam(name = "id", value = "字典编号", defaultValue = "")
-            @PathVariable(value = "id") long id,
+            @RequestParam(value = "id") long id,
             @ApiParam(name = "version", value = "版本编号", defaultValue = "")
             @RequestParam(value = "version") String version) throws Exception{
 

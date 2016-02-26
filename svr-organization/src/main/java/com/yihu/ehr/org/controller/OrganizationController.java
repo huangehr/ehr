@@ -1,7 +1,7 @@
 package com.yihu.ehr.org.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.org.MOrganization;
@@ -30,13 +30,12 @@ import java.util.Map;
  * @created 2015.08.10 17:57
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0 )
+@RequestMapping(ApiVersion.Version1_0 )
 @Api(protocols = "https", value = "org", description = "组织机构管理接口", tags = {"机构管理"})
 public class OrganizationController extends BaseRestController {
 
     @Autowired
     private OrgService orgService;
-
     @Autowired
     private SecurityClient securityClient;
 
@@ -92,7 +91,6 @@ public class OrganizationController extends BaseRestController {
     /**
      * 创建机构
      * @param orgJsonData
-     * @return
      * @throws Exception
      */
     @RequestMapping(value = "/organizations" , method = RequestMethod.POST)
@@ -100,7 +98,6 @@ public class OrganizationController extends BaseRestController {
     public MOrganization create(String orgJsonData ) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
         Organization org = objectMapper.readValue(orgJsonData, Organization.class);
-        if(orgService.isExistOrg(org.getOrgCode())) throw new ApiException(ErrorCode.ExistOrgForCreate, "该机构已存在");
         org.setActivityFlag(1);
         orgService.save(org);
         return convertToModel(org,MOrganization.class);
@@ -112,7 +109,6 @@ public class OrganizationController extends BaseRestController {
             String jsonData ) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
         Organization org = objectMapper.readValue(jsonData, Organization.class);
-        if(orgService.isExistOrg(org.getOrgCode())) throw new ApiException(ErrorCode.ExistOrgForCreate, "该机构已存在");
         orgService.save(org);
         return convertToModel(org,MOrganization.class);
     }
@@ -213,6 +209,14 @@ public class OrganizationController extends BaseRestController {
         keyMap.put("validTime", validTime);
         keyMap.put("startTime", DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd"));
         return keyMap;
+    }
+
+    @RequestMapping(value = "/organizations/existence/{org_code}" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断提交的机构代码是否已经存在")
+    boolean isOrgCodeExists(
+            @ApiParam(name = "org_code", value = "org_code", defaultValue = "")
+            @PathVariable(value = "org_code") String orgCode){
+        return orgService.isExistOrg(orgCode);
     }
 
 

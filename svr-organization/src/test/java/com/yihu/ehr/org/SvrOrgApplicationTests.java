@@ -1,6 +1,6 @@
 package com.yihu.ehr.org;
 
-import com.eureka2.shading.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.SvrOrgApplication;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.org.controller.OrganizationController;
@@ -13,12 +13,14 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SvrOrgApplication.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@Transactional
 public class SvrOrgApplicationTests {
 
 	ApplicationContext applicationContext;

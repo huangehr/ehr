@@ -1,7 +1,7 @@
 package com.yihu.ehr.pack.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.pack.feign.ConventionalDictClient;
 import com.yihu.ehr.pack.feign.DemographicIndexClient;
 import io.swagger.annotations.ApiOperation;
@@ -21,7 +21,7 @@ import java.text.ParseException;
  * @created 2016.02.03 14:15
  */
 @RestController
-@RequestMapping(value = ApiVersionPrefix.Version1_0 + "/patient")
+@RequestMapping(value = ApiVersion.Version1_0 + "/patient")
 public class PatientController {
     @Autowired
     ObjectMapper objectMapper;

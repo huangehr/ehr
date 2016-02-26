@@ -1,6 +1,6 @@
 package com.yihu.ehr.standard.datasets.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.standard.MStdDataSet;
@@ -25,7 +25,7 @@ import java.util.List;
  * @created 2016.2.15
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0 + "/std")
+@RequestMapping(ApiVersion.Version1_0 + "/std")
 @Api(protocols = "https", value = "std/dataset", description = "标准数据集", tags = {"标准数据集", "标准数据元"})
 public class DataSetsController extends ExtendController<MStdDataSet> {
 

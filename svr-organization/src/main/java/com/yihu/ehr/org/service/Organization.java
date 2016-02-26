@@ -24,13 +24,13 @@ public class Organization  {
     private String orgType;        // 机构类型,如:行政\科研等
     private String pyCode;            // 拼音码
     private String shortName;        // 简称
-    private Set<String> tags;        // 标签
+    //private Set<String> tags;        // 标签
     private String tel;                // 机构电话
     private Date createDate;        // 创建日期
     private String location;        // 地址
     private int activityFlag;
     public Organization() {
-        tags = new HashSet<>();
+        //tags = new HashSet<>();
     }
 
     @Id
@@ -52,27 +52,27 @@ public class Organization  {
 
 
 
-    @Column(name = "tags",  nullable = true)
-    public String getTags() {
-        return String.join(",", tags);
-    }
-    public void setTags(String tags) {
-        if(tags == null) return;
-        String[] tagToken = tags.split(",");
-        for (String token: tagToken){
-            token = token.trim();
-            if(token.length() == 0) continue;
-            this.tags.add(token);
-        }
-    }
-//    public String getTagsStr(){
+//    @Column(name = "tags",  nullable = true)
+//    public String getTags() {
 //        return String.join(",", tags);
 //    }
-    public void addTag(String tag) {
-        if(tag == null || tag.length() == 0) return;
-        if (tags.contains(tag)) return;
-        tags.add(tag);
-    }
+//    public void setTags(String tags) {
+//        if(tags == null) return;
+//        String[] tagToken = tags.split(",");
+//        for (String token: tagToken){
+//            token = token.trim();
+//            if(token.length() == 0) continue;
+//            this.tags.add(token);
+//        }
+//    }
+////    public String getTagsStr(){
+////        return String.join(",", tags);
+////    }
+//    public void addTag(String tag) {
+//        if(tag == null || tag.length() == 0) return;
+//        if (tags.contains(tag)) return;
+//        tags.add(tag);
+//    }
 //    public void removeTag(String tag) {
 //        this.tags.remove(tag);
 //    }

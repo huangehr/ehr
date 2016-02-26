@@ -3,7 +3,7 @@ package com.yihu.ehr.adaption.orgdictitem.controller;
 import com.yihu.ehr.adaption.commons.ExtendController;
 import com.yihu.ehr.adaption.orgdictitem.service.OrgDictItem;
 import com.yihu.ehr.adaption.orgdictitem.service.OrgDictItemService;
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.adaption.MOrgDictItem;
@@ -27,7 +27,7 @@ import java.util.List;
  * @created 2016.2.1
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0 + "/adapter/org")
+@RequestMapping(ApiVersion.Version1_0 + "/adapter/org")
 @Api(protocols = "https", value = "orgdictitem", description = "机构字典项", tags = {"机构字典项"})
 public class OrgDictItemController extends ExtendController<MOrgDictItem> {
 

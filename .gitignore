@@ -4,6 +4,8 @@ ehr.iws
 ehr.ids
 */*.iml
 */target
+.idea/*
+
 
 # ---> Java
 *.class

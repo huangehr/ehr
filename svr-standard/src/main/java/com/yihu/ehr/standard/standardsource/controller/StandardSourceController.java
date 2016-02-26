@@ -1,6 +1,6 @@
 package com.yihu.ehr.standard.standardsource.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.standard.MStdSource;
@@ -23,7 +23,7 @@ import java.util.*;
  * @created 2016.1.23
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0 + "/std")
+@RequestMapping(ApiVersion.Version1_0 + "/std")
 @Api(protocols = "https", value = "source", description = "标准来源", tags = {"标准来源"})
 public class StandardSourceController extends ExtendController<MStdSource>{
 

@@ -1,6 +1,6 @@
 package com.yihu.ehr.dict.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.dict.service.*;
 import com.yihu.ehr.exception.ApiException;
@@ -25,7 +25,7 @@ import java.util.Collection;
  * @created 2016.02.15 18:25
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0)
+@RequestMapping(ApiVersion.Version1_0)
 @Api(protocols = "https", value = "DictionaryEntry", description = "系统全局字典项管理", tags = {"系统字典项"})
 public class SystemDictEntryController extends BaseRestController {
     @Autowired
@@ -66,17 +66,10 @@ public class SystemDictEntryController extends BaseRestController {
             @ApiParam(name = "entry", value = "字典JSON结构")
             @RequestParam(value = "entry") String entryJson) {
         SystemDictEntry entry = toEntity(entryJson, SystemDictEntry.class);
-
         SystemDict systemDict = dictService.retrieve(entry.getDictId());
         if (systemDict == null) throw new ApiException(ErrorCode.GetDictFaild, "所属字典不存在");
-
-        if (systemDictEntryService.isDictContainEntry(entry.getDictId(), entry.getCode())) {
-            throw new ApiException(ErrorCode.InvalidSysDictEntry, "字典项代码已存在");
-        }
         int nextSort = systemDictEntryService.getNextSN(entry.getDictId());
         entry.setSort(nextSort);
-//        SystemDictEntry systemDictEntry = new SystemDictEntry();
-       // entry.setSort(nextSort);
         systemDictEntryService.createDictEntry(entry);
 
         return convertToModel(entry, MDictionaryEntry.class, null);
@@ -101,14 +94,6 @@ public class SystemDictEntryController extends BaseRestController {
             @PathVariable(value = "dict_id") long dictId,
             @ApiParam(name = "code", value = "字典ID", defaultValue = "")
             @PathVariable(value = "code") String code) throws Exception{
-//        SystemDict systemDict = dictService.retrieve(dictId);
-//        if (systemDict == null) {
-//            return;
-//        }
-//
-//        if (!systemDictEntryService.isDictContainEntry(dictId, code)) {
-//            return;
-//        }
 
         systemDictEntryService.deleteDictEntry(dictId, code);
         return true;
@@ -128,5 +113,15 @@ public class SystemDictEntryController extends BaseRestController {
         systemDictEntryService.saveDictEntry(entry);
 
         return convertToModel(entry, MDictionaryEntry.class, null);
+    }
+
+    @RequestMapping(value = "/dictionaries/existence/{dict_id}/{code}" , method = RequestMethod.GET)
+    @ApiOperation(value = "根基dictId和code判断提交的字典项名称是否已经存在")
+    boolean isAppNameExists(
+            @ApiParam(name = "dict_id", value = "dict_id", defaultValue = "")
+            @PathVariable(value = "dict_id") long dictId,
+            @ApiParam(name = "code", value = "code", defaultValue = "")
+            @PathVariable(value = "code") String code){
+        return systemDictEntryService.isDictContainEntry(dictId, code);
     }
 }

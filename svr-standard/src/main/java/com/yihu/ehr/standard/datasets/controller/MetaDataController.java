@@ -1,6 +1,6 @@
 package com.yihu.ehr.standard.datasets.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.MStdMetaData;
 import com.yihu.ehr.standard.commons.ExtendController;
 import com.yihu.ehr.standard.datasets.service.IMetaData;
@@ -24,7 +24,7 @@ import java.util.List;
  * @created 2016.2.3
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0 + "/std")
+@RequestMapping(ApiVersion.Version1_0 + "/std")
 @Api(protocols = "https", value = "metadata", description = "标准数据元", tags = {"标准数据元"})
 public class MetaDataController extends ExtendController<MStdMetaData> {
 

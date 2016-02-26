@@ -5,7 +5,7 @@ import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanService;
 import com.yihu.ehr.adaption.commons.ExtendController;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSet;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSetService;
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.adaption.MAdapterDataSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,7 +28,7 @@ import java.util.List;
  * @created 2016.2.3
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0 + "/adapter")
+@RequestMapping(ApiVersion.Version1_0 + "/adapter")
 @Api(protocols = "https", value = "adapterDataSet", description = "适配数据集接口", tags = {"适配数据集"})
 public class AdapterDataSetController extends ExtendController<MAdapterDataSet> {
 
@@ -139,7 +139,7 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
 
 
     private boolean saveAdapterMetaData(AdapterDataSet adapterDataSet, String jsonModel)  {
-        String apiVersion = ApiVersionPrefix.Version1_0;
+        String apiVersion = ApiVersion.Version1_0;
         AdapterDataSet adapterDataSetModel = null;
         try {
             adapterDataSetModel = jsonToObj(jsonModel, AdapterDataSet.class);

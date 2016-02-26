@@ -20,13 +20,13 @@
 
 使用简单的正确用户/密码组合即可调用平台的API。通过以下命令行即可实现对用户的授权，只需要将 username 替换你的用户名
 
-	curl -u username https://ehr.yihu.com/rest/v1/user
+	curl -u username https://ehr.yihu.com/api/v1/user
 	
 **使用OAuth Token**
 
 另外也可以使用个人Token或OAuth Token替代用户名/密码
 
-	curl -u username:token https://ehr.yihu.com/rest/v1/user
+	curl -u username:token https://ehr.yihu.com/api/v1/user
 	
 这种方式对于不能使用OAuth机制，但想利用Token的优点时非常方便。
 

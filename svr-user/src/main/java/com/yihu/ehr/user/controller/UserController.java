@@ -1,12 +1,14 @@
 package com.yihu.ehr.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.security.MUserSecurity;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.user.feign.SecurityClient;
 import com.yihu.ehr.user.service.User;
 import com.yihu.ehr.user.service.UserManager;
+import com.yihu.ehr.util.ObjectId;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.encode.HashUtil;
 import io.swagger.annotations.Api;
@@ -14,6 +16,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +29,7 @@ import java.util.*;
  * @created 2015.08.10 17:57
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0)
+@RequestMapping(ApiVersion.Version1_0)
 @Api(protocols = "https", value = "users", description = "用户管理接口", tags = {"用户", "登录帐号", "密码"})
 public class UserController extends BaseRestController {
 
@@ -70,8 +73,8 @@ public class UserController extends BaseRestController {
     public MUser createUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData) throws Exception{
-        ObjectMapper objectMapper = new ObjectMapper();
-        User user = objectMapper.readValue(userJsonData, User.class);
+        User user = new ObjectMapper().readValue(userJsonData, User.class);
+        user.setId(getObjectId(BizObject.User));
         user.setCreateDate(new Date());
         user.setPassword(HashUtil.hashStr(user.getPassword()));
         user.setActivated(true);
@@ -143,23 +146,19 @@ public class UserController extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(value = "/users/key/{login_code}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/users/key/{user_id}", method = RequestMethod.PUT)
     @ApiOperation(value = "重新分配密钥",notes = "重新分配密钥")
     public Map<String, String> distributeKey(
-            @ApiParam(name = "login_code", value = "登录帐号", defaultValue = "")
-            @PathVariable(value = "login_code") String loginCode) {
-        MUserSecurity userSecurity = securityClient.getUserSecurityByLoginCode(loginCode);
+            @ApiParam(name = "user_id", value = "登录帐号", defaultValue = "")
+            @PathVariable(value = "user_id") String userId) {
+        MUserSecurity userSecurity = securityClient.getUserSecurityByUserId(userId);
         Map<String, String> keyMap = new HashMap<>();
         if (userSecurity == null) {
-            User userInfo = userManager.getUserByLoginCode(loginCode);
-            String userId = userInfo.getId();
             userSecurity = securityClient.createSecurityByUserId(userId);
         }else{
             //result.setErrorMsg("公钥信息已存在。");
             //这里删除原有的公私钥重新分配
             //1-1根据用户登陆名获取用户信息。
-            User userInfo = userManager.getUserByLoginCode(loginCode);
-            String userId = userInfo.getId();
             String userKeyId = securityClient.getUserKeyByUserId(userId);
             securityClient.deleteSecurity(userSecurity.getId());
             securityClient.deleteUserKey(userKeyId);
@@ -205,5 +204,14 @@ public class UserController extends BaseRestController {
             @PathVariable(value = "login_code") String loginCode) {
         User user = userManager.getUserByLoginCode(loginCode);
         return convertToModel(user,MUser.class);
+    }
+
+
+    @RequestMapping(value = "/dictionaries/existence/{login_code}" , method = RequestMethod.GET)
+    @ApiOperation(value = "根基dictId和code判断提交的字典项名称是否已经存在")
+    boolean isLoginCodeExists(
+            @ApiParam(name = "login_code", value = "login_code", defaultValue = "")
+            @PathVariable(value = "login_code") String loginCode){
+        return userManager.getUserByLoginCode(loginCode)!=null;
     }
 }

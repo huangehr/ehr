@@ -2,7 +2,7 @@ package com.yihu.ehr.adaption.feignclient;
 
 
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  */
 @EnableFeignClients
 @FeignClient("svr-address")
-@RequestMapping(ApiVersionPrefix.Version1_0)
+@RequestMapping(ApiVersion.Version1_0)
 public interface AddressClient {
 
     @RequestMapping(value = "/address/address", method = RequestMethod.PUT)

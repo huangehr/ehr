@@ -8,40 +8,40 @@ package com.yihu.ehr.model.adaption;
 public class MAdapterDataSet {
 
 	/**
-	 * ÊÊÅäÊý¾Ý¼¯ID
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¼ï¿½ID
 	 */
 	private Long id;
 	/**
-	 * ËùÊô·½°¸
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	private Long adapterPlanId;
 	/**
-	 * ËùÊô±ê×¼Êý¾Ý¼¯
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×¼ï¿½ï¿½ï¿½Ý¼ï¿½
 	 */
 	private Long dataSetId;
 	private String dataSetCode;
 	private String dataSetName;
 
 	/**
-	 * ±ê×¼Êý¾ÝÔª
+	 * ï¿½ï¿½×¼ï¿½ï¿½ï¿½ï¿½Ôª
 	 */
 	private Long metaDataId;
 	private String metaDataCode;
 	private String metaDataName;
 
 	/**
-	 * Êý¾ÝÀàÐÍ
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	private String dataType;
 	private String dataTypeName;
 	/**
-	 * ËùÊô»ú¹¹Êý¾Ý¼¯
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¼ï¿½
 	 */
 	private Long orgDataSetSeq;
 	private String orgDataSetCode;
 	private String orgDataSetName;
 	/**
-	 * »ú¹¹Êý¾ÝÔª
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ôª
 	 */
 	private Long orgMetaDataSeq;
 	private String orgMetaDataCode;
