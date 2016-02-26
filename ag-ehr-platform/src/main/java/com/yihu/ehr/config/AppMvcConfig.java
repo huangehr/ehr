@@ -3,6 +3,7 @@ package com.yihu.ehr.config;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.interceptor.RateLimitInterceptor;
 import com.yihu.ehr.interceptor.UserAgentInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -17,12 +18,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
  * @created 2016.02.26 16:04
  */
 @Configuration
-@ComponentScan("com.yihu.ehr.api")
 public class AppMvcConfig extends WebMvcConfigurerAdapter {
+
+    @Autowired
+    private RateLimitInterceptor rateLimitInterceptor;
+
+    @Autowired
+    private UserAgentInterceptor userAgentInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new RateLimitInterceptor()).addPathPatterns(ApiVersion.Version1_0 + "/**");
-        registry.addInterceptor(new UserAgentInterceptor()).addPathPatterns(ApiVersion.Version1_0 + "/**");
+        registry.addInterceptor(userAgentInterceptor).addPathPatterns(ApiVersion.Version1_0 + "/**");
+        registry.addInterceptor(rateLimitInterceptor).addPathPatterns("/**").excludePathPatterns("/swagger**");
     }
 }

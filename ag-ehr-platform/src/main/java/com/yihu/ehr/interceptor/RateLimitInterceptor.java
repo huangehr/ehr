@@ -1,16 +1,17 @@
 package com.yihu.ehr.interceptor;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.config.ApiHttpHeader;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * API请求频率截取器。频率限制策略：
@@ -21,41 +22,54 @@ import java.util.Date;
  * @version 1.0
  * @created 2016.02.26 15:57
  */
-public class RateLimitInterceptor extends HandlerInterceptorAdapter {
+@Component
+public class RateLimitInterceptor extends BaseHandlerInterceptor {
+    private static final int AuthorizedRateLimit = 5000;
+    private static final int UnauthorizedRateLimit = 60;
 
-    private RateLimitService rateLimitService = new RateLimitService();
+    @Autowired
+    private RateLimitService rateLimitService;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-            throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        boolean authorized = isAuthorized(getAccessToken(request));
+
+        int count = rateLimitService.incrementLimit(request.getRemoteAddr());
+        int limit = authorized ? AuthorizedRateLimit : UnauthorizedRateLimit;
+        boolean overhead = authorized ? count > AuthorizedRateLimit : count > UnauthorizedRateLimit;
+
+        response.setIntHeader(ApiHttpHeader.RATE_LIMIT_LIMIT, limit);
+        response.setHeader(ApiHttpHeader.RATE_LIMIT_RESET, Long.toString(rateLimitService.getResetTime(request.getRemoteAddr())));
+        response.setIntHeader(ApiHttpHeader.RATE_LIMIT_REMAINING, overhead ? 0 : limit - count);
+        if (overhead) {
+            headerError(request, response, HttpStatus.NOT_FOUND, error(request.getRemoteAddr()));
+
+            return false;
+        }
 
         return true;
     }
-}
 
-/**
- * @author Sand
- * @version 1.0
- * @created 2016.02.26 16:02
- */
-class RateLimitService {
+    private boolean isAuthorized(String token){
+        if (StringUtils.isEmpty(token)) return false;
 
-    public static int timeToNextQuarter = 15;
-
-    private Calendar calendar = Calendar.getInstance();
-
-    @Scheduled(cron = "0/10 * * * * *")
-    public void updateExpireTimeForCache() {
-        int currentMinute = calendar.get(Calendar.MINUTE);
-        int mod = currentMinute % 15;
-        calendar.set(Calendar.MINUTE, currentMinute - mod + 15);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-
-        timeToNextQuarter = (int) ((calendar.getTime().getTime() - new Date().getTime())/1000);
+        return false;
     }
 
-    public long incrementLimit(String userKey) {
-        return cache.incr(userKey, 1, 1, timeToNextQuarter);
+    private String getAccessToken(HttpServletRequest request){
+        String token = request.getHeader(ApiHttpHeader.AUTHORIZATION);
+        if (StringUtils.isEmpty(token)){
+            token = request.getParameter("api_key");
+        }
+
+        return token;
+    }
+
+    private static String error(String ip) throws JsonProcessingException {
+        Map<String, String> map = new HashMap<>();
+        map.put("message", ip + "的API请求超过限制(好消息：认证提限优惠大酬宾，活动参见链接)");
+        map.put("documentation_url", "https://ehr.yihu.com/docs/api/v1/#rate-limiting");
+
+        return new ObjectMapper().writeValueAsString(map);
     }
 }

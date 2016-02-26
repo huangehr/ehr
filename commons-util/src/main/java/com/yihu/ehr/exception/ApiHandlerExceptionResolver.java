@@ -17,9 +17,9 @@ import java.io.IOException;
 /**
  * API 异常机制：如果是业务流程正常执行，则返回业务Model, 即以 M 开头的Java对象。
  * 若出现异常则执行以下流程：
- *  - 设置返回状态码为 403
- *  - 提取异常中的信息，若是业务主动抛出的异常，则异常类为 ApiException。
- *  - 若是Java运行时招聘的异常，异做其他处理，并将异常代码标识为 SystemError。
+ * - 设置返回状态码为 403
+ * - 提取异常中的信息，若是业务主动抛出的异常，则异常类为 ApiException。
+ * - 若是Java运行时招聘的异常，异做其他处理，并将异常代码标识为 SystemError。
  *
  * @author Sand
  * @version 1.0
@@ -46,13 +46,12 @@ public class ApiHandlerExceptionResolver extends AbstractHandlerExceptionResolve
     private void writeJsonResponse(Exception ex, HttpServletResponse response)
             throws HttpMessageNotWritableException, IOException {
         response.setContentType("application/json;charset=utf-8");
-        response.setStatus(403);
 
         if (ex instanceof ApiException) {
-            ApiException apiException = (ApiException)ex;
+            ApiException apiException = (ApiException) ex;
 
-            ApiErrorEcho errorEcho = new ApiErrorEcho(apiException.getErrorCode(), apiException.toString());
-            response.getWriter().print(errorEcho.toString());
+            response.setStatus(apiException.getHttpStatus().value());
+            response.getWriter().print(apiException.toJson());
         } else if (ex instanceof IllegalArgumentException || ex instanceof MissingServletRequestParameterException) {
             ApiErrorEcho errorEcho = new ApiErrorEcho(ErrorCode.InvalidParameter, ex.getMessage());
             response.getWriter().print(errorEcho.toString());

@@ -379,8 +379,8 @@ Link字段包含一个或多个超媒体链接关系。*rel*可能值如下：
     X-RateLimit-Reset: 1377013266
     
     {
-       "message": "API rate limit exceeded for xxx.xxx.xxx.xxx. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)",
-       "documentation_url": "https://ehr.yihu.com/api/v1/#rate-limiting"
+       "message": "xxx.xxx.xxx.xxx的API请求超过限制(好消息：认证提限优惠大酬宾，活动参见链接)",
+       "documentation_url": "https://ehr.yihu.com/docs/api/v1/#rate-limiting"
     }
     
 - 增加未授权的应用请求次数
@@ -400,14 +400,14 @@ Link字段包含一个或多个超媒体链接关系。*rel*可能值如下：
 使用User Agent
 ---------------------
 
-所有的API都需要在请求头中包含User-Agent。没有User-Agent的请求将被拒绝。请在此字段中使用您的用户名或Client ID。
+所有的API都需要在请求头中包含User-Agent。没有User-Agent的请求将被拒绝。请在此字段中使用您的用户名或Client名称。
 这样做可以在出现问题的时候方便联系你们。
 
 例如：
 	
-	User-Agent: client_name;health-profile-browser
+	User-Agent: client,health-profile-browser
 	
-	User-Agent: user_name;developer
+	User-Agent: user,developer
 	
 如果提供的User-Agent是无效值，你将收到以下错误信息：
 
