@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -76,7 +77,7 @@ public class CdaVersionController extends ExtendController<MCDAVersion>{
 
 
     @RequestMapping(value = "/cdaVersion/{version}/drop", method = RequestMethod.DELETE)
-    @ApiOperation(value = "丢弃版本")
+    @ApiOperation(value = "删除版本")
     public boolean dropCDAVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @PathVariable(value = "version") String version) throws Exception{
@@ -104,6 +105,9 @@ public class CdaVersionController extends ExtendController<MCDAVersion>{
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @PathVariable(value = "version") String version) throws Exception{
 
+        //todo: 创建版本文件，并返回文件路径
+
+
         CDAVersion cdaVersion = cdaVersionService.getVersion(version);
         cdaVersionService.commitVersion(cdaVersion);
         return true;
@@ -113,7 +117,7 @@ public class CdaVersionController extends ExtendController<MCDAVersion>{
     @ApiOperation(value = "将最新的已发布版本回滚为编辑状态")
     public boolean rollbackToStage(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
-            @RequestParam(value = "version") String version) throws Exception{
+            @PathVariable(value = "version") String version) throws Exception{
 
         CDAVersion cdaVersion = cdaVersionService.getVersion(version);
         cdaVersionService.rollbackToStage(cdaVersion);
@@ -121,18 +125,28 @@ public class CdaVersionController extends ExtendController<MCDAVersion>{
     }
 
 
-    @RequestMapping(value = "/cdaVersion/{strVersion}", method = RequestMethod.PUT)
-    @ApiOperation(value = "将最新的已发布版本回滚为编辑状态")
+    @RequestMapping(value = "/cdaVersion/{version}", method = RequestMethod.PUT)
+    @ApiOperation(value = "修改版本信息")
     public boolean updateVersion(
-            @ApiParam(name = "vesion", value = "版本号", defaultValue = "")
-            @RequestParam(value = "vesion") String vesion,
-            @ApiParam(name = "vesionName", value = "版本名称", defaultValue = "")
-            @RequestParam(value = "vesionName") String vesionName) throws Exception{
+            @ApiParam(name = "version", value = "版本号", defaultValue = "")
+            @PathVariable(value = "version") String version,
+            @ApiParam(name = "versionName", value = "版本名称", defaultValue = "")
+            @RequestParam(value = "versionName") String versionName,
+            @ApiParam(name = "userCode", value = "操作者", defaultValue = "")
+            @RequestParam(value = "userCode") String userCode,
+            @ApiParam(name = "inStage", value = "编辑状态", defaultValue = "")
+            @RequestParam(value = "inStage") int inStage,
+            @ApiParam(name = "baseVersion", value = "父版本", defaultValue = "")
+            @RequestParam(value = "baseVersion") String baseVersion) throws Exception{
 
-        CDAVersion cdaVersion = cdaVersionService.retrieve(vesion);
+        CDAVersion cdaVersion = cdaVersionService.retrieve(version);
         if(cdaVersion==null)
             throw errNotFound();
-        cdaVersion.setVersionName(vesionName);
+        cdaVersion.setVersionName(versionName);
+        cdaVersion.setAuthor(userCode);
+        cdaVersion.setCommitTime(new Date());
+        cdaVersion.setInStage(inStage == 1);
+        cdaVersion.setBaseVersion(baseVersion);
         cdaVersionService.save(cdaVersion);
         return true;
     }
@@ -152,5 +166,15 @@ public class CdaVersionController extends ExtendController<MCDAVersion>{
     public boolean existInStage() throws Exception{
         int num = cdaVersionService.searchInStage();
         return num>0;
+    }
+
+
+    @RequestMapping(value = "/cdaVersion/{version}", method = RequestMethod.GET)
+    @ApiOperation(value = "获取版本信息")
+    public MCDAVersion getVersion(
+            @ApiParam(name = "version", value = "版本号", defaultValue = "")
+            @PathVariable(value = "version") String version ) throws Exception{
+
+        return getModel(cdaVersionService.retrieve(version));
     }
 }

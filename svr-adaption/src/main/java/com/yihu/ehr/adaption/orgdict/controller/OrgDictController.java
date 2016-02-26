@@ -49,7 +49,7 @@ public class OrgDictController extends ExtendController<MOrgDict> {
             @RequestParam(value = "code") String code,
             @ApiParam(name = "name", value = "name", defaultValue = "")
             @RequestParam(value = "name") String name,
-            @ApiParam(name = "orgCode", value = "name", defaultValue = "")
+            @ApiParam(name = "orgCode", value = "orgCode", defaultValue = "")
             @RequestParam(value = "orgCode") String orgCode,
             @ApiParam(name = "description", value = "description", defaultValue = "")
             @RequestParam(value = "description", required = false) String description,

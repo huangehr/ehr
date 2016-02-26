@@ -123,7 +123,7 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
 
         return dictEntryService.deleteByFields(
                     new String[]{"dictId", "id"},
-                    new Object[]{dictId, ids.split(",")},
+                    new Object[]{dictId, strToLongArr(ids)},
                     getServiceEntity(version)
                 ) > 0;
     }
@@ -134,7 +134,7 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
             @ApiParam(name = "version", value = "cda版本号", defaultValue = "")
             @RequestParam(value = "version") String version,
             @ApiParam(name = "dictId", value = "字典编号", defaultValue = "")
-            @RequestParam(value = "dictId") String dictId) throws Exception{
+            @PathVariable(value = "dictId") long dictId) throws Exception{
 
         return dictEntryService.deleteByField("dictId", dictId, getServiceEntity(version)) > 0;
     }
@@ -168,7 +168,7 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
     @ApiOperation(value = "获取字典项")
     public MStdDictEntry getDictEntry(
             @ApiParam(name = "id", value = "字典项编号", defaultValue = "")
-            @RequestParam(value = "id") long id,
+            @PathVariable(value = "id") long id,
             @ApiParam(name = "version", value = "版本编号", defaultValue = "")
             @RequestParam(value = "version") String version) throws Exception{
 

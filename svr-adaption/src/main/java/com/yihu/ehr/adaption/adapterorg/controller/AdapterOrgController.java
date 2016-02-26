@@ -71,19 +71,14 @@ public class AdapterOrgController extends ExtendController<MAdapterOrg> {
     @RequestMapping(value = "/org", method = RequestMethod.POST)
     @ApiOperation(value = "新增采集标准")
     public boolean addAdapterOrg(
-            @ApiParam(name = "adapterOrgModel", value = "采集机构json模型", defaultValue = "")
-            @RequestParam(value = "adapterOrgModel", required = false) String adapterOrgModel) throws Exception{
+            @ApiParam(name = "adapterOrg", value = "采集机构模型", defaultValue = "")
+            @RequestParam(value = "adapterOrg", required = false) AdapterOrg adapterOrg) throws Exception{
 
-        try {
-            AdapterOrg adapterOrg = jsonToObj(adapterOrgModel, AdapterOrg.class);
-            if (adapterOrgService.retrieve(adapterOrg.getCode()) != null) {
-                throw new ApiException(ErrorCode.RepeatAdapterOrg, "该机构已存在采集标准！");
-            }
-            adapterOrgService.addAdapterOrg(adapterOrg);
-            return true;
-        } catch (IOException e) {
-            throw errParm();
+        if (adapterOrgService.retrieve(adapterOrg.getCode()) != null) {
+            throw new ApiException(ErrorCode.RepeatAdapterOrg, "该机构已存在采集标准！");
         }
+        adapterOrgService.addAdapterOrg(adapterOrg);
+        return true;
     }
 
 
