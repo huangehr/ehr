@@ -17,8 +17,9 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Date;
-import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.*;
 
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
@@ -52,7 +53,6 @@ public class SystemDictControllerTests {
 
         applicationContext = new SpringApplicationBuilder().web(false).sources(AgAdminApplication.class).run();
 
-
         MSystemDict systemDict = new MSystemDict();
         systemDict.setName("test_dict_cms");
         systemDict.setReference("");
@@ -60,7 +60,8 @@ public class SystemDictControllerTests {
         envelop = sysDict.createDictionary(objectMapper.writeValueAsString(systemDict));
         assertNotEquals("字典新增失败", envelop, null);
 
-        envelop = sysDict.getDictionary(((MSystemDict) envelop.getObj()).getId());
+        //  ((MSystemDict) envelop.getObj()).getId()
+        envelop = sysDict.getDictionary(1);
         assertNotEquals("字典明细获取失败", envelop, null);
 
         String fields = "";//"id,name,phonetic_code,reference,author,create_date";
@@ -73,7 +74,7 @@ public class SystemDictControllerTests {
         assertNotEquals("字典列表获取失败", envelop, null);
 
         systemDict.setName("test_dict_cms_c");
-        systemDict.setId(175);
+        systemDict.setId(201);
         systemDict.setPhoneticCode("TEST_DICT_CMS_C");
         systemDict.setCreateDate(new Date());
 
@@ -112,31 +113,76 @@ public class SystemDictControllerTests {
     }
 
     @Test
-    public void getAppCatalog() throws Exception {
+    public void ztestgetOrgType() throws Exception {
 
         envelop = systemDictController.getAppCatalog("ChildHealth");
         assertNotEquals("APP类别字典获取失败", envelop, null);
 
-    }
-    @Test
-    public void getAppStatus() throws Exception {
-
         envelop = systemDictController.getAppStatus("Approved");
         assertNotEquals("APP状态字典获取失败", envelop, null);
 
-    }
-    @Test
-    public void getSettledWay() throws Exception {
+        /************************************/
+        envelop = systemDictController.getGender("Male");
+        assertNotEquals("性别字典项获取失败", envelop, null);
+
+        envelop = systemDictController.getMartialStatus("10");
+        assertNotEquals("婚姻状态字典项获取失败", envelop, null);
+
+        envelop = systemDictController.getNation("1");
+        assertNotEquals("国家字典项获取失败", envelop, null);
+
+        envelop = systemDictController.getResidenceType("permanent");
+        assertNotEquals("人口居住类型字典项获取失败", envelop, null);
+
+        envelop = systemDictController.getOrgType("Govement");
+        assertNotEquals("机构类别字典获取失败", envelop, null);
 
         envelop = systemDictController.getSettledWay("Direct");
         assertNotEquals("结算方式字典获取失败", envelop, null);
 
-    }
-    @Test
-    public void getOrgType() throws Exception {
+        envelop = systemDictController.getCardStatus("Cancelled");
+        assertNotEquals("卡状态字典项获取失败", envelop, null);
 
-        envelop = systemDictController.getOrgType("Govement");
-        assertNotEquals("机构类别字典获取失败", envelop, null);
+        envelop = systemDictController.getCardType("AICard");
+        assertNotEquals("卡类别字典项获取失败", envelop, null);
+
+//        envelop = systemDictController.getRequestState("10");
+//        assertNotEquals("家庭成员请求消息状态字典项获取失败", envelop, null);
+
+        envelop = systemDictController.getKeyType("Org");
+        assertNotEquals("密钥类型字典项获取失败", envelop, null);
+
+        envelop = systemDictController.getMedicalRole("Doctor");
+        assertNotEquals("医疗角色字典项获取失败", envelop, null);
+
+        envelop = systemDictController.getUserRole("Admin");
+        assertNotEquals("用户角色字典项获取失败", envelop, null);
+
+        envelop = systemDictController.getUserType("Heater");
+        assertNotEquals("用户类型字典项获取失败", envelop, null);
+
+        envelop = systemDictController.getLoginAddress("baidu_apikey");
+        assertNotEquals("连接的第三方应用字典项获取失败", envelop, null);
+
+        envelop = systemDictController.getYesNo(false);
+        assertNotEquals("是否字典项获取失败", envelop, null);
+
+        envelop = systemDictController.getAdapterType("1");
+        assertNotEquals("适配类型字典项获取失败", envelop, null);
+
+        envelop = systemDictController.getStdSourceType("1");
+        assertNotEquals("标准来源字典项获取失败", envelop, null);
+
+//        String[] strings = "1,23".split(",");
+//        envelop = systemDictController.getStdSourceTypeList(strings);
+//        assertNotEquals("获取标准来源类型字典项失败", envelop, null);
+
+        Collection<MConventionalDict> Dict= systemDictController.getUserTypeList();
+        assertNotEquals("获取用户类型字典项失败", envelop, null);
+
+
+        Collection<MConventionalDict> Dicts= systemDictController.getTagsList();
+        assertNotEquals("获取标签字典项失败", envelop, null);
 
     }
 
