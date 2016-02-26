@@ -55,6 +55,7 @@ public class OrgService extends BaseJpaService<Organization, XOrganizationReposi
 
 
     public List<String> getCodesByName(String name) {
+        String named = name;
         List<String> codes = organizationRepository.fingIdsByFullnameOrShortName(name);
         return codes;
     }
