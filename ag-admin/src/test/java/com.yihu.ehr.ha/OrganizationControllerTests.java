@@ -1,59 +1,81 @@
 package com.yihu.ehr.ha;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.geogrephy.GeographyModel;
+import com.yihu.ehr.agModel.org.OrgDetailModel;
+import com.yihu.ehr.ha.organization.controller.OrganizationController;
+import com.yihu.ehr.util.Envelop;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import static org.junit.Assert.assertNotEquals;
+
+
 /**
  * Created by AndyCai on 2016/2/1.
  */
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@SpringApplicationConfiguration(classes = AgAdminApplication.class)
-//@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = AgAdminApplication.class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class OrganizationControllerTests {
 
-//    private static String version = "v1.0";
+    @Autowired
+    private static OrganizationController orgController;
+
+    @Autowired
+    ApplicationContext applicationContext;
+
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Test
+    public void atestOrg() throws Exception{
+        applicationContext = new SpringApplicationBuilder()
+                .web(false).sources(AgAdminApplication.class).run();
+        Envelop envelop = new Envelop();
+
+        //新增机构-------------------------1
+        OrgDetailModel orgDetailModel = new OrgDetailModel();
+        orgDetailModel.setOrgCode("jinshida-weining");
+        orgDetailModel.setAdmin("shanghai");
+        orgDetailModel.setCity("上海");
+        orgDetailModel.setDistrict("黄埔");
+        orgDetailModel.setFullName("上海金仕达卫宁");
+        orgDetailModel.setOrgType("ThirdPartyPlatform");
+        orgDetailModel.setSettledWay("ThirdParty");
+        orgDetailModel.setProvince("上海");
+        orgDetailModel.setShortName("卫宁");
+        orgDetailModel.setTags("电子病历");
+        orgDetailModel.setTel("15959208182");
+
+        //机构地址
+//        GeographyModel addr = new GeographyModel();
 //
-//    @Autowired
-//    private static OrganizationController orgController;
 //
-//    @Autowired
-//    private ObjectMapper objectMapper;
-//
-//    ApplicationContext applicationContext;
-//
-//    @Test
-//    public void atestOrg() throws Exception{
-//        applicationContext = new SpringApplicationBuilder()
-//                .web(false).sources(AgAdminApplication.class).run();
-//
-//        OrgModel orgModel = new OrgModel();
-//        orgModel.setOrgCode("jinshida-weining");
-//        orgModel.setAdmin("shanghai");
-//        orgModel.setCity("上海");
-//        orgModel.setDistrict("黄埔");
-//        orgModel.setFullName("上海金仕达卫宁");
-//        orgModel.setOrgType("ThirdPartyPlatform");
-//        orgModel.setSettledWay("ThirdParty");
-//        orgModel.setProvince("上海");
-//        orgModel.setShortName("卫宁");
-//        orgModel.setTags("电子病历");
-//        orgModel.setTel("15959208182");
-//        String orgModelJson = objectMapper.writeValueAsString(orgModel);
-//        Object object = orgController.updateOrg(version,orgModelJson);
-//        assertNotEquals("机构5新增失败！", object, null);
-//
-//        String id = "";
-//
-//        String orgCode = "";
-//        String fullName="";
-//        String settledWay="";
-//        String orgType="";
-//        String province="";
-//        String city="";
-//        String district="";
-//        int page=1;
-//        int rows =15;
-//
-//        object = orgController.searchOrgs(orgCode,fullName,settledWay,orgType,province,city,district,page,rows);
-//        assertNotEquals("机构列表数据获取失败！", object, null);
-//
+//        String orgModelJson = objectMapper.writeValueAsString(orgDetailModel);
+//        envelop = orgController.update(addrModelJson, orgModelJson);
+//        assertNotEquals("机构5新增失败！", envelop.getObj(), null);
+
+        // 新创建的orgDetailModel对象，用于下面的操作
+        OrgDetailModel orgNew = (OrgDetailModel)envelop.getObj();
+
+
+        //列表查询（page、size）
+        String fields = "";
+        String filters = "";
+        String sorts = "";
+        int size = 30;
+        int page = 1;
+        envelop = orgController.searchOrgs(fields,filters,sorts,size,page);
+        assertNotEquals("机构列表数据获取失败！", envelop.isSuccessFlg(), false);
+
 //        object = orgController.getOrgByCode(version,id);
 //        assertNotEquals("机构信息获取失败！", object, null);
 //
@@ -81,6 +103,6 @@ public class OrganizationControllerTests {
 //
 //        object = orgController.deleteOrg(version,id);
 //        assertNotEquals("机构上传失败！", object, "false");
-//    }
+    }
 
 }

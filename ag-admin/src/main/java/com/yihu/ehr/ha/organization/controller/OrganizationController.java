@@ -62,8 +62,7 @@ public class OrganizationController extends BaseController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletResponse response) throws Exception{
+            @RequestParam(value = "page", required = false) int page) throws Exception{
         List<OrgModel> orgModelList = new ArrayList<>();
         List<MOrganization> organizations = orgClient.searchOrgs(fields,filters,sorts,size,page);
         for(MOrganization org : organizations){
@@ -91,8 +90,8 @@ public class OrganizationController extends BaseController {
             orgModelList.add(orgModel);
         }
         //获取符合条件总条数
-        String count = response.getHeader(AgAdminConstants.ResourceCount);
-        int totalCount = StringUtils.isNotEmpty(count)?Integer.parseInt(count):0;
+        //TODO 获取符合条件的总记录数
+        int totalCount = 20;
 
         return getResult(orgModelList,totalCount,page,size);
     }
