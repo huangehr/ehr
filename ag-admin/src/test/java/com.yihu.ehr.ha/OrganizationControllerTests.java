@@ -42,7 +42,9 @@ public class OrganizationControllerTests {
                 .web(false).sources(AgAdminApplication.class).run();
         Envelop envelop = new Envelop();
         //新增机构-------------------------1
-
+        if (orgController.getOrg("CSJG10200FJ").isSuccessFlg()) {
+            orgController.deleteOrg("CSJG10200FJ");
+        }
         OrgDetailModel orgDetailModel = new OrgDetailModel();
         orgDetailModel.setOrgCode("CSJG10200FJ");
         orgDetailModel.setFullName("健康之路1");
@@ -56,8 +58,8 @@ public class OrganizationControllerTests {
         //机构地址
         GeographyModel addrCreate = new GeographyModel();
         addrCreate.setCountry("中国");
-        addrCreate.setProvince("福建");
-        addrCreate.setCity("厦门");
+        addrCreate.setProvince("福建省");
+        addrCreate.setCity("厦门市");
         addrCreate.setDistrict("思明区");
         addrCreate.setTown("金山街道");
         addrCreate.setStreet("金山");
@@ -111,8 +113,8 @@ public class OrganizationControllerTests {
 
         //根据地址获取机构下拉列表 ---------------------6ok
 
-//        envelop = orgController.getOrgsByAddress("福建省","厦门市","海沧区");
-//        assertNotEquals("未查询到对应的机构列表！",envelop.isSuccessFlg(),false);
+        envelop = orgController.getOrgsByAddress("福建省", "厦门市", "海沧区");
+        assertNotEquals("未查询到对应的机构列表！", envelop.isSuccessFlg(), false);
 
 
         //更新机构激活状态-----------------7ok
