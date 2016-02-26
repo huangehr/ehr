@@ -1,23 +1,25 @@
 package com.yihu.ehr.agModel.app;
 
+import java.util.Date;
+
 /**
  * Created by yww on 2016/2/23.
  */
 public class AppDetailModel {
-    String id;
-    String name;
-    String secret;
-    String url;
-    String creator;
-    String auditor;
-    String create_time;
-    String audit_time;
-    String catalogCode;
-    String catalogName;
-    String statusCode;
-    String statusValue;
-    String description;
-    String strTags;
+    private String id;
+    private String name;
+    private String secret;
+    private String url;
+    private String creator;
+    private String auditor;
+    private Date createTime;
+    private Date auditTime;
+    private String catalog;
+    private String catalogName;
+    private String status;
+    private String statusName;
+    private String description;
+    private String tags;
 
     public String getId() {
         return id;
@@ -67,28 +69,28 @@ public class AppDetailModel {
         this.auditor = auditor;
     }
 
-    public String getCreate_time() {
-        return create_time;
+    public Date getCreateTime() {
+        return createTime;
     }
 
-    public void setCreate_time(String create_time) {
-        this.create_time = create_time;
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
-    public String getAudit_time() {
-        return audit_time;
+    public Date getAuditTime() {
+        return auditTime;
     }
 
-    public void setAudit_time(String audit_time) {
-        this.audit_time = audit_time;
+    public void setAuditTime(Date auditTime) {
+        this.auditTime = auditTime;
     }
 
-    public String getCatalogCode() {
-        return catalogCode;
+    public String getCatalog() {
+        return catalog;
     }
 
-    public void setCatalogCode(String catalogCode) {
-        this.catalogCode = catalogCode;
+    public void setCatalog(String catalog) {
+        this.catalog = catalog;
     }
 
     public String getCatalogName() {
@@ -99,20 +101,20 @@ public class AppDetailModel {
         this.catalogName = catalogName;
     }
 
-    public String getStatusCode() {
-        return statusCode;
+    public String getStatus() {
+        return status;
     }
 
-    public void setStatusCode(String statusCode) {
-        this.statusCode = statusCode;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
-    public String getStatusValue() {
-        return statusValue;
+    public String getStatusName() {
+        return statusName;
     }
 
-    public void setStatusValue(String statusValue) {
-        this.statusValue = statusValue;
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
     }
 
     public String getDescription() {
@@ -123,11 +125,11 @@ public class AppDetailModel {
         this.description = description;
     }
 
-    public String getStrTags() {
-        return strTags;
+    public String getTags() {
+        return tags;
     }
 
-    public void setStrTags(String strTags) {
-        this.strTags = strTags;
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 }

@@ -73,19 +73,19 @@ public class OrganizationController extends BaseController {
             orgModel.setAdmin(org.getAdmin());
             orgModel.setTel(org.getTel());
             // 获取机构类别字典
-            String orgTypeCode = org.getOrgCode();
-            orgModel.setOrgTypeCode(orgTypeCode);
-            orgModel.setOrgTypeName(conDictEntryClient.getOrgType(orgTypeCode).getValue());
+            String orgType = org.getOrgType();
+            orgModel.setOrgType(orgType);
+            orgModel.setOrgTypeName(conDictEntryClient.getOrgType(orgType).getValue());
             // 获取机构地址信息
-            String locationId = org.getLocation();
-            orgModel.setLocationStrName(addressClient.getCanonicalAddress(locationId));
+            String location = org.getLocation();
+            orgModel.setLocationStrName(addressClient.getCanonicalAddress(location));
             //获取机构接入方式
-            String settledWayCode = org.getSettledWay();
-            orgModel.setSettledWayCode(settledWayCode);
-            orgModel.setSettledWayName(conDictEntryClient.getSettledWay(settledWayCode).getValue());
+            String settledWay = org.getSettledWay();
+            orgModel.setSettledWay(settledWay);
+            orgModel.setSettledWayName(conDictEntryClient.getSettledWay(settledWay).getValue());
             // 判断机构状态（是否已激活）
             String activityFlag = org.getActivityFlag();
-            orgModel.setActivityFlagCode(activityFlag);
+            orgModel.setActivityFlag(activityFlag);
             orgModel.setActivityFlagName(activityFlag=="1"?"是":"否");
 
             orgModelList.add(orgModel);
@@ -198,13 +198,13 @@ public class OrganizationController extends BaseController {
         org.setFullName(mOrg.getFullName());
         org.setShortName(mOrg.getShortName());
         //获取机构类别字典值
-        String orgTypeCode = mOrg.getOrgType();
-        org.setOrgTypeCode(orgTypeCode);
-        org.setOrgTypeName(conDictEntryClient.getOrgType(orgTypeCode).getValue());
+        String orgType = mOrg.getOrgType();
+        org.setOrgType(orgType);
+        org.setOrgTypeName(conDictEntryClient.getOrgType(orgType).getValue());
         //获取接入方式字典字典值
-        String settledWayCode = mOrg.getSettledWay();
-        org.setSettledWayCode(settledWayCode);
-        org.setSettledWayName(conDictEntryClient.getSettledWay(settledWayCode).getValue());
+        String settledWay = mOrg.getSettledWay();
+        org.setSettledWay(settledWay);
+        org.setSettledWayName(conDictEntryClient.getSettledWay(settledWay).getValue());
 
         org.setAdmin(mOrg.getAdmin());
         org.setTel(mOrg.getTel());
