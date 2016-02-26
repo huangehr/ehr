@@ -400,12 +400,14 @@ Link字段包含一个或多个超媒体链接关系。*rel*可能值如下：
 使用User Agent
 ---------------------
 
-所有的API都需要在请求头中包含User-Agent。没有User-Agent的请求将被拒绝。请在此字段中使用您的用户名或应用名称。
+所有的API都需要在请求头中包含User-Agent。没有User-Agent的请求将被拒绝。请在此字段中使用您的用户名或Client ID。
 这样做可以在出现问题的时候方便联系你们。
 
 例如：
 	
-	User-Agent: Health-Profile-Browser
+	User-Agent: client_name;health-profile-browser
+	
+	User-Agent: user_name;developer
 	
 如果提供的User-Agent是无效值，你将收到以下错误信息：
 

@@ -23,26 +23,26 @@ public class AppController {
     @ApiOperation(value = "检查应用授权", response = String.class)
     @RequestMapping(value = "/{client_id}/tokens/{access_token}", produces = "application/json", method = RequestMethod.GET)
     public String checkClientAuthorization(@ApiParam(value = "client_id")
-                                                 @PathVariable("client_id") String clientId,
-                                                 @ApiParam(value = "access_token")
-                                                 @PathVariable("access_token") String accessToken) {
+                                           @PathVariable("client_id") String clientId,
+                                           @ApiParam(value = "access_token")
+                                           @PathVariable("access_token") String accessToken) {
         return null;
     }
 
     @ApiOperation(value = "重置应用授权", response = String.class)
     @RequestMapping(value = "/{client_id}/tokens/{access_token}", produces = "application/json", method = RequestMethod.POST)
     public String restClientAuthorization(@ApiParam(value = "client_id")
-                                                @PathVariable("client_id") String clientId,
-                                                @ApiParam(value = "access_token")
-                                                @PathVariable("access_token") String accessToken) {
+                                          @PathVariable("client_id") String clientId,
+                                          @ApiParam(value = "access_token")
+                                          @PathVariable("access_token") String accessToken) {
         return null;
     }
 
     @ApiOperation(value = "删除应用授权", response = String.class)
     @RequestMapping(value = "/{client_id}/tokens/{access_token}", produces = "application/json", method = RequestMethod.DELETE)
     public void revokeClientAuthorization(@ApiParam(value = "client_id")
-                                                @PathVariable("client_id") String clientId,
-                                                @ApiParam(value = "access_token")
-                                                @PathVariable("access_token") String accessToken) {
+                                          @PathVariable("client_id") String clientId,
+                                          @ApiParam(value = "access_token")
+                                          @PathVariable("access_token") String accessToken) {
     }
 }

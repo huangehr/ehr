@@ -1,4 +1,4 @@
-package com.yihu.ehr;
+package com.yihu.ehr.config;
 
 import org.apache.catalina.connector.Connector;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,13 +9,13 @@ import org.springframework.boot.context.embedded.tomcat.TomcatConnectorCustomize
  * @version 1.0
  * @created 2016.02.23 18:36
  */
-public class EHRTomcatConnectionCustomizer implements TomcatConnectorCustomizer {
+public class AppTomcatConnectionCustomizer implements TomcatConnectorCustomizer {
 
     int port;
     private String absoluteKeystoreFile;
     private String keystorePassword;
 
-    public EHRTomcatConnectionCustomizer(
+    public AppTomcatConnectionCustomizer(
             String absoluteKeystoreFile,
             String keystorePassword,
             int port) {

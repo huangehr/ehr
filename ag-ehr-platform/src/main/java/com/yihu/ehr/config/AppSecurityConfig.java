@@ -1,5 +1,8 @@
-package com.yihu.ehr;
+package com.yihu.ehr.config;
 
+import com.yihu.ehr.security.RESTAuthenticationEntryPoint;
+import com.yihu.ehr.security.RESTAuthenticationFailureHandler;
+import com.yihu.ehr.security.RESTAuthenticationSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.core.annotation.Order;
@@ -13,9 +16,15 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
  * @created 2016.02.25 14:58
  */
 @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
-public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
-    //@Autowired
-    //private RESTAuthen
+public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
+    @Autowired
+    private RESTAuthenticationEntryPoint entryPoint;
+
+    @Autowired
+    private RESTAuthenticationSuccessHandler successHandler;
+
+    @Autowired
+    private RESTAuthenticationFailureHandler failureHandler;
 
     @Override
     protected void configure(AuthenticationManagerBuilder builder) throws Exception {
@@ -26,12 +35,10 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().antMatchers("/api").anonymous().anyRequest().authenticated().and().httpBasic();;
-        http.authorizeRequests().antMatchers("/api/**").authenticated();
+        /*http.authorizeRequests().antMatchers("/api/v1.0/**").authenticated();
         http.csrf().disable();
-        //http.exceptionHandling().authenticationEntryPoint(null);
-        //http.formLogin().successHandler(null);
-        //http.formLogin().failureHandler(null);
-        //
+        http.exceptionHandling().authenticationEntryPoint(entryPoint);
+        http.formLogin().successHandler(successHandler);
+        http.formLogin().failureHandler(failureHandler);*/
     }
 }

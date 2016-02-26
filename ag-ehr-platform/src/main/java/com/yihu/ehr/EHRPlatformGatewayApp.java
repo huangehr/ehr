@@ -1,5 +1,7 @@
 package com.yihu.ehr;
 
+import com.yihu.ehr.config.AppSecurityConfig;
+import com.yihu.ehr.config.AppTomcatConnectionCustomizer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,7 +28,7 @@ public class EHRPlatformGatewayApp {
     public EmbeddedServletContainerCustomizer containerCustomizer() throws FileNotFoundException {
         final String absoluteKeystoreFile = ResourceUtils.getFile("C:/Windows/tomcat.keystore").getAbsolutePath();
 
-        final TomcatConnectorCustomizer customizer = new EHRTomcatConnectionCustomizer(absoluteKeystoreFile, "123456", port);
+        final TomcatConnectorCustomizer customizer = new AppTomcatConnectionCustomizer(absoluteKeystoreFile, "123456", port);
 
         return new EmbeddedServletContainerCustomizer() {
             @Override
@@ -41,6 +43,6 @@ public class EHRPlatformGatewayApp {
 
     @Bean
     public WebSecurityConfigurerAdapter webSecurityConfigurerAdapter() {
-        return new ApplicationSecurity();
+        return new AppSecurityConfig();
     }
 }
