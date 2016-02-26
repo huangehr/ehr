@@ -67,15 +67,15 @@ public interface PatientClient {
 
     /**
      * 根据前端传回来的json新增一个人口信息
-     * @param patientModelJsonData
+     * @param jsonData
      * @return
      * @throws Exception
      */
     @RequestMapping(value = "/populations",method = RequestMethod.POST)
     @ApiOperation(value = "根据前端传回来的json创建一个人口信息")
     MDemographicInfo createPatient(
-            @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
-            @RequestParam(value = "patient_model_json_data") String patientModelJsonData) ;
+            @ApiParam(name = "json_data", value = "病人信息", defaultValue = "")
+            @RequestParam(value = "json_data") String jsonData) ;
 
     /**
      * 根据前端传回来的json修改人口信息

@@ -65,7 +65,7 @@ public class GeographyController extends BaseRestController{
             geography.setCountry("中国");
         }
         List<Geography> geographies = geographyService.isGeographyExist(geography);
-        if(geographies.size()==0){
+        if(geographies==null || geographies.size()==0){
             geography.setId(getObjectId(BizObject.Geography));
             String addressId = geographyService.saveAddress(geography);
             return addressId;

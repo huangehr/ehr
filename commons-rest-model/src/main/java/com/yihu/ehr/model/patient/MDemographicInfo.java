@@ -13,7 +13,7 @@ public class MDemographicInfo {
 
     private String idCardNo;                       // 身份证
     private Date birthday;                            // 出生日期
-    private String birthPlace;                    // 出生地
+    private String birthPlace;                    // 户籍地址
     private String nativePlace;                    // 籍贯
     private String email;                            // 邮箱
     private String gender;                            // 性别

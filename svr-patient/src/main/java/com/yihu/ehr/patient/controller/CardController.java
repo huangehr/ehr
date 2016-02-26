@@ -91,8 +91,9 @@ public class CardController extends BaseRestController {
         conditionMap.put("page",page);
         conditionMap.put("rows",rows);
         List<AbstractCard> cardBrowseModelList = cardManager.searchAbstractCard(conditionMap);
+        List<MAbstractCard> mAbstractCards = (List<MAbstractCard>)convertToModels(cardBrowseModelList,new ArrayList<MAbstractCard>(cardBrowseModelList.size()), MAbstractCard.class, null);
         Integer totalCount = cardManager.searchCardInt(conditionMap, false);
-        return getResult(cardBrowseModelList, totalCount);
+        return getResult(mAbstractCards, totalCount);
     }
 
     /**
