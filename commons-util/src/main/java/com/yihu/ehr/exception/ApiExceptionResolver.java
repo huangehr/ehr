@@ -5,6 +5,7 @@ import com.yihu.ehr.util.ApiErrorEcho;
 import com.yihu.ehr.util.log.LogService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.util.MimeType;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.ModelAndView;
@@ -26,14 +27,27 @@ import java.io.IOException;
  * @created 2015.12.20 16:56
  */
 @ControllerAdvice
-public class ApiHandlerExceptionResolver extends AbstractHandlerExceptionResolver {
+public class ApiExceptionResolver extends AbstractHandlerExceptionResolver {
     protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response, Object handler,
                                               Exception ex) {
         LogService.getLogger().error(ex.getMessage(), ex);
-        response.setStatus(HttpStatus.FORBIDDEN.value());
 
         try {
-            writeJsonResponse(ex, response);
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+            response.setContentType("application/json; charset=utf-8");
+
+            if (ex instanceof ApiException) {
+                ApiException apiException = (ApiException) ex;
+
+                response.setStatus(apiException.getHttpStatus().value());
+                response.getWriter().print(apiException.toString());
+            } else if (ex instanceof IllegalArgumentException || ex instanceof MissingServletRequestParameterException) {
+                ApiErrorEcho errorEcho = new ApiErrorEcho(ErrorCode.InvalidParameter, ex.getMessage());
+                response.getWriter().print(errorEcho.toString());
+            } else {
+                ApiErrorEcho errorEcho = new ApiErrorEcho(ErrorCode.SystemError, ex.getMessage());
+                response.getWriter().print(errorEcho.toString());
+            }
 
             return new ModelAndView();
         } catch (Exception e) {
@@ -45,19 +59,6 @@ public class ApiHandlerExceptionResolver extends AbstractHandlerExceptionResolve
 
     private void writeJsonResponse(Exception ex, HttpServletResponse response)
             throws HttpMessageNotWritableException, IOException {
-        response.setContentType("application/json;charset=utf-8");
 
-        if (ex instanceof ApiException) {
-            ApiException apiException = (ApiException) ex;
-
-            response.setStatus(apiException.getHttpStatus().value());
-            response.getWriter().print(apiException.toJson());
-        } else if (ex instanceof IllegalArgumentException || ex instanceof MissingServletRequestParameterException) {
-            ApiErrorEcho errorEcho = new ApiErrorEcho(ErrorCode.InvalidParameter, ex.getMessage());
-            response.getWriter().print(errorEcho.toString());
-        } else {
-            ApiErrorEcho errorEcho = new ApiErrorEcho(ErrorCode.SystemError, ex.getMessage());
-            response.getWriter().print(errorEcho.toString());
-        }
     }
 }

@@ -1,4 +1,4 @@
-package com.yihu.ehr.error;
+package com.yihu.ehr.api.error;
 
 import org.springframework.boot.autoconfigure.web.ErrorController;
 import org.springframework.http.HttpStatus;
