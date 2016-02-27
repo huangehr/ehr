@@ -9,6 +9,12 @@ endpoints:
   health:
     sensitive: false
 
+## 错误消息
+missing:
+  user_agent: Request forbidden by administrative rules. Please make sure your request has a User-Agent header.
+rate_limit:
+  exceeding: 主机{0}的API请求超过限制(好消息：认证提限优惠大酬宾，活动参见链接).
+
 ---
 spring:
   profiles: dev

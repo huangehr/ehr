@@ -1,14 +1,17 @@
 package com.yihu.ehr.constants;
 
 /**
- *
  * @author Sand
  * @version 1.0
  * @created 2015.08.10 17:49
  */
 public enum ErrorCode {
+    // api specification
+    MissingUserAgent("missing.user_agent"),
+    RateLimitExceeding("rate_limit.exceeding"),
 
 
+    //
     MissMethod("ehr.common.miss.method"),
     MissTimestamp("ehr.common.miss.timestamp"),
     MissAppKey("ehr.common.miss.appid"),
@@ -84,7 +87,6 @@ public enum ErrorCode {
     InvalidSysDictEntry("ehr.sysDictEntry.name.invalid"),
     InvalidDelSysDictEntry("ehr.sysDictEntry.del.invalid"),
     InvalidUpdateSysDictEntry("ehr.sysDictEntry.update.invalid"),
-
 
     GetGeographyFailed("ehr.geography.ger.invalid"),
 

@@ -11,12 +11,5 @@ import java.io.IOException;
  * Created by Sand Wen on 2016.2.27.
  */
 public class BaseHandlerInterceptor extends HandlerInterceptorAdapter {
-    public void headerError(HttpServletRequest request,
-                            HttpServletResponse response,
-                            HttpStatus httpStatus,
-                            String body) throws IOException {
-        response.setContentType("application/json; charset=utf-8");
-        response.setStatus(httpStatus.value());
-        response.getWriter().print(body);
-    }
+
 }

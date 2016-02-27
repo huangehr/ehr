@@ -129,7 +129,7 @@ GET方法点击进去之后，根据方法的实际情况：
     
 - 若客户端发送的数据包含无效的字段，服务端将返回422错误：
 
-	
+
 	HTTP/1.1 422 Unprocessable Entity
     Content-Length: 149
     
@@ -143,6 +143,7 @@ GET方法点击进去之后，根据方法的实际情况：
         }
       ]
     }
+    
     
 所有的错误对象都含有相应的资源与属性字段，用以告诉客户端可能的错误原因。另外，错误对象中还有一个错误代码，用于告诉哪个字段发生错误。
 错误代码列表如下：
@@ -405,9 +406,9 @@ Link字段包含一个或多个超媒体链接关系。*rel*可能值如下：
 
 例如：
 	
-	User-Agent: client,health-profile-browser
+	User-Agent: client health-profile-browser
 	
-	User-Agent: user,developer
+	User-Agent: user developer
 	
 如果提供的User-Agent是无效值，你将收到以下错误信息：
 

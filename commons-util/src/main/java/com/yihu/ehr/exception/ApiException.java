@@ -9,9 +9,24 @@ import com.yihu.ehr.util.StringBuilderUtil;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 
+import java.util.List;
+
 /**
  * API 异常。使用错误代码初始化，并可接收用于补充错误消息的参数。
  * 用于描述错误代码的信息配置在各服务配置文件中，并由服务配置中心统一管理。
+ *
+ * 错误描述结构，结构(字段errors对资源而言，REST规范错误不包含此结构)：
+ * {
+ *    "message": "Validation Failed",
+ *    "document_url": "https://ehr.yihu.com/docs/api/somewhere"
+ *    "errors": [
+ *        {
+ *            "resource": "User",
+ *            "field": "title",
+ *            "code": "missing_field"
+ *        }
+ *    ]
+ * }
  *
  * @author Sand
  * @version 1.0
@@ -22,91 +37,69 @@ public class ApiException extends RuntimeException {
         return httpStatus;
     }
 
-    @Override
-    public String getMessage() {
-        return message;
-    }
-
-    public String getDocumentURL() {
-        return documentURL;
-    }
-
     HttpStatus httpStatus;
-
-    String message;
+    ErrorCode errorCode;        // 用于从配置环境中提取错误信息
+    String[] errorArgs;         // 格式化配置环境中的错误信息
     String documentURL;
-    Object errors;
 
-    private ErrorCode errorCode;
-    private String[] args;
+    List<ResourceError> resourceErrors;         // 资源具体错误描述
 
-    public ApiException(HttpStatus httpStatus, String message, String documentURL, Object errors, ErrorCode errorCode, String... args){
+    private ApiException(HttpStatus httpStatus, ErrorCode errorCode, String documentURL, List<ResourceError> resourceErrors, String... errorArgs){
+        this.httpStatus = httpStatus;
         this.errorCode = errorCode;
-        this.httpStatus = httpStatus;
-        this.message = message;
+        this.errorArgs = errorArgs;
         this.documentURL = documentURL;
-        this.errors = errors;
 
-        this.errorCode = errorCode;
-        this.args = args;
+        this.resourceErrors = resourceErrors;
     }
 
-    public ApiException(HttpStatus httpStatus, String message, String documentURL, Object errors){
-        this.httpStatus = httpStatus;
-        this.message = message;
-        this.documentURL = documentURL;
-        this.errors = errors;
+    public ApiException(HttpStatus httpStatus, ErrorCode errorCode, String documentURL, String... errorArgs){
+        this(httpStatus, errorCode, documentURL, null, errorArgs);
     }
 
-    public ApiException(HttpStatus httpStatus, String message, String documentURL){
-        this.httpStatus = httpStatus;
-        this.message = message;
-        this.documentURL = documentURL;
+    public ApiException(HttpStatus httpStatus, ErrorCode errorCode){
+        this(httpStatus, errorCode, null, null, null);
     }
 
-    public ApiException(HttpStatus httpStatus, String message){
-        this.httpStatus = httpStatus;
-        this.message = message;
-    }
-
+    // legacy support
     public ApiException(ErrorCode errorCode) {
-        this.errorCode = errorCode;
+        this(HttpStatus.FORBIDDEN, errorCode, null, null, null);
     }
 
-    public ApiException(ErrorCode errorCode, String... args) {
-        this.errorCode = errorCode;
-        this.args = args;
-    }
-
-    public ErrorCode getErrorCode() {
-        return errorCode;
+    public ApiException(ErrorCode errorCode, String... errorArgs) {
+        this(HttpStatus.FORBIDDEN, errorCode, null, null, errorArgs);
     }
 
     @Override
     public String toString(){
-        Environment environment = SpringContext.getService(Environment.class);
-        String description = environment.getProperty(errorCode.toString());
-
-        if (null != description && null != args && args.length > 0){
-            StringBuilderUtil util = new StringBuilderUtil(description);
-            for (int i = 0; i < args.length; ++i){
-                util.replace("{" + i + "}", args[i]);
-            }
-
-            description = util.toString();
+        try {
+            return toJson();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
         }
 
-        return description;
+        return "";
     }
 
-    public String toJson() throws JsonProcessingException {
-        ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
+    private String toJson() throws JsonProcessingException {
+        Environment environment = SpringContext.getService(Environment.class);
+        String message = environment.getProperty(errorCode.getErrorCode());
+
+        if (null != message && null != errorArgs && errorArgs.length > 0){
+            StringBuilderUtil util = new StringBuilderUtil(message);
+            for (int i = 0; i < errorArgs.length; ++i){
+                util.replace("{" + i + "}", errorArgs[i]);
+            }
+
+            message = util.toString();
+        }
+
+        ObjectMapper objectMapper = SpringContext.getService("objectMapper");
         ObjectNode objectNode = objectMapper.createObjectNode();
 
         if (message != null) objectNode.put("message", message);
         if (documentURL != null) objectNode.put("document_url", documentURL);
-        if (errors != null) objectNode.put("errors", objectMapper.writeValueAsString(errors));
-
+        if (resourceErrors != null) objectNode.put("errors", objectMapper.writeValueAsString(resourceErrors));
 
         return objectNode.toString();
     }

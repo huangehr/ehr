@@ -28,9 +28,8 @@ import java.io.IOException;
  */
 @ControllerAdvice
 public class ApiExceptionResolver extends AbstractHandlerExceptionResolver {
-    protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response, Object handler,
-                                              Exception ex) {
-        LogService.getLogger().error(ex.getMessage(), ex);
+    protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+        if(false) LogService.getLogger().error(ex.getMessage(), ex);
 
         try {
             response.setStatus(HttpStatus.FORBIDDEN.value());
@@ -51,7 +50,7 @@ public class ApiExceptionResolver extends AbstractHandlerExceptionResolver {
 
             return new ModelAndView();
         } catch (Exception e) {
-            LogService.getLogger().error("Error rendering json response!", e);
+            LogService.getLogger().error("ApiExceptionResolver无法格式化错误信息", e);
         }
 
         return null; // pass handle to default ExceptionResolver
