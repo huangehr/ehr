@@ -1,6 +1,7 @@
 package com.yihu.ehr.ha.SystemDict.service;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.dict.MSystemDict;
@@ -18,7 +19,7 @@ import java.util.Collection;
 /**
  * Created by AndyCai on 2016/2/1.
  */
-@FeignClient("svr-dict")
+@FeignClient(MicroServices.DictMgr)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface SystemDictClient {

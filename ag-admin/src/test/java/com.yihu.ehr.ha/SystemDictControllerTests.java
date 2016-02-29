@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.ha.SystemDict.controller.ConventionalDictEntryController;
 import com.yihu.ehr.ha.SystemDict.controller.SystemDictController;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.dict.MSystemDict;
 import com.yihu.ehr.util.Envelop;
 import org.junit.FixMethodOrder;
@@ -17,9 +16,8 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
 
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
@@ -113,7 +111,7 @@ public class SystemDictControllerTests {
     }
 
     @Test
-    public void ztestgetOrgType() throws Exception {
+    public void btestgetOrgType() throws Exception {
 
         envelop = systemDictController.getAppCatalog("ChildHealth");
         assertNotEquals("APP类别字典获取失败", envelop, null);

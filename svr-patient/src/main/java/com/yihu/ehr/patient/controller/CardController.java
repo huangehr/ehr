@@ -115,7 +115,7 @@ public class CardController extends BaseRestController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/cards/id/card_type",method = RequestMethod.GET)
+    @RequestMapping(value = "/cards/card_type/{id}",method = RequestMethod.GET)
     @ApiOperation(value = "根据卡号和卡类型查找卡")
     public MAbstractCard getCard(
             @ApiParam(name = "id", value = "卡号", defaultValue = "")
@@ -133,7 +133,7 @@ public class CardController extends BaseRestController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/cards/id/card_type}",method = RequestMethod.PUT)
+    @RequestMapping(value = "/cards/card_type/{id}",method = RequestMethod.PUT)
     @ApiOperation(value = "根据卡号和卡类型解绑卡")
     public boolean detachCard(
             @ApiParam(name = "id", value = "卡号", defaultValue = "")

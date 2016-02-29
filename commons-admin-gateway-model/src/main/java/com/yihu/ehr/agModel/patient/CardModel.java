@@ -11,7 +11,7 @@ public class CardModel {
     String ownerName;			// 持有人姓名
     String status;			// 状态 CardStatus
     String statusName;
-    String type;				// 类型 CardType
+    String cardType;				// 类型 CardType
     String typeName;
     Date createDate;				// 创建日期
     String releaseOrg;
@@ -57,12 +57,12 @@ public class CardModel {
         this.statusName = statusName;
     }
 
-    public String getType() {
-        return type;
+    public String getCardType() {
+        return cardType;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setCardType(String cardType) {
+        this.cardType = cardType;
     }
 
     public Date getCreateDate() {

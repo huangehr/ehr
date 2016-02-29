@@ -1,8 +1,8 @@
 package com.yihu.ehr.ha.patient.service;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.patient.MDemographicInfo;
-import com.yihu.ehr.util.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -12,17 +12,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.List;
+
 /**
  * Created by AndyCai on 2016/2/16.
  */
-@FeignClient("svr-patient")
+@FeignClient(MicroServices.PatientMgr)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface PatientClient {
 
     @RequestMapping(value = "/populations",method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询人")
-    Envelop searchPatient(
+    List<MDemographicInfo> searchPatient(
             @ApiParam(name = "name", value = "姓名", defaultValue = "")
             @RequestParam(value = "name") String name,
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")

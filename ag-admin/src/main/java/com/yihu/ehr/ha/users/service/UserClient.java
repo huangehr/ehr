@@ -1,6 +1,7 @@
 package com.yihu.ehr.ha.users.service;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.user.MUser;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -17,7 +18,7 @@ import java.util.Map;
 /**
  * Created by AndyCai on 2016/1/29.
  */
-@FeignClient("svr-user")
+@FeignClient(MicroServices.User)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface UserClient {

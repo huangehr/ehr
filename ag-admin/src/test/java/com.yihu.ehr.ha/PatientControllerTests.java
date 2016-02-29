@@ -94,16 +94,16 @@ public class PatientControllerTests {
         {
             cardModel = cardModels.get(0);
         }
-        boolResult = cardController.attachCard(cardModel.getId(),detailModel.getIdCardNo(),cardModel.getType());
+        boolResult = cardController.attachCard(cardModel.getId(),detailModel.getIdCardNo(),cardModel.getCardType());
         assertTrue("卡关联失败",boolResult);
 
         envelop = cardController.searchCardBinding(detailModel.getIdCardNo(), "", "MediCard", 1, 15);
         assertTrue("已关联卡信息获取失败",envelop.isSuccessFlg()&&envelop.getDetailModelList().size()>0);
 
-        boolResult = cardController.detachCard(cardModel.getId(),cardModel.getType());
+        boolResult = cardController.detachCard(cardModel.getId(),cardModel.getCardType());
         assertTrue("解绑失败",boolResult);
 
-        envelop = patientController.searchPatient(detailModel.getName(),"","","","",1,15);
+        envelop = patientController.searchPatient(detailModel.getName(),"","","","",15,1);
         assertTrue("病人列表获取失败",envelop.isSuccessFlg() && envelop.getDetailModelList().size()>0);
 
         envelop = patientController.deletePatient(detailModel.getIdCardNo());
