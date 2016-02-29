@@ -32,6 +32,7 @@ public enum ErrorCode {
     NotFoundObj("ehr.common.query.not.found"),
     RepeatCode("ehr.commons.repeat.code"),
     RepeatName("ehr.commons.repeat.name"),  // add by cws 20160223
+    RepeatRelation("ehr.commons.repeat.relation"),  // add by cws 20160225
 
     SuccessSave("ehr.common.success.update"),
     InvalidUpdate("ehr.common.invalid.update"),
