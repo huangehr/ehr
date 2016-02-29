@@ -68,7 +68,13 @@ public class SystemDictController extends BaseController {
         Envelop envelop = new Envelop();
         MSystemDict systemDict = systemDictClient.createDictionary(dictJson);
 
-        envelop.setObj(systemDict);
+        if(systemDict != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(systemDict);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("创建字典失败");
+        }
 
         return envelop;
     }
@@ -83,7 +89,14 @@ public class SystemDictController extends BaseController {
 
         MSystemDict systemDict = systemDictClient.getDictionary(id);
 
-        envelop.setObj(systemDict);
+        if(systemDict != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(systemDict);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("获取字典失败");
+        }
+
         return envelop;
     }
 
@@ -96,7 +109,13 @@ public class SystemDictController extends BaseController {
 
         MSystemDict systemDict = systemDictClient.updateDictionary(dictJson);
 
-        envelop.setObj(systemDict);
+        if(systemDict != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(systemDict);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("修改字典失败");
+        }
 
         return envelop;
     }
@@ -128,6 +147,9 @@ public class SystemDictController extends BaseController {
 
         List<MDictionaryEntry> dictionaryEntries = (List<MDictionaryEntry>)systemDictClient.getDictEntries(id,value,page,rows);
 
+//        String count = response.getHeader(AgAdminConstants.ResourceCount);
+//        int totalCount = StringUtils.isNotEmpty(count) ? Integer.parseInt(count) : 0;
+
         Envelop envelop = getResult(dictionaryEntries,0,page,rows);
 
         return envelop;
@@ -142,7 +164,14 @@ public class SystemDictController extends BaseController {
 
         MConventionalDict mConventionalDict= systemDictClient.createDictEntry(entryJson);
 
-        envelop.setObj(mConventionalDict);
+        if(mConventionalDict != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(mConventionalDict);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("创建字典项失败");
+        }
+
         return envelop;
     }
 
@@ -157,7 +186,14 @@ public class SystemDictController extends BaseController {
 
         MDictionaryEntry mDictionaryEntry= systemDictClient.getDictEntry(id, code);
 
-        envelop.setObj(mDictionaryEntry);
+        if(mDictionaryEntry != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(mDictionaryEntry);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("创建字典项失败");
+        }
+
         return envelop;
     }
 
@@ -185,7 +221,13 @@ public class SystemDictController extends BaseController {
 
         MConventionalDict mConventionalDict= systemDictClient.updateDictEntry(entryJson);
 
-        envelop.setObj(mConventionalDict);
+        if(mConventionalDict != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(mConventionalDict);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("修改字典项失败");
+        }
 
         return envelop;
     }
