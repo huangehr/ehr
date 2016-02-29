@@ -4,7 +4,6 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.patient.MAbstractCard;
 import com.yihu.ehr.patient.service.card.AbstractCard;
 import com.yihu.ehr.patient.service.card.CardManager;
-import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -12,6 +11,8 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +40,7 @@ public class CardController extends BaseRestController {
      */
     @RequestMapping(value = "/cards/id_card_no",method = RequestMethod.GET)
     @ApiOperation(value = "根据身份证好查询相对应的卡列表")
-    public Envelop searchCardBinding(
+    public List<MAbstractCard> searchCardBinding(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @RequestParam(value = "id_card_no") String idCardNo,
             @ApiParam(name = "number", value = "卡号", defaultValue = "")
@@ -49,7 +50,9 @@ public class CardController extends BaseRestController {
             @ApiParam(name = "page", value = "当前页", defaultValue = "")
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
-            @RequestParam(value = "rows") Integer rows) throws Exception{
+            @RequestParam(value = "rows") Integer rows,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception{
         Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("type","bind_card");
         conditionMap.put("idCardNo",idCardNo);
@@ -58,10 +61,12 @@ public class CardController extends BaseRestController {
         conditionMap.put("page",page);
         conditionMap.put("rows",rows);
         List<AbstractCard> cardAbstractCardList = cardManager.searchAbstractCard(conditionMap);
-        Integer totalCount = cardManager.searchCardInt(conditionMap, false);
+        Long totalCount = Long.parseLong(cardManager.searchCardInt(conditionMap, false).toString());
+        pagedResponse(request, response, totalCount, page, rows);
+        return (List<MAbstractCard>)convertToModels(cardAbstractCardList,new ArrayList<MAbstractCard>(cardAbstractCardList.size()), MAbstractCard.class, null);
 
-        List<MAbstractCard> mAbstractCards = (List<MAbstractCard>)convertToModels(cardAbstractCardList,new ArrayList<MAbstractCard>(cardAbstractCardList.size()), MAbstractCard.class, null);
-        return getResult(mAbstractCards,totalCount);
+//        List<MAbstractCard> mAbstractCards = (List<MAbstractCard>)convertToModels(cardAbstractCardList,new ArrayList<MAbstractCard>(cardAbstractCardList.size()), MAbstractCard.class, null);
+//        return getResult(mAbstractCards,totalCount);
     }
 
     /**
@@ -75,7 +80,7 @@ public class CardController extends BaseRestController {
      */
     @RequestMapping(value = "/cards",method = RequestMethod.GET)
     @ApiOperation(value = "查询未绑定的卡列表")
-    public Envelop searchCardUnBinding(
+    public List<MAbstractCard> searchCardUnBinding(
             @ApiParam(name = "number", value = "卡号", defaultValue = "")
             @RequestParam(value = "number") String number,
             @ApiParam(name = "card_type", value = "卡类别", defaultValue = "")
@@ -83,17 +88,24 @@ public class CardController extends BaseRestController {
             @ApiParam(name = "page", value = "当前页", defaultValue = "")
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
-            @RequestParam(value = "rows") Integer rows) throws Exception{
+            @RequestParam(value = "rows") Integer rows,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception{
         Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("type","not_bound_card");
         conditionMap.put("number",number);
         conditionMap.put("cardType",cardType);
         conditionMap.put("page",page);
         conditionMap.put("rows",rows);
-        List<AbstractCard> cardBrowseModelList = cardManager.searchAbstractCard(conditionMap);
-        List<MAbstractCard> mAbstractCards = (List<MAbstractCard>)convertToModels(cardBrowseModelList,new ArrayList<MAbstractCard>(cardBrowseModelList.size()), MAbstractCard.class, null);
-        Integer totalCount = cardManager.searchCardInt(conditionMap, false);
-        return getResult(mAbstractCards, totalCount);
+//        List<AbstractCard> cardBrowseModelList = cardManager.searchAbstractCard(conditionMap);
+//        List<MAbstractCard> mAbstractCards = (List<MAbstractCard>)convertToModels(cardBrowseModelList,new ArrayList<MAbstractCard>(cardBrowseModelList.size()), MAbstractCard.class, null);
+//        Integer totalCount = cardManager.searchCardInt(conditionMap, false);
+//        return getResult(mAbstractCards, totalCount);
+
+        List<AbstractCard> cardAbstractCardList = cardManager.searchAbstractCard(conditionMap);
+        Long totalCount = Long.parseLong(cardManager.searchCardInt(conditionMap, false).toString());
+        pagedResponse(request, response, totalCount, page, rows);
+        return (List<MAbstractCard>)convertToModels(cardAbstractCardList,new ArrayList<MAbstractCard>(cardAbstractCardList.size()), MAbstractCard.class, null);
     }
 
     /**
