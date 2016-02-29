@@ -140,7 +140,7 @@ public interface ConventionalDictEntryClient {
     @ApiOperation(value = "获取标准来源类型字典项", response = MConventionalDict.class, produces = "application/json")
     List<MConventionalDict> getStdSourceTypeList(
             @ApiParam(name = "codes", value = "字典代码", defaultValue = "")
-            @RequestParam(value = "codes") String[] codes);
+            @RequestParam(value = "codes") List<String> codes);
 
     @RequestMapping(value = "/dictionaries/user_types", method = RequestMethod.GET)
     @ApiOperation(value = "获取用户类型字典项", response = MConventionalDict.class, produces = "application/json")
