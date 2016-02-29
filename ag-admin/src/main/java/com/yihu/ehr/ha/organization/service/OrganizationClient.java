@@ -58,11 +58,17 @@ public interface OrganizationClient {
      */
     @RequestMapping(value = "/organizations" , method = RequestMethod.POST)
     @ApiOperation(value = "创建机构")
-    Object create(String orgModelJsonData ) ;
+    MOrganization create(
+            @ApiParam(name = "mOrganizationJsonData", value = "机构代码", defaultValue = "")
+            @RequestParam(value = "mOrganizationJsonData") String orgModelJsonData ) ;
+
+
 
     @RequestMapping(value = "/organizations" , method = RequestMethod.PUT)
     @ApiOperation(value = "修改机构")
-    Object update(String orgModelJsonData ) ;
+    MOrganization update(
+            @ApiParam(name = "mOrganizationJsonData", value = "机构代码", defaultValue = "")
+            @RequestParam(value = "mOrganizationJsonData") String orgModelJsonData ) ;
 
 
     /**
@@ -74,7 +80,7 @@ public interface OrganizationClient {
     @ApiOperation(value = "根据机构代码获取机构")
     MOrganization getOrg(
             @ApiParam(name = "org_code", value = "机构代码", defaultValue = "")
-            @RequestParam(value = "org_code") String orgCode) ;
+            @PathVariable(value = "org_code") String orgCode) ;
 
 
     /**
@@ -83,10 +89,10 @@ public interface OrganizationClient {
      * @return
      */
     @ApiOperation(value = "根据地名称取机构ids")
-    @RequestMapping(value = "/organizations/{name}", method = RequestMethod.GET)
+    @RequestMapping(value = "/organizations/name", method = RequestMethod.GET)
     List<String> getIdsByName(
             @ApiParam(name = "name", value = "机构名称", defaultValue = "")
-            @PathVariable(value = "name") String name);
+            @RequestParam(value = "name") String name);
 
 
     /**
@@ -107,19 +113,28 @@ public interface OrganizationClient {
      * 根据地址获取机构下拉列表
      * @param province
      * @param city
+     * @param district
      * @return
      */
-    @RequestMapping(value = "/organizations/{province}/{city}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/organizations/geography" , method = RequestMethod.GET)
     @ApiOperation(value = "根据地址获取机构下拉列表")
     Collection<MOrganization> getOrgsByAddress(
             @ApiParam(name = "province", value = "省")
-            @PathVariable(value = "province") String province,
+            @RequestParam(value = "province") String province,
             @ApiParam(name = "city", value = "市")
-            @PathVariable(value = "city") String city) ;
+            @RequestParam(value = "city") String city,
+            @ApiParam(name = "district", value = "市")
+            @RequestParam(value = "district") String district);
 
     @RequestMapping( value = "/organizations/key" , method = RequestMethod.POST)
     @ApiOperation(value = "机构分发密钥")
     Map<String, String> distributeKey(
             @ApiParam(name = "org_code", value = "机构代码")
             @RequestParam(value = "org_code") String orgCode) ;
+
+    @RequestMapping(value = "/organizations/existence/{org_code}" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断提交的机构代码是否已经存在")
+    boolean isOrgCodeExists(
+            @ApiParam(name = "org_code", value = "org_code", defaultValue = "")
+            @PathVariable(value = "org_code") String orgCode);
 }

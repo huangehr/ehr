@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="健康之路健康档案">
+    <!--bannerLeft>
+        <name>健康之路健康档案平台</name>
+        <src>images/logos/org-logo.png</src>
+        <href>http://www.yihu.com</href>
+    </bannerLeft-->
+    <bannerRight>
+        <src>images/logos/platform-logo.jpg</src>
+    </bannerRight>
+    <body>
+        <links>
+            <item name="医护网" href="http://www.yihu.com/" />
+        </links>
+
+        <menu name="健康档案平台">
+            <item name="介绍" href="index.html"/>
+            <item name="下载" href="resource/download.html"/>
+            <item name="发布说明" href="resource/release-notes.html" />
+        </menu>
+
+        <menu name="工程概要" ref="reports"/>
+    </body>
+    <skin>
+        <groupId>lt.velykis.maven.skins</groupId>
+        <artifactId>reflow-maven-skin</artifactId>
+        <version>1.1.1</version>
+    </skin>
+</project>

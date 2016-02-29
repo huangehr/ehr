@@ -13,10 +13,10 @@ public class OrgDetailModel{
     private String pyCode;
     private String orgType;
     private String orgTypeName;
-    private String settled;
+    private boolean settled;
     private String settledWay;
     private String settledWayName;
-    private String activityFlg;
+    private int activityFlg;
     private String activityFlgName;
     private Date createDate;
     private String location;
@@ -82,11 +82,11 @@ public class OrgDetailModel{
         this.orgTypeName = orgTypeName;
     }
 
-    public String getSettled() {
+    public boolean getSettled() {
         return settled;
     }
 
-    public void setSettled(String settled) {
+    public void setSettled(boolean settled) {
         this.settled = settled;
     }
 
@@ -106,11 +106,11 @@ public class OrgDetailModel{
         this.settledWayName = settledWayName;
     }
 
-    public String getActivityFlg() {
+    public int getActivityFlg() {
         return activityFlg;
     }
 
-    public void setActivityFlg(String activityFlg) {
+    public void setActivityFlg(int activityFlg) {
         this.activityFlg = activityFlg;
     }
 

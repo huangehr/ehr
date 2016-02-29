@@ -23,11 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by AndyCai on 2016/1/21.
@@ -62,40 +58,43 @@ public class OrganizationController extends BaseController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletResponse response) throws Exception{
+            @RequestParam(value = "page", required = false) int page) throws Exception{
         List<OrgModel> orgModelList = new ArrayList<>();
         List<MOrganization> organizations = orgClient.searchOrgs(fields,filters,sorts,size,page);
-        for(MOrganization org : organizations){
-            OrgModel orgModel = new OrgModel();
-            orgModel.setOrgCode(org.getOrgCode());
-            orgModel.setFullName(org.getFullName());
-            orgModel.setAdmin(org.getAdmin());
-            orgModel.setTel(org.getTel());
-            // 获取机构类别字典
-            String orgType = org.getOrgType();
-            orgModel.setOrgType(orgType);
-            orgModel.setOrgTypeName(conDictEntryClient.getOrgType(orgType).getValue());
-            // 获取机构地址信息
-            String location = org.getLocation();
-            orgModel.setLocationStrName(addressClient.getCanonicalAddress(location));
-            //获取机构接入方式
-            String settledWay = org.getSettledWay();
-            orgModel.setSettledWay(settledWay);
-            orgModel.setSettledWayName(conDictEntryClient.getSettledWay(settledWay).getValue());
-            // 判断机构状态（是否已激活）
-            String activityFlag = org.getActivityFlag();
-            orgModel.setActivityFlag(activityFlag);
-            orgModel.setActivityFlagName(activityFlag=="1"?"是":"否");
-
+        for(MOrganization mOrg : organizations){
+            OrgModel orgModel = changeToOrgModel(mOrg);
             orgModelList.add(orgModel);
         }
         //获取符合条件总条数
-        String count = response.getHeader(AgAdminConstants.ResourceCount);
-        int totalCount = StringUtils.isNotEmpty(count)?Integer.parseInt(count):0;
-
+        //TODO 获取符合条件的总记录数
+        int totalCount = 20;
         return getResult(orgModelList,totalCount,page,size);
     }
+
+    public OrgModel changeToOrgModel(MOrganization mOrg){
+        OrgModel orgModel = new OrgModel();
+        orgModel.setOrgCode(mOrg.getOrgCode());
+        orgModel.setFullName(mOrg.getFullName());
+        orgModel.setAdmin(mOrg.getAdmin());
+        orgModel.setTel(mOrg.getTel());
+        // 获取机构类别字典
+        String orgType = mOrg.getOrgType();
+        orgModel.setOrgType(orgType);
+        orgModel.setOrgTypeName(conDictEntryClient.getOrgType(orgType).getValue());
+        // 获取机构地址信息
+        String location = mOrg.getLocation();
+        orgModel.setLocationStrName(addressClient.getCanonicalAddress(location));
+        //获取机构接入方式
+        String settledWay = mOrg.getSettledWay();
+        orgModel.setSettledWay(settledWay);
+        orgModel.setSettledWayName(conDictEntryClient.getSettledWay(settledWay).getValue());
+        // 判断机构状态（是否已激活）
+        int activityFlag = mOrg.getActivityFlag();
+        orgModel.setActivityFlag(activityFlag+"");
+        orgModel.setActivityFlagName(activityFlag==1?"是":"否");
+        return orgModel;
+    }
+
 
 
     /**
@@ -134,18 +133,17 @@ public class OrganizationController extends BaseController {
             @RequestParam(value = "geography_model_json_data", required = false) String geographyModelJsonData ) throws Exception{
         Envelop envelop  = new Envelop();
         ObjectMapper objectMapper = new ObjectMapper();
-        String locationId = addressClient.saveAddress(geographyModelJsonData);
-        //TODO 返回地址id非空
+        String location = addressClient.saveAddress(geographyModelJsonData);
         MOrganization mOrganization = objectMapper.readValue(mOrganizationJsonData,MOrganization.class);
-        mOrganization.setLocation(locationId);
+        mOrganization.setLocation(location);
         String mOrganizationJson = objectMapper.writeValueAsString(mOrganization);
-        Object object = orgClient.create(mOrganizationJson);
-        if(object==null){
+        MOrganization mOrgNew = orgClient.create(mOrganizationJson);
+        if(mOrgNew==null){
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("机构创建失败");
         }else{
             envelop.setSuccessFlg(true);
-            envelop.setObj(object);
+            envelop.setObj(mOrgNew);
         }
         return envelop;
     }
@@ -160,15 +158,17 @@ public class OrganizationController extends BaseController {
         Envelop envelop = new Envelop();
         ObjectMapper objectMapper = new ObjectMapper();
         String locationId = addressClient.saveAddress(geographyModelJsonData);
-        MOrganization mOrganization = objectMapper.readValue(mOrganizationJsonData,MOrganization.class);
+        OrgDetailModel orgDetailModel = objectMapper.readValue(mOrganizationJsonData,OrgDetailModel.class);
+        MOrganization mOrganization = convertToModel(orgDetailModel,MOrganization.class);
         mOrganization.setLocation(locationId);
         String mOrganizationJson = objectMapper.writeValueAsString(mOrganization);
-        Object object = orgClient.create(mOrganizationJson);
-        if("true".equals(object.toString())){
-            envelop.setSuccessFlg(true);
-        }else {
+        MOrganization mOrgNew = orgClient.create(mOrganizationJson);
+        if(mOrgNew == null){
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("更新失败");
+        }else {
+            envelop.setSuccessFlg(true);
+            envelop.setObj(mOrgNew);
         }
         return envelop;
     }
@@ -184,15 +184,26 @@ public class OrganizationController extends BaseController {
             @ApiParam(name = "org_code", value = "机构代码", defaultValue = "")
             @PathVariable(value = "org_code") String orgCode) throws Exception {
         Envelop envelop = new Envelop();
-        MOrganization mOrg = new MOrganization();
-        mOrg = orgClient.getOrg(orgCode);
-        // MOrganization mOrg = orgClient.getOrg(orgCode);
+        MOrganization mOrg = orgClient.getOrg(orgCode);
         if (mOrg == null) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("机构获取失败");
             return envelop;
         }
 
+        OrgDetailModel org = changeToOrgDetailModel(mOrg);
+        envelop.setSuccessFlg(true);
+        envelop.setObj(org);
+        return envelop;
+    }
+
+    /**
+     * 将微服务返回结果转化为OrgDetailModel
+     * @param mOrg
+     * @return
+     */
+
+    public OrgDetailModel changeToOrgDetailModel(MOrganization mOrg){
         OrgDetailModel org = new OrgDetailModel();
         org.setOrgCode(mOrg.getOrgCode());
         org.setFullName(mOrg.getFullName());
@@ -208,7 +219,8 @@ public class OrganizationController extends BaseController {
 
         org.setAdmin(mOrg.getAdmin());
         org.setTel(mOrg.getTel());
-       // org.setTags(mOrg.getTags());
+        //TODO 微服务返回model无tags属性
+        //org.setTags(mOrg.getTags());
         //获取地址字典值明细
         String locationId = mOrg.getLocation();
         MGeography addr = addressClient.getAddressById(locationId);
@@ -220,14 +232,13 @@ public class OrganizationController extends BaseController {
         org.setExtra(addr.getExtra());
         //获取公钥信息（公钥、有效区间、开始时间）
         MUserSecurity security = securityClient.getUserSecurityByOrgCode(mOrg.getOrgCode());
-        org.setPublicKey(security.getPublicKey());
-        org.setValidTime(DateUtil.toString(security.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT)
-                + "~" + DateUtil.toString(security.getExpiryDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT));
-        org.setStartTime(DateUtil.toString(security.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT));
-
-        envelop.setSuccessFlg(true);
-        envelop.setObj(org);
-        return envelop;
+        if(security!=null){
+            org.setPublicKey(security.getPublicKey());
+            org.setValidTime(DateUtil.toString(security.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT)
+                    + "~" + DateUtil.toString(security.getExpiryDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT));
+            org.setStartTime(DateUtil.toString(security.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT));
+        }
+        return org;
     }
 
 
@@ -236,20 +247,17 @@ public class OrganizationController extends BaseController {
      * @param name
      * @return
      */
-    @ApiOperation(value = "根据地名称取机构ids")
-    @RequestMapping(value = "/organizations/{name}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据名称获取机构编号列表ids")
+    @RequestMapping(value = "/organizations/name", method = RequestMethod.GET)
     public Envelop getIdsByName(
             @ApiParam(name = "name", value = "机构名称", defaultValue = "")
-            @PathVariable(value = "name") String name) {
+            @RequestParam(value = "name") String name) {
         Envelop envelop = new Envelop();
         envelop.setDetailModelList(orgClient.getIdsByName(name));
+        envelop.setSuccessFlg(true);
         return envelop;
     }
 
-    public String back(@ApiParam(name = "name", value = "机构名称", defaultValue = "")
-                       @PathVariable(value = "name") String name){
-        return name;
-    }
 
 
     /**
@@ -272,20 +280,25 @@ public class OrganizationController extends BaseController {
      * 根据地址获取机构下拉列表
      * @param province
      * @param city
+     * @param district
      * @return
      */
-    @RequestMapping(value = "organizations/{province}/{city}" , method = RequestMethod.GET)
+    @RequestMapping(value = "organizations/geography" , method = RequestMethod.GET)
     @ApiOperation(value = "根据地址获取机构下拉列表")
     public Envelop getOrgsByAddress(
             @ApiParam(name = "province", value = "省")
-            @PathVariable(value = "province") String province,
+            @RequestParam(value = "province") String province,
             @ApiParam(name = "city", value = "市")
-            @PathVariable(value = "city") String city) {
+            @RequestParam(value = "city") String city,
+            @ApiParam(name = "district", value = "市")
+            @RequestParam(value = "district") String district) {
         Envelop envelop = new Envelop();
-        Collection<MOrganization> mOrganizations = orgClient.getOrgsByAddress(province, city);
+        Collection<MOrganization> mOrganizations = orgClient.getOrgsByAddress(province,city,district);
         envelop.setObj(mOrganizations);
+        envelop.setSuccessFlg(true);
         return envelop;
     }
+
 
     @RequestMapping( value = "organizations/key" , method = RequestMethod.POST)
     @ApiOperation(value = "机构分发密钥")
@@ -294,7 +307,20 @@ public class OrganizationController extends BaseController {
             @RequestParam(value = "org_code") String orgCode) {
         Envelop envelop = new Envelop();
         Map<String,String> key = orgClient.distributeKey(orgCode);
-        envelop.setObj(key);
+        if(key!=null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(key);
+        }else{
+            envelop.setSuccessFlg(false);
+        }
         return envelop;
+    }
+
+    @RequestMapping(value = "organizations/existence/{org_code}", method = RequestMethod.GET)
+    @ApiOperation(value = "判断提交的机构代码是否已经存在")
+    public boolean isOrgCodeExists(
+            @ApiParam(name = "org_code", value = "org_code", defaultValue = "")
+            @PathVariable(value = "org_code") String orgCode){
+        return orgClient.isOrgCodeExists(orgCode);
     }
 }
