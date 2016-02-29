@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.patient.MDemographicInfo;
-import com.yihu.ehr.patient.service.demographic.DemographicService;
 import com.yihu.ehr.patient.service.demographic.DemographicId;
 import com.yihu.ehr.patient.service.demographic.DemographicInfo;
+import com.yihu.ehr.patient.service.demographic.DemographicService;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.encode.HashUtil;
@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +79,9 @@ public class PatientController extends BaseRestController {
         conditionMap.put("district", district);
         List<DemographicInfo> demographicInfos = demographicService.searchPatient(conditionMap);
         Integer totalCount = demographicService.searchPatientTotalCount(conditionMap);
-        return getResult(demographicInfos,totalCount);
+
+        List<MDemographicInfo> mDemographicInfos = (List<MDemographicInfo>)convertToModels(demographicInfos,new ArrayList<MDemographicInfo>(demographicInfos.size()), MDemographicInfo.class, null);
+        return getResult(mDemographicInfos,totalCount);
     }
 
 

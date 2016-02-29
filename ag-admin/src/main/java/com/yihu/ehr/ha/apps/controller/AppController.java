@@ -1,5 +1,6 @@
 package com.yihu.ehr.ha.apps.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.constants.ApiVersion;
@@ -12,12 +13,11 @@ import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -33,6 +33,9 @@ public class AppController extends BaseController {
     @Autowired
     private ConventionalDictEntryClient conDictEntryClient;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @RequestMapping(value = "/apps", method = RequestMethod.GET)
     @ApiOperation(value = "获取App列表")
     public Envelop getApps(
@@ -45,15 +48,14 @@ public class AppController extends BaseController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletResponse response) throws Exception {
+            @RequestParam(value = "page", required = false) int page) throws Exception {
         List<AppModel> appModelList = new ArrayList<>();
         List<MApp> mAppList = (List<MApp>)appClient.getApps(fields,filters,sort,size,page);
         for(MApp app :mAppList){
             appModelList.add(changeToAppModel(app));
         }
         // TODO 获取符合条件记录总数
-        Integer totalCount = 1;
+        Integer totalCount = 10;
         Envelop envelop = getResult(appModelList,totalCount,page,size);
         return envelop;
     }
@@ -69,10 +71,13 @@ public class AppController extends BaseController {
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true, defaultValue = "{\"name\": \"\", \"url\": \"\", \"catalog\": \"\", \"description\": \"\", \"creator\":\"\"}")
             @RequestParam(value = "app", required = false) String appJson) throws Exception {
         Envelop envelop = new Envelop();
-        MApp mApp = appClient.createApp(appJson);
+        //传入的appJson里包含userId
+        AppDetailModel appDetailModel = objectMapper.readValue(appJson,AppDetailModel.class);
+        MApp app = convertToModel(appDetailModel,MApp.class);
+        MApp mApp = appClient.createApp(objectMapper.writeValueAsString(app));
         if(mApp==null){
             envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("未找到相应的app！");
+            envelop.setErrorMsg("app创建失败！");
         }else{
             envelop.setSuccessFlg(true);
             envelop.setObj(changeToAppDetailModel(mApp));
@@ -104,7 +109,9 @@ public class AppController extends BaseController {
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true)
             @RequestParam(value = "app", required = false) String appJson) throws Exception {
         Envelop envelop = new Envelop();
-        MApp mApp = appClient.updateApp(appJson);
+        AppDetailModel appDetailModel = objectMapper.readValue(appJson,AppDetailModel.class);
+        MApp app = convertToModel(appDetailModel,MApp.class);
+        MApp mApp = appClient.updateApp(objectMapper.writeValueAsString(app));
         if(mApp==null){
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("app更新失败！");
@@ -121,7 +128,7 @@ public class AppController extends BaseController {
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
             @PathVariable(value = "app_id") String appId) throws Exception {
         Envelop envelop = new Envelop();
-        //TODO api无返回值
+        //TODO 微服务无返回值
         appClient.deleteApp(appId);
         envelop.setSuccessFlg(true);
         return envelop;
@@ -137,14 +144,22 @@ public class AppController extends BaseController {
         return appClient.updateStatus(appId, appStatus);
     }
 
-    @RequestMapping(value = "apps/existence/{app_id}",method = RequestMethod.GET)
-    @ApiOperation(value = "验证")
+    @RequestMapping(value = "apps/existence/app_id/{app_id}",method = RequestMethod.GET)
+    @ApiOperation(value = "验证app")
     public boolean isAppExistence(
             @ApiParam(name= "app_id",value = "app_id",defaultValue = "")
-            @RequestParam(value = "app_id") String appId,
+            @PathVariable(value = "app_id") String appId,
             @ApiParam(name = "secret",value = "密钥",defaultValue = "")
             @RequestParam(value = "secret") String secret)throws Exception{
         return appClient.isAppExistence(appId, secret);
+    }
+
+    @RequestMapping(value = "apps/existence/app_name/{app_name}",method = RequestMethod.GET)
+    @ApiOperation(value = "验证app名字是否存在")
+    public boolean isAppNameExists(
+            @ApiParam(value = "app_name")
+            @PathVariable(value = "app_name") String appName){
+        return appClient.isAppNameExists(appName);
     }
 
     /**
@@ -157,14 +172,15 @@ public class AppController extends BaseController {
         appModel.setId(app.getId());
         appModel.setName(app.getName());
         appModel.setUrl(app.getUrl());
+        appModel.setSecret(app.getSecret());
         //获取app类别字典值
-//        String catalogCode = app.getCatalog();
-//        String catalogValue = conDictEntryClient.getAppCatalog(catalogCode).getValue();
-//        appModel.setCatalogName(catalogValue);
+        String catalog = app.getCatalog();
+        String catalogName = conDictEntryClient.getAppCatalog(catalog).getValue();
+        appModel.setCatalogName(catalogName);
         //获取状态字典值
-//        String statusCode = app.getStatus();
-//        String statusValue = conDictEntryClient.getAppStatus(statusCode).getValue();
-//        appModel.setStatusName(statusValue);
+        String status = app.getStatus();
+        String statusValue = conDictEntryClient.getAppStatus(status).getValue();
+        appModel.setStatusName(statusValue);
         return appModel;
     }
 
@@ -180,16 +196,17 @@ public class AppController extends BaseController {
         app.setSecret(mApp.getSecret());
         app.setUrl(mApp.getUrl());
         app.setDescription(mApp.getDescription());
+        app.setCreateTime(mApp.getCreateTime());
         //TODO 微服务提供的model缺少tags标签属性
-        //app.setStrTags();
+        //app.setTags();
         //获取app类别字典值
-        String catalogCode = mApp.getCatalog();
-        app.setCatalogCode(catalogCode);
-        app.setCatalogName(conDictEntryClient.getAppCatalog(catalogCode).getValue());
+        String catalog = mApp.getCatalog();
+        app.setCatalog(catalog);
+        app.setCatalogName(conDictEntryClient.getAppCatalog(catalog).getValue());
         //获取app状态字典值
-        String statusCode = mApp.getStatus();
-        app.setStatusCode(statusCode);
-        app.setStatusValue(conDictEntryClient.getAppStatus(statusCode).getValue());
+        String status = mApp.getStatus();
+        app.setStatus(status);
+        app.setStatusName(conDictEntryClient.getAppStatus(status).getValue());
         return app;
     }
 }

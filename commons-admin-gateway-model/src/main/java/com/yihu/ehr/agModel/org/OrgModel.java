@@ -5,20 +5,20 @@ package com.yihu.ehr.agModel.org;
  */
 
 public class OrgModel {
-    String orgCode = "";
-    String orgTypeCode = "";
-    String orgTypeName = "";
-    String orgCodeName = "";
-    String fullName = "";
-    String admin ="";
-    String tel = "";
-    String locationId="";
-    String locationStrName = "";
-    String activityFlagCode = "1";
-    String activityFlagName = "";
-    String settledWayCode = "";
-    String settledWayName = "";
-    String createDate = "";
+    private String orgCode;
+    private String orgType;
+    private String orgTypeName;
+    private String orgCodeName;
+    private String fullName;
+    private String admin;
+    private String tel;
+    private String location;
+    private String locationStrName;
+    private String activityFlag;
+    private String activityFlagName;
+    private String settledWay;
+    private String settledWayName;
+    private String createDate;
 
     public String getOrgCode() {
         return orgCode;
@@ -28,12 +28,12 @@ public class OrgModel {
         this.orgCode = orgCode;
     }
 
-    public String getOrgTypeCode() {
-        return orgTypeCode;
+    public String getOrgType() {
+        return orgType;
     }
 
-    public void setOrgTypeCode(String orgTypeCode) {
-        this.orgTypeCode = orgTypeCode;
+    public void setOrgType(String orgType) {
+        this.orgType = orgType;
     }
 
     public String getOrgTypeName() {
@@ -76,12 +76,12 @@ public class OrgModel {
         this.tel = tel;
     }
 
-    public String getLocationId() {
-        return locationId;
+    public String getLocation() {
+        return location;
     }
 
-    public void setLocationId(String locationId) {
-        this.locationId = locationId;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public String getLocationStrName() {
@@ -92,12 +92,12 @@ public class OrgModel {
         this.locationStrName = locationStrName;
     }
 
-    public String getActivityFlagCode() {
-        return activityFlagCode;
+    public String getActivityFlag() {
+        return activityFlag;
     }
 
-    public void setActivityFlagCode(String activityFlagCode) {
-        this.activityFlagCode = activityFlagCode;
+    public void setActivityFlag(String activityFlag) {
+        this.activityFlag = activityFlag;
     }
 
     public String getActivityFlagName() {
@@ -108,12 +108,12 @@ public class OrgModel {
         this.activityFlagName = activityFlagName;
     }
 
-    public String getSettledWayCode() {
-        return settledWayCode;
+    public String getSettledWay() {
+        return settledWay;
     }
 
-    public void setSettledWayCode(String settledWayCode) {
-        this.settledWayCode = settledWayCode;
+    public void setSettledWay(String settledWay) {
+        this.settledWay = settledWay;
     }
 
     public String getSettledWayName() {
