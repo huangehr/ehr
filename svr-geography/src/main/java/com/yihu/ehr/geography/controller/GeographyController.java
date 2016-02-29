@@ -64,13 +64,13 @@ public class GeographyController extends BaseRestController{
         if (geography.getCountry() == null) {
             geography.setCountry("中国");
         }
-        List<Geography> geographys = geographyService.isGeographyExist(geography);
-        if(geographys.size()==0){
+        List<Geography> geographies = geographyService.isGeographyExist(geography);
+        if(geographies==null || geographies.size()==0){
             geography.setId(getObjectId(BizObject.Geography));
             String addressId = geographyService.saveAddress(geography);
             return addressId;
         }else {
-            return geographys.get(0).getId();
+            return geographies.get(0).getId();
         }
 
     }

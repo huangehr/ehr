@@ -12,8 +12,8 @@
 	<artifactId>docs-micro-service</artifactId>
 	<packaging>jar</packaging>
 
-	<name>健康档案平台微服务文档</name>
-	<description>E健康档案平台微服务文档</description>
+	<name>健康档案微服务平台</name>
+	<description>健康档案微服务平台</description>
 
 	<properties>
 	</properties>

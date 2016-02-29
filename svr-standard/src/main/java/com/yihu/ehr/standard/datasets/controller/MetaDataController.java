@@ -69,15 +69,15 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version) throws Exception{
 
-        metaDataService.delete(ids.split(","), getServiceEntity(version));
+        metaDataService.delete(strToLongArr(ids), getServiceEntity(version));
         return true;
     }
 
-    @RequestMapping(value = "/dataset/{id}/metadata", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/dataset/{dataSetId}/metadata", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据集关联的数据元")
     public boolean deleteMetaDataByDataSet(
-            @ApiParam(name = "dataSetId", value = "编号集", defaultValue = "")
-            @PathVariable(value = "dataSetId") String dataSetId,
+            @ApiParam(name = "dataSetId", value = "数据集编号", defaultValue = "")
+            @PathVariable(value = "dataSetId") long dataSetId,
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version) throws Exception{
 
@@ -88,7 +88,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
     @ApiOperation(value = "删除数据元")
     public boolean deleteMetaData(
             @ApiParam(name = "id", value = "编号集", defaultValue = "")
-            @PathVariable(value = "id") String id,
+            @PathVariable(value = "id") long id,
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version) throws Exception{
 
@@ -159,7 +159,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
 
     @RequestMapping(value = "/metadata/validate/name", method = RequestMethod.GET)
     @ApiOperation(value = "验证数据元名称是否重复")
-    public boolean validatorMetadata(
+    public boolean validatorName(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @RequestParam(value = "version") String version,
             @ApiParam(name = "dataSetId", value = "数据集编号", defaultValue = "")

@@ -1,7 +1,7 @@
 健康档案(EHR)开放平台
 ====================
 
-- 作者：温富建，2016.02.19
+> 作者：温富建，2016.02.19
 
 平台概况
 ---------------------
@@ -26,7 +26,7 @@
 开发指南
 ---------------------
 
-> [授权](dev-guide/authoritarian/index.html)
+> [认证与授权](dev-guide/authoritarian/index.html)
 
 > [数据标准](dev-guide/standard/index.html)
 
@@ -43,12 +43,10 @@
 
 > [康赛项目](dev-tutorial/sanofi.html)
 
-资源下载
+内部资源
 ---------------------
 
-> Java版SDK
-
-> 数据标准
+> [重大问题解决方案](solutions/index.html)
 
 FQA
 ---------------------

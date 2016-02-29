@@ -1,28 +1,33 @@
 package com.yihu.ehr.ha.SystemDict.controller;
 
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.SystemDict.service.SystemDictClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.dict.MSystemDict;
 import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
  * Created by AndyCai on 2016/1/21.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersion.Version1_0)
+@RequestMapping(ApiVersion.Version1_0+"/admin")
 @RestController
 @Api(value = "sys_dict", description = "系统字典接口，用于系统全局字典管理", tags = {"系统字典接口"})
-public class SystemDictController {
+public class SystemDictController extends BaseController {
 
     @Autowired
     private SystemDictClient systemDictClient;
@@ -42,16 +47,14 @@ public class SystemDictController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) Integer size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) Integer page) {
+            @RequestParam(value = "page", required = false) Integer page){
 
-        Envelop envelop = new Envelop();
-
-        //todo: 微服务缺少获取字典总条数的接口
-        //todo： 前端的分页需要用到ListModel，totalCount，page，rows属性，但是 Envelop 工具类没有page，rows属性？
         List<MSystemDict> systemDicts =(List<MSystemDict>)systemDictClient.getDictionaries(fields,filters,sorts,size,page);
 
-        envelop.setDetailModelList(systemDicts);
+//        String count = response.getHeader(AgAdminConstants.ResourceCount);
+//        int totalCount = StringUtils.isNotEmpty(count) ? Integer.parseInt(count) : 0;
 
+        Envelop envelop = getResult(systemDicts,0,page,size);
 
        return envelop;
     }
@@ -65,7 +68,13 @@ public class SystemDictController {
         Envelop envelop = new Envelop();
         MSystemDict systemDict = systemDictClient.createDictionary(dictJson);
 
-        envelop.setObj(systemDict);
+        if(systemDict != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(systemDict);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("创建字典失败");
+        }
 
         return envelop;
     }
@@ -80,7 +89,14 @@ public class SystemDictController {
 
         MSystemDict systemDict = systemDictClient.getDictionary(id);
 
-        envelop.setObj(systemDict);
+        if(systemDict != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(systemDict);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("获取字典失败");
+        }
+
         return envelop;
     }
 
@@ -93,7 +109,13 @@ public class SystemDictController {
 
         MSystemDict systemDict = systemDictClient.updateDictionary(dictJson);
 
-        envelop.setObj(systemDict);
+        if(systemDict != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(systemDict);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("修改字典失败");
+        }
 
         return envelop;
     }
@@ -123,11 +145,12 @@ public class SystemDictController {
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
             @RequestParam(value = "rows", required = false) Integer rows) {
 
-        Envelop envelop = new Envelop();
         List<MDictionaryEntry> dictionaryEntries = (List<MDictionaryEntry>)systemDictClient.getDictEntries(id,value,page,rows);
-        //todo: 微服务缺少获取字典项总条数的接口
 
-        envelop.setDetailModelList(dictionaryEntries);
+//        String count = response.getHeader(AgAdminConstants.ResourceCount);
+//        int totalCount = StringUtils.isNotEmpty(count) ? Integer.parseInt(count) : 0;
+
+        Envelop envelop = getResult(dictionaryEntries,0,page,rows);
 
         return envelop;
     }
@@ -141,7 +164,14 @@ public class SystemDictController {
 
         MConventionalDict mConventionalDict= systemDictClient.createDictEntry(entryJson);
 
-        envelop.setObj(mConventionalDict);
+        if(mConventionalDict != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(mConventionalDict);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("创建字典项失败");
+        }
+
         return envelop;
     }
 
@@ -156,7 +186,14 @@ public class SystemDictController {
 
         MDictionaryEntry mDictionaryEntry= systemDictClient.getDictEntry(id, code);
 
-        envelop.setObj(mDictionaryEntry);
+        if(mDictionaryEntry != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(mDictionaryEntry);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("创建字典项失败");
+        }
+
         return envelop;
     }
 
@@ -184,7 +221,13 @@ public class SystemDictController {
 
         MConventionalDict mConventionalDict= systemDictClient.updateDictEntry(entryJson);
 
-        envelop.setObj(mConventionalDict);
+        if(mConventionalDict != null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(mConventionalDict);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("修改字典项失败");
+        }
 
         return envelop;
     }

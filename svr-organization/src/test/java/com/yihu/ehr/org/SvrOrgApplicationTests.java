@@ -1,6 +1,6 @@
 package com.yihu.ehr.org;
 
-import com.eureka2.shading.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.SvrOrgApplication;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.org.controller.OrganizationController;

@@ -1,32 +1,39 @@
-package com.yihu.ehr.agModel.org.UIModels;
+package com.yihu.ehr.agModel.org;
 
+import java.util.Date;
 import java.util.HashSet;
 
 /**
  * Created by yww on 2016/2/22.
  */
 public class OrgDetailModel{
-    String orgCode="";
-    String fullName="";
-    String shortName="";
-    String pyCode = "";
-    String orgTypeCode="";
-    String orgTypeName="";
-    String settledWayCode="";
-    String settledWayName="";
-    String activityFlgCode = "";
-    String activityFlgName = "";
-    String createDate = "";
-    String locationId="";
-    String province="";
-    String city="";
-    String district="";
-    String town="";
-    String street = "";
-    String extra = "";
-    String admin = "";
-    String tel="";
-    String tags="";
+    private String orgCode;
+    private String fullName;
+    private String shortName;
+    private String pyCode;
+    private String orgType;
+    private String orgTypeName;
+    private boolean settled;
+    private String settledWay;
+    private String settledWayName;
+    private int activityFlg;
+    private String activityFlgName;
+    private Date createDate;
+    private String location;
+    private String province;
+    private String city;
+    private String district;
+    private String town;
+    private String street;
+    private String extra;
+    private String admin;
+    private String tel;
+    private String tags;
+    //公钥信息
+    String publicKey;
+    String validTime;
+    String startTime;
+
     public String getOrgCode() {
         return orgCode;
     }
@@ -59,12 +66,12 @@ public class OrgDetailModel{
         this.pyCode = pyCode;
     }
 
-    public String getOrgTypeCode() {
-        return orgTypeCode;
+    public String getOrgType() {
+        return orgType;
     }
 
-    public void setOrgTypeCode(String orgTypeCode) {
-        this.orgTypeCode = orgTypeCode;
+    public void setOrgType(String orgType) {
+        this.orgType = orgType;
     }
 
     public String getOrgTypeName() {
@@ -75,12 +82,20 @@ public class OrgDetailModel{
         this.orgTypeName = orgTypeName;
     }
 
-    public String getSettledWayCode() {
-        return settledWayCode;
+    public boolean getSettled() {
+        return settled;
     }
 
-    public void setSettledWayCode(String settledWayCode) {
-        this.settledWayCode = settledWayCode;
+    public void setSettled(boolean settled) {
+        this.settled = settled;
+    }
+
+    public String getSettledWay() {
+        return settledWay;
+    }
+
+    public void setSettledWay(String settledWay) {
+        this.settledWay = settledWay;
     }
 
     public String getSettledWayName() {
@@ -91,12 +106,12 @@ public class OrgDetailModel{
         this.settledWayName = settledWayName;
     }
 
-    public String getActivityFlgCode() {
-        return activityFlgCode;
+    public int getActivityFlg() {
+        return activityFlg;
     }
 
-    public void setActivityFlgCode(String activityFlgCode) {
-        this.activityFlgCode = activityFlgCode;
+    public void setActivityFlg(int activityFlg) {
+        this.activityFlg = activityFlg;
     }
 
     public String getActivityFlgName() {
@@ -107,20 +122,20 @@ public class OrgDetailModel{
         this.activityFlgName = activityFlgName;
     }
 
-    public String getCreateDate() {
+    public Date getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(String createDate) {
+    public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
 
-    public String getLocationId() {
-        return locationId;
+    public String getLocation() {
+        return location;
     }
 
-    public void setLocationId(String locationId) {
-        this.locationId = locationId;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public String getProvince() {
@@ -193,5 +208,29 @@ public class OrgDetailModel{
 
     public void setTags(String tags) {
         this.tags = tags;
+    }
+
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    public String getValidTime() {
+        return validTime;
+    }
+
+    public void setValidTime(String validTime) {
+        this.validTime = validTime;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
     }
 }

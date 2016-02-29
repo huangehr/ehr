@@ -89,12 +89,12 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version) throws Exception{
 
-        return dataSetService.removeDataSet(ids.split(","), version) > 0;
+        return dataSetService.removeDataSet(strToLongArr(ids), version) > 0;
     }
 
     @RequestMapping(value = "/dataset/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "获取数据集信息")
-    public Object getDataSet(
+    public MStdDataSet getDataSet(
             @ApiParam(name = "id", value = "数据集编号", defaultValue = "")
             @PathVariable(value = "id") long id,
             @ApiParam(name = "version", value = "版本", defaultValue = "")
@@ -131,7 +131,7 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
     @ApiOperation(value = "修改数据集信息")
     public boolean updateDataSet(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @RequestParam(value = "id") String id,
+            @PathVariable(value = "id") long id,
             @ApiParam(name = "code", value = "代码", defaultValue = "")
             @RequestParam(value = "code") String code,
             @ApiParam(name = "name", value = "名称", defaultValue = "")
