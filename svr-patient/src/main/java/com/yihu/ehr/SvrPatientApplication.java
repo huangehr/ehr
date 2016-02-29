@@ -11,15 +11,15 @@ import org.springframework.context.ApplicationContextAware;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableFeignClients
-public class SvrPatientApplication /*implements ApplicationContextAware*/{
+public class SvrPatientApplication implements ApplicationContextAware{
 
 	public static void main(String[] args) {
 		SpringApplication.run(SvrPatientApplication.class, args);
 	}
 
-	/*@Override
+	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		//force the bean to get loaded as soon as possible
 		applicationContext.getBean("requestMappingHandlerAdapter");
-	}*/
+	}
 }

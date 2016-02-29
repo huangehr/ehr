@@ -3,7 +3,6 @@ package com.yihu.ehr.geography.service;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.UUID;
 
 /**
  * @author Sand
@@ -24,7 +23,7 @@ public class Geography {
     private String extra;
     private String postalCode;
     public Geography() {
-        id  = UUID.randomUUID().toString().replace("-","");
+
     }
 
     @Id

@@ -3,6 +3,7 @@ package com.yihu.ehr.geography.service;
 
 import com.yihu.ehr.geography.dao.XGeographyRepository;
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.util.po.PoUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,6 @@ import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.lang.reflect.Field;
 import java.util.List;
 
 /**
@@ -29,26 +29,6 @@ public class GeographyService extends BaseJpaService<Geography,XGeographyReposit
     protected EntityManager entityManager;
     @Autowired
     private XGeographyRepository geographyRepository;
-
-    public static String getHql(Object obj) throws Exception {
-        //通过反射获得类名和属性名
-        Class cls = obj.getClass();
-        //生成语句前缀
-        StringBuilder hql = new StringBuilder("from " + cls.getSimpleName()
-                + " where 1=1");
-        //取得所有的属性
-        Field[] fields = cls.getDeclaredFields();
-        for (int i = 0; i < fields.length; i++) {
-            //设置可读
-            fields[i].setAccessible(true);
-            //判断属性是否有值，如果有值就加入到HQL语句中
-            if (fields[i].get(obj) != null){
-                hql.append(" and " + fields[i].getName() + "=?");
-            }
-        }
-        //返回生成的语句
-        return hql.toString();
-    }
 
 
     /**
@@ -202,5 +182,13 @@ public class GeographyService extends BaseJpaService<Geography,XGeographyReposit
 
     public void deleteAddress(Geography address) {
         geographyRepository.delete(address);
+    }
+
+    public List<Geography> isGeographyExist(Geography geography) throws Exception {
+        String hql = PoUtil.getHql(geography,"id","postalCode");
+        Session session = currentSession();
+        Query query = session.createQuery(hql);
+        List<Geography> list = query.list();
+        return list;
     }
 }

@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.patient.MDemographicInfo;
-import com.yihu.ehr.patient.service.demographic.DemographicService;
 import com.yihu.ehr.patient.service.demographic.DemographicId;
 import com.yihu.ehr.patient.service.demographic.DemographicInfo;
+import com.yihu.ehr.patient.service.demographic.DemographicService;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.encode.HashUtil;
@@ -16,11 +16,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +79,9 @@ public class PatientController extends BaseRestController {
         conditionMap.put("district", district);
         List<DemographicInfo> demographicInfos = demographicService.searchPatient(conditionMap);
         Integer totalCount = demographicService.searchPatientTotalCount(conditionMap);
-        return getResult(demographicInfos,totalCount);
+
+        List<MDemographicInfo> mDemographicInfos = (List<MDemographicInfo>)convertToModels(demographicInfos,new ArrayList<MDemographicInfo>(demographicInfos.size()), MDemographicInfo.class, null);
+        return getResult(mDemographicInfos,totalCount);
     }
 
 
@@ -116,32 +120,30 @@ public class PatientController extends BaseRestController {
 
     /**
      * 根据前端传回来的json新增一个人口信息
-     * @param patientModelJsonData
+     * @param jsonData
      * @param request
-     * @param response
      * @return
      * @throws Exception
      */
     @RequestMapping(value = "/populations",method = RequestMethod.POST)
     @ApiOperation(value = "根据前端传回来的json创建一个人口信息")
     public MDemographicInfo createPatient(
-            @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
-            @RequestParam(value = "patient_model_json_data") String patientModelJsonData,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception{
+            @ApiParam(name = "json_data", value = "身份证号", defaultValue = "")
+            @RequestParam(value = "json_data") String jsonData,
+            HttpServletRequest request) throws Exception{
         //将文件保存至服务器，返回文件的path，
         String picPath = webupload(request);
         ObjectMapper objectMapper = new ObjectMapper();
-        MDemographicInfo demographicInfoModel = objectMapper.readValue(patientModelJsonData, MDemographicInfo.class);
+        DemographicInfo demographicInfo = objectMapper.readValue(jsonData, DemographicInfo.class);
         //将文件path保存至数据库
-        demographicInfoModel.setPicPath(picPath);
-        if(picPath != null){
-            demographicInfoModel.setLocalPath("");
+        demographicInfo.setPicPath(picPath);
+        if(!StringUtils.isEmpty(picPath)){
+            demographicInfo.setLocalPath("");
         }
         String pwd = "123456";
-        demographicInfoModel.setPassword(HashUtil.hashStr(pwd));
-        demographicService.savePatient(demographicInfoModel);
-        return convertToModel(demographicInfoModel,MDemographicInfo.class,null);
+        demographicInfo.setPassword(HashUtil.hashStr(pwd));
+        demographicService.savePatient(demographicInfo);
+        return convertToModel(demographicInfo,MDemographicInfo.class,null);
     }
 
     /**
@@ -161,53 +163,17 @@ public class PatientController extends BaseRestController {
         //将文件保存至服务器，返回文件的path，
         String picPath = webupload(request);
         ObjectMapper objectMapper = new ObjectMapper();
-        MDemographicInfo demographicInfoModel = objectMapper.readValue(patientModelJsonData, MDemographicInfo.class);
+        DemographicInfo demographicInfo = objectMapper.readValue(patientModelJsonData, DemographicInfo.class);
         //将文件path保存至数据库
-        demographicInfoModel.setPicPath(picPath);
+        demographicInfo.setPicPath(picPath);
         if(picPath != null){
-            demographicInfoModel.setLocalPath("");
+            demographicInfo.setLocalPath("");
         }
-        demographicService.savePatient(demographicInfoModel);
-        return convertToModel(demographicInfoModel,MDemographicInfo.class,null);
+        demographicService.savePatient(demographicInfo);
+        return convertToModel(demographicInfo,MDemographicInfo.class,null);
     }
 
-    /**
-     * 人口信息头像图片上传
-     * @param request
-     * @return
-     * @throws IOException
-     */
-    public String webupload(HttpServletRequest request) throws IOException {
-        try {
-            request.setCharacterEncoding("UTF-8");
-        } catch (UnsupportedEncodingException e1) {
-        }
-        InputStream inputStearm = request.getInputStream();
-        String fileName = (String) request.getParameter("name");
-        if(fileName == null){
-            return null;
-        }
-        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-        String description = null;
-        if ((fileName != null) && (fileName.length() > 0)) {
-            int dot = fileName.lastIndexOf('.');
-            if ((dot > -1) && (dot < (fileName.length()))) {
-                description = fileName.substring(0, dot);
-            }
-        }
-        ObjectNode objectNode = null;
-        String path = null;
-        try {
-            objectNode = fastDFSUtil.upload(inputStearm, fileExtension, description);
-            String groupName = objectNode.get("groupName").toString();
-            String remoteFileName = objectNode.get("remoteFileName").toString();
-            path = "{groupName:" + groupName + ",remoteFileName:" + remoteFileName + "}";
-        } catch (Exception e) {
-            LogService.getLogger(DemographicInfo.class).error("人口头像图片上传失败；错误代码："+e);
-        }
-        //返回文件路径
-        return path;
-    }
+
 
     /**
      * 初始化密码
@@ -225,7 +191,43 @@ public class PatientController extends BaseRestController {
     }
 
 
-
+    /**
+     * 人口信息头像图片上传
+     * @param request
+     * @return
+     * @throws IOException
+     */
+    public String webupload(HttpServletRequest request) throws IOException {
+        if(request==null){
+            return "";
+        }else {
+            InputStream inputStearm = request.getInputStream();
+            String fileName = (String) request.getParameter("name");
+            if(fileName == null){
+                return null;
+            }
+            String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+            String description = null;
+            if ((fileName != null) && (fileName.length() > 0)) {
+                int dot = fileName.lastIndexOf('.');
+                if ((dot > -1) && (dot < (fileName.length()))) {
+                    description = fileName.substring(0, dot);
+                }
+            }
+            ObjectNode objectNode = null;
+            String path = null;
+            try {
+                objectNode = fastDFSUtil.upload(inputStearm, fileExtension, description);
+                String groupName = objectNode.get("groupName").toString();
+                String remoteFileName = objectNode.get("remoteFileName").toString();
+                path = "{groupName:" + groupName + ",remoteFileName:" + remoteFileName + "}";
+            } catch (Exception e) {
+                LogService.getLogger(DemographicInfo.class).error("人口头像图片上传失败；错误代码："+e);
+            }
+            //返回文件路径
+            return path;
+        }
+    }
 
 
     /**

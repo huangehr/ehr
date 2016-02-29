@@ -41,7 +41,7 @@ public class StdHibernateConfig extends HibernateConfig  {
         //bind entity to session
         sessionFactory.setAnnotatedClasses(tableClass.toArray(new Class[tableClass.size()]));
         sessionFactory.setDataSource(dataSource);
-        sessionFactory.getHibernateProperties().setProperty("hibernate.show_sql", showSQL);
+        sessionFactory.getHibernateProperties().setProperty("hibernate.show_sql", "true");
         sessionFactory.getHibernateProperties().setProperty("hibernate.format_sql", formatSQL);
         return sessionFactory;
     }

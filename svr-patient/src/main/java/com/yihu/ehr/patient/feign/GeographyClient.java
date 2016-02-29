@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
@@ -15,17 +16,16 @@ import java.util.List;
  * Created by Administrator on 2016/1/4.
  */
 @FeignClient(MicroServices.Geography)
-@RequestMapping(value = "/rest/v1.0")
+@RequestMapping(value = "/api/v1.0")
+@ApiIgnore
 public interface GeographyClient {
 
 
     @RequestMapping(value = "/geographies/{id}", method = RequestMethod.GET)
-    MGeography getAddressById(
-            @PathVariable(value = "id") String id);
+    MGeography getAddressById(@PathVariable(value = "id") String id);
 
     @RequestMapping(value = "/geographies", method =  RequestMethod.PUT)
-    String saveAddress(
-            @RequestParam( value = "json_data") String GeographyModelJsonData);
+    String saveAddress(@RequestParam( value = "json_data") String GeographyModelJsonData);
 
 
     @RequestMapping(value = "/geographies", method = RequestMethod.GET )
@@ -36,7 +36,6 @@ public interface GeographyClient {
 
 
     @RequestMapping(value = "/geographies/existence", method = RequestMethod.GET )
-    boolean isNullAddress(
-            @RequestParam(value = "json_data") String geographyModelJsonData);
+    boolean isNullAddress(@RequestParam(value = "json_data") String geographyModelJsonData);
 
 }

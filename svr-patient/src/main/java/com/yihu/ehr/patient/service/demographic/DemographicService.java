@@ -12,12 +12,11 @@ import org.hibernate.Session;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Map;
 
@@ -51,40 +50,13 @@ public class DemographicService {
 
 
 
-    public void save(MDemographicInfo demographicInfoModel) throws JsonProcessingException {
-        //地址检查并保存
-        DemographicInfo demographicInfo = new DemographicInfo();
-        BeanUtils.copyProperties(demographicInfoModel,DemographicInfo.class);
-        //出生地
-        MGeography birthPlace = demographicInfoModel.getBirthPlace();
-        if (!isNullAddress(birthPlace)) {
-            String addressId = savaAddress(birthPlace);
-            demographicInfo.setBirthPlace(addressId);
-        }else{
-            demographicInfo.setBirthPlace(null);
-        }
-        //工作地址
-        MGeography workAddress = demographicInfoModel.getWorkAddress();
-        if (!isNullAddress(workAddress)) {
-            String addressid = savaAddress(workAddress);
-            demographicInfo.setWorkAddress(addressid);
-        }else{
-            demographicInfo.setWorkAddress(null);
-        }
-        //家庭地址
-        MGeography homeAddress = demographicInfoModel.getHomeAddress();
-        if (!isNullAddress(homeAddress)) {
-            String addressId = savaAddress(homeAddress);
-            demographicInfo.setHomeAddress(addressId);
-        }else{
-            demographicInfo.setHomeAddress(null);
-        }
+    public void save(DemographicInfo demographicInfo) throws JsonProcessingException {
         demographicInfoRepository.save(demographicInfo);
     }
 
 
-    public boolean savePatient(MDemographicInfo demographicInfoModel) throws Exception{
-        save(demographicInfoModel);
+    public boolean savePatient(DemographicInfo demographicInfo) throws Exception{
+        save(demographicInfo);
         return true;
     }
 
@@ -99,14 +71,23 @@ public class DemographicService {
         String city = (String) args.get("city");
         String district = (String) args.get("district");
         List<String> homeAddressIdList = addressClient.search(province,city,district);
-        String hql = "from DemographicInfo where (name like :name or id like :idCardNo)";
+        String hql = "from DemographicInfo where 1=1";
+        if (!StringUtils.isEmpty(idCardNo)) {
+            hql += " and id like :idCardNo)";
+        }
+        if (!StringUtils.isEmpty(name)) {
+            hql += " and name like :name)";
+        }
         if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
             hql += " and homeAddress in (:homeAddressIdList)";
         }
         Query query = session.createQuery(hql);
-        query.setString("name", "%" + name + "%");
-        query.setString("idCardNo", "%" + idCardNo + "%");
-
+        if (!StringUtils.isEmpty(idCardNo)) {
+            query.setString("idCardNo", "%" + idCardNo + "%");
+        }
+        if (!StringUtils.isEmpty(name)) {
+            query.setString("name", "%" + name + "%");
+        }
         if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
             query.setParameterList("homeAddressIdList", homeAddressIdList);
         }
@@ -120,19 +101,30 @@ public class DemographicService {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         String name = (String) args.get("name");
         String idCardNo = (String) args.get("idCardNo");
+
         String province = (String) args.get("province");
         String city = (String) args.get("city");
         String district = (String) args.get("district");
-        List<String> addressIdList = addressClient.search(province,city,district);
-        String hql = "from DemographicInfo where (name like :name or id like :idCardNo)";
+        List<String> homeAddressIdList = addressClient.search(province,city,district);
+        String hql = "from DemographicInfo where 1=1";
+        if (!StringUtils.isEmpty(idCardNo)) {
+            hql += " and id like :idCardNo)";
+        }
+        if (!StringUtils.isEmpty(name)) {
+            hql += " and name like :name)";
+        }
         if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
-            hql += " and homeAddress in (:addressIdList)";
+            hql += " and homeAddress in (:homeAddressIdList)";
         }
         Query query = session.createQuery(hql);
-        query.setString("name", "%" + name + "%");
-        query.setString("idCardNo", "%" + idCardNo + "%");
+        if (!StringUtils.isEmpty(idCardNo)) {
+            query.setString("idCardNo", "%" + idCardNo + "%");
+        }
+        if (!StringUtils.isEmpty(name)) {
+            query.setString("name", "%" + name + "%");
+        }
         if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
-            query.setParameterList("addressIdList", addressIdList);
+            query.setParameterList("homeAddressIdList", homeAddressIdList);
         }
         return query.list().size();
     }

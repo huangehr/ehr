@@ -61,6 +61,16 @@ public class BaseHbmService<T> {
         return (T) currentSession().get(getEntityClass(), id);
     }
 
+    public List findAll(){
+
+        return findAll(getEntityClass());
+    }
+
+    public List findAll(Class entityClass){
+
+        return currentSession().createCriteria(entityClass).list();
+    }
+
     public boolean isExistByField(String field, Object val, Class entityClass){
 
         return isExistByFields(
@@ -112,7 +122,7 @@ public class BaseHbmService<T> {
             return 0;
         String hql =
                 "DELETE FROM "+ entity.getSimpleName() +
-                        " WHERE " + sessionFactory().getClassMetadata(entity).getIdentifierPropertyName() + "in(:ids) ";
+                        " WHERE " + sessionFactory().getClassMetadata(entity).getIdentifierPropertyName() + " in(:ids) ";
         return currentSession().createQuery(hql)
                 .setParameterList("ids", ids)
                 .executeUpdate();
@@ -133,9 +143,9 @@ public class BaseHbmService<T> {
         String where = "";
         for(int i=0; i<fields.length; i++){
             if(vals[i].getClass().isArray())
-                where += "AND " + fields[i] +"in(:v"+i+") ";
+                where += "AND " + fields[i] +" in(:v"+i+") ";
             else
-                where += "AND " + fields[i] +"=:v("+i+") ";
+                where += "AND " + fields[i] +"=:v"+i+" ";
         }
         if(!where.equals("")){
             hql += " WHERE " + where.substring(4);
@@ -193,6 +203,16 @@ public class BaseHbmService<T> {
     public List search(Class entityClass, String fields, String filters) {
 
         return search(entityClass, fields, filters, "");
+    }
+
+    public List search(String filters) {
+
+        return search(entityClass, "", filters, "");
+    }
+
+    public List search(Class entityClass, String filters) {
+
+        return search(entityClass, "", filters, "");
     }
 
     public long getCount(String filters) {

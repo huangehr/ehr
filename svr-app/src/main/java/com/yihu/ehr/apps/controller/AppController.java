@@ -77,7 +77,6 @@ public class AppController extends BaseRestController {
             @RequestParam(value = "app", required = false) String appJson) throws Exception {
         App app = toEntity(appJson, App.class);
         app.setId(getObjectId(BizObject.App));
-        if(appService.isAppNameExists(app.getName())) throw new ApiException(ErrorCode.InvalidAppRegister, "应用程序名称已存在");
         app = appService.createApp(app);
         return convertToModel(app, MApp.class);
     }
@@ -97,15 +96,8 @@ public class AppController extends BaseRestController {
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true)
             @RequestParam(value = "app", required = false) String appJson) throws Exception {
         App app = toEntity(appJson, App.class);
-        app.setId(getObjectId(BizObject.App));
         if (appService.retrieve(app.getId()) == null) throw new ApiException(ErrorCode.InvalidAppId, "应用不存在");
-
-        if(!appService.retrieve(app.getId()).getName().equals(app.getName()) && appService.isAppNameExists(app.getName())){
-            throw new ApiException(ErrorCode.InvalidAppRegister, "应用程序名称已存在");
-        }
-
         appService.save(app);
-
         return convertToModel(app, MApp.class);
     }
 
@@ -118,7 +110,7 @@ public class AppController extends BaseRestController {
     }
 
 
-    @RequestMapping(value = "apps/status" , method = RequestMethod.PUT)
+    @RequestMapping(value = "/apps/status" , method = RequestMethod.PUT)
     @ApiOperation(value = "修改状态")
     public boolean updateSatus(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
@@ -129,7 +121,7 @@ public class AppController extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(value = "apps/existence/{app_id}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/apps/existence/app_id/{app_id}" , method = RequestMethod.GET)
     @ApiOperation(value = "验证")
     public boolean isAppExistence(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
@@ -137,5 +129,13 @@ public class AppController extends BaseRestController {
             @ApiParam(name = "secret", value = "", defaultValue = "")
             @RequestParam(value = "secret") String secret) throws Exception{
         return appService.findByIdAndSecret(appId, secret)!=null;
+    }
+
+    @RequestMapping(value = "/apps/existence/app_name/{app_name}" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断提交的app名称是否已经存在")
+    boolean isAppNameExists(
+            @ApiParam(value = "app_name")
+            @PathVariable(value = "app_name") String appName){
+        return appService.isAppNameExists(appName);
     }
 }

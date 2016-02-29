@@ -8,10 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -31,7 +28,7 @@ public class GeographyDictController extends BaseRestController{
      * @param level
      * @return
      */
-    @RequestMapping(value = "/geography_entries/{level}", method = RequestMethod.GET)
+    @RequestMapping(value = "/geography_entries/level/{level}", method = RequestMethod.GET)
     @ApiOperation(value = "根据等级查询行政区划地址")
     public List<GeographyDict> getAddressByLevel(
             @ApiParam(name = "level", value = "等级", defaultValue = "")
@@ -40,7 +37,7 @@ public class GeographyDictController extends BaseRestController{
         return addressDictList;
     }
 
-    @RequestMapping(value = "/geography_entries/{pid}", method = RequestMethod.GET)
+    @RequestMapping(value = "/geography_entries/pid/{pid}", method = RequestMethod.GET)
     @ApiOperation(value = "根据上级编号查询行政区划地址")
     public List<GeographyDict> getAddressDictByPid(
         @ApiParam(name = "pid", value = "上级id", defaultValue = "")
