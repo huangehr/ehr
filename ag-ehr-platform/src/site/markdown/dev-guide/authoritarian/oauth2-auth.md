@@ -471,9 +471,9 @@ API列表
       "created_at": "2011-09-06T17:26:27Z"
     }
 	
-### 创建单个授权
+### 创建单个应用授权
 
-此方法为尚未创建授权的应用创建授权。Client ID直接包含在URL中。若授权已直接，则返回此授权信息，否则创建一个新的并返回。
+此方法为尚未创建授权的应用创建授权。Client ID直接包含在URL中。若授权已存在，则返回此授权信息，否则创建一个新的并返回。
 
 	PUT /authorizations/clients/:client_id
 	
@@ -505,6 +505,11 @@ API列表
    	 <td>string </td>
    	 <td>使用URL提醒你这是哪个应用的Token</td>
    </tr>
+	<tr>
+   	 <td>fingerprint</td>
+   	 <td>string </td>
+   	 <td>区别同一个应用，同一个用户创建的Token</td>
+   </tr>
 </table>
 
 参数示例：
@@ -514,7 +519,8 @@ API列表
       "scopes": [
         "public_repo"
       ],
-      "note": "admin script"
+      "note": "admin script",
+      "fingerprint": ""
     }
     
 **返回值**
@@ -543,7 +549,8 @@ API列表
       "note": "optional note",
       "note_url": "http://optional/note/url",
       "updated_at": "2011-09-06T20:39:23Z",
-      "created_at": "2011-09-06T17:26:27Z"
+      "created_at": "2011-09-06T17:26:27Z",
+      "fingerprint": ""
     }
     
 授权存在时：
@@ -570,7 +577,108 @@ API列表
       "note": "optional note",
       "note_url": "http://optional/note/url",
       "updated_at": "2011-09-06T20:39:23Z",
-      "created_at": "2011-09-06T17:26:27Z"
+      "created_at": "2011-09-06T17:26:27Z",
+      "fingerprint": ""
+    }
+    
+### 创建单个用户授权
+
+此方法为尚未创建授权的应用创建授权。用户名直接包含在URL中。若授权已存在，则返回此授权信息，否则创建一个新的并返回。
+
+	PUT /authorizations/users/:user_name
+	
+**参数**
+
+<table>
+   <tr>
+	 <td>名称 </td>
+	 <td>类型</td>
+	 <td>描述</td>
+   </tr>
+   <tr>
+      <td>password</td>
+      <td>string </td>
+      <td>必选。与URL中user_name相对应的密码。</td>
+   </tr>
+   <tr>
+      <td>scopes </td>
+      <td>array </td>
+      <td>要申请的授权作用域。</td>
+   </tr>
+   <tr>
+	 <td>note</td>
+	 <td>string</td>
+	 <td>对Token做备注以免你忘了这是要干嘛的。</td>
+   </tr>
+</table>
+
+参数示例：
+
+	{
+      "client_secret": "abcdabcdabcdabcdabcdabcdabcdabcdabcdabcd",
+      "scopes": [
+        "public_repo"
+      ],
+      "note": "admin script",
+      "fingerprint": ""
+    }
+    
+**返回值**
+
+授权不存在时：
+
+	Status: 201 Created
+    Location: https://ehr.yihu.com/api/v1/authorizations/1
+    X-RateLimit-Limit: 5000
+    X-RateLimit-Remaining: 4999
+    
+    {
+      "id": 1,
+      "url": "https://ehr.yihu.com/api/v1/authorizations/1",
+      "scopes": [
+        "public_repo"
+      ],
+      "token": "abcdefgh12345678",
+      "token_last_eight": "12345678",
+      "hashed_token": "25f94a2a5c7fbaf499c665bc73d67c1c87e496da8985131633ee0a95819db2e8",
+      "app": {
+        "url": "http://my-github-app.com",
+        "name": "my github app",
+        "client_id": "abcde12345fghij67890"
+      },
+      "note": "optional note",
+      "note_url": "http://optional/note/url",
+      "updated_at": "2011-09-06T20:39:23Z",
+      "created_at": "2011-09-06T17:26:27Z",
+      "fingerprint": ""
+    }
+    
+授权存在时：
+
+	Status: 200 OK
+    Location: https://ehr.yihu.com/api/v1/authorizations/1
+    X-RateLimit-Limit: 5000
+    X-RateLimit-Remaining: 4999
+    
+    {
+      "id": 1,
+      "url": "https://ehr.yihu.com/api/v1/authorizations/1",
+      "scopes": [
+        "public_repo"
+      ],
+      "token": "",
+      "token_last_eight": "12345678",
+      "hashed_token": "25f94a2a5c7fbaf499c665bc73d67c1c87e496da8985131633ee0a95819db2e8",
+      "app": {
+        "url": "http://my-github-app.com",
+        "name": "my github app",
+        "client_id": "abcde12345fghij67890"
+      },
+      "note": "optional note",
+      "note_url": "http://optional/note/url",
+      "updated_at": "2011-09-06T20:39:23Z",
+      "created_at": "2011-09-06T17:26:27Z",
+      "fingerprint": ""
     }
 	
 ### 更新授权信息
@@ -610,6 +718,11 @@ API列表
    	 <td>string </td>
    	 <td>使用URL提醒你这是哪个应用的Token</td>
    </tr>
+	<tr>
+		<td>fingerprint </td>
+		<td>string </td>
+		<td>区别同一应用在不同用户下创建的Token</td>
+	</tr>
 </table>
 
 参数示例（三个scope参数是互斥的，若同时存在，只取第一个）：
@@ -644,7 +757,8 @@ API列表
       "note": "optional note",
       "note_url": "http://optional/note/url",
       "updated_at": "2011-09-06T20:39:23Z",
-      "created_at": "2011-09-06T17:26:27Z"
+      "created_at": "2011-09-06T17:26:27Z",
+      "fingerprint": "jklmnop12345678"
     }
 	
 ### 删除应用的所有授权

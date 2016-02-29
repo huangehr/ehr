@@ -17,8 +17,9 @@ import static springfox.documentation.builders.PathSelectors.regex;
 @EnableSwagger2
 @ComponentScan("com.yihu.ehr.*.controller")
 public class SwaggerConfig {
+    public static final String LEGACY_API = "Legacy";
     public static final String PUBLIC_API = "Public";
-    public static final String ADMIN_API = "Private";
+    public static final String PRIVATE_API = "Private";
 
     @Bean
     public Docket publicAPI() {
@@ -37,18 +38,50 @@ public class SwaggerConfig {
     @Bean
     public Docket privateAPI() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .groupName(ADMIN_API)
+                .groupName(PRIVATE_API)
                 .genericModelSubstitutes(DeferredResult.class)
                 .useDefaultResponseMessages(false)
                 .forCodeGeneration(false)
                 .pathMapping("/")
                 .select()
-                .paths(or(regex("/admin.*")))
+                .paths(or(regex("/admin.*"),
+                        regex("/restart/.*"),
+                        regex("/env/.*"),
+                        regex("/trace/.*"),
+                        regex("/health/.*"),
+                        regex("/shutdown/.*"),
+                        regex("/refresh/.*"),
+                        regex("/pause/.*"),
+                        regex("/dump/.*"),
+                        regex("/archaius/.*"),
+                        regex("/docs/.*"),
+                        regex("/actuator/.*"),
+                        regex("/info/.*"),
+                        regex("/autoconfig/.*")))
                 .build()
                 .apiInfo(privateAPIInfo());
     }
 
     @Bean
+    public Docket legacyAPI(){
+        return new Docket(DocumentationType.SWAGGER_2)
+                .groupName(LEGACY_API)
+                .genericModelSubstitutes(DeferredResult.class)
+                .useDefaultResponseMessages(false)
+                .forCodeGeneration(false)
+                .pathMapping("/")
+                .select()
+                .paths(or(regex("/rest/v.*")))
+                .build()
+                .apiInfo(legacyApiInfo());
+    }
+
+    /**
+     * 测试client信息。
+     *
+     * @return
+     */
+    //@Bean
     SecurityConfiguration security() {
         return new SecurityConfiguration(
                 "test-app-client-id",
@@ -57,11 +90,24 @@ public class SwaggerConfig {
                 "ac04-47ec-9a9a-7c47bbcbbbd1");
     }
 
+    private ApiInfo legacyApiInfo() {
+        ApiInfo apiInfo = new ApiInfo("健康档案平台开放API",
+                "健康档案平台开放API(历史兼容接口)，此部分API因为设计不规范，但已经发布，所以继续提供兼容。",
+                "1.0",
+                "No terms of service",
+                "wenfujian@jkzl.com",
+                "The Apache License, Version 2.0",
+                "http://www.apache.org/licenses/LICENSE-2.0.html"
+        );
+
+        return apiInfo;
+    }
+
     private ApiInfo publicApiInfo() {
         ApiInfo apiInfo = new ApiInfo("健康档案平台开放API",
                 "健康档案平台开放API，提供健康档案服务。",
                 "1.0",
-                "NO terms of service",
+                "No terms of service",
                 "wenfujian@jkzl.com",
                 "The Apache License, Version 2.0",
                 "http://www.apache.org/licenses/LICENSE-2.0.html"
@@ -74,7 +120,7 @@ public class SwaggerConfig {
         ApiInfo apiInfo = new ApiInfo("健康档案平台私有API",
                 "健康档案平台私有API。",
                 "1.0",
-                "NO terms of service",
+                "No terms of service",
                 "wenfujian@jkzl.com",
                 "The Apache License, Version 2.0",
                 "http://www.apache.org/licenses/LICENSE-2.0.html"

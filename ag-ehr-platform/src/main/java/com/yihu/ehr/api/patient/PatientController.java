@@ -2,6 +2,8 @@ package com.yihu.ehr.api.patient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.feign.DemographicIndexClient;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.spring.web.json.Json;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -31,23 +34,8 @@ public class PatientController {
 
     private DemographicIndexClient demographicIndex;
 
-    protected boolean isPatientRegistered(String demographicId) {
-        return demographicIndex.isRegistered(demographicId);
-    }
-
-    @RequestMapping(value = "/{demographic_id}", method = {RequestMethod.GET})
-    @ApiOperation(value = "判断病人是否已注册", response = boolean.class, produces = "application/json", notes = "使用身份证号判断患者是否已在健康档案平台中注册")
-    public ResponseEntity<String> getPatient(@ApiParam(name = "demographic_id", value = "用户名")
-                                             @PathVariable(value = "demographic_id") String demographicId) {
-        if (isPatientRegistered(demographicId)) {
-            return null;
-        }
-
-        return new ResponseEntity<String>("", HttpStatus.NOT_FOUND);
-    }
-
     /**
-     * 病人注册。requestBody格式:
+     * patientInfo格式:
      * <p>
      * {
      * "inner_version": "000000000000",
@@ -61,7 +49,7 @@ public class PatientController {
      * "event_code":" ",		        //标准数据集编码
      * "org_code":" ",		            //就诊卡发卡机构编码
      * "org_type":" ",		            //机构类型
-     * "patien_id":" ",		        //病人ID
+     * "patien_id":" ",		        //患者ID
      * "card_no":" ",		            //就诊卡编号
      * "HDSD00_02_052":"",	            //医疗保险类别代码
      * "card_type":"",		            //卡类型代码
@@ -91,9 +79,9 @@ public class PatientController {
      * ]
      * }
      * <p>
-     * 病人注册信息
+     * 患者注册信息
      */
-    @ApiOperation(value = "注册", response = boolean.class, produces = "application/json", notes = "根据病人的身份证号及其他病人信息在健康档案平台中注册病人")
+    @ApiOperation(value = "注册患者", response = boolean.class, produces = "application/json", notes = "根据患者的身份证号及其他患者信息在健康档案平台中注册患者")
     @RequestMapping(value = "", method = {RequestMethod.POST})
     public String registerPatient(@ApiParam(name = "json", value = "患者人口学数据集")
                                   @RequestParam(value = "json", required = true) String patientInfo) throws IOException, ParseException {
@@ -104,6 +92,39 @@ public class PatientController {
 
         return "";
     }
+
+    @ApiOperation(value = "获取患者", response = boolean.class, produces = "application/json")
+    @RequestMapping(value = "/{demographic_id}", method = {RequestMethod.GET})
+    public ResponseEntity<Json> getPatient(@ApiParam(name = "demographic_id", value = "身份证号")
+                                           @PathVariable(value = "demographic_id") String demographicId) {
+        if (isPatientRegistered(demographicId)) {
+            throw new ApiException(HttpStatus.NOT_FOUND, ErrorCode.PatientRegisterFailedForExist);
+        }
+
+        return new ResponseEntity<>(new Json(""), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "更新患者", response = boolean.class, produces = "application/json")
+    @RequestMapping(value = "/{demographic_id}", method = {RequestMethod.PUT})
+    public String updatePatient(@ApiParam(name = "demographic_id", value = "身份证号")
+                                @PathVariable(value = "demographic_id") String demographicId,
+                                @ApiParam(name = "json", value = "患者人口学数据集")
+                                @RequestParam(value = "json", required = true) String patient) throws IOException, ParseException {
+
+        if (isPatientRegistered(demographicId)) {
+            throw new ApiException(HttpStatus.NOT_FOUND, ErrorCode.PatientRegisterFailedForExist);
+        }
+
+        return "";
+    }
+
+    /**
+     * 判断患者是否已注册。
+     *
+     * @param demographicId
+     * @return
+     */
+    protected boolean isPatientRegistered(String demographicId) {
+        return demographicIndex.isRegistered(demographicId);
+    }
 }
-
-

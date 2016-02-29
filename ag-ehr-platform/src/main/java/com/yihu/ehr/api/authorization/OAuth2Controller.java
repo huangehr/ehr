@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * OAuth2 认证控制器。此控制器基于用户名/密码认证，即Basic Authorization，需要在HTTP中提供用户名与密码。
+ * OAuth2 认证控制器。此控制器基于用户名/密码认证，即Basic Authorization，需要在HTTPS中提供用户名与密码。
  *
  * @author Sand
  * @version 1.0
@@ -56,28 +56,23 @@ public class OAuth2Controller {
         return null;
     }
 
-    @ApiOperation(value = "为指定应用创建授权", response = String.class)
+    @ApiOperation(value = "为指定应用创建授权，若存在返回已有授权", response = String.class)
     @RequestMapping(value = "/clients/{client_id}", produces = "application/json", method = RequestMethod.PUT)
-    public List<String> createAuthorization(@ApiParam(value = "json")
-                                            @RequestParam("json") String json) {
+    public List<String> createClientAuthorization(@ApiParam("client_id")
+                                                  @PathVariable("client_id")
+                                                  String clientId,
+                                                  @ApiParam(value = "info")
+                                                  @RequestParam("info") String info) {
         return null;
     }
 
-    /*
-    @ApiOperation(value = "/user_key", response = String.class)
-    @RequestMapping(value = "/user_key", produces = "application/text", method = RequestMethod.GET)
-    public String getUserKey(){
+    @ApiOperation(value = "为指定用户创建授权，若存在返回已有授权", response = String.class)
+    @RequestMapping(value = "/users/{user_name}", produces = "application/json", method = RequestMethod.PUT)
+    public List<String> createUserAuthorization(@ApiParam("user_name")
+                                                @PathVariable("user_name")
+                                                String userName,
+                                                @ApiParam(value = "info")
+                                                @RequestParam("info") String info) {
         return null;
     }
-
-    @ApiOperation(value = "/token", response = String.class)
-    @RequestMapping(value = "/token", produces = "application/text", method = RequestMethod.GET)
-    public String getAppToken(){
-        return null;
-    }
-
-    @RequestMapping(value = "/{client_id}", method = RequestMethod.POST)
-    public String getToken(@PathVariable String appId, @RequestParam String secret){
-        return "";
-    }*/
 }
