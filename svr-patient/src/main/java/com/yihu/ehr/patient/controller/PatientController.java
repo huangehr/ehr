@@ -8,7 +8,6 @@ import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.patient.service.demographic.DemographicId;
 import com.yihu.ehr.patient.service.demographic.DemographicInfo;
 import com.yihu.ehr.patient.service.demographic.DemographicService;
-import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.encode.HashUtil;
 import com.yihu.ehr.util.log.LogService;
@@ -54,7 +53,7 @@ public class PatientController extends BaseRestController {
      */
     @RequestMapping(value = "/populations",method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询人")
-    public Envelop searchPatient(
+    public List<MDemographicInfo> searchPatient(
             @ApiParam(name = "name", value = "姓名", defaultValue = "")
             @RequestParam(value = "name") String name,
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
@@ -68,7 +67,9 @@ public class PatientController extends BaseRestController {
             @ApiParam(name = "page", value = "当前页", defaultValue = "")
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
-            @RequestParam(value = "rows") Integer rows) throws Exception{
+            @RequestParam(value = "rows") Integer rows,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception{
         Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("name", name);
         conditionMap.put("idCardNo", idCardNo);
@@ -77,11 +78,17 @@ public class PatientController extends BaseRestController {
         conditionMap.put("province", province);
         conditionMap.put("city", city);
         conditionMap.put("district", district);
-        List<DemographicInfo> demographicInfos = demographicService.searchPatient(conditionMap);
-        Integer totalCount = demographicService.searchPatientTotalCount(conditionMap);
+//        List<DemographicInfo> demographicInfos = demographicService.searchPatient(conditionMap);
+//        Integer totalCount = demographicService.searchPatientTotalCount(conditionMap);
+//
+//        List<MDemographicInfo> mDemographicInfos = (List<MDemographicInfo>)convertToModels(demographicInfos,new ArrayList<MDemographicInfo>(demographicInfos.size()), MDemographicInfo.class, null);
+//        return getResult(mDemographicInfos,totalCount);
 
-        List<MDemographicInfo> mDemographicInfos = (List<MDemographicInfo>)convertToModels(demographicInfos,new ArrayList<MDemographicInfo>(demographicInfos.size()), MDemographicInfo.class, null);
-        return getResult(mDemographicInfos,totalCount);
+        List<DemographicInfo> demographicInfos = demographicService.searchPatient(conditionMap);
+        Long totalCount =Long.parseLong(demographicService.searchPatientTotalCount(conditionMap).toString());
+        pagedResponse(request, response, totalCount, page, rows);
+        return (List<MDemographicInfo>)convertToModels(demographicInfos,new ArrayList<MDemographicInfo>(demographicInfos.size()), MDemographicInfo.class, null);
+
     }
 
 
