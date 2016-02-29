@@ -162,7 +162,7 @@ public class CDAVersionService extends BaseJpaService<CDAVersion, XCDAVersionRep
             session.save(subVersion);
         }
         dropVersionTables(version);
-        delete(version);
+        delete(version.getVersion());
     }
 
     /**
