@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.ha.geography.service.AddressClient;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.agModel.org.OrgModel;
 import com.yihu.ehr.ha.security.service.SecurityClient;
@@ -71,27 +72,28 @@ public class OrganizationController extends BaseController {
         return getResult(orgModelList,totalCount,page,size);
     }
 
-    public OrgModel changeToOrgModel(MOrganization mOrg){
-        OrgModel orgModel = new OrgModel();
-        orgModel.setOrgCode(mOrg.getOrgCode());
-        orgModel.setFullName(mOrg.getFullName());
-        orgModel.setAdmin(mOrg.getAdmin());
-        orgModel.setTel(mOrg.getTel());
+    /**
+     * 将微服务返回的结果转化为前端OrgModel模型
+     *
+     * @param mOrg
+     * @return
+     */
+    public OrgModel changeToOrgModel(MOrganization mOrg) {
+        OrgModel orgModel = convertToModel(mOrg, OrgModel.class);
         // 获取机构类别字典
-        String orgType = mOrg.getOrgType();
-        orgModel.setOrgType(orgType);
-        orgModel.setOrgTypeName(conDictEntryClient.getOrgType(orgType).getValue());
+        MConventionalDict orgTypeDict = conDictEntryClient.getOrgType(mOrg.getOrgType());
+        orgModel.setOrgTypeName(orgTypeDict == null ? "" : orgTypeDict.getValue());
         // 获取机构地址信息
-        String location = mOrg.getLocation();
-        orgModel.setLocationStrName(addressClient.getCanonicalAddress(location));
+        String locationStrName = addressClient.getCanonicalAddress(mOrg.getLocation());
+        orgModel.setLocationStrName(locationStrName);
         //获取机构接入方式
-        String settledWay = mOrg.getSettledWay();
-        orgModel.setSettledWay(settledWay);
-        orgModel.setSettledWayName(conDictEntryClient.getSettledWay(settledWay).getValue());
+        MConventionalDict settledWayDict = conDictEntryClient.getSettledWay(mOrg.getSettledWay());
+        orgModel.setSettledWayName(settledWayDict.getValue());
         // 判断机构状态（是否已激活）
-        int activityFlag = mOrg.getActivityFlag();
-        orgModel.setActivityFlag(activityFlag+"");
-        orgModel.setActivityFlagName(activityFlag==1?"是":"否");
+        orgModel.setActivityFlagName(mOrg.getActivityFlag() == 1 ? "是" : "否");
+        //创建时间转化
+        orgModel.setCreateDate(DateUtil.formatDate(mOrg.getCreateDate(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT));
+
         return orgModel;
     }
 
@@ -203,27 +205,18 @@ public class OrganizationController extends BaseController {
      * @return
      */
 
-    public OrgDetailModel changeToOrgDetailModel(MOrganization mOrg){
-        OrgDetailModel org = new OrgDetailModel();
-        org.setOrgCode(mOrg.getOrgCode());
-        org.setFullName(mOrg.getFullName());
-        org.setShortName(mOrg.getShortName());
+    public OrgDetailModel changeToOrgDetailModel(MOrganization mOrg) {
+        OrgDetailModel org = convertToModel(mOrg, OrgDetailModel.class);
         //获取机构类别字典值
-        String orgType = mOrg.getOrgType();
-        org.setOrgType(orgType);
-        org.setOrgTypeName(conDictEntryClient.getOrgType(orgType).getValue());
+        MConventionalDict orgTypeDict = conDictEntryClient.getOrgType(mOrg.getOrgType());
+        org.setOrgTypeName(orgTypeDict == null ? "" : orgTypeDict.getValue());
         //获取接入方式字典字典值
-        String settledWay = mOrg.getSettledWay();
-        org.setSettledWay(settledWay);
-        org.setSettledWayName(conDictEntryClient.getSettledWay(settledWay).getValue());
-
-        org.setAdmin(mOrg.getAdmin());
-        org.setTel(mOrg.getTel());
+        MConventionalDict settledWayDict = conDictEntryClient.getSettledWay(mOrg.getSettledWay());
+        org.setSettledWayName(settledWayDict.getValue());
         //TODO 微服务返回model无tags属性
         //org.setTags(mOrg.getTags());
         //获取地址字典值明细
-        String locationId = mOrg.getLocation();
-        MGeography addr = addressClient.getAddressById(locationId);
+        MGeography addr = addressClient.getAddressById(mOrg.getLocation());
         org.setProvince(addr.getProvince());
         org.setCity(addr.getCity());
         org.setDistrict(addr.getDistrict());
