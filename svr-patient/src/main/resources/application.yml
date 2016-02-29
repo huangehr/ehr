@@ -50,6 +50,9 @@ fast-dfs:
 
 server:
   port: 9007
+security:
+  user:
+    password: patient
 
 info:
   app:

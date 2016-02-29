@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.Collection;
+import java.util.List;
+
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 /**
@@ -15,6 +18,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  */
 @FeignClient(MicroServices.DictMgr)
 @RequestMapping(value = "/api/v1.0")
+@ApiIgnore
 public interface ConventionalDictClient {
 
     @ApiIgnore
@@ -29,7 +33,7 @@ public interface ConventionalDictClient {
     @RequestMapping(value = "/dictionaries/user_type", method = GET )
     MConventionalDict getUserType(@RequestParam(value = "code") String code);
 
-    @ApiIgnore
+
     @RequestMapping(value = "/dictionaries/residence_type", method = GET )
     MConventionalDict getResidenceType(@RequestParam(value = "code") String code);
 
@@ -40,6 +44,11 @@ public interface ConventionalDictClient {
     @ApiIgnore
     @RequestMapping(value = "/dictionaries/card_type", method = GET )
     MConventionalDict getCardType(@RequestParam(value = "code") String code);
+
+
+    @RequestMapping(value = "/dictionaries/std_source_types", method = GET )
+    Collection<MConventionalDict> getStdSourceTypeList(@RequestParam(value = "codes") List<String> codes);
+
 
 }
 
