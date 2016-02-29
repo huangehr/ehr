@@ -65,7 +65,7 @@ public class SystemDictControllerTests {
         assertNotEquals("字典明细获取失败", envelop, null);
 
         String fields = "";//"id,name,phonetic_code,reference,author,create_date";
-        String filter = "";
+        String filter = "name=11";
         String sorts = "";
         int page = 1;
         int rows = 15;
@@ -74,7 +74,7 @@ public class SystemDictControllerTests {
         assertNotEquals("字典列表获取失败", envelop, null);
 
         systemDict.setName("test_dict_cms_c");
-        systemDict.setId(201);
+        systemDict.setId(212);
         systemDict.setPhoneticCode("TEST_DICT_CMS_C");
         systemDict.setCreateDate(new Date());
 
@@ -173,9 +173,10 @@ public class SystemDictControllerTests {
         envelop = systemDictController.getStdSourceType("1");
         assertNotEquals("标准来源字典项获取失败", envelop, null);
 
-//        String[] strings = "1,23".split(",");
-//        envelop = systemDictController.getStdSourceTypeList(strings);
-//        assertNotEquals("获取标准来源类型字典项失败", envelop, null);
+        String[] strings = new String[]{"1","2"};
+
+        envelop = systemDictController.getStdSourceTypeList(strings);
+        assertNotEquals("获取标准来源类型字典项失败", envelop, null);
 
         Collection<MConventionalDict> Dict= systemDictController.getUserTypeList();
         assertNotEquals("获取用户类型字典项失败", envelop, null);

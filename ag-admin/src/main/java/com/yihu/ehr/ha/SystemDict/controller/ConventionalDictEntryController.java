@@ -3,6 +3,7 @@ package com.yihu.ehr.ha.SystemDict.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.util.Array_ListUtil;
 import com.yihu.ehr.util.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -319,7 +321,7 @@ public class ConventionalDictEntryController {
 
         Envelop envelop = new Envelop();
 
-        List<MConventionalDict> mConventionalDictList = dictEntryClient.getStdSourceTypeList(codes);
+        List<MConventionalDict> mConventionalDictList = dictEntryClient.getStdSourceTypeList(Array_ListUtil.getList(codes));
 
         envelop.setDetailModelList(mConventionalDictList);
 

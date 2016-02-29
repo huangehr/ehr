@@ -59,7 +59,7 @@ public class SystemDictEntryService extends BaseJpaService<SystemDictEntry, XSys
         if (codes == null) {
             return repo.findByDictId(dictId);
         } else {
-            return repo.findByDictIdAndCodes(dictId, String.join(",", codes));
+            return repo.findByDictIdAndCodes(dictId, codes);
         }
     }
 
