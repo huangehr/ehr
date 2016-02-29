@@ -19,7 +19,8 @@ public enum BizObject {
     ADAPTER((short)0x0008),
     STANDARD((short)0x0009),
     App((short)0x00010),
-    Dict((short)0x0011);
+    Dict((short)0x0011),
+    CdaType((short)0x0012);
 
     public short getBizObject(){
         return bizObject;

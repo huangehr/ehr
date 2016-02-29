@@ -251,12 +251,10 @@ public class CDADocumentManager {
     /**
      * 保存CDA信息
      *
-     * @param xCDA
+     * @param cdaDocument
      */
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public boolean saveDocument(CDADocument xCDA) {
+    public boolean saveDocument(CDADocument cdaDocument) {
 
-        CDADocument cdaDocument = (CDADocument) xCDA;
         Session session = currentSession();
 
         String strTableName = CDAVersionUtil.getCDATableName(cdaDocument.getVersionCode());
@@ -398,14 +396,14 @@ public class CDADocumentManager {
 
             //获取数据元
             //// TODO: 2016/2/5
-//            List<MetaData> xMetaDatas = dataSet.getMetaDataList();
-            List<MetaData> xMetaDatas = null;
+//            List<MetaData> metaDatas = dataSet.getMetaDataList();
+            List<MetaData> metaDatas = null;
 
-            for (int j = 0; j < xMetaDatas.size(); j++) {
+            for (int j = 0; j < metaDatas.size(); j++) {
                 Element rowEle = doc.createElement("xs:element");
-                rowEle.setAttribute("code", xMetaDatas.get(j).getCode());
+                rowEle.setAttribute("code", metaDatas.get(j).getCode());
 
-                String strColumnType = xMetaDatas.get(j).getColumnType().equals("") ? "VARCHAR" : xMetaDatas.get(j).getColumnType();
+                String strColumnType = metaDatas.get(j).getColumnType().equals("") ? "VARCHAR" : metaDatas.get(j).getColumnType();
 
                 rowEle.setAttribute("type", "xs:" + strColumnType);
                 rowSet.appendChild(rowEle);
