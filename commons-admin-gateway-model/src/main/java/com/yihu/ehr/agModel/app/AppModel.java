@@ -4,14 +4,14 @@ package com.yihu.ehr.agModel.app;
  * Created by yww on 2016/2/23.
  */
 public class AppModel {
-    String id;
-    String name;
-    String secret;
-    String catalogCode;
-    String catalogName;
-    String url;
-    String statusCode;
-    String statusName;
+    private String id;
+    private String name;
+    private String secret;
+    private String catalog;
+    private String catalogName;
+    private String url;
+    private String status;
+    private String statusName;
 
     public String getId() {
         return id;
@@ -37,12 +37,12 @@ public class AppModel {
         this.secret = secret;
     }
 
-    public String getCatalogCode() {
-        return catalogCode;
+    public String getCatalog() {
+        return catalog;
     }
 
-    public void setCatalogCode(String catalogCode) {
-        this.catalogCode = catalogCode;
+    public void setCatalog(String catalog) {
+        this.catalog = catalog;
     }
 
     public String getCatalogName() {
@@ -61,12 +61,12 @@ public class AppModel {
         this.url = url;
     }
 
-    public String getStatusCode() {
-        return statusCode;
+    public String getStatus() {
+        return status;
     }
 
-    public void setStatusCode(String statusCode) {
-        this.statusCode = statusCode;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getStatusName() {

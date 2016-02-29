@@ -118,7 +118,7 @@ public class StandardSource {
         this.update_user = update_user;
     }
 
-    @Transient
+    @Column(name = "hash")
     public int getHashCode() {
         hashCode = Objects.hash(code, create_date, create_user, description, id, name, update_date, update_user, sourceType);
         return hashCode;

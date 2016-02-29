@@ -4,10 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.util.controller.BaseRestController;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author lincl
@@ -16,7 +20,19 @@ import java.lang.reflect.Type;
  */
 public class ExtendController<T>  extends BaseRestController{
 
+    protected Long[] strToLongArr(String str){
 
+        return strArrToLongArr(str.split(","));
+    }
+
+    protected Long[] strArrToLongArr(String[] strArr){
+
+        Long[] rs = new Long[strArr.length];
+        for (int i=0; i< strArr.length; i++){
+            rs[i] = Long.valueOf(strArr[i]);
+        }
+        return rs;
+    }
     protected <T> T jsonToObj(String json ,Class<T> clz) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.readValue(json, clz);

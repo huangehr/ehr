@@ -10,22 +10,27 @@ import java.util.Date;
 public class PatientDetailModel {
     private String idCardNo;                       // 身份证
     private Date birthday;                            // 出生日期
-    private GeographyModel birthPlace;                    // 出生地
+    private String birthPlace;
+    private GeographyModel birthPlaceInfo;                    // 户籍地址
     private String birthPlaceFull;
-    private GeographyModel nativePlace;                    // 籍贯
-    private String nativePlaceFull;
+    private String nativePlace;
     private String email;                            // 邮箱
     private String gender;                            // 性别
     private String name;                            // 姓名
     private String martialStatus;            // 婚姻情况
+    private String martialStatusName;
     private String nation;                            // 民族
+    private String nationName;
     private String residenceType;            // 户口性质（农村、城镇）
-    private GeographyModel workAddress;                    // 工作地址
+    private String residenceTypeName;
+    private String workAddress;
+    private GeographyModel workAddressInfo;                    // 工作地址
     private String workAddressFull;
-    private GeographyModel homeAddress;                    // 家庭地址
+    private String homeAddress;
+    private GeographyModel homeAddressInfo;                    // 家庭地址
     private String homeAddressFull;
     private String password;                        //密码
-    private String telphoneNo ;                     // 电话号码，之前是个电话号码列表
+    private String telephoneNo ;                     // 电话号码，之前是个电话号码列表
     private String picPath = "";
     private String localPath = "";
 
@@ -43,22 +48,6 @@ public class PatientDetailModel {
 
     public void setBirthday(Date birthday) {
         this.birthday = birthday;
-    }
-
-    public GeographyModel getBirthPlace() {
-        return birthPlace;
-    }
-
-    public void setBirthPlace(GeographyModel birthPlace) {
-        this.birthPlace = birthPlace;
-    }
-
-    public GeographyModel getNativePlace() {
-        return nativePlace;
-    }
-
-    public void setNativePlace(GeographyModel nativePlace) {
-        this.nativePlace = nativePlace;
     }
 
     public String getEmail() {
@@ -105,26 +94,6 @@ public class PatientDetailModel {
         return residenceType;
     }
 
-    public void setResidenceType(String residenceType) {
-        this.residenceType = residenceType;
-    }
-
-    public GeographyModel getWorkAddress() {
-        return workAddress;
-    }
-
-    public void setWorkAddress(GeographyModel workAddress) {
-        this.workAddress = workAddress;
-    }
-
-    public GeographyModel getHomeAddress() {
-        return homeAddress;
-    }
-
-    public void setHomeAddress(GeographyModel homeAddress) {
-        this.homeAddress = homeAddress;
-    }
-
     public String getPassword() {
         return password;
     }
@@ -133,12 +102,12 @@ public class PatientDetailModel {
         this.password = password;
     }
 
-    public String getTelphoneNo() {
-        return telphoneNo;
+    public String getTelephoneNo() {
+        return telephoneNo;
     }
 
-    public void setTelphoneNo(String telphoneNo) {
-        this.telphoneNo = telphoneNo;
+    public void setTelephoneNo(String telephoneNo) {
+        this.telephoneNo = telephoneNo;
     }
 
     public String getPicPath() {
@@ -165,14 +134,6 @@ public class PatientDetailModel {
         this.birthPlaceFull = birthPlaceFull;
     }
 
-    public String getNativePlaceFull() {
-        return nativePlaceFull;
-    }
-
-    public void setNativePlaceFull(String nativePlaceFull) {
-        this.nativePlaceFull = nativePlaceFull;
-    }
-
     public String getWorkAddressFull() {
         return workAddressFull;
     }
@@ -187,5 +148,89 @@ public class PatientDetailModel {
 
     public void setHomeAddressFull(String homeAddressFull) {
         this.homeAddressFull = homeAddressFull;
+    }
+
+    public String getMartialStatusName() {
+        return martialStatusName;
+    }
+
+    public void setMartialStatusName(String martialStatusName) {
+        this.martialStatusName = martialStatusName;
+    }
+
+    public String getNationName() {
+        return nationName;
+    }
+
+    public void setNationName(String nationName) {
+        this.nationName = nationName;
+    }
+
+    public String getResidenceTypeName() {
+        return residenceTypeName;
+    }
+
+    public void setResidenceTypeName(String residenceTypeName) {
+        this.residenceTypeName = residenceTypeName;
+    }
+
+    public String getBirthPlace() {
+        return birthPlace;
+    }
+
+    public void setBirthPlace(String birthPlace) {
+        this.birthPlace = birthPlace;
+    }
+
+    public GeographyModel getBirthPlaceInfo() {
+        return birthPlaceInfo;
+    }
+
+    public void setBirthPlaceInfo(GeographyModel birthPlaceInfo) {
+        this.birthPlaceInfo = birthPlaceInfo;
+    }
+
+    public String getNativePlace() {
+        return nativePlace;
+    }
+
+    public void setNativePlace(String nativePlace) {
+        this.nativePlace = nativePlace;
+    }
+
+    public void setResidenceType(String residenceType) {
+        this.residenceType = residenceType;
+    }
+
+    public String getWorkAddress() {
+        return workAddress;
+    }
+
+    public void setWorkAddress(String workAddress) {
+        this.workAddress = workAddress;
+    }
+
+    public GeographyModel getWorkAddressInfo() {
+        return workAddressInfo;
+    }
+
+    public void setWorkAddressInfo(GeographyModel workAddressInfo) {
+        this.workAddressInfo = workAddressInfo;
+    }
+
+    public String getHomeAddress() {
+        return homeAddress;
+    }
+
+    public void setHomeAddress(String homeAddress) {
+        this.homeAddress = homeAddress;
+    }
+
+    public GeographyModel getHomeAddressInfo() {
+        return homeAddressInfo;
+    }
+
+    public void setHomeAddressInfo(GeographyModel homeAddressInfo) {
+        this.homeAddressInfo = homeAddressInfo;
     }
 }

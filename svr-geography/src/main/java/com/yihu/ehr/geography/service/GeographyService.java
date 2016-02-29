@@ -185,7 +185,7 @@ public class GeographyService extends BaseJpaService<Geography,XGeographyReposit
     }
 
     public List<Geography> isGeographyExist(Geography geography) throws Exception {
-        String hql = PoUtil.getHql(geography);
+        String hql = PoUtil.getHql(geography,"id","postalCode");
         Session session = currentSession();
         Query query = session.createQuery(hql);
         List<Geography> list = query.list();

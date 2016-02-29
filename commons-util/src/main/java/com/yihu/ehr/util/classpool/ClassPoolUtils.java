@@ -82,7 +82,11 @@ public class ClassPoolUtils {
     }
 
     public static String classNameTofilePath(String clzName) {
-        return ClassPoolUtils.class.getClassLoader().getResource("").getPath()
+        String path = ClassPoolUtils.class.getClassLoader().getResource("").getPath();
+        if(path.indexOf("test-classes")!=-1){
+            path = path.replace("test-classes", "classes");
+        }
+        return path
                 + clzName.replace(".", "/") + ".class";
     }
 }

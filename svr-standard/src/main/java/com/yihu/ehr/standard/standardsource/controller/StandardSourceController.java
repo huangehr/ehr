@@ -61,11 +61,11 @@ public class StandardSourceController extends ExtendController<MStdSource>{
     }
 
 
-    @RequestMapping(value = "/source", method = RequestMethod.GET)
+    @RequestMapping(value = "/source/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取标准来源信息")
     public MStdSource getStdSource(
             @ApiParam(name = "id", value = "标准来源编号", defaultValue = "")
-            @RequestParam(value = "id") String id) {
+            @PathVariable(value = "id") String id) {
 
         return getModel(stdSourceService.retrieve(id));
     }
@@ -73,7 +73,7 @@ public class StandardSourceController extends ExtendController<MStdSource>{
 
     @RequestMapping(value = "/source/{id}", method = RequestMethod.PUT)
     @ApiOperation(value = "修改标准来源，通过id取数据，取不到数据时新增，否则修改")
-    public Object updateStdSource(
+    public boolean updateStdSource(
             @ApiParam(name = "id", value = "标准来源编号", defaultValue = "")
             @PathVariable(value = "id") String id,
             @ApiParam(name = "code", value = "编码", defaultValue = "")
@@ -100,7 +100,7 @@ public class StandardSourceController extends ExtendController<MStdSource>{
 
     @RequestMapping(value = "/source", method = RequestMethod.POST)
     @ApiOperation(value = "新增标准来源")
-    public Object updateStdSource(
+    public boolean addStdSource(
             @ApiParam(name = "code", value = "编码", defaultValue = "")
             @RequestParam(value = "code") String code,
             @ApiParam(name = "name", value = "名称", defaultValue = "")
@@ -129,11 +129,11 @@ public class StandardSourceController extends ExtendController<MStdSource>{
         return stdSourceService.deleteSource(Arrays.asList(idArr)) != -1;
     }
 
-    @RequestMapping(value = "/source", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/source/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "通过id删除标准来源")
     public boolean delStdSource(
             @ApiParam(name = "id", value = "标准来源编号", defaultValue = "")
-            @RequestParam(value = "id") String id) throws Exception{
+            @PathVariable(value = "id") String id) throws Exception{
 
         stdSourceService.delete(id);
         return true;
