@@ -19,10 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author zlf
@@ -95,9 +92,12 @@ public class OrganizationController extends BaseRestController {
      */
     @RequestMapping(value = "/organizations" , method = RequestMethod.POST)
     @ApiOperation(value = "创建机构")
-    public MOrganization create(String orgJsonData ) throws Exception{
+    public MOrganization create(
+            @ApiParam(name = "mOrganizationJsonData", value = "机构代码", defaultValue = "")
+            @RequestParam(value = "mOrganizationJsonData") String orgJsonData) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
         Organization org = objectMapper.readValue(orgJsonData, Organization.class);
+        org.setCreateDate(new Date());
         org.setActivityFlag(1);
         orgService.save(org);
         return convertToModel(org,MOrganization.class);
@@ -106,9 +106,10 @@ public class OrganizationController extends BaseRestController {
     @RequestMapping(value = "organizations" , method = RequestMethod.PUT)
     @ApiOperation(value = "修改机构")
     public MOrganization update(
-            String jsonData ) throws Exception{
+            @ApiParam(name = "mOrganizationJsonData", value = "机构代码", defaultValue = "")
+            @RequestParam(value = "mOrganizationJsonData") String orgJsonData) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
-        Organization org = objectMapper.readValue(jsonData, Organization.class);
+        Organization org = objectMapper.readValue(orgJsonData, Organization.class);
         orgService.save(org);
         return convertToModel(org,MOrganization.class);
     }
@@ -158,7 +159,7 @@ public class OrganizationController extends BaseRestController {
             @ApiParam(name = "activity_flag", value = "状态", defaultValue = "")
             @PathVariable(value = "activity_flag") int activityFlag) throws Exception{
         Organization org = orgService.getOrg(orgCode);
-        if("1".equals(activityFlag)){
+        if(org.getActivityFlag()==1){
             org.setActivityFlag(0);
         }else{
             org.setActivityFlag(1);
@@ -171,6 +172,7 @@ public class OrganizationController extends BaseRestController {
      * 根据地址获取机构下拉列表
      * @param province
      * @param city
+     * @param district
      * @return
      */
     @RequestMapping(value = "organizations/geography" , method = RequestMethod.GET)
@@ -180,7 +182,7 @@ public class OrganizationController extends BaseRestController {
             @RequestParam(value = "province") String province,
             @ApiParam(name = "city", value = "市")
             @RequestParam(value = "city") String city,
-            @ApiParam(name = "district", value = "市")
+            @ApiParam(name = "district", value = "县")
             @RequestParam(value = "district") String district) {
         List<Organization> orgList = orgService.searchByAddress(province,city,district);
         return (List<MOrganization>)convertToModels(orgList, new ArrayList<MOrganization>(orgList.size()), MOrganization.class,null);
