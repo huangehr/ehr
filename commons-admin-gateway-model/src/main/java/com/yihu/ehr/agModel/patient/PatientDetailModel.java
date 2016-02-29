@@ -11,11 +11,9 @@ public class PatientDetailModel {
     private String idCardNo;                       // 身份证
     private Date birthday;                            // 出生日期
     private String birthPlace;
-    private GeographyModel birthPlaceInfo;                    // 出生地
+    private GeographyModel birthPlaceInfo;                    // 户籍地址
     private String birthPlaceFull;
     private String nativePlace;
-    private GeographyModel nativePlaceInfo;                    // 籍贯
-    private String nativePlaceFull;
     private String email;                            // 邮箱
     private String gender;                            // 性别
     private String name;                            // 姓名
@@ -32,7 +30,7 @@ public class PatientDetailModel {
     private GeographyModel homeAddressInfo;                    // 家庭地址
     private String homeAddressFull;
     private String password;                        //密码
-    private String telphoneNo ;                     // 电话号码，之前是个电话号码列表
+    private String telephoneNo ;                     // 电话号码，之前是个电话号码列表
     private String picPath = "";
     private String localPath = "";
 
@@ -104,12 +102,12 @@ public class PatientDetailModel {
         this.password = password;
     }
 
-    public String getTelphoneNo() {
-        return telphoneNo;
+    public String getTelephoneNo() {
+        return telephoneNo;
     }
 
-    public void setTelphoneNo(String telphoneNo) {
-        this.telphoneNo = telphoneNo;
+    public void setTelephoneNo(String telephoneNo) {
+        this.telephoneNo = telephoneNo;
     }
 
     public String getPicPath() {
@@ -134,14 +132,6 @@ public class PatientDetailModel {
 
     public void setBirthPlaceFull(String birthPlaceFull) {
         this.birthPlaceFull = birthPlaceFull;
-    }
-
-    public String getNativePlaceFull() {
-        return nativePlaceFull;
-    }
-
-    public void setNativePlaceFull(String nativePlaceFull) {
-        this.nativePlaceFull = nativePlaceFull;
     }
 
     public String getWorkAddressFull() {
@@ -206,14 +196,6 @@ public class PatientDetailModel {
 
     public void setNativePlace(String nativePlace) {
         this.nativePlace = nativePlace;
-    }
-
-    public GeographyModel getNativePlaceInfo() {
-        return nativePlaceInfo;
-    }
-
-    public void setNativePlaceInfo(GeographyModel nativePlaceInfo) {
-        this.nativePlaceInfo = nativePlaceInfo;
     }
 
     public void setResidenceType(String residenceType) {

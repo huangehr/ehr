@@ -1,7 +1,5 @@
 package com.yihu.ehr.ha.security.controller;
 
-import com.sun.xml.internal.messaging.saaj.soap.Envelope;
-import com.yihu.ehr.agModel.security.UserSecurityModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.security.service.SecurityClient;
 import com.yihu.ehr.model.security.MUserSecurity;
@@ -9,16 +7,18 @@ import com.yihu.ehr.util.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created by AndyCai on 2016/2/1.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersion.Version1_0 )
+@RequestMapping(ApiVersion.Version1_0 +"/admin")
 @RestController
 @Api(value = "sec", description = "安全管理接口，用于安全验证管理", tags = {"安全管理接口"})
 public class SecurityController {

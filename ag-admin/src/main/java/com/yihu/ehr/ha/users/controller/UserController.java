@@ -71,11 +71,11 @@ public class UserController extends BaseController {
         SimpleDateFormat sdf = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss ");
         for (MUser mUser : mUsers) {
             UsersModel usersModel = convertToModel(mUser, UsersModel.class);
-            //TODO:获取用户类别字典
+            //获取用户类别字典
             MConventionalDict dict = conventionalDictClient.getUserType(mUser.getUserType());
             usersModel.setUserTypeName(dict == null ? "" : dict.getValue());
 
-            //TODO:获取机构信息
+            //获取机构信息
             MOrganization organization = orgClient.getOrg(mUser.getOrganization());
             usersModel.setOrganizationName(organization == null ? "" : organization.getFullName());
 

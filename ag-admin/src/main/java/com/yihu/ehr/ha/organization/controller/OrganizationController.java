@@ -208,7 +208,7 @@ public class OrganizationController extends BaseController {
 
         org.setAdmin(mOrg.getAdmin());
         org.setTel(mOrg.getTel());
-        org.setTags(mOrg.getTags());
+       // org.setTags(mOrg.getTags());
         //获取地址字典值明细
         String locationId = mOrg.getLocation();
         MGeography addr = addressClient.getAddressById(locationId);

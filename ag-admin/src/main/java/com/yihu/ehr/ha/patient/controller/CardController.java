@@ -13,6 +13,7 @@ import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,17 +63,30 @@ public class CardController extends BaseController {
         List<MAbstractCard> mAbstractCards = (List<MAbstractCard>)envelop.getDetailModelList();
         List<CardModel> cardModels = new ArrayList<>();
 
-        for (MAbstractCard info : mAbstractCards) {
-            CardModel cardModel = convertToModel(info, CardModel.class);
+        for (int i=0;i<mAbstractCards.size();i++) {
 
-            MConventionalDict dict = conventionalDictEntryClient.getCardType(cardModel.getType());
-            cardModel.setTypeName(dict.getValue());
+            CardModel cardModel = new CardModel();
+            cardModel.setId(mAbstractCards.get(i).getId());
+            cardModel.setNumber(mAbstractCards.get(i).getNumber());
+            cardModel.setOwnerName(mAbstractCards.get(i).getOwnerName());
+            cardModel.setReleaseOrg(mAbstractCards.get(i).getReleaseOrg());
+            cardModel.setStatus(mAbstractCards.get(i).getStatus());
+            cardModel.setType(mAbstractCards.get(i).getType());
+            cardModel.setCreateDate(mAbstractCards.get(i).getCreateDate());
 
-            dict = conventionalDictEntryClient.getCardStatus(cardModel.getStatus());
-            cardModel.setStatusName(dict.getValue());
-
-            MOrganization organization = orgClient.getOrg(cardModel.getReleaseOrg());
-            cardModel.setReleaseOrgName(organization.getFullName());
+            MConventionalDict dict =null;
+            if(!StringUtils.isEmpty(cardModel.getType())) {
+                dict = conventionalDictEntryClient.getCardType(cardModel.getType());
+                cardModel.setTypeName(dict.getValue());
+            }
+            if (!StringUtils.isEmpty(cardModel.getStatus())) {
+                dict = conventionalDictEntryClient.getCardStatus(cardModel.getStatus());
+                cardModel.setStatusName(dict.getValue());
+            }
+            if(!StringUtils.isEmpty(cardModel.getReleaseOrg())) {
+                MOrganization organization = orgClient.getOrg(cardModel.getReleaseOrg());
+                cardModel.setReleaseOrgName(organization.getFullName());
+            }
 
             cardModels.add(cardModel);
         }
@@ -103,21 +117,35 @@ public class CardController extends BaseController {
             @RequestParam(value = "rows") Integer rows) throws Exception {
 
         Envelop envelop = cardClient.searchCardUnBinding(number, cardType, page, rows);
-        List<MAbstractCard> mAbstractCards = (List<MAbstractCard>)envelop.getDetailModelList();
+        List<MAbstractCard> mAbstractCards = envelop.getDetailModelList();
         List<CardModel> cardModels = new ArrayList<>();
 
-        for (MAbstractCard info : mAbstractCards) {
-            CardModel cardModel = convertToModel(info, CardModel.class);
+        for (int i=0;i<mAbstractCards.size();i++) {
 
-            MConventionalDict dict = conventionalDictEntryClient.getCardType(cardModel.getType());
-            cardModel.setTypeName(dict.getValue());
+           // MAbstractCard card = (MAbstractCard)mAbstractCards.get(i);
 
-            dict = conventionalDictEntryClient.getCardStatus(cardModel.getStatus());
-            cardModel.setStatusName(dict.getValue());
+            CardModel cardModel = new CardModel();
+            cardModel.setId(mAbstractCards.get(i).getId());
+            cardModel.setNumber(mAbstractCards.get(i).getNumber());
+            cardModel.setOwnerName(mAbstractCards.get(i).getOwnerName());
+            cardModel.setReleaseOrg(mAbstractCards.get(i).getReleaseOrg());
+            cardModel.setStatus(mAbstractCards.get(i).getStatus());
+            cardModel.setType(mAbstractCards.get(i).getType());
+            cardModel.setCreateDate(mAbstractCards.get(i).getCreateDate());
 
-            MOrganization organization = orgClient.getOrg(cardModel.getReleaseOrg());
-            cardModel.setReleaseOrgName(organization.getFullName());
-
+            MConventionalDict dict =null;
+            if(!StringUtils.isEmpty(cardModel.getType())) {
+                dict = conventionalDictEntryClient.getCardType(cardModel.getType());
+                cardModel.setTypeName(dict.getValue());
+            }
+            if (!StringUtils.isEmpty(cardModel.getStatus())) {
+                dict = conventionalDictEntryClient.getCardStatus(cardModel.getStatus());
+                cardModel.setStatusName(dict.getValue());
+            }
+            if(!StringUtils.isEmpty(cardModel.getReleaseOrg())) {
+                MOrganization organization = orgClient.getOrg(cardModel.getReleaseOrg());
+                cardModel.setReleaseOrgName(organization.getFullName());
+            }
             cardModels.add(cardModel);
         }
 

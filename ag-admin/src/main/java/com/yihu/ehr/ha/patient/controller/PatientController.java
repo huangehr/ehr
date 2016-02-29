@@ -19,7 +19,6 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,16 +57,17 @@ public class PatientController extends BaseController {
             @ApiParam(name = "page", value = "当前页", defaultValue = "")
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
-            @RequestParam(value = "rows") Integer rows,
-            HttpServletResponse response) throws Exception {
+            @RequestParam(value = "rows") Integer rows) throws Exception {
 
         Envelop envelop = patientClient.searchPatient(name, idCardNo, province, city, district, page, rows);
         List<MDemographicInfo> demographicInfos = (List<MDemographicInfo>) envelop.getDetailModelList();
         List<PatientModel> patients = new ArrayList<>();
-        for (MDemographicInfo patientInfo : demographicInfos) {
-            PatientModel patient = convertToModel(patientInfo, PatientModel.class);
+        //for (MDemographicInfo patientInfo : demographicInfos) {
+        for(int i=0;i<demographicInfos.size();i++){
+
+            PatientModel patient = convertToModel(demographicInfos.get(i), PatientModel.class);
             //TODO:获取家庭地址信息
-            String homeAddressId = "";//patientInfo.getHomeAddress()
+            String homeAddressId = demographicInfos.get(i).getHomeAddress();
             MGeography geography = addressClient.getAddressById(homeAddressId);
             String homeAddress = "";
             if (geography != null) {
@@ -148,6 +148,8 @@ public class PatientController extends BaseController {
             @ApiParam(name = "patientModelJsonData", value = "身份证号", defaultValue = "")
             @RequestParam(value = "patientModelJsonData") String patientModelJsonData) throws Exception {
 
+        //TODO:身份证校验
+
         PatientDetailModel detailModel = objectMapper.readValue(patientModelJsonData, PatientDetailModel.class);
         //新增家庭地址信息
         GeographyModel geographyModel = detailModel.getHomeAddressInfo();
@@ -175,7 +177,8 @@ public class PatientController extends BaseController {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
         //新增人口信息
-        MDemographicInfo info = patientClient.createPatient(objectMapper.writeValueAsString(detailModel));
+        MDemographicInfo info = (MDemographicInfo)convertToModel(detailModel,MDemographicInfo.class);
+        info = patientClient.createPatient(objectMapper.writeValueAsString(info));
         if (info == null) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("保存失败!");
@@ -198,6 +201,8 @@ public class PatientController extends BaseController {
     public Envelop updatePatient(
             @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
             @RequestParam(value = "patient_model_json_data") String patientModelJsonData) throws Exception {
+
+        //TODO:身份证校验
 
         PatientDetailModel detailModel = objectMapper.readValue(patientModelJsonData, PatientDetailModel.class);
         //新增家庭地址信息
@@ -226,12 +231,14 @@ public class PatientController extends BaseController {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
         //修改人口信息
-        MDemographicInfo info = patientClient.updatePatient(objectMapper.writeValueAsString(detailModel));
+        MDemographicInfo info = (MDemographicInfo)convertToModel(detailModel,MDemographicInfo.class);
+        info = patientClient.updatePatient(objectMapper.writeValueAsString(info));
         if (info == null) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("保存失败!");
             return envelop;
         }
+
         detailModel = MDemographicInfoToPatientDetailModel(info);
         envelop.setObj(detailModel);
         return envelop;
@@ -259,26 +266,33 @@ public class PatientController extends BaseController {
         MConventionalDict dict = conventionalDictClient.getMartialStatus(detailModel.getMartialStatus());
         detailModel.setMartialStatusName(dict == null ? "" : dict.getValue());
 
-        dict = conventionalDictClient.getMartialStatus(detailModel.getNation());
+        dict = conventionalDictClient.getNation(detailModel.getNation());
         detailModel.setNationName(dict == null ? "" : dict.getValue());
 
-        //家庭地址
-        MGeography mGeography = addressClient.getAddressById(demographicInfo.getHomeAddress());
-        if (mGeography != null) {
-            detailModel.setHomeAddressFull(getFullAddress(mGeography));
-            detailModel.setHomeAddressInfo(convertToModel(mGeography, GeographyModel.class));
+        MGeography mGeography =null;
+        if(!StringUtils.isEmpty(demographicInfo.getHomeAddress())) {
+            //家庭地址
+            mGeography = addressClient.getAddressById(demographicInfo.getHomeAddress());
+            if (mGeography != null) {
+                detailModel.setHomeAddressFull(getFullAddress(mGeography));
+                detailModel.setHomeAddressInfo(convertToModel(mGeography, GeographyModel.class));
+            }
         }
-        //户籍地址
-        mGeography = addressClient.getAddressById(demographicInfo.getBirthPlace());
-        if (mGeography != null) {
-            detailModel.setBirthPlaceFull(getFullAddress(mGeography));
-            detailModel.setBirthPlaceInfo(convertToModel(mGeography, GeographyModel.class));
+        if(!StringUtils.isEmpty(demographicInfo.getBirthPlace())) {
+            //户籍地址
+            mGeography = addressClient.getAddressById(demographicInfo.getBirthPlace());
+            if (mGeography != null) {
+                detailModel.setBirthPlaceFull(getFullAddress(mGeography));
+                detailModel.setBirthPlaceInfo(convertToModel(mGeography, GeographyModel.class));
+            }
         }
         //工作地址
-        mGeography = addressClient.getAddressById(demographicInfo.getWorkAddress());
-        if (mGeography != null) {
-            detailModel.setWorkAddressFull(getFullAddress(mGeography));
-            detailModel.setWorkAddressInfo(convertToModel(mGeography, GeographyModel.class));
+        if(!StringUtils.isEmpty(demographicInfo.getWorkAddress())) {
+            mGeography = addressClient.getAddressById(demographicInfo.getWorkAddress());
+            if (mGeography != null) {
+                detailModel.setWorkAddressFull(getFullAddress(mGeography));
+                detailModel.setWorkAddressInfo(convertToModel(mGeography, GeographyModel.class));
+            }
         }
         return detailModel;
     }
