@@ -123,4 +123,22 @@ public class BaseController extends AbstractController {
 
         return result;
     }
+
+    public String trimEnd(String param,String trimChars)
+    {
+        if(param.endsWith(trimChars))
+        {
+            param = param.substring(0,param.length()-trimChars.length());
+        }
+        return param;
+    }
+
+    public String trimStart(String param,String trimChars)
+    {
+        if(param.startsWith(trimChars))
+        {
+            param = param.substring(trimChars.length(),param.length());
+        }
+        return param;
+    }
 }
