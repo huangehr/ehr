@@ -15,10 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author lincl
@@ -51,7 +48,7 @@ public class DictController extends ExtendController<MStdDict> {
 
     @RequestMapping(value = "/dicts", method = RequestMethod.GET)
     @ApiOperation(value = "查询字典")
-    public Collection searchDataSets(
+    public Collection<MStdDict> searchDataSets(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -160,12 +157,26 @@ public class DictController extends ExtendController<MStdDict> {
 
     @RequestMapping(value = "/dict/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据CdaVersion及字典ID查询相应版本的字典详细信息")
-    public Object getCdaDictInfo(
+    public MStdDict getCdaDictInfo(
             @ApiParam(name = "id", value = "字典编号", defaultValue = "")
             @RequestParam(value = "id") long id,
             @ApiParam(name = "version", value = "版本编号", defaultValue = "")
             @RequestParam(value = "version") String version) throws Exception{
 
         return getModel(dictService.retrieve(id, getServiceEntity(version)));
+    }
+
+
+    @RequestMapping(value = "/dict/map", method = RequestMethod.GET)
+    @ApiOperation(value = "获取字典 map集")
+    public Map getDictMapByIds(
+            @ApiParam(name = "version", value = "版本号", defaultValue = "")
+            @RequestParam(value = "version") String version,
+            @ApiParam(name = "dataSetId", value = "数据集编号", defaultValue = "")
+            @RequestParam(value = "dataSetId") Long dataSetId,
+            @ApiParam(name = "metaDataId", value = "数据元编号", defaultValue = "")
+            @RequestParam(value = "metaDataId") Long metaDataId) {
+
+        return dictService.getDictMapByIds(version, dataSetId, metaDataId);
     }
 }
