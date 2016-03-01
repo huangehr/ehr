@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * ½¡¿µµµ°¸ä¯ÀÀÆ÷Ä£°å¹ÜÀí¿ØÖÆÆ÷¡£
+ * å¥åº·æ¡£æ¡ˆæµè§ˆå™¨æ¨¡æ¿ç®¡ç†æ§åˆ¶å™¨ã€‚
  *
  * @author Sand
  * @version 1.0
@@ -30,7 +30,7 @@ public class ArchiveTplMgrController extends BaseRestController {
     private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
     private static   String username = ResourceProperties.getProperty("username");
     private static   String password = ResourceProperties.getProperty("password");
-    private static   String module = ResourceProperties.getProperty("module");  //Ä¿Ç°¶¨ÒåÎªrest
+    private static   String module = ResourceProperties.getProperty("module");  //Ä¿Ç°ï¿½ï¿½ï¿½ï¿½Îªrest
     private static   String version = ResourceProperties.getProperty("version");
     private static   String comUrl = host + module + version;
 
@@ -51,7 +51,7 @@ public class ArchiveTplMgrController extends BaseRestController {
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             model.addAttribute("tpl", resultStr);
-            //todo: province + city + orgCode×é×°£¬Ç°Ì¨½âÎö
+            //todo: province + city + orgCode
             url = "/template/local";
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             model.addAttribute("local", resultStr);
@@ -70,7 +70,7 @@ public class ArchiveTplMgrController extends BaseRestController {
 //        if(!StringUtil.isEmpty(idNo)){
 //             id = Integer.valueOf(idNo);
 //        }
-//        //mode¶¨Òå£ºnew modify view copyÄ£Ê½£¬ĞÂÔö£¬ĞŞ¸Ä£¬²é¿´ ¸´ÖÆ
+//        //modeå®šä¹‰ï¼šnew modify view copyæ¨¡å¼ï¼Œæ–°å¢ï¼Œä¿®æ”¹ï¼ŒæŸ¥çœ‹ å¤åˆ¶
 //        if(mode.equals("view")){
 //            tpl = tplManager.getArchiveTemplate(id);
 //            org = tpl!=null?tpl.getOrg():null;
@@ -111,7 +111,7 @@ public class ArchiveTplMgrController extends BaseRestController {
         params.put("templateId",templateId);
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            //todo: result×ªmodel
+            //todo: result--model
 //            XArchiveTpl archiveTpl = mapper.readValue(resultStr,XArchiveTpl.class);
 //            result.setObj(archiveTpl);
             result.setSuccessFlg(true);
@@ -150,7 +150,7 @@ public class ArchiveTplMgrController extends BaseRestController {
         params.put("orgCode",orgCode);
         try {
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
-            //todo: result×ªmodel
+            //todo: result--model
 //            XArchiveTpl archiveTpl = mapper.readValue(resultStr,XArchiveTpl.class);
 //            result.setObj(archiveTpl);
             result.setSuccessFlg(true);
@@ -191,7 +191,7 @@ public class ArchiveTplMgrController extends BaseRestController {
         params.put("templateModel",templateModel);
         try {
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
-            //todo: result×ªmodel
+            //todo: result--model
 //            XArchiveTpl archiveTpl = mapper.readValue(resultStr,XArchiveTpl.class);
 //            result.setObj(archiveTpl);
             result.setSuccessFlg(true);
@@ -226,7 +226,7 @@ public class ArchiveTplMgrController extends BaseRestController {
         params.put("orgCode",orgCode);
         try {
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
-            //todo: result×ªmodel
+            //todo: result--model
 //            ObjectMapper mapper = new ObjectMapper();
 //            XArchiveTpl archiveTpl = mapper.readValue(resultStr,XArchiveTpl.class);
 //            result.setObj(archiveTpl);
@@ -264,7 +264,7 @@ public class ArchiveTplMgrController extends BaseRestController {
         params.put("templateId",templateId);
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            //todo: result×ªmodel
+            //todo: result--model
 //            TemplateModel templateModel = mapper.readValue(resultStr,TemplateModel.class);
 //            result.setObj(templateModel);
             result.setSuccessFlg(true);
@@ -294,7 +294,7 @@ public class ArchiveTplMgrController extends BaseRestController {
         Map<String, Object> params = new HashMap<>();
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            //todo: result×ªmodel
+            //todo: result--model
 //            ObjectMapper mapper = new ObjectMapper();
 //            List<String> templateList = Arrays.asList(mapper.readValue(resultStr,String[].class));
 //            model.addAttribute("versionList", templateList);
@@ -331,7 +331,7 @@ public class ArchiveTplMgrController extends BaseRestController {
 
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            //todo: result×ªmodel
+            //todo: result--model
 //            ObjectMapper mapper = new ObjectMapper();
 //            TemplateDetailModel templateList = mapper.readValue(resultStr,TemplateDetailModel.class);
 //            result.setObj(templateList);
@@ -440,7 +440,7 @@ public class ArchiveTplMgrController extends BaseRestController {
 
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            //todo: result×ªmodel
+            //todo: result--model
 //            if(resultStr == null){
 //                result.setSuccessFlg(true);
 //                return result;
@@ -484,7 +484,7 @@ public class ArchiveTplMgrController extends BaseRestController {
 
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            //todo: result×ªmodel
+            //todo: result--model
 //            if(resultStr == null){
 //                result.setSuccessFlg(true);
 //                return result;

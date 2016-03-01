@@ -11,14 +11,11 @@ import com.yihu.ehr.util.log.LogService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,7 +39,7 @@ public class SystemDictController extends BaseRestController {
 
     @RequestMapping("createDict")
     @ResponseBody
-    public Object createDict(String name, String reference, @ModelAttribute(SessionAttributeKeys.CurrentUser) XUser user) {
+    public Object createDict(String name, String reference, String userId) {
         Envelop result = new Envelop();
         if(StringUtils.isEmpty(name)){
             result.setSuccessFlg(false);
@@ -62,7 +59,7 @@ public class SystemDictController extends BaseRestController {
             }
             String url = "/sys_dict/dictionaries";
             params.put("reference",reference);
-            params.put("userId",user.getId());
+            params.put("userId",userId);
             String _rus = HttpClientUtil.doPost(comUrl+url,params,username,password);
             if (StringUtils.isEmpty(_rus)) {
                 result.setSuccessFlg(false);

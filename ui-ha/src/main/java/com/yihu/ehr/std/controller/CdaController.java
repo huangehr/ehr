@@ -12,12 +12,10 @@ import com.yihu.ehr.util.log.LogService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,15 +38,15 @@ public class CdaController extends BaseRestController {
     }
 
     @RequestMapping("cdaupdate")
-    public String cdaUpdate(Model model, @ModelAttribute(SessionAttributeKeys.CurrentUser) XUser user) {
-        model.addAttribute("User", user);
+    public String cdaUpdate(Model model,String userId) {
+        model.addAttribute("UserId", userId);
         model.addAttribute("contentPage", "std/cda/CDAUpdate");
         return "generalView";
     }
 
     @RequestMapping("cdaBaseInfo")
-    public String cdaBaseInfo(Model model, @ModelAttribute(SessionAttributeKeys.CurrentUser) XUser user) {
-        model.addAttribute("User", user);
+    public String cdaBaseInfo(Model model, String userId) {
+        model.addAttribute("UserId", userId);
         model.addAttribute("contentPage", "std/cda/cdaBaseInfo");
         return "generalView";
     }
@@ -94,7 +92,7 @@ public class CdaController extends BaseRestController {
         /*Result result = new Result();
         if (strVersion == null) {
             result.setSuccessFlg(false);
-            result.setErrorMsg("ÇëÑ¡Ôñ±ê×¼°æ±¾!");
+            result.setErrorMsg("è¯·é€‰æ‹©æ ‡å‡†ç‰ˆæœ¬!");
             return result;
         }
         try {
@@ -123,10 +121,10 @@ public class CdaController extends BaseRestController {
         Envelop result = new Envelop();
         String strErrorMsg = "";
         if (StringUtils.isEmpty(strVersion)) {
-            strErrorMsg += "ÇëÑ¡Ôñ±ê×¼°æ±¾!";
+            strErrorMsg += "è¯·é€‰æ‹©æ ‡å‡†ç‰ˆæœ¬!";
         }
         if (StringUtils.isEmpty(strId)) {
-            strErrorMsg += "ÇëÑ¡Ôñ½«Òª±à¼­µÄCDA!";
+            strErrorMsg += "è¯·é€‰æ‹©å°†è¦ç¼–è¾‘çš„CDA!";
         }
         if (!StringUtils.isEmpty(strErrorMsg)) {
             result.setSuccessFlg(false);
@@ -144,7 +142,7 @@ public class CdaController extends BaseRestController {
                 result.setErrorMsg(ErrorCode.GetCDAInfoFailed.toString());
             }else {
                 result.setSuccessFlg(true);
-                //TODO ÓĞ×ª»»Îª¶ÔÏó
+                //TODO è¦è½¬æ¢ä¸ºå¯¹è±¡
 //                ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
 //                CDAForInterface cdaForInterfaces = objectMapper.readValue(_rus,CDAForInterface.class);
 //                result.setObj(cdaForInterfaces);
@@ -161,10 +159,10 @@ public class CdaController extends BaseRestController {
         try {
             String strErrorMsg = "";
             if (strVersion == null || strVersion == "") {
-                strErrorMsg += "ÇëÑ¡Ôñ±ê×¼°æ±¾!";
+                strErrorMsg += "è¯·é€‰æ‹©æ ‡å‡†ç‰ˆæœ¬!";
             }
             if (strId == null || strId == "") {
-                strErrorMsg += "ÇëÑ¡Ôñ½«Òª±à¼­µÄCDA!";
+                strErrorMsg += "è¯·é€‰æ‹©å°†è¦ç¼–è¾‘çš„CDA!";
             }
             if (strErrorMsg != "") {
                 result.setSuccessFlg(false);
@@ -210,7 +208,7 @@ public class CdaController extends BaseRestController {
     @RequestMapping("getRelationByCdaId")
     @ResponseBody
     public Object getRelationByCdaId(String cdaId, String strVersionCode, String strkey, Integer page, Integer rows) {
-        // TODO ÎŞ¶ÔÓ¦
+        // TODO æ— å¯¹åº”
         Envelop result = new Envelop();
         try {
             String url = "/cda*/************";
@@ -223,7 +221,7 @@ public class CdaController extends BaseRestController {
             String _rus = HttpClientUtil.doGet(comUrl+url,params,username,password);
             if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
-                result.setErrorMsg("¹ØÏµ»ñÈ¡Ê§°Ü!");
+                result.setErrorMsg("å…³ç³»è·å–å¤±è´¥!");
             }else {
                 return _rus;
             }
@@ -254,7 +252,7 @@ public class CdaController extends BaseRestController {
         } catch (Exception ex) {
             LogService.getLogger(CdaController_w.class).error(ex.getMessage());
             result.setSuccessFlg(false);
-            result.setErrorMsg("¹ØÏµ»ñÈ¡Ê§°Ü!");
+            result.setErrorMsg("ï¿½ï¿½Ïµï¿½ï¿½È¡Ê§ï¿½ï¿½!");
         }
         return result;*/
     }
@@ -268,11 +266,11 @@ public class CdaController extends BaseRestController {
             Map<String,Object> params = new HashMap<>();
             params.put("cdaId",cdaId);
             params.put("versionCode",strVersionCode);
-            //TODO ½á¹û×ª»»Îª¶ÔÏóÇÒgetResult(listResult,1,1,1);
+            //TODO ç»“æœè½¬æ¢ä¸ºå¯¹è±¡ä¸”getResult(listResult,1,1,1);
             String _rus = HttpClientUtil.doGet(comUrl+url,params,username,password);
             if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
-                result.setErrorMsg("¹ØÏµ»ñÈ¡Ê§°Ü!");
+                result.setErrorMsg("å…³ç³»è·å–å¤±è´¥!");
             }else {
               result.setSuccessFlg(true);
                 return _rus;
@@ -305,7 +303,7 @@ public class CdaController extends BaseRestController {
         } catch (Exception ex) {
             LogService.getLogger(CdaController_w.class).error(ex.getMessage());
             result.setSuccessFlg(false);
-            result.setErrorMsg("¹ØÏµ»ñÈ¡Ê§°Ü!");
+            result.setErrorMsg("å…³ç³»è·å–å¤±è´¥!");
         }
         return result;*/
     }
@@ -315,26 +313,26 @@ public class CdaController extends BaseRestController {
     public Object SaveCdaInfo(String info) {
         Envelop result = new Envelop();
         String strErrorMsg = "";
-        //todo£ºÇ°Ì¨jsÈ¥×öÎª¿ÕÅĞ¶Ï
-//        if (StringUtils.isEmpty(info.getCode())) {
-//            strErrorMsg += "´úÂë²»ÄÜÎª¿Õ£¡";
-//        }
-//        if (StringUtils.isEmpty(info.getName())) {
-//            strErrorMsg += "Ãû³Æ²»ÄÜÎª¿Õ£¡";
-//        }
-//        if (StringUtils.isEmpty(info.getSourceId())) {
-//            strErrorMsg += "±ê×¼À´Ô´²»ÄÜÎª¿Õ£¡";
-//        }
-//        if (StringUtils.isEmpty(info.getVersionCode())) {
-//            strErrorMsg += "±ê×¼°æ±¾²»ÄÜÎª¿Õ£¡";
-//        }
-//        if (strErrorMsg != "") {
-//            result.setSuccessFlg(false);
-//            result.setErrorMsg(strErrorMsg);
-//            return result;
-//        }
+        //todo å‰å°jsåšä¸ºç©ºåˆ¤æ–­
+//        if (StringUtil.isEmpty(info.getCode())) {
+//        strErrorMsg += "ä»£ç ä¸èƒ½ä¸ºç©ºï¼";
+//    }
+//    if (StringUtil.isEmpty(info.getName())) {
+//        strErrorMsg += "åç§°ä¸èƒ½ä¸ºç©ºï¼";
+//    }
+//    if (StringUtil.isEmpty(info.getSourceId())) {
+//        strErrorMsg += "æ ‡å‡†æ¥æºä¸èƒ½ä¸ºç©ºï¼";
+//    }
+//    if (StringUtil.isEmpty(info.getVersionCode())) {
+//        strErrorMsg += "æ ‡å‡†ç‰ˆæœ¬ä¸èƒ½ä¸ºç©ºï¼";
+//    }
+//    if (strErrorMsg != "") {
+//        result.setSuccessFlg(false);
+//        result.setErrorMsg(strErrorMsg);
+//        return result;
+//    }
         try {
-            //TODO Î¨Ò»ĞÔÑéÖ¤api
+            //TODO å”¯ä¸€æ€§éªŒè¯api
             ObjectMapper objectMapper = new ObjectMapper();
             String cdaInfoJson = objectMapper.writeValueAsString(info);
             String url = "/cda/cda";
@@ -343,7 +341,7 @@ public class CdaController extends BaseRestController {
             String _rus = HttpClientUtil.doPost(comUrl+url,params,username,password);
             if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
-                result.setErrorMsg("CDA±£´æÊ§°Ü£¡");
+                result.setErrorMsg("CDAä¿å­˜å¤±è´¥");
             }else {
                 result.setSuccessFlg(true);
             }
@@ -359,25 +357,25 @@ public class CdaController extends BaseRestController {
             XCDADocument cdaInfo = new CDADocument();
             String strErrorMsg = "";
             if (info.getCode() == null || info.getCode() == "") {
-                strErrorMsg += "´úÂë²»ÄÜÎª¿Õ£¡";
+                strErrorMsg += "ä»£ç ä¸èƒ½ä¸ºç©ºï¼";
             }
             if (info.getName() == null || info.getName() == "") {
-                strErrorMsg += "Ãû³Æ²»ÄÜÎª¿Õ£¡";
+                strErrorMsg += "åç§°ä¸èƒ½ä¸ºç©ºï¼";
             }
             if (info.getSourceId() == null || info.getSourceId() == "") {
-                strErrorMsg += "±ê×¼À´Ô´²»ÄÜÎª¿Õ£¡";
+                strErrorMsg += "æ ‡å‡†æ¥æºä¸èƒ½ä¸ºç©ºï¼";
             }
             if (info.getVersionCode() == null || info.getVersionCode() == "") {
-                strErrorMsg += "±ê×¼°æ±¾²»ÄÜÎª¿Õ£¡";
+                strErrorMsg += "æ ‡å‡†ç‰ˆæœ¬ä¸èƒ½ä¸ºç©ºï¼";
             }
             if (info.getId() == null || info.getId().equals("")) {
                 if (xcdaDocumentManager.isDocumentExist(info.getVersionCode(), info.getCode())) {
-                    strErrorMsg += "´úÂë²»ÄÜÖØ¸´£¡";
+                    strErrorMsg += "ä»£ç ä¸èƒ½é‡å¤ï¼";
                 }
                 cdaInfo.setCreateUser(info.getUser());
             } else {
                 if (xcdaDocumentManager.isDocumentExist(info.getVersionCode(), info.getCode(), info.getId())) {
-                    strErrorMsg += "´úÂë²»ÄÜÖØ¸´£¡";
+                    strErrorMsg += "ä»£ç ä¸èƒ½é‡å¤ï¼";
                 } else {
                     cdaInfo = xcdaDocumentManager.getDocument(info.getVersionCode(), info.getId());
                     cdaInfo.setUpdateUser(info.getUser());
@@ -400,13 +398,13 @@ public class CdaController extends BaseRestController {
                 result.setSuccessFlg(true);
             } else {
                 result.setSuccessFlg(false);
-                result.setErrorMsg("CDA±£´æÊ§°Ü!");
+                result.setErrorMsg("CDAä¿å­˜å¤±è´¥!");
             }
         } catch (Exception ex) {
             LogService.getLogger(CdaController_w.class).error(ex.getMessage());
 
             result.setSuccessFlg(false);
-            result.setErrorMsg("CDA±£´æÊ§°Ü!");
+            result.setErrorMsg("CDAä¿å­˜å¤±è´¥!");
         }
         return result;*/
     }
@@ -417,10 +415,10 @@ public class CdaController extends BaseRestController {
         Envelop result = new Envelop();
         String strErrorMsg = "";
         if (StringUtils.isEmpty(strVersionCode)) {
-            strErrorMsg += "±ê×¼°æ±¾²»ÄÜÎª¿Õ!";
+            strErrorMsg += "æ ‡å‡†ç‰ˆæœ¬ä¸èƒ½ä¸ºç©º!";
         }
         if (StringUtils.isEmpty(ids)) {
-            strErrorMsg += "ÇëÏÈÑ¡Ôñ½«ÒªÉ¾³ıµÄCDA£¡";
+            strErrorMsg += "è¯·å…ˆé€‰æ‹©å°†è¦åˆ é™¤çš„CDA";
         }
         if (!StringUtils.isEmpty(strErrorMsg)) {
             result.setSuccessFlg(false);
@@ -436,7 +434,7 @@ public class CdaController extends BaseRestController {
                 result.setSuccessFlg(true);
             }else {
                 result.setSuccessFlg(false);
-                result.setErrorMsg("CDAÉ¾³ıÊ§°Ü£¡");
+                result.setErrorMsg("CDAåˆ é™¤å¤±è´¥");
             }
         } catch (Exception ex) {
             LogService.getLogger(CdaController.class).error(ex.getMessage());
@@ -449,10 +447,10 @@ public class CdaController extends BaseRestController {
         try {
             String strErrorMsg = "";
             if (strVersionCode == null || strVersionCode == "") {
-                strErrorMsg += "±ê×¼°æ±¾²»ÄÜÎª¿Õ!";
+                strErrorMsg += "æ ‡å‡†ç‰ˆæœ¬ä¸èƒ½ä¸ºç©º!";
             }
             if (ids == null || ids == "") {
-                strErrorMsg += "ÇëÏÈÑ¡Ôñ½«ÒªÉ¾³ıµÄCDA£¡";
+                strErrorMsg += "è¯·å…ˆé€‰æ‹©å°†è¦åˆ é™¤çš„CDAï¼";
             }
             if (strErrorMsg != "") {
                 result.setSuccessFlg(false);
@@ -464,24 +462,24 @@ public class CdaController extends BaseRestController {
                 result.setSuccessFlg(true);
             } else {
                 result.setSuccessFlg(false);
-                result.setErrorMsg("CDAÉ¾³ıÊ§°Ü!");
+                result.setErrorMsg("CDAåˆ é™¤å¤±è´¥!");
             }
         } catch (Exception ex) {
             LogService.getLogger(CdaController_w.class).error(ex.getMessage());
             result.setSuccessFlg(false);
-            result.setErrorMsg("CDAÉ¾³ıÊ§°Ü!");
+            result.setErrorMsg("CDAåˆ é™¤å¤±è´¥!");
         }
         return result;*/
     }
 
     /**
-     * ±£´æCDAĞÅÏ¢
-     * 1.ÏÈÉ¾³ıCDAÊı¾İ¼¯¹ØÁª¹ØÏµĞÅÏ¢ÓëcdaÎÄµµXMLÎÄ¼ş£¬ÔÚĞÂÔöĞÅÏ¢
-     * @param strDatasetIds ¹ØÁªµÄÊı¾İ¼¯
-     * @param strCdaId  cdaÎÄµµ ID
-     * @param strVersionCode °æ±¾ºÅ
-     * @param xmlInfo xml ÎÄ¼şÄÚÈİ
-     * @return ²Ù×÷½á¹û
+     * ä¿å­˜CDAä¿¡æ¯
+     * 1.å…ˆåˆ é™¤CDAæ•°æ®é›†å…³è”å…³ç³»ä¿¡æ¯ä¸cdaæ–‡æ¡£XMLæ–‡ä»¶ï¼Œåœ¨æ–°å¢ä¿¡æ¯
+     * @param strDatasetIds å…³è”çš„æ•°æ®é›†
+     * @param strCdaId  cdaæ–‡æ¡£ ID
+     * @param strVersionCode ç‰ˆæœ¬å·
+     * @param xmlInfo xml æ–‡ä»¶å†…å®¹
+     * @return æ“ä½œç»“æœ
      */
     @RequestMapping("SaveRelationship")
     @ResponseBody
@@ -489,10 +487,10 @@ public class CdaController extends BaseRestController {
         Envelop result = new Envelop();
         String strErrorMsg = "";
         if (StringUtils.isEmpty(strVersionCode)) {
-            strErrorMsg += "±ê×¼°æ±¾²»ÄÜÎª¿Õ!";
+            strErrorMsg += "æ ‡å‡†ç‰ˆæœ¬ä¸èƒ½ä¸ºç©º!";
         }
         if (StringUtils.isEmpty(strCdaId)) {
-            strErrorMsg += "ÇëÏÈÑ¡ÔñCDA!";
+            strErrorMsg += "è¯·å…ˆé€‰æ‹©CDA!";
         }
         if (!StringUtils.isEmpty(strErrorMsg)) {
             result.setSuccessFlg(false);
@@ -509,7 +507,7 @@ public class CdaController extends BaseRestController {
             String _rus = HttpClientUtil.doPost(comUrl + url, params, username, password);
             if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
-                result.setErrorMsg("¹ØÏµ±£´æÊ§°Ü£¡");
+                result.setErrorMsg("å…³ç³»ä¿å­˜å¤±è´¥");
             }else{
                 result.setSuccessFlg(true);
             }
@@ -521,14 +519,14 @@ public class CdaController extends BaseRestController {
         return result;
 
 
-        /*Result result = new Result();
+       /*Result result = new Result();
         try {
             String strErrorMsg = "";
             if (strVersionCode == null || strVersionCode == "") {
-                strErrorMsg += "±ê×¼°æ±¾²»ÄÜÎª¿Õ!";
+                strErrorMsg += "æ ‡å‡†ç‰ˆæœ¬ä¸èƒ½ä¸ºç©º!";
             }
             if (strCdaId == null || strCdaId == "") {
-                strErrorMsg += "ÇëÏÈÑ¡ÔñCDA!";
+                strErrorMsg += "è¯·å…ˆé€‰æ‹©CDA!";
             }
             if (strErrorMsg != "") {
                 result.setSuccessFlg(false);
@@ -539,7 +537,7 @@ public class CdaController extends BaseRestController {
             int iDelRes = xCdaDatasetRelationshipManager.deleteRelationshipByCdaId(strVersionCode, listCdaId);
             if (iDelRes < 0) {
                 result.setSuccessFlg(false);
-                result.setErrorMsg("¹ØÏµ±£´æÊ§°Ü!");
+                result.setErrorMsg("å…³ç³»ä¿å­˜å¤±è´¥!");
                 return result;
             }
             List<String> listIds = new ArrayList<>();
@@ -547,7 +545,7 @@ public class CdaController extends BaseRestController {
             XCDADocument[] xcdaDocuments = xcdaDocumentManager.getDocumentList(strVersionCode, listIds);
             if (xcdaDocuments.length <= 0) {
                 result.setSuccessFlg(false);
-                result.setErrorMsg("ÇëÏÈÑ¡ÔñCDA£¡");
+                result.setErrorMsg("è¯·å…ˆé€‰æ‹©CDAï¼");
                 return result;
             }
             if (xcdaDocuments[0].getFileGroup() != null && !xcdaDocuments[0].getFileGroup().equals("") && xcdaDocuments[0].getSchema() != null && !xcdaDocuments[0].getSchema().equals("")) {
@@ -555,7 +553,7 @@ public class CdaController extends BaseRestController {
             }
             if (strDatasetIds == null || strDatasetIds == "") {
                 result.setSuccessFlg(true);
-                result.setErrorMsg("¹ØÏµ±£´æ³É¹¦!");
+                result.setErrorMsg("å…³ç³»ä¿å­˜æˆåŠŸ!");
                 return result;
             }
             strDatasetIds = strDatasetIds.substring(0, strDatasetIds.length() - 1);
@@ -572,30 +570,30 @@ public class CdaController extends BaseRestController {
             int iResult = xCdaDatasetRelationshipManager.addRelationship(infos);
             if (iResult < 0) {
                 result.setSuccessFlg(false);
-                result.setErrorMsg("¹ØÏµ±£´æÊ§°Ü!");
+                result.setErrorMsg("å…³ç³»ä¿å­˜å¤±è´¥!");
             }
             String strFilePath = SaveCdaFile(xmlInfo, strVersionCode, strCdaId);
-            //½«ÎÄ¼şÉÏ´«µ½·şÎñÆ÷ÖĞ
+            //å°†æ–‡ä»¶ä¸Šä¼ åˆ°æœåŠ¡å™¨ä¸­
             ObjectNode msg = FastDFSUtil.upload(strFilePath, "");
             String strFileGroup = msg.get(FastDFSUtil.GroupField).asText();//setFilePath
             String strSchemePath = msg.get(FastDFSUtil.RemoteFileField).asText();//setFileName
             File file = new File(strFilePath);
-            // Â·¾¶ÎªÎÄ¼şÇÒ²»Îª¿ÕÔò½øĞĞÉ¾³ı
+            // è·¯å¾„ä¸ºæ–‡ä»¶ä¸”ä¸ä¸ºç©ºåˆ™è¿›è¡Œåˆ é™¤
             if (file.isFile() && file.exists()) {
                 file.delete();
             }
             boolean bRes = SaveXmlFilePath(strCdaId, strVersionCode, strFileGroup, strSchemePath);
             if (bRes) {
                 result.setSuccessFlg(true);
-                result.setErrorMsg("¹ØÏµ±£´æ³É¹¦!");
+                result.setErrorMsg("å…³ç³»ä¿å­˜æˆåŠŸ!");
             } else {
                 result.setSuccessFlg(false);
-                result.setErrorMsg("¹ØÏµ±£´æÊ§°Ü!");
+                result.setErrorMsg("å…³ç³»ä¿å­˜å¤±è´¥!");
             }
         } catch (Exception ex) {
             LogService.getLogger(CdaController_w.class).error(ex.getMessage());
             result.setSuccessFlg(false);
-            result.setErrorMsg("¹ØÏµ±£´æÊ§°Ü!");
+            result.setErrorMsg("å…³ç³»ä¿å­˜å¤±è´¥!");
         }
         return result;*/
     }
@@ -603,7 +601,7 @@ public class CdaController extends BaseRestController {
     @RequestMapping("DeleteRelationship")
     @ResponseBody
     public Object DeleteRelationship(String ids, String strVersionCode) {
-        //TODO ÎŞ¶ÔÓ¦
+        //TODO æ— å¯¹åº”
         Envelop result = new Envelop();
         try {
             String url = "/cda*/*************";
@@ -615,7 +613,7 @@ public class CdaController extends BaseRestController {
                 result.setSuccessFlg(true);
             }else {
                 result.setSuccessFlg(false);
-                result.setErrorMsg("¹ØÏµÉ¾³ıÊ§°Ü£¡");
+                result.setErrorMsg("å…³ç³»åˆ é™¤å¤±è´¥!");
             }
         } catch (Exception ex) {
             LogService.getLogger(CdaController.class).error(ex.getMessage());
@@ -632,22 +630,22 @@ public class CdaController extends BaseRestController {
                 result.setSuccessFlg(true);
             } else {
                 result.setSuccessFlg(false);
-                result.setErrorMsg("¹ØÏµÉ¾³ıÊ§°Ü!");
+                result.setErrorMsg("å…³ç³»åˆ é™¤å¤±è´¥!");
             }
         } catch (Exception ex) {
             LogService.getLogger(CdaController_w.class).error(ex.getMessage());
             result.setSuccessFlg(false);
-            result.setErrorMsg("¹ØÏµÉ¾³ıÊ§°Ü!");
+            result.setErrorMsg("å…³ç³»åˆ é™¤å¤±è´¥!");
         }
         return result;*/
     }
 
     /*
-    * ÅĞ¶ÏÎÄ¼şÊÇ·ñ´æÔÚ*/
+  * åˆ¤æ–­æ–‡ä»¶æ˜¯å¦å­˜åœ¨*/
     @RequestMapping("/FileExists")
     @ResponseBody
     public String FileExists(String strCdaId, String strVersionCode) {
-        //TODO ÎŞ¶ÔÓ¦
+        //TODO æ— å¯¹åº”
         try{
             String url = "/cda/***********";
             Map<String,Object> params = new HashMap<>();
@@ -663,7 +661,7 @@ public class CdaController extends BaseRestController {
             LogService.getLogger(CdaController.class).error(ex.getMessage());
             return "false";
         }
-       /*//1£ºÒÑ´æÔÚÎÄ¼ş
+       /*//1 å·²å­˜åœ¨æ–‡ä»¶
         if (xcdaDocumentManager.isFileExists(strCdaId, strVersionCode)) {
             return "true";
         } else {
@@ -672,7 +670,7 @@ public class CdaController extends BaseRestController {
     }
 
     /**
-     * Éú³ÉCDAÎÄ¼ş
+     * ç”ŸæˆCDAæ–‡ä»¶
      *
      * @param strCdaId
      * @param strVersionCode
@@ -681,7 +679,7 @@ public class CdaController extends BaseRestController {
     @RequestMapping("/createCDASchemaFile")
     @ResponseBody
     public Object createCDASchemaFile(String strCdaId, String strVersionCode) {
-        // TODO ÎŞ¶ÔÓ¦
+        // TODO æ— å¯¹åº”
         Envelop result = new Envelop();
         try {
             String url = "/cda/***********";
@@ -691,33 +689,32 @@ public class CdaController extends BaseRestController {
             String _rus = HttpClientUtil.doPost(comUrl+url,params,username,password);
             if (StringUtils.isEmpty(_rus)) {
                 result.setSuccessFlg(false);
-                result.setErrorMsg("cdaÎÄµµ´´½¨Ê§°Ü£¡");
+                result.setErrorMsg("cdaï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½Ê§ï¿½Ü£ï¿½");
             } else {
                 result.setSuccessFlg(true);
             }
         } catch (Exception ex) {
             LogService.getLogger(CdaController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
-            result.setErrorMsg("CDAÎÄµµ´´½¨Ê§°Ü!");
+            result.setErrorMsg("CDAï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½!");
         }
         return result;
 
-        /*Result result = new Result();
+       /*Result result = new Result();
         try {
             int iResult = xcdaDocumentManager.createCDASchemaFile(strCdaId, strVersionCode);
             if (iResult >= 0) {
                 result.setSuccessFlg(true);
             } else {
                 result.setSuccessFlg(false);
-                result.setErrorMsg("CDAÎÄµµ´´½¨Ê§°Ü!");
+                result.setErrorMsg("CDAæ–‡æ¡£åˆ›å»ºå¤±è´¥!");
             }
         } catch (Exception ex) {
             LogService.getLogger(CdaController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
-            result.setErrorMsg("CDAÎÄµµ´´½¨Ê§°Ü!");
+            result.setErrorMsg("CDAæ–‡æ¡£åˆ›å»ºå¤±è´¥!");
         }
         return result.toJson();*/
-
     }
 
 //    @RequestMapping("/TestFileSend")
@@ -736,11 +733,11 @@ public class CdaController extends BaseRestController {
 //    }
 
     /*
-    * ¸ù¾İCDA ID »ñÈ¡Êı¾İ¼¯ĞÅÏ¢
-    * @param strVersionCode °æ±¾ºÅ
-    * @param strCdaId CDAID
-    * @return Result
-    * */
+     * æ ¹æ®CDA ID è·å–æ•°æ®é›†ä¿¡æ¯
+     * @param strVersionCode ç‰ˆæœ¬å·
+     * @param strCdaId CDAID
+     * @return Result
+     * */
     @RequestMapping("/getDatasetByCdaId")
     @ResponseBody
     public Object getDatasetByCdaId(String strVersionCode, String strCdaId) {
@@ -753,13 +750,13 @@ public class CdaController extends BaseRestController {
             String _rus = HttpClientUtil.doGet(comUrl+url,params,username,password);
             if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
-                result.setErrorMsg("Êı¾İ¼¯»ñÈ¡Ê§°Ü£¡");
+                result.setErrorMsg("æ•°æ®é›†è·å–å¤±è´¥");
             }else{
                result.setSuccessFlg(true);
                 return _rus;
             }
         } catch (Exception ex) {
-            LogService.getLogger(com.yihu.ha.std.controller.CdaTypeController.class).error(ex.getMessage());
+            LogService.getLogger(CdaTypeController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
@@ -825,17 +822,17 @@ public class CdaController extends BaseRestController {
     }
 
     /**
-     * ½«String ±£´æÎªXMLÎÄ¼ş
+     * å°†String ä¿å­˜ä¸ºXMLæ–‡ä»¶
      *
-     * @param fileInfo ÎÄ¼şĞÅÏ¢
-     * @return ·µ»Ø ÎÄ¼şÂ·¾¶
+     * @param fileInfo æ–‡ä»¶ä¿¡æ¯
+     * @return è¿”å› æ–‡ä»¶è·¯å¾„
      */
     /*public String SaveCdaFile(String fileInfo, String versionCode, String cdaId) {
         fileInfo = fileInfo.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
         String strPath = System.getProperty("java.io.tmpdir");
         String splitMark = System.getProperty("file.separator");
         strPath += splitMark+"StandardFiles";
-        //ÎÄ¼şÂ·¾¶
+        //æ–‡ä»¶è·¯å¾„
         String strXMLFilePath = strPath + splitMark + "xml" + splitMark + versionCode + splitMark + "createfile" + splitMark + cdaId + ".xml";
 
         File file = new File(strXMLFilePath);
@@ -869,7 +866,7 @@ public class CdaController extends BaseRestController {
             listIds.add(cdaId);
             XCDADocument[] xcdaDocuments = xcdaDocumentManager.getDocumentList(versionCode, listIds);
             if (xcdaDocuments.length <= 0) {
-                LogService.getLogger(CdaController_w.class).error("Î´ÕÒµ½CDA");
+                LogService.getLogger(CdaController_w.class).error("Î´ï¿½Òµï¿½CDA");
                 return false;
             }
 
@@ -889,14 +886,14 @@ public class CdaController extends BaseRestController {
     }*/
 
     /**
-     * »ñÈ¡cdaÎÄµµµÄXMLÎÄ¼şĞÅÏ¢¡£
+     * è·å–cdaæ–‡æ¡£çš„XMLæ–‡ä»¶ä¿¡æ¯ã€‚
      * <p>
-     * ´Ó·şÎñÆ÷µÄÁÙÊ±ÎÄ¼şÂ·¾¶ÖĞ¶ÁÈ¡ÅäÖÃÎÄ¼ş£¬²¢ÒÔXMLĞÎÊ½·µ»Ø¡£
+     * ä»æœåŠ¡å™¨çš„ä¸´æ—¶æ–‡ä»¶è·¯å¾„ä¸­è¯»å–é…ç½®æ–‡ä»¶ï¼Œå¹¶ä»¥XMLå½¢å¼è¿”å›ã€‚
      *
      * @param cdaId
      * @param versionCode
-     * @return XMLĞÅÏ¢
-     * @version 1.0.1 ½«ÁÙÊ±Ä¿Â¼×ªÒÆÖÁfastDFS¡£
+     * @return XMLä¿¡æ¯
+     * @version 1.0.1 å°†ä¸´æ—¶ç›®å½•è½¬ç§»è‡³fastDFSã€‚
      */
     @RequestMapping("/getCdaXmlFileInfo")
     @ResponseBody
@@ -964,7 +961,7 @@ public class CdaController extends BaseRestController {
     @RequestMapping("/getOrgType")
     @ResponseBody
     public Object getOrgType() {
-        // Àı×Ó
+        // ä¾‹å­
         Envelop result = new Envelop();
         try {
             String url = "/conDict/orgType";
