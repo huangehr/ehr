@@ -1,6 +1,8 @@
 package com.yihu.ehr.ha;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.dict.SystemDictEntryModel;
+import com.yihu.ehr.agModel.dict.SystemDictModel;
 import com.yihu.ehr.ha.SystemDict.controller.ConventionalDictEntryController;
 import com.yihu.ehr.ha.SystemDict.controller.SystemDictController;
 import com.yihu.ehr.model.dict.MConventionalDict;
@@ -53,11 +55,11 @@ public class SystemDictControllerTests {
 
         applicationContext = new SpringApplicationBuilder().web(false).sources(AgAdminApplication.class).run();
 
-        MSystemDict systemDict = new MSystemDict();
-        systemDict.setName("test_dict_cms");
-        systemDict.setReference("");
-        systemDict.setAuthorId("0dae0003567a0d909b10c56a3220efdf");
-        envelop = sysDict.createDictionary(objectMapper.writeValueAsString(systemDict));
+        SystemDictModel systemDictModel = new SystemDictModel();
+        systemDictModel.setName("test_dict_cms");
+        systemDictModel.setReference("");
+        systemDictModel.setAuthorId("0dae0003567a0d909b10c56a3220efdf");
+        envelop = sysDict.createDictionary(objectMapper.writeValueAsString(systemDictModel));
         assertNotEquals("字典新增失败", envelop, null);
 
         //  ((MSystemDict) envelop.getObj()).getId()
@@ -73,42 +75,37 @@ public class SystemDictControllerTests {
         envelop = sysDict.getDictionaries(fields, filter, sorts,rows,page);
         assertNotEquals("字典列表获取失败", envelop, null);
 
-        systemDict.setName("test_dict_cms_c");
-        systemDict.setId(212);
-        systemDict.setPhoneticCode("TEST_DICT_CMS_C");
-        systemDict.setCreateDate(new Date());
+        systemDictModel.setName("test_dict_cms_c");
+        systemDictModel.setId(230);
+        systemDictModel.setPhoneticCode("TEST_DICT_CMS_C");
+        systemDictModel.setCreateDate(new Date());
 
-        envelop = sysDict.updateDictionary(objectMapper.writeValueAsString(systemDict));
+        envelop = sysDict.updateDictionary(objectMapper.writeValueAsString(systemDictModel));
+        assertTrue("字典修改失败", ((SystemDictModel) envelop.getObj()).getName().equals("test_dict_cms_c"));
 
-        assertTrue("字典修改失败", ((MSystemDict) envelop.getObj()).getName().equals("test_dict_cms_c"));
-
-        MConventionalDict conventionalDict = new MConventionalDict();
-        conventionalDict.setDictId(systemDict.getId());
-        conventionalDict.setCode( "test_item_cms");
-        conventionalDict.setValue( "test_value_cms");
-        conventionalDict.setSort(1);
-        conventionalDict.setCatalog("");
-        envelop = sysDict.createDictEntry(objectMapper.writeValueAsString(conventionalDict));
+        SystemDictEntryModel systemDictEntryModel = new SystemDictEntryModel();
+        systemDictEntryModel.setDictId(systemDictModel.getId());
+        systemDictEntryModel.setCode( "test_item_cms");
+        systemDictEntryModel.setValue( "test_value_cms");
+        systemDictEntryModel.setSort(1);
+        systemDictEntryModel.setCatalog("");
+        envelop = sysDict.createDictEntry(objectMapper.writeValueAsString(systemDictEntryModel));
         assertNotEquals("字典项新增失败", envelop, null);
 
-        conventionalDict.setValue("test_value_cms_c");
-        envelop = sysDict.updateDictEntry(objectMapper.writeValueAsString(conventionalDict));
-
-        assertTrue("字典项修改失败", ((MConventionalDict) envelop.getObj()).getValue().equals("test_value_cms_c"));
-
+        systemDictEntryModel.setValue("test_value_cms_c");
+        envelop = sysDict.updateDictEntry(objectMapper.writeValueAsString(systemDictEntryModel));
+        assertTrue("字典项修改失败", ((SystemDictEntryModel) envelop.getObj()).getValue().equals("test_value_cms_c"));
 
         envelop = sysDict.getDictEntry(46,"3");
         assertNotEquals("字典项获取失败",envelop,null);
 
-        envelop = sysDict.getDictEntries(systemDict.getId(),"", 1, 15);
+        envelop = sysDict.getDictEntries(systemDictModel.getId(),"", 1, 15);
         assertNotEquals("字典项列表获取失败", envelop, null);
 
-
-        envelop = sysDict.deleteDictEntry(systemDict.getId(),conventionalDict.getCode());
+        envelop = sysDict.deleteDictEntry(systemDictModel.getId(),systemDictEntryModel.getCode());
         assertTrue("字典项删除失败", envelop.isSuccessFlg());
 
-        envelop = sysDict.deleteDictionary(systemDict.getId());
-
+        envelop = sysDict.deleteDictionary(systemDictModel.getId());
         assertTrue("字典删除失败", envelop.isSuccessFlg());
     }
 
@@ -178,11 +175,10 @@ public class SystemDictControllerTests {
         envelop = systemDictController.getStdSourceTypeList(strings);
         assertNotEquals("获取标准来源类型字典项失败", envelop, null);
 
-        Collection<MConventionalDict> Dict= systemDictController.getUserTypeList();
+        envelop = systemDictController.getUserTypeList();
         assertNotEquals("获取用户类型字典项失败", envelop, null);
 
-
-        Collection<MConventionalDict> Dicts= systemDictController.getTagsList();
+        envelop = systemDictController.getTagsList();
         assertNotEquals("获取标签字典项失败", envelop, null);
 
     }

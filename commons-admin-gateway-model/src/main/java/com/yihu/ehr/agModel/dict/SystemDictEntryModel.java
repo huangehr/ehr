@@ -5,25 +5,25 @@ package com.yihu.ehr.agModel.dict;
  */
 public class SystemDictEntryModel {
 
-    private String id;
+    private long dictId;
 
     private String code;
 
     private String value;
 
-    private String sort;
+    private Integer sort;
 
     private String catalog;
 
     private String phoneticCode;
 
 
-    public String getId() {
-        return id;
+    public long getDictId() {
+        return dictId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setDictId(long dictId) {
+        this.dictId = dictId;
     }
 
     public String getCode() {
@@ -42,11 +42,11 @@ public class SystemDictEntryModel {
         this.value = value;
     }
 
-    public String getSort() {
+    public Integer getSort() {
         return sort;
     }
 
-    public void setSort(String sort) {
+    public void setSort(Integer sort) {
         this.sort = sort;
     }
 
