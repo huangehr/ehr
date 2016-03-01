@@ -1,7 +1,6 @@
 package com.yihu.ehr.ha.std.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.agModel.standard.cdaType.CdaTypeDetailModel;
 import com.yihu.ehr.agModel.standard.cdaType.CdaTypeModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.std.service.CDATypeClient;
