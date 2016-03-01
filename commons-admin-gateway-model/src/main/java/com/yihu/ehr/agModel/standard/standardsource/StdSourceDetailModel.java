@@ -7,9 +7,13 @@ public class StdSourceDetailModel {
     private String id;
     private String code;
     private String name;
-    private String sourceType;
-    private String sourceName;
+    private String create_date;
+    private String create_user;
+    private String update_date;
+    private String update_user;
     private String description;
+    private String sourceType;
+    private String sourceValue;
 
     public String getId() {
         return id;
@@ -35,20 +39,36 @@ public class StdSourceDetailModel {
         this.name = name;
     }
 
-    public String getSourceType() {
-        return sourceType;
+    public String getCreate_date() {
+        return create_date;
     }
 
-    public void setSourceType(String sourceType) {
-        this.sourceType = sourceType;
+    public void setCreate_date(String create_date) {
+        this.create_date = create_date;
     }
 
-    public String getSourceName() {
-        return sourceName;
+    public String getCreate_user() {
+        return create_user;
     }
 
-    public void setSourceName(String sourceName) {
-        this.sourceName = sourceName;
+    public void setCreate_user(String create_user) {
+        this.create_user = create_user;
+    }
+
+    public String getUpdate_date() {
+        return update_date;
+    }
+
+    public void setUpdate_date(String update_date) {
+        this.update_date = update_date;
+    }
+
+    public String getUpdate_user() {
+        return update_user;
+    }
+
+    public void setUpdate_user(String update_user) {
+        this.update_user = update_user;
     }
 
     public String getDescription() {
@@ -57,5 +77,21 @@ public class StdSourceDetailModel {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getSourceType() {
+        return sourceType;
+    }
+
+    public void setSourceType(String sourceType) {
+        this.sourceType = sourceType;
+    }
+
+    public String getSourceValue() {
+        return sourceValue;
+    }
+
+    public void setSourceValue(String sourceValue) {
+        this.sourceValue = sourceValue;
     }
 }

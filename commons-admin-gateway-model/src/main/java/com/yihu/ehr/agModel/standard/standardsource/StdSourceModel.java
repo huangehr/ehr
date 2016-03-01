@@ -8,7 +8,7 @@ public class StdSourceModel {
     private String code;
     private String name;
     private String sourceType;
-    private String sourceName;
+    private String sourceValue;
     private String create_date;
     private String create_user;
     private String description;
@@ -45,12 +45,12 @@ public class StdSourceModel {
         this.sourceType = sourceType;
     }
 
-    public String getSourceName() {
-        return sourceName;
+    public String getSourceValue() {
+        return sourceValue;
     }
 
-    public void setSourceName(String sourceName) {
-        this.sourceName = sourceName;
+    public void setSourceValue(String sourceValue) {
+        this.sourceValue = sourceValue;
     }
 
     public String getCreate_date() {

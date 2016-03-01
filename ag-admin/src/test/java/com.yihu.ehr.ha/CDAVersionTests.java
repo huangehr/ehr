@@ -25,7 +25,6 @@ import static org.junit.Assert.assertNotEquals;
 public class CDAVersionTests {
     ApplicationContext applicationContext = new SpringApplicationBuilder()
             .web(false).sources(AgAdminApplication.class).run();
-    ;
 
     Envelop envelop = new Envelop();
 
