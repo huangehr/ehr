@@ -1,6 +1,7 @@
 package com.yihu.ehr.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -13,16 +14,15 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/login")
 public class OAuth2LoginController {
     @RequestMapping("/oauth/confirm_access")
-    public ModelAndView confirmAccess(){
-        ModelAndView modelAndView = new ModelAndView("templates/login/oauth/confirm_access.jsp");
+    public String confirmAccess(Model model) {
+        model.addAttribute("name", "Sand");
+        model.addAttribute("clientName", "爱康弹性福利平台");
 
-        return modelAndView;
+        return "login/oauth/confirm_access.html";
     }
 
     @RequestMapping("/oauth/error")
-    public ModelAndView error(){
-        ModelAndView modelAndView = new ModelAndView("login/oauth/access_confirmation.jsp");
-
-        return modelAndView;
+    public String error() {
+        return "login/oauth/error";
     }
 }

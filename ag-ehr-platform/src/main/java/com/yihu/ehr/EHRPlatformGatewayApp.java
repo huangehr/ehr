@@ -10,6 +10,7 @@ import org.springframework.boot.context.embedded.tomcat.TomcatConnectorCustomize
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.ResourceUtils;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import java.io.FileNotFoundException;
 
