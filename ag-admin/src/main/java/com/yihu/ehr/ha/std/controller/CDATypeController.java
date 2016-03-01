@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.cdaType.CdaTypeDetailModel;
 import com.yihu.ehr.agModel.standard.cdaType.CdaTypeModel;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.ha.std.service.CDATypeClient;
 import com.yihu.ehr.model.standard.MCDAType;
 import com.yihu.ehr.util.Envelop;
@@ -12,11 +11,9 @@ import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -58,8 +55,8 @@ public class CDATypeController extends BaseController {
     private List<CdaTypeModel> changeToCdaTypeModels(List<MCDAType> mCdaTypeList) {
         List<CdaTypeModel> cdaTypeModelList = new ArrayList<>();
         for (MCDAType mCdaType : mCdaTypeList) {
-            CdaTypeModel cdaTypeModel = convertToModel(mCdaType, CdaTypeModel.class);
-            cdaTypeModelList.add(cdaTypeModel);
+            CdaTypeModel CdaTypeModel = convertToModel(mCdaType, CdaTypeModel.class);
+            cdaTypeModelList.add(CdaTypeModel);
         }
         return cdaTypeModelList;
     }
