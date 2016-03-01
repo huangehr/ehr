@@ -6,6 +6,7 @@ import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.standard.commons.ExtendController;
 import com.yihu.ehr.standard.dispatch.service.DispatchService;
+import com.yihu.ehr.util.RestEcho;
 import com.yihu.ehr.util.encode.Base64;
 import com.yihu.ehr.util.encrypt.RSA;
 import io.swagger.annotations.Api;
@@ -35,7 +36,7 @@ public class StandardDispatchRestController  extends ExtendController{
     @RequestMapping(value = "/schema", method = RequestMethod.GET)
     @ApiOperation(value = "获取适配方案摘要", produces = "application/json",
             notes = "获取两个指定版本的标准化数据差异与适配方案，文件以Base64编码，压缩格式为zip")
-    public List getSchemeInfo(
+    public RestEcho getSchemeInfo(
             @ApiParam(required = true, name = "userPrivateKey", value = "用户私钥")
             @RequestParam(value = "userPrivateKey", required = true) String userPrivateKey,
             @ApiParam(required = true, name = "update_version", value = "要更新的目标版本")
@@ -75,12 +76,12 @@ public class StandardDispatchRestController  extends ExtendController{
         }
 
         try {
-            List rs = new ArrayList<>();
             //密码RSA加密
             String encryptPwd = RSA.encrypt(password, RSA.genPrivateKey(userPrivateKey));
-            rs.add(encryptPwd);
-            rs.add(fileBytes);
-            return rs;
+            RestEcho restEcho = new RestEcho().success();
+            restEcho.putResult("cryptograph", encryptPwd);
+            restEcho.putResult("zipfile", fileBytes);
+            return restEcho;
         } catch (IOException ex) {
             throw new ApiException(ErrorCode.GenerateArchiveFileStreamFailed);
         } catch (Exception ex) {

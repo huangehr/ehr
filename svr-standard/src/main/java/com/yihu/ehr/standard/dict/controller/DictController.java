@@ -34,17 +34,6 @@ public class DictController extends ExtendController<MStdDict> {
         return dictService.getServiceEntity(version);
     }
 
-    private void setValues(IDict dict, String code, String name,
-                           long baseDict, String stdSource, String stdVersion, String description){
-
-        dict.setStdVersion(stdVersion);
-        dict.setCode(code);
-        dict.setBaseDict(baseDict);
-        dict.setDescription(description);
-        dict.setName(name);
-        dict.setSourceId(stdSource);
-    }
-
 
     @RequestMapping(value = "/dicts", method = RequestMethod.GET)
     @ApiOperation(value = "查询字典")
@@ -73,62 +62,40 @@ public class DictController extends ExtendController<MStdDict> {
 
     @RequestMapping(value = "/dict", method = RequestMethod.POST)
     @ApiOperation(value = "新增字典")
-    public boolean addDict(
-            @ApiParam(name = "code", value = "代码", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "名称", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "stdSource", value = "标准来源", defaultValue = "")
-            @RequestParam(value = "stdSource") String stdSource,
+    public MStdDict addDict(
             @ApiParam(name = "stdVersion", value = "标准版本", defaultValue = "")
             @RequestParam(value = "stdVersion") String stdVersion,
-            @ApiParam(name = "baseDict", value = "继承字典", defaultValue = "")
-            @RequestParam(value = "baseDict", required = false) long baseDict,
-            @ApiParam(name = "description", value = "描述", defaultValue = "")
-            @RequestParam(value = "description", required = false) String description,
-            @ApiParam(name = "userId", value = "用户编号", defaultValue = "")
-            @RequestParam(value = "userId") String userId) throws Exception{
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestParam(value = "model") String model) throws Exception{
 
         Class entityClass = getServiceEntity(stdVersion);
-        if(dictService.isExistByField("code", code, entityClass))
+        IDict dict = (IDict) jsonToObj(model, entityClass);
+        if(dictService.isExistByField("code", dict.getCode(), entityClass))
             throw errRepeatCode();
 
-        IDict dict = (IDict) getServiceEntity(stdVersion).newInstance();
         dict.setCreatedate(new Date());
-        dict.setAuthor(userId);
-        setValues(dict, code, name, baseDict, stdSource, stdVersion, description);
-        return dictService.add(dict);
+        if(dictService.add(dict))
+            return getModel(dictService.add(dict));
+         return null;
     }
 
-    @RequestMapping(value = "/dict/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/dict", method = RequestMethod.POST)
     @ApiOperation(value = "修改字典")
-    public boolean updateDict(
-            @ApiParam(name = "id", value = "代码", defaultValue = "")
-            @PathVariable(value = "id") long id,
-            @ApiParam(name = "code", value = "代码", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "名称", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "stdSource", value = "标准来源", defaultValue = "")
-            @RequestParam(value = "stdSource") String stdSource,
-            @ApiParam(name = "stdVersion", value = "标准版本", defaultValue = "")
-            @RequestParam(value = "stdVersion") String stdVersion,
-            @ApiParam(name = "baseDict", value = "继承字典", defaultValue = "")
-            @RequestParam(value = "baseDict") long baseDict,
-            @ApiParam(name = "description", value = "描述", defaultValue = "")
-            @RequestParam(value = "description") String description,
-            @ApiParam(name = "userId", value = "用户编号", defaultValue = "")
-            @RequestParam(value = "userId") String userId) throws Exception{
+    public MStdDict updateDict(
+            @ApiParam(name = "version", value = "标准版本", defaultValue = "")
+            @RequestParam(value = "version") String version,
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestParam(value = "model") String model) throws Exception{
 
-        Class entityClass = getServiceEntity(stdVersion);
-        IDict dict = dictService.retrieve(id, entityClass);
-        if(!dict.getCode().equals(code) &&
-                dictService.isExistByField("code", code, entityClass))
+        Class entityClass = getServiceEntity(version);
+        IDict dictModel = (IDict) jsonToObj(model, entityClass);
+        IDict dict = dictService.retrieve(dictModel.getId(), entityClass);
+        if(!dict.getCode().equals(dictModel.getCode()) &&
+                dictService.isExistByField("code", dictModel.getCode(), entityClass))
             throw errRepeatCode();
 
-        setValues(dict, code, name, baseDict, stdSource, stdVersion, description);
         dictService.save(dict);
-        return true;
+        return getModel(dictService.add(dict));
     }
 
 

@@ -47,7 +47,7 @@ public class DataSetService extends BaseHbmService<IDataSet>{
 
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void add(IDataSet dataSet){
+    public boolean add(IDataSet dataSet){
         String sql =
                 "INSERT INTO " + getTaleName(dataSet.getStdVersion()) +
                 "(code, name, ref_standard, std_version, summary, hashCode, documentId, lang) " +
@@ -61,7 +61,7 @@ public class DataSetService extends BaseHbmService<IDataSet>{
         query.setParameter("hashCode", dataSet.getHashCode());
         query.setParameter("documentId", dataSet.getDocumentId());
         query.setParameter("lang", dataSet.getLang());
-        query.executeUpdate();
+        return query.executeUpdate()>0;
     }
 
 
