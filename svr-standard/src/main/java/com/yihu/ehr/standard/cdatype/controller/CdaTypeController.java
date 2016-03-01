@@ -2,6 +2,8 @@ package com.yihu.ehr.standard.cdatype.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.BizObject;
+import com.yihu.ehr.model.standard.MCDAType;
 import com.yihu.ehr.standard.cdatype.service.CDAType;
 import com.yihu.ehr.standard.cdatype.service.CDATypeManager;
 import com.yihu.ehr.util.controller.BaseRestController;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -32,11 +35,11 @@ public class CdaTypeController extends BaseRestController {
      */
     @RequestMapping(value = "/children_cda_types/{parent_id}",method = RequestMethod.GET)
     @ApiOperation(value = "根据父级ID获取下级")
-    public List<CDAType> getChildrenByPatientId(
+    public List<MCDAType> getChildrenByPatientId(
             @ApiParam(name = "parent_id", value = "父级id")
             @PathVariable(value = "parent_id") String parentId) throws Exception {
         List<CDAType> listType = cdaTypeManager.getChildrenCDATypeByParentId(parentId);
-        return listType;
+        return (List<MCDAType>)convertToModels(listType,new ArrayList<MCDAType>(listType.size()),MCDAType.class,"");
     }
 
     /**
@@ -47,7 +50,7 @@ public class CdaTypeController extends BaseRestController {
      */
     @RequestMapping(value = "/cda_types/patient_ids/key",method = RequestMethod.GET)
     @ApiOperation(value = "根据父级类别获取父级类别所在以下所有子集类别（包括当前父级列表）")
-    public List<CDAType> getChildIncludeSelfByParentTypesAndKey(
+    public List<MCDAType> getChildIncludeSelfByParentTypesAndKey(
             @ApiParam(name = "patient_ids", value = "父级id")
             @RequestParam(value = "patient_ids") String[] patientIds,
             @ApiParam(name = "key", value = "查询条件")
@@ -57,53 +60,65 @@ public class CdaTypeController extends BaseRestController {
         if(childrenIds.length()>0) {
             childrenIds = childrenIds.substring(0, childrenIds.length() - 1);
         }
-        return  cdaTypeManager.getParentType(childrenIds,key);
+        List<CDAType> cdaTypeList = cdaTypeManager.getParentType(childrenIds,key);
+        return  (List<MCDAType>)convertToModels(cdaTypeList,new ArrayList<MCDAType>(cdaTypeList.size()),MCDAType.class,"");
     }
 
 
 
     @RequestMapping(value = "/cda_types/code_name",method = RequestMethod.GET)
     @ApiOperation(value = "根据code或者name获取CDAType列表")
-    public List<CDAType> getCdaTypeByCodeOrName(
+    public List<MCDAType> getCdaTypeByCodeOrName(
             @ApiParam(name = "code", value = "代码")
             @RequestParam(value = "code") String code,
             @ApiParam(name = "name", value = "名称")
             @RequestParam(value = "name") String name) {
-        return cdaTypeManager.GetCdaTypeByCodeOrName(code,name);
+        List<CDAType> cdaTypeList = cdaTypeManager.GetCdaTypeByCodeOrName(code,name);
+        return  (List<MCDAType>)convertToModels(cdaTypeList,new ArrayList<MCDAType>(cdaTypeList.size()),MCDAType.class,"");
     }
 
 
     @RequestMapping(value = "/cda_types/id/{id}",method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取CDAType")
-    public CDAType getCdaTypeById(
+    public MCDAType getCdaTypeById(
             @ApiParam(name = "id", value = "id")
             @PathVariable(value = "id") String id) {
-        return cdaTypeManager.getCdaTypeById(id);
+        CDAType cdaType = cdaTypeManager.getCdaTypeById(id);
+        return convertToModel(cdaType,MCDAType.class);
     }
 
     @RequestMapping(value = "/cda_types/ids/{ids}",method = RequestMethod.GET)
     @ApiOperation(value = "根据ids获取CDAType列表")
-    public List<CDAType> getCdaTypeByIds(
+    public List<MCDAType> getCdaTypeByIds(
             @ApiParam(name = "ids", value = "ids")
             @PathVariable(value = "ids") String[] ids) {
-        return cdaTypeManager.getCDATypeByIds(ids);
+        List<CDAType> cdaTypeList = cdaTypeManager.getCDATypeByIds(ids);
+        return (List<MCDAType>)convertToModels(cdaTypeList,new ArrayList<MCDAType>(cdaTypeList.size()),MCDAType.class,"");
     }
 
 
 
     @RequestMapping(value = "/cda_types",method = RequestMethod.POST)
-    @ApiOperation(value = "保存CDAType,新增或者修改")
-    public Object saveCDAType(
+    @ApiOperation(value = "新增CDAType")
+    public MCDAType saveCDAType(
             @ApiParam(name = "jsonData", value = "json")
             @RequestParam(value = "jsonData") String jsonData) throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        CDAType cdaType =  objectMapper.readValue(jsonData, CDAType.class);
-        if (!StringUtils.isEmpty(cdaType.getId())) {      //add
-            cdaType.setUpdateDate(new Date());
-        } else {
-            cdaType.setCreateDate(new Date());
-        }
-        return cdaTypeManager.save(cdaType);
+        CDAType cdaType =  new ObjectMapper().readValue(jsonData, CDAType.class);
+        cdaType.setId(getObjectId(BizObject.CdaType));
+        cdaType.setCreateDate(new Date());
+        cdaType = cdaTypeManager.save(cdaType);
+        return convertToModel(cdaType,MCDAType.class);
+    }
+
+    @RequestMapping(value = "/cda_types",method = RequestMethod.PUT)
+    @ApiOperation(value = "修改CDAType")
+    public MCDAType updateCDAType(
+            @ApiParam(name = "jsonData", value = "json")
+            @RequestParam(value = "jsonData") String jsonData) throws Exception {
+        CDAType cdaType =  new ObjectMapper().readValue(jsonData, CDAType.class);
+        cdaType.setUpdateDate(new Date());
+        cdaType = cdaTypeManager.save(cdaType);
+        return convertToModel(cdaType,MCDAType.class);
     }
 
     @RequestMapping(value = "/cda_types/existence/{code}" , method = RequestMethod.GET)
@@ -123,7 +138,7 @@ public class CdaTypeController extends BaseRestController {
      */
     @RequestMapping(value = "/cda_types/{ids}",method = RequestMethod.DELETE)
     @ApiOperation(value = "删除CDA类别，若该类别存在子类别，将一并删除子类别")
-    public Object deleteCDATypeByPatientIds(
+    public boolean deleteCDATypeByPatientIds(
             @ApiParam(name = "ids", value = "ids")
             @PathVariable(value = "ids") String[] ids) {
         List<CDAType> parentTypes = cdaTypeManager.getCDATypeByIds(ids);

@@ -49,7 +49,7 @@ public class CDAManager {
     public boolean SaveDataSetRelationship(String[] dataSetIds,String cdaId,String versionCode, String xmlInfo) throws Exception {
 
         cdaDataSetRelationshipManager.deleteRelationshipByCdaId(versionCode,new String[]{cdaId});
-        List<CDADocument> cdaDocuments = cdaDocumentManager.getDocumentList(versionCode,new String[]{cdaId});
+        List<CDADocument> cdaDocuments = cdaDocumentManager.getDocumentList(new String[]{cdaId},versionCode);
         if (cdaDocuments.size() <= 0) {
             return false;
             //请先选择CDA
@@ -130,7 +130,7 @@ public class CDAManager {
     }
 
     public boolean SaveXmlFilePath(String[] cdaIds, String versionCode, String fileGroup, String filePath) {
-        List<CDADocument> cdaDocuments = cdaDocumentManager.getDocumentList(versionCode, cdaIds);
+        List<CDADocument> cdaDocuments = cdaDocumentManager.getDocumentList(cdaIds,versionCode);
         if (cdaDocuments.size() <= 0) {
             //未找到CDA
             return false;
