@@ -45,14 +45,14 @@ public interface AdapterOrgClient {
 
     @RequestMapping(value = "/org", method = RequestMethod.POST)
     @ApiOperation(value = "新增采集标准")
-    boolean addAdapterOrg(
+    MAdapterOrg addAdapterOrg(
             @ApiParam(name = "adapterOrg", value = "采集机构模型", defaultValue = "")
             @RequestParam(value = "adapterOrg", required = false) String adapterOrg) ;
 
 
     @RequestMapping(value = "/org/{code}", method = RequestMethod.PUT)
     @ApiOperation(value = "更新采集标准")
-    boolean updateAdapterOrg(
+    MAdapterOrg updateAdapterOrg(
             @ApiParam(name = "code", value = "代码", defaultValue = "")
             @PathVariable(value = "code") String code,
             @ApiParam(name = "name", value = "名称", defaultValue = "")
