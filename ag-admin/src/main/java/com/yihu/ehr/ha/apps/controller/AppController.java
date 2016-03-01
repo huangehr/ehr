@@ -8,6 +8,7 @@ import com.yihu.ehr.ha.apps.service.AppClient;
 import com.yihu.ehr.agModel.app.AppDetailModel;
 import com.yihu.ehr.agModel.app.AppModel;
 import com.yihu.ehr.model.app.MApp;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
@@ -164,23 +165,17 @@ public class AppController extends BaseController {
 
     /**
      *  将微服务返回的MApp转化为前端AppModel
-     * @param app
+     * @param mApp
      * @return AppModel
      */
-    private AppModel changeToAppModel(MApp app){
-        AppModel appModel = new AppModel();
-        appModel.setId(app.getId());
-        appModel.setName(app.getName());
-        appModel.setUrl(app.getUrl());
-        appModel.setSecret(app.getSecret());
+    private AppModel changeToAppModel(MApp mApp) {
+        AppModel appModel = convertToModel(mApp, AppModel.class);
         //获取app类别字典值
-        String catalog = app.getCatalog();
-        String catalogName = conDictEntryClient.getAppCatalog(catalog).getValue();
-        appModel.setCatalogName(catalogName);
+        MConventionalDict catalogDict = conDictEntryClient.getAppCatalog(mApp.getCatalog());
+        appModel.setCatalogName(catalogDict == null ? "" : catalogDict.getValue());
         //获取状态字典值
-        String status = app.getStatus();
-        String statusValue = conDictEntryClient.getAppStatus(status).getValue();
-        appModel.setStatusName(statusValue);
+        MConventionalDict statusDict = conDictEntryClient.getAppStatus(mApp.getStatus());
+        appModel.setStatusName(statusDict == null ? "" : statusDict.getValue());
         return appModel;
     }
 
@@ -190,23 +185,14 @@ public class AppController extends BaseController {
      * @return
      */
     private AppDetailModel changeToAppDetailModel(MApp mApp){
-        AppDetailModel app = new AppDetailModel();
-        app.setId(mApp.getId());
-        app.setName(mApp.getName());
-        app.setSecret(mApp.getSecret());
-        app.setUrl(mApp.getUrl());
-        app.setDescription(mApp.getDescription());
-        app.setCreateTime(mApp.getCreateTime());
+        AppDetailModel app = convertToModel(mApp, AppDetailModel.class);
         //TODO 微服务提供的model缺少tags标签属性
-        //app.setTags();
         //获取app类别字典值
-        String catalog = mApp.getCatalog();
-        app.setCatalog(catalog);
-        app.setCatalogName(conDictEntryClient.getAppCatalog(catalog).getValue());
+        MConventionalDict catalopDict = conDictEntryClient.getAppCatalog(mApp.getCatalog());
+        app.setCatalogName(catalopDict == null ? "" : catalopDict.getValue());
         //获取app状态字典值
-        String status = mApp.getStatus();
-        app.setStatus(status);
-        app.setStatusName(conDictEntryClient.getAppStatus(status).getValue());
+        MConventionalDict statusDict = conDictEntryClient.getAppStatus(mApp.getStatus());
+        app.setStatusName(statusDict == null ? "" : statusDict.getValue());
         return app;
     }
 }

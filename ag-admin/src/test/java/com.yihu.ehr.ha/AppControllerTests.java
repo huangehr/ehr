@@ -43,15 +43,15 @@ public class AppControllerTests {
     @Test
     public void atestCreateApp() throws Exception{
 
-        applicationContext = new SpringApplicationBuilder().web(false).sources(AgAdminApplication.class).run();
+        applicationContext = new SpringApplicationBuilder()
+                .web(false).sources(AgAdminApplication.class).run();
 
-        Object object = new Object();
         Envelop envelop = new Envelop();
         //列表查询（size、page）---------1 ok
 
-        String fields = "id,name,status,catalog,url,description";
-        String filter = "name=wwcs";
-        String sorts = "create_time";
+        String fields = "";
+        String filter = "";
+        String sorts = "";
         int page = 1;
         int size = 15;
         envelop = appController.getApps(fields, filter, sorts, size, page);
