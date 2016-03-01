@@ -34,7 +34,7 @@ public class CardTests {
 		String cardType = "MediCard";
 		int size = 1;
 		int page = 10;
-		Object result = cardController.searchCardBinding(idCardNo,number,cardType,size,page);
+		Object result = cardController.searchCardBinding(idCardNo,number,cardType,size,page,null,null);
 		assertTrue("查询失败！" , result != null);
 	}
 
@@ -44,7 +44,7 @@ public class CardTests {
 		String cardType = "MediCard";
 		int size = 1;
 		int page = 10;
-		Object result = cardController.searchCardUnBinding(number,cardType,size,page);
+		Object result = cardController.searchCardUnBinding(number,cardType,size,page,null,null);
 		assertTrue("查询失败！" , result != null);
 	}
 
