@@ -71,7 +71,7 @@ Web页面授权流程
 
 使用验证码获取Token：
 
-	POST https://ehr.yihu.com/api/v1/login/oauth/access_token
+	POST https://ehr.yihu.com/login/oauth/access_token
 	
 **参数**
 <table>
@@ -114,12 +114,8 @@ Web页面授权流程
 </table>
 
 **返回值**
-
-默认返回值格式如下：
-
-	access_token=e72e16c7e42f292c6912e7710c838347ae178b4a&scope=user%2Cprofile&token_type=bearer
 	
-根据请求头的格式，其返回值格式也可能如下：
+根据请求头的格式，其返回值格式可能如下：
 
 	Accept: application/json
 	{

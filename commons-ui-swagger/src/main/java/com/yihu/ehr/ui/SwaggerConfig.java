@@ -18,8 +18,8 @@ import static springfox.documentation.builders.PathSelectors.regex;
 @ComponentScan("com.yihu.ehr.*.controller")
 public class SwaggerConfig {
     public static final String LEGACY_API = "Legacy";
-    public static final String PUBLIC_API = "Public";
     public static final String PRIVATE_API = "Private";
+    public static final String PUBLIC_API = "Default";
 
     @Bean
     public Docket publicAPI() {
@@ -44,7 +44,7 @@ public class SwaggerConfig {
                 .forCodeGeneration(false)
                 .pathMapping("/")
                 .select()
-                .paths(or(regex("/admin.*"),
+                .paths(or(regex("/admin/.*"),
                         regex("/restart/.*"),
                         regex("/env/.*"),
                         regex("/trace/.*"),
@@ -53,7 +53,7 @@ public class SwaggerConfig {
                         regex("/refresh/.*"),
                         regex("/pause/.*"),
                         regex("/dump/.*"),
-                        regex("/archaius/.*"),
+                        regex("/resume/.*"),
                         regex("/docs/.*"),
                         regex("/actuator/.*"),
                         regex("/info/.*"),

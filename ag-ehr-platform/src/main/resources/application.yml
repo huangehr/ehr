@@ -9,6 +9,11 @@ endpoints:
   health:
     sensitive: false
 
+security:
+  user:
+    name: user
+    password: gateway
+
 ## 错误消息
 missing:
   user_agent: Request forbidden by administrative rules. Please make sure your request has a User-Agent header.

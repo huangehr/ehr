@@ -1,6 +1,5 @@
 package com.yihu.ehr;
 
-import com.yihu.ehr.config.AppSecurityConfig;
 import com.yihu.ehr.config.AppTomcatConnectionCustomizer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -10,8 +9,6 @@ import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomi
 import org.springframework.boot.context.embedded.tomcat.TomcatConnectorCustomizer;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.util.ResourceUtils;
 
 import java.io.FileNotFoundException;
@@ -40,10 +37,5 @@ public class EHRPlatformGatewayApp {
                 }
             };
         };
-    }
-
-    @Bean
-    public WebSecurityConfigurerAdapter webSecurityConfigurerAdapter() {
-        return new AppSecurityConfig();
     }
 }
