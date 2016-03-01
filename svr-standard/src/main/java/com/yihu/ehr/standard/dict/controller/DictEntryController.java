@@ -36,62 +36,42 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
         return dictEntryService.getServiceEntity(version);
     }
 
-    private void setValues(IDictEntry dictEntry, long dictId, String code, String value, String desc){
-        dictEntry.setCode(code);
-        dictEntry.setDesc(desc);
-        dictEntry.setDictId(dictId);
-        dictEntry.setValue(value);
-    }
 
-    @RequestMapping(value = "/entry/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/entry", method = RequestMethod.PUT)
     @ApiOperation(value = "修改字典项")
-    public boolean updateDictEntry(
-            @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @PathVariable(value = "id") long id,
-            @ApiParam(name = "version", value = "cda版本号", defaultValue = "")
+    public MStdDictEntry updateDictEntry(
+            @ApiParam(name = "version", value = "标准版本", defaultValue = "")
             @RequestParam(value = "version") String version,
-            @ApiParam(name = "dictId", value = "字典编号", defaultValue = "")
-            @RequestParam(value = "dictId") long dictId,
-            @ApiParam(name = "code", value = "代码", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "value", value = "值", defaultValue = "")
-            @RequestParam(value = "value") String value,
-            @ApiParam(name = "desc", value = "描述", defaultValue = "")
-            @RequestParam(value = "desc") String desc) throws Exception{
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestParam(value = "model") String model) throws Exception{
 
         Class entityClass = getServiceEntity(version);
-        IDictEntry dictEntry = dictEntryService.retrieve(id, entityClass);
-        if(!dictEntry.getCode().equals(code)
-                && dictEntryService.isExistByField("code", code, entityClass))
+        IDictEntry dictEntryModel = (IDictEntry) jsonToObj(model, entityClass);
+        IDictEntry dictEntry = dictEntryService.retrieve(dictEntryModel.getId(), entityClass);
+        if(!dictEntry.getCode().equals(dictEntryModel.getCode())
+                && dictEntryService.isExistByField("code", dictEntryModel.getCode(), entityClass))
             throw errRepeatCode();
 
-        setValues(dictEntry, dictId, code, value, desc);
         dictEntryService.save(dictEntry);
-        return true;
+        return getModel(dictEntryModel);
     }
 
 
     @RequestMapping(value = "/entry", method = RequestMethod.POST)
     @ApiOperation(value = "新增字典项")
-    public boolean addDictEntry(
+    public MStdDictEntry addDictEntry(
             @ApiParam(name = "version", value = "cda版本号", defaultValue = "")
             @RequestParam(value = "version") String version,
-            @ApiParam(name = "dictId", value = "字典编号", defaultValue = "")
-            @RequestParam(value = "dictId") long dictId,
-            @ApiParam(name = "code", value = "代码", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "value", value = "值", defaultValue = "")
-            @RequestParam(value = "value") String value,
-            @ApiParam(name = "desc", value = "描述", defaultValue = "")
-            @RequestParam(value = "desc") String desc) throws Exception{
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestParam(value = "model") String model) throws Exception{
 
         Class entityClass = getServiceEntity(version);
-        IDictEntry dictEntry = (IDictEntry) entityClass.newInstance();
-        if(dictEntryService.isExistByField("code", code, entityClass))
+        IDictEntry dictEntry = (IDictEntry) jsonToObj(model, entityClass);
+        if(dictEntryService.isExistByField("code", dictEntry.getCode(), entityClass))
             throw errRepeatCode();
-
-        setValues(dictEntry, dictId, code, value, desc);
-        return dictEntryService.add(dictEntry, version);
+        if (dictEntryService.add(dictEntry, version))
+            return getModel(dictEntry);
+        return null;
     }
 
 

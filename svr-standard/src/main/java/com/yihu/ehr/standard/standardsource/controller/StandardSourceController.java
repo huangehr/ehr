@@ -30,15 +30,6 @@ public class StandardSourceController extends ExtendController<MStdSource>{
     @Autowired
     private StdSourceService stdSourceService;
 
-    private StandardSource setValues(StandardSource standardSource, String code, String name, String type, String description){
-        standardSource.setCode(code);
-        standardSource.setName(name);
-        standardSource.setSourceType(type);
-        standardSource.setDescription(description);
-        standardSource.setUpdateDate(new Date());
-        return standardSource;
-    }
-
     @RequestMapping(value = "/sources", method = RequestMethod.GET)
     @ApiOperation(value = "标准来源分页搜索")
     public Collection<MStdSource> searchAdapterOrg(
@@ -71,51 +62,34 @@ public class StandardSourceController extends ExtendController<MStdSource>{
     }
 
 
-    @RequestMapping(value = "/source/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/source", method = RequestMethod.PUT)
     @ApiOperation(value = "修改标准来源，通过id取数据，取不到数据时新增，否则修改")
-    public boolean updateStdSource(
-            @ApiParam(name = "id", value = "标准来源编号", defaultValue = "")
-            @PathVariable(value = "id") String id,
-            @ApiParam(name = "code", value = "编码", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "名称", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "type", value = "类型", defaultValue = "")
-            @RequestParam(value = "type") String type,
-            @ApiParam(name = "description", value = "描述", defaultValue = "")
-            @RequestParam(value = "description") String description) throws Exception{
+    public MStdSource updateStdSource(
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestParam(value = "model") String model) throws Exception{
 
-        StandardSource standardSource = stdSourceService.retrieve(id);
+        StandardSource standardSourceModel = jsonToObj(model, StandardSource.class);
+        StandardSource standardSource = stdSourceService.retrieve(standardSourceModel.getId());
         if(standardSource==null)
             throw errNotFound();
 
-        if (!standardSource.getCode().equals(code)
-                && stdSourceService.isSourceCodeExist(code))
+        if (!standardSource.getCode().equals(standardSourceModel.getCode())
+                && stdSourceService.isSourceCodeExist(standardSourceModel.getCode()))
             throw new ApiException(ErrorCode.RepeatCode, "代码重复！");
 
-        stdSourceService.save(
-                setValues(standardSource, code, name, type, description));
-        return true;
+        return getModel(stdSourceService.save(standardSourceModel));
     }
 
     @RequestMapping(value = "/source", method = RequestMethod.POST)
     @ApiOperation(value = "新增标准来源")
-    public boolean addStdSource(
-            @ApiParam(name = "code", value = "编码", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "名称", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "type", value = "类型", defaultValue = "")
-            @RequestParam(value = "type") String type,
-            @ApiParam(name = "description", value = "描述", defaultValue = "")
-            @RequestParam(value = "description") String description) throws Exception{
+    public MStdSource addStdSource(
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestParam(value = "model") String model) throws Exception{
 
-        if (stdSourceService.isSourceCodeExist(code))
+        StandardSource standardSource = jsonToObj(model, StandardSource.class);
+        if (stdSourceService.isSourceCodeExist(standardSource.getCode()))
             throw errRepeatCode();
-
-        stdSourceService.save(
-                setValues(new StandardSource(), code, name, type, description));
-        return true;
+        return getModel(stdSourceService.save(standardSource));
     }
 
 

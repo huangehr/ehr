@@ -107,54 +107,40 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
 
     @RequestMapping(value = "/dataset", method = RequestMethod.POST)
     @ApiOperation(value = "新增数据集信息")
-    public boolean saveDataSet(
-            @ApiParam(name = "code", value = "代码", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "名称", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "refStandard", value = "标准来源", defaultValue = "")
-            @RequestParam(value = "refStandard") String refStandard,
-            @ApiParam(name = "summary", value = "描述", defaultValue = "")
-            @RequestParam(value = "summary") String summary,
-            @ApiParam(name = "version", value = "版本号", defaultValue = "")
-            @RequestParam(value = "version") String version) throws Exception{
+    public MStdDataSet saveDataSet(
+            @ApiParam(name = "version", value = "标准版本", defaultValue = "")
+            @RequestParam(value = "version") String version,
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestParam(value = "model") String model) throws Exception{
 
         Class entityClass = getServiceEntity(version);
-        IDataSet dataSet = (IDataSet)entityClass.newInstance();
-        setValues(dataSet, code, name, refStandard, summary, version);
-        if (dataSetService.isExistByField("code", code, entityClass))
+        IDataSet dataSet = (IDataSet) jsonToObj(model, entityClass);
+        if (dataSetService.isExistByField("code", dataSet.getCode(), entityClass))
             throw new ApiException(ErrorCode.RapeatDataSetCode, "代码重复！");
-        dataSetService.add(dataSet);
-        return true;
+        if(dataSetService.add(dataSet))
+            return getModel(dataSet);
+        return null;
     }
 
-    @RequestMapping(value = "/dataset/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/dataset", method = RequestMethod.PUT)
     @ApiOperation(value = "修改数据集信息")
-    public boolean updateDataSet(
-            @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @PathVariable(value = "id") long id,
-            @ApiParam(name = "code", value = "代码", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "名称", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "refStandard", value = "标准来源", defaultValue = "")
-            @RequestParam(value = "refStandard") String refStandard,
-            @ApiParam(name = "summary", value = "描述", defaultValue = "")
-            @RequestParam(value = "summary") String summary,
-            @ApiParam(name = "version", value = "版本号", defaultValue = "")
-            @RequestParam(value = "version") String version) throws Exception{
+    public MStdDataSet updateDataSet(
+            @ApiParam(name = "version", value = "标准版本", defaultValue = "")
+            @RequestParam(value = "version") String version,
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestParam(value = "model") String model) throws Exception{
 
         Class entityClass = getServiceEntity(version);
-        IDataSet dataSet = dataSetService.retrieve(id, entityClass);
-        if(!dataSet.getCode().equals(code)){
-            dataSet.setCode(code);
-            if(dataSetService.isExistByField("code", code, entityClass))
+        IDataSet dataSetModel = (IDataSet) jsonToObj(model, entityClass);
+        IDataSet dataSet = dataSetService.retrieve(dataSetModel.getId(), entityClass);
+        if(!dataSet.getCode().equals(dataSetModel.getCode())){
+            if(dataSetService.isExistByField("code", dataSetModel.getCode(), entityClass))
                 throw new ApiException(ErrorCode.RapeatDataSetCode, "代码重复！");
         }
-        setValues(dataSet, code, name, refStandard, summary, version);
         dataSetService.save(dataSet);
-        return true;
+        return getModel(dataSetModel);
     }
+
 
     @RequestMapping(value = "/datasets/map", method = RequestMethod.GET)
     @ApiOperation(value = "获取数据集 id-name : map集")
