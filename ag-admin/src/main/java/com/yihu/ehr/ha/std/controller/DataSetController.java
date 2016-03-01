@@ -1,5 +1,7 @@
 package com.yihu.ehr.ha.std.controller;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.datasset.DataSetModel;
 import com.yihu.ehr.agModel.standard.datasset.MetaDataModel;
 import com.yihu.ehr.constants.ApiVersion;
@@ -14,6 +16,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -49,10 +52,10 @@ public class DataSetController extends BaseController{
 
         for (MStdDataSet mStdDataSet:mStdDataSets){
             DataSetModel dataSetModel = convertToModel(mStdDataSet,DataSetModel.class);
-            dataSetModel.setId(mStdDataSet.getId());
-            dataSetModel.setDatasetCode(mStdDataSet.getCode());
-            dataSetModel.setDatasetName(mStdDataSet.getName());
-            dataSetModel.setStdVersion(mStdDataSet.getStdVersion());
+//            dataSetModel.setId(mStdDataSet.getId());
+//            dataSetModel.setDatasetCode(mStdDataSet.getCode());
+//            dataSetModel.setDatasetName(mStdDataSet.getName());
+//            dataSetModel.setStdVersion(mStdDataSet.getStdVersion());
             dataSetModelList.add(dataSetModel);
         }
 
@@ -111,16 +114,17 @@ public class DataSetController extends BaseController{
 
         MStdDataSet mStdDataSet = dataSetClient.getDataSet(id,version);
 
-        DataSetModel dataSetModel = new DataSetModel();
+//        DataSetModel dataSetModel = new DataSetModel();
         Envelop envelop = new Envelop();
 
         if(mStdDataSet != null){
-            dataSetModel.setId(mStdDataSet.getId());
-            dataSetModel.setDatasetCode(mStdDataSet.getCode());
-            dataSetModel.setDatasetName(mStdDataSet.getName());
-            dataSetModel.setStdVersion(mStdDataSet.getStdVersion());
-            dataSetModel.setReference(mStdDataSet.getReference());
-            dataSetModel.setSummary(mStdDataSet.getSummary());
+            DataSetModel dataSetModel = convertToModel(mStdDataSet,DataSetModel.class);
+//            dataSetModel.setId(mStdDataSet.getId());
+//            dataSetModel.setDatasetCode(mStdDataSet.getCode());
+//            dataSetModel.setDatasetName(mStdDataSet.getName());
+//            dataSetModel.setStdVersion(mStdDataSet.getStdVersion());
+//            dataSetModel.setReference(mStdDataSet.getReference());
+//            dataSetModel.setSummary(mStdDataSet.getSummary());
             envelop.setSuccessFlg(true);
             envelop.setObj(dataSetModel);
         }else {
@@ -220,22 +224,37 @@ public class DataSetController extends BaseController{
         return envelop;
     }
 
-//todo:2.29
     @RequestMapping(value = "/metaData", method = RequestMethod.DELETE)
-    public String deleteMetaData(
-            @ApiParam(name = "apiVersion", value = "API版本号", defaultValue = "v1.0")
-
-            @PathVariable(value = "apiVersion") String apiVersion,
+    @ApiOperation(value = "删除数据元")
+    public Envelop deleteMetaData(
             @ApiParam(name = "ids", value = "数据元ID")
-            @RequestParam(value = "ids") long ids,
+            @RequestParam(value = "ids") String ids,
             @ApiParam(name = "versionCode", value = "标准版本号")
             @RequestParam(value = "versionCode") String versionCode) {
 
-        return null;
+        Envelop envelop = new Envelop();
+
+        String[] strings = ids.split(",");
+        boolean bo;
+        if (strings.length>1){
+            //批量删除数据元
+            bo = dataSetClient.deleteMetaDatas(ids,versionCode);
+            envelop.setSuccessFlg(bo);
+        }else {
+            //单个删除数据元
+            long id = Long.valueOf(ids);
+            bo = dataSetClient.deleteMetaData(id,versionCode);
+            envelop.setSuccessFlg(bo);
+        }
+
+        return envelop;
     }
 
+
+//todo:微服务没有接受数据元id
     @RequestMapping(value = "/getMetaData", method = RequestMethod.GET)
-    public String getMetaData(
+    @ApiOperation(value = "获取数据元")
+    public Envelop getMetaData(
             @ApiParam(name = "apiVersion", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "apiVersion") String apiVersion,
             @ApiParam(name = "dataSetId", value = "数据集ID")
@@ -244,30 +263,79 @@ public class DataSetController extends BaseController{
             @RequestParam(value = "metaDataId") long metaDataId,
             @ApiParam(name = "versionCode", value = "标准版本号")
             @RequestParam(value = "versionCode") String versionCode) {
-        return null;
+
+        Envelop envelop = new Envelop();
+
+        MStdMetaData mStdMetaData = dataSetClient.getMetaData(dataSetId, metaDataId, versionCode);
+        MetaDataModel metaDataModel = convertToModel(mStdMetaData,MetaDataModel.class);
+
+        if (metaDataModel != null){
+            envelop.setObj(metaDataModel);
+            envelop.setSuccessFlg(true);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("获取数据元失败");
+        }
+        return envelop;
     }
 
     @RequestMapping(value = "/updataMetaSet", method = RequestMethod.POST)
-    public String updataMetaData(
-            @ApiParam(name = "apiVersion", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable(value = "apiVersion") String apiVersion,
+    @ApiOperation(value = "更新数据元")
+    public Envelop updataMetaData(
+            @ApiParam(name = "version", value = "版本", defaultValue = "")
+            @RequestParam(value = "version") String version,
             @ApiParam(name = "metaDataJson", value = "数据元Json")
-            @RequestParam(value = "metaDataJson") String metaDataJson) {
-        return null;
+            @RequestParam(value = "metaDataJson") String metaDataJson) throws IOException {
+
+        Envelop envelop = new Envelop();
+        ObjectMapper mapper = new ObjectMapper();
+        boolean bo;
+
+        MetaDataModel metaDataModel = mapper.readValue(metaDataJson, MetaDataModel.class);
+        if(metaDataModel.getId()>0){
+            bo = dataSetClient.updataMetaSet(version, metaDataJson);
+        }else {
+            bo = dataSetClient.saveMetaSet(version,metaDataJson);
+        }
+
+        envelop.setSuccessFlg(bo);
+
+        return envelop;
     }
 
-    @RequestMapping(value = "/validatorMetadata", method = RequestMethod.GET)
-    public String validatorMetadata(
-            @ApiParam(name = "apiVersion", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable(value = "apiVersion") String apiVersion,
-            @ApiParam(name = "versionCode", value = "标准版本代码")
-            @RequestParam(value = "versionCode") String versionCode,
-            @ApiParam(name = "datasetId", value = "数据集ID")
-            @RequestParam(value = "datasetId") String datasetId,
-            @ApiParam(name = "searchNm", value = "查询条件")
-            @RequestParam(value = "searchNm") String searchNm,
-            @ApiParam(name = "metaDataCodeMsg", value = "查询类别")
-            @RequestParam(value = "metaDataCodeMsg") String metaDataCodeMsg) {
-        return null;
+    @RequestMapping(value = "/validatorMetadata/code", method = RequestMethod.GET)
+    @ApiOperation(value = "验证数据元代码是否重复")
+    public Envelop validatorMetadataCode(
+            @ApiParam(name = "version", value = "版本号", defaultValue = "")
+            @RequestParam(value = "version") String version,
+            @ApiParam(name = "dataSetId", value = "数据集编号", defaultValue = "")
+            @RequestParam(value = "dataSetId") long dataSetId,
+            @ApiParam(name = "code", value = "查询代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+
+        Envelop envelop = new Envelop();
+
+        boolean bo = dataSetClient.validateCode(version,dataSetId,code);
+        envelop.setSuccessFlg(bo);
+
+        return envelop;
+    }
+
+    @RequestMapping(value = "/validatorMetadata/name", method = RequestMethod.GET)
+    @ApiOperation(value = "验证数据元名称是否重复")
+    public Envelop validatorMetadataName(
+            @ApiParam(name = "version", value = "版本号", defaultValue = "")
+            @RequestParam(value = "version") String version,
+            @ApiParam(name = "dataSetId", value = "数据集编号", defaultValue = "")
+            @RequestParam(value = "dataSetId") long dataSetId,
+            @ApiParam(name = "code", value = "查询代码", defaultValue = "")
+            @RequestParam(value = "code") String name) {
+
+        Envelop envelop = new Envelop();
+
+        boolean bo = dataSetClient.validatorName(version, dataSetId, name);
+        envelop.setSuccessFlg(bo);
+
+        return envelop;
     }
 }
