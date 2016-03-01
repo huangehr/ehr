@@ -41,7 +41,7 @@ public class StandardSourceController extends ExtendController<MStdSource>{
 
     @RequestMapping(value = "/sources", method = RequestMethod.GET)
     @ApiOperation(value = "标准来源分页搜索")
-    public Collection searchAdapterOrg(
+    public Collection<MStdSource> searchAdapterOrg(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")

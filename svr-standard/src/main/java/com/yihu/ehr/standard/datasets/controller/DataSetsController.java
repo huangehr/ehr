@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lincl
@@ -47,7 +48,7 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
 
     @RequestMapping(value = "/datasets", method = RequestMethod.GET)
     @ApiOperation(value = "查询数据集的方法")
-    public Collection searchDataSets(
+    public Collection<MStdDataSet> searchDataSets(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -153,6 +154,19 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
         setValues(dataSet, code, name, refStandard, summary, version);
         dataSetService.save(dataSet);
         return true;
+    }
+
+    @RequestMapping(value = "/datasets/map", method = RequestMethod.GET)
+    @ApiOperation(value = "获取数据集 id-name : map集")
+    public Map getDataSetMapByIds(
+            @ApiParam(name = "version", value = "版本号", defaultValue = "")
+            @RequestParam(value = "version") String version,
+            @ApiParam(name = "ids", value = "数据集编号", defaultValue = "")
+            @RequestParam(value = "ids") String ids) throws Exception{
+
+        return dataSetService.getDataSetMapByIds(
+                ids==null || ids.trim().length()==0? new String[]{} : ids.split(","),
+                version);
     }
 
 }

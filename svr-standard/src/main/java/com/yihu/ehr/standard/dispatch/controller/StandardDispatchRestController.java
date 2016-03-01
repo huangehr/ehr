@@ -1,6 +1,6 @@
 package com.yihu.ehr.standard.dispatch.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
@@ -25,7 +25,7 @@ import java.util.Map;
  * @created 2015.07.14 17:59
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0 + "/standard-dispatcher")
+@RequestMapping(ApiVersion.Version1_0 + "/standard-dispatcher")
 @Api(protocols = "https", value = "Standard-Dispatch", description = "标准分发接口", tags = {"标准化", "适配方案", "分发"})
 public class StandardDispatchRestController  extends ExtendController{
 

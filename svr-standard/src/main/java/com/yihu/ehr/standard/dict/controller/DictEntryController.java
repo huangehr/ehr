@@ -142,7 +142,7 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
 
     @RequestMapping(value = "/entrys", method = RequestMethod.GET)
     @ApiOperation(value = "查询字典项")
-    public Collection searchDataSets(
+    public Collection<MStdDictEntry> searchDataSets(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
