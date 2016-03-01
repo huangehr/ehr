@@ -36,11 +36,8 @@ public class CDADocument {
      * 标准来源ID
      */
     private String sourceId;
-
     private int hashCode;
-
     private String fileGroup;
-
     private String typeId;
 
 

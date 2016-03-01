@@ -46,34 +46,7 @@ public class SecurityRestControllerTests {
         assertTrue("查询失败！" , userSecurity != null);
     }
 
-//    @Test
-//    //// TODO: 2016/1/27
-//    public void ctestGetUserToken() throws Exception{
-//        String loginCode = "admin";
-//        String rsaPWD = "e10adc3949ba59abbe56e057f20f883e";
-//        String appId = "33nuGNdwGl";
-//        String appSecret = "Yhep6NKOOBd2h8rd";
-//        Object userSecurity = securityRestController.getUserToken(loginCode,rsaPWD,appId,appSecret);
-//        assertTrue("查询失败！" , userSecurity != null);
-//        assertTrue("查询失败！" , 1==1);
-//    }
-//
-//    @Test
-//    public void dtestrefreshToken() throws Exception{
-//        String userId = "0dae000355efa435b735be11806d23a2";
-//        String refreshToken = "3801916fbd19d6fdc2adf2752b491a5d";
-//        String appId = "Vppx44kHAb";
-//        Object userSecurity = securityRestController.refreshToken(userId,refreshToken,appId);
-//        assertTrue("查询失败！" , userSecurity != null);
-//    }
-//
-//    @Test
-//    public void etestRevokeToken() throws Exception{
-//        String accessToken = "3801916fbd19d6fdc2adf2752b491a5w";
-//        Object result = securityRestController.revokeToken(accessToken);
-//        assertTrue("查询失败！" , result != null);
-//    }
-//
+
     @Test
     public void ftestCreateSecurityByOrgCode() throws Exception{
         String orgCode = "341321234";

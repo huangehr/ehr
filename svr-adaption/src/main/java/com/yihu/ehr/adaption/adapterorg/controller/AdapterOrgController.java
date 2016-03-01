@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -36,7 +35,7 @@ public class AdapterOrgController extends ExtendController<MAdapterOrg> {
 
     @RequestMapping(value = "/orgs", method = RequestMethod.GET)
     @ApiOperation(value = "适配采集标准")
-    public Collection searchAdapterOrg(
+    public Collection<MAdapterOrg> searchAdapterOrg(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -115,7 +114,7 @@ public class AdapterOrgController extends ExtendController<MAdapterOrg> {
     }
 
 
-    @RequestMapping(value = "/{org}/isExistAdapterData", method = RequestMethod.GET)
+    @RequestMapping(value = "/isExistAdapterData/{org}", method = RequestMethod.GET)
     @ApiOperation(value = "判断采集机构是否存在采集数据")
     public boolean orgIsExistData(
             @ApiParam(name = "org", value = "机构", defaultValue = "")

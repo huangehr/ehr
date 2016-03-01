@@ -111,7 +111,7 @@ public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAd
      * @param adapterCustomizes
      */
     @Transactional(propagation = Propagation.REQUIRED)
-    public void adapterDataSet(String apiVersion, Long planId, List<AdapterCustomize> adapterCustomizes) {
+    public void adapterDataSet(Long planId, List<AdapterCustomize> adapterCustomizes) {
         //删除取消的 数据元、字典
         int rs = unselectAdapterDataSet(planId, adapterCustomizes);
 
@@ -144,7 +144,7 @@ public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAd
                 if (metaDataId != null) {
                     dataSet.setMetaDataId(metaDataId);
                 }
-                adapterDataSetService.addAdapterDataSet(apiVersion, dataSet, orgAdapterPlan);
+                adapterDataSetService.addAdapterDataSet( dataSet, orgAdapterPlan);
             }
             adapterFlag = true;
         }

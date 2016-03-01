@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lincl
@@ -38,7 +39,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
 
     @RequestMapping(value = "/metadatas", method = RequestMethod.GET)
     @ApiOperation(value = "查询数据元")
-    public Collection searchDataSets(
+    public Collection<MStdMetaData> searchDataSets(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -110,39 +111,43 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
 
     @RequestMapping(value = "/metadata", method = RequestMethod.PUT)
     @ApiOperation(value = "更新数据元")
-    public boolean updataMetaSet(
+    public MStdMetaData updataMetaSet(
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version,
             @ApiParam(name = "model", value = "数据源模型", defaultValue = "")
-            @RequestParam(value = "model", required = false) IMetaData model) throws Exception{
+            @RequestParam(value = "model", required = false) String model) throws Exception{
 
         Class entityClass = getServiceEntity(version);
-        IMetaData metaData = metaDataService.retrieve(model.getId(), entityClass);
+        IMetaData metaDataModel = (IMetaData) jsonToObj(model, entityClass);
+        IMetaData metaData = metaDataService.retrieve(metaDataModel.getId(), entityClass);
         if(metaData.getId()==0)
             throw errNotFound();
 
-        if(!metaData.getCode().equals(model.getCode())
-                && metaDataService.isColumnValExsit(model.getDataSetId(), "code", model.getCode(), entityClass))
+        if(!metaData.getCode().equals(metaDataModel.getCode())
+                && metaDataService.isColumnValExsit(metaDataModel.getDataSetId(), "code", metaDataModel.getCode(), entityClass))
             throw errRepeatCode();
 
         BeanUtils.copyProperties(model, metaData);
         metaDataService.save(metaData);
-        return true;
+        return getModel(metaData);
     }
 
     @RequestMapping(value = "/metadata", method = RequestMethod.POST)
     @ApiOperation(value = "新增数据元")
-    public boolean saveMetaSet(
+    public MStdMetaData saveMetaSet(
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version,
             @ApiParam(name = "model", value = "数据源模型", defaultValue = "")
-            @RequestParam(value = "model", required = false) IMetaData model) throws Exception{
+            @RequestParam(value = "model", required = false) String model) throws Exception{
 
-        if(metaDataService.isColumnValExsit(model.getDataSetId(), "code", model.getCode(), getServiceEntity(version)))
+        IMetaData metaData = (IMetaData) jsonToObj(model, getServiceEntity(version));
+        if(metaDataService.isColumnValExsit(metaData.getDataSetId(), "code", metaData.getCode(), getServiceEntity(version)))
             throw errRepeatCode();
-
-        return metaDataService.saveMetaData(model, version);
+        if(metaDataService.saveMetaData(metaData, version))
+            return getModel(model);
+        return null;
     }
+
 
     @RequestMapping(value = "/metadata/validate/code", method = RequestMethod.GET)
     @ApiOperation(value = "验证数据元代码是否重复")
@@ -170,4 +175,14 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
         return metaDataService.isColumnValExsit(dataSetId, "name", name, getServiceEntity(version));
     }
 
+    @RequestMapping(value = "/metadatas/map", method = RequestMethod.GET)
+    @ApiOperation(value = "获取数据元 id-name : map集")
+    public Map getMetaDataMapByIds(
+            @ApiParam(name = "version", value = "版本号", defaultValue = "")
+            @RequestParam(value = "version") String version,
+            @ApiParam(name = "medaIds", value = "数据元编号", defaultValue = "")
+            @RequestParam(value = "medaIds") String metaIds) {
+
+        return metaDataService.getMetaDataMapByIds(strToLongArr(metaIds), version);
+    }
 }

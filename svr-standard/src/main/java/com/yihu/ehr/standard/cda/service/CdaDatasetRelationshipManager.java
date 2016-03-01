@@ -63,7 +63,7 @@ public class CdaDataSetRelationshipManager{
      * @param pageSize
      * @return
      */
-    public List<CdaDataSetRelationship> getCDADataSetRelationshipByCDAId(String cdaId,String versionCode,int page,int pageSize) {
+    public List<CdaDataSetRelationship> getCDADataSetRelationshipByCDAId(String versionCode,String cdaId,int page,int pageSize) {
         Session session = currentSession();
         String strTableName = CDAVersionUtil.getCDADatasetRelationshipTableName(versionCode);
         String strSql = "SELECT t.id," +

@@ -37,7 +37,6 @@ public class CDATypeManager{
      * @param name
      * @return
      */
-    @Transactional(Transactional.TxType.SUPPORTS)
     public List<CDAType> GetCdaTypeByCodeOrName(String code,String name) {
 
         Session session = currentSession();
@@ -64,10 +63,8 @@ public class CDATypeManager{
     /**
      * @param info
      */
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public boolean save(CDAType info) {
-        cdaTypeRepository.save(info);
-        return true;
+    public CDAType save(CDAType info) {
+        return cdaTypeRepository.save(info);
     }
 
     /**
@@ -108,7 +105,6 @@ public class CDATypeManager{
      *
      * @param code
      */
-    @Transactional(Transactional.TxType.SUPPORTS)
     public boolean isCodeExist(String code) {
         List<CDAType> listInfo = null;
         Session session = currentSession();
@@ -126,7 +122,6 @@ public class CDATypeManager{
     /**
      * 根据父级ID获取下级类别
      */
-    @Transactional(Transactional.TxType.SUPPORTS)
     public List<CDAType> getChildrenCDATypeByParentId(String parentId) {
         Session session = currentSession();
         String strSql="";

@@ -8,6 +8,7 @@ import com.yihu.ehr.adaption.dict.service.AdapterDictModel;
 import com.yihu.ehr.adaption.dict.service.AdapterDictService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.adaption.MAdapterDict;
+import com.yihu.ehr.model.adaption.MDataSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -38,7 +39,7 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
 
     @RequestMapping(value = "/plan/{planId}/dicts", method = RequestMethod.GET)
     @ApiOperation(value = "字典适配关系分页查询")
-    public Collection searchAdapterDict(
+    public Collection<MDataSet> searchAdapterDict(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "code", value = "代码查询值", defaultValue = "")
@@ -62,9 +63,9 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
         return ls;
     }
 
-    @RequestMapping(value = "/plan/{planId}/dict/{dictId}/items", method = RequestMethod.GET)
+    @RequestMapping(value = "/plan/{planId}/dict/{dictId}/entrys", method = RequestMethod.GET)
     @ApiOperation(value = "字典项适配关系分页查询")
-    public Collection searchAdapterDictEntry(
+    public Collection<MAdapterDict> searchAdapterDictEntry(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "dictId", value = "字典编号", defaultValue = "")
@@ -90,7 +91,7 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
         return ls;
     }
 
-    @RequestMapping(value = "/items/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/entry/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据字典ID获取字典项适配关系明细")
     public MAdapterDict getAdapterDictEntry(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
@@ -99,7 +100,7 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
         return getAdapterDict(id);
     }
 
-    @RequestMapping(value = "/item", method = RequestMethod.POST)
+    @RequestMapping(value = "/entry", method = RequestMethod.POST)
     @ApiOperation(value = "保存字典项映射关系")
     public boolean createAdapterDictEntry(
             @ApiParam(name = "adapterDictModel", value = "字典数据模型", defaultValue = "")
@@ -112,11 +113,11 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
         }
     }
 
-    @RequestMapping(value = "/item/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/entry/{id}", method = RequestMethod.PUT)
     @ApiOperation(value = "修改字典项映射关系")
     public boolean updateAdapterDictEntry(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @RequestParam(value = "id") Long id,
+            @PathVariable(value = "id") Long id,
             @ApiParam(name = "adapterDictModel", value = "字典数据模型", defaultValue = "")
             @RequestParam(value = "adapterDictModel") String dictJsonModel) throws Exception {
 
@@ -130,7 +131,7 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
         }
     }
 
-    @RequestMapping(value = "/items", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/entrys", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除字典项映射")
     public boolean delDictEntry(
             @RequestParam("ids") String ids) throws Exception {

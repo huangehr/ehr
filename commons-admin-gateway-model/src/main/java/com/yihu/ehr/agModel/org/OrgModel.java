@@ -14,7 +14,7 @@ public class OrgModel {
     private String tel;
     private String location;
     private String locationStrName;
-    private String activityFlag;
+    private int activityFlag;
     private String activityFlagName;
     private String settledWay;
     private String settledWayName;
@@ -92,11 +92,11 @@ public class OrgModel {
         this.locationStrName = locationStrName;
     }
 
-    public String getActivityFlag() {
+    public int getActivityFlag() {
         return activityFlag;
     }
 
-    public void setActivityFlag(String activityFlag) {
+    public void setActivityFlag(int activityFlag) {
         this.activityFlag = activityFlag;
     }
 

@@ -1,17 +1,13 @@
 package com.yihu.ehr.constants;
 
 /**
+ *
  * @author Sand
  * @version 1.0
  * @created 2015.08.10 17:49
  */
 public enum ErrorCode {
-    // api specification
-    MissingUserAgent("missing.user_agent"),
-    RateLimitExceeding("rate_limit.exceeding"),
 
-
-    //
     MissMethod("ehr.common.miss.method"),
     MissTimestamp("ehr.common.miss.timestamp"),
     MissAppKey("ehr.common.miss.appid"),
@@ -35,6 +31,8 @@ public enum ErrorCode {
     QueryTotalCount("ehr.common.query.count"),
     NotFoundObj("ehr.common.query.not.found"),
     RepeatCode("ehr.commons.repeat.code"),
+    RepeatName("ehr.commons.repeat.name"),  // add by cws 20160223
+    RepeatRelation("ehr.commons.repeat.relation"),  // add by cws 20160225
 
     SuccessSave("ehr.common.success.update"),
     InvalidUpdate("ehr.common.invalid.update"),
@@ -67,8 +65,6 @@ public enum ErrorCode {
     PatientRegisterFailed("ehr.patient.register.failed"),
     InvalidFormatPatientRegister("ehr.patient.invalid.register.info"),
     PatientRegisterFailedForExist("ehr.patient.exist.create"),
-    CardMessageMissing("ehr.card.update.failed"),
-    CardIsToVoid("ehr.card.update.failed"),
 
     MissArchiveFile("ehr.archive.miss.file"),
     MissArchiveCrypto("ehr.archive.miss.cryptograph"),
@@ -89,6 +85,7 @@ public enum ErrorCode {
     InvalidSysDictEntry("ehr.sysDictEntry.name.invalid"),
     InvalidDelSysDictEntry("ehr.sysDictEntry.del.invalid"),
     InvalidUpdateSysDictEntry("ehr.sysDictEntry.update.invalid"),
+
 
     GetGeographyFailed("ehr.geography.ger.invalid"),
 

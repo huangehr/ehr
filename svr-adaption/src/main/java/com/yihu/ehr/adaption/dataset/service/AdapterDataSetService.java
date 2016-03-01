@@ -200,11 +200,11 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
      * @param orgAdapterPlan
      */
     @Transactional(propagation = Propagation.REQUIRED)
-    public void addAdapterDataSet(String apiVersion, AdapterDataSet adapterDataSet, OrgAdapterPlan orgAdapterPlan) {
+    public void addAdapterDataSet(AdapterDataSet adapterDataSet, OrgAdapterPlan orgAdapterPlan) {
         //新增需要适配的字典
         Long planId = adapterDataSet.getAdapterPlanId();
         String cdaVersion = orgAdapterPlan.getVersion();
-        Map map = dictClient.getDataSetMapByIds(apiVersion, cdaVersion, adapterDataSet.getDataSetId(), adapterDataSet.getMetaDataId());
+        Map map = dictClient.getDictMapByIds(cdaVersion, adapterDataSet.getDataSetId(), adapterDataSet.getMetaDataId());
         if (map != null) {
             Long dictId = Long.parseLong((String) map.get("dictId"));
             adapterDataSet.setStdDict(dictId);

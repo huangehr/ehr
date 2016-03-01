@@ -65,7 +65,7 @@ public class OrganizationController extends BaseRestController {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
         List<Organization> organizationList = orgService.search(fields, filters, sorts, page, size);
-        pagedResponse(request, response, orgService.getCount(filters), page, page);
+        pagedResponse(request, response, orgService.getCount(filters), page, size);
         return (List<MOrganization>)convertToModels(organizationList, new ArrayList<MOrganization>(organizationList.size()), MOrganization.class, fields);
     }
 
