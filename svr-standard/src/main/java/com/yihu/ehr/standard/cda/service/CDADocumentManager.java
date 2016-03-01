@@ -1,7 +1,7 @@
 package com.yihu.ehr.standard.cda.service;
-import com.yihu.ehr.standard.cdaversion.service.CDAVersion;
 import com.yihu.ehr.standard.datasets.service.DataSet;
 import com.yihu.ehr.standard.datasets.service.MetaData;
+import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ import java.util.List;
 public class CDADocumentManager {
 
     @Autowired
-    private CdaDatasetRelationshipManager cdaDatasetRelationshipManager;
+    private CdaDataSetRelationshipManager cdaDataSetRelationshipManager;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -51,10 +51,10 @@ public class CDADocumentManager {
      * @param ids
      */
     @Transactional(Transactional.TxType.SUPPORTS)
-    public boolean deleteDocument(String versionCode,String[] ids) {
-        cdaDatasetRelationshipManager.deleteRelationshipByCdaId(versionCode,ids);
+    public boolean deleteDocument(String[] ids,String versionCode) {
+        cdaDataSetRelationshipManager.deleteRelationshipByCdaId(versionCode,ids);
         Session session = currentSession();
-        String sql = "delete from " + CDAVersion.getCDATableName(versionCode) + " where id in(:ids)";
+        String sql = "delete from " + CDAVersionUtil.getCDATableName(versionCode) + " where id in(:ids)";
         Query query = session.createSQLQuery(sql);
         query.setParameterList("ids",ids);
         query.executeUpdate();
@@ -67,10 +67,10 @@ public class CDADocumentManager {
      * @param versionCode
      * @param ids
      */
-    public List<CDADocument> getDocumentList(String versionCode, String[] ids) {
+    public List<CDADocument> getDocumentList(String[] ids,String versionCode) {
 
         Session session = currentSession();
-        String strTableName = CDAVersion.getCDATableName(versionCode);
+        String strTableName = CDAVersionUtil.getCDATableName(versionCode);
         Query query = session.createSQLQuery("SELECT " +
                 "t.id," +
                 "t.code," +
@@ -114,7 +114,7 @@ public class CDADocumentManager {
     @Transactional
     public CDADocument getDocument(String versionId, String cdaDocumentId) {
         Session session = currentSession();
-        String strTableName = CDAVersion.getCDATableName(versionId);
+        String strTableName = CDAVersionUtil.getCDATableName(versionId);
 
         String strSql = "SELECT t.id, t.`code`, t.create_date, t.create_user, t.`name`, t.print_out, t.`schema_path`, t.source_id, t.update_date, t.update_user,t.description,t.type,t.file_group " +
                 "FROM " + strTableName + " t where t.id = '" + cdaDocumentId + "'";
@@ -142,7 +142,7 @@ public class CDADocumentManager {
     @Transactional(Transactional.TxType.SUPPORTS)
     public int getDocumentCount(String versionCode,String code,String name,String type) {
         Session session = currentSession();
-        String strTableName = CDAVersion.getCDATableName(versionCode);
+        String strTableName = CDAVersionUtil.getCDATableName(versionCode);
         String strSql = "SELECT t.id, t.`code`, t.create_date, t.create_user, t.`name`, t.print_out, t.`schema_path`, t.source_id, t.update_date, t.update_user,t.description,t.type,t.file_group " +
                 "FROM " + strTableName + " t where 1=1 and t.type=:type";
         if (!StringUtils.isEmpty(code)) {
@@ -169,7 +169,7 @@ public class CDADocumentManager {
      */
     public List<CDADocument> getDocumentList(String versionCode,String code,String name,String type,int page,int pageSize) {
         Session session = currentSession();
-        String strTableName = CDAVersion.getCDATableName(versionCode);
+        String strTableName = CDAVersionUtil.getCDATableName(versionCode);
         String strSql = "SELECT t.id," +
                 "t.code," +
                 "t.create_date," +
@@ -230,7 +230,7 @@ public class CDADocumentManager {
     public boolean isDocumentExist(String versionId, String documentCode,String documentId) {
 
         Session session = currentSession();
-        String strTableName = CDAVersion.getCDATableName(versionId);
+        String strTableName = CDAVersionUtil.getCDATableName(versionId);
         String strSql;
 
         if(StringUtils.isEmpty(documentId)){
@@ -251,19 +251,17 @@ public class CDADocumentManager {
     /**
      * 保存CDA信息
      *
-     * @param xCDA
+     * @param cdaDocument
      */
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public boolean saveDocument(CDADocument xCDA) {
+    public boolean saveDocument(CDADocument cdaDocument) {
 
-        CDADocument cdaDocument = (CDADocument) xCDA;
         Session session = currentSession();
 
-        String strTableName = CDAVersion.getCDATableName(cdaDocument.getVersionCode());
+        String strTableName = CDAVersionUtil.getCDATableName(cdaDocument.getVersionCode());
         String sql;
         Query query;
         String[] ids = new String[]{cdaDocument.getId()};
-        List<CDADocument> xCda = getDocumentList(cdaDocument.getVersionCode(), ids);
+        List<CDADocument> xCda = getDocumentList(ids,cdaDocument.getVersionCode());
         if (xCda.size() == 0) {
             sql = "insert into " + strTableName +" "+
                     "(id," +
@@ -367,8 +365,8 @@ public class CDADocumentManager {
      */
     public boolean createCDASchemaFile(String cdaId, String versionCode) throws TransformerException, ParserConfigurationException, FileNotFoundException, UnsupportedEncodingException {
         //操作结果：0：现在失败 1：新增成功
-        int iSetCount = cdaDatasetRelationshipManager.getRelationshipCountByCdaId(cdaId, versionCode);
-        List<CdaDataSetRelationship> relationshipsList = cdaDatasetRelationshipManager.getCDADataSetRelationshipByCDAId(cdaId, versionCode, 1, iSetCount);
+        int iSetCount = cdaDataSetRelationshipManager.getRelationshipCountByCdaId(cdaId, versionCode);
+        List<CdaDataSetRelationship> relationshipsList = cdaDataSetRelationshipManager.getCDADataSetRelationshipByCDAId(cdaId, versionCode, 1, iSetCount);
 
         String strPath = System.getProperty("java.io.tmpdir");
         strPath += "StandardFiles";
@@ -398,14 +396,14 @@ public class CDADocumentManager {
 
             //获取数据元
             //// TODO: 2016/2/5
-//            List<MetaData> xMetaDatas = dataSet.getMetaDataList();
-            List<MetaData> xMetaDatas = null;
+//            List<MetaData> metaDatas = dataSet.getMetaDataList();
+            List<MetaData> metaDatas = null;
 
-            for (int j = 0; j < xMetaDatas.size(); j++) {
+            for (int j = 0; j < metaDatas.size(); j++) {
                 Element rowEle = doc.createElement("xs:element");
-                rowEle.setAttribute("code", xMetaDatas.get(j).getCode());
+                rowEle.setAttribute("code", metaDatas.get(j).getCode());
 
-                String strColumnType = xMetaDatas.get(j).getColumnType().equals("") ? "VARCHAR" : xMetaDatas.get(j).getColumnType();
+                String strColumnType = metaDatas.get(j).getColumnType().equals("") ? "VARCHAR" : metaDatas.get(j).getColumnType();
 
                 rowEle.setAttribute("type", "xs:" + strColumnType);
                 rowSet.appendChild(rowEle);

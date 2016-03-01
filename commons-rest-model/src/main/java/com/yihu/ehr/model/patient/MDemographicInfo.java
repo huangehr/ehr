@@ -1,7 +1,5 @@
 package com.yihu.ehr.model.patient;
 
-import com.yihu.ehr.model.geogrephy.MGeography;
-
 import java.util.Date;
 
 /**
@@ -15,16 +13,16 @@ public class MDemographicInfo {
 
     private String idCardNo;                       // 身份证
     private Date birthday;                            // 出生日期
-    private MGeography birthPlace;                    // 出生地
-    private MGeography nativePlace;                    // 籍贯
+    private String birthPlace;                    // 户籍地址
+    private String nativePlace;                    // 籍贯
     private String email;                            // 邮箱
     private String gender;                            // 性别
     private String name;                            // 姓名
     private String martialStatus;            // 婚姻情况
     private String nation;                            // 民族
     private String residenceType;            // 户口性质（农村、城镇）
-    private MGeography workAddress;                    // 工作地址
-    private MGeography homeAddress;                    // 家庭地址
+    private String workAddress;                    // 工作地址
+    private String homeAddress;                    // 家庭地址
     private String password;                        //密码
     private String telphoneNo ;                     // 电话号码，之前是个电话号码列表
     private String picPath = "";
@@ -49,19 +47,19 @@ public class MDemographicInfo {
         this.birthday = birthday;
     }
 
-    public MGeography getBirthPlace() {
+    public String getBirthPlace() {
         return birthPlace;
     }
 
-    public void setBirthPlace(MGeography birthPlace) {
+    public void setBirthPlace(String birthPlace) {
         this.birthPlace = birthPlace;
     }
 
-    public MGeography getNativePlace() {
+    public String getNativePlace() {
         return nativePlace;
     }
 
-    public void setNativePlace(MGeography nativePlace) {
+    public void setNativePlace(String nativePlace) {
         this.nativePlace = nativePlace;
     }
 
@@ -113,19 +111,19 @@ public class MDemographicInfo {
         this.residenceType = residenceType;
     }
 
-    public MGeography getWorkAddress() {
+    public String getWorkAddress() {
         return workAddress;
     }
 
-    public void setWorkAddress(MGeography workAddress) {
+    public void setWorkAddress(String workAddress) {
         this.workAddress = workAddress;
     }
 
-    public MGeography getHomeAddress() {
+    public String getHomeAddress() {
         return homeAddress;
     }
 
-    public void setHomeAddress(MGeography homeAddress) {
+    public void setHomeAddress(String homeAddress) {
         this.homeAddress = homeAddress;
     }
 

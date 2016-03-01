@@ -1,12 +1,16 @@
 package com.yihu.ehr.util.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.PageArg;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.ObjectId;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
@@ -33,9 +37,10 @@ public class BaseRestController extends AbstractController {
     private final static String ResourceCount = "X-Total-Count";
     private final static String ResourceLink = "Link";
 
+    @Value("${deploy.region}")
+    Short deployRegion = 3502;
     @Autowired
     protected EntityManager entityManager;
-
     @Autowired
     ObjectMapper objectMapper;
 
@@ -54,9 +59,11 @@ public class BaseRestController extends AbstractController {
      * @return
      */
     public <T> T convertToModel(Object source, Class<T> targetCls, String... properties) {
+        if(source==null){
+            return null;
+        }
         T target = BeanUtils.instantiate(targetCls);
         BeanUtils.copyProperties(source, target, propertyDiffer(properties, targetCls));
-
         return target;
     }
 
@@ -79,12 +86,15 @@ public class BaseRestController extends AbstractController {
      * @return
      */
     public <T> Collection<T> convertToModels(Collection sources, Collection<T> targets, Class<T> targetCls, String properties) {
+        if(sources==null){
+            return null;
+        }
         Iterator iterator = sources.iterator();
         while (iterator.hasNext()) {
             Object source = iterator.next();
 
             T target = (T) BeanUtils.instantiate(targetCls);
-            BeanUtils.copyProperties(source, target, propertyDiffer(properties == null ? null : properties.split(","), targetCls));
+            BeanUtils.copyProperties(source, target, propertyDiffer(StringUtils.isEmpty(properties) ? null : properties.split(","), targetCls));
             targets.add(target);
         }
 
@@ -105,7 +115,6 @@ public class BaseRestController extends AbstractController {
 
         for (PropertyDescriptor targetPd : targetPds) {
             Method writeMethod = targetPd.getWriteMethod();
-
             if (writeMethod != null && !propertiesList.contains(targetPd.getName())) {
                 arrayList.add(targetPd.getName());
             }
@@ -184,5 +193,9 @@ public class BaseRestController extends AbstractController {
         envelop.setTotalCount(totalCount);
 
         return envelop;
+    }
+
+    protected String getObjectId(BizObject bizObject){
+        return new ObjectId(deployRegion, bizObject).toString();
     }
 }

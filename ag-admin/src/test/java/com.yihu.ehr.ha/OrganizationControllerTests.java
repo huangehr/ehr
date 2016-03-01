@@ -1,8 +1,11 @@
 package com.yihu.ehr.ha;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.geogrephy.GeographyModel;
+import com.yihu.ehr.agModel.org.OrgDetailModel;
 import com.yihu.ehr.ha.organization.controller.OrganizationController;
-import com.yihu.ehr.ha.organization.model.OrgModel;
+import com.yihu.ehr.model.org.MOrganization;
+import com.yihu.ehr.util.Envelop;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,7 +15,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import static org.junit.Assert.assertNotEquals;
 
 
@@ -24,79 +26,114 @@ import static org.junit.Assert.assertNotEquals;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class OrganizationControllerTests {
 
-    private static String version = "v1.0";
+    @Autowired
+    private OrganizationController orgController;
 
     @Autowired
-    private static OrganizationController orgController;
+    ApplicationContext applicationContext;
+
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    ApplicationContext applicationContext;
-
     @Test
-    public void atestOrg() throws Exception{
+    public void atestOrg() throws Exception {
         applicationContext = new SpringApplicationBuilder()
                 .web(false).sources(AgAdminApplication.class).run();
+        Envelop envelop = new Envelop();
+        //新增机构-------------------------1
+        if (orgController.getOrg("CSJG10200FJ").isSuccessFlg()) {
+            orgController.deleteOrg("CSJG10200FJ");
+        }
+        OrgDetailModel orgDetailModel = new OrgDetailModel();
+        orgDetailModel.setOrgCode("CSJG10200FJ");
+        orgDetailModel.setFullName("健康之路1");
+        orgDetailModel.setShortName("健康之路1");
+        orgDetailModel.setSettledWay("ThirdParty");
+        orgDetailModel.setAdmin("陈");
+        orgDetailModel.setTel("15959208182");
+        orgDetailModel.setOrgType("ThirdPartyPlatform");
+        orgDetailModel.setTel("15959208182");
 
-        OrgModel orgModel = new OrgModel();
-        orgModel.setOrgCode("jinshida-weining");
-        orgModel.setAdmin("shanghai");
-        orgModel.setCity("上海");
-        orgModel.setDistrict("黄埔");
-        orgModel.setFullName("上海金仕达卫宁");
-        orgModel.setOrgType("ThirdPartyPlatform");
-        orgModel.setSettledWay("ThirdParty");
-        orgModel.setProvince("上海");
-        orgModel.setShortName("卫宁");
-        orgModel.setTags("电子病历");
-        orgModel.setTel("15959208182");
-        String orgModelJson = objectMapper.writeValueAsString(orgModel);
-        Object object = orgController.updateOrg(version,orgModelJson);
-        assertNotEquals("机构5新增失败！", object, null);
+        //机构地址
+        GeographyModel addrCreate = new GeographyModel();
+        addrCreate.setCountry("中国");
+        addrCreate.setProvince("福建省");
+        addrCreate.setCity("厦门市");
+        addrCreate.setDistrict("思明区");
+        addrCreate.setTown("金山街道");
+        addrCreate.setStreet("金山");
+        addrCreate.setExtra("金山西里110号");
+        addrCreate.setPostalCode("364110");
 
-        String id = "";
+        String orgCreateJson = objectMapper.writeValueAsString(orgDetailModel);
+        String addrCreateJson = objectMapper.writeValueAsString(addrCreate);
+        envelop = orgController.update(orgCreateJson, addrCreateJson);
+        assertNotEquals("机构新增失败！", envelop.isSuccessFlg(), false);
 
-        String orgCode = "";
-        String fullName="";
-        String settledWay="";
-        String orgType="";
-        String province="";
-        String city="";
-        String district="";
-        int page=1;
-        int rows =15;
+        // 新创建的orgDetailModel对象，用于下面的操作
+        MOrganization mOrg = (MOrganization) envelop.getObj();
+        OrgDetailModel orgNew = orgController.changeToOrgDetailModel(mOrg);
 
-        object = orgController.searchOrgs(orgCode,fullName,settledWay,orgType,province,city,district,page,rows);
-        assertNotEquals("机构列表数据获取失败！", object, null);
+        //修改刚新建的机构 ----------------------2ok
+        GeographyModel addrUpdate = new GeographyModel();
+        addrUpdate.setCountry("中国");
+        addrUpdate.setProvince("福建省");
+        addrUpdate.setCity("福州市");
+        addrUpdate.setDistrict("仓山区");
+        addrUpdate.setTown("滨江街道");
+        addrUpdate.setStreet("滨江");
+        addrUpdate.setExtra("滨江西路110");
+        addrUpdate.setPostalCode("364110");
 
-        object = orgController.getOrgByCode(version,id);
-        assertNotEquals("机构信息获取失败！", object, null);
+        orgNew.setAdmin("程海");
+        String orgUpdateJson = objectMapper.writeValueAsString(orgNew);
+        String addrUpdateJson = objectMapper.writeValueAsString(addrUpdate);
+        envelop = orgController.update(orgUpdateJson, addrUpdateJson);
+        assertNotEquals("机构更新失败！", envelop.getObj(), null);
 
-        object = orgController.getOrgModel(version,id);
-        assertNotEquals("机构明细获取失败！", object, null);
 
-        object = orgController.updateOrg(version,orgModelJson);
-        assertNotEquals("机构修改失败！", object, null);
+        //列表查询（page、size）---------------------3ok
+        String fields = "";
+        String filters = "";
+        String sorts = "";
+        int size = 2;
+        int page = 1;
+        envelop = orgController.searchOrgs(fields,filters,sorts,size,page);
+        assertNotEquals("机构列表数据获取失败！", envelop.isSuccessFlg(), false);
 
-        String status = "1";
-        object = orgController.activity(version,id,status);
-        assertNotEquals("机构激活失败！", object, "true");
+        //根据机构的code查询机构------------------------4ok
+        envelop = orgController.getOrg("CSJG10200FJ");
+        assertNotEquals("未查询到该机构！",envelop.isSuccessFlg(),false);
 
-        object=orgController.getIdsByName(version,fullName);
-        assertNotEquals("机构ID获取失败！", object, null);
+        //根据机构名称search机构编号列表ids（like fullName/shortName）-------------------5ok
+        envelop = orgController.getIdsByName("健康之路");
+        assertNotEquals("未查询到对应的ids！",envelop.isSuccessFlg(),false);
 
-        object = orgController.getOrgsByAddress(version,province,city);
-        assertNotEquals("根据地址获取机构信息失败！", object, null);
 
-        object = orgController.distributeKey(version,id);
-        assertNotEquals("秘钥分发失败！", object, null);
+        //根据地址获取机构下拉列表 ---------------------6ok
 
-        object = orgController.validationOrg(version,id);
-        assertNotEquals("机构验证失败！", object, null);
+        envelop = orgController.getOrgsByAddress("福建省", "厦门市", "海沧区");
+        assertNotEquals("未查询到对应的机构列表！", envelop.isSuccessFlg(), false);
 
-        object = orgController.deleteOrg(version,id);
-        assertNotEquals("机构上传失败！", object, "false");
+
+        //更新机构激活状态-----------------7ok
+        //微服务需要提供2个参数。实际第二个参数没有使用
+
+        boolean flag1 = orgController.activity("CS1113001",0);
+        assertNotEquals("更新机构状态失败！",flag1,false);
+
+        //分配机构密钥-------------------8ok
+
+        envelop = orgController.distributeKey("CSJG10200FJ");
+        assertNotEquals("密钥分配失败！",envelop.isSuccessFlg(),false);
+
+        //判断提交的机构代码是否已经存在-----------------------9ok
+        boolean flag2 = orgController.isOrgCodeExists("CSJG10200FJ");
+        assertNotEquals("机构代码不存在！",envelop.isSuccessFlg(),false);
+
+        //根据机构的code删除刚新建的机构-----------------10ok
+        envelop = orgController.deleteOrg("CSJG10200FJ");
+        assertNotEquals("删除机构失败！",envelop.isSuccessFlg(),false);
     }
-
 }

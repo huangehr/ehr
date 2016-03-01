@@ -58,6 +58,12 @@ Web页面授权流程
 	</tr>
 </table>
 
+**返回值**
+
+	{
+		"code": "asdf12345hgiljl"
+	}
+
 **2 平台将用户重定向回你的应用**
 
 在用户成功对应用授权之后，健康档案平台会用户重定向到你的应用，并在返回参数中添加一个验证码:code及上一步调用时使用的state参数。
@@ -65,7 +71,7 @@ Web页面授权流程
 
 使用验证码获取Token：
 
-	POST https://ehr.yihu.com/rest/v1/login/oauth/access_token
+	POST https://ehr.yihu.com/api/v1/login/oauth/access_token
 	
 **参数**
 <table>
@@ -145,7 +151,7 @@ scope属性包含此Token由用户所授权的有效作用域。正常情况下�
 
 应用使用授权过的Token可以代表用户调用API：
 
-	GET https://ehr.yihu.com/rest/v1/user?access_token=...
+	GET https://ehr.yihu.com/api/v1/user?access_token=...
 	
 可以将Token作为URL查询参数的一部分传递，如上所示，但更简洁的调用是将其作为HTTP请求头的一部分：
 
@@ -154,9 +160,6 @@ scope属性包含此Token由用户所授权的有效作用域。正常情况下�
 调用示例：
 	
 	curl -H "Authorization: token OAUTH-TOKEN" https://ehr.yihu.com/v1/user
-
-非Web页面授权流程
----------------------
 
 重定向URL
 ---------------------
@@ -177,13 +180,48 @@ scope属性包含此Token由用户所授权的有效作用域。正常情况下�
 作用域
 ---------------------
 
-作用域(scope.html)用于限定Token能够访问的资源范围，没有附加其他与授权用户本身有关的权限。
+作用域于限定Token能够访问的资源范围，没有附加其他与授权用户本身有关的权限。用户可根据需要修改作用域，以限制应用的资源访问范围。
 
-对于Web页面授权流程，应用在请求用户授权时会在授权页面表单上显示要授权的资源作用域。
+对于Web页面授权流程，应用在请求用户授权时会在授权页面表单上显示要授权的资源作用域。下表为平台当前开放的作用域：
+
+<table>
+   <tr>
+      <td>名称</td>
+      <td>描述</td>
+   </tr>
+   <tr>
+      <td>(no scope)</td>
+      <td>应用仅可以访问公开的信息，如：用户信息，机构信息。</td>
+   </tr>
+   <tr>
+      <td>read,write:user</td>
+      <td>授予用户信息的读/写权限，user:demographic_id与user:health_profile为只读。</td>
+   </tr>
+   <tr>
+      <td>read:user:demographic_id</td>
+      <td>授予用户身份证号的读取权限。</td>
+   </tr>
+   <tr>
+      <td>read:user:health_profile</td>
+      <td>授予用户健康档案的读取权限。</td>
+   </tr>
+   <tr>
+      <td>read,write:organization</td>
+      <td>授予机构信息的读/写权限，organization:standard与organization:adaption为只读。</td>
+   </tr>
+   <tr>
+      <td>read:organization:standard</td>
+      <td>授予机构数据标准的读取权限。</td>
+   </tr>
+   <tr>
+      <td>read:organization:adaption</td>
+      <td>授予机构适配数据的读取权限。</td>
+   </tr>
+</table>
 
 检查响应头可知道你的作用域范围及API需要什么样的作用域作为条件
 
-	curl -H "Authorization: token OAUTH-TOKEN" https://ehr.yihu.com/rest/v1/users/technoweenie -I
+	curl -H "Authorization: token OAUTH-TOKEN" https://ehr.yihu.com/api/v1/users/technoweenie -I
 	
     HTTP/1.1 200 OK
     X-OAuth-Scopes: repo, user
@@ -191,21 +229,6 @@ scope属性包含此Token由用户所授权的有效作用域。正常情况下�
     
 - X-OAuth-Scopes：此Token被授权的作用域列表
 - X-Accepted-OAuth-Scopes：API检查的作用域列表
-
-<table>
-	<tr>
-		<td>名称</td>
-		<td>描述</td>
-	</tr>
-	<tr>
-		<td>(no scope)</td>
-		<td>对公共数据仅有只读权限（包括公开的用户档案信息，机构信息等）</td>
-	</tr>
-	<tr>
-		<td>user</td>
-		<td>具有患者数据的读/写权限，包括：user:email</td>
-	</tr>
-</table>
 
 常见授权错误
 ---------------------
@@ -218,7 +241,7 @@ scope属性包含此Token由用户所授权的有效作用域。正常情况下�
 
 	http://your-application.com/callback?error=application_suspended
 	  &error_description=Your+application+has+been+suspended.+Contact+support@yihu.com.
-	  &error_uri=https://ehr.yihu.com/rest/v1/oauth/%23application-suspended
+	  &error_uri=https://ehr.yihu.com/api/v1/oauth/%23application-suspended
 	  &state=xyz
 	  
 如果收到上述信息，请联系技术支持以解决此问题。
@@ -229,7 +252,7 @@ scope属性包含此Token由用户所授权的有效作用域。正常情况下�
 
 	http://your-application.com/callback?error=redirect_uri_mismatch
 	  &error_description=The+redirect_uri+MUST+match+the+registered+callback+URL+for+this+application.
-	  &error_uri=https://ehr.yihu.com/rest/v1/oauth/%23redirect-uri-mismatch
+	  &error_uri=https://ehr.yihu.com/api/v1/oauth/%23redirect-uri-mismatch
 	  &state=xyz
 	  
 使用匹配的URL即可修复此错误。
@@ -240,7 +263,7 @@ scope属性包含此Token由用户所授权的有效作用域。正常情况下�
 
 	http://your-application.com/callback?error=access_denied
       &error_description=The+user+has+denied+your+application+access.
-      &error_uri=https://ehr.yihu.com/rest/v1/oauth/%23access-denied
+      &error_uri=https://ehr.yihu.com/api/v1/oauth/%23access-denied
       &state=xyz
       
 这种情况你的应用是无法继续下一步操作的，如果用户只是简单地关闭了窗口，那你连这个错误也收不到。
@@ -257,7 +280,7 @@ scope属性包含此Token由用户所授权的有效作用域。正常情况下�
 	{
       "error": "incorrect_client_credentials",
       "error_description": "The client_id and/or client_secret passed are incorrect.",
-      "error_uri": "https://ehr.yihu.com/rest/v1/oauth/#incorrect-client-credentials"
+      "error_uri": "https://ehr.yihu.com/api/v1/oauth/#incorrect-client-credentials"
     }
     
 若发生这种错误，请检查你的应用并提供有效的凭据即可。
@@ -269,7 +292,7 @@ scope属性包含此Token由用户所授权的有效作用域。正常情况下�
 	{
       "error": "redirect_uri_mismatch",
       "error_description": "The redirect_uri MUST match the registered callback URL for this application.",
-      "error_uri": "https://ehr.yihu.com/rest/v1/oauth/#redirect-uri-mismatch"
+      "error_uri": "https://ehr.yihu.com/api/v1/oauth/#redirect-uri-mismatch"
     }
     
 若发生这种情况，请根据应用注册时提供的URL，重新请求授权。
@@ -288,7 +311,7 @@ scope属性包含此Token由用户所授权的有效作用域。正常情况下�
 	{
       "error": "bad_verification_code",
       "error_description": "The code passed is incorrect or expired.",
-      "error_uri": "https://ehr.yihu.com/rest/v1/oauth/#bad-verification-code"
+      "error_uri": "https://ehr.yihu.com/api/v1/oauth/#bad-verification-code"
     }
     
 若发生这种情况，请重新请求授权，并获取新的验证码。
@@ -307,22 +330,22 @@ API列表
 
 若用户启用两阶段授权（未实现），你可能需要多做一些工作才能调用API。
 
-### 获取授权列表
+### 获取你的授权列表
 
 	GET /authorizations
 	
 **返回值**
 
 	Status: 200 OK    			
-	Link: &lt;https://ehr.yihu.com/rest/v1/resource?page=2&gt; rel="next",
-		  &lt;https://ehr.yihu.com/rest/v1/resource?page=5&gt; rel="last"
+	Link: &lt;https://ehr.yihu.com/api/v1/resource?page=2&gt; rel="next",
+		  &lt;https://ehr.yihu.com/api/v1/resource?page=5&gt; rel="last"
 	X-RateLimit-Limit: 5000
 	X-RateLimit-Remaining: 4999
 	
 	[
 	  {
 		"id": 1,
-		"url": "https://ehr.yihu.com/rest/v1/authorizations/1",
+		"url": "https://ehr.yihu.com/api/v1/authorizations/1",
 		"scopes": [
 		  "user"
 		],
@@ -340,9 +363,9 @@ API列表
 	  }
 	]
 
-### 获取应用授权
+### 获取授权Token
 
-	GET /authorizations/:client_id
+	GET /authorizations/:id
 	
 **返回值**
 	
@@ -352,7 +375,7 @@ API列表
     
     {
       "id": 1,
-      "url": "https://ehr.yihu.com/rest/v1/authorizations/1",
+      "url": "https://ehr.yihu.com/api/v1/authorizations/1",
       "scopes": [
         "public_repo"
       ],
@@ -372,7 +395,8 @@ API列表
 
 ### 批量创建授权
 	
-若你的应用需要一次创建多个Token，那使用Web页面流程将变得非常冗长。相反，通用简易授权你就可以调用OAuth授权API一次创建多个Token。
+若你的应用需要一次创建多个Token，那使用Web页面流程将变得非常冗长。相反，通过简易授权你可以为你旗下的多个应用一次性创建多个Token。
+
 
 	POST /authorizations
 	
@@ -395,19 +419,19 @@ API列表
       <td>必选。对Token做备注以免你忘了这是要干嘛的。</td>
    </tr>
    <tr>
-      <td>note_url </td>
+      <td>note_url</td>
       <td>string </td>
       <td>使用URL提醒你这是哪个应用的Token</td>
    </tr>
    <tr>
       <td>client_id</td>
       <td>string </td>
-      <td>用于创建Token的Client ID</td>
+      <td>用于创建Token的Client ID，用分号分开。为空时，为你的所有应用创建Token，否则只为指定应用的创建Token</td>
    </tr>
    <tr>
       <td>client_secret </td>
       <td>string </td>
-      <td>用于创建Token的Client secret</td>
+      <td>用于创建Token的Client secret。与client_id相对应。</td>
    </tr>
 </table>
 
@@ -423,13 +447,13 @@ API列表
 **返回值**
     
     Status: 201 Created
-    Location: https://ehr.yihu.com/rest/v1/authorizations/1
+    Location: https://ehr.yihu.com/api/v1/authorizations/1
     X-RateLimit-Limit: 5000
     X-RateLimit-Remaining: 4999
     
     {
       "id": 1,
-      "url": "https://ehr.yihu.com/rest/v1/authorizations/1",
+      "url": "https://ehr.yihu.com/api/v1/authorizations/1",
       "scopes": [
         "public_repo"
       ],
@@ -498,13 +522,13 @@ API列表
 授权不存在时：
 
 	Status: 201 Created
-    Location: https://ehr.yihu.com/rest/v1/authorizations/1
+    Location: https://ehr.yihu.com/api/v1/authorizations/1
     X-RateLimit-Limit: 5000
     X-RateLimit-Remaining: 4999
     
     {
       "id": 1,
-      "url": "https://ehr.yihu.com/rest/v1/authorizations/1",
+      "url": "https://ehr.yihu.com/api/v1/authorizations/1",
       "scopes": [
         "public_repo"
       ],
@@ -525,13 +549,13 @@ API列表
 授权存在时：
 
 	Status: 200 OK
-    Location: https://ehr.yihu.com/rest/v1/authorizations/1
+    Location: https://ehr.yihu.com/api/v1/authorizations/1
     X-RateLimit-Limit: 5000
     X-RateLimit-Remaining: 4999
     
     {
       "id": 1,
-      "url": "https://ehr.yihu.com/rest/v1/authorizations/1",
+      "url": "https://ehr.yihu.com/api/v1/authorizations/1",
       "scopes": [
         "public_repo"
       ],
@@ -605,7 +629,7 @@ API列表
     
     {
       "id": 1,
-      "url": "https://ehr.yihu.com/rest/v1/authorizations/1",
+      "url": "https://ehr.yihu.com/api/v1/authorizations/1",
       "scopes": [
         "public_repo"
       ],
@@ -648,7 +672,7 @@ API列表
     
     {
       "id": 1,
-      "url": "https://ehr.yihu.com/rest/v1/authorizations/1",
+      "url": "https://ehr.yihu.com/api/v1/authorizations/1",
       "scopes": [
         "public_repo"
       ],
@@ -667,19 +691,19 @@ API列表
       "user": {
         "login": "octocat",
         "id": 1,
-        "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+        "avatar_url": "https://ehr.yihu.com/images/error/octocat_happy.gif",
         "gravatar_id": "",
-        "url": "https://ehr.yihu.com/rest/v1/users/octocat",
-        "html_url": "https://github.com/octocat",
-        "followers_url": "https://ehr.yihu.com/rest/v1/users/octocat/followers",
-        "following_url": "https://ehr.yihu.com/rest/v1/users/octocat/following{/other_user}",
-        "gists_url": "https://ehr.yihu.com/rest/v1/users/octocat/gists{/gist_id}",
-        "starred_url": "https://ehr.yihu.com/rest/v1/users/octocat/starred{/owner}{/repo}",
-        "subscriptions_url": "https://ehr.yihu.com/rest/v1/users/octocat/subscriptions",
-        "organizations_url": "https://ehr.yihu.com/rest/v1/users/octocat/orgs",
-        "repos_url": "https://ehr.yihu.com/rest/v1/users/octocat/repos",
-        "events_url": "https://ehr.yihu.com/rest/v1/users/octocat/events{/privacy}",
-        "received_events_url": "https://ehr.yihu.com/rest/v1/users/octocat/received_events",
+        "url": "https://ehr.yihu.com/api/v1/users/octocat",
+        "html_url": "https://ehr.yihu.com/octocat",
+        "followers_url": "https://ehr.yihu.com/api/v1/users/octocat/followers",
+        "following_url": "https://ehr.yihu.com/api/v1/users/octocat/following{/other_user}",
+        "gists_url": "https://ehr.yihu.com/api/v1/users/octocat/gists{/gist_id}",
+        "starred_url": "https://ehr.yihu.com/api/v1/users/octocat/starred{/owner}{/repo}",
+        "subscriptions_url": "https://ehr.yihu.com/api/v1/users/octocat/subscriptions",
+        "organizations_url": "https://ehr.yihu.com/api/v1/users/octocat/orgs",
+        "repos_url": "https://ehr.yihu.com/api/v1/users/octocat/repos",
+        "events_url": "https://ehr.yihu.com/api/v1/users/octocat/events{/privacy}",
+        "received_events_url": "https://ehr.yihu.com/api/v1/users/octocat/received_events",
         "type": "User",
         "site_admin": false
       }
@@ -687,7 +711,7 @@ API列表
 	
 ### 重置Token
 
-你的应用可以在无需人员干预的情况下使用此API重置一个有效的OAuth Token。应用必须保存这个API的返回值，因为重置是实时生效的。
+你的应用可以在无需人工干预的情况下使用此API重置一个有效的OAuth Token。应用必须立即使用这个API的返回值，因为重置是实时生效的。
 请使用简易授权，并提供应用Client ID与Secret调用此API。若Token本身已经无效，则返回*404 Not Found*。
 
 	POST /applications/:client_id/tokens/:access_token
@@ -700,7 +724,7 @@ API列表
     
     {
       "id": 1,
-      "url": "https://ehr.yihu.com/rest/v1/authorizations/1",
+      "url": "https://ehr.yihu.com/api/v1/authorizations/1",
       "scopes": [
         "public_repo"
       ],
@@ -719,19 +743,19 @@ API列表
       "user": {
         "login": "octocat",
         "id": 1,
-        "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+        "avatar_url": "https://ehr.yihu.com/images/error/octocat_happy.gif",
         "gravatar_id": "",
-        "url": "https://ehr.yihu.com/rest/v1/users/octocat",
-        "html_url": "https://github.com/octocat",
-        "followers_url": "https://ehr.yihu.com/rest/v1/users/octocat/followers",
-        "following_url": "https://ehr.yihu.com/rest/v1/users/octocat/following{/other_user}",
-        "gists_url": "https://ehr.yihu.com/rest/v1/users/octocat/gists{/gist_id}",
-        "starred_url": "https://ehr.yihu.com/rest/v1/users/octocat/starred{/owner}{/repo}",
-        "subscriptions_url": "https://ehr.yihu.com/rest/v1/users/octocat/subscriptions",
-        "organizations_url": "https://ehr.yihu.com/rest/v1/users/octocat/orgs",
-        "repos_url": "https://ehr.yihu.com/rest/v1/users/octocat/repos",
-        "events_url": "https://ehr.yihu.com/rest/v1/users/octocat/events{/privacy}",
-        "received_events_url": "https://ehr.yihu.com/rest/v1/users/octocat/received_events",
+        "url": "https://ehr.yihu.com/api/v1/users/octocat",
+        "html_url": "https://ehr.yihu.com/octocat",
+        "followers_url": "https://ehr.yihu.com/api/v1/users/octocat/followers",
+        "following_url": "https://ehr.yihu.com/api/v1/users/octocat/following{/other_user}",
+        "gists_url": "https://ehr.yihu.com/api/v1/users/octocat/gists{/gist_id}",
+        "starred_url": "https://ehr.yihu.com/api/v1/users/octocat/starred{/owner}{/repo}",
+        "subscriptions_url": "https://ehr.yihu.com/api/v1/users/octocat/subscriptions",
+        "organizations_url": "https://ehr.yihu.com/api/v1/users/octocat/orgs",
+        "repos_url": "https://ehr.yihu.com/api/v1/users/octocat/repos",
+        "events_url": "https://ehr.yihu.com/api/v1/users/octocat/events{/privacy}",
+        "received_events_url": "https://ehr.yihu.com/api/v1/users/octocat/received_events",
         "type": "User",
         "site_admin": false
       }

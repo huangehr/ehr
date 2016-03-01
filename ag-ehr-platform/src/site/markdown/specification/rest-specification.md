@@ -13,32 +13,33 @@ REST API调用规范
 术语解释
 ---------------------
 
-- Client Id: 在平台注册App时，由平台提供的唯一App标识。
+- Client ID: 在平台注册App时，由平台提供的唯一App标识。
 - Client Secret：在平台注册App时为其分配的应用密码。
-- 用户ID：在平台注册用户时，由平台提供的唯一用户标识。
+- 用户名：在平台注册用户时，由平台提供的唯一用户标识。
 - 用户密码：与用户ID相匹配的用户密码，由用户保管。
-- 机构代码：在平台注册机构时，此机构在国家注册的机构代码。
-- 机构公钥：在平台注册时，平台为机构提供的公钥。
+- 机构代码：在平台注册机构时，使用此机构在国家机构数据库中注册的代码。
+- 机构公钥：在平台注册机构时，平台为机构提供的公钥。
 
 版本
 ---------------------
 
 健康档案平台API均被版本化，当前版本为v1.0，版本号通过URL指定，例如： 
 
-	rest/v1.0/user?age=20
+	api/v1.0/user?age=20
 	
 请务必在请求中包含版本号以便请求能够得到正确响应。
 
-模式
+请求与响应通用模式
 ---------------------
 
-所有API请求均通过HTTPS协议。API服务器地址为：
+所有API请求均通过HTTPS协议。API服务器地址：
 
-	https://ehr.yihu.com
+- [https://ehr.yihu.com/api](https://ehr.yihu.com/api)：数据服务地址
+- [https://da.yihu.com/api](https://da.yihu.com/api)：档案包接收/采集地址
 
 数据发送与接收均以JSON作为载体。例如：数组参数array。普通字符串直接使用URL。
 
-	curl -i https://ehr.yihu.com/rest/v1.0/users
+	curl -i https://ehr.yihu.com/api/v1.0/users
     
     HTTP/1.1 200 OK
     Server: nginx
@@ -50,9 +51,7 @@ REST API调用规范
     Content-Length: 5
     Cache-Control: max-age=0, private, must-revalidate
     
-JSON结构中字段为空的时候，使用null表示，而不是将其丢弃。
-
-所有时间戳数据均以ISO 8601格式返回：
+JSON结构中字段为空的时候，使用null表示，而不是将其丢弃。所有时间戳数据均以ISO 8601格式返回：
 
 	YYYY-MM-DDTHH:MM:SSZ
 	
@@ -91,9 +90,21 @@ JSON结构中字段为空的时候，使用null表示，而不是将其丢弃。
 
 通过向根路径发送GET请求，将会得到平台所有支持的API列表：
 
-	curl https://ehr.yihu.com/rest
+	curl https://ehr.yihu.com/api
 
-可以从返回的JSON得到你所需要的API列表
+可以从返回的JSON得到你所需要的API列表。入口处显示平台API列表可以点击进去。列表只显示各API的第一个GET方法链接。若含有多个GET方法会被忽略。
+GET方法点击进去之后，根据方法的实际情况：
+
+- 若方法不需要认证，可以修改URL中的查询参数就可以得到结果
+- 若方法需要认证，此时返回API的错误信息。结构如下
+
+
+	{
+        message: "需要认证",
+        documentation_url: http://ehr.yihu.com/docs/help.html
+    }
+    
+另外，平台提供了[Swagger](https://ehr.yihu.com/swagger-ui.html)工具，用户可以直接访问API列表。
 
 客户端错误
 ---------------------
@@ -118,7 +129,7 @@ JSON结构中字段为空的时候，使用null表示，而不是将其丢弃。
     
 - 若客户端发送的数据包含无效的字段，服务端将返回422错误：
 
-	
+
 	HTTP/1.1 422 Unprocessable Entity
     Content-Length: 149
     
@@ -132,6 +143,7 @@ JSON结构中字段为空的时候，使用null表示，而不是将其丢弃。
         }
       ]
     }
+    
     
 所有的错误对象都含有相应的资源与属性字段，用以告诉客户端可能的错误原因。另外，错误对象中还有一个错误代码，用于告诉哪个字段发生错误。
 错误代码列表如下：
@@ -219,19 +231,19 @@ HTTP动词
 - OAuth2 Token（包含在请求头中）
 
  
-	curl -H "Authorization: token OAUTH-TOKEN" https://ehr.yihu.com/rest
+	curl -H "Authorization: token OAUTH-TOKEN" https://ehr.yihu.com/api
 	
 - OAuth2 Token（作为请求参数的一部分）
 
 
-	curl https://ehr.yihu.com/rest/resource?access_token=OAUTH-TOKEN
+	curl https://ehr.yihu.com/api/resource?access_token=OAUTH-TOKEN
 	
 更多关于OAuth2的信息，请参考(OAuth2规范)[https://developer.github.com/v3/oauth/]。OAuth2 Token获取请查询授权接口。
 
 - OAuth2 Id/Secret获取
 
 
-	curl 'https://ehr.yihu.com/rest/users/whatever?client_id=xxxx&client_secret=yyyy'
+	curl 'https://ehr.yihu.com/api/users/whatever?client_id=xxxx&client_secret=yyyy'
 	
 该请求返回的Token仅能用于服务端-服务端的场景，请不要部署两个一样的应用，然后分别向服务端请求Token，会互相覆盖。
 请保管好应用Secret，不要泄露。
@@ -240,22 +252,22 @@ HTTP动词
 
 使用非法凭据来请求资源将会返回*401 Unauthorized*错误：
 
-	curl https://ehr.yihu.com/rest/resource?access_token=OAUTH-TOKEN
+	curl https://ehr.yihu.com/api/resource?access_token=OAUTH-TOKEN
     HTTP/1.1 401 Unauthorized
     
     {
       "message": "Bad credentials",
-      "documentation_url": "https://ehr.yihu.com/rest"
+      "documentation_url": "https://ehr.yihu.com/api"
     }
 
 如果在短时间内，服务端接收到多个使用非法凭据的请求，后续该开发者的所有API请求在一段时间内都将被拒绝（包括使用合法凭据的请求），返回的错误为*403 Forbidden*
 
-	curl -i https://ehr.yihu.com/rest/resource?access_token=INVALID-OAUTH-TOKEN
+	curl -i https://ehr.yihu.com/api/resource?access_token=INVALID-OAUTH-TOKEN
     HTTP/1.1 403 Forbidden
     
     {
       "message": "Maximum number of login attempts exceeded. Please try again later.",
-      "documentation_url": "https://ehr.yihu.com/rest"
+      "documentation_url": "https://ehr.yihu.com/api"
     }
     
 超媒体
@@ -279,16 +291,16 @@ HTTP动词
 
 当请求的资源过多时，会默认以15条/页的数据返回。可以指定新的页码*page*与页大小*size*以返回更多的数据。
 
-	curl 'https://aehr.yihu.com/rest/users?page=2&per_page=100'
+	curl 'https://aehr.yihu.com/api/users?page=2&per_page=100'
 	
 注意，分布起始值为1，若请求中不提供page参数，默认返回第一页的数据。
 
-### Link Header
+### Link头
 
 分页信息包含在响应头的Link字段中。建议使用此字段的值作为资源导航，而不是自己构建URL。某些情况下，分页信息会使用SHA1并且不提供页码。
 
-	Link: <https://ehr.yihu.com/rest/user/repos?page=3&per_page=100>; rel="next",
-      <https://ehr.yihu.com/rest/repos?page=50&per_page=100>; rel="last"
+	Link: <https://ehr.yihu.com/api/user/repos?page=3&per_page=100>; rel="next",
+      <https://ehr.yihu.com/api/repos?page=50&per_page=100>; rel="last"
       
 Link字段包含一个或多个超媒体链接关系。*rel*可能值如下：
 
@@ -324,7 +336,7 @@ Link字段包含一个或多个超媒体链接关系。*rel*可能值如下：
 
 通过检查HTTP响应头可以得到当前的请求频率限制：
 
-	curl -i https://ehr.yihu.com/rest/users/whatever
+	curl -i https://ehr.yihu.com/api/users/whatever
     HTTP/1.1 200 OK
     Date: Mon, 01 Jul 2013 17:27:06 GMT
     Status: 200 OK
@@ -368,15 +380,15 @@ Link字段包含一个或多个超媒体链接关系。*rel*可能值如下：
     X-RateLimit-Reset: 1377013266
     
     {
-       "message": "API rate limit exceeded for xxx.xxx.xxx.xxx. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)",
-       "documentation_url": "https://ehr.yihu.com/rest/v1/#rate-limiting"
+       "message": "xxx.xxx.xxx.xxx的API请求超过限制(好消息：认证提限优惠大酬宾，活动参见链接)",
+       "documentation_url": "https://ehr.yihu.com/docs/api/v1/#rate-limiting"
     }
     
 - 增加未授权的应用请求次数
 
 若想增加未授权的应用请求次数，你需要在查询字段串中传递客户端的Client Id与Secret：
 
-	curl -i 'https://ehr.yihu.com/rest/v1/users/whatever?client_id=xxxx&client_secret=yyyy'
+	curl -i 'https://ehr.yihu.com/api/v1/users/whatever?client_id=xxxx&client_secret=yyyy'
     HTTP/1.1 200 OK
     Date: Mon, 01 Jul 2013 17:27:06 GMT
     Status: 200 OK
@@ -389,16 +401,18 @@ Link字段包含一个或多个超媒体链接关系。*rel*可能值如下：
 使用User Agent
 ---------------------
 
-所有的API都需要在请求头中包含User-Agent。没有User-Agent的请求将被拒绝。请在此字段中使用您的用户名或应用名称。
+所有的API都需要在请求头中包含User-Agent。没有User-Agent的请求将被拒绝。请在此字段中使用您的用户名或Client名称。
 这样做可以在出现问题的时候方便联系你们。
 
 例如：
 	
-	User-Agent: Health-Profile-Browser
+	User-Agent: client health-profile-browser
+	
+	User-Agent: user developer
 	
 如果提供的User-Agent是无效值，你将收到以下错误信息：
 
-	curl -iH 'User-Agent: ' https://ehr.yihu.com/rest/v1/meta
+	curl -iH 'User-Agent: ' https://ehr.yihu.com/api/v1/meta
 	
     HTTP/1.0 403 Forbidden
     Connection: close
@@ -406,7 +420,7 @@ Link字段包含一个或多个超媒体链接关系。*rel*可能值如下：
     
     Request forbidden by administrative rules.
     Please make sure your request has a User-Agent header.
-    Check https://ehr.yihu.com/rest for other possible causes.
+    Check https://ehr.yihu.com/api for other possible causes.
     
 条件式请求
 ---------------------
@@ -424,7 +438,7 @@ JSON-P回调
 你可以在GET请求参数中添加?callback参数以将请求结果包装成JSON函数，这种方式经常用在向第三方Web页面中嵌入健康档案平台的内容（跨域）。
 平台将会把回调结果中的HTTP头作为API返回值的一部分：
 
-	curl https://ehr.yihu.com/rest/v1?callback=foo
+	curl https://ehr.yihu.com/api/v1?callback=foo
     
     foo({
       "meta": {
@@ -433,7 +447,7 @@ JSON-P回调
         "X-RateLimit-Remaining": "4966",
         "X-RateLimit-Reset": "1372700873",
         "Link": [ // pagination headers and other links
-          ["https://ehr.yihu.com/rest/v1?page=2", {"rel": "next"}]
+          ["https://ehr.yihu.com/api/v1?page=2", {"rel": "next"}]
         ]
       },
       "data": {

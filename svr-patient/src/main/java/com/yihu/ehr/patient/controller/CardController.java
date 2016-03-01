@@ -1,12 +1,9 @@
 package com.yihu.ehr.patient.controller;
 
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.patient.MAbstractCard;
-import com.yihu.ehr.patient.feign.GeographyClient;
-import com.yihu.ehr.patient.feign.ConventionalDictClient;
-import com.yihu.ehr.patient.feign.OrgClient;
-import com.yihu.ehr.patient.service.card.*;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.patient.service.card.AbstractCard;
+import com.yihu.ehr.patient.service.card.CardManager;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,6 +11,9 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,23 +22,14 @@ import java.util.Map;
  * Created by zqb on 2015/8/20.
  */
 @RestController
-@RequestMapping(ApiVersionPrefix.Version1_0)
+@RequestMapping(ApiVersion.Version1_0)
 @Api(protocols = "https", value = "cards", description = "卡管理", tags = {"卡管理"})
 public class CardController extends BaseRestController {
     @Autowired
     private CardManager cardManager;
 
-    @Autowired
-    private ConventionalDictClient conventionalDictClient;
-
-    @Autowired
-    private GeographyClient addressClient;
-
-    @Autowired
-    private OrgClient orgClient;
-
     /**
-     * 已绑定的卡
+     * 根据身份证好查询相对应的卡列表
      * @param idCardNo
      * @param number
      * @param cardType
@@ -47,9 +38,9 @@ public class CardController extends BaseRestController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/cards/bound_card",method = RequestMethod.GET)
-    @ApiOperation(value = "获取已绑定的卡列表")
-    public Envelop searchCard(
+    @RequestMapping(value = "/cards/id_card_no",method = RequestMethod.GET)
+    @ApiOperation(value = "根据身份证好查询相对应的卡列表")
+    public List<MAbstractCard> searchCardBinding(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @RequestParam(value = "id_card_no") String idCardNo,
             @ApiParam(name = "number", value = "卡号", defaultValue = "")
@@ -59,21 +50,27 @@ public class CardController extends BaseRestController {
             @ApiParam(name = "page", value = "当前页", defaultValue = "")
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
-            @RequestParam(value = "rows") Integer rows) throws Exception{
+            @RequestParam(value = "rows") Integer rows,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception{
         Map<String, Object> conditionMap = new HashMap<>();
-        conditionMap.put("cardType","bound_card");
+        conditionMap.put("type","bind_card");
         conditionMap.put("idCardNo",idCardNo);
         conditionMap.put("number",number);
-        conditionMap.put("type",cardType);
+        conditionMap.put("cardType",cardType);
         conditionMap.put("page",page);
         conditionMap.put("rows",rows);
         List<AbstractCard> cardAbstractCardList = cardManager.searchAbstractCard(conditionMap);
-        Integer totalCount = cardManager.searchCardInt(conditionMap, false);
-        return getResult(cardAbstractCardList,totalCount);
+        Long totalCount = Long.parseLong(cardManager.searchCardInt(conditionMap, false).toString());
+        pagedResponse(request, response, totalCount, page, rows);
+        return (List<MAbstractCard>)convertToModels(cardAbstractCardList,new ArrayList<MAbstractCard>(cardAbstractCardList.size()), MAbstractCard.class, null);
+
+//        List<MAbstractCard> mAbstractCards = (List<MAbstractCard>)convertToModels(cardAbstractCardList,new ArrayList<MAbstractCard>(cardAbstractCardList.size()), MAbstractCard.class, null);
+//        return getResult(mAbstractCards,totalCount);
     }
 
     /**
-     * 未绑定的卡
+     * 查询未绑定的卡列表
      * @param number
      * @param cardType
      * @param page
@@ -81,9 +78,9 @@ public class CardController extends BaseRestController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/cards/not_bound_card",method = RequestMethod.GET)
-    @ApiOperation(value = "未绑定的卡")
-    public Envelop searchNewCard(
+    @RequestMapping(value = "/cards",method = RequestMethod.GET)
+    @ApiOperation(value = "查询未绑定的卡列表")
+    public List<MAbstractCard> searchCardUnBinding(
             @ApiParam(name = "number", value = "卡号", defaultValue = "")
             @RequestParam(value = "number") String number,
             @ApiParam(name = "card_type", value = "卡类别", defaultValue = "")
@@ -91,16 +88,24 @@ public class CardController extends BaseRestController {
             @ApiParam(name = "page", value = "当前页", defaultValue = "")
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
-            @RequestParam(value = "rows") Integer rows) throws Exception{
+            @RequestParam(value = "rows") Integer rows,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception{
         Map<String, Object> conditionMap = new HashMap<>();
-        conditionMap.put("cardType","not_bound_card");
+        conditionMap.put("type","not_bound_card");
         conditionMap.put("number",number);
-        conditionMap.put("type",cardType);
+        conditionMap.put("cardType",cardType);
         conditionMap.put("page",page);
         conditionMap.put("rows",rows);
-        List<AbstractCard> cardBrowseModelList = cardManager.searchAbstractCard(conditionMap);
-        Integer totalCount = cardManager.searchCardInt(conditionMap, false);
-        return getResult(cardBrowseModelList, totalCount);
+//        List<AbstractCard> cardBrowseModelList = cardManager.searchAbstractCard(conditionMap);
+//        List<MAbstractCard> mAbstractCards = (List<MAbstractCard>)convertToModels(cardBrowseModelList,new ArrayList<MAbstractCard>(cardBrowseModelList.size()), MAbstractCard.class, null);
+//        Integer totalCount = cardManager.searchCardInt(conditionMap, false);
+//        return getResult(mAbstractCards, totalCount);
+
+        List<AbstractCard> cardAbstractCardList = cardManager.searchAbstractCard(conditionMap);
+        Long totalCount = Long.parseLong(cardManager.searchCardInt(conditionMap, false).toString());
+        pagedResponse(request, response, totalCount, page, rows);
+        return (List<MAbstractCard>)convertToModels(cardAbstractCardList,new ArrayList<MAbstractCard>(cardAbstractCardList.size()), MAbstractCard.class, null);
     }
 
     /**
@@ -110,13 +115,13 @@ public class CardController extends BaseRestController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/cards/{id}/{card_type}",method = RequestMethod.GET)
+    @RequestMapping(value = "/cards/card_type/{id}",method = RequestMethod.GET)
     @ApiOperation(value = "根据卡号和卡类型查找卡")
     public MAbstractCard getCard(
             @ApiParam(name = "id", value = "卡号", defaultValue = "")
-            @PathVariable(value = "id") String id,
+            @RequestParam(value = "id") String id,
             @ApiParam(name = "card_type", value = "卡类别", defaultValue = "")
-            @PathVariable(value = "card_type") String cardType) throws Exception{
+            @RequestParam(value = "card_type") String cardType) throws Exception{
         AbstractCard card = cardManager.getCard(id, cardType);
         return convertToModel(card,MAbstractCard.class);
     }
@@ -128,13 +133,13 @@ public class CardController extends BaseRestController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/cards/detach/{id}/{card_type}",method = RequestMethod.PUT)
+    @RequestMapping(value = "/cards/card_type/{id}",method = RequestMethod.PUT)
     @ApiOperation(value = "根据卡号和卡类型解绑卡")
     public boolean detachCard(
             @ApiParam(name = "id", value = "卡号", defaultValue = "")
-            @PathVariable(value = "id") String id,
+            @RequestParam(value = "id") String id,
             @ApiParam(name = "card_type", value = "卡类别", defaultValue = "")
-            @PathVariable(value = "card_type") String cardType) throws Exception{
+            @RequestParam(value = "card_type") String cardType) throws Exception{
         AbstractCard card = cardManager.getCard(id, cardType);
         return cardManager.detachCard(card);
     }
@@ -147,15 +152,15 @@ public class CardController extends BaseRestController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/cards/attach/{id}/{id_card_no}/{card_type}",method = RequestMethod.PUT)
+    @RequestMapping(value = "/cards/attach/{id}",method = RequestMethod.PUT)
     @ApiOperation(value = "根据卡编号(卡主键，卡的唯一标识)，身份证号，卡类型绑定卡")
     public boolean attachCard(
             @ApiParam(name = "id", value = "卡号", defaultValue = "")
             @PathVariable(value = "id") String id,
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
-            @PathVariable(value = "id_card_no") String idCardNo,
+            @RequestParam(value = "id_card_no") String idCardNo,
             @ApiParam(name = "card_type", value = "卡类别", defaultValue = "")
-            @PathVariable(value = "card_type") String cardType) throws Exception{
+            @RequestParam(value = "card_type") String cardType) throws Exception{
         AbstractCard card = cardManager.getCard(id, cardType);
         return cardManager.attachCardWith(card, idCardNo);
     }

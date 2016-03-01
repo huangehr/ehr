@@ -1,9 +1,9 @@
 package com.yihu.ehr.standard.cda.service;
+
+import com.yihu.ehr.util.CDAVersionUtil;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
@@ -18,7 +18,7 @@ import java.util.UUID;
  * @created 02-9月-2015 14:00:55
  */
 @Service
-public class CdaDatasetRelationshipManager{
+public class CdaDataSetRelationshipManager{
 
 
     @PersistenceContext
@@ -33,53 +33,49 @@ public class CdaDatasetRelationshipManager{
      *
      * @param ids
      */
-    public int deleteRelationshipById(String strVersion, List<String> ids) {
-        int result = 0;
-        try {
-            String strIds = StringUtils.join(ids, "','");
-            strIds = "'" + strIds + "'";
-
-            Session session = currentSession();
-            String sql = "delete from " + CDAVersion.getCDADatasetRelationshipTableName(strVersion) + " where id in(" + strIds + ")";
-            result = session.createSQLQuery(sql).executeUpdate();
-        } catch (Exception ex) {
-            result = -1;
-        }
-        return result;
+    public boolean deleteRelationshipById(String strVersion, String[] ids) {
+        Session session = currentSession();
+        String sql = "delete from " + CDAVersionUtil.getCDADatasetRelationshipTableName(strVersion) + " where id in(:ids)";
+        Query query = session.createSQLQuery(sql);
+        query.setParameterList("ids",ids)
+        .executeUpdate();
+        return true;
     }
 
     /**
      * 根据CDAID删除CDA数据集关联关系
      * @param strVersion
-     * @param ids
+     * @param cdaIds
      */
-    public void deleteRelationshipByCdaId(String strVersion,String[] ids) {
+    public void deleteRelationshipByCdaId(String strVersion,String[] cdaIds) {
         Session session = currentSession();
-        String sql = "delete from " + CDAVersion.getCDADatasetRelationshipTableName(strVersion) + " where cda_id in(:ids)";
+        String sql = "delete from " + CDAVersionUtil.getCDADatasetRelationshipTableName(strVersion) + " where cda_id in(:cdaIds)";
         Query query = session.createSQLQuery(sql);
-        query.setParameterList("ids",ids);
-        query.executeUpdate();
+        query.setParameterList("cdaIds",cdaIds)
+        .executeUpdate();
     }
 
     /**
      * 根据CDAID获取关联关系
      * @param cdaId
-     * @param strVersionCode
+     * @param versionCode
      * @param page
      * @param pageSize
      * @return
      */
-    public List<CdaDataSetRelationship> getCDADataSetRelationshipByCDAId(String cdaId,String strVersionCode,int page,int pageSize) {
+    public List<CdaDataSetRelationship> getCDADataSetRelationshipByCDAId(String versionCode,String cdaId,int page,int pageSize) {
         Session session = currentSession();
-        String strTableName = CDAVersion.getCDADatasetRelationshipTableName(strVersionCode);
+        String strTableName = CDAVersionUtil.getCDADatasetRelationshipTableName(versionCode);
         String strSql = "SELECT t.id," +
                 "t.cda_id," +
                 "t.dataSet_id" +
                 " from " + strTableName + " t where  t.cda_id = :cdaId ";
         Query query = session.createSQLQuery(strSql);
-        query.setMaxResults(pageSize);
-        query.setFirstResult((page - 1) * pageSize);
-        query.setString("cda_id", cdaId);
+        if(page!=0 && pageSize!=0){
+            query.setMaxResults(pageSize);
+            query.setFirstResult((page - 1) * pageSize);
+        }
+        query.setString("cdaId", cdaId);
         List<Object> records = query.list();
         List<CdaDataSetRelationship> infos = new ArrayList<>();
         for (int i = 0; i < records.size(); ++i) {
@@ -96,13 +92,13 @@ public class CdaDatasetRelationshipManager{
 
     public int getRelationshipCountByCdaId(String cdaId,String VersionCode) {
         Session session = currentSession();
-        String strTableName = CDAVersion.getCDADatasetRelationshipTableName(VersionCode);
+        String strTableName = CDAVersionUtil.getCDADatasetRelationshipTableName(VersionCode);
         String strSql = "SELECT t.id," +
                 "t.cda_id," +
                 "t.dataSet_id" +
                 " from " + strTableName + " t where  t.cda_id = :cdaId ";
         Query query = session.createSQLQuery(strSql);
-        query.setString("cda_id", cdaId);
+        query.setString("cdaId", cdaId);
         List<Object> records = query.list();
         return records.size();
     }
@@ -116,7 +112,7 @@ public class CdaDatasetRelationshipManager{
     public boolean addRelationship(List<CdaDataSetRelationship> cdaDatasetRelationships,String versionCode) {
         Session session = currentSession();
 
-        String strTableName = CDAVersion.getCDADatasetRelationshipTableName(versionCode);
+        String strTableName = CDAVersionUtil.getCDADatasetRelationshipTableName(versionCode);
         String sql;
         Query query;
 

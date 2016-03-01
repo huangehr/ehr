@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
+import org.springframework.orm.jpa.LocalEntityManagerFactoryBean;
 
 import java.sql.SQLException;
 
@@ -68,4 +69,5 @@ public class HibernateConfig {
 
         return basicDataSource;
     }
+
 }

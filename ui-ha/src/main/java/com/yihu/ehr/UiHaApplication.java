@@ -13,5 +13,6 @@ public class UiHaApplication extends SpringBootServletInitializer {
 	}
 	public static void main(String[] args) {
 		SpringApplication.run(UiHaApplication.class, args);
+
 	}
 }

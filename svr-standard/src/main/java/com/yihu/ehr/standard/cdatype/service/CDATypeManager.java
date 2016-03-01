@@ -24,7 +24,7 @@ public class CDATypeManager{
     @PersistenceContext
     private EntityManager entityManager;
     @Autowired
-    private XcdaTypeRepository xcdaTypeRepository;
+    private XcdaTypeRepository cdaTypeRepository;
 
     Session currentSession(){
         return entityManager.unwrap(org.hibernate.Session.class);
@@ -37,8 +37,7 @@ public class CDATypeManager{
      * @param name
      * @return
      */
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public List<CDAType> getCDATypeListByKey(String code,String name) {
+    public List<CDAType> GetCdaTypeByCodeOrName(String code,String name) {
 
         Session session = currentSession();
         String strSql = "from CDAType a where 1=1";
@@ -64,10 +63,8 @@ public class CDATypeManager{
     /**
      * @param info
      */
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public boolean save(CDAType info) {
-        xcdaTypeRepository.save(info);
-        return true;
+    public CDAType save(CDAType info) {
+        return cdaTypeRepository.save(info);
     }
 
     /**
@@ -86,25 +83,28 @@ public class CDATypeManager{
         return true;
     }
 
+
     /**
      * 根据id 获取类别信息
-     *
+     * @param id
+     */
+    public CDAType getCdaTypeById(String id) {
+        return cdaTypeRepository.findOne(id);
+    }
+
+
+    /**
+     * 根据ids获取类别信息
      * @param ids
      */
-    public List<CDAType> getCdatypeInfoByIds(String[] ids) {
-        Session session = currentSession();
-        String strSql = "from CDAType a where a.id in(:ids)";
-        Query query = session.createQuery(strSql);
-        query.setParameterList("ids",ids);
-        List<CDAType> listInfo = query.list();
-        return listInfo;
+    public List<CDAType> getCDATypeByIds(String[] ids) {
+        return cdaTypeRepository.findCDATypeByIds(ids);
     }
     /**
      * 判断代码是否重复
      *
      * @param code
      */
-    @Transactional(Transactional.TxType.SUPPORTS)
     public boolean isCodeExist(String code) {
         List<CDAType> listInfo = null;
         Session session = currentSession();
@@ -117,61 +117,43 @@ public class CDATypeManager{
         return query.list().size()>0;
     }
 
+
+
     /**
      * 根据父级ID获取下级类别
-     *
-     * @param strparentId
      */
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public List<CDAType> getCDATypeListByParentId(String strparentId) {
+    public List<CDAType> getChildrenCDATypeByParentId(String parentId) {
         Session session = currentSession();
-        String strSql = "from CDAType a where 1=1";
-        if (strparentId.equals("")) {
-            strSql += " and (a.parentId is null or a.parentId='')";
-        } else {
-            strSql += " and a.parentId =:parent_id";
+        String strSql="";
+        if(StringUtils.isEmpty(parentId)){
+            strSql += "from CDAType a where 1=1 and (a.parentId is null or a.parentId='')";
+        }else{
+            strSql += "from CDAType a where 1=1 and a.parentId =:parentId";
         }
         Query query = session.createQuery(strSql);
-        if (!strparentId.equals("")) {
-            query.setString("parent_id", strparentId);
+        if(!StringUtils.isEmpty(parentId)){
+            query.setString("parentId", parentId);
         }
         return query.list();
     }
 
-    public CDAType getParentTypeById(String configId) {
-        Session session = currentSession();
-        String strSql = "from CDAType a where 1=1 and a.id =(select a.parentId from CDAType a where a.id = '"+configId+"')";
-        Query query = session.createQuery(strSql);
-        List<CDAType> cdaTypeList =  query.list();
-        if(cdaTypeList!=null&&cdaTypeList.size()>0){
-            return cdaTypeList.get(0);
-        }else {
-            return null;
-        }
-    }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
+
     public List<CDAType> getParentType(String strId, String strKey) {
         List<CDAType> listType = null;
-
         Session session = currentSession();
-
         String strSql = "from CDAType a where 1=1 ";
         if (strId != null && !strId.equals("")) {
             strId="'"+strId.replaceAll(",","','")+"'";
             strSql += " and a.id not in ("+strId+")";
         }
-
         if (strKey != null && !strKey.equals("")) {
             strSql += " and (a.code like :strkey or a.name like :strkey)";
         }
-
         Query query = session.createQuery(strSql);
-
         if (strKey != null && !strKey.equals("")) {
             query.setString("strkey", "%" + strKey + "%");
         }
-
         listType = query.list();
         return listType;
     }

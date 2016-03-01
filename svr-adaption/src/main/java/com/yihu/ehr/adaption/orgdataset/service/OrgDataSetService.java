@@ -1,8 +1,8 @@
 package com.yihu.ehr.adaption.orgdataset.service;
 
 
-import com.yihu.ehr.util.query.BaseService;
 import com.yihu.ehr.adaption.orgmetaset.service.OrgMetaDataService;
+import com.yihu.ehr.query.BaseJpaService;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 @Service
-public class OrgDataSetService extends BaseService<OrgDataSet, XOrgDataSetRepository> {
+public class OrgDataSetService extends BaseJpaService<OrgDataSet, XOrgDataSetRepository> {
     @Autowired
-    OrgMetaDataService orgMetaDataManager;
+    OrgMetaDataService orgMetaDataService;
 
 
     @Transactional(propagation = Propagation.SUPPORTS)
     public boolean isExistOrgDataSet(String orgCode, String code, String name) {
-        return getRepository().isExistOrgDataSet(code, name).size() != 0;
+        return ((XOrgDataSetRepository) getRepository()).isExistOrgDataSet(code, name).size() != 0;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -55,11 +55,11 @@ public class OrgDataSetService extends BaseService<OrgDataSet, XOrgDataSetReposi
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void deleteOrgDataSet(long id) {
-        OrgDataSet orgDataSet = findOne(id);
+        OrgDataSet orgDataSet = retrieve(id);
         if (orgDataSet == null)
             return;
         delete(orgDataSet);
-        orgMetaDataManager.deleteOrgMetaDataBySet(orgDataSet);
+        orgMetaDataService.deleteOrgMetaDataBySet(orgDataSet);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

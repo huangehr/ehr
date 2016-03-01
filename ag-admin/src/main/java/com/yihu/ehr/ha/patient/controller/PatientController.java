@@ -1,29 +1,33 @@
 package com.yihu.ehr.ha.patient.controller;
 
-import com.yihu.ehr.constants.AgAdminConstants;
-import com.yihu.ehr.constants.ApiVersionPrefix;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.geogrephy.GeographyModel;
+import com.yihu.ehr.agModel.patient.PatientDetailModel;
+import com.yihu.ehr.agModel.patient.PatientModel;
+import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.ha.geography.service.AddressClient;
 import com.yihu.ehr.ha.patient.service.PatientClient;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.geogrephy.MGeography;
 import com.yihu.ehr.model.patient.MDemographicInfo;
-import com.yihu.ehr.model.patient.UIModels.PatientModel;
 import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by AndyCai on 2016/1/21.
  */
-@RequestMapping(ApiVersionPrefix.Version1_0)
+@RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-public class PatientController{
+public class PatientController extends BaseController {
 
     @Autowired
     private PatientClient patientClient;
@@ -31,7 +35,13 @@ public class PatientController{
     @Autowired
     private AddressClient addressClient;
 
-    @RequestMapping(value = "/populations",method = RequestMethod.GET)
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private ConventionalDictEntryClient conventionalDictClient;
+
+    @RequestMapping(value = "/populations", method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询人")
     public Envelop searchPatient(
             @ApiParam(name = "name", value = "姓名", defaultValue = "")
@@ -47,133 +57,255 @@ public class PatientController{
             @ApiParam(name = "page", value = "当前页", defaultValue = "")
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
-            @RequestParam(value = "rows") Integer rows,
-            HttpServletResponse response) throws Exception{
+            @RequestParam(value = "rows") Integer rows) throws Exception {
 
-        Envelop envelop = new Envelop();
+        List<MDemographicInfo> demographicInfos = patientClient.searchPatient(name, idCardNo, province, city, district, page, rows);
 
-        List<MDemographicInfo> demographicInfos = patientClient.searchPatient(name,idCardNo,province,city,district,page,rows);
         List<PatientModel> patients = new ArrayList<>();
-        for(MDemographicInfo patientInfo : demographicInfos)
-        {
-            PatientModel patient = new PatientModel();
-            patient.setIdCardNo(patientInfo.getIdCardNo());
-            patient.setName(patientInfo.getName());
-            //TODO:获取家庭地址信息
-            String homeAddressId = "";//patientInfo.getHomeAddress()
+        for (MDemographicInfo patientInfo : demographicInfos) {
+
+            PatientModel patient = convertToModel(patientInfo, PatientModel.class);
+            //获取家庭地址信息
+            String homeAddressId = patientInfo.getHomeAddress();
             MGeography geography = addressClient.getAddressById(homeAddressId);
             String homeAddress = "";
-            if(geography!=null)
-            {
-                if(StringUtils.isNotEmpty(geography.getProvince())) homeAddress+=geography.getProvince();
-                if(StringUtils.isNotEmpty(geography.getCity()))homeAddress+=geography.getCity();
-                if(StringUtils.isNotEmpty(geography.getDistrict()))homeAddress+=geography.getDistrict();
-                if(StringUtils.isNotEmpty(geography.getTown()))homeAddress+=geography.getTown();
-                if(StringUtils.isNotEmpty(geography.getStreet()))homeAddress+=geography.getStreet();
-                if(StringUtils.isNotEmpty(geography.getExtra()))homeAddress+=geography.getExtra();
-
+            if (geography != null) {
+                if (StringUtils.isNotEmpty(geography.getProvince())) homeAddress += geography.getProvince();
+                if (StringUtils.isNotEmpty(geography.getCity())) homeAddress += geography.getCity();
+                if (StringUtils.isNotEmpty(geography.getDistrict())) homeAddress += geography.getDistrict();
+                if (StringUtils.isNotEmpty(geography.getTown())) homeAddress += geography.getTown();
+                if (StringUtils.isNotEmpty(geography.getStreet())) homeAddress += geography.getStreet();
+                if (StringUtils.isNotEmpty(geography.getExtra())) homeAddress += geography.getExtra();
             }
             patient.setAddress(homeAddress);
             patients.add(patient);
         }
 
-        envelop.setSuccessFlg(true);
-        envelop.setDetailModelList(patients);
-        envelop.setCurrPage(page);
-        envelop.setPageSize(rows);
-        //TODO:获取总条数
-        String count = response.getHeader(AgAdminConstants.ResourceCount);
-        int totalCount = StringUtils.isNotEmpty(count)?Integer.parseInt(count):0;
-        envelop.setTotalCount(totalCount);
-
+        Envelop envelop = getResult(patients, 1, page, rows);
         return envelop;
     }
 
 
     /**
      * 根据身份证号删除人
+     *
      * @param idCardNo
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/populations/{id_card_no}",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/populations/{id_card_no}", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据身份证号删除人")
-    public Object deletePatient(
+    public Envelop deletePatient(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
-            @PathVariable(value = "id_card_no") String idCardNo) throws Exception{
-        return patientClient.deletePatient(idCardNo);
+            @PathVariable(value = "id_card_no") String idCardNo) throws Exception {
+        Envelop envelop = new Envelop();
+        boolean result = patientClient.deletePatient(idCardNo);
+        envelop.setSuccessFlg(result);
+        if (!result) {
+            envelop.setErrorMsg("删除失败!");
+        }
+        return envelop;
     }
 
 
     /**
      * 根据身份证号查找人
+     *
      * @param idCardNo
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/populations/{id_card_no}",method = RequestMethod.GET)
+    @RequestMapping(value = "/populations/{id_card_no}", method = RequestMethod.GET)
     @ApiOperation(value = "根据身份证号查找人")
-    public MDemographicInfo getPatient(
+    public Envelop getPatient(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
-            @PathVariable(value = "id_card_no") String idCardNo) throws Exception{
-        return patientClient.getPatient(idCardNo);
+            @PathVariable(value = "id_card_no") String idCardNo) throws Exception {
+
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        MDemographicInfo demographicInfo = patientClient.getPatient(idCardNo);
+        if (demographicInfo == null) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("数据获取失败！");
+        }
+        PatientDetailModel detailModel = MDemographicInfoToPatientDetailModel(demographicInfo);
+        envelop.setObj(detailModel);
+        return envelop;
     }
 
 
     /**
      * 根据前端传回来的json新增一个人口信息
+     *
      * @param patientModelJsonData
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/populations",method = RequestMethod.POST)
+    @RequestMapping(value = "/populations", method = RequestMethod.POST)
     @ApiOperation(value = "根据前端传回来的json创建一个人口信息")
-    public boolean createPatient(
-            @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
-            @RequestParam(value = "patient_model_json_data") String patientModelJsonData) throws Exception{
-        return patientClient.createPatient(patientModelJsonData);
+    public Envelop createPatient(
+            @ApiParam(name = "patientModelJsonData", value = "身份证号", defaultValue = "")
+            @RequestParam(value = "patientModelJsonData") String patientModelJsonData) throws Exception {
+
+        //TODO:身份证校验
+
+        PatientDetailModel detailModel = objectMapper.readValue(patientModelJsonData, PatientDetailModel.class);
+        //新增家庭地址信息
+        GeographyModel geographyModel = detailModel.getHomeAddressInfo();
+        detailModel.setHomeAddress("");
+        if (geographyModel != null) {
+            String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+            detailModel.setHomeAddress(addressId);
+        }
+        //新增户籍地址信息
+        geographyModel = detailModel.getBirthPlaceInfo();
+        detailModel.setBirthPlace("");
+        if (geographyModel != null) {
+            String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+            detailModel.setBirthPlace(addressId);
+        }
+
+        //新增工作地址信息
+        geographyModel = detailModel.getWorkAddressInfo();
+        detailModel.setWorkAddress("");
+        if (geographyModel != null) {
+            String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+            detailModel.setWorkAddress(addressId);
+        }
+
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        //新增人口信息
+        MDemographicInfo info = (MDemographicInfo)convertToModel(detailModel,MDemographicInfo.class);
+        info = patientClient.createPatient(objectMapper.writeValueAsString(info));
+        if (info == null) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("保存失败!");
+            return envelop;
+        }
+        detailModel = MDemographicInfoToPatientDetailModel(info);
+        envelop.setObj(detailModel);
+        return envelop;
     }
 
     /**
      * 根据前端传回来的json修改人口信息
+     *
      * @param patientModelJsonData
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/populations",method = RequestMethod.PUT)
+    @RequestMapping(value = "/populations", method = RequestMethod.PUT)
     @ApiOperation(value = "根据前端传回来的json修改人口信息")
-    public boolean updatePatient(
+    public Envelop updatePatient(
             @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
-            @RequestParam(value = "patient_model_json_data") String patientModelJsonData) throws Exception{
+            @RequestParam(value = "patient_model_json_data") String patientModelJsonData) throws Exception {
 
-        return patientClient.updatePatient(patientModelJsonData);
+        //TODO:身份证校验
+
+        PatientDetailModel detailModel = objectMapper.readValue(patientModelJsonData, PatientDetailModel.class);
+        //新增家庭地址信息
+        GeographyModel geographyModel = detailModel.getHomeAddressInfo();
+        detailModel.setHomeAddress("");
+        if (geographyModel != null) {
+            String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+            detailModel.setHomeAddress(addressId);
+        }
+        //新增户籍地址信息
+        geographyModel = detailModel.getBirthPlaceInfo();
+        detailModel.setBirthPlace("");
+        if (geographyModel != null) {
+            String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+            detailModel.setBirthPlace(addressId);
+        }
+
+        //新增工作地址信息
+        geographyModel = detailModel.getWorkAddressInfo();
+        detailModel.setWorkAddress("");
+        if (geographyModel != null) {
+            String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+            detailModel.setWorkAddress(addressId);
+        }
+
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        //修改人口信息
+        MDemographicInfo info = (MDemographicInfo)convertToModel(detailModel,MDemographicInfo.class);
+        info = patientClient.updatePatient(objectMapper.writeValueAsString(info));
+        if (info == null) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("保存失败!");
+            return envelop;
+        }
+
+        detailModel = MDemographicInfoToPatientDetailModel(info);
+        envelop.setObj(detailModel);
+        return envelop;
+
     }
 
     /**
      * 初始化密码
+     *
      * @param idCardNo
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/populations/password/{id_card_no}",method = RequestMethod.PUT)
-    @ApiOperation(value = "初始化密码",notes = "用户忘记密码时重置密码，初始密码为123456")
-    public Object resetPass(
+    @RequestMapping(value = "/populations/password/{id_card_no}", method = RequestMethod.PUT)
+    @ApiOperation(value = "初始化密码", notes = "用户忘记密码时重置密码，初始密码为123456")
+    public boolean resetPass(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
-            @PathVariable(value = "id_card_no") String idCardNo) throws Exception{
+            @PathVariable(value = "id_card_no") String idCardNo) throws Exception {
         return patientClient.resetPass(idCardNo);
     }
 
-    /**
-     * 注：因直接访问文件路径，无法显示文件信息
-     * 将文件路径解析成字节流，通过字节流的方式读取文件
-     * @param localImgPath       文件路径
-     * @throws Exception
-     */
-    @RequestMapping(value = "/populations/images/{local_img_path}",method = RequestMethod.PUT)
-    @ApiOperation(value = "显示头像")
-    public void showImage(
-            @ApiParam(name = "local_img_path", value = "身份证号", defaultValue = "")
-            @PathVariable(value = "local_img_path") String localImgPath) throws Exception{
-        patientClient.showImage(localImgPath);
+    public PatientDetailModel MDemographicInfoToPatientDetailModel(MDemographicInfo demographicInfo) {
+        PatientDetailModel detailModel = convertToModel(demographicInfo, PatientDetailModel.class);
+
+        MConventionalDict dict = conventionalDictClient.getMartialStatus(detailModel.getMartialStatus());
+        detailModel.setMartialStatusName(dict == null ? "" : dict.getValue());
+
+        dict = conventionalDictClient.getNation(detailModel.getNation());
+        detailModel.setNationName(dict == null ? "" : dict.getValue());
+
+        MGeography mGeography =null;
+        if(!StringUtils.isEmpty(demographicInfo.getHomeAddress())) {
+            //家庭地址
+            mGeography = addressClient.getAddressById(demographicInfo.getHomeAddress());
+            if (mGeography != null) {
+                detailModel.setHomeAddressFull(getFullAddress(mGeography));
+                detailModel.setHomeAddressInfo(convertToModel(mGeography, GeographyModel.class));
+            }
+        }
+        if(!StringUtils.isEmpty(demographicInfo.getBirthPlace())) {
+            //户籍地址
+            mGeography = addressClient.getAddressById(demographicInfo.getBirthPlace());
+            if (mGeography != null) {
+                detailModel.setBirthPlaceFull(getFullAddress(mGeography));
+                detailModel.setBirthPlaceInfo(convertToModel(mGeography, GeographyModel.class));
+            }
+        }
+        //工作地址
+        if(!StringUtils.isEmpty(demographicInfo.getWorkAddress())) {
+            mGeography = addressClient.getAddressById(demographicInfo.getWorkAddress());
+            if (mGeography != null) {
+                detailModel.setWorkAddressFull(getFullAddress(mGeography));
+                detailModel.setWorkAddressInfo(convertToModel(mGeography, GeographyModel.class));
+            }
+        }
+        return detailModel;
+    }
+
+    public String getFullAddress(MGeography geography) {
+        String fullAddress = "";
+
+        if (StringUtils.isNotEmpty(geography.getProvince())) fullAddress += geography.getProvince();
+        if (StringUtils.isNotEmpty(geography.getCity())) fullAddress += geography.getCity();
+        if (StringUtils.isNotEmpty(geography.getDistrict())) fullAddress += geography.getDistrict();
+        if (StringUtils.isNotEmpty(geography.getTown())) fullAddress += geography.getTown();
+        if (StringUtils.isNotEmpty(geography.getStreet())) fullAddress += geography.getStreet();
+        if (StringUtils.isNotEmpty(geography.getExtra())) fullAddress += geography.getExtra();
+
+        return fullAddress;
     }
 }

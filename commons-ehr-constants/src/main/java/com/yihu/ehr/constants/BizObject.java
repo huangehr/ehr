@@ -17,7 +17,10 @@ public enum BizObject {
     StdArchive((short)0x0006),
     HealthEvent((short)0x0007),
     ADAPTER((short)0x0008),
-    STANDARD((short)0x0009);
+    STANDARD((short)0x0009),
+    App((short)0x00010),
+    Dict((short)0x0011),
+    CdaType((short)0x0012);
 
     public short getBizObject(){
         return bizObject;
