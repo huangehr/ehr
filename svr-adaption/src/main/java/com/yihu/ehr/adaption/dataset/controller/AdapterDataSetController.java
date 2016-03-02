@@ -66,7 +66,7 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
 
     @RequestMapping("/plan/{planId}/datasets/{dataSetId}/datametas")
     @ApiOperation(value = "根据dataSetId搜索数据元适配关系")
-    public Collection searchAdapterMetaData(
+    public Collection<MAdapterDataSet> searchAdapterMetaData(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "dataSetId", value = "数据集id", defaultValue = "")
@@ -105,7 +105,7 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
 
     @RequestMapping(value = "/datameta/{id}", method = RequestMethod.PUT)
     @ApiOperation(value = "修改数据元映射关系")
-    public boolean updateAdapterMetaData(
+    public MAdapterDataSet updateAdapterMetaData(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") Long id,
             @ApiParam(name = "jsonModel", value = "数据元模型", defaultValue = "")
@@ -114,17 +114,17 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
         AdapterDataSet adapterDataSet = adapterDataSetService.retrieve(id);
         if(adapterDataSet==null)
             throw errNotFound();
-        return saveAdapterMetaData(adapterDataSet, jsonModel);
+        return getModel(saveAdapterMetaData(adapterDataSet, jsonModel));
     }
 
 
     @RequestMapping(value = "/datameta", method = RequestMethod.POST)
     @ApiOperation(value = "新增数据元映射关系")
-    public boolean createAdapterMetaData(
+    public MAdapterDataSet createAdapterMetaData(
             @ApiParam(name = "jsonModel", value = "数据元模型", defaultValue = "")
             @RequestParam(value = "jsonModel") String jsonModel) throws Exception{
 
-        return saveAdapterMetaData(new AdapterDataSet(), jsonModel);
+        return getModel(saveAdapterMetaData(new AdapterDataSet(), jsonModel));
     }
 
     @RequestMapping(value = "/datametas", method = RequestMethod.DELETE)
@@ -139,8 +139,7 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
     }
 
 
-    private boolean saveAdapterMetaData(AdapterDataSet adapterDataSet, String jsonModel)  {
-        String apiVersion = ApiVersion.Version1_0;
+    private AdapterDataSet saveAdapterMetaData(AdapterDataSet adapterDataSet, String jsonModel)  {
         AdapterDataSet adapterDataSetModel = null;
         try {
             adapterDataSetModel = jsonToObj(jsonModel, AdapterDataSet.class);
@@ -157,10 +156,9 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
         adapterDataSet.setDescription(adapterDataSetModel.getDescription());
         if (adapterDataSetModel.getId() == null) {
             OrgAdapterPlan orgAdapterPlan = orgAdapterPlanService.retrieve(adapterDataSetModel.getAdapterPlanId());
-            adapterDataSetService.addAdapterDataSet(adapterDataSet, orgAdapterPlan);
+            return adapterDataSetService.addAdapterDataSet(adapterDataSet, orgAdapterPlan);
         } else {
-            adapterDataSetService.save(adapterDataSet);
+            return adapterDataSetService.save(adapterDataSet);
         }
-        return true;
     }
 }

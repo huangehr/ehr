@@ -17,8 +17,8 @@ public class MOrgDataSet {
     long id;
     String code;
     String name;
-    String createDate;
-    String updateDate;
+    Date createDate;
+    Date updateDate;
     String createUser;
     String updateUser;
     String description;
@@ -47,22 +47,6 @@ public class MOrgDataSet {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(String createDate) {
-        this.createDate = createDate;
-    }
-
-    public String getUpdateDate() {
-        return updateDate;
-    }
-
-    public void setUpdateDate(String updateDate) {
-        this.updateDate = updateDate;
     }
 
     public String getCreateUser() {
@@ -103,5 +87,21 @@ public class MOrgDataSet {
 
     public void setSequence(int sequence) {
         this.sequence = sequence;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
     }
 }

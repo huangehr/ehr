@@ -2,9 +2,13 @@ package com.yihu.ehr.ha.adapter.controller;
 
 import com.yihu.ehr.agModel.adapter.AdapterDictModel;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.ha.adapter.service.AdapterDictClient;
+import com.yihu.ehr.ha.adapter.utils.ExtendController;
 import com.yihu.ehr.model.adaption.MAdapterDict;
 import com.yihu.ehr.model.adaption.MDataSet;
+import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.validate.ValidateResult;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,22 +25,11 @@ import java.util.Collection;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin/adapter")
 @RestController
-public class AdapterDictController extends ExtendController {
+public class AdapterDictController extends ExtendController<AdapterDictModel> {
 
     @Autowired
     AdapterDictClient adapterDictClient;
 
-    private AdapterDictModel setValues(
-            AdapterDictModel adapterDictModel, Long planId, Long dictId, Long dictEntryId,
-            Long orgDictId, Long orgDictEntryId, String description){
-        adapterDictModel.setDescription(description);
-        adapterDictModel.setAdapterPlanId(planId);
-        adapterDictModel.setDictEntryId(dictEntryId);
-        adapterDictModel.setDictId(dictId);
-        adapterDictModel.setOrgDictEntrySeq(orgDictEntryId);
-        adapterDictModel.setOrgDictSeq(orgDictId);
-        return adapterDictModel;
-    }
 
     @RequestMapping(value = "/plan/{planId}/dicts", method = RequestMethod.GET)
     public Collection<MDataSet> searchDictse(
@@ -86,54 +79,51 @@ public class AdapterDictController extends ExtendController {
             @ApiParam(name = "id", value = "适配关系ID")
             @RequestParam(value = "id") long id) {
 
-        return convertToModel(
-                adapterDictClient.getAdapterDictEntry(id),
-                AdapterDictModel.class
-        );
+        return getModel(adapterDictClient.getAdapterDictEntry(id));
     }
 
     @RequestMapping(value = "/dict/entry", method = RequestMethod.POST)
     @ApiOperation(value = "保存字典项映射关系")
-    public boolean createAdapterDictEntry(
-            @ApiParam(name = "planId", value = "方案ID")
-            @RequestParam(value = "planId") Long planId,
-            @ApiParam(name = "dictId", value = "标准字典ID")
-            @RequestParam(value = "dictId") Long dictId,
-            @ApiParam(name = "dictEntryId", value = "标准字典项ID")
-            @RequestParam(value = "dictEntryId") Long dictEntryId,
-            @ApiParam(name = "orgDictId", value = "机构字典ID")
-            @RequestParam(value = "orgDictId") Long orgDictId,
-            @ApiParam(name = "orgDictEntryId", value = "机构字典项ID")
-            @RequestParam(value = "orgDictEntryId") Long orgDictEntryId,
-            @ApiParam(name = "description", value = "说明")
-            @RequestParam(value = "description") String description) throws Exception {
+    public Envelop createAdapterDictEntry(
+            @ApiParam(name = "model", value = "数据模型")
+            @RequestParam(value = "model") String model) {
 
-        AdapterDictModel adapterDictModel =
-                setValues(new AdapterDictModel(), planId, dictId, dictEntryId, orgDictId, orgDictEntryId, description);
-        return adapterDictClient.createAdapterDictEntry(objToJson(adapterDictModel));
+        try {
+            AdapterDictModel adapterDictModel = jsonToObj(model);
+            ValidateResult validateResult = validate(adapterDictModel);
+            if(!validateResult.isRs()){
+                return failed(validateResult.getMsg());
+            }
+            return success(adapterDictClient.createAdapterDictEntry(model));
+        } catch (ApiException e){
+            e.printStackTrace();
+            return failed(e.getMessage());
+        } catch (Exception e){
+            e.printStackTrace();
+            return failedSystem();
+        }
     };
 
 
-    @RequestMapping(value = "/dict/entry/{id}", method = RequestMethod.POST)
-    public boolean updateAdapterDictEntry(
-            @ApiParam(name = "id", value = "适配关系ID")
-            @PathVariable(value = "id") long id,
-            @ApiParam(name = "planId", value = "方案ID")
-            @RequestParam(value = "planId") long planId,
-            @ApiParam(name = "dictId", value = "标准字典ID")
-            @RequestParam(value = "dictId") Long dictId,
-            @ApiParam(name = "dictEntryId", value = "标准字典项ID")
-            @RequestParam(value = "dictEntryId") Long dictEntryId,
-            @ApiParam(name = "orgDictId", value = "机构字典ID")
-            @RequestParam(value = "orgDictId") Long orgDictId,
-            @ApiParam(name = "orgDictEntryId", value = "机构字典项ID")
-            @RequestParam(value = "orgDictEntryId") Long orgDictEntryId,
-            @ApiParam(name = "description", value = "说明")
-            @RequestParam(value = "description") String description) throws Exception{
+    @RequestMapping(value = "/dict/entry", method = RequestMethod.POST)
+    public Envelop updateAdapterDictEntry(
+            @ApiParam(name = "model", value = "数据模型")
+            @RequestParam(value = "model") String model) {
 
-        AdapterDictModel adapterDictModel =
-                setValues(new AdapterDictModel(), planId, dictId, dictEntryId, orgDictId, orgDictEntryId, description);
-        return adapterDictClient.updateAdapterDictEntry(id, objToJson(adapterDictModel));
+        try {
+            AdapterDictModel adapterDictModel = jsonToObj(model);
+            ValidateResult validateResult = validate(adapterDictModel);
+            if(!validateResult.isRs()){
+                return failed(validateResult.getMsg());
+            }
+            return success(adapterDictClient.updateAdapterDictEntry(adapterDictModel.getId(), model));
+        } catch (ApiException e){
+            e.printStackTrace();
+            return failed(e.getMessage());
+        } catch (Exception e){
+            e.printStackTrace();
+            return failedSystem();
+        }
     }
 
 

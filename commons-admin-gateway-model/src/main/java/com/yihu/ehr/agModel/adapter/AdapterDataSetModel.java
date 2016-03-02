@@ -1,10 +1,14 @@
 package com.yihu.ehr.agModel.adapter;
 
+import com.yihu.ehr.util.validate.Required;
+import com.yihu.ehr.util.validate.Valid;
+
 /**
  * @author lincl
  * @version 1.0
  * @created 2016.2.3
  */
+@Valid
 public class AdapterDataSetModel {
 
 	private Long id;
@@ -52,6 +56,7 @@ public class AdapterDataSetModel {
 		this.id = id;
 	}
 
+	@Required(filedName = "适配方案")
 	public Long getAdapterPlanId() {
 		return adapterPlanId;
 	}
@@ -60,6 +65,7 @@ public class AdapterDataSetModel {
 		this.adapterPlanId = adapterPlanId;
 	}
 
+	@Required(filedName = "标准数据集")
 	public Long getDataSetId() {
 		return dataSetId;
 	}
@@ -68,6 +74,7 @@ public class AdapterDataSetModel {
 		this.dataSetId = dataSetId;
 	}
 
+	@Required(filedName = "标准数据元")
 	public Long getMetaDataId() {
 		return metaDataId;
 	}

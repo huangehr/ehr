@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.standard;
 
+import java.util.Date;
+
 /**
  * @author lincl
  * @version 1.0
@@ -9,9 +11,9 @@ public class MStdSource {
     private String id;
     private String code;
     private String name;
-    private String create_date;
+    private Date create_date;
     private String create_user;
-    private String update_date;
+    private Date update_date;
     private String update_user;
     private String description;
 
@@ -79,14 +81,6 @@ public class MStdSource {
         this.sourceValue = sourceValue;
     }
 
-    public String getCreate_date() {
-        return create_date;
-    }
-
-    public void setCreate_date(String create_date) {
-        this.create_date = create_date;
-    }
-
     public String getCreate_user() {
         return create_user;
     }
@@ -95,19 +89,27 @@ public class MStdSource {
         this.create_user = create_user;
     }
 
-    public String getUpdate_date() {
-        return update_date;
-    }
-
-    public void setUpdate_date(String update_date) {
-        this.update_date = update_date;
-    }
-
     public String getUpdate_user() {
         return update_user;
     }
 
     public void setUpdate_user(String update_user) {
         this.update_user = update_user;
+    }
+
+    public Date getCreate_date() {
+        return create_date;
+    }
+
+    public void setCreate_date(Date create_date) {
+        this.create_date = create_date;
+    }
+
+    public Date getUpdate_date() {
+        return update_date;
+    }
+
+    public void setUpdate_date(Date update_date) {
+        this.update_date = update_date;
     }
 }
