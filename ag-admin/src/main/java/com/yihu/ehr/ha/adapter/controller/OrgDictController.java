@@ -1,158 +1,152 @@
 package com.yihu.ehr.ha.adapter.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.thirdpartystandard.OrgDictDetailModel;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.ha.adapter.service.OrgDictClient;
+import com.yihu.ehr.model.adaption.MOrgDict;
+import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by AndyCai on 2016/1/27.
  */
 @RequestMapping(ApiVersion.Version1_0 + "/orgDict")
 @RestController
-public class OrgDictController   {
+public class OrgDictController extends BaseController {
 
-    @RequestMapping(value = "/orgDict", method = RequestMethod.GET)
-    public Object getOrgDictById(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                                 @PathVariable(value = "api_version") String apiVersion,
-                                 @ApiParam(name = "id", value = "字典ID")
-                                 @RequestParam(value = "id") String id) {
+    @Autowired
+    private OrgDictClient orgDictClient;
 
-        return null;
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @RequestMapping(value = "/dict", method = RequestMethod.GET)
+    @ApiOperation(value = "根据id查询实体")
+    public Envelop getOrgDict(
+            @ApiParam(name = "id", value = "查询条件", defaultValue = "")
+            @RequestParam(value = "id", required = false) long id) throws Exception{
+
+        Envelop envelop=new Envelop();
+        envelop.setSuccessFlg(true);
+
+        MOrgDict mOrgDict = orgDictClient.getOrgDict(id);
+        if(mOrgDict==null)
+        {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("字典明细获取失败!");
+            return envelop;
+        }
+        OrgDictDetailModel detailModel = null;
+        envelop.setObj(detailModel);
+
+        return envelop;
     }
 
-    public Object getOrgDictItemById(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                                     @PathVariable(value = "api_version") String apiVersion,
-                                     @ApiParam(name = "id", value = "字典项ID")
-                                     @RequestParam(value = "id") String id) {
-        return null;
+    @RequestMapping(value = "/dict", method = RequestMethod.POST)
+    @ApiOperation(value = "创建机构字典")
+    public Envelop saveOrgDict(
+            @ApiParam(name = "json_data", value = "字典信息", defaultValue = "")
+            @RequestParam(value = "json_data") String jsonData) throws Exception{
+
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+
+        OrgDictDetailModel detailModel = objectMapper.readValue(jsonData,OrgDictDetailModel.class);
+        String errorMsg = "";
+        if (StringUtils.isEmpty(detailModel.getCode())) {
+            errorMsg += "代码不能为空!";
+        }
+        if (StringUtils.isEmpty(detailModel.getName())) {
+            errorMsg += "值不能为空!";
+        }
+        if (StringUtils.isEmpty(detailModel.getOrganization())) {
+            errorMsg += "请先选择对应的机构!";
+        }
+        if (StringUtils.isNotEmpty(errorMsg)) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(errorMsg);
+            return envelop;
+        }
+
+        MOrgDict mOrgDict = convertToModel(detailModel,MOrgDict.class);
+        if(mOrgDict.getId()==0)
+        {
+            mOrgDict = orgDictClient.createOrgDict(objectMapper.writeValueAsString(mOrgDict));
+        }
+        else {
+            mOrgDict = orgDictClient.updateOrgDict(objectMapper.writeValueAsString(mOrgDict));
+        }
+
+        if (mOrgDict == null) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("保存失败");
+        }
+        detailModel = convertToModel(mOrgDict, OrgDictDetailModel.class);
+        envelop.setObj(detailModel);
+
+        return envelop;
     }
 
-    @RequestMapping(value = "/createOrgDict", method = RequestMethod.POST)
-    public String createOrgDict(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                                @PathVariable(value = "api_version") String apiVersion,
-                                @ApiParam(name = "code", value = "代码")
-                                @RequestParam(value = "code") String code,
-                                @ApiParam(name = "name", value = "名称")
-                                @RequestParam(value = "name") String name,
-                                @ApiParam(name = "description", value = "描述")
-                                @RequestParam(value = "description") String description,
-                                @ApiParam(name = "orgCode", value = "机构代码")
-                                @RequestParam(value = "orgCode") String orgCode,
-                                @ApiParam(name = "userId", value = "用户ID")
-                                @RequestParam(value = "userId") String userId) {
 
-        return null;
+    @RequestMapping(value = "/dict/{id}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除机构字典")
+    public Envelop deleteOrgDict(
+            @ApiParam(name = "id", value = "编号", defaultValue = "")
+            @PathVariable(value = "id") long id) {
+
+
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+
+        boolean result = orgDictClient.deleteOrgDict(id);
+        if(!result)
+        {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("删除失败!");
+        }
+        return envelop;
     }
 
-    @RequestMapping(value = "/updateOrgDict", method = RequestMethod.POST)
-    public String updateOrgDict(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                                @PathVariable(value = "api_version") String apiVersion,
-                                @ApiParam(name = "id", value = "字典ID")
-                                @RequestParam(value = "id") long id,
-                                @ApiParam(name = "code", value = "代码")
-                                @RequestParam(value = "code") String code,
-                                @ApiParam(name = "name", value = "名称")
-                                @RequestParam(value = "name") String name,
-                                @ApiParam(name = "description", value = "描述")
-                                @RequestParam(value = "description") String description,
-                                @ApiParam(name = "orgCode", value = "机构代码")
-                                @RequestParam(value = "orgCode") String orgCode,
-                                @ApiParam(name = "userId", value = "用户ID")
-                                @RequestParam(value = "userId") String userId) {
 
-        return null;
+    @RequestMapping(value = "/dicts", method = RequestMethod.GET)
+    @ApiOperation(value = "条件查询")
+    public Envelop searchOrgDicts(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) throws Exception{
+
+        List<MOrgDict> dicts = (List<MOrgDict>) orgDictClient.searchOrgDicts(fields, filters, sorts, size, page);
+        List<OrgDictDetailModel> detailModels = (List<OrgDictDetailModel>) convertToModels(dicts,
+                                                                                            new ArrayList<OrgDictDetailModel>(dicts.size()),
+                                                                                            OrgDictDetailModel.class,
+                                                                                            null);
+
+        return getResult(detailModels,1,page,size);
     }
 
-    @RequestMapping(value = "/deleteOrgDict", method = RequestMethod.DELETE)
-    public String deleteOrgDict(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                                @PathVariable(value = "api_version") String apiVersion,
-                                @ApiParam(name = "id", value = "字典ID")
-                                @RequestParam(value = "id") long id) {
-        return null;
-    }
 
-    @RequestMapping(value = "/orgDicts", method = RequestMethod.GET)
-    public Object getOrgDictsByCodeOrName(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                                          @PathVariable(value = "api_version") String apiVersion,
-                                          @ApiParam(name = "orgCode", value = "机构代码")
-                                          @RequestParam(value = "orgCode") String orgCode,
-                                          @ApiParam(name = "code", value = "代码")
-                                          @RequestParam(value = "code") String code,
-                                          @ApiParam(name = "name", value = "名称")
-                                          @RequestParam(value = "name") String name,
-                                          @ApiParam(name = "page", value = "当前页", defaultValue = "1")
-                                          @RequestParam(value = "page") int page,
-                                          @ApiParam(name = "rows", value = "每页行数", defaultValue = "20")
-                                          @RequestParam(value = "rows") int rows) {
-        return null;
-    }
+    @RequestMapping(value = "/dict/combo", method = RequestMethod.GET)
+    @ApiOperation(value = "机构字典下拉")
+    public List<String> getOrgDict(
+            @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
+            @RequestParam(value = "orgCode", required = false) String orgCode) throws Exception{
 
-    @RequestMapping(value = "createOrgDictItem", produces = "text/html;charset=UTF-8")
-    public String createOrgDictItem(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                                    @PathVariable(value = "api_version") String apiVersion,
-                                    @ApiParam(name = "orgDictSeq", value = "字典序号")
-                                    @RequestParam(value = "orgDictSeq") int orgDictSeq,
-                                    @ApiParam(name = "orgCode", value = "机构代码")
-                                    @RequestParam(value = "orgCode") String orgCode, @ApiParam(name = "code", value = "代码")
-                                    @RequestParam(value = "code") String code,
-                                    @ApiParam(name = "name", value = "名称")
-                                    @RequestParam(value = "name") String name,
-                                    @ApiParam(name = "description", value = "描述")
-                                    @RequestParam(value = "description") String description,
-                                    @ApiParam(name = "sort", value = "排序")
-                                    @RequestParam(value = "sort") String sort,
-                                    @ApiParam(name = "userId", value = "用户ID")
-                                    @RequestParam(value = "userId") String userId) {
-        return null;
-    }
-
-    @RequestMapping(value = "updateDictItem", produces = "text/html;charset=UTF-8")
-    @ResponseBody
-    public String updateDictItem(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                                 @PathVariable(value = "api_version") String apiVersion,
-                                 @ApiParam(name = "id", value = "字典项ID")
-                                 @RequestParam(value = "id") String id,
-                                 @ApiParam(name = "orgDictSeq", value = "字典序号")
-                                 @RequestParam(value = "orgDictSeq") int orgDictSeq,
-                                 @ApiParam(name = "orgCode", value = "机构代码")
-                                 @RequestParam(value = "orgCode") String orgCode, @ApiParam(name = "code", value = "代码")
-                                 @RequestParam(value = "code") String code,
-                                 @ApiParam(name = "name", value = "名称")
-                                 @RequestParam(value = "name") String name,
-                                 @ApiParam(name = "description", value = "描述")
-                                 @RequestParam(value = "description") String description,
-                                 @ApiParam(name = "sort", value = "排序")
-                                 @RequestParam(value = "sort") String sort,
-                                 @ApiParam(name = "userId", value = "用户ID")
-                                 @RequestParam(value = "userId") String userId) {
-        return null;
-    }
-
-    @RequestMapping(value = "/deleteOrgDictItem", method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除机构字典项", produces = "application/json", notes = "删除机构字典项信息，批量删除时，Id以逗号隔开")
-    public String deleteOrgDictItem(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                                    @PathVariable(value = "api_version") String apiVersion,
-                                    @ApiParam(name = "ids", value = "字典ID")
-                                    @RequestParam(value = "ids") String ids) {
-        return null;
-    }
-
-    @RequestMapping(value = "/orgDictItems", method = RequestMethod.GET)
-    public String getOrgDictItemsByCodeOrName(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                                              @PathVariable(value = "api_version") String apiVersion,
-                                              @ApiParam(name = "orgCode", value = "机构代码")
-                                              @RequestParam(value = "orgCode") String orgCode,
-                                              @ApiParam(name = "orgDictSeq", value = "字典序号")
-                                              @RequestParam(value = "orgDictSeq") int orgDictSeq,
-                                              @ApiParam(name = "code", value = "代码")
-                                              @RequestParam(value = "code") String code,
-                                              @ApiParam(name = "name", value = "名称")
-                                              @RequestParam(value = "name") String name,
-                                              @ApiParam(name = "page", value = "当前页", defaultValue = "1")
-                                              @RequestParam(value = "page") int page,
-                                              @ApiParam(name = "rows", value = "每页行数", defaultValue = "20")
-                                              @RequestParam(value = "rows") int rows) {
-        return null;
+        return orgDictClient.getOrgDict(orgCode);
     }
 }
