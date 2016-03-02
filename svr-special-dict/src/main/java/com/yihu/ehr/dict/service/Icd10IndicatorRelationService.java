@@ -3,6 +3,9 @@ package com.yihu.ehr.dict.service;
 import com.yihu.ehr.query.BaseJpaService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,17 +30,9 @@ public class Icd10IndicatorRelationService extends BaseJpaService<Icd10Indicator
     @Autowired
     private XIcd10IndicatorRelationRepository icd10IndicatorRelaRepo;
 
-    //flag: 0 - create  1 - update
-    public boolean isExist(String id, String icd10Id,String indicatorId, String flag){
+    public boolean isExist(String icd10Id,String indicatorId){
         Icd10IndicatorRelation icd10IndicatorRelation = icd10IndicatorRelaRepo.findByIcd10IdAndIndicatorId(icd10Id, indicatorId);
-        if(icd10IndicatorRelation != null){
-            if(StringUtils.equals(flag,"1")){
-                return (!icd10IndicatorRelation.getId().equals(id));
-            }
-            return true;
-        }else{
-            return false;
-        }
+        return  icd10IndicatorRelation != null;
     }
 
     public List<Icd10IndicatorRelation> getIcd10IndicatorRelationListByIcd10Id(String icd10Id){
@@ -54,5 +49,10 @@ public class Icd10IndicatorRelationService extends BaseJpaService<Icd10Indicator
             return false;
         }
         return true;
+    }
+
+    public Page<Icd10IndicatorRelation> getRelationList(String sorts, int page, int size) {
+        Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
+        return icd10IndicatorRelaRepo.findAll(pageable);
     }
 }

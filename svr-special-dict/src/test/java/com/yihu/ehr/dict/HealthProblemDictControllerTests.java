@@ -1,5 +1,6 @@
 package com.yihu.ehr.dict;
 
+import com.eureka2.shading.codehaus.jackson.map.ObjectMapper;
 import com.yihu.ehr.SvrSpecialDictApplication;
 import com.yihu.ehr.dict.controller.HealthProblemDictController;
 import com.yihu.ehr.dict.controller.Icd10DictController;
@@ -16,7 +17,9 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -51,42 +54,22 @@ public class HealthProblemDictControllerTests {
         String name = "健康问题字典测试_01";
         String description = "健康问题字典新增测试。";
 
-        hpDictController.createHpDict(code,name, description);
-        HealthProblemDict healthProblemDict = hpDictRepo.findByCode(code);
+        Map<String,String> retrieveMap = new HashMap<>();
+        retrieveMap.put("code",code);
+        retrieveMap.put("name",name);
+        retrieveMap.put("description",description);
 
-        assertTrue("健康问题字典新增失败！" , healthProblemDict != null);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(retrieveMap);
+
+        assertTrue("健康问题字典新增失败！" , hpDictController.createHpDict(json) != null);
+
+        assertTrue("存在性验证失败！", hpDictController.isCodeExists("HealthProblemDictTest_01"));
+        assertTrue("存在性验证失败！", hpDictController.isNameExists("健康问题字典测试_01"));
     }
 
     @Test
-    public void btestCreateIcd10DictCodeRepeat() throws Exception{
-        try{
-            String code = "HealthProblemDictTest_01";
-            String name = "健康问题字典测试_02";
-            String description = "健康问题字典新增Code重复测试。";
-
-            Object result = hpDictController.createHpDict(code, name, description);
-        }
-        catch (ApiException e){
-            assertTrue("健康问题字典新增Code重复测试失败！",true);
-        }
-    }
-
-    @Test
-    public void ctestCreateHpDictNameRepeat() throws Exception{
-        try{
-            String code = "HealthProblemDictTest_02";
-            String name = "健康问题字典测试_01";
-            String description = "健康问题字典新增Name重复测试。";
-
-            Object result = hpDictController.createHpDict(code, name, description);
-        }
-        catch (ApiException e){
-            assertTrue("健康问题字典新增Name重复测试失败！", true);
-        }
-    }
-
-    @Test
-    public void dtestUpdateHpDict() throws Exception{
+    public void btestUpdateHpDict() throws Exception{
         String code = "HealthProblemDictTest_02";
         String name = "健康问题字典测试_02";
         String description = "健康问题字典修改测试。Only a test。";
@@ -94,7 +77,16 @@ public class HealthProblemDictControllerTests {
         HealthProblemDict healthProblemDict = hpDictRepo.findByCode("HealthProblemDictTest_01");
         String id = healthProblemDict.getId().toString();
 
-        hpDictController.updateHpDict(id, code, name, description);
+        Map<String,String> retrieveMap = new HashMap<>();
+        retrieveMap.put("id",id);
+        retrieveMap.put("code",code);
+        retrieveMap.put("name",name);
+        retrieveMap.put("description",description);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(retrieveMap);
+
+        hpDictController.updateHpDict(json);
 
         healthProblemDict = hpDictRepo.findByCode("HealthProblemDictTest_02");
         boolean result = healthProblemDict.getId().toString().equals(id);
@@ -106,18 +98,18 @@ public class HealthProblemDictControllerTests {
     }
 
     @Test
-    public void etestGetHpDictById() throws Exception{
+    public void ctestGetHpDictById() throws Exception{
 
         HealthProblemDict healthProblemDict = hpDictRepo.findByCode("HealthProblemDictTest_02");
         String id = healthProblemDict.getId().toString();
 
-        MHealthProblemDict result = (MHealthProblemDict)hpDictController.getHpDict(id);
+        MHealthProblemDict result = hpDictController.getHpDict(id);
 
         assertTrue("健康问题字典获取失败！", result != null);
     }
 
     @Test
-    public void ftestGetHpDictList() throws Exception{
+    public void dtestGetHpDictList() throws Exception{
         String code = "HealthProblemDictTest_02";
         String name = "健康问题字典测试_02";
 
@@ -137,7 +129,16 @@ public class HealthProblemDictControllerTests {
         String code = "HealthProblemDictTest_03";
         String name = "健康问题字典测试_03";
         String description = "健康问题字典新增测试_03。";
-        hpDictController.createHpDict(code, name, description);
+
+        Map<String,String> retrieveMap01 = new HashMap<>();
+        retrieveMap01.put("code",code);
+        retrieveMap01.put("name",name);
+        retrieveMap01.put("description",description);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json01 = objectMapper.writeValueAsString(retrieveMap01);
+
+        hpDictController.createHpDict(json01);
         HealthProblemDict healthProblemDict = hpDictRepo.findByCode("HealthProblemDictTest_03");
         String hpId = healthProblemDict.getId().toString();
 
@@ -146,12 +147,31 @@ public class HealthProblemDictControllerTests {
         String chronicFlag = "0";
         String infectiousFlag = "1";
         String description_icd10 = "ICD10字典新增测试_03。";
-        icd10DictController.createIcd10Dict(code_icd10, name_icd10, chronicFlag, infectiousFlag, description_icd10);
+
+        Map<String,String> retrieveMap02 = new HashMap<>();
+        retrieveMap02.put("code",code_icd10);
+        retrieveMap02.put("name",name_icd10);
+        retrieveMap02.put("chronicFlag",chronicFlag);
+        retrieveMap02.put("infectiousFlag",infectiousFlag);
+        retrieveMap02.put("description",description_icd10);
+
+        String json02 = objectMapper.writeValueAsString(retrieveMap02);
+
+        icd10DictController.createIcd10Dict(json02);
         Icd10Dict icd10Dict = icd10DictRepo.findByCode("Icd10DictTest_03");
         String icd10Id = icd10Dict.getId().toString();
 
-        boolean result = (boolean)hpDictController.createHpIcd10Relation(hpId,icd10Id);
-        assertTrue("新增失败！", result);
+        Map<String,String> retrieveMap03 = new HashMap<>();
+        retrieveMap03.put("hpId",hpId);
+        retrieveMap03.put("icd10Id",icd10Id);
+
+        String json03 = objectMapper.writeValueAsString(retrieveMap03);
+
+        assertTrue("新增失败！", hpDictController.createHpIcd10Relation(json03) != null);
+
+        assertTrue("存在性验证失败！", hpDictController.isHpIcd10RelaExist(icd10Id,hpId));
+
+
     }
 
     @Test
@@ -159,7 +179,16 @@ public class HealthProblemDictControllerTests {
         String code = "HealthProblemDictTest_04";
         String name = "健康问题字典测试_04";
         String description = "健康问题字典新增测试_04。";
-        hpDictController.createHpDict(code, name, description);
+
+        Map<String,String> retrieveMap01 = new HashMap<>();
+        retrieveMap01.put("code",code);
+        retrieveMap01.put("name",name);
+        retrieveMap01.put("description",description);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json01 = objectMapper.writeValueAsString(retrieveMap01);
+
+        hpDictController.createHpDict(json01);
         HealthProblemDict hpDict = hpDictRepo.findByCode("HealthProblemDictTest_04");
         String hpId = hpDict.getId().toString();
 
@@ -168,19 +197,34 @@ public class HealthProblemDictControllerTests {
         String chronicFlag = "0";
         String infectiousFlag = "1";
         String description_icd10 = "ICD10字典新增测试_04。";
-        icd10DictController.createIcd10Dict(code_icd10, name_icd10, chronicFlag, infectiousFlag, description_icd10);
+
+        Map<String,String> retrieveMap02 = new HashMap<>();
+        retrieveMap02.put("code",code_icd10);
+        retrieveMap02.put("name",name_icd10);
+        retrieveMap02.put("chronicFlag",chronicFlag);
+        retrieveMap02.put("infectiousFlag",infectiousFlag);
+        retrieveMap02.put("description",description_icd10);
+
+        String json02 = objectMapper.writeValueAsString(retrieveMap02);
+
+        icd10DictController.createIcd10Dict(json02);
         Icd10Dict icd10Dict = icd10DictRepo.findByCode("Icd10DictTest_03");
         String icd10Id = icd10Dict.getId().toString();
 
         HealthProblemDict healthProblemDict = hpDictRepo.findByCode("HealthProblemDictTest_03");
         String id = healthProblemDict.getId().toString();
 
-        List<HpIcd10Relation> hpIcd10Relation_old = (List<HpIcd10Relation>)hpIcd10RelaRepo.findByHpId(id);
+        List<HpIcd10Relation> hpIcd10Relation_old = hpIcd10RelaRepo.findByHpId(id);
         String relaId = hpIcd10Relation_old.get(0).getId();
 
-        boolean result = (boolean)hpDictController.updateHpIcd10Relation(relaId,hpId,icd10Id);
+        Map<String,String> retrieveMap03 = new HashMap<>();
+        retrieveMap03.put("id",relaId);
+        retrieveMap03.put("hpId",hpId);
+        retrieveMap03.put("icd10Id",icd10Id);
 
-        assertTrue("修改关联失败！", result);
+        String json03 = objectMapper.writeValueAsString(retrieveMap03);
+
+        assertTrue("修改关联失败！", hpDictController.updateHpIcd10Relation(json03) != null);
     }
 
     @Test
@@ -189,11 +233,11 @@ public class HealthProblemDictControllerTests {
         HealthProblemDict healthProblemDict = hpDictRepo.findByCode("HealthProblemDictTest_04");
         String id = healthProblemDict.getId().toString();
 
-        List<HpIcd10Relation> hpIcd10Relation = (List<HpIcd10Relation>)hpIcd10RelaRepo.findByHpId(id);
+        List<HpIcd10Relation> hpIcd10Relation = hpIcd10RelaRepo.findByHpId(id);
         String relaId = hpIcd10Relation.get(0).getId();
         boolean result = hpDictController.deleteHpDict(id);
 
-        hpIcd10Relation = (List<HpIcd10Relation>)hpIcd10RelaRepo.findByHpId(id);
+        hpIcd10Relation = hpIcd10RelaRepo.findByHpId(id);
         result = result&&(hpIcd10Relation.size() == 0);
 
         assertTrue("删除失败！", result);
