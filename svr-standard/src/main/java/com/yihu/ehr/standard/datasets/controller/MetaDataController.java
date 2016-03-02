@@ -128,8 +128,8 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
             throw errRepeatCode();
 
         BeanUtils.copyProperties(model, metaData);
-        metaDataService.save(metaData);
-        return getModel(metaData);
+        metaDataService.save(metaDataModel);
+        return getModel(metaDataModel);
     }
 
     @RequestMapping(value = "/metadata", method = RequestMethod.POST)
@@ -144,7 +144,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
         if(metaDataService.isColumnValExsit(metaData.getDataSetId(), "code", metaData.getCode(), getServiceEntity(version)))
             throw errRepeatCode();
         if(metaDataService.saveMetaData(metaData, version))
-            return getModel(model);
+            return getModel(metaData);
         return null;
     }
 

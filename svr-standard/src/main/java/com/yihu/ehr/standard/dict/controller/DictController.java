@@ -75,7 +75,7 @@ public class DictController extends ExtendController<MStdDict> {
 
         dict.setCreatedate(new Date());
         if(dictService.add(dict))
-            return getModel(dictService.add(dict));
+            return getModel(dict);
          return null;
     }
 
@@ -94,8 +94,8 @@ public class DictController extends ExtendController<MStdDict> {
                 dictService.isExistByField("code", dictModel.getCode(), entityClass))
             throw errRepeatCode();
 
-        dictService.save(dict);
-        return getModel(dictService.add(dict));
+        dictService.save(dictModel);
+        return getModel(dictModel);
     }
 
 
@@ -118,7 +118,7 @@ public class DictController extends ExtendController<MStdDict> {
             @ApiParam(name = "ids", value = "编号", defaultValue = "")
             @RequestParam(value = "ids") String ids) throws Exception{
 
-        return dictService.removeDicts(ids.split(","), version) > 0;
+        return dictService.removeDicts(strToLongArr(ids), version) > 0;
     }
 
 
