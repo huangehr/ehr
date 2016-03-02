@@ -31,8 +31,8 @@ public class OrgMetaDataTests {
         String userId = "TEST";
         String description = "desc";
         int orgDataSetSeq = 1;
-        boolean rs = orgMetaDataController.createOrgMetaData(orgDataSetSeq, orgCode, code, name, description, userId);
-        assertTrue("新增失败", rs);
+        MOrgMetaData rs = orgMetaDataController.createOrgMetaData("");
+        assertTrue("新增失败", rs!=null);
     }
 
     @Test
@@ -43,8 +43,8 @@ public class OrgMetaDataTests {
         String userId = "TEST";
         int orgDataSetSeq = 1;
         String description = "desc";
-        boolean rs = orgMetaDataController.updateOrgMetaData(id, orgDataSetSeq, orgCode, code, name, description, userId);
-        assertTrue("修改失败！", rs);
+        MOrgMetaData rs = orgMetaDataController.updateOrgMetaData("");
+        assertTrue("修改失败！", rs!=null);
     }
 
     @Test

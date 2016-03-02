@@ -33,8 +33,8 @@ public class OrgDictTests {
 		String description = "DESC";
 		String orgCode = "ORGCODE";
 		String userId = "TEST";
-		boolean rs = orgDictController.createOrgDict(code, name, orgCode, description, userId);
-		assertTrue("新增失败", rs);
+		MOrgDict rs = orgDictController.createOrgDict("");
+		assertTrue("新增失败", rs!=null);
 	}
 
 	@Test
@@ -44,8 +44,8 @@ public class OrgDictTests {
 		String description = "DESC";
 		String orgCode = "ORGCODE";
 		String userId = "TEST";
-		boolean rs = orgDictController.updateOrgDict(id, orgCode, code, name, description, userId);
-		assertTrue("修改失败！", rs);
+		MOrgDict rs = orgDictController.updateOrgDict("");
+		assertTrue("修改失败！", rs!=null);
 	}
 
 	@Test

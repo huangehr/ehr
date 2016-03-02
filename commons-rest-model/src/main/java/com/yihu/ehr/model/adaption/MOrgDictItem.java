@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.adaption;
 
+import java.util.Date;
+
 /**
  * 机构字典项
  *
@@ -12,8 +14,8 @@ public class MOrgDictItem {
     long id;
     String code;
     String name;
-    String createDate;
-    String updateDate;
+    Date createDate;
+    Date updateDate;
     int sort;
     String description;
     String createUser;
@@ -46,19 +48,19 @@ public class MOrgDictItem {
         this.name = name;
     }
 
-    public String getCreateDate() {
+    public Date getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(String createDate) {
+    public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
 
-    public String getUpdateDate() {
+    public Date getUpdateDate() {
         return updateDate;
     }
 
-    public void setUpdateDate(String updateDate) {
+    public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
     }
 
