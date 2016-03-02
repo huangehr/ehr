@@ -46,17 +46,19 @@ public class StandardSourceController extends BaseController {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) throws Exception {
-        //TODO 该分页查询方法名有误
-
+        //TODO 该分页查询方法名不合理
+        //TODO 微服务返回Collection
         List<MStdSource> stdSources = stdSourcrClient.searchAdapterOrg(fields, filters, sorts, size, page);
         List<StdSourceModel> sourcrModelList = new ArrayList<>();
         for (MStdSource stdSource : stdSources) {
             StdSourceModel sourceModel = convertToModel(stdSource, StdSourceModel.class);
-            //标准来源类型(
+            //标准来源类型字典
             MConventionalDict sourcerTypeDict = conDictEntryClient.getStdSourceType(stdSource.getSourceType());
             sourceModel.setSourceValue(sourcerTypeDict == null ? "" : sourcerTypeDict.getValue());
             //微服务返回的是String类型的日期
+            //TODO 微服务返回时间类型问题，对应要修改前端model
             //sourceModel.setCreate_date(DateUtil.formatDate(stdSource.getCreate_date(),DateUtil.DEFAULT_YMDHMSDATE_FORMAT));
+            sourcrModelList.add(sourceModel);
         }
         //TODO 取得符合条件总记录数的方法
         int totalCount = 10;
@@ -111,13 +113,14 @@ public class StandardSourceController extends BaseController {
             @ApiParam(name = "description", value = "描述", defaultValue = "")
             @RequestParam(value = "description") String description) throws Exception {
         Envelop envelop = new Envelop();
-        boolean flag = stdSourcrClient.updateStdSource(id, code, name, type, description);
-        if (!flag) {
+        MStdSource mStdSource = stdSourcrClient.updateStdSource(id, code, name, type, description);
+        if (mStdSource == null) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("标准来源更新失败！");
             return envelop;
         }
         envelop.setSuccessFlg(true);
+        envelop.setObj(getStdSourceDetailModel(mStdSource));
         return envelop;
     }
 
@@ -133,13 +136,14 @@ public class StandardSourceController extends BaseController {
             @ApiParam(name = "description", value = "描述", defaultValue = "")
             @RequestParam(value = "description") String description) throws Exception {
         Envelop envelop = new Envelop();
-        boolean flag = stdSourcrClient.addStdSource(code, name, type, description);
-        if (!flag) {
+        MStdSource mStdSource = stdSourcrClient.addStdSource(code, name, type, description);
+        if (mStdSource == null) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("新增标准来源失败！");
             return envelop;
         }
         envelop.setSuccessFlg(true);
+        envelop.setObj(getStdSourceDetailModel(mStdSource));
         return envelop;
     }
 

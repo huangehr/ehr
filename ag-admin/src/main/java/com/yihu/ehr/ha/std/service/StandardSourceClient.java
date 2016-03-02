@@ -45,7 +45,7 @@ public interface StandardSourceClient {
 
     @RequestMapping(value = "/source/{id}", method = RequestMethod.PUT)
     @ApiOperation(value = "修改标准来源，通过id取数据，取不到数据时新增，否则修改")
-    boolean updateStdSource(
+    MStdSource updateStdSource(
             @ApiParam(name = "id", value = "标准来源编号", defaultValue = "")
             @PathVariable(value = "id") String id,
             @ApiParam(name = "code", value = "编码", defaultValue = "")
@@ -60,7 +60,7 @@ public interface StandardSourceClient {
 
     @RequestMapping(value = "/source", method = RequestMethod.POST)
     @ApiOperation(value = "新增标准来源")
-    boolean addStdSource(
+    MStdSource addStdSource(
             @ApiParam(name = "code", value = "编码", defaultValue = "")
             @RequestParam(value = "code") String code,
             @ApiParam(name = "name", value = "名称", defaultValue = "")
