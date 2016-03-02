@@ -1,12 +1,14 @@
 package com.yihu.ehr.ha.adapter.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.adapter.AdapterDataSetModel;
 import com.yihu.ehr.agModel.adapter.DataSetModel;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.ha.adapter.service.AdapterDataSetClient;
+import com.yihu.ehr.ha.adapter.utils.ExtendController;
 import com.yihu.ehr.model.adaption.MAdapterDataSet;
-import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.validate.ValidateResult;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,7 @@ import java.util.Collection;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin/adapter")
 @RestController
-public class AdapterDataSetController extends BaseRestController {
+public class AdapterDataSetController extends ExtendController<AdapterDataSetModel> {
 
     @Autowired
     AdapterDataSetClient adapterDataSetClient;
@@ -88,63 +90,47 @@ public class AdapterDataSetController extends BaseRestController {
     }
 
 
-    @RequestMapping(value = "/metadata/{id}", method = RequestMethod.PUT)
-    public boolean updateAdapterMetaData(
-            @ApiParam(name = "id", value = "适配方案ID")
-            @RequestParam(value = "id") long id,
-            @ApiParam(name = "planId", value = "适配方案ID")
-            @RequestParam(value = "planId") long planId,
-            @ApiParam(name = "metaDataId", value = "")
-            @RequestParam(value = "metaDataId") Long metaDataId,
-            @ApiParam(name = "dataSetId", value = "")
-            @RequestParam(value = "dataSetId") Long dataSetId,
-            @ApiParam(name = "orgMetaDataId", value = "")
-            @RequestParam(value = "orgMetaDataId") Long orgMetaDataId,
-            @ApiParam(name = "orgDataSetId", value = "")
-            @RequestParam(value = "orgDataSetId") Long orgDataSetId,
-            @ApiParam(name = "dataType", value = "")
-            @RequestParam(value = "dataType") String dataType,
-            @ApiParam(name = "description", value = "说明")
-            @RequestParam(value = "description") String description) throws Exception {
+    @RequestMapping(value = "/metadata", method = RequestMethod.PUT)
+    public Envelop updateAdapterMetaData(
+            @ApiParam(name = "model", value = "说明")
+            @RequestParam(value = "model") String model) {
 
-        AdapterDataSetModel adapterDataSetModel = new AdapterDataSetModel();
-        adapterDataSetModel.setAdapterPlanId(planId);
-        adapterDataSetModel.setDataSetId(dataSetId);
-        adapterDataSetModel.setMetaDataId(metaDataId);
-        adapterDataSetModel.setOrgDataSetSeq(orgDataSetId);
-        adapterDataSetModel.setOrgMetaDataSeq(orgMetaDataId);
-        adapterDataSetModel.setDataType(dataType);
-        adapterDataSetModel.setDescription(description);
-        return adapterDataSetClient.updateAdapterMetaData(id, new ObjectMapper().writeValueAsString(adapterDataSetModel));
+        try {
+            AdapterDataSetModel dataModel = jsonToObj(model);
+            ValidateResult validateResult = validate(dataModel);
+            if(!validateResult.isRs()){
+                return failed(validateResult.getMsg());
+            }
+            return success(adapterDataSetClient.updateAdapterMetaData(dataModel.getId(), model));
+        } catch (ApiException e) {
+            e.printStackTrace();
+            return failed(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return failedSystem();
+        }
     }
 
 
     @RequestMapping(value = "/metadata", method = RequestMethod.POST)
-    public boolean addAdapterMetaData(
-            @ApiParam(name = "planId", value = "适配方案ID")
-            @RequestParam(value = "planId") long planId,
-            @ApiParam(name = "metaDataId", value = "")
-            @RequestParam(value = "metaDataId") Long metaDataId,
-            @ApiParam(name = "dataSetId", value = "")
-            @RequestParam(value = "dataSetId") Long dataSetId,
-            @ApiParam(name = "orgMetaDataId", value = "")
-            @RequestParam(value = "orgMetaDataId") Long orgMetaDataId,
-            @ApiParam(name = "orgDataSetId", value = "")
-            @RequestParam(value = "orgDataSetId") Long orgDataSetId,
-            @ApiParam(name = "dataType", value = "")
-            @RequestParam(value = "dataType") String dataType,
-            @ApiParam(name = "description", value = "说明")
-            @RequestParam(value = "description") String description) throws Exception {
+    public Envelop addAdapterMetaData(
+            @ApiParam(name = "model", value = "说明")
+            @RequestParam(value = "model") String model) {
 
-        AdapterDataSetModel adapterDataSetModel = new AdapterDataSetModel();
-        adapterDataSetModel.setAdapterPlanId(planId);
-        adapterDataSetModel.setDataSetId(dataSetId);
-        adapterDataSetModel.setMetaDataId(metaDataId);
-        adapterDataSetModel.setOrgDataSetSeq(orgDataSetId);
-        adapterDataSetModel.setOrgMetaDataSeq(orgMetaDataId);
-        adapterDataSetModel.setDataType(dataType);
-        adapterDataSetModel.setDescription(description);
-        return adapterDataSetClient.createAdapterMetaData(new ObjectMapper().writeValueAsString(adapterDataSetModel));
+        try {
+            AdapterDataSetModel dataModel = jsonToObj(model);
+            ValidateResult validateResult = validate(dataModel);
+            if(!validateResult.isRs()){
+                return failed(validateResult.getMsg());
+            }
+            return success(adapterDataSetClient.createAdapterMetaData(model));
+        } catch (ApiException e) {
+            e.printStackTrace();
+            return failed(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return failedSystem();
+        }
     }
 
 

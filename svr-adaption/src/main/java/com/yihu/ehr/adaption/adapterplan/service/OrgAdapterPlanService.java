@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lincl
@@ -37,7 +38,7 @@ public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAd
      * @param orgAdapterPlan
      */
     @Transactional(propagation = Propagation.REQUIRED)
-    public boolean addOrgAdapterPlan(OrgAdapterPlan orgAdapterPlan, String isCover) {
+    public OrgAdapterPlan addOrgAdapterPlan(OrgAdapterPlan orgAdapterPlan, String isCover) {
         Session s = currentSession();
         String org = orgAdapterPlan.getOrg();
         if (orgAdapterPlan.getVersion() == null) {
@@ -73,7 +74,7 @@ public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAd
         }
         ;
         s.flush();
-        return true;
+        return orgAdapterPlan;
     }
 
     /**
@@ -314,4 +315,21 @@ public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAd
         return true;
     }
 
+    public List<OrgAdapterPlan> getOrgAdapterPlanByOrgCode(Map<String, Object> args){
+
+        List<OrgAdapterPlan> orgAdapterPlans=null;
+        try {
+            Session session = currentSession();
+            String orgcode = (String) args.get("orgcode");
+
+            Query query = session.createQuery("from OrgAdapterPlan where org = :org and status=1 order by version desc");
+            query.setString("org", orgcode);
+            orgAdapterPlans = query.list();
+        }
+        catch (Exception ex)
+        {
+
+        }
+        return orgAdapterPlans;
+    }
 }

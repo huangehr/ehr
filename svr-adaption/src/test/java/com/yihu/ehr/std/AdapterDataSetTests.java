@@ -37,8 +37,8 @@ public class AdapterDataSetTests {
 		dataSet.setOrgMetaDataSeq(2l);
 		dataSet.setStdDict(1l);
 		String json = new ObjectMapper().writeValueAsString(dataSet);
-		boolean rs = adapterDataSetController.createAdapterMetaData(json);
-		assertTrue("新增失败", rs);
+		MAdapterDataSet rs = adapterDataSetController.createAdapterMetaData(json);
+		assertTrue("新增失败", rs!=null);
 	}
 
 	@Test
@@ -53,8 +53,8 @@ public class AdapterDataSetTests {
 		dataSet.setOrgMetaDataSeq(2l);
 		dataSet.setStdDict(1l);
 		String json = new ObjectMapper().writeValueAsString(dataSet);
-		boolean rs = adapterDataSetController.updateAdapterMetaData(id, json);
-		assertTrue("修改失败！", rs);
+		MAdapterDataSet rs = adapterDataSetController.updateAdapterMetaData(id, json);
+		assertTrue("修改失败！", rs!=null);
 	}
 
 	@Test

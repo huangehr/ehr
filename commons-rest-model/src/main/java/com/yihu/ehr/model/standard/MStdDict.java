@@ -20,7 +20,7 @@ public class MStdDict {
     String name;//字典名称
     String author;// 作者
     long baseDict;//参考/继承的字典
-    String createdate;//创建日期
+    Date createdate;//创建日期
     String description;//字典描述
     String sourceId;
     String stdVersion;// 标准化版本
@@ -126,11 +126,11 @@ public class MStdDict {
         this.inStage = inStage;
     }
 
-    public String getCreatedate() {
+    public Date getCreatedate() {
         return createdate;
     }
 
-    public void setCreatedate(String createdate) {
+    public void setCreatedate(Date createdate) {
         this.createdate = createdate;
     }
 }

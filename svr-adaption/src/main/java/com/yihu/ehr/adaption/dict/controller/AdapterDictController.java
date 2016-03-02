@@ -4,7 +4,6 @@ import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlan;
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanService;
 import com.yihu.ehr.adaption.commons.ExtendController;
 import com.yihu.ehr.adaption.dict.service.AdapterDict;
-import com.yihu.ehr.adaption.dict.service.AdapterDictModel;
 import com.yihu.ehr.adaption.dict.service.AdapterDictService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.adaption.MAdapterDict;
@@ -102,12 +101,12 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
 
     @RequestMapping(value = "/entry", method = RequestMethod.POST)
     @ApiOperation(value = "保存字典项映射关系")
-    public boolean createAdapterDictEntry(
+    public MAdapterDict createAdapterDictEntry(
             @ApiParam(name = "adapterDictModel", value = "字典数据模型", defaultValue = "")
             @RequestParam(value = "adapterDictModel") String dictJsonModel) throws Exception {
 
         try {
-            return save(jsonToObj(dictJsonModel, AdapterDictModel.class), new AdapterDict());
+            return getModel(save(jsonToObj(dictJsonModel, MAdapterDict.class), new AdapterDict()));
         } catch (IOException e) {
             throw errParm();
         }
@@ -115,7 +114,7 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
 
     @RequestMapping(value = "/entry/{id}", method = RequestMethod.PUT)
     @ApiOperation(value = "修改字典项映射关系")
-    public boolean updateAdapterDictEntry(
+    public MAdapterDict updateAdapterDictEntry(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") Long id,
             @ApiParam(name = "adapterDictModel", value = "字典数据模型", defaultValue = "")
@@ -125,7 +124,7 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
             AdapterDict adapterDict = adapterDictService.retrieve(id);
             if (adapterDict == null)
                 throw errNotFound();
-            return save(jsonToObj(dictJsonModel, AdapterDictModel.class), adapterDict);
+            return getModel(save(jsonToObj(dictJsonModel, MAdapterDict.class), adapterDict));
         } catch (IOException e) {
             throw errParm();
         }
@@ -145,19 +144,18 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
         return convertToModel(adapterDictService.retrieve(id), MAdapterDict.class);
     }
 
-    private boolean save(AdapterDictModel adapterDictModel, AdapterDict adapterDict) {
+    private AdapterDict save(MAdapterDict adapterDictModel, AdapterDict adapterDict) {
 
         adapterDict.setAdapterPlanId(adapterDictModel.getAdapterPlanId());
         adapterDict.setDictEntryId(adapterDictModel.getDictEntryId());
         adapterDict.setDictId(adapterDictModel.getDictId());
         adapterDict.setOrgDictSeq(adapterDictModel.getOrgDictSeq());
-        adapterDict.setOrgDictItemSeq(adapterDictModel.getOrgDictEntrySeq());
+        adapterDict.setOrgDictEntrySeq(adapterDictModel.getOrgDictEntrySeq());
         adapterDict.setDescription(adapterDictModel.getDescription());
         if (adapterDictModel.getId() == null) {
-            adapterDictService.addAdapterDict(adapterDict);
+            return adapterDictService.addAdapterDict(adapterDict);
         } else {
-            adapterDictService.save(adapterDict);
+            return adapterDictService.save(adapterDict);
         }
-        return true;
     }
 }

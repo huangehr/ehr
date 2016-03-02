@@ -40,7 +40,7 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
 
     @RequestMapping(value = "/plans", method = RequestMethod.GET)
     @ApiOperation(value = "适配方案搜索")
-    public Collection searchAdapterPlan(
+    public Collection<MAdapterPlan> searchAdapterPlan(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -74,25 +74,25 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
 
     @RequestMapping(value = "/plan", method = RequestMethod.POST)
     @ApiOperation(value = "保存适配方案")
-    public boolean saveAdapterPlan(
+    public MAdapterPlan saveAdapterPlan(
             @ApiParam(name = "parmJson", value = "数据模型", defaultValue = "")
             @RequestParam(value = "parmJson") String parmJson,
             @ApiParam(name = "isCover", value = "是否覆盖", defaultValue = "")
             @RequestParam(value = "isCover") String isCover) throws Exception {
 
-        return saveModel(parmJson, isCover, 0l);
+        return getModel(saveModel(parmJson, isCover, 0l));
     }
 
 
     @RequestMapping(value = "/plan/{id}", method = RequestMethod.PUT)
     @ApiOperation(value = "更新适配方案")
-    public boolean updateAdapterPlan(
+    public MAdapterPlan updateAdapterPlan(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") Long id,
             @ApiParam(name = "parmJson", value = "数据模型", defaultValue = "")
             @RequestParam(value = "parmJson") String parmJson) throws Exception {
 
-        return saveModel(parmJson, "", id);
+        return getModel(saveModel(parmJson, "", id));
     }
 
 
@@ -280,7 +280,7 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
         return adapterCustomizeList;
     }
 
-    private boolean saveModel(String parmJson, String isCover, Long id) {
+    private OrgAdapterPlan saveModel(String parmJson, String isCover, Long id) {
         OrgAdapterPlan plan = null;
         try {
             plan = jsonToObj(parmJson, OrgAdapterPlan.class);
@@ -302,10 +302,9 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
         orgAdapterPlan.setOrg(plan.getOrg());
         orgAdapterPlan.setParentId(plan.getParentId());
         if (plan.getId() == null) {
-            orgAdapterPlanService.addOrgAdapterPlan(orgAdapterPlan, isCover);
+            return orgAdapterPlanService.addOrgAdapterPlan(orgAdapterPlan, isCover);
         } else {
-            orgAdapterPlanService.save(orgAdapterPlan);
+            return orgAdapterPlanService.save(orgAdapterPlan);
         }
-        return true;
     }
 }
