@@ -66,13 +66,15 @@ public class CdaVersionController extends ExtendController<MCDAVersion>{
 
     @RequestMapping(value = "/cdaVersion", method = RequestMethod.POST)
     @ApiOperation(value = "新增cda版本")
-    public boolean addVersion(
+    public MCDAVersion addVersion(
             @ApiParam(name = "userLoginCode", value = "用户登录名")
             @RequestParam(value = "userLoginCode") String userLoginCode) throws Exception{
 
         CDAVersion baseVersion = cdaVersionService.getLatestVersion();
         CDAVersion xcdaVersion = cdaVersionService.createStageVersion(baseVersion, userLoginCode);
-        return xcdaVersion!=null;
+        if(xcdaVersion!=null)
+            return getModel(xcdaVersion);
+        return null;
     }
 
 
@@ -127,7 +129,7 @@ public class CdaVersionController extends ExtendController<MCDAVersion>{
 
     @RequestMapping(value = "/cdaVersion/{version}", method = RequestMethod.PUT)
     @ApiOperation(value = "修改版本信息")
-    public boolean updateVersion(
+    public MCDAVersion updateVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @PathVariable(value = "version") String version,
             @ApiParam(name = "versionName", value = "版本名称", defaultValue = "")
@@ -148,7 +150,7 @@ public class CdaVersionController extends ExtendController<MCDAVersion>{
         cdaVersion.setInStage(inStage == 1);
         cdaVersion.setBaseVersion(baseVersion);
         cdaVersionService.save(cdaVersion);
-        return true;
+        return getModel(cdaVersion);
     }
 
     @RequestMapping(value = "/cdaVersion/checkName", method = RequestMethod.GET)

@@ -2,7 +2,11 @@ package com.yihu.ehr.ha.adapter.controller;
 
 import com.yihu.ehr.agModel.adapter.AdapterPlanModel;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.ha.adapter.service.PlanClient;
+import com.yihu.ehr.ha.adapter.utils.ExtendController;
+import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.validate.ValidateResult;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,23 +26,59 @@ import java.util.Map;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin/adapter")
 @RestController
-public class OrgAdapterPlanController extends ExtendController {
+public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel> {
 
     @Autowired
     PlanClient planClient;
 
 
-    private AdapterPlanModel setValues(
-            AdapterPlanModel model, String code, String name, String description,
-            String versionCode,String orgCode, Long parentId) {
-        model.setDescription(description);
-        model.setCode(code);
-        model.setName(name);
-        model.setOrg(orgCode);
-        model.setParentId(parentId);
-        model.setVersion(versionCode);
-        return model;
+    @RequestMapping(value = "/plan", method = RequestMethod.POST)
+    @ApiOperation(value = "新增适配方案信息")
+    public Envelop addAdapterPlan(
+            @ApiParam(name = "model", value = "数据模型")
+            @RequestParam(value = "model") String model,
+            @ApiParam(name = "isCover", value = "是否覆盖")
+            @RequestParam(value = "isCover") String isCover)  {
+
+        try {
+            AdapterPlanModel dataModel = jsonToObj(model);
+            ValidateResult validateResult = validate(dataModel);
+            if(!validateResult.isRs()){
+                return failed(validateResult.getMsg());
+            }
+            return success(planClient.saveAdapterPlan(objToJson(dataModel), isCover));
+        } catch (ApiException e) {
+            e.printStackTrace();
+            return failed(e.getMessage());
+        } catch (Exception e){
+            e.printStackTrace();
+            return failedSystem();
+        }
     }
+
+
+    @RequestMapping(value = "/plan", method = RequestMethod.PUT)
+    @ApiOperation(value = "修改适配方案信息")
+    public Envelop updateAdapterPlan(
+            @ApiParam(name = "model", value = "数据模型")
+            @RequestParam(value = "model") String model) {
+
+        try {
+            AdapterPlanModel dataModel = jsonToObj(model);
+            ValidateResult validateResult = validate(dataModel);
+            if(!validateResult.isRs()){
+                return failed(validateResult.getMsg());
+            }
+            return success(planClient.updateAdapterPlan(dataModel.getId(), objToJson(dataModel)));
+        } catch (ApiException e) {
+            e.printStackTrace();
+            return failed(e.getMessage());
+        } catch (Exception e){
+            e.printStackTrace();
+            return failedSystem();
+        }
+    }
+
 
     @RequestMapping(value = "/plans", method = RequestMethod.GET)
     @ApiOperation(value = "适配方案搜索")
@@ -54,11 +94,16 @@ public class OrgAdapterPlanController extends ExtendController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+            HttpServletResponse response) {
 
-        return convertToModels(
-                planClient.searchAdapterPlan(fields, filters, sorts, size, page, request, response),
-                new ArrayList<>(), AdapterPlanModel.class, "");
+        try {
+            return convertToModels(
+                    planClient.searchAdapterPlan(fields, filters, sorts, size, page, request, response),
+                    new ArrayList<>(), AdapterPlanModel.class, "");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 
@@ -68,58 +113,7 @@ public class OrgAdapterPlanController extends ExtendController {
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") Long id) throws Exception {
 
-        return convertToModel(
-                planClient.getAdapterPlanById(id),
-                AdapterPlanModel.class
-        );
-    }
-
-
-    @RequestMapping(value = "/plan", method = RequestMethod.POST)
-    @ApiOperation(value = "新增适配方案信息")
-    public boolean addAdapterPlan(
-            @ApiParam(name = "code", value = "方案代码")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "方案名称")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "description", value = "描述")
-            @RequestParam(value = "description") String description,
-            @ApiParam(name = "versionCode", value = "版本号")
-            @RequestParam(value = "versionCode") String versionCode,
-            @ApiParam(name = "orgCode", value = "机构代码")
-            @RequestParam(value = "orgCode") String orgCode,
-            @ApiParam(name = "parentId", value = "继承标准ID")
-            @RequestParam(value = "parentId") Long parentId,
-            @ApiParam(name = "isCover", value = "是否覆盖")
-            @RequestParam(value = "isCover") String isCover) throws Exception {
-
-        return planClient.saveAdapterPlan(
-                objToJson(setValues(new AdapterPlanModel(), code, name, description, versionCode, orgCode, parentId)),
-                isCover);
-    }
-
-
-    @RequestMapping(value = "/plan/{id}", method = RequestMethod.POST)
-    @ApiOperation(value = "修改适配方案信息")
-    public boolean updateAdapterPlan(
-            @ApiParam(name = "id", value = "方案ID")
-            @PathVariable(value = "id") long id,
-            @ApiParam(name = "code", value = "方案代码")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "方案名称")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "description", value = "描述")
-            @RequestParam(value = "description") String description,
-            @ApiParam(name = "versionCode", value = "版本号")
-            @RequestParam(value = "versionCode") String versionCode,
-            @ApiParam(name = "orgCode", value = "机构代码")
-            @RequestParam(value = "orgCode") String orgCode,
-            @ApiParam(name = "parentId", value = "继承标准ID")
-            @RequestParam(value = "parentId") Long parentId) throws Exception {
-
-        return planClient.updateAdapterPlan(
-                id,
-                objToJson(setValues(new AdapterPlanModel(), code, name, description, versionCode, orgCode, parentId)));
+        return getModel(planClient.getAdapterPlanById(id));
     }
 
 
@@ -156,6 +150,7 @@ public class OrgAdapterPlanController extends ExtendController {
         return planClient.getAdapterCustomize(planId, version);
     }
 
+
     @RequestMapping(value = "/plan/{planId}/adapterDataSet", method = RequestMethod.GET)
     @ApiOperation(value = "定制数据集")
     public boolean adapterDataSet(
@@ -166,8 +161,6 @@ public class OrgAdapterPlanController extends ExtendController {
 
         return planClient.adapterDataSet(planId, customizeData);
     }
-
-
 
 
 

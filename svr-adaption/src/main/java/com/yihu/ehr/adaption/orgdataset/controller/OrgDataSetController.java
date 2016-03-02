@@ -48,29 +48,16 @@ public class OrgDataSetController extends ExtendController<MOrgDataSet> {
 
     @RequestMapping(value = "/dataset", method = RequestMethod.POST)
     @ApiOperation(value = "创建机构数据集")
-    public boolean createOrgDataSet(
-            @ApiParam(name = "code", value = "code", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "name", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "description", value = "description", defaultValue = "")
-            @RequestParam(value = "description") String description,
-            @ApiParam(name = "orgCode", value = "orgCode", defaultValue = "")
-            @RequestParam(value = "orgCode") String orgCode,
-            @ApiParam(name = "userId", value = "userId", defaultValue = "")
-            @RequestParam(value = "userId") String userId) throws Exception{
+    public MOrgDataSet createOrgDataSet(
+            @ApiParam(name = "model", value = "适配字典数据模型", defaultValue = "")
+            @RequestParam(value = "model") String model) throws Exception{
 
-        if (orgDataSetService.isExistOrgDataSet(orgCode, code, name))
+        OrgDataSet orgDataSet = jsonToObj(model, OrgDataSet.class);
+        if (orgDataSetService.isExistOrgDataSet(orgDataSet.getOrganization(), orgDataSet.getCode(), orgDataSet.getName()))
             throw new ApiException(ErrorCode.RepeatOrgDataSet, "该数据集已存在!");
-        OrgDataSet orgDataSet = new OrgDataSet();
-        orgDataSet.setCode(code);
-        orgDataSet.setName(name);
-        orgDataSet.setDescription(description);
-        orgDataSet.setOrganization(orgCode);
+
         orgDataSet.setCreateDate(new Date());
-        orgDataSet.setCreateUser(userId);
-        orgDataSetService.createOrgDataSet(orgDataSet);
-        return true;
+        return getModel(orgDataSetService.createOrgDataSet(orgDataSet));
     }
 
 
@@ -87,35 +74,21 @@ public class OrgDataSetController extends ExtendController<MOrgDataSet> {
 
     @RequestMapping(value = "/dataset", method = RequestMethod.PUT)
     @ApiOperation(value = "修改机构数据集")
-    public boolean updateOrgDataSet(
-            @ApiParam(name = "orgCode", value = "orgCode", defaultValue = "")
-            @RequestParam(value = "orgCode") String orgCode,
-            @ApiParam(name = "id", value = "id", defaultValue = "")
-            @RequestParam(value = "id") Long id,
-            @ApiParam(name = "code", value = "code", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "name", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "description", value = "description", defaultValue = "")
-            @RequestParam(value = "description", required = false) String description,
-            @ApiParam(name = "userId", value = "userId", defaultValue = "")
-            @RequestParam(value = "userId") String userId) throws Exception{
+    public MOrgDataSet updateOrgDataSet(
+            @ApiParam(name = "model", value = "适配字典数据模型", defaultValue = "")
+            @RequestParam(value = "model") String model) throws Exception{
 
-        OrgDataSet orgDataSet = orgDataSetService.retrieve(id);
+        OrgDataSet dataModel = jsonToObj(model, OrgDataSet.class);
+        OrgDataSet orgDataSet = orgDataSetService.retrieve(dataModel.getId());
         if (orgDataSet == null)
             throw errNotFound();
-        if (orgDataSet.getCode().equals(code)
-                || !orgDataSetService.isExistOrgDataSet(orgCode, code, name)) {
-            orgDataSet.setCode(code);
-            orgDataSet.setName(name);
-            orgDataSet.setDescription(description);
-            orgDataSet.setUpdateDate(new Date());
-            orgDataSet.setUpdateUser(userId);
-            orgDataSetService.save(orgDataSet);
-            return true;
+        if (orgDataSet.getCode().equals(dataModel.getCode())
+                || !orgDataSetService.isExistOrgDataSet(dataModel.getOrganization(), dataModel.getCode(), dataModel.getName())) {
+
+            dataModel.setUpdateDate(new Date());
+            return getModel(orgDataSetService.save(dataModel));
         } else
             throw new ApiException(ErrorCode.RepeatOrgDataSet, "该数据集已存在!");
-
     }
 
 

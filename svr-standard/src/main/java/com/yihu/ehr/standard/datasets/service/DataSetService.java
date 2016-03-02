@@ -50,7 +50,7 @@ public class DataSetService extends BaseHbmService<IDataSet>{
     public boolean add(IDataSet dataSet){
         String sql =
                 "INSERT INTO " + getTaleName(dataSet.getStdVersion()) +
-                "(code, name, ref_standard, std_version, summary, hashCode, documentId, lang) " +
+                "(code, name, ref_standard, std_version, summary, hash, documentId, lang) " +
                 "VALUES (:code, :name, :refStandard, :version, :summary, :hashCode, :documentId, :lang)";
         Query query = currentSession().createSQLQuery(sql);
         query.setParameter("code", dataSet.getCode());

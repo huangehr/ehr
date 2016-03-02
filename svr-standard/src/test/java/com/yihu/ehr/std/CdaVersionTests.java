@@ -34,8 +34,8 @@ public class CdaVersionTests {
     @Test
     public void testAddVersion() throws Exception{
         String userCode = "user1";
-        boolean rs = cdaVersionController.addVersion(userCode);
-        assertTrue("新增失败！", rs);
+        MCDAVersion rs = cdaVersionController.addVersion(userCode);
+        assertTrue("新增失败！", rs!=null);
     }
 
     @Test
@@ -73,8 +73,8 @@ public class CdaVersionTests {
         String userCode = "lincl";
         int inStage = 1;
         String baseVersion = "568f110cf330";
-        boolean rs = cdaVersionController.updateVersion(version, versionName, userCode, inStage, baseVersion);
-        assertTrue("更新失败！", rs);
+        MCDAVersion rs = cdaVersionController.updateVersion(version, versionName, userCode, inStage, baseVersion);
+        assertTrue("更新失败！", rs!=null);
     }
 
     @Test
