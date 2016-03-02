@@ -52,7 +52,7 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
                 && dictEntryService.isExistByField("code", dictEntryModel.getCode(), entityClass))
             throw errRepeatCode();
 
-        dictEntryService.save(dictEntry);
+        dictEntryService.save(dictEntryModel);
         return getModel(dictEntryModel);
     }
 
