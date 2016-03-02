@@ -1,5 +1,6 @@
 package com.yihu.ehr.ha.std.service;
 
+import com.yihu.ehr.agModel.standard.datasset.MetaDataModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.standard.MStdDataSet;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
-import com.yihu.ehr.standard.datasets.service.IMetaData;
+//import com.yihu.ehr.standard.datasets.service.IMetaData;
 
 import java.util.Collection;
 
@@ -103,8 +104,7 @@ public interface DataSetClient {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version,
             @ApiParam(name = "model", value = "数据源模型", defaultValue = "")
-            @RequestParam(value = "model", required = false) IMetaData model);
-
+            @RequestParam(value = "model", required = false) String metadataJsonData);
 
     @RequestMapping(value = "/std/metadatas", method = RequestMethod.GET)
     @ApiOperation(value = "查询数据元")
@@ -127,6 +127,8 @@ public interface DataSetClient {
     MStdMetaData getMetaData(
             @ApiParam(name = "id", value = "数据元编号", defaultValue = "")
             @PathVariable(value = "id") long id,
+            @ApiParam(name = "metaDataId", value = "数据元ID")
+            @RequestParam(value = "metaDataId") long metaDataId,
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version);
 
@@ -136,7 +138,7 @@ public interface DataSetClient {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version,
             @ApiParam(name = "model", value = "数据源模型", defaultValue = "")
-            @RequestParam(value = "model", required = false) IMetaData model);
+            @RequestParam(value = "model", required = false) String model);
 
     @RequestMapping(value = "/std/metadata/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据元")

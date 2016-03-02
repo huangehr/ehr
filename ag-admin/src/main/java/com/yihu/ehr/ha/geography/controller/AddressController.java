@@ -1,11 +1,13 @@
 package com.yihu.ehr.ha.geography.controller;
 
+import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.geography.service.AddressClient;
 import com.yihu.ehr.model.geogrephy.MGeography;
 import com.yihu.ehr.model.geogrephy.MGeographyDict;
 import com.yihu.ehr.agModel.geogrephy.GeographyDictModel;
 import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -14,6 +16,7 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.management.BufferPoolMXBean;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,7 +26,7 @@ import java.util.List;
 @RequestMapping(ApiVersion.Version1_0+"/admin")
 @RestController
 @Api(value = "address", description = "地址信息管理接口，用于地址信息管理", tags = {"地址信息管理接口"})
-public class AddressController {
+public class AddressController extends BaseController{
     @Autowired
     private AddressClient addressClient;
 
@@ -34,12 +37,17 @@ public class AddressController {
             @PathVariable(value = "level") Integer level) {
 
         Envelop envelop = new Envelop();
+        List<GeographyDictModel> geographyDictModels = new ArrayList<>();
 
         List<MGeographyDict> mGeographyDictList = addressClient.getAddressByLevel(level);
+        for (MGeographyDict mGeographyDict : mGeographyDictList){
+            GeographyDictModel geographyDictModel = convertToModel(mGeographyDict,GeographyDictModel.class);
+            geographyDictModels.add(geographyDictModel);
+        }
 
-        if(mGeographyDictList.size()>0){
+        if(geographyDictModels.size()>0){
             envelop.setSuccessFlg(true);
-            envelop.setDetailModelList(mGeographyDictList);
+            envelop.setDetailModelList(geographyDictModels);
         }else {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("根据地址等级查询地址字典失败");
@@ -55,12 +63,17 @@ public class AddressController {
             @PathVariable(value = "pid") Integer pid) {
 
         Envelop envelop = new Envelop();
+        List<GeographyDictModel> geographyDictModels = new ArrayList<>();
 
         List<MGeographyDict> mGeographyDictList = addressClient.getAddressDictByPid(pid);
+        for (MGeographyDict mGeographyDict : mGeographyDictList){
+            GeographyDictModel geographyDictModel = convertToModel(mGeographyDict,GeographyDictModel.class);
+            geographyDictModels.add(geographyDictModel);
+        }
 
-        if(mGeographyDictList.size()>0){
+        if(geographyDictModels.size()>0){
             envelop.setSuccessFlg(true);
-            envelop.setDetailModelList(mGeographyDictList);
+            envelop.setDetailModelList(geographyDictModels);
         }else {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("根据上级编号查询行政区划地址失败");
@@ -75,13 +88,15 @@ public class AddressController {
     public Envelop getAddressById(
             @ApiParam(name = "id", value = "地址编号", defaultValue = "")
             @PathVariable(value = "id") String id) {
+
         Envelop envelop = new Envelop();
 
         MGeography mGeography = addressClient.getAddressById(id);
+        GeographyModel geographyModel = convertToModel(mGeography,GeographyModel.class);
 
-        if(mGeography != null){
+        if(geographyModel != null){
             envelop.setSuccessFlg(true);
-            envelop.setObj(mGeography);
+            envelop.setObj(geographyModel);
         }else {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("地址查询失败");
@@ -158,13 +173,14 @@ public class AddressController {
             @RequestParam(value = "city") String city,
             @ApiParam(name = "district", value = "县", defaultValue = "")
             @RequestParam(value = "district") String district) {
+
         Envelop envelop = new Envelop();
 
-        List<String> mGeographyList = addressClient.search(province,city,district);
+        List<String> geographyList = addressClient.search(province,city,district);
 
-        if(mGeographyList.size()>0){
+        if(geographyList.size()>0){
             envelop.setSuccessFlg(true);
-            envelop.setDetailModelList(mGeographyList);
+            envelop.setDetailModelList(geographyList);
         }else {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("地址查询失败");

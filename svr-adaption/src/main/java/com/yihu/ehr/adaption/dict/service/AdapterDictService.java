@@ -4,6 +4,7 @@ package com.yihu.ehr.adaption.dict.service;
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlan;
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanService;
 import com.yihu.ehr.model.adaption.MAdapterDict;
+import com.yihu.ehr.model.adaption.MDataSet;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
@@ -38,7 +39,7 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
      *
      */
     @Transactional(propagation = Propagation.NEVER)
-    public List<MAdapterDict> searchAdapterDict(OrgAdapterPlan orgAdapterPlan, String code, String name, String orders, int page, int rows) {
+    public List<MDataSet> searchAdapterDict(OrgAdapterPlan orgAdapterPlan, String code, String name, String orders, int page, int rows) {
         long planId = orgAdapterPlan.getId();
         String dictTableName = CDAVersionUtil.getDictTableName(orgAdapterPlan.getVersion());
         Session session = currentSession();
@@ -63,7 +64,7 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
         page = page == 0 ? 1 : page;
         sqlQuery.setMaxResults(rows);
         sqlQuery.setFirstResult((page - 1) * rows);
-        sqlQuery.setResultTransformer(Transformers.aliasToBean(MAdapterDict.class));
+        sqlQuery.setResultTransformer(Transformers.aliasToBean(MDataSet.class));
         return sqlQuery.list();
     }
 

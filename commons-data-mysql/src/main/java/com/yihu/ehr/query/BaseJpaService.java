@@ -12,7 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -37,8 +39,8 @@ public class BaseJpaService<T, R> {
     @PersistenceContext
     protected EntityManager entityManager;
 
-    public void save(T entity) {
-        getRepository().save(entity);
+    public T save(T entity) {
+        return (T) getRepository().save(entity);
     }
 
     public T retrieve(Serializable id) {
@@ -75,6 +77,15 @@ public class BaseJpaService<T, R> {
                 .createQuery(query)
                 .setFirstResult((page - 1) * size)
                 .setMaxResults(size)
+                .getResultList();
+    }
+
+    public List search(String filters) {
+        URLQueryParser queryParser = createQueryParser("", filters, "");
+        CriteriaQuery query = queryParser.makeCriteriaQuery();
+
+        return entityManager
+                .createQuery(query)
                 .getResultList();
     }
 
@@ -127,5 +138,28 @@ public class BaseJpaService<T, R> {
 
     public JpaRepository getJpaRepository(){
         return (JpaRepository)repo;
+    }
+
+    public List<T> findByField(String field, Object value){
+
+        return findByFields(
+                new String[]{field},
+                new Object[]{value}
+        );
+    }
+
+    public List<T> findByFields(String[] fields, Object[] values){
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery query = criteriaBuilder.createQuery();
+        Root<T> root = query.from(getEntityClass());
+        for(int i=0; i< fields.length; i++){
+            if(values[i].getClass().isArray())
+                criteriaBuilder.in(root.get(fields[i]).in((Object[])values[i]));
+            else
+                criteriaBuilder.equal(root.get(fields[i]), values[i]);
+        }
+        return entityManager
+                .createQuery(query)
+                .getResultList() ;
     }
 }
