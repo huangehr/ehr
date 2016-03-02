@@ -4,36 +4,36 @@ package com.yihu.ehr.standard.dispatch.service;
 import java.util.Date;
 
 /**
- * ±£´æ±ê×¼°æ±¾ÎÄ¼şĞÅÏ¢
+ * ä¿å­˜æ ‡å‡†ç‰ˆæœ¬æ–‡ä»¶ä¿¡æ¯
  * @author AndyCai
  * @version 1.0
- * @created 24-7ÔÂ-2015 13:56:27
+ * @created 24-7æœˆ-2015 13:56:27
  */
 public class VersionFileInfo {
 
 	/**
-	 * ´´½¨ÈÕÆÚ
+	 * åˆ›å»ºæ—¥æœŸ
 	 */
 	private Date CreateDTime;
 	/**
-	 * ´´½¨ÈË
+	 * åˆ›å»ºäºº
 	 */
 	private String CreateUser;
 	/**
-	 * ÎÄ¼şÃû
+	 * æ–‡ä»¶å
 	 */
 	private String FileName;
 	/**
-	 * ÎÄ¼şÂ·¾¶
+	 * æ–‡ä»¶è·¯å¾„
 	 */
 	private String FilePath;
 	private long Id;
 	/**
-	 * ±È½Ï°æ±¾ID
+	 * æ¯”è¾ƒç‰ˆæœ¬ID
 	 */
 	private String SourceVersionId;
 	/**
-	 * ±»±È½Ï°æ±¾ID
+	 * è¢«æ¯”è¾ƒç‰ˆæœ¬ID
 	 */
 	private String TargetVersionId;
 
