@@ -36,18 +36,13 @@ public class OrgDictEntryController extends BaseController {
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") long id) throws Exception {
 
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
-
         MOrgDictItem mOrgDictItem = orgDictEntryClient.getOrgDictItem(id);
         if (mOrgDictItem == null) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("字典明细获取失败!");
-            return envelop;
+            return failed("字典明细获取失败!");
         }
         OrgDictEntryDetailModel detailModel = convertToModel(mOrgDictItem, OrgDictEntryDetailModel.class);
-        envelop.setObj(detailModel);
-        return envelop;
+
+        return success(detailModel);
     }
 
     @RequestMapping(value = "/item", method = RequestMethod.POST)
@@ -56,8 +51,6 @@ public class OrgDictEntryController extends BaseController {
             @ApiParam(name = "json_data", value = "字典项信息", defaultValue = "")
             @RequestParam(value = "json_data") String jsonData) throws Exception {
 
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
         OrgDictEntryDetailModel detailModel = objectMapper.readValue(jsonData, OrgDictEntryDetailModel.class);
         String errorMsg = "";
         if (StringUtils.isEmpty(detailModel.getCode())) {
@@ -73,9 +66,7 @@ public class OrgDictEntryController extends BaseController {
             errorMsg += "请先选择对应的机构!";
         }
         if (StringUtils.isNotEmpty(errorMsg)) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(errorMsg);
-            return envelop;
+            return failed(errorMsg);
         }
         MOrgDictItem mOrgDictItem = convertToModel(detailModel, MOrgDictItem.class);
         if (mOrgDictItem.getId() == 0) {
@@ -84,13 +75,11 @@ public class OrgDictEntryController extends BaseController {
             mOrgDictItem = orgDictEntryClient.updateDictItem(objectMapper.writeValueAsString(mOrgDictItem));
         }
         if (mOrgDictItem == null) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("保存失败");
+            return failed("保存失败!");
         }
         detailModel = convertToModel(mOrgDictItem, OrgDictEntryDetailModel.class);
-        envelop.setObj(detailModel);
 
-        return envelop;
+        return success(detailModel);
     }
 
 
@@ -100,16 +89,13 @@ public class OrgDictEntryController extends BaseController {
             @ApiParam(name = "ids", value = "编号", defaultValue = "")
             @RequestParam(value = "ids", required = false) String ids) throws Exception {
 
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
         ids = trimEnd(ids,",");
         boolean result = orgDictEntryClient.deleteOrgDictItemList(ids);
         if(!result)
         {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("删除失败!");
+            return failed("删除失败!");
         }
-        return envelop;
+        return success(null);
     }
 
 

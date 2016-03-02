@@ -58,19 +58,14 @@ public class AdapterOrgController extends BaseController {
             @ApiParam(name = "code", value = "代码", defaultValue = "")
             @PathVariable(value = "code") String code) throws Exception {
 
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
-
         MAdapterOrg mAdapterOrg = adapterOrgClient.getAdapterOrg(code);
 
         AdapterOrgModel adapterOrgModel = convertToModel(mAdapterOrg, AdapterOrgModel.class);
         if (adapterOrgModel == null) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("适配机构信息获取失败!");
+            return failed("适配机构信息获取失败!");
         }
 
-        envelop.setObj(mAdapterOrg);
-        return envelop;
+        return success(mAdapterOrg);
     }
 
 
@@ -79,9 +74,6 @@ public class AdapterOrgController extends BaseController {
     public Envelop addAdapterOrg(
             @ApiParam(name = "adapterOrg", value = "采集机构模型", defaultValue = "")
             @RequestParam(value = "adapterOrg", required = false) String adapterOrg) throws Exception {
-
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
 
         AdapterOrgDetailModel detailModel = objectMapper.readValue(adapterOrg, AdapterOrgDetailModel.class);
 
@@ -95,27 +87,19 @@ public class AdapterOrgController extends BaseController {
         }
 
         if (StringUtils.isNotEmpty(errorMsg)) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(errorMsg);
-            return envelop;
+            return failed(errorMsg);
         }
 
         if (adapterOrgClient.orgIsExistData(detailModel.getOrg())) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("已存在该机构标准信息!");
-            return envelop;
+            return failed("已存在该机构标准信息!");
         }
 
         MAdapterOrg mAdapterOrg = convertToModel(detailModel, MAdapterOrg.class);
         mAdapterOrg = adapterOrgClient.addAdapterOrg(objectMapper.writeValueAsString(mAdapterOrg));
         if (mAdapterOrg == null) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("新增失败!");
-
-            return envelop;
+            return failed("新增失败!");
         }
-        envelop.setObj(mAdapterOrg);
-        return envelop;
+        return success(mAdapterOrg);
     }
 
 
@@ -129,9 +113,6 @@ public class AdapterOrgController extends BaseController {
             @ApiParam(name = "description", value = "描述", defaultValue = "")
             @RequestParam(value = "description", required = false) String description) throws Exception {
 
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
-
         String errorMsg = "";
 
         if (StringUtils.isEmpty(code)) {
@@ -142,20 +123,14 @@ public class AdapterOrgController extends BaseController {
         }
 
         if (StringUtils.isNotEmpty(errorMsg)) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(errorMsg);
-            return envelop;
+            return failed(errorMsg);
         }
 
         MAdapterOrg mAdapterOrg = adapterOrgClient.updateAdapterOrg(code, name, description);
         if (mAdapterOrg == null) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("修改失败!");
-
-            return envelop;
+            return failed("修改失败!");
         }
-        envelop.setObj(mAdapterOrg);
-        return envelop;
+        return success(mAdapterOrg);
     }
 
 
@@ -165,19 +140,11 @@ public class AdapterOrgController extends BaseController {
             @ApiParam(name = "codes", value = "代码", defaultValue = "")
             @PathVariable(value = "codes") String codes) throws Exception {
 
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
-
         boolean result = adapterOrgClient.delAdapterOrg(codes);
         if (!result) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("删除失败!");
-            return envelop;
+            return failed("删除失败!");
         }
-
-        envelop.setErrorMsg("删除成功!");
-
-        return envelop;
+        return success(null);
     }
 
 

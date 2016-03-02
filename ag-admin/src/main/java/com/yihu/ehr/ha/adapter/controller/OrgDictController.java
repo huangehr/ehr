@@ -35,20 +35,14 @@ public class OrgDictController extends BaseController {
             @ApiParam(name = "id", value = "查询条件", defaultValue = "")
             @RequestParam(value = "id", required = false) long id) throws Exception{
 
-        Envelop envelop=new Envelop();
-        envelop.setSuccessFlg(true);
-
         MOrgDict mOrgDict = orgDictClient.getOrgDict(id);
         if(mOrgDict==null)
         {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("字典明细获取失败!");
-            return envelop;
+            return failed("字典明细获取失败!");
         }
-        OrgDictDetailModel detailModel = null;
-        envelop.setObj(detailModel);
+        OrgDictDetailModel detailModel = convertToModel(mOrgDict,OrgDictDetailModel.class);
 
-        return envelop;
+        return success(detailModel);
     }
 
     @RequestMapping(value = "/dict", method = RequestMethod.POST)
@@ -56,9 +50,6 @@ public class OrgDictController extends BaseController {
     public Envelop saveOrgDict(
             @ApiParam(name = "json_data", value = "字典信息", defaultValue = "")
             @RequestParam(value = "json_data") String jsonData) throws Exception{
-
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
 
         OrgDictDetailModel detailModel = objectMapper.readValue(jsonData,OrgDictDetailModel.class);
         String errorMsg = "";
@@ -72,9 +63,7 @@ public class OrgDictController extends BaseController {
             errorMsg += "请先选择对应的机构!";
         }
         if (StringUtils.isNotEmpty(errorMsg)) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(errorMsg);
-            return envelop;
+            return failed(errorMsg);
         }
 
         MOrgDict mOrgDict = convertToModel(detailModel,MOrgDict.class);
@@ -87,13 +76,11 @@ public class OrgDictController extends BaseController {
         }
 
         if (mOrgDict == null) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("保存失败");
+            return failed("保存失败");
         }
         detailModel = convertToModel(mOrgDict, OrgDictDetailModel.class);
-        envelop.setObj(detailModel);
 
-        return envelop;
+        return success(detailModel);
     }
 
 
@@ -103,17 +90,12 @@ public class OrgDictController extends BaseController {
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") long id) {
 
-
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
-
         boolean result = orgDictClient.deleteOrgDict(id);
         if(!result)
         {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("删除失败!");
+            return failed("删除失败!");
         }
-        return envelop;
+        return success(null);
     }
 
 
