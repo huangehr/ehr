@@ -1,5 +1,6 @@
 package com.yihu.ehr.ha.std.controller;
 
+import com.yihu.ehr.agModel.standard.standardversion.StdVersionDetailModel;
 import com.yihu.ehr.agModel.standard.standardversion.StdVersionModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.std.service.CDAVersionClient;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by AndyCai on 2016/1/25.
+ * Created by yww on 2016/3/1.
  */
 @RequestMapping(ApiVersion.Version1_0 + "/version")
 @RestController
@@ -36,16 +37,17 @@ public class CDAVersionController extends BaseController {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) throws Exception {
-        List<MCDAVersion> mCdaVersions = (List<MCDAVersion>) cdaVersionClient.searchCDAVersions(fields, filters, sorts, size, page);
+        List<MCDAVersion> mCdaVersions = cdaVersionClient.searchCDAVersions(fields, filters, sorts, size, page);
         List<StdVersionModel> versionModelList = new ArrayList<>();
         for (MCDAVersion mCdaVersion : mCdaVersions) {
             StdVersionModel versionModel = convertToModel(mCdaVersion, StdVersionModel.class);
-            //----微服务返回model已修改为String类型
+            //----微服务返回model已修改为String类型--（为便于增、改操作model的日期为String类型，DetailModel的日期为Data类型）
             //versionModel.setCommitTime(DateUtil.formatDate(mCdaVersion.getCommitTime(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT));
             //TODO 没有字典
             versionModel.setStageName(mCdaVersion.isInStage() ? "已发布" : "未发布");
             //基础版本名字
             //versionModel.setBaseVersionName();
+            //MCDAVersion mcdaVersionBase = cdaVersionClient.getVersion(versionModel.getBaseVersion());
             versionModelList.add(versionModel);
         }
         //TODO 取得符合条件的总记录数
@@ -73,13 +75,16 @@ public class CDAVersionController extends BaseController {
             envelop.setErrorMsg("已经存在处于编辑状态的标准版，不能新增！");
             return envelop;
         }
-        //TODO 微服务返回boolean类型，不利于测试
-        if (!cdaVersionClient.addVersion(userLoginCode)) {
+        MCDAVersion mcdaVersion = cdaVersionClient.addVersion(userLoginCode);
+        if (mcdaVersion == null) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("新增标准版本失败");
             return envelop;
         }
         envelop.setSuccessFlg(true);
+        //微服务返回的是字符串日期，而这个model为Date类型
+        StdVersionDetailModel stdVersionDetailModel = convertToModel(mcdaVersion, StdVersionDetailModel.class);
+        envelop.setObj(stdVersionDetailModel);
         return envelop;
     }
 
@@ -138,13 +143,15 @@ public class CDAVersionController extends BaseController {
             @RequestParam(value = "baseVersion") String baseVersion) throws Exception {
 
         Envelop envelop = new Envelop();
-        boolean flag = cdaVersionClient.updateVersion(version, versionName, userCode, inStage, baseVersion);
-        if (!flag) {
+        MCDAVersion mcdaVersion = cdaVersionClient.updateVersion(version, versionName, userCode, inStage, baseVersion);
+        if (mcdaVersion == null) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("标准版本更新失败！");
             return envelop;
         }
         envelop.setSuccessFlg(true);
+        //TODO 待日期类型统一，需要的是Date类型的日期，现在微服务返回Model是String类型，但又没有转换
+        envelop.setObj(convertToModel(mcdaVersion, StdVersionDetailModel.class));
         return envelop;
     }
 
