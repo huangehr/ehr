@@ -46,13 +46,15 @@ public class StandardSourceController extends BaseController {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) throws Exception {
+        //TODO 该分页查询方法名有误
+
         List<MStdSource> stdSources = stdSourcrClient.searchAdapterOrg(fields, filters, sorts, size, page);
         List<StdSourceModel> sourcrModelList = new ArrayList<>();
         for (MStdSource stdSource : stdSources) {
             StdSourceModel sourceModel = convertToModel(stdSource, StdSourceModel.class);
             //标准来源类型(
             MConventionalDict sourcerTypeDict = conDictEntryClient.getStdSourceType(stdSource.getSourceType());
-            sourceModel.setSourceName(sourcerTypeDict == null ? "" : sourcerTypeDict.getValue());
+            sourceModel.setSourceValue(sourcerTypeDict == null ? "" : sourcerTypeDict.getValue());
             //微服务返回的是String类型的日期
             //sourceModel.setCreate_date(DateUtil.formatDate(stdSource.getCreate_date(),DateUtil.DEFAULT_YMDHMSDATE_FORMAT));
         }
@@ -90,7 +92,7 @@ public class StandardSourceController extends BaseController {
         StdSourceDetailModel sourceDetailModel = convertToModel(mStdSource, StdSourceDetailModel.class);
         //标准来源类型字典
         MConventionalDict sourcerTypeDict = conDictEntryClient.getStdSourceType(mStdSource.getSourceType());
-        sourceDetailModel.setSourceName(sourcerTypeDict == null ? "" : sourcerTypeDict.getValue());
+        sourceDetailModel.setSourceValue(sourcerTypeDict == null ? "" : sourcerTypeDict.getValue());
         return sourceDetailModel;
     }
 
@@ -121,7 +123,7 @@ public class StandardSourceController extends BaseController {
 
     @RequestMapping(value = "/source", method = RequestMethod.POST)
     @ApiOperation(value = "新增标准来源")
-    public boolean addStdSource(
+    public Envelop addStdSource(
             @ApiParam(name = "code", value = "编码", defaultValue = "")
             @RequestParam(value = "code") String code,
             @ApiParam(name = "name", value = "名称", defaultValue = "")
@@ -130,9 +132,15 @@ public class StandardSourceController extends BaseController {
             @RequestParam(value = "type") String type,
             @ApiParam(name = "description", value = "描述", defaultValue = "")
             @RequestParam(value = "description") String description) throws Exception {
-
-
-        return true;
+        Envelop envelop = new Envelop();
+        boolean flag = stdSourcrClient.addStdSource(code, name, type, description);
+        if (!flag) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("新增标准来源失败！");
+            return envelop;
+        }
+        envelop.setSuccessFlg(true);
+        return envelop;
     }
 
 
@@ -142,7 +150,7 @@ public class StandardSourceController extends BaseController {
             @ApiParam(name = "ids", value = "标准来源编号", defaultValue = "")
             @RequestParam(value = "ids") String ids) throws Exception {
 
-        return true;
+        return stdSourcrClient.delStdSources(ids);
 
     }
 
@@ -152,62 +160,6 @@ public class StandardSourceController extends BaseController {
             @ApiParam(name = "id", value = "标准来源编号", defaultValue = "")
             @PathVariable(value = "id") String id) throws Exception {
 
-        return true;
+        return stdSourcrClient.delStdSource(id);
     }
-
-
-//    @RequestMapping(value = "/standardSources",method = RequestMethod.GET)
-//    public Object getStdSourceList(@ApiParam(name = "apiVersion", value = "API版本号", defaultValue = "v1.0")
-//                                   @PathVariable(value = "apiVersion") String apiVersion) {
-//        return null;
-//    }
-//
-//    @RequestMapping(value = "/standardSource",method = RequestMethod.GET)
-//    public Object getStdSourceById(@ApiParam(name = "apiVersion", value = "API版本号", defaultValue = "v1.0")
-//                                   @PathVariable(value = "apiVersion") String apiVersion,
-//                                   @ApiParam(name = "id",value = "标准来源ID")
-//                                   @RequestParam(value = "id")String id){
-//        return null;
-//    }
-//    @RequestMapping(value = "/getStdSource",method = RequestMethod.GET)
-//    public String getStandardSourceByCodeOrName(@ApiParam(name = "apiVersion", value = "API版本号", defaultValue = "v1.0")
-//                                      @PathVariable(value = "apiVersion") String apiVersion,
-//                                  @ApiParam(name = "code",value = "来源代码")
-//                                  @RequestParam(value = "code")String code,
-//                                  @ApiParam(name = "name",value = "来源名称")
-//                                      @RequestParam(value = "name")String name,
-//                                  @ApiParam(name = "type",value = "来源类型")
-//                                      @RequestParam(value = "type")String type,
-//                                  @ApiParam(name = "page", value = "当前页", defaultValue = "1")
-//                                      @RequestParam(value = "page") int page,
-//                                  @ApiParam(name = "rows", value = "每页行数", defaultValue = "20")
-//                                      @RequestParam(value = "rows") int rows) {
-//        return null;
-//    }
-//
-//    @RequestMapping(value = "/standardSource",method = RequestMethod.POST)
-//    public Object saveStandardSource(@ApiParam(name = "apiVersion", value = "API版本号", defaultValue = "v1.0")
-//                                     @PathVariable(value = "apiVersion") String apiVersion,
-//                                     @ApiParam(name = "id",value = "id")
-//                                     @RequestParam(value = "id")String id,
-//                                     @ApiParam(name = "code",value = "代码")
-//                                     @RequestParam(value = "code")String code,
-//                                     @ApiParam(name = "name",value = "名称")
-//                                     @RequestParam(value = "name")String name,
-//                                     @ApiParam(name = "type",value = "类别")
-//                                     @RequestParam(value = "type")String type,
-//                                     @ApiParam(name = "description",value = "说明")
-//                                     @RequestParam(value = "description")String description){
-//
-//        return null;
-//    }
-//
-//
-//    @RequestMapping(value = "/standardSource",method = RequestMethod.DELETE)
-//    public String delStdSource(@ApiParam(name = "apiVersion", value = "API版本号", defaultValue = "v1.0")
-//                               @PathVariable(value = "apiVersion") String apiVersion,
-//                               @ApiParam(name = "id", value = "id")
-//                               @RequestParam(value = "id") String id) {
-//        return null;
-//    }
 }
