@@ -25,7 +25,7 @@ public interface CDAVersionClient {
 
     @RequestMapping(value = "/cdaVersions", method = RequestMethod.GET)
     @ApiOperation(value = "适配采集标准")
-    List<MCDAVersion> searchCDAVersions(
+    Collection<MCDAVersion> searchCDAVersions(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")

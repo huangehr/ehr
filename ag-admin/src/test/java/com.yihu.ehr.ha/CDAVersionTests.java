@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 @SpringApplicationConfiguration(classes = AgAdminApplication.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CDAVersionTests {
-    //ApplicationContext applicationContext;
+
     static ApplicationContext applicationContext = new SpringApplicationBuilder()
             .web(false).sources(AgAdminApplication.class).run();
 
@@ -75,25 +75,25 @@ public class CDAVersionTests {
     }
 
     @Test
-    public void testCreateVersion() throws Exception {
+    public void testCreateVersion() throws Exception {//ok
         String userCode = "user1";
         envelop = cdaVersionController.addVersion(userCode);
         assertTrue("新增失败！", envelop.getObj() != null);
     }
 
     //    @Test
-//    public void testIsLatestVersions() throws Exception{//-----------ok
-//        String version = "56d3f3b33656";
-//        boolean rs = cdaVersionController.isLatestVersion(version);
-//        assertTrue("不是最新已发布的版本！", rs);
-//    }
+    public void testIsLatestVersions() throws Exception {//-----------ok
+        String version = "56d3f3b33656";
+        boolean rs = cdaVersionController.isLatestVersion(version);
+        assertTrue("不是最新已发布的版本！", rs);
+    }
 
-//    @Test
-//    public void testDropCDAVersion() throws Exception{
-//        String version = "56cc4441886d";
-//        boolean rs = cdaVersionController.dropCDAVersion(version);
-//        assertTrue("删除失败！", rs);
-//    }
+    @Test
+    public void testDropCDAVersion() throws Exception {//-----------ok
+        String version = "56cc4441886d";
+        boolean rs = cdaVersionController.dropCDAVersion(version);
+        assertTrue("删除失败！", rs);
+    }
 
     @Test
     public void testRevertVersion() throws Exception {//----------ok
