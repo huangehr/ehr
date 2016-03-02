@@ -69,21 +69,21 @@ public class AdapterOrgController extends ExtendController<MAdapterOrg> {
 
     @RequestMapping(value = "/org", method = RequestMethod.POST)
     @ApiOperation(value = "新增采集标准")
-    public boolean addAdapterOrg(
-            @ApiParam(name = "adapterOrg", value = "采集机构模型", defaultValue = "")
-            @RequestParam(value = "adapterOrg", required = false) AdapterOrg adapterOrg) throws Exception{
+    public MAdapterOrg addAdapterOrg(
+            @ApiParam(name = "model", value = "采集机构模型", defaultValue = "")
+            @RequestParam(value = "model", required = false) String model) throws Exception{
 
+        AdapterOrg adapterOrg = jsonToObj(model, AdapterOrg.class);
         if (adapterOrgService.retrieve(adapterOrg.getCode()) != null) {
             throw new ApiException(ErrorCode.RepeatAdapterOrg, "该机构已存在采集标准！");
         }
-        adapterOrgService.addAdapterOrg(adapterOrg);
-        return true;
+        return getModel(adapterOrgService.addAdapterOrg(adapterOrg));
     }
 
 
     @RequestMapping(value = "/org/{code}", method = RequestMethod.PUT)
     @ApiOperation(value = "更新采集标准")
-    public boolean updateAdapterOrg(
+    public MAdapterOrg updateAdapterOrg(
             @ApiParam(name = "code", value = "代码", defaultValue = "")
             @PathVariable(value = "code") String code,
             @ApiParam(name = "name", value = "名称", defaultValue = "")
@@ -96,8 +96,7 @@ public class AdapterOrgController extends ExtendController<MAdapterOrg> {
             throw errNotFound();
         adapterOrg.setName(name);
         adapterOrg.setDescription(description);
-        adapterOrgService.save(adapterOrg);
-        return true;
+        return getModel(adapterOrgService.save(adapterOrg));
     }
 
 

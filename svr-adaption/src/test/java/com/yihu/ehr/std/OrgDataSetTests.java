@@ -36,8 +36,8 @@ public class OrgDataSetTests {
 		String description = "DESC";
 		String orgCode = "ORGCODE";
 		String userId = "TEST";
-		boolean rs = orgDataSetController.createOrgDataSet(code, name, description, orgCode, userId);
-		assertTrue("新增失败", rs);
+		MOrgDataSet rs = orgDataSetController.createOrgDataSet("");
+		assertTrue("新增失败", rs!=null);
 	}
 
 	@Test
@@ -47,8 +47,8 @@ public class OrgDataSetTests {
 		String description = "DESC";
 		String orgCode = "ORGCODE";
 		String userId = "TEST";
-		boolean rs = orgDataSetController.updateOrgDataSet(orgCode, id, code, name, description, userId);
-		assertTrue("修改失败！", rs);
+		MOrgDataSet rs = orgDataSetController.updateOrgDataSet("");
+		assertTrue("修改失败！", rs!=null);
 	}
 
 	@Test

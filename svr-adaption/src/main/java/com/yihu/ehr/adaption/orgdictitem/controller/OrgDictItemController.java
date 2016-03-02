@@ -11,7 +11,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,41 +44,19 @@ public class OrgDictItemController extends ExtendController<MOrgDictItem> {
 
     @RequestMapping(value = "/item", method = RequestMethod.POST)
     @ApiOperation(value = "新增字典项")
-    public boolean createOrgDictItem(
-            @ApiParam(name = "orgDictSeq", value = "orgDictSeq", defaultValue = "")
-            @RequestParam(value = "orgDictSeq") int orgDictSeq,
-            @ApiParam(name = "orgCode", value = "orgCode", defaultValue = "")
-            @RequestParam(value = "orgCode") String orgCode,
-            @ApiParam(name = "code", value = "code", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "name", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "description", value = "description", defaultValue = "")
-            @RequestParam(value = "description", required = false) String description,
-            @ApiParam(name = "sort", value = "sort", defaultValue = "")
-            @RequestParam(value = "sort") String sort,
-            @ApiParam(name = "userId", value = "userId", defaultValue = "")
-            @RequestParam(value = "userId") String userId) throws Exception{
+    public MOrgDictItem createOrgDictItem(
+            @ApiParam(name = "model", value = "数据模型", defaultValue = "")
+            @RequestParam(value = "model") String model) throws Exception{
 
-        if (orgDictItemService.isExistOrgDictItem(orgDictSeq, orgCode, code))
+        OrgDictItem orgDictItem = jsonToObj(model, OrgDictItem.class);
+        if (orgDictItemService.isExistOrgDictItem(orgDictItem.getOrgDict(), orgDictItem.getOrganization(), orgDictItem.getCode()))
             throw new ApiException(ErrorCode.RepeatOrgDictItem, "该字典项已存在!");
-        OrgDictItem orgDictItem = new OrgDictItem();
-        int nextSort;
-        if (StringUtils.isEmpty(sort)) {
-            nextSort = orgDictItemService.getNextSort(orgDictSeq);
-        } else {
-            nextSort = Integer.parseInt(sort);
-        }
-        orgDictItem.setCode(code);
-        orgDictItem.setName(name);
-        orgDictItem.setSort(nextSort);
-        orgDictItem.setOrgDict(orgDictSeq);
+
+        if (orgDictItem.getSort() == 0)
+            orgDictItem.setSort(orgDictItemService.getNextSort(orgDictItem.getOrgDict()));
+
         orgDictItem.setCreateDate(new Date());
-        orgDictItem.setCreateUser(userId);
-        orgDictItem.setDescription(description);
-        orgDictItem.setOrganization(orgCode);
-        orgDictItemService.createOrgDictItem(orgDictItem);
-        return true;
+        return getModel(orgDictItemService.createOrgDictItem(orgDictItem));
     }
 
 
@@ -106,42 +83,23 @@ public class OrgDictItemController extends ExtendController<MOrgDictItem> {
     }
 
 
-    @RequestMapping(value = "/item/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/item", method = RequestMethod.PUT)
     @ApiOperation(value = "修改字典项")
-    public boolean updateDictItem(
-            @ApiParam(name = "id", value = "id", defaultValue = "")
-            @PathVariable(value = "id") Long id,
-            @ApiParam(name = "orgDictSeq", value = "orgDictSeq", defaultValue = "")
-            @RequestParam(value = "orgDictSeq") Integer orgDictSeq,
-            @ApiParam(name = "orgCode", value = "orgCode", defaultValue = "")
-            @RequestParam(value = "orgCode") String orgCode,
-            @ApiParam(name = "code", value = "code", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "name", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "description", value = "description", defaultValue = "")
-            @RequestParam(value = "description", required = false) String description,
-            @ApiParam(name = "sort", value = "sort", defaultValue = "")
-            @RequestParam(value = "sort") String sort,
-            @ApiParam(name = "userId", value = "userId", defaultValue = "")
-            @RequestParam(value = "userId") String userId) {
+    public MOrgDictItem updateDictItem(
+            @ApiParam(name = "model", value = "数据模型", defaultValue = "")
+            @RequestParam(value = "model") String model) throws Exception{
 
-        OrgDictItem orgDictItem = orgDictItemService.retrieve(id);
+        OrgDictItem dataModel = jsonToObj(model, OrgDictItem.class);
+        OrgDictItem orgDictItem = orgDictItemService.retrieve(dataModel.getId());
         if (orgDictItem == null) {
             throw errNotFound();
         } else {
             //重复验证
-            boolean updateFlg = orgDictItem.getCode().equals(code) || !orgDictItemService.isExistOrgDictItem(orgDictSeq, orgCode, code);
+            boolean updateFlg = orgDictItem.getCode().equals(dataModel.getCode())
+                    || !orgDictItemService.isExistOrgDictItem(dataModel.getOrgDict(), dataModel.getOrganization(), dataModel.getCode());
             if (updateFlg) {
-                orgDictItem.setCode(code);
-                orgDictItem.setName(name);
-                orgDictItem.setDescription(description);
-                orgDictItem.setUpdateDate(new Date());
-                orgDictItem.setUpdateUser(userId);
-                orgDictItem.setSort(Integer.parseInt(sort));
-                orgDictItem.setOrganization(orgCode);
-                orgDictItemService.save(orgDictItem);
-                return true;
+                dataModel.setUpdateDate(new Date());
+                return getModel(orgDictItemService.save(dataModel));
             }
             throw new ApiException(ErrorCode.RepeatOrgDictItem, "该字典项已存在!");
         }
@@ -150,7 +108,7 @@ public class OrgDictItemController extends ExtendController<MOrgDictItem> {
 
     @RequestMapping(value = "/items", method = RequestMethod.GET)
     @ApiOperation(value = "分页查询")
-    public Collection searchOrgDictItems(
+    public Collection<MOrgDictItem> searchOrgDictItems(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -171,7 +129,7 @@ public class OrgDictItemController extends ExtendController<MOrgDictItem> {
 
     @RequestMapping(value = "/items/combo", method = RequestMethod.GET)
     @ApiOperation(value = "机构字典项下拉")
-    public Collection getOrgDictEntry(
+    public List<String> getOrgDictEntry(
             @ApiParam(name = "orgDictSeq", value = "字典seq", defaultValue = "")
             @RequestParam(value = "orgDictSeq") Integer orgDictSeq,
             @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")

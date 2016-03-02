@@ -121,7 +121,7 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
     /**
      * 根据datasetId搜索数据元适配关系
      */
-    public List<AdapterDataSetModel> searchAdapterMetaData(OrgAdapterPlan orgAdapterPlan, long dataSetId, String code, String name, String orders, int page, int rows) {
+    public List<MAdapterDataSet> searchAdapterMetaData(OrgAdapterPlan orgAdapterPlan, long dataSetId, String code, String name, String orders, int page, int rows) {
 
         String orgCode = orgAdapterPlan.getOrg();
         String dsTableName = CDAVersionUtil.getDataSetTableName(orgAdapterPlan.getVersion());
@@ -200,7 +200,7 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
      * @param orgAdapterPlan
      */
     @Transactional(propagation = Propagation.REQUIRED)
-    public void addAdapterDataSet(AdapterDataSet adapterDataSet, OrgAdapterPlan orgAdapterPlan) {
+    public AdapterDataSet addAdapterDataSet(AdapterDataSet adapterDataSet, OrgAdapterPlan orgAdapterPlan) {
         //新增需要适配的字典
         Long planId = adapterDataSet.getAdapterPlanId();
         String cdaVersion = orgAdapterPlan.getVersion();
@@ -213,6 +213,7 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
             }
         }
         saveAdapterDataSet(adapterDataSet);
+        return adapterDataSet;
     }
 
 
@@ -336,5 +337,157 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
         Query query = session.createQuery("from AdapterDataSet where adapterPlanId = :planId");
         query.setParameter("planId", planId);
         return query.list();
+    }
+
+
+    /*
+    * 获取数据集映射信息
+    * @param strPlanId 方案ID
+    * @param versionCode 映射版本ID
+    * @return List<DataSetMappingInfo> 数据集映射信息列表
+    * */
+    public Map getDataSetMappingInfo(String strPlanId, String versionCode,String strOrgCode) {
+
+        Map<String, Object> mapResult = new HashMap<>();
+
+        try {
+            Session session = currentSession();
+            String datasetTableName = CDAVersionUtil.getDataSetTableName(versionCode);
+
+            StringBuffer sb = new StringBuffer();
+
+            sb.append("SELECT ");
+            sb.append("DISTINCT ");
+            sb.append("a.std_dataset, ");
+            sb.append("b.`code` std_dataset_code, ");
+            sb.append("c.id, ");
+            sb.append("c.`code` org_dataset_code,  ");
+            sb.append("b.name std_dataset_name, ");
+            sb.append("c.name org_dataset_name,  ");
+            sb.append("a.org_dataset ");
+            sb.append("from adapter_dataset a ");
+            sb.append("left JOIN " + datasetTableName + " b on a.std_dataset = b.id ");
+            sb.append("left join org_std_dataset c on a.org_dataset = c.sequence and c.organization='"+strOrgCode+"' ");
+            sb.append("where a.plan_id='" + strPlanId + "' ");
+            Query query = session.createSQLQuery(sb.toString());
+
+            List<Object> records = query.list();
+
+            List<DataSetMappingInfo> listMapping = new ArrayList<>();
+            List<MetadataMappingInfo> listMetadataInfo = new ArrayList<>();
+
+            for (int i = 0; i < records.size(); ++i) {
+
+                DataSetMappingInfo info = new DataSetMappingInfo();
+
+                Object[] record = (Object[]) records.get(i);
+
+                info.setId(String.valueOf(i + 1));
+                info.setStdSetId(record[0].toString());
+                info.setStdSetCode(record[1].toString());
+                info.setOrgSetId(record[2] == null ? "" : record[2].toString());
+                info.setOrgSetCode(record[3] == null ? "" : record[3].toString());
+                info.setStdSetName(record[4] == null ? "" : record[4].toString());
+                info.setOrgSetName(record[5] == null ? "" : record[5].toString());
+                String orgSequence = record[6] == null ? "" : record[6].toString();
+                info.setPlanId(strPlanId);
+                listMapping.add(info);
+
+                //获取数据元映射关系
+                Map<String,Object> mapKey = new HashMap<>();
+                mapKey.put("strStdSetId",info.getStdSetId());
+                mapKey.put("StrOrgSetId",orgSequence);
+                mapKey.put("versionCode",versionCode);
+                mapKey.put("strPlanId",info.getPlanId());
+                mapKey.put("strMappingId",info.getId());
+                mapKey.put("length",listMetadataInfo.size());
+                mapKey.put("orgCode",strOrgCode);
+                List<MetadataMappingInfo> listMetadata=getMetadatamapping(mapKey);
+
+                listMetadataInfo.addAll(listMetadata);
+            }
+
+            mapResult.put("datasetlist", listMapping);
+            mapResult.put("elementlist", listMetadataInfo);
+
+        } catch (Exception ex) {
+            mapResult=null;
+        }
+
+        return mapResult;
+    }
+
+
+    /*
+    * 根据平台数据集ID和机构数据ID 获取数据元映射关系
+    * @param strStdSetId 平台数据集ID
+    * @param StrOrgSetId 机构数据集ID
+    * @param versionCode 版本号
+    * @return List<MetadataMappingInfo>映射关系
+    * */
+    public List<MetadataMappingInfo> getMetadatamapping(Map<String,Object> map) {
+        List<MetadataMappingInfo> listInfo = null;
+
+        try {
+            String strStdSetId = map.get("strStdSetId").toString();
+            String StrOrgSetId= map.get("StrOrgSetId").toString();
+            String versionCode= map.get("versionCode").toString();
+            String strPlanId= map.get("strPlanId").toString();
+            String strMappingId= map.get("strMappingId").toString();
+            String strOrgCode = map.get("orgCode").toString();
+            int ilength = Integer.parseInt(map.get("length").toString());
+
+            Session session = currentSession();
+            String elementTanleName = CDAVersionUtil.getMetaDataTableName(versionCode);
+
+            StringBuffer sb = new StringBuffer();
+
+            sb.append("select ");
+            sb.append("a.std_metadata, ");
+            sb.append("c.inner_code std_metadata_code, ");
+            sb.append(" b.id, ");
+            sb.append("b.`code` org_metadata_code, ");
+            sb.append("a.data_type, ");
+            sb.append("c.name std_metadata_name, ");
+            sb.append("b.name org_metadata_name ");
+            sb.append("from adapter_dataset a ");
+            sb.append("LEFT JOIN org_std_metadata b on a.org_metadata =b.sequence and b.organization='"+strOrgCode+"' ");
+            sb.append("LEFT JOIN "+elementTanleName+" c on c.id=a.std_metadata ");
+
+            sb.append("where a.plan_id='"+strPlanId+"' ");
+            sb.append("and a.std_dataset='"+strStdSetId+"' ");
+            if(StrOrgSetId==null || StrOrgSetId=="")
+                sb.append("and (a.org_dataset ='' or a.org_dataset is null)");
+            else
+                sb.append("and a.org_dataset='"+StrOrgSetId+"' ");
+
+            Query query = session.createSQLQuery(sb.toString());
+
+            List<Object> records = query.list();
+
+            listInfo = new ArrayList<>();
+
+            for (int i = 0; i < records.size(); ++i) {
+                ilength++;
+                MetadataMappingInfo info = new MetadataMappingInfo();
+
+                Object[] record = (Object[]) records.get(i);
+
+                info.setId(String.valueOf(ilength));
+                info.setStdMetadataId(record[0].toString());
+                info.setStdMetadataCode(record[1].toString());
+                info.setOrgMetadataId(record[2] == null ? "" : record[2].toString());
+                info.setOrgMetadataCode(record[3] == null ? "" : record[3].toString());
+                info.setOrgDictDataType(record[4] == null ? "0" : record[4].toString());
+                info.setStdMetadataName(record[5]==null?"":record[5].toString());
+                info.setOrgMetadataName(record[6]==null?"":record[6].toString());
+                info.setAdapterDataSetId(strMappingId);
+                info.setPlanId(strPlanId);
+                listInfo.add(info);
+            }
+        } catch (Exception e) {
+            listInfo=null;
+        }
+        return listInfo;
     }
 }

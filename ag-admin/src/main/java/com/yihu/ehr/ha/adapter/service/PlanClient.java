@@ -34,7 +34,7 @@ public interface PlanClient {
 
     @RequestMapping(value = "/plans", method = RequestMethod.GET)
     @ApiOperation(value = "适配方案搜索")
-    public Collection searchAdapterPlan(
+    public Collection<MAdapterPlan> searchAdapterPlan(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -58,7 +58,7 @@ public interface PlanClient {
 
     @RequestMapping(value = "/plan", method = RequestMethod.POST)
     @ApiOperation(value = "保存适配方案")
-    public boolean saveAdapterPlan(
+    public MAdapterPlan saveAdapterPlan(
             @ApiParam(name = "parmJson", value = "数据模型", defaultValue = "")
             @RequestParam(value = "parmJson") String parmJson,
             @ApiParam(name = "isCover", value = "是否覆盖", defaultValue = "")
@@ -67,7 +67,7 @@ public interface PlanClient {
 
     @RequestMapping(value = "/plan/{id}", method = RequestMethod.PUT)
     @ApiOperation(value = "更新适配方案")
-    public boolean updateAdapterPlan(
+    public MAdapterPlan updateAdapterPlan(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") Long id,
             @ApiParam(name = "parmJson", value = "数据模型", defaultValue = "")

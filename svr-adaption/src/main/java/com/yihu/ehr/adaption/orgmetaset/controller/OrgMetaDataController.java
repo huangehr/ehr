@@ -46,34 +46,17 @@ public class OrgMetaDataController extends ExtendController<MOrgMetaData> {
 
     @RequestMapping(value = "/meta", method = RequestMethod.POST)
     @ApiOperation(value = "新增数据元")
-    public boolean createOrgMetaData(
-            @ApiParam(name = "orgDataSetSeq", value = "orgDataSetSeq", defaultValue = "")
-            @RequestParam(value = "orgDataSetSeq") int orgDataSetSeq,
-            @ApiParam(name = "orgCode", value = "orgCode", defaultValue = "")
-            @RequestParam(value = "orgCode") String orgCode,
-            @ApiParam(name = "code", value = "code", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "name", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "description", value = "description", defaultValue = "")
-            @RequestParam(value = "description", required = false) String description,
-            @ApiParam(name = "userId", value = "userId", defaultValue = "")
-            @RequestParam(value = "userId") String userId) throws Exception {
+    public MOrgMetaData createOrgMetaData(
+            @ApiParam(name = "model", value = "数据模型", defaultValue = "")
+            @RequestParam(value = "model") String model) throws Exception {
 
-        boolean isExist = orgMetaDataService.isExistOrgMetaData(orgDataSetSeq, orgCode, code);//重复验证
+        OrgMetaData orgMetaData = jsonToObj(model, OrgMetaData.class);
+        boolean isExist = orgMetaDataService.isExistOrgMetaData(orgMetaData.getOrgDataSet(), orgMetaData.getOrganization(), orgMetaData.getCode());//重复验证
         if (isExist)
             throw new ApiException(ErrorCode.RepeatOrgMetaData, "该数据元已存在!");
 
-        OrgMetaData orgMetaData = new OrgMetaData();
-        orgMetaData.setCode(code);
-        orgMetaData.setName(name);
-        orgMetaData.setOrgDataSet(orgDataSetSeq);
         orgMetaData.setCreateDate(new Date());
-        orgMetaData.setCreateUser(userId);
-        orgMetaData.setOrganization(orgCode);
-        orgMetaData.setDescription(description);
-        orgMetaDataService.createOrgMetaData(orgMetaData);
-        return true;
+        return getModel(orgMetaDataService.createOrgMetaData(orgMetaData));
     }
 
 
@@ -98,39 +81,23 @@ public class OrgMetaDataController extends ExtendController<MOrgMetaData> {
         return true;
     }
 
-    @RequestMapping(value = "/meta/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/meta", method = RequestMethod.PUT)
     @ApiOperation(value = "修改数据元")
-    public boolean updateOrgMetaData(
-            @ApiParam(name = "id", value = "id", defaultValue = "")
-            @PathVariable(value = "id") long id,
-            @ApiParam(name = "orgDataSetSeq", value = "orgDataSetSeq", defaultValue = "")
-            @RequestParam(value = "orgDataSetSeq") Integer orgDataSetSeq,
-            @ApiParam(name = "orgCode", value = "orgCode", defaultValue = "")
-            @RequestParam(value = "orgCode") String orgCode,
-            @ApiParam(name = "code", value = "code", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "name", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "description", value = "description", defaultValue = "")
-            @RequestParam(value = "description", required = false) String description,
-            @ApiParam(name = "userId", value = "userId", defaultValue = "")
-            @RequestParam(value = "userId") String userId) throws Exception {
+    public MOrgMetaData updateOrgMetaData(
+            @ApiParam(name = "model", value = "数据模型", defaultValue = "")
+            @RequestParam(value = "model") String model) throws Exception {
 
-        OrgMetaData orgMetaData = orgMetaDataService.retrieve(id);
+        OrgMetaData dataModel = jsonToObj(model, OrgMetaData.class);
+        OrgMetaData orgMetaData = orgMetaDataService.retrieve(dataModel.getId());
         if (orgMetaData == null) {
             throw errNotFound();
         } else {
             //重复验证
-            boolean updateFlg = orgMetaData.getCode().equals(code) || !orgMetaDataService.isExistOrgMetaData(orgDataSetSeq, orgCode, code);
+            boolean updateFlg = orgMetaData.getCode().equals(dataModel.getCode())
+                    || !orgMetaDataService.isExistOrgMetaData(dataModel.getOrgDataSet(), dataModel.getOrganization(), dataModel.getCode());
             if (updateFlg) {
-                orgMetaData.setCode(code);
-                orgMetaData.setName(name);
-                orgMetaData.setDescription(description);
-                orgMetaData.setUpdateDate(new Date());
-                orgMetaData.setUpdateUser(userId);
-                orgMetaData.setOrganization(orgCode);
-                orgMetaDataService.save(orgMetaData);
-                return true;
+                dataModel.setUpdateDate(new Date());
+                return getModel(orgMetaDataService.save(dataModel));
             } else
                 throw new ApiException(ErrorCode.RepeatOrgMetaData, "数据元代码重复！");
         }
@@ -139,7 +106,7 @@ public class OrgMetaDataController extends ExtendController<MOrgMetaData> {
 
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @ApiOperation(value = "分页查询")
-    public Collection searchOrgMetaDatas(
+    public Collection<MOrgMetaData> searchOrgMetaDatas(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")

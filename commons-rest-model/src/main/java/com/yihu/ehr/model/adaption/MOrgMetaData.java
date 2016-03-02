@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.adaption;
 
+import java.util.Date;
+
 /**
  * 机构数据元
  *
@@ -12,8 +14,8 @@ public class MOrgMetaData {
     long id;
     String code;
     String name;
-    String createDate;
-    String updateDate;
+    Date createDate;
+    Date updateDate;
     String createUser;
     String updateUser;
     int orgDataSet;
@@ -47,19 +49,19 @@ public class MOrgMetaData {
         this.name = name;
     }
 
-    public String getCreateDate() {
+    public Date getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(String createDate) {
+    public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
 
-    public String getUpdateDate() {
+    public Date getUpdateDate() {
         return updateDate;
     }
 
-    public void setUpdateDate(String updateDate) {
+    public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
     }
 
