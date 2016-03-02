@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -32,24 +33,29 @@ import java.util.List;
  * @created 2016.03.01 9:57
  */
 @Configuration
-//@EnableAuthorizationServer
-public class OAuth2ServerConfig extends AuthorizationServerConfigurerAdapter {
+public class ServerSecurityConfig {
 
     private static final String SERVER_RESOURCE_ID = "oauth2server";
 
-    @Configuration
     @Order(10)
+    @Configuration
     protected static class UiResourceConfiguration extends WebSecurityConfigurerAdapter {
+        @Autowired
+        private FakeUserDetailsService userDetailsService;
+
+        @Override
+        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+            auth.userDetailsService(userDetailsService);
+        }
+
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http
                     .formLogin().loginPage("/login").failureUrl("/login?error").defaultSuccessUrl("/login?logout").permitAll()
                     .and()
-                    .authorizeRequests().antMatchers("/css/**", "/docs", "/api").permitAll()
+                    .authorizeRequests().antMatchers("/css/**", "/docs").permitAll()
                     .and()
-                    .authorizeRequests().antMatchers("/swagger**", "/login/oauth/**").authenticated()
-                    .and()
-                    .logout().permitAll();
+                    .authorizeRequests().antMatchers("/swagger**", "/login/oauth/**").access("hasRole('ROLE_USER')");
         }
     }
 
@@ -65,18 +71,10 @@ public class OAuth2ServerConfig extends AuthorizationServerConfigurerAdapter {
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
-            List<String> oauthMatcher = new ArrayList<>(ApiVersion.class.getFields().length);
-            for (Field field : ApiVersion.class.getFields()) {
-                if (field.getName().startsWith("Version")) {
-                    oauthMatcher.add(field.get(null) + "/**");
-                }
-            }
-
             http
                     .requestMatchers().antMatchers("/api/v1.0/**")
                     .and()
-                    .authorizeRequests()
-                    .antMatchers("/api/v1.0/**").access("#oauth2.hasScope('read')");
+                    .authorizeRequests().antMatchers("/api/v1.0/**").access("#oauth2.hasScope('read')");
         }
 
     }
@@ -97,7 +95,7 @@ public class OAuth2ServerConfig extends AuthorizationServerConfigurerAdapter {
                     .resourceIds(SERVER_RESOURCE_ID)
                     .authorizedGrantTypes("authorization_code")
                     .authorities("ROLE_CLIENT")
-                    .scopes("read", "write","trust","自定义权限")//这个scope是自定义的么？？
+                    .scopes("read", "write", "trust", "自定义权限")//这个scope是自定义的么？？
                     .accessTokenValiditySeconds(100)
                     .secret("secret")
                     .redirectUris("redirect_uri");
@@ -112,8 +110,8 @@ public class OAuth2ServerConfig extends AuthorizationServerConfigurerAdapter {
         public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
             endpoints.tokenStore(tokenStore)
                     .authenticationManager(authenticationManager);
-					/*.pathMapping("/oauth/authorize", "/oauth2/authorize")
-					.pathMapping("/oauth/token", "/oauth2/token");*/
+                    //.pathMapping("/oauth/authorize", "/oauth2/authorize")
+                    //.pathMapping("/oauth/token", "/oauth2/token");
             //以上的注释掉的是用来改变配置的
         }
 
@@ -132,7 +130,7 @@ public class OAuth2ServerConfig extends AuthorizationServerConfigurerAdapter {
 
     }
 
-    @Autowired
+    /*@Autowired
     private AuthenticationManager authenticationManager;
 
     @Override
@@ -166,6 +164,6 @@ public class OAuth2ServerConfig extends AuthorizationServerConfigurerAdapter {
                 .authorities("ROLE_CLIENT")
                 .scopes("read")
                 .resourceIds(RESOURCE_ID)
-                .secret("secret");*/
-    }
+                .secret("secret");
+    }*/
 }
