@@ -3,6 +3,7 @@ package com.yihu.ehr.ha.adapter.service;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.adaption.MAdapterDataSet;
+import com.yihu.ehr.model.adaption.MDataSet;
 import com.yihu.ehr.model.geogrephy.MGeography;
 import com.yihu.ehr.model.geogrephy.MGeographyDict;
 import io.swagger.annotations.ApiOperation;
@@ -35,7 +36,7 @@ public interface AdapterDataSetClient {
 
     @RequestMapping(value = "/plan/{planId}/datasets", method = RequestMethod.GET)
     @ApiOperation(value = "根据方案ID及查询条件查询数据集适配关系")
-    public Collection searchAdapterDataSet(
+    public Collection<MDataSet> searchAdapterDataSet(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "code", value = "代码查询值", defaultValue = "")
@@ -53,7 +54,7 @@ public interface AdapterDataSetClient {
 
     @RequestMapping("/plan/{planId}/datasets/{dataSetId}/datametas")
     @ApiOperation(value = "根据dataSetId搜索数据元适配关系")
-    public Collection searchAdapterMetaData(
+    public Collection<MAdapterDataSet> searchAdapterMetaData(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "dataSetId", value = "数据集id", defaultValue = "")
@@ -81,7 +82,7 @@ public interface AdapterDataSetClient {
 
     @RequestMapping(value = "/datameta/{id}", method = RequestMethod.PUT)
     @ApiOperation(value = "修改数据元映射关系")
-    public boolean updateAdapterMetaData(
+    public MAdapterDataSet updateAdapterMetaData(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") Long id,
             @ApiParam(name = "jsonModel", value = "数据元模型", defaultValue = "")
@@ -90,7 +91,7 @@ public interface AdapterDataSetClient {
 
     @RequestMapping(value = "/datameta", method = RequestMethod.POST)
     @ApiOperation(value = "新增数据元映射关系")
-    public boolean createAdapterMetaData(
+    public MAdapterDataSet createAdapterMetaData(
             @ApiParam(name = "jsonModel", value = "数据元模型", defaultValue = "")
             @RequestParam(value = "jsonModel") String jsonModel) throws Exception;
 

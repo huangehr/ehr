@@ -79,7 +79,7 @@ public class DictController extends ExtendController<MStdDict> {
          return null;
     }
 
-    @RequestMapping(value = "/dict", method = RequestMethod.POST)
+    @RequestMapping(value = "/dict", method = RequestMethod.PUT)
     @ApiOperation(value = "修改字典")
     public MStdDict updateDict(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")

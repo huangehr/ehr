@@ -82,14 +82,14 @@ public interface AdapterDictClient {
 
     @RequestMapping(value = "/dict/entry", method = RequestMethod.POST)
     @ApiOperation(value = "保存字典项映射关系")
-    public boolean createAdapterDictEntry(
+    public MAdapterDict createAdapterDictEntry(
             @ApiParam(name = "adapterDictModel", value = "字典数据模型", defaultValue = "")
             @RequestParam(value = "adapterDictModel") String dictJsonModel) throws Exception ;
 
 
     @RequestMapping(value = "/dict/entry/{id}", method = RequestMethod.PUT)
     @ApiOperation(value = "修改字典项映射关系")
-    public boolean updateAdapterDictEntry(
+    public MAdapterDict updateAdapterDictEntry(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") Long id,
             @ApiParam(name = "adapterDictModel", value = "字典数据模型", defaultValue = "")

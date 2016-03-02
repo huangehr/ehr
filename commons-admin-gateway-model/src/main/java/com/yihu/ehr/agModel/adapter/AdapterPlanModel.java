@@ -1,10 +1,14 @@
 package com.yihu.ehr.agModel.adapter;
 
+import com.yihu.ehr.util.validate.Required;
+import com.yihu.ehr.util.validate.Valid;
+
 /**
  * @author lincl
  * @version 1.0
  * @created 2016.2.3
  */
+@Valid
 public class AdapterPlanModel {
     public Long id;
     public Long parentId;
@@ -42,6 +46,7 @@ public class AdapterPlanModel {
         this.parentName = parentName;
     }
 
+    @Required(filedName = "代码")
     public String getCode() {
         return code;
     }
@@ -50,6 +55,7 @@ public class AdapterPlanModel {
         this.code = code;
     }
 
+    @Required(filedName = "名称")
     public String getName() {
         return name;
     }
@@ -58,6 +64,7 @@ public class AdapterPlanModel {
         this.name = name;
     }
 
+    @Required(filedName = "方案类别")
     public String getType() {
         return type;
     }
@@ -74,6 +81,7 @@ public class AdapterPlanModel {
         this.typeValue = typeValue;
     }
 
+    @Required(filedName = "标准版本")
     public String getVersion() {
         return version;
     }
@@ -82,6 +90,7 @@ public class AdapterPlanModel {
         this.version = version;
     }
 
+    @Required(filedName = "采集机构")
     public String getOrg() {
         return org;
     }
