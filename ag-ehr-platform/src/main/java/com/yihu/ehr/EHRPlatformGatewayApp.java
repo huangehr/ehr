@@ -1,6 +1,6 @@
 package com.yihu.ehr;
 
-import com.yihu.ehr.config.AppTomcatConnectionCustomizer;
+import com.yihu.ehr.config.TomcatConnCustomizer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -10,7 +10,6 @@ import org.springframework.boot.context.embedded.tomcat.TomcatConnectorCustomize
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.ResourceUtils;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import java.io.FileNotFoundException;
 
@@ -27,7 +26,7 @@ public class EHRPlatformGatewayApp {
     public EmbeddedServletContainerCustomizer containerCustomizer() throws FileNotFoundException {
         final String absoluteKeystoreFile = ResourceUtils.getFile("C:/Windows/tomcat.keystore").getAbsolutePath();
 
-        final TomcatConnectorCustomizer customizer = new AppTomcatConnectionCustomizer(absoluteKeystoreFile, "123456", port);
+        final TomcatConnectorCustomizer customizer = new TomcatConnCustomizer(absoluteKeystoreFile, "123456", port);
 
         return new EmbeddedServletContainerCustomizer() {
             @Override
