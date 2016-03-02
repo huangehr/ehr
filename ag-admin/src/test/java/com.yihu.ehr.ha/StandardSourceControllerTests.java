@@ -28,6 +28,9 @@ public class StandardSourceControllerTests {
 
     ApplicationContext applicationContext;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Test
     public void atestVersion() throws Exception {
         applicationContext = new SpringApplicationBuilder()
@@ -39,24 +42,28 @@ public class StandardSourceControllerTests {
         String sorts = "";
         int size = 15;
         int page = 1;
-        envelop = stdSourceController.searchAdapterOrg(fields, filters, sorts, size, page);
+        envelop = stdSourceController.searchSources(fields, filters, sorts, size, page);
 
-        //新增标准来源----------------------------3ok
-        String codeOld = "wwcs";
-        String nameOld = "api改造测试新增";
-        String sourctTypeOld = "1";
-        String descriptionOld = "only a test";
-        envelop = stdSourceController.addStdSource(codeOld, nameOld, sourctTypeOld, descriptionOld);
+        //新增标准来源----------------------------3
+        StdSourceDetailModel sourceDetailModel = new StdSourceDetailModel();
+        sourceDetailModel.setCode("wwcs");
+        sourceDetailModel.setName("api改造测试新增");
+        sourceDetailModel.setSourceType("1");
+        sourceDetailModel.setDescription("only a test");
+        String jSonData = objectMapper.writeValueAsString(sourceDetailModel);
+        envelop = stdSourceController.addStdSource(jSonData);
         StdSourceDetailModel detailModel = (StdSourceDetailModel) envelop.getObj();
 
 
-        //更新标准来源----------------------------4ok
+        //更新标准来源----------------------------4
         String idForTest = detailModel.getId();
-        String codeNew = "wwcsjkzl";
-        String nameNew = "api改造测试修改";
-        String sourctTypeNew = "2";
-        String descriptionNew = "again";
-        envelop = stdSourceController.updateStdSource(idForTest, codeNew, nameNew, sourctTypeNew, descriptionNew);
+
+        detailModel.setCode("wwcsjkzl");
+        detailModel.setName("api改造测试修改");
+        detailModel.setSourceType("2");
+        detailModel.setDescription("again");
+        String jSonDataNew = objectMapper.writeValueAsString(detailModel);
+        envelop = stdSourceController.updateStdSource(jSonDataNew);
 
         //根据id获取标准信息来源----------------------------ok
         envelop = stdSourceController.getStdSource(idForTest);
