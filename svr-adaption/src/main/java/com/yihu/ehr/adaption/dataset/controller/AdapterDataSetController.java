@@ -7,6 +7,7 @@ import com.yihu.ehr.adaption.dataset.service.AdapterDataSet;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSetService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.adaption.MAdapterDataSet;
+import com.yihu.ehr.model.adaption.MDataSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -39,7 +40,7 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
 
     @RequestMapping(value = "/plan/{planId}/datasets", method = RequestMethod.GET)
     @ApiOperation(value = "根据方案ID及查询条件查询数据集适配关系")
-    public Collection searchAdapterDataSet(
+    public Collection<MDataSet> searchAdapterDataSet(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "code", value = "代码查询值", defaultValue = "")
@@ -65,7 +66,7 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
 
     @RequestMapping("/plan/{planId}/datasets/{dataSetId}/datametas")
     @ApiOperation(value = "根据dataSetId搜索数据元适配关系")
-    public Collection searchAdapterMetaData(
+    public Collection<MAdapterDataSet> searchAdapterMetaData(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "dataSetId", value = "数据集id", defaultValue = "")
@@ -104,7 +105,7 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
 
     @RequestMapping(value = "/datameta/{id}", method = RequestMethod.PUT)
     @ApiOperation(value = "修改数据元映射关系")
-    public boolean updateAdapterMetaData(
+    public MAdapterDataSet updateAdapterMetaData(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") Long id,
             @ApiParam(name = "jsonModel", value = "数据元模型", defaultValue = "")
@@ -113,17 +114,17 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
         AdapterDataSet adapterDataSet = adapterDataSetService.retrieve(id);
         if(adapterDataSet==null)
             throw errNotFound();
-        return saveAdapterMetaData(adapterDataSet, jsonModel);
+        return getModel(saveAdapterMetaData(adapterDataSet, jsonModel));
     }
 
 
     @RequestMapping(value = "/datameta", method = RequestMethod.POST)
     @ApiOperation(value = "新增数据元映射关系")
-    public boolean createAdapterMetaData(
+    public MAdapterDataSet createAdapterMetaData(
             @ApiParam(name = "jsonModel", value = "数据元模型", defaultValue = "")
             @RequestParam(value = "jsonModel") String jsonModel) throws Exception{
 
-        return saveAdapterMetaData(new AdapterDataSet(), jsonModel);
+        return getModel(saveAdapterMetaData(new AdapterDataSet(), jsonModel));
     }
 
     @RequestMapping(value = "/datametas", method = RequestMethod.DELETE)
@@ -138,8 +139,7 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
     }
 
 
-    private boolean saveAdapterMetaData(AdapterDataSet adapterDataSet, String jsonModel)  {
-        String apiVersion = ApiVersion.Version1_0;
+    private AdapterDataSet saveAdapterMetaData(AdapterDataSet adapterDataSet, String jsonModel)  {
         AdapterDataSet adapterDataSetModel = null;
         try {
             adapterDataSetModel = jsonToObj(jsonModel, AdapterDataSet.class);
@@ -156,10 +156,9 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
         adapterDataSet.setDescription(adapterDataSetModel.getDescription());
         if (adapterDataSetModel.getId() == null) {
             OrgAdapterPlan orgAdapterPlan = orgAdapterPlanService.retrieve(adapterDataSetModel.getAdapterPlanId());
-            adapterDataSetService.addAdapterDataSet(apiVersion, adapterDataSet, orgAdapterPlan);
+            return adapterDataSetService.addAdapterDataSet(adapterDataSet, orgAdapterPlan);
         } else {
-            adapterDataSetService.save(adapterDataSet);
+            return adapterDataSetService.save(adapterDataSet);
         }
-        return true;
     }
 }

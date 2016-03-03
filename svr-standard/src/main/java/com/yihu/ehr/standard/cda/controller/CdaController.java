@@ -1,8 +1,11 @@
 package com.yihu.ehr.standard.cda.controller;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
+import com.yihu.ehr.model.standard.MCDADocument;
+import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import com.yihu.ehr.standard.cda.service.*;
-import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -10,8 +13,11 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RequestMapping(ApiVersion.Version1_0+"/std")
@@ -31,46 +37,91 @@ public class CdaController extends BaseRestController{
 
     @RequestMapping(value = "/CDADocuments" ,method = RequestMethod.GET)
     @ApiOperation(value = "根据条件获取cda列表")
-    public Object GetCDADocuments(String strVersion,String code,String name,String type,Integer page,Integer rows) {
-        List<CDADocument> xcdaDocuments = cdaDocumentManager.getDocumentList(strVersion,code,name,type,page,rows);
-        int resultCount = cdaDocumentManager.getDocumentCount(strVersion,code,name,type);
-        return getResult(xcdaDocuments, resultCount);
+    public List<MCDADocument> GetCDADocuments(
+            @ApiParam(name = "version_code", value = "版本号")
+            @RequestParam(value = "version_code") String versionCode,
+            @ApiParam(name = "code", value = "code")
+            @RequestParam(value = "code") String code,
+            @ApiParam(name = "name", value = "name")
+            @RequestParam(value = "name") String name,
+            @ApiParam(name = "type", value = "type")
+            @RequestParam(value = "type") String type,
+            @ApiParam(name = "page", value = "当前页", defaultValue = "")
+            @RequestParam(value = "page") Integer page,
+            @ApiParam(name = "rows", value = "行数", defaultValue = "")
+            @RequestParam(value = "rows") Integer rows,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        List<CDADocument> cdaDocuments = cdaDocumentManager.getDocumentList(versionCode,code,name,type,page,rows);
+        int resultCount = cdaDocumentManager.getDocumentCount(versionCode,code,name,type);
+        pagedResponse(request, response, (long) resultCount, page, rows);
+        return (List<MCDADocument>)convertToModels(cdaDocuments, new ArrayList<MCDADocument>(cdaDocuments.size()), MCDADocument.class, "");
     }
 
     @RequestMapping(value = "/CDADocuments/ids" ,method = RequestMethod.GET)
     @ApiOperation(value = "根据ids获取cda列表")
-    public List<CDADocument> getCDADocumentById(String[] ids, String strVersion) {
-        List<CDADocument> xcdaDocuments = cdaDocumentManager.getDocumentList(ids,strVersion);
-        return xcdaDocuments;
+    public List<MCDADocument> getCDADocumentById(
+            @ApiParam(name = "ids", value = "版本号")
+            @RequestParam(value = "ids") String[] ids,
+            @ApiParam(name = "version_code", value = "version_code")
+            @RequestParam(value = "version_code") String version) {
+        List<CDADocument> cdaDocuments = cdaDocumentManager.getDocumentList(ids,version);
+        List<MCDADocument> documentModels = (List<MCDADocument>)convertToModels(cdaDocuments, new ArrayList<MCDADocument>(cdaDocuments.size()), MCDADocument.class, "");
+        return documentModels;
     }
 
 
     @RequestMapping(value = "/cda_data_set_relationships" ,method = RequestMethod.GET)
     @ApiOperation(value = "根据条件获取getCDADataSetRelationship列表")
-    public Envelop getCDADataSetRelationships(
-            @ApiParam(required = true, name = "cda_Id", value = "用户名")
-            @RequestParam(value = "cda_Id", required = true) String cdaId,
-            @ApiParam(required = true, name = "version_code", value = "用户密码，以RSA加密")
-            @RequestParam(value = "version_code", required = true) String versionCode,
+    public List<MCdaDataSetRelationship> getCDADataSetRelationships(
+            @ApiParam(name = "cda_Id", value = "cda_Id")
+            @RequestParam(value = "cda_Id") String cdaId,
+            @ApiParam(name = "version_code", value = "版本号")
+            @RequestParam(value = "version_code") String versionCode,
             @ApiParam(name = "page", value = "当前页", defaultValue = "")
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
-            @RequestParam(value = "rows") Integer rows) {
+            @RequestParam(value = "rows") Integer rows,
+            HttpServletRequest request,
+            HttpServletResponse response) {
         List<CdaDataSetRelationship> relations = cdaDatasetRelationshipManager.getCDADataSetRelationshipByCDAId(cdaId,versionCode,page,rows);
         int resultCount = cdaDatasetRelationshipManager.getRelationshipCountByCdaId(cdaId,versionCode);
-        return getResult(relations,resultCount);
+        pagedResponse(request, response, (long) resultCount, page, rows);
+        return (List<MCdaDataSetRelationship>)convertToModels(relations, new ArrayList<MCdaDataSetRelationship>(relations.size()), MCdaDataSetRelationship.class, "");
     }
 
 
     @ApiOperation(value = "保存CDADocuments")
     @RequestMapping(value = "/cda_documents",method = RequestMethod.POST)
-    public Object saveCdaInfo(String cdaDocumentJsonData) throws Exception {
-        return cdaManager.saveCdaInfo(cdaDocumentJsonData);
+    public MCDADocument saveCDADocuments(
+            @ApiParam(name = "json_date", value = "json_date")
+            @RequestParam(value = "json_date") String cdaDocumentJsonData) throws Exception {
+        CDADocument cdaDocument = new ObjectMapper().readValue(cdaDocumentJsonData, CDADocument.class);
+        cdaDocument.setId(getObjectId(BizObject.STANDARD));
+        cdaDocument.setCreateDate(new Date());
+        cdaDocumentManager.saveDocument(cdaDocument);
+        return convertToModel(cdaDocument,MCDADocument.class);
+    }
+
+
+    @ApiOperation(value = "修改CDADocuments")
+    @RequestMapping(value = "/cda_documents",method = RequestMethod.PUT)
+    public MCDADocument updateCDADocuments(
+            @ApiParam(name = "json_date", value = "json_date")
+            @RequestParam(value = "json_date") String cdaDocumentJsonData) throws Exception {
+        CDADocument cdaDocument = new ObjectMapper().readValue(cdaDocumentJsonData, CDADocument.class);
+        cdaDocument.setUpdateDate(new Date());
+        cdaDocumentManager.saveDocument(cdaDocument);
+        return convertToModel(cdaDocument,MCDADocument.class);
     }
 
     @ApiOperation(value = "删除CDADocuments")
     @RequestMapping(value = "cda_documents",method = RequestMethod.DELETE)
-    public boolean deleteCdaInfo(String[] ids,String versionCode) {
+    public boolean deleteCDADocuments(
+            @ApiParam(name = "ids", value = "ids")
+            @RequestParam(value = "ids") String[] ids,
+            @ApiParam(name = "versionCode", value = "versionCode")
+            @RequestParam(value = "versionCode") String versionCode) {
         cdaDocumentManager.deleteDocument(ids,versionCode);
         return true;
     }
@@ -86,14 +137,26 @@ public class CdaController extends BaseRestController{
      */
     @ApiOperation(value = "保存CDADataSetRelationship")
     @RequestMapping(value = "/cda_data_set_relationships",method = RequestMethod.POST)
-    public boolean saveCDADataSetRelationship(String[] dataSetIds,String cdaId,String versionCode,String xmlInfo) throws Exception {
+    public boolean saveCDADataSetRelationship(
+            @ApiParam(name = "data_set_ids", value = "data_set_ids")
+            @RequestParam(value = "data_set_ids") String[] dataSetIds,
+            @ApiParam(name = "cda_id", value = "cda_id")
+            @RequestParam(value = "cda_id") String cdaId,
+            @ApiParam(name = "versionCode", value = "versionCode")
+            @RequestParam(value = "versionCode") String versionCode,
+            @ApiParam(name = "xml_info", value = "xml_info")
+            @RequestParam(value = "xml_info") String xmlInfo) throws Exception {
         return cdaManager.SaveDataSetRelationship(dataSetIds,cdaId,versionCode, xmlInfo);
     }
 
-    @ApiOperation(value = "删除CDADataSetRelationship")
+    @ApiOperation(value = "根基id删除CDADataSetRelationship")
     @RequestMapping(value = "/cda_data_set_relationships",method = RequestMethod.DELETE)
-    public Object deleteCDADataSetRelationship(String[] relationIds, String versionCode) {
-        return cdaDatasetRelationshipManager.deleteRelationshipById(versionCode, relationIds);
+    public boolean deleteCDADataSetRelationship(
+            @ApiParam(name = "versionCode", value = "versionCode")
+            @RequestParam(value = "versionCode") String versionCode,
+            @ApiParam(name = "ids", value = "ids")
+            @RequestParam(value = "ids") String[] ids) {
+        return cdaDatasetRelationshipManager.deleteRelationshipById(versionCode, ids);
     }
 
 
@@ -104,9 +167,13 @@ public class CdaController extends BaseRestController{
      */
     @RequestMapping(value = "/cda_data_set_relationships/cda_id" ,method = RequestMethod.GET)
     @ApiOperation(value = "根据cda_id获取getCDADataSetRelationship列表")
-    public List<CdaDataSetRelationship> getCDADataSetRelationshipByCDAId(String cdaId, String versionCode) {
-        List<CdaDataSetRelationship> relations = cdaDatasetRelationshipManager.getCDADataSetRelationshipByCDAId(cdaId,versionCode,0,0);
-        return relations;
+    public List<MCdaDataSetRelationship> getCDADataSetRelationshipByCDAId(
+            @ApiParam(name = "versionCode", value = "versionCode")
+            @RequestParam(value = "versionCode") String versionCode,
+            @ApiParam(name = "cda_id", value = "cda_id")
+            @RequestParam(value = "cda_id") String cdaId) {
+        List<CdaDataSetRelationship> relations = cdaDatasetRelationshipManager.getCDADataSetRelationshipByCDAId(versionCode,cdaId,0,0);
+        return (List<MCdaDataSetRelationship>)convertToModels(relations,new ArrayList<MCdaDataSetRelationship>(relations.size()),MCdaDataSetRelationship.class,"");
     }
 
 
@@ -114,21 +181,29 @@ public class CdaController extends BaseRestController{
     * 判断文件是否存在*/
     @RequestMapping(value = "/file/existence/cda_id" ,method = RequestMethod.GET)
     @ApiOperation(value = "根据cdaId和versionCode判断文件是否存在")
-    public boolean FileExists(String cdaId, String versionCode) {
+    public boolean FileExists(
+            @ApiParam(name = "versionCode", value = "versionCode")
+            @RequestParam(value = "versionCode") String versionCode,
+            @ApiParam(name = "cda_id", value = "cda_id")
+            @RequestParam(value = "cda_id") String cdaId) {
         return cdaDocumentManager.isFileExists(cdaId, versionCode);
     }
 
     /**
      * 生成CDA文件
      *
-     * @param strCdaId
+     * @param cdaId
      * @param versionCode
      * @return
      */
     @RequestMapping("/createCDASchemaFile")
     @ResponseBody
-    public boolean createCDASchemaFile(String strCdaId, String versionCode) throws Exception {
-        return cdaDocumentManager.createCDASchemaFile(strCdaId, versionCode);
+    public boolean createCDASchemaFile(
+            @ApiParam(name = "versionCode", value = "versionCode")
+            @RequestParam(value = "versionCode") String versionCode,
+            @ApiParam(name = "cda_id", value = "cda_id")
+            @RequestParam(value = "cda_id") String cdaId) throws Exception {
+        return cdaDocumentManager.createCDASchemaFile(cdaId, versionCode);
     }
 
     /**

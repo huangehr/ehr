@@ -1,5 +1,8 @@
 package com.yihu.ehr.ha.SystemDict.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.dict.SystemDictEntryModel;
+import com.yihu.ehr.agModel.dict.SystemDictModel;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.SystemDict.service.SystemDictClient;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -50,11 +54,17 @@ public class SystemDictController extends BaseController {
             @RequestParam(value = "page", required = false) Integer page){
 
         List<MSystemDict> systemDicts =(List<MSystemDict>)systemDictClient.getDictionaries(fields,filters,sorts,size,page);
+        List<SystemDictModel> systemDictModelList = new ArrayList<>();
+
+        for (MSystemDict mSystemDict:systemDicts){
+            SystemDictModel systemDictModel = convertToModel(mSystemDict,SystemDictModel.class);
+            systemDictModelList.add(systemDictModel);
+        }
 
 //        String count = response.getHeader(AgAdminConstants.ResourceCount);
 //        int totalCount = StringUtils.isNotEmpty(count) ? Integer.parseInt(count) : 0;
 
-        Envelop envelop = getResult(systemDicts,0,page,size);
+        Envelop envelop = getResult(systemDictModelList,0,page,size);
 
        return envelop;
     }
@@ -67,10 +77,11 @@ public class SystemDictController extends BaseController {
 
         Envelop envelop = new Envelop();
         MSystemDict systemDict = systemDictClient.createDictionary(dictJson);
+        SystemDictModel systemDictModel = convertToModel(systemDict,SystemDictModel.class);
 
-        if(systemDict != null){
+        if(systemDictModel != null){
             envelop.setSuccessFlg(true);
-            envelop.setObj(systemDict);
+            envelop.setObj(systemDictModel);
         }else {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("创建字典失败");
@@ -88,10 +99,11 @@ public class SystemDictController extends BaseController {
         Envelop envelop = new Envelop();
 
         MSystemDict systemDict = systemDictClient.getDictionary(id);
+        SystemDictModel systemDictModel = convertToModel(systemDict,SystemDictModel.class);
 
-        if(systemDict != null){
+        if(systemDictModel != null){
             envelop.setSuccessFlg(true);
-            envelop.setObj(systemDict);
+            envelop.setObj(systemDictModel);
         }else {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("获取字典失败");
@@ -108,10 +120,11 @@ public class SystemDictController extends BaseController {
         Envelop envelop = new Envelop();
 
         MSystemDict systemDict = systemDictClient.updateDictionary(dictJson);
+        SystemDictModel systemDictModel = convertToModel(systemDict,SystemDictModel.class);
 
-        if(systemDict != null){
+        if(systemDictModel != null){
             envelop.setSuccessFlg(true);
-            envelop.setObj(systemDict);
+            envelop.setObj(systemDictModel);
         }else {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("修改字典失败");
@@ -146,11 +159,17 @@ public class SystemDictController extends BaseController {
             @RequestParam(value = "rows", required = false) Integer rows) {
 
         List<MDictionaryEntry> dictionaryEntries = (List<MDictionaryEntry>)systemDictClient.getDictEntries(id,value,page,rows);
+        List<SystemDictEntryModel> systemDictEntryModelList = new ArrayList<>();
+
+        for (MDictionaryEntry mDictionaryEntry: dictionaryEntries){
+            SystemDictEntryModel systemDictEntryModel = convertToModel(mDictionaryEntry,SystemDictEntryModel.class);
+            systemDictEntryModelList.add(systemDictEntryModel);
+        }
 
 //        String count = response.getHeader(AgAdminConstants.ResourceCount);
 //        int totalCount = StringUtils.isNotEmpty(count) ? Integer.parseInt(count) : 0;
 
-        Envelop envelop = getResult(dictionaryEntries,0,page,rows);
+        Envelop envelop = getResult(systemDictEntryModelList,0,page,rows);
 
         return envelop;
     }
@@ -163,10 +182,11 @@ public class SystemDictController extends BaseController {
         Envelop envelop = new Envelop();
 
         MConventionalDict mConventionalDict= systemDictClient.createDictEntry(entryJson);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
 
-        if(mConventionalDict != null){
+        if(systemDictEntryModel != null){
             envelop.setSuccessFlg(true);
-            envelop.setObj(mConventionalDict);
+            envelop.setObj(systemDictEntryModel);
         }else {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("创建字典项失败");
@@ -185,10 +205,11 @@ public class SystemDictController extends BaseController {
         Envelop envelop = new Envelop();
 
         MDictionaryEntry mDictionaryEntry= systemDictClient.getDictEntry(id, code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mDictionaryEntry,SystemDictEntryModel.class);
 
-        if(mDictionaryEntry != null){
+        if(systemDictEntryModel != null){
             envelop.setSuccessFlg(true);
-            envelop.setObj(mDictionaryEntry);
+            envelop.setObj(systemDictEntryModel);
         }else {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("创建字典项失败");
@@ -220,10 +241,11 @@ public class SystemDictController extends BaseController {
         Envelop envelop = new Envelop();
 
         MConventionalDict mConventionalDict= systemDictClient.updateDictEntry(entryJson);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
 
-        if(mConventionalDict != null){
+        if(systemDictEntryModel != null){
             envelop.setSuccessFlg(true);
-            envelop.setObj(mConventionalDict);
+            envelop.setObj(systemDictEntryModel);
         }else {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("修改字典项失败");

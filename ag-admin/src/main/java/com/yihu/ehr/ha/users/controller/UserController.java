@@ -95,8 +95,6 @@ public class UserController extends BaseController {
     public Envelop deleteUser(
             @ApiParam(name = "user_id", value = "用户编号", defaultValue = "")
             @PathVariable(value = "user_id") String userId) throws Exception {
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
 
         MUserSecurity userSecurity = securityClient.getUserSecurityByUserId(userId);
         if (userSecurity != null) {
@@ -107,10 +105,9 @@ public class UserController extends BaseController {
 
         boolean result = userClient.deleteUser(userId);
         if (!result) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("删除失败!");
+            return failed("删除失败!");
         }
-        return envelop;
+        return success(null);
     }
 
 
@@ -120,18 +117,14 @@ public class UserController extends BaseController {
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
 
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
         UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
         MUser mUser = convertToModel(detailModel, MUser.class);
         mUser = userClient.createUser(objectMapper.writeValueAsString(mUser));
         if (mUser == null) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("保存失败!");
+            return failed("保存失败!");
         }
         detailModel = convertToModel(mUser, UserDetailModel.class);
-        envelop.setObj(detailModel);
-        return envelop;
+        return success(detailModel);
     }
 
 
@@ -141,18 +134,15 @@ public class UserController extends BaseController {
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
 
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
         UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
         MUser mUser = convertToModel(detailModel, MUser.class);
         mUser = userClient.updateUser(objectMapper.writeValueAsString(mUser));
         if (mUser == null) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("保存失败!");
+            return failed("保存失败!");
         }
         detailModel = convertToModel(mUser, UserDetailModel.class);
-        envelop.setObj(detailModel);
-        return envelop;
+
+        return success(detailModel);
     }
 
 
@@ -161,20 +151,14 @@ public class UserController extends BaseController {
     public Envelop getUser(
             @ApiParam(name = "user_id", value = "", defaultValue = "")
             @PathVariable(value = "user_id") String userId) {
-        Envelop envelop = new Envelop();
+
         MUser mUser = userClient.getUser(userId);
         if (mUser == null) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("用户信息获取失败!");
-            return envelop;
+            return failed("用户信息获取失败!");
         }
-
         UserDetailModel detailModel = MUserToUserDetailModel(mUser);
 
-        envelop.setSuccessFlg(true);
-        envelop.setObj(detailModel);
-
-        return envelop;
+        return success(detailModel);
     }
 
 
@@ -216,7 +200,7 @@ public class UserController extends BaseController {
      * @param loginCode 账号
      * @return map  key{publicKey:公钥；validTime：有效时间; startTime：生效时间}
      */
-    @RequestMapping(value = "/users/users/key/{login_code}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/users/key/{login_code}", method = RequestMethod.PUT)
     @ApiOperation(value = "重新分配密钥", notes = "重新分配密钥")
     public Map<String, String> distributeKey(
             @ApiParam(name = "login_code", value = "登录帐号", defaultValue = "")
@@ -242,18 +226,14 @@ public class UserController extends BaseController {
             @PathVariable(value = "login_code") String loginCode,
             @ApiParam(name = "psw", value = "密码", defaultValue = "")
             @RequestParam(value = "psw") String psw) {
-        Envelop envelop = new Envelop();
+
         MUser mUser = userClient.loginVerification(loginCode, psw);
         if (mUser == null) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("用户信息获取失败!");
-            return envelop;
+            return failed("用户信息获取失败!");
         }
         UserDetailModel detailModel = MUserToUserDetailModel(mUser);
 
-        envelop.setSuccessFlg(true);
-        envelop.setObj(detailModel);
-        return envelop;
+        return success(detailModel);
     }
 
     /**
@@ -268,18 +248,13 @@ public class UserController extends BaseController {
             @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
             @PathVariable(value = "login_code") String loginCode) {
 
-        Envelop envelop = new Envelop();
         MUser mUser = userClient.getUserByLoginCode(loginCode);
         if (mUser == null) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("用户信息获取失败!");
-            return envelop;
+            return failed("用户信息获取失败!");
         }
         UserDetailModel detailModel = MUserToUserDetailModel(mUser);
 
-        envelop.setSuccessFlg(true);
-        envelop.setObj(detailModel);
-        return envelop;
+        return success(detailModel);
     }
 
     /**

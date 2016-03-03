@@ -123,4 +123,36 @@ public class BaseController extends AbstractController {
 
         return result;
     }
+
+    public String trimEnd(String param,String trimChars)
+    {
+        if(param.endsWith(trimChars))
+        {
+            param = param.substring(0,param.length()-trimChars.length());
+        }
+        return param;
+    }
+
+    public String trimStart(String param,String trimChars)
+    {
+        if(param.startsWith(trimChars))
+        {
+            param = param.substring(trimChars.length(),param.length());
+        }
+        return param;
+    }
+
+    public Envelop failed(String errMsg){
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        envelop.setErrorMsg(errMsg);
+        return envelop;
+    }
+
+    public Envelop success(Object object){
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        envelop.setObj(object);
+        return envelop;
+    }
 }

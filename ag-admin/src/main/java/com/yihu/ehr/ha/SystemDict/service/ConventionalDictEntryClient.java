@@ -1,6 +1,7 @@
 package com.yihu.ehr.ha.SystemDict.service;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -16,7 +17,7 @@ import java.util.List;
 /**
  * Created by AndyCai on 2016/1/19.
  */
-@FeignClient("svr-dict")
+@FeignClient(MicroServices.DictMgr)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface ConventionalDictEntryClient {

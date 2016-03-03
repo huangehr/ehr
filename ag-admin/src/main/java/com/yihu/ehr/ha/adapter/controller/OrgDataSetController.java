@@ -1,155 +1,138 @@
 package com.yihu.ehr.ha.adapter.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.thirdpartystandard.OrgDataSetDetailModel;
+import com.yihu.ehr.agModel.thirdpartystandard.OrgDataSetModel;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.ha.adapter.service.OrgDataSetClient;
+import com.yihu.ehr.model.adaption.MOrgDataSet;
+import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.web.bind.annotation.*;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.websocket.server.PathParam;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by AndyCai on 2016/1/27.
  */
-@RequestMapping(ApiVersion.Version1_0 + "/orgDataSet")
+@RequestMapping(ApiVersion.Version1_0 + "/admin/adapter/org")
 @RestController
-public class OrgDataSetController   {
+public class OrgDataSetController extends BaseController {
 
-    @RequestMapping(value = "/orgDataSet",method = RequestMethod.GET)
-    public Object getOrgDataSetById(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                                    @PathVariable(value = "api_version") String apiVersion,
-                                    @ApiParam(name = "id",value = "数据集ID")
-                                    @RequestParam(value = "id")String id){
-        return null;
+    @Autowired
+    private OrgDataSetClient orgDataSetClient;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @RequestMapping(value = "/data_set/{id}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据id查询实体")
+    public Envelop getOrgDataSet(
+            @ApiParam(name = "id", value = "编号", defaultValue = "")
+            @PathParam(value = "id") long id) throws Exception{
+
+        MOrgDataSet mOrgDataSet = orgDataSetClient.getOrgDataSet(id);
+        OrgDataSetModel dataSetModel = convertToModel(mOrgDataSet,OrgDataSetModel.class);
+        if(dataSetModel==null)
+        {
+            return failed("数据集信息获取失败!");
+        }
+
+        return success(dataSetModel);
     }
 
-    @RequestMapping(value = "/orgMetaData",method = RequestMethod.GET)
-    public Object getOrgMetaDataById(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                                     @PathVariable(value = "api_version") String apiVersion,
-                                     @ApiParam(name = "metaDataId", value = "机构数据元ID")
-                                     @RequestParam(value = "metaDataId") String metaDataId) {
-        return null;
+    @RequestMapping(value = "/data_set", method = RequestMethod.POST)
+    @ApiOperation(value = "创建机构数据集")
+    public Envelop saveOrgDataSet(
+            @ApiParam(name = "json_data", value = "json_data", defaultValue = "")
+            @RequestParam(value = "json_data") String jsonData) throws Exception{
+
+        OrgDataSetDetailModel detailModel = objectMapper.readValue(jsonData,OrgDataSetDetailModel.class);
+
+        String errorMsg = "";
+        if(StringUtils.isEmpty(detailModel.getOrganization()))
+        {
+            errorMsg+="机构代码不能为空!";
+        }
+
+        if(StringUtils.isEmpty(detailModel.getCode()))
+        {
+            errorMsg+="数据集代码不能为空!";
+        }
+
+        if(StringUtils.isEmpty(detailModel.getName()))
+        {
+            errorMsg+="数据集名称不能为空!";
+        }
+
+        if(StringUtils.isNotEmpty(errorMsg))
+        {
+            return failed(errorMsg);
+        }
+
+        if (orgDataSetClient.isExistOrgDataSet(detailModel.getOrganization(), detailModel.getCode(), detailModel.getName()))
+        {
+            return failed("代码、名称不能重复!");
+        }
+        MOrgDataSet mOrgDataSet = convertToModel(detailModel,MOrgDataSet.class);
+        if (detailModel.getId()==0) {
+            mOrgDataSet = orgDataSetClient.createOrgDataSet(objectMapper.writeValueAsString(mOrgDataSet));
+        }else
+        {
+            mOrgDataSet = orgDataSetClient.updateOrgDataSet(objectMapper.writeValueAsString(mOrgDataSet));
+        }
+
+        detailModel = convertToModel(mOrgDataSet,OrgDataSetDetailModel.class);
+        if(detailModel==null)
+        {
+            return failed("保存失败!");
+        }
+        return success(detailModel);
     }
 
-    @RequestMapping(value = "/orgDataSet", method = RequestMethod.POST)
-    public String createOrgDataSet(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                                   @PathVariable(value = "api_version") String apiVersion,
-                                   @ApiParam(name = "code", value = "代码")
-                                   @RequestParam(value = "code") String code,
-                                   @ApiParam(name = "name", value = "名称")
-                                   @RequestParam(value = "name") String name,
-                                   @ApiParam(name = "description", value = "描述")
-                                   @RequestParam(value = "description") String description,
-                                   @ApiParam(name = "orgCode", value = "机构代码")
-                                   @RequestParam(value = "orgCode") String orgCode,
-                                   @ApiParam(name = "userId", value = "用户ID")
-                                   @RequestParam(value = "userId") String userId) {
 
-        return null;
+    @RequestMapping(value = "/data_set/{id}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除机构数据集")
+    public Envelop deleteOrgDataSet(
+            @ApiParam(name = "id", value = "编号", defaultValue = "")
+            @PathParam(value = "id") long id) throws Exception{
+
+        boolean result = orgDataSetClient.deleteOrgDataSet(id);
+        if(!result)
+        {
+            return failed("删除失败!");
+        }
+
+        return success(null);
     }
 
-    @RequestMapping(value = "/updateOrgDataSet",method = RequestMethod.POST)
-    public String updateOrgDataSet(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                                   @PathVariable(value = "api_version") String apiVersion,
-                                   @ApiParam(name = "id", value = "数据集ID")
-                                   @RequestParam(value = "id") long id,
-                                   @ApiParam(name = "code", value = "代码")
-                                   @RequestParam(value = "code") String code,
-                                   @ApiParam(name = "name", value = "名称")
-                                   @RequestParam(value = "name") String name,
-                                   @ApiParam(name = "description", value = "描述")
-                                   @RequestParam(value = "description") String description,
-                                   @ApiParam(name = "orgCode", value = "机构代码")
-                                   @RequestParam(value = "orgCode") String orgCode,
-                                   @ApiParam(name = "userId", value = "用户ID")
-                                   @RequestParam(value = "userId") String userId) {
-        return null;
-    }
 
-    @RequestMapping(value = "/deleteOrgDataSet",method = RequestMethod.DELETE)
-    public String deleteOrgDataSet(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                                   @PathVariable(value = "api_version") String apiVersion,
-                                   @ApiParam(name = "id", value = "数据集ID")
-                                   @RequestParam(value = "id") long id) {
+    @RequestMapping(value = "/data_sets", method = RequestMethod.GET)
+    @ApiOperation(value = "条件查询")
+    public Envelop searchAdapterOrg(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) throws Exception{
 
-        return null;
-    }
+        List<MOrgDataSet> mOrgDataSets = (List<MOrgDataSet>)orgDataSetClient.searchAdapterOrg(fields,filters,sorts,size,page);
+        List<OrgDataSetDetailModel> detailModels = (List<OrgDataSetDetailModel>)convertToModels(mOrgDataSets,new ArrayList<OrgDataSetDetailModel>(mOrgDataSets.size()),OrgDataSetDetailModel.class,null);
 
-    @RequestMapping(value = "/orgDataSets",method = RequestMethod.GET)
-    public String getOrgDataSetsByCodeOrName(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                                             @PathVariable(value = "api_version") String apiVersion,
-                                             @ApiParam(name = "orgCode", value = "机构代码")
-                                             @RequestParam(value = "orgCode") String orgCode,
-                                             @ApiParam(name = "code", value = "代码")
-                                             @RequestParam(value = "code") String code,
-                                             @ApiParam(name = "name", value = "名称")
-                                             @RequestParam(value = "name") String name,
-                                             @ApiParam(name = "page", value = "当前页", defaultValue = "1")
-                                             @RequestParam(value = "page") int page,
-                                             @ApiParam(name = "rows", value = "每页行数", defaultValue = "20")
-                                             @RequestParam(value = "rows") int rows) {
-        return null;
-    }
-
-    @RequestMapping(value = "/createOrgMetaData", method = RequestMethod.POST)
-    public String createOrgMetaData(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                                    @PathVariable(value = "api_version") String apiVersion,
-                                    @ApiParam(name = "orgDataSetSeq", value = "数据集序号")
-                                    @RequestParam(value = "orgDataSetSeq") int orgDataSetSeq,
-                                    @ApiParam(name = "code", value = "代码")
-                                    @RequestParam(value = "code") String code,
-                                    @ApiParam(name = "name", value = "名称")
-                                    @RequestParam(value = "name") String name,
-                                    @ApiParam(name = "description", value = "描述")
-                                    @RequestParam(value = "description") String description,
-                                    @ApiParam(name = "orgCode", value = "机构代码")
-                                    @RequestParam(value = "orgCode") String orgCode,
-                                    @ApiParam(name = "userId", value = "用户ID")
-                                    @RequestParam(value = "userId") String userId) {
-        return null;
-    }
-
-    @RequestMapping(value = "/updateOrgMetaData", method = RequestMethod.POST)
-    public String updateOrgMetaData(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                                        @PathVariable(value = "api_version") String apiVersion,
-                                    @ApiParam(name = "orgDataSetSeq", value = "数据集序号")
-                                        @RequestParam(value = "orgDataSetSeq") int orgDataSetSeq,
-                                    @ApiParam(name = "metaDataId",value = "数据元ID")
-                                    @RequestParam(value = "metaDataId")long metaDataId,
-                                    @ApiParam(name = "code", value = "代码")
-                                        @RequestParam(value = "code") String code,
-                                    @ApiParam(name = "name", value = "名称")
-                                        @RequestParam(value = "name") String name,
-                                    @ApiParam(name = "description", value = "描述")
-                                        @RequestParam(value = "description") String description,
-                                    @ApiParam(name = "orgCode", value = "机构代码")
-                                        @RequestParam(value = "orgCode") String orgCode,
-                                    @ApiParam(name = "userId", value = "用户ID")
-                                        @RequestParam(value = "userId") String userId) {
-        return null;
-    }
-
-    @RequestMapping(value = "/deleteOrgMetaData",method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除机构数据元", produces = "application/json", notes = "删除机构数据元信息，批量删除时，Id以逗号隔开")
-    public String deleteOrgMetaData(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                                    @PathVariable(value = "api_version") String apiVersion,
-                                    @ApiParam(name = "ids", value = "数据元ID")
-                                    @RequestParam(value = "ids") String ids) {
-        return null;
-    }
-
-    @RequestMapping(value = "/orgMetaDatas",method = RequestMethod.GET)
-    public String getOrgMetaDatasByCodeOrName(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                                              @PathVariable(value = "api_version") String apiVersion,
-                                              @ApiParam(name = "orgCode", value = "机构代码")
-                                              @RequestParam(value = "orgCode") String orgCode,
-                                              @ApiParam(name = "orgDataSetSeq", value = "数据集序号")
-                                              @RequestParam(value = "orgDataSetSeq") int orgDataSetSeq,
-                                              @ApiParam(name = "code", value = "代码")
-                                              @RequestParam(value = "code") String code,
-                                              @ApiParam(name = "name", value = "名称")
-                                              @RequestParam(value = "name") String name,
-                                              @ApiParam(name = "page", value = "当前页", defaultValue = "1")
-                                              @RequestParam(value = "page") int page,
-                                              @ApiParam(name = "rows", value = "每页行数", defaultValue = "20")
-                                              @RequestParam(value = "rows") int rows) {
-        return null;
+        return getResult(detailModels,1,page,size);
     }
 }

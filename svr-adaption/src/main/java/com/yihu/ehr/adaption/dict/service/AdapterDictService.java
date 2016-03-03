@@ -4,6 +4,7 @@ package com.yihu.ehr.adaption.dict.service;
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlan;
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanService;
 import com.yihu.ehr.model.adaption.MAdapterDict;
+import com.yihu.ehr.model.adaption.MDataSet;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
@@ -17,9 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author lincl
@@ -38,7 +37,7 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
      *
      */
     @Transactional(propagation = Propagation.NEVER)
-    public List<MAdapterDict> searchAdapterDict(OrgAdapterPlan orgAdapterPlan, String code, String name, String orders, int page, int rows) {
+    public List<MDataSet> searchAdapterDict(OrgAdapterPlan orgAdapterPlan, String code, String name, String orders, int page, int rows) {
         long planId = orgAdapterPlan.getId();
         String dictTableName = CDAVersionUtil.getDictTableName(orgAdapterPlan.getVersion());
         Session session = currentSession();
@@ -63,7 +62,7 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
         page = page == 0 ? 1 : page;
         sqlQuery.setMaxResults(rows);
         sqlQuery.setFirstResult((page - 1) * rows);
-        sqlQuery.setResultTransformer(Transformers.aliasToBean(MAdapterDict.class));
+        sqlQuery.setResultTransformer(Transformers.aliasToBean(MDataSet.class));
         return sqlQuery.list();
     }
 
@@ -194,7 +193,7 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
      * @param adapterDict
      */
     @Transactional(propagation= Propagation.REQUIRED)
-    public void addAdapterDict(AdapterDict adapterDict) {
+    public AdapterDict addAdapterDict(AdapterDict adapterDict) {
         Session s = currentSession();
         String sql =
                 " insert into adapter_dict " +
@@ -206,9 +205,10 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
         q.setParameter("std_dict", adapterDict.getDictId());
         q.setParameter("std_dictentry", adapterDict.getDictEntryId());
         q.setParameter("org_dict", adapterDict.getOrgDictSeq());
-        q.setParameter("org_dictentry", adapterDict.getOrgDictItemSeq());
+        q.setParameter("org_dictentry", adapterDict.getOrgDictEntrySeq());
         q.setParameter("description", adapterDict.getDescription());
         int rs = q.executeUpdate();
+        return adapterDict;
     }
 
     /**
@@ -296,5 +296,155 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
         query.setParameter("dictId", dictId);
         query.setLong("planId", planId);
         return query.executeUpdate();
+    }
+
+    /*
+   * 获取字典、字典项映射信息
+   * @param strPlanId 方案ID
+   * @param versionCode 标准版本ID
+   * @result Map
+   * */
+    public Map<String, Object> getDictMappingInfo(String strPlanId, String versionCode,String strOrgCode) {
+        Map<String, Object> mapResult = new HashMap<>();
+
+        try {
+            Session session = currentSession();
+            String dictTableName = CDAVersionUtil.getDictTableName(versionCode);
+
+            StringBuffer sb = new StringBuffer();
+
+            sb.append("SELECT ");
+            sb.append("DISTINCT ");
+            sb.append("a.std_dict, ");
+            sb.append("b.`code` std_dict_code,  ");
+            sb.append("c.id dict_id, ");
+            sb.append("c.`code` org_dict_code,  ");
+            sb.append("b.name std_dict_name,  ");
+            sb.append("c.name org_dict_name,   ");
+            sb.append("a.org_dict ");
+            sb.append("from adapter_dict a  ");
+            sb.append("left JOIN " + dictTableName + " b on a.std_dict = b.id  ");
+            sb.append("left join org_std_dict c on a.org_dict = c.sequence and c.organization='"+strOrgCode+"' ");
+            sb.append("where a.plan_id='" + strPlanId + "'");
+
+            Query query = session.createSQLQuery(sb.toString());
+
+            List<Object> records = query.list();
+
+            List<DictMappingInfo> listMapping = new ArrayList<>();
+            List<DictEntryMappingInfo> listEntryInfo = new ArrayList<>();
+
+            for (int i = 0; i < records.size(); ++i) {
+
+                DictMappingInfo info = new DictMappingInfo();
+
+                Object[] record = (Object[]) records.get(i);
+
+                info.setId(String.valueOf(i + 1));
+                info.setStdDictId(record[0].toString());
+                info.setStdDictCode(record[1].toString());
+                info.setOrgDictId(record[2] == null ? "" : record[2].toString());
+                info.setOrgDictCode(record[3] == null ? "" : record[3].toString());
+                info.setStdDictName(record[4] == null ? "" : record[4].toString());
+                info.setOrgDictName(record[5] == null ? "" : record[5].toString());
+                String orgSequence = record[6] == null ? "" : record[6].toString();
+                info.setPlanId(strPlanId);
+                listMapping.add(info);
+
+                //获取数据元映射关系
+                Map<String, Object> mapKey = new HashMap<>();
+                mapKey.put("strStdDictId", info.getStdDictId());
+                mapKey.put("StrOrgDictId", orgSequence);
+                mapKey.put("versionCode", versionCode);
+                mapKey.put("strPlanId", info.getPlanId());
+                mapKey.put("strMappingId", info.getId());
+                mapKey.put("length",listEntryInfo.size());
+                mapKey.put("orgCode",strOrgCode);
+                List<DictEntryMappingInfo> listMetadata = getDictEntrymapping(mapKey);
+
+                listEntryInfo.addAll(listMetadata);
+            }
+
+            mapResult.put("dictlist", listMapping);
+            mapResult.put("dictentrylist", listEntryInfo);
+
+        } catch (Exception ex) {
+            mapResult=null;
+        }
+
+        return mapResult;
+    }
+
+
+    /*
+    * 根据平台字典D和机构字典ID 获取字典项映射关系
+    * @param strStdDictId 平台数据集ID
+    * @param StrOrgDictId 机构数据集ID
+    * @param versionCode 版本号
+    * @return List<DictEntryMappingInfo>映射关系
+    * */
+    public List<DictEntryMappingInfo> getDictEntrymapping(Map<String, Object> map) {
+        List<DictEntryMappingInfo> listInfo = null;
+
+        try {
+            String strStdSetId = map.get("strStdDictId").toString();
+            String StrOrgSetId = map.get("StrOrgDictId").toString();
+            String versionCode = map.get("versionCode").toString();
+            String strPlanId = map.get("strPlanId").toString();
+            String strMappingId = map.get("strMappingId").toString();
+            String strOrgCode = map.get("orgCode").toString();
+            int iLength = Integer.parseInt(map.get("length").toString());
+
+            Session session = currentSession();
+            String entryTableName = CDAVersionUtil.getDictEntryTableName(versionCode);
+
+            StringBuffer sb = new StringBuffer();
+
+            sb.append("select ");
+            sb.append("a.std_dictentry, ");
+            sb.append("c.`code` std_dictentry_code, ");
+            sb.append("c.`value` std_dictentry_value, ");
+            sb.append("a.org_dictentry, ");
+            sb.append("b.`code` org_dictentry_code, ");
+            sb.append("b.`name` org_dictentry_value ");
+            sb.append("from adapter_dict a ");
+            sb.append("LEFT JOIN org_std_dictentry b on a.org_dictentry = b.sequence and b.organization='"+strOrgCode+"' ");
+            sb.append("LEFT JOIN "+entryTableName+" c on c.id=a.std_dictentry ");
+
+            sb.append("where a.plan_id='"+strPlanId+"' ");
+            sb.append("and a.std_dict='" + strStdSetId + "' ");
+
+            if (StrOrgSetId == null || StrOrgSetId=="")
+                sb.append("and (a.org_dict is null or a.org_dict='')");
+            else
+                sb.append("and a.org_dict='" + StrOrgSetId + "' ");
+
+            Query query = session.createSQLQuery(sb.toString());
+
+            List<Object> records = query.list();
+
+            listInfo = new ArrayList<>();
+
+            for (int i = 0; i < records.size(); ++i) {
+                iLength++;
+                DictEntryMappingInfo info = new DictEntryMappingInfo();
+
+                Object[] record = (Object[]) records.get(i);
+
+                info.setId(String.valueOf(iLength));
+                info.setStdDictEntryId(record[0].toString());
+                info.setStdDictEntryCode(record[1].toString());
+                info.setStdDictEntryValue(record[2].toString());
+                info.setOrgDictEntryId(record[3] == null ? "" : record[3].toString());
+                info.setOrgDictEntryCode(record[4] == null ? "" : record[4].toString());
+                info.setOrgDictEntryValue(record[5] == null ? "" : record[5].toString());
+                info.setAdapterDictId(strMappingId);
+                info.setPlanId(strPlanId);
+                listInfo.add(info);
+            }
+        } catch (Exception e) {
+            listInfo=null;
+        }
+        return listInfo;
     }
 }

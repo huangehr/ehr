@@ -1,11 +1,14 @@
 package com.yihu.ehr.agModel.dict;
 
+
+import java.util.Date;
+
 /**
  * Created by wq on 2016/2/19.
  */
 public class SystemDictModel {
 
-    private String id;
+    private long id;
 
     private String name;
 
@@ -15,13 +18,13 @@ public class SystemDictModel {
 
     private String phoneticCode;
 
-    private String createDate;
+    private Date createDate;
 
-    public String getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -57,11 +60,11 @@ public class SystemDictModel {
         this.phoneticCode = phoneticCode;
     }
 
-    public String getCreateDate() {
+    public Date getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(String createDate) {
+    public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
 }

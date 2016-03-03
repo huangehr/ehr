@@ -59,24 +59,17 @@ public class CardController extends BaseController {
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
             @RequestParam(value = "rows") Integer rows) throws Exception {
-        Envelop envelop = cardClient.searchCardBinding(idCardNo, number, cardType, page, rows);
-        List<MAbstractCard> mAbstractCards = (List<MAbstractCard>)envelop.getDetailModelList();
+        List<MAbstractCard> mAbstractCards = cardClient.searchCardBinding(idCardNo, number, cardType, page, rows);
+
         List<CardModel> cardModels = new ArrayList<>();
 
-        for (int i=0;i<mAbstractCards.size();i++) {
+        for (MAbstractCard info : mAbstractCards) {
 
-            CardModel cardModel = new CardModel();
-            cardModel.setId(mAbstractCards.get(i).getId());
-            cardModel.setNumber(mAbstractCards.get(i).getNumber());
-            cardModel.setOwnerName(mAbstractCards.get(i).getOwnerName());
-            cardModel.setReleaseOrg(mAbstractCards.get(i).getReleaseOrg());
-            cardModel.setStatus(mAbstractCards.get(i).getStatus());
-            cardModel.setType(mAbstractCards.get(i).getType());
-            cardModel.setCreateDate(mAbstractCards.get(i).getCreateDate());
+            CardModel cardModel = convertToModel(info, CardModel.class);
 
             MConventionalDict dict =null;
-            if(!StringUtils.isEmpty(cardModel.getType())) {
-                dict = conventionalDictEntryClient.getCardType(cardModel.getType());
+            if(!StringUtils.isEmpty(cardModel.getCardType())) {
+                dict = conventionalDictEntryClient.getCardType(cardModel.getCardType());
                 cardModel.setTypeName(dict.getValue());
             }
             if (!StringUtils.isEmpty(cardModel.getStatus())) {
@@ -90,8 +83,8 @@ public class CardController extends BaseController {
 
             cardModels.add(cardModel);
         }
-
-        return getResult(cardModels, envelop.getTotalCount(), page, rows);
+        Envelop envelop = getResult(cardModels, 1, page, rows);
+        return envelop;
     }
 
     /**
@@ -116,26 +109,16 @@ public class CardController extends BaseController {
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
             @RequestParam(value = "rows") Integer rows) throws Exception {
 
-        Envelop envelop = cardClient.searchCardUnBinding(number, cardType, page, rows);
-        List<MAbstractCard> mAbstractCards = envelop.getDetailModelList();
+        List<MAbstractCard> mAbstractCards  = cardClient.searchCardUnBinding(number, cardType, page, rows);
         List<CardModel> cardModels = new ArrayList<>();
 
-        for (int i=0;i<mAbstractCards.size();i++) {
+        for (MAbstractCard info : mAbstractCards){
 
-           // MAbstractCard card = (MAbstractCard)mAbstractCards.get(i);
-
-            CardModel cardModel = new CardModel();
-            cardModel.setId(mAbstractCards.get(i).getId());
-            cardModel.setNumber(mAbstractCards.get(i).getNumber());
-            cardModel.setOwnerName(mAbstractCards.get(i).getOwnerName());
-            cardModel.setReleaseOrg(mAbstractCards.get(i).getReleaseOrg());
-            cardModel.setStatus(mAbstractCards.get(i).getStatus());
-            cardModel.setType(mAbstractCards.get(i).getType());
-            cardModel.setCreateDate(mAbstractCards.get(i).getCreateDate());
+            CardModel cardModel = convertToModel(info, CardModel.class);
 
             MConventionalDict dict =null;
-            if(!StringUtils.isEmpty(cardModel.getType())) {
-                dict = conventionalDictEntryClient.getCardType(cardModel.getType());
+            if(!StringUtils.isEmpty(cardModel.getCardType())) {
+                dict = conventionalDictEntryClient.getCardType(cardModel.getCardType());
                 cardModel.setTypeName(dict.getValue());
             }
             if (!StringUtils.isEmpty(cardModel.getStatus())) {
@@ -148,8 +131,8 @@ public class CardController extends BaseController {
             }
             cardModels.add(cardModel);
         }
-
-        return getResult(cardModels, envelop.getTotalCount(), page, rows);
+        Envelop envelop = getResult(cardModels, 1, page, rows);
+        return envelop;
     }
 
     /**
@@ -168,17 +151,13 @@ public class CardController extends BaseController {
             @ApiParam(name = "card_type", value = "卡类别", defaultValue = "")
             @RequestParam(value = "card_type") String cardType) throws Exception {
 
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
         MAbstractCard cardInfo = cardClient.getCard(id, cardType);
         CardDetailModel detailModel = convertToModel(cardInfo,CardDetailModel.class);
         if(detailModel!=null)
         {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("数据获取失败!");
-            return envelop;
+            return failed("数据获取失败!");
         }
-        MConventionalDict dict = conventionalDictEntryClient.getCardType(detailModel.getType());
+        MConventionalDict dict = conventionalDictEntryClient.getCardType(detailModel.getCardType());
         detailModel.setTypeName(dict.getValue());
 
         dict = conventionalDictEntryClient.getCardStatus(detailModel.getStatus());
@@ -186,9 +165,8 @@ public class CardController extends BaseController {
 
         MOrganization organization = orgClient.getOrg(detailModel.getReleaseOrg());
         detailModel.setReleaseOrgName(organization.getFullName());
-        envelop.setObj(detailModel);
 
-        return envelop;
+        return success(detailModel);
     }
 
     /**
@@ -199,7 +177,7 @@ public class CardController extends BaseController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/cards/id/card_type}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/cards/id/{card_type}", method = RequestMethod.PUT)
     @ApiOperation(value = "根据卡号和卡类型解绑卡")
     public boolean detachCard(
             @ApiParam(name = "id", value = "卡号", defaultValue = "")

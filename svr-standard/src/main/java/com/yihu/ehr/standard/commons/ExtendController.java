@@ -21,7 +21,8 @@ import java.util.List;
 public class ExtendController<T>  extends BaseRestController{
 
     protected Long[] strToLongArr(String str){
-
+        if(str==null || str.trim().length()==0)
+            return new Long[0];
         return strArrToLongArr(str.split(","));
     }
 
