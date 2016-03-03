@@ -23,7 +23,7 @@ import java.util.*;
  * @created 2016.2.1
  */
 @RestController
-@RequestMapping(ApiVersion.Version1_0 + "/std/")
+@RequestMapping(ApiVersion.Version1_0 + "/std")
 @Api(protocols = "https", value = "dict", description = "标准字典", tags = {"标准字典", "标准字典项"})
 public class DictController extends ExtendController<MStdDict> {
 

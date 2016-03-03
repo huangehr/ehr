@@ -40,6 +40,24 @@ fast-dfs:
     tracker-http-port: 80
     anti-steal-token: no
     secret-key: FastDFS1234567890
+
+ehr:
+  commons:
+    repeat:
+      code: 代码已存在!
+  common:
+    query:
+      not:
+        found: 该{0}不存在：{1}
+    miss:
+      parameter:  参数不能为空：{0}！
+    notfound:
+      entity: 没有找到{0}实体：{}
+  std:
+    version:
+      invalid:
+        stage: 该版本不处于编辑状态！
+
 ---
 spring:
   profiles: dev
@@ -61,6 +79,8 @@ hibernate:
   show-sql: true
   format-sql: true
 
+fast-dfs:
+  tracker-server: 172.19.103.54:22122
 ---
 spring:
   profiles: test

@@ -23,12 +23,12 @@ public class StandardSource {
 
     private String id;
     private String code;
-    private Date create_date;
-    private String create_user;
+    private Date createDate;
+    private String createUser;
     private String description;
     private String name;
-    private Date update_date;
-    private String update_user;
+    private Date updateDate;
+    private String updateUser;
     private String sourceType;
 
     private String sourceValue;
@@ -36,13 +36,14 @@ public class StandardSource {
     private String OperationType;
 
     public StandardSource() {
-        this.create_date = new Date();
-        this.create_user = "Sys";
+        this.createDate = new Date();
+        this.createUser = "Sys";
         this.OperationType = "";
 
         Object objectID = new ObjectId(adminRegion, BizObject.StdArchive);
         this.id = objectID.toString();
     }
+
     @Id
     @GeneratedValue(generator = "Generator")
     @GenericGenerator(name = "Generator", strategy = "assigned")
@@ -51,7 +52,11 @@ public class StandardSource {
         return this.id;
     }
     public void setId(String id) {
-        this.id = id;
+        if(id==null || "".equals(id.trim())){
+            Object objectID = new ObjectId(adminRegion, BizObject.StdArchive);
+            this.id = objectID.toString();
+        }else
+            this.id = id;
     }
 
     @Column(name = "source_type")
@@ -88,39 +93,39 @@ public class StandardSource {
 
     @Column(name = "create_date")
     public Date getCreateDate() {
-        return this.create_date;
+        return this.createDate;
     }
-    public void setCreateDate(Date create_date) {
-        this.create_date = create_date;
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
     }
 
     @Column(name = "create_user")
     public String getCreateUser() {
-        return this.create_user;
+        return this.createUser;
     }
-    public void setCreateUser(String create_user) {
-        this.create_user = create_user;
+    public void setCreateUser(String createUser) {
+        this.createUser = createUser;
     }
 
     @Column(name = "update_date")
     public Date getUpdateDate() {
-        return this.update_date;
+        return this.updateDate;
     }
-    public void setUpdateDate(Date update_date) {
-        this.update_date = update_date;
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
     }
 
     @Column(name = "update_user")
     public String getUpdateUser() {
-        return this.update_user;
+        return this.updateUser;
     }
-    public void setUpdateUser(String update_user) {
-        this.update_user = update_user;
+    public void setUpdateUser(String updateUser) {
+        this.updateUser = updateUser;
     }
 
     @Column(name = "hash")
     public int getHashCode() {
-        hashCode = Objects.hash(code, create_date, create_user, description, id, name, update_date, update_user, sourceType);
+        hashCode = Objects.hash(code, createDate, createUser, description, id, name, updateDate, updateUser, sourceType);
         return hashCode;
     }
     public void setHashCode(int hashCode){

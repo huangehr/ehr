@@ -1,10 +1,13 @@
 package com.yihu.ehr.standard.cdaversion.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.standard.MCDAVersion;
 import com.yihu.ehr.standard.cdaversion.service.CDAVersion;
 import com.yihu.ehr.standard.cdaversion.service.CDAVersionService;
 import com.yihu.ehr.standard.commons.ExtendController;
+import com.yihu.ehr.standard.dispatch.service.DispatchService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -13,10 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author lincl
@@ -25,13 +25,34 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/std")
-@Api(protocols = "https", value = "cdaVersion", description = "cda版本", tags = {"cda版本"})
+@Api(protocols = "https", value = "std_version", description = "标准版本", tags = {"标准版本"})
 public class CdaVersionController extends ExtendController<MCDAVersion>{
 
    @Autowired
     private CDAVersionService cdaVersionService;
+    @Autowired
+    DispatchService dispatchService;
 
-    @RequestMapping(value = "/cdaVersions", method = RequestMethod.GET)
+    protected ApiException errNotFound(String version) {
+        return errNotFound("标准版本", version);
+    }
+
+    private CDAVersion findVersion(String version){
+        CDAVersion cdaVersion = cdaVersionService.getVersion(version);
+        if(cdaVersion==null)
+            throw errNotFound(version);
+        return cdaVersion;
+    }
+
+    private CDAVersion findVersionInstage(String version){
+        CDAVersion cdaVersion = findVersion(version);
+        if (!cdaVersion.isInStage()) {
+            throw new ApiException(ErrorCode.InValidCDAVersionStage);
+        }
+        return cdaVersion;
+    }
+
+    @RequestMapping(value = "/versions", method = RequestMethod.GET)
     @ApiOperation(value = "适配采集标准")
     public Collection<MCDAVersion> searchCDAVersions(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
@@ -53,7 +74,7 @@ public class CdaVersionController extends ExtendController<MCDAVersion>{
     }
 
 
-    @RequestMapping(value="/cdaVersions/{version}/isLatest", method = RequestMethod.GET)
+    @RequestMapping(value="/version/{version}/is_latest", method = RequestMethod.GET)
     @ApiOperation(value = "判断是否最新版本")
     public boolean isLatestVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
@@ -64,7 +85,7 @@ public class CdaVersionController extends ExtendController<MCDAVersion>{
         return latestVersion!=null&&latestVersion.equals(version);
     }
 
-    @RequestMapping(value = "/cdaVersion", method = RequestMethod.POST)
+    @RequestMapping(value = "/version", method = RequestMethod.POST)
     @ApiOperation(value = "新增cda版本")
     public MCDAVersion addVersion(
             @ApiParam(name = "userLoginCode", value = "用户登录名")
@@ -78,44 +99,45 @@ public class CdaVersionController extends ExtendController<MCDAVersion>{
     }
 
 
-    @RequestMapping(value = "/cdaVersion/{version}/drop", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/version/{version}/drop", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除版本")
     public boolean dropCDAVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @PathVariable(value = "version") String version) throws Exception{
 
-        CDAVersion cdaVersion = new CDAVersion();
-        cdaVersion.setVersion(version);
-        cdaVersionService.dropVersion(cdaVersion);
+        cdaVersionService.dropVersion(findVersion(version));
         return true;
     }
 
-    @RequestMapping(value = "/cdaVersion/{version}/revert", method = RequestMethod.PUT)
+
+    @RequestMapping(value = "/version/{version}/revert", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除编辑状态的版本")
     public boolean revertVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @PathVariable(value = "version") String version) throws Exception{
 
-        CDAVersion cdaVersion = cdaVersionService.getVersion(version);
-        cdaVersionService.revertVersion(cdaVersion);
+        cdaVersionService.revertVersion(findVersionInstage(version));
         return true;
     }
 
-    @RequestMapping(value = "/cdaVersion/{version}/commit", method = RequestMethod.PUT)
+
+    @RequestMapping(value = "/version/{version}/commit", method = RequestMethod.PUT)
     @ApiOperation(value = "发布新版本")
     public boolean commitVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @PathVariable(value = "version") String version) throws Exception{
 
-        //todo: 创建版本文件，并返回文件路径
+        CDAVersion cdaVersion = findVersionInstage(version);
 
+        Map<String,Object> mapResult = dispatchService.createFullVersionFile(cdaVersion.getVersion());
+        if(mapResult==null)
+            return false;
 
-        CDAVersion cdaVersion = cdaVersionService.getVersion(version);
         cdaVersionService.commitVersion(cdaVersion);
         return true;
     }
 
-    @RequestMapping(value = "/cdaVersion/{version}/rollbackToStage", method = RequestMethod.PUT)
+    @RequestMapping(value = "/version/{version}/rollback_stage", method = RequestMethod.PUT)
     @ApiOperation(value = "将最新的已发布版本回滚为编辑状态")
     public boolean rollbackToStage(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
@@ -127,7 +149,7 @@ public class CdaVersionController extends ExtendController<MCDAVersion>{
     }
 
 
-    @RequestMapping(value = "/cdaVersion/{version}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/version/{version}", method = RequestMethod.PUT)
     @ApiOperation(value = "修改版本信息")
     public MCDAVersion updateVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
@@ -141,9 +163,7 @@ public class CdaVersionController extends ExtendController<MCDAVersion>{
             @ApiParam(name = "baseVersion", value = "父版本", defaultValue = "")
             @RequestParam(value = "baseVersion") String baseVersion) throws Exception{
 
-        CDAVersion cdaVersion = cdaVersionService.retrieve(version);
-        if(cdaVersion==null)
-            throw errNotFound();
+        CDAVersion cdaVersion = findVersion(version);
         cdaVersion.setVersionName(versionName);
         cdaVersion.setAuthor(userCode);
         cdaVersion.setCommitTime(new Date());
@@ -153,7 +173,7 @@ public class CdaVersionController extends ExtendController<MCDAVersion>{
         return getModel(cdaVersion);
     }
 
-    @RequestMapping(value = "/cdaVersion/checkName", method = RequestMethod.GET)
+    @RequestMapping(value = "/version/check_name", method = RequestMethod.GET)
     @ApiOperation(value = "判断版本名称是否已存在")
     public boolean checkVersionName(
             @ApiParam(name = "versionName", value = "版本名称", defaultValue = "")
@@ -163,7 +183,7 @@ public class CdaVersionController extends ExtendController<MCDAVersion>{
         return num>0;
     }
 
-    @RequestMapping(value = "/cdaVersion/existInStage", method = RequestMethod.GET)
+    @RequestMapping(value = "/version/exist_instage", method = RequestMethod.GET)
     @ApiOperation(value = "检查是否存在处于编辑状态的版本")
     public boolean existInStage() throws Exception{
         int num = cdaVersionService.searchInStage();
@@ -171,7 +191,7 @@ public class CdaVersionController extends ExtendController<MCDAVersion>{
     }
 
 
-    @RequestMapping(value = "/cdaVersion/{version}", method = RequestMethod.GET)
+    @RequestMapping(value = "/version/{version}", method = RequestMethod.GET)
     @ApiOperation(value = "获取版本信息")
     public MCDAVersion getVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
