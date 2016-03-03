@@ -44,36 +44,40 @@ public class StandardSourceControllerTests {
         int page = 1;
         envelop = stdSourceController.searchSources(fields, filters, sorts, size, page);
 
-        //新增标准来源----------------------------3
+        //新增标准来源----------------------------3ok
         StdSourceDetailModel sourceDetailModel = new StdSourceDetailModel();
+        sourceDetailModel.setId("0dae0006568f839386faa62bd4dyww55");
         sourceDetailModel.setCode("wwcs");
-        sourceDetailModel.setName("api改造测试新增");
+        sourceDetailModel.setName("api");
         sourceDetailModel.setSourceType("1");
-        sourceDetailModel.setDescription("only a test");
+        sourceDetailModel.setDescription("测试，这个描述若用英文，单词之间不能有空格，否则报错！");
         String jSonData = objectMapper.writeValueAsString(sourceDetailModel);
         envelop = stdSourceController.addStdSource(jSonData);
+        assertTrue("新增失败!", envelop.getObj() != null);
         StdSourceDetailModel detailModel = (StdSourceDetailModel) envelop.getObj();
 
-
-        //更新标准来源----------------------------4
+        //更新标准来源----------------------------4ok
         String idForTest = detailModel.getId();
-
+        detailModel.setId(idForTest);
         detailModel.setCode("wwcsjkzl");
-        detailModel.setName("api改造测试修改");
+        detailModel.setName("apiupdate");
         detailModel.setSourceType("2");
-        detailModel.setDescription("again");
+        detailModel.setDescription("只是一个测试！");
         String jSonDataNew = objectMapper.writeValueAsString(detailModel);
         envelop = stdSourceController.updateStdSource(jSonDataNew);
+        assertTrue("修改标准来源失败!", envelop.getObj() != null);
 
         //根据id获取标准信息来源----------------------------ok
         envelop = stdSourceController.getStdSource(idForTest);
+        assertTrue("获取标准来源失败!", envelop.getObj() != null);
+
 
         //批量删除标准来源（ids）----------------------------5ok
 //        String ids = "0000000656d6513be60f8d1780e16198,0000000656d65155e60f8d1780e1619b";
 //        boolean flag1 = stdSourceController.delStdSources(ids);
 //        assertTrue("批量删除失败!",flag1);
         //删除标准来源（id）----------------------------6ok
-        boolean flag2 = stdSourceController.delStdSource(idForTest);
-        assertTrue("标准来源删除失败！", flag2);
+        boolean flag11 = stdSourceController.delStdSource(idForTest);
+        assertTrue("标准来源删除失败！", flag11);
     }
 }

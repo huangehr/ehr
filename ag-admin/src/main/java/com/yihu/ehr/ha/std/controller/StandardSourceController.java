@@ -54,7 +54,8 @@ public class StandardSourceController extends BaseController {
             //标准来源类型字典
             MConventionalDict sourcerTypeDict = conDictEntryClient.getStdSourceType(stdSource.getSourceType());
             sourceModel.setSourceValue(sourcerTypeDict == null ? "" : sourcerTypeDict.getValue());
-            sourceModel.setCreate_date(DateUtil.formatDate(stdSource.getCreate_date(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT));
+            //TODO 微服务返回时间为null，转换出异常
+            //sourceModel.setCreate_date(DateUtil.formatDate(stdSource.getCreate_date(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT));
             sourcrModelList.add(sourceModel);
         }
         //TODO 取得符合条件总记录数的方法
@@ -102,7 +103,10 @@ public class StandardSourceController extends BaseController {
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam(value = "model") String model) throws Exception {
         Envelop envelop = new Envelop();
-        MStdSource mStdSource = stdSourcrClient.updateStdSource(model);
+        StdSourceDetailModel sourceDetailModel = objectMapper.readValue(model, StdSourceDetailModel.class);
+        MStdSource mStdSourceOld = convertToModel(sourceDetailModel, MStdSource.class);
+        String jsonData = objectMapper.writeValueAsString(mStdSourceOld);
+        MStdSource mStdSource = stdSourcrClient.updateStdSource(jsonData);
         if (mStdSource == null) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("标准来源更新失败！");
@@ -119,7 +123,10 @@ public class StandardSourceController extends BaseController {
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam(value = "model") String model) throws Exception {
         Envelop envelop = new Envelop();
-        MStdSource mStdSource = stdSourcrClient.addStdSource(model);
+        StdSourceDetailModel sourceDetailModel = objectMapper.readValue(model, StdSourceDetailModel.class);
+        MStdSource mStdSourceOld = convertToModel(sourceDetailModel, MStdSource.class);
+        String jsonData = objectMapper.writeValueAsString(mStdSourceOld);
+        MStdSource mStdSource = stdSourcrClient.addStdSource(jsonData);
         if (mStdSource == null) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("新增标准来源失败！");
