@@ -15,7 +15,7 @@
     <packaging>pom</packaging>
     <name>commons-dependencies</name>
     <description>EHR platform Dependencies</description>
-    <url>http://www.yihu.com/ehr</url>
+    <url>http://ehr.yihu.com</url>
     <organization>
         <name>JKZL Software, Inc.</name>
         <url>http://www.yihu.com</url>

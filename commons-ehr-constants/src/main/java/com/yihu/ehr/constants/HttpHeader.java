@@ -1,4 +1,4 @@
-package com.yihu.ehr.config;
+package com.yihu.ehr.constants;
 
 /**
  * Created by Sand Wen on 2016.2.27.

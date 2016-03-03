@@ -1,10 +1,13 @@
 package com.yihu.ehr.config;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.interceptor.RateLimitInterceptor;
+import com.yihu.ehr.interceptor.UserAgentInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -22,6 +25,8 @@ import org.springframework.security.oauth2.provider.approval.ApprovalStore;
 import org.springframework.security.oauth2.provider.approval.TokenApprovalStore;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -33,9 +38,41 @@ import java.util.List;
  * @created 2016.03.01 9:57
  */
 @Configuration
-public class ServerSecurityConfig {
+public class WebServerConfig {
 
     private static final String SERVER_RESOURCE_ID = "oauth2server";
+
+    @Configuration
+    public static class MvcConfig extends WebMvcConfigurerAdapter {
+
+        @Autowired
+        private RateLimitInterceptor rateLimitInterceptor;
+
+        @Autowired
+        private UserAgentInterceptor userAgentInterceptor;
+
+        /**
+         * 注册截取器。
+         *
+         * @param registry
+         */
+        /*@Override
+        public void addInterceptors(InterceptorRegistry registry) {
+            registry.addInterceptor(userAgentInterceptor).addPathPatterns(ApiVersion.Version1_0 + "/**");
+            registry.addInterceptor(rateLimitInterceptor).addPathPatterns("/**").excludePathPatterns("/swagger**");
+        }*/
+
+        /**
+         * 注册视图-控制器
+         *
+         * @param registry
+         */
+        @Override
+        public void addViewControllers(ViewControllerRegistry registry) {
+            registry.addViewController("/login").setViewName("/login/login");
+            registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        }
+    }
 
     @Order(10)
     @Configuration
@@ -110,8 +147,8 @@ public class ServerSecurityConfig {
         public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
             endpoints.tokenStore(tokenStore)
                     .authenticationManager(authenticationManager);
-                    //.pathMapping("/oauth/authorize", "/oauth2/authorize")
-                    //.pathMapping("/oauth/token", "/oauth2/token");
+            //.pathMapping("/oauth/authorize", "/oauth2/authorize")
+            //.pathMapping("/oauth/token", "/oauth2/token");
             //以上的注释掉的是用来改变配置的
         }
 
@@ -166,4 +203,6 @@ public class ServerSecurityConfig {
                 .resourceIds(RESOURCE_ID)
                 .secret("secret");
     }*/
+
+
 }
