@@ -44,7 +44,7 @@ public class ApiEntryController {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
+    //@Autowired
     private DocumentationCache documentationCache;
 
     @ApiIgnore

@@ -1,7 +1,8 @@
-package com.yihu.ehr.config;
+package com.yihu.ehr.service;
 
+import com.yihu.ehr.feign.UserClient;
+import com.yihu.ehr.model.user.MUser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,22 +20,22 @@ import java.util.Collection;
  */
 @Service
 public class FakeUserDetailsService implements UserDetailsService {
+    @Autowired
+    UserClient userClient;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        if (!username.equals("user")) {
-            throw new UsernameNotFoundException("User name " + username + " not found.");
+        MUser user = userClient.getUserByUserName(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("用户" + username + "不存在");
         }
 
-        return new User(username, "gateway", getGrantedAuthorities(username));
+        return new User(username, user.getPassword(), getGrantedAuthorities(username));
     }
 
     private Collection<? extends GrantedAuthority> getGrantedAuthorities(String username) {
         Collection<? extends GrantedAuthority> authorities;
-        if (username.equals("user")) {
-            authorities = Arrays.asList(() -> "ROLE_ADMIN", () -> "ROLE_USER");
-        } else {
-            authorities = Arrays.asList(() -> "ROLE_USER");
-        }
+        authorities = Arrays.asList(() -> "ROLE_USER");
 
         return authorities;
     }

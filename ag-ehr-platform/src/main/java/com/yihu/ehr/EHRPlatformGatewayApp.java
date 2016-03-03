@@ -1,6 +1,7 @@
 package com.yihu.ehr;
 
 import com.yihu.ehr.config.TomcatConnCustomizer;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,13 +9,20 @@ import org.springframework.boot.context.embedded.ConfigurableEmbeddedServletCont
 import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
 import org.springframework.boot.context.embedded.tomcat.TomcatConnectorCustomizer;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.ResourceUtils;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.io.FileNotFoundException;
 
 @SpringBootApplication
-public class EHRPlatformGatewayApp {
+@EnableDiscoveryClient
+@EnableFeignClients
+public class EHRPlatformGatewayApp implements ApplicationContextAware {
     @Value("${server.port}")
     int port;
 
@@ -37,5 +45,11 @@ public class EHRPlatformGatewayApp {
                 }
             };
         };
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        //force the bean to get loaded as soon as possible
+        //applicationContext.getBean("requestMappingHandlerAdapter");
     }
 }

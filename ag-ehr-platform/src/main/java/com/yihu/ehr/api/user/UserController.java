@@ -55,31 +55,6 @@ public class UserController {
         return "";
     }
 
-    //------ 用户Token ------
-    @ApiOperation("获取你的Token列表")
-    @RequestMapping(value = "/user/tokens", method = RequestMethod.GET)
-    public List<String> getTokens(@ApiParam("user_name")
-                                  @PathVariable("user_name")
-                                  String userName) {
-        return null;
-    }
-
-    @ApiOperation("为你创建Token")
-    @RequestMapping(value = "/user/tokens", method = RequestMethod.POST)
-    public String createToken(@ApiParam("json")
-                              @RequestParam("json")
-                              String json) {
-        return null;
-    }
-
-    @ApiOperation("获取你的Token")
-    @RequestMapping(value = "/user/tokens/{id}", method = RequestMethod.GET)
-    public String getToken(@ApiParam("id")
-                           @PathVariable("id")
-                           String id) {
-        return "";
-    }
-
     //------ 用户RSA公钥 ------
     @ApiOperation("获取用户公钥列表")
     @RequestMapping(value = "/users/{user_name}/keys", method = RequestMethod.GET)

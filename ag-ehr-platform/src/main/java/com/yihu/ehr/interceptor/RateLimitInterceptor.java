@@ -1,7 +1,7 @@
 package com.yihu.ehr.interceptor;
 
-import com.yihu.ehr.config.HttpHeader;
 import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.constants.HttpHeader;
 import com.yihu.ehr.exception.ApiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

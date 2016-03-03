@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * OAuth2 认证控制器。此控制器基于用户名/密码认证，即Basic Authorization，需要在HTTPS中提供用户名与密码。
+ * 认证控制器。此控制器基于用户名/密码认证，即Basic Authorization，需要在HTTPS中提供用户名与密码。
  *
  * @author Sand
  * @version 1.0
@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/authorizations")
 @Api(protocols = "https", value = "authorizations", description = "OAuth2授权服务")
-public class OAuth2Controller {
+public class AuthorizationController {
 
     @ApiOperation(value = "获取用户所有应用授权", response = String.class)
     @RequestMapping(value = "", produces = "application/json", method = RequestMethod.GET)
@@ -64,6 +64,24 @@ public class OAuth2Controller {
                                                   @ApiParam(value = "info")
                                                   @RequestParam("info") String info) {
         return null;
+    }
+
+    //------ 用户Token ------
+
+    @ApiOperation("获取用户Token列表")
+    @RequestMapping(value = "/users/{user_name}/tokens", method = RequestMethod.GET)
+    public List<String> getTokens(@ApiParam("user_name")
+                                  @PathVariable("user_name")
+                                  String userName) {
+        return null;
+    }
+
+    @ApiOperation("获取用户单个Token")
+    @RequestMapping(value = "/users/{user_name}/tokens/{id}", method = RequestMethod.GET)
+    public String getToken(@ApiParam("id")
+                           @PathVariable("id")
+                           String id) {
+        return "";
     }
 
     @ApiOperation(value = "为指定用户创建授权，若存在返回已有授权", response = String.class)

@@ -9,6 +9,10 @@ endpoints:
   health:
     sensitive: false
 
+security:
+  user:
+    password: gateway
+
 ## 错误消息
 missing:
   user_agent: Request forbidden by administrative rules. Please make sure your request has a User-Agent header.
@@ -19,11 +23,15 @@ rate_limit:
 spring:
   profiles: dev
 
+keystore:
+  file: C:/Windows/tomcat.keystore
+  password: 123456
+
 eureka:
   instance:
     hostname: localhost
   client:
-    registerWithEureka: false
+    registerWithEureka: true
     fetchRegistry: true
     serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
 

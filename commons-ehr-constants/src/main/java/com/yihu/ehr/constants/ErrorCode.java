@@ -7,6 +7,8 @@ package com.yihu.ehr.constants;
  * @created 2015.08.10 17:49
  */
 public enum ErrorCode {
+    MissingUserAgent("missing.user_agent"),
+    RateLimitExceeding("rate_limit.exceeding"),
 
     MissMethod("ehr.common.miss.method"),
     MissTimestamp("ehr.common.miss.timestamp"),
