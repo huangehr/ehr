@@ -51,7 +51,7 @@ public class StandardDispatchRestController  extends ExtendController{
         try {
 
             if (updateVersion == null || "".equals(updateVersion))
-                throw errMissParm("update_version");
+                throw errMissParm("目标版本");
 
             if (currentVersion == null) {
                 schema = dispatchService.sendStandard(updateVersion);

@@ -32,7 +32,7 @@ public class DictService extends BaseHbmService<IDict> {
         try {
             return Class.forName(ENTITY_PRE + version);
         } catch (ClassNotFoundException e) {
-            throw new ApiException(ErrorCode.NotFoundStdDictView);
+            throw new ApiException(ErrorCode.NotFoundEntity, "字典版本", version);
         }
     }
 

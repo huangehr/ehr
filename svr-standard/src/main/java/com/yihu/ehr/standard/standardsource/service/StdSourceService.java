@@ -1,6 +1,7 @@
 package com.yihu.ehr.standard.standardsource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
+import org.hibernate.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,16 +25,11 @@ public class StdSourceService extends BaseJpaService<StandardSource, XStdSourceR
      *
      * @param ids
      */
-    public int deleteSource(List<String> ids) {
-        int result = 0;
-        try {
-            if (ids == null || ids.size() == 0)
-                return 0;
-            result = standardSourceRepository.deleteByIdIn(ids);
-        } catch (Exception ex) {
-            result = -1;
-        }
-        return result;
+    public int deleteSource(String[] ids) {
+        String hql = "DELETE FROM StandardSource WHERE id in (:ids)";
+        Query query = currentSession().createQuery(hql);
+        query.setParameterList("ids", ids);
+        return query.executeUpdate();
     }
 
 
