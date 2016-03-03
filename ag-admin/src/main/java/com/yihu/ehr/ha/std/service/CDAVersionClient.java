@@ -25,7 +25,7 @@ public interface CDAVersionClient {
 
     @RequestMapping(value = "/cdaVersions", method = RequestMethod.GET)
     @ApiOperation(value = "适配采集标准")
-    Collection searchCDAVersions(
+    Collection<MCDAVersion> searchCDAVersions(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -46,7 +46,7 @@ public interface CDAVersionClient {
 
     @RequestMapping(value = "/cdaVersion", method = RequestMethod.POST)
     @ApiOperation(value = "新增cda版本")
-    boolean addVersion(
+    MCDAVersion addVersion(
             @ApiParam(name = "userLoginCode", value = "用户登录名")
             @RequestParam(value = "userLoginCode") String userLoginCode);
 
@@ -79,7 +79,7 @@ public interface CDAVersionClient {
 
     @RequestMapping(value = "/cdaVersion/{version}", method = RequestMethod.PUT)
     @ApiOperation(value = "修改版本信息")
-    public boolean updateVersion(
+    MCDAVersion updateVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @PathVariable(value = "version") String version,
             @ApiParam(name = "versionName", value = "版本名称", defaultValue = "")

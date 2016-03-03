@@ -40,19 +40,14 @@ public class OrgDataSetController extends BaseController {
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathParam(value = "id") long id) throws Exception{
 
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
-
         MOrgDataSet mOrgDataSet = orgDataSetClient.getOrgDataSet(id);
         OrgDataSetModel dataSetModel = convertToModel(mOrgDataSet,OrgDataSetModel.class);
         if(dataSetModel==null)
         {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("数据集信息获取失败!");
-            return envelop;
+            return failed("数据集信息获取失败!");
         }
-        envelop.setObj(dataSetModel);
-        return envelop;
+
+        return success(dataSetModel);
     }
 
     @RequestMapping(value = "/data_set", method = RequestMethod.POST)
@@ -61,8 +56,6 @@ public class OrgDataSetController extends BaseController {
             @ApiParam(name = "json_data", value = "json_data", defaultValue = "")
             @RequestParam(value = "json_data") String jsonData) throws Exception{
 
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
         OrgDataSetDetailModel detailModel = objectMapper.readValue(jsonData,OrgDataSetDetailModel.class);
 
         String errorMsg = "";
@@ -83,16 +76,12 @@ public class OrgDataSetController extends BaseController {
 
         if(StringUtils.isNotEmpty(errorMsg))
         {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(errorMsg);
-            return envelop;
+            return failed(errorMsg);
         }
 
         if (orgDataSetClient.isExistOrgDataSet(detailModel.getOrganization(), detailModel.getCode(), detailModel.getName()))
         {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("代码、名称不能重复!");
-            return envelop;
+            return failed("代码、名称不能重复!");
         }
         MOrgDataSet mOrgDataSet = convertToModel(detailModel,MOrgDataSet.class);
         if (detailModel.getId()==0) {
@@ -105,13 +94,9 @@ public class OrgDataSetController extends BaseController {
         detailModel = convertToModel(mOrgDataSet,OrgDataSetDetailModel.class);
         if(detailModel==null)
         {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("保存失败!");
-            return envelop;
+            return failed("保存失败!");
         }
-        envelop.setObj(detailModel);
-
-        return envelop;
+        return success(detailModel);
     }
 
 
@@ -121,17 +106,13 @@ public class OrgDataSetController extends BaseController {
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathParam(value = "id") long id) throws Exception{
 
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
         boolean result = orgDataSetClient.deleteOrgDataSet(id);
         if(!result)
         {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("删除失败!");
-            return envelop;
+            return failed("删除失败!");
         }
 
-        return envelop;
+        return success(null);
     }
 
 

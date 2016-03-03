@@ -10,6 +10,7 @@ import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.standard.MStdSource;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.util.operator.DateUtil;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 /**
- * Created by AndyCai on 2016/1/25.
+ * Created by yww on 2016/3/1.
  */
 @RequestMapping(ApiVersion.Version1_0 + "/stdSource")
 @RestController
@@ -35,7 +36,7 @@ public class StandardSourceController extends BaseController {
 
     @RequestMapping(value = "/sources", method = RequestMethod.GET)
     @ApiOperation(value = "标准来源分页搜索")
-    public Envelop searchAdapterOrg(
+    public Envelop searchSources(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -46,17 +47,15 @@ public class StandardSourceController extends BaseController {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) throws Exception {
-        //TODO 该分页查询方法名有误
-
-        List<MStdSource> stdSources = stdSourcrClient.searchAdapterOrg(fields, filters, sorts, size, page);
+        Collection<MStdSource> stdSources = stdSourcrClient.searchSources(fields, filters, sorts, size, page);
         List<StdSourceModel> sourcrModelList = new ArrayList<>();
         for (MStdSource stdSource : stdSources) {
             StdSourceModel sourceModel = convertToModel(stdSource, StdSourceModel.class);
-            //标准来源类型(
+            //标准来源类型字典
             MConventionalDict sourcerTypeDict = conDictEntryClient.getStdSourceType(stdSource.getSourceType());
             sourceModel.setSourceValue(sourcerTypeDict == null ? "" : sourcerTypeDict.getValue());
-            //微服务返回的是String类型的日期
-            //sourceModel.setCreate_date(DateUtil.formatDate(stdSource.getCreate_date(),DateUtil.DEFAULT_YMDHMSDATE_FORMAT));
+            sourceModel.setCreate_date(DateUtil.formatDate(stdSource.getCreate_date(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT));
+            sourcrModelList.add(sourceModel);
         }
         //TODO 取得符合条件总记录数的方法
         int totalCount = 10;
@@ -97,49 +96,37 @@ public class StandardSourceController extends BaseController {
     }
 
 
-    @RequestMapping(value = "/source/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/source", method = RequestMethod.PUT)
     @ApiOperation(value = "修改标准来源，通过id取数据，取不到数据时新增，否则修改")
     public Envelop updateStdSource(
-            @ApiParam(name = "id", value = "标准来源编号", defaultValue = "")
-            @PathVariable(value = "id") String id,
-            @ApiParam(name = "code", value = "编码", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "名称", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "type", value = "类型", defaultValue = "")
-            @RequestParam(value = "type") String type,
-            @ApiParam(name = "description", value = "描述", defaultValue = "")
-            @RequestParam(value = "description") String description) throws Exception {
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestParam(value = "model") String model) throws Exception {
         Envelop envelop = new Envelop();
-        boolean flag = stdSourcrClient.updateStdSource(id, code, name, type, description);
-        if (!flag) {
+        MStdSource mStdSource = stdSourcrClient.updateStdSource(model);
+        if (mStdSource == null) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("标准来源更新失败！");
             return envelop;
         }
         envelop.setSuccessFlg(true);
+        envelop.setObj(getStdSourceDetailModel(mStdSource));
         return envelop;
     }
 
     @RequestMapping(value = "/source", method = RequestMethod.POST)
     @ApiOperation(value = "新增标准来源")
     public Envelop addStdSource(
-            @ApiParam(name = "code", value = "编码", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "名称", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "type", value = "类型", defaultValue = "")
-            @RequestParam(value = "type") String type,
-            @ApiParam(name = "description", value = "描述", defaultValue = "")
-            @RequestParam(value = "description") String description) throws Exception {
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestParam(value = "model") String model) throws Exception {
         Envelop envelop = new Envelop();
-        boolean flag = stdSourcrClient.addStdSource(code, name, type, description);
-        if (!flag) {
+        MStdSource mStdSource = stdSourcrClient.addStdSource(model);
+        if (mStdSource == null) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("新增标准来源失败！");
             return envelop;
         }
         envelop.setSuccessFlg(true);
+        envelop.setObj(getStdSourceDetailModel(mStdSource));
         return envelop;
     }
 

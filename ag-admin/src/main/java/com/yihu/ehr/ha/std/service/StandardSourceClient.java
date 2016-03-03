@@ -14,7 +14,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import java.util.*;
 
 /**
- * Created by Administrator on 2016/2/29.
+ * Created by yww on 2016/3/1.
  */
 @FeignClient("svr-standard")
 @RequestMapping(ApiVersion.Version1_0 + "/std")
@@ -23,7 +23,7 @@ public interface StandardSourceClient {
 
     @RequestMapping(value = "/sources", method = RequestMethod.GET)
     @ApiOperation(value = "标准来源分页搜索")
-    List<MStdSource> searchAdapterOrg(
+    Collection<MStdSource> searchSources(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -43,32 +43,18 @@ public interface StandardSourceClient {
             @PathVariable(value = "id") String id);
 
 
-    @RequestMapping(value = "/source/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/source", method = RequestMethod.PUT)
     @ApiOperation(value = "修改标准来源，通过id取数据，取不到数据时新增，否则修改")
-    boolean updateStdSource(
-            @ApiParam(name = "id", value = "标准来源编号", defaultValue = "")
-            @PathVariable(value = "id") String id,
-            @ApiParam(name = "code", value = "编码", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "名称", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "type", value = "类型", defaultValue = "")
-            @RequestParam(value = "type") String type,
-            @ApiParam(name = "description", value = "描述", defaultValue = "")
-            @RequestParam(value = "description") String description);
+    MStdSource updateStdSource(
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestParam(value = "model") String model);
 
 
     @RequestMapping(value = "/source", method = RequestMethod.POST)
     @ApiOperation(value = "新增标准来源")
-    boolean addStdSource(
-            @ApiParam(name = "code", value = "编码", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "名称", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "type", value = "类型", defaultValue = "")
-            @RequestParam(value = "type") String type,
-            @ApiParam(name = "description", value = "描述", defaultValue = "")
-            @RequestParam(value = "description") String description);
+    MStdSource addStdSource(
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestParam(value = "model") String model);
 
 
     @RequestMapping(value = "/sources", method = RequestMethod.DELETE)
