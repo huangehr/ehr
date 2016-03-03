@@ -13,7 +13,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import static com.google.common.base.Predicates.or;
 import static springfox.documentation.builders.PathSelectors.regex;
 
-//@Configuration
+@Configuration
 @EnableSwagger2
 @ComponentScan("com.yihu.ehr.*.controller")
 public class SwaggerConfig {
@@ -81,14 +81,15 @@ public class SwaggerConfig {
      *
      * @return
      */
-    //@Bean
+    /*@Bean
     SecurityConfiguration security() {
         return new SecurityConfiguration(
-                "test-app-client-id",
-                "test-app-realm",
+                "ehr-browser",
+                "secret123",
+                "ROLE_CLIENT",
                 "test-app",
                 "ac04-47ec-9a9a-7c47bbcbbbd1");
-    }
+    }*/
 
     private ApiInfo legacyApiInfo() {
         ApiInfo apiInfo = new ApiInfo("健康档案平台开放API",

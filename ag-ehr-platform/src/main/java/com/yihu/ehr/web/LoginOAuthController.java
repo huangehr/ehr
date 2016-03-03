@@ -11,7 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @Controller
 @RequestMapping("/login/oauth")
-public class OAuth2AuthController {
+public class LoginOAuthController {
     @RequestMapping("/confirm_access")
     public void confirmAccess(ModelAndView model) {
         model.addObject("name", "Sand");

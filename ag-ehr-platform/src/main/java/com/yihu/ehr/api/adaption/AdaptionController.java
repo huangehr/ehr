@@ -37,6 +37,6 @@ public class AdaptionController {
     @ApiOperation(value = "获取机构所有适配方案", produces = "application/gzip")
     public Object getOrgAdaptions(@ApiParam(name = "org_code", value = "机构代码")
                                   @PathVariable(value = "org_code") String orgCode) {
-        return null;
+        return "{message: Hello}";
     }
 }

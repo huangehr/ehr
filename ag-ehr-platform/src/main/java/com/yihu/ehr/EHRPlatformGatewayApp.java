@@ -22,7 +22,7 @@ import java.io.FileNotFoundException;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableFeignClients
-public class EHRPlatformGatewayApp implements ApplicationContextAware {
+public class EHRPlatformGatewayApp {
     @Value("${server.port}")
     int port;
 
@@ -45,11 +45,5 @@ public class EHRPlatformGatewayApp implements ApplicationContextAware {
                 }
             };
         };
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        //force the bean to get loaded as soon as possible
-        //applicationContext.getBean("requestMappingHandlerAdapter");
     }
 }
