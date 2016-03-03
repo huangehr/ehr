@@ -58,17 +58,17 @@ public class RestEcho implements Serializable {
         return this;
     }
 
-    @ApiModelProperty(required = true, readOnly = true, dataType = "String", allowableValues = "ok/null/ErrorCode", value = "²Ù×÷½á¹û´úÂë¡£ÕıÈ·Ê±Îªok»ònull£¬´íÎóÊ±ÎªÏàÓ¦µÄ´íÎóÌáÊ¾")
+    @ApiModelProperty(required = true, readOnly = true, dataType = "String", allowableValues = "ok/null/ErrorCode", value = "æ“ä½œç»“æœä»£ç ã€‚æ­£ç¡®æ—¶ä¸ºokæˆ–nullï¼Œé”™è¯¯æ—¶ä¸ºç›¸åº”çš„é”™è¯¯æç¤º")
     public JsonNode getCode() {
         return root.get(CodeNode);
     }
 
-    @ApiModelProperty(required = true, readOnly = true, dataType = "String", value = "²Ù×÷½á¹ûÏûÏ¢»ò´íÎóÌáÊ¾")
+    @ApiModelProperty(required = true, readOnly = true, dataType = "String", value = "æ“ä½œç»“æœæ¶ˆæ¯æˆ–é”™è¯¯æç¤º")
     public JsonNode getMessage() {
         return root.get(MessageNode);
     }
 
-    @ApiModelProperty(required = true, readOnly = true, dataType = "String", value = "½á¹ûÖµ£¬Ò»¸öJSON×Ó½Úµã¡£²Ù×÷³ö´íÊ±Îªnull")
+    @ApiModelProperty(required = true, readOnly = true, dataType = "String", value = "ç»“æœå€¼ï¼Œä¸€ä¸ªJSONå­èŠ‚ç‚¹ã€‚æ“ä½œå‡ºé”™æ—¶ä¸ºnull")
     public JsonNode getResult() {
         return root.get(ResultNode);
     }

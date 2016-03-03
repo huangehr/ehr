@@ -1,0 +1,80 @@
+package com.yihu.ehr.ha.adapter.service;
+
+import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.model.adaption.MOrgDictItem;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.Collection;
+
+/**
+ * Created by AndyCai on 2016/3/2.
+ */
+@FeignClient(MicroServices.AdaptionMgr)
+@RequestMapping(ApiVersion.Version1_0)
+@ApiIgnore
+public interface OrgDictEntryClient {
+
+    @RequestMapping(value = "/item/{id}", method = RequestMethod.GET)
+    @ApiOperation(value = "获取字典项信息")
+    MOrgDictItem getOrgDictItem(
+            @ApiParam(name = "id", value = "编号", defaultValue = "")
+            @PathVariable(value = "id") long id) ;
+
+    @RequestMapping(value = "/item", method = RequestMethod.POST)
+    @ApiOperation(value = "新增字典项")
+    MOrgDictItem createOrgDictItem(
+            @ApiParam(name = "json_data", value = "字典项信息", defaultValue = "")
+            @RequestParam(value = "json_data") String jsonData) ;
+
+
+    @RequestMapping(value = "/item/{id}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除字典项")
+    boolean deleteOrgDictItem(
+            @ApiParam(name = "id", value = "编号", defaultValue = "")
+            @RequestParam(value = "id", required = false) long id) ;
+
+
+    @RequestMapping(value = "/items", method = RequestMethod.DELETE)
+    @ApiOperation(value = "批量删除字典项")
+    boolean deleteOrgDictItemList(
+            @ApiParam(name = "ids", value = "编号集", defaultValue = "")
+            @RequestParam(value = "ids") String ids) ;
+
+
+    @RequestMapping(value = "/item/{id}", method = RequestMethod.PUT)
+    @ApiOperation(value = "修改字典项")
+    MOrgDictItem updateDictItem(
+            @ApiParam(name = "json_data", value = "字典项信息", defaultValue = "")
+            @RequestParam(value = "json_data") String jsonData);
+
+
+    @RequestMapping(value = "/items", method = RequestMethod.GET)
+    @ApiOperation(value = "分页查询")
+    Collection<MOrgDictItem> searchOrgDictItems(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page);
+
+    @RequestMapping(value = "/items/combo", method = RequestMethod.GET)
+    @ApiOperation(value = "机构字典项下拉")
+    Collection<String> getOrgDictEntry(
+            @ApiParam(name = "orgDictSeq", value = "字典seq", defaultValue = "")
+            @RequestParam(value = "orgDictSeq") Integer orgDictSeq,
+            @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
+            @RequestParam(value = "orgCode") String orgCode);
+}

@@ -3,6 +3,7 @@ package com.yihu.ehr.ha;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.thirdpartystandard.AdapterOrgDetailModel;
 import com.yihu.ehr.agModel.thirdpartystandard.OrgDataSetDetailModel;
+import com.yihu.ehr.agModel.thirdpartystandard.OrgDataSetModel;
 import com.yihu.ehr.ha.adapter.controller.AdapterOrgController;
 import com.yihu.ehr.ha.adapter.controller.OrgDataSetController;
 import com.yihu.ehr.util.Envelop;
@@ -23,7 +24,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = AgAdminApplication.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class OrgDataSetTests {
+public class OrgDataSetControllerTests {
 
     @Autowired
     private OrgDataSetController orgDataSetController;
@@ -67,21 +68,23 @@ public class OrgDataSetTests {
         envelop = orgDataSetController.saveOrgDataSet(objectMapper.writeValueAsString(dataSetModel));
         assertTrue("新增失败!",envelop.isSuccessFlg());
 
-        dataSetModel = (OrgDataSetDetailModel)envelop.getObj();
-        envelop = orgDataSetController.getOrgDataSet(dataSetModel.getId());
+        String fields = "";
+        String filter = "name=test_cms_name";
+        int page = 1;
+        int rows = 15;
+        envelop = orgDataSetController.searchAdapterOrg(fields,filter,"",rows,page);
+        assertTrue("列表获取失败!",envelop.getDetailModelList()!=null && envelop.getDetailModelList().size()==1);
+
+        String jsonData = objectMapper.writeValueAsString(envelop.getDetailModelList().get(0));
+        OrgDataSetModel orgDataSetModel = objectMapper.readValue(jsonData,OrgDataSetModel.class);
+
+        envelop = orgDataSetController.getOrgDataSet( Integer.parseInt(orgDataSetModel.getId()));
         assertTrue("数据集明细获取失败!",envelop.isSuccessFlg()&&envelop.getObj()!=null);
 
         dataSetModel = (OrgDataSetDetailModel)envelop.getObj();
         dataSetModel.setName("test_cms_name_c");
         envelop = orgDataSetController.saveOrgDataSet(objectMapper.writeValueAsString(dataSetModel));
         assertTrue("修改失败!", envelop.isSuccessFlg() && envelop.getObj() != null && ((OrgDataSetDetailModel) envelop.getObj()).getName().equals("test_cms_name_c"));
-
-        String fields = "";
-        String filter = "name=test_cms_name_c";
-        int page = 1;
-        int rows = 15;
-        envelop = orgDataSetController.searchAdapterOrg(fields,filter,"",rows,page);
-        assertTrue("列表获取失败!",envelop.getDetailModelList()!=null && envelop.getDetailModelList().size()==1);
 
         envelop = orgDataSetController.deleteOrgDataSet(dataSetModel.getId());
         assertTrue("数据集删除失败!",envelop.isSuccessFlg());

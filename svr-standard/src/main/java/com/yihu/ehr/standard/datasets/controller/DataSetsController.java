@@ -37,14 +37,6 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
         return dataSetService.getServiceEntity(version);
     }
 
-    private IDataSet setValues(IDataSet dataSet, String code, String name, String refStandard, String summary, String version){
-        dataSet.setStdVersion(version);
-        dataSet.setName(name);
-        dataSet.setReference(refStandard);
-        dataSet.setSummary(summary);
-        dataSet.setCode(code);
-        return dataSet;
-    }
 
     @RequestMapping(value = "/datasets", method = RequestMethod.GET)
     @ApiOperation(value = "查询数据集的方法")
@@ -137,7 +129,7 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
             if(dataSetService.isExistByField("code", dataSetModel.getCode(), entityClass))
                 throw new ApiException(ErrorCode.RapeatDataSetCode, "代码重复！");
         }
-        dataSetService.save(dataSet);
+        dataSetService.save(dataSetModel);
         return getModel(dataSetModel);
     }
 
