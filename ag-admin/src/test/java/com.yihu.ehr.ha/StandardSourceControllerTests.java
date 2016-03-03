@@ -1,7 +1,7 @@
 package com.yihu.ehr.ha;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.AgAdminConstants;
+import com.yihu.ehr.agModel.standard.standardsource.StdSourceDetailModel;
 import com.yihu.ehr.ha.std.controller.StandardSourceController;
 import com.yihu.ehr.util.Envelop;
 import org.junit.FixMethodOrder;
@@ -14,61 +14,66 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.junit.Assert.assertTrue;
 /**
- * Created by Administrator on 2016/3/1.
+ * Created by yww on 2016/3/1.
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = AgAdminConstants.class)
+@SpringApplicationConfiguration(classes = AgAdminApplication.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class StandardSourceControllerTests {
     @Autowired
-    StandardSourceController stdSourceController;
-
-    @Autowired
-    ObjectMapper objectMapper;
+    private StandardSourceController stdSourceController;
 
     ApplicationContext applicationContext;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Test
     public void atestVersion() throws Exception {
         applicationContext = new SpringApplicationBuilder()
                 .web(false).sources(AgAdminApplication.class).run();
         Envelop envelop = new Envelop();
-        //分页查询----------------------------1
+        //分页查询----------------------------1ok
         String fields = "";
         String filters = "";
         String sorts = "";
         int size = 15;
         int page = 1;
-        envelop = stdSourceController.searchAdapterOrg(fields, filters, sorts, size, page);
+        envelop = stdSourceController.searchSources(fields, filters, sorts, size, page);
 
-        //根据id获取标准信息来源----------------------------2
-        String sourceId = "";
-        envelop = stdSourceController.getStdSource(sourceId);
+        //新增标准来源----------------------------3
+        StdSourceDetailModel sourceDetailModel = new StdSourceDetailModel();
+        sourceDetailModel.setCode("wwcs");
+        sourceDetailModel.setName("api改造测试新增");
+        sourceDetailModel.setSourceType("1");
+        sourceDetailModel.setDescription("only a test");
+        String jSonData = objectMapper.writeValueAsString(sourceDetailModel);
+        envelop = stdSourceController.addStdSource(jSonData);
+        StdSourceDetailModel detailModel = (StdSourceDetailModel) envelop.getObj();
 
-//        //新增标准来源----------------------------3
-//        String codeOld = "";
-//        String nameOld = "";
-//        String sourctTypeOld = "";
-//        String descriptionOld = "";
-//        envelop = stdSourceController.addStdSource(codeOld,nameOld,sourctTypeOld,descriptionOld);
-//
-//
-//        //更新标准来源----------------------------4
-//        String id = "";
-//        String codeNew = "";
-//        String nameNew = "";
-//        String sourctTypeNew = "";
-//        String descriptionNew = "";
-//        envelop = stdSourceController.updateStdSource(id,codeNew,nameNew,sourctTypeNew,descriptionNew);
-//
-//
-//        //批量删除标准来源（ids）----------------------------5
-//        String ids = "";
+
+        //更新标准来源----------------------------4
+        String idForTest = detailModel.getId();
+
+        detailModel.setCode("wwcsjkzl");
+        detailModel.setName("api改造测试修改");
+        detailModel.setSourceType("2");
+        detailModel.setDescription("again");
+        String jSonDataNew = objectMapper.writeValueAsString(detailModel);
+        envelop = stdSourceController.updateStdSource(jSonDataNew);
+
+        //根据id获取标准信息来源----------------------------ok
+        envelop = stdSourceController.getStdSource(idForTest);
+
+        //批量删除标准来源（ids）----------------------------5ok
+//        String ids = "0000000656d6513be60f8d1780e16198,0000000656d65155e60f8d1780e1619b";
 //        boolean flag1 = stdSourceController.delStdSources(ids);
-//        //删除标准来源（id）----------------------------6
-//        String idForDel = "";
-//        boolean flag2 = stdSourceController.delStdSource(idForDel);
+//        assertTrue("批量删除失败!",flag1);
+        //删除标准来源（id）----------------------------6ok
+        boolean flag2 = stdSourceController.delStdSource(idForTest);
+        assertTrue("标准来源删除失败！", flag2);
     }
 }
