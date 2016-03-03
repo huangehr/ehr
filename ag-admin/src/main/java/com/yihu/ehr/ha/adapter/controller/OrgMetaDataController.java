@@ -36,17 +36,13 @@ public class OrgMetaDataController extends BaseController {
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") long id) throws Exception {
 
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
         MOrgMetaData mOrgMetaData = orgMetaDataClient.getOrgMetaData(id);
         OrgDataSetDetailModel detailModel = convertToModel(mOrgMetaData, OrgDataSetDetailModel.class);
         if (detailModel == null) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("数据元信息获取失败!");
-            return envelop;
+            return failed("数据元信息获取失败!");
         }
-        envelop.setObj(detailModel);
-        return envelop;
+
+        return success(detailModel);
     }
 
 
@@ -56,8 +52,6 @@ public class OrgMetaDataController extends BaseController {
             @ApiParam(name = "json_data", value = "json_data", defaultValue = "")
             @RequestParam(value = "json_data") String jsonData) throws Exception {
 
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
         OrgMetaDataDetailModel detailModel = objectMapper.readValue(jsonData, OrgMetaDataDetailModel.class);
         String errorMsg = "";
         if (StringUtils.isEmpty(detailModel.getCode())) {
@@ -71,9 +65,7 @@ public class OrgMetaDataController extends BaseController {
         }
 
         if (StringUtils.isNotEmpty(errorMsg)) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(errorMsg);
-            return envelop;
+            return failed(errorMsg);
         }
         MOrgMetaData mOrgMetaData = convertToModel(detailModel, MOrgMetaData.class);
         if (detailModel.getOrgDataSet() == 0) {
@@ -83,11 +75,10 @@ public class OrgMetaDataController extends BaseController {
         }
         detailModel = convertToModel(mOrgMetaData, OrgMetaDataDetailModel.class);
         if (detailModel == null) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("保存失败!");
-            return envelop;
+
+            return failed("保存失败!");
         }
-        return envelop;
+        return success(detailModel);
     }
 
     @RequestMapping(value = "/meta_data", method = RequestMethod.DELETE)
@@ -96,18 +87,14 @@ public class OrgMetaDataController extends BaseController {
             @ApiParam(name = "ids", value = "编号集", defaultValue = "")
             @RequestParam(value = "ids") String ids) throws Exception {
 
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
         ids = trimEnd(ids,",");
         boolean result = orgMetaDataClient.deleteOrgMetaDataList(ids);
         if(!result)
         {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("删除失败!");
-            return envelop;
+            return failed("删除失败!");
         }
 
-        return envelop;
+        return success(null);
     }
 
     @RequestMapping(value = "/meta_datas", method = RequestMethod.GET)
