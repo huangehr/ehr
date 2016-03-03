@@ -54,8 +54,7 @@ public class StandardSourceController extends BaseController {
             //标准来源类型字典
             MConventionalDict sourcerTypeDict = conDictEntryClient.getStdSourceType(stdSource.getSourceType());
             sourceModel.setSourceValue(sourcerTypeDict == null ? "" : sourcerTypeDict.getValue());
-            //TODO 微服务返回时间为null，转换出异常
-            //sourceModel.setCreate_date(DateUtil.formatDate(stdSource.getCreate_date(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT));
+            sourceModel.setCreateDate(DateUtil.formatDate(stdSource.getCreateDate(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT));
             sourcrModelList.add(sourceModel);
         }
         //TODO 取得符合条件总记录数的方法
