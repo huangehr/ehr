@@ -36,7 +36,7 @@ public class AdapterOrgService extends BaseJpaService<AdapterOrg, XAdapterOrgRep
     OrgDictService orgDictManager;
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void addAdapterOrg(AdapterOrg adapterOrg) {
+    public AdapterOrg addAdapterOrg(AdapterOrg adapterOrg) {
         //地址检查并保存
 //        MAddress address = adapterOrg.getMAddress();
 //        if (address != null) {
@@ -46,12 +46,13 @@ public class AdapterOrgService extends BaseJpaService<AdapterOrg, XAdapterOrgRep
 //                            address.getStreet(), address.getExtra(), address.getPostalCode());
 //            adapterOrg.setArea((String) addressId);
 //        }
-        save(adapterOrg);
+        adapterOrg = save(adapterOrg);
         //拷贝采集标准
         String parent = adapterOrg.getParent();
         if (parent != null && !parent.equals("")) {
             copy(adapterOrg.getCode(), parent);
         }
+        return adapterOrg;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

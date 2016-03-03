@@ -38,7 +38,7 @@ public class PaientTests {
 		String district = "安平县";
 		int size = 1;
 		int page = 10;
-		Object result = patientController.searchPatient(name,idCardNo,province,city,district,size,page);
+		Object result = patientController.searchPatient(name,idCardNo,province,city,district,size,page,null,null);
 		assertTrue("查询失败！" , result != null);
 	}
 

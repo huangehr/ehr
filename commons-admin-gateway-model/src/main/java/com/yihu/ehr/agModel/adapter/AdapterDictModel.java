@@ -1,11 +1,14 @@
-package com.yihu.ehr.adaption.dict.service;
+package com.yihu.ehr.agModel.adapter;
+
+import com.yihu.ehr.util.validate.Required;
+import com.yihu.ehr.util.validate.Valid;
 
 /**
- * 方案字典映射
  * @author lincl
  * @version 1.0
- * @created 2016.2.3
+ * @created 2016.3.1
  */
+@Valid
 public class AdapterDictModel {
 	private Long id;
 
@@ -26,7 +29,7 @@ public class AdapterDictModel {
 	private String dictEntryName;
 
 	/**
-	 * 所属机构字典
+	 *  所属机构字典
 	 */
 	private Long orgDictSeq;
 	private String orgDictCode;
@@ -56,6 +59,7 @@ public class AdapterDictModel {
 		this.id = id;
 	}
 
+	@Required(filedName = "适配方案")
 	public Long getAdapterPlanId() {
 		return adapterPlanId;
 	}
@@ -64,6 +68,7 @@ public class AdapterDictModel {
 		this.adapterPlanId = adapterPlanId;
 	}
 
+	@Required(filedName = "标准字典")
 	public Long getDictId() {
 		return dictId;
 	}
@@ -72,6 +77,7 @@ public class AdapterDictModel {
 		this.dictId = dictId;
 	}
 
+	@Required(filedName = "标准字典项")
 	public Long getDictEntryId() {
 		return dictEntryId;
 	}

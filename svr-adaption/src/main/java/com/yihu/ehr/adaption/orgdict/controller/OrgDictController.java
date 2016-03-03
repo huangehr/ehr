@@ -44,29 +44,16 @@ public class OrgDictController extends ExtendController<MOrgDict> {
 
     @RequestMapping(value = "/dict", method = RequestMethod.POST)
     @ApiOperation(value = "创建机构字典")
-    public boolean createOrgDict(
-            @ApiParam(name = "code", value = "code", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "name", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "orgCode", value = "orgCode", defaultValue = "")
-            @RequestParam(value = "orgCode") String orgCode,
-            @ApiParam(name = "description", value = "description", defaultValue = "")
-            @RequestParam(value = "description", required = false) String description,
-            @ApiParam(name = "userId", value = "userId", defaultValue = "")
-            @RequestParam(value = "userId") String userId) {
+    public MOrgDict createOrgDict(
+            @ApiParam(name = "model", value = "数据模型", defaultValue = "")
+            @RequestParam(value = "model") String model) throws Exception{
 
-        if (orgDictService.isExistOrgDict(orgCode, code))
+        OrgDict orgDict = jsonToObj(model, OrgDict.class);
+        if (orgDictService.isExistOrgDict(orgDict.getOrganization(), orgDict.getCode()))
             throw new ApiException(ErrorCode.RepeatOrgDict, "该字典已存在！");
-        OrgDict orgDict = new OrgDict();
-        orgDict.setCode(code);
-        orgDict.setName(name);
-        orgDict.setDescription(description);
-        orgDict.setOrganization(orgCode);
+
         orgDict.setCreateDate(new Date());
-        orgDict.setCreateUser(userId);
-        orgDictService.createOrgDict(orgDict);
-        return true;
+        return getModel(orgDictService.createOrgDict(orgDict));
     }
 
 
@@ -74,40 +61,26 @@ public class OrgDictController extends ExtendController<MOrgDict> {
     @ApiOperation(value = "删除机构字典")
     public boolean deleteOrgDict(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @PathVariable(value = "id") long id) {
+            @PathVariable(value = "id") long id) throws Exception{
 
         orgDictService.deleteOrgDict(id);
         return true;
     }
 
 
-    @RequestMapping(value = "/dict/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/dict", method = RequestMethod.PUT)
     @ApiOperation(value = "修改机构字典")
-    public boolean updateOrgDict(
-            @ApiParam(name = "id", value = "id", defaultValue = "")
-            @PathVariable(value = "id") long id,
-            @ApiParam(name = "orgCode", value = "orgCode", defaultValue = "")
-            @RequestParam(value = "orgCode") String orgCode,
-            @ApiParam(name = "code", value = "code", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "name", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "description", value = "description", defaultValue = "")
-            @RequestParam(value = "description", required = false) String description,
-            @ApiParam(name = "userId", value = "userId", defaultValue = "")
-            @RequestParam(value = "userId") String userId) {
+    public MOrgDict updateOrgDict(
+            @ApiParam(name = "model", value = "数据模型", defaultValue = "")
+            @RequestParam(value = "model") String model) throws Exception{
 
-        OrgDict orgDict = orgDictService.retrieve(id);
+        OrgDict dataModel = jsonToObj(model, OrgDict.class);
+        OrgDict orgDict = orgDictService.retrieve(dataModel.getId());
         if (orgDict == null)
             throw errNotFound();
-        if (orgDict.getCode().equals(code) || !orgDictService.isExistOrgDict(orgCode, code)) {
-            orgDict.setCode(code);
-            orgDict.setName(name);
-            orgDict.setDescription(description);
-            orgDict.setUpdateDate(new Date());
-            orgDict.setUpdateUser(userId);
-            orgDictService.save(orgDict);
-            return true;
+        if (orgDict.getCode().equals(dataModel.getCode()) || !orgDictService.isExistOrgDict(dataModel.getOrganization(), dataModel.getCode())) {
+            dataModel.setUpdateDate(new Date());
+            return getModel(orgDictService.save(dataModel));
         }
         else
             throw new ApiException(ErrorCode.RepeatOrgDict, "该字典已存在！");
@@ -117,7 +90,7 @@ public class OrgDictController extends ExtendController<MOrgDict> {
 
     @RequestMapping(value = "/dicts", method = RequestMethod.GET)
     @ApiOperation(value = "条件查询")
-    public Collection searchOrgDicts(
+    public Collection<MOrgDict> searchOrgDicts(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")

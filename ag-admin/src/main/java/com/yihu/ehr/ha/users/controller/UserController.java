@@ -216,7 +216,7 @@ public class UserController extends BaseController {
      * @param loginCode 账号
      * @return map  key{publicKey:公钥；validTime：有效时间; startTime：生效时间}
      */
-    @RequestMapping(value = "/users/users/key/{login_code}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/users/key/{login_code}", method = RequestMethod.PUT)
     @ApiOperation(value = "重新分配密钥", notes = "重新分配密钥")
     public Map<String, String> distributeKey(
             @ApiParam(name = "login_code", value = "登录帐号", defaultValue = "")

@@ -73,12 +73,4 @@ public class OrgDictService extends BaseJpaService<OrgDict, XOrgDictRepository> 
         delete(orgDict);
         orgDictItemManager.deleteOrgDictItemByDict(orgDict);
     }
-
-    public List<OrgDict> findByField(Object val, String field){
-        String hql = "select orgDict from OrgDict where "+ field + "=:val";
-        Session session = currentSession();
-        Query query = session.createQuery(hql);
-        query.setParameter("val", val);
-        return query.list();
-    }
 }

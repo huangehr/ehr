@@ -1,6 +1,8 @@
 package com.yihu.ehr.model.standard;
 
 
+import java.util.Date;
+
 /**
  * @author lincl
  * @version 1.0
@@ -8,7 +10,7 @@ package com.yihu.ehr.model.standard;
  */
 public class MCDAVersion {
     private String author;
-    private String commitTime;
+    private Date commitTime;
     private boolean isInStage;
     private String version;
     private String versionName;
@@ -20,14 +22,6 @@ public class MCDAVersion {
 
     public void setAuthor(String author) {
         this.author = author;
-    }
-
-    public String getCommitTime() {
-        return commitTime;
-    }
-
-    public void setCommitTime(String commitTime) {
-        this.commitTime = commitTime;
     }
 
     public boolean isInStage() {
@@ -60,5 +54,13 @@ public class MCDAVersion {
 
     public void setBaseVersion(String baseVersion) {
         this.baseVersion = baseVersion;
+    }
+
+    public Date getCommitTime() {
+        return commitTime;
+    }
+
+    public void setCommitTime(Date commitTime) {
+        this.commitTime = commitTime;
     }
 }

@@ -59,15 +59,14 @@ public class PatientController extends BaseController {
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
             @RequestParam(value = "rows") Integer rows) throws Exception {
 
-        Envelop envelop = patientClient.searchPatient(name, idCardNo, province, city, district, page, rows);
-        List<MDemographicInfo> demographicInfos = (List<MDemographicInfo>) envelop.getDetailModelList();
-        List<PatientModel> patients = new ArrayList<>();
-        //for (MDemographicInfo patientInfo : demographicInfos) {
-        for(int i=0;i<demographicInfos.size();i++){
+        List<MDemographicInfo> demographicInfos = patientClient.searchPatient(name, idCardNo, province, city, district, page, rows);
 
-            PatientModel patient = convertToModel(demographicInfos.get(i), PatientModel.class);
-            //TODO:获取家庭地址信息
-            String homeAddressId = demographicInfos.get(i).getHomeAddress();
+        List<PatientModel> patients = new ArrayList<>();
+        for (MDemographicInfo patientInfo : demographicInfos) {
+
+            PatientModel patient = convertToModel(patientInfo, PatientModel.class);
+            //获取家庭地址信息
+            String homeAddressId = patientInfo.getHomeAddress();
             MGeography geography = addressClient.getAddressById(homeAddressId);
             String homeAddress = "";
             if (geography != null) {
@@ -82,7 +81,7 @@ public class PatientController extends BaseController {
             patients.add(patient);
         }
 
-        envelop = getResult(patients, envelop.getTotalCount(), page, rows);
+        Envelop envelop = getResult(patients, 1, page, rows);
         return envelop;
     }
 

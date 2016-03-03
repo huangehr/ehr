@@ -1,10 +1,11 @@
 package com.yihu.ehr.ha.SystemDict.controller;
 
+import com.yihu.ehr.agModel.dict.SystemDictEntryModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.util.Array_ListUtil;
 import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -22,7 +24,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0 +"/admin")
 @RestController
-public class ConventionalDictEntryController {
+public class ConventionalDictEntryController extends BaseController{
 
     @Autowired
     private ConventionalDictEntryClient dictEntryClient;
@@ -36,8 +38,9 @@ public class ConventionalDictEntryController {
         Envelop envelop = new Envelop();
 
         MConventionalDict mConventionalDict = dictEntryClient.getAppCatalog(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
 
-        envelop.setObj(mConventionalDict);
+        envelop.setObj(systemDictEntryModel);
 
         return envelop;
     }
@@ -51,8 +54,9 @@ public class ConventionalDictEntryController {
         Envelop envelop = new Envelop();
 
         MConventionalDict mConventionalDict = dictEntryClient.getAppStatus(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
 
-        envelop.setObj(mConventionalDict);
+        envelop.setObj(systemDictEntryModel);
 
         return envelop;
     }
@@ -66,8 +70,9 @@ public class ConventionalDictEntryController {
         Envelop envelop = new Envelop();
 
         MConventionalDict mConventionalDict = dictEntryClient.getGender(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
 
-        envelop.setObj(mConventionalDict);
+        envelop.setObj(systemDictEntryModel);
 
         return envelop;
     }
@@ -81,8 +86,9 @@ public class ConventionalDictEntryController {
         Envelop envelop = new Envelop();
 
         MConventionalDict mConventionalDict = dictEntryClient.getMartialStatus(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
 
-        envelop.setObj(mConventionalDict);
+        envelop.setObj(systemDictEntryModel);
 
         return envelop;
     }
@@ -96,8 +102,9 @@ public class ConventionalDictEntryController {
         Envelop envelop = new Envelop();
 
         MConventionalDict mConventionalDict = dictEntryClient.getNation(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
 
-        envelop.setObj(mConventionalDict);
+        envelop.setObj(systemDictEntryModel);
 
         return envelop;
     }
@@ -111,8 +118,9 @@ public class ConventionalDictEntryController {
         Envelop envelop = new Envelop();
 
         MConventionalDict mConventionalDict = dictEntryClient.getResidenceType(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
 
-        envelop.setObj(mConventionalDict);
+        envelop.setObj(systemDictEntryModel);
 
         return envelop;
     }
@@ -126,8 +134,9 @@ public class ConventionalDictEntryController {
         Envelop envelop = new Envelop();
 
         MConventionalDict mConventionalDict = dictEntryClient.getOrgType(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
 
-        envelop.setObj(mConventionalDict);
+        envelop.setObj(systemDictEntryModel);
 
         return envelop;
     }
@@ -141,9 +150,9 @@ public class ConventionalDictEntryController {
         Envelop envelop = new Envelop();
 
         MConventionalDict mConventionalDict = dictEntryClient.getSettledWay(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
 
-        envelop.setObj(mConventionalDict);
-
+        envelop.setObj(systemDictEntryModel);
         return envelop;
     }
 
@@ -156,8 +165,9 @@ public class ConventionalDictEntryController {
         Envelop envelop = new Envelop();
 
         MConventionalDict mConventionalDict = dictEntryClient.getCardStatus(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
 
-        envelop.setObj(mConventionalDict);
+        envelop.setObj(systemDictEntryModel);
 
         return envelop;
     }
@@ -171,8 +181,9 @@ public class ConventionalDictEntryController {
         Envelop envelop = new Envelop();
 
         MConventionalDict mConventionalDict = dictEntryClient.getCardType(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
 
-        envelop.setObj(mConventionalDict);
+        envelop.setObj(systemDictEntryModel);
 
         return envelop;
     }
@@ -186,8 +197,9 @@ public class ConventionalDictEntryController {
         Envelop envelop = new Envelop();
 
         MConventionalDict mConventionalDict = dictEntryClient.getRequestState(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
 
-        envelop.setObj(mConventionalDict);
+        envelop.setObj(systemDictEntryModel);
 
         return envelop;
     }
@@ -201,9 +213,9 @@ public class ConventionalDictEntryController {
         Envelop envelop = new Envelop();
 
         MConventionalDict mConventionalDict = dictEntryClient.getKeyType(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
 
-        envelop.setObj(mConventionalDict);
-
+        envelop.setObj(systemDictEntryModel);
         return envelop;
     }
 
@@ -216,8 +228,9 @@ public class ConventionalDictEntryController {
         Envelop envelop = new Envelop();
 
         MConventionalDict mConventionalDict = dictEntryClient.getMedicalRole(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
 
-        envelop.setObj(mConventionalDict);
+        envelop.setObj(systemDictEntryModel);
 
         return envelop;
     }
@@ -231,8 +244,9 @@ public class ConventionalDictEntryController {
         Envelop envelop = new Envelop();
 
         MConventionalDict mConventionalDict = dictEntryClient.getUserRole(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
 
-        envelop.setObj(mConventionalDict);
+        envelop.setObj(systemDictEntryModel);
 
         return envelop;
     }
@@ -246,8 +260,9 @@ public class ConventionalDictEntryController {
         Envelop envelop = new Envelop();
 
         MConventionalDict mConventionalDict = dictEntryClient.getUserType(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
 
-        envelop.setObj(mConventionalDict);
+        envelop.setObj(systemDictEntryModel);
 
         return envelop;
     }
@@ -261,8 +276,9 @@ public class ConventionalDictEntryController {
         Envelop envelop = new Envelop();
 
         MConventionalDict mConventionalDict = dictEntryClient.getLoginAddress(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
 
-        envelop.setObj(mConventionalDict);
+        envelop.setObj(systemDictEntryModel);
 
         return envelop;
     }
@@ -276,8 +292,9 @@ public class ConventionalDictEntryController {
         Envelop envelop = new Envelop();
 
         MConventionalDict mConventionalDict = dictEntryClient.getYesNo(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
 
-        envelop.setObj(mConventionalDict);
+        envelop.setObj(systemDictEntryModel);
 
         return envelop;
     }
@@ -291,8 +308,9 @@ public class ConventionalDictEntryController {
         Envelop envelop = new Envelop();
 
         MConventionalDict mConventionalDict = dictEntryClient.getAdapterType(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
 
-        envelop.setObj(mConventionalDict);
+        envelop.setObj(systemDictEntryModel);
 
         return envelop;
     }
@@ -306,8 +324,9 @@ public class ConventionalDictEntryController {
         Envelop envelop = new Envelop();
 
         MConventionalDict mConventionalDict = dictEntryClient.getStdSourceType(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
 
-        envelop.setObj(mConventionalDict);
+        envelop.setObj(systemDictEntryModel);
 
         return envelop;
     }
@@ -320,23 +339,54 @@ public class ConventionalDictEntryController {
             @RequestParam(value = "codes") String[] codes) {
 
         Envelop envelop = new Envelop();
+        List<MConventionalDict> mConventionalDictList = dictEntryClient.getStdSourceTypeList(Arrays.asList(codes));
+        List<SystemDictEntryModel> systemDictEntryModelList = new ArrayList<>();
 
-        List<MConventionalDict> mConventionalDictList = dictEntryClient.getStdSourceTypeList(Array_ListUtil.getList(codes));
+        for (MConventionalDict mConventionalDict: mConventionalDictList){
+            SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
+            systemDictEntryModelList.add(systemDictEntryModel);
+        }
 
-        envelop.setDetailModelList(mConventionalDictList);
+        envelop.setDetailModelList(systemDictEntryModelList);
 
         return envelop;
     }
 
     @RequestMapping(value = "/dictionaries/user_types", method = RequestMethod.GET)
     @ApiOperation(value = "获取用户类型字典项", response = MConventionalDict.class, produces = "application/json")
-    public Collection<MConventionalDict> getUserTypeList() {
-        return dictEntryClient.getUserTypeList();
+    public Envelop getUserTypeList() {
+
+        Envelop envelop = new Envelop();
+        List<SystemDictEntryModel> systemDictEntryModelList = new ArrayList<>();
+
+        Collection<MConventionalDict> mConventionalDicts = dictEntryClient.getUserTypeList();
+
+        for (MConventionalDict mConventionalDict: mConventionalDicts){
+            SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
+            systemDictEntryModelList.add(systemDictEntryModel);
+        }
+
+        envelop.setDetailModelList(systemDictEntryModelList);
+
+        return envelop;
     }
 
     @RequestMapping(value = "/dictionaries/tags", method = RequestMethod.GET)
     @ApiOperation(value = "获取标签字典项", response = MConventionalDict.class, produces = "application/json")
-    public Collection<MConventionalDict> getTagsList() {
-        return dictEntryClient.getTagsList();
+    public Envelop getTagsList() {
+
+        Envelop envelop = new Envelop();
+        List<SystemDictEntryModel> systemDictEntryModelList = new ArrayList<>();
+
+        Collection<MConventionalDict> mConventionalDicts = dictEntryClient.getTagsList();
+
+        for (MConventionalDict mConventionalDict: mConventionalDicts){
+            SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
+            systemDictEntryModelList.add(systemDictEntryModel);
+        }
+
+        envelop.setDetailModelList(systemDictEntryModelList);
+
+        return envelop;
     }
 }

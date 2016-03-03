@@ -35,11 +35,11 @@ public class AdapterDictTests {
 		dict.setDescription("ddd");
 		dict.setDictEntryId(1l);
 		dict.setDictId(1l);
-		dict.setOrgDictItemSeq(1l);
+		dict.setOrgDictEntrySeq(1l);
 		dict.setOrgDictSeq(1l);
 		String json = new ObjectMapper().writeValueAsString(dict);
-		boolean rs = adapterDictController.createAdapterDictEntry(json);
-		assertTrue("新增失败", rs);
+		MAdapterDict rs = adapterDictController.createAdapterDictEntry(json);
+		assertTrue("新增失败", rs!=null);
 	}
 
 	@Test
@@ -49,11 +49,11 @@ public class AdapterDictTests {
 		dict.setDescription("ddd");
 		dict.setDictEntryId(1l);
 		dict.setDictId(1l);
-		dict.setOrgDictItemSeq(1l);
+		dict.setOrgDictEntrySeq(1l);
 		dict.setOrgDictSeq(1l);
 		String json = new ObjectMapper().writeValueAsString(dict);
-		boolean rs = adapterDictController.updateAdapterDictEntry(id, json);
-		assertTrue("修改失败！", rs);
+		MAdapterDict rs = adapterDictController.updateAdapterDictEntry(id, json);
+		assertTrue("修改失败！", rs!=null);
 	}
 
 	@Test

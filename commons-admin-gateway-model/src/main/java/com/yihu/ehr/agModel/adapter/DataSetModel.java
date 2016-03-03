@@ -1,4 +1,4 @@
-package com.yihu.ehr.adaption.dataset.service;
+package com.yihu.ehr.agModel.adapter;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 

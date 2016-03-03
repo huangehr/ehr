@@ -35,8 +35,8 @@ public class OrgDictItemTests {
 		int orgDictSeq = 1;
 		String sort = "1";
 		String description = "desc";
-		boolean rs = orgDictItemController.createOrgDictItem(orgDictSeq, orgCode, code, name, description, sort, userId);
-		assertTrue("新增失败", rs);
+		MOrgDictItem rs = orgDictItemController.createOrgDictItem("");
+		assertTrue("新增失败", rs!=null);
 	}
 
 	@Test
@@ -48,8 +48,8 @@ public class OrgDictItemTests {
 		int orgDictSeq = 1;
 		String sort = "1";
 		String description = "desc";
-		boolean rs = orgDictItemController.updateDictItem(id, orgDictSeq, orgCode, code, name, description, sort, userId);
-		assertTrue("修改失败！", rs);
+		MOrgDictItem rs = orgDictItemController.updateDictItem("");
+		assertTrue("修改失败！", rs!=null);
 	}
 
 	@Test

@@ -33,11 +33,11 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * ±ê×¼ÏÂ·¢ĞÅÏ¢²Ù×÷
+ * æ ‡å‡†ä¸‹å‘ä¿¡æ¯æ“ä½œ
  *
  * @author AndyCai
  * @version 1.0
- * @created 23-7ÔÂ-2015 15:51:39
+ * @created 23-7æœˆ-2015 15:51:39
  */
 @Transactional
 @Service
@@ -67,11 +67,11 @@ public class DispatchService {
 
 
     /**
-     * ÏÂ·¢±ê×¼  ±»¶¯µ÷ÓÃ£¬Éú³É±ê×¼ÎÄ¼ş²¢·µ»ØÎÄ¼şµÄbyte[]
-     * ÒÑÉú³ÉÈ«°æ±¾±ê×¼ÎÄ¼ş£¬»¹ÓĞ²îÒì»¯°æ±¾ÎÄ¼şÎ´Éú³É
+     * ä¸‹å‘æ ‡å‡†  è¢«åŠ¨è°ƒç”¨ï¼Œç”Ÿæˆæ ‡å‡†æ–‡ä»¶å¹¶è¿”å›æ–‡ä»¶çš„byte[]
+     * å·²ç”Ÿæˆå…¨ç‰ˆæœ¬æ ‡å‡†æ–‡ä»¶ï¼Œè¿˜æœ‰å·®å¼‚åŒ–ç‰ˆæœ¬æ–‡ä»¶æœªç”Ÿæˆ
      *
-     * @param strSourceVersionId ½«ÏÂ·¢µÄ±ê×¼°æ±¾
-     * @return Map 1.filepath ÎÄ¼şÂ·¾¶  2.password ÎÄ¼ş¼ĞÃÜÂë
+     * @param strSourceVersionId å°†ä¸‹å‘çš„æ ‡å‡†ç‰ˆæœ¬
+     * @return Map 1.filepath æ–‡ä»¶è·¯å¾„  2.password æ–‡ä»¶å¤¹å¯†ç 
      */
     @Transactional(propagation = Propagation.SUPPORTS)
     public Map sendStandard(String strSourceVersionId) throws Exception {
@@ -80,12 +80,12 @@ public class DispatchService {
 
 
     /**
-     * ÏÂ·¢±ê×¼  ±»¶¯µ÷ÓÃ£¬Éú³É±ê×¼ÎÄ¼ş²¢·µ»ØÎÄ¼şµÄbyte[]
-     * ÒÑÉú³ÉÈ«°æ±¾±ê×¼ÎÄ¼ş£¬»¹ÓĞ²îÒì»¯°æ±¾ÎÄ¼şÎ´Éú³É
+     * ä¸‹å‘æ ‡å‡†  è¢«åŠ¨è°ƒç”¨ï¼Œç”Ÿæˆæ ‡å‡†æ–‡ä»¶å¹¶è¿”å›æ–‡ä»¶çš„byte[]
+     * å·²ç”Ÿæˆå…¨ç‰ˆæœ¬æ ‡å‡†æ–‡ä»¶ï¼Œè¿˜æœ‰å·®å¼‚åŒ–ç‰ˆæœ¬æ–‡ä»¶æœªç”Ÿæˆ
      *
-     * @param strSourceVersionId ½«ÏÂ·¢µÄ±ê×¼°æ±¾
-     * @param stdTargetVersionId µ±Ç°Ê¹ÓÃµÄ°æ±¾
-     * @return Map 1.filepath ÎÄ¼şÂ·¾¶  2.password ÎÄ¼ş¼ĞÃÜÂë
+     * @param strSourceVersionId å°†ä¸‹å‘çš„æ ‡å‡†ç‰ˆæœ¬
+     * @param stdTargetVersionId å½“å‰ä½¿ç”¨çš„ç‰ˆæœ¬
+     * @return Map 1.filepath æ–‡ä»¶è·¯å¾„  2.password æ–‡ä»¶å¤¹å¯†ç 
      */
     @Transactional(propagation = Propagation.SUPPORTS)
     public Map sendStandard(String strSourceVersionId, String stdTargetVersionId)
@@ -102,18 +102,18 @@ public class DispatchService {
 
         } else {
 
-            /************20151110 CMS Ôİ²»¿¼ÂÇ²îÒì»¯°æ±¾¸üĞÂÎÊÌâ£¬°æ±¾¸üĞÂ¾ùÎªÈ«°æ±¾ÏÂ·¢ Start*************/
-                            /*ÒÔÏÂÅĞ¶ÏÎª²îÒì»¯°æ±¾¸üĞÂÅĞ¶Ï*/
+            /************20151110 CMS æš‚ä¸è€ƒè™‘å·®å¼‚åŒ–ç‰ˆæœ¬æ›´æ–°é—®é¢˜ï¼Œç‰ˆæœ¬æ›´æ–°å‡ä¸ºå…¨ç‰ˆæœ¬ä¸‹å‘ Start*************/
+                            /*ä»¥ä¸‹åˆ¤æ–­ä¸ºå·®å¼‚åŒ–ç‰ˆæœ¬æ›´æ–°åˆ¤æ–­*/
 
             // if (stdTargetVersionId == null || stdTargetVersionId == "") {
-            //È«°æ±¾ÏÂ·¢
+            //å…¨ç‰ˆæœ¬ä¸‹å‘
             map = createFullVersionFile(strSourceVersionId);
 //                } else {
-            //²îÒì»¯°æ±¾ÏÂ·¢
+            //å·®å¼‚åŒ–ç‰ˆæœ¬ä¸‹å‘
 //                    map = CreateDiffVersionFile(strSourceVersionId, stdTargetVersionId);
 //                }
 
-            /************20151110 CMS Ôİ²»¿¼ÂÇ²îÒì»¯°æ±¾¸üĞÂÎÊÌâ£¬°æ±¾¸üĞÂ¾ùÎªÈ«°æ±¾ÏÂ·¢ End*************/
+            /************20151110 CMS æš‚ä¸è€ƒè™‘å·®å¼‚åŒ–ç‰ˆæœ¬æ›´æ–°é—®é¢˜ï¼Œç‰ˆæœ¬æ›´æ–°å‡ä¸ºå…¨ç‰ˆæœ¬ä¸‹å‘ End*************/
         }
         return map;
     }
@@ -155,7 +155,7 @@ public class DispatchService {
 
 
     /**
-     * ´´½¨ÎÄµµµÄ±í½á¹¹
+     * åˆ›å»ºæ–‡æ¡£çš„è¡¨ç»“æ„
      */
     public Element getColumnElement(Document doc, Element colRoot, String[] strColumn) {
         for (int i = 0; i < strColumn.length; i++) {
@@ -177,7 +177,7 @@ public class DispatchService {
 
         DOMSource source = new DOMSource(doc);
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");//ÉèÖÃÎÄµµµÄ»»ĞĞÓëËõ½ø
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");//è®¾ç½®æ–‡æ¡£çš„æ¢è¡Œä¸ç¼©è¿›
 
         OutputStreamWriter pw = new OutputStreamWriter(new FileOutputStream(fileName), "UTF-8");
         StreamResult result = new StreamResult(pw);
@@ -185,7 +185,7 @@ public class DispatchService {
     }
 
     /**
-     * ´´½¨±ê×¼°æ±¾XML
+     * åˆ›å»ºæ ‡å‡†ç‰ˆæœ¬XML
      */
     @Transactional(propagation = Propagation.SUPPORTS)
     public void createStandardVersionFile(String strFilePath, String strFileName, List<CDAVersion> cdaVersion)
@@ -195,10 +195,10 @@ public class DispatchService {
         root.setAttribute("name", "std_inner_version");
         doc.appendChild(root);
 
-        //´´½¨°æ±¾ÎÄ¼şÁĞĞÅÏ¢
+        //åˆ›å»ºç‰ˆæœ¬æ–‡ä»¶åˆ—ä¿¡æ¯
         root.appendChild(getVersionColumnElementRoot(doc));
 
-        //´´½¨°æ±¾ÏêÏ¸ĞÅÏ¢
+        //åˆ›å»ºç‰ˆæœ¬è¯¦ç»†ä¿¡æ¯
         for (CDAVersion version : cdaVersion) {
             Element rowRoot = doc.createElement("row");
             rowRoot.setAttribute("type", "add");
@@ -209,7 +209,7 @@ public class DispatchService {
             appendChild(rowRoot, doc.createElement("valid"), "1");
             appendChild(rowRoot, doc.createElement("type"), "1");
             appendChild(rowRoot, doc.createElement("valid_date"), String.valueOf(version.getCommitTime()));
-            appendChild(rowRoot, doc.createElement("author"), version.getAuthor()==""?"½¡¿µÖ®Â·":version.getAuthor());
+            appendChild(rowRoot, doc.createElement("author"), version.getAuthor()==""?"å¥åº·ä¹‹è·¯":version.getAuthor());
             appendChild(rowRoot, doc.createElement("id"), version.getVersion());
 
             root.appendChild(rowRoot);
@@ -219,25 +219,25 @@ public class DispatchService {
 
 
     /**
-     * ´´½¨Êı¾İ¼¯ÎÄ¼ş
+     * åˆ›å»ºæ•°æ®é›†æ–‡ä»¶
      */
     @Transactional(propagation = Propagation.SUPPORTS)
     public List<IMetaData> createDataSetFile(String strFilePath, String strFileName, List<IDataSet> dataSet)
             throws Exception {
-        //´´½¨Êı¾İ¼¯XML ·µ»ØÊı¾İ¼¯IDList
+        //åˆ›å»ºæ•°æ®é›†XML è¿”å›æ•°æ®é›†IDList
         List<IMetaData> listMetaDta = new ArrayList<>();
         Document doc = createDocument();
         Element root = doc.createElement("table");
         root.setAttribute("name", "std_dataset");
         doc.appendChild(root);
 
-        //´´½¨Êı¾İ¼¯ÎÄ¼şÁĞĞÅÏ¢
+        //åˆ›å»ºæ•°æ®é›†æ–‡ä»¶åˆ—ä¿¡æ¯
         Element colRoot = doc.createElement("metadata");
 
         String[] strColumn = {"summary|S", "valid|N", "inner_version|S", "ref_standard|S", "code|S", "catalog|S", "name|S", "publisher|S", "key_word|S", "id|N", "lang|S", "version|S"};
         root.appendChild(getColumnElement(doc, colRoot, strColumn));
 
-        //´´½¨Êı¾İ¼¯ÏêÏ¸ĞÅÏ¢
+        //åˆ›å»ºæ•°æ®é›†è¯¦ç»†ä¿¡æ¯
         for (IDataSet xDataSet : dataSet) {
             Element rowRoot = doc.createElement("row");
             String type = typeMapping.get(xDataSet.getOperationType());
@@ -264,31 +264,31 @@ public class DispatchService {
             root.appendChild(rowRoot);
         }
 
-        //Êä³öÎÄ¼ş
+        //è¾“å‡ºæ–‡ä»¶
         outputXml(doc, strFilePath + strFileName);
         return listMetaDta;
     }
 
 
     /**
-     * ´´½¨Êı¾İÔªÎÄ¼ş
+     * åˆ›å»ºæ•°æ®å…ƒæ–‡ä»¶
      */
     @Transactional(propagation = Propagation.SUPPORTS)
     public void createMetaDataFile(String strFilePath, String strFileName, String version, List<IMetaData> metaDataList)
             throws Exception{
-        //´´½¨Êı¾İÔªXML
+        //åˆ›å»ºæ•°æ®å…ƒXML
         Document doc = createDocument();
         Element root = doc.createElement("table");
         root.setAttribute("name", "std_metadata");
         doc.appendChild(root);
 
-        //´´½¨Êı¾İÔªÎÄ¼şÁĞĞÅÏ¢
+        //åˆ›å»ºæ•°æ®å…ƒæ–‡ä»¶åˆ—ä¿¡æ¯
         Element colRoot = doc.createElement("metadata");
         String[] strColumn = {"inner_version|S", "code|S", "nullable|N", "dataset_id|N", "format|S", "column_name|S", "type|S",
                 "dict_code|S", "version|S", "primary_key|N", "valid|N", "name|S", "de_code|S", "definition|S", "id|N", "column_type|S", "dict_value_type|N"};
         root.appendChild(getColumnElement(doc, colRoot, strColumn));
 
-        //´´½¨Êı¾İÔªÃ÷Ï¸ĞÅÏ¢
+        //åˆ›å»ºæ•°æ®å…ƒæ˜ç»†ä¿¡æ¯
         for (IMetaData metaData : metaDataList) {
             Element rowRoot = doc.createElement("row");
             String type = typeMapping.get(metaData.getOperationType());
@@ -323,12 +323,12 @@ public class DispatchService {
 
 
     /**
-     * ´´½¨×ÖµäÎÄ¼ş
+     * åˆ›å»ºå­—å…¸æ–‡ä»¶
      */
     @Transactional(propagation = Propagation.SUPPORTS)
     public List<IDictEntry> createDictFile(String strFilePath, String strFileName, List<IDict> dicts)
         throws Exception{
-        //´´½¨×ÖµäXML£¬·µ»Ø×ÖµäÖµ List
+        //åˆ›å»ºå­—å…¸XMLï¼Œè¿”å›å­—å…¸å€¼ List
         List<IDictEntry> listEntry = new ArrayList<>();
         Document doc = createDocument();
         Element root = doc.createElement("table");
@@ -337,7 +337,7 @@ public class DispatchService {
 
         Element colRoot = doc.createElement("metadata");
         String[] strColumn = {"valid|N", "inner_version|S", "ref_standard|S", "code|S", "name|S", "publisher|S", "version|S", "id|N"};
-        //´´½¨Êı¾İÔªÎÄ¼şÁĞĞÅÏ¢
+        //åˆ›å»ºæ•°æ®å…ƒæ–‡ä»¶åˆ—ä¿¡æ¯
         root.appendChild(getColumnElement(doc, colRoot, strColumn));
 
         for (IDict xDict : dicts) {
@@ -375,12 +375,12 @@ public class DispatchService {
     }
 
     /**
-     * ´´½¨×ÖµäÖµXMLÎÄ¼ş
+     * åˆ›å»ºå­—å…¸å€¼XMLæ–‡ä»¶
      */
     @Transactional(propagation = Propagation.SUPPORTS)
     public void createDictEntryFile(String strFilePath, String strFileName, String version, List<IDictEntry> dictEntry)
         throws Exception{
-        //´´½¨×ÖµäÖµXML
+        //åˆ›å»ºå­—å…¸å€¼XML
         Document doc = createDocument();
         Element root = doc.createElement("table");
         root.setAttribute("name", "std_dict_item");
@@ -389,7 +389,7 @@ public class DispatchService {
         Element colRoot = doc.createElement("metadata");
         String[] strColumn = {"valid|S", "inner_version|S", "dict_id|N", "code|S", "value|S", "version|S", "id|N"};
 
-        //´´½¨Êı¾İÔªÎÄ¼şÁĞĞÅÏ¢
+        //åˆ›å»ºæ•°æ®å…ƒæ–‡ä»¶åˆ—ä¿¡æ¯
         root.appendChild(getColumnElement(doc, colRoot, strColumn));
         for (IDictEntry xDictEntry : dictEntry) {
             Element rowRoot = doc.createElement("row");
@@ -411,25 +411,25 @@ public class DispatchService {
 
     public void copyFile(File sourcefile,File targetFile) throws IOException {
 
-        //ĞÂ½¨ÎÄ¼şÊäÈëÁ÷²¢¶ÔËü½øĞĞ»º³å
+        //æ–°å»ºæ–‡ä»¶è¾“å…¥æµå¹¶å¯¹å®ƒè¿›è¡Œç¼“å†²
         FileInputStream input=new FileInputStream(sourcefile);
         BufferedInputStream inbuff=new BufferedInputStream(input);
 
-        //ĞÂ½¨ÎÄ¼şÊä³öÁ÷²¢¶ÔËü½øĞĞ»º³å
+        //æ–°å»ºæ–‡ä»¶è¾“å‡ºæµå¹¶å¯¹å®ƒè¿›è¡Œç¼“å†²
         FileOutputStream out=new FileOutputStream(targetFile);
         BufferedOutputStream outbuff=new BufferedOutputStream(out);
 
-        //»º³åÊı×é
+        //ç¼“å†²æ•°ç»„
         byte[] b=new byte[1024*5];
         int len=0;
         while((len=inbuff.read(b))!=-1){
             outbuff.write(b, 0, len);
         }
 
-        //Ë¢ĞÂ´Ë»º³åµÄÊä³öÁ÷
+        //åˆ·æ–°æ­¤ç¼“å†²çš„è¾“å‡ºæµ
         outbuff.flush();
 
-        //¹Ø±ÕÁ÷
+        //å…³é—­æµ
         inbuff.close();
         outbuff.close();
         out.close();
@@ -438,14 +438,14 @@ public class DispatchService {
 
 
     /**
-     * ´´½¨°æ±¾ÎÄ¼ş£¬²¢·µ»ØÎÄ¼şÂ·¾¶
+     * åˆ›å»ºç‰ˆæœ¬æ–‡ä»¶ï¼Œå¹¶è¿”å›æ–‡ä»¶è·¯å¾„
      */
     @Transactional(propagation = Propagation.SUPPORTS)
     public Map createFullVersionFile(String sourceVersionId)
         throws Exception{
         Map resultMap = new HashMap<>();
 
-        //´´½¨±ê×¼°æ±¾ Êı¾İ¼¯ Êı¾İÔª ×Öµä ×ÖµäÖµ 5¸öXMLÎÄ¼ş £¬²¢Éú³ÉzipÑ¹Ëõ°ü
+        //åˆ›å»ºæ ‡å‡†ç‰ˆæœ¬ æ•°æ®é›† æ•°æ®å…ƒ å­—å…¸ å­—å…¸å€¼ 5ä¸ªXMLæ–‡ä»¶ ï¼Œå¹¶ç”Ÿæˆzipå‹ç¼©åŒ…
         String strFilePath = getFileSystemPath();
 
         String splitMark=System.getProperty("file.separator");
@@ -458,7 +458,7 @@ public class DispatchService {
 
         File targetFile = new File(strXMLFilePath);
 
-        //Èç¹ûÄ¿µÄÂ·¾¶²»´æÔÚ£¬ÔòĞÂ½¨
+        //å¦‚æœç›®çš„è·¯å¾„ä¸å­˜åœ¨ï¼Œåˆ™æ–°å»º
         if (!targetFile.exists()) {
             targetFile.mkdirs();
         }
@@ -466,20 +466,20 @@ public class DispatchService {
             zipFile.mkdirs();
         }
 
-        //»ñÈ¡±ê×¼°æ±¾ĞÅÏ¢
+        //è·å–æ ‡å‡†ç‰ˆæœ¬ä¿¡æ¯
         List<CDAVersion> listVersion = new ArrayList<CDAVersion>();
         CDAVersion sourceVersion = cdaVersionService.retrieve(sourceVersionId);
         listVersion.add(sourceVersion);
 
-        //´´½¨ÎÄµµ
+        //åˆ›å»ºæ–‡æ¡£
         createFiles(strXMLFilePath, listVersion, sourceVersionId);
 
-        //Ô´ÎÄ¼şÂ·¾¶
+        //æºæ–‡ä»¶è·¯å¾„
         String strCDAFilePath =  strFilePath + splitMark+"xml" +splitMark+sourceVersion.getVersion()+splitMark;
         File file = new File(strCDAFilePath);
-        //ÅĞ¶ÏÎÄ¼ş¼ĞÊÇ·ñ´æÔÚ
+        //åˆ¤æ–­æ–‡ä»¶å¤¹æ˜¯å¦å­˜åœ¨
         if (file.exists()) {
-            //Ä¿±êÎÄ¼şÂ·¾¶
+            //ç›®æ ‡æ–‡ä»¶è·¯å¾„
             String strCDAFileZipPath = strXMLFilePath+"CDA_File"+splitMark;
             File fileCDAZip = new File(strCDAFileZipPath);
             if(!fileCDAZip.exists()) {
@@ -489,19 +489,19 @@ public class DispatchService {
             File[] fileCDA=file.listFiles();
             for (int i = 0; i < fileCDA.length; i++) {
                 if(fileCDA[i].isFile()){
-                    //¸´ÖÆÎÄ¼ş
+                    //å¤åˆ¶æ–‡ä»¶
                     copyFile(fileCDA[i],new File(strCDAFileZipPath+fileCDA[i].getName()));
                 }
             }
         }
 
-        //Éú³ÉZipÎÄ¼ş
+        //ç”ŸæˆZipæ–‡ä»¶
         Zipper zipper = new Zipper();
         File resourcesFile = new File(strXMLFilePath);
         String strPwd = UUID.randomUUID().toString();
         zipper.zipFile(resourcesFile, strZIPFilePath + strFileName, strPwd);
 
-        //½«ÎÄ¼şÉÏ´«µ½·şÎñÆ÷ÖĞ
+        //å°†æ–‡ä»¶ä¸Šä¼ åˆ°æœåŠ¡å™¨ä¸­
         ObjectNode msg = new FastDFSUtil().upload(strZIPFilePath + strFileName, "");
 
         resultMap.put(FastDFSUtil.GroupField, msg.get(FastDFSUtil.GroupField).asText());//setFilePath
@@ -528,33 +528,33 @@ public class DispatchService {
 
     private void createFiles(String strXMLFilePath, List<CDAVersion> listVersion, String sourceVersionId)
         throws Exception{
-        //´´½¨°æ±¾ÎÄ¼ş
+        //åˆ›å»ºç‰ˆæœ¬æ–‡ä»¶
         createStandardVersionFile(strXMLFilePath, "std_inner_version.xml", listVersion);
 
-        //´´½¨Êı¾İ¼¯ÎÄ¼ş£¬²¢»ñÈ¡Êı¾İÔªĞÅÏ¢
+        //åˆ›å»ºæ•°æ®é›†æ–‡ä»¶ï¼Œå¹¶è·å–æ•°æ®å…ƒä¿¡æ¯
         List<IMetaData> listMateData =
                 createDataSetFile(strXMLFilePath, "std_dataset.xml",
                     dataSetService.findAll(dataSetService.getServiceEntity(sourceVersionId)));
 
-        //´´½¨Êı¾İÔªÎÄ¼ş
+        //åˆ›å»ºæ•°æ®å…ƒæ–‡ä»¶
         createMetaDataFile(strXMLFilePath, "std_metadata.xml", sourceVersionId, listMateData);
 
-        //´´½¨CDAÎÄµµ
+        //åˆ›å»ºCDAæ–‡æ¡£
 //        String strCDAFileName = "std_cda.xml";
 //        List<CDADocument> listCDA = Arrays.asList(xcdaDocumentManager.getDocumentList(sourceVersion.getVersion(), ""));
 //        createCDAFile(strXMLFilePath, strCDAFileName, listCDA);
 
-        //´´½¨¹ØÏµÎÄµµ
+        //åˆ›å»ºå…³ç³»æ–‡æ¡£
 //        String strRelationFileName = "std_cda_dataset_relationship.xml";
 //        List<XCdaDatasetRelationship> listRelation = Arrays.asList(xCdaDatasetRelationshipManager.getRelationshipByVersion(sourceVersion.getVersion()));
 //        createCDADatasetRelationshipFile(strXMLFilePath, strRelationFileName, listRelation);
 
-        //´´½¨×ÖµäÎÄµµ£¬²¢»ñÈ¡×ÖµäÖµĞÅÏ¢
+        //åˆ›å»ºå­—å…¸æ–‡æ¡£ï¼Œå¹¶è·å–å­—å…¸å€¼ä¿¡æ¯
         List<IDictEntry> listEntry =
                 createDictFile(strXMLFilePath, "std_dict.xml",
                         dictService.findAll(dictService.getServiceEntity(sourceVersionId)));
 
-        //´´½¨×ÖµäÖµÎÄµµ
+        //åˆ›å»ºå­—å…¸å€¼æ–‡æ¡£
         createDictEntryFile(strXMLFilePath, "std_dict_item.xml", sourceVersionId, listEntry);
     }
 }

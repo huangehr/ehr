@@ -1,6 +1,7 @@
 package com.yihu.ehr.ha.organization.service;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.org.MOrganization;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -18,7 +19,7 @@ import java.util.Map;
 /**
  * Created by AndyCai on 2016/2/1.
  */
-@FeignClient("svr-org")
+@FeignClient(MicroServices.OrganizationMgr)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface OrganizationClient {

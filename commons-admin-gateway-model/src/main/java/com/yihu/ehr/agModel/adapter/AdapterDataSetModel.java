@@ -1,41 +1,36 @@
-package com.yihu.ehr.adaption.dataset.service;
+package com.yihu.ehr.agModel.adapter;
+
+import com.yihu.ehr.util.validate.Required;
+import com.yihu.ehr.util.validate.Valid;
 
 /**
  * @author lincl
  * @version 1.0
  * @created 2016.2.3
  */
+@Valid
 public class AdapterDataSetModel {
 
-	/**
-	 * 适配数据集ID
-	 */
 	private Long id;
-	/**
-	 * 所属方案
-	 */
 	private Long adapterPlanId;
 	/**
-	 * 所属标准数据集
+	 * 数据集
 	 */
 	private Long dataSetId;
 	private String dataSetCode;
 	private String dataSetName;
 
 	/**
-	 * 标准数据元
+	 * 数据元
 	 */
 	private Long metaDataId;
 	private String metaDataCode;
 	private String metaDataName;
 
-	/**
-	 * 数据类型
-	 */
 	private String dataType;
 	private String dataTypeName;
 	/**
-	 * 所属机构数据集
+	 * 机构数据集
 	 */
 	private Long orgDataSetSeq;
 	private String orgDataSetCode;
@@ -61,6 +56,7 @@ public class AdapterDataSetModel {
 		this.id = id;
 	}
 
+	@Required(filedName = "适配方案")
 	public Long getAdapterPlanId() {
 		return adapterPlanId;
 	}
@@ -69,6 +65,7 @@ public class AdapterDataSetModel {
 		this.adapterPlanId = adapterPlanId;
 	}
 
+	@Required(filedName = "标准数据集")
 	public Long getDataSetId() {
 		return dataSetId;
 	}
@@ -77,6 +74,7 @@ public class AdapterDataSetModel {
 		this.dataSetId = dataSetId;
 	}
 
+	@Required(filedName = "标准数据元")
 	public Long getMetaDataId() {
 		return metaDataId;
 	}

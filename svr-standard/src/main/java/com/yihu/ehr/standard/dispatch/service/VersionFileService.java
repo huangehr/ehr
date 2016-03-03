@@ -13,11 +13,11 @@ import java.util.Date;
 
 
 /**
- * ¹ÜÀí±ê×¼°æ±¾ÎÄ¼ş
+ * ç®¡ç†æ ‡å‡†ç‰ˆæœ¬æ–‡ä»¶
  *
  * @author AndyCai
  * @version 1.0
- * @created 24-7ÔÂ-2015 13:56:50
+ * @created 24-7æœˆ-2015 13:56:50
  */
 @Transactional
 @Service
@@ -25,8 +25,8 @@ public class VersionFileService extends BaseHbmService {
 
 
     /**
-     * ¸ù¾İ´ı±È½ÏÓë±»±È½Ï±ê×¼°æ±¾ID»ñÈ¡°æ±¾ÎÄ¼şĞÅÏ¢
-     * ³õÊ¼°æ±¾Ôò ±»±È½Ï±ê×¼°æ±¾IDÎª0
+     * æ ¹æ®å¾…æ¯”è¾ƒä¸è¢«æ¯”è¾ƒæ ‡å‡†ç‰ˆæœ¬IDè·å–ç‰ˆæœ¬æ–‡ä»¶ä¿¡æ¯
+     * åˆå§‹ç‰ˆæœ¬åˆ™ è¢«æ¯”è¾ƒæ ‡å‡†ç‰ˆæœ¬IDä¸º0
      *
      * @param sourceVersionId
      * @param targetVersionId
@@ -58,7 +58,7 @@ public class VersionFileService extends BaseHbmService {
     }
 
     /**
-     * ±£´æ°æ±¾ÎÄ¼şĞÅÏ¢£¨³õÊ¼°æ±¾µÄ ±»±È½Ï°æ±¾ID(¼´targetVersionId) Îª¿Õ£©
+     * ä¿å­˜ç‰ˆæœ¬æ–‡ä»¶ä¿¡æ¯ï¼ˆåˆå§‹ç‰ˆæœ¬çš„ è¢«æ¯”è¾ƒç‰ˆæœ¬ID(å³targetVersionId) ä¸ºç©ºï¼‰
      *
      * @param info
      */
@@ -70,7 +70,7 @@ public class VersionFileService extends BaseHbmService {
 
         String strSql;
         Query query;
-        //ÏÈ»ñÈ¡×Öµä×î´ó±àºÅ
+        //å…ˆè·å–å­—å…¸æœ€å¤§ç¼–å·
         strSql = "select max(id) from std_version_file_info";
         query = session.createSQLQuery(strSql);
         Object object = query.uniqueResult();
