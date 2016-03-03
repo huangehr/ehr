@@ -89,10 +89,10 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
     public boolean updateAdapterPlan(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") Long id,
-            @ApiParam(name = "parmJson", value = "数据模型", defaultValue = "")
-            @RequestParam(value = "parmJson") String parmJson) throws Exception {
+            @ApiParam(name = "json_data", value = "数据模型", defaultValue = "")
+            @RequestParam(value = "json_data") String jsonData) throws Exception {
 
-        return saveModel(parmJson, "", id);
+        return saveModel(jsonData, "", id);
     }
 
 

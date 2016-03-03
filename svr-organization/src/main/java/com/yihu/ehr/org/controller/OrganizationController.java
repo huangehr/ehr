@@ -131,6 +131,23 @@ public class OrganizationController extends BaseRestController {
     }
 
 
+
+    /**
+     * 根据管理员登录帐号获取机构
+     * @param adminLoginCode
+     * @return
+     */
+    @RequestMapping(value = "/organizations/admin/{admin_login_code}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据机构代码获取机构")
+    public MOrganization getOrgByAdminLoginCode(
+            @ApiParam(name = "admin_login_code", value = "管理员登录帐号", defaultValue = "")
+            @PathVariable(value = "admin_login_code") String adminLoginCode) throws Exception{
+        Organization org = orgService.getOrgByAdminLoginCode(adminLoginCode);
+        MOrganization orgModel = convertToModel(org,MOrganization.class);
+        return orgModel;
+    }
+
+
     /**
      * 根据name获取机构orgCodes
      * @param name
