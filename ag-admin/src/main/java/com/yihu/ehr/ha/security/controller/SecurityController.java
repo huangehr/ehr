@@ -1,9 +1,11 @@
 package com.yihu.ehr.ha.security.controller;
 
+import com.yihu.ehr.agModel.security.UserSecurityModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.security.service.SecurityClient;
 import com.yihu.ehr.model.security.MUserSecurity;
 import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -21,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(ApiVersion.Version1_0 +"/admin")
 @RestController
 @Api(value = "sec", description = "安全管理接口，用于安全验证管理", tags = {"安全管理接口"})
-public class SecurityController {
+public class SecurityController extends BaseController{
 
     @Autowired
     private SecurityClient securityClient;
@@ -36,10 +38,11 @@ public class SecurityController {
         Envelop envelop = new Envelop();
 
         MUserSecurity mUserSecurity = securityClient.getUserSecurityByLoginCode(loginCode);
+        UserSecurityModel userSecurityModel = convertToModel(mUserSecurity,UserSecurityModel.class);
 
         if(mUserSecurity != null){
             envelop.setSuccessFlg(true);
-            envelop.setObj(mUserSecurity);
+            envelop.setObj(userSecurityModel);
         }else {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("获取用户公钥失败");
@@ -59,10 +62,11 @@ public class SecurityController {
         Envelop envelop = new Envelop();
 
         MUserSecurity mUserSecurity = securityClient.getUserSecurityByOrgCode(orgCode);
+        UserSecurityModel userSecurityModel = convertToModel(mUserSecurity,UserSecurityModel.class);
 
-        if(mUserSecurity != null){
+        if(userSecurityModel != null){
             envelop.setSuccessFlg(true);
-            envelop.setObj(mUserSecurity);
+            envelop.setObj(userSecurityModel);
         }else {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("获取企业公钥失败");
@@ -192,10 +196,11 @@ public class SecurityController {
         Envelop envelop = new Envelop();
 
         MUserSecurity mUserSecurity = securityClient.createSecurityByOrgCode(orgCode);
+        UserSecurityModel userSecurityModel = convertToModel(mUserSecurity,UserSecurityModel.class);
 
-        if(mUserSecurity != null){
+        if(userSecurityModel != null){
             envelop.setSuccessFlg(true);
-            envelop.setObj(mUserSecurity);
+            envelop.setObj(userSecurityModel);
         }else {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("创建机构security失败");
@@ -331,10 +336,11 @@ public class SecurityController {
         Envelop envelop = new Envelop();
 
         MUserSecurity mUserSecurity = securityClient.createSecurityByUserId(userId);
+        UserSecurityModel userSecurityModel = convertToModel(mUserSecurity,UserSecurityModel.class);
 
-        if(mUserSecurity != null){
+        if(userSecurityModel != null){
             envelop.setSuccessFlg(true);
-            envelop.setObj(mUserSecurity);
+            envelop.setObj(userSecurityModel);
         }else {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("创建Security失败");
@@ -378,10 +384,11 @@ public class SecurityController {
         Envelop envelop = new Envelop();
 
         MUserSecurity mUserSecurity = securityClient.getUserSecurityByUserId(userId);
+        UserSecurityModel userSecurityModel = convertToModel(mUserSecurity,UserSecurityModel.class);
 
-        if(mUserSecurity != null){
+        if(userSecurityModel != null){
             envelop.setSuccessFlg(true);
-            envelop.setObj(mUserSecurity);
+            envelop.setObj(userSecurityModel);
         }else {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("获取UserSecurity失败");

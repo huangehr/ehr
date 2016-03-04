@@ -39,8 +39,8 @@ public class AdapterPlanTests {
 		plan.setType("1");
 		plan.setVersion("00000000000");
 		String json = new ObjectMapper().writeValueAsString(plan);
-		boolean rs = orgAdapterPlanController.saveAdapterPlan(new ObjectMapper().writeValueAsString(plan), "true");
-		assertTrue("新增失败", rs);
+		MAdapterPlan rs = orgAdapterPlanController.saveAdapterPlan(new ObjectMapper().writeValueAsString(plan), "true");
+		assertTrue("新增失败", rs!=null);
 	}
 
 	@Test
@@ -55,8 +55,8 @@ public class AdapterPlanTests {
 		plan.setType("1");
 		plan.setVersion("00000000000");
 		String json = new ObjectMapper().writeValueAsString(plan);
-		boolean rs = orgAdapterPlanController.updateAdapterPlan(2L, json);
-		assertTrue("修改失败！", rs);
+		MAdapterPlan rs = orgAdapterPlanController.updateAdapterPlan(2L, json);
+		assertTrue("修改失败！", rs!=null);
 	}
 
 	@Test

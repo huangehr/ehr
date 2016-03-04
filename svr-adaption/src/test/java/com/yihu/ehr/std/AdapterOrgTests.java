@@ -25,16 +25,9 @@ public class AdapterOrgTests {
 
 	@Test
 	public void testAddAdapterOrg() throws Exception{
-		AdapterOrg org = new AdapterOrg();
-		org.setCode("test1");
-		org.setType("1");
-		org.setArea("0000");
-		org.setDescription("test");
-		org.setName("test1");
-		org.setOrg("org");
-		org.setParent("parent");
-		boolean rs = adapterOrgController.addAdapterOrg(org);
-		assertTrue("新增失败", rs);
+		String model = "";
+		MAdapterOrg rs = adapterOrgController.addAdapterOrg(model);
+		assertTrue("新增失败", rs!=null);
 	}
 
 	@Test
@@ -42,8 +35,8 @@ public class AdapterOrgTests {
 		String code = "test1";
 		String name = "test1";
 		String desc = "test2";
-		boolean rs = adapterOrgController.updateAdapterOrg(code, name, desc);
-		assertTrue("修改失败！", rs);
+		MAdapterOrg rs = adapterOrgController.updateAdapterOrg(code, name, desc);
+		assertTrue("修改失败！", rs!=null);
 	}
 
 	@Test

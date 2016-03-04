@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lincl
@@ -36,9 +37,9 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
         return  metaDataService.getServiceEntity(version);
     }
 
-    @RequestMapping(value = "/metadatas", method = RequestMethod.GET)
+    @RequestMapping(value = "/meta_datas", method = RequestMethod.GET)
     @ApiOperation(value = "查询数据元")
-    public Collection searchDataSets(
+    public Collection<MStdMetaData> searchDataSets(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -61,7 +62,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
     }
 
 
-    @RequestMapping(value = "/metadatas", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/meta_datas", method = RequestMethod.DELETE)
     @ApiOperation(value = "批量删除数据元")
     public boolean deleteMetaDatas(
             @ApiParam(name = "ids", value = "编号集", defaultValue = "")
@@ -73,7 +74,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
         return true;
     }
 
-    @RequestMapping(value = "/dataset/{dataSetId}/metadata", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/data_set/{dataSetId}/meta_data", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据集关联的数据元")
     public boolean deleteMetaDataByDataSet(
             @ApiParam(name = "dataSetId", value = "数据集编号", defaultValue = "")
@@ -84,7 +85,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
         return metaDataService.deleteByField("dataSetId", dataSetId, getServiceEntity(version)) > 0;
     }
 
-    @RequestMapping(value = "/metadata/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/meta_data/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据元")
     public boolean deleteMetaData(
             @ApiParam(name = "id", value = "编号集", defaultValue = "")
@@ -96,7 +97,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
         return true;
     }
 
-    @RequestMapping(value = "/metadata/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/meta_data/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "获取数据元")
     public MStdMetaData getMetaData(
             @ApiParam(name = "id", value = "数据元编号", defaultValue = "")
@@ -108,43 +109,47 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
     }
 
 
-    @RequestMapping(value = "/metadata", method = RequestMethod.PUT)
+    @RequestMapping(value = "/meta_data", method = RequestMethod.PUT)
     @ApiOperation(value = "更新数据元")
-    public boolean updataMetaSet(
+    public MStdMetaData updataMetaSet(
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version,
             @ApiParam(name = "model", value = "数据源模型", defaultValue = "")
-            @RequestParam(value = "model", required = false) IMetaData model) throws Exception{
+            @RequestParam(value = "model", required = false) String model) throws Exception{
 
         Class entityClass = getServiceEntity(version);
-        IMetaData metaData = metaDataService.retrieve(model.getId(), entityClass);
+        IMetaData metaDataModel = (IMetaData) jsonToObj(model, entityClass);
+        IMetaData metaData = metaDataService.retrieve(metaDataModel.getId(), entityClass);
         if(metaData.getId()==0)
-            throw errNotFound();
+            throw errNotFound("数据元", metaDataModel.getId());
 
-        if(!metaData.getCode().equals(model.getCode())
-                && metaDataService.isColumnValExsit(model.getDataSetId(), "code", model.getCode(), entityClass))
+        if(!metaData.getCode().equals(metaDataModel.getCode())
+                && metaDataService.isColumnValExsit(metaDataModel.getDataSetId(), "code", metaDataModel.getCode(), entityClass))
             throw errRepeatCode();
 
         BeanUtils.copyProperties(model, metaData);
-        metaDataService.save(metaData);
-        return true;
+        metaDataService.save(metaDataModel);
+        return getModel(metaDataModel);
     }
 
-    @RequestMapping(value = "/metadata", method = RequestMethod.POST)
+    @RequestMapping(value = "/meta_data", method = RequestMethod.POST)
     @ApiOperation(value = "新增数据元")
-    public boolean saveMetaSet(
+    public MStdMetaData saveMetaSet(
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version,
             @ApiParam(name = "model", value = "数据源模型", defaultValue = "")
-            @RequestParam(value = "model", required = false) IMetaData model) throws Exception{
+            @RequestParam(value = "model", required = false) String model) throws Exception{
 
-        if(metaDataService.isColumnValExsit(model.getDataSetId(), "code", model.getCode(), getServiceEntity(version)))
+        IMetaData metaData = (IMetaData) jsonToObj(model, getServiceEntity(version));
+        if(metaDataService.isColumnValExsit(metaData.getDataSetId(), "code", metaData.getCode(), getServiceEntity(version)))
             throw errRepeatCode();
-
-        return metaDataService.saveMetaData(model, version);
+        if(metaDataService.saveMetaData(metaData, version))
+            return getModel(metaData);
+        return null;
     }
 
-    @RequestMapping(value = "/metadata/validate/code", method = RequestMethod.GET)
+
+    @RequestMapping(value = "/meta_data/validate/code", method = RequestMethod.GET)
     @ApiOperation(value = "验证数据元代码是否重复")
     public boolean validateCode(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
@@ -157,7 +162,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
         return metaDataService.isColumnValExsit(dataSetId, "code", code, getServiceEntity(version));
     }
 
-    @RequestMapping(value = "/metadata/validate/name", method = RequestMethod.GET)
+    @RequestMapping(value = "/meta_data/validate/name", method = RequestMethod.GET)
     @ApiOperation(value = "验证数据元名称是否重复")
     public boolean validatorName(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
@@ -170,4 +175,14 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
         return metaDataService.isColumnValExsit(dataSetId, "name", name, getServiceEntity(version));
     }
 
+    @RequestMapping(value = "/meta_datas/map", method = RequestMethod.GET)
+    @ApiOperation(value = "获取数据元 id-name : map集")
+    public Map getMetaDataMapByIds(
+            @ApiParam(name = "version", value = "版本号", defaultValue = "")
+            @RequestParam(value = "version") String version,
+            @ApiParam(name = "medaIds", value = "数据元编号", defaultValue = "")
+            @RequestParam(value = "medaIds") String metaIds) {
+
+        return metaDataService.getMetaDataMapByIds(strToLongArr(metaIds), version);
+    }
 }

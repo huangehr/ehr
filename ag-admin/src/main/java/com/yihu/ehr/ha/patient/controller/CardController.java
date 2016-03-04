@@ -151,15 +151,11 @@ public class CardController extends BaseController {
             @ApiParam(name = "card_type", value = "卡类别", defaultValue = "")
             @RequestParam(value = "card_type") String cardType) throws Exception {
 
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
         MAbstractCard cardInfo = cardClient.getCard(id, cardType);
         CardDetailModel detailModel = convertToModel(cardInfo,CardDetailModel.class);
         if(detailModel!=null)
         {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("数据获取失败!");
-            return envelop;
+            return failed("数据获取失败!");
         }
         MConventionalDict dict = conventionalDictEntryClient.getCardType(detailModel.getCardType());
         detailModel.setTypeName(dict.getValue());
@@ -169,9 +165,8 @@ public class CardController extends BaseController {
 
         MOrganization organization = orgClient.getOrg(detailModel.getReleaseOrg());
         detailModel.setReleaseOrgName(organization.getFullName());
-        envelop.setObj(detailModel);
 
-        return envelop;
+        return success(detailModel);
     }
 
     /**

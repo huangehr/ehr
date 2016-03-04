@@ -21,7 +21,8 @@ import java.util.List;
 public class ExtendController<T>  extends BaseRestController{
 
     protected Long[] strToLongArr(String str){
-
+        if(str==null || str.trim().length()==0)
+            return new Long[0];
         return strArrToLongArr(str.split(","));
     }
 
@@ -61,23 +62,23 @@ public class ExtendController<T>  extends BaseRestController{
     }
 
     protected ApiException errMissCode(){
-        return errMissParm("代码不能为空！");
+        return errMissParm("代码");
     }
 
     protected ApiException errMissId(){
-        return errMissParm("编号不能为空！");
+        return errMissParm("编号");
     }
 
     protected ApiException errRepeatCode(){
-        return new ApiException(ErrorCode.RepeatCode, "代码已存在!");
+        return new ApiException(ErrorCode.RepeatCode);
     }
 
     protected ApiException errMissParm(String msg){
         return new ApiException(ErrorCode.MissParameter, msg);
     }
 
-    protected ApiException errNotFound(){
-        return new ApiException(ErrorCode.NotFoundObj, "不存在该对象！");
+    protected ApiException errNotFound(String objName, Object id){
+        return new ApiException(ErrorCode.NotFoundObj, objName, String.valueOf(id));
     }
 
     protected ApiException errMissVersion(){

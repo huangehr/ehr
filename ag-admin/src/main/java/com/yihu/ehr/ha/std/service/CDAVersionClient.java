@@ -39,20 +39,20 @@ public interface CDAVersionClient {
 
 
     @RequestMapping(value = "/cdaVersions/{version}/isLatest", method = RequestMethod.GET)
-    @ApiOperation(value = "判断是否最新版本")
+    @ApiOperation(value = "判断是否是最新已发布版本")
     boolean isLatestVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @PathVariable(value = "version") String version);
 
     @RequestMapping(value = "/cdaVersion", method = RequestMethod.POST)
     @ApiOperation(value = "新增cda版本")
-    boolean addVersion(
+    MCDAVersion addVersion(
             @ApiParam(name = "userLoginCode", value = "用户登录名")
             @RequestParam(value = "userLoginCode") String userLoginCode);
 
 
     @RequestMapping(value = "/cdaVersion/{version}/drop", method = RequestMethod.DELETE)
-    @ApiOperation(value = "丢弃版本")
+    @ApiOperation(value = "删除版本版本（编辑状态/非编辑状态）")
     boolean dropCDAVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @PathVariable(value = "version") String version);
@@ -71,19 +71,25 @@ public interface CDAVersionClient {
             @PathVariable(value = "version") String version);
 
     @RequestMapping(value = "/cdaVersion/{version}/rollbackToStage", method = RequestMethod.PUT)
-    @ApiOperation(value = "将最新的已发布版本回滚为编辑状态")
-    public boolean rollbackToStage(
+    @ApiOperation(value = "将最新的已发布版本修改为编辑状态")
+    boolean rollbackToStage(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @RequestParam(value = "version") String version);
 
 
-    @RequestMapping(value = "/cdaVersion/{strVersion}", method = RequestMethod.PUT)
-    @ApiOperation(value = "将最新的已发布版本回滚为编辑状态")
-    public boolean updateVersion(
-            @ApiParam(name = "vesion", value = "版本号", defaultValue = "")
-            @RequestParam(value = "vesion") String vesion,
-            @ApiParam(name = "vesionName", value = "版本名称", defaultValue = "")
-            @RequestParam(value = "vesionName") String vesionName);
+    @RequestMapping(value = "/cdaVersion/{version}", method = RequestMethod.PUT)
+    @ApiOperation(value = "修改版本信息")
+    MCDAVersion updateVersion(
+            @ApiParam(name = "version", value = "版本号", defaultValue = "")
+            @PathVariable(value = "version") String version,
+            @ApiParam(name = "versionName", value = "版本名称", defaultValue = "")
+            @RequestParam(value = "versionName") String versionName,
+            @ApiParam(name = "userCode", value = "操作者", defaultValue = "")
+            @RequestParam(value = "userCode") String userCode,
+            @ApiParam(name = "inStage", value = "编辑状态", defaultValue = "")
+            @RequestParam(value = "inStage") int inStage,
+            @ApiParam(name = "baseVersion", value = "父版本", defaultValue = "")
+            @RequestParam(value = "baseVersion") String baseVersion);
 
 
     @RequestMapping(value = "/cdaVersion/checkName", method = RequestMethod.GET)
@@ -96,5 +102,11 @@ public interface CDAVersionClient {
     @RequestMapping(value = "/cdaVersion/existInStage", method = RequestMethod.GET)
     @ApiOperation(value = "检查是否存在处于编辑状态的版本")
     boolean existInStage();
+
+    @RequestMapping(value = "/cdaVersion/{version}", method = RequestMethod.GET)
+    @ApiOperation(value = "获取版本信息")
+    MCDAVersion getVersion(
+            @ApiParam(name = "version", value = "版本号", defaultValue = "")
+            @PathVariable(value = "version") String version);
 
 }

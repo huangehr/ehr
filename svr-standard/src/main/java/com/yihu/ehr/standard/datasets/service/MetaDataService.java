@@ -5,10 +5,18 @@ import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.query.BaseHbmService;
 import com.yihu.ehr.standard.cdaversion.service.CDAVersion;
 import com.yihu.ehr.util.CDAVersionUtil;
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 数据元管理接口实现。
@@ -31,7 +39,7 @@ public class MetaDataService extends BaseHbmService<IMetaData>{
         try {
             return Class.forName(ENTITY_PRE + version);
         } catch (ClassNotFoundException e) {
-            throw new ApiException(ErrorCode.NotFoundMetaDataView);
+            throw new ApiException(ErrorCode.NotFoundEntity, "数据元版本", version);
         }
     }
 
@@ -74,4 +82,22 @@ public class MetaDataService extends BaseHbmService<IMetaData>{
         return deleteByField("dataSetId", dataSetIds, getServiceEntity(version)) > 0;
     }
 
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public Map getMetaDataMapByIds(Long[] ids, String version) {
+        Criteria criteria = currentSession().createCriteria(getServiceEntity(version));
+        if (ids != null && ids.length != 0)
+            criteria.add(Restrictions.in("id", ids));
+        List<MetaData> records = criteria.list();
+        Map<Long, Map<Long, String>> rs = new HashMap<>();
+        Map<Long, String> ch;
+        for(MetaData metaData : records){
+            ch = rs.get(metaData.getDataSetId());
+            if (ch == null) {
+                ch = new HashMap<>();
+                rs.put(metaData.getDataSetId(), ch);
+            }
+            ch.put(metaData.getId(), metaData.getName());
+        }
+        return rs;
+    }
 }

@@ -2,6 +2,7 @@ package com.yihu.ehr.std;
 
 import com.eureka2.shading.codehaus.jackson.map.ObjectMapper;
 import com.yihu.ehr.StandardServiceApp;
+import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.standard.cda.controller.CdaController;
 import com.yihu.ehr.standard.cda.service.CDADocument;
 import org.junit.FixMethodOrder;
@@ -40,7 +41,7 @@ public class CdaControllerTests {
         String type = "0dae0006567210a6269e0319806c0f24";
         Integer page = 1;
         Integer rows = 10;
-        Object result = cdaController.GetCDADocuments(strVersion,code,name,type,page,rows);
+        Object result = cdaController.GetCDADocuments(strVersion,code,name,type,page,rows,null,null);
         assertTrue("查询失败！" , result != null);
     }
 
@@ -58,7 +59,7 @@ public class CdaControllerTests {
         String strVersion = "000000000000";
         Integer page = 1;
         Integer rows = 10;
-        Object result = cdaController.getCDADataSetRelationships(cda_Id,strVersion,page,rows);
+        Object result = cdaController.getCDADataSetRelationships(cda_Id,strVersion,page,rows,null,null);
         assertTrue("查询失败！" , result != null);
     }
 
@@ -66,10 +67,10 @@ public class CdaControllerTests {
     public void dSaveCdaInfo() throws Exception{
         String[] ids = new String[]{"0dae00065683df1fb11bbb211c8a9092"};
         String strVersion = "000000000000";
-        CDADocument cdaDocument = cdaController.getCDADocumentById(ids,strVersion).get(0);
+        MCDADocument cdaDocument = cdaController.getCDADocumentById(ids,strVersion).get(0);
         cdaDocument.setCode("test");
         String jsonData = new ObjectMapper().writeValueAsString(cdaDocument);
-        Object result = cdaController.saveCdaInfo(jsonData);
+        Object result = cdaController.saveCDADocuments(jsonData);
         assertTrue("保存失败！" , result != null);
     }
 
@@ -77,7 +78,7 @@ public class CdaControllerTests {
     public void eDeleteCdaInfo() throws Exception{
         String[] ids = new String[]{"0dae00065683df1fb11bbb211c8a9092"};
         String strVersion = "000000000000";
-        Object result = cdaController.deleteCdaInfo(ids,strVersion);
+        Object result = cdaController.deleteCDADocuments(ids,strVersion);
         assertTrue("查询失败！" , result != null);
     }
 
@@ -95,7 +96,7 @@ public class CdaControllerTests {
     public void gDeleteDataSetRelationship() throws Exception{
         String[] relationIds = new String[]{"0dae0006568244cc0dc356006a770371"};
         String versionCode = "000000000000";
-        Object result = cdaController.deleteCDADataSetRelationship(relationIds,versionCode);
+        Object result = cdaController.deleteCDADataSetRelationship(versionCode,relationIds);
         assertTrue("删除失败！" , result != null);
     }
 

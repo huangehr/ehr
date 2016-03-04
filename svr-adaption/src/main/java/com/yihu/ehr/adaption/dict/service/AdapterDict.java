@@ -36,7 +36,7 @@ public class AdapterDict {
     /**
      * 机构字典项
      */
-    private Long orgDictItemSeq;
+    private Long orgDictEntrySeq;
     /**
      * 说明
      */
@@ -91,12 +91,12 @@ public class AdapterDict {
     }
 
     @Column(name = "org_dictentry", unique = false, nullable = true)
-    public Long getOrgDictItemSeq() {
-        return orgDictItemSeq;
+    public Long getOrgDictEntrySeq() {
+        return orgDictEntrySeq;
     }
 
-    public void setOrgDictItemSeq(Long orgDictItemSeq) {
-        this.orgDictItemSeq = orgDictItemSeq;
+    public void setOrgDictEntrySeq(Long orgDictEntrySeq) {
+        this.orgDictEntrySeq = orgDictEntrySeq;
     }
 
     @Column(name = "description", unique = false, nullable = true)

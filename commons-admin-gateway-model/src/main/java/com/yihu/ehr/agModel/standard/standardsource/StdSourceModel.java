@@ -8,9 +8,9 @@ public class StdSourceModel {
     private String code;
     private String name;
     private String sourceType;
-    private String sourceName;
-    private String create_date;
-    private String create_user;
+    private String sourceValue;
+    private String createDate;
+    private String createUser;
     private String description;
 
     public String getId() {
@@ -45,28 +45,28 @@ public class StdSourceModel {
         this.sourceType = sourceType;
     }
 
-    public String getSourceName() {
-        return sourceName;
+    public String getSourceValue() {
+        return sourceValue;
     }
 
-    public void setSourceName(String sourceName) {
-        this.sourceName = sourceName;
+    public void setSourceValue(String sourceValue) {
+        this.sourceValue = sourceValue;
     }
 
-    public String getCreate_date() {
-        return create_date;
+    public String getCreateDate() {
+        return createDate;
     }
 
-    public void setCreate_date(String create_date) {
-        this.create_date = create_date;
+    public void setCreateDate(String createDate) {
+        this.createDate = createDate;
     }
 
-    public String getCreate_user() {
-        return create_user;
+    public String getCreateUser() {
+        return createUser;
     }
 
-    public void setCreate_user(String create_user) {
-        this.create_user = create_user;
+    public void setCreateUser(String createUser) {
+        this.createUser = createUser;
     }
 
     public String getDescription() {

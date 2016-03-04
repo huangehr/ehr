@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.standard;
 
+import java.util.Date;
+
 /**
  * @author lincl
  * @version 1.0
@@ -9,10 +11,10 @@ public class MStdSource {
     private String id;
     private String code;
     private String name;
-    private String create_date;
-    private String create_user;
-    private String update_date;
-    private String update_user;
+    private Date createDate;
+    private String createUser;
+    private Date updateDate;
+    private String updateUser;
     private String description;
 
     private String sourceType;
@@ -57,20 +59,6 @@ public class MStdSource {
         this.description = description;
     }
 
-    public String getCreateUser() {
-        return this.create_user;
-    }
-    public void setCreateUser(String create_user) {
-        this.create_user = create_user;
-    }
-
-    public String getUpdateUser() {
-        return this.update_user;
-    }
-    public void setUpdateUser(String update_user) {
-        this.update_user = update_user;
-    }
-
     public String getSourceValue() {
         return sourceValue;
     }
@@ -79,35 +67,35 @@ public class MStdSource {
         this.sourceValue = sourceValue;
     }
 
-    public String getCreate_date() {
-        return create_date;
+    public Date getCreateDate() {
+        return createDate;
     }
 
-    public void setCreate_date(String create_date) {
-        this.create_date = create_date;
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
     }
 
-    public String getCreate_user() {
-        return create_user;
+    public String getCreateUser() {
+        return createUser;
     }
 
-    public void setCreate_user(String create_user) {
-        this.create_user = create_user;
+    public void setCreateUser(String createUser) {
+        this.createUser = createUser;
     }
 
-    public String getUpdate_date() {
-        return update_date;
+    public Date getUpdateDate() {
+        return updateDate;
     }
 
-    public void setUpdate_date(String update_date) {
-        this.update_date = update_date;
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
     }
 
-    public String getUpdate_user() {
-        return update_user;
+    public String getUpdateUser() {
+        return updateUser;
     }
 
-    public void setUpdate_user(String update_user) {
-        this.update_user = update_user;
+    public void setUpdateUser(String updateUser) {
+        this.updateUser = updateUser;
     }
 }

@@ -1,5 +1,7 @@
 package com.yihu.ehr.adaption.feignclient;
 
+import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.MicroServices;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
@@ -13,18 +15,18 @@ import java.util.Map;
 
 
 /**
- * Created by Administrator on 2016/1/4.
+ * @author lincl
+ * @version 1.0
+ * @created 2016.2.1
  */
 @EnableFeignClients
-@FeignClient("svr-standard")
-@RequestMapping("/rest")
+@FeignClient(MicroServices.StandardMgr)
+@RequestMapping(ApiVersion.Version1_0 + "/std/")
 public interface DictClient {
 
-    @RequestMapping(value = "/{api_version}/cdadict/map", method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/map", method = RequestMethod.GET)
     @ApiOperation(value = "获取字典 map集")
-    public Map getDataSetMapByIds(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable( value = "api_version") String apiVersion,
+    public Map getDictMapByIds(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @RequestParam(value = "version") String version,
             @ApiParam(name = "dataSetId", value = "数据集编号", defaultValue = "")

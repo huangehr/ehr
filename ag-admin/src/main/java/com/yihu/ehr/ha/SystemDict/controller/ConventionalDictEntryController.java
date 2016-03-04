@@ -4,7 +4,6 @@ import com.yihu.ehr.agModel.dict.SystemDictEntryModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.util.Array_ListUtil;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.ApiOperation;
@@ -340,8 +339,7 @@ public class ConventionalDictEntryController extends BaseController{
             @RequestParam(value = "codes") String[] codes) {
 
         Envelop envelop = new Envelop();
-
-        List<MConventionalDict> mConventionalDictList = dictEntryClient.getStdSourceTypeList(Array_ListUtil.getList(codes));
+        List<MConventionalDict> mConventionalDictList = dictEntryClient.getStdSourceTypeList(Arrays.asList(codes));
         List<SystemDictEntryModel> systemDictEntryModelList = new ArrayList<>();
 
         for (MConventionalDict mConventionalDict: mConventionalDictList){

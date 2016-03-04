@@ -31,10 +31,14 @@ public class OrgService extends BaseJpaService<Organization, XOrganizationReposi
         return organizationRepository.findOne(orgCode);
     }
 
-
-    public void save(Organization org) {
-        organizationRepository.save(org);
+    public Organization getOrgByAdminLoginCode(String adminLoginCode) {
+        return organizationRepository.getOrgByAdmin(adminLoginCode);
     }
+
+
+//    public Organization saveOrg(Organization org) {
+//        return save(org);
+//    }
 
 
     public Boolean isExistOrg(String orgCode){

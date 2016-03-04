@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lincl
@@ -26,7 +27,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/std")
-@Api(protocols = "https", value = "std/dataset", description = "标准数据集", tags = {"标准数据集", "标准数据元"})
+@Api(protocols = "https", value = "std/dataset", description = "标准数据集", tags = {"标准数据集"})
 public class DataSetsController extends ExtendController<MStdDataSet> {
 
     @Autowired
@@ -36,18 +37,10 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
         return dataSetService.getServiceEntity(version);
     }
 
-    private IDataSet setValues(IDataSet dataSet, String code, String name, String refStandard, String summary, String version){
-        dataSet.setStdVersion(version);
-        dataSet.setName(name);
-        dataSet.setReference(refStandard);
-        dataSet.setSummary(summary);
-        dataSet.setCode(code);
-        return dataSet;
-    }
 
-    @RequestMapping(value = "/datasets", method = RequestMethod.GET)
+    @RequestMapping(value = "/data_sets", method = RequestMethod.GET)
     @ApiOperation(value = "查询数据集的方法")
-    public Collection searchDataSets(
+    public Collection<MStdDataSet> searchDataSets(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -70,7 +63,7 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
     }
 
 
-    @RequestMapping(value = "/dataset/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/data_set/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据集信息")
     public boolean deleteDataSet(
             @ApiParam(name = "id", value = "数据集编号", defaultValue = "")
@@ -81,7 +74,7 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
         return dataSetService.removeDataSet(new Long[]{id}, version) > 0;
     }
 
-    @RequestMapping(value = "/datasets", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/data_sets", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据集信息")
     public boolean deleteDataSet(
             @ApiParam(name = "ids", value = "数据集编号", defaultValue = "")
@@ -92,7 +85,7 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
         return dataSetService.removeDataSet(strToLongArr(ids), version) > 0;
     }
 
-    @RequestMapping(value = "/dataset/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/data_set/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "获取数据集信息")
     public MStdDataSet getDataSet(
             @ApiParam(name = "id", value = "数据集编号", defaultValue = "")
@@ -104,55 +97,54 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
     }
 
 
-    @RequestMapping(value = "/dataset", method = RequestMethod.POST)
+    @RequestMapping(value = "/data_set", method = RequestMethod.POST)
     @ApiOperation(value = "新增数据集信息")
-    public boolean saveDataSet(
-            @ApiParam(name = "code", value = "代码", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "名称", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "refStandard", value = "标准来源", defaultValue = "")
-            @RequestParam(value = "refStandard") String refStandard,
-            @ApiParam(name = "summary", value = "描述", defaultValue = "")
-            @RequestParam(value = "summary") String summary,
-            @ApiParam(name = "version", value = "版本号", defaultValue = "")
-            @RequestParam(value = "version") String version) throws Exception{
+    public MStdDataSet saveDataSet(
+            @ApiParam(name = "version", value = "标准版本", defaultValue = "")
+            @RequestParam(value = "version") String version,
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestParam(value = "model") String model) throws Exception{
 
         Class entityClass = getServiceEntity(version);
-        IDataSet dataSet = (IDataSet)entityClass.newInstance();
-        setValues(dataSet, code, name, refStandard, summary, version);
-        if (dataSetService.isExistByField("code", code, entityClass))
+        IDataSet dataSet = (IDataSet) jsonToObj(model, entityClass);
+        if (dataSetService.isExistByField("code", dataSet.getCode(), entityClass))
             throw new ApiException(ErrorCode.RapeatDataSetCode, "代码重复！");
-        dataSetService.add(dataSet);
-        return true;
+        if(dataSetService.add(dataSet))
+            return getModel(dataSet);
+        return null;
     }
 
-    @RequestMapping(value = "/dataset/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/data_set", method = RequestMethod.PUT)
     @ApiOperation(value = "修改数据集信息")
-    public boolean updateDataSet(
-            @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @PathVariable(value = "id") long id,
-            @ApiParam(name = "code", value = "代码", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "名称", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "refStandard", value = "标准来源", defaultValue = "")
-            @RequestParam(value = "refStandard") String refStandard,
-            @ApiParam(name = "summary", value = "描述", defaultValue = "")
-            @RequestParam(value = "summary") String summary,
-            @ApiParam(name = "version", value = "版本号", defaultValue = "")
-            @RequestParam(value = "version") String version) throws Exception{
+    public MStdDataSet updateDataSet(
+            @ApiParam(name = "version", value = "标准版本", defaultValue = "")
+            @RequestParam(value = "version") String version,
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestParam(value = "model") String model) throws Exception{
 
         Class entityClass = getServiceEntity(version);
-        IDataSet dataSet = dataSetService.retrieve(id, entityClass);
-        if(!dataSet.getCode().equals(code)){
-            dataSet.setCode(code);
-            if(dataSetService.isExistByField("code", code, entityClass))
+        IDataSet dataSetModel = (IDataSet) jsonToObj(model, entityClass);
+        IDataSet dataSet = dataSetService.retrieve(dataSetModel.getId(), entityClass);
+        if(!dataSet.getCode().equals(dataSetModel.getCode())){
+            if(dataSetService.isExistByField("code", dataSetModel.getCode(), entityClass))
                 throw new ApiException(ErrorCode.RapeatDataSetCode, "代码重复！");
         }
-        setValues(dataSet, code, name, refStandard, summary, version);
-        dataSetService.save(dataSet);
-        return true;
+        dataSetService.save(dataSetModel);
+        return getModel(dataSetModel);
+    }
+
+
+    @RequestMapping(value = "/data_sets/map", method = RequestMethod.GET)
+    @ApiOperation(value = "获取数据集 id-name : map集")
+    public Map getDataSetMapByIds(
+            @ApiParam(name = "version", value = "版本号", defaultValue = "")
+            @RequestParam(value = "version") String version,
+            @ApiParam(name = "ids", value = "数据集编号", defaultValue = "")
+            @RequestParam(value = "ids") String ids) throws Exception{
+
+        return dataSetService.getDataSetMapByIds(
+                ids==null || ids.trim().length()==0? new String[]{} : ids.split(","),
+                version);
     }
 
 }

@@ -13,15 +13,15 @@ public class PoUtil {
 
 
 
-    public static void main(String[] args) throws Exception {
-        User user = new User();
-        user.setId("123");
-        user.setName("testUser");
-        user.setAddress("beijing");
-        user.setPassword("123456");
-        String sql = getHql(user,"name","address");
-        System.out.printf(sql);
-    }
+//    public static void main(String[] args) throws Exception {
+//        User user = new User();
+//        user.setId("123");
+//        user.setName("testUser");
+//        user.setAddress("beijing");
+//        user.setPassword("123456");
+//        String sql = getHql(user,"name","address");
+//        System.out.printf(sql);
+//    }
 
     /**
      * 通过Bean对象获取查询语句

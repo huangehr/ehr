@@ -6,10 +6,15 @@ import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.query.BaseHbmService;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -32,7 +37,7 @@ public class DataSetService extends BaseHbmService<IDataSet>{
         try {
             return Class.forName(ENTITY_PRE + version);
         } catch (ClassNotFoundException e) {
-            throw new ApiException(ErrorCode.NotFoundDataSetView);
+            throw new ApiException(ErrorCode.NotFoundEntity, "数据集版本", version);
         }
     }
 
@@ -42,10 +47,10 @@ public class DataSetService extends BaseHbmService<IDataSet>{
 
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void add(IDataSet dataSet){
+    public boolean add(IDataSet dataSet){
         String sql =
                 "INSERT INTO " + getTaleName(dataSet.getStdVersion()) +
-                "(code, name, ref_standard, std_version, summary, hashCode, documentId, lang) " +
+                "(code, name, ref_standard, std_version, summary, hash, document_id, lang) " +
                 "VALUES (:code, :name, :refStandard, :version, :summary, :hashCode, :documentId, :lang)";
         Query query = currentSession().createSQLQuery(sql);
         query.setParameter("code", dataSet.getCode());
@@ -56,7 +61,7 @@ public class DataSetService extends BaseHbmService<IDataSet>{
         query.setParameter("hashCode", dataSet.getHashCode());
         query.setParameter("documentId", dataSet.getDocumentId());
         query.setParameter("lang", dataSet.getLang());
-        query.executeUpdate();
+        return query.executeUpdate()>0;
     }
 
 
@@ -67,6 +72,26 @@ public class DataSetService extends BaseHbmService<IDataSet>{
             metaDataService.deleteByDataSetId(ids, version);
         }
         return row;
+    }
+
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public Map<Integer, String> getDataSetMapByIds(Object[] ids, String versionid) {
+        Session session = currentSession();
+        String dataSetTable = CDAVersionUtil.getDataSetTableName(versionid);
+        String sql = "select id, name from " + dataSetTable;
+        if (ids.length > 0)
+            sql += " where id in(:ids) ";
+        Query query = session.createSQLQuery(sql);
+        if (ids.length > 0)
+            query.setParameterList("ids", ids);
+        List<Object> records = query.list();
+        Map<Integer, String> rs = new HashMap<>();
+        for (int i = 0; i < records.size(); ++i) {
+            Object[] record = (Object[]) records.get(i);
+            rs.put((Integer) record[0], (String) record[1]);
+        }
+        return rs;
     }
 
     //TODO: 从excel导入数据集、数据元

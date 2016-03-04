@@ -1,5 +1,6 @@
 package com.yihu.ehr.ha.std.service;
 
+import com.yihu.ehr.agModel.standard.datasset.MetaDataModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.standard.MStdDataSet;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
-import com.yihu.ehr.standard.datasets.service.IMetaData;
+//import com.yihu.ehr.standard.datasets.service.IMetaData;
 
 import java.util.Collection;
 
@@ -67,44 +68,29 @@ public interface DataSetClient {
 
     @RequestMapping(value = "/std/dataset", method = RequestMethod.POST)
     @ApiOperation(value = "新增数据集信息")
-    public boolean saveDataSet(
-            @ApiParam(name = "code", value = "代码", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "名称", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "refStandard", value = "标准来源", defaultValue = "")
-            @RequestParam(value = "refStandard") String refStandard,
-            @ApiParam(name = "summary", value = "描述", defaultValue = "")
-            @RequestParam(value = "summary") String summary,
-            @ApiParam(name = "version", value = "版本号", defaultValue = "")
-            @RequestParam(value = "version") String version);
+    public MStdDataSet saveDataSet(
+            @ApiParam(name = "version", value = "标准版本", defaultValue = "")
+            @RequestParam(value = "version") String version,
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestParam(value = "model") String model);
 
 
-    @RequestMapping(value = "/std/dataset/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/std/dataset/", method = RequestMethod.PUT)
     @ApiOperation(value = "修改数据集信息")
-    public boolean updateDataSet(
-            @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @PathVariable(value = "id") long id,
-            @ApiParam(name = "code", value = "代码", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "名称", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "refStandard", value = "标准来源", defaultValue = "")
-            @RequestParam(value = "refStandard") String refStandard,
-            @ApiParam(name = "summary", value = "描述", defaultValue = "")
-            @RequestParam(value = "summary") String summary,
-            @ApiParam(name = "version", value = "版本号", defaultValue = "")
-            @RequestParam(value = "version") String version);
+    public MStdDataSet updateDataSet(
+            @ApiParam(name = "version", value = "标准版本", defaultValue = "")
+            @RequestParam(value = "version") String version,
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestParam(value = "model") String model);
 
     //以下是数据元部分
     @RequestMapping(value = "/std/metadata", method = RequestMethod.POST)
     @ApiOperation(value = "新增数据元")
-    boolean saveMetaSet(
+    MStdMetaData saveMetaSet(
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version,
             @ApiParam(name = "model", value = "数据源模型", defaultValue = "")
-            @RequestParam(value = "model", required = false) IMetaData model);
-
+            @RequestParam(value = "model", required = false) String metadataJsonData);
 
     @RequestMapping(value = "/std/metadatas", method = RequestMethod.GET)
     @ApiOperation(value = "查询数据元")
@@ -125,18 +111,18 @@ public interface DataSetClient {
     @RequestMapping(value = "/std/metadata/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "获取数据元")
     MStdMetaData getMetaData(
-            @ApiParam(name = "id", value = "数据元编号", defaultValue = "")
+            @ApiParam(name = "id", value = "数据元ID", defaultValue = "")
             @PathVariable(value = "id") long id,
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version);
 
     @RequestMapping(value = "/std/metadata", method = RequestMethod.PUT)
     @ApiOperation(value = "更新数据元")
-    boolean updataMetaSet(
+    MStdMetaData updataMetaSet(
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version,
             @ApiParam(name = "model", value = "数据源模型", defaultValue = "")
-            @RequestParam(value = "model", required = false) IMetaData model);
+            @RequestParam(value = "model", required = false) String model);
 
     @RequestMapping(value = "/std/metadata/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据元")

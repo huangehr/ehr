@@ -25,7 +25,7 @@ public class CdaDataSetRelationshipManager{
     private EntityManager entityManager;
 
     Session currentSession(){
-        return entityManager.unwrap(org.hibernate.Session.class);
+        return entityManager.unwrap(Session.class);
     }
 
     /**
@@ -89,6 +89,28 @@ public class CdaDataSetRelationshipManager{
         return infos;
     }
 
+    /**
+     * 获取关联关系
+     */
+    public List<CdaDataSetRelationship> getCDADataSetRelationship(String versionCode) {
+        Session session = currentSession();
+        String strTableName = CDAVersionUtil.getCDADatasetRelationshipTableName(versionCode);
+        String strSql = "SELECT t.id," +
+                "t.cda_id," +
+                "t.dataSet_id" +
+                " from " + strTableName + " t ";
+        List<Object> records = session.createSQLQuery(strSql).list();
+        List<CdaDataSetRelationship> infos = new ArrayList<>();
+        for (int i = 0; i < records.size(); ++i) {
+            Object[] record = (Object[]) records.get(i);
+            CdaDataSetRelationship info = new CdaDataSetRelationship();
+            info.setId(record[0].toString());
+            info.setCdaId(record[1].toString());
+            info.setDataSetId(record[2].toString());
+            infos.add(info);
+        }
+        return infos;
+    }
 
     public int getRelationshipCountByCdaId(String cdaId,String VersionCode) {
         Session session = currentSession();

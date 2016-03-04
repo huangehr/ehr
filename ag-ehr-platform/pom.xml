@@ -29,8 +29,8 @@
 			<artifactId>spring-boot-actuator-docs</artifactId>
 		</dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-oauth2</artifactId>
         </dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
@@ -61,14 +61,18 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-netflix-sidecar</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-util</artifactId>
@@ -77,6 +81,11 @@
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-ui-swagger</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-rest-model</artifactId>
             <version>1.1.0</version>
         </dependency>
 	</dependencies>
