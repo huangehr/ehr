@@ -65,6 +65,7 @@ public enum ErrorCode {
     PatientRegisterFailed("ehr.patient.register.failed"),
     InvalidFormatPatientRegister("ehr.patient.invalid.register.info"),
     PatientRegisterFailedForExist("ehr.patient.exist.create"),
+    CardIsToVoid("ehr.commons.repeat.code"),
 
     MissArchiveFile("ehr.archive.miss.file"),
     MissArchiveCrypto("ehr.archive.miss.cryptograph"),

@@ -10,12 +10,6 @@ info:
     name: DiscoveryService
     description: EHR platform global discovery service
     version: 1.0.0
-
----
-
-spring:
-  profiles: dev
-
 security:
   user:
     password: eureka
@@ -23,7 +17,6 @@ security:
 eureka:
   instance:
       hostname: localhost
-      #ipAddress: 127.0.0.1
   client:
     #don't register this app as a service in eureka
     register-with-eureka: false
@@ -38,10 +31,4 @@ eureka:
       hostname: localhost
   server:
       enable-self-preservation: false
-      waitTimeInMsWhenSyncEmpty: 0
-
-
----
-
-spring:
-  profiles: prod
+      waitTimeInMsWhenSyncEmpty: 500000
