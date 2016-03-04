@@ -26,7 +26,7 @@ import java.util.Collection;
 @ApiIgnore
 public interface DataSetClient {
 
-    @RequestMapping(value = "/std/datasets", method = RequestMethod.GET)
+    @RequestMapping(value = "/std/data_sets", method = RequestMethod.GET)
     @ApiOperation("查询数据集的方法")
     Collection<MStdDataSet> searchDataSets(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -66,7 +66,7 @@ public interface DataSetClient {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version);
 
-    @RequestMapping(value = "/std/dataset", method = RequestMethod.POST)
+    @RequestMapping(value = "/std/data_set", method = RequestMethod.POST)
     @ApiOperation(value = "新增数据集信息")
     public MStdDataSet saveDataSet(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
@@ -75,7 +75,7 @@ public interface DataSetClient {
             @RequestParam(value = "model") String model);
 
 
-    @RequestMapping(value = "/std/dataset/", method = RequestMethod.PUT)
+    @RequestMapping(value = "/std/dataset", method = RequestMethod.PUT)
     @ApiOperation(value = "修改数据集信息")
     public MStdDataSet updateDataSet(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
