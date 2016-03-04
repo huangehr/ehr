@@ -90,10 +90,6 @@ public class AdapterOrgController extends BaseController {
             return failed(errorMsg);
         }
 
-        if (adapterOrgClient.orgIsExistData(detailModel.getOrg())) {
-            return failed("已存在该机构标准信息!");
-        }
-
         MAdapterOrg mAdapterOrg = convertToModel(detailModel, MAdapterOrg.class);
         mAdapterOrg = adapterOrgClient.addAdapterOrg(objectMapper.writeValueAsString(mAdapterOrg));
         if (mAdapterOrg == null) {
