@@ -22,7 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
 @Api(protocols = "https", value = "users", description = "用户服务")
-public class UserController {
+public class Users {
     @Autowired
     ObjectMapper objectMapper;
 

@@ -28,7 +28,7 @@ import java.text.ParseException;
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/patients")
 @Api(protocols = "https", value = "patients", description = "患者服务")
-public class PatientController {
+public class Patients {
     @Autowired
     ObjectMapper objectMapper;
 

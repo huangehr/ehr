@@ -17,12 +17,12 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
  * @version 1.0
  * @created 2016.03.03 20:50
  */
-@Configuration
+//@Configuration
 public class OAuth2Config{
     private static final String RESOURCE_ID = "ehr";
 
-    @Configuration
-    @EnableAuthorizationServer
+    //@Configuration
+    //@EnableAuthorizationServer
     public static class OAuth2ServerConfig extends AuthorizationServerConfigurerAdapter {
 
         @Autowired
@@ -53,8 +53,8 @@ public class OAuth2Config{
         }
     }
 
-    @Configuration
-    @EnableResourceServer
+    //@Configuration
+    //@EnableResourceServer
     public static class ResourceServer extends ResourceServerConfigurerAdapter {
         @Override
         public void configure(HttpSecurity http) throws Exception {

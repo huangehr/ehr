@@ -16,7 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/standards")
 @Api(protocols = "https", value = "standards", description = "健康档案标准服务")
-public class StdController {
+public class Standards {
     @ApiOperation(value = "获取健康档案标准版本列表", produces = "application/json")
     @RequestMapping(value = "/versions", method = {RequestMethod.GET})
     public List<Object> getVersions() {

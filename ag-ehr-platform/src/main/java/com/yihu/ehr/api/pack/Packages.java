@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/packages")
 @Api(protocols = "https", value = "packages", description = "数据包服务")
-public class PackageController {
+public class Packages {
     //@Autowired
     JsonPackageClient jsonPackageClient;
 

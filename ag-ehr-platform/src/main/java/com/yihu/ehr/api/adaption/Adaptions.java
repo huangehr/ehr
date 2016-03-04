@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/adaptions")
 @Api(protocols = "https", value = "adaptions", description = "标准适配")
-public class AdaptionController {
+public class Adaptions {
 
     @ApiOperation(value = "获取机构数据标准", produces = "application/gzip")
     @RequestMapping(value = "/organization/{org_code}/standard", method = {RequestMethod.GET})

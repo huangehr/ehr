@@ -21,7 +21,7 @@ import java.util.Date;
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/patient/health_profiles")
 @Api(protocols = "https", value = "health_profiles", description = "健康档案服务")
-public class HealthProfilesController {
+public class HealthProfiles {
     @Autowired
     ObjectMapper objectMapper;
 
