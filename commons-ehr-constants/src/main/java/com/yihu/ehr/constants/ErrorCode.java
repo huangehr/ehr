@@ -45,6 +45,8 @@ public enum ErrorCode {
     InputRequestSingle("ehr.common.input.request.single"),
     InputRequestMultiple("ehr.common.input.request.multiple"),
 
+    NotFoundEntity("ehr.common.notfound.entity"),//add by lincl 2016.3.3
+
     InvalidUser("ehr.invalid.user"),
     GetUserSecurityFailed("ehr.get.user.security.failed"),
     InvalidUserNameOrPwd("ehr.invalid.username.or.pwd"),
@@ -103,6 +105,8 @@ public enum ErrorCode {
     GetCDAVersionFailed("ehr.cda.version.get.failed"),
     SaveCDAVersionFailed("ehr.cda.version.save.failed"),
     GetCDAInfoFailed("ehr.std.get.CDA.list.failed"),
+    InValidCDAVersionStage("ehr.std.version.invalid.stage"),//add by lincl 2016.3.3
+
 
     NotFoundDataSetView("ehr.dataset.view.notfound"),
     GetCDATypeFailed("ehr.cda.type.get.failed"),

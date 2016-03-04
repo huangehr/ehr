@@ -27,7 +27,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/std")
-@Api(protocols = "https", value = "std/dataset", description = "标准数据集", tags = {"标准数据集", "标准数据元"})
+@Api(protocols = "https", value = "std/dataset", description = "标准数据集", tags = {"标准数据集"})
 public class DataSetsController extends ExtendController<MStdDataSet> {
 
     @Autowired
@@ -38,7 +38,7 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
     }
 
 
-    @RequestMapping(value = "/datasets", method = RequestMethod.GET)
+    @RequestMapping(value = "/data_sets", method = RequestMethod.GET)
     @ApiOperation(value = "查询数据集的方法")
     public Collection<MStdDataSet> searchDataSets(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -63,7 +63,7 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
     }
 
 
-    @RequestMapping(value = "/dataset/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/data_set/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据集信息")
     public boolean deleteDataSet(
             @ApiParam(name = "id", value = "数据集编号", defaultValue = "")
@@ -74,7 +74,7 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
         return dataSetService.removeDataSet(new Long[]{id}, version) > 0;
     }
 
-    @RequestMapping(value = "/datasets", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/data_sets", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据集信息")
     public boolean deleteDataSet(
             @ApiParam(name = "ids", value = "数据集编号", defaultValue = "")
@@ -85,7 +85,7 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
         return dataSetService.removeDataSet(strToLongArr(ids), version) > 0;
     }
 
-    @RequestMapping(value = "/dataset/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/data_set/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "获取数据集信息")
     public MStdDataSet getDataSet(
             @ApiParam(name = "id", value = "数据集编号", defaultValue = "")
@@ -97,7 +97,7 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
     }
 
 
-    @RequestMapping(value = "/dataset", method = RequestMethod.POST)
+    @RequestMapping(value = "/data_set", method = RequestMethod.POST)
     @ApiOperation(value = "新增数据集信息")
     public MStdDataSet saveDataSet(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
@@ -114,7 +114,7 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
         return null;
     }
 
-    @RequestMapping(value = "/dataset", method = RequestMethod.PUT)
+    @RequestMapping(value = "/data_set", method = RequestMethod.PUT)
     @ApiOperation(value = "修改数据集信息")
     public MStdDataSet updateDataSet(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
@@ -134,7 +134,7 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
     }
 
 
-    @RequestMapping(value = "/datasets/map", method = RequestMethod.GET)
+    @RequestMapping(value = "/data_sets/map", method = RequestMethod.GET)
     @ApiOperation(value = "获取数据集 id-name : map集")
     public Map getDataSetMapByIds(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
