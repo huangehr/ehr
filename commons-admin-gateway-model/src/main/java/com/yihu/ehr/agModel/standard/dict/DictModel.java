@@ -13,7 +13,7 @@ public class DictModel {
 
     String author;// 作者
 
-    long baseDict;//参考/继承的字典
+    Long baseDict;//参考/继承的字典
 
     String description;//字典描述
 
@@ -53,11 +53,11 @@ public class DictModel {
         this.author = author;
     }
 
-    public long getBaseDict() {
+    public Long getBaseDict() {
         return baseDict;
     }
 
-    public void setBaseDict(long baseDict) {
+    public void setBaseDict(Long baseDict) {
         this.baseDict = baseDict;
     }
 

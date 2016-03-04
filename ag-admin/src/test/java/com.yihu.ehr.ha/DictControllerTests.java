@@ -40,30 +40,34 @@ public class DictControllerTests {
 
         applicationContext = new SpringApplicationBuilder().web(false).sources(AgAdminApplication.class).run();
 
-//
+
 //        envelop = dictController.saveDict("0", "code_test1", "name_test", "32156412", "source_test", version, "test", "0dae0003561e059a49f6321ee017ef88");
 //        envelop = dictController.saveDict("0", "code_test2", "name_test", "32156412", "source_test", version, "test", "0dae0003561e059a49f6321ee017ef88");
 //        envelop = dictController.saveDict("0", "code_test3", "name_test", "32156412", "source_test", version, "test", "0dae0003561e059a49f6321ee017ef88");
 //        envelop = dictController.saveDict("0", "code_test4", "name_test", "32156412", "source_test", version, "test", "0dae0003561e059a49f6321ee017ef88");
 //        envelop = dictController.saveDict("0", "code_test5", "name_test", "32156412", "source_test", version, "test", "0dae0003561e059a49f6321ee017ef88");
 //        assertNotEquals("字典新增失败",envelop,null);
-//
-////        String.valueOf(((DictModel) envelop.getObj()).getId())
-//        //todo:修改字典测试未通过
-////        envelop = dictController.saveDict("446", "code_test_copy", "name_test_copy", "2222222222", "source_test_copy", version, "test", "0dae0003561e059a49f6321ee017ef88");
-////        assertNotEquals("字典修改失败",envelop,null);
-////
-//        envelop = dictController.getDictById(version, 423);
-//        assertNotEquals("获取字典信息失败",envelop,null);
-////
-////        envelop = dictController.deleteDict(version, "424");
-////        assertNotEquals("删除字典失败",envelop,null);
-//
-//        //todo：测试不完整，不是真实数据
-//        envelop = dictController.searchDataSets("","","",15,1,version);
-//        assertNotEquals("查询字典失败",envelop,null);
 
+        //todo:带条件查询出错
+        envelop = dictController.searchDicts("", "", "", 15, 1, version);
+        assertNotEquals("查询字典失败",envelop,null);
 
+//        StringBuffer ids = new StringBuffer();
+//        for (int i = 1;i<(envelop.getDetailModelList().size());i++){
+//            String id = String.valueOf(((DictModel) envelop.getDetailModelList().get(i)).getId());
+//            ids.append(id+",");
+//        }
+//        envelop = dictController.deleteDict(version, ids.toString());
+//        assertNotEquals("删除字典失败",envelop,null);
+
+        envelop = dictController.saveDict("472", "code_test_copy", "name_test_copy", "22", "source_test_copy", version, "test", "0dae0003561e059a49f6321ee017ef88");
+        assertNotEquals("字典修改失败",envelop,null);
+
+        envelop = dictController.getDictById(version, 472);
+        assertNotEquals("获取字典信息失败",envelop,null);
+
+        envelop = dictController.deleteDict(version, "472");
+        assertNotEquals("删除字典失败",envelop,null);
 
     }
 
