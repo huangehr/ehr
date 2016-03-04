@@ -1,7 +1,7 @@
 package com.yihu.ehr;
 
-import com.yihu.ehr.config.AppSecurityConfig;
-import com.yihu.ehr.config.AppTomcatConnectionCustomizer;
+import com.yihu.ehr.config.TomcatConnCustomizer;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,14 +9,19 @@ import org.springframework.boot.context.embedded.ConfigurableEmbeddedServletCont
 import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
 import org.springframework.boot.context.embedded.tomcat.TomcatConnectorCustomizer;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.util.ResourceUtils;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.io.FileNotFoundException;
 
 @SpringBootApplication
+@EnableDiscoveryClient
+@EnableFeignClients
 public class EHRPlatformGatewayApp {
     @Value("${server.port}")
     int port;
@@ -29,7 +34,7 @@ public class EHRPlatformGatewayApp {
     public EmbeddedServletContainerCustomizer containerCustomizer() throws FileNotFoundException {
         final String absoluteKeystoreFile = ResourceUtils.getFile("C:/Windows/tomcat.keystore").getAbsolutePath();
 
-        final TomcatConnectorCustomizer customizer = new AppTomcatConnectionCustomizer(absoluteKeystoreFile, "123456", port);
+        final TomcatConnectorCustomizer customizer = new TomcatConnCustomizer(absoluteKeystoreFile, "123456", port);
 
         return new EmbeddedServletContainerCustomizer() {
             @Override
@@ -40,10 +45,5 @@ public class EHRPlatformGatewayApp {
                 }
             };
         };
-    }
-
-    @Bean
-    public WebSecurityConfigurerAdapter webSecurityConfigurerAdapter() {
-        return new AppSecurityConfig();
     }
 }
