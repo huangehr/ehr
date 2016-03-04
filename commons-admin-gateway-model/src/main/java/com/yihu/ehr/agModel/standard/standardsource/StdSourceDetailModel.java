@@ -9,10 +9,10 @@ public class StdSourceDetailModel {
     private String id;
     private String code;
     private String name;
-    private Date create_date;
-    private String create_user;
-    private Date update_date;
-    private String update_user;
+    private Date createDate;
+    private String createUser;
+    private Date updateDate;
+    private String updateUser;
     private String description;
     private String sourceType;
     private String sourceValue;
@@ -41,36 +41,36 @@ public class StdSourceDetailModel {
         this.name = name;
     }
 
-    public Date getCreate_date() {
-        return create_date;
+    public Date getCreateDate() {
+        return createDate;
     }
 
-    public void setCreate_date(Date create_date) {
-        this.create_date = create_date;
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
     }
 
-    public String getCreate_user() {
-        return create_user;
+    public String getCreateUser() {
+        return createUser;
     }
 
-    public void setCreate_user(String create_user) {
-        this.create_user = create_user;
+    public void setCreateUser(String createUser) {
+        this.createUser = createUser;
     }
 
-    public Date getUpdate_date() {
-        return update_date;
+    public Date getUpdateDate() {
+        return updateDate;
     }
 
-    public void setUpdate_date(Date update_date) {
-        this.update_date = update_date;
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
     }
 
-    public String getUpdate_user() {
-        return update_user;
+    public String getUpdateUser() {
+        return updateUser;
     }
 
-    public void setUpdate_user(String update_user) {
-        this.update_user = update_user;
+    public void setUpdateUser(String updateUser) {
+        this.updateUser = updateUser;
     }
 
     public String getDescription() {

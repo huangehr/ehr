@@ -34,7 +34,7 @@ public class DictController extends BaseController{
 
     @RequestMapping(value = "/dicts",method = RequestMethod.GET)
     @ApiOperation(value = "查询字典")
-    public Envelop searchDataSets(
+    public Envelop searchDicts(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -48,20 +48,7 @@ public class DictController extends BaseController{
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version) throws Exception {
 
-        Collection<MStdDict> mStdDictCollection = new ArrayList<>();//dictClient.searchDict(fields, filters, sorts, size, page, version);
-
-        //todo：测试数据开始
-        MStdDict mStdDict = new MStdDict();
-        mStdDict.setId(123);
-        mStdDict.setName("name");
-        mStdDict.setCode("code");
-        mStdDictCollection.add(mStdDict);
-        MStdDict mStdDict1 = new MStdDict();
-        mStdDict1.setId(123);
-        mStdDict1.setName("name");
-        mStdDict1.setCode("code");
-        mStdDictCollection.add(mStdDict1);
-        //todo：测试数据结束
+        Collection<MStdDict> mStdDictCollection = dictClient.searchDict(fields, filters, sorts, size, page, version);
 
         List<DictModel> dictModelList = (List<DictModel>)convertToModels(mStdDictCollection,new ArrayList<DictModel>(mStdDictCollection.size()),DictModel.class,null);
 

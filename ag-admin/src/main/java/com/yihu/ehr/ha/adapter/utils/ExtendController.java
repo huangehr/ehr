@@ -54,7 +54,7 @@ public class ExtendController<T> extends BaseController {
         return (T) convertToModel(obj, getModelClass());
     }
 
-    protected Envelop failed(String errMsg){
+    public Envelop failed(String errMsg){
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         envelop.setErrorMsg(errMsg);
@@ -72,7 +72,7 @@ public class ExtendController<T> extends BaseController {
         return envelop;
     }
 
-    protected Envelop success(Object object){
+    public Envelop success(Object object){
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
         envelop.setObj(convertToModel(object, getModelClass()));
