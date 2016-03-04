@@ -2,7 +2,6 @@ package com.yihu.ehr.standard.dispatch.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.standard.commons.ExtendController;
 import com.yihu.ehr.standard.dispatch.service.DispatchService;
@@ -13,11 +12,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -51,7 +51,7 @@ public class StandardDispatchRestController  extends ExtendController{
         try {
 
             if (updateVersion == null || "".equals(updateVersion))
-                throw errMissParm("目标版本");
+                return new RestEcho().failed(ErrorCode.MissParameter," 缺失参数:updateVersion");
 
             if (currentVersion == null) {
                 schema = dispatchService.sendStandard(updateVersion);
@@ -60,19 +60,19 @@ public class StandardDispatchRestController  extends ExtendController{
             }
 
             if (schema == null)
-                throw new ApiException(ErrorCode.GenerateArchiveFailed);
+                return new RestEcho().failed(ErrorCode.GenerateArchiveFailed," 标准化数据生成失败");
 
             String group = (String) schema.get(FastDFSUtil.GroupField);
             String remoteFile = (String) schema.get(FastDFSUtil.RemoteFileField);
 
             if (group == null || remoteFile == null)
-                throw new ApiException(ErrorCode.GenerateArchiveFailed);
+                return new RestEcho().failed(ErrorCode.GenerateArchiveFailed," 标准化数据生成失败");
 
             password = (String) schema.get("password");
             byte[] bytes = new FastDFSUtil().download(group, remoteFile);
             fileBytes = Base64.encode(bytes);
         }catch (Exception e) {
-            throw new ApiException(ErrorCode.DownArchiveFileFailed);
+            return new RestEcho().failed(ErrorCode.DownArchiveFileFailed,"下载标准适配版本失败");
         }
 
         try {
@@ -83,9 +83,10 @@ public class StandardDispatchRestController  extends ExtendController{
             restEcho.putResult("zipfile", fileBytes);
             return restEcho;
         } catch (IOException ex) {
-            throw new ApiException(ErrorCode.GenerateArchiveFileStreamFailed);
+            return new RestEcho().failed(ErrorCode.GenerateArchiveFileStreamFailed,"生成适配版本文件流失败");
+
         } catch (Exception ex) {
-            throw new ApiException(ErrorCode.GenerateFileCryptographFailed);
+            return new RestEcho().failed(ErrorCode.GenerateFileCryptographFailed,"生成适配版本文件密码失败");
         }
     }
 }
