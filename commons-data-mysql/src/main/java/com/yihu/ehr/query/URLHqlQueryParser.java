@@ -273,9 +273,9 @@ public class URLHqlQueryParser<T> {
     private Field getField(String fieldName) throws NoSuchFieldException {
         Field f;
         try {
-            f = entityCls.getDeclaredField("id");
+            f = entityCls.getDeclaredField(fieldName);
         } catch (NoSuchFieldException e) {
-            f = entityCls.getSuperclass().getDeclaredField("id");
+            f = entityCls.getSuperclass().getDeclaredField(fieldName);
         }
         return f;
     }
