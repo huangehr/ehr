@@ -3,7 +3,7 @@ package com.yihu.ehr.ha.adapter.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.util.controller.BaseController;
 import com.yihu.ehr.util.validate.Length;
 import com.yihu.ehr.util.validate.Required;
 import com.yihu.ehr.util.validate.Valid;
@@ -24,7 +24,7 @@ import java.util.List;
  * @version 1.0
  * @created 2016/3/1
  */
-public class ExtendController<T> extends BaseRestController {
+public class ExtendController<T> extends BaseController {
     public static String ERR_SYSREM_DES = "系统错误！";
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -54,7 +54,7 @@ public class ExtendController<T> extends BaseRestController {
         return (T) convertToModel(obj, getModelClass());
     }
 
-    protected Envelop failed(String errMsg){
+    public Envelop failed(String errMsg){
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         envelop.setErrorMsg(errMsg);
@@ -72,7 +72,7 @@ public class ExtendController<T> extends BaseRestController {
         return envelop;
     }
 
-    protected Envelop success(Object object){
+    public Envelop success(Object object){
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
         envelop.setObj(convertToModel(object, getModelClass()));

@@ -15,7 +15,7 @@
     <packaging>pom</packaging>
     <name>commons-dependencies</name>
     <description>EHR platform Dependencies</description>
-    <url>http://www.yihu.com/ehr</url>
+    <url>http://ehr.yihu.com</url>
     <organization>
         <name>JKZL Software, Inc.</name>
         <url>http://www.yihu.com</url>
@@ -42,11 +42,80 @@
                 <role>Project programmer</role>
             </roles>
         </developer>
-
         <developer>
             <id>laz</id>
             <name>林阿忠</name>
             <email>laz@qq.com</email>
+            <organization>JKZL Software, Inc.</organization>
+            <organizationUrl>http://www.yihu.com</organizationUrl>
+            <roles>
+                <role>Project programmer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>laz</id>
+            <name>林聪亮</name>
+            <email>linck@qq.com</email>
+            <organization>JKZL Software, Inc.</organization>
+            <organizationUrl>http://www.yihu.com</organizationUrl>
+            <roles>
+                <role>Project programmer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>yzh</id>
+            <name>叶泽华</name>
+            <email>yzh@qq.com</email>
+            <organization>JKZL Software, Inc.</organization>
+            <organizationUrl>http://www.yihu.com</organizationUrl>
+            <roles>
+                <role>Project programmer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>cms</id>
+            <name>蔡明松</name>
+            <email>caimingsong@qq.com</email>
+            <organization>JKZL Software, Inc.</organization>
+            <organizationUrl>http://www.yihu.com</organizationUrl>
+            <roles>
+                <role>Project programmer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>cws</id>
+            <name>陈维山</name>
+            <email>hill9868@qq.com</email>
+            <organization>JKZL Software, Inc.</organization>
+            <organizationUrl>http://www.yihu.com</organizationUrl>
+            <roles>
+                <role>Project programmer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>zqb</id>
+            <name>庄清斌</name>
+            <email>zqb@qq.com</email>
+            <organization>JKZL Software, Inc.</organization>
+            <organizationUrl>http://www.yihu.com</organizationUrl>
+            <roles>
+                <role>Project programmer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>yww</id>
+            <name>伟炜武</name>
+            <email>linck@qq.com</email>
+            <organization>JKZL Software, Inc.</organization>
+            <organizationUrl>http://www.yihu.com</organizationUrl>
+            <roles>
+                <role>Project programmer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>wq</id>
+            <name>王琼</name>
+            <email>wq@qq.com</email>
             <organization>JKZL Software, Inc.</organization>
             <organizationUrl>http://www.yihu.com</organizationUrl>
             <roles>
@@ -170,10 +239,6 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

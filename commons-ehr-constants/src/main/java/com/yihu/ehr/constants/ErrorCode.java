@@ -7,6 +7,8 @@ package com.yihu.ehr.constants;
  * @created 2015.08.10 17:49
  */
 public enum ErrorCode {
+    MissingUserAgent("missing.user_agent"),
+    RateLimitExceeding("rate_limit.exceeding"),
 
     MissMethod("ehr.common.miss.method"),
     MissTimestamp("ehr.common.miss.timestamp"),
@@ -45,6 +47,8 @@ public enum ErrorCode {
     InputRequestSingle("ehr.common.input.request.single"),
     InputRequestMultiple("ehr.common.input.request.multiple"),
 
+    NotFoundEntity("ehr.common.notfound.entity"),//add by lincl 2016.3.3
+
     InvalidUser("ehr.invalid.user"),
     GetUserSecurityFailed("ehr.get.user.security.failed"),
     InvalidUserNameOrPwd("ehr.invalid.username.or.pwd"),
@@ -65,6 +69,7 @@ public enum ErrorCode {
     PatientRegisterFailed("ehr.patient.register.failed"),
     InvalidFormatPatientRegister("ehr.patient.invalid.register.info"),
     PatientRegisterFailedForExist("ehr.patient.exist.create"),
+    CardIsToVoid("ehr.commons.repeat.code"),
 
     MissArchiveFile("ehr.archive.miss.file"),
     MissArchiveCrypto("ehr.archive.miss.cryptograph"),
@@ -103,6 +108,8 @@ public enum ErrorCode {
     GetCDAVersionFailed("ehr.cda.version.get.failed"),
     SaveCDAVersionFailed("ehr.cda.version.save.failed"),
     GetCDAInfoFailed("ehr.std.get.CDA.list.failed"),
+    InValidCDAVersionStage("ehr.std.version.invalid.stage"),//add by lincl 2016.3.3
+
 
     NotFoundDataSetView("ehr.dataset.view.notfound"),
     GetCDATypeFailed("ehr.cda.type.get.failed"),

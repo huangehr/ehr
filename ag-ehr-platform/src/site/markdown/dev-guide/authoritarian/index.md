@@ -19,6 +19,7 @@
  
 - 用户都有用户名/密码，用于Basic认证
 - 用户可以生成私有Token（多个），并限制Token能够访问的数据范围，即Scope。此Token相当于用户在平台上的数据访问钥匙，用户可以公开此Token给第三方使用，并且可以随时作废或修改数据访问权限。
+- 平台还会为用户分配一个公钥，可用于数据加解密。用户可根据需要维护此公钥。
  
 ### 机构
 
@@ -39,6 +40,7 @@
 **应用凭据**
 
 - 应用Client ID与Secret
+- 应用Token
 
 平台授权体系
 ---------------------
@@ -51,9 +53,10 @@
 
 Token是平台的授权核心对象。Token与平台资源绑定，设置Token资源访问范围（Scope）可更安全地对外开放数据。Token有以下类型：
 
-- 临时Token（TEMP-TOKEN）：客户端使用用户名/密码登录后，服务端返回的一个临时Token（有效期为20分钟），使用此Token即可调用API。
 - 私有Token（PRIVATE-TOKEN）：平台对象私有的Token，可在“用户个人设置”中心管理Token，私有Token可以有多个，并且可以公开。
 - OAuth Token（OAUTH-TOKEN）：由用户授权第三方应用，平台使用OAuth2协议产生的Token。
+
+Token有一个fingerprint，用于区别同一个用户使用同一个应用创建的不同Token。
 
 ### Scope
 
@@ -69,6 +72,13 @@ Token是平台的授权核心对象。Token与平台资源绑定，设置Token�
 > [OAuth2授权](oauth2-auth.html)
 
 对OAuth2授权，需要限定开发者，用户（狭义，指非开发者用户）属于平台，而不是属于第三方应用，否则用户无法在平台上对应用进行授权。
+
+总结平台API调用授权情况：
+
+- 不需授权，如API根路径：https://ehr.yihu.com/api
+- 需要授权的API
+	- Basic授权
+	- OAuth授权
 
 健康之路应用
 ---------------------

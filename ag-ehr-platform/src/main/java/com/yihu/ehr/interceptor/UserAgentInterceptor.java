@@ -5,6 +5,7 @@ import com.yihu.ehr.exception.ApiException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
  * @created 2016.02.26 18:04
  */
 @Component
-public class UserAgentInterceptor extends BaseHandlerInterceptor {
+public class UserAgentInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String userAgent = request.getHeader("User-Agent");

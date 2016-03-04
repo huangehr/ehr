@@ -1,7 +1,10 @@
 package com.yihu.ehr.std;
 
+import com.eureka2.shading.codehaus.jackson.map.ObjectMapper;
 import com.yihu.ehr.StandardServiceApp;
+import com.yihu.ehr.model.standard.MCDAType;
 import com.yihu.ehr.standard.cdatype.controller.CdaTypeController;
+import com.yihu.ehr.standard.cdatype.service.CDAType;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,12 +75,12 @@ public class CdaTypeControllerTests {
 
     @Test
     public void jSaveCDAType() throws Exception{
-//        String id = "0dae000656720d25269e0319806c0ef2";
-//        CDAType cdaType = cdaTypeController.getCdaTypeById(id);
-//        cdaType.setName("test");
-//        String jsonData = new ObjectMapper().writeValueAsString(cdaType);
-//        Object result = cdaTypeController.saveCDAType(jsonData);
-//        assertTrue("保存失败！" , result != null);
+        String id = "0dae000656720d25269e0319806c0ef2";
+        MCDAType cdaType = cdaTypeController.getCdaTypeById(id);
+        cdaType.setName("test");
+        String jsonData = new ObjectMapper().writeValueAsString(cdaType);
+        Object result = cdaTypeController.saveCDAType(jsonData);
+        assertTrue("保存失败！" , result != null);
     }
 
     @Test
