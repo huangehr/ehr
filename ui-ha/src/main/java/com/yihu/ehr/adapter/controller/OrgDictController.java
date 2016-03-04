@@ -1,16 +1,21 @@
 package com.yihu.ehr.adapter.controller;
 
+import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.constants.RestAPI;
+import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.controller.BaseRestController;
-import com.yihu.ehr.constants.*;
 import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.ResourceProperties;
+import com.yihu.ehr.util.controller.BaseRestController;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
-import javax.annotation.Resource;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Administrator on 2015/8/12.
@@ -169,12 +174,12 @@ public class OrgDictController extends BaseRestController {
      * @param name
      * @param description
      * @param orgCode
-     * @param user
+     * @param userId
      * @return
      */
     @RequestMapping(value = "createOrgDict",produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public Object createOrgDict(String orgCode,String code,String name,String description,@ModelAttribute(SessionAttributeKeys.CurrentUser)XUser user){
+    public Object createOrgDict(String orgCode,String code,String name,String description,String userId){
 
         String url="";
         String resultStr = "";
@@ -194,7 +199,7 @@ public class OrgDictController extends BaseRestController {
 
             url="/orgDict/createOrgDict";
             params.put("description", description);
-            params.put("userId",user.getId());
+            params.put("userId",userId);
             //todo 失败，返回的错误信息怎么体现？
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//创建字典
 //            ObjectMapper mapper = new ObjectMapper();
@@ -296,12 +301,12 @@ public class OrgDictController extends BaseRestController {
      * @param code
      * @param name
      * @param description
-     * @param user
+     * @param userId
      * @return
      */
     @RequestMapping(value="updateOrgDict",produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public Object updateOrgDict(String orgCode,long id,String code,String name,String description,@ModelAttribute(SessionAttributeKeys.CurrentUser)XUser user) {
+    public Object updateOrgDict(String orgCode,long id,String code,String name,String description,String userId) {
 
         String url="";
         String resultStr = "";
@@ -330,7 +335,7 @@ public class OrgDictController extends BaseRestController {
 
             url="/orgDict/updateOrgDict";
             params.put("description", description);
-            params.put("userId",user.getId());
+            params.put("userId",userId);
             //todo 失败，返回的错误信息怎么体现？
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//更新字典
 //            ObjectMapper mapper = new ObjectMapper();
@@ -471,12 +476,12 @@ public class OrgDictController extends BaseRestController {
      * @param code
      * @param name
      * @param description
-     * @param user
+     * @param userId
      * @return
      */
     @RequestMapping(value="createOrgDictItem",produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public Object createOrgDictItem(Integer orgDictSeq,String orgCode,String code,String name,String description,String sort,@ModelAttribute(SessionAttributeKeys.CurrentUser)XUser user){
+    public Object createOrgDictItem(Integer orgDictSeq,String orgCode,String code,String name,String description,String sort,String userId){
 
         String url;
         String resultStr = "";
@@ -498,7 +503,7 @@ public class OrgDictController extends BaseRestController {
             url="/orgDict/createOrgDictItem";
             params.put("description", description);
             params.put("sort", sort);
-            params.put("userId",user.getId());
+            params.put("userId",userId);
             //todo 失败，返回的错误信息怎么体现？
             //todo : 网关没有url的请求方式
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//创建字典项
@@ -652,12 +657,12 @@ public class OrgDictController extends BaseRestController {
      * @param code
      * @param name
      * @param description
-     * @param user
+     * @param userId
      * @return
      */
     @RequestMapping(value="updateDictItem",produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public Object updateDictItem(Long id,Integer orgDictSeq,String orgCode,String code,String name,String description,String sort,@ModelAttribute(SessionAttributeKeys.CurrentUser)XUser user) {
+    public Object updateDictItem(Long id,Integer orgDictSeq,String orgCode,String code,String name,String description,String sort,String userId) {
 
         String url="";
         String resultStr = "";
@@ -688,7 +693,7 @@ public class OrgDictController extends BaseRestController {
             url="/orgDict/updateDictItem";
             params.put("description", description);
             params.put("sort", sort);
-            params.put("userId",user.getId());
+            params.put("userId",userId);
             //todo 失败，返回的错误信息怎么体现？
             //todo : 网关没有url的请求方式
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//更新字典项

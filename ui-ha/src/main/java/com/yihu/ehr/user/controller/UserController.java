@@ -2,11 +2,11 @@ package com.yihu.ehr.user.controller;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.ResourceProperties;
 import com.yihu.ehr.util.controller.BaseRestController;
-import com.yihu.ehr.fastdfs.FastDFSUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;

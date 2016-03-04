@@ -13,7 +13,7 @@
 
     <!--业务Beans, 使用注解方式配置-->
     <context:component-scan base-package="com.yihu.ehr">
-        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+        <!--<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>-->
     </context:component-scan>
 
     <!--Hibernate 数据库配置-->
@@ -39,57 +39,57 @@
     </bean>
 
     <!--Hibernate 会话管理器配置-->
-    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
-        <property name="dataSource" ref="dataSource"/>
-        <property name="hibernateProperties">
-            <value>
-                hibernate.dialect=org.hibernate.dialect.MySQL5Dialect
-                hibernate.show_sql=true
-                hibernate.format_sql=true
-            </value>
-        </property>
-        <property name="mappingLocations">
-            <list>
-                <value>classpath:hbm/*.hbm.xml</value>
-                <value>classpath:hbm/common/*.hbm.xml</value>
-            </list>
-        </property>
-    </bean>
+    <!--<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">-->
+        <!--<property name="dataSource" ref="dataSource"/>-->
+        <!--<property name="hibernateProperties">-->
+            <!--<value>-->
+                <!--hibernate.dialect=org.hibernate.dialect.MySQL5Dialect-->
+                <!--hibernate.show_sql=true-->
+                <!--hibernate.format_sql=true-->
+            <!--</value>-->
+        <!--</property>-->
+        <!--<property name="mappingLocations">-->
+            <!--<list>-->
+                <!--<value>classpath:hbm/*.hbm.xml</value>-->
+                <!--<value>classpath:hbm/common/*.hbm.xml</value>-->
+            <!--</list>-->
+        <!--</property>-->
+    <!--</bean>-->
 
-    <!--Hibernate 事务配置-->
-    <bean id="txManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
-        <property name="sessionFactory" ref="sessionFactory"/>
-    </bean>
-    <tx:annotation-driven transaction-manager="txManager"/>
+    <!--&lt;!&ndash;Hibernate 事务配置&ndash;&gt;-->
+    <!--<bean id="txManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">-->
+        <!--<property name="sessionFactory" ref="sessionFactory"/>-->
+    <!--</bean>-->
+    <!--<tx:annotation-driven transaction-manager="txManager"/>-->
 
-    <!--Redis 连接池配置-->
-    <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
-        <property name="maxTotal" value="15"/>
-        <property name="maxIdle" value="10"/>
-        <property name="minIdle" value="5"/>
-    </bean>
+    <!--&lt;!&ndash;Redis 连接池配置&ndash;&gt;-->
+    <!--<bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">-->
+        <!--<property name="maxTotal" value="15"/>-->
+        <!--<property name="maxIdle" value="10"/>-->
+        <!--<property name="minIdle" value="5"/>-->
+    <!--</bean>-->
 
-    <!--Redis 数据库配置-->
-    <bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
-        <!--property name="hostName" value="172.17.110.68" note="use this element when deploy on tomcat in real"/-->
-        <property name="hostName" value="192.168.1.220"/>
-        <property name="port" value="6379"/>
-        <property name="poolConfig" ref="poolConfig"/>
-    </bean>
+    <!--&lt;!&ndash;Redis 数据库配置&ndash;&gt;-->
+    <!--<bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">-->
+        <!--&lt;!&ndash;property name="hostName" value="172.17.110.68" note="use this element when deploy on tomcat in real"/&ndash;&gt;-->
+        <!--<property name="hostName" value="192.168.1.220"/>-->
+        <!--<property name="port" value="6379"/>-->
+        <!--<property name="poolConfig" ref="poolConfig"/>-->
+    <!--</bean>-->
 
-    <!--Redis 会话管理器配置-->
-    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
-        <property name="connectionFactory" ref="jedisConnectionFactory"/>
-    </bean>
+    <!--&lt;!&ndash;Redis 会话管理器配置&ndash;&gt;-->
+    <!--<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">-->
+        <!--<property name="connectionFactory" ref="jedisConnectionFactory"/>-->
+    <!--</bean>-->
 
-    <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
-        <property name="customEditors">
-            <map>
-                <entry key="com.yihu.ha.constrant.JobType"
-                       value="com.yihu.ha.util.web.JobTypeConverter"/>
-            </map>
-        </property>
-    </bean>
+    <!--<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">-->
+        <!--<property name="customEditors">-->
+            <!--<map>-->
+                <!--<entry key="com.yihu.ha.constrant.JobType"-->
+                       <!--value="com.yihu.ha.util.web.JobTypeConverter"/>-->
+            <!--</map>-->
+        <!--</property>-->
+    <!--</bean>-->
 
     <!--文件上传支持-->
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
