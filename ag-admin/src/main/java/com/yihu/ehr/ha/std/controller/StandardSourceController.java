@@ -104,6 +104,7 @@ public class StandardSourceController extends BaseController {
         Envelop envelop = new Envelop();
         StdSourceDetailModel sourceDetailModel = objectMapper.readValue(model, StdSourceDetailModel.class);
         MStdSource mStdSourceOld = convertToModel(sourceDetailModel, MStdSource.class);
+        mStdSourceOld.setUpdateDate(new Date());
         String jsonData = objectMapper.writeValueAsString(mStdSourceOld);
         MStdSource mStdSource = stdSourcrClient.updateStdSource(jsonData);
         if (mStdSource == null) {
@@ -124,6 +125,7 @@ public class StandardSourceController extends BaseController {
         Envelop envelop = new Envelop();
         StdSourceDetailModel sourceDetailModel = objectMapper.readValue(model, StdSourceDetailModel.class);
         MStdSource mStdSourceOld = convertToModel(sourceDetailModel, MStdSource.class);
+        mStdSourceOld.setCreateDate(new Date());
         String jsonData = objectMapper.writeValueAsString(mStdSourceOld);
         MStdSource mStdSource = stdSourcrClient.addStdSource(jsonData);
         if (mStdSource == null) {

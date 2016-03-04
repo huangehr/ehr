@@ -26,7 +26,7 @@ public class CDAVersionController extends BaseController {
     @Autowired
     private CDAVersionClient cdaVersionClient;
 
-    @RequestMapping(value = "/cdaVersions", method = RequestMethod.GET)
+    @RequestMapping(value = "/versions", method = RequestMethod.GET)
     @ApiOperation(value = "标准版本列表查询")
     public Envelop searchCDAVersions(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
@@ -56,7 +56,7 @@ public class CDAVersionController extends BaseController {
         return getResult(versionModelList, totalCount, page, size);
     }
 
-    @RequestMapping(value = "/cdaVersions/{version}/isLatest", method = RequestMethod.GET)
+    @RequestMapping(value = "/version/{version}/isLatest", method = RequestMethod.GET)
     @ApiOperation(value = "判断是否是最新的已发布的版本")
     public boolean isLatestVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
@@ -65,7 +65,7 @@ public class CDAVersionController extends BaseController {
         return cdaVersionClient.isLatestVersion(version);
     }
 
-    @RequestMapping(value = "/cdaVersion", method = RequestMethod.POST)
+    @RequestMapping(value = "/version", method = RequestMethod.POST)
     @ApiOperation(value = "新增编辑状态标准版本")
     public Envelop addVersion(
             @ApiParam(name = "userLoginCode", value = "用户登录名")
@@ -88,7 +88,7 @@ public class CDAVersionController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = "/cdaVersion/{version}/drop", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/version/{version}/drop", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除版本版本（编辑状态/非编辑状态）")
     public boolean dropCDAVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
@@ -97,7 +97,7 @@ public class CDAVersionController extends BaseController {
         return cdaVersionClient.dropCDAVersion(version);
     }
 
-    @RequestMapping(value = "/cdaVersion/{version}/revert", method = RequestMethod.PUT)
+    @RequestMapping(value = "/version/{version}/revert", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除编辑状态的版本")
     public boolean revertVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
@@ -106,7 +106,7 @@ public class CDAVersionController extends BaseController {
         return cdaVersionClient.revertVersion(version);
     }
 
-    @RequestMapping(value = "/cdaVersion/{version}/commit", method = RequestMethod.PUT)
+    @RequestMapping(value = "/version/{version}/commit", method = RequestMethod.PUT)
     @ApiOperation(value = "发布新版本")
     public boolean commitVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
@@ -115,7 +115,7 @@ public class CDAVersionController extends BaseController {
         return cdaVersionClient.commitVersion(version);
     }
 
-    @RequestMapping(value = "/cdaVersion/{version}/rollbackToStage", method = RequestMethod.PUT)
+    @RequestMapping(value = "/version/{version}/rollback_stage", method = RequestMethod.PUT)
     @ApiOperation(value = "将最新的已发布版本修改为编辑状态")
     public boolean rollbackToStage(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
@@ -124,7 +124,7 @@ public class CDAVersionController extends BaseController {
         return cdaVersionClient.rollbackToStage(version);
     }
 
-    @RequestMapping(value = "/cdaVersion/{version}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/version/{version}", method = RequestMethod.PUT)
     @ApiOperation(value = "修改版本信息")
     public Envelop updateVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
@@ -151,7 +151,7 @@ public class CDAVersionController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = "/cdaVersion/checkName", method = RequestMethod.GET)
+    @RequestMapping(value = "/version/check_name", method = RequestMethod.GET)
     @ApiOperation(value = "判断版本名称是否已存在")
     public boolean checkVersionName(
             @ApiParam(name = "versionName", value = "版本名称", defaultValue = "")
@@ -160,13 +160,13 @@ public class CDAVersionController extends BaseController {
         return cdaVersionClient.checkVersionName(versionName);
     }
 
-    @RequestMapping(value = "/cdaVersion/existInStage", method = RequestMethod.GET)
+    @RequestMapping(value = "/version/exist_instage", method = RequestMethod.GET)
     @ApiOperation(value = "检查是否存在处于编辑状态的版本")
     public boolean existInStage() throws Exception {
         return cdaVersionClient.existInStage();
     }
 
-    @RequestMapping(value = "/cdaVersion/{version}", method = RequestMethod.GET)
+    @RequestMapping(value = "/version/{version}", method = RequestMethod.GET)
     @ApiOperation(value = "获取版本信息")
     public Envelop getVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
