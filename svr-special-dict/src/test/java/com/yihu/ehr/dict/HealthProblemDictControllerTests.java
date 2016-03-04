@@ -170,8 +170,6 @@ public class HealthProblemDictControllerTests {
         assertTrue("新增失败！", hpDictController.createHpIcd10Relation(json03) != null);
 
         assertTrue("存在性验证失败！", hpDictController.isHpIcd10RelaExist(icd10Id,hpId));
-
-
     }
 
     @Test

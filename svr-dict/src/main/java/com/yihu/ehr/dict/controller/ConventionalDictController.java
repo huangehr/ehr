@@ -254,4 +254,32 @@ public class ConventionalDictController extends BaseRestController {
 
         return convertToModels(list, new ArrayList<MConventionalDict>(list.size()), MConventionalDict.class, null);
     }
+
+    @RequestMapping(value = "/dictionaries/indicators", method = RequestMethod.GET)
+    @ApiOperation(value = "获取指标类型", response = MConventionalDict.class)
+    public Collection<MConventionalDict> getIndicatorList() {
+        List<SystemDictEntry> list = dictEntryService.getDictEntries(23, null);
+
+        return convertToModels(list, new ArrayList<MConventionalDict>(list.size()), MConventionalDict.class, null);
+    }
+
+    @RequestMapping(value = "/dictionaries/drug_type", method = RequestMethod.GET)
+    @ApiOperation(value = "获取药品类型", response = MConventionalDict.class)
+    public MConventionalDict getDrugType(
+        @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+        @RequestParam(value = "code") String code) {
+            SystemDictEntry drugType = dictEntryService.getDictEntry(24, code);
+
+            return getDictModel(drugType);
+    }
+
+    @RequestMapping(value = "/dictionaries/drug_flag", method = RequestMethod.GET)
+    @ApiOperation(value = "获取药品处方标识", response = MConventionalDict.class)
+    public MConventionalDict getDrugFalg(
+        @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+        @RequestParam(value = "code") String code) {
+            SystemDictEntry drugFlag = dictEntryService.getDictEntry(25, code);
+
+            return getDictModel(drugFlag);
+    }
 }

@@ -150,4 +150,24 @@ public interface ConventionalDictEntryClient {
     @RequestMapping(value = "/dictionaries/tags", method = RequestMethod.GET)
     @ApiOperation(value = "获取标签字典项", response = MConventionalDict.class, produces = "application/json")
     Collection<MConventionalDict> getTagsList();
+
+    @RequestMapping(value = "/dictionaries/drug_flag", method = RequestMethod.GET)
+    @ApiOperation(value = "获取字典处方标识", response = MConventionalDict.class, produces = "application/json")
+    MConventionalDict getDrugFlag(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/drug_type", method = RequestMethod.GET)
+    @ApiOperation(value = "获取字典类别", response = MConventionalDict.class, produces = "application/json")
+    MConventionalDict getDrugType(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/indicator_type", method = RequestMethod.GET)
+    @ApiOperation(value = "获取字典类别", response = MConventionalDict.class, produces = "application/json")
+    MConventionalDict getIndicatorType(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+
 }

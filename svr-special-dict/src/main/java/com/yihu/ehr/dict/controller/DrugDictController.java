@@ -43,6 +43,7 @@ public class DrugDictController extends BaseRestController {
         String id = getObjectId(BizObject.Dict);
         dict.setId(id);
         DrugDict drugDict = drugDictService.createDict(dict);
+
         return convertToModel(drugDict, MDrugDict.class, null);
     }
 
