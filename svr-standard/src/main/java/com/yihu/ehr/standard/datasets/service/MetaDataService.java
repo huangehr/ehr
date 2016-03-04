@@ -39,7 +39,7 @@ public class MetaDataService extends BaseHbmService<IMetaData>{
         try {
             return Class.forName(ENTITY_PRE + version);
         } catch (ClassNotFoundException e) {
-            throw new ApiException(ErrorCode.NotFoundMetaDataView);
+            throw new ApiException(ErrorCode.NotFoundEntity, "数据元版本", version);
         }
     }
 

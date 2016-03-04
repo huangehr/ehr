@@ -141,4 +141,18 @@ public class BaseController extends AbstractController {
         }
         return param;
     }
+
+    public Envelop failed(String errMsg){
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        envelop.setErrorMsg(errMsg);
+        return envelop;
+    }
+
+    public Envelop success(Object object){
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        envelop.setObj(object);
+        return envelop;
+    }
 }

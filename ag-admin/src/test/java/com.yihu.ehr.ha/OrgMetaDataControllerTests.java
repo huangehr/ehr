@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = AgAdminApplication.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class OrgMetaDataTests {
+public class OrgMetaDataControllerTests {
 
     @Autowired
     private OrgMetaDataController metaDataController;
@@ -89,7 +89,7 @@ public class OrgMetaDataTests {
         assertTrue("新增失败!",envelop.isSuccessFlg());
 
         String fields = "";
-        String filter = "name=test_cms_name_c";
+        String filter = "name=test_cms_name";
         int page = 1;
         int rows = 15;
         envelop = metaDataController.searchOrgMetaData(fields,filter,"",rows,page);

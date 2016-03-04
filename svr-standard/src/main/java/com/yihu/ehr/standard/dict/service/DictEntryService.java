@@ -23,7 +23,7 @@ public class DictEntryService extends BaseHbmService<IDictEntry>{
 		try {
 			return Class.forName(ENTITY_PRE + version);
 		} catch (ClassNotFoundException e) {
-			throw new ApiException(ErrorCode.NotFoundDictEntryView);
+			throw new ApiException(ErrorCode.NotFoundEntity, "字典项版本", version);
 		}
 	}
 

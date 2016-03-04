@@ -7,9 +7,9 @@ public class DataSetModel {
 
     private long id;
 
-    private String datasetCode;
+    private String code;
 
-    private String datasetName;
+    private String name;
 
     private String stdVersion;
 
@@ -26,20 +26,20 @@ public class DataSetModel {
         this.id = id;
     }
 
-    public String getDatasetCode() {
-        return datasetCode;
+    public String getCode() {
+        return code;
     }
 
-    public void setDatasetCode(String datasetCode) {
-        this.datasetCode = datasetCode;
+    public void setCode(String code) {
+        this.code = code;
     }
 
-    public String getDatasetName() {
-        return datasetName;
+    public String getName() {
+        return name;
     }
 
-    public void setDatasetName(String datasetName) {
-        this.datasetName = datasetName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getStdVersion() {

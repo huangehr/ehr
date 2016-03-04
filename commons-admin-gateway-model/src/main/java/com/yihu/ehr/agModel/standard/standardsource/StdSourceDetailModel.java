@@ -1,5 +1,7 @@
 package com.yihu.ehr.agModel.standard.standardsource;
 
+import java.util.Date;
+
 /**
  * Created by Administrator on 2016/2/29.
  */
@@ -7,9 +9,9 @@ public class StdSourceDetailModel {
     private String id;
     private String code;
     private String name;
-    private String create_date;
+    private Date create_date;
     private String create_user;
-    private String update_date;
+    private Date update_date;
     private String update_user;
     private String description;
     private String sourceType;
@@ -39,11 +41,11 @@ public class StdSourceDetailModel {
         this.name = name;
     }
 
-    public String getCreate_date() {
+    public Date getCreate_date() {
         return create_date;
     }
 
-    public void setCreate_date(String create_date) {
+    public void setCreate_date(Date create_date) {
         this.create_date = create_date;
     }
 
@@ -55,11 +57,11 @@ public class StdSourceDetailModel {
         this.create_user = create_user;
     }
 
-    public String getUpdate_date() {
+    public Date getUpdate_date() {
         return update_date;
     }
 
-    public void setUpdate_date(String update_date) {
+    public void setUpdate_date(Date update_date) {
         this.update_date = update_date;
     }
 

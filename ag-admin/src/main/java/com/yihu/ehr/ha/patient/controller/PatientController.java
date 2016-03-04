@@ -98,13 +98,12 @@ public class PatientController extends BaseController {
     public Envelop deletePatient(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @PathVariable(value = "id_card_no") String idCardNo) throws Exception {
-        Envelop envelop = new Envelop();
+
         boolean result = patientClient.deletePatient(idCardNo);
-        envelop.setSuccessFlg(result);
         if (!result) {
-            envelop.setErrorMsg("删除失败!");
+            return failed("删除失败!");
         }
-        return envelop;
+        return success(null);
     }
 
 
@@ -121,16 +120,13 @@ public class PatientController extends BaseController {
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @PathVariable(value = "id_card_no") String idCardNo) throws Exception {
 
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
         MDemographicInfo demographicInfo = patientClient.getPatient(idCardNo);
         if (demographicInfo == null) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("数据获取失败！");
+            return failed("数据获取失败！");
         }
         PatientDetailModel detailModel = MDemographicInfoToPatientDetailModel(demographicInfo);
-        envelop.setObj(detailModel);
-        return envelop;
+
+        return success(detailModel);
     }
 
 
@@ -173,19 +169,14 @@ public class PatientController extends BaseController {
             detailModel.setWorkAddress(addressId);
         }
 
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
         //新增人口信息
         MDemographicInfo info = (MDemographicInfo)convertToModel(detailModel,MDemographicInfo.class);
         info = patientClient.createPatient(objectMapper.writeValueAsString(info));
         if (info == null) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("保存失败!");
-            return envelop;
+            return failed("保存失败!");
         }
         detailModel = MDemographicInfoToPatientDetailModel(info);
-        envelop.setObj(detailModel);
-        return envelop;
+        return success(detailModel);
     }
 
     /**
@@ -227,20 +218,15 @@ public class PatientController extends BaseController {
             detailModel.setWorkAddress(addressId);
         }
 
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
         //修改人口信息
         MDemographicInfo info = (MDemographicInfo)convertToModel(detailModel,MDemographicInfo.class);
         info = patientClient.updatePatient(objectMapper.writeValueAsString(info));
         if (info == null) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("保存失败!");
-            return envelop;
+            return failed("保存失败!");
         }
 
         detailModel = MDemographicInfoToPatientDetailModel(info);
-        envelop.setObj(detailModel);
-        return envelop;
+        return success(detailModel);
 
     }
 
