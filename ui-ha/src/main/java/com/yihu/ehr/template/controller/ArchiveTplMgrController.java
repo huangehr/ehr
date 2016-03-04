@@ -6,7 +6,6 @@ import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.ResourceProperties;
 import com.yihu.ehr.util.controller.BaseRestController;
-import freemarker.template.TemplateModel;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -182,7 +181,7 @@ public class ArchiveTplMgrController extends BaseRestController {
 
     @RequestMapping("addTemplate")
     @ResponseBody
-    public Object addTemplate(TemplateModel templateModel) {
+    public Object addTemplate(String templateModel) {
         String url = "/template/addTemplate";
         String resultStr = "";
         Envelop result = new Envelop();

@@ -1,0 +1,30 @@
+.m-login { position: absolute; width: 100%; height:100%;}
+.m-login .box { position: absolute; left: 50%; top: 295px; width: 560px; height: 286px;  margin-left: -280px; z-index: 1;}
+.m-login .box-form { height: 265px; margin-left: 240px; margin-top: 20px;}
+
+.u-input-group { *position: relative; display: table; margin-top: 10px; border-collapse: separate;}
+.u-input-group .u-input-addon { display: table-cell; *display:inline-block; width: 39px; height: 40px; border-radius: 0;   border: 1px solid #ccc; }
+.u-input-group .u-input-addon:first-child { border-right: 0; }
+.u-input-group.has-error input,
+.u-input-group.has-error select,
+.u-input-group.has-error textarea,
+.u-input-group.has-error .u-input-addon { border-color: #f09784; color: #d68273; }
+
+.u-input { *position: relative; *top: -1px; width: 250px; *width: 240px; height: 40px; *height: 30px; line-height:30px\9; padding: 5px 4px;  border: 1px solid #d5d5d5; border-left: 0; border-radius: 0; color: #858585; background-color: #fff; }
+.u-input.ui-input-vcode { width: 95px; }
+.f-icon-lbg { background: url(../images/login_bg.jpg) 50% 0px no-repeat;}
+.f-icon-lbbg { background: url(../images/login_input_bg.png) no-repeat; }
+.f-icon-user { background: url(../images/icon_User.png) center no-repeat; }
+.f-icon-psw { background: url(../images/icon_Cipher.png) center no-repeat; }
+.f-icon-vcode { background: url(../images/icon_Verification-code.png) center no-repeat; }
+.f-icon-bb { position: absolute; top: 545px; width:100%; height: 59px; }
+.f-icon-bbp { background: url(../images/login_Projection.png) center no-repeat;}
+
+.f-w290 { width: 290px; }
+
+#idcode { position: absolute; }
+#loginBtn { line-height: 25px; }
+
+
+/* 覆盖validate验证时的消息提示样式 */
+#login-form .has-error label.error { display: none !important; }

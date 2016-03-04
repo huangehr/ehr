@@ -37,6 +37,8 @@ public class LoginController extends BaseRestController {
     public String login(Model model) {
         model.addAttribute("contentPage","login/login");
         return "generalView";
+        //return "login/login";
+        //return "test";
     }
 
     @RequestMapping(value = "validate", method = RequestMethod.POST)
