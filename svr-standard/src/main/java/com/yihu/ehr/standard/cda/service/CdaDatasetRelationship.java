@@ -14,7 +14,7 @@ public class CdaDataSetRelationship {
 //	private String dataSetCode;
 //	private String dataSetName;
 //	private String summary;
-//	private String OperationType;
+	private String OperationType;
 
 
 	public String getDataSetId() {
@@ -39,5 +39,13 @@ public class CdaDataSetRelationship {
 
 	public void setCdaId(String cdaId) {
 		this.cdaId = cdaId;
+	}
+
+	public String getOperationType() {
+		return OperationType;
+	}
+
+	public void setOperationType(String operationType) {
+		OperationType = operationType;
 	}
 }
