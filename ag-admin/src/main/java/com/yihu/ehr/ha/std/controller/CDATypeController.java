@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by AndyCai on 2016/1/25.
+ * Created by yww on 2016/3/1.
  */
 @RequestMapping(ApiVersion.Version1_0 + "/cdaType")
 @RestController
@@ -42,7 +42,7 @@ public class CDATypeController extends BaseController {
         Envelop envelop = new Envelop();
         List<MCDAType> mCdaTypeList = cdaTypeClient.getChildrenByPatientId(parentId);
         envelop.setSuccessFlg(true);
-        envelop.setObj(changeToCdaTypeModels(mCdaTypeList));
+        envelop.setDetailModelList(changeToCdaTypeModels(mCdaTypeList));
         return envelop;
     }
 
@@ -53,11 +53,7 @@ public class CDATypeController extends BaseController {
      * @return
      */
     private List<CdaTypeModel> changeToCdaTypeModels(List<MCDAType> mCdaTypeList) {
-        List<CdaTypeModel> cdaTypeModelList = new ArrayList<>();
-        for (MCDAType mCdaType : mCdaTypeList) {
-            CdaTypeModel CdaTypeModel = convertToModel(mCdaType, CdaTypeModel.class);
-            cdaTypeModelList.add(CdaTypeModel);
-        }
+        List<CdaTypeModel> cdaTypeModelList = (List<CdaTypeModel>) convertToModels(mCdaTypeList, new ArrayList<CdaTypeModel>(mCdaTypeList.size()), CdaTypeModel.class, null);
         return cdaTypeModelList;
     }
 
@@ -78,10 +74,9 @@ public class CDATypeController extends BaseController {
         Envelop envelop = new Envelop();
         List<MCDAType> mCdaTypeList = cdaTypeClient.getChildIncludeSelfByParentTypesAndKey(patientIds, key);
         envelop.setSuccessFlg(true);
-        envelop.setObj(changeToCdaTypeModels(mCdaTypeList));
+        envelop.setDetailModelList(changeToCdaTypeModels(mCdaTypeList));
         return envelop;
     }
-
 
     @RequestMapping(value = "/cda_types/code_name", method = RequestMethod.GET)
     @ApiOperation(value = "根据code或者name获取CDAType列表")
@@ -93,7 +88,7 @@ public class CDATypeController extends BaseController {
         Envelop envelop = new Envelop();
         List<MCDAType> mCdaTypeList = cdaTypeClient.getCdaTypeByCodeOrName(code, name);
         envelop.setSuccessFlg(true);
-        envelop.setObj(changeToCdaTypeModels(mCdaTypeList));
+        envelop.setDetailModelList(changeToCdaTypeModels(mCdaTypeList));
         return envelop;
     }
 
@@ -125,7 +120,7 @@ public class CDATypeController extends BaseController {
         List<MCDAType> mCdaTypeList = cdaTypeClient.getCdaTypeByIds(ids);
         if (mCdaTypeList != null) {
             envelop.setSuccessFlg(true);
-            envelop.setObj(changeToCdaTypeModels(mCdaTypeList));
+            envelop.setDetailModelList(changeToCdaTypeModels(mCdaTypeList));
         }
         return envelop;
     }

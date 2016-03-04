@@ -2,6 +2,8 @@ package com.yihu.ehr.standard.cdaversion.service;
 
 import com.yihu.ehr.config.StdHibernateConfig;
 import com.yihu.ehr.config.StdSessionFactoryBean;
+import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.log.LogService;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.CDAVersionUtil;
@@ -133,9 +135,7 @@ public class CDAVersionService extends BaseJpaService<CDAVersion, XCDAVersionRep
      */
     @Transactional(propagation = Propagation.REQUIRED)
     public void commitVersion(CDAVersion version) {
-        if (!version.isInStage()) {
-            throw new IllegalArgumentException("此版本未处于版本化编辑状态");
-        }
+
         version.setInStage(false);
         version.setCommitTime(new Date());
         save(version);
@@ -144,9 +144,7 @@ public class CDAVersionService extends BaseJpaService<CDAVersion, XCDAVersionRep
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void revertVersion(CDAVersion version) {
-        if (!version.isInStage()) {
-            throw new IllegalArgumentException("此版本未处于版本化编辑状态");
-        }
+
         dropVersionTables(version);
         delete(version);
     }

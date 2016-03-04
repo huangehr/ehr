@@ -41,7 +41,7 @@ public interface DictClient {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page,
             @ApiParam(name = "version", value = "版本", defaultValue = "")
-            @RequestParam(value = "version") String version);
+            @RequestParam(value = "version") String version)throws Exception;
 
     @RequestMapping(value = "/std/dict", method = RequestMethod.POST)
     @ApiOperation(value = "新增字典")

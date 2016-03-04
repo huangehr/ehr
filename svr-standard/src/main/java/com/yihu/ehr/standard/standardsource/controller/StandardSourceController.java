@@ -57,13 +57,13 @@ public class StandardSourceController extends ExtendController<MStdSource>{
     public MStdSource getStdSource(
             @ApiParam(name = "id", value = "标准来源编号", defaultValue = "")
             @PathVariable(value = "id") String id) {
-
-        return getModel(stdSourceService.retrieve(id));
+        MStdSource mStdSource = getModel(stdSourceService.retrieve(id));
+        return mStdSource;
     }
 
 
     @RequestMapping(value = "/source", method = RequestMethod.PUT)
-    @ApiOperation(value = "修改标准来源，通过id取数据，取不到数据时新增，否则修改")
+    @ApiOperation(value = "修改标准来源")
     public MStdSource updateStdSource(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam(value = "model") String model) throws Exception{
@@ -71,7 +71,7 @@ public class StandardSourceController extends ExtendController<MStdSource>{
         StandardSource standardSourceModel = jsonToObj(model, StandardSource.class);
         StandardSource standardSource = stdSourceService.retrieve(standardSourceModel.getId());
         if(standardSource==null)
-            throw errNotFound();
+            throw errNotFound("标准来源", standardSourceModel.getId());
 
         if (!standardSource.getCode().equals(standardSourceModel.getCode())
                 && stdSourceService.isSourceCodeExist(standardSourceModel.getCode()))
@@ -99,8 +99,8 @@ public class StandardSourceController extends ExtendController<MStdSource>{
             @ApiParam(name = "ids", value = "标准来源编号", defaultValue = "")
             @RequestParam(value = "ids") String ids) throws Exception{
 
-        String idArr[] = ids.split(",");
-        return stdSourceService.deleteSource(Arrays.asList(idArr)) != -1;
+        stdSourceService.deleteSource(ids.split(","));
+        return true;
     }
 
     @RequestMapping(value = "/source/{id}", method = RequestMethod.DELETE)

@@ -2,7 +2,11 @@ package com.yihu.ehr.standard.dispatch.service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
-import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.log.LogService;
+import com.yihu.ehr.standard.cda.service.CDADocument;
+import com.yihu.ehr.standard.cda.service.CDADocumentManager;
+import com.yihu.ehr.standard.cda.service.CdaDataSetRelationship;
+import com.yihu.ehr.standard.cda.service.CdaDataSetRelationshipManager;
 import com.yihu.ehr.standard.cdaversion.service.CDAVersion;
 import com.yihu.ehr.standard.cdaversion.service.CDAVersionService;
 import com.yihu.ehr.standard.datasets.service.DataSetService;
@@ -56,7 +60,12 @@ public class DispatchService {
     DictService dictService;
     @Autowired
     DictEntryService dictEntryService;
-
+    @Autowired
+    CDADocumentManager cdaDocumentManager;
+    @Autowired
+    CdaDataSetRelationshipManager cdaDataSetRelationshipManager;
+    @Autowired
+    FastDFSUtil fastDFSUtil;
     public static  Map<String, String> typeMapping = new HashMap<>();
 
     static {
@@ -222,7 +231,7 @@ public class DispatchService {
      * 创建数据集文件
      */
     @Transactional(propagation = Propagation.SUPPORTS)
-    public List<IMetaData> createDataSetFile(String strFilePath, String strFileName, List<IDataSet> dataSet)
+    public List<IMetaData> createDataSetFile(String strFilePath, String strFileName, List<IDataSet> dataSet, String version)
             throws Exception {
         //创建数据集XML 返回数据集IDList
         List<IMetaData> listMetaDta = new ArrayList<>();
@@ -245,7 +254,7 @@ public class DispatchService {
                 type = "add";
                 listMetaDta.addAll(
                         metaDataService.search(
-                                metaDataService.getServiceEntity(xDataSet.getStdVersion()), "dataSetId=" + xDataSet.getId()));
+                                metaDataService.getServiceEntity(version), "dataSetId=" + xDataSet.getId()));
             }
             rowRoot.setAttribute("type", type);
 
@@ -326,7 +335,7 @@ public class DispatchService {
      * 创建字典文件
      */
     @Transactional(propagation = Propagation.SUPPORTS)
-    public List<IDictEntry> createDictFile(String strFilePath, String strFileName, List<IDict> dicts)
+    public List<IDictEntry> createDictFile(String strFilePath, String strFileName, List<IDict> dicts, String sourceVersionId)
         throws Exception{
         //创建字典XML，返回字典值 List
         List<IDictEntry> listEntry = new ArrayList<>();
@@ -347,7 +356,7 @@ public class DispatchService {
                 type = "add";
                 listEntry.addAll(
                         dictEntryService.search(
-                                dictEntryService.getServiceEntity(xDict.getStdVersion()), "dictId="+xDict.getId()));
+                                dictEntryService.getServiceEntity(sourceVersionId), "dictId="+xDict.getId()));
             }
             rowRoot.setAttribute("type", type);
 
@@ -502,7 +511,7 @@ public class DispatchService {
         zipper.zipFile(resourcesFile, strZIPFilePath + strFileName, strPwd);
 
         //将文件上传到服务器中
-        ObjectNode msg = new FastDFSUtil().upload(strZIPFilePath + strFileName, "");
+        ObjectNode msg = fastDFSUtil.upload(strZIPFilePath + strFileName, "");
 
         resultMap.put(FastDFSUtil.GroupField, msg.get(FastDFSUtil.GroupField).asText());//setFilePath
         resultMap.put(FastDFSUtil.RemoteFileField, msg.get(FastDFSUtil.RemoteFileField).asText());//setFileName
@@ -526,6 +535,101 @@ public class DispatchService {
     }
 
 
+
+    /**
+     * 文件重命名
+     *
+     * @param path    文件目录
+     * @param oldFilePath 原来的文件名
+     * @param newname 新文件名
+     */
+    public void renameFile(String path, String oldFilePath, String newname) {
+        String splitMark = System.getProperty("file.separator");
+        if (!oldFilePath.equals(path + splitMark + newname)) {//新的文件名和以前文件名不同时,才有必要进行重命名
+            File oldfile = new File(oldFilePath);
+            File newfile = new File(path + splitMark + newname);
+            if (!oldfile.exists()) {
+                LogService.getLogger(DispatchService.class).error(oldFilePath+"：重命名文件不存在");
+            }
+            if (newfile.exists())//若在该目录下已经有一个文件和新文件名相同，则不允许重命名
+                LogService.getLogger(DispatchService.class).error(path + splitMark + newname+"文件名称不存在");
+            else {
+                oldfile.renameTo(newfile);
+            }
+        } else {
+
+            LogService.getLogger(DispatchService.class).error("newFileName:"+path +splitMark + newname+"；oldFileName:"+oldFilePath+"新文件名和旧文件名相同...");
+        }
+    }
+
+
+    /**
+     *创建CDA数据文档，并且将CDA文档下载到相应的位置
+     * @param strFilePath
+     * @param strFileName
+     * @param listCDA
+     * @return
+     */
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public void createCDAFile(String strFilePath, String strFileName, List<CDADocument> listCDA) throws Exception{
+        Document doc = createDocument();
+        Element root = doc.createElement("table");
+        root.setAttribute("name", "std_cda");
+        doc.appendChild(root);
+
+        Element colRoot = doc.createElement("metadata");
+
+        String[] strColumn = {"id|S", "name|S", "code|S", "source_id|S",
+                "print_out|S", "schema_path|S", "description|S",
+                "version|S", "inner_version|S"};
+
+        String strPath = System.getProperty("java.io.tmpdir");
+        String splitMark = System.getProperty("file.separator");
+        strPath += splitMark+"StandardFiles";
+
+        //创建数据元文件列信息
+        root.appendChild(getColumnElement(doc, colRoot, strColumn));
+        for (int i = 0; i < listCDA.size(); i++) {
+            CDADocument info = listCDA.get(i);
+            Element rowRoot = doc.createElement("row");
+            String type = typeMapping.get(info.getOperationType());
+            if(type==null)
+                type = "add";
+            rowRoot.setAttribute("type", type);
+
+            appendChild(rowRoot, doc.createElement("id"), info.getId());
+            appendChild(rowRoot, doc.createElement("name"), info.getName());
+            appendChild(rowRoot, doc.createElement("code"), info.getCode());
+            appendChild(rowRoot, doc.createElement("source_id"), info.getSourceId());
+            appendChild(rowRoot, doc.createElement("print_out"), info.getPrintOut());
+            appendChild(rowRoot, doc.createElement("schema_path"), info.getSchema());
+            appendChild(rowRoot, doc.createElement("description"), info.getDescription());
+            appendChild(rowRoot, doc.createElement("version"), "");
+            appendChild(rowRoot, doc.createElement("inner_version"), info.getVersionCode());
+            appendChild(rowRoot, doc.createElement("id"), "");
+            appendChild(rowRoot, doc.createElement("id"), "");
+            appendChild(rowRoot, doc.createElement("id"), "");
+
+            root.appendChild(rowRoot);
+
+            String strXMLFilePath = strPath + splitMark + "xml" + splitMark + info.getVersionCode();
+            File file = new File(strXMLFilePath);
+            if(!file.exists()) {
+                file.mkdirs();
+            }
+            String fileGroup = info.getFileGroup();
+            String schemePath=info.getSchema();
+
+            if(!fileGroup.equals("") && !schemePath.equals("")) {
+                String localFileName = fastDFSUtil.download(fileGroup, schemePath, strXMLFilePath);
+                renameFile(strXMLFilePath,localFileName,info.getId()+".xml");
+                File oldFile = new File(localFileName);
+                oldFile.delete();
+            }
+        }
+        outputXml(doc, strFilePath + strFileName);
+    }
+
     private void createFiles(String strXMLFilePath, List<CDAVersion> listVersion, String sourceVersionId)
         throws Exception{
         //创建版本文件
@@ -534,27 +638,66 @@ public class DispatchService {
         //创建数据集文件，并获取数据元信息
         List<IMetaData> listMateData =
                 createDataSetFile(strXMLFilePath, "std_dataset.xml",
-                    dataSetService.findAll(dataSetService.getServiceEntity(sourceVersionId)));
+                    dataSetService.findAll(dataSetService.getServiceEntity(sourceVersionId)), sourceVersionId);
 
         //创建数据元文件
         createMetaDataFile(strXMLFilePath, "std_metadata.xml", sourceVersionId, listMateData);
 
         //创建CDA文档
-//        String strCDAFileName = "std_cda.xml";
-//        List<CDADocument> listCDA = Arrays.asList(xcdaDocumentManager.getDocumentList(sourceVersion.getVersion(), ""));
-//        createCDAFile(strXMLFilePath, strCDAFileName, listCDA);
+        String strCDAFileName = "std_cda.xml";
+        List<CDADocument> listCDA = cdaDocumentManager.getDocumentList(sourceVersionId, "", "", "", 0, 0);
+        createCDAFile(strXMLFilePath, strCDAFileName, listCDA);
 
         //创建关系文档
-//        String strRelationFileName = "std_cda_dataset_relationship.xml";
-//        List<XCdaDatasetRelationship> listRelation = Arrays.asList(xCdaDatasetRelationshipManager.getRelationshipByVersion(sourceVersion.getVersion()));
-//        createCDADatasetRelationshipFile(strXMLFilePath, strRelationFileName, listRelation);
+        String strRelationFileName = "std_cda_dataset_relationship.xml";
+        List<CdaDataSetRelationship> listRelation = cdaDataSetRelationshipManager.getCDADataSetRelationship(sourceVersionId);
+        createCDADatasetRelationshipFile(strXMLFilePath, strRelationFileName, listRelation);
 
         //创建字典文档，并获取字典值信息
         List<IDictEntry> listEntry =
                 createDictFile(strXMLFilePath, "std_dict.xml",
-                        dictService.findAll(dictService.getServiceEntity(sourceVersionId)));
+                        dictService.findAll(dictService.getServiceEntity(sourceVersionId)), sourceVersionId);
 
         //创建字典值文档
         createDictEntryFile(strXMLFilePath, "std_dict_item.xml", sourceVersionId, listEntry);
     }
+
+
+    /**
+     * 创建CDA与数据集的关联关系文档
+     *
+     * @param strFilePath
+     * @param strFileName
+     * @param listRelastion
+     * @return
+     */
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public void createCDADatasetRelationshipFile(String strFilePath, String strFileName, List<CdaDataSetRelationship> listRelastion) throws Exception{
+        //创建字典值XML
+        Document doc = createDocument();
+        Element root = doc.createElement("table");
+        root.setAttribute("name", "std_cda_dataset_relationship");
+        doc.appendChild(root);
+
+        Element colRoot = doc.createElement("metadata");
+        String[] strColumn = {"id|S", "cda_id|S", "dataset_id|N"};
+
+        root.appendChild(getColumnElement(doc, colRoot, strColumn));
+        for (int i = 0; i < listRelastion.size(); i++) {
+            CdaDataSetRelationship info = listRelastion.get(i);
+            Element rowRoot = doc.createElement("row");
+            String type = typeMapping.get(info.getOperationType());
+            if(type==null)
+                type = "add";
+            rowRoot.setAttribute("type", type);
+
+            appendChild(rowRoot, doc.createElement("id"), info.getId());
+            appendChild(rowRoot, doc.createElement("cda_id"), info.getCdaId());
+            appendChild(rowRoot, doc.createElement("dataset_id"), info.getDataSetId());
+
+            root.appendChild(rowRoot);
+        }
+        outputXml(doc, strFilePath + strFileName);
+    }
+
 }
