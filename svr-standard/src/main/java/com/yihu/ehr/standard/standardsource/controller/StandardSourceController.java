@@ -89,6 +89,7 @@ public class StandardSourceController extends ExtendController<MStdSource>{
         StandardSource standardSource = jsonToObj(model, StandardSource.class);
         if (stdSourceService.isSourceCodeExist(standardSource.getCode()))
             throw errRepeatCode();
+        standardSource.setCreateDate(new Date());
         return getModel(stdSourceService.save(standardSource));
     }
 
