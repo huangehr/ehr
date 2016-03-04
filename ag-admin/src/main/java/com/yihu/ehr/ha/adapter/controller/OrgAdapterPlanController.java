@@ -12,8 +12,6 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -92,13 +90,11 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) {
+            @RequestParam(value = "page", required = false) int page) {
 
         try {
             return convertToModels(
-                    planClient.searchAdapterPlan(fields, filters, sorts, size, page, request, response),
+                    planClient.searchAdapterPlan(fields, filters, sorts, size, page ),
                     new ArrayList<>(), AdapterPlanModel.class, "");
         } catch (Exception e) {
             e.printStackTrace();
@@ -117,7 +113,7 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
     }
 
 
-    @RequestMapping(value = "/plans", method = RequestMethod.GET)
+    @RequestMapping(value = "/plans", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除适配方案", notes = "删除适配方案信息，批量删除时，Id以逗号隔开")
     public boolean delAdapterPlan(
             @ApiParam(name = "ids", value = "方案ID")

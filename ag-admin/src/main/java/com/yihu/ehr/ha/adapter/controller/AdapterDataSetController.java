@@ -14,8 +14,6 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -54,16 +52,14 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+            @RequestParam(value = "page", required = false) int page) throws Exception {
 
         return convertToModels(
-                adapterDataSetClient.searchAdapterDataSet(planId, code, name, sorts, size, page, request, response),
+                adapterDataSetClient.searchAdapterDataSet(planId, code, name, sorts, size, page),
                 new ArrayList<>(), DataSetModel.class, "");
     }
 
-    @RequestMapping("/plan/{planId}/datasets/{dataSetId}/datametas")
+    @RequestMapping(value = "/plan/{planId}/datasets/{dataSetId}/datametas",method = RequestMethod.GET)
     @ApiOperation(value = "根据dataSetId搜索数据元适配关系")
     public Collection<AdapterDataSetModel> searchAdapterMetaData(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
@@ -79,12 +75,10 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+            @RequestParam(value = "page", required = false) int page) throws Exception {
 
         return convertToModels(
-                adapterDataSetClient.searchAdapterMetaData(planId, dataSetId, code, name, sorts, size, page, request, response),
+                adapterDataSetClient.searchAdapterMetaData(planId, dataSetId, code, name, sorts, size, page),
                 new ArrayList<>(), AdapterDataSetModel.class, ""
         );
     }
