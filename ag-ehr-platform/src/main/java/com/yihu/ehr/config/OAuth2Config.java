@@ -17,12 +17,12 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
  * @version 1.0
  * @created 2016.03.03 20:50
  */
-//@Configuration
+@Configuration
 public class OAuth2Config{
     private static final String RESOURCE_ID = "ehr";
 
-    //@Configuration
-    //@EnableAuthorizationServer
+    @Configuration
+    @EnableAuthorizationServer
     public static class OAuth2ServerConfig extends AuthorizationServerConfigurerAdapter {
 
         @Autowired
@@ -39,22 +39,15 @@ public class OAuth2Config{
                     .withClient("client-with-registered-redirect")
                     .authorizedGrantTypes("authorization_code")
                     .authorities("ROLE_CLIENT")
-                    .scopes("read", "trust")
+                    .scopes("user", "user.demographic_id", "user.health_profiles", "organization")
                     .resourceIds(RESOURCE_ID)
                     .redirectUris("http://www.yihu.com?key=value")
-                    .secret("secret123")
-                    .and()
-                    .withClient("my-client-with-secret")
-                    .authorizedGrantTypes("client_credentials", "password")
-                    .authorities("ROLE_CLIENT")
-                    .scopes("read")
-                    .resourceIds(RESOURCE_ID)
-                    .secret("secret");
+                    .secret("secret123");
         }
     }
 
-    //@Configuration
-    //@EnableResourceServer
+    @Configuration
+    @EnableResourceServer
     public static class ResourceServer extends ResourceServerConfigurerAdapter {
         @Override
         public void configure(HttpSecurity http) throws Exception {

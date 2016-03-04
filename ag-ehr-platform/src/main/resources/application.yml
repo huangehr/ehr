@@ -21,6 +21,9 @@ rate_limit:
 spring:
   profiles: dev
 
+  thymeleaf:
+    cache: false
+
 keystore:
   file: C:/Windows/tomcat.keystore
   password: 123456

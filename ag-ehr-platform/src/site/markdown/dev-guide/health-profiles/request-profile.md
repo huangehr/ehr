@@ -11,8 +11,10 @@
 健康档案提供两种调阅模式：前端页面及API。根据使用对象的不同，前端页面又分为个人版与医护版，可嵌入第三方应用中。其中，个人版立足于患者角度，提供个人健康档案的管理及浏览。
 医护版立足于医疗专业人员，为医疗专业人员提供定制化的患者健康数据分析。
 
-个人版档案
+档案
 ---------------------
+
+### 个人版档案
 
 访问URL：
 
@@ -48,12 +50,61 @@
 	</tr>
 </table>
 
-医护版档案
----------------------
+### 医护版档案
 
 访问URL：
 
 	未提供
+	
+档案搜索
+---------------------
+
+档案搜索提供健康档案搜索功能。为了防止档案被误认领或冒领，目前开放以下字段进行搜索，若匹配的结果大于1，则不会返回具体的档案内容，并且会返回*404 Not Found*错误。
+
+	GET /patient/health-profiles/search
+
+<table>
+	<tr>
+		<td>名称</td>
+		<td>类型</td>
+		<td>描述</td>
+	</tr>
+	<tr>
+		<td>demographic_id</td>
+		<td>string</td>
+		<td>患者身份证号。若不为空，优先使用此字段</td>
+	</tr>
+	<tr>
+		<td>org_code</td>
+		<td>string</td>
+		<td>机构代码</td>
+	</tr>
+	<tr>
+		<td>card_no</td>
+		<td>string</td>
+		<td>就诊卡号（医保/社保卡、居民健康卡、院内临时卡）</td>
+	</tr>
+	<tr>
+		<td>name</td>
+		<td>string</td>
+        <td>姓名</td>
+	</tr>
+	<tr>
+		<td>gender</td>
+		<td>string</td>
+        <td>性别</td>
+	</tr>
+	<tr>
+		<td>mobile</td>
+		<td>string</td>
+        <td>手机号</td>
+	</tr>
+	<tr>
+		<td>native_place</td>
+		<td>string</td>
+        <td>籍贯</td>
+	</tr>
+</table>
 
 API列表
 ---------------------
@@ -62,7 +113,7 @@ API列表
 
 ### 健康事件列表（时间轴）与事件文档列表
 
-	GET /patient/profiles/timeline
+	GET /patient/health-profiles/timeline
 	
 **参数**
 
@@ -144,7 +195,7 @@ API列表
 
 ### 获取文档
 
-	GET /patient/profiles/document/datasets
+	GET /patient/health-profiles/document/datasets
 
 **参数**
 
