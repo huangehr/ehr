@@ -21,8 +21,6 @@ import java.util.List;
 @Service
 public class GeographyDictService extends BaseJpaService<GeographyDict,XGeographyDictRepository>{
 
-    @PersistenceContext
-    protected EntityManager entityManager;
     @Autowired
     private XGeographyDictRepository geographyDictRepository;
 

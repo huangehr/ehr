@@ -2,11 +2,23 @@ spring:
   application:
     name: svr-app
 
+---
+spring:
+  profiles: dev
   cloud:
     config:
       username: user
       password: configuration
-
       uri: http://localhost:1221
+      label: dev
+
+---
+spring:
+  profiles: prod
+  cloud:
+    config:
+      username: user
+      password: configuration
+      uri: http://172.19.103.73:1221
       label: dev
 

@@ -36,9 +36,9 @@ public class OrgService extends BaseJpaService<Organization, XOrganizationReposi
     }
 
 
-    public void save(Organization org) {
-        organizationRepository.save(org);
-    }
+//    public Organization saveOrg(Organization org) {
+//        return save(org);
+//    }
 
 
     public Boolean isExistOrg(String orgCode){
