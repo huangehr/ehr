@@ -19,7 +19,7 @@ public class MStdDict {
     String code;//字典代码
     String name;//字典名称
     String author;// 作者
-    long baseDict;//参考/继承的字典
+    Long baseDict;//参考/继承的字典
     Date createdate;//创建日期
     String description;//字典描述
     String sourceId;
@@ -61,11 +61,11 @@ public class MStdDict {
         this.author = author;
     }
 
-    public long getBaseDict() {
+    public Long getBaseDict() {
         return baseDict;
     }
 
-    public void setBaseDict(long baseDict) {
+    public void setBaseDict(Long baseDict) {
         this.baseDict = baseDict;
     }
 
