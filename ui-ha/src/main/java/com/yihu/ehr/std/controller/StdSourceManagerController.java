@@ -48,13 +48,13 @@ public class StdSourceManagerController extends BaseRestController {
         }catch(Exception ex){
             LogService.getLogger(StdSourceManagerController.class).error(ex.getMessage());
         }
-        model.addAttribute("std", _rus); // ÒÑĞŞ¸ÄjspÒ³Ãæ var std = $.parseJSON('${std}');
+        model.addAttribute("std", _rus); // å·²ä¿®æ”¹jspé¡µé¢ var std = $.parseJSON('${std}');
         model.addAttribute("mode",mode);
         model.addAttribute("contentPage","/std/standardsource/stdInfoDialog");
         return "simpleView";
 
         /*XStandardSource standardSource = null;
-        //mode¶¨Òå£ºnew modify viewÈıÖÖÄ£Ê½£¬ĞÂÔö£¬ĞŞ¸Ä£¬²é¿´
+        //modeå®šä¹‰ï¼šnew modify viewä¸‰ç§æ¨¡å¼ï¼Œæ–°å¢ï¼Œä¿®æ”¹ï¼ŒæŸ¥çœ‹
         if(mode.equals("view") || mode.equals("modify")){
             List ls = new ArrayList<>();
             ls.add(id);
@@ -112,12 +112,12 @@ public class StdSourceManagerController extends BaseRestController {
 
     @RequestMapping("getStdSource")
     @ResponseBody
-    //»ñÈ¡±ê×¼À´Ô´ĞÅÏ¢
+    //è·å–æ ‡å‡†æ¥æºä¿¡æ¯
     public Object getStdSource(String id) {
         Envelop result = new Envelop();
         if(StringUtils.isEmpty(id)){
             result.setSuccessFlg(false);
-            result.setErrorMsg("±ê×¼À´Ô´idÎª¿Õ£¡");
+            result.setErrorMsg("æ ‡å‡†æ¥æºidä¸ºç©ºï¼");
             return result;
         }
         String url = "/stdSource/standardSource";
@@ -125,7 +125,7 @@ public class StdSourceManagerController extends BaseRestController {
             Map<String,Object> params = new HashMap<>();
             params.put("id",id);
             String _rus = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            //TODO »òĞŞ¸ÄÒ³ÃæÏÔÊ¾£¿
+            //TODO æˆ–ä¿®æ”¹é¡µé¢æ˜¾ç¤ºï¼Ÿ
 //            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
 //            StandardSourceModel[] stdSourcesModel = objectMapper.readValue(_rus, StandardSourceModel[].class);
 //            Map<String,StandardSourceModel> data = new HashMap<>();
@@ -156,13 +156,13 @@ public class StdSourceManagerController extends BaseRestController {
 
     @RequestMapping("updateStdSource")
     @ResponseBody
-    //¸üĞÂ±ê×¼À´Ô´
+    //æ›´æ–°æ ‡å‡†æ¥æº
     public Object updateStdSource(String id,String code, String name, String type, String description) {
-        //TODO ¸Ã·½·¨¼æÓĞĞÂÔö/ĞŞ¸Ä²Ù×÷
+        //TODO è¯¥æ–¹æ³•å…¼æœ‰æ–°å¢/ä¿®æ”¹æ“ä½œ
         Envelop result = new Envelop();
         if (StringUtils.isEmpty(code)){
             result.setSuccessFlg(false);
-            result.setErrorMsg("±ê×¼À´Ô´±àÂë²»ÄÜÎª¿Õ£¡");
+            result.setErrorMsg("æ ‡å‡†æ¥æºç¼–ç ä¸èƒ½ä¸ºç©ºï¼");
             return result;
         }
         try{
@@ -178,7 +178,7 @@ public class StdSourceManagerController extends BaseRestController {
 //            StandardSourceModel stdSources = objectMapper.readValue(_rusSource,StandardSourceModel.class);
             if (Boolean.parseBoolean(_rusSource)) {
                 result.setSuccessFlg(false);
-                result.setErrorMsg("±àÂëÒÑ´æÔÚ!");
+                result.setErrorMsg("ç¼–ç å·²å­˜åœ¨!");
                 return result;
             }
             params.put("code",code);
@@ -189,7 +189,7 @@ public class StdSourceManagerController extends BaseRestController {
             String _rus = HttpClientUtil.doPost(comUrl + url, params, username, password);
             if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
-                result.setErrorMsg("±ê×¼À´Ô´¸üĞÂÊ§°Ü");
+                result.setErrorMsg("æ ‡å‡†æ¥æºæ›´æ–°å¤±è´¥");
             }else{
                 result.setSuccessFlg(true);
             }
@@ -236,7 +236,7 @@ public class StdSourceManagerController extends BaseRestController {
 
     @RequestMapping("delStdSource")
     @ResponseBody
-    //É¾³ı±ê×¼À´Ô´-¿ÉÅúÁ¿É¾³ı
+    //åˆ é™¤æ ‡å‡†æ¥æº-å¯æ‰¹é‡åˆ é™¤
     public Object delStdSource(String id) {
         Envelop result = new Envelop();
         String url = "/stdSource/standardSource";
@@ -248,7 +248,7 @@ public class StdSourceManagerController extends BaseRestController {
                 result.setSuccessFlg(true);
             }else{
                 result.setSuccessFlg(false);
-                result.setErrorMsg("±ê×¼À´Ô´É¾³ıÊ§°Ü");
+                result.setErrorMsg("æ ‡å‡†æ¥æºåˆ é™¤å¤±è´¥");
             }
         }catch(Exception ex){
             LogService.getLogger(StdSourceManagerController.class).error(ex.getMessage());
@@ -266,13 +266,13 @@ public class StdSourceManagerController extends BaseRestController {
 
     @RequestMapping("getVersionList")
     @ResponseBody
-    //»ñÈ¡°æ±¾ºÅÓÃÓÚÏÂÀ­¿ò
+    //è·å–ç‰ˆæœ¬å·ç”¨äºä¸‹æ‹‰æ¡†
     public Object getVersionList() {
         Envelop result = new Envelop();
         String url = "/version/allVersions";
         try{
             String  _rus = HttpClientUtil.doGet(comUrl+url,username,password);
-            //todo:ºóÌ¨×ªMAP
+            //todo:åå°è½¬MAP
 //            List<Map> versions = new ArrayList<>();
 //            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
 //            CDAVersionModel[] cdaVersionModels = objectMapper.readValue(_rus, CDAVersionModel[].class);

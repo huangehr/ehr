@@ -44,6 +44,7 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
         return user;
     }
 
+
     /**
      * 根据登陆用户名获取用户接口.
      *

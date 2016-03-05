@@ -32,7 +32,7 @@ public class OrgService extends BaseJpaService<Organization, XOrganizationReposi
     }
 
     public Organization getOrgByAdminLoginCode(String adminLoginCode) {
-        return organizationRepository.getOrgByAdmin(adminLoginCode);
+        return organizationRepository.findByAdmin(adminLoginCode);
     }
 
 

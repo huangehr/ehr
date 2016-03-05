@@ -14,6 +14,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
@@ -150,14 +151,16 @@ public class BaseJpaService<T, R> {
 
     public List<T> findByFields(String[] fields, Object[] values){
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery query = criteriaBuilder.createQuery();
+        CriteriaQuery query = criteriaBuilder.createQuery(getEntityClass());
         Root<T> root = query.from(getEntityClass());
+        List<Predicate> ls = new ArrayList<>();
         for(int i=0; i< fields.length; i++){
             if(values[i].getClass().isArray())
-                criteriaBuilder.in(root.get(fields[i]).in((Object[])values[i]));
+                ls.add(criteriaBuilder.in(root.get(fields[i]).in((Object[])values[i])));
             else
-                criteriaBuilder.equal(root.get(fields[i]), values[i]);
+                ls.add(criteriaBuilder.equal(root.get(fields[i]), values[i]));
         }
+        query.where(ls.toArray(new Predicate[ls.size()]));
         return entityManager
                 .createQuery(query)
                 .getResultList() ;
