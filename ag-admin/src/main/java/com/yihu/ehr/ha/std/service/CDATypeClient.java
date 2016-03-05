@@ -37,7 +37,7 @@ public interface CDATypeClient {
     @ApiOperation(value = "根据父级类别获取父级类别所在以下所有子集类别（包括当前父级列表）")
     List<MCDAType> getChildIncludeSelfByParentTypesAndKey(
             @ApiParam(name = "patient_ids", value = "父级id")
-            @RequestParam(value = "patient_ids") String[] patientIds,
+            @RequestParam(value = "patient_ids") String patientIds,
             @ApiParam(name = "key", value = "查询条件")
             @RequestParam(value = "key") String key);
 
