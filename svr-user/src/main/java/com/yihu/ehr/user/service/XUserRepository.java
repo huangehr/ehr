@@ -2,6 +2,8 @@ package com.yihu.ehr.user.service;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
 
+import java.util.List;
+
 /**
  * @author Sand
  * @version 1.0
@@ -9,5 +11,5 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  */
 public interface XUserRepository extends PagingAndSortingRepository<User, String> {
 
-
+    List<User>  findByRealName(String userName);
 }

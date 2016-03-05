@@ -33,8 +33,6 @@ public class Packages {
     @RequestMapping(value = "/", method = {RequestMethod.POST})
     @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
     public void receiveJsonPackage(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable(value = "api_version") String apiVersion,
 
             @ApiParam(required = true, name = "package", value = "JSON档案包", allowMultiple = true)
             MultipartHttpServletRequest jsonPackage,

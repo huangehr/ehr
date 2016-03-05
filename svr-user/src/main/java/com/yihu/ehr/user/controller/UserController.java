@@ -96,13 +96,29 @@ public class UserController extends BaseRestController {
 
 
     @RequestMapping(value = "users/{user_id}" , method = RequestMethod.GET)
-    @ApiOperation(value = "获取用户信息",notes = "包括地址信息等")
+    @ApiOperation(value = "根据id获取获取用户信息")
     public MUser getUser(
             @ApiParam(name = "user_id", value = "", defaultValue = "")
             @PathVariable(value = "user_id") String userId) {
         User user = userManager.getUser(userId);
         MUser userModel = convertToModel(user,MUser.class);
         return userModel;
+    }
+
+
+    /**
+     *
+     * 根据loginCode 获取user
+     * @param loginCode
+     * @return
+     */
+    @RequestMapping(value = "/users/login/{login_code}" , method = RequestMethod.GET)
+    @ApiOperation(value = "根据登录账号获取当前用户",notes = "根据登陆用户名及密码验证用户")
+    public MUser getUserByLoginCode(
+            @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
+            @PathVariable(value = "login_code") String loginCode) {
+        User user = userManager.getUserByLoginCode(loginCode);
+        return convertToModel(user,MUser.class);
     }
 
 
@@ -177,34 +193,21 @@ public class UserController extends BaseRestController {
     /**
      * 根据登陆用户名及密码验证用户.
      *
-     * @param loginCode
-     * @param psw
+     * @param userName
+     * @param password
      */
-    @RequestMapping(value = "/users/verification/{login_code}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/users/user_name/{user_name}/password/{password}" , method = RequestMethod.GET)
     @ApiOperation(value = "根据登陆用户名及密码验证用户",notes = "根据登陆用户名及密码验证用户")
-    public MUser loginVerification(
-            @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
-            @PathVariable(value = "login_code") String loginCode,
-            @ApiParam(name = "psw", value = "密码", defaultValue = "")
-            @RequestParam(value = "psw") String psw) {
-        User user = userManager.loginVerification(loginCode,psw);
+    public MUser getUserByNameAndPassword(
+            @ApiParam(name = "user_name", value = "登录账号", defaultValue = "")
+            @PathVariable(value = "user_name") String userName,
+            @ApiParam(name = "password", value = "密码", defaultValue = "")
+            @PathVariable(value = "password") String password) {
+        User user = userManager.loginVerification(userName,password);
         return convertToModel(user,MUser.class);
     }
 
-    /**
-     *
-     * 根据loginCode 获取user
-     * @param loginCode
-     * @return
-     */
-    @RequestMapping(value = "/users/login/{login_code}" , method = RequestMethod.GET)
-    @ApiOperation(value = "根据登录账号获取当前用户",notes = "根据登陆用户名及密码验证用户")
-    public MUser getUserByLoginCode(
-            @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
-            @PathVariable(value = "login_code") String loginCode) {
-        User user = userManager.getUserByLoginCode(loginCode);
-        return convertToModel(user,MUser.class);
-    }
+
 
 
     @RequestMapping(value = "/dictionaries/existence/{login_code}" , method = RequestMethod.GET)
