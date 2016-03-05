@@ -65,11 +65,9 @@ public interface OrgDataSetClient {
 
     @RequestMapping(value = "/adapter/org/is_exist", method = RequestMethod.GET)
     @ApiOperation(value = "条件查询")
-    boolean isExistOrgDataSet(
-            @ApiParam(name = "org_code",value = "机构代码")
-            @RequestParam(value = "org_code",required = false)String orgCode,
-            @ApiParam(name="code",value="数据集代码")
-            @RequestParam(value = "code",required = false)String code,
-            @ApiParam(name="name",value="数据集名称")
-            @RequestParam(value = "name",required = false)String name);
+    boolean dataSetIsExist(
+            @ApiParam(name = "org_code",value = "机构代码",defaultValue = "")
+            @RequestParam(value = "org_code")String orgCode,
+            @ApiParam(name="code",value="数据集代码",defaultValue = "")
+            @RequestParam(value = "code")String code);
 }

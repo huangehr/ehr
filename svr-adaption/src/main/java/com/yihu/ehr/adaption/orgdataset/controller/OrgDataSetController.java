@@ -1,5 +1,6 @@
 package com.yihu.ehr.adaption.orgdataset.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adaption.commons.ExtendController;
 import com.yihu.ehr.adaption.orgdataset.service.OrgDataSet;
 import com.yihu.ehr.adaption.orgdataset.service.OrgDataSetService;
@@ -35,6 +36,9 @@ public class OrgDataSetController extends ExtendController<MOrgDataSet> {
     @Autowired
     private OrgDataSetService orgDataSetService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @RequestMapping(value = "/data_set/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据id查询实体")
     public MOrgDataSet getOrgDataSet(
@@ -50,7 +54,7 @@ public class OrgDataSetController extends ExtendController<MOrgDataSet> {
             @ApiParam(name = "model", value = "适配字典数据模型", defaultValue = "")
             @RequestParam(value = "model") String model) throws Exception{
 
-        OrgDataSet orgDataSet = jsonToObj(model, OrgDataSet.class);
+        OrgDataSet orgDataSet = objectMapper.readValue(model, OrgDataSet.class);
         orgDataSet.setCreateDate(new Date());
         return getModel(orgDataSetService.createOrgDataSet(orgDataSet));
     }
@@ -73,7 +77,7 @@ public class OrgDataSetController extends ExtendController<MOrgDataSet> {
             @ApiParam(name = "model", value = "适配字典数据模型", defaultValue = "")
             @RequestParam(value = "model") String model) throws Exception{
 
-        OrgDataSet dataModel = jsonToObj(model, OrgDataSet.class);
+        OrgDataSet dataModel = objectMapper.readValue(model, OrgDataSet.class);
 
         return getModel(orgDataSetService.save(dataModel));
 
@@ -104,14 +108,12 @@ public class OrgDataSetController extends ExtendController<MOrgDataSet> {
 
     @RequestMapping(value = "/is_exist", method = RequestMethod.GET)
     @ApiOperation(value = "条件查询")
-    public boolean isExistOrgDataSet(
-            @ApiParam(name = "org_code",value = "机构代码")
-            @RequestParam(value = "org_code",required = false)String orgCode,
-            @ApiParam(name="code",value="数据集代码")
-            @RequestParam(value = "code",required = false)String code,
-            @ApiParam(name="name",value="数据集名称")
-            @RequestParam(value = "name",required = false)String name){
-       return orgDataSetService.isExistOrgDataSet(orgCode, code, name);
+    public boolean dataSetIsExist(
+            @ApiParam(name = "org_code",value = "机构代码",defaultValue = "")
+            @RequestParam(value = "org_code")String orgCode,
+            @ApiParam(name="code",value="数据集代码",defaultValue = "")
+            @RequestParam(value = "code")String code){
+       return orgDataSetService.isExistOrgDataSet(orgCode, code);
     }
 
 }

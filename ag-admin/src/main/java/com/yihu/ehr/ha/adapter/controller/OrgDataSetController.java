@@ -77,7 +77,7 @@ public class OrgDataSetController extends BaseController {
             if (StringUtils.isNotEmpty(errorMsg)) {
                 return failed(errorMsg);
             }
-            boolean isExist = orgDataSetClient.isExistOrgDataSet(detailModel.getOrganization(), detailModel.getCode(), detailModel.getName());
+            boolean isExist = orgDataSetClient.dataSetIsExist(detailModel.getOrganization(), detailModel.getCode());
 
             MOrgDataSet mOrgDataSet = convertToModel(detailModel, MOrgDataSet.class);
             if (detailModel.getId() == 0) {
