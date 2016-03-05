@@ -1,0 +1,15 @@
+#spring:
+#  datasource:
+#    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
+#    username: ha
+#    password: ha
+#    driver-class: com.mysql.jdbc.Driver
+
+spring:
+  view:
+    prefix: /WEB-INF/ehr/jsp/
+    suffix: .jsp
+
+#server:
+#  contextPath: /ehr
+#  port: 8080

@@ -54,7 +54,7 @@ public class DataSetsController extends BaseRestController {
     }
 
     /**
-     * Êı¾İ¼¯°æ±¾ºÅ²éÑ¯µÄ·½·¨
+     * æ•°æ®é›†ç‰ˆæœ¬å·æŸ¥è¯¢çš„æ–¹æ³•
      *
      * @return
      */
@@ -65,7 +65,7 @@ public class DataSetsController extends BaseRestController {
         try {
             String url = "/version/allVersions";
             String  _rus = HttpClientUtil.doGet(comUrl+url,username,password);
-            //todo:×ª³ÉMAP
+            //todo:×ªï¿½ï¿½MAP
 //            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
 //            CDAVersionModel[] cdaVersionModels = objectMapper.readValue(_rus, CDAVersionModel[].class);
 //            List<String> cdaVersionslist = new ArrayList<>();
@@ -98,7 +98,7 @@ public class DataSetsController extends BaseRestController {
     }
 
     /**
-     * ²éÑ¯Êı¾İ¼¯µÄ·½·¨
+     * æŸ¥è¯¢æ•°æ®é›†çš„æ–¹æ³•
      *
      * @param codename
      * @param page
@@ -111,7 +111,7 @@ public class DataSetsController extends BaseRestController {
         Envelop result = new Envelop();
         String strErrMessage = "";
         if (StringUtils.isEmpty(version)) {
-            strErrMessage += "ÇëÑ¡Ôñ°æ±¾ºÅ!";
+            strErrMessage += "è¯·é€‰æ‹©ç‰ˆæœ¬å·!";
         }
         if (!StringUtils.isEmpty(strErrMessage)) {
             result.setSuccessFlg(false);
@@ -144,7 +144,7 @@ public class DataSetsController extends BaseRestController {
         Result result = new Result();
         String strErrMessage = "";
         if (version == null || version == "") {
-            strErrMessage += "ÇëÑ¡Ôñ°æ±¾ºÅ!";
+            strErrMessage += "è¯·é€‰æ‹©ç‰ˆæœ¬å·!";
         }
         if (strErrMessage != "") {
             result.setSuccessFlg(false);
@@ -173,7 +173,7 @@ public class DataSetsController extends BaseRestController {
     }
 
     /**
-     * É¾³ıÊı¾İ¼¯ĞÅÏ¢µÄ·½·¨
+     * åˆ é™¤æ•°æ®é›†ä¿¡æ¯çš„æ–¹æ³•
      *
      * @param dataSetId
      * @return
@@ -184,7 +184,7 @@ public class DataSetsController extends BaseRestController {
         Envelop result = new Envelop();
         if (StringUtils.isEmpty(dataSetId) || dataSetId.equals(0)) {
             result.setSuccessFlg(false);
-            result.setErrorMsg("Êı¾İ¼¯idºÍ°æ±¾ºÅ²»ÄÜÎª¿Õ£¡");
+            result.setErrorMsg("æ•°æ®é›†idå’Œç‰ˆæœ¬å·ä¸èƒ½ä¸ºç©º!");
             return result;
         }
         String url = "/dataSet/dataSet";
@@ -235,7 +235,7 @@ public class DataSetsController extends BaseRestController {
         Envelop result = new Envelop();
         if (StringUtils.isEmpty(dataSetId) || dataSetId.equals(0)) {
             result.setSuccessFlg(false);
-            result.setErrorMsg("Êı¾İ¼¯IdºÍ°æ±¾ºÅ²»ÄÜÎª¿Õ£¡");
+            result.setErrorMsg("æ•°æ®é›†Idå’Œç‰ˆæœ¬å·ä¸èƒ½ä¸ºç©º!");
             return result;
         }
         String url = "/dataSet/dataSet";
@@ -249,7 +249,7 @@ public class DataSetsController extends BaseRestController {
                 result.setErrorMsg(ErrorCode.GetDataSetFailed.toString());
             }else {
                 result.setSuccessFlg(true);
-                //TODO ÓĞ×ª»¯Îª¶ÔÏóÔÚ´æ´¢µ½resultÖĞ
+                //TODO è¦è½¬åŒ–ä¸ºå¯¹è±¡åœ¨å­˜å‚¨åˆ°resultä¸­
                 result.setObj(_rus);
             }
         }catch(Exception ex){
@@ -282,7 +282,7 @@ public class DataSetsController extends BaseRestController {
     }
 
     /**
-     * Êı¾İ¼¯ĞÅÏ¢ĞŞ¸ÄµÄ·½·¨
+     * æ•°æ®é›†ä¿¡æ¯ä¿®æ”¹çš„æ–¹æ³•
      *
      * @param id
      * @param code
@@ -298,16 +298,16 @@ public class DataSetsController extends BaseRestController {
         Envelop result = new Envelop();
         String strErrorMsg = "";
         if(StringUtils.isEmpty(code)) {
-            strErrorMsg += "´úÂë²»ÄÜÎª¿Õ£¡";
+            strErrorMsg += "ä»£ç ä¸èƒ½ä¸ºç©º!";
         }
         if (StringUtils.isEmpty(name)) {
-            strErrorMsg += "Ãû³Æ²»ÄÜÎª¿Õ£¡";
+            strErrorMsg += "åç§°ä¸èƒ½ä¸ºç©º!";
         }
         if (StringUtils.isEmpty(type)) {
-            strErrorMsg += "±ê×¼À´Ô´²»ÄÜÎª¿Õ£¡";
+            strErrorMsg += "æ ‡å‡†æ¥æºä¸èƒ½ä¸ºç©º!";
         }
         if (StringUtils.isEmpty(refStandard)) {
-            strErrorMsg += "±ê×¼°æ±¾²»ÄÜÎª¿Õ£¡";
+            strErrorMsg += "æ ‡å‡†ç‰ˆæœ¬ä¸èƒ½ä¸ºç©º!";
         }
         if (StringUtils.isEmpty(strErrorMsg)) {
             result.setSuccessFlg(false);
@@ -319,7 +319,7 @@ public class DataSetsController extends BaseRestController {
             Map<String,Object> params = new HashMap<>();
             params.put("id",id);
             params.put("code",code);
-            //TODO Ìá¹©code²»ÄÜ´Ó¸´ÑéÖ¤api
+            //TODO æä¾›codeä¸èƒ½ä»å¤éªŒè¯api
             params.put("name",name);
             params.put("type",type);
             params.put("refStandard",refStandard);
@@ -345,29 +345,29 @@ public class DataSetsController extends BaseRestController {
         String strErrorMsg = "";
         try {
             if (code == null || code == "") {
-                strErrorMsg += "´úÂë²»ÄÜÎª¿Õ£¡";
+                strErrorMsg += "ä»£ç ä¸èƒ½ä¸ºç©ºï¼";
             }
             if (name == null || name == "") {
-                strErrorMsg += "Ãû³Æ²»ÄÜÎª¿Õ£¡";
+                strErrorMsg += "åç§°ä¸èƒ½ä¸ºç©ºï¼";
             }
             if (refStandard == null || refStandard == "") {
-                strErrorMsg += "±ê×¼À´Ô´²»ÄÜÎª¿Õ£¡";
+                strErrorMsg += "æ ‡å‡†æ¥æºä¸èƒ½ä¸ºç©ºï¼";
             }
             if (cdaVersion == null || cdaVersion.getVersion() == "") {
-                strErrorMsg += "±ê×¼°æ±¾²»ÄÜÎª¿Õ£¡";
+                strErrorMsg += "æ ‡å‡†ç‰ˆæœ¬ä¸èƒ½ä¸ºç©ºï¼";
             }
             XDataSet dataSet = new DataSet();
-            //ĞÂÔöÊ±´úÂë²»ÄÜÖØ¸´
+            //æ–°å¢æ—¶ä»£ç ä¸èƒ½é‡å¤
             if (id == 0) {
                 XDataSet dataSetCode = (XDataSet) dataSetManager.getDataSet(code, cdaVersion.getVersion());
                 if (dataSetCode != null) {
-                    strErrorMsg += "´úÂë²»ÄÜÖØ¸´£¡";
+                    strErrorMsg += "ä»£ç ä¸èƒ½é‡å¤ï¼";
                 }
             } else {
-                //ĞŞ¸ÄÊ±´úÂë²»ÄÜÖØ¸´
+                //ä¿®æ”¹æ—¶ä»£ç ä¸èƒ½é‡å¤
                 dataSet = (XDataSet) dataSetManager.getDataSet(code, cdaVersion.getVersion());
                 if (dataSet != null && dataSet.getId() != id) {
-                    strErrorMsg += "´úÂë²»ÄÜÖØ¸´£¡";
+                    strErrorMsg += "ä»£ç ä¸èƒ½é‡å¤ï¼";
                 }
                 else {
                     dataSet = dataSetManager.getDataSet(id, cdaVersion);
@@ -397,7 +397,7 @@ public class DataSetsController extends BaseRestController {
     }
 
     /**
-     * ²éÑ¯Êı¾İÔ´µÄ·½·¨
+     * æŸ¥è¯¢æ•°æ®æºçš„æ–¹æ³•
      *
      * @param id
      * @param version
@@ -412,7 +412,7 @@ public class DataSetsController extends BaseRestController {
         Envelop result = new Envelop();
         if (StringUtils.isEmpty(id) || id.equals(0) || StringUtils.isEmpty(version)|| version.equals(0)) {
             result.setSuccessFlg(false);
-            result.setErrorMsg("Êı¾İÔªid¡¢±ê×¼°æ±¾²»ÄÜÎª¿Õ");
+            result.setErrorMsg("æ•°æ®å…ƒidã€æ ‡å‡†ç‰ˆæœ¬ä¸èƒ½ä¸ºç©º!");
             return result;
         }
         String url = "/dataSet/metaDatas";
@@ -466,7 +466,7 @@ public class DataSetsController extends BaseRestController {
     }
 
     /**
-     * É¾³ıÊı¾İÔªµÄ·½·¨
+     * åˆ é™¤æ•°æ®å…ƒçš„æ–¹æ³•
      *
      * @param ids
      * @return
@@ -477,10 +477,10 @@ public class DataSetsController extends BaseRestController {
         Envelop result = new Envelop();
         String strErrMessage = "";
         if (StringUtils.isEmpty(ids)) {
-            strErrMessage += "ÇëÑ¡ÔñÊı¾İÔª!";
+            strErrMessage += "è¯·é€‰æ‹©æ•°æ®å…ƒ!";
         }
         if (StringUtils.isEmpty(version)) {
-            strErrMessage += "ÇëÑ¡Ôñ±ê×¼°æ±¾!";
+            strErrMessage += "è¯·é€‰æ‹©æ ‡å‡†ç‰ˆæœ¬!";
         }
         if (!strErrMessage.equals("")) {
             result.setErrorMsg(strErrMessage);
@@ -490,7 +490,7 @@ public class DataSetsController extends BaseRestController {
         try {
             String url = "/dataSet/metaData";
             Map<String,Object> params = new HashMap<>();
-            params.put("ids",ids);// TODO api²ÎÊıÎªLong ids  ---ÅúÁ¿É¾³ı´«µİ¹ıÀ´µÄÊÇids×Ö·û´®
+            params.put("ids",ids);// TODO apiå‚æ•°ä¸ºLong ids  ---æ‰¹é‡åˆ é™¤ä¼ é€’è¿‡æ¥çš„æ˜¯idså­—ç¬¦ä¸²
             params.put("versionCode",version);
             String _msg = HttpClientUtil.doDelete(comUrl+url,params,username,password);
             if(Boolean.parseBoolean(_msg)){
@@ -508,11 +508,11 @@ public class DataSetsController extends BaseRestController {
 
         /*Result result = new Result();
         String strErrMessage = "";
-        if (ids == null || ids.equals("")) {
-            strErrMessage += "ÇëÑ¡ÔñÊı¾İÔª!";
+       if (ids == null || ids.equals("")) {
+            strErrMessage += "è¯·é€‰æ‹©æ•°æ®å…ƒ!";
         }
         if (version == null || version.equals("")) {
-            strErrMessage += "ÇëÑ¡Ôñ±ê×¼°æ±¾!";
+            strErrMessage += "è¯·é€‰æ‹©æ ‡å‡†ç‰ˆæœ¬!";
         }
         if (!strErrMessage.equals("")) {
             result.setErrorMsg(strErrMessage);
@@ -540,13 +540,13 @@ public class DataSetsController extends BaseRestController {
         Envelop result = new Envelop();
         String strErrMessage = "";
         if (StringUtils.isEmpty(dataSetId) || dataSetId.equals(0)) {
-            strErrMessage += "ÇëÏÈÑ¡ÔñÊı¾İ¼¯!";
+            strErrMessage += "è¯·å…ˆé€‰æ‹©æ•°æ®é›†!";
         }
         if (StringUtils.isEmpty(metaDataId) || metaDataId.equals(0)) {
-            strErrMessage += "ÇëÏÈÑ¡ÔñÊı¾İÔª!";
+            strErrMessage += "è¯·å…ˆé€‰æ‹©æ•°æ®å…ƒ!";
         }
         if (StringUtils.isEmpty(version) || version.equals(0)) {
-            strErrMessage += "ÇëÏÈÑ¡Ôñ±ê×¼°æ±¾!";
+            strErrMessage += "è¯·å…ˆé€‰æ‹©æ ‡å‡†ç‰ˆæœ¬!";
         }
         if (strErrMessage != "") {
             result.setSuccessFlg(false);
@@ -564,7 +564,7 @@ public class DataSetsController extends BaseRestController {
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.GetMetaDataFailed.toString());
             }else {
-                //TODO ÓĞ×ª»¯³ÉÎª¶ÔÏóÔÚ´æÈëresultÖĞ
+                //TODO æœ‰è½¬åŒ–æˆä¸ºå¯¹è±¡åœ¨å­˜å…¥resultä¸­
 //                ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
 //                XMetaDataForInterface metaData = objectMapper.readValue(_rus,XMetaDataForInterface.class);
 //                List<XMetaDataForInterface> elementList = new ArrayList<>();
@@ -584,13 +584,13 @@ public class DataSetsController extends BaseRestController {
         Result result = new Result();
         String strErrMessage = "";
         if (dataSetId == null || dataSetId.equals(0) || dataSetId.equals("")) {
-            strErrMessage += "ÇëÏÈÑ¡ÔñÊı¾İ¼¯!";
+            strErrMessage += "è¯·å…ˆé€‰æ‹©æ•°æ®é›†!";
         }
         if (metaDataId == null || metaDataId.equals(0) || metaDataId.equals("")) {
-            strErrMessage += "ÇëÏÈÑ¡ÔñÊı¾İÔª!";
+            strErrMessage += "è¯·å…ˆé€‰æ‹©æ•°æ®å…ƒ!";
         }
         if (version == null || version.equals(0) || version.equals("")) {
-            strErrMessage += "ÇëÏÈÑ¡Ôñ±ê×¼°æ±¾!";
+            strErrMessage += "è¯·å…ˆé€‰æ‹©æ ‡å‡†ç‰ˆæœ¬!";
         }
         if (strErrMessage != "") {
             result.setSuccessFlg(false);
@@ -647,24 +647,24 @@ public class DataSetsController extends BaseRestController {
         Envelop result = new Envelop();
         try {
             String strErrMessage = "";
-            //todo: Ç°Ì¨js²»ÄÜÎª¿ÕÅĞ¶Ï
+            //todo: å‰å°jsåšä¸ºç©ºåˆ¤æ–­
 //            if (StringUtil.isEmpty(info.getVersion()) || info.getVersion().equals(0)) {
-//                strErrMessage += "ÇëÏÈÑ¡Ôñ±ê×¼°æ±¾!";
+//                strErrMessage += "è¯·å…ˆé€‰æ‹©æ ‡å‡†ç‰ˆæœ¬!";
 //            }
 //            if (StringUtil.isEmpty(info.getDatasetId())|| info.getDatasetId().equals(0)) {
-//                strErrMessage += "ÇëÏÈÑ¡ÔñÊı¾İ¼¯!";
+//                strErrMessage += "è¯·å…ˆé€‰æ‹©æ•°æ®é›†!";
 //            }
 //            if (StringUtil.isEmpty(info.getCode())|| info.getCode().equals(0)) {
-//                strErrMessage += "´úÂë²»ÄÜÎª¿Õ!";
+//                strErrMessage += "ä»£ç ä¸èƒ½ä¸ºç©º!";
 //            }
 //            if (StringUtil.isEmpty(info.getName())|| info.getName().equals(0)) {
-//                strErrMessage += "Ãû³Æ²»ÄÜÎª¿Õ!";
+//                strErrMessage += "åç§°ä¸èƒ½ä¸ºç©º!";
 //            }
 //            if (StringUtil.isEmpty(info.getInnerCode()) || info.getInnerCode().equals(0)) {
-//                strErrMessage += "ÄÚ²¿´úÂë²»ÄÜÎª¿Õ!";
+//                strErrMessage += "å†…éƒ¨ä»£ç ä¸èƒ½ä¸ºç©º!";
 //            }
 //            if (StringUtil.isEmpty(info.getColumnName())|| info.getColumnName().equals(0)) {
-//                strErrMessage += "×Ö¶ÎÃû³Æ²»ÄÜÎª¿Õ!";
+//                strErrMessage += "å­—æ®µåç§°ä¸èƒ½ä¸ºç©º!";
 //            }
             if (!strErrMessage.equals("")) {
                 result.setErrorMsg(strErrMessage);
@@ -672,7 +672,7 @@ public class DataSetsController extends BaseRestController {
                 return result;
             }
             String url = "/dataSet/updataMetaSet";
-            // TODO ÓĞwriteValueAsString(info);²Ù×÷
+            //todo
 //            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
 //            String _MetaDataForInterface = objectMapper.writeValueAsString(info);
             Map<String,Object> params = new HashMap<>();
@@ -696,29 +696,29 @@ public class DataSetsController extends BaseRestController {
         try {
             String strErrMessage = "";
             if (info.getVersion() == null || info.getVersion().equals(0) || info.getVersion().equals("")) {
-                strErrMessage += "ÇëÏÈÑ¡Ôñ±ê×¼°æ±¾!";
+                strErrMessage += "è¯·å…ˆé€‰æ‹©æ ‡å‡†ç‰ˆæœ¬!";
             }
             if (info.getDatasetId() == null || info.getDatasetId().equals(0) || info.getDatasetId().equals("")) {
-                strErrMessage += "ÇëÏÈÑ¡ÔñÊı¾İ¼¯!";
+                strErrMessage += "è¯·å…ˆé€‰æ‹©æ•°æ®é›†!";
             }
             if (info.getCode() == null || info.getCode().equals(0) || info.getCode().equals("")) {
-                strErrMessage += "´úÂë²»ÄÜÎª¿Õ!";
+                strErrMessage += "ä»£ç ä¸èƒ½ä¸ºç©º!";
             }
             if (info.getName() == null || info.getName().equals(0) || info.getName().equals("")) {
-                strErrMessage += "Ãû³Æ²»ÄÜÎª¿Õ!";
+                strErrMessage += "åç§°ä¸èƒ½ä¸ºç©º!";
             }
             if (info.getInnerCode() == null || info.getInnerCode().equals(0) || info.getInnerCode().equals("")) {
-                strErrMessage += "ÄÚ²¿´úÂë²»ÄÜÎª¿Õ!";
+                strErrMessage += "å†…éƒ¨ä»£ç ä¸èƒ½ä¸ºç©º!";
             }
             if (info.getColumnName() == null || info.getColumnName().equals(0) || info.getColumnName().equals("")) {
-                strErrMessage += "×Ö¶ÎÃû³Æ²»ÄÜÎª¿Õ!";
+                strErrMessage += "å­—æ®µåç§°ä¸èƒ½ä¸ºç©º!";
             }
             if (info.getId().equals("0")) {
                 if (metaDataManager.getCountByCode(info.getVersion(), info.getInnerCode(), info.getDatasetId()) > 0) {
-                    strErrMessage += "´úÂë²»ÄÜÖØ¸´!";
+                    strErrMessage += "ä»£ç ä¸èƒ½é‡å¤!";
                 }
                 if (metaDataManager.getCountByColumnName(info.getVersion(), info.getColumnName(), info.getDatasetId()) > 0) {
-                    strErrMessage += "×Ö¶ÎÃû²»ÄÜÖØ¸´!";
+                    strErrMessage += "å­—æ®µåä¸èƒ½é‡å¤!";
                 }
             }else {
                 //if ()
@@ -769,7 +769,7 @@ public class DataSetsController extends BaseRestController {
     }
 
     /**
-     * ±ê×¼À´Ô´ÏÂÀ­¿òµÄ²éÑ¯
+     * æ ‡å‡†æ¥æºä¸‹æ‹‰æ¡†çš„æŸ¥è¯¢
      *
      * @param version
      * @return
@@ -782,7 +782,7 @@ public class DataSetsController extends BaseRestController {
         try {
             if (StringUtils.isEmpty(version)) {
                 result.setSuccessFlg(false);
-                result.setErrorMsg("°æ±¾²»ÄÜÎª¿Õ£¡");
+                result.setErrorMsg("ç‰ˆæœ¬å·ä¸èƒ½ä¸ºç©º");
                 return result;
             }
             String url = "/stdSource/standardSources";
@@ -791,20 +791,19 @@ public class DataSetsController extends BaseRestController {
             String _rus = HttpClientUtil.doGet(comUrl+url,params,username,password);
             if (StringUtils.isEmpty(_rus)) {
                 result.setSuccessFlg(false);
-                result.setErrorMsg("²éÕÒ²»µ½±ê×¼À´Ô´£¡");
+                result.setErrorMsg("æ²¡æœ‰æ ‡å‡†æ¥æº");
                 return result;
             }
-            //TODO ÓĞ writeValueAsString(resultInfos);²Ù×÷
+            return _rus;
 //            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
 //            List<StandardSourceForInterface> resultInfos = Arrays.asList(objectMapper.readValue(_rus,StandardSourceForInterface[].class));
 //            strJson = objectMapper.writeValueAsString(resultInfos);
         } catch (Exception ex) {
             LogService.getLogger(DataSetsController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
-            result.setErrorMsg("»ñÈ¡±ê×¼À´Ô´Ê§°Ü£¡");
+            result.setErrorMsg("è·å–æ ‡å‡†æ¥æºå‡ºé”™!");
             return result;
         }
-        return result;
         /*Result result = new Result();
         String strJson = "";
         try {
@@ -845,7 +844,7 @@ public class DataSetsController extends BaseRestController {
 */
 
     /**
-     * ¼ìÑé×Öµä²éÑ¯µÄ·½·¨
+     * æ£€éªŒå­—å…¸æŸ¥è¯¢çš„æ–¹æ³•
      *
      * @param version
      * @param key
@@ -856,7 +855,7 @@ public class DataSetsController extends BaseRestController {
     public String getMetaDataDict(String version, String key) {
         String strResult = "[]";
         try {
-            //TODO ÎŞ¶ÔÓ¦
+            //TODO æ— å¯¹åº”
             String url = "/******";
             Map<String,Object> params = new HashMap<>();
             params.put("versionCode",version);
@@ -925,7 +924,7 @@ public class DataSetsController extends BaseRestController {
                 result.setSuccessFlg(true);
             }else{
                 result.setSuccessFlg(false);
-                result.setErrorMsg("ÑéÖ¤Ê§°Ü");
+                result.setErrorMsg("éªŒè¯å¤±è´¥");
             }
         }catch(Exception ex){
             LogService.getLogger(DataSetsController.class).error(ex.getMessage());
@@ -949,14 +948,14 @@ public class DataSetsController extends BaseRestController {
     }
 
     /**
-     * ½«CDA¹éÊôµÄÊı¾İ¼¯ĞÅÏ¢×ª»»µÄXMLĞÅÏ¢
-     * @param setId Êı¾İ¼¯ID
-     * @param versionCode °æ±¾ºÅ
-     * @return xmlĞÅÏ¢*/
+     * å°†CDAå½’å±çš„æ•°æ®é›†ä¿¡æ¯è½¬æ¢çš„XMLä¿¡æ¯
+     * @param setId æ•°æ®é›†ID
+     * @param versionCode ç‰ˆæœ¬å·
+     * @return xmlä¿¡æ¯*/
     @RequestMapping("/getXMLInfoByDataSetId")
     @ResponseBody
     public Object getXMLInfoByDataSetId(String setId, String versionCode) {
-        //TODO Ã»ÓĞ¶ÔÓ¦
+        //TODO æ— å¯¹åº”
         Envelop result = new Envelop();
         try {
             String url = "/dataSet/*******";
@@ -966,7 +965,7 @@ public class DataSetsController extends BaseRestController {
             String _rus = HttpClientUtil.doGet(comUrl+url,params,username,password);
             if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
-                result.setErrorMsg("Êı¾İ»ñÈ¡Ê§°Ü£¡");
+                result.setErrorMsg("æ•°æ®è·å–å¤±è´¥!");
             }else{
                 result.setSuccessFlg(true);
                 result.setObj(_rus);
@@ -1008,7 +1007,7 @@ public class DataSetsController extends BaseRestController {
     }
 
 //    public void exportToExcel(){
-//        //todo£ºtest µ¼³ö²âÊÔ
+//        //todoï¼štest å¯¼å‡ºæµ‹è¯•
 //        List<String> ids = new ArrayList<>();
 //        ids.add("1");
 //        ids.add("2");
@@ -1018,7 +1017,7 @@ public class DataSetsController extends BaseRestController {
 //    }
 //
 //    public void importFromExcel(){
-//        //todo£ºtestµ¼Èë²âÊÔ
-//        dataSetManager.importFromExcel("E:/workspaces/excel/²âÊÔexcelµ¼Èë.xls", xcdaVersionManager.getLatestVersion());
+//        //todoï¼štestå¯¼å…¥æµ‹è¯•
+//        dataSetManager.importFromExcel("E:/workspaces/excel/ï¿½ï¿½ï¿½ï¿½excelï¿½ï¿½ï¿½ï¿½.xls", xcdaVersionManager.getLatestVersion());
 //    }
 }
