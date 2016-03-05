@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by Administrator on 2016/2/29.
+ * Created by yww on 2016/3/1.
  */
 @FeignClient("svr-standard")
 @RequestMapping(ApiVersion.Version1_0 + "/std")
@@ -62,7 +62,7 @@ public interface CDATypeClient {
     @ApiOperation(value = "根据ids获取CDAType列表")
     List<MCDAType> getCdaTypeByIds(
             @ApiParam(name = "ids", value = "ids")
-            @PathVariable(value = "ids") String[] ids);
+            @PathVariable(value = "ids") String ids);
 
 
     @RequestMapping(value = "/cda_types", method = RequestMethod.POST)
@@ -90,6 +90,6 @@ public interface CDATypeClient {
     @ApiOperation(value = "删除CDA类别，若该类别存在子类别，将一并删除子类别")
     boolean deleteCDATypeByPatientIds(
             @ApiParam(name = "ids", value = "ids")
-            @PathVariable(value = "ids") String[] ids);
+            @PathVariable(value = "ids") String ids);
 
 }

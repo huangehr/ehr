@@ -1,6 +1,7 @@
 package com.yihu.ehr.ha;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.standard.cdaType.CdaTypeDetailModel;
 import com.yihu.ehr.ha.std.controller.CDATypeController;
 import com.yihu.ehr.util.Envelop;
 import org.junit.FixMethodOrder;
@@ -36,11 +37,6 @@ public class CDATypeControllerTests {
     @Autowired
     ObjectMapper objectMapper;
 
-
-//    @Test
-//    public void testAddVersion() throws Exception {
-//    }
-
     @Test
     public void testChildrenByPatientId() throws Exception {
         //根据父级cdaType的id获取下一级cdaType----------------ok
@@ -68,35 +64,49 @@ public class CDATypeControllerTests {
     }
 
     @Test
-    public void testCdaTypeById() throws Exception {
-        //根据id获取CDAType-------ok
-        String typeId = "0dae000656720d12269e0319806c0ef1";
-        envelop = cdaTypeController.getCdaTypeById(typeId);
-        assertNotEquals("没有查询到对应的cdaType！", envelop.getObj(), null);
-    }
-
-    @Test
     public void testCdaTypeByIds() throws Exception {
-        //根据ids获取CDAType列表-----------
-        String[] typeIds = {"0dae00065681f7a80dc356006a76fb89"};
-        envelop = cdaTypeController.getCdaTypeByIds(typeIds);
+        //根据ids获取CDAType列表------------------------------------------ok
+        String ids = "0dae000656720bd5269e0319806c0eed,0dae001256da2f60feffc211342c6ec7";
+        envelop = cdaTypeController.getCdaTypeByIds(ids);
         assertNotEquals("没有查询到对应的cdaType！", envelop.getDetailModelList().size(), 0);
     }
 
     @Test
     public void testSaveCDAType() throws Exception {
-        //新增CDAType----------
-        String jsonData = "";
-        envelop = cdaTypeController.saveCDAType(jsonData);
-        assertNotEquals("新增cdaType失败！", envelop.getObj(), null);
-    }
+        //新增CDAType----------ok
 
-    @Test
-    public void testUpdateCDAType() throws Exception {
-        //修改CDAType-------
-        String jsonDataNew = "";
-        envelop = cdaTypeController.updateCDAType(jsonDataNew);
-        assertNotEquals("修改CdaType失败！", envelop.getObj(), null);
+        CdaTypeDetailModel detailModel = new CdaTypeDetailModel();
+        detailModel.setCode("wwcs");
+        detailModel.setName("api网关改造测试");
+        detailModel.setCreateUser("0dae0003561cc415c72d9111e8cb88aa");
+        detailModel.setParentId("0dae000656720d02269e0319806c0ef0");
+        detailModel.setDescription("wwcscscscscsscs");
+        String jsonDataCreate = objectMapper.writeValueAsString(detailModel);
+        envelop = cdaTypeController.saveCDAType(jsonDataCreate);
+        assertNotEquals("新增cdaType失败！", envelop.getObj(), null);
+
+        //获取刚新建的cdaType 便于后面测试
+        CdaTypeDetailModel cdaTypeDetailModel = (CdaTypeDetailModel) envelop.getObj();
+
+        //根据id获取cdaType）-----------ok
+
+        envelop = cdaTypeController.getCdaTypeById(cdaTypeDetailModel.getId());
+        assertNotEquals("没有查询到对应的cdaType！", envelop.getObj(), null);
+
+        //修改cdaType--------------ok
+
+        cdaTypeDetailModel.setCode("wwcsUpdate");
+        cdaTypeDetailModel.setName("api网关改造测试Update");
+        cdaTypeDetailModel.setUpdateUser("0dae0003561cc415c72d9111e8cb88aa");
+        String jsonDataUpdate = objectMapper.writeValueAsString(cdaTypeDetailModel);
+        envelop = cdaTypeController.updateCDAType(jsonDataUpdate);
+        assertNotEquals("更新cdaType失败！", envelop.getObj(), null);
+
+        //删除刚新建的cdaType------------ok
+
+        boolean rs = cdaTypeController.deleteCDATypeByPatientIds(cdaTypeDetailModel.getId());
+        assertNotEquals("删除cdaType失败！", rs, false);
+
     }
 
     @Test
@@ -111,10 +121,10 @@ public class CDATypeControllerTests {
     }
 
     @Test
-    public void testExistInStage() throws Exception {
-        //删除CDA类别，若该类别存在子类别，将一并删除子类别-----------
-        String[] parentIds = {};
-        boolean rs = cdaTypeController.deleteCDATypeByPatientIds(parentIds);
-        assertNotEquals("删除cdaType失败！", rs, true);
+    public void testDeleteByParentIds() throws Exception {
+        //删除CDA类别，若该类别存在子类别，将一并删除子类别---------------------------------------ok
+        String ids = "85be292860a5488c9ada65afaf2735e0,cd4b8e189b9d4cdea2e823fb2a027f34";
+        boolean rs = cdaTypeController.deleteCDATypeByPatientIds(ids);
+        assertNotEquals("删除cdaType失败！", rs, false);
     }
 }
