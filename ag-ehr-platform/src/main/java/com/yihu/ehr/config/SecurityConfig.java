@@ -1,6 +1,6 @@
 package com.yihu.ehr.config;
 
-import com.yihu.ehr.service.FakeUserDetailsService;
+import com.yihu.ehr.service.oauth2.EhrUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
@@ -16,7 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
-    private FakeUserDetailsService userDetailsService;
+    private EhrUserDetailsService userDetailsService;
 
     @Override
     protected void configure(AuthenticationManagerBuilder authBuilder) throws Exception {

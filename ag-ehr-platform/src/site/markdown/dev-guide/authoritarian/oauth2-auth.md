@@ -11,10 +11,10 @@ OAuth2授权
 所有的开发者都需要在应用开发中心中注册成为开发者，并提交应用。成功之后平台会为应用分配一个Client Id与Secret，请不要泄漏Secret信息。
 用户可以创建一个仅供个人使用的Token，也可以实现Web页面授权流程以允许其他用户能够对你的应用进行授权。
 
-平台OAuth2仅支持[授权许可代码模式](https://tools.ietf.org/html/rfc6749#section-4.1)。开发者需要实现下文中描述的“Web页面授权流程”，
+平台OAuth2仅支持[授权许可代码模式](https://tools.ietf.org/html/rfc6749#section-4.1)。开发者需要实现下文中描述的“Web页面授权流”，
 并取得Token（平台不支持[隐式授权模式](https://tools.ietf.org/html/rfc6749#section-4.2)）。
 
-Web页面授权流程
+Web页面授权流
 ---------------------
 
 本流程描述来自第三方Web站点的OAuth2流程。
@@ -60,13 +60,12 @@ Web页面授权流程
 
 **返回值**
 
-	{
-		"code": "asdf12345hgiljl"
-	}
+在用户成功对应用授权之后，健康档案平台会用户重定向到你的应用，并在URL参数中添加一个验证码:code及上一步调用时使用的state参数：
+
+	https://you-application.com?code=LjF5Jm&state=asdf12345hgiljl
 
 **2 平台将用户重定向回你的应用**
 
-在用户成功对应用授权之后，健康档案平台会用户重定向到你的应用，并在返回参数中添加一个验证码:code及上一步调用时使用的state参数。
 验证码有效期为10分钟且仅能使用一次。如果state参数不匹配，应用应该取消本次授权过程。
 
 使用验证码获取Token：
@@ -294,23 +293,16 @@ scope属性包含此Token由用户所授权的有效作用域。正常情况下�
 若发生这种情况，请根据应用注册时提供的URL，重新请求授权。
 
 **无效验证码**
-
-	{
-      "add_scopes": [
-        "repo"
-      ],
-      "note": "admin script"
-    }
     
 如果验证码错误或过期，平台将返回以下错误：
 
 	{
       "error": "bad_verification_code",
-      "error_description": "The code passed is incorrect or expired.",
-      "error_uri": "https://ehr.yihu.com/api/v1.0/oauth/#bad-verification-code"
+      "error_description": "授权码Lk8gzM无效或已过期",
+      "error_uri": "https://ehr.yihu.com/docs/oauth/#bad-verification-code"
     }
     
-若发生这种情况，请重新请求授权，并获取新的验证码。
+若发生这种情况，请重新发请授权流获取新的验证码。
 
 用户授权检查与审核
 ---------------------

@@ -12,7 +12,7 @@
 
 > 总体结构
 
-> 开发约定
+> [开发职责与约定](agreement/agreement.html)
 
 > [代码规范](specification/index.html)
 

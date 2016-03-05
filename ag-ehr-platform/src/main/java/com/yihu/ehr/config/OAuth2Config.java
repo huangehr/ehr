@@ -1,5 +1,6 @@
 package com.yihu.ehr.config;
 
+import com.yihu.ehr.service.oauth2.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,6 +12,9 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.OAuth2RequestFactory;
+import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
+import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
 
 /**
  * @author Sand
@@ -28,21 +32,23 @@ public class OAuth2Config{
         @Autowired
         private AuthenticationManager authenticationManager;
 
+        EhrTokenServices tokenServices = new EhrTokenServices();
+        EhrClientDetailsService clientDetailsService = new EhrClientDetailsService();
+        EhrAuthorizationCodeService authorizationCodeService = new EhrAuthorizationCodeService();
+        OAuth2RequestFactory requestFactory = new DefaultOAuth2RequestFactory(clientDetailsService);
+
         @Override
         public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
             endpoints.authenticationManager(authenticationManager);
+            endpoints.authorizationCodeServices(authorizationCodeService);
+            endpoints.tokenGranter(new EhrTokenGranter(tokenServices, authorizationCodeService, clientDetailsService, requestFactory));
+            endpoints.setClientDetailsService(clientDetailsService);
+            endpoints.exceptionTranslator(new EhrOAuth2ExceptionTranslator());
         }
 
         @Override
         public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-            clients.inMemory()
-                    .withClient("client-with-registered-redirect")
-                    .authorizedGrantTypes("authorization_code")
-                    .authorities("ROLE_CLIENT")
-                    .scopes("user", "user.demographic_id", "user.health_profiles", "organization")
-                    .resourceIds(RESOURCE_ID)
-                    .redirectUris("http://www.yihu.com?key=value")
-                    .secret("secret123");
+            clients.withClientDetails(clientDetailsService);
         }
     }
 

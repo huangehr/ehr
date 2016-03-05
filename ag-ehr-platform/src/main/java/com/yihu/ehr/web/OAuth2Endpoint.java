@@ -44,8 +44,8 @@ import java.util.*;
  * @version 1.0
  * @created 2016.03.04 10:56
  */
-@Controller
-@SessionAttributes("authorizationRequest")
+//@Controller
+//@SessionAttributes("authorizationRequest")
 public class OAuth2Endpoint extends AbstractEndpoint {
 
     private AuthorizationCodeServices authorizationCodeServices = new InMemoryAuthorizationCodeServices();

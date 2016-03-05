@@ -1,4 +1,4 @@
-package com.yihu.ehr.service;
+package com.yihu.ehr.service.oauth2;
 
 import com.yihu.ehr.feign.UserClient;
 import com.yihu.ehr.model.user.MUser;
@@ -19,7 +19,7 @@ import java.util.Collection;
  * @created 2016.03.02 17:11
  */
 @Service
-public class FakeUserDetailsService implements UserDetailsService {
+public class EhrUserDetailsService implements UserDetailsService {
     @Autowired
     UserClient userClient;
 
