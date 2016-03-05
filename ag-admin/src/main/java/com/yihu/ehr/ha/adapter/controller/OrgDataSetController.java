@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.websocket.server.PathParam;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -38,65 +39,72 @@ public class OrgDataSetController extends BaseController {
     @ApiOperation(value = "根据id查询实体")
     public Envelop getOrgDataSet(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @PathParam(value = "id") long id) throws Exception{
+            @PathParam(value = "id") long id) {
 
-        MOrgDataSet mOrgDataSet = orgDataSetClient.getOrgDataSet(id);
-        OrgDataSetModel dataSetModel = convertToModel(mOrgDataSet,OrgDataSetModel.class);
-        if(dataSetModel==null)
-        {
-            return failed("数据集信息获取失败!");
+        try {
+            MOrgDataSet mOrgDataSet = orgDataSetClient.getOrgDataSet(id);
+            OrgDataSetModel dataSetModel = convertToModel(mOrgDataSet, OrgDataSetModel.class);
+            if (dataSetModel == null) {
+                return failed("数据集信息获取失败!");
+            }
+            return success(dataSetModel);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
         }
 
-        return success(dataSetModel);
     }
 
     @RequestMapping(value = "/data_set", method = RequestMethod.POST)
     @ApiOperation(value = "创建机构数据集")
     public Envelop saveOrgDataSet(
             @ApiParam(name = "json_data", value = "json_data", defaultValue = "")
-            @RequestParam(value = "json_data") String jsonData) throws Exception{
+            @RequestParam(value = "json_data") String jsonData) {
 
-        OrgDataSetDetailModel detailModel = objectMapper.readValue(jsonData,OrgDataSetDetailModel.class);
+        try {
+            OrgDataSetDetailModel detailModel = objectMapper.readValue(jsonData, OrgDataSetDetailModel.class);
 
-        String errorMsg = "";
-        if(StringUtils.isEmpty(detailModel.getOrganization()))
-        {
-            errorMsg+="机构代码不能为空!";
-        }
+            String errorMsg = "";
+            if (StringUtils.isEmpty(detailModel.getOrganization())) {
+                errorMsg += "机构代码不能为空!";
+            }
+            if (StringUtils.isEmpty(detailModel.getCode())) {
+                errorMsg += "数据集代码不能为空!";
+            }
+            if (StringUtils.isEmpty(detailModel.getName())) {
+                errorMsg += "数据集名称不能为空!";
+            }
+            if (StringUtils.isNotEmpty(errorMsg)) {
+                return failed(errorMsg);
+            }
+            boolean isExist = orgDataSetClient.dataSetIsExist(detailModel.getOrganization(), detailModel.getCode());
 
-        if(StringUtils.isEmpty(detailModel.getCode()))
-        {
-            errorMsg+="数据集代码不能为空!";
-        }
+            MOrgDataSet mOrgDataSet = convertToModel(detailModel, MOrgDataSet.class);
+            if (detailModel.getId() == 0) {
+                if(isExist)
+                {
+                    return failed("数据集已存在!");
+                }
+                mOrgDataSet = orgDataSetClient.createOrgDataSet(objectMapper.writeValueAsString(mOrgDataSet));
+            } else {
+                MOrgDataSet orgDataSet = orgDataSetClient.getOrgDataSet(detailModel.getId());
+                if(!orgDataSet.getCode().equals(detailModel.getCode())
+                         && isExist){
+                    return failed("数据集已存在!");
+                }
+                mOrgDataSet.setUpdateDate(new Date());
+                mOrgDataSet = orgDataSetClient.updateOrgDataSet(objectMapper.writeValueAsString(mOrgDataSet));
+            }
 
-        if(StringUtils.isEmpty(detailModel.getName()))
-        {
-            errorMsg+="数据集名称不能为空!";
+            detailModel = convertToModel(mOrgDataSet, OrgDataSetDetailModel.class);
+            if (detailModel == null) {
+                return failed("保存失败!");
+            }
+            return success(detailModel);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
         }
-
-        if(StringUtils.isNotEmpty(errorMsg))
-        {
-            return failed(errorMsg);
-        }
-
-        if (orgDataSetClient.isExistOrgDataSet(detailModel.getOrganization(), detailModel.getCode(), detailModel.getName()))
-        {
-            return failed("代码、名称不能重复!");
-        }
-        MOrgDataSet mOrgDataSet = convertToModel(detailModel,MOrgDataSet.class);
-        if (detailModel.getId()==0) {
-            mOrgDataSet = orgDataSetClient.createOrgDataSet(objectMapper.writeValueAsString(mOrgDataSet));
-        }else
-        {
-            mOrgDataSet = orgDataSetClient.updateOrgDataSet(objectMapper.writeValueAsString(mOrgDataSet));
-        }
-
-        detailModel = convertToModel(mOrgDataSet,OrgDataSetDetailModel.class);
-        if(detailModel==null)
-        {
-            return failed("保存失败!");
-        }
-        return success(detailModel);
     }
 
 
@@ -104,15 +112,23 @@ public class OrgDataSetController extends BaseController {
     @ApiOperation(value = "删除机构数据集")
     public Envelop deleteOrgDataSet(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @PathParam(value = "id") long id) throws Exception{
+            @PathParam(value = "id") long id) {
 
-        boolean result = orgDataSetClient.deleteOrgDataSet(id);
-        if(!result)
-        {
-            return failed("删除失败!");
+        try {
+            if (id == 0) {
+                return failed("请选择需要删除数据集!");
+            }
+
+            boolean result = orgDataSetClient.deleteOrgDataSet(id);
+            if (!result) {
+                return failed("删除失败!");
+            }
+
+            return success(null);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
         }
-
-        return success(null);
     }
 
 
@@ -128,11 +144,16 @@ public class OrgDataSetController extends BaseController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page) throws Exception{
+            @RequestParam(value = "page", required = false) int page) {
 
-        List<MOrgDataSet> mOrgDataSets = (List<MOrgDataSet>)orgDataSetClient.searchAdapterOrg(fields,filters,sorts,size,page);
-        List<OrgDataSetDetailModel> detailModels = (List<OrgDataSetDetailModel>)convertToModels(mOrgDataSets,new ArrayList<OrgDataSetDetailModel>(mOrgDataSets.size()),OrgDataSetDetailModel.class,null);
+        try {
+            List<MOrgDataSet> mOrgDataSets = (List<MOrgDataSet>) orgDataSetClient.searchAdapterOrg(fields, filters, sorts, size, page);
+            List<OrgDataSetDetailModel> detailModels = (List<OrgDataSetDetailModel>) convertToModels(mOrgDataSets, new ArrayList<OrgDataSetDetailModel>(mOrgDataSets.size()), OrgDataSetDetailModel.class, null);
 
-        return getResult(detailModels,1,page,size);
+            return getResult(detailModels, 1, page, size);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
+        }
     }
 }
