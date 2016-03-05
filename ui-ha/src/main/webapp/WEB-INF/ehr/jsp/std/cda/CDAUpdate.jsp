@@ -20,4 +20,4 @@
 <input type="hidden" id="hdId" value=""/>
 <input type="hidden" id="hdversion" value=""/>
 <input type="hidden" id="hd_url" value="${contextRoot}"/>
-<input type="hidden" id="hd_user" value="${User.id}"/>
+<input type="hidden" id="hd_user" value="${UserId}"/>

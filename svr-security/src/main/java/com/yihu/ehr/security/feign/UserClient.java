@@ -17,10 +17,10 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @ApiIgnore
 public interface UserClient {
 
-    @RequestMapping(value = ApiVersion.Version1_0+"users/{user_id}", method = GET )
+    @RequestMapping(value = ApiVersion.Version1_0+"/users/{user_id}", method = GET )
     MUser getUser(@PathVariable(value = "user_id") String userId);
 
-    @RequestMapping(value = ApiVersion.Version1_0+"users/login/{login_code}", method = GET )
+    @RequestMapping(value = ApiVersion.Version1_0+"/users/login/{login_code}", method = GET )
     MUser getUserByLoginCode(@PathVariable(value = "login_code") String loginCode);
 
 

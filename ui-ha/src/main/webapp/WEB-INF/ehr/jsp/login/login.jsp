@@ -7,7 +7,7 @@
 <!--######用户登录部分######-->
 <div class="m-login u-icon-lbg">
     <section class="box u-icon-lbbg">
-        <form id="form_login" class="box-form"action="${contextRoot}/login/validate" method="post">
+        <form id="form_login" class="box-form" action="${contextRoot}/login/validate" method="post">
             <div class="u-input-group">
                 <span class="u-input-addon u-icon-user"></span>
                 <input name="userName" id="inp_user_name" data-attr-scan type="text" value="${userName}" class="u-input required useTitle" placeholder="输入用户名/邮箱/手机号"  required-title=<spring:message code="lbl.must.input"/>>

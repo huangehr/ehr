@@ -1,6 +1,5 @@
 package com.yihu.ehr.adaption.adapterorg.service;
 
-import com.yihu.ehr.adaption.feignclient.AddressClient;
 import com.yihu.ehr.adaption.orgdataset.service.OrgDataSetService;
 import com.yihu.ehr.adaption.orgdict.service.OrgDictService;
 import com.yihu.ehr.adaption.orgdictitem.service.OrgDictItemService;
@@ -24,8 +23,6 @@ import java.util.List;
 @Service
 public class AdapterOrgService extends BaseJpaService<AdapterOrg, XAdapterOrgRepository> {
 
-    @Autowired
-    AddressClient addressClient;
     @Autowired
     OrgDataSetService orgDataSetManager;
     @Autowired

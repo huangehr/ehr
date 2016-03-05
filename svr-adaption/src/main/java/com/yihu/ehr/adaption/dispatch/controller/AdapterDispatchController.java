@@ -6,7 +6,6 @@ import com.yihu.ehr.adaption.dispatch.service.AdapterInfoSendService;
 import com.yihu.ehr.adaption.feignclient.StdVersionClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.standard.MCDAVersion;
 import com.yihu.ehr.util.RestEcho;
@@ -15,6 +14,7 @@ import com.yihu.ehr.util.encrypt.RSA;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -58,26 +58,25 @@ public class AdapterDispatchController {
         String fileBytes = null;
 
         try {
-            if (versionCode == null || versionCode == ""
-                    || orgcode == null || orgcode == "")
-                return null;
+//            if (StringUtils.isEmpty(versionCode) || StringUtils.isEmpty(orgcode))
+//                return new RestEcho().failed(ErrorCode.MissParameter," 缺失参数:updateVersion");
 
             mapResult = adapterInfoSendService.getAdapterFileInfo(versionCode, orgcode);
 
             if (mapResult == null)
-                throw new ApiException(ErrorCode.GenerateArchiveFailed);
+                return new RestEcho().failed(ErrorCode.GenerateArchiveFailed," 标准化数据生成失败");
 
             String group = (String) mapResult.get(FastDFSUtil.GroupField);
             String remoteFile = (String) mapResult.get(FastDFSUtil.RemoteFileField);
 
             if (group == null || remoteFile == null)
-                throw new ApiException(ErrorCode.GenerateArchiveFailed);
+                return new RestEcho().failed(ErrorCode.GenerateArchiveFailed," 标准化数据生成失败");
 
             password = (String) mapResult.get("password");
             byte[] bytes = new FastDFSUtil().download(group, remoteFile);
             fileBytes = Base64.encode(bytes);
         } catch (Exception e) {
-            throw new ApiException(ErrorCode.DownArchiveFileFailed);
+            return new RestEcho().failed(ErrorCode.DownArchiveFileFailed,"下载标准适配版本失败");
         }
 
         try {
@@ -89,9 +88,9 @@ public class AdapterDispatchController {
             restEcho.putResult("zipfile", fileBytes);
             return restEcho;
         } catch (IOException ex) {
-            throw new ApiException(ErrorCode.GenerateArchiveFileStreamFailed);
+            return new RestEcho().failed(ErrorCode.GenerateArchiveFileStreamFailed,"生成适配版本文件流失败");
         } catch (Exception ex) {
-            throw new ApiException(ErrorCode.GenerateFileCryptographFailed);
+            return new RestEcho().failed(ErrorCode.GenerateFileCryptographFailed,"生成适配版本文件密码失败");
         }
     }
 
@@ -110,26 +109,26 @@ public class AdapterDispatchController {
         String password = null;
         String fileBytes = null;
         try {
-            if (versionCode == null || versionCode == "" || orgcode == null || orgcode == "") {
-                return null;
-            }
+//            if (versionCode == null || versionCode == "" || orgcode == null || orgcode == "") {
+//                return null;
+//            }
 
             mapResult = adapterInfoSendService.getStandardAndMappingInfo(versionCode, orgcode);
 
             if (mapResult == null)
-                throw new ApiException(ErrorCode.GenerateArchiveFailed);
+                return new RestEcho().failed(ErrorCode.GenerateArchiveFailed," 标准化数据生成失败");
 
             String group = (String) mapResult.get(FastDFSUtil.GroupField);
             String remoteFile = (String) mapResult.get(FastDFSUtil.RemoteFileField);
 
-            if (group == null || remoteFile == null)
-                throw new ApiException(ErrorCode.GenerateArchiveFailed);
+            if (StringUtils.isEmpty(group)|| StringUtils.isEmpty(remoteFile))
+                return new RestEcho().failed(ErrorCode.GenerateArchiveFailed," 标准化数据生成失败");
 
             password = (String) mapResult.get("password");
             byte[] bytes = new FastDFSUtil().download(group, remoteFile);
             fileBytes = Base64.encode(bytes);
         } catch (Exception e) {
-            throw new ApiException(ErrorCode.DownArchiveFileFailed);
+            return new RestEcho().failed(ErrorCode.DownArchiveFileFailed,"下载标准适配版本失败");
         }
 
         try {
@@ -141,9 +140,10 @@ public class AdapterDispatchController {
             restEcho.putResult("zipfile", fileBytes);
             return restEcho;
         } catch (IOException ex) {
-            throw new ApiException(ErrorCode.GenerateArchiveFileStreamFailed);
+            return new RestEcho().failed(ErrorCode.GenerateArchiveFileStreamFailed,"生成适配版本文件流失败");
+
         } catch (Exception ex) {
-            throw new ApiException(ErrorCode.GenerateFileCryptographFailed);
+            return new RestEcho().failed(ErrorCode.GenerateFileCryptographFailed,"生成适配版本文件密码失败");
         }
     }
 
@@ -154,7 +154,6 @@ public class AdapterDispatchController {
             @ApiParam(name = "org_code", value = "机构编码")
             @RequestParam(value = "org_code") String orgCode) throws Exception {
 
-        String json = "";
         try {
 
             Map<String, Object> args = new HashMap<>();
@@ -169,10 +168,10 @@ public class AdapterDispatchController {
                 restEcho.putResult("timestamp", version.getCommitTime());
                 return restEcho;
             } else {
-                throw new ApiException(ErrorCode.GetCDAVersionFailed);
+                return new RestEcho().failed(ErrorCode.GetCDAVersionFailed,"标准版本获取失败");
             }
         } catch (Exception ex) {
-            throw new ApiException(ErrorCode.GetCDAVersionFailed);
+            return new RestEcho().failed(ErrorCode.GetCDAVersionFailed,"标准版本获取失败");
         }
     }
 }

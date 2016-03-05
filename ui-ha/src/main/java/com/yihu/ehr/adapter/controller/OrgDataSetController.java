@@ -184,7 +184,7 @@ public class OrgDataSetController extends BaseRestController {
      * @param name
      * @param description
      * @param orgCode
-     * @param user
+     * @param userId
      * @return
      */
     @RequestMapping(value = "createOrgDataSet", produces = "text/html;charset=UTF-8")
@@ -193,7 +193,7 @@ public class OrgDataSetController extends BaseRestController {
                                    String name,
                                    String description,
                                    String orgCode,
-                                   @ModelAttribute(SessionAttributeKeys.CurrentUser) XUser user) {
+                                   String userId) {
 
         String url="";
         String resultStr = "";
@@ -213,7 +213,7 @@ public class OrgDataSetController extends BaseRestController {
 
             url="/orgDataSet/orgDataSet";
             params.put("description", description);
-            params.put("userId",user.getId());
+            params.put("userId",userId);
             //todo 失败，返回的错误信息怎么体现？
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//创建数据集
 //            ObjectMapper mapper = new ObjectMapper();
@@ -319,7 +319,7 @@ public class OrgDataSetController extends BaseRestController {
      * @param code
      * @param name
      * @param description
-     * @param user
+     * @param userId
      * @return
      */
     @RequestMapping(value = "updateOrgDataSet", produces = "text/html;charset=UTF-8")
@@ -329,7 +329,7 @@ public class OrgDataSetController extends BaseRestController {
                                    String code,
                                    String name,
                                    String description,
-                                   @ModelAttribute(SessionAttributeKeys.CurrentUser) XUser user) {
+                                   String userId) {
 
         String url="";
         String resultStr = "";
@@ -358,7 +358,7 @@ public class OrgDataSetController extends BaseRestController {
 
             url="/orgDataSet/updateOrgDataSet";
             params.put("description", description);
-            params.put("userId",user.getId());
+            params.put("userId",userId);
             //todo 失败，返回的错误信息怎么体现？
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//更新数据集
 //            ObjectMapper mapper = new ObjectMapper();
@@ -504,7 +504,7 @@ public class OrgDataSetController extends BaseRestController {
      * @param code
      * @param name
      * @param description
-     * @param user
+     * @param userId
      * @return
      */
     @RequestMapping(value = "createOrgMetaData", produces = "text/html;charset=UTF-8")
@@ -514,7 +514,7 @@ public class OrgDataSetController extends BaseRestController {
                                     String code,
                                     String name,
                                     String description,
-                                    @ModelAttribute(SessionAttributeKeys.CurrentUser) XUser user) {
+                                    String userId) {
 
         String url;
         String resultStr = "";
@@ -535,7 +535,7 @@ public class OrgDataSetController extends BaseRestController {
 
             url="/orgDataSet/createOrgMetaData";
             params.put("description", description);
-            params.put("userId",user.getId());
+            params.put("userId",userId);
             //todo 失败，返回的错误信息怎么体现？
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//创建数据元
 //            ObjectMapper mapper = new ObjectMapper();
@@ -681,7 +681,7 @@ public class OrgDataSetController extends BaseRestController {
      * @param code
      * @param name
      * @param description
-     * @param user
+     * @param userId
      * @return
      */
     @RequestMapping(value = "updateOrgMetaData", produces = "text/html;charset=UTF-8")
@@ -692,7 +692,7 @@ public class OrgDataSetController extends BaseRestController {
                                     String code,
                                     String name,
                                     String description,
-                                    @ModelAttribute(SessionAttributeKeys.CurrentUser) XUser user) {
+                                    String userId) {
 
         String url="";
         String resultStr = "";
@@ -722,7 +722,7 @@ public class OrgDataSetController extends BaseRestController {
 
             url="/orgDataSet/updateOrgMetaData";
             params.put("description", description);
-            params.put("userId",user.getId());
+            params.put("userId",userId);
             //todo 失败，返回的错误信息怎么体现？
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//更新数据元
 //            ObjectMapper mapper = new ObjectMapper();

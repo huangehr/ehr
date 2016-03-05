@@ -3,6 +3,7 @@ package com.yihu.ehr.util;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.yihu.ehr.constants.ErrorCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -86,14 +87,13 @@ public class RestEcho implements Serializable {
         return this;
     }
 
-//    public RestEcho failed(ErrorCode errorCode, String... args) {
-//        XTextResource textResource = ServiceFactory.getService(Services.TextResource);
-//        ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-//
-//        root = objectMapper.createObjectNode();
-//        root.put(CodeNode, errorCode.getErrorCode());
-//        root.put(MessageNode, textResource.getErrorPhrase(errorCode, args));
-//
-//        return this;
-//    }
+    public RestEcho failed(ErrorCode errorCode, String errorMsg) {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        root = objectMapper.createObjectNode();
+        root.put(CodeNode, errorCode.getErrorCode());
+        root.put(MessageNode, errorMsg);
+
+        return this;
+    }
 }

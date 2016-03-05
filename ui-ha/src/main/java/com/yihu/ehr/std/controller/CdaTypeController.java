@@ -1,6 +1,5 @@
 package com.yihu.ehr.std.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.RestAPI;
 import com.yihu.ehr.constants.SessionAttributeKeys;
@@ -12,12 +11,12 @@ import com.yihu.ehr.util.log.LogService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by AndyCai on 2015/12/14.
@@ -40,8 +39,8 @@ public class CdaTypeController extends BaseRestController {
     }
 
     @RequestMapping("typeupdate")
-    public String typeupdate(Model model, @ModelAttribute(SessionAttributeKeys.CurrentUser) XUser user) {
-        model.addAttribute("User", user);
+    public String typeupdate(Model model,String userId) {
+        model.addAttribute("UserId", userId);
         model.addAttribute("contentPage", "std/cdaType/CdaTypeDetail");
         return "generalView";
     }
@@ -72,9 +71,9 @@ public class CdaTypeController extends BaseRestController {
     }
 
 //    /**
-//     * ¸ù¾İ¸¸¼¶ĞÅÏ¢»ñÈ¡È«²¿µÄ×Ó¼¶ĞÅÏ¢
-//     * @param info ¸¸¼¶ĞÅÏ¢
-//     * @return È«²¿×Ó¼¶ĞÅÏ¢
+//     * æ ¹æ®çˆ¶çº§ä¿¡æ¯è·å–å…¨éƒ¨çš„å­çº§ä¿¡æ¯
+//     * @param info çˆ¶çº§ä¿¡æ¯
+//     * @return å…¨éƒ¨å­çº§ä¿¡æ¯
 //     */
 //    public List<CDATypeTreeModel> getCdaTypeChild(List<XCDAType> info) {
 //        List<CDATypeTreeModel> treeInfo = new ArrayList<>();
@@ -98,9 +97,10 @@ public class CdaTypeController extends BaseRestController {
 //    }
 
 //    /**
-//     * ¸ù¾İ¸¸¼¶Àà±ğ»ñÈ¡È«²¿µÄ×ÓÀà±ğID£¬·µ»ØÖµ°üÀ¨¸¸¼¶µÄID
-//
-//     * @return È«²¿×Ó¼¶
+//     * æ ¹æ®çˆ¶çº§ç±»åˆ«è·å–å…¨éƒ¨çš„å­ç±»åˆ«IDï¼Œè¿”å›å€¼åŒ…æ‹¬çˆ¶çº§çš„ID
+//     * @param info çˆ¶çº§ä¿¡æ¯
+//     * @param childrenIds   å­çº§ID
+//     * @return å…¨éƒ¨å­çº§
 //     */
 //    public String getCdaTypeChildId(List<XCDAType> info,String childrenIds) {
 //        try {
@@ -120,7 +120,7 @@ public class CdaTypeController extends BaseRestController {
     @RequestMapping("GetCdaTypeListByKey")
     @ResponseBody
     public Object GetCdaTypeListByKey(String strKey, Integer page, Integer rows) {
-        // TODO ÎŞ¶ÔÓ¦
+        // TODO æ— å¯¹åº”
         Envelop result = new Envelop();
         String url = "/cdaType/***********";
         try{
@@ -131,7 +131,7 @@ public class CdaTypeController extends BaseRestController {
             String _rus = HttpClientUtil.doGet(comUrl+url,params,username,password);
             if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
-                result.setErrorMsg("cdaÀà±ğ»ñÈ¡Ê§°Ü");
+                result.setErrorMsg("cdaç±»åˆ«è·å–å¤±è´¥");
             }else{
                 //result.setSuccessFlg(true);
                 return _rus;
@@ -152,7 +152,7 @@ public class CdaTypeController extends BaseRestController {
             List<XCDAType> listType = xcdaTypeManager.getCDATypeListByKey(mapKey);
             if (listType == null) {
                 result.setSuccessFlg(false);
-                result.setErrorMsg("Êı¾İ»ñÈ¡Ê§°Ü!");
+                result.setErrorMsg("æ•°æ®è·å–å¤±è´¥!");
                 return result;
             }
             List<CDATypeForInterface> listInfo = getTypeForInterface(listType);
@@ -164,7 +164,7 @@ public class CdaTypeController extends BaseRestController {
         } catch (Exception ex) {
             LogService.getLogger(CdaTypeController_w.class).error(ex.getMessage());
             result.setSuccessFlg(false);
-            result.setErrorMsg("ÏµÍ³´íÎó£¬ÇëÁªÏµ¹ÜÀíÔ±!");
+            result.setErrorMsg("ç³»ç»Ÿé”™è¯¯ï¼Œè¯·è”ç³»ç®¡ç†å‘˜!");
         }
         return result;*/
     }
@@ -180,7 +180,7 @@ public class CdaTypeController extends BaseRestController {
             String _rus = HttpClientUtil.doGet(comUrl+url,params,username,password);
             if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
-                result.setErrorMsg("cdaÀà±ğ»ñÈ¡Ê§°Ü");
+                result.setErrorMsg("cdaç±»åˆ«è·å–å¤±è´¥");
             }else{
                 result.setSuccessFlg(true);
                 result.setObj(_rus);
@@ -203,7 +203,7 @@ public class CdaTypeController extends BaseRestController {
             }
         } catch (Exception ex) {
             LogService.getLogger(CdaController.class).error(ex.getMessage());
-            result.setErrorMsg("ÏµÍ³´íÎó£¬ÇëÁªÏµ¹ÜÀíÔ±!");
+            result.setErrorMsg("ç³»ç»Ÿé”™è¯¯ï¼Œè¯·è”ç³»ç®¡ç†å‘˜!");
         }
         return result;*/
     }
@@ -211,16 +211,16 @@ public class CdaTypeController extends BaseRestController {
     @RequestMapping("delteCdaTypeInfo")
     @ResponseBody
     /**
-     * É¾³ıCDAÀà±ğ£¬Èô¸ÃÀà±ğ´æÔÚ×ÓÀà±ğ£¬½«Ò»²¢É¾³ı×ÓÀà±ğ
-     * ÏÈ¸ù¾İµ±Ç°µÄÀà±ğID»ñÈ¡È«²¿×ÓÀà±ğID£¬ÔÙ½øĞĞÉ¾³ı
+     * åˆ é™¤CDAç±»åˆ«ï¼Œè‹¥è¯¥ç±»åˆ«å­˜åœ¨å­ç±»åˆ«ï¼Œå°†ä¸€å¹¶åˆ é™¤å­ç±»åˆ«
+     * å…ˆæ ¹æ®å½“å‰çš„ç±»åˆ«IDè·å–å…¨éƒ¨å­ç±»åˆ«IDï¼Œå†è¿›è¡Œåˆ é™¤
      * @param  ids  cdaType Id
-     *  @return result ²Ù×÷½á¹û
+     *  @return result æ“ä½œç»“æœ
      */
     public Object delteCdaTypeInfo(String ids) {
         Envelop result = new Envelop();
         String url = "/cdaType/cdaType";
         if (StringUtils.isEmpty(ids)){
-            result.setErrorMsg("ÇëÑ¡ÔñÒªÉ¾³ıµÄÊı¾İ");
+            result.setErrorMsg("è¯·é€‰æ‹©è¦åˆ é™¤çš„æ•°æ®");
             result.setSuccessFlg(false);
             return result;
         }
@@ -232,7 +232,7 @@ public class CdaTypeController extends BaseRestController {
                 result.setSuccessFlg(true);
             }else{
                 result.setSuccessFlg(false);
-                result.setErrorMsg("cdaÀà±ğÉ¾³ıÊ§°Ü");
+                result.setErrorMsg("cdaç±»åˆ«åˆ é™¤å¤±è´¥");
             }
         }catch (Exception ex){
             LogService.getLogger(CdaTypeController.class).error(ex.getMessage());
@@ -245,7 +245,7 @@ public class CdaTypeController extends BaseRestController {
        /* try {
             String strErrorMsg = "";
             if (ids == null || ids == "") {
-                strErrorMsg += "ÇëÏÈÑ¡Ôñ½«ÒªÉ¾³ıµÄÊı¾İ£¡";
+                strErrorMsg += "è¯·å…ˆé€‰æ‹©å°†è¦åˆ é™¤çš„æ•°æ®";
             }
             if (strErrorMsg != "") {
                 result.setSuccessFlg(false);
@@ -261,12 +261,12 @@ public class CdaTypeController extends BaseRestController {
                 result.setSuccessFlg(true);
             } else {
                 result.setSuccessFlg(false);
-                result.setErrorMsg("É¾³ıÊ§°Ü!");
+                result.setErrorMsg("åˆ é™¤å¤±è´¥!");
             }
         } catch (Exception ex) {
             LogService.getLogger(CdaController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
-            result.setErrorMsg("ÏµÍ³´íÎó£¬ÇëÁªÏµ¹ÜÀíÔ±!");
+            result.setErrorMsg("ç³»ç»Ÿé”™è¯¯ï¼Œè¯·è”ç³»ç®¡ç†å‘˜!");
         }
         return result;*/
     }
@@ -276,12 +276,12 @@ public class CdaTypeController extends BaseRestController {
     public Object SaveCdaType(String info) {
         Envelop result = new Envelop();
         String url = "/cdaType/SaveCdaType";
-        //todo£ºÇ°Ì¨jsÅĞ¶Ï²»ÄÜÎª¿Õ
+        //TODO å‰å°jsåšä¸ºç©ºåˆ¤æ–­
 //        if(StringUtil.isEmpty(info.getCode())){
-//            strErrorMsg += "´úÂë²»ÄÜÎª¿Õ! ";
+//            strErrorMsg += "ï¿½ï¿½ï¿½ë²»ï¿½ï¿½Îªï¿½ï¿½! ";
 //        }
 //        if(StringUtil.isEmpty(info.getParentName())){
-//            strErrorMsg += "Ãû³Æ²»ÄÜÎª¿Õ£¡";
+//            strErrorMsg += "ï¿½ï¿½ï¿½Æ²ï¿½ï¿½ï¿½Îªï¿½Õ£ï¿½";
 //        }
 //        if(!StringUtil.isEmpty(strErrorMsg)){
 //            result.setSuccessFlg(false);
@@ -289,13 +289,13 @@ public class CdaTypeController extends BaseRestController {
 //            return result.toJson();
 //        }
         try {
-            //TODO Ìá¹©codeÎ¨Ò»ĞÔÑéÖ¤api
+            //TODO æä¾›codeå”¯ä¸€æ€§éªŒè¯api
             Map<String, Object> params = new HashMap<>();
             params.put("typeJson", info);
             String _rus = HttpClientUtil.doPost(comUrl+url,params,username,password);
             if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
-                result.setErrorMsg("cadtype±£´æÊ§°Ü");
+                result.setErrorMsg("cadtypeä¿å­˜å¤±è´¥");
             }else{
                 result.setSuccessFlg(true);
             }
@@ -307,29 +307,29 @@ public class CdaTypeController extends BaseRestController {
         return result;
 
 
-       /* try {
+        /* try {
             String strErrorMsg = "";
             if (info.getCode() == null || info.getCode() == "") {
-                strErrorMsg += "´úÂë²»ÄÜÎª¿Õ!";
+                strErrorMsg += "ä»£ç ä¸èƒ½ä¸ºç©º!";
             }
             if (info.getName() == null || info.getName() == "") {
-                strErrorMsg += "Ãû³Æ²»ÄÜÎª¿Õ!";
+                strErrorMsg += "åç§°ä¸èƒ½ä¸ºç©º!";
             }
             XCDAType xcdaType = new CDAType();
-            //id ²»Îª¿ÕÔòÏÈ»ñÈ¡Êı¾İ£¬ÔÙ½øĞĞĞŞ¸Ä
+            //id ä¸ä¸ºç©ºåˆ™å…ˆè·å–æ•°æ®ï¼Œå†è¿›è¡Œä¿®æ”¹
             if (!StringUtil.isEmpty(info.getId())) {
                 List<XCDAType> listType = xcdaTypeManager.getCdatypeInfoByIds(info.getId());
                 if (listType.size() > 0) {
                     xcdaType = listType.get(0);
                 }
                 if(!info.getCode().equals(xcdaType.getCode()) && xcdaTypeManager.isCodeExist(info.getCode())){
-                    strErrorMsg = "´úÂëÒÑ´æÔÚ!";
+                    strErrorMsg = "ä»£ç å·²å­˜åœ¨!";
                 }
                 xcdaType.setUpdateUser(info.getUserId());
                 xcdaType.setUpdateDate(new Date());
             } else {
                 if(xcdaTypeManager.isCodeExist(info.getCode())){
-                    strErrorMsg = "´úÂëÒÑ´æÔÚ!";
+                    strErrorMsg = "ä»£ç å·²å­˜åœ¨!";
                 }
                 xcdaType.setCreateUser(info.getUserId());
                 xcdaType.setCreateDate(new Date());
@@ -356,12 +356,12 @@ public class CdaTypeController extends BaseRestController {
                 result.setSuccessFlg(true);
             } else {
                 result.setSuccessFlg(false);
-                result.setErrorMsg("±£´æÊ§°Ü!");
+                result.setErrorMsg("ä¿å­˜å¤±è´¥!");
             }
         } catch (Exception ex) {
             LogService.getLogger(CdaController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
-            result.setErrorMsg("ÏµÍ³´íÎó£¬ÇëÁªÏµ¹ÜÀíÔ±!");
+            result.setErrorMsg("ç³»ç»Ÿé”™è¯¯ï¼Œè¯·è”ç³»ç®¡ç†å‘˜!");
         }
         return result;*/
     }
