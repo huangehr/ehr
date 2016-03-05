@@ -76,8 +76,8 @@ public class OrgMetaDataController extends ExtendController<MOrgMetaData> {
             @ApiParam(name = "ids", value = "编号集", defaultValue = "")
             @RequestParam(value = "ids") String ids) throws Exception {
 
-        if (ids != null && ids.length() > 0)
-            orgMetaDataService.delete(ids.split(","));
+        //if (ids != null && ids.length() > 0)
+        orgMetaDataService.delete(ids.split(","));
         return true;
     }
 

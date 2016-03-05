@@ -4,8 +4,6 @@ import com.yihu.ehr.adaption.commons.ExtendController;
 import com.yihu.ehr.adaption.orgdataset.service.OrgDataSet;
 import com.yihu.ehr.adaption.orgdataset.service.OrgDataSetService;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.adaption.MOrgDataSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -76,16 +74,9 @@ public class OrgDataSetController extends ExtendController<MOrgDataSet> {
             @RequestParam(value = "model") String model) throws Exception{
 
         OrgDataSet dataModel = jsonToObj(model, OrgDataSet.class);
-        OrgDataSet orgDataSet = orgDataSetService.retrieve(dataModel.getId());
-        if (orgDataSet == null)
-            throw errNotFound();
-        if (orgDataSet.getCode().equals(dataModel.getCode())
-                || !orgDataSetService.isExistOrgDataSet(dataModel.getOrganization(), dataModel.getCode(), dataModel.getName())) {
 
-            dataModel.setUpdateDate(new Date());
-            return getModel(orgDataSetService.save(dataModel));
-        } else
-            throw new ApiException(ErrorCode.RepeatOrgDataSet, "该数据集已存在!");
+        return getModel(orgDataSetService.save(dataModel));
+
     }
 
 
