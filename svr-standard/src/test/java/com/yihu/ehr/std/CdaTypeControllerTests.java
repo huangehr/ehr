@@ -95,6 +95,8 @@ public class CdaTypeControllerTests {
 
     @Test
     public void mDeleteCDATypeByPatientIds() throws Exception{
+        applicationContext = new SpringApplicationBuilder()
+                .web(false).sources(StandardServiceApp.class).run();
         String[] ids = new String[]{"0dae000656720d12269e0319806c0ef1","0dae000656720d25269e0319806c0ef2"};
         Object result = cdaTypeController.deleteCDATypeByPatientIds(ids);
         assertTrue("删除失败！" , result != null);
