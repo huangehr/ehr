@@ -121,4 +121,16 @@ public interface UserClient {
     MUser getUserByLoginCode(
             @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
             @PathVariable(value = "login_code") String loginCode);
+
+    @RequestMapping(value = "/users/existence/{login_code}" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断账户是否存在")
+    boolean isLoginCodeExists(
+            @ApiParam(name = "login_code", value = "login_code", defaultValue = "")
+            @PathVariable(value = "login_code") String loginCode);
+
+    @RequestMapping(value = "/users/is_exist/{id_card}" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断账户是否存在")
+    boolean isIdCardExists(
+            @ApiParam(name = "id_card", value = "id_card", defaultValue = "")
+            @PathVariable(value = "id_card") String idCard);
 }
