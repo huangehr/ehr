@@ -1,8 +1,8 @@
 package com.yihu.ehr.ha.std.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.agModel.standard.cdaType.CdaTypeDetailModel;
-import com.yihu.ehr.agModel.standard.cdaType.CdaTypeModel;
+import com.yihu.ehr.agModel.standard.cdatype.CdaTypeDetailModel;
+import com.yihu.ehr.agModel.standard.cdatype.CdaTypeModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.std.service.CDATypeClient;
 import com.yihu.ehr.model.standard.MCDAType;
@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Created by yww on 2016/3/1.
  */
-@RequestMapping(ApiVersion.Version1_0 + "/cdaType")
+@RequestMapping(ApiVersion.Version1_0 + "/cdatype")
 @RestController
 public class CDATypeController extends BaseController {
 

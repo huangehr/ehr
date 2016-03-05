@@ -1,7 +1,7 @@
 package com.yihu.ehr.ha;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.agModel.standard.cdaType.CdaTypeDetailModel;
+import com.yihu.ehr.agModel.standard.cdatype.CdaTypeDetailModel;
 import com.yihu.ehr.ha.std.controller.CDATypeController;
 import com.yihu.ehr.util.Envelop;
 import org.junit.FixMethodOrder;
@@ -66,7 +66,7 @@ public class CDATypeControllerTests {
     @Test
     public void testCdaTypeByIds() throws Exception {
         //根据ids获取CDAType列表------------------------------------------ok
-        String ids = "0dae000656720bd5269e0319806c0eed,0dae001256da2f60feffc211342c6ec7";
+        String ids = "0dae000656720bd5269e0319806c0eed,0dae000656720d25269e0319806c0ef2";
         envelop = cdaTypeController.getCdaTypeByIds(ids);
         assertNotEquals("没有查询到对应的cdaType！", envelop.getDetailModelList().size(), 0);
     }
