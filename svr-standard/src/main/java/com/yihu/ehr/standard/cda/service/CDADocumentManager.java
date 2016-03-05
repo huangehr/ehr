@@ -34,7 +34,7 @@ import java.util.List;
 public class CDADocumentManager {
 
     @Autowired
-    private CdaDataSetRelationshipManager cdaDataSetRelationshipManager;
+    private CDADataSetRelationshipManager cdaDataSetRelationshipManager;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -366,7 +366,7 @@ public class CDADocumentManager {
     public boolean createCDASchemaFile(String cdaId, String versionCode) throws TransformerException, ParserConfigurationException, FileNotFoundException, UnsupportedEncodingException {
         //操作结果：0：现在失败 1：新增成功
         int iSetCount = cdaDataSetRelationshipManager.getRelationshipCountByCdaId(cdaId, versionCode);
-        List<CdaDataSetRelationship> relationshipsList = cdaDataSetRelationshipManager.getCDADataSetRelationshipByCDAId(cdaId, versionCode, 1, iSetCount);
+        List<CDADataSetRelationship> relationshipsList = cdaDataSetRelationshipManager.getCDADataSetRelationshipByCDAId(cdaId, versionCode, 1, iSetCount);
 
         String strPath = System.getProperty("java.io.tmpdir");
         strPath += "StandardFiles";

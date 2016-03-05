@@ -5,7 +5,7 @@ package com.yihu.ehr.standard.cda.service;
  * @version 1.0
  * @created 01-9月-2015 17:08:41
  */
-public class CdaDataSetRelationship {
+public class CDADataSetRelationship {
 
 	private String id;
 	private String cdaId;
