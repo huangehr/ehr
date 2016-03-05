@@ -50,7 +50,7 @@ public class CdaTypeController extends BaseRestController {
      */
     @RequestMapping(value = "/cda_types/patient_ids/key",method = RequestMethod.GET)
     @ApiOperation(value = "根据父级类别获取父级类别所在以下所有子集类别（包括当前父级列表）")
-    public List<MCDAType> getChildIncludeSelfByParentTypesAndKey(
+    public List<MCDAType> getChildIncludeSelfByParentIdsAndKey(
             @ApiParam(name = "patient_ids", value = "父级id")
             @RequestParam(value = "patient_ids") String[] patientIds,
             @ApiParam(name = "key", value = "查询条件")
@@ -64,6 +64,18 @@ public class CdaTypeController extends BaseRestController {
         return  (List<MCDAType>)convertToModels(cdaTypeList,new ArrayList<MCDAType>(cdaTypeList.size()),MCDAType.class,"");
     }
 
+
+
+//    public List<CDAType> getParentType(String[] parentIds, String key) {
+//        List<CDAType> listParentType = cdaTypeManager.getCDATypeByIds(parentIds);
+//        String childrenIds = getChildIncludeSelfByParentsAndChildrenIds(listParentType,"");
+//        if(childrenIds.length()>0) {
+//            childrenIds = childrenIds.substring(0, childrenIds.length() - 1);
+//        }
+//
+//        List<CDAType> listType = cdaTypeManager.getParentType(childrenIds,key);
+//        return listType;
+//    }
 
 
     @RequestMapping(value = "/cda_types/code_name",method = RequestMethod.GET)
