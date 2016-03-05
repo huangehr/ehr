@@ -1,6 +1,4 @@
-package com.yihu.ehr.agModel.standard.cdaType;
-
-import java.util.Date;
+package com.yihu.ehr.agModel.standard.cdatype;
 
 /**
  * Created by Administrator on 2016/2/29.
