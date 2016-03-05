@@ -1,0 +1,276 @@
+## 配置说明
+#
+# 页面端使用方法：
+#   jsp最前面增加该行：<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+#   jsp中汉字替换方法：<spring:message code="lbl.dict.tip.name.input"/>
+#      以上code即为该文档中左边部分的编码，为英文概要注解。
+##
+
+# Title 页面菜单 ------------------------------------------------------
+
+# 导航显示标题（后期需改善从DB读取）
+title.homePage						= 健康之路
+title.navigation.menu				= 导航栏菜单
+title.register.manage.center		= 注册管理中心
+title.data.manage.center			= 数据管理中心
+title.personage.record.manage		= 个人档案管理
+
+# 主页面标题
+title.login							= 登录
+title.retrieve.password				= 找回密码
+title.user.manage					= 用户管理
+title.org.manage					= 机构管理
+title.app.manage					= 应用管理
+title.patient.manage				= 病人管理
+title.sysDict.manage				= 系统字典
+title.template.manage               = 模版管理
+title.detailed.information          = 详细信息
+title.dict.manage				    = 标准字典
+title.dataSet                            =数据集
+
+# 弹出子窗口标题
+title.user.detail                   = 用户基本信息
+title.user.detail.input             = 填写基本信息
+title.user.detail.update            = 修改基本信息
+title.info.delete                   = 删除信息
+title.publicKey.manage              = 公钥管理
+title.tel.unwrap                    = 手机解绑
+title.mail.unwrap                   = 邮箱解绑
+title.org.belong.update             = 修改所属机构
+title.org.detail                    = 机构基本信息
+title.org.create                    = 新增机构信息
+title.org.update                    = 修改机构信息
+title.address.update                = 修改地址
+title.patient.detail                = 病人基本信息
+title.card.manage                   = 卡管理
+title.card.detail                   = 卡基本信息
+title.record.manage                 = 档案管理
+title.info.relieve                  = 解除信息
+title.info.unwrap                   = 解绑信息
+title.info.claim                    = 认领信息
+title.patient.create                = 新增病人信息
+title.patient.update                = 修改病人信息
+title.app.create                    = 新增应用信息
+title.app.update                    = 修改应用信息
+title.app.detail                    = 应用基本信息
+title.app.qualification             = 资质
+title.std.source                   = 标准来源
+title.dict.detail                   = 标准字典
+title.add.dataSet               =新增数据集
+title.add.metaData           =新增数据元
+title.updata.data               =修改数据集
+title.updata.metaData     =修改数据元
+title.metaData                    =数据元
+title.basic.attribute          =基本属性
+title.database.attribute   =数据库属性
+# Button 页面按钮 ------------------------------------------------------
+
+btn.login                           = 登录
+btn.confirm                         = 确定
+btn.go                              = Go
+btn.save                            = 保存
+btn.exit                            = 退出
+btn.search               			= 搜索
+btn.create               			= 新增
+btn.update               			= 修改
+btn.delete               			= 删除
+btn.multi.delete                    = 批量删除
+btn.homePage             			= 首页
+btn.upPage               			= 上一页
+btn.downPage             			= 下一页
+btn.trailerPage          			= 尾页
+btn.affirm               			= 确认
+btn.cancel               			= 取消
+btn.reset.pass           			= 重置密码
+btn.public.key.manage    			= 公钥管理
+btn.public.key.assign      			= 分配公钥
+btn.file.choose                     = 选择文件
+btn.verification.get                = 获取验证码
+btn.record.create                   = 增加档案
+btn.record.search                   = 档案搜索
+btn.card.create                     = 增加卡
+btn.dict.create                     = 新增字典
+btn.dictEntry.create                = 新增明细
+
+# label 页面标签 -------------------------------------------------------
+
+# 共通
+lbl.page.total                      = 共{0}页
+lbl.page.goto                       = 到
+lbl.code.name                       = 代码或名称
+lbl.version.select                  = 版本选择
+lbl.identity.card                  	= 身份证号
+lbl.introduction                    = 说明
+lbl.address.tips                = 点击选择详细信息
+lbl.type                            = 类型
+lbl.description                    = 描述
+lbl.code                            = 代码
+lbl.designation                     = 名称
+lbl.marriage.status                 = 婚姻状况
+lbl.real.name                       = 真实姓名
+lbl.location                        = 位置
+lbl.seqNo                           =序号
+lbl.operation                       = 操作
+lbl.name                            = 姓名
+lbl.user.org                      = 所属机构
+lbl.advanced                        = 高级
+lbl.publicKey.info                  = 公钥信息
+lbl.effective.date                  = 有效期限
+lbl.create.date                     = 生成时间
+lbl.selected                        =选择所有
+
+# 登录模块
+lbl.delete.message                  = 删除信息
+lbl.user.input                      = 输入用户名/邮箱/手机号
+lbl.user.noExist 			        = 没有帐号？
+lbl.user.forget 		            = 立即注册
+lbl.user.validation 		        = 用户验证
+lbl.pwd.input                       = 输入密码：
+lbl.pwd.register                    = 忘记密码?
+lbl.pwd.change                      = 密码修改
+lbl.pwd.retrieve.success            = 找回成功
+lbl.pwd.new                         = 新的密码：
+lbl.input.again                     = 再输一次：
+lbl.verification.input              = 输入验证码
+lbl.verification.in                 = 输入验证：
+lbl.verification.invisibility       = 看不清
+lbl.verification.change             = 换一张
+lbl.dict.tip.name.input             = 请输入名称或简拼
+lbl.welcome.login                   = 欢迎登入
+lbl.last.login                      = 最近登入
+
+# 用户管理
+lbl.user.org.input                  = 姓名或所属机构
+lbl.activate                        =是否激活
+lbl.invalid                        = 是否失效
+lbl.last.login.date                =上次登录时间
+lbl.specialized                     = 专业
+lbl.user.tel                        = 用户手机
+lbl.login.code                      =账号
+lbl.user.sex                        = 用户性别
+lbl.user.mail                       = 用户邮箱
+lbl.user.telephone                  =用户手机
+lbl.user.role                       = 用户角色
+lbl.org.belong                      = 所属机构
+lbl.specialized.belong              = 所属专业
+lbl.mail.open                       = 邮箱解绑
+lbl.mail.input                      = 输入新邮箱
+
+# 机构管理
+lbl.code.org.input              =代码或机构名称
+lbl.join.mode                       = 入驻方式
+lbl.org.code                        = 组织机构代码
+lbl.org.fullName                    = 机构全名
+lbl.org.shortName                   = 机构简称
+lbl.local                           =位置
+lbl.join.mode.tips                 = 入驻方式
+lbl.org.tel                         =联系电话
+lbl.org.type                        = 机构类型
+lbl.tip                             = 标签
+lbl.paste                           = 贴上
+lbl.addr.province                   = 省/自治区/直辖市
+lbl.addr.city                       = 市/自治州/自治县
+lbl.addr.town                       = 区/县
+lbl.addr.detail                     = 镇/街道/门牌号
+
+# 病人管理
+lbl.name.idCard.input           = 姓名或身份证
+lbl.patient.tel                     = 病人手机
+lbl.patient.sex                     = 病人性别
+lbl.patient.nation                  = 病人民族
+lbl.patient.native.place            = 病人籍贯
+lbl.birthdate                       = 出生日期
+lbl.home.address                   = 家庭地址
+lbl.census.register.address         = 户籍地址
+lbl.work.address                    = 工作地址
+lbl.census.register.type          = 户籍性质
+lbl.patient.mail                    = 病人邮箱
+
+# 应用管理
+lbl.internal.code.name             =内码或者名称
+lbl.app.id                          = APP ID
+lbl.app.secret                      = APP Secret
+lbl.callback.URL                    = 回调URL
+lbl.audit                           = 审核
+lbl.pass                            = 通过
+lbl.reject                          = 否决
+lbl.forbidden                       = 禁用
+lbl.open                            = 开启
+lbl.nothing                         = 无
+lbl.qualification.search            = 查看资质
+lbl.option.tags                         =标签选择
+lbl.internal.code                      =内码
+lbl.secret.key                            =密钥
+lbl.status                          = 状态
+
+# 系统字典管理
+lbl.dict.name                       = 字典名称
+lbl.dict.detail                     = 字典详情
+lbl.encoding                        = 编码
+lbl.content                         = 内容
+lbl.subCatalog                      = 小分类
+
+# 标准来源
+lbl.std.source.detail            = 标准来源基本信息
+lbl.source.type                     = 类别
+
+# 标准字典管理
+lbl.dict.base                       = 基础字典
+lbl.std.source                      = 标准来源
+lbl.version.ref                     = 参考版本
+lbl.value                           = 值
+
+#数据集
+lbl.input.code.name         =请输入代码或名称
+lbl.inside.serial                  =内部序号
+lbl.inside.code                    =内部代码
+lbl.metaData.encoding    =数据元编码
+lbl.metaData.name           =数据元名称
+lbl.dict                                   =字典
+lbl.metaData.type              =数据元类型
+lbl.verify.dict                       =检验字典
+lbl.format                             =格式
+lbl.definition                       =说明
+lbl.field.name                      =字段名
+lbl.field.length                    =字段长度
+lbl.data.type                        =数据类型
+lbl.whether.key                  =是否主键
+lbl.whether.null                 =是否为空
+
+<<<<<<< HEAD
+#CDA
+lbl.input.placehold                 = 请输入代码或者名称
+lbl.input.schemapath                   = 概要路径
+title.CDA.manage				     = CDA
+btn.edit                            = 编辑
+lbl.dataset                         = 数据集
+lbl.selected_Item                   = 已选择项
+lbl.cdaDocument.edit                        = CDA编辑
+=======
+
+>>>>>>> origin/master
+
+# Message ------------------------------------------------------------------
+
+msg.000001                          = 验证信息已发送至您的手机，请注意查收！
+msg.000002                          = 没收到验证码信息，请在{0}秒后再次获取。
+msg.000003                          = 确认删除该行信息？
+msg.000004                          = 如果是请点击确认按钮，否则请点击取消。
+msg.000005                          = 密码已修改成功！
+msg.000009                          = 确定认领关联档案？
+msg.000006                          = 确定要解除关联档案？
+msg.000007                          = 确定解绑该卡信息？
+msg.000008                          = 确定绑定该卡信息？
+msg.000013                          = 确认失效该用户信息？
+
+# Special -------------------------------------------------------------------
+
+spe.star                            = *
+spe.vertical                        = |
+spe.colon                           = :
+spe.less_than                       = >
+spe.slash                           = /
+spe.blank                           = ""
+spe.null                            = null
+
+# End -----------------------------------------------------------------------

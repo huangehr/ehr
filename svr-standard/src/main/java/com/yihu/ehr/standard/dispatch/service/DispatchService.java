@@ -606,9 +606,6 @@ public class DispatchService {
             appendChild(rowRoot, doc.createElement("description"), info.getDescription());
             appendChild(rowRoot, doc.createElement("version"), "");
             appendChild(rowRoot, doc.createElement("inner_version"), info.getVersionCode());
-            appendChild(rowRoot, doc.createElement("id"), "");
-            appendChild(rowRoot, doc.createElement("id"), "");
-            appendChild(rowRoot, doc.createElement("id"), "");
 
             root.appendChild(rowRoot);
 

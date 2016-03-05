@@ -1,11 +1,10 @@
 package com.yihu.ehr.adaption.orgdataset.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adaption.commons.ExtendController;
 import com.yihu.ehr.adaption.orgdataset.service.OrgDataSet;
 import com.yihu.ehr.adaption.orgdataset.service.OrgDataSetService;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.adaption.MOrgDataSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -37,7 +36,10 @@ public class OrgDataSetController extends ExtendController<MOrgDataSet> {
     @Autowired
     private OrgDataSetService orgDataSetService;
 
-    @RequestMapping(value = "/dataset/{id}", method = RequestMethod.GET)
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @RequestMapping(value = "/data_set/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据id查询实体")
     public MOrgDataSet getOrgDataSet(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
@@ -46,22 +48,19 @@ public class OrgDataSetController extends ExtendController<MOrgDataSet> {
         return getModel(orgDataSetService.retrieve(id));
     }
 
-    @RequestMapping(value = "/dataset", method = RequestMethod.POST)
+    @RequestMapping(value = "/data_set", method = RequestMethod.POST)
     @ApiOperation(value = "创建机构数据集")
     public MOrgDataSet createOrgDataSet(
             @ApiParam(name = "model", value = "适配字典数据模型", defaultValue = "")
             @RequestParam(value = "model") String model) throws Exception{
 
-        OrgDataSet orgDataSet = jsonToObj(model, OrgDataSet.class);
-        if (orgDataSetService.isExistOrgDataSet(orgDataSet.getOrganization(), orgDataSet.getCode(), orgDataSet.getName()))
-            throw new ApiException(ErrorCode.RepeatOrgDataSet, "该数据集已存在!");
-
+        OrgDataSet orgDataSet = objectMapper.readValue(model, OrgDataSet.class);
         orgDataSet.setCreateDate(new Date());
         return getModel(orgDataSetService.createOrgDataSet(orgDataSet));
     }
 
 
-    @RequestMapping(value = "/dataset", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/data_set", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除机构数据集")
     public boolean deleteOrgDataSet(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
@@ -72,28 +71,21 @@ public class OrgDataSetController extends ExtendController<MOrgDataSet> {
     }
 
 
-    @RequestMapping(value = "/dataset", method = RequestMethod.PUT)
+    @RequestMapping(value = "/data_set", method = RequestMethod.PUT)
     @ApiOperation(value = "修改机构数据集")
     public MOrgDataSet updateOrgDataSet(
             @ApiParam(name = "model", value = "适配字典数据模型", defaultValue = "")
             @RequestParam(value = "model") String model) throws Exception{
 
-        OrgDataSet dataModel = jsonToObj(model, OrgDataSet.class);
-        OrgDataSet orgDataSet = orgDataSetService.retrieve(dataModel.getId());
-        if (orgDataSet == null)
-            throw errNotFound();
-        if (orgDataSet.getCode().equals(dataModel.getCode())
-                || !orgDataSetService.isExistOrgDataSet(dataModel.getOrganization(), dataModel.getCode(), dataModel.getName())) {
+        OrgDataSet dataModel = objectMapper.readValue(model, OrgDataSet.class);
 
-            dataModel.setUpdateDate(new Date());
-            return getModel(orgDataSetService.save(dataModel));
-        } else
-            throw new ApiException(ErrorCode.RepeatOrgDataSet, "该数据集已存在!");
+        return getModel(orgDataSetService.save(dataModel));
+
     }
 
 
 
-    @RequestMapping(value = "/datasets", method = RequestMethod.GET)
+    @RequestMapping(value = "/data_sets", method = RequestMethod.GET)
     @ApiOperation(value = "条件查询")
     public Collection<MOrgDataSet> searchAdapterOrg(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
@@ -113,4 +105,15 @@ public class OrgDataSetController extends ExtendController<MOrgDataSet> {
         pagedResponse(request, response, orgDataSetService.getCount(filters), page, size);
         return convertToModels(appList, new ArrayList<>(appList.size()), MOrgDataSet.class, fields);
     }
+
+    @RequestMapping(value = "/is_exist", method = RequestMethod.GET)
+    @ApiOperation(value = "条件查询")
+    public boolean dataSetIsExist(
+            @ApiParam(name = "org_code",value = "机构代码",defaultValue = "")
+            @RequestParam(value = "org_code")String orgCode,
+            @ApiParam(name="code",value="数据集代码",defaultValue = "")
+            @RequestParam(value = "code")String code){
+       return orgDataSetService.isExistOrgDataSet(orgCode, code);
+    }
+
 }

@@ -18,10 +18,12 @@ import com.yihu.ehr.adaption.orgdictitem.service.OrgDictItem;
 import com.yihu.ehr.adaption.orgdictitem.service.OrgDictItemService;
 import com.yihu.ehr.adaption.orgmetaset.service.OrgMetaData;
 import com.yihu.ehr.adaption.orgmetaset.service.OrgMetaDataService;
+import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.standard.MDispatchLog;
 import com.yihu.ehr.util.compress.Zipper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -43,29 +45,25 @@ import java.util.*;
  * @version 1.0
  * @created 2016/3/1
  */
+@Service
 public class AdapterInfoSendService {
+    @Autowired
+    FastDFSUtil fastDFSUtil;
 
     @Autowired
     private OrgDataSetService orgDataSetService;
-
     @Autowired
     private OrgMetaDataService orgMetaDataService;
-
     @Autowired
     private OrgDictService orgDictService;
-
     @Autowired
     private OrgDictItemService orgDictItemService;
-
     @Autowired
     private OrgAdapterPlanService orgAdapterPlanService;
-
     @Autowired
     private AdapterDataSetService adapterDataSetService;
-
     @Autowired
     private AdapterDictService adapterDictService;
-
     @Autowired
     private DispatchLogClient dispatchLogClient;
 
@@ -539,6 +537,9 @@ public class AdapterInfoSendService {
 
         //生成数据集映射文件
         Map mapResult = adapterDataSetService.getDataSetMappingInfo(strPlanId, versionCode,strOrgCode);
+        if(mapResult==null){
+            throw new NullPointerException("数据集映射信息为空！");
+        }
         List<DataSetMappingInfo> listDataSetMapping = (List<DataSetMappingInfo>) mapResult.get("datasetlist");
         createDataSetMapping(listDataSetMapping, strFilePath);
 
@@ -548,6 +549,9 @@ public class AdapterInfoSendService {
 
         //生成字典映射文件
         Map dictResultMap = adapterDictService.getDictMappingInfo(strPlanId, versionCode, strOrgCode);
+        if(dictResultMap==null){
+            throw new NullPointerException("字典映射信息为空！");
+        }
         List<DictMappingInfo> listDictMapping = (List<DictMappingInfo>) dictResultMap.get("dictlist");
         createDictMapping(listDictMapping, strFilePath);
 
@@ -594,7 +598,7 @@ public class AdapterInfoSendService {
             zipper.zipFile(resourcesFile, strZIPFilePath + strFileName, strPwd);
 
             //将文件上传到服务器中
-            ObjectNode msg = new FastDFSUtil().upload(strZIPFilePath + strFileName, "");
+            ObjectNode msg = fastDFSUtil.upload(strZIPFilePath + strFileName, "");
 
             resultMap.put(FastDFSUtil.GroupField, msg.get(FastDFSUtil.GroupField).asText());//setFilePath
             resultMap.put(FastDFSUtil.RemoteFileField, msg.get(FastDFSUtil.RemoteFileField).asText());//setFileName

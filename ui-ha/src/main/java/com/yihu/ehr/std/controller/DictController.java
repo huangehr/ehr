@@ -1,6 +1,5 @@
 package com.yihu.ehr.std.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.RestAPI;
 import com.yihu.ehr.constants.SessionAttributeKeys;
@@ -12,7 +11,6 @@ import com.yihu.ehr.util.log.LogService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -30,7 +28,7 @@ public class DictController extends BaseRestController {
     private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
     private static   String username = ResourceProperties.getProperty("username");
     private static   String password = ResourceProperties.getProperty("password");
-    private static   String module = ResourceProperties.getProperty("module");  //Ä¿Ç°¶¨ÒåÎªrest
+    private static   String module = ResourceProperties.getProperty("module");  //ç›®å‰å®šä¹‰ä¸ºrest
     private static   String version = ResourceProperties.getProperty("version");
     private static   String comUrl = host + module + version;
 
@@ -43,11 +41,11 @@ public class DictController extends BaseRestController {
     @RequestMapping("template/stdDictInfo")
     public String stdDictInfoTemplate(Model model, String dictId, String strVersionCode, String mode) {
         String _rus = "";
-        //mode¶¨Òå£ºnew modify viewÈıÖÖÄ£Ê½£¬ĞÂÔö£¬ĞŞ¸Ä£¬²é¿´
+        //modeå®šä¹‰ï¼šnew modify viewä¸‰ç§æ¨¡å¼ï¼Œæ–°å¢ï¼Œä¿®æ”¹ï¼ŒæŸ¥çœ‹
         if(mode.equals("view") || mode.equals("modify")){
             model.addAttribute("rs", "suc");
             if (strVersionCode == null) {
-                model.addAttribute("rs", ("ÕÒ²»µ½version_code"));
+                model.addAttribute("rs", ("æ‰¾ä¸åˆ°version_code"));
             }else{
                 String url = "/dict/dict";
                 try {
@@ -55,7 +53,7 @@ public class DictController extends BaseRestController {
                     params.put("dictId",dictId);
                     params.put("versionCode",strVersionCode);
                     _rus = HttpClientUtil.doGet(comUrl + url, params, username, password);
-                    //todo: »¹Òª°üº¬baseDictId¡¢baseDictName
+                    //todo: è¿˜è¦åŒ…å«baseDictIdã€baseDictName
 //                    ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
 //                    DictForInterface dict = objectMapper.readValue(_rus, DictForInterface.class);
 //                    if (dict != null) {
@@ -76,13 +74,13 @@ public class DictController extends BaseRestController {
                 }
             }
         }
-        model.addAttribute("info", _rus);   // jspÒ³ÃæÒÑĞŞ¸Ä
+        model.addAttribute("info", _rus);   // jspé¡µé¢å·²ä¿®æ”¹
         model.addAttribute("mode",mode);
         model.addAttribute("contentPage","/std/dict/stdDictInfoDialog");
         return "simpleView";
 
        /* XDictForInterface info = new DictForInterface();
-        //mode¶¨Òå£ºnew modify viewÈıÖÖÄ£Ê½£¬ĞÂÔö£¬ĞŞ¸Ä£¬²é¿´
+        //modeå®šä¹‰ï¼šnew modify viewä¸‰ç§æ¨¡å¼ï¼Œæ–°å¢ï¼Œä¿®æ”¹ï¼ŒæŸ¥çœ‹
         if(mode.equals("view") || mode.equals("modify")){
             Result result = new Result();
             model.addAttribute("rs", "suc");
@@ -137,7 +135,7 @@ public class DictController extends BaseRestController {
     public String dictEntryInfoTemplate(Model model, String id, String dictId, String strVersionCode, String mode) {
         String _rus = "";
         model.addAttribute("rs", "suc");
-        //mode¶¨Òå£ºnew modify viewÈıÖÖÄ£Ê½£¬ĞÂÔö£¬ĞŞ¸Ä£¬²é¿´
+        //modeå®šä¹‰ï¼šnew modify viewä¸‰ç§æ¨¡å¼ï¼Œæ–°å¢ï¼Œä¿®æ”¹ï¼ŒæŸ¥çœ‹
         String url = "/dict/dictEntry*****";
         try {
             Map<String,Object> params = new HashMap<>();
@@ -149,7 +147,7 @@ public class DictController extends BaseRestController {
             LogService.getLogger(DictController.class).error(ex.getMessage());
             model.addAttribute("rs", "error");
         }
-        model.addAttribute("info", _rus); // ÒÑĞŞ¸ÄjspÒ³Ãæ
+        model.addAttribute("info", _rus); // å·²ä¿®æ”¹jspé¡µé¢
         //model.addAttribute("dictId",dictId);
         model.addAttribute("mode",mode);
         model.addAttribute("contentPage","/std/dict/dictEntryInfoDialog");
@@ -157,7 +155,7 @@ public class DictController extends BaseRestController {
 
        /* XDictEntryForInterface info = new DictEntryForInterface();
         model.addAttribute("rs", "suc");
-        //mode¶¨Òå£ºnew modify viewÈıÖÖÄ£Ê½£¬ĞÂÔö£¬ĞŞ¸Ä£¬²é¿´
+        //modeå®šä¹‰ï¼šnew modify viewä¸‰ç§æ¨¡å¼ï¼Œæ–°å¢ï¼Œä¿®æ”¹ï¼ŒæŸ¥çœ‹
         if(mode.equals("view") || mode.equals("modify")){
             Result result = new Result();
             Long dictEntryId = id.equals("") ? 0 : Long.parseLong(id);
@@ -187,27 +185,27 @@ public class DictController extends BaseRestController {
     }
 
     /**
-     * ĞÂÔö»ò¸üĞÂ×ÖµäÊı¾İ¡£
+     * æ–°å¢æˆ–æ›´æ–°å­—å…¸æ•°æ®ã€‚
      *
      * @return
      */
     @RequestMapping("saveDict")
     @ResponseBody
-    public Object saveDict(String cdaVersion, String dictId, String code, String name, String baseDict, String stdSource, String stdVersion, String description, @ModelAttribute(SessionAttributeKeys.CurrentUser) XUser user) {
+    public Object saveDict(String cdaVersion, String dictId, String code, String name, String baseDict, String stdSource, String stdVersion, String description,String userId) {
         Envelop result = new Envelop();
         if (StringUtils.isEmpty(cdaVersion)) {
             result.setSuccessFlg(false);
-            result.setErrorMsg("°æ±¾ºÅ²»ÄÜÎª¿Õ£¡");
+            result.setErrorMsg("ç‰ˆæœ¬å·ä¸èƒ½ä¸ºç©ºï¼");
             return result;
         }
         if (StringUtils.isEmpty(code)) {
             result.setSuccessFlg(false);
-            result.setErrorMsg("´úÂë²»ÄÜÎª¿Õ£¡");
+            result.setErrorMsg("ä»£ç ä¸èƒ½ä¸ºç©ºï¼");
             return result;
         }
         if (StringUtils.isEmpty(name)) {
             result.setSuccessFlg(false);
-            result.setErrorMsg("Ãû³Æ²»ÄÜÎª¿Õ£¡");
+            result.setErrorMsg("åç§°ä¸èƒ½ä¸ºç©ºï¼");
             return result;
         }
         try{
@@ -216,7 +214,7 @@ public class DictController extends BaseRestController {
             params.put("versionCode",cdaVersion);
             params.put("dictId",dictId);
             params.put("code",code);
-            // ¼ì²é×Öµä±àÂëÊÇ·ñÖØ¸´
+            // æ£€æŸ¥å­—å…¸ç¼–ç æ˜¯å¦é‡å¤
             String urlCheckCode = "/dict/isExistCode******";
             String _msg = HttpClientUtil.doGet(comUrl+urlCheckCode,params,username,password);
             if (Boolean.parseBoolean(_msg)){
@@ -228,7 +226,7 @@ public class DictController extends BaseRestController {
             params.put("stdSource",stdSource);
             params.put("stdVersion",stdVersion);
             params.put("description",description);
-            params.put("userId",user.getId());
+            params.put("userId",userId);
             String _rus = HttpClientUtil.doPost(comUrl+url,params,username,password);
             if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
@@ -246,7 +244,7 @@ public class DictController extends BaseRestController {
        /* Result result = new Result();
         Long id = dictId.equals("") ? 0 : Long.parseLong(dictId);
         Long baseDictL = baseDict.equals("") ? 0 : Long.parseLong(baseDict);
-        //ĞÂÔö×Öµä
+        //æ–°å¢å­—å…¸
         try {
             if (cdaVersion == null || cdaVersion.equals("")) {
                 return missParameter("VersionCode");
@@ -353,7 +351,7 @@ public class DictController extends BaseRestController {
     }
 
     /**
-     * ¸ù¾İCdaVersion²éÑ¯ÏàÓ¦°æ±¾µÄ×ÖµäÊı¾İ¡£
+     * æ ¹æ®CdaVersionæŸ¥è¯¢ç›¸åº”ç‰ˆæœ¬çš„å­—å…¸æ•°æ®ã€‚
      *
      * @return
      */
@@ -363,7 +361,7 @@ public class DictController extends BaseRestController {
         Envelop result = new Envelop();
         if (strVersionCode == null) {
             result.setSuccessFlg(false);
-            result.setErrorMsg("°æ±¾ºÅ²»ÄÜÎª¿Õ£¡");
+            result.setErrorMsg("ç‰ˆæœ¬å·ä¸èƒ½ä¸ºç©ºï¼");
             return result;
         }
         String url = "/dict/getCdaDictList";
@@ -425,7 +423,7 @@ public class DictController extends BaseRestController {
     }
 
     /**
-     * ¸ù¾İCdaVersion¼°×ÖµäID²éÑ¯ÏàÓ¦°æ±¾µÄ×ÖµäÏêÏ¸ĞÅÏ¢¡£
+     * æ ¹æ®CdaVersionåŠå­—å…¸IDæŸ¥è¯¢ç›¸åº”ç‰ˆæœ¬çš„å­—å…¸è¯¦ç»†ä¿¡æ¯ã€‚
      *
      * @return
      */
@@ -435,7 +433,7 @@ public class DictController extends BaseRestController {
         Envelop result = new Envelop();
         if (strVersionCode == null) {
             result.setSuccessFlg(false);
-            result.setErrorMsg("°æ±¾ºÅ²»ÄÜÎª¿Õ£¡");
+            result.setErrorMsg("ç‰ˆæœ¬å·ä¸èƒ½ä¸ºç©ºï¼");
             return result;
         }
         try{
@@ -449,7 +447,7 @@ public class DictController extends BaseRestController {
                 result.setErrorMsg(ErrorCode.GetDictFaild.toString());
             }else{
                 result.setSuccessFlg(true);
-                //TODO »òĞŞ¸ÄÇ°¶ËÒ³Ãæ
+                //TODO æˆ–ä¿®æ”¹å‰ç«¯é¡µé¢
 //                ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
 //                XDictForInterface info = objectMapper.readValue(_rus,XDictForInterface.class);
                 result.setObj(_rus);
@@ -499,7 +497,7 @@ public class DictController extends BaseRestController {
     }
 
     /**
-     * ²éÑ¯CdaVersionÓÃÓÚÏÂÀ­¿ò¸³Öµ¡£
+     * æŸ¥è¯¢CdaVersionç”¨äºä¸‹æ‹‰æ¡†èµ‹å€¼ã€‚
      *
      * @return
      */
@@ -566,7 +564,7 @@ public class DictController extends BaseRestController {
     }
 
     /**
-     * ²éÑ¯StdSourceÓÃÓÚÏÂÀ­¿ò¸³Öµ¡£
+     * æŸ¥è¯¢StdSourceç”¨äºä¸‹æ‹‰æ¡†èµ‹å€¼ã€‚
      *
      * @return
      */
@@ -578,7 +576,7 @@ public class DictController extends BaseRestController {
         try {
             if (StringUtils.isEmpty(strVersionCode)) {
                 result.setSuccessFlg(false);
-                result.setErrorMsg("°æ±¾ºÅ²»ÄÜÎª¿Õ£¡");
+                result.setErrorMsg("ç‰ˆæœ¬å·ä¸èƒ½ä¸ºç©ºï¼");
                 return result;
             }
             String url = "/stdSource/standardSources";
@@ -620,7 +618,7 @@ public class DictController extends BaseRestController {
     }
 
     /**
-     * ¸ù¾İÊäÈëÌõ¼ş£¬²éÑ¯×ÖµäList(¹ıÂËµôµ±Ç°×Öµä)
+     * æ ¹æ®è¾“å…¥æ¡ä»¶ï¼ŒæŸ¥è¯¢å­—å…¸List(è¿‡æ»¤æ‰å½“å‰å­—å…¸)
      *
      * @return
      */
@@ -690,7 +688,7 @@ public class DictController extends BaseRestController {
     }
 
     /**
-     * ¸ù¾İÊäÈëÌõ¼ş£¬²éÑ¯×ÖµäList(¹ıÂËµôµ±Ç°×Öµä)
+     * æ ¹æ®è¾“å…¥æ¡ä»¶ï¼ŒæŸ¥è¯¢å­—å…¸List(è¿‡æ»¤æ‰å½“å‰å­—å…¸)
      *
      * @return
      */
@@ -751,7 +749,7 @@ public class DictController extends BaseRestController {
         return result.toJson();*/
     }
     /**
-     * ²éÑ¯×îĞÂ°æ±¾µÄCdaVersion£¬ÓÃÓÚ³õÊ¼»¯²éÑ¯×ÖµäÊı¾İ¡£
+     * æŸ¥è¯¢æœ€æ–°ç‰ˆæœ¬çš„CdaVersionï¼Œç”¨äºåˆå§‹åŒ–æŸ¥è¯¢å­—å…¸æ•°æ®ã€‚
      *
      * @return
      */
@@ -795,27 +793,27 @@ public class DictController extends BaseRestController {
         Envelop result = new Envelop();
         if (StringUtils.isEmpty(cdaVersion)) {
             result.setSuccessFlg(false);
-            result.setErrorMsg("°æ±¾ºÅ²»ÄÜÎª¿Õ£¡");
+            result.setErrorMsg("ç‰ˆæœ¬å·ä¸èƒ½ä¸ºç©ºï¼");
             return result;
         }
         if (StringUtils.isEmpty(dictId)) {
             result.setSuccessFlg(false);
-            result.setErrorMsg("×ÖµäID²»ÄÜÎª¿Õ£¡");
+            result.setErrorMsg("å­—å…¸IDä¸èƒ½ä¸ºç©ºï¼");
             return result;
         }
         if (StringUtils.isEmpty(id)) {
             result.setSuccessFlg(false);
-            result.setErrorMsg("ID²»ÄÜÎª¿Õ£¡");
+            result.setErrorMsg("IDä¸èƒ½ä¸ºç©ºï¼");
             return result;
         }
         if (StringUtils.isEmpty(code)) {
             result.setSuccessFlg(false);
-            result.setErrorMsg("´úÂë²»ÄÜÎª¿Õ£¡");
+            result.setErrorMsg("ä»£ç ä¸èƒ½ä¸ºç©ºï¼");
             return result;
         }
         if (StringUtils.isEmpty(value)) {
             result.setSuccessFlg(false);
-            result.setErrorMsg("Öµ²»ÄÜÎª¿Õ£¡");
+            result.setErrorMsg("å€¼ä¸èƒ½ä¸ºç©ºï¼");
             return result;
         }
 
@@ -907,7 +905,7 @@ public class DictController extends BaseRestController {
         Envelop result = new Envelop();
         if (StringUtils.isEmpty(cdaVersion)) {
             result.setSuccessFlg(false);
-            result.setErrorMsg("°æ±¾ºÅ²»ÄÜÎª¿Õ£¡");
+            result.setErrorMsg("ç‰ˆæœ¬å·ä¸èƒ½ä¸ºç©ºï¼");
             return result;
         }
         try{
@@ -967,11 +965,11 @@ public class DictController extends BaseRestController {
     @RequestMapping("deleteDictEntryList")
     @ResponseBody
     public Object deleteDictEntryList(String cdaVersion, String id) {
-        //TODO APIÒªÇó dictId ²ÎÊı
+        //TODO APIè¦æ±‚ dictId å‚æ•°
         Envelop result = new Envelop();
         if (StringUtils.isEmpty(cdaVersion)) {
             result.setSuccessFlg(false);
-            result.setErrorMsg("°æ±¾ºÅ²»ÄÜÎª¿Õ£¡");
+            result.setErrorMsg("ç‰ˆæœ¬å·ä¸èƒ½ä¸ºç©ºï¼");
             return result;
         }
         try{
@@ -1151,14 +1149,14 @@ public class DictController extends BaseRestController {
     }*/
 
 //    public void exportToExcel(){
-//        //todo£ºtest µ¼³ö²âÊÔ
+//        //todoï¼štest å¯¼å‡ºæµ‹è¯•
 //        XDict[] dicts = dictManager.getDictList(0, 0,cdaVersionManager.getLatestVersion());
 //        dictManager.exportToExcel("E:/workspaces/excel/testExport.xls", dicts);
 //    }
 //
 //    public void importFromExcel(){
-//        //todo£ºtestµ¼Èë²âÊÔ
-//        dictManager.importFromExcel("E:/workspaces/excel/²âÊÔexcelµ¼Èë.xls", cdaVersionManager.getLatestVersion());
+//        //todoï¼štestå¯¼å…¥æµ‹è¯•
+//        dictManager.importFromExcel("E:/workspaces/excel/æµ‹è¯•excelå¯¼å…¥.xls", cdaVersionManager.getLatestVersion());
 //
 //    }
 }

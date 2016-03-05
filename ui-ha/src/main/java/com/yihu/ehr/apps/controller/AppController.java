@@ -10,7 +10,6 @@ import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.log.LogService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -129,7 +128,7 @@ public class AppController extends BaseRestController {
                             String url,
                             String description,
                             String tags,
-                            @ModelAttribute(SessionAttributeKeys.CurrentUser) XUser user) {
+                            String userId) {
         Envelop result = new Envelop();
 
         try {
@@ -140,7 +139,7 @@ public class AppController extends BaseRestController {
             conditionMap.put("url", url);
             conditionMap.put("description", description);
             conditionMap.put("tags", tags);
-            conditionMap.put("userId", user.getId());
+            conditionMap.put("userId", userId);
 
             String _res = HttpClientUtil.doPost(host + urlPath, conditionMap, username, password);
 
