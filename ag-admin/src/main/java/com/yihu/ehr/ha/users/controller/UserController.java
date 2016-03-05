@@ -227,7 +227,7 @@ public class UserController extends BaseController {
             @ApiParam(name = "psw", value = "密码", defaultValue = "")
             @RequestParam(value = "psw") String psw) {
 
-        MUser mUser = userClient.loginVerification(loginCode, psw);
+        MUser mUser = userClient.getUserByNameAndPassword(loginCode, psw);
         if (mUser == null) {
             return failed("用户信息获取失败!");
         }

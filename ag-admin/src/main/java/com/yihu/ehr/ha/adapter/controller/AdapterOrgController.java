@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.thirdpartystandard.AdapterOrgDetailModel;
 import com.yihu.ehr.agModel.thirdpartystandard.AdapterOrgModel;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.ha.adapter.service.AdapterOrgClient;
 import com.yihu.ehr.model.adaption.MAdapterOrg;
 import com.yihu.ehr.util.Envelop;
@@ -60,12 +61,12 @@ public class AdapterOrgController extends BaseController {
 
         MAdapterOrg mAdapterOrg = adapterOrgClient.getAdapterOrg(code);
 
-        AdapterOrgModel adapterOrgModel = convertToModel(mAdapterOrg, AdapterOrgModel.class);
+        AdapterOrgDetailModel adapterOrgModel = convertToModel(mAdapterOrg, AdapterOrgDetailModel.class);
         if (adapterOrgModel == null) {
             return failed("适配机构信息获取失败!");
         }
 
-        return success(mAdapterOrg);
+        return success(adapterOrgModel);
     }
 
 
@@ -73,29 +74,40 @@ public class AdapterOrgController extends BaseController {
     @ApiOperation(value = "新增采集标准")
     public Envelop addAdapterOrg(
             @ApiParam(name = "adapterOrg", value = "采集机构模型", defaultValue = "")
-            @RequestParam(value = "adapterOrg", required = false) String adapterOrg) throws Exception {
+            @RequestParam(value = "adapterOrg", required = false) String adapterOrg) {
+        MAdapterOrg mAdapterOrg = null;
+        try {
+            AdapterOrgDetailModel detailModel = objectMapper.readValue(adapterOrg, AdapterOrgDetailModel.class);
 
-        AdapterOrgDetailModel detailModel = objectMapper.readValue(adapterOrg, AdapterOrgDetailModel.class);
+            String errorMsg = "";
+            if (StringUtils.isEmpty(detailModel.getName())) {
+                errorMsg += "名称不能为空!";
+            }
 
-        String errorMsg = "";
-        if (StringUtils.isEmpty(detailModel.getName())) {
-            errorMsg += "名称不能为空!";
+            if (StringUtils.isEmpty(detailModel.getOrg())) {
+                errorMsg += "机构代码不能为空!";
+            }
+
+            if (StringUtils.isNotEmpty(errorMsg)) {
+                return failed(errorMsg);
+            }
+
+            if(adapterOrgClient.isExistAdapterOrg(detailModel.getCode()))
+            {
+                return failed("该机构已存在采集标准！");
+            }
+
+            mAdapterOrg = convertToModel(detailModel, MAdapterOrg.class);
+            mAdapterOrg = adapterOrgClient.addAdapterOrg(objectMapper.writeValueAsString(mAdapterOrg));
+            if (mAdapterOrg == null) {
+                return failed("新增失败!");
+            }
         }
-
-        if (StringUtils.isEmpty(detailModel.getOrg())) {
-            errorMsg += "机构代码不能为空!";
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
         }
-
-        if (StringUtils.isNotEmpty(errorMsg)) {
-            return failed(errorMsg);
-        }
-
-        MAdapterOrg mAdapterOrg = convertToModel(detailModel, MAdapterOrg.class);
-        mAdapterOrg = adapterOrgClient.addAdapterOrg(objectMapper.writeValueAsString(mAdapterOrg));
-        if (mAdapterOrg == null) {
-            return failed("新增失败!");
-        }
-        return success(mAdapterOrg);
+        return success(convertToModel(mAdapterOrg,AdapterOrgDetailModel.class));
     }
 
 
@@ -126,7 +138,7 @@ public class AdapterOrgController extends BaseController {
         if (mAdapterOrg == null) {
             return failed("修改失败!");
         }
-        return success(mAdapterOrg);
+        return success(convertToModel(mAdapterOrg,AdapterOrgDetailModel.class));
     }
 
 
@@ -134,11 +146,19 @@ public class AdapterOrgController extends BaseController {
     @ApiOperation(value = "删除采集标准")
     public Envelop delAdapterOrg(
             @ApiParam(name = "codes", value = "代码", defaultValue = "")
-            @PathVariable(value = "codes") String codes) throws Exception {
-
-        boolean result = adapterOrgClient.delAdapterOrg(codes);
-        if (!result) {
-            return failed("删除失败!");
+            @PathVariable(value = "codes") String codes) {
+        try {
+            boolean result = adapterOrgClient.delAdapterOrg(codes);
+            if (!result) {
+                return failed("删除失败!");
+            }
+        } catch (ApiException ex) {
+            ex.printStackTrace();
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
         }
         return success(null);
     }

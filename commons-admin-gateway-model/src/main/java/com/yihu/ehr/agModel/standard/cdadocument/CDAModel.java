@@ -1,7 +1,5 @@
 package com.yihu.ehr.agModel.standard.cdadocument;
 
-import java.util.Date;
-
 /**
  * Created by AndyCai on 2016/2/29.
  */
