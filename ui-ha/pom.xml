@@ -4,18 +4,16 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.yihu.ehr</groupId>
-		<artifactId>commons-dependencies</artifactId>
+		<artifactId>commons-dependencies-docker</artifactId>
 		<version>1.1.0</version>
-		<relativePath/> <!-- lookup parent from repository -->
+        <relativePath>../commons-dependencies-docker</relativePath>
 	</parent>
 
-	<groupId>com.yihu.ehr</groupId>
-	<artifactId>ui-ha</artifactId>
-	<version>1.1.0</version>
+	<artifactId>app-admin</artifactId>
 	<packaging>jar</packaging>
 
-	<name>ui-ha</name>
-	<description>总支撑平台UI</description>
+	<name>总支撑管理应用</name>
+	<description>总支撑管理应用</description>
 
 	<properties>
 		<spring.version>4.1.1.RELEASE</spring.version>

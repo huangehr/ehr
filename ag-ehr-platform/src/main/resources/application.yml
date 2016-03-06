@@ -9,7 +9,10 @@ endpoints:
   health:
     sensitive: false
 
-#security.user.password: gateway
+security:
+  user:
+    name: admin
+    password: gateway
 
 ## 错误消息
 missing:
@@ -30,10 +33,29 @@ keystore:
 
 eureka:
   instance:
-    hostname: localhost
+    ip-address: 127.0.0.1
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
+
+---
+spring:
+  profiles: sand-home-dev
+
+  thymeleaf:
+      cache: false
+
+keystore:
+  file: C:/Windows/tomcat.keystore
+  password: 123456
+
+eureka:
+  instance:
+    ip-address: 127.0.0.1
   client:
     registerWithEureka: true
-    fetchRegistry: true
+    fetchRegistry: false
     serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
 
 ---
@@ -42,7 +64,7 @@ spring:
 
 eureka:
   instance:
-    hostname: localhost
+    ip-address: unknown
   client:
     registerWithEureka: true
     fetchRegistry: true
@@ -54,7 +76,7 @@ spring:
 
 eureka:
   instance:
-    hostname: localhost
+    ip-address: unknown
   client:
     registerWithEureka: true
     fetchRegistry: true

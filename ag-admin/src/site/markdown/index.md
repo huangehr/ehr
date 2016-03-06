@@ -16,9 +16,9 @@
 
 > [代码规范](specification/index.html)
 
-> 工程结构
+> [工程结构](projects/projects.html)
 
-> Maven插件
+> [开发流程](development/development.html)
 
 > [部署](deployment/index.html)
 

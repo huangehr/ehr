@@ -202,6 +202,23 @@
         </dependency>
     </dependencies>
 
+    <modules>
+        <module>../commons-ehr-constants</module>
+        <module>../commons-ui-swagger</module>
+        <module>../commons-util</module>
+
+        <module>../commons-data-fastdfs</module>
+        <module>../commons-data-hbase</module>
+        <module>../commons-data-mysql</module>
+        <module>../commons-data-redis</module>
+        <module>../commons-data-solr</module>
+        <module>../commons-thrift-services</module>
+        <module>../commons-thrift-client</module>
+        <module>../commons-thrift-server</module>
+        <module>../commons-rest-model</module>
+        <module>../commons-admin-gateway-model</module>
+    </modules>
+
     <repositories>
         <repository>
             <id>nexus</id>
