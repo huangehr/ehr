@@ -1,22 +1,25 @@
 package com.yihu.ehr.web;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.exceptions.*;
 import org.springframework.security.oauth2.common.util.OAuth2Utils;
+import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerEndpointsConfiguration;
+import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.provider.*;
 import org.springframework.security.oauth2.provider.approval.DefaultUserApprovalHandler;
 import org.springframework.security.oauth2.provider.approval.UserApprovalHandler;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.code.InMemoryAuthorizationCodeServices;
-import org.springframework.security.oauth2.provider.endpoint.AbstractEndpoint;
-import org.springframework.security.oauth2.provider.endpoint.DefaultRedirectResolver;
-import org.springframework.security.oauth2.provider.endpoint.RedirectResolver;
+import org.springframework.security.oauth2.provider.endpoint.*;
 import org.springframework.security.oauth2.provider.implicit.ImplicitTokenRequest;
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestValidator;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,13 +33,15 @@ import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.security.Principal;
 import java.util.*;
 
 /**
- * 自定义授权确认界面。
+ * 自定义授权入口。由于Spring使用了自带授权入口Bean{@link AuthorizationEndpoint}，但其使用@FrameworkEndpoint标识，
+ * 因此用户自定义的Controller不会与之冲突，放心地使用常规方式创建新的Controller即可。
  *
  * http://stackoverflow.com/questions/29345508/spring-oauth2-custom-oauth-approval-page-at-oauth-authorize
  *
@@ -46,7 +51,7 @@ import java.util.*;
  */
 //@Controller
 //@SessionAttributes("authorizationRequest")
-public class OAuth2Endpoint extends AbstractEndpoint {
+public class EhrAuthorizationEndpoint extends AbstractEndpoint {
 
     private AuthorizationCodeServices authorizationCodeServices = new InMemoryAuthorizationCodeServices();
 
@@ -64,6 +69,24 @@ public class OAuth2Endpoint extends AbstractEndpoint {
 
     private Object implicitLock = new Object();
 
+    @Autowired
+    AuthorizationServerEndpointsConfiguration configuration;
+
+    @PostConstruct
+    public void init() throws Exception {
+        AuthorizationServerEndpointsConfigurer configurer = configuration.getEndpointsConfigurer();
+        FrameworkEndpointHandlerMapping mapping = configuration.getEndpointsConfigurer().getFrameworkEndpointHandlerMapping();
+        this.setUserApprovalPage(extractPath(mapping, "/oauth/confirm_access"));
+        this.setProviderExceptionHandler(configurer.getExceptionTranslator());
+        this.setErrorPage(extractPath(mapping, "/oauth/error"));
+        this.setTokenGranter(configurer.getTokenGranter());
+        this.setClientDetailsService(configurer.getClientDetailsService());
+        this.setAuthorizationCodeServices(configurer.getAuthorizationCodeServices());
+        this.setOAuth2RequestFactory(configurer.getOAuth2RequestFactory());
+        this.setOAuth2RequestValidator(configurer.getOAuth2RequestValidator());
+        this.setUserApprovalHandler(configurer.getUserApprovalHandler());
+    }
+
     @RequestMapping("/oauth/confirm_access")
     public ModelAndView getAccessConfirmation(Map<String, Object> model, HttpServletRequest request) throws Exception {
         if (request.getAttribute("_csrf") != null) {
@@ -79,6 +102,82 @@ public class OAuth2Endpoint extends AbstractEndpoint {
         return new ModelAndView("/oauth/confirm_access", model);
     }
 
+    @RequestMapping(value = "/oauth/authorize")
+    public ModelAndView authorize(Map<String, Object> model, @RequestParam Map<String, String> parameters,
+                                  SessionStatus sessionStatus, Principal principal) {
+
+        // Pull out the authorization request first, using the OAuth2RequestFactory. All further logic should
+        // query off of the authorization request instead of referring back to the parameters map. The contents of the
+        // parameters map will be stored without change in the AuthorizationRequest object once it is created.
+        AuthorizationRequest authorizationRequest = getOAuth2RequestFactory().createAuthorizationRequest(parameters);
+
+        Set<String> responseTypes = authorizationRequest.getResponseTypes();
+
+        if (!responseTypes.contains("token") && !responseTypes.contains("code")) {
+            throw new UnsupportedResponseTypeException("Unsupported response types: " + responseTypes);
+        }
+
+        if (authorizationRequest.getClientId() == null) {
+            throw new InvalidClientException("A client id must be provided");
+        }
+
+        try {
+
+            if (!(principal instanceof Authentication) || !((Authentication) principal).isAuthenticated()) {
+                throw new InsufficientAuthenticationException(
+                        "User must be authenticated with Spring Security before authorization can be completed.");
+            }
+
+            ClientDetails client = getClientDetailsService().loadClientByClientId(authorizationRequest.getClientId());
+
+            // The resolved redirect URI is either the redirect_uri from the parameters or the one from
+            // clientDetails. Either way we need to store it on the AuthorizationRequest.
+            String redirectUriParameter = authorizationRequest.getRequestParameters().get(OAuth2Utils.REDIRECT_URI);
+            String resolvedRedirect = redirectResolver.resolveRedirect(redirectUriParameter, client);
+            if (!StringUtils.hasText(resolvedRedirect)) {
+                throw new RedirectMismatchException(
+                        "A redirectUri must be either supplied or preconfigured in the ClientDetails");
+            }
+            authorizationRequest.setRedirectUri(resolvedRedirect);
+
+            // We intentionally only validate the parameters requested by the client (ignoring any data that may have
+            // been added to the request by the manager).
+            oauth2RequestValidator.validateScope(authorizationRequest, client);
+
+            // Some systems may allow for approval decisions to be remembered or approved by default. Check for
+            // such logic here, and set the approved flag on the authorization request accordingly.
+            authorizationRequest = userApprovalHandler.checkForPreApproval(authorizationRequest,
+                    (Authentication) principal);
+            // TODO: is this call necessary?
+            boolean approved = userApprovalHandler.isApproved(authorizationRequest, (Authentication) principal);
+            authorizationRequest.setApproved(approved);
+
+            // Validation is all done, so we can check for auto approval...
+            if (authorizationRequest.isApproved()) {
+                if (responseTypes.contains("token")) {
+                    return getImplicitGrantResponse(authorizationRequest);
+                }
+                if (responseTypes.contains("code")) {
+                    return new ModelAndView(getAuthorizationCodeResponse(authorizationRequest,
+                            (Authentication) principal));
+                }
+            }
+
+            // Place auth request into the model so that it is stored in the session
+            // for approveOrDeny to use. That way we make sure that auth request comes from the session,
+            // so any auth request parameters passed to approveOrDeny will be ignored and retrieved from the session.
+            model.put("authorizationRequest", authorizationRequest);
+
+            return getUserApprovalPageResponse(model, authorizationRequest, (Authentication) principal);
+
+        }
+        catch (RuntimeException e) {
+            sessionStatus.setComplete();
+            throw e;
+        }
+
+    }
+
     @RequestMapping(value = "/oauth/authorize", method = RequestMethod.POST, params = OAuth2Utils.USER_OAUTH_APPROVAL)
     public View approveOrDeny(@RequestParam Map<String, String> approvalParameters, Map<String, ?> model,
                               SessionStatus sessionStatus, Principal principal) {
@@ -92,15 +191,15 @@ public class OAuth2Endpoint extends AbstractEndpoint {
 
         if (authorizationRequest == null) {
             sessionStatus.setComplete();
-            throw new InvalidRequestException("无法对未登录的用户进行授权确认");
+            throw new InvalidRequestException("用户未登录，无法授权");
         }
 
         try {
             Set<String> responseTypes = authorizationRequest.getResponseTypes();
 
             authorizationRequest.setApprovalParameters(approvalParameters);
-            authorizationRequest = userApprovalHandler.updateAfterApproval(authorizationRequest,
-                    (Authentication) principal);
+            authorizationRequest = userApprovalHandler.updateAfterApproval(authorizationRequest, (Authentication) principal);
+
             boolean approved = userApprovalHandler.isApproved(authorizationRequest, (Authentication) principal);
             authorizationRequest.setApproved(approved);
 
@@ -109,22 +208,31 @@ public class OAuth2Endpoint extends AbstractEndpoint {
                 throw new InvalidRequestException("未提供重定向URI，无法授权");
             }
 
-            if (!authorizationRequest.isApproved()) {
+            ClientDetails client = getClientDetailsService().loadClientByClientId(authorizationRequest.getClientId());
+            String registeredUri = client.getRegisteredRedirectUri().iterator().next();
+            if (!authorizationRequest.getRedirectUri().startsWith(registeredUri)){
+                authorizationRequest.setRedirectUri(registeredUri);
+
                 return new RedirectView(getUnsuccessfulRedirect(authorizationRequest,
-                        new UserDeniedAuthorizationException("User denied access"), responseTypes.contains("token")),
+                        new RedirectMismatchException("重定向URI必须与应用注册回调URI一致"), false),
                         false, true, false);
             }
 
-            if (responseTypes.contains("token")) {
-                return getImplicitGrantResponse(authorizationRequest).getView();
+            if (!authorizationRequest.isApproved()) {
+                return new RedirectView(getUnsuccessfulRedirect(authorizationRequest,
+                        new UserDeniedAuthorizationException("用户拒绝授权"), false),
+                        false, true, false);
             }
+
+            /*if (responseTypes.contains("token")) {
+                return getImplicitGrantResponse(authorizationRequest).getView();
+            }*/
 
             return getAuthorizationCodeResponse(authorizationRequest, (Authentication) principal);
         }
         finally {
             sessionStatus.setComplete();
         }
-
     }
 
     @RequestMapping("/oauth/error")
@@ -138,6 +246,38 @@ public class OAuth2Endpoint extends AbstractEndpoint {
         model.put("error", error);
 
         return new ModelAndView("/oauth/error", model);
+    }
+
+    public void setUserApprovalPage(String userApprovalPage) {
+        this.userApprovalPage = userApprovalPage;
+    }
+
+    public void setAuthorizationCodeServices(AuthorizationCodeServices authorizationCodeServices) {
+        this.authorizationCodeServices = authorizationCodeServices;
+    }
+
+    public void setRedirectResolver(RedirectResolver redirectResolver) {
+        this.redirectResolver = redirectResolver;
+    }
+
+    public void setOAuth2RequestValidator(OAuth2RequestValidator oauth2RequestValidator) {
+        this.oauth2RequestValidator = oauth2RequestValidator;
+    }
+
+    public void setUserApprovalHandler(UserApprovalHandler userApprovalHandler) {
+        this.userApprovalHandler = userApprovalHandler;
+    }
+
+    public void setErrorPage(String errorPage) {
+        this.errorPage = errorPage;
+    }
+
+    private String extractPath(FrameworkEndpointHandlerMapping mapping, String page) {
+        String path = mapping.getPath(page);
+        if (path.contains(":")) {
+            return path;
+        }
+        return "forward:" + path;
     }
 
     // We need explicit approval from the user.

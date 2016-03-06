@@ -246,8 +246,7 @@ scope属性包含此Token由用户所授权的有效作用域。正常情况下�
 如果*redirect_uri*参数与应用注册时提供的回调URL不匹配，平台将重定向到应用注册配置的回调URL，并附加错误信息：
 
 	http://your-application.com/callback?error=redirect_uri_mismatch
-	  &error_description=The+redirect_uri+MUST+match+the+registered+callback+URL+for+this+application.
-	  &error_uri=https://ehr.yihu.com/api/v1.0/oauth/%23redirect-uri-mismatch
+	  &error_description=重定向URI必须与应用注册回调URI一致
 	  &state=xyz
 	  
 使用匹配的URL即可修复此错误。
@@ -257,8 +256,7 @@ scope属性包含此Token由用户所授权的有效作用域。正常情况下�
 如果用户拒绝你的应用授权请求，平台将重定向到应用注册配置的回调URL，并附加错误信息：
 
 	http://your-application.com/callback?error=access_denied
-      &error_description=The+user+has+denied+your+application+access.
-      &error_uri=https://ehr.yihu.com/api/v1.0/oauth/%23access-denied
+      &error_description=用户拒绝授权
       &state=xyz
       
 这种情况你的应用是无法继续下一步操作的，如果用户只是简单地关闭了窗口，那你连这个错误也收不到。

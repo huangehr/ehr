@@ -12,13 +12,7 @@ endpoints:
 security:
   user:
     name: admin
-    password: gateway
-
-## 错误消息
-missing:
-  user_agent: Request forbidden by administrative rules. Please make sure your request has a User-Agent header.
-rate_limit:
-  exceeding: 主机{0}的API请求超过限制(好消息：认证提限优惠大酬宾，活动参见链接).
+    password: 123456
 
 ---
 spring:
@@ -54,7 +48,7 @@ eureka:
   instance:
     ip-address: 127.0.0.1
   client:
-    registerWithEureka: true
+    registerWithEureka: false
     fetchRegistry: false
     serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
 
@@ -66,7 +60,7 @@ eureka:
   instance:
     ip-address: unknown
   client:
-    registerWithEureka: true
+    registerWithEureka: false
     fetchRegistry: true
     serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
 
@@ -78,6 +72,6 @@ eureka:
   instance:
     ip-address: unknown
   client:
-    registerWithEureka: true
+    registerWithEureka: false
     fetchRegistry: true
     serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/

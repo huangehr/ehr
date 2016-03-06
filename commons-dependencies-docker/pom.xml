@@ -13,7 +13,7 @@
     <artifactId>commons-dependencies-docker</artifactId>
     <name>commons-dependencies-docker</name>
     <packaging>pom</packaging>
-    <description>EHR platform docker deploy dependencies</description>
+    <description>Docker部署模板</description>
 
     <properties>
         <docker.host></docker.host>

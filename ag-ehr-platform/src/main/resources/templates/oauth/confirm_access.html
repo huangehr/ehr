@@ -19,18 +19,17 @@
         <input th:name="${_csrf.parameterName}?:${_csrf.parameterName}" th:value="${_csrf.token}?:${_csrf.token}" type='hidden'/>
         <div class='container' th:each="scope, iterStat:${scopes}">
             <span style="width: 100px; display:inline-block" th:text="${scope}"/>
-            <input type='radio' th:name="${scope}" value='true'>允许</input>
-            <input type='radio' th:name="${scope}" value='false'>拒绝</input>
+            <input type='radio' th:name="'scope.' + ${scope}" value='true'>同意</input>
+            <input type='radio' th:name="'scope.' + ${scope}" value='false'>拒绝</input>
         </div>
-        <label><input name='authorize' value='确认授权' type='submit' class="btn btn-primary"/></label>
+        <label><input name='authorize' value='授权' type='submit' class="btn btn-primary"/></label>
     </form>
 
     <form id='denialForm' name='denialForm' action='authorize' method='post'>
         <input name='user_oauth_approval' value='false' type='hidden'/>
         <input type='hidden' th:name="${_csrf.parameterName}?:${_csrf.parameterName}" th:value="${_csrf.token}?:${_csrf.token}"/>
-        <label><input name='deny' value='拒绝授权' type='submit' class="btn"/></label>
+        <label><input name='deny' value='拒绝' type='submit' class="btn"/></label>
     </form>
 </div>
 </body>
 </html>
-
