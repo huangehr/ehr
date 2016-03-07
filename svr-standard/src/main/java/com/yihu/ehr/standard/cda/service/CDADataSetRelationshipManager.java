@@ -1,7 +1,6 @@
 package com.yihu.ehr.standard.cda.service;
 
 import com.yihu.ehr.util.CDAVersionUtil;
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,7 @@ import java.util.UUID;
  * @created 02-9月-2015 14:00:55
  */
 @Service
-public class CdaDataSetRelationshipManager{
+public class CDADataSetRelationshipManager {
 
 
     @PersistenceContext
@@ -63,7 +62,7 @@ public class CdaDataSetRelationshipManager{
      * @param pageSize
      * @return
      */
-    public List<CdaDataSetRelationship> getCDADataSetRelationshipByCDAId(String versionCode,String cdaId,int page,int pageSize) {
+    public List<CDADataSetRelationship> getCDADataSetRelationshipByCDAId(String versionCode,String cdaId,int page,int pageSize) {
         Session session = currentSession();
         String strTableName = CDAVersionUtil.getCDADatasetRelationshipTableName(versionCode);
         String strSql = "SELECT t.id," +
@@ -77,10 +76,10 @@ public class CdaDataSetRelationshipManager{
         }
         query.setString("cdaId", cdaId);
         List<Object> records = query.list();
-        List<CdaDataSetRelationship> infos = new ArrayList<>();
+        List<CDADataSetRelationship> infos = new ArrayList<>();
         for (int i = 0; i < records.size(); ++i) {
             Object[] record = (Object[]) records.get(i);
-            CdaDataSetRelationship info = new CdaDataSetRelationship();
+            CDADataSetRelationship info = new CDADataSetRelationship();
             info.setId(record[0].toString());
             info.setCdaId(record[1].toString());
             info.setDataSetId(record[2].toString());
@@ -92,7 +91,7 @@ public class CdaDataSetRelationshipManager{
     /**
      * 获取关联关系
      */
-    public List<CdaDataSetRelationship> getCDADataSetRelationship(String versionCode) {
+    public List<CDADataSetRelationship> getCDADataSetRelationship(String versionCode) {
         Session session = currentSession();
         String strTableName = CDAVersionUtil.getCDADatasetRelationshipTableName(versionCode);
         String strSql = "SELECT t.id," +
@@ -100,10 +99,10 @@ public class CdaDataSetRelationshipManager{
                 "t.dataSet_id" +
                 " from " + strTableName + " t ";
         List<Object> records = session.createSQLQuery(strSql).list();
-        List<CdaDataSetRelationship> infos = new ArrayList<>();
+        List<CDADataSetRelationship> infos = new ArrayList<>();
         for (int i = 0; i < records.size(); ++i) {
             Object[] record = (Object[]) records.get(i);
-            CdaDataSetRelationship info = new CdaDataSetRelationship();
+            CDADataSetRelationship info = new CDADataSetRelationship();
             info.setId(record[0].toString());
             info.setCdaId(record[1].toString());
             info.setDataSetId(record[2].toString());
@@ -131,7 +130,7 @@ public class CdaDataSetRelationshipManager{
      *
      * @param cdaDatasetRelationships
      */
-    public boolean addRelationship(List<CdaDataSetRelationship> cdaDatasetRelationships,String versionCode) {
+    public boolean addRelationship(List<CDADataSetRelationship> cdaDatasetRelationships,String versionCode) {
         Session session = currentSession();
 
         String strTableName = CDAVersionUtil.getCDADatasetRelationshipTableName(versionCode);
@@ -140,7 +139,7 @@ public class CdaDataSetRelationshipManager{
 
         String strValues = "";
         for (int i = 0; i < cdaDatasetRelationships.size(); i++) {
-            CdaDataSetRelationship info = (CdaDataSetRelationship) cdaDatasetRelationships.get(i);
+            CDADataSetRelationship info = (CDADataSetRelationship) cdaDatasetRelationships.get(i);
             if (org.springframework.util.StringUtils.isEmpty(info.getId())) {
                 String strId = UUID.randomUUID().toString();
                 info.setId(strId);

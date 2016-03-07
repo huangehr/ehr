@@ -30,7 +30,7 @@ public class CdaController extends BaseRestController{
     @Autowired
     private CDAManager cdaManager;
     @Autowired
-    private CdaDataSetRelationshipManager cdaDatasetRelationshipManager;
+    private CDADataSetRelationshipManager cdaDatasetRelationshipManager;
 
     @Autowired
     private FastDFSUtil fastDFSUtil;
@@ -84,7 +84,7 @@ public class CdaController extends BaseRestController{
             @RequestParam(value = "rows") Integer rows,
             HttpServletRequest request,
             HttpServletResponse response) {
-        List<CdaDataSetRelationship> relations = cdaDatasetRelationshipManager.getCDADataSetRelationshipByCDAId(cdaId,versionCode,page,rows);
+        List<CDADataSetRelationship> relations = cdaDatasetRelationshipManager.getCDADataSetRelationshipByCDAId(cdaId,versionCode,page,rows);
         int resultCount = cdaDatasetRelationshipManager.getRelationshipCountByCdaId(cdaId,versionCode);
         pagedResponse(request, response, (long) resultCount, page, rows);
         return (List<MCdaDataSetRelationship>)convertToModels(relations, new ArrayList<MCdaDataSetRelationship>(relations.size()), MCdaDataSetRelationship.class, "");
@@ -172,7 +172,7 @@ public class CdaController extends BaseRestController{
             @RequestParam(value = "versionCode") String versionCode,
             @ApiParam(name = "cda_id", value = "cda_id")
             @RequestParam(value = "cda_id") String cdaId) {
-        List<CdaDataSetRelationship> relations = cdaDatasetRelationshipManager.getCDADataSetRelationshipByCDAId(versionCode,cdaId,0,0);
+        List<CDADataSetRelationship> relations = cdaDatasetRelationshipManager.getCDADataSetRelationshipByCDAId(versionCode,cdaId,0,0);
         return (List<MCdaDataSetRelationship>)convertToModels(relations,new ArrayList<MCdaDataSetRelationship>(relations.size()),MCdaDataSetRelationship.class,"");
     }
 
