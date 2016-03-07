@@ -2,10 +2,7 @@ package com.yihu.ehr.api.esb.service;
 
 
 import com.yihu.ehr.api.esb.dao.*;
-import com.yihu.ehr.api.esb.model.HosAcqTask;
-import com.yihu.ehr.api.esb.model.HosEsbMiniRelease;
-import com.yihu.ehr.api.esb.model.HosLog;
-import com.yihu.ehr.api.esb.model.HosSqlTask;
+import com.yihu.ehr.api.esb.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,16 +27,16 @@ public class SimplifiedESBService {
     private IHosSqlTaskDao hosSqlTaskDao;
 
 
-    public boolean getUpdateFlag(String versionCode, String systemCode, String orgCode) throws Exception {
+    public HosEsbMiniRelease getUpdateFlag(String versionCode, String systemCode, String orgCode) throws Exception {
         HosEsbMiniRelease hemr = hosEsbMiniReleaseDao.findBySystemCode(systemCode).get(0);
         //判断版本是否需要更新
         if (Integer.valueOf(versionCode) < hemr.getVersionCode()) {
             //判断该机构是否包含在更新的里面
             if (hemr.getOrgCode().contains(orgCode)) {
-                return true;
+                return hemr;
             }
         }
-        return false;
+        return null;
     }
 
     public HosEsbMiniRelease getSimplifiedESBBySystemCodes(String systemCode, String orgCode) throws Exception {
@@ -90,5 +87,17 @@ public class SimplifiedESBService {
     @Transactional
     public void saveHosLog(HosLog lh) {
         hosLogDao.save(lh);
+    }
+
+    @Transactional
+    public String uploadResult(String systemCode, String orgCode, String versionCode, String versionName, String updateDate) throws Exception {
+        HosEsbMiniInstallLog hosEsbMiniInstallLog = new HosEsbMiniInstallLog();
+        hosEsbMiniInstallLog.setOrgCode(orgCode);
+        hosEsbMiniInstallLog.setSystemCode(systemCode);
+        hosEsbMiniInstallLog.setCurrentVersionCode(versionCode);
+        hosEsbMiniInstallLog.setCurrentVersionName(versionName);
+        hosEsbMiniInstallLog.setInstallTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(updateDate));
+        hosEsbMiniInstallLogDao.save(hosEsbMiniInstallLog);
+        return "";
     }
 }

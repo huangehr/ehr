@@ -21,10 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.text.ParseException;
+import java.util.*;
 
 /**
  * JSON 档案Rest控制器。
@@ -45,8 +43,6 @@ public class JsonPackageController extends BaseRestController {
     @RequestMapping(value = "/packages", method = RequestMethod.GET)
     @ApiOperation(value = "获取档案列表", response = MJsonPackage.class, responseContainer = "List", notes = "获取当前平台上的档案列表")
     public Collection<MJsonPackage> packageList(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable(value = "api_version") String apiVersion,
             @ApiParam(name = "archive_status", value = "档案包状态", defaultValue = "Acquired")
             @RequestParam(value = "archive_status") ArchiveStatus archiveStatus,
             @ApiParam(name = "from", value = "起始日期", defaultValue = "2015-10-01")
@@ -58,12 +54,16 @@ public class JsonPackageController extends BaseRestController {
             @ApiParam(name = "page", value = "页面号，从0开始", defaultValue = "0")
             @RequestParam(value = "page") int page,
             @ApiParam(name = "page_size", value = "页面记录数", defaultValue = "10")
-            @RequestParam(value = "page_size") int pageSize) {
+            @RequestParam(value = "page_size") int pageSize) throws ParseException {
 
         Pageable pageable = new PageRequest(page, pageSize);
-        List<JsonPackage> jsonPackageList = jsonPackageService.search(since, to, archiveStatus, pageable);
+        Map<String,Object> map = new HashMap<>();
+        map.put("fromTime",since);
+        map.put("toTime",to);
+        map.put("archiveStatus",archiveStatus);
+        List<JsonPackage> jsonPackageList = jsonPackageService.searchArchives(map, pageable);
 
-        return convertToModels(jsonPackageList, new ArrayList<MJsonPackage>(jsonPackageList.size()));
+        return convertToModels(jsonPackageList, new ArrayList<MJsonPackage>(jsonPackageList.size()),MJsonPackage.class,null);
     }
 
     /**
@@ -73,19 +73,15 @@ public class JsonPackageController extends BaseRestController {
      */
     @RequestMapping(value = "/package", method = {RequestMethod.POST})
     @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
-    public void savePackage(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                            @PathVariable(value = "api_version") String apiVersion,
-                            @ApiParam(required = true, name = "package", value = "JSON档案包", allowMultiple = true)
-                            MultipartHttpServletRequest jsonPackage,
-                            @ApiParam(required = true, name = "user_name", value = "用户名")
-                            @RequestParam(value = "user_name")
-                            String userName,
-                            @ApiParam(required = true, name = "package_crypto", value = "档案包解压密码,二次加密")
-                            @RequestParam(value = "package_crypto")
-                            String packageCrypto,
-                            @ApiParam(required = true, name = "md5", value = "档案包MD5")
-                            @RequestParam(value = "md5")
-                            String md5) throws Exception {
+    public void savePackage(
+            @ApiParam(required = true, name = "package", value = "JSON档案包", allowMultiple = true)
+            MultipartHttpServletRequest jsonPackage,
+            @ApiParam(required = true, name = "user_name", value = "用户名")
+            @RequestParam(value = "user_name") String userName,
+            @ApiParam(required = true, name = "package_crypto", value = "档案包解压密码,二次加密")
+            @RequestParam(value = "package_crypto") String packageCrypto,
+            @ApiParam(required = true, name = "md5", value = "档案包MD5")
+            @RequestParam(value = "md5") String md5) throws Exception {
 
         MultipartFile file = jsonPackage.getFile("file");
         if (null == file) throw new ApiException(ErrorCode.MissParameter, "file");
@@ -94,36 +90,29 @@ public class JsonPackageController extends BaseRestController {
         if (null == privateKey) throw new ApiException(ErrorCode.GenerateUserKeyFailed);
 
         String unzipPwd = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
-        jsonPackageService.savePackage(file.getInputStream(), unzipPwd);
+        jsonPackageService.receive(file.getInputStream(), unzipPwd);
     }
 
     /**
      * 获取档案包。
      *
-     * @param apiVersion
      * @param id
      * @return
      */
     @RequestMapping(value = "/package/{id}", method = {RequestMethod.POST})
     @ApiOperation(value = "获取档案包", notes = "获取档案包的信息")
     public MJsonPackage retrievePackage(
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable(value = "api_version") String apiVersion,
-            @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
+            @ApiParam(name = "id", value = "档案包编号", defaultValue = "v1.0")
             @PathVariable(value = "id") String id) {
-
-        JsonPackage jsonPackage = jsonPackageService.getPackage(id);
-
+        JsonPackage jsonPackage = jsonPackageService.getJsonPackage(id);
         return convertToModel(jsonPackage, MJsonPackage.class, null);
     }
 
     @RequestMapping(value = "/package/{id}", method = {RequestMethod.DELETE})
     @ApiOperation(value = "删除档案", response = Object.class, notes = "删除一个数据包")
-    public void deletePackage(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                              @PathVariable(value = "api_version") String apiVersion,
-                              @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                              @PathVariable(value = "id") String id) {
-
+    public void deletePackage(
+           @ApiParam(name = "id", value = "档案包编号")
+           @PathVariable(value = "id") String id) {
         jsonPackageService.deletePackage(id);
     }
 }

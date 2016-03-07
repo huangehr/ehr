@@ -4,6 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Date;
 
 
 /**
@@ -14,14 +15,14 @@ import java.sql.Timestamp;
 public class HosEsbMiniInstallLog implements java.io.Serializable {
 
 
-    // Fields    
+    // Fields
 
     private String id;
     private String orgCode;
     private String systemCode;
     private String currentVersionName;
     private String currentVersionCode;
-    private Timestamp installTime;
+    private Date installTime;
 
 
     // Constructors
@@ -102,11 +103,11 @@ public class HosEsbMiniInstallLog implements java.io.Serializable {
     }
 
     @Column(name = "install_time", length = 0)
-    public Timestamp getInstallTime() {
+    public Date getInstallTime() {
         return this.installTime;
     }
 
-    public void setInstallTime(Timestamp installTime) {
+    public void setInstallTime(Date installTime) {
         this.installTime = installTime;
     }
 

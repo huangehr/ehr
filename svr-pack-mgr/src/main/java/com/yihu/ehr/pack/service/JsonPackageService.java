@@ -31,7 +31,7 @@ import java.util.*;
 @Service
 @Transactional
 public class JsonPackageService {
-    @Value("${admin.region}")
+    @Value("${deploy.region}")
     Short adminRegion = 3502;
 
     @Autowired
@@ -59,9 +59,10 @@ public class JsonPackageService {
 
     public List<JsonPackage> searchArchives(Map<String, Object> args, Pageable pageable) throws ParseException {
 
-        ArchiveStatus archiveStatus = (ArchiveStatus) args.get("archiveStatus");
+
         Date from = DateFormatter.simpleDateTimeParse((String) args.get("fromTime"));
         Date to = DateFormatter.simpleDateTimeParse((String) args.get("toTime"));
+        ArchiveStatus archiveStatus = (ArchiveStatus) args.get("archiveStatus");
 
         return jsonPackageRepo.findAll(archiveStatus, from, to, pageable);
     }
@@ -160,5 +161,9 @@ public class JsonPackageService {
         } catch (IOException | MyException ex) {
             throw new RuntimeException("fastDFS - " + ex.getMessage());
         }
+    }
+
+    public void deletePackage(String id) {
+        jsonPackageRepo.delete(id);
     }
 }

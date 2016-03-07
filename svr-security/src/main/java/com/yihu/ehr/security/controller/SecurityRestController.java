@@ -2,17 +2,27 @@ package com.yihu.ehr.security.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.security.MUserSecurity;
+import com.yihu.ehr.model.user.MUser;
+import com.yihu.ehr.security.feign.AppClient;
+import com.yihu.ehr.security.feign.UserClient;
 import com.yihu.ehr.security.service.SecurityManager;
+import com.yihu.ehr.security.service.TokenManager;
 import com.yihu.ehr.security.service.UserSecurity;
+import com.yihu.ehr.security.service.UserToken;
+import com.yihu.ehr.util.DateUtil;
 import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.util.encrypt.RSA;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URLDecoder;
+import java.security.Key;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
@@ -21,6 +31,12 @@ public class SecurityRestController extends BaseRestController {
 
     @Autowired
     private SecurityManager securityManager;
+    @Autowired
+    private TokenManager tokenManager;
+    @Autowired
+    private AppClient appClient;
+    @Autowired
+    private UserClient userClient;
 
 
     @RequestMapping(value = "/securities/login/{login_code}", method = RequestMethod.GET)
@@ -60,64 +76,63 @@ public class SecurityRestController extends BaseRestController {
      * }
      *
      */
-//    @RequestMapping(value = "/tokens", method = RequestMethod.GET)
-//    @ApiOperation(value = "获取用户登录用的临时会话Token",produces = "application/json", notes = "此Token用于客户与平台之间的会话，时效性时差为20分钟")
-//    public Object getUserToken(
-//            @ApiParam(required = true, name = "login_code", value = "用户名")
-//            @RequestParam(value = "login_code", required = true) String loginCode,
-//            @ApiParam(required = true, name = "rsa_pw", value = "用户密码，以RSA加密")
-//            @RequestParam(value = "rsa_pw", required = true) String rsaPWD,
-//            @ApiParam(required = true, name = "app_id", value = "APP ID")
-//            @RequestParam(value = "app_id", required = true) String appId,
-//            @ApiParam(required = true, name = "app_secret", value = "APP 密码")
-//            @RequestParam(value = "app_secret", required = true) String appSecret) throws Exception {
-//
-//        boolean isAppExistence = appClient.isAppExistence(appId, appSecret);
-//        if (!isAppExistence) {
-//            return false;
-//        }
-//        UserSecurity userSecurity = securityManager.getUserSecurityByLoginCode(loginCode);
-//        String privateKey = userSecurity.getPrivateKey();
-//        Key priKey = RSA.genPrivateKey(privateKey);
-//        String psw = RSA.decrypt(rsaPWD, priKey);
-//
-//        loginCode = URLDecoder.decode(loginCode, "UTF-8");
-//        appId = URLDecoder.decode(appId, "UTF-8");
-//
-//        MUser user = userClient.loginVerification(loginCode, psw);
-//        if (user == null) {
-//            return false;
-//        }
-//        UserToken userToken = tokenManager.getUserTokenByUserId(user.getId(), appId);
-//
-//        if (userToken == null) {
-//            userToken = tokenManager.createUserToken(user.getId(), appId);
-//
-//            Map<String,Object> map = new HashMap<>();
-//            map.put("access_token",userToken.getAccessToken());
-//            map.put("refresh_token",userToken.getRefreshToken());
-//            map.put("expires_in",userToken.getExpiresIn());
-//            map.put("token_id",userToken.getTokenId());
-//            return map;
-//        }
-//
-//        Date currentDate = new Date();
-//        boolean result = DateUtil.isExpire(userToken.getUpdateDate(), currentDate, userToken.getExpiresIn());
-//
-//        if (result == true) {
-//            userToken = tokenManager.refreshAccessToken(user.getId(), userToken.getRefreshToken(), appId);
-//            Map<String,Object> map = new HashMap<>();
-//            map.put("access_token",userToken.getAccessToken());
-//            map.put("refresh_token",userToken.getRefreshToken());
-//            map.put("expires_in",userToken.getExpiresIn());
-//            return map;
-//        }
-//        Map<String,Object> map = new HashMap<>();
-//        map.put("access_token",userToken.getAccessToken());
-//        map.put("refresh_token",userToken.getRefreshToken());
-//        map.put("expires_in",userToken.getExpiresIn());
-//        return map;
-//    }
+    @RequestMapping(value = "/tokens", method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户登录用的临时会话Token",produces = "application/json", notes = "此Token用于客户与平台之间的会话，时效性时差为20分钟")
+    public Object getUserToken(
+            @ApiParam(required = true, name = "login_code", value = "用户名")
+            @RequestParam(value = "login_code", required = true) String loginCode,
+            @ApiParam(required = true, name = "rsa_pw", value = "用户密码，以RSA加密")
+            @RequestParam(value = "rsa_pw", required = true) String rsaPWD,
+            @ApiParam(required = true, name = "app_id", value = "APP ID")
+            @RequestParam(value = "app_id", required = true) String appId,
+            @ApiParam(required = true, name = "app_secret", value = "APP 密码")
+            @RequestParam(value = "app_secret", required = true) String appSecret) throws Exception {
+
+        boolean isAppExistence = appClient.isAppExistence(appId, appSecret);
+        if (!isAppExistence) {
+            return false;
+        }
+        UserSecurity userSecurity = securityManager.getUserSecurityByLoginCode(loginCode);
+        String privateKey = userSecurity.getPrivateKey();
+        Key priKey = RSA.genPrivateKey(privateKey);
+        String psw = RSA.decrypt(rsaPWD, priKey);
+
+        loginCode = URLDecoder.decode(loginCode, "UTF-8");
+        appId = URLDecoder.decode(appId, "UTF-8");
+
+        MUser user = userClient.getUserByNameAndPassword(loginCode, psw);
+        if (user == null) {
+            return false;
+        }
+        UserToken userToken = tokenManager.getUserTokenByUserId(user.getId(), appId);
+
+        if (userToken == null) {
+            userToken = tokenManager.createUserToken(user.getId(), appId);
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("access_token", userToken.getAccessToken());
+            map.put("refresh_token", userToken.getRefreshToken());
+            map.put("expires_in", userToken.getExpiresIn());
+            map.put("token_id", userToken.getTokenId());
+            return map;
+        }
+        Date currentDate = new Date();
+        boolean result = DateUtil.isExpire(userToken.getUpdateDate(), currentDate, userToken.getExpiresIn());
+
+        if (result == true) {
+            userToken = tokenManager.refreshAccessToken(user.getId(), userToken.getRefreshToken(), appId);
+            Map<String,Object> map = new HashMap<>();
+            map.put("access_token",userToken.getAccessToken());
+            map.put("refresh_token",userToken.getRefreshToken());
+            map.put("expires_in",userToken.getExpiresIn());
+            return map;
+        }
+        Map<String,Object> map = new HashMap<>();
+        map.put("access_token",userToken.getAccessToken());
+        map.put("refresh_token",userToken.getRefreshToken());
+        map.put("expires_in",userToken.getExpiresIn());
+        return map;
+    }
 //
 //    /**
 //     * 1-3 access_token失效后，根据传入的用户名及refresh_token重新申请accesee_token。
@@ -182,7 +197,7 @@ public class SecurityRestController extends BaseRestController {
     }
 
     /**
-     * 根据orgCode创建security
+     * 根据orgCode创建UserKey
      * @param orgCode
      * @return
      * @throws Exception
