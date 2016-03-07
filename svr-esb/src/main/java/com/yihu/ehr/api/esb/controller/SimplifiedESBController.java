@@ -1,5 +1,6 @@
 package com.yihu.ehr.api.esb.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.api.esb.model.HosEsbMiniRelease;
 import com.yihu.ehr.api.esb.model.HosLog;
@@ -70,13 +71,19 @@ public class SimplifiedESBController {
      */
     @ResponseBody
     @RequestMapping(value = "/getUpdateFlag", method = RequestMethod.POST)
-    public HosEsbMiniRelease getUpdateFlag(String versionCode, String systemCode, String orgCode) {
+    public String getUpdateFlag(String versionCode, String systemCode, String orgCode) {
         try {
-            return simplifiedESBService.getUpdateFlag(versionCode, systemCode, orgCode);
+            HosEsbMiniRelease h = simplifiedESBService.getUpdateFlag(versionCode, systemCode, orgCode);
+            if (h != null) {
+                ObjectMapper om = new ObjectMapper();
+                return om.writeValueAsString(om);
+            } else {
+                return "";
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new HosEsbMiniRelease();
+        return "";
     }
 
     /**

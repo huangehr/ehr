@@ -8,7 +8,10 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.spring.web.json.Json;
 
@@ -36,35 +39,29 @@ public class SimplifiedESB {
     @ApiOperation("获取版本")
     @RequestMapping(value = "/application/{id}", produces = "application/binary", method = RequestMethod.GET)
     public ResponseEntity<Json> getApplication(@ApiParam(value = "id", defaultValue = "latest")
-                                               @PathVariable("id")
+                                               @RequestParam(value = "userkey", required = true)
                                                String id) {
         return new ResponseEntity<>(new Json(""), HttpStatus.OK);
     }
 
     @ApiOperation("日志上传")
     @RequestMapping(value = "/uploadLog", method = RequestMethod.POST)
-    public ResponseEntity<String> uploadLogger(@ApiParam("orgCode")
-                                               @PathVariable("orgCode")
+    public ResponseEntity<String> uploadLogger(@ApiParam("orgCode") @RequestParam(value = "orgCode", required = true)
                                                String orgCode,
-                                               @ApiParam("ip")
-                                               @RequestParam("ip")
+                                               @ApiParam("ip") @RequestParam(value = "ip", required = true)
                                                String ip,
-                                               @ApiParam("file")
-                                               @RequestParam("file")
+                                               @ApiParam("file") @RequestParam(value = "file", required = true)
                                                MultipartFile file) {
         return new ResponseEntity<>(simplifiedESBClient.uploadLog(orgCode, ip, file) + "", HttpStatus.OK);
     }
 
     @ApiOperation("查询版本是否需要更新")
     @RequestMapping(value = "/getUpdateFlag", method = RequestMethod.POST)
-    public ResponseEntity getUpdateFlag(@ApiParam("versionCode")
-                                        @PathVariable("versionCode")
+    public ResponseEntity getUpdateFlag(@ApiParam("versionCode") @RequestParam(value = "versionCode", required = true)
                                         String versionCode,
-                                        @ApiParam("systemCode")
-                                        @PathVariable("systemCode")
+                                        @ApiParam("systemCode") @RequestParam(value = "systemCode", required = true)
                                         String systemCode,
-                                        @ApiParam("orgCode")
-                                        @PathVariable("orgCode")
+                                        @ApiParam("orgCode") @RequestParam(value = "orgCode", required = true)
                                         String orgCode) {
 
         return new ResponseEntity<>(simplifiedESBClient.getUpdateFlag(versionCode, systemCode, orgCode), HttpStatus.OK);
@@ -73,11 +70,9 @@ public class SimplifiedESB {
 
     @ApiOperation("下载项目")
     @RequestMapping(value = "/downUpdateWar", method = RequestMethod.POST)
-    public ResponseEntity downUpdateWar(@ApiParam("systemCode")
-                                        @PathVariable("systemCode")
+    public ResponseEntity downUpdateWar(@ApiParam("systemCode") @RequestParam(value = "systemCode", required = true)
                                         String systemCode,
-                                        @ApiParam("orgCode")
-                                        @PathVariable("orgCode")
+                                        @ApiParam("orgCode") @RequestParam(value = "orgCode", required = true)
                                         String orgCode
             , HttpServletResponse response) {
 
@@ -87,20 +82,15 @@ public class SimplifiedESB {
     @ApiOperation("上传客户端升级信息")
     @RequestMapping(value = "/uploadResult", method = RequestMethod.POST)
     public ResponseEntity uploadResult(
-            @ApiParam("systemCode")
-            @PathVariable("systemCode")
+            @ApiParam("systemCode") @RequestParam(value = "systemCode", required = true)
             String systemCode,
-            @ApiParam("orgCode")
-            @PathVariable("orgCode")
+            @ApiParam("orgCode") @RequestParam(value = "orgCode", required = true)
             String orgCode,
-            @ApiParam("versionCode")
-            @PathVariable("versionCode")
+            @ApiParam("versionCode") @RequestParam(value = "versionCode", required = true)
             String versionCode,
-            @ApiParam("versionName")
-            @PathVariable("versionName")
+            @ApiParam("versionName") @RequestParam(value = "versionName", required = true)
             String versionName,
-            @ApiParam("updateDate")
-            @PathVariable("updateDate")
+            @ApiParam("updateDate") @RequestParam(value = "updateDate", required = true)
             String updateDate) {
 
         return new ResponseEntity<>(simplifiedESBClient.uploadResult(systemCode, orgCode, versionCode, versionName, updateDate), HttpStatus.OK);
@@ -109,11 +99,9 @@ public class SimplifiedESB {
     @ApiOperation("补采功能")
     @RequestMapping(value = "/fillMining", method = RequestMethod.POST)
     public ResponseEntity fillMining(
-            @ApiParam("systemCode")
-            @PathVariable("systemCode")
+            @ApiParam("systemCode") @RequestParam(value = "systemCode", required = true)
             String systemCode,
-            @ApiParam("orgCode")
-            @PathVariable("orgCode")
+            @ApiParam("orgCode") @RequestParam(value = "orgCode", required = true)
             String orgCode) {
 
         return new ResponseEntity<>(simplifiedESBClient.fillMining(systemCode, orgCode), HttpStatus.OK);
@@ -122,17 +110,13 @@ public class SimplifiedESB {
     @ApiOperation("补采功能")
     @RequestMapping(value = "/changeFillMiningStatus", method = RequestMethod.POST)
     public ResponseEntity changeFillMiningStatus(
-            @ApiParam("result")
-            @PathVariable("result")
+            @ApiParam("result") @RequestParam(value = "result", required = true)
             String result,
-            @ApiParam("message")
-            @PathVariable("message")
+            @ApiParam("message") @RequestParam(value = "message", required = true)
             String message,
-            @ApiParam("id")
-            @PathVariable("id")
+            @ApiParam("id") @RequestParam(value = "id", required = true)
             String id,
-            @ApiParam("status")
-            @PathVariable("status")
+            @ApiParam("status") @RequestParam(value = "status", required = true)
             String status) {
         return new ResponseEntity<>(simplifiedESBClient.changeFillMiningStatus(result, message, id, status), HttpStatus.OK);
     }
@@ -140,11 +124,9 @@ public class SimplifiedESB {
     @ApiOperation(" his穿透查询")
     @RequestMapping(value = "/hisPenetration", method = RequestMethod.POST)
     public ResponseEntity hisPenetration(
-            @ApiParam("systemCode")
-            @PathVariable("systemCode")
+            @ApiParam("systemCode") @RequestParam(value = "systemCode", required = true)
             String systemCode,
-            @ApiParam("orgCode")
-            @PathVariable("orgCode")
+            @ApiParam("orgCode") @RequestParam(value = "orgCode", required = true)
             String orgCode) {
         return new ResponseEntity<>(simplifiedESBClient.hisPenetration(systemCode, orgCode), HttpStatus.OK);
     }
@@ -152,14 +134,11 @@ public class SimplifiedESB {
     @ApiOperation("修改his穿透查询状态")
     @RequestMapping(value = "/changeHisPenetrationStatus", method = RequestMethod.POST)
     public ResponseEntity changeHisPenetrationStatus(
-            @ApiParam("result")
-            @PathVariable("result")
+            @ApiParam("result") @RequestParam(value = "result", required = true)
             String result,
-            @ApiParam("status")
-            @PathVariable("status")
+            @ApiParam("status") @RequestParam(value = "status", required = true)
             String status,
-            @ApiParam("id")
-            @PathVariable("id")
+            @ApiParam("id") @RequestParam(value = "id", required = true)
             String id) {
         return new ResponseEntity<>(simplifiedESBClient.changeHisPenetrationStatus(result, status, id), HttpStatus.OK);
     }
