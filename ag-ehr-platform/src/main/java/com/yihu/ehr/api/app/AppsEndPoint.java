@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/applications")
 @Api(protocols = "https", value = "applications", description = "应用管理服务")
-public class Apps {
+public class AppsEndPoint {
     @ApiOperation(value = "检查应用授权", response = String.class)
     @RequestMapping(value = "/{client_id}/tokens/{access_token}", produces = "application/json", method = RequestMethod.GET)
     public String checkClientAuthorization(@ApiParam(value = "client_id")

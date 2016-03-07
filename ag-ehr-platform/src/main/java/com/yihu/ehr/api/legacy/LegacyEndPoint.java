@@ -36,9 +36,9 @@ import java.util.regex.Pattern;
  * @created 2016.02.26 10:13
  */
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0)
-@Api(protocols = "https", value = "legacy", description = "历史遗留接口，以rest开头。这些接口只被集成开放平台使用，目前先整合到这边来。待所有版本均升级好之后，可以去掉此接口。")
-public class LegacyController {
+@RequestMapping(value = "/rest/v1.0")
+@Api(protocols = "https", value = "legacy", description = "历史遗留接口，这些接口只被集成开放平台使用。")
+public class LegacyEndPoint {
 
     @Autowired
     private GeographyClient geographyClient;

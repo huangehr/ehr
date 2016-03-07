@@ -40,7 +40,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 @RestController
 @RequestMapping("/api")
 @ApiIgnore
-public class ApiEntryController {
+public class ApiEndPoint {
     @Autowired
     private ObjectMapper objectMapper;
 

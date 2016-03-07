@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/adaptions")
 @Api(protocols = "https", value = "adaptions", description = "标准适配")
-public class Adaptions {
+public class AdaptionsEndPoint {
 
     @Autowired
     private SecurityClient securityClient;

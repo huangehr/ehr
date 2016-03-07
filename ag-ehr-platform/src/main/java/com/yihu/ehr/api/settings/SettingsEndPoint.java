@@ -5,5 +5,5 @@ package com.yihu.ehr.api.settings;
  * @version 1.0
  * @created 2016.02.23 17:50
  */
-public class Settings {
+public class SettingsEndPoint {
 }

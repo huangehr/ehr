@@ -22,7 +22,7 @@ import java.util.Date;
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/search")
 @Api(protocols = "https", value = "search", description = "搜索服务")
-public class SearchController {
+public class SearchEndPoint {
     @ApiOperation(value = "档案搜索", produces = "application/json", notes = "搜索健康档案")
     @RequestMapping(value = "/profiles", method = RequestMethod.GET)
     public Object searchProfiles(

@@ -13,7 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
  * @version 1.0
  * @created 2016.03.03 21:57
  */
-//@Configuration
+@Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private EhrUserDetailsService userDetailsService;

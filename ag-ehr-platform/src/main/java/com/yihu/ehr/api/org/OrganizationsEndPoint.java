@@ -22,7 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/organizations")
 @Api(protocols = "https", value = "organizations", description = "组织机构服务")
-public class OrganizationRestController extends BaseController{
+public class OrganizationsEndPoint extends BaseController{
 
     @Autowired
     private OrganizationClient organizationClient;

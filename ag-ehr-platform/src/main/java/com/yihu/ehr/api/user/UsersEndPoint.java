@@ -28,11 +28,13 @@ import java.util.List;
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
 @Api(protocols = "https", value = "users", description = "用户服务")
-public class UserRestController extends BaseController {
+public class UsersEndPoint extends BaseController {
     @Autowired
     ObjectMapper objectMapper;
+
     @Autowired
     private UserClient userClient;
+
     @Autowired
     private OrganizationClient organizationClient;
 

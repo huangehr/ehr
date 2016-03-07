@@ -23,37 +23,39 @@ import org.springframework.security.oauth2.provider.request.DefaultOAuth2Request
  * @version 1.0
  * @created 2016.03.03 20:50
  */
-//@Configuration
+@Configuration
 public class OAuth2Config{
     private static final String RESOURCE_ID = "ehr";
 
-    //@Configuration
-    //@EnableAuthorizationServer
+    EhrAuthorizationCodeService authorizationCodeService = new EhrAuthorizationCodeService();
+
+    @Configuration
+    @EnableAuthorizationServer
     public static class OAuth2ServerConfig extends AuthorizationServerConfigurerAdapter {
 
         @Autowired
         private AuthenticationManager authenticationManager;
 
-        EhrTokenServices tokenServices = new EhrTokenServices();
-        EhrClientDetailsService clientDetailsService = new EhrClientDetailsService();
-        EhrAuthorizationCodeService authorizationCodeService = new EhrAuthorizationCodeService();
-        OAuth2RequestFactory requestFactory = new DefaultOAuth2RequestFactory(clientDetailsService);
+        @Autowired
+        private EhrAuthorizationCodeService authorizationCodeService;
+
+        @Autowired
+        private EhrTokenServices tokenServices;
+
+        @Autowired
+        EhrClientDetailsService clientDetailsService;
 
         @Override
         public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-            /*tokenServices.setTokenStore(tokenStore());
-            tokenServices.setSupportRefreshToken(true);
-            tokenServices.setReuseRefreshToken(true);
-            tokenServices.setClientDetailsService(clientDetailsService);
-            tokenServices.setTokenEnhancer(tokenEnhancer());
-            addUserDetailsService(tokenServices, this.userDetailsService);*/
-
             endpoints.authenticationManager(authenticationManager);
             endpoints.authorizationCodeServices(authorizationCodeService);
             endpoints.tokenServices(tokenServices);
-            endpoints.tokenGranter(new EhrTokenGranter(tokenServices, authorizationCodeService, clientDetailsService, requestFactory));
             endpoints.setClientDetailsService(clientDetailsService);
             endpoints.exceptionTranslator(new EhrOAuth2ExceptionTranslator());
+            endpoints.tokenGranter(new EhrTokenGranter(tokenServices,
+                    authorizationCodeService,
+                    clientDetailsService,
+                    new DefaultOAuth2RequestFactory(clientDetailsService)));
         }
 
         @Override
@@ -62,9 +64,18 @@ public class OAuth2Config{
         }
     }
 
-    //@Configuration
-    //@EnableResourceServer
+    @Configuration
+    @EnableResourceServer
     public static class ResourceServer extends ResourceServerConfigurerAdapter {
+        @Autowired
+        private EhrAuthorizationCodeService authorizationCodeService;
+
+        @Autowired
+        private EhrTokenServices tokenServices;
+
+        @Autowired
+        EhrClientDetailsService clientDetailsService;
+
         @Override
         public void configure(HttpSecurity http) throws Exception {
             http
@@ -74,6 +85,36 @@ public class OAuth2Config{
         @Override
         public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
             resources.resourceId(RESOURCE_ID);
+            resources.tokenServices(tokenServices);
+            resources.tokenExtractor(new EhrTokenExtractor());
+            resources.authenticationEntryPoint(new EhrOAuth2AuthenticationEntryPoint());
         }
+    }
+
+    @Bean
+    EhrClientDetailsService ehrClientDetailsService(){
+        return new EhrClientDetailsService();
+    }
+
+    @Bean
+    EhrAuthorizationCodeService authorizationCodeService(){
+        return new EhrAuthorizationCodeService();
+    }
+
+    @Bean
+    EhrTokenStoreService tokenStoreService(){
+        return new EhrTokenStoreService();
+    }
+
+    @Bean
+    EhrTokenServices ehrTokenServices(EhrClientDetailsService clientDetailsService, EhrTokenStoreService tokenStoreService){
+        EhrTokenServices tokenServices = new EhrTokenServices();
+
+        tokenServices.setReuseRefreshToken(true);
+        tokenServices.setSupportRefreshToken(true);
+        tokenServices.setTokenStore(tokenStoreService);
+        tokenServices.setClientDetailsService(clientDetailsService);
+
+        return tokenServices;
     }
 }

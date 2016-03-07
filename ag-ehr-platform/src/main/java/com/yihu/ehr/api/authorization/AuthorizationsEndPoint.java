@@ -17,8 +17,8 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/authorizations")
-@Api(protocols = "https", value = "authorizations", description = "OAuth2授权服务")
-public class Authorizations {
+@Api(protocols = "https", value = "authorizations", description = "认证与授权服务")
+public class AuthorizationsEndPoint {
 
     @ApiOperation(value = "获取用户所有应用授权", response = String.class)
     @RequestMapping(value = "", produces = "application/json", method = RequestMethod.GET)
