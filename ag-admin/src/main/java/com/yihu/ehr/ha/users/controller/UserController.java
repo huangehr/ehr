@@ -22,6 +22,8 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -84,6 +86,7 @@ public class UserController extends BaseController {
         }
 
         //TODO:获取总条数
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
 //        String count = response.getHeader(AgAdminConstants.ResourceCount);
 //        int totalCount = StringUtils.isNotEmpty(count) ? Integer.parseInt(count) : 0;
 
