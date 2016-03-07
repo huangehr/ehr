@@ -1,9 +1,29 @@
 spring:
   application:
     name: simplifiedESB
+#  cloud:
+#      config:
+#        username: user
+#        password: configuration
+#        uri: http://localhost:1221
+#        label: dev
+
+---
+spring:
+  profiles: dev
   cloud:
-      config:
-        username: user
-        password: configuration
-        uri: http://localhost:1221
-        label: dev
+    config:
+      username: user
+      password: configuration
+      uri: http://localhost:1221
+      label: dev
+
+---
+spring:
+  profiles: test
+  cloud:
+    config:
+      username: user
+      password: configuration
+      uri: http://172.19.103.73:1221
+      label: dev
