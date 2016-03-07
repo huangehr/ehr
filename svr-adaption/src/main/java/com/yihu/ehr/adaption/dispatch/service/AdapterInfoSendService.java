@@ -1,5 +1,6 @@
 package com.yihu.ehr.adaption.dispatch.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlan;
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanService;
@@ -10,6 +11,7 @@ import com.yihu.ehr.adaption.dict.service.AdapterDictService;
 import com.yihu.ehr.adaption.dict.service.DictEntryMappingInfo;
 import com.yihu.ehr.adaption.dict.service.DictMappingInfo;
 import com.yihu.ehr.adaption.feignclient.DispatchLogClient;
+import com.yihu.ehr.adaption.feignclient.StandardDispatchClient;
 import com.yihu.ehr.adaption.orgdataset.service.OrgDataSet;
 import com.yihu.ehr.adaption.orgdataset.service.OrgDataSetService;
 import com.yihu.ehr.adaption.orgdict.service.OrgDict;
@@ -24,6 +26,8 @@ import com.yihu.ehr.model.standard.MDispatchLog;
 import com.yihu.ehr.util.compress.Zipper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -66,6 +70,9 @@ public class AdapterInfoSendService {
     private AdapterDictService adapterDictService;
     @Autowired
     private DispatchLogClient dispatchLogClient;
+
+    @Autowired
+    StandardDispatchClient standardDispatchClient;
 
     public String getFileSystemPath() {
         String strPath = System.getProperty("java.io.tmpdir");
@@ -630,5 +637,97 @@ public class AdapterInfoSendService {
             return resultMap;
         }
         return null;
+    }
+
+
+    /**
+     * 创建采集标准和适配方案信息
+     * @param versionCode 版本号
+     * @param strOrgCode 机构编号
+     *@return Map<String, Object> password:压缩密码 IsSuccess：是否成功  ErrorMsg：错误消息 groupName:
+     */
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public Map<String, Object> createStandardAndMappingInfo(String versionCode, String strOrgCode) throws Exception{
+        Map<String, Object> resultMap = new HashMap<>();
+
+        String strFilePath = getFileSystemPath();
+        String splitMark = System.getProperty("file.separator");
+        strFilePath += splitMark+"StandardFiles";
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd_HHmmss");
+        String strFileName = format.format(new Date()) + ".zip";
+        String strXMLFilePath = strFilePath + splitMark + "standardadapter" + splitMark + "xml" + splitMark + format.format(new Date()) + splitMark;
+        String strZIPFilePath = strFilePath + splitMark + "standardadapter" + splitMark + "zip" + splitMark;
+        File zipFile = new File(strZIPFilePath);
+
+        File targetFile = new File(strXMLFilePath);
+
+        //如果目的路径不存在，则新建
+        if (!targetFile.exists()) {
+            targetFile.mkdirs();
+        }
+        if (!zipFile.exists()) {
+            zipFile.mkdirs();
+        }
+
+        //根据版本号获取采集标准文件
+        Map<String, Object> standardMap = standardDispatchClient.createSchemeInfo(versionCode);
+
+        if (standardMap == null) {
+            standardMap = new HashMap<>();
+            standardMap.put("ErrorMsg", "未找到采集标准!");
+            standardMap.put("IsSuccess", "false");
+            return standardMap;
+        }
+
+        String group = (String) standardMap.get(FastDFSUtil.GroupField);
+        String remoteFile = (String) standardMap.get(FastDFSUtil.RemoteFileField);
+        String password = (String) standardMap.get("password");
+
+        String strLocalFileName = fastDFSUtil.download(group, remoteFile, strFilePath + splitMark + "standardadapter" + splitMark + "xml" + splitMark);
+        //将采集标准文件解压到适配方案路径下
+        Zipper zipper = new Zipper();
+        File standardFile = new File(strLocalFileName);
+        String ss =standardFile.getName();
+        File standardFileXml= zipper.unzipFile(standardFile,strXMLFilePath,password);
+
+        //生成适配映射方案信息
+        String strErrorMsg = createAllMappingFile(versionCode, strOrgCode, strXMLFilePath, splitMark);
+        if(strErrorMsg!="")
+        {
+            resultMap.put("ErrorMsg", strErrorMsg);
+            resultMap.put("IsSuccess", "false");
+
+            return resultMap;
+        }
+
+        //生成Zip文件
+        //    Zipper zipper = new Zipper();
+        File resourcesFile = new File(strXMLFilePath);
+        String strPwd = UUID.randomUUID().toString();
+        zipper.zipFile(resourcesFile, strZIPFilePath + strFileName, strPwd);
+
+        //将文件上传到服务器中
+        ObjectNode msg = fastDFSUtil.upload(strZIPFilePath + strFileName, "");
+
+        resultMap.put(FastDFSUtil.GroupField, msg.get(FastDFSUtil.GroupField).asText());//setFilePath
+        resultMap.put(FastDFSUtil.RemoteFileField, msg.get(FastDFSUtil.RemoteFileField).asText());//setFileName
+        resultMap.put("password", strPwd);
+        resultMap.put("ErrorMsg", "");
+        resultMap.put("IsSuccess", "true");
+
+        dispatchLogClient.deleteLog(versionCode, strOrgCode);
+
+        MDispatchLog logInfo = new MDispatchLog();
+        logInfo.setOrgId(strOrgCode);
+        logInfo.setStdVersionId(versionCode);
+        logInfo.setDispatchTime(new Date());
+        logInfo.setFileGroup(msg.get(FastDFSUtil.GroupField).asText());
+        logInfo.setFilePath(msg.get(FastDFSUtil.RemoteFileField).asText());
+        logInfo.setPassword(strPwd);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String model = objectMapper.writeValueAsString(logInfo);
+        dispatchLogClient.saveLog(model);
+
+        return resultMap;
     }
 }

@@ -36,20 +36,20 @@ public class Adaptions {
 
     @RequestMapping(value = "/organization/standard", method = RequestMethod.GET)
     @ApiOperation(value = "获取适配方案摘要", produces = "application/json", notes = "获取两个指定版本的标准化数据差异与适配方案，文件以Base64编码，压缩格式为zip")
-    public RestEcho getOrgSchema(
+    public Object getOrgSchema(
             @ApiParam(required = true, name = "user_name", value = "用户名")
             @RequestParam(value = "user_name", required = true) String userName,
             @ApiParam(required = true, name = "update_version", value = "要更新的目标版本")
             @RequestParam(value = "update_version", required = true) String updateVersion,
             @ApiParam(required = true, name = "current_version", value = "用户当前使用的版本")
-            @RequestParam(value = "current_version", required = true) String currentVersion) {
+            @RequestParam(value = "current_version", required = false) String currentVersion) {
 
         MUserSecurity mUserSecurity = securityClient.getUserSecurityByLoginCode(userName);
         if(mUserSecurity==null)
         {
             return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed,"获取用户密钥失败");
         }
-        RestEcho restEcho = standardDispatchClient.getSchemeInfo(mUserSecurity.getPrivateKey(),updateVersion,currentVersion);
+        Object restEcho = standardDispatchClient.getSchemeInfo(mUserSecurity.getPrivateKey(),updateVersion,currentVersion);
         return restEcho;
     }
 
@@ -97,6 +97,7 @@ public class Adaptions {
             @RequestParam(value = "version_code", required = true) String versionCode,
             @ApiParam(required = true, name = "org_code", value = "机构代码")
             @RequestParam(value = "org_code", required = true) String orgCode) {
+
         String errorMsg = null;
         if(StringUtils.isEmpty(userName))
         {

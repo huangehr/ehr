@@ -42,6 +42,8 @@ public class AdapterDispatchController {
     OrgAdapterPlanService orgAdapterPlanService;
     @Autowired
     StdVersionClient stdVersionClient;
+    @Autowired
+    FastDFSUtil fastDFSUtil;
 
     @RequestMapping(value = "/schemaMappingPlan", method = RequestMethod.GET)
     @ApiOperation(value = "获取适配方案映射信息", response = RestEcho.class, produces = "application/json", notes = "获取采集标准适配方案信息，文件以Base64编码，压缩格式为zip")
@@ -73,7 +75,7 @@ public class AdapterDispatchController {
                 return new RestEcho().failed(ErrorCode.GenerateArchiveFailed," 标准化数据生成失败");
 
             password = (String) mapResult.get("password");
-            byte[] bytes = new FastDFSUtil().download(group, remoteFile);
+            byte[] bytes = fastDFSUtil.download(group, remoteFile);
             fileBytes = Base64.encode(bytes);
         } catch (Exception e) {
             return new RestEcho().failed(ErrorCode.DownArchiveFileFailed,"下载标准适配版本失败");
@@ -108,6 +110,7 @@ public class AdapterDispatchController {
         Map<String, Object> mapResult = null;
         String password = null;
         String fileBytes = null;
+//        userkey = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAIHbcm4xgUZv0VdZ/wh2k7gyf0NkqG7xK9MyI/KJoOoPH4cRdQhZiHijFA1GfClNHg0U8nZ0lVaOwI97VbvY5lB0dvJu9Fclp7b+9wA1Ll0hN35ta0rAl5kznSwO3brqmvV+eG2IbDLXHmGzclRi+gwyb2ZFceGhw/jMbSf2VoxjAgMBAAECgYAZ/AmH10whBhsDubR4wxGIGEKy/59co9G7LxtWWwfiDiim5G1gwFm4mhlXFrWdphrPT1O9NFL1wRbzHyDmt95ODJEijZhETdIDzRTPHgKIYeHdN+F9sC7oz6oLcF8vBTopEyYTO/8qBwiHeORsf0rk444IC+Clspwk6nETQEglwQJBAOCPA/OsrUKUBCvDUrlNFPBRNUGCftu/LYs6RaAkuaIq45k3ejCq2W8IXIWeiq85Aiufck0YGKPmyZdBoYB4q1MCQQCUCf5bhcgkn2Yp5xypBQl7JzEMY2/CtfdC+hbWNiWzi/CvHmQEbmxMluOJMCx8DXr3kWBGa/K0Ccen/lIADIixAkEAwAuPZaYXxwivSH4TEUZK0fuhgBUKSQSG/rsnMH44A+iKHU7EwTpcGgkcl2mvUYt/v67tIeGpsQJ/BUyrwiNw4QJAA5NmOHG3zuKmxhZWA+MiQn5E2gbA2VQp381Ipe3y5S5ZJvG1+sFsDkGKx3KJcImm0boKOEk9OIoP74feFTA4UQJAfkY5CGSRbqSz5Y0yfu/PBIq1nI5HEggzDdNp/YHqM9tQdI/EhT00pAlm6337TQFvgJX2NbxOT7PZ4gsWDhxEBw==";
         try {
 //            if (versionCode == null || versionCode == "" || orgcode == null || orgcode == "") {
 //                return null;
@@ -125,7 +128,7 @@ public class AdapterDispatchController {
                 return new RestEcho().failed(ErrorCode.GenerateArchiveFailed," 标准化数据生成失败");
 
             password = (String) mapResult.get("password");
-            byte[] bytes = new FastDFSUtil().download(group, remoteFile);
+            byte[] bytes = fastDFSUtil.download(group, remoteFile);
             fileBytes = Base64.encode(bytes);
         } catch (Exception e) {
             return new RestEcho().failed(ErrorCode.DownArchiveFileFailed,"下载标准适配版本失败");
