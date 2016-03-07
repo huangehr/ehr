@@ -24,9 +24,9 @@ public interface UserClient {
     MUser getUserByLoginCode(@PathVariable(value = "login_code") String loginCode);
 
 
-    @RequestMapping(value = ApiVersion.Version1_0+"/users/verification/{login_code}", method = GET )
-    MUser loginVerification(
-            @PathVariable(value = "login_code") String loginCode,
-            @PathVariable(value = "psw") String psw);
+    @RequestMapping(value = ApiVersion.Version1_0+"/users/user_name/{user_name}/password/{password}", method = GET )
+    MUser getUserByNameAndPassword(
+            @PathVariable(value = "user_name") String userName,
+            @PathVariable(value = "password") String password);
 
 }

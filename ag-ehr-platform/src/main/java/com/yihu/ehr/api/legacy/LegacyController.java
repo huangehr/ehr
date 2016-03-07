@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.feign.GeographyClient;
+import com.yihu.ehr.feign.JsonPackageClient;
 import com.yihu.ehr.feign.PatientClient;
 import com.yihu.ehr.feign.SecurityClient;
 import com.yihu.ehr.model.geogrephy.MGeography;
@@ -18,6 +19,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -45,6 +47,8 @@ public class LegacyController {
     private PatientClient patientClient;
     @Autowired
     private SecurityClient securityClient;
+    @Autowired
+    private JsonPackageClient jsonPackageClient;
 
 
     @ApiOperation(value = "下载标准版本", response = String.class)
@@ -273,9 +277,20 @@ public class LegacyController {
 
     @ApiOperation(value = "上传档案包", response = String.class)
     @RequestMapping(value = "/json_package", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
-    public String uploadPackage() {
-        return null;
+    public String uploadPackage(
+            @ApiParam(required = true, name = "package", value = "JSON档案包", allowMultiple = true)
+            MultipartHttpServletRequest jsonPackage,
+            @ApiParam(required = true, name = "user_name", value = "用户名")
+            @RequestParam(value = "user_name") String userName,
+            @ApiParam(required = true, name = "package_crypto", value = "档案包解压密码,二次加密")
+            @RequestParam(value = "package_crypto") String packageCrypto,
+            @ApiParam(required = true, name = "md5", value = "档案包MD5")
+            @RequestParam(value = "md5") String md5) {
+        jsonPackageClient.savePackage(jsonPackage,userName,packageCrypto,md5);
+        return "success";
     }
+
+
 
 //    @ApiOperation(value = "公钥", response = String.class)
 //    @RequestMapping(value = "/user_key", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
