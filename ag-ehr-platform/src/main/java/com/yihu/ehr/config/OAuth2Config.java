@@ -23,12 +23,12 @@ import org.springframework.security.oauth2.provider.request.DefaultOAuth2Request
  * @version 1.0
  * @created 2016.03.03 20:50
  */
-@Configuration
+//@Configuration
 public class OAuth2Config{
     private static final String RESOURCE_ID = "ehr";
 
-    @Configuration
-    @EnableAuthorizationServer
+    //@Configuration
+    //@EnableAuthorizationServer
     public static class OAuth2ServerConfig extends AuthorizationServerConfigurerAdapter {
 
         @Autowired
@@ -41,12 +41,12 @@ public class OAuth2Config{
 
         @Override
         public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-            tokenServices.setTokenStore(tokenStore());
+            /*tokenServices.setTokenStore(tokenStore());
             tokenServices.setSupportRefreshToken(true);
             tokenServices.setReuseRefreshToken(true);
             tokenServices.setClientDetailsService(clientDetailsService);
             tokenServices.setTokenEnhancer(tokenEnhancer());
-            addUserDetailsService(tokenServices, this.userDetailsService);
+            addUserDetailsService(tokenServices, this.userDetailsService);*/
 
             endpoints.authenticationManager(authenticationManager);
             endpoints.authorizationCodeServices(authorizationCodeService);
@@ -62,8 +62,8 @@ public class OAuth2Config{
         }
     }
 
-    @Configuration
-    @EnableResourceServer
+    //@Configuration
+    //@EnableResourceServer
     public static class ResourceServer extends ResourceServerConfigurerAdapter {
         @Override
         public void configure(HttpSecurity http) throws Exception {
