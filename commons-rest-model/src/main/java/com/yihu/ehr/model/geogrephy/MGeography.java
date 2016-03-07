@@ -19,8 +19,19 @@ public class MGeography implements Serializable {
     private String street;
     private String extra;
     private String postalCode;
+
     public MGeography() {
-        id  = UUID.randomUUID().toString().replace("-","");
+
+    }
+
+
+    public MGeography(String province,String city,String district,String town,String street) {
+        this.province = province;
+        this.city = city;
+        this.district = district;
+        this.town = town;
+        this.province = province;
+        this.street = street;
     }
 
     public String getId() {
