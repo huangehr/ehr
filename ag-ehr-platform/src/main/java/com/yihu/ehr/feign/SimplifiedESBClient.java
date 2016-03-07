@@ -5,9 +5,9 @@ import com.yihu.ehr.model.esb.MHosEsbMiniRelease;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 @ApiIgnore
 public interface SimplifiedESBClient {
     @RequestMapping(value = "/uploadLog", method = RequestMethod.POST)
-    public boolean uploadLog(String orgCode, HttpServletRequest request);
+    public boolean uploadLog(String orgCode, String ip, MultipartFile file);
 
 
     @RequestMapping(value = "/getUpdateFlag", method = RequestMethod.POST)
@@ -25,7 +25,7 @@ public interface SimplifiedESBClient {
 
 
     @RequestMapping(value = "/downUpdateWar", method = RequestMethod.POST)
-    public void downUpdateWar(String systemCode, String orgCode, HttpServletResponse response);
+    public String downUpdateWar(String systemCode, String orgCode, HttpServletResponse response);
 
     @RequestMapping(value = "/uploadResult", method = RequestMethod.POST)
     public String uploadResult(String systemCode, String orgCode, String versionCode, String versionName, String updateDate);
@@ -34,11 +34,11 @@ public interface SimplifiedESBClient {
     public String fillMining(String systemCode, String orgCode);
 
     @RequestMapping(value = "/changeFillMiningStatus", method = RequestMethod.POST)
-    public void changeFillMiningStatus(String result, String message, String id, String status);
+    public String changeFillMiningStatus(String result, String message, String id, String status);
 
     @RequestMapping(value = "/hisPenetration", method = RequestMethod.POST)
     public String hisPenetration(String systemCode, String orgCode);
 
     @RequestMapping(value = "/changeHisPenetrationStatus", method = RequestMethod.POST)
-    public void changeHisPenetrationStatus(String result, String status, String id);
+    public String changeHisPenetrationStatus(String result, String status, String id);
 }

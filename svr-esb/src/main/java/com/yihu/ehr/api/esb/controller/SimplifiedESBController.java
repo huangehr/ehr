@@ -1,7 +1,6 @@
 package com.yihu.ehr.api.esb.controller;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.api.esb.Util.NetworkUtil;
 import com.yihu.ehr.api.esb.model.HosEsbMiniRelease;
 import com.yihu.ehr.api.esb.model.HosLog;
 import com.yihu.ehr.api.esb.model.HosSqlTask;
@@ -12,16 +11,13 @@ import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.util.DateFormatter;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.Date;
@@ -42,22 +38,20 @@ public class SimplifiedESBController {
     /**
      * 上传日志
      *
-     * @param request
      * @return
      */
     @ResponseBody
     @RequestMapping(value = "/uploadLog", method = RequestMethod.POST)
-    public boolean uploadLog(String orgCode, HttpServletRequest request) {
+    public boolean uploadLog(String orgCode, String ip, MultipartFile file) {
         try {
-            MultipartFile file = ((MultipartHttpServletRequest) request).getFile("file");
             FastDFSUtil fdfs = FastDFSConfig.fastDFSUtil();
             ObjectNode jsonResult = fdfs.upload(file.getInputStream(), "txt", "");
             String filePath = jsonResult.get("fid").textValue();
             HosLog lh = new HosLog();
             lh.setOrgCode(orgCode);
-            lh.setIp(NetworkUtil.getIpAddress(request));
             lh.setUploadTime(DateFormatter.simpleDateTimeFormat(new Date()));
             lh.setFilePath(filePath);
+            lh.setId(ip);
             simplifiedESBService.saveHosLog(lh);
             return true;
         } catch (Exception e) {
@@ -93,7 +87,7 @@ public class SimplifiedESBController {
      * @param response
      */
     @RequestMapping(value = "/downUpdateWar", method = RequestMethod.POST)
-    public void downUpdateWar(String systemCode, String orgCode, HttpServletResponse response) {
+    public String downUpdateWar(String systemCode, String orgCode, HttpServletResponse response) {
         try {
             // path是指欲下载的文件的路径。
             HosEsbMiniRelease he = simplifiedESBService.getSimplifiedESBBySystemCodes(systemCode, orgCode);
@@ -121,8 +115,19 @@ public class SimplifiedESBController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return "";
     }
 
+    /**
+     * 上传客户端升级数据
+     *
+     * @param systemCode
+     * @param orgCode
+     * @param versionCode
+     * @param versionName
+     * @param updateDate
+     * @return
+     */
     @ResponseBody
     @RequestMapping(value = "/uploadResult", method = RequestMethod.POST)
     public String uploadResult(String systemCode, String orgCode, String versionCode, String versionName, String updateDate) {
@@ -162,12 +167,13 @@ public class SimplifiedESBController {
      */
     @ResponseBody
     @RequestMapping(value = "/changeFillMiningStatus", method = RequestMethod.POST)
-    public void changeFillMiningStatus(String result, String message, String id, String status) {
+    public String changeFillMiningStatus(String result, String message, String id, String status) {
         try {
             simplifiedESBService.changeFillMiningStatus(id, message, result, status);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return "";
     }
 
     /**
@@ -199,11 +205,12 @@ public class SimplifiedESBController {
      */
     @ResponseBody
     @RequestMapping(value = "/changeHisPenetrationStatus", method = RequestMethod.POST)
-    public void changeHisPenetrationStatus(String result, String status, String id) {
+    public String changeHisPenetrationStatus(String result, String status, String id) {
         try {
             simplifiedESBService.changeHisPenetrationStatus(id, status, result);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return "";
     }
 }
