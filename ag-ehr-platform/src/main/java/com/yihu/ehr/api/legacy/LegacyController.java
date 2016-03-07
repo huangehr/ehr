@@ -6,19 +6,18 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.feign.GeographyClient;
 import com.yihu.ehr.feign.PatientClient;
+import com.yihu.ehr.feign.SecurityClient;
 import com.yihu.ehr.model.geogrephy.MGeography;
 import com.yihu.ehr.model.patient.MDemographicInfo;
+import com.yihu.ehr.model.security.MUserSecurity;
+import com.yihu.ehr.util.DateFormatter;
 import com.yihu.ehr.util.IdCardValidator;
-import com.yihu.ehr.web.DateFormatter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -44,6 +43,8 @@ public class LegacyController {
     private GeographyClient geographyClient;
     @Autowired
     private PatientClient patientClient;
+    @Autowired
+    private SecurityClient securityClient;
 
 
     @ApiOperation(value = "下载标准版本", response = String.class)
@@ -159,7 +160,7 @@ public class LegacyController {
         String birthCity      = "";  //户籍地址-市（地区、州）
         String birthDistrict  = "";  //户籍地址-县（区）
         String birthTown      = "";  //户籍地址-乡（镇、街道办事）
-        String birthStreet   = "";  //户籍地址-门牌号码
+        String birthStreet    = "";  //户籍地址-门牌号码
         String birthExtra     = ""; //户籍地址--详细信息（未结构化的完整地址暂存这里）
 
         String telphoneJson   = "";   //电话
@@ -276,15 +277,51 @@ public class LegacyController {
         return null;
     }
 
-    @ApiOperation(value = "公钥", response = String.class)
-    @RequestMapping(value = "/user_key", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
-    public String getUserKey() {
-        return null;
+//    @ApiOperation(value = "公钥", response = String.class)
+//    @RequestMapping(value = "/user_key", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
+//    public String getUserKey(
+//            @ApiParam(name = "org_code", value = "机构代码")
+//            @PathVariable(value = "org_code") String orgCode) {
+//        String aaa = securityClient.getUserSecurityByOrgCode(orgCode);
+//        return null;
+//    }
+
+
+    @RequestMapping(value = "/securities/{login_code}/login", method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户公钥" , notes = "用户在平台注册时，会分配一个公钥，此公钥用于与健康档案平台加密传输数据使用")
+    public MUserSecurity getUserSecurityByLoginCode(
+            @ApiParam(name = "login_code", value = "用户名")
+            @PathVariable(value = "login_code") String loginCode) throws Exception {
+        MUserSecurity userSecurity = securityClient.getUserSecurityByLoginCode(loginCode);
+        return userSecurity;
+
     }
+
+
+
+    @RequestMapping(value = "/securities/{org_code}/org", method = RequestMethod.GET)
+    @ApiOperation(value = "获取企业公钥", produces = "application/json", notes = "企业公钥，用于与健康档案平台之间传输数据的加密。")
+    public MUserSecurity getUserSecurityByOrgCode(
+            @ApiParam(name = "org_code", value = "机构代码")
+            @PathVariable(value = "org_code") String orgCode) {
+        MUserSecurity userSecurity = securityClient.getUserSecurityByOrgCode(orgCode);
+        return userSecurity;
+    }
+
+
+
 
     @ApiOperation(value = "临时Token", response = String.class)
     @RequestMapping(value = "/token", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
-    public String getAppToken() {
-        return null;
+    public Object getAppToken(
+            @ApiParam(required = true, name = "login_code", value = "用户名")
+            @RequestParam(value = "login_code", required = true) String loginCode,
+            @ApiParam(required = true, name = "rsa_pw", value = "用户密码，以RSA加密")
+            @RequestParam(value = "rsa_pw", required = true) String rsaPWD,
+            @ApiParam(required = true, name = "app_id", value = "APP ID")
+            @RequestParam(value = "app_id", required = true) String appId,
+            @ApiParam(required = true, name = "app_secret", value = "APP 密码")
+            @RequestParam(value = "app_secret", required = true) String appSecret) {
+        return securityClient.getUserToken(loginCode,rsaPWD,appId,appSecret);
     }
 }

@@ -1,7 +1,7 @@
 package com.yihu.ehr.feign;
 
-import com.yihu.ehr.api.esb.model.HosEsbMiniRelease;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.model.esb.MHosEsbMiniRelease;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,7 +21,7 @@ public interface SimplifiedESBClient {
 
 
     @RequestMapping(value = "/getUpdateFlag", method = RequestMethod.POST)
-    public HosEsbMiniRelease getUpdateFlag(String versionCode, String systemCode, String orgCode);
+    public MHosEsbMiniRelease getUpdateFlag(String versionCode, String systemCode, String orgCode);
 
 
     @RequestMapping(value = "/downUpdateWar", method = RequestMethod.POST)
