@@ -18,6 +18,7 @@ import com.yihu.ehr.util.operator.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
@@ -118,6 +119,33 @@ public class UserController extends BaseController {
             @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
 
         UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
+
+        String errorMsg = null;
+        if (StringUtils.isEmpty(detailModel.getLoginCode())) {
+            errorMsg += "账户不能为空";
+        }
+        if (StringUtils.isEmpty(detailModel.getRealName())) {
+            errorMsg += "姓名不能为空!";
+        }
+        if (StringUtils.isEmpty(detailModel.getIdCardNo())) {
+            errorMsg += "身份证号不能为空!";
+        }
+        if (StringUtils.isEmpty(detailModel.getEmail())) {
+            errorMsg += "邮箱不能为空!";
+        }
+        if (StringUtils.isEmpty(detailModel.getTelephone())) {
+            errorMsg += "电话号码不能为空!";
+        }
+        if (StringUtils.isNotEmpty(errorMsg)) {
+            return failed(errorMsg);
+        }
+        if (userClient.isLoginCodeExists(detailModel.getLoginCode())) {
+            return failed("账户已存在!");
+        }
+        if (userClient.isIdCardExists(detailModel.getIdCardNo())) {
+            return failed("身份证号已存在!");
+        }
+
         MUser mUser = convertToModel(detailModel, MUser.class);
         mUser = userClient.createUser(objectMapper.writeValueAsString(mUser));
         if (mUser == null) {
@@ -135,7 +163,38 @@ public class UserController extends BaseController {
             @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
 
         UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
-        MUser mUser = convertToModel(detailModel, MUser.class);
+
+        String errorMsg = null;
+        if (StringUtils.isEmpty(detailModel.getLoginCode())) {
+            errorMsg += "账户不能为空";
+        }
+        if (StringUtils.isEmpty(detailModel.getRealName())) {
+            errorMsg += "姓名不能为空!";
+        }
+        if (StringUtils.isEmpty(detailModel.getIdCardNo())) {
+            errorMsg += "身份证号不能为空!";
+        }
+        if (StringUtils.isEmpty(detailModel.getEmail())) {
+            errorMsg += "邮箱不能为空!";
+        }
+        if (StringUtils.isEmpty(detailModel.getTelephone())) {
+            errorMsg += "电话号码不能为空!";
+        }
+        if (StringUtils.isNotEmpty(errorMsg)) {
+            return failed(errorMsg);
+        }
+        MUser mUser = userClient.getUser(detailModel.getId());
+        if (!mUser.getLoginCode().equals(detailModel.getLoginCode())
+                && userClient.isLoginCodeExists(detailModel.getLoginCode())) {
+            return failed("账户已存在!");
+        }
+
+        if (!mUser.getIdCardNo().equals(detailModel.getIdCardNo())
+                && userClient.isIdCardExists(detailModel.getIdCardNo())) {
+            return failed("身份证号已存在!");
+        }
+
+        mUser = convertToModel(detailModel, MUser.class);
         mUser = userClient.updateUser(objectMapper.writeValueAsString(mUser));
         if (mUser == null) {
             return failed("保存失败!");
@@ -267,22 +326,22 @@ public class UserController extends BaseController {
 
         UserDetailModel detailModel = convertToModel(mUser, UserDetailModel.class);
 
-        //TODO:获取婚姻状态代码
+        //获取婚姻状态代码
         String marryCode = mUser.getMartialStatus();
         MConventionalDict dict = conventionalDictClient.getMartialStatus(marryCode);
         detailModel.setMartialStatusName(dict == null ? "" : dict.getValue());
 
-        //TODO:获取用户类型
+        //获取用户类型
         String userType = mUser.getUserType();
         dict = conventionalDictClient.getUserType(userType);
         detailModel.setUserTypeName(dict == null ? "" : dict.getValue());
 
-        //TODO:获取归属机构
+        //获取归属机构
         String orgCode = mUser.getOrganization();
         MOrganization orgModel = orgClient.getOrg(orgCode);
         detailModel.setOrganizationName(orgModel == null ? "" : orgModel.getFullName());
 
-        //TODO:获取秘钥信息
+        //获取秘钥信息
         MUserSecurity userSecurity = securityClient.getUserSecurityByUserId(mUser.getId());
         if (userSecurity != null) {
             detailModel.setPublicKey(userSecurity.getPublicKey());
@@ -293,4 +352,5 @@ public class UserController extends BaseController {
         }
         return detailModel;
     }
+
 }
