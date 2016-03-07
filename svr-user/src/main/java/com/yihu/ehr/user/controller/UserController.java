@@ -8,7 +8,6 @@ import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.user.feign.SecurityClient;
 import com.yihu.ehr.user.service.User;
 import com.yihu.ehr.user.service.UserManager;
-import com.yihu.ehr.util.ObjectId;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.encode.HashUtil;
 import io.swagger.annotations.Api;
@@ -16,7 +15,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -207,14 +205,19 @@ public class UserController extends BaseRestController {
         return convertToModel(user,MUser.class);
     }
 
-
-
-
-    @RequestMapping(value = "/dictionaries/existence/{login_code}" , method = RequestMethod.GET)
-    @ApiOperation(value = "根基dictId和code判断提交的字典项名称是否已经存在")
-    boolean isLoginCodeExists(
+    @RequestMapping(value = "/users/existence/{login_code}" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断账户是否存在")
+    public boolean isLoginCodeExists(
             @ApiParam(name = "login_code", value = "login_code", defaultValue = "")
             @PathVariable(value = "login_code") String loginCode){
         return userManager.getUserByLoginCode(loginCode)!=null;
+    }
+
+    @RequestMapping(value = "/users/is_exist/{id_card}" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断账户是否存在")
+    public boolean isIdCardExists(
+            @ApiParam(name = "id_card", value = "id_card", defaultValue = "")
+            @PathVariable(value = "id_card") String idCard){
+        return userManager.getUserByIdCardNo(idCard) != null;
     }
 }
