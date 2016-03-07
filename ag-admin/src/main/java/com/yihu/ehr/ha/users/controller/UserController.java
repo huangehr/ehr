@@ -21,9 +21,8 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -54,7 +53,6 @@ public class UserController extends BaseController {
     @Autowired
     private ObjectMapper objectMapper;
 
-
     @RequestMapping(value = "/users", method = RequestMethod.GET)
     @ApiOperation(value = "获取用户列表", notes = "根据查询条件获取用户列表在前端表格展示")
     public Envelop searchUsers(
@@ -69,28 +67,32 @@ public class UserController extends BaseController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) {
 
-        List<MUser> mUsers = userClient.searchUsers(fields, filters, sorts, size, page);
+        ResponseEntity<List<MUser>> responseEntity = userClient.searchUsers(fields, filters, sorts, size, page);
+        List<MUser> mUsers = responseEntity.getBody();
         List<UsersModel> usersModels = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss ");
         for (MUser mUser : mUsers) {
             UsersModel usersModel = convertToModel(mUser, UsersModel.class);
             //获取用户类别字典
-            MConventionalDict dict = conventionalDictClient.getUserType(mUser.getUserType());
-            usersModel.setUserTypeName(dict == null ? "" : dict.getValue());
-
+            if(StringUtils.isNotEmpty(mUser.getUserType())) {
+                MConventionalDict dict = conventionalDictClient.getUserType(mUser.getUserType());
+                usersModel.setUserTypeName(dict == null ? "" : dict.getValue());
+            }
             //获取机构信息
-            MOrganization organization = orgClient.getOrg(mUser.getOrganization());
-            usersModel.setOrganizationName(organization == null ? "" : organization.getFullName());
-
+            if(StringUtils.isNotEmpty(mUser.getOrganization())) {
+                MOrganization organization = orgClient.getOrg(mUser.getOrganization());
+                usersModel.setOrganizationName(organization == null ? "" : organization.getFullName());
+            }
             usersModels.add(usersModel);
         }
 
-        //TODO:获取总条数
-        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        //获取总条数
+        int totalCount = getTotalCount(responseEntity);
+
 //        String count = response.getHeader(AgAdminConstants.ResourceCount);
 //        int totalCount = StringUtils.isNotEmpty(count) ? Integer.parseInt(count) : 0;
 
-        Envelop envelop = getResult(usersModels, 0, page, size);
+        Envelop envelop = getResult(usersModels, totalCount, page, size);
         return envelop;
     }
 
@@ -214,13 +216,20 @@ public class UserController extends BaseController {
             @ApiParam(name = "user_id", value = "", defaultValue = "")
             @PathVariable(value = "user_id") String userId) {
 
-        MUser mUser = userClient.getUser(userId);
-        if (mUser == null) {
-            return failed("用户信息获取失败!");
-        }
-        UserDetailModel detailModel = MUserToUserDetailModel(mUser);
+        try {
+            MUser mUser = userClient.getUser(userId);
+            if (mUser == null) {
+                return failed("用户信息获取失败!");
+            }
+            UserDetailModel detailModel = MUserToUserDetailModel(mUser);
 
-        return success(detailModel);
+            return success(detailModel);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
     }
 
 
@@ -331,19 +340,23 @@ public class UserController extends BaseController {
 
         //获取婚姻状态代码
         String marryCode = mUser.getMartialStatus();
-        MConventionalDict dict = conventionalDictClient.getMartialStatus(marryCode);
-        detailModel.setMartialStatusName(dict == null ? "" : dict.getValue());
-
+        MConventionalDict dict=null;
+        if(StringUtils.isNotEmpty(marryCode)) {
+            dict = conventionalDictClient.getMartialStatus(marryCode);
+            detailModel.setMartialStatusName(dict == null ? "" : dict.getValue());
+        }
         //获取用户类型
         String userType = mUser.getUserType();
-        dict = conventionalDictClient.getUserType(userType);
-        detailModel.setUserTypeName(dict == null ? "" : dict.getValue());
-
+        if (StringUtils.isNotEmpty(userType)) {
+            dict = conventionalDictClient.getUserType(userType);
+            detailModel.setUserTypeName(dict == null ? "" : dict.getValue());
+        }
         //获取归属机构
         String orgCode = mUser.getOrganization();
-        MOrganization orgModel = orgClient.getOrg(orgCode);
-        detailModel.setOrganizationName(orgModel == null ? "" : orgModel.getFullName());
-
+        if(StringUtils.isNotEmpty(orgCode)) {
+            MOrganization orgModel = orgClient.getOrg(orgCode);
+            detailModel.setOrganizationName(orgModel == null ? "" : orgModel.getFullName());
+        }
         //获取秘钥信息
         MUserSecurity userSecurity = securityClient.getUserSecurityByUserId(mUser.getId());
         if (userSecurity != null) {
