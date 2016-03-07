@@ -74,14 +74,13 @@ public class SimplifiedESBController {
      */
     @ResponseBody
     @RequestMapping(value = "/getUpdateFlag", method = RequestMethod.POST)
-    public boolean getUpdateFlag(String versionCode, String systemCode, String orgCode) {
-        boolean isUpdateFlag = false;
+    public HosEsbMiniRelease getUpdateFlag(String versionCode, String systemCode, String orgCode) {
         try {
-            isUpdateFlag = simplifiedESBService.getUpdateFlag(versionCode, systemCode, orgCode);
+            return simplifiedESBService.getUpdateFlag(versionCode, systemCode, orgCode);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return isUpdateFlag;
+        return new HosEsbMiniRelease();
     }
 
     /**
@@ -120,6 +119,18 @@ public class SimplifiedESBController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/uploadResult", method = RequestMethod.POST)
+    public String uploadResult(String systemCode, String orgCode, String versionCode, String versionName, String updateDate) {
+        String hsa = null;
+        try {
+            hsa = simplifiedESBService.uploadResult(systemCode, orgCode, versionCode, versionName, updateDate);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return hsa;
     }
 
     /**
