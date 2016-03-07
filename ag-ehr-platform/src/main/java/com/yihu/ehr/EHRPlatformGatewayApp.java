@@ -22,7 +22,7 @@ import java.io.FileNotFoundException;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableFeignClients
-public class EHRPlatformGatewayApp {
+public class EHRPlatformGatewayApp  {
     @Value("${server.port}")
     int port;
 
@@ -46,4 +46,5 @@ public class EHRPlatformGatewayApp {
             };
         };
     }
+
 }

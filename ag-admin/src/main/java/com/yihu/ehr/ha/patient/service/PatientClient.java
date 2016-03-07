@@ -97,4 +97,10 @@ public interface PatientClient {
     boolean resetPass(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @PathVariable(value = "id_card_no") String idCardNo);
+
+    @RequestMapping(value = "/populations/is_exist/{id_card_no}",method = RequestMethod.GET)
+    @ApiOperation(value = "判断身份证是否存在")
+    boolean isExistIdCardNo(
+            @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
+            @PathVariable(value = "id_card_no") String idCardNo);
 }

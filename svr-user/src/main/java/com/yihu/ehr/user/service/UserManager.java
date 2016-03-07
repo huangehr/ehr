@@ -44,6 +44,7 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
         return user;
     }
 
+
     /**
      * 根据登陆用户名获取用户接口.
      *
@@ -54,6 +55,18 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         Query query = session.createQuery("from User where loginCode = :loginCode");
         List<User> userList = query.setString("loginCode", loginCode).list();
+        if(userList.size()== 0) {
+            return null;
+        }else {
+            return userList.get(0);
+        }
+    }
+
+    public User getUserByIdCardNo(String idCardNo) {
+        Map<String,String> map =new HashMap<>();
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        Query query = session.createQuery("from User where idCardNo = :idCardNo");
+        List<User> userList = query.setString("idCardNo", idCardNo).list();
         if(userList.size()== 0) {
             return null;
         }else {

@@ -18,10 +18,10 @@ import java.util.Collection;
  * Created by AndyCai on 2016/2/29.
  */
 @FeignClient(MicroServices.AdaptionMgr)
-@RequestMapping(ApiVersion.Version1_0+"/adapter")
+@RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface AdapterOrgClient {
-    @RequestMapping(value = "/orgs", method = RequestMethod.GET)
+    @RequestMapping(value = "/adapter/orgs", method = RequestMethod.GET)
     @ApiOperation(value = "适配采集标准")
     Collection<MAdapterOrg> searchAdapterOrg(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
@@ -36,21 +36,21 @@ public interface AdapterOrgClient {
             @RequestParam(value = "page", required = false) int page);
 
 
-    @RequestMapping(value = "/org/{code}", method = RequestMethod.GET)
+    @RequestMapping(value = "/adapter/org/{code}", method = RequestMethod.GET)
     @ApiOperation(value = "获取适配采集标准")
     MAdapterOrg getAdapterOrg(
             @ApiParam(name = "code", value = "代码", defaultValue = "")
             @PathVariable(value = "code") String code) ;
 
 
-    @RequestMapping(value = "/org", method = RequestMethod.POST)
+    @RequestMapping(value = "/adapter/org", method = RequestMethod.POST)
     @ApiOperation(value = "新增采集标准")
     MAdapterOrg addAdapterOrg(
-            @ApiParam(name = "adapterOrg", value = "采集机构模型", defaultValue = "")
-            @RequestParam(value = "adapterOrg", required = false) String adapterOrg) ;
+            @ApiParam(name = "json_data", value = "采集机构模型", defaultValue = "")
+            @RequestParam(value = "json_data", required = false) String jsonData) ;
 
 
-    @RequestMapping(value = "/org/{code}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/adapter/org/{code}", method = RequestMethod.PUT)
     @ApiOperation(value = "更新采集标准")
     MAdapterOrg updateAdapterOrg(
             @ApiParam(name = "code", value = "代码", defaultValue = "")
@@ -61,16 +61,21 @@ public interface AdapterOrgClient {
             @RequestParam(value = "description", required = false) String description) ;
 
 
-    @RequestMapping(value = "/orgs", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/adapter/orgs", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除采集标准")
     boolean delAdapterOrg(
             @ApiParam(name = "codes", value = "代码", defaultValue = "")
-            @PathVariable(value = "codes") String codes);
+            @RequestParam(value = "codes") String codes);
 
 
-    @RequestMapping(value = "/isExistAdapterData/{org}", method = RequestMethod.GET)
+    @RequestMapping(value = "/adapter/isExistAdapterData/{org}", method = RequestMethod.GET)
     @ApiOperation(value = "判断采集机构是否存在采集数据")
     boolean orgIsExistData(
             @ApiParam(name = "org", value = "机构", defaultValue = "")
             @PathVariable(value = "org") String org) ;
+
+    @RequestMapping(value = "/adapter/isExistAdapterOrg/{org}", method = RequestMethod.GET)
+    @ApiOperation(value = "判断采集机构是否存在采集数据")
+    boolean isExistAdapterOrg(@ApiParam(name = "org", value = "机构", defaultValue = "")
+                                     @PathVariable(value = "org") String org);
 }

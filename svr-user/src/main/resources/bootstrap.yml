@@ -14,7 +14,17 @@ spring:
 
 ---
 spring:
-  profiles: prod
+  profiles: sand-home-dev
+  cloud:
+    config:
+      username: user
+      password: configuration
+      uri: http://localhost:1221
+      label: dev
+
+---
+spring:
+  profiles: test
   cloud:
     config:
       username: user

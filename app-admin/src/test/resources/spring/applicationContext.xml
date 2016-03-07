@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-lazy-init="false"
+       xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--业务Beans, 使用注解方式配置-->
+    <context:component-scan base-package="com.yihu.ehr">
+        <!--<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>-->
+    </context:component-scan>
+
+    <!--Hibernate 数据库配置-->
+    <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <!--
+        <property name="url"
+                  value="jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8"/>
+        <property name="username" value="fujian"/>
+        <property name="password" value="fujian"/>
+        -->
+        <property name="url"
+                  value="jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8"/>
+        <property name="username" value="ha"/>
+        <property name="password" value="ha"/>
+        <property name="initialSize" value="1"/>
+        <property name="maxTotal" value="100"/>
+        <property name="maxIdle" value="50"/>
+        <property name="minIdle" value="1"/>
+        <property name="validationQuery" value="SELECT 1"/>
+        <property name="testOnBorrow" value="true"/>
+        <property name="removeAbandonedTimeout" value="55"/>
+    </bean>
+
+    <!--Hibernate 会话管理器配置-->
+    <!--<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">-->
+        <!--<property name="dataSource" ref="dataSource"/>-->
+        <!--<property name="hibernateProperties">-->
+            <!--<value>-->
+                <!--hibernate.dialect=org.hibernate.dialect.MySQL5Dialect-->
+                <!--hibernate.show_sql=true-->
+                <!--hibernate.format_sql=true-->
+            <!--</value>-->
+        <!--</property>-->
+        <!--<property name="mappingLocations">-->
+            <!--<list>-->
+                <!--<value>classpath:hbm/*.hbm.xml</value>-->
+                <!--<value>classpath:hbm/common/*.hbm.xml</value>-->
+            <!--</list>-->
+        <!--</property>-->
+    <!--</bean>-->
+
+    <!--&lt;!&ndash;Hibernate 事务配置&ndash;&gt;-->
+    <!--<bean id="txManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">-->
+        <!--<property name="sessionFactory" ref="sessionFactory"/>-->
+    <!--</bean>-->
+    <!--<tx:annotation-driven transaction-manager="txManager"/>-->
+
+    <!--&lt;!&ndash;Redis 连接池配置&ndash;&gt;-->
+    <!--<bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">-->
+        <!--<property name="maxTotal" value="15"/>-->
+        <!--<property name="maxIdle" value="10"/>-->
+        <!--<property name="minIdle" value="5"/>-->
+    <!--</bean>-->
+
+    <!--&lt;!&ndash;Redis 数据库配置&ndash;&gt;-->
+    <!--<bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">-->
+        <!--&lt;!&ndash;property name="hostName" value="172.17.110.68" note="use this element when deploy on tomcat in real"/&ndash;&gt;-->
+        <!--<property name="hostName" value="192.168.1.220"/>-->
+        <!--<property name="port" value="6379"/>-->
+        <!--<property name="poolConfig" ref="poolConfig"/>-->
+    <!--</bean>-->
+
+    <!--&lt;!&ndash;Redis 会话管理器配置&ndash;&gt;-->
+    <!--<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">-->
+        <!--<property name="connectionFactory" ref="jedisConnectionFactory"/>-->
+    <!--</bean>-->
+
+    <!--<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">-->
+        <!--<property name="customEditors">-->
+            <!--<map>-->
+                <!--<entry key="com.yihu.ha.constrant.JobType"-->
+                       <!--value="com.yihu.ha.util.web.JobTypeConverter"/>-->
+            <!--</map>-->
+        <!--</property>-->
+    <!--</bean>-->
+
+    <!--文件上传支持-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+
+    <!--国际化配置-->
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <description>Message Sources</description>
+        <property name="basenames">
+            <list>
+                <value>text/message</value>
+            </list>
+        </property>
+        <property name="defaultEncoding" value="UTF-8"/>
+    </bean>
+
+    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
+        <property name="cookieMaxAge" value="604800"/>
+        <property name="defaultLocale" value="zh_CN"/>
+        <property name="cookieName" value="Language"></property>
+    </bean>
+
+    <bean id="localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor"/>
+</beans>

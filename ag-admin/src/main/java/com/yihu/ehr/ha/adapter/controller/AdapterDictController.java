@@ -14,8 +14,6 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;
 
 /**
@@ -44,11 +42,9 @@ public class AdapterDictController extends ExtendController<AdapterDictModel> {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+            @RequestParam(value = "page", required = false) int page) throws Exception {
 
-        return adapterDictClient.searchAdapterDict(planId, code, name, sorts, size, page, request, response);
+        return adapterDictClient.searchAdapterDict(planId, code, name, sorts, size, page);
     }
 
     @RequestMapping(value = "/plan/{planId}/dict/{dictId}/entrys", method = RequestMethod.GET)
@@ -66,11 +62,9 @@ public class AdapterDictController extends ExtendController<AdapterDictModel> {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+            @RequestParam(value = "page", required = false) int page) throws Exception {
 
-        return adapterDictClient.searchAdapterDictEntry(planId, dictId, code, name, sorts, size, page, request, response);
+        return adapterDictClient.searchAdapterDictEntry(planId, dictId, code, name, sorts, size, page);
     }
 
 
@@ -105,7 +99,7 @@ public class AdapterDictController extends ExtendController<AdapterDictModel> {
     };
 
 
-    @RequestMapping(value = "/dict/entry", method = RequestMethod.POST)
+    @RequestMapping(value = "/dict/entry", method = RequestMethod.PUT)
     public Envelop updateAdapterDictEntry(
             @ApiParam(name = "model", value = "数据模型")
             @RequestParam(value = "model") String model) {

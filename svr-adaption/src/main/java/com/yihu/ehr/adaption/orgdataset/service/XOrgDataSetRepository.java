@@ -2,6 +2,7 @@ package com.yihu.ehr.adaption.orgdataset.service;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
  */
 public interface XOrgDataSetRepository extends PagingAndSortingRepository<OrgDataSet, Long> {
 
-    @Query("select dataset from OrgDataSet dataset where organization = :orgCode and code = :code")
-    List<OrgDataSet> isExistOrgDataSet(String orgCode, String code);
+    @Query("select dataset from OrgDataSet dataset where dataset.organization = :orgCode and dataset.code = :code")
+    List<OrgDataSet> isExistOrgDataSet(@Param("orgCode") String orgCode, @Param("code") String code);
 
 }

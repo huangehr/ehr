@@ -6,6 +6,7 @@ import com.yihu.ehr.ha.adapter.controller.AdapterOrgController;
 import com.yihu.ehr.ha.adapter.controller.OrgDataSetController;
 import com.yihu.ehr.util.Envelop;
 import org.junit.FixMethodOrder;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,7 @@ public class AdapterOrgTests {
 
     ApplicationContext applicationContext;
 
+    @Test
     public void atestAdapterOrg() throws Exception{
         applicationContext = new SpringApplicationBuilder()
                 .web(false).sources(AgAdminApplication.class).run();
@@ -53,6 +55,7 @@ public class AdapterOrgTests {
         envelop = adapterOrgController.addAdapterOrg(objectMapper.writeValueAsString(detailModel));
         assertTrue("机构为空", !envelop.isSuccessFlg());
 
+        detailModel.setCode("CSJG1019002");
         detailModel.setOrg("CSJG1019002");
         envelop = adapterOrgController.addAdapterOrg(objectMapper.writeValueAsString(detailModel));
         assertTrue("新增失败", envelop.isSuccessFlg());
@@ -71,8 +74,12 @@ public class AdapterOrgTests {
 
     }
 
+    @Test
     public void bTestStandardCopy() throws Exception{
+        //TODO:未测试
+
         AdapterOrgDetailModel detailModel = new AdapterOrgDetailModel();
+        detailModel.setCode("CSJG1019002");
         detailModel.setName("test_org_cms");
         detailModel.setType("2");
         detailModel.setDescription("这是测试机构");
