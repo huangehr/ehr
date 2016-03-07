@@ -100,15 +100,15 @@ public interface UserClient {
      * 根据登陆用户名及密码验证用户.
      *
      * @param loginCode
-     * @param psw
+     * @param password
      */
-    @RequestMapping(value = "/users/verification/{login_code}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/users/user_name/{user_name}/password/{password}" , method = RequestMethod.GET)
     @ApiOperation(value = "根据登陆用户名及密码验证用户",notes = "根据登陆用户名及密码验证用户")
-    MUser loginVerification(
-            @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
-            @PathVariable(value = "login_code") String loginCode,
-            @ApiParam(name = "psw", value = "密码", defaultValue = "")
-            @RequestParam(value = "psw") String psw);
+    MUser getUserByNameAndPassword(
+            @ApiParam(name = "user_name", value = "登录账号", defaultValue = "")
+            @PathVariable(value = "user_name") String loginCode,
+            @ApiParam(name = "password", value = "密码", defaultValue = "")
+            @PathVariable(value = "password") String password);
 
     /**
      *
@@ -121,4 +121,16 @@ public interface UserClient {
     MUser getUserByLoginCode(
             @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
             @PathVariable(value = "login_code") String loginCode);
+
+    @RequestMapping(value = "/users/existence/{login_code}" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断账户是否存在")
+    boolean isLoginCodeExists(
+            @ApiParam(name = "login_code", value = "login_code", defaultValue = "")
+            @PathVariable(value = "login_code") String loginCode);
+
+    @RequestMapping(value = "/users/is_exist/{id_card}" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断账户是否存在")
+    boolean isIdCardExists(
+            @ApiParam(name = "id_card", value = "id_card", defaultValue = "")
+            @PathVariable(value = "id_card") String idCard);
 }

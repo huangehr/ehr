@@ -88,6 +88,10 @@ public class OrgMetaDataController extends BaseController {
             @RequestParam(value = "ids") String ids) throws Exception {
 
         ids = trimEnd(ids,",");
+        if(StringUtils.isEmpty(ids))
+        {
+            return failed("请选择需要删除的数据元!");
+        }
         boolean result = orgMetaDataClient.deleteOrgMetaDataList(ids);
         if(!result)
         {

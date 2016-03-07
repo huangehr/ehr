@@ -41,25 +41,44 @@ public class UserControllerTests {
                 .web(false).sources(AgAdminApplication.class).run();
 
         UserDetailModel userModel = new UserDetailModel();
-        userModel.setLoginCode("test_cms");
-        userModel.setRealName("test_cms");
-        userModel.setIdCardNo("111111111111111111");
+//        userModel.setLoginCode("test_cms");
+//        userModel.setRealName("test_cms");
+//        userModel.setIdCardNo("111111111111111111");
+//        userModel.setEmail("555@qq.com");
+//        userModel.setTelephone("11111111111");
         userModel.setGender("Male");
         userModel.setMartialStatus("10");
-        userModel.setEmail("555@qq.com");
-        userModel.setTelephone("11111111111");
         userModel.setUserType("Nurse");
         userModel.setOrganization("341321234");
         userModel.setMajor("");
 
         String userModelJson = objectMapper.writeValueAsString(userModel);
         Envelop envelop = userController.createUser(userModelJson);
+        assertTrue("非空验证失败！", !envelop.isSuccessFlg());
+
+        userModel.setLoginCode("test_cms");
+        userModel.setRealName("test_cms");
+        userModel.setIdCardNo("111111111111111111");
+        userModel.setEmail("555@qq.com");
+        userModel.setTelephone("11111111111");
+        userModelJson = objectMapper.writeValueAsString(userModel);
+        envelop = userController.createUser(userModelJson);
         assertTrue("新增失败", envelop.isSuccessFlg());
 
+        userModel = (UserDetailModel)envelop.getObj();
+
+        envelop = userController.createUser(userModelJson);
+        assertTrue("账户重复校验失败", !envelop.isSuccessFlg());
+
+        userModel.setLoginCode("test_cms_1");
+        userModelJson = objectMapper.writeValueAsString(userModel);
+        envelop = userController.createUser(userModelJson);
+        assertTrue("身份证号重复校验失败", !envelop.isSuccessFlg());
+
+        userModel.setLoginCode("test_cms");
         Object object1 = userController.distributeKey(userModel.getLoginCode());
         assertTrue("秘钥分发失败", object1!=null);
 
-        userModel = (UserDetailModel)envelop.getObj();
         String id= userModel.getId();
         envelop = userController.getUser(id);
         assertTrue("用户明细获取失败！",envelop.isSuccessFlg() && envelop.getObj()!=null);
@@ -69,6 +88,7 @@ public class UserControllerTests {
         userModelJson = objectMapper.writeValueAsString(userModel);
         envelop = userController.updateUser(userModelJson);
         assertTrue("修改失败", envelop.isSuccessFlg() && ((UserDetailModel)envelop.getObj()).getRealName().equals("test_cms_1"));
+
 
         String fields = "";
         String filter = "realName=test_cms_1";

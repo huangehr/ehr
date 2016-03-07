@@ -21,6 +21,8 @@ import java.util.*;
  */
 public class BaseController extends AbstractController {
 
+    private static String ERR_SYSREM_DES="系统错误,请联系管理员!";
+
     @Autowired
     ObjectMapper objectMapper;
 
@@ -154,5 +156,9 @@ public class BaseController extends AbstractController {
         envelop.setSuccessFlg(true);
         envelop.setObj(object);
         return envelop;
+    }
+
+    protected Envelop failedSystem(){
+        return failed(ERR_SYSREM_DES);
     }
 }

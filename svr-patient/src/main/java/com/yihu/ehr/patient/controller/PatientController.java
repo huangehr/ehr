@@ -289,5 +289,13 @@ public class PatientController extends BaseRestController {
         }
     }
 
+    @RequestMapping(value = "/populations/is_exist/{id_card_no}",method = RequestMethod.GET)
+    @ApiOperation(value = "判断身份证是否存在")
+    public boolean isExistIdCardNo(
+            @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
+            @PathVariable(value = "id_card_no") String idCardNo) throws Exception {
+
+        return demographicService.getDemographicInfo(new DemographicId(idCardNo)) != null;
+    }
 
 }

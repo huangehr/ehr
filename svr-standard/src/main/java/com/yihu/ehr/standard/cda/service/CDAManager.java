@@ -28,7 +28,7 @@ import java.util.List;
 public class CDAManager {
 
     @Autowired
-    private CdaDataSetRelationshipManager cdaDataSetRelationshipManager;
+    private CDADataSetRelationshipManager cdaDataSetRelationshipManager;
 
     @Autowired
     private CDADocumentManager cdaDocumentManager;
@@ -65,10 +65,10 @@ public class CDAManager {
             //关系保存成功
             return true;
         }
-        List<CdaDataSetRelationship> infos = new ArrayList<>();
+        List<CDADataSetRelationship> infos = new ArrayList<>();
         for (int i = 0; i < infos.size(); i++) {
             String dataSetId = dataSetIds[i];
-            CdaDataSetRelationship info = new CdaDataSetRelationship();
+            CDADataSetRelationship info = new CDADataSetRelationship();
             info.setCdaId(cdaId);
             info.setDataSetId(dataSetId);
             infos.add(info);
