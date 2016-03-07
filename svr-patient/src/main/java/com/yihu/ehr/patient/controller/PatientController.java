@@ -124,6 +124,16 @@ public class PatientController extends BaseRestController {
         return demographicModel;
     }
 
+    @RequestMapping(value = "/populations/{id_card_no}/register",method = RequestMethod.GET)
+    @ApiOperation(value = "根据身份证号判断病人是否注册")
+    public boolean isRegistered(
+            @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
+            @PathVariable(value = "id_card_no") String idCardNo) throws Exception{
+        MDemographicInfo demographicInfo = getPatient(idCardNo);
+        return  demographicInfo!=null;
+    }
+
+
 
     /**
      * 根据前端传回来的json新增一个人口信息
