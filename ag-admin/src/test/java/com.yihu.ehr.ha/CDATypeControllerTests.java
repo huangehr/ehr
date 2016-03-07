@@ -46,11 +46,11 @@ public class CDATypeControllerTests {
     }
 
     @Test
-    public void testChildIncludeSelfByParentTypesAndKey() throws Exception {
+    public void testChildIncludeSelfByParentIdsAndKey() throws Exception {
         //根据父级类别获取父级类别所在以下所有子集类别（包括当前父级列表）---------(微服务取得not in结果）
         String parentIds = "0dae000656720d12269e0319806c0ef1";
         String key = "";
-        envelop = cdaTypeController.getChildIncludeSelfByParentTypesAndKey(parentIds, key);
+        envelop = cdaTypeController.getChildIncludeSelfByParentIdsAndKey(parentIds, key);
         assertNotEquals("根据parentIds、key查询失败！", envelop.getDetailModelList(), 0);
     }
 
