@@ -51,9 +51,9 @@ info:
 ---
 spring:
   profiles: dev
-keystore:
-  file: C:/Windows/tomcat.keystore
-  password: 123456
+#keystore:
+#  file: C:/Windows/tomcat.keystore
+#  password: 123456
 eureka:
   instance:
     ip-address: localhost
@@ -65,9 +65,9 @@ eureka:
 ---
 spring:
   profiles: test
-keystore:
-  file: /tomcat/tomcat.keystore
-  password: 123456
+#keystore:
+#  file: /tomcat/tomcat.keystore
+#  password: 123456
 eureka:
   instance:
     ip-address: 172.19.103.73
