@@ -5,8 +5,8 @@ import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.log.LogService;
 import com.yihu.ehr.standard.cda.service.CDADocument;
 import com.yihu.ehr.standard.cda.service.CDADocumentManager;
-import com.yihu.ehr.standard.cda.service.CdaDataSetRelationship;
-import com.yihu.ehr.standard.cda.service.CdaDataSetRelationshipManager;
+import com.yihu.ehr.standard.cda.service.CDADataSetRelationship;
+import com.yihu.ehr.standard.cda.service.CDADataSetRelationshipManager;
 import com.yihu.ehr.standard.cdaversion.service.CDAVersion;
 import com.yihu.ehr.standard.cdaversion.service.CDAVersionService;
 import com.yihu.ehr.standard.datasets.service.DataSetService;
@@ -63,7 +63,7 @@ public class DispatchService {
     @Autowired
     CDADocumentManager cdaDocumentManager;
     @Autowired
-    CdaDataSetRelationshipManager cdaDataSetRelationshipManager;
+    CDADataSetRelationshipManager cdaDataSetRelationshipManager;
     @Autowired
     FastDFSUtil fastDFSUtil;
     public static  Map<String, String> typeMapping = new HashMap<>();
@@ -606,9 +606,6 @@ public class DispatchService {
             appendChild(rowRoot, doc.createElement("description"), info.getDescription());
             appendChild(rowRoot, doc.createElement("version"), "");
             appendChild(rowRoot, doc.createElement("inner_version"), info.getVersionCode());
-            appendChild(rowRoot, doc.createElement("id"), "");
-            appendChild(rowRoot, doc.createElement("id"), "");
-            appendChild(rowRoot, doc.createElement("id"), "");
 
             root.appendChild(rowRoot);
 
@@ -650,7 +647,7 @@ public class DispatchService {
 
         //创建关系文档
         String strRelationFileName = "std_cda_dataset_relationship.xml";
-        List<CdaDataSetRelationship> listRelation = cdaDataSetRelationshipManager.getCDADataSetRelationship(sourceVersionId);
+        List<CDADataSetRelationship> listRelation = cdaDataSetRelationshipManager.getCDADataSetRelationship(sourceVersionId);
         createCDADatasetRelationshipFile(strXMLFilePath, strRelationFileName, listRelation);
 
         //创建字典文档，并获取字典值信息
@@ -672,7 +669,7 @@ public class DispatchService {
      * @return
      */
     @Transactional(propagation = Propagation.SUPPORTS)
-    public void createCDADatasetRelationshipFile(String strFilePath, String strFileName, List<CdaDataSetRelationship> listRelastion) throws Exception{
+    public void createCDADatasetRelationshipFile(String strFilePath, String strFileName, List<CDADataSetRelationship> listRelastion) throws Exception{
         //创建字典值XML
         Document doc = createDocument();
         Element root = doc.createElement("table");
@@ -684,7 +681,7 @@ public class DispatchService {
 
         root.appendChild(getColumnElement(doc, colRoot, strColumn));
         for (int i = 0; i < listRelastion.size(); i++) {
-            CdaDataSetRelationship info = listRelastion.get(i);
+            CDADataSetRelationship info = listRelastion.get(i);
             Element rowRoot = doc.createElement("row");
             String type = typeMapping.get(info.getOperationType());
             if(type==null)

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import springfox.documentation.annotations.ApiIgnore;
 
 
 /**
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @version 1.0
  * @created 2016.3.2
  */
-@EnableFeignClients
+@ApiIgnore
 @FeignClient(MicroServices.StandardMgr + "/std")
 @RequestMapping(ApiVersion.Version1_0)
 public interface StdVersionClient {

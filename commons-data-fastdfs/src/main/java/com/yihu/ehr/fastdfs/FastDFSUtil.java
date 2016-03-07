@@ -29,7 +29,8 @@ public class FastDFSUtil {
     
     @Autowired
     FastDFSClientPool clientPool;
-
+    @Autowired
+    ObjectMapper objectMapper;
     /**
      * 以输入流的方式上传文件
      * InputStream in = new FileInputStream("C://Desert.jpg");
@@ -63,7 +64,7 @@ public class FastDFSUtil {
             fileMetaData = new NameValuePair[1];
             fileMetaData[0] = new NameValuePair("description", description == null ? "" : description);
 
-            ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
+//            ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
             ObjectNode message = objectMapper.createObjectNode();
 
             byte fileBuffer[] = new byte[in.available()];
@@ -148,7 +149,7 @@ public class FastDFSUtil {
             fileMetaData = new NameValuePair[1];
             fileMetaData[0] = new NameValuePair("description", description == null ? "" : description);
 
-            ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
+//            ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
             ObjectNode message = objectMapper.createObjectNode();
             String fileExtension = "";
             if (fileName.contains(".")) {

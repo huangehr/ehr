@@ -28,7 +28,7 @@ public class CDAType {
     private String description;
 
     public CDAType() {
-        id  = UUID.randomUUID().toString().replace("-","");
+
     }
 
     @Id

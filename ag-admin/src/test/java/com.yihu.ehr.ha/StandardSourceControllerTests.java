@@ -46,7 +46,7 @@ public class StandardSourceControllerTests {
 
         //新增标准来源----------------------------3ok
         StdSourceDetailModel sourceDetailModel = new StdSourceDetailModel();
-        sourceDetailModel.setId("0dae0006568f839386faa62bd4dyww55");
+        sourceDetailModel.setId("");
         sourceDetailModel.setCode("wwcs");
         sourceDetailModel.setName("api");
         sourceDetailModel.setSourceType("1");
