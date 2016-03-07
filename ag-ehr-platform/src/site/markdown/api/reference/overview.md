@@ -1,4 +1,4 @@
-REST API调用规范
+API
 ====================
 
 > 作者：温富建，2016.02.18
@@ -8,7 +8,17 @@ REST API调用规范
 
 本文档为平台REST API调用规范，旨在为第三方应用提供访统一的问平台调用与交互方式，通过这些接口可以访问患者的健康数据，医疗资源及医疗机构等数据。
 
-所有API都是通过向平台的REST服务器发送HTTP请求来实现，REST服务器支持gzip，可有效降低网络开销，建议第三方应用加入gzip支持。
+所有API都是通过向平台的REST服务器发送HTTP请求来实现，REST服务器支持gzip，可有效降低网络开销，建议第三方应用加入gzip支持。其他内容参见：
+
+> [认证与授权](auth/auth.html)
+
+> [健康档案](health-profiles/health-profiles.html)
+
+> [患者](patients/patients.html)
+
+> [数据标准](standards/standards.html)
+
+> [用户](users/users.html)
  
 术语解释
 ---------------------
