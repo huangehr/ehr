@@ -1,6 +1,6 @@
 spring:
   application:
-    name: simplifiedESB
+    name: svr-esb
   cloud:
       config:
         username: user

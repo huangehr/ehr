@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -28,9 +29,10 @@ import java.util.Date;
 /**
  * Created by chenweida on 2016/3/1.
  */
-@Controller
-@RequestMapping(ApiVersion.Version1_0 + "/esb")
-@Api(protocols = "https", value = "esb", description = "esb管理", tags = {"esb管理"})
+
+@RestController
+@RequestMapping(value = ApiVersion.Version1_0 + "/simplified-esb")
+@Api(protocols = "https", value = "simplified-esb", description = "简易ESB服务临时接口")
 public class SimplifiedESBController {
     @Resource(name = "simplifiedESBService")
     private SimplifiedESBService simplifiedESBService;
