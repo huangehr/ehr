@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * 机构数据集管理器。
  *
@@ -22,11 +24,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrgDataSetService extends BaseJpaService<OrgDataSet, XOrgDataSetRepository> {
     @Autowired
     OrgMetaDataService orgMetaDataService;
+    @Autowired
+    private XOrgDataSetRepository orgDataSetRepository;
 
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public boolean isExistOrgDataSet(String orgCode, String code, String name) {
-        return ((XOrgDataSetRepository) getRepository()).isExistOrgDataSet(code, name).size() != 0;
+    public boolean isExistOrgDataSet(String orgCode, String code) {
+        //List<OrgDataSet> list =  orgDataSetRepository.isExistOrgDataSet(orgCode, code);
+        return ((XOrgDataSetRepository) getRepository()).isExistOrgDataSet(orgCode, code).size() != 0;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

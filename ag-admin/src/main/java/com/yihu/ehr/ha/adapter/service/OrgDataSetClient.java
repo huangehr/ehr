@@ -22,34 +22,34 @@ import java.util.Collection;
 @ApiIgnore
 public interface OrgDataSetClient {
 
-    @RequestMapping(value = "/data_set/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/adapter/org/data_set/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据id查询实体")
     MOrgDataSet getOrgDataSet(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") long id);
 
-    @RequestMapping(value = "/data_set", method = RequestMethod.POST)
+    @RequestMapping(value = "/adapter/org/data_set", method = RequestMethod.POST)
     @ApiOperation(value = "创建机构数据集")
     MOrgDataSet createOrgDataSet(
             @ApiParam(name = "json_data", value = "json_data", defaultValue = "")
             @RequestParam(value = "json_data") String jsonData);
 
 
-    @RequestMapping(value = "/data_set/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/adapter/org/data_set/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除机构数据集")
     boolean deleteOrgDataSet(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathParam(value = "id") long id);
 
 
-    @RequestMapping(value = "/data_set", method = RequestMethod.PUT)
+    @RequestMapping(value = "/adapter/org/data_set", method = RequestMethod.PUT)
     @ApiOperation(value = "修改机构数据集")
     MOrgDataSet updateOrgDataSet(
             @ApiParam(name = "json_data", value = "json_data", defaultValue = "")
             @RequestParam(value = "json_data") String jsonData);
 
 
-    @RequestMapping(value = "/data_sets", method = RequestMethod.GET)
+    @RequestMapping(value = "/adapter/org/data_sets", method = RequestMethod.GET)
     @ApiOperation(value = "条件查询")
     Collection<MOrgDataSet> searchAdapterOrg(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
@@ -63,13 +63,11 @@ public interface OrgDataSetClient {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page);
 
-    @RequestMapping(value = "/data_sets/is_exist", method = RequestMethod.GET)
+    @RequestMapping(value = "/adapter/org/is_exist", method = RequestMethod.GET)
     @ApiOperation(value = "条件查询")
-    boolean isExistOrgDataSet(
-            @ApiParam(name = "orgCode", value = "orgCode", defaultValue = "")
-            @RequestParam(value = "orgCode") String orgCode,
-            @ApiParam(name = "code", value = "code", defaultValue = "")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "name", defaultValue = "")
-            @RequestParam(value = "name") String name);
+    boolean dataSetIsExist(
+            @ApiParam(name = "org_code",value = "机构代码",defaultValue = "")
+            @RequestParam(value = "org_code")String orgCode,
+            @ApiParam(name="code",value="数据集代码",defaultValue = "")
+            @RequestParam(value = "code")String code);
 }

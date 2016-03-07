@@ -1,12 +1,11 @@
 package com.yihu.ehr.adaption.adapterorg.controller;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adaption.adapterorg.service.AdapterOrg;
 import com.yihu.ehr.adaption.adapterorg.service.AdapterOrgService;
 import com.yihu.ehr.adaption.commons.ExtendController;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.adaption.MAdapterOrg;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,6 +31,9 @@ import java.util.List;
 public class AdapterOrgController extends ExtendController<MAdapterOrg> {
     @Autowired
     private AdapterOrgService adapterOrgService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @RequestMapping(value = "/orgs", method = RequestMethod.GET)
     @ApiOperation(value = "适配采集标准")
@@ -70,13 +72,11 @@ public class AdapterOrgController extends ExtendController<MAdapterOrg> {
     @RequestMapping(value = "/org", method = RequestMethod.POST)
     @ApiOperation(value = "新增采集标准")
     public MAdapterOrg addAdapterOrg(
-            @ApiParam(name = "model", value = "采集机构模型", defaultValue = "")
-            @RequestParam(value = "model", required = false) String model) throws Exception{
+            @ApiParam(name = "json_data", value = "采集机构模型", defaultValue = "")
+            @RequestParam(value = "json_data", required = false) String jsonData) throws Exception{
 
-        AdapterOrg adapterOrg = jsonToObj(model, AdapterOrg.class);
-        if (adapterOrgService.retrieve(adapterOrg.getCode()) != null) {
-            throw new ApiException(ErrorCode.RepeatAdapterOrg, "该机构已存在采集标准！");
-        }
+        AdapterOrg adapterOrg = objectMapper.readValue(jsonData,AdapterOrg.class);//jsonToObj(jsonData, AdapterOrg.class);
+
         return getModel(adapterOrgService.addAdapterOrg(adapterOrg));
     }
 
@@ -104,7 +104,7 @@ public class AdapterOrgController extends ExtendController<MAdapterOrg> {
     @ApiOperation(value = "删除采集标准")
     public boolean delAdapterOrg(
             @ApiParam(name = "codes", value = "代码", defaultValue = "")
-            @PathVariable(value = "codes") String codes) throws Exception{
+            @RequestParam(value = "codes") String codes) throws Exception{
 
         if (StringUtils.isEmpty(codes))
             throw errMissCode();
@@ -120,5 +120,13 @@ public class AdapterOrgController extends ExtendController<MAdapterOrg> {
             @PathVariable(value = "org") String org) throws Exception{
 
         return adapterOrgService.isExistData(org);
+    }
+
+    @RequestMapping(value = "/isExistAdapterOrg/{org}", method = RequestMethod.GET)
+    @ApiOperation(value = "判断采集机构是否存在采集数据")
+    public boolean isExistAdapterOrg(@ApiParam(name = "org", value = "机构", defaultValue = "")
+                                     @PathVariable(value = "org") String org){
+
+        return adapterOrgService.retrieve(org) != null;
     }
 }
