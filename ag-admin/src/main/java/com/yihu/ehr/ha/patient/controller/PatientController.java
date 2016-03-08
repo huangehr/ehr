@@ -17,6 +17,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -59,29 +60,31 @@ public class PatientController extends BaseController {
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
             @RequestParam(value = "rows") Integer rows) throws Exception {
 
-        List<MDemographicInfo> demographicInfos = patientClient.searchPatient(name, idCardNo, province, city, district, page, rows);
-
+        ResponseEntity<List<MDemographicInfo>> responseEntity = patientClient.searchPatient(name, idCardNo, province, city, district, page, rows);
+        List<MDemographicInfo> demographicInfos = responseEntity.getBody();
         List<PatientModel> patients = new ArrayList<>();
         for (MDemographicInfo patientInfo : demographicInfos) {
 
             PatientModel patient = convertToModel(patientInfo, PatientModel.class);
             //获取家庭地址信息
             String homeAddressId = patientInfo.getHomeAddress();
-            MGeography geography = addressClient.getAddressById(homeAddressId);
-            String homeAddress = "";
-            if (geography != null) {
-                if (StringUtils.isNotEmpty(geography.getProvince())) homeAddress += geography.getProvince();
-                if (StringUtils.isNotEmpty(geography.getCity())) homeAddress += geography.getCity();
-                if (StringUtils.isNotEmpty(geography.getDistrict())) homeAddress += geography.getDistrict();
-                if (StringUtils.isNotEmpty(geography.getTown())) homeAddress += geography.getTown();
-                if (StringUtils.isNotEmpty(geography.getStreet())) homeAddress += geography.getStreet();
-                if (StringUtils.isNotEmpty(geography.getExtra())) homeAddress += geography.getExtra();
+            if(StringUtils.isNotEmpty(homeAddressId)) {
+                MGeography geography = addressClient.getAddressById(homeAddressId);
+                String homeAddress = "";
+                if (geography != null) {
+                    if (StringUtils.isNotEmpty(geography.getProvince())) homeAddress += geography.getProvince();
+                    if (StringUtils.isNotEmpty(geography.getCity())) homeAddress += geography.getCity();
+                    if (StringUtils.isNotEmpty(geography.getDistrict())) homeAddress += geography.getDistrict();
+                    if (StringUtils.isNotEmpty(geography.getTown())) homeAddress += geography.getTown();
+                    if (StringUtils.isNotEmpty(geography.getStreet())) homeAddress += geography.getStreet();
+                    if (StringUtils.isNotEmpty(geography.getExtra())) homeAddress += geography.getExtra();
+                }
+                patient.setAddress(homeAddress);
             }
-            patient.setAddress(homeAddress);
             patients.add(patient);
         }
 
-        Envelop envelop = getResult(patients, 1, page, rows);
+        Envelop envelop = getResult(patients, getTotalCount(responseEntity), page, rows);
         return envelop;
     }
 

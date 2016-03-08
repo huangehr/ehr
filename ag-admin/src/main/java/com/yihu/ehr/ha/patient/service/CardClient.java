@@ -6,6 +6,7 @@ import com.yihu.ehr.model.patient.MAbstractCard;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,7 +35,7 @@ public interface CardClient {
      */
     @RequestMapping(value = "/cards/id_card_no",method = RequestMethod.GET)
     @ApiOperation(value = "根据身份证好查询相对应的卡列表")
-    List<MAbstractCard> searchCardBinding(
+    ResponseEntity<List<MAbstractCard>> searchCardBinding(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @RequestParam(value = "id_card_no") String idCardNo,
             @ApiParam(name = "number", value = "卡号", defaultValue = "")
@@ -57,7 +58,7 @@ public interface CardClient {
      */
     @RequestMapping(value = "/cards",method = RequestMethod.GET)
     @ApiOperation(value = "查询未绑定的卡列表")
-    List<MAbstractCard> searchCardUnBinding(
+    ResponseEntity<List<MAbstractCard>> searchCardUnBinding(
             @ApiParam(name = "number", value = "卡号", defaultValue = "")
             @RequestParam(value = "number") String number,
             @ApiParam(name = "card_type", value = "卡类别", defaultValue = "")

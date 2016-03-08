@@ -1,5 +1,5 @@
 server:
-  port: 4431
+  port: 443
 
 endpoints:
   restart:
