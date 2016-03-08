@@ -47,7 +47,7 @@ public class CdaTypeControllerTests {
     public void bgGetChildIncludeSelfByParentTypesAndKey() throws Exception{
         String[] patientIds = new String[]{"0dae000656720d12269e0319806c0ef1","0dae000656720d25269e0319806c0ef2"}; //儿童保健，妇女保健
         String key = "";
-        Object result = cdaTypeController.getChildIncludeSelfByParentTypesAndKey(patientIds,key);
+        Object result = cdaTypeController.getChildIncludeSelfByParentIdsAndKey(patientIds,key);
         assertTrue("查询失败！" , result != null);
     }
 

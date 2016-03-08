@@ -13,9 +13,6 @@ import java.util.UUID;
  * @version 1.0
  * @created 11-12月-2015 15:52:22
  */
-@Entity
-@Table(name = "std_cda_type")
-@Access(value = AccessType.PROPERTY)
 public class MCDAType {
 
     private String id;
@@ -28,91 +25,74 @@ public class MCDAType {
     private String updateUser;
     private String description;
 
-    public MCDAType() {
-        id  = UUID.randomUUID().toString().replace("-","");
+    public String getId() {
+        return id;
     }
 
-    @Id
-    @GeneratedValue(generator = "Generator")
-    @GenericGenerator(name = "Generator", strategy = "assigned")
-    @Column(name = "id", unique = true, nullable = false)
-    public String getId() {
-        return this.id;
-    }
     public void setId(String id) {
         this.id = id;
     }
 
-    @Column(name = "code",  nullable = false)
+    public String getCode() {
+        return code;
+    }
+
     public void setCode(String code) {
         this.code = code;
     }
-    public String getCode() {
-        return this.code;
+
+    public String getName() {
+        return name;
     }
 
-    @Column(name = "name",  nullable = false)
     public void setName(String name) {
         this.name = name;
     }
-    public String getName() {
-        return this.name;
+
+    public String getParentId() {
+        return parentId;
     }
 
-    @Column(name = "parent_id",  nullable = true)
     public void setParentId(String parentId) {
         this.parentId = parentId;
     }
-    public String getParentId() {
-        return this.parentId;
+
+    public Date getCreateDate() {
+        return createDate;
     }
 
-    @Column(name = "create_date",  nullable = true)
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
-    public Date getCreateDate() {
-        return this.createDate;
+
+    public String getCreateUser() {
+        return createUser;
     }
 
-    @Column(name = "create_user",  nullable = true)
     public void setCreateUser(String createUser) {
         this.createUser = createUser;
     }
-    public String getCreateUser() {
-        return this.createUser;
+
+    public Date getUpdateDate() {
+        return updateDate;
     }
 
-    @Column(name = "update_date",  nullable = true)
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
     }
-    public Date getUpdateDate() {
-        return this.updateDate;
+
+    public String getUpdateUser() {
+        return updateUser;
     }
 
-    @Column(name = "update_user",  nullable = true)
     public void setUpdateUser(String updateUser) {
         this.updateUser = updateUser;
     }
-    public String getUpdateUser() {
-        return this.updateUser;
-    }
 
-//    public CDAType getParentCdaType() {
-//
-////        XCDATypeManager xcdaTypeManager = ServiceFactory.getService(Services.CDATypeManager);
-////        List<XCDAType> listType = xcdaTypeManager.getCdatypeInfoByIds(this.parentId);
-////        if (listType.size() > 0) {
-////            return (CDAType) listType.get(0);
-////        }
-//        return null;
-//    }
-
-    @Column(name = "description",  nullable = true)
     public String getDescription() {
         return description;
     }
+
     public void setDescription(String description) {
         this.description = description;
     }
