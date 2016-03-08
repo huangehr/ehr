@@ -1,4 +1,4 @@
-档案接收
+档案上传
 ====================
 
 - 作者：温富建，2016.02.18
@@ -18,7 +18,7 @@
 再用机构公钥对随机密码加密，最后再调用服务端上传档案。服务端在接收到档案包后会使用相应的私钥解密档案包密码，再用此密码打开档案包提取数据。
 如下图所示：
 
-![档案包加密与解密流程](../../images/档案包加密与解密.png)
+![档案包加密与解密流程](../../../images/档案包加密与解密.png)
 
 档案包类型与结构
 ---------------------
@@ -138,6 +138,10 @@ ZIP包：
 				[
 					{
 						"mime_type": "文件类型，参见:https://en.wikipedia.org/wiki/MIME",
+						"name": "文件名1.扩展名;文件名2.扩展名"
+					},
+					{
+						"mime_type": "文件类型，参见:https://en.wikipedia.org/wiki/MIME",
 						"name": "文件名.扩展名"
 					}
 				]
@@ -171,22 +175,33 @@ meta.json
 		data：
 		[
 			{
-				"cda_doc_id": "CDA文档ID",
+				"cda_doc_id": "CDA_ABC",
 				"url": "/api/patient/patient_id=10295514&event_no=000622508",
 				"expiry_date": "2016-10-10 00:00:00"
 				"key_words": {
 					//key格式: 数据集.数据元
 					"key": "word"    
 				},
-				"content":
-				[
+				"content":{
+					"mime_type": "application/msword",
+					"name": "住院病历.doc"
+				}
+			}，
+			{
+				"cda_doc_id: "CDA_DEF",
+				"url": "/api/patient/patient_id=10295514&event_no=000622508",
+				"expiry_date": "2016-10-10 00:00:00"
+				"key_words": {
+                  					"dataset.code": "value" 
+                },
+				"content":[
 					{
-						"mime_type": "application/msword",
-						"name": "住院病历1.png;住院病历2.png"
+						"mime_type": "application/png",
+						"name": "检验报告-血常规.png;检验报告-尿常规.png"
 					},
 					{
 						"mime_type": "application/pdf",
-						"name": "检查报告1.pdf;检查报告2.pdf;检查报告3.pdf"
+						"name": "检验报告-肝功能.pdf;检验报告-肾功能.pdf"
 					}
 				]
 			}
