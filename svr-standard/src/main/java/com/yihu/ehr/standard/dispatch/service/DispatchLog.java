@@ -1,6 +1,9 @@
 package com.yihu.ehr.standard.dispatch.service;
 
+import com.yihu.ehr.constants.BizObject;
+import com.yihu.ehr.util.ObjectId;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -10,9 +13,13 @@ import java.util.Date;
  * @version 1.0
  * @created 2016.3.2
  */
-@Table
-@Entity(name = "std_dispatch_log")
+@Entity
+@Table(name = "std_dispatch_log")
+@Access(value = AccessType.PROPERTY)
 public class DispatchLog {
+    @Value("${admin-region}")
+    short adminRegion;
+
     private String id;
     private String orgId;
     private String stdVersionId;
@@ -21,6 +28,10 @@ public class DispatchLog {
     private String fileGroup;
     private String password;
 
+    public void createId(){
+        Object objectID = new ObjectId(adminRegion, BizObject.StdArchive);
+        setId(objectID.toString());
+    }
     @Id
     @GeneratedValue(generator = "Generator")
     @GenericGenerator(name = "Generator", strategy = "assigned")
