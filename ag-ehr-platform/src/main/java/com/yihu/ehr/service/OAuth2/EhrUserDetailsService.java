@@ -31,7 +31,12 @@ public class EhrUserDetailsService implements UserDetailsService {
         }
 
         return new User(username, user.getPassword(), getGrantedAuthorities(username));*/
-        return new User("admin", "e10adc3949ba59abbe56e057f20f883e", getGrantedAuthorities(username));
+
+        if (username.equals("admin")){
+            return new User("admin", "e10adc3949ba59abbe56e057f20f883e", getGrantedAuthorities(username));
+        }
+
+        return null;
     }
 
     private Collection<? extends GrantedAuthority> getGrantedAuthorities(String username) {

@@ -1,6 +1,8 @@
 package com.yihu.ehr.api.legacy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.api.authorization.AuthorizationsEndPoint;
+import com.yihu.ehr.api.model.MToken;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
@@ -8,19 +10,25 @@ import com.yihu.ehr.feign.GeographyClient;
 import com.yihu.ehr.feign.PatientClient;
 import com.yihu.ehr.model.geogrephy.MGeography;
 import com.yihu.ehr.model.patient.MDemographicInfo;
+import com.yihu.ehr.service.oauth2.EhrUserDetailsService;
 import com.yihu.ehr.util.IdCardValidator;
+import com.yihu.ehr.util.encode.HashUtil;
+import com.yihu.ehr.util.encrypt.RSA;
 import com.yihu.ehr.web.DateFormatter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.security.InvalidParameterException;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
@@ -47,25 +55,25 @@ public class LegacyEndPoint {
 
 
     @ApiOperation(value = "下载标准版本", response = String.class)
-    @RequestMapping(value = "/adapter-dispatcher/versionplan", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
+    @RequestMapping(value = "/adapter-dispatcher/versionplan", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.GET)
     public String getVersion() {
         return null;
     }
 
     @ApiOperation(value = "下载标准版本列表", response = String.class)
-    @RequestMapping(value = "/adapter-dispatcher/allSchemaMappingPlan", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
+    @RequestMapping(value = "/adapter-dispatcher/allSchemaMappingPlan", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.GET)
     public String getAllVerions() {
         return null;
     }
 
     @ApiOperation(value = "机构数据元", response = String.class)
-    @RequestMapping(value = "/adapter-dispatcher/schema", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
+    @RequestMapping(value = "/adapter-dispatcher/schema", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.GET)
     public String downloadOrgMeta() {
         return null;
     }
 
     @ApiOperation(value = "标准映射", response = String.class)
-    @RequestMapping(value = "adapter-dispatcher/schemaMappingPlan", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
+    @RequestMapping(value = "adapter-dispatcher/schemaMappingPlan", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.GET)
     public String downloadMapper() {
         return null;
     }
@@ -120,7 +128,7 @@ public class LegacyEndPoint {
      *
      * @return map
      */
-    @ApiOperation(value = "注册病人",  notes = "根据病人的身份证号及其他病人信息在健康档案平台中注册病人")
+    @ApiOperation(value = "注册病人", notes = "根据病人的身份证号及其他病人信息在健康档案平台中注册病人")
     @RequestMapping(value = "/patient/registration", method = RequestMethod.POST)
     public Object patientRegister(
             @ApiParam(name = "user_info", value = "用户名")
@@ -139,88 +147,88 @@ public class LegacyEndPoint {
 //        String org_code = (String) fields.get("org_code");
 //        String ds_code = (String) fields.get("code");
 
-        String userName       = "";   //本人姓名
-        String idCardNo       = "";   //身份证件号码
-        String birthday       = "";   //出生日期
-        String gender         = "";   //性别代码
-        String nation         = "";   //民族
-        String martialStatus  = "";   //婚姻状况代码
-        String nativePlace    = "";   //籍贯
+        String userName = "";   //本人姓名
+        String idCardNo = "";   //身份证件号码
+        String birthday = "";   //出生日期
+        String gender = "";   //性别代码
+        String nation = "";   //民族
+        String martialStatus = "";   //婚姻状况代码
+        String nativePlace = "";   //籍贯
 
         MGeography homeAddress = new MGeography();
-        String homeProvince   = "";   //现住地址-省（自治区、直辖）
-        String homeCity       = "";   //现住地址-市（地区、州）
-        String homeDistrict   = "";   //现住地址-县（区）
-        String homeTown       = "";   //现住地址-乡（镇、街道办事）
-        String homeStreet    = "";   //现住地址-门牌号码
+        String homeProvince = "";   //现住地址-省（自治区、直辖）
+        String homeCity = "";   //现住地址-市（地区、州）
+        String homeDistrict = "";   //现住地址-县（区）
+        String homeTown = "";   //现住地址-乡（镇、街道办事）
+        String homeStreet = "";   //现住地址-门牌号码
 
         MGeography birthAddress = new MGeography();
-        String birthProvince  = "";  //户籍地址-省（自治区、直辖）
-        String birthCity      = "";  //户籍地址-市（地区、州）
-        String birthDistrict  = "";  //户籍地址-县（区）
-        String birthTown      = "";  //户籍地址-乡（镇、街道办事）
-        String birthStreet   = "";  //户籍地址-门牌号码
-        String birthExtra     = ""; //户籍地址--详细信息（未结构化的完整地址暂存这里）
+        String birthProvince = "";  //户籍地址-省（自治区、直辖）
+        String birthCity = "";  //户籍地址-市（地区、州）
+        String birthDistrict = "";  //户籍地址-县（区）
+        String birthTown = "";  //户籍地址-乡（镇、街道办事）
+        String birthStreet = "";  //户籍地址-门牌号码
+        String birthExtra = ""; //户籍地址--详细信息（未结构化的完整地址暂存这里）
 
-        String telphoneJson   = "";   //电话
-        String email          = "";   //电子邮件地址
+        String telphoneJson = "";   //电话
+        String email = "";   //电子邮件地址
 
         //以下代码为临时对应方案
-        if(inner_version.equals("000000000000")){
-            userName       = (String) patient.get("HDSA00_01_009");
-            idCardNo       = (String) patient.get("HDSA00_01_017");
-            birthday       = (String) patient.get("HDSA00_01_012");
-            gender         = (String) patient.get("HDSA00_01_011");
-            nation         = (String) patient.get("HDSA00_01_014");
-            martialStatus  = (String) patient.get("HDSA00_01_015");
-            nativePlace    = (String) patient.get("HDSA00_01_022") + (String) patient.get("HDSA00_01_023") + (String) patient.get("HDSA00_01_024") ;
+        if (inner_version.equals("000000000000")) {
+            userName = (String) patient.get("HDSA00_01_009");
+            idCardNo = (String) patient.get("HDSA00_01_017");
+            birthday = (String) patient.get("HDSA00_01_012");
+            gender = (String) patient.get("HDSA00_01_011");
+            nation = (String) patient.get("HDSA00_01_014");
+            martialStatus = (String) patient.get("HDSA00_01_015");
+            nativePlace = (String) patient.get("HDSA00_01_022") + (String) patient.get("HDSA00_01_023") + (String) patient.get("HDSA00_01_024");
 
-            homeProvince   = (String) patient.get("HDSA00_01_029");
-            homeCity       = (String) patient.get("HDSA00_01_030");
-            homeDistrict   = (String) patient.get("HDSA00_01_031");
-            homeTown       = (String) patient.get("HDSA00_01_032");
-            homeStreet    = (String) patient.get("HDSA00_01_033");
+            homeProvince = (String) patient.get("HDSA00_01_029");
+            homeCity = (String) patient.get("HDSA00_01_030");
+            homeDistrict = (String) patient.get("HDSA00_01_031");
+            homeTown = (String) patient.get("HDSA00_01_032");
+            homeStreet = (String) patient.get("HDSA00_01_033");
 
-            birthProvince  = (String) patient.get("HDSA00_01_022");
-            birthCity      = (String) patient.get("HDSA00_01_023");
-            birthDistrict  = (String) patient.get("HDSA00_01_024");
-            birthTown      = (String) patient.get("HDSA00_01_025");
-            birthStreet    = (String) patient.get("HDSA00_01_027");
+            birthProvince = (String) patient.get("HDSA00_01_022");
+            birthCity = (String) patient.get("HDSA00_01_023");
+            birthDistrict = (String) patient.get("HDSA00_01_024");
+            birthTown = (String) patient.get("HDSA00_01_025");
+            birthStreet = (String) patient.get("HDSA00_01_027");
 
-            telphoneJson   = (String) patient.get("HDSA00_01_019");
-            email          = (String) patient.get("HDSA00_01_021");
-        } else{
-            userName       = (String) patient.get("HDSD00_01_002");
-            idCardNo       = (String) patient.get("HDSA00_01_017");
-            birthday       = (String) patient.get("HDSA00_01_012");
-            gender         = (String) patient.get("HDSA00_01_011");
-            nation         = (String) patient.get("HDSA00_01_014");
-            martialStatus  = (String) patient.get("HDSD00_01_017");
-            nativePlace    = (String) patient.get("HDSA00_11_051");
-            telphoneJson   = (String) patient.get("HDSD00_01_008");
-            email          = (String) patient.get("HDSA00_01_021");
-            birthExtra   = (String) patient.get("JDSA00_01_000");//地址无法解析情况，是否直接存入详细地址栏？
+            telphoneJson = (String) patient.get("HDSA00_01_019");
+            email = (String) patient.get("HDSA00_01_021");
+        } else {
+            userName = (String) patient.get("HDSD00_01_002");
+            idCardNo = (String) patient.get("HDSA00_01_017");
+            birthday = (String) patient.get("HDSA00_01_012");
+            gender = (String) patient.get("HDSA00_01_011");
+            nation = (String) patient.get("HDSA00_01_014");
+            martialStatus = (String) patient.get("HDSD00_01_017");
+            nativePlace = (String) patient.get("HDSA00_11_051");
+            telphoneJson = (String) patient.get("HDSD00_01_008");
+            email = (String) patient.get("HDSA00_01_021");
+            birthExtra = (String) patient.get("JDSA00_01_000");//地址无法解析情况，是否直接存入详细地址栏？
         }
 
         telMap.put("联系电话", telphoneJson);
 
-        if(!StringUtils.isEmpty(birthProvince)){
-            birthAddress = new MGeography(birthProvince,birthCity,birthDistrict,birthTown,birthStreet);
+        if (!StringUtils.isEmpty(birthProvince)) {
+            birthAddress = new MGeography(birthProvince, birthCity, birthDistrict, birthTown, birthStreet);
         }
-        if(!StringUtils.isEmpty(homeProvince)){
-            homeAddress = new MGeography(homeProvince,homeCity,homeDistrict,homeTown,homeStreet);
+        if (!StringUtils.isEmpty(homeProvince)) {
+            homeAddress = new MGeography(homeProvince, homeCity, homeDistrict, homeTown, homeStreet);
         }
         //完整的户籍地址
-        if(!StringUtils.isEmpty(birthExtra)){
+        if (!StringUtils.isEmpty(birthExtra)) {
             birthAddress.setExtra(birthExtra);
         }
 
         //缺少身份证号
-        if (idCardNo == null){
-            throw  new ApiException(ErrorCode.MissParameter);
+        if (idCardNo == null) {
+            throw new ApiException(ErrorCode.MissParameter);
         }
         String errorInfo = IdCardValidator.doValidate(idCardNo);
-        if (!StringUtils.isEmpty(errorInfo)){
+        if (!StringUtils.isEmpty(errorInfo)) {
             throw new ApiException(ErrorCode.InvalidIdentityNo, errorInfo);
         }
 
@@ -269,22 +277,50 @@ public class LegacyEndPoint {
     }
 
 
-
     @ApiOperation(value = "上传档案包", response = String.class)
-    @RequestMapping(value = "/json_package", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
+    @RequestMapping(value = "/json_package", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.GET)
     public String uploadPackage() {
         return null;
     }
 
     @ApiOperation(value = "公钥", response = String.class)
-    @RequestMapping(value = "/user_key", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
+    @RequestMapping(value = "/user_key", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.GET)
     public String getUserKey() {
         return null;
     }
 
+    @Autowired
+    private AuthorizationsEndPoint authEndPoint;
+
+    @Autowired
+    EhrUserDetailsService userDetailsService;
+
     @ApiOperation(value = "临时Token", response = String.class)
-    @RequestMapping(value = "/token", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
-    public String getAppToken() {
-        return null;
+    @RequestMapping(value = "/token", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.GET)
+    public Object getUserTempToken(@ApiParam(required = true, name = "user_name", value = "用户名")
+                                   @RequestParam(value = "user_name", required = true) String userName,
+                                   @ApiParam(required = true, name = "rsa_pw", value = "用户密码，以RSA加密")
+                                   @RequestParam(value = "rsa_pw", required = true) String rsaPWD,
+                                   @ApiParam(required = true, name = "app_id", value = "APP ID")
+                                   @RequestParam(value = "app_id", required = true) String appId,
+                                   @ApiParam(required = true, name = "app_secret", value = "APP 密码")
+                                   @RequestParam(value = "app_secret", required = true) String appSecret,
+                                   HttpServletRequest request) throws Exception
+
+    {
+
+        String privateKey = ""; // 此处要获取用户RSA密钥
+        Key priKey = RSA.genPrivateKey(privateKey);
+        String password = RSA.decrypt(rsaPWD, priKey);
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
+        if (userDetails == null || !HashUtil.hashStr(password).equals(userDetails.getPassword())){
+            throw new InvalidParameterException("用户名或密码错误");
+        }
+
+        MToken token = authEndPoint.createTempToken(userDetails);
+        if (token == null) return null;
+
+        return token.getToken();
     }
 }

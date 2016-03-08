@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
 
 /**
- * 从请求中提取Token。
+ * 从请求中提取Token。兼容Swagger Api Key。
  *
  * @author Sand
  * @version 1.0
@@ -21,6 +21,7 @@ import java.util.Enumeration;
 public class EhrTokenExtractor implements TokenExtractor {
 
     private final static Log logger = LogFactory.getLog(EhrTokenExtractor.class);
+    private final static String SWAGGER_API_KEY = "api_key";
 
     @Override
     public Authentication extract(HttpServletRequest request) {
@@ -42,7 +43,11 @@ public class EhrTokenExtractor implements TokenExtractor {
 
             token = request.getParameter(OAuth2AccessToken.ACCESS_TOKEN);
             if (token == null) {
-                logger.debug("找不到Token，非OAuth2请求类型.");
+                token = request.getParameter(SWAGGER_API_KEY);
+
+                if (token == null) {
+                    logger.debug("找不到Token，非OAuth2请求类型.");
+                }
             } else {
                 request.setAttribute(OAuth2AuthenticationDetails.ACCESS_TOKEN_TYPE, OAuth2AccessToken.BEARER_TYPE);
             }
@@ -58,7 +63,14 @@ public class EhrTokenExtractor implements TokenExtractor {
      * @return Token，若没有则返回null
      */
     protected String extractHeaderToken(HttpServletRequest request) {
-        Enumeration<String> headers = request.getHeaders("Authorization");
+        String apiKey = request.getHeader(SWAGGER_API_KEY);
+        if (apiKey != null) return apiKey;
+
+        Enumeration<String> headers = request.getHeaders(SWAGGER_API_KEY);
+        if(headers == null){
+            headers = request.getHeaders("Authorization");
+        }
+
         while (headers.hasMoreElements()) { // typically there is only one (most servers enforce that)
             String value = headers.nextElement();
             if ((value.toLowerCase().startsWith(OAuth2AccessToken.BEARER_TYPE.toLowerCase()))) {

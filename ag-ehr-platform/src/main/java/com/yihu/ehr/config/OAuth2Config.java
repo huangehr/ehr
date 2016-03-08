@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.*;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
@@ -20,8 +21,13 @@ import org.springframework.security.oauth2.provider.code.AuthorizationCodeServic
 import org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint;
 import org.springframework.security.oauth2.provider.endpoint.FrameworkEndpointHandlerMapping;
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
 
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.UUID;
 
 /**
  * @author Sand
@@ -29,7 +35,7 @@ import java.util.Arrays;
  * @created 2016.03.03 20:50
  */
 @Configuration
-public class OAuth2Config{
+public class OAuth2Config {
     private static final String RESOURCE_ID = "ehr";
 
     @Configuration
@@ -87,7 +93,21 @@ public class OAuth2Config{
         @Override
         public void configure(HttpSecurity http) throws Exception {
             http
-                    .antMatcher("/api/v1.0/**").authorizeRequests().anyRequest().access("#oauth2.hasScope('read')");
+                    .requestMatcher(
+                            new OrRequestMatcher(
+                                    new AntPathRequestMatcher("/api/v1.0/**"),
+                                    new AntPathRequestMatcher("/rest/v1.0/adapter-dispatcher/**"),
+                                    new AntPathRequestMatcher("/rest/v1.0/json_package/**"),
+                                    new AntPathRequestMatcher("/rest/v1.0/patient/**"),
+                                    new AntPathRequestMatcher("/rest/v1.0/user_key/**")
+
+                            ))
+                    .authorizeRequests()
+                    .antMatchers("/api/v1.0/**").access("#oauth2.hasScope('read')")
+                    .antMatchers("/rest/v1.0/adapter-dispatcher/**").access("#oauth2.hasScope('read')")
+                    .antMatchers("/rest/v1.0/json_package/**").access("#oauth2.hasScope('read')")
+                    .antMatchers("/rest/v1.0/patient/**").access("#oauth2.hasScope('read')")
+                    .antMatchers("/rest/v1.0/user_key/**").access("#oauth2.hasScope('read')");
         }
 
         @Override
@@ -100,24 +120,24 @@ public class OAuth2Config{
     }
 
     @Bean
-    EhrClientDetailsService ehrClientDetailsService(){
+    EhrClientDetailsService ehrClientDetailsService() {
         return new EhrClientDetailsService();
     }
 
     @Bean
-    EhrAuthorizationCodeService authorizationCodeService(){
+    EhrAuthorizationCodeService authorizationCodeService() {
         return new EhrAuthorizationCodeService();
     }
 
     @Bean
-    EhrTokenStoreService tokenStoreService(){
+    EhrTokenStoreService tokenStoreService() {
         EhrTokenStoreService tokenStoreService = new EhrTokenStoreService();
 
         return tokenStoreService;
     }
 
     @Bean
-    EhrTokenServices ehrTokenServices(EhrClientDetailsService clientDetailsService, EhrTokenStoreService tokenStoreService){
+    EhrTokenServices ehrTokenServices(EhrClientDetailsService clientDetailsService, EhrTokenStoreService tokenStoreService) {
         EhrTokenServices tokenServices = new EhrTokenServices();
 
         tokenServices.setReuseRefreshToken(true);
