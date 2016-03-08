@@ -25,4 +25,6 @@ public class MicroServices {
     public static final String SSO = "svr-sso";
     public static final String StandardMgr = "svr-standard";
     public static final String User = "svr-user";
+
+    public static final String Simplifiedesb = "svr-esb";
 }
