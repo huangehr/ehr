@@ -40,10 +40,12 @@ public interface SimplifiedESBClient {
             , @RequestParam(value = "updateDate", required = true) String updateDate);
 
     @RequestMapping(value = "/fillMining", method = RequestMethod.POST)
-    public String fillMining(@RequestParam(value = "systemCode", required = true) String systemCode, @RequestParam(value = "orgCode", required = true) String orgCode);
+    public String fillMining(
+            @RequestParam(value = "systemCode", required = true) String systemCode,
+            @RequestParam(value = "orgCode", required = true) String orgCode);
 
     @RequestMapping(value = "/changeFillMiningStatus", method = RequestMethod.POST)
-    public String changeFillMiningStatus(@RequestParam(value = "result", required = true) String result,
+    public String changeFillMiningStatus(
                                          @RequestParam(value = "message", required = true) String message,
                                          @RequestParam(value = "id", required = true) String id,
                                          @RequestParam(value = "status", required = true) String status);

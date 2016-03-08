@@ -187,12 +187,11 @@ public class SimplifiedESBController {
     @ResponseBody
     @RequestMapping(value = "/changeFillMiningStatus", method = RequestMethod.POST)
     public String changeFillMiningStatus(
-            @RequestParam(value = "result", required = true) String result,
             @RequestParam(value = "message", required = true) String message,
             @RequestParam(value = "id", required = true) String id,
             @RequestParam(value = "status", required = true) String status) {
         try {
-            simplifiedESBService.changeFillMiningStatus(id, message, result, status);
+            simplifiedESBService.changeFillMiningStatus(id, message, status);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -215,7 +214,7 @@ public class SimplifiedESBController {
         try {
             HosSqlTask hq = simplifiedESBService.hisPenetration(systemCode, orgCode);
             if (hq != null) {
-                returnString = "{\"id\":\"" + hq.getId() + "\",\"sql\":\"" + hq.getSql() + "\"}";
+                returnString = "{\"id\":\"" + hq.getId() + "\",\"sql\":\"" + hq.getSqlscript() + "\"}";
             }
             return returnString;
         } catch (Exception e) {

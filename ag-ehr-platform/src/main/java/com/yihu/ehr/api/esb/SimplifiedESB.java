@@ -107,18 +107,16 @@ public class SimplifiedESB {
         return new ResponseEntity<>(simplifiedESBClient.fillMining(systemCode, orgCode), HttpStatus.OK);
     }
 
-    @ApiOperation("补采功能")
+    @ApiOperation("改变补采状态")
     @RequestMapping(value = "/changeFillMiningStatus", method = RequestMethod.POST)
     public ResponseEntity changeFillMiningStatus(
-            @ApiParam("result") @RequestParam(value = "result", required = true)
-            String result,
             @ApiParam("message") @RequestParam(value = "message", required = true)
             String message,
             @ApiParam("id") @RequestParam(value = "id", required = true)
             String id,
             @ApiParam("status") @RequestParam(value = "status", required = true)
             String status) {
-        return new ResponseEntity<>(simplifiedESBClient.changeFillMiningStatus(result, message, id, status), HttpStatus.OK);
+        return new ResponseEntity<>(simplifiedESBClient.changeFillMiningStatus(message, id, status), HttpStatus.OK);
     }
 
     @ApiOperation(" his穿透查询")
