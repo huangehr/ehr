@@ -6,6 +6,7 @@ import com.yihu.ehr.model.user.MUser;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,7 +26,7 @@ public interface UserClient {
 
     @RequestMapping(value = "/users" , method = RequestMethod.GET)
     @ApiOperation(value = "获取用户列表",notes = "根据查询条件获取用户列表在前端表格展示")
-    List<MUser> searchUsers(
+    ResponseEntity<List<MUser>> searchUsers(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -121,4 +122,16 @@ public interface UserClient {
     MUser getUserByLoginCode(
             @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
             @PathVariable(value = "login_code") String loginCode);
+
+    @RequestMapping(value = "/users/existence/{login_code}" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断账户是否存在")
+    boolean isLoginCodeExists(
+            @ApiParam(name = "login_code", value = "login_code", defaultValue = "")
+            @PathVariable(value = "login_code") String loginCode);
+
+    @RequestMapping(value = "/users/is_exist/{id_card}" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断账户是否存在")
+    boolean isIdCardExists(
+            @ApiParam(name = "id_card", value = "id_card", defaultValue = "")
+            @PathVariable(value = "id_card") String idCard);
 }

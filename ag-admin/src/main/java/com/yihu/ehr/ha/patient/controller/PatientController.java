@@ -17,6 +17,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -59,29 +60,31 @@ public class PatientController extends BaseController {
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
             @RequestParam(value = "rows") Integer rows) throws Exception {
 
-        List<MDemographicInfo> demographicInfos = patientClient.searchPatient(name, idCardNo, province, city, district, page, rows);
-
+        ResponseEntity<List<MDemographicInfo>> responseEntity = patientClient.searchPatient(name, idCardNo, province, city, district, page, rows);
+        List<MDemographicInfo> demographicInfos = responseEntity.getBody();
         List<PatientModel> patients = new ArrayList<>();
         for (MDemographicInfo patientInfo : demographicInfos) {
 
             PatientModel patient = convertToModel(patientInfo, PatientModel.class);
             //获取家庭地址信息
             String homeAddressId = patientInfo.getHomeAddress();
-            MGeography geography = addressClient.getAddressById(homeAddressId);
-            String homeAddress = "";
-            if (geography != null) {
-                if (StringUtils.isNotEmpty(geography.getProvince())) homeAddress += geography.getProvince();
-                if (StringUtils.isNotEmpty(geography.getCity())) homeAddress += geography.getCity();
-                if (StringUtils.isNotEmpty(geography.getDistrict())) homeAddress += geography.getDistrict();
-                if (StringUtils.isNotEmpty(geography.getTown())) homeAddress += geography.getTown();
-                if (StringUtils.isNotEmpty(geography.getStreet())) homeAddress += geography.getStreet();
-                if (StringUtils.isNotEmpty(geography.getExtra())) homeAddress += geography.getExtra();
+            if(StringUtils.isNotEmpty(homeAddressId)) {
+                MGeography geography = addressClient.getAddressById(homeAddressId);
+                String homeAddress = "";
+                if (geography != null) {
+                    if (StringUtils.isNotEmpty(geography.getProvince())) homeAddress += geography.getProvince();
+                    if (StringUtils.isNotEmpty(geography.getCity())) homeAddress += geography.getCity();
+                    if (StringUtils.isNotEmpty(geography.getDistrict())) homeAddress += geography.getDistrict();
+                    if (StringUtils.isNotEmpty(geography.getTown())) homeAddress += geography.getTown();
+                    if (StringUtils.isNotEmpty(geography.getStreet())) homeAddress += geography.getStreet();
+                    if (StringUtils.isNotEmpty(geography.getExtra())) homeAddress += geography.getExtra();
+                }
+                patient.setAddress(homeAddress);
             }
-            patient.setAddress(homeAddress);
             patients.add(patient);
         }
 
-        Envelop envelop = getResult(patients, 1, page, rows);
+        Envelop envelop = getResult(patients, getTotalCount(responseEntity), page, rows);
         return envelop;
     }
 
@@ -143,9 +146,33 @@ public class PatientController extends BaseController {
             @ApiParam(name = "patientModelJsonData", value = "身份证号", defaultValue = "")
             @RequestParam(value = "patientModelJsonData") String patientModelJsonData) throws Exception {
 
-        //TODO:身份证校验
-
         PatientDetailModel detailModel = objectMapper.readValue(patientModelJsonData, PatientDetailModel.class);
+        String errorMsg = null;
+        if (StringUtils.isEmpty(detailModel.getName())) {
+            errorMsg += "姓名不能为空!";
+        }
+        if (StringUtils.isEmpty(detailModel.getIdCardNo())) {
+            errorMsg += "身份证号不能为空!";
+        }
+        if (StringUtils.isEmpty(detailModel.getTelphoneNo())) {
+            errorMsg += "联系方式不能为空!";
+        }
+        if (StringUtils.isEmpty(detailModel.getNativePlace())) {
+            errorMsg += "籍贯不能为空!";
+        }
+        if (StringUtils.isEmpty(detailModel.getNation())) {
+            errorMsg += "籍贯不能为空!";
+        }
+        if (StringUtils.isNotEmpty(errorMsg)) {
+            return failed(errorMsg);
+        }
+
+        //TODO:身份证校验
+        if(patientClient.isExistIdCardNo(detailModel.getIdCardNo()))
+        {
+            return failed("身份证号已存在!");
+        }
+
         //新增家庭地址信息
         GeographyModel geographyModel = detailModel.getHomeAddressInfo();
         detailModel.setHomeAddress("");
@@ -170,7 +197,7 @@ public class PatientController extends BaseController {
         }
 
         //新增人口信息
-        MDemographicInfo info = (MDemographicInfo)convertToModel(detailModel,MDemographicInfo.class);
+        MDemographicInfo info = (MDemographicInfo) convertToModel(detailModel, MDemographicInfo.class);
         info = patientClient.createPatient(objectMapper.writeValueAsString(info));
         if (info == null) {
             return failed("保存失败!");
@@ -192,9 +219,27 @@ public class PatientController extends BaseController {
             @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
             @RequestParam(value = "patient_model_json_data") String patientModelJsonData) throws Exception {
 
-        //TODO:身份证校验
-
         PatientDetailModel detailModel = objectMapper.readValue(patientModelJsonData, PatientDetailModel.class);
+        String errorMsg = null;
+        if (StringUtils.isEmpty(detailModel.getName())) {
+            errorMsg += "姓名不能为空!";
+        }
+        if (StringUtils.isEmpty(detailModel.getIdCardNo())) {
+            errorMsg += "身份证号不能为空!";
+        }
+        if (StringUtils.isEmpty(detailModel.getTelphoneNo())) {
+            errorMsg += "联系方式不能为空!";
+        }
+        if (StringUtils.isEmpty(detailModel.getNativePlace())) {
+            errorMsg += "籍贯不能为空!";
+        }
+        if (StringUtils.isEmpty(detailModel.getNation())) {
+            errorMsg += "籍贯不能为空!";
+        }
+        if (StringUtils.isNotEmpty(errorMsg)) {
+            return failed(errorMsg);
+        }
+
         //新增家庭地址信息
         GeographyModel geographyModel = detailModel.getHomeAddressInfo();
         detailModel.setHomeAddress("");
@@ -219,7 +264,7 @@ public class PatientController extends BaseController {
         }
 
         //修改人口信息
-        MDemographicInfo info = (MDemographicInfo)convertToModel(detailModel,MDemographicInfo.class);
+        MDemographicInfo info = (MDemographicInfo) convertToModel(detailModel, MDemographicInfo.class);
         info = patientClient.updatePatient(objectMapper.writeValueAsString(info));
         if (info == null) {
             return failed("保存失败!");
@@ -254,8 +299,8 @@ public class PatientController extends BaseController {
         dict = conventionalDictClient.getNation(detailModel.getNation());
         detailModel.setNationName(dict == null ? "" : dict.getValue());
 
-        MGeography mGeography =null;
-        if(!StringUtils.isEmpty(demographicInfo.getHomeAddress())) {
+        MGeography mGeography = null;
+        if (!StringUtils.isEmpty(demographicInfo.getHomeAddress())) {
             //家庭地址
             mGeography = addressClient.getAddressById(demographicInfo.getHomeAddress());
             if (mGeography != null) {
@@ -263,7 +308,7 @@ public class PatientController extends BaseController {
                 detailModel.setHomeAddressInfo(convertToModel(mGeography, GeographyModel.class));
             }
         }
-        if(!StringUtils.isEmpty(demographicInfo.getBirthPlace())) {
+        if (!StringUtils.isEmpty(demographicInfo.getBirthPlace())) {
             //户籍地址
             mGeography = addressClient.getAddressById(demographicInfo.getBirthPlace());
             if (mGeography != null) {
@@ -272,7 +317,7 @@ public class PatientController extends BaseController {
             }
         }
         //工作地址
-        if(!StringUtils.isEmpty(demographicInfo.getWorkAddress())) {
+        if (!StringUtils.isEmpty(demographicInfo.getWorkAddress())) {
             mGeography = addressClient.getAddressById(demographicInfo.getWorkAddress());
             if (mGeography != null) {
                 detailModel.setWorkAddressFull(getFullAddress(mGeography));

@@ -43,11 +43,6 @@
 
 > [康赛项目](dev-tutorial/sanofi.html)
 
-内部资源
----------------------
-
-> [重大问题解决方案](solutions/index.html)
-
 FQA
 ---------------------
 

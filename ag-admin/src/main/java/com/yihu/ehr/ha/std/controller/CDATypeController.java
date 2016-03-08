@@ -1,8 +1,8 @@
 package com.yihu.ehr.ha.std.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.agModel.standard.cdaType.CdaTypeDetailModel;
-import com.yihu.ehr.agModel.standard.cdaType.CdaTypeModel;
+import com.yihu.ehr.agModel.standard.cdatype.CdaTypeDetailModel;
+import com.yihu.ehr.agModel.standard.cdatype.CdaTypeModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.std.service.CDATypeClient;
 import com.yihu.ehr.model.standard.MCDAType;
@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Created by yww on 2016/3/1.
  */
-@RequestMapping(ApiVersion.Version1_0 + "/cdaType")
+@RequestMapping(ApiVersion.Version1_0 + "/cdatype")
 @RestController
 public class CDATypeController extends BaseController {
 
@@ -66,13 +66,18 @@ public class CDATypeController extends BaseController {
      */
     @RequestMapping(value = "/cda_types/patient_ids/key", method = RequestMethod.GET)
     @ApiOperation(value = "根据父级类别获取父级类别所在以下所有子集类别（包括当前父级列表）")
-    public Envelop getChildIncludeSelfByParentTypesAndKey(
+    public Envelop getChildIncludeSelfByParentIdsAndKey(
             @ApiParam(name = "patient_ids", value = "父级id")
-            @RequestParam(value = "patient_ids") String[] patientIds,
+            @RequestParam(value = "patient_ids") String patientIds,
             @ApiParam(name = "key", value = "查询条件")
             @RequestParam(value = "key") String key) throws Exception {
         Envelop envelop = new Envelop();
-        List<MCDAType> mCdaTypeList = cdaTypeClient.getChildIncludeSelfByParentTypesAndKey(patientIds, key);
+        List<MCDAType> mCdaTypeList = cdaTypeClient.getChildIncludeSelfByParentIdsAndKey(patientIds, key);
+        if (mCdaTypeList.size() == 0){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("没有匹配条件的cda类别！");
+            return envelop;
+        }
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(changeToCdaTypeModels(mCdaTypeList));
         return envelop;
@@ -87,6 +92,11 @@ public class CDATypeController extends BaseController {
             @RequestParam(value = "name") String name) {
         Envelop envelop = new Envelop();
         List<MCDAType> mCdaTypeList = cdaTypeClient.getCdaTypeByCodeOrName(code, name);
+        if (mCdaTypeList.size() == 0){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("没有匹配条件的cda类别！");
+            return envelop;
+        }
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(changeToCdaTypeModels(mCdaTypeList));
         return envelop;
@@ -115,13 +125,16 @@ public class CDATypeController extends BaseController {
     @ApiOperation(value = "根据ids获取CDAType列表")
     public Envelop getCdaTypeByIds(
             @ApiParam(name = "ids", value = "ids")
-            @PathVariable(value = "ids") String[] ids) {
+            @PathVariable(value = "ids") String ids) {
         Envelop envelop = new Envelop();
         List<MCDAType> mCdaTypeList = cdaTypeClient.getCdaTypeByIds(ids);
-        if (mCdaTypeList != null) {
-            envelop.setSuccessFlg(true);
-            envelop.setDetailModelList(changeToCdaTypeModels(mCdaTypeList));
+        if (mCdaTypeList.size() == 0){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("没有匹配条件的cda类别！");
+            return envelop;
         }
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(changeToCdaTypeModels(mCdaTypeList));
         return envelop;
     }
 
@@ -134,15 +147,22 @@ public class CDATypeController extends BaseController {
         Envelop envelop = new Envelop();
         CdaTypeDetailModel cdaTypeDetailModel = objectMapper.readValue(jsonData, CdaTypeDetailModel.class);
         MCDAType mCdaTypeOld = convertToModel(cdaTypeDetailModel, MCDAType.class);
+        if (cdaTypeClient.isCDATypeExists(mCdaTypeOld.getCode())){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("该cda类别代码已经存在！");
+            return envelop;
+        }
         mCdaTypeOld.setCreateDate(new Date());
         String jsonDataNew = objectMapper.writeValueAsString(mCdaTypeOld);
 
         MCDAType mCdaTypeNew = cdaTypeClient.saveCDAType(jsonDataNew);
-        if (mCdaTypeNew != null) {
-            envelop.setSuccessFlg(true);
-            CdaTypeDetailModel detailModel = convertToModel(mCdaTypeNew, CdaTypeDetailModel.class);
-            envelop.setObj(detailModel);
+        if (mCdaTypeNew == null) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("创建cda类别失败！");
         }
+        envelop.setSuccessFlg(true);
+        CdaTypeDetailModel detailModel = convertToModel(mCdaTypeNew, CdaTypeDetailModel.class);
+        envelop.setObj(detailModel);
         return envelop;
     }
 
@@ -155,15 +175,22 @@ public class CDATypeController extends BaseController {
         Envelop envelop = new Envelop();
         CdaTypeDetailModel cdaTypeDetailModel = objectMapper.readValue(jsonData, CdaTypeDetailModel.class);
         MCDAType mCdaTypeOld = convertToModel(cdaTypeDetailModel, MCDAType.class);
+        if (cdaTypeClient.isCDATypeExists(mCdaTypeOld.getCode())){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("该cda类别代码已经存在！");
+            return envelop;
+        }
         mCdaTypeOld.setUpdateDate(new Date());
         String jsonDataNew = objectMapper.writeValueAsString(mCdaTypeOld);
 
-        MCDAType mCdaTypeNew = cdaTypeClient.saveCDAType(jsonDataNew);
-        if (mCdaTypeNew != null) {
-            envelop.setSuccessFlg(true);
-            CdaTypeDetailModel detailModel = convertToModel(mCdaTypeNew, CdaTypeDetailModel.class);
-            envelop.setObj(detailModel);
+        MCDAType mCdaTypeNew = cdaTypeClient.updateCDAType(jsonDataNew);
+        if (mCdaTypeNew == null) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("更新cda类别失败！");
         }
+        envelop.setSuccessFlg(true);
+        CdaTypeDetailModel detailModel = convertToModel(mCdaTypeNew, CdaTypeDetailModel.class);
+        envelop.setObj(detailModel);
         return envelop;
     }
 
@@ -181,10 +208,10 @@ public class CDATypeController extends BaseController {
      * 先根据当前的类别ID获取全部子类别ID，再进行删除
      */
     @RequestMapping(value = "/cda_types/{ids}", method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除CDA类别，若该类别存在子类别，将一并删除子类别")
+    @ApiOperation(value = "删除CDA类别，若该类别存在子类别，将一并删除子类别,多个id用逗号隔开")
     public boolean deleteCDATypeByPatientIds(
             @ApiParam(name = "ids", value = "ids")
-            @PathVariable(value = "ids") String[] ids) {
+            @PathVariable(value = "ids") String ids) {
         return cdaTypeClient.deleteCDATypeByPatientIds(ids);
     }
 }

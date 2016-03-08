@@ -62,6 +62,18 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
         }
     }
 
+    public User getUserByIdCardNo(String idCardNo) {
+        Map<String,String> map =new HashMap<>();
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        Query query = session.createQuery("from User where idCardNo = :idCardNo");
+        List<User> userList = query.setString("idCardNo", idCardNo).list();
+        if(userList.size()== 0) {
+            return null;
+        }else {
+            return userList.get(0);
+        }
+    }
+
     public String hashPassword(String pwd) {
         return HashUtil.hashStr(pwd);
     }

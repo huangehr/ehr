@@ -60,19 +60,23 @@ public class CDAVersionTests {
             StdVersionModel detailModel = list.get(0);
             String versionNew = detailModel.getVersion();
 
-            //修改版本信息--正常情况不允许修改------------
-            envelop = cdaVersionController.updateVersion(detailModel.getVersion(), "V5.11", "wwcs", 1, detailModel.getBaseVersion());
-            assertTrue("更新失败！", envelop.getObj() != null);
-
-            //发布刚新增的版本-------微服务有添加创建版本文件，并返回文件路径  -----暂时测不同
+//            //修改版本信息--正常情况不允许修改------------
+//            envelop = cdaVersionController.updateVersion(detailModel.getVersion(), "V5.11", "wwcs", 1, detailModel.getBaseVersion());
+//            assertTrue("更新失败！", envelop.getObj() != null);
+//
+//            //发布刚新增的版本-------微服务去生成版本相关的XML文件，文件有生成，测试超时，版本发布状态未更改
 //            boolean rs2 = cdaVersionController.commitVersion(versionNew);
 //            assertTrue("发布版本失败！", rs2);
-
-            //讲刚新建的已被发布的版本，修改为编辑状态--------------
+//
+//            //讲刚新建的已被发布的版本，修改为编辑状态--------------
 //            boolean rs = cdaVersionController.rollbackToStage(versionNew);
 //            assertTrue("版本回滚失败！", rs);
-
-            //测试是否为最新已发布版本-----------ok
+//
+//            //用于测试检验是否是最新已发布版本
+//            boolean rs22 = cdaVersionController.commitVersion(versionNew);
+//            assertTrue("发布版本失败！", rs22);
+//
+//            //测试是否为最新已发布版本-----------ok
 //            boolean rs3 = cdaVersionController.isLatestVersion(versionNew);
 //            assertTrue("不是最新已发布的版本！", rs3);
 
@@ -94,12 +98,6 @@ public class CDAVersionTests {
         String versionName = "0.1";
         boolean rs = cdaVersionController.checkVersionName(versionName);
         assertTrue("版本名称存在", rs);
-    }
-
-    @Test
-    public void testExistInStage() throws Exception {//-----------ok
-        boolean rs = cdaVersionController.existInStage();
-        assertTrue("不存在处于编辑状态的版本：", rs);
     }
 
     @Test

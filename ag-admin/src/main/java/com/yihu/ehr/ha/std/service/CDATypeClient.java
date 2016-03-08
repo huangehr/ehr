@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by Administrator on 2016/2/29.
+ * Created by yww on 2016/3/1.
  */
 @FeignClient("svr-standard")
 @RequestMapping(ApiVersion.Version1_0 + "/std")
@@ -35,9 +35,9 @@ public interface CDATypeClient {
 
     @RequestMapping(value = "/cda_types/patient_ids/key", method = RequestMethod.GET)
     @ApiOperation(value = "根据父级类别获取父级类别所在以下所有子集类别（包括当前父级列表）")
-    List<MCDAType> getChildIncludeSelfByParentTypesAndKey(
+    List<MCDAType> getChildIncludeSelfByParentIdsAndKey(
             @ApiParam(name = "patient_ids", value = "父级id")
-            @RequestParam(value = "patient_ids") String[] patientIds,
+            @RequestParam(value = "patient_ids") String patientIds,
             @ApiParam(name = "key", value = "查询条件")
             @RequestParam(value = "key") String key);
 
@@ -62,7 +62,7 @@ public interface CDATypeClient {
     @ApiOperation(value = "根据ids获取CDAType列表")
     List<MCDAType> getCdaTypeByIds(
             @ApiParam(name = "ids", value = "ids")
-            @PathVariable(value = "ids") String[] ids);
+            @PathVariable(value = "ids") String ids);
 
 
     @RequestMapping(value = "/cda_types", method = RequestMethod.POST)
@@ -90,6 +90,6 @@ public interface CDATypeClient {
     @ApiOperation(value = "删除CDA类别，若该类别存在子类别，将一并删除子类别")
     boolean deleteCDATypeByPatientIds(
             @ApiParam(name = "ids", value = "ids")
-            @PathVariable(value = "ids") String[] ids);
+            @PathVariable(value = "ids") String ids);
 
 }

@@ -6,6 +6,7 @@ import com.yihu.ehr.model.patient.MDemographicInfo;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,7 +25,7 @@ public interface PatientClient {
 
     @RequestMapping(value = "/populations",method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询人")
-    List<MDemographicInfo> searchPatient(
+    ResponseEntity<List<MDemographicInfo>> searchPatient(
             @ApiParam(name = "name", value = "姓名", defaultValue = "")
             @RequestParam(value = "name") String name,
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
@@ -95,6 +96,12 @@ public interface PatientClient {
     @RequestMapping(value = "/populations/password/{id_card_no}",method = RequestMethod.PUT)
     @ApiOperation(value = "初始化密码",notes = "用户忘记密码时重置密码，初始密码为123456")
     boolean resetPass(
+            @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
+            @PathVariable(value = "id_card_no") String idCardNo);
+
+    @RequestMapping(value = "/populations/is_exist/{id_card_no}",method = RequestMethod.GET)
+    @ApiOperation(value = "判断身份证是否存在")
+    boolean isExistIdCardNo(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @PathVariable(value = "id_card_no") String idCardNo);
 }

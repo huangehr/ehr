@@ -145,7 +145,7 @@ public class CDATypeManager{
         String strSql = "from CDAType a where 1=1 ";
         if (strId != null && !strId.equals("")) {
             strId="'"+strId.replaceAll(",","','")+"'";
-            strSql += " and a.id not in ("+strId+")";
+            strSql += " and a.id  in ("+strId+")";
         }
         if (strKey != null && !strKey.equals("")) {
             strSql += " and (a.code like :strkey or a.name like :strkey)";

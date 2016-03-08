@@ -1,0 +1,77 @@
+##数据库配置
+data-source:
+  driver-class-name: com.mysql.jdbc.Driver
+  initialize-size: 1
+  max-total: 20
+  max-idle: 10
+  min-idle: 1
+  validation-query: SELECT 1
+  test-on-borrow: true
+  remove-abandoned-timeout: 55
+  url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+  user-name: ha
+  password: ha
+
+multipart:
+  max-file-size: 100MB
+  max-request-size: 100MB
+
+
+hibernate:
+  dialect: org.hibernate.dialect.MySQL5Dialect
+  show-sql: true
+  format-sql: true
+
+fast-dfs:
+  pool:
+    init-size: 5
+    max-size: 20
+    wait-time: 500
+  connect-timeout: 2
+  network-timeout: 30
+  tracker-server: 172.19.103.54:22122
+  fast-dfs:
+    charset: ISO8859-1
+  http:
+    tracker-http-port: 80
+    anti-steal-token: no
+    secret-key: FastDFS1234567890
+##boot启动端口
+server:
+  port: 10130
+
+##配置描述 不是必要的
+info:
+  app:
+    name: simplifiedESB
+    description: EHR platform simplifiedESB service.
+    version: 1.0.0
+
+##配置de版本信息
+---
+spring:
+  profiles: dev
+#keystore:
+#  file: C:/Windows/tomcat.keystore
+#  password: 123456
+eureka:
+  instance:
+    ip-address: localhost
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@localhost:8761}/eureka/
+
+---
+spring:
+  profiles: test
+#keystore:
+#  file: /tomcat/tomcat.keystore
+#  password: 123456
+eureka:
+  instance:
+    ip-address: 172.19.103.73
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@172.19.103.73:8761}/eureka/

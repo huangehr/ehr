@@ -6,6 +6,7 @@ import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.util.Envelop;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
@@ -22,6 +23,8 @@ import java.util.*;
 public class BaseController extends AbstractController {
 
     private static String ERR_SYSREM_DES="系统错误,请联系管理员!";
+
+    private static String X_Total_Count = "X-Total-Count";
 
     @Autowired
     ObjectMapper objectMapper;
@@ -160,5 +163,10 @@ public class BaseController extends AbstractController {
 
     protected Envelop failedSystem(){
         return failed(ERR_SYSREM_DES);
+    }
+
+    protected int getTotalCount(ResponseEntity responseEntity)
+    {
+        return Integer.parseInt(responseEntity.getHeaders().get(X_Total_Count).get(0));
     }
 }
