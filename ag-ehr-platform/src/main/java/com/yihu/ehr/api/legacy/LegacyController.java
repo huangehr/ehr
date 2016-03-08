@@ -299,7 +299,7 @@ public class LegacyController {
 
             String demoInfoJsonData = objectMaper.writeValueAsString(demoInfo);
             patientClient.createPatient(demoInfoJsonData);
-            return true;
+            return "success";
             //return succeedWithMessage("Patient register success.");
         }
     }

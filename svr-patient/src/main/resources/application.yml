@@ -1,22 +1,3 @@
-
----
-spring:
-  profiles: dev
-
-data-source:
-  url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
-  user-name: ha
-  password: ha
-
-hibernate:
-  show-sql: true
-  format-sql: true
-
-
-fast-dfs:
-  tracker-server: 172.19.103.54:22122
-
-
 server:
   port: 10100
 
@@ -30,9 +11,14 @@ info:
     description: EHR platform json patient service.
     version: 1.0.0
 
+
 ---
 spring:
   profiles: dev
+
+fast-dfs:
+  tracker-server: 172.19.103.54:22122
+
 eureka:
   instance:
     ip-address: localhost
@@ -44,6 +30,10 @@ eureka:
 ---
 spring:
   profiles: test
+
+fast-dfs:
+  tracker-server: 172.19.103.54:22122
+
 eureka:
   instance:
     ip-address: 172.19.103.73
