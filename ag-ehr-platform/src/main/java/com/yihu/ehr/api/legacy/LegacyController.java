@@ -159,7 +159,7 @@ public class LegacyController {
     @ApiOperation(value = "注册病人",  notes = "根据病人的身份证号及其他病人信息在健康档案平台中注册病人")
     @RequestMapping(value = "/patient/registration", method = RequestMethod.POST)
     public Object patientRegister(
-            @ApiParam(name = "user_info", value = "用户名")
+            @ApiParam(name = "user_info", value = "病人实体json字符串")
             @RequestParam(value = "user_info", required = true) String userInfo) throws IOException, ParseException {
 
         Map<String, String> telMap = new HashMap<>();
@@ -362,7 +362,7 @@ public class LegacyController {
     public Object getAppToken(
             @ApiParam(required = true, name = "login_code", value = "用户名")
             @RequestParam(value = "login_code", required = true) String loginCode,
-            @ApiParam(required = true, name = "rsa_pw", value = "用户密码，以RSA加密")
+            @ApiParam(required = true, name = "rsa_pw", value = "以RSA加密")
             @RequestParam(value = "rsa_pw", required = true) String rsaPWD,
             @ApiParam(required = true, name = "app_id", value = "APP ID")
             @RequestParam(value = "app_id", required = true) String appId,
