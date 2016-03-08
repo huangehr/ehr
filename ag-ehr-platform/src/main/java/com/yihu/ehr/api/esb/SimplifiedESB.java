@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
  * @created 2016.02.29 10:47
  */
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0 + "/simplified-esb")
+@RequestMapping(ApiVersion.Version1_0 + "/simplified-esb")
 @Api(protocols = "https", value = "simplified-esb", description = "简易ESB服务临时接口")
 public class SimplifiedESB {
 
@@ -51,12 +51,12 @@ public class SimplifiedESB {
                                                @ApiParam("ip") @RequestParam(value = "ip", required = true)
                                                String ip,
                                                @ApiParam("file") @RequestParam(value = "file", required = true)
-                                               MultipartFile file) {
-        return new ResponseEntity<>(simplifiedESBClient.uploadLog(orgCode, ip, file) + "", HttpStatus.OK);
+                                               MultipartFile file) throws Exception {
+        return new ResponseEntity<>(simplifiedESBClient.uploadLog(orgCode, ip, new String(file.getBytes(), "UTF-8")) + "", HttpStatus.OK);
     }
 
     @ApiOperation("查询版本是否需要更新")
-    @RequestMapping(value = "/getUpdateFlag", method = RequestMethod.POST)
+    @RequestMapping(value = "/getUpdateFlag", method = RequestMethod.GET)
     public ResponseEntity getUpdateFlag(@ApiParam("versionCode") @RequestParam(value = "versionCode", required = true)
                                         String versionCode,
                                         @ApiParam("systemCode") @RequestParam(value = "systemCode", required = true)

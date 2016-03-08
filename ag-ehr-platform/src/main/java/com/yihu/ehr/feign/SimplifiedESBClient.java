@@ -1,12 +1,10 @@
 package com.yihu.ehr.feign;
 
-import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
@@ -15,13 +13,12 @@ import javax.servlet.http.HttpServletResponse;
  * Created by chenweida on 2016/3/7.
  */
 @FeignClient(MicroServices.Simplifiedesb)
-@RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface SimplifiedESBClient {
     @RequestMapping(value = "/uploadLog", method = RequestMethod.POST)
     public boolean uploadLog(@RequestParam(value = "orgCode", required = true) String orgCode,
                              @RequestParam(value = "ip", required = true) String ip,
-                             @RequestParam(value = "file", required = true) MultipartFile file);
+                             @RequestParam(value = "file", required = true) String file);
 
 
     @RequestMapping(value = "/getUpdateFlag", method = RequestMethod.POST)
