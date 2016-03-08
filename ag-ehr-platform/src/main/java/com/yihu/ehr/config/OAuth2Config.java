@@ -3,6 +3,8 @@ package com.yihu.ehr.config;
 import com.yihu.ehr.service.oauth2.*;
 import com.yihu.ehr.web.EhrAuthorizationEndpoint;
 import io.swagger.annotations.Authorization;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,10 +15,13 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.*
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.OAuth2RequestFactory;
+import org.springframework.security.oauth2.provider.TokenRequest;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint;
 import org.springframework.security.oauth2.provider.endpoint.FrameworkEndpointHandlerMapping;
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
+
+import java.util.Arrays;
 
 /**
  * @author Sand
@@ -26,8 +31,6 @@ import org.springframework.security.oauth2.provider.request.DefaultOAuth2Request
 @Configuration
 public class OAuth2Config{
     private static final String RESOURCE_ID = "ehr";
-
-    EhrAuthorizationCodeService authorizationCodeService = new EhrAuthorizationCodeService();
 
     @Configuration
     @EnableAuthorizationServer
@@ -47,15 +50,22 @@ public class OAuth2Config{
 
         @Override
         public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+            EhrTokenGranter tokenGranter = new EhrTokenGranter(tokenServices,
+                    authorizationCodeService,
+                    clientDetailsService,
+                    new DefaultOAuth2RequestFactory(clientDetailsService));
+
+            String scopes[] = "user,user.demographic_id,user.health_profiles,organization".split(",");
+            /*tokenGranter.grant("authorization_code", new TokenRequest(null, "client-with-registered-redirect",
+                    Arrays.asList(scopes),
+                    "authorization_code"));*/
+
             endpoints.authenticationManager(authenticationManager);
             endpoints.authorizationCodeServices(authorizationCodeService);
             endpoints.tokenServices(tokenServices);
             endpoints.setClientDetailsService(clientDetailsService);
             endpoints.exceptionTranslator(new EhrOAuth2ExceptionTranslator());
-            endpoints.tokenGranter(new EhrTokenGranter(tokenServices,
-                    authorizationCodeService,
-                    clientDetailsService,
-                    new DefaultOAuth2RequestFactory(clientDetailsService)));
+            endpoints.tokenGranter(tokenGranter);
         }
 
         @Override
@@ -67,8 +77,6 @@ public class OAuth2Config{
     @Configuration
     @EnableResourceServer
     public static class ResourceServer extends ResourceServerConfigurerAdapter {
-        @Autowired
-        private EhrAuthorizationCodeService authorizationCodeService;
 
         @Autowired
         private EhrTokenServices tokenServices;
@@ -103,7 +111,9 @@ public class OAuth2Config{
 
     @Bean
     EhrTokenStoreService tokenStoreService(){
-        return new EhrTokenStoreService();
+        EhrTokenStoreService tokenStoreService = new EhrTokenStoreService();
+
+        return tokenStoreService;
     }
 
     @Bean
