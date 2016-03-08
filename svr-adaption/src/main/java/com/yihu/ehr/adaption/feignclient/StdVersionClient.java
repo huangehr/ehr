@@ -22,11 +22,11 @@ import springfox.documentation.annotations.ApiIgnore;
  * @created 2016.3.2
  */
 @ApiIgnore
-@FeignClient(MicroServices.StandardMgr + "/std")
-@RequestMapping(ApiVersion.Version1_0)
+@FeignClient(MicroServices.StandardMgr )
+@RequestMapping(ApiVersion.Version1_0 + "/std")
 public interface StdVersionClient {
 
-    @RequestMapping(value = "/cdaVersion/{version}", method = RequestMethod.GET)
+    @RequestMapping(value = "/version/{version}", method = RequestMethod.GET)
     @ApiOperation(value = "获取版本信息")
     public MCDAVersion getVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")

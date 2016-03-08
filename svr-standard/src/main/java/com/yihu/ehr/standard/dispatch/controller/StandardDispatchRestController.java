@@ -32,17 +32,19 @@ public class StandardDispatchRestController  extends ExtendController{
 
     @Autowired
     private DispatchService dispatchService;
+    @Autowired
+    FastDFSUtil fastDFSUtil;
 
     @RequestMapping(value = "/schema", method = RequestMethod.GET)
-    @ApiOperation(value = "获取适配方案摘要", produces = "application/json",
+    @ApiOperation(value = "获取适配方案摘要",  response = RestEcho.class, produces = "application/json",
             notes = "获取两个指定版本的标准化数据差异与适配方案，文件以Base64编码，压缩格式为zip")
-    public RestEcho getSchemeInfo(
+    public Object getSchemeInfo(
             @ApiParam(required = true, name = "userPrivateKey", value = "用户私钥")
             @RequestParam(value = "userPrivateKey", required = true) String userPrivateKey,
             @ApiParam(required = true, name = "update_version", value = "要更新的目标版本")
             @RequestParam(value = "update_version", required = true) String updateVersion,
             @ApiParam(required = true, name = "current_version", value = "用户当前使用的版本")
-            @RequestParam(value = "current_version", required = true) String currentVersion) {
+            @RequestParam(value = "current_version", required = false) String currentVersion) {
 
         Map<String, Object> schema = null;
         String password = null;
@@ -69,7 +71,7 @@ public class StandardDispatchRestController  extends ExtendController{
                 return new RestEcho().failed(ErrorCode.GenerateArchiveFailed," 标准化数据生成失败");
 
             password = (String) schema.get("password");
-            byte[] bytes = new FastDFSUtil().download(group, remoteFile);
+            byte[] bytes = fastDFSUtil.download(group, remoteFile);
             fileBytes = Base64.encode(bytes);
         }catch (Exception e) {
             return new RestEcho().failed(ErrorCode.DownArchiveFileFailed,"下载标准适配版本失败");
@@ -88,6 +90,17 @@ public class StandardDispatchRestController  extends ExtendController{
         } catch (Exception ex) {
             return new RestEcho().failed(ErrorCode.GenerateFileCryptographFailed,"生成适配版本文件密码失败");
         }
+    }
+
+
+    @RequestMapping(value = "/schema", method = RequestMethod.POST)
+    @ApiOperation(value = "生成适配方案摘要", produces = "application/json",
+            notes = "")
+    public Map createSchemeInfo(
+            @ApiParam(required = true, name = "version", value = "要生成的目标版本")
+            @RequestParam(value = "version", required = true) String version) throws Exception{
+
+        return dispatchService.sendStandard(version);
     }
 }
 

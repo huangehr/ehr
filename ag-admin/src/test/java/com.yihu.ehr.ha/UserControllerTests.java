@@ -116,4 +116,20 @@ public class UserControllerTests {
         envelop = userController.deleteUser(userModel.getId());
         assertTrue("删除失败", envelop.isSuccessFlg());
     }
+
+    @Test
+    public void bTestSearch(){
+
+        applicationContext = new SpringApplicationBuilder()
+                .web(false).sources(AgAdminApplication.class).run();
+
+        String fields = "";
+        String filter = "";
+        int page = 1;
+        int rows = 15;
+
+        Envelop envelop = userController.searchUsers(fields,filter,"",rows,page);
+        assertTrue("列表获取失败", envelop.isSuccessFlg() && envelop.getDetailModelList()!=null);
+
+    }
 }
