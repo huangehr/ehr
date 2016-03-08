@@ -19,7 +19,7 @@ import java.util.Map;
  */
 @RequestMapping("/adapterDict")
 @Controller
-public class AdapterDictController extends BaseRestController {
+public class AdapterDictController {
     private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
     private static   String username = ResourceProperties.getProperty("username");
     private static   String password = ResourceProperties.getProperty("password");
