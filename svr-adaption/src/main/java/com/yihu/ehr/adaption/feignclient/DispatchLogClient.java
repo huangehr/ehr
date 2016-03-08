@@ -20,15 +20,32 @@ import springfox.documentation.annotations.ApiIgnore;
  * @created 2016.3.2
  */
 @ApiIgnore
-@FeignClient(MicroServices.StandardMgr + "/std/dispatch")
-@RequestMapping(ApiVersion.Version1_0)
+@FeignClient(MicroServices.StandardMgr)
+@RequestMapping(ApiVersion.Version1_0 + "/std/dispatch")
 public interface DispatchLogClient {
 
-    @RequestMapping(value = "/logs", method = RequestMethod.GET)
+    @RequestMapping(value = "/log", method = RequestMethod.POST)
+    @ApiOperation(value = "新增日志信息")
+    public MDispatchLog saveLog(
+            @ApiParam(name = "model", value = "数据模型")
+            @RequestParam(value = "model") String model) throws Exception;
+
+    @RequestMapping(value = "/log", method = RequestMethod.GET)
     @ApiOperation(value = "获取日志信息")
     public MDispatchLog getLog(
             @ApiParam(required = true, name = "versionCode", value = "版本号")
             @RequestParam(value = "versionCode", required = true) String versionCode,
             @ApiParam(required = true, name = "orgCode", value = "机构代码")
             @RequestParam(value = "orgCode", required = true) String orgCode) throws Exception;
+
+
+    @RequestMapping(value = "/log", method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除日志信息")
+    public boolean deleteLog(
+            @ApiParam(required = true, name = "versionCode", value = "版本号")
+            @RequestParam(value = "versionCode", required = true) String versionCode,
+            @ApiParam(required = true, name = "orgCode", value = "机构代码")
+            @RequestParam(value = "orgCode", required = true) String orgCode) throws Exception;
+
+
 }

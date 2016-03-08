@@ -66,13 +66,13 @@ public class CDATypeController extends BaseController {
      */
     @RequestMapping(value = "/cda_types/patient_ids/key", method = RequestMethod.GET)
     @ApiOperation(value = "根据父级类别获取父级类别所在以下所有子集类别（包括当前父级列表）")
-    public Envelop getChildIncludeSelfByParentTypesAndKey(
+    public Envelop getChildIncludeSelfByParentIdsAndKey(
             @ApiParam(name = "patient_ids", value = "父级id")
             @RequestParam(value = "patient_ids") String patientIds,
             @ApiParam(name = "key", value = "查询条件")
             @RequestParam(value = "key") String key) throws Exception {
         Envelop envelop = new Envelop();
-        List<MCDAType> mCdaTypeList = cdaTypeClient.getChildIncludeSelfByParentTypesAndKey(patientIds, key);
+        List<MCDAType> mCdaTypeList = cdaTypeClient.getChildIncludeSelfByParentIdsAndKey(patientIds, key);
         if (mCdaTypeList.size() == 0){
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("没有匹配条件的cda类别！");
