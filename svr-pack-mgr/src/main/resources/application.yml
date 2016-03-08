@@ -11,29 +11,50 @@ info:
     description: EHR platform json package service.
     version: 1.1.0
 
+fast-dfs:
+  pool:
+    init-size: 5
+    max-size: 20
+    wait-time: 500
+
+  connect-timeout: 2
+  network-timeout: 30
+  fast-dfs:
+    charset: ISO8859-1
+  tracker-server: l27.0.0.1
+
+  http:
+    tracker-http-port: 80
+    anti-steal-token: no
+    secret-key: FastDFS1234567890
+
 ---
 spring:
   profiles: dev
-
 eureka:
   instance:
-    hostname: localhost
+    ip-address: localhost
   client:
     registerWithEureka: true
     fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
+    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@localhost:8761}/eureka/
+
+fast-dfs:
+  tracker-server: 172.19.103.54:22122
 
 ---
 spring:
   profiles: test
-
 eureka:
   instance:
-    hostname: localhost
+    ip-address: 172.19.103.73
   client:
     registerWithEureka: true
     fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
+    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@172.19.103.73:8761}/eureka/
+
+fast-dfs:
+  tracker-server: 172.19.103.54:22122
 
 ---
 spring:
