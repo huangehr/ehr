@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.spring.web.json.Json;
 
-import javax.servlet.http.HttpServletResponse;
-
 /**
  * @author Sand
  * @version 1.0
@@ -67,16 +65,14 @@ public class SimplifiedESB {
         return new ResponseEntity<>(simplifiedESBClient.getUpdateFlag(versionCode, systemCode, orgCode), HttpStatus.OK);
     }
 
-
+    ///api/v1.0/simplified-esb/downUpdateWar
     @ApiOperation("下载项目")
-    @RequestMapping(value = "/downUpdateWar", method = RequestMethod.POST)
+    @RequestMapping(value = "/downUpdateWar", method = RequestMethod.GET)
     public ResponseEntity downUpdateWar(@ApiParam("systemCode") @RequestParam(value = "systemCode", required = true)
                                         String systemCode,
                                         @ApiParam("orgCode") @RequestParam(value = "orgCode", required = true)
-                                        String orgCode
-            , HttpServletResponse response) {
-
-        return new ResponseEntity<>(simplifiedESBClient.downUpdateWar(systemCode, orgCode, response), HttpStatus.OK);
+                                        String orgCode) {
+        return new ResponseEntity<>(simplifiedESBClient.downUpdateWar(systemCode, orgCode), HttpStatus.OK);
     }
 
     @ApiOperation("上传客户端升级信息")
