@@ -41,44 +41,29 @@ public class UsersEndPoint extends BaseController {
     @ApiOperation("获取用户列表")
     @RequestMapping(value = "/users", method = RequestMethod.GET)
     public List<UserModel> getUsers() {
-        List<UserModel>  userModels = new ArrayList<>();
+        List<UserModel> userModels = new ArrayList<>();
         List<MUser> mUsers = userClient.getUsers();
-        for (MUser mUser : mUsers){
-            UserModel userModel = convertToModel(mUser,UserModel.class);
+        for (MUser mUser : mUsers) {
+            UserModel userModel = convertToModel(mUser, UserModel.class);
             userModel.setOrganization(organizationClient.getOrg(mUser.getOrganization()));
             userModels.add(userModel);
         }
+
         return userModels;
     }
 
-
-    @ApiOperation(value = "验证用户名密码获取用户信息（保护用户所属机构信息）")
-    @RequestMapping(value = "/organizations/user_name/{user_name}/password/{password}", method = RequestMethod.GET)
-    public UserModel getByUserNameAndPassword (
-            @ApiParam(name = "user_name", value = "账户", defaultValue = "")
-            @PathVariable(value = "user_name") String userName,
-            @ApiParam(name = "password", value = "密码", defaultValue = "")
-            @PathVariable(value = "password") String password) throws Exception{
-        MUser mUser = userClient.getUserByNameAndPassword(userName,password);
-        UserModel userModel = convertToModel(mUser,UserModel.class);
-        //包括机构信息
-        userModel.setOrganization(organizationClient.getOrg(mUser.getOrganization()));
-        return userModel;
-    }
-
     @ApiOperation("获取用户")
-    @RequestMapping(value = "/users/login/{user_name}", method = RequestMethod.GET)
+    @RequestMapping(value = "/users/{user_name}", method = RequestMethod.GET)
     public UserModel getUser(
-                @ApiParam("user_name")
-                @PathVariable("user_name") String userName) {
-        MUser mUser = userClient.getUserLoginCode(userName);
-        UserModel userModel = convertToModel(mUser,UserModel.class);
+            @ApiParam("user_name")
+            @PathVariable("user_name") String userName) {
+        MUser mUser = userClient.getUserByUserName(userName);
+        UserModel userModel = convertToModel(mUser, UserModel.class);
+
         //包括机构信息
         userModel.setOrganization(organizationClient.getOrg(mUser.getOrganization()));
         return userModel;
     }
-
-
 
     @ApiOperation(value = "获取你自己的信息", notes = "/users/{user_name}的快捷方式")
     @RequestMapping(value = "/user", method = RequestMethod.GET)

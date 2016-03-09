@@ -1,26 +1,19 @@
 package com.yihu.ehr.api.authorization;
 
-import com.sun.javaws.exceptions.InvalidArgumentException;
 import com.yihu.ehr.api.model.MToken;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.service.oauth2.EhrTokenStoreService;
 import com.yihu.ehr.service.oauth2.EhrUserDetailsService;
 import com.yihu.ehr.util.encode.HashUtil;
-import com.yihu.ehr.util.encrypt.MD5;
 import com.yihu.ehr.utils.BasicAuthorizationExtractor;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
@@ -30,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.InvalidParameterException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
@@ -43,7 +35,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/authorizations")
-@Api(protocols = "https", value = "authorizations", description = "认证与授权服务")
+@Api(protocols = "https", value = "authorizations", description = "认证与授权服务。注意此API使用Basic认证。")
 public class AuthorizationsEndPoint {
 
     @Autowired
@@ -117,30 +109,32 @@ public class AuthorizationsEndPoint {
     }
 
     // 临时固化一个Token
-    private Map<String,String> userTokens = new HashMap<>();
+    private Map<String, String> userTokens = new HashMap<>();
 
     @ApiOperation(value = "为指定用户创建授权，若存在返回已有授权", notes = "提供用户名/密码作为Basic验证")
     @RequestMapping(value = "/users/{user_name}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.PUT)
-    public MToken createUserAuthorization(@ApiParam("user_name")
-                                                          @PathVariable("user_name")
-                                                          String userName,
-                                                          @ApiParam(value = "info")
-                                                          @RequestParam(value = "info", required = false) String info,
-                                                          HttpServletRequest request) throws NoSuchAlgorithmException {
+    public MToken createUserAuthorization(@ApiParam(name = "user_name", value = "与Basic认证用户名一致")
+                                          @PathVariable("user_name")
+                                          String userName,
+                                          @ApiParam(value = "info")
+                                          @RequestParam(value = "info", required = false) String info,
+                                          HttpServletRequest request) throws NoSuchAlgorithmException {
 
         Pair<String, String> basic = BasicAuthorizationExtractor.extract(request.getHeader("Authorization"));
+        if (!basic.getKey().equals(userName)) throw new InvalidParameterException("用户名不一致");
+
         UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
-        if (userDetails == null || !HashUtil.hashStr(basic.getValue()).equals(userDetails.getPassword())){
+        if (userDetails == null || !HashUtil.hashStr(basic.getValue()).equals(userDetails.getPassword())) {
             throw new InvalidParameterException("用户名或密码错误");
         }
 
         return createTempToken(userDetails);
     }
 
-    public MToken createTempToken(UserDetails userDetails){
+    public MToken createTempToken(UserDetails userDetails) {
 
         String token = userTokens.get(userDetails.getUsername());
-        if (token == null){
+        if (token == null) {
             token = UUID.randomUUID().toString();
             userTokens.put(userDetails.getUsername(), token);
         }
