@@ -42,6 +42,10 @@ fast-dfs:
     anti-steal-token: no
     secret-key: FastDFS1234567890
 
+ehr:
+  common:
+    invalid:
+      parameter: 参数解析错误！
 ---
 spring:
   profiles: dev

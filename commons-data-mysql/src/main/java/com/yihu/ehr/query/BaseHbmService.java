@@ -1,30 +1,14 @@
 package com.yihu.ehr.query;
 
 import com.yihu.ehr.config.StdSessionFactoryBean;
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.hibernate.*;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.engine.spi.SessionDelegatorBaseImpl;
-import org.hibernate.event.spi.EventSource;
-import org.hibernate.internal.CriteriaImpl;
-import org.hibernate.internal.SessionImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaQuery;
 import java.io.Serializable;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -67,7 +51,7 @@ public class BaseHbmService<T> {
     }
 
     public List findAll(Class entityClass){
-
+        currentSession().setFlushMode(FlushMode.MANUAL);
         return currentSession().createCriteria(entityClass).list();
     }
 
@@ -235,6 +219,8 @@ public class BaseHbmService<T> {
     }
 
     protected <T> URLHqlQueryParser createHqlQueryParser(Class entity, String fields, String filters, String orders) {
+
+        currentSession().setFlushMode(FlushMode.MANUAL);
         URLHqlQueryParser queryParser = new URLHqlQueryParser<T>(fields, filters, orders)
                 .setSession(currentSession())
                 .setEntityClass(entity);
@@ -248,11 +234,8 @@ public class BaseHbmService<T> {
     }
 
     protected <T> URLHqlQueryParser createHqlQueryParser(Class entity, String filters) {
-        URLHqlQueryParser queryParser = new URLHqlQueryParser<T>(filters)
-                .setSession(currentSession())
-                .setEntityClass(entity);
 
-        return queryParser;
+        return createHqlQueryParser(entity, "", filters, "");
     }
 
 
