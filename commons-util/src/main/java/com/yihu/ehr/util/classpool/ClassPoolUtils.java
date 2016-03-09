@@ -82,11 +82,12 @@ public class ClassPoolUtils {
     }
 
     public static String classNameTofilePath(String clzName) {
+        String clzPath = System.getProperty("user.home") + "/ehr/std/";
         String path = ClassPoolUtils.class.getClassLoader().getResource("").getPath();
         if(path.indexOf("test-classes")!=-1){
             path = path.replace("test-classes", "classes");
         }
-        return path
+        return clzPath
                 + clzName.replace(".", "/") + ".class";
     }
 }

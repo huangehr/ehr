@@ -3,7 +3,7 @@ package com.yihu.ehr.api.esb.model;// default package
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.util.Date;
 
 
 /**
@@ -22,7 +22,7 @@ public class HosEsbMiniRelease implements java.io.Serializable {
     private String versionName;
     private Integer versionCode;
     private String file;
-    private Timestamp releaseTime;
+    private Date releaseTime;
     private String orgCode;
 
 
@@ -44,7 +44,7 @@ public class HosEsbMiniRelease implements java.io.Serializable {
     /**
      * full constructor
      */
-    public HosEsbMiniRelease(String id, String systemCode, String versionName, Integer versionCode, String file, Timestamp releaseTime) {
+    public HosEsbMiniRelease(String id, String systemCode, String versionName, Integer versionCode, String file, Date releaseTime) {
         this.id = id;
         this.systemCode = systemCode;
         this.versionName = versionName;
@@ -111,11 +111,11 @@ public class HosEsbMiniRelease implements java.io.Serializable {
 
     @Column(name = "release_time", length = 0)
 
-    public Timestamp getReleaseTime() {
+    public Date getReleaseTime() {
         return this.releaseTime;
     }
 
-    public void setReleaseTime(Timestamp releaseTime) {
+    public void setReleaseTime(Date releaseTime) {
         this.releaseTime = releaseTime;
     }
 

@@ -7,7 +7,6 @@ import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.ResourceProperties;
-import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.log.LogService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,7 +22,7 @@ import java.util.Map;
 @RequestMapping("/cda")
 @Controller(RestAPI.StandardCDAManagerController)
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
-public class CdaController extends BaseRestController {
+public class CdaController {
     private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
     private static   String username = ResourceProperties.getProperty("username");
     private static   String password = ResourceProperties.getProperty("password");

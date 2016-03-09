@@ -18,7 +18,7 @@ import springfox.documentation.spring.web.json.Json;
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/simplified-esb")
 @Api(protocols = "https", value = "simplified-esb", description = "简易ESB服务临时接口")
-public class SimplifiedEsbEndPoint {
+public class SimplifiedESB {
     @ApiOperation("获取版本列表")
     @RequestMapping(value = "/applications", method = RequestMethod.GET)
     public ResponseEntity<Json> getApplications() {

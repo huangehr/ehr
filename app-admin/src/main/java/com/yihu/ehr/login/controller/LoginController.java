@@ -3,7 +3,6 @@ package com.yihu.ehr.login.controller;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.ResourceProperties;
-import com.yihu.ehr.util.controller.BaseRestController;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,7 +24,7 @@ import java.util.*;
 @Controller
 @RequestMapping("/login")
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
-public class LoginController extends BaseRestController {
+public class LoginController {
     private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
     private static   String username = ResourceProperties.getProperty("username");
     private static   String password = ResourceProperties.getProperty("password");

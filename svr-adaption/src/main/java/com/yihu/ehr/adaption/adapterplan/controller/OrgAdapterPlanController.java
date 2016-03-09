@@ -1,14 +1,20 @@
 package com.yihu.ehr.adaption.adapterplan.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adaption.adapterplan.service.AdapterCustomize;
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlan;
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanService;
 import com.yihu.ehr.adaption.commons.ExtendController;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSet;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSetService;
+import com.yihu.ehr.adaption.dispatch.service.AdapterInfoSendService;
 import com.yihu.ehr.adaption.feignclient.DataSetClient;
+import com.yihu.ehr.adaption.feignclient.DispatchLogClient;
+import com.yihu.ehr.adaption.log.LogService;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.adaption.MAdapterPlan;
+import com.yihu.ehr.model.standard.MDispatchLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -36,8 +42,12 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
     private AdapterDataSetService adapterDataSetService;
     @Autowired
     private DataSetClient dataSetClient;
-
-
+    @Autowired
+    AdapterInfoSendService adapterInfoSendService;
+    @Autowired
+    ObjectMapper objectMapper;
+    @Autowired
+    DispatchLogClient dispatchLogClient;
     @RequestMapping(value = "/plans", method = RequestMethod.GET)
     @ApiOperation(value = "适配方案搜索")
     public Collection<MAdapterPlan> searchAdapterPlan(
@@ -166,6 +176,35 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
             return true;
         } catch (IOException ex) {
             throw errParm();
+        }
+    }
+
+    /**
+     * 适配版本发布
+     * 1.生成适配版本文件并记录文件位置；2.修改适配方案状态
+     */
+    @RequestMapping(value = "/plan/{planId}/dispatch", method = RequestMethod.POST)
+    @ApiOperation(value = "适配版本发布")
+    public boolean adapterDispatch(
+            @ApiParam(name = "planId", value = "方案编号", defaultValue = "")
+            @PathVariable("planId") Long planId) throws Exception{
+
+        try {
+            OrgAdapterPlan orgAdapterPlan = orgAdapterPlanService.retrieve(planId);
+            String versionCode = orgAdapterPlan.getVersion();
+            String orgCode = orgAdapterPlan.getOrg();
+
+            Map<String, Object> resultMap = adapterInfoSendService.createStandardAndMappingInfo(versionCode, orgCode);
+            if (resultMap == null) {
+                return false;
+            }
+
+            orgAdapterPlan.setStatus(1);
+            orgAdapterPlanService.save(orgAdapterPlan);
+            return true;
+        } catch (Exception ex) {
+            LogService.getLogger(OrgAdapterPlanController.class).error(ex.getMessage());
+            throw ex;
         }
     }
 
