@@ -15,7 +15,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Date;
 
 /**
@@ -78,7 +81,7 @@ public class SimplifiedESBController {
             HosEsbMiniRelease h = simplifiedESBService.getUpdateFlag(versionCode, systemCode, orgCode);
             if (h != null) {
                 ObjectMapper om = new ObjectMapper();
-                return om.writeValueAsString(om);
+                return om.writeValueAsString(h);
             } else {
                 return "";
             }
@@ -95,7 +98,7 @@ public class SimplifiedESBController {
      * @param orgCode
      * @param response
      */
-    @RequestMapping(value = "/downUpdateWar", method = RequestMethod.POST)
+    @RequestMapping(value = "/downUpdateWar", method = RequestMethod.GET)
     public String downUpdateWar(
             @RequestParam(value = "versionCode", required = true) String systemCode,
             @RequestParam(value = "versionCode", required = true) String orgCode,
@@ -104,6 +107,15 @@ public class SimplifiedESBController {
             // path是指欲下载的文件的路径。
             HosEsbMiniRelease he = simplifiedESBService.getSimplifiedESBBySystemCodes(systemCode, orgCode);
             File file = new File(he.getFile());
+            InputStream i = new FileInputStream(file);
+            if (file.exists()) {
+                long l = file.length();
+                byte[] by = new byte[(int) l];
+                i.read(by);
+                String s = new String(by, "UTF-8");
+                return s;
+            }
+            /*
             // 取得文件名。
             String filename = file.getName();
             // 取得文件的后缀名。
@@ -123,7 +135,7 @@ public class SimplifiedESBController {
             response.setContentType("application/octet-stream");
             toClient.write(buffer);
             toClient.flush();
-            toClient.close();
+            toClient.close();*/
         } catch (Exception e) {
             e.printStackTrace();
         }
