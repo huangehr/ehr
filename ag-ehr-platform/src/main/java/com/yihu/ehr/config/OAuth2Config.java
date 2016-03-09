@@ -38,72 +38,72 @@ import java.util.UUID;
 public class OAuth2Config {
     private static final String RESOURCE_ID = "ehr";
 
-    @Configuration
-    @EnableAuthorizationServer
-    public static class OAuth2ServerConfig extends AuthorizationServerConfigurerAdapter {
-
-        @Autowired
-        private AuthenticationManager authenticationManager;
-
-        @Autowired
-        private EhrAuthorizationCodeService authorizationCodeService;
-
-        @Autowired
-        private EhrTokenServices tokenServices;
-
-        @Autowired
-        EhrClientDetailsService clientDetailsService;
-
-        @Override
-        public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-            EhrTokenGranter tokenGranter = new EhrTokenGranter(tokenServices,
-                    authorizationCodeService,
-                    clientDetailsService,
-                    new DefaultOAuth2RequestFactory(clientDetailsService));
-
-            endpoints.authenticationManager(authenticationManager);
-            endpoints.authorizationCodeServices(authorizationCodeService);
-            endpoints.tokenServices(tokenServices);
-            endpoints.setClientDetailsService(clientDetailsService);
-            endpoints.exceptionTranslator(new EhrOAuth2ExceptionTranslator());
-            endpoints.tokenGranter(tokenGranter);
-        }
-
-        @Override
-        public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-            clients.withClientDetails(clientDetailsService);
-        }
-    }
-
-    @Configuration
-    @EnableResourceServer
-    public static class ResourceServer extends ResourceServerConfigurerAdapter {
-
-        @Autowired
-        private EhrTokenServices tokenServices;
-
-        @Autowired
-        EhrClientDetailsService clientDetailsService;
-
-        @Override
-        public void configure(HttpSecurity http) throws Exception {
-            http
-                    .requestMatcher(
-                            new OrRequestMatcher(
-                                    new AntPathRequestMatcher("/api/v1.0/**")
-                            ))
-                    .authorizeRequests()
-                    .antMatchers("/api/v1.0/**").access("#oauth2.hasScope('read')");
-        }
-
-        @Override
-        public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
-            resources.resourceId(RESOURCE_ID);
-            resources.tokenServices(tokenServices);
-            resources.tokenExtractor(new EhrTokenExtractor());
-            resources.authenticationEntryPoint(new EhrOAuth2AuthenticationEntryPoint());
-        }
-    }
+//    @Configuration
+//    @EnableAuthorizationServer
+//    public static class OAuth2ServerConfig extends AuthorizationServerConfigurerAdapter {
+//
+//        @Autowired
+//        private AuthenticationManager authenticationManager;
+//
+//        @Autowired
+//        private EhrAuthorizationCodeService authorizationCodeService;
+//
+//        @Autowired
+//        private EhrTokenServices tokenServices;
+//
+//        @Autowired
+//        EhrClientDetailsService clientDetailsService;
+//
+//        @Override
+//        public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+//            EhrTokenGranter tokenGranter = new EhrTokenGranter(tokenServices,
+//                    authorizationCodeService,
+//                    clientDetailsService,
+//                    new DefaultOAuth2RequestFactory(clientDetailsService));
+//
+//            endpoints.authenticationManager(authenticationManager);
+//            endpoints.authorizationCodeServices(authorizationCodeService);
+//            endpoints.tokenServices(tokenServices);
+//            endpoints.setClientDetailsService(clientDetailsService);
+//            endpoints.exceptionTranslator(new EhrOAuth2ExceptionTranslator());
+//            endpoints.tokenGranter(tokenGranter);
+//        }
+//
+//        @Override
+//        public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+//            clients.withClientDetails(clientDetailsService);
+//        }
+//    }
+//
+//    @Configuration
+//    @EnableResourceServer
+//    public static class ResourceServer extends ResourceServerConfigurerAdapter {
+//
+//        @Autowired
+//        private EhrTokenServices tokenServices;
+//
+//        @Autowired
+//        EhrClientDetailsService clientDetailsService;
+//
+//        @Override
+//        public void configure(HttpSecurity http) throws Exception {
+//            http
+//                    .requestMatcher(
+//                            new OrRequestMatcher(
+//                                    new AntPathRequestMatcher("/api/v1.0/**")
+//                            ))
+//                    .authorizeRequests()
+//                    .antMatchers("/api/v1.0/**").access("#oauth2.hasScope('read')");
+//        }
+//
+//        @Override
+//        public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
+//            resources.resourceId(RESOURCE_ID);
+//            resources.tokenServices(tokenServices);
+//            resources.tokenExtractor(new EhrTokenExtractor());
+//            resources.authenticationEntryPoint(new EhrOAuth2AuthenticationEntryPoint());
+//        }
+//    }
 
     @Bean
     EhrClientDetailsService ehrClientDetailsService() {

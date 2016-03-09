@@ -1,7 +1,11 @@
 package com.yihu.ehr.api.authorization;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netflix.discovery.converters.Auto;
 import com.yihu.ehr.api.model.MToken;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.service.oauth2.EhrClientDetailsService;
 import com.yihu.ehr.service.oauth2.EhrTokenStoreService;
 import com.yihu.ehr.service.oauth2.EhrUserDetailsService;
 import com.yihu.ehr.util.encode.HashUtil;
@@ -11,17 +15,25 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
+import org.springframework.security.oauth2.provider.ClientDetails;
+import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.OAuth2Request;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.spring.web.json.Json;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -39,10 +51,16 @@ import java.util.*;
 public class AuthorizationsEndPoint {
 
     @Autowired
+    ObjectMapper objectMapper;
+
+    @Autowired
     EhrTokenStoreService tokenStoreService;
 
     @Autowired
     EhrUserDetailsService userDetailsService;
+
+    @Autowired
+    EhrClientDetailsService clientDetailsService;
 
     @ApiOperation(value = "获取用户所有应用授权", notes = "提供用户名/密码作为Basic验证")
     @RequestMapping(value = "", produces = "application/json", method = RequestMethod.GET)
@@ -80,17 +98,41 @@ public class AuthorizationsEndPoint {
         return null;
     }
 
-    @ApiOperation(value = "为指定应用创建授权，若存在返回已有授权", notes = "提供用户名/密码作为Basic验证")
+    @ApiOperation(value = "为指定应用创建授权，若存在返回已有授权", notes = "提供Client Id/Secret作为Basic验证")
     @RequestMapping(value = "/clients/{client_id}", produces = "application/json", method = RequestMethod.PUT)
-    public List<String> createClientAuthorization(@ApiParam("client_id")
-                                                  @PathVariable("client_id")
-                                                  String clientId,
-                                                  @ApiParam(value = "info")
-                                                  @RequestParam("info") String info) {
-        return null;
-    }
+    public ResponseEntity<Json> createClientAuthorization(@ApiParam(value = "client_id", defaultValue = "kHAbVppx44")
+                                                          @PathVariable("client_id")
+                                                          String clientId,
+                                                          @ApiParam(value = "info")
+                                                          @RequestParam(value = "info")
+                                                          String info,
+                                                          HttpServletRequest request) throws JsonProcessingException {
+        Pair<String, String> basic = BasicAuthorizationExtractor.extract(request.getHeader("Authorization"));
+        if (!basic.getKey().equals(clientId))
+            throw new InvalidParameterException("Basic authorization client id MUST be same with url path.");
 
-    //------ 用户Token ------
+        Map<String, Object> values;
+        try {
+            values = objectMapper.readValue(info, Map.class);
+        } catch (IOException e) {
+            throw new InvalidParameterException("'info' parameter must be json format");
+        }
+
+        String fingerprint = values.get("fingerprint").toString();
+        fingerprint = fingerprint == null ? "" : fingerprint;
+
+        ClientDetails clientDetails = clientDetailsService.loadClientByClientId(clientId);
+        if (!clientDetails.getClientSecret().equals(basic.getValue())) {
+            throw new InvalidParameterException("Client id or secret incorrect.");
+        }
+
+        MToken token = createClientToken(clientId, fingerprint);
+        if (token == null) {
+            throw new AuthenticationServiceException("Create client token failed.");
+        }
+
+        return new ResponseEntity<Json>(new Json(objectMapper.writeValueAsString(token)), HttpStatus.OK);
+    }
 
     @ApiOperation(value = "获取用户Token列表", notes = "提供用户名/密码作为Basic验证")
     @RequestMapping(value = "/users/{user_name}/tokens", method = RequestMethod.GET)
@@ -102,14 +144,16 @@ public class AuthorizationsEndPoint {
 
     @ApiOperation(value = "获取用户单个Token", notes = "提供用户名/密码作为Basic验证")
     @RequestMapping(value = "/users/{user_name}/tokens/{id}", method = RequestMethod.GET)
-    public String getToken(@ApiParam("id")
+    public String getToken(@ApiParam("user_name")
+                           @PathVariable("user_name")
+                           String userName,
+                           @ApiParam("id")
                            @PathVariable("id")
                            String id) {
         return "";
     }
 
-    // 临时固化一个Token
-    private Map<String, String> userTokens = new HashMap<>();
+    private Map<String, String> appTokens = new HashMap<>();
 
     @ApiOperation(value = "为指定用户创建授权，若存在返回已有授权", notes = "提供用户名/密码作为Basic验证")
     @RequestMapping(value = "/users/{user_name}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.PUT)
@@ -121,24 +165,30 @@ public class AuthorizationsEndPoint {
                                           HttpServletRequest request) throws NoSuchAlgorithmException {
 
         Pair<String, String> basic = BasicAuthorizationExtractor.extract(request.getHeader("Authorization"));
-        if (!basic.getKey().equals(userName)) throw new InvalidParameterException("用户名不一致");
+        if (!basic.getKey().equals(userName)) throw new InvalidParameterException("Basic authorization user name MUST be same with url path.");
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
         if (userDetails == null || !HashUtil.hashStr(basic.getValue()).equals(userDetails.getPassword())) {
-            throw new InvalidParameterException("用户名或密码错误");
+            throw new InvalidParameterException("User name or password incorrect.");
         }
 
-        return createTempToken(userDetails);
+        MToken mToken = new MToken();
+        mToken.setToken(UUID.randomUUID().toString());
+        mToken.setToken_last_eight(mToken.getToken().substring(mToken.getToken().length() - 8));
+        mToken.setUpdated_at(new Date());
+
+        return mToken;
     }
 
-    public MToken createTempToken(UserDetails userDetails) {
-
-        String token = userTokens.get(userDetails.getUsername());
+    public MToken createClientToken(String clientId, String fingerprint) {
+        String key = clientId + "-" + fingerprint;
+        String token = appTokens.get(key);
         if (token == null) {
             token = UUID.randomUUID().toString();
-            userTokens.put(userDetails.getUsername(), token);
+            appTokens.put(key, token);
         }
 
+        UserDetails userDetails = userDetailsService.loadUserByUsername("su");
         DefaultOAuth2AccessToken accessToken = (DefaultOAuth2AccessToken) tokenStoreService.readAccessToken(token);
         if (null == accessToken) {
             Set<String> scopes = new HashSet<>();
@@ -152,7 +202,7 @@ public class AuthorizationsEndPoint {
             resourceIds.add("ehr");
 
             OAuth2Request auth2Request = new OAuth2Request(null,
-                    "client-with-registered-redirect",
+                    "simplified-esb-app",
                     userDetails.getAuthorities(),
                     true,
                     scopes,
