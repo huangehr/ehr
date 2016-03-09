@@ -24,6 +24,7 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter{
         InternalResourceViewResolver resolver = new InternalResourceViewResolver();
         resolver.setPrefix("WEB-INF/ehr/jsp/");
         resolver.setSuffix(".jsp");
+        resolver.setOrder(1);
         return resolver;
     }
 
@@ -38,7 +39,7 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter{
     @Bean
     public TilesViewResolver tilesViewResolver(){
         TilesViewResolver tilesViewResolver = new TilesViewResolver();
-        tilesViewResolver.setOrder(1);
+        tilesViewResolver.setOrder(0);
         return tilesViewResolver;
     }
 
