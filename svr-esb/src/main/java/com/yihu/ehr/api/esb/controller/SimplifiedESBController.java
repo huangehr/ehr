@@ -9,12 +9,12 @@ import com.yihu.ehr.api.esb.service.SimplifiedESBService;
 import com.yihu.ehr.config.FastDFSConfig;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.util.DateFormatter;
+import com.yihu.ehr.util.encode.Base64;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -96,13 +96,11 @@ public class SimplifiedESBController {
      *
      * @param systemCode
      * @param orgCode
-     * @param response
      */
-    @RequestMapping(value = "/downUpdateWar", method = RequestMethod.GET)
+    @RequestMapping(value = "/downUpdateWar", method = RequestMethod.POST)
     public String downUpdateWar(
-            @RequestParam(value = "versionCode", required = true) String systemCode,
-            @RequestParam(value = "versionCode", required = true) String orgCode,
-            @RequestParam(value = "versionCode", required = true) HttpServletResponse response) {
+            @RequestParam(value = "systemCode", required = true) String systemCode,
+            @RequestParam(value = "orgCode", required = true) String orgCode) {
         try {
             // path是指欲下载的文件的路径。
             HosEsbMiniRelease he = simplifiedESBService.getSimplifiedESBBySystemCodes(systemCode, orgCode);
@@ -112,8 +110,7 @@ public class SimplifiedESBController {
                 long l = file.length();
                 byte[] by = new byte[(int) l];
                 i.read(by);
-                String s = new String(by, "UTF-8");
-                return s;
+                return Base64.encode(by);
             }
             /*
             // 取得文件名。
