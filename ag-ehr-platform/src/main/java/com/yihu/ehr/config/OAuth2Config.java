@@ -95,19 +95,10 @@ public class OAuth2Config {
             http
                     .requestMatcher(
                             new OrRequestMatcher(
-                                    new AntPathRequestMatcher("/api/v1.0/**"),
-                                    new AntPathRequestMatcher("/rest/v1.0/adapter-dispatcher/**"),
-                                    new AntPathRequestMatcher("/rest/v1.0/json_package/**"),
-                                    new AntPathRequestMatcher("/rest/v1.0/patient/**"),
-                                    new AntPathRequestMatcher("/rest/v1.0/user_key/**")
-
+                                    new AntPathRequestMatcher("/api/v1.0/**")
                             ))
                     .authorizeRequests()
-                    .antMatchers("/api/v1.0/**").access("#oauth2.hasScope('read')")
-                    .antMatchers("/rest/v1.0/adapter-dispatcher/**").access("#oauth2.hasScope('read')")
-                    .antMatchers("/rest/v1.0/json_package/**").access("#oauth2.hasScope('read')")
-                    .antMatchers("/rest/v1.0/patient/**").access("#oauth2.hasScope('read')")
-                    .antMatchers("/rest/v1.0/user_key/**").access("#oauth2.hasScope('read')");
+                    .antMatchers("/api/v1.0/**").access("#oauth2.hasScope('read')");
         }
 
         @Override

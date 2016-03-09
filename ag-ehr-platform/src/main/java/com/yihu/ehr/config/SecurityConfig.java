@@ -57,8 +57,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .authorizeRequests().anyRequest().authenticated()
                     .and()
                     .formLogin().loginPage("/login").defaultSuccessUrl("/login?logout").permitAll()
-                    .and()
-                    .antMatcher("/rest/v1.0/token").authorizeRequests().anyRequest().permitAll()
                     .and().httpBasic();
         }
     }
