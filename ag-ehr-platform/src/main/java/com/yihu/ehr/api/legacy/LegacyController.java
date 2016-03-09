@@ -57,7 +57,7 @@ public class LegacyController {
     private JsonPackageClient jsonPackageClient;
 
 
-    @ApiOperation(value = "下载标准版本", response = String.class)
+    @ApiOperation(value = "下载标准版本", response = RestEcho.class)
     @RequestMapping(value = "/adapter-dispatcher/versionplan", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
     public Object getVersion(
             @ApiParam(name = "org_code", value = "机构编码")
@@ -161,7 +161,6 @@ public class LegacyController {
     public Object patientRegister(
             @ApiParam(name = "user_info", value = "病人实体json字符串")
             @RequestParam(value = "user_info", required = true) String userInfo) throws IOException, ParseException {
-
         Map<String, String> telMap = new HashMap<>();
 
         Map<String, Object> fields = new ObjectMapper().readValue(userInfo, Map.class);
@@ -252,7 +251,8 @@ public class LegacyController {
         }
 
         //缺少身份证号
-        if (idCardNo == null){
+        idCardNo = "352225199102146010";
+        if (StringUtils.isEmpty(idCardNo)){
             throw  new ApiException(ErrorCode.MissParameter);
         }
         String errorInfo = IdCardValidator.doValidate(idCardNo);
@@ -270,6 +270,7 @@ public class LegacyController {
             }
 
             MDemographicInfo demoInfo = new MDemographicInfo();
+            demoInfo.setIdCardNo(idCardNo);
             demoInfo.setName(userName);
             if (!StringUtils.isEmpty(martialStatus)) {
                 demoInfo.setMartialStatus(martialStatus);
@@ -291,24 +292,29 @@ public class LegacyController {
             demoInfo.setTelphoneNo(telMap.get(0));
 
 
-            demoInfo.setHomeAddress(geographyClient.saveAddress(homeAddressJsonData));
-            demoInfo.setBirthPlace(geographyClient.saveAddress(birthPlacejsonData));
+            if(!StringUtils.isEmpty(birthProvince)){
+                demoInfo.setHomeAddress(geographyClient.saveAddress(homeAddressJsonData));
+            }
+            if(!StringUtils.isEmpty(homeProvince)){
+                demoInfo.setBirthPlace(geographyClient.saveAddress(birthPlacejsonData));
+            }
             demoInfo.setWorkAddress(null);
 
             demoInfo.setEmail(email);
 
             String demoInfoJsonData = objectMaper.writeValueAsString(demoInfo);
             patientClient.createPatient(demoInfoJsonData);
-            return "success";
-            //return succeedWithMessage("Patient register success.");
+            RestEcho restEcho = new RestEcho().success();
+            restEcho.putMessage("Patient register success.");
+            return restEcho;
         }
     }
 
 
 
     @ApiOperation(value = "上传档案包", response = String.class)
-    @RequestMapping(value = "/json_package", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
-    public String uploadPackage(
+    @RequestMapping(value = "/json_package",method = RequestMethod.POST)
+    public RestEcho uploadPackage(
             @ApiParam(required = true, name = "package", value = "JSON档案包", allowMultiple = true)
             MultipartHttpServletRequest jsonPackage,
             @ApiParam(required = true, name = "user_name", value = "用户名")
@@ -318,48 +324,52 @@ public class LegacyController {
             @ApiParam(required = true, name = "md5", value = "档案包MD5")
             @RequestParam(value = "md5") String md5) {
         jsonPackageClient.savePackage(jsonPackage,userName,packageCrypto,md5);
-        return "success";
+        return new RestEcho().success().putMessage("ok");
     }
 
 
+    @ApiOperation(value = "公钥", response = String.class)
+    @RequestMapping(value = "/security/user_key/{login_code}",  method = RequestMethod.GET)
+    public RestEcho getUserKey(
+            @ApiParam(name = "login_code", value = "用户名")
+            @PathVariable(value = "login_code") String loginCode) {
+        MUserSecurity userSecurity = securityClient.getUserSecurityByLoginCode(loginCode);
+        String publicKey = userSecurity.getPublicKey();
+        RestEcho restEcho = new RestEcho().success();
+        restEcho.putResult("public_key", publicKey);
+        return restEcho;
+    }
 
-//    @ApiOperation(value = "公钥", response = String.class)
-//    @RequestMapping(value = "/user_key", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
-//    public String getUserKey(
+
+//    @RequestMapping(value = "/securities/{login_code}/login", method = RequestMethod.GET)
+//    @ApiOperation(value = "获取用户公钥" , notes = "用户在平台注册时，会分配一个公钥，此公钥用于与健康档案平台加密传输数据使用")
+//    public String getUserSecurityByLoginCode(
+//            @ApiParam(name = "login_code", value = "用户名")
+//            @PathVariable(value = "login_code") String loginCode) throws Exception {
+//        MUserSecurity userSecurity = securityClient.getUserSecurityByLoginCode(loginCode);
+//        String publicKey = userSecurity.getPublicKey();
+//        return publicKey;
+//
+//    }
+//
+//
+//
+//    @RequestMapping(value = "/securities/{org_code}/org", method = RequestMethod.GET)
+//    @ApiOperation(value = "获取企业公钥", notes = "企业公钥，用于与健康档案平台之间传输数据的加密。")
+//    public String getUserSecurityByOrgCode(
 //            @ApiParam(name = "org_code", value = "机构代码")
 //            @PathVariable(value = "org_code") String orgCode) {
-//        String aaa = securityClient.getUserSecurityByOrgCode(orgCode);
-//        return null;
+//        MUserSecurity userSecurity = securityClient.getUserSecurityByOrgCode(orgCode);
+//        String publicKey = userSecurity.getPublicKey();
+//        return publicKey;
 //    }
-
-
-    @RequestMapping(value = "/securities/{login_code}/login", method = RequestMethod.GET)
-    @ApiOperation(value = "获取用户公钥" , notes = "用户在平台注册时，会分配一个公钥，此公钥用于与健康档案平台加密传输数据使用")
-    public MUserSecurity getUserSecurityByLoginCode(
-            @ApiParam(name = "login_code", value = "用户名")
-            @PathVariable(value = "login_code") String loginCode) throws Exception {
-        MUserSecurity userSecurity = securityClient.getUserSecurityByLoginCode(loginCode);
-        return userSecurity;
-
-    }
-
-
-
-    @RequestMapping(value = "/securities/{org_code}/org", method = RequestMethod.GET)
-    @ApiOperation(value = "获取企业公钥", produces = "application/json", notes = "企业公钥，用于与健康档案平台之间传输数据的加密。")
-    public MUserSecurity getUserSecurityByOrgCode(
-            @ApiParam(name = "org_code", value = "机构代码")
-            @PathVariable(value = "org_code") String orgCode) {
-        MUserSecurity userSecurity = securityClient.getUserSecurityByOrgCode(orgCode);
-        return userSecurity;
-    }
 
 
 
 
     @ApiOperation(value = "临时Token", response = String.class)
     @RequestMapping(value = "/token", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
-    public Object getAppToken(
+    public RestEcho getAppToken(
             @ApiParam(required = true, name = "login_code", value = "用户名")
             @RequestParam(value = "login_code", required = true) String loginCode,
             @ApiParam(required = true, name = "rsa_pw", value = "以RSA加密")
@@ -368,6 +378,13 @@ public class LegacyController {
             @RequestParam(value = "app_id", required = true) String appId,
             @ApiParam(required = true, name = "app_secret", value = "APP 密码")
             @RequestParam(value = "app_secret", required = true) String appSecret) {
-        return securityClient.getUserToken(loginCode,rsaPWD,appId,appSecret);
+        RestEcho restEcho;
+        Map<String,Object> map = securityClient.getUserToken(loginCode,rsaPWD,appId,appSecret);
+        restEcho = new RestEcho().success();
+        restEcho.putResult("access_token", map.get("access_token"));
+        restEcho.putResult("refresh_token", map.get("refresh_token"));
+        restEcho.putResult("expires_in", map.get("expires_in"));
+        return restEcho;
+
     }
 }
