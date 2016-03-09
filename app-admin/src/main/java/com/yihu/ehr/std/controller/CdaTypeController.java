@@ -24,7 +24,7 @@ import java.util.Map;
 @RequestMapping("/cdatype")
 @Controller(RestAPI.StandardCDATypeController)
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
-public class CdaTypeController extends BaseRestController {
+public class CdaTypeController {
     private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
     private static   String username = ResourceProperties.getProperty("username");
     private static   String password = ResourceProperties.getProperty("password");

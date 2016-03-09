@@ -3,7 +3,6 @@ package com.yihu.ehr.ha.organization.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.organization.service.OrganizationClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.ha.geography.service.AddressClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
@@ -19,9 +18,9 @@ import com.yihu.ehr.util.operator.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -61,14 +60,13 @@ public class OrganizationController extends BaseController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) throws Exception{
         List<OrgModel> orgModelList = new ArrayList<>();
-        List<MOrganization> organizations = orgClient.searchOrgs(fields,filters,sorts,size,page);
+        ResponseEntity<List<MOrganization>> responseEntity = orgClient.searchOrgs(fields,filters,sorts,size,page);
+        List<MOrganization> organizations = responseEntity.getBody();
         for(MOrganization mOrg : organizations){
             OrgModel orgModel = changeToOrgModel(mOrg);
             orgModelList.add(orgModel);
         }
-        //获取符合条件总条数
-        //TODO 获取符合条件的总记录数
-        int totalCount = 20;
+        int totalCount = getTotalCount(responseEntity);
         return getResult(orgModelList,totalCount,page,size);
     }
 

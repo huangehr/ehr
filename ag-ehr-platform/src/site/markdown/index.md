@@ -1,54 +1,18 @@
-健康档案(EHR)开放平台
+健康档案开放平台
 ====================
 
-> 作者：温富建，2016.02.19
+> 作者：温富建，2016.02.18
 
-平台概况
----------------------
+欢迎来到健康档案开放平台。
 
-> [平台简介](overview/index.html)
+健康档案平台是健康之路旗下的健康产品，管理患者的健康档案，并由用户决定数据开放范围。
 
-> 合作模式
+健康档案开放平台您可以得到以下内容：
 
-> 服务条款
+- [API参考](api/reference/overview.html)
+- [如何成为开发者](developers/introduction.html)
+- [官方博客](blogs/blogs.html)
+- [技术支持](support/support.html)
 
-规范
----------------------
 
-> 应用开发流程
-
-> 应用UI设计与审核规范
-
-> [REST API规范](specification/rest-specification.html)
-
-> Thrift API规范
-
-开发指南
----------------------
-
-> [认证与授权](dev-guide/authoritarian/index.html)
-
-> [数据标准](dev-guide/standard/index.html)
-
-> [档案接收与调阅](dev-guide/health-profiles/index.html)
-
-> [基础数据管理](dev-guide/admin/index.html)
-
-开发教程
----------------------
-
-> [转诊](dev-tutorial/referral.html)
-
-> [随访](dev-tutorial/follow.html)
-
-> [康赛项目](dev-tutorial/sanofi.html)
-
-FQA
----------------------
-
-> 开发过程FQA
-
-> 应用审核FQA
-
-> 开放平台FQA
 
