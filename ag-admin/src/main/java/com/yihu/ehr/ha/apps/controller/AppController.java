@@ -1,7 +1,6 @@
 package com.yihu.ehr.ha.apps.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.apps.service.AppClient;
@@ -15,10 +14,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -51,12 +50,12 @@ public class AppController extends BaseController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) throws Exception {
         List<AppModel> appModelList = new ArrayList<>();
-        List<MApp> mAppList = (List<MApp>)appClient.getApps(fields,filters,sort,size,page);
+        ResponseEntity<List<MApp>> responseEntity = appClient.getApps(fields,filters,sort,size,page);
+        List<MApp> mAppList = responseEntity.getBody();
         for(MApp app :mAppList){
             appModelList.add(changeToAppModel(app));
         }
-        // TODO 获取符合条件记录总数
-        Integer totalCount = 10;
+        Integer totalCount = getTotalCount(responseEntity);
         Envelop envelop = getResult(appModelList,totalCount,page,size);
         return envelop;
     }

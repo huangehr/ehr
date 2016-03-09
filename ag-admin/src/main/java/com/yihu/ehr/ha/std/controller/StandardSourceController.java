@@ -14,6 +14,7 @@ import com.yihu.ehr.util.operator.DateUtil;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -47,7 +48,8 @@ public class StandardSourceController extends BaseController {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) throws Exception {
-        Collection<MStdSource> stdSources = stdSourcrClient.searchSources(fields, filters, sorts, size, page);
+        ResponseEntity<Collection<MStdSource>> responseEntity = stdSourcrClient.searchSources(fields, filters, sorts, size, page);
+        Collection<MStdSource> stdSources = responseEntity.getBody();
         List<StdSourceModel> sourcrModelList = new ArrayList<>();
         for (MStdSource stdSource : stdSources) {
             StdSourceModel sourceModel = convertToModel(stdSource, StdSourceModel.class);
@@ -57,8 +59,7 @@ public class StandardSourceController extends BaseController {
             sourceModel.setCreateDate(DateUtil.formatDate(stdSource.getCreateDate(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT));
             sourcrModelList.add(sourceModel);
         }
-        //TODO 取得符合条件总记录数的方法
-        int totalCount = 10;
+        int totalCount = getTotalCount(responseEntity);
         return getResult(sourcrModelList, totalCount, page, size);
     }
 
