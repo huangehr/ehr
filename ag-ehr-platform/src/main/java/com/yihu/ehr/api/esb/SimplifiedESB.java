@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
  * @created 2016.02.29 10:47
  */
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0 + "/simplified-esb")
+@RequestMapping(ApiVersion.Version1_0 + "/simplified-esb")
 @Api(protocols = "https", value = "simplified-esb", description = "简易ESB服务临时接口")
 public class SimplifiedESB {
 
@@ -51,12 +51,12 @@ public class SimplifiedESB {
                                                @ApiParam("ip") @RequestParam(value = "ip", required = true)
                                                String ip,
                                                @ApiParam("file") @RequestParam(value = "file", required = true)
-                                               MultipartFile file) {
-        return new ResponseEntity<>(simplifiedESBClient.uploadLog(orgCode, ip, file) + "", HttpStatus.OK);
+                                               MultipartFile file) throws Exception {
+        return new ResponseEntity<>(simplifiedESBClient.uploadLog(orgCode, ip, new String(file.getBytes(), "UTF-8")) + "", HttpStatus.OK);
     }
 
     @ApiOperation("查询版本是否需要更新")
-    @RequestMapping(value = "/getUpdateFlag", method = RequestMethod.POST)
+    @RequestMapping(value = "/getUpdateFlag", method = RequestMethod.GET)
     public ResponseEntity getUpdateFlag(@ApiParam("versionCode") @RequestParam(value = "versionCode", required = true)
                                         String versionCode,
                                         @ApiParam("systemCode") @RequestParam(value = "systemCode", required = true)
@@ -107,18 +107,16 @@ public class SimplifiedESB {
         return new ResponseEntity<>(simplifiedESBClient.fillMining(systemCode, orgCode), HttpStatus.OK);
     }
 
-    @ApiOperation("补采功能")
+    @ApiOperation("改变补采状态")
     @RequestMapping(value = "/changeFillMiningStatus", method = RequestMethod.POST)
     public ResponseEntity changeFillMiningStatus(
-            @ApiParam("result") @RequestParam(value = "result", required = true)
-            String result,
             @ApiParam("message") @RequestParam(value = "message", required = true)
             String message,
             @ApiParam("id") @RequestParam(value = "id", required = true)
             String id,
             @ApiParam("status") @RequestParam(value = "status", required = true)
             String status) {
-        return new ResponseEntity<>(simplifiedESBClient.changeFillMiningStatus(result, message, id, status), HttpStatus.OK);
+        return new ResponseEntity<>(simplifiedESBClient.changeFillMiningStatus(message, id, status), HttpStatus.OK);
     }
 
     @ApiOperation(" his穿透查询")

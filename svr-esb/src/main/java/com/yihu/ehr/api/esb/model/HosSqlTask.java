@@ -4,6 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Date;
 
 
 /**
@@ -19,11 +20,11 @@ public class HosSqlTask implements java.io.Serializable {
     private String id;
     private String orgCode;
     private String systemCode;
-    private String sql;
+    private String sqlscript;
     private String result;
     private String status;
     private String message;
-    private Timestamp createTime;
+    private Date createTime;
 
 
     // Constructors
@@ -44,11 +45,11 @@ public class HosSqlTask implements java.io.Serializable {
     /**
      * full constructor
      */
-    public HosSqlTask(String id, String orgCode, String systemCode, String sql, String result, String status, String message, Timestamp createTime) {
+    public HosSqlTask(String id, String orgCode, String systemCode, String sqlscript, String result, String status, String message, Date createTime) {
         this.id = id;
         this.orgCode = orgCode;
         this.systemCode = systemCode;
-        this.sql = sql;
+        this.sqlscript = sqlscript;
         this.result = result;
         this.status = status;
         this.message = message;
@@ -89,14 +90,14 @@ public class HosSqlTask implements java.io.Serializable {
         this.systemCode = systemCode;
     }
 
-    @Column(name = "sql", length = 2000)
+    @Column(name = "sqlscript", length = 2000)
 
-    public String getSql() {
-        return this.sql;
+    public String getSqlscript() {
+        return this.sqlscript;
     }
 
-    public void setSql(String sql) {
-        this.sql = sql;
+    public void setSqlscript(String sqlscript) {
+        this.sqlscript = sqlscript;
     }
 
     @Column(name = "result", length = 2000)
@@ -131,7 +132,7 @@ public class HosSqlTask implements java.io.Serializable {
 
     @Column(name = "create_time", length = 0)
 
-    public Timestamp getCreateTime() {
+    public Date getCreateTime() {
         return this.createTime;
     }
 

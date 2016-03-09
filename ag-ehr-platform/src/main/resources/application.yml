@@ -11,7 +11,6 @@ endpoints:
 
 security:
   user:
-    name: admin
     password: 123456
 
 ---
@@ -29,8 +28,8 @@ eureka:
   instance:
     ip-address: 127.0.0.1
   client:
-    registerWithEureka: false
-    fetchRegistry: false
+    registerWithEureka: true
+    fetchRegistry: true
     serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
 
 ---
