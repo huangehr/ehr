@@ -25,6 +25,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Order(1)
     @Configuration
     public static class AuthorizationApiSecurityConfig extends WebSecurityConfigurerAdapter{
+        @Autowired
+        private EhrUserDetailsService userDetailsService;
+
+        @Override
+        protected void configure(AuthenticationManagerBuilder authBuilder) throws Exception {
+            authBuilder.userDetailsService(userDetailsService).passwordEncoder(new Md5PasswordEncoder());
+        }
+
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http.csrf().disable().requestMatcher(
@@ -54,6 +62,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http
+                    .authorizeRequests().antMatchers("/rest/v1.0/**").permitAll()
+                    .and()
                     .authorizeRequests().anyRequest().authenticated()
                     .and()
                     .formLogin().loginPage("/login").defaultSuccessUrl("/login?logout").permitAll()

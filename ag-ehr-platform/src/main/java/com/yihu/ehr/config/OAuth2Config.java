@@ -61,11 +61,6 @@ public class OAuth2Config {
                     clientDetailsService,
                     new DefaultOAuth2RequestFactory(clientDetailsService));
 
-            String scopes[] = "user,user.demographic_id,user.health_profiles,organization".split(",");
-            /*tokenGranter.grant("authorization_code", new TokenRequest(null, "client-with-registered-redirect",
-                    Arrays.asList(scopes),
-                    "authorization_code"));*/
-
             endpoints.authenticationManager(authenticationManager);
             endpoints.authorizationCodeServices(authorizationCodeService);
             endpoints.tokenServices(tokenServices);
