@@ -155,10 +155,10 @@ public class SystemDictController extends BaseController {
             @RequestParam(value = "value", required = false) String value,
             @ApiParam(name = "page", value = "当前页", defaultValue = "")
             @RequestParam(value = "page", required = false) Integer page,
-            @ApiParam(name = "rows", value = "行数", defaultValue = "")
-            @RequestParam(value = "rows", required = false) Integer rows) {
+            @ApiParam(name = "size", value = "行数", defaultValue = "")
+            @RequestParam(value = "size", required = false) Integer size) {
 
-        List<MDictionaryEntry> dictionaryEntries = (List<MDictionaryEntry>)systemDictClient.getDictEntries(id,value,page,rows);
+        List<MDictionaryEntry> dictionaryEntries = (List<MDictionaryEntry>)systemDictClient.getDictEntries(id,value,page,size);
         List<SystemDictEntryModel> systemDictEntryModelList = new ArrayList<>();
 
         for (MDictionaryEntry mDictionaryEntry: dictionaryEntries){
@@ -169,7 +169,7 @@ public class SystemDictController extends BaseController {
 //        String count = response.getHeader(AgAdminConstants.ResourceCount);
 //        int totalCount = StringUtils.isNotEmpty(count) ? Integer.parseInt(count) : 0;
 
-        Envelop envelop = getResult(systemDictEntryModelList,0,page,rows);
+        Envelop envelop = getResult(systemDictEntryModelList,0,page,size);
 
         return envelop;
     }
@@ -212,7 +212,7 @@ public class SystemDictController extends BaseController {
             envelop.setObj(systemDictEntryModel);
         }else {
             envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("创建字典项失败");
+            envelop.setErrorMsg("获取字典项失败");
         }
 
         return envelop;
@@ -251,6 +251,18 @@ public class SystemDictController extends BaseController {
             envelop.setErrorMsg("修改字典项失败");
         }
 
+        return envelop;
+    }
+
+
+    @RequestMapping(value = "/dictionaries/existence/{app_name}" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断提交的字典名称是否已经存在")
+    public Envelop isAppNameExists(
+            @ApiParam(name = "app_name", value = "app_name", defaultValue = "")
+            @PathVariable(value = "app_name") String appName){
+        Envelop envelop = new Envelop();
+        boolean bo = systemDictClient.isAppNameExists(appName);
+        envelop.setSuccessFlg(bo);
         return envelop;
     }
 }
