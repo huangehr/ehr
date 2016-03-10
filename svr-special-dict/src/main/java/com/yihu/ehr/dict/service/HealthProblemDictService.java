@@ -3,6 +3,9 @@ package com.yihu.ehr.dict.service;
 import com.yihu.ehr.query.BaseJpaService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,28 +31,25 @@ public class HealthProblemDictService extends BaseJpaService<HealthProblemDict, 
     @Autowired
     private XHpIcd10RelationRepository hpIcd10ReRepo;
 
-    //flag: 0 - create  1 - update
-    public boolean isCodeExist(String id, String code, String flag){
-        HealthProblemDict hpDict = hpDictRepo.findByCode(code);
-        if(hpDict != null){
-            if(StringUtils.equals(flag,"1")){
-                return (!hpDict.getId().equals(id));
-            }
-            return true;
-        }else{
-            return false;
-        }
+    public Page<HealthProblemDict> getDictList(String sorts, int page, int size) {
+        Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
+        return hpDictRepo.findAll(pageable);
     }
-    public boolean isNameExist(String id, String name, String flag){
+
+    public boolean isCodeExist(String code){
+        HealthProblemDict hpDict = hpDictRepo.findByCode(code);
+        return hpDict != null;
+    }
+
+    public boolean isNameExist(String name){
         HealthProblemDict hpDict = hpDictRepo.findByName(name);
-        if(hpDict != null){
-            if(StringUtils.equals(flag,"1")){
-                return (!hpDict.getId().equals(id));
-            }
-            return true;
-        }else{
-            return false;
-        }
+        return hpDict != null;
+    }
+
+    public HealthProblemDict createDict(HealthProblemDict dict) {
+        dict.setName(dict.getName());
+        hpDictRepo.save(dict);
+        return dict;
     }
 
     public boolean isUsage(String id){

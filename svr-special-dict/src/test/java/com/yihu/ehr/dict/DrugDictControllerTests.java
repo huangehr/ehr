@@ -1,5 +1,6 @@
 package com.yihu.ehr.dict;
 
+import com.eureka2.shading.codehaus.jackson.map.ObjectMapper;
 import com.yihu.ehr.SvrSpecialDictApplication;
 import com.yihu.ehr.dict.controller.DrugDictController;
 import com.yihu.ehr.dict.controller.Icd10DictController;
@@ -7,8 +8,8 @@ import com.yihu.ehr.dict.service.DrugDict;
 import com.yihu.ehr.dict.service.Icd10Dict;
 import com.yihu.ehr.dict.service.XDrugDictRepository;
 import com.yihu.ehr.dict.service.XIcd10DictRepository;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.specialdict.MDrugDict;
+import com.yihu.ehr.model.specialdict.MIcd10Dict;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +19,9 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
 
@@ -55,53 +58,27 @@ public class DrugDictControllerTests {
         String specifications = "12包";
         String description = "Drug字典新增测试。";
 
-        drugDictController.createDrugDict(code, name, type, flag,tradeName,unit, specifications,description);
-        DrugDict drugDict = drugDictRepo.findByCode(code);
+        Map<String,String> retrieveMap = new HashMap<>();
+        retrieveMap.put("code",code);
+        retrieveMap.put("name",name);
+        retrieveMap.put("type",type);
+        retrieveMap.put("flag",flag);
+        retrieveMap.put("tradeName",tradeName);
+        retrieveMap.put("unit",unit);
+        retrieveMap.put("specifications",specifications);
+        retrieveMap.put("description",description);
 
-        assertTrue("Drug字典新增失败！" , drugDict != null);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(retrieveMap);
+
+        assertTrue("Drug字典新增失败！" , drugDictController.createDrugDict(json) != null);
+
+        assertTrue("存在性验证失败！", drugDictController.isCodeExist("DrugDictTest_01"));
+        assertTrue("存在性验证失败！", drugDictController.isNameExist("Drug字典测试_01"));
     }
 
     @Test
-    public void btestCreateDrugDictCodeRepeat() throws Exception{
-        try{
-            String code = "DrugDictTest_01";
-            String name = "Drug字典测试_02";
-            String type = "1";
-            String flag = "0";
-            String tradeName = "商品名称_02";
-            String unit = "盒";
-            String specifications = "12包";
-            String description = "Drug字典新增测试。";
-
-            Object result = drugDictController.createDrugDict(code, name, type, flag, tradeName, unit, specifications, description);
-
-        }
-        catch (ApiException e){
-            assertTrue("Drug字典code重复验证失败！", true);
-        }
-    }
-
-    @Test
-    public void ctestCreateDrugDictNameRepeat() throws Exception{
-        try{
-            String code = "DrugDictTest_02";
-            String name = "Drug字典测试_01";
-            String type = "1";
-            String flag = "0";
-            String tradeName = "商品名称_02";
-            String unit = "盒";
-            String specifications = "12包";
-            String description = "Drug字典新增测试。";
-
-            Object result = drugDictController.createDrugDict(code, name, type, flag,tradeName,unit, specifications,description);
-        }
-        catch (ApiException e){
-            assertTrue("Drug字典name重复验证失败！", true);
-        }
-    }
-
-    @Test
-    public void dtestUpdateDrugDict() throws Exception{
+    public void btestUpdateDrugDict() throws Exception{
         String code = "DrugDictTest_02";
         String name = "Drug字典测试_02";
         String type = "1";
@@ -114,7 +91,21 @@ public class DrugDictControllerTests {
         DrugDict drugDict = drugDictRepo.findByCode("DrugDictTest_01");
         String id = drugDict.getId().toString();
 
-        drugDictController.updateDrugDict(id, code, name, type, flag, tradeName, unit, specifications,description);
+        Map<String,String> retrieveMap = new HashMap<>();
+        retrieveMap.put("id",id);
+        retrieveMap.put("code",code);
+        retrieveMap.put("name",name);
+        retrieveMap.put("type",type);
+        retrieveMap.put("flag",flag);
+        retrieveMap.put("tradeName",tradeName);
+        retrieveMap.put("unit",unit);
+        retrieveMap.put("specifications",specifications);
+        retrieveMap.put("description",description);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(retrieveMap);
+
+        drugDictController.updateDrugDict(json);
 
         drugDict = drugDictRepo.findByCode("DrugDictTest_02");
         boolean result = drugDict.getId().toString().equals(id);
@@ -131,7 +122,7 @@ public class DrugDictControllerTests {
     }
 
     @Test
-    public void etestGetDrugDictById() throws Exception{
+    public void ctestGetDrugDictById() throws Exception{
 
         DrugDict drugDict = drugDictRepo.findByCode("DrugDictTest_02");
         String id = drugDict.getId().toString();
@@ -142,7 +133,7 @@ public class DrugDictControllerTests {
     }
 
     @Test
-    public void ftestGetDrugDictList() throws Exception{
+    public void dtestGetDrugDictList() throws Exception{
         String code = "DrugDictTest_02";
         String name = "Drug字典测试_02";
         String type = "1";
@@ -169,7 +160,7 @@ public class DrugDictControllerTests {
     }
 
     @Test
-    public void gtestDrugIsUsageDict() throws Exception{
+    public void etestDrugIsUsageDict() throws Exception{
         DrugDict drugDict = drugDictRepo.findByCode("DrugDictTest_02");
         String id = drugDict.getId().toString();
 
@@ -178,16 +169,31 @@ public class DrugDictControllerTests {
         String chronicFlag = "1";
         String infectiousFlag = "1";
         String description = "ICD10字典新增测试_05。";
-        icd10DictController.createIcd10Dict(code,name,chronicFlag,infectiousFlag,description);
-        Icd10Dict icd10Dict = icd10DictRepository.findByCode(code);
+
+        Map<String,String> retrieveMap = new HashMap<>();
+        retrieveMap.put("code",code);
+        retrieveMap.put("name",name);
+        retrieveMap.put("chronicFlag",chronicFlag);
+        retrieveMap.put("infectiousFlag",infectiousFlag);
+        retrieveMap.put("description",description);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String icd10Json = objectMapper.writeValueAsString(retrieveMap);
+
+
+        MIcd10Dict icd10Dict = icd10DictController.createIcd10Dict(icd10Json);
         String icd10Id = icd10Dict.getId();
 
-        icd10DictController.createIcd10DrugRelation(icd10Id,id);
-        boolean result = drugDictController.drugIsUsage(id);
+        Map<String,String> retrieveMap02 = new HashMap<>();
+        retrieveMap02.put("icd10Id",icd10Id);
+        retrieveMap02.put("drugId",id);
+
+        String relaJson = objectMapper.writeValueAsString(retrieveMap02);
+
+        icd10DictController.createIcd10DrugRelation(relaJson);
+        boolean result = drugDictController.isUsage(id);
 
         assertTrue("验证失败！", result);
-
-        icd10DictController.deleteIcd10Dict(icd10Id);
     }
 
     @Test
@@ -196,6 +202,11 @@ public class DrugDictControllerTests {
         String id = drugDict.getId().toString();
         boolean result = drugDictController.deleteDrugDict(id);
 
+        assertTrue("删除失败！", result);
+
+        Icd10Dict icd10Dict = icd10DictRepository.findByCode("Icd10DictTest_05");
+        String icd10Id = icd10Dict.getId();
+        result = icd10DictController.deleteIcd10Dict(icd10Id);
         assertTrue("删除失败！", result);
     }
 }

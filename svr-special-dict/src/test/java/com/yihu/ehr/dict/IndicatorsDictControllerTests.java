@@ -1,5 +1,6 @@
 package com.yihu.ehr.dict;
 
+import com.eureka2.shading.codehaus.jackson.map.ObjectMapper;
 import com.yihu.ehr.SvrSpecialDictApplication;
 import com.yihu.ehr.dict.controller.Icd10DictController;
 import com.yihu.ehr.dict.controller.IndicatorsDictController;
@@ -17,7 +18,9 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
 
@@ -53,50 +56,26 @@ public class IndicatorsDictControllerTests {
         String lowerLimit = "1度";
         String description = "指标字典新增测试。";
 
-        indicatorsDictController.createIndicatorsDict(code, name, type,unit,upperLimit, lowerLimit, description);
-        IndicatorsDict indicatorsDict = indicatorsDictRepo.findByCode(code);
+        Map<String,String> retrieveMap = new HashMap<>();
+        retrieveMap.put("code",code);
+        retrieveMap.put("name",name);
+        retrieveMap.put("type",type);
+        retrieveMap.put("unit",unit);
+        retrieveMap.put("upperLimit",upperLimit);
+        retrieveMap.put("lowerLimit",lowerLimit);
+        retrieveMap.put("description",description);
 
-        assertTrue("指标字典新增失败！" , indicatorsDict != null);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(retrieveMap);
+
+        assertTrue("指标字典新增失败！" , indicatorsDictController.createIndicatorsDict(json) != null);
+
+        assertTrue("存在性验证失败！", indicatorsDictController.isCodeExists("IndicatorDictTest_01"));
+        assertTrue("存在性验证失败！", indicatorsDictController.isNameExists("指标字典测试_01"));
     }
 
     @Test
-    public void btestCreateIndicatorDictCodeRepeat() throws Exception{
-        try{
-            String code = "IndicatorDictTest_01";
-            String name = "指标字典测试_02";
-            String type = "1";
-            String unit = "度";
-            String upperLimit = "14度";
-            String lowerLimit = "1度";
-            String description = "指标字典新增测试。";
-
-            Object result = indicatorsDictController.createIndicatorsDict(code, name, type, unit, upperLimit, lowerLimit, description);
-        }
-        catch (ApiException e){
-            assertTrue("指标字典code重复验证失败！", true);
-        }
-    }
-
-    @Test
-    public void ctestCreateIndicatorDictNameRepeat() throws Exception{
-        try{
-            String code = "IndicatorDictTest_02";
-            String name = "指标字典测试_01";
-            String type = "1";
-            String unit = "度";
-            String upperLimit = "14度";
-            String lowerLimit = "1度";
-            String description = "指标字典新增测试。";
-
-            Object result = indicatorsDictController.createIndicatorsDict(code, name, type, unit, upperLimit, lowerLimit, description);
-        }
-        catch (ApiException e){
-            assertTrue("指标字典name重复验证失败！", true);
-        }
-    }
-
-    @Test
-    public void dtestUpdateIndicatorDict() throws Exception{
+    public void btestUpdateIndicatorDict() throws Exception{
         String code = "IndicatorDictTest_02";
         String name = "指标字典测试_02";
         String type = "1";
@@ -108,7 +87,20 @@ public class IndicatorsDictControllerTests {
         IndicatorsDict indicatorsDict = indicatorsDictRepo.findByCode("IndicatorDictTest_01");
         String id = indicatorsDict.getId().toString();
 
-        indicatorsDictController.updateIndicatorsDict(id, code, name, type, unit, upperLimit, lowerLimit, description);
+        Map<String,String> retrieveMap = new HashMap<>();
+        retrieveMap.put("id",id);
+        retrieveMap.put("code",code);
+        retrieveMap.put("name",name);
+        retrieveMap.put("type",type);
+        retrieveMap.put("unit",unit);
+        retrieveMap.put("upperLimit",upperLimit);
+        retrieveMap.put("lowerLimit",lowerLimit);
+        retrieveMap.put("description",description);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(retrieveMap);
+
+        indicatorsDictController.updateIndicatorsDict(json);
 
         indicatorsDict = indicatorsDictRepo.findByCode("IndicatorDictTest_02");
         boolean result = indicatorsDict.getId().toString().equals(id);
@@ -124,7 +116,7 @@ public class IndicatorsDictControllerTests {
     }
 
     @Test
-    public void etestGetIndicatorDictById() throws Exception{
+    public void ctestGetIndicatorDictById() throws Exception{
 
         IndicatorsDict indicatorsDict = indicatorsDictRepo.findByCode("IndicatorDictTest_02");
         String id = indicatorsDict.getId().toString();
@@ -135,7 +127,7 @@ public class IndicatorsDictControllerTests {
     }
 
     @Test
-    public void ftestGetIcd10DictList() throws Exception{
+    public void dtestGetIcd10DictList() throws Exception{
         String code = "IndicatorDictTest_02";
         String name = "指标字典测试_02";
         String type = "1";
@@ -158,7 +150,7 @@ public class IndicatorsDictControllerTests {
     }
 
     @Test
-    public void gtestIndicatorIsUsageDict() throws Exception{
+    public void etestIndicatorIsUsageDict() throws Exception{
         IndicatorsDict indicatorsDict = indicatorsDictRepo.findByCode("IndicatorDictTest_02");
         String id = indicatorsDict.getId().toString();
 
@@ -167,17 +159,33 @@ public class IndicatorsDictControllerTests {
         String chronicFlag = "1";
         String infectiousFlag = "1";
         String description = "ICD10字典新增测试_05。";
-        icd10DictController.createIcd10Dict(code,name,chronicFlag,infectiousFlag,description);
+
+        Map<String,String> retrieveMap = new HashMap<>();
+        retrieveMap.put("code",code);
+        retrieveMap.put("name",name);
+        retrieveMap.put("chronicFlag",chronicFlag);
+        retrieveMap.put("infectiousFlag",infectiousFlag);
+        retrieveMap.put("description",description);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String icd10Json = objectMapper.writeValueAsString(retrieveMap);
+
+        icd10DictController.createIcd10Dict(icd10Json);
         Icd10Dict icd10Dict = icd10DictRepository.findByCode(code);
         String icd10Id = icd10Dict.getId();
 
-        icd10DictController.createIcd10IndicatorRelation(icd10Id, id);
+        Map<String,String> retrieveMap02 = new HashMap<>();
+        retrieveMap02.put("icd10Id",icd10Id);
+        retrieveMap02.put("indicatorId",id);
+
+        String relaJson = objectMapper.writeValueAsString(retrieveMap02);
+
+        icd10DictController.createIcd10IndicatorRelation(relaJson);
         boolean result = indicatorsDictController.indicatorIsUsage(id);
 
         assertTrue("验证失败！", result);
 
         icd10DictController.deleteIcd10Dict(icd10Id);
-
     }
 
     @Test
