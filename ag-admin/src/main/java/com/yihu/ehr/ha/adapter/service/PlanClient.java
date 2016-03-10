@@ -30,7 +30,7 @@ public interface PlanClient {
 
     @RequestMapping(value = "/plans", method = RequestMethod.GET)
     @ApiOperation(value = "适配方案搜索")
-    Collection<MAdapterPlan> searchAdapterPlan(
+    public Collection<MAdapterPlan> searchAdapterPlan(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -40,7 +40,7 @@ public interface PlanClient {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page) ;
+            @RequestParam(value = "page", required = false) int page) throws Exception ;
 
 
     @RequestMapping(value = "/plan/{id}", method = RequestMethod.GET)
@@ -100,4 +100,15 @@ public interface PlanClient {
             @PathVariable("planId") Long planId,
             @ApiParam(name = "customizeData", value = "customizeData", defaultValue = "")
             @RequestParam("customizeData") String customizeData) throws Exception ;
+
+    /**
+     * 适配版本发布
+     * 1.生成适配版本文件并记录文件位置；2.修改适配方案状态
+     */
+    @RequestMapping(value = "/plan/{planId}/dispatch", method = RequestMethod.POST)
+    @ApiOperation(value = "适配版本发布")
+    public boolean adapterDispatch(
+            @ApiParam(name = "planId", value = "方案编号", defaultValue = "")
+            @PathVariable("planId") Long planId) throws Exception;
+
 }

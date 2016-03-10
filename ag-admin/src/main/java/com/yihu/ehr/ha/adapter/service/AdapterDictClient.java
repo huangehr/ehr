@@ -29,7 +29,7 @@ public interface AdapterDictClient {
 
     @RequestMapping(value = "/plan/{planId}/dicts", method = RequestMethod.GET)
     @ApiOperation(value = "字典适配关系分页查询")
-    Collection<MDataSet> searchAdapterDict(
+    public Collection<MDataSet> searchAdapterDict(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "code", value = "代码查询值", defaultValue = "")
@@ -41,12 +41,11 @@ public interface AdapterDictClient {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page) ;
-
+            @RequestParam(value = "page", required = false) int page) throws Exception ;
 
     @RequestMapping(value = "/plan/{planId}/dict/{dictId}/entrys", method = RequestMethod.GET)
     @ApiOperation(value = "字典项适配关系分页查询")
-    Collection<MAdapterDict> searchAdapterDictEntry(
+    public Collection<MAdapterDict> searchAdapterDictEntry(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "dictId", value = "字典编号", defaultValue = "")
@@ -60,34 +59,31 @@ public interface AdapterDictClient {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page);
+            @RequestParam(value = "page", required = false) int page) throws Exception ;
 
-
-    @RequestMapping(value = "/dict/entry/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/entry/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据字典ID获取字典项适配关系明细")
-    MAdapterDict getAdapterDictEntry(
+    public MAdapterDict getAdapterDictEntry(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @PathVariable(value = "id") Long id);
+            @PathVariable(value = "id") Long id) ;
 
-
-    @RequestMapping(value = "/dict/entry", method = RequestMethod.POST)
+    @RequestMapping(value = "/entry", method = RequestMethod.POST)
     @ApiOperation(value = "保存字典项映射关系")
-    MAdapterDict createAdapterDictEntry(
+    public MAdapterDict createAdapterDictEntry(
             @ApiParam(name = "adapterDictModel", value = "字典数据模型", defaultValue = "")
-            @RequestParam(value = "adapterDictModel") String dictJsonModel);
+            @RequestParam(value = "adapterDictModel") String dictJsonModel) throws Exception ;
 
-
-    @RequestMapping(value = "/dict/entry/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/entry/{id}", method = RequestMethod.PUT)
     @ApiOperation(value = "修改字典项映射关系")
-    MAdapterDict updateAdapterDictEntry(
+    public MAdapterDict updateAdapterDictEntry(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") Long id,
             @ApiParam(name = "adapterDictModel", value = "字典数据模型", defaultValue = "")
-            @RequestParam(value = "adapterDictModel") String dictJsonModel);
+            @RequestParam(value = "adapterDictModel") String dictJsonModel) throws Exception ;
 
-
-    @RequestMapping(value = "/dict/entrys", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/entrys", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除字典项映射")
-    boolean delDictEntry(
-            @RequestParam("ids") String ids);
+    public boolean delDictEntry(
+            @RequestParam("ids") String ids) throws Exception ;
+
 }

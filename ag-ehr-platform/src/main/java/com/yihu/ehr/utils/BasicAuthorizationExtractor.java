@@ -10,7 +10,7 @@ import java.util.Base64;
  */
 public class BasicAuthorizationExtractor {
     public static Pair<String, String> extract(String authorization){
-        if(null == authorization) throw new InvalidParameterException("请求不含Basic认证信息");
+        if(null == authorization) throw new InvalidParameterException("Need basic authentication.");
 
         String base64 = authorization.substring(authorization.indexOf(' ') + 1);
 
