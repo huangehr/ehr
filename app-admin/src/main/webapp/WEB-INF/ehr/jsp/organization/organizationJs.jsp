@@ -42,13 +42,11 @@
 
 					this.$searchNm.ligerTextBox({width: 240});
 
-					this.$location.addressDropdown({
-						tabsData: [
-							{name: '省份', url: '${contextRoot}/address/getParent', params: {level: '1'}},
-							{name: '城市', url: '${contextRoot}/address/getChildByParent'},
-							{name: '县区', url: '${contextRoot}/address/getChildByParent'}
-						]
-					});
+					<%--this.$location.addressDropdown({tabsData:[--%>//-----------------------------------------？？？？？
+					<%--{name: '省份', url: '${contextRoot}/address/getParent', params: {level:'1'}},--%>
+					<%--{name: '城市', url: '${contextRoot}/address/getChildByParent'},--%>
+					<%--{name: '县区', url: '${contextRoot}/address/getChildByParent'}--%>
+					<%--]});--%>
 
 					this.bindEvents();
 
@@ -75,8 +73,10 @@
 				bindEvents: function () {
 					var self = this;
 					self.$searchBtn.click(function () {
+						debugger
 						master.grid.options.newPage = 1;
 						master.reloadGrid();
+
 					});
 					self.$newRecordBtn.click(function () {
 						self.addOrgInfoDialog = $.ligerDialog.open({
@@ -158,78 +158,12 @@
 							}
 						}
 					});
-				}, init: function () {
-					this.grid = $("#div_org_info_grid").ligerGrid($.LigerGridEx.config({
-						url: '${contextRoot}/organization/searchOrgs',
-						parms: {
-							searchNm: '',
-							searchType: '',
-							orgType: '',
-							province: '',
-							city: '',
-							district: ''
-						},
-						columns: [
-							{display: '机构类型', name: 'orgTypeName', width: '8%', align: "left"},
-							{display: '机构代码', name: 'orgCode', width: '9%', align: "left"},
-							{display: '机构全名', name: 'fullName', width: '15%', align: "left"},
-							{display: '联系人', name: 'admin', width: '10%', align: "left"},
-							{display: '联系方式', name: 'tel', width: '10%', align: "left"},
-							{display: '机构地址', name: 'locationStrName', width: '20%', align: "left"},
-							{display: '是否激活', name: 'activityFlagName', width: '8%', isAllowHide: false},
-							{display: '入驻方式', name: 'settledWayName', width: '10%', isAllowHide: false},
-							{
-								display: '操作', name: 'operator', width: '10%', render: function (row) {
-								var html = '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:modify", row.orgCode, 'modify') + '">编辑</a> / ';
-								html += '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:del", row.orgCode, 'del') + '">删除</a> /';
-								if (row.activityFlag == 1) {
-									html += '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:activityFlg", row.orgCode, '1') + '">失效</a>';
-								} else {
-									html += '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:activityFlg", row.orgCode, '0') + '">开启</a>';
-								}
-								return html;
-							}
-							},
-							{name: 'activityFlag', hide: true, align: "center"},
-							{name: 'settledWay', hide: true, align: "center"}
-						],
-						enabledEdit: true,
-						validate: true,
-						unSetValidateAttr: false,
-						onDblClickRow: function (row) {
-							var mode = 'view';
-							this.orgInfoDialog = $.ligerDialog.open({
-								height: 700,
-								width: 600,
-								title: '机构基本信息',
-								url: '${contextRoot}/organization/dialog/orgInfo',
-								load: true,
-								urlParms: {
-									orgCode: encodeURIComponent(row.orgCode),
-									mode: mode
-								}
-							});
-						}
-					}));
-					// 自适应宽度
-					this.grid.adjustToWidth();
-					this.bindEvents();
-				},
-				activity: function (orgCode, activityFlag) {
-					var dataModel = $.DataModel.init();
-					dataModel.createRemote('${contextRoot}/organization/activity', {
-						data: {orgCode: orgCode, activityFlag: activityFlag},
-						success: function (data) {
-							if (data.successFlg) {
-								master.reloadGrid();
-							}
-						}
-					});
 				},
 				reloadGrid: function () {
 					//var values = retrieve.$element.Fields.getValues();
 					retrieve.$element.attrScan();
 					var orgAddress = retrieve.$element.Fields.location.getValue();
+
 					var values = $.extend({}, retrieve.$element.Fields.getValues(),
 							{province: (orgAddress.names[0] == null ? '' : orgAddress.names[0])},
 							{city: (orgAddress.names[1] == null ? '' : orgAddress.names[1])},
