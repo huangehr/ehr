@@ -10,7 +10,7 @@
     </parent>
 
 	<artifactId>svr-standard</artifactId>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>svr-standard</name>
 	<description>EHR platform standard service</description>
 

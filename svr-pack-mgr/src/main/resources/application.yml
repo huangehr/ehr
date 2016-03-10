@@ -1,9 +1,9 @@
 server:
   port: 6010
 
-security:
-  user:
-    password: pack
+#security:
+#  user:
+#    password: pack
 
 info:
   app:
