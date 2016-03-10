@@ -8,7 +8,7 @@ public class OrgModel {
     private String orgCode;
     private String orgType;
     private String orgTypeName;
-    private String orgCodeName;
+    private String pyCode;
     private String fullName;
     private String admin;
     private String tel;
@@ -44,12 +44,12 @@ public class OrgModel {
         this.orgTypeName = orgTypeName;
     }
 
-    public String getOrgCodeName() {
-        return orgCodeName;
+    public String getPyCode() {
+        return pyCode;
     }
 
-    public void setOrgCodeName(String orgCodeName) {
-        this.orgCodeName = orgCodeName;
+    public void setPyCode(String pyCode) {
+        this.pyCode = pyCode;
     }
 
     public String getFullName() {
