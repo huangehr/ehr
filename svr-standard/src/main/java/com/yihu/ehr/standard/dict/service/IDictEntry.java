@@ -17,7 +17,7 @@ import java.util.Objects;
 public class IDictEntry {
 
     long id;
-    long dictId;//字典ID
+    Long dictId;//字典ID
     String code;
     String value;
     String desc;
@@ -47,10 +47,7 @@ public class IDictEntry {
     }
 
     public void setDictId(Long dictId) {
-        if (dictId == null)
-            this.dictId = 0;
-        else
-            this.dictId = dictId;
+        this.dictId = dictId;
     }
 
     @Column(name = "code", unique = false, nullable = false)

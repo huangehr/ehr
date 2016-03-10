@@ -60,8 +60,10 @@ public class UsersEndPoint extends BaseController {
         MUser mUser = userClient.getUserByUserName(userName);
         UserModel userModel = convertToModel(mUser, UserModel.class);
 
-        //包括机构信息
-        userModel.setOrganization(organizationClient.getOrg(mUser.getOrganization()));
+        if (mUser.getOrganization() != null) {
+            userModel.setOrganization(organizationClient.getOrg(mUser.getOrganization()));
+        }
+
         return userModel;
     }
 
