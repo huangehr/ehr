@@ -1,5 +1,6 @@
 package com.yihu.ehr.dict.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.RestAPI;
 import com.yihu.ehr.constants.SessionAttributeKeys;
@@ -7,6 +8,7 @@ import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.ResourceProperties;
 import com.yihu.ehr.util.log.LogService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -24,12 +26,20 @@ import java.util.Map;
 @Controller(RestAPI.SystemDictManagerController)
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
 public class SystemDictController {
-    private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
-    private static   String username = ResourceProperties.getProperty("username");
-    private static   String password = ResourceProperties.getProperty("password");
-    private static   String module = ResourceProperties.getProperty("module");
-    private static   String version = ResourceProperties.getProperty("version");
-    private static   String comUrl = host + module + version;
+//    private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
+//    private static   String username = ResourceProperties.getProperty("username");
+//    private static   String password = ResourceProperties.getProperty("password");
+//    private static   String module = ResourceProperties.getProperty("module");
+//    private static   String version = ResourceProperties.getProperty("version");
+//    private static   String comUrl = host +"/"+ module +"/"+ version;
+
+    @Value("${service-gateway.username}")
+    private String username;
+    @Value("${service-gateway.password}")
+    private String password;
+    @Value("${service-gateway.url}")
+    private String comUrl;
+
     @RequestMapping("initial")
     public String systemDictDialog(Model model) {
         model.addAttribute("contentPage","/dict/systemDict");
@@ -427,7 +437,7 @@ public class SystemDictController {
     @ResponseBody
     public Object searchDictEntryList(Long dictId, Integer page, Integer rows) {
         Envelop result = new Envelop();
-        String url = "/sys_dict/dictionaries/{id}/entries";
+        String url = "/admin/dictionaries/"+dictId+"/entries";
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("dictId",dictId);
@@ -506,27 +516,22 @@ public class SystemDictController {
     @ResponseBody
     public Object searchDictEntryListForDDL(Long dictId, Integer page, Integer rows) {
         Envelop result = new Envelop();
+        ObjectMapper mapper = new ObjectMapper();
+
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("dictId",dictId);
-            String urlCheckDict = "/sys_dict/dictionaries/{id}";
+            params.put("value","");
+            params.put("page",1);
+            params.put("size",15);
+            String urlCheckDict = "/dictionaries/"+dictId+"/entries";
             String _rusDict = HttpClientUtil.doGet(comUrl+urlCheckDict,params,username,password);
-            if(StringUtils.isEmpty(_rusDict)){
+            result = mapper.readValue(_rusDict,Envelop.class);
+            if(!StringUtils.isEmpty(result)){
+                result.setSuccessFlg(true);
+            }else{
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.NotExistSysDict.toString());
-                return  result;
-            }
-            params.put("value","");
-            params.put("page",page);
-            params.put("rows",rows);
-            String url = "/sys_dict/dictionaries/{id}";
-            String _rus = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.InvalidSysDictEntry.toString());
-            }else{
-                //TODO 原方法只返回result.setDetailModelList(systemDictEntryList);
-                return _rus;
             }
         }catch (Exception ex){
             LogService.getLogger(SystemDictController.class).error(ex.getMessage());
@@ -534,18 +539,6 @@ public class SystemDictController {
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
         return result;
-
-       /* Result result = new Result();
-        XSystemDict systemDict = systemDictManager.getDict(dictId);
-        if (systemDict==null || systemDict.getEntryList().length == 0) {
-            result.setSuccessFlg(true);
-            return result.toJson();
-        }
-        XSystemDictEntry[] systemDictEntrys = systemDict.getEntryList();
-        List<XSystemDictEntry> systemDictEntryList = Arrays.asList(systemDictEntrys);
-        result.setSuccessFlg(true);
-        result.setDetailModelList(systemDictEntryList);
-        return result.toJson();*/
 
     }
     @RequestMapping("validator")

@@ -1,12 +1,14 @@
 package com.yihu.ehr.login.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.SessionAttributeKeys;
+import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
-import com.yihu.ehr.util.ResourceProperties;
+import com.yihu.ehr.web.DateFormatter;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -18,6 +20,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.*;
 
+
 /**
  * Created by lingfeng on 2015/6/30.
  */
@@ -25,12 +28,21 @@ import java.util.*;
 @RequestMapping("/login")
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
 public class LoginController {
-    private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
-    private static   String username = ResourceProperties.getProperty("username");
-    private static   String password = ResourceProperties.getProperty("password");
-    private static   String module = ResourceProperties.getProperty("module");  //目前定义为rest
-    private static   String version = ResourceProperties.getProperty("version");
-    private static   String comUrl = host + module + version;
+
+//    private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
+//    private static   String username = ResourceProperties.getProperty("username");
+//    private static   String password = ResourceProperties.getProperty("password");
+//    private static   String module = ResourceProperties.getProperty("module");  //目前定义为rest
+//    private static   String version = ResourceProperties.getProperty("version");
+//    private static   String comUrl = host +"/"+module +"/"+ version;
+
+    @Value("${service-gateway.username}")
+    private String username;
+    @Value("${service-gateway.password}")
+    private String password;
+    @Value("${service-gateway.url}")
+    private String comUrl;
+
 
     @RequestMapping(value = "")
     public String login(Model model) {
@@ -43,27 +55,29 @@ public class LoginController {
     @RequestMapping(value = "validate", method = RequestMethod.POST)
     public String loginValid(Model model, String userName, String password, HttpServletRequest request, HttpServletResponse response) {
 
-        String url = "/users/verification";
+        String url = "/users/verification/" + userName;
         String resultStr = "";
         Map<String, Object> params = new HashMap<>();
-        params.put("userName", userName);
-        params.put("password", password);
+        ObjectMapper mapper = new ObjectMapper();
+        params.put("psw", password);
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, this.password);
-            if (!StringUtils.isEmpty(resultStr)){
-                url = "user/isActivate";
-                Map<String, Object> params1 = new HashMap<>();
-                params1.put("userName", userName);
-                params1.put("password", password);
-                resultStr = HttpClientUtil.doGet(comUrl + url, params1, username, this.password);
-                if (!Boolean.parseBoolean(resultStr)){
+            Envelop envelop = mapper.readValue(resultStr, Envelop.class);
+
+            if (envelop.isSuccessFlg()){
+
+                boolean bo = Boolean.parseBoolean(String.valueOf((((Map)envelop.getObj()).get("activated"))));
+
+                if(!bo){
+
                     model.addAttribute("userName", userName);
                     model.addAttribute("successFlg", false);
                     model.addAttribute("failMsg", "该用户已失效，请联系系统管理员重新生效。");
                     model.addAttribute("contentPage","login/login");
-                    //todo:登陆时间
+
                     return "generalView";
                 }
+
                 return "redirect:/index";
             }else{
                 model.addAttribute("userName", userName);
