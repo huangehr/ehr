@@ -13,7 +13,6 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,18 +31,18 @@ public class CDAController extends BaseController{
     @RequestMapping(value = "/cdas", method = RequestMethod.GET)
     @ApiOperation(value = "根据条件获取cda列表")
     public Envelop GetCdaListByKey(
-                                    @ApiParam(name = "code", value = "CDA代码")
-                                    @RequestParam(value = "code") String code,
-                                    @ApiParam(name = "name", value = "CDA名称")
-                                    @RequestParam(value = "name") String name,
-                                    @ApiParam(name = "versionCode", value = "标准版本代码")
-                                    @RequestParam(value = "versionCode") String versionCode,
-                                    @ApiParam(name = "cdaType", value = "cda类别")
-                                    @RequestParam(value = "cdaType") String cdaType,
-                                    @ApiParam(name = "page", value = "当前页", defaultValue = "1")
-                                    @RequestParam(value = "page") int page,
-                                    @ApiParam(name = "rows", value = "每页行数", defaultValue = "20")
-                                    @RequestParam(value = "rows") int rows) {
+            @ApiParam(name = "code", value = "CDA代码")
+            @RequestParam(value = "code") String code,
+            @ApiParam(name = "name", value = "CDA名称")
+            @RequestParam(value = "name") String name,
+            @ApiParam(name = "versionCode", value = "标准版本代码")
+            @RequestParam(value = "versionCode") String versionCode,
+            @ApiParam(name = "cdaType", value = "cda类别")
+            @RequestParam(value = "cdaType") String cdaType,
+            @ApiParam(name = "page", value = "当前页", defaultValue = "1")
+            @RequestParam(value = "page") int page,
+            @ApiParam(name = "rows", value = "每页行数", defaultValue = "20")
+            @RequestParam(value = "rows") int rows) {
 
         List<MCDADocument> mcdaDocumentList = cdaClient.GetCDADocuments(versionCode,code,name,cdaType,page,rows);
         List<CDAModel> cdaModels = (List<CDAModel>)convertToModels(mcdaDocumentList,new ArrayList<CDAModel>(mcdaDocumentList.size()),CDAModel.class,null);
@@ -58,18 +57,22 @@ public class CDAController extends BaseController{
     @RequestMapping(value = "/cda", method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取cda")
     public Envelop getCDAInfoById(
-                                 @ApiParam(name = "cdaId", value = "cdaID")
-                                 @PathVariable(value = "cdaId") String cdaId,
-                                 @ApiParam(name = "versionCode", value = "标准版本代码")
-                                 @PathVariable(value = "versionCode") String versionCode) {
+            @ApiParam(name = "cdaId", value = "cdaID")
+            @PathVariable(value = "cdaId") String cdaId,
+            @ApiParam(name = "versionCode", value = "标准版本代码")
+            @PathVariable(value = "versionCode") String versionCode) {
 
         Envelop envelop = new Envelop();
+        CDAModel cdaModel = null;
 
-        List<MCDADocument> mcdaDocumentList = cdaClient.getCDADocumentById(Arrays.asList(cdaId), versionCode);
-        List<CDAModel> cdaModels = (List<CDAModel>)convertToModels(mcdaDocumentList,new ArrayList<CDAModel>(mcdaDocumentList.size()),CDAModel.class,null);
-        if (cdaModels != null){
+        List<MCDADocument> mcdaDocumentList = cdaClient.getCDADocumentById(cdaId, versionCode);
+        for (MCDADocument mcdaDocument:mcdaDocumentList){
+            cdaModel = convertToModel(mcdaDocument,CDAModel.class);
+        }
+
+        if (cdaModel != null){
             envelop.setSuccessFlg(true);
-            envelop.setDetailModelList(cdaModels);
+            envelop.setObj(cdaModel);
         }else {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("查询失败");
@@ -83,8 +86,8 @@ public class CDAController extends BaseController{
     @RequestMapping(value = "cda",method = RequestMethod.POST)
     @ApiOperation(value = "保存CDADocuments")
     public Envelop SaveCdaInfo(
-                              @ApiParam(name = "cdaInfoJson", value = "CDAJson")
-                              @RequestParam(value = "cdaInfoJson") String cdaInfoJson) {
+            @ApiParam(name = "cdaInfoJson", value = "CDAJson")
+            @RequestParam(value = "cdaInfoJson") String cdaInfoJson) {
 
         Envelop envelop = new Envelop();
 
@@ -128,10 +131,10 @@ public class CDAController extends BaseController{
     @RequestMapping(value = "/cda",method = RequestMethod.DELETE)
     @ApiOperation(value = "删除CDADocuments")
     public Envelop deleteCdaInfo(
-                                @ApiParam(name = "cdaId", value = "cdaID")
-                                @PathVariable(value = "cdaId") String cdaId,
-                                @ApiParam(name = "versionCode", value = "标准版本代码")
-                                @PathVariable(value = "versionCode") String versionCode) {
+            @ApiParam(name = "cdaId", value = "cdaID")
+            @PathVariable(value = "cdaId") String cdaId,
+            @ApiParam(name = "versionCode", value = "标准版本代码")
+            @PathVariable(value = "versionCode") String versionCode) {
 
         Envelop envelop = new Envelop();
 
@@ -170,20 +173,20 @@ public class CDAController extends BaseController{
     @RequestMapping("SaveRelationship")
     @ApiOperation(value = "保存CDADataSetRelationship")
     public Envelop SaveRelationship(
-                                   @ApiParam(name = "dataSetIds", value = "数据集ID(多ID以逗号隔开)")
-                                   @RequestParam(value = "dataSetIds") String dataSetIds,
-                                   @ApiParam(name = "cdaId", value = "cdaID")
-                                   @PathVariable(value = "cdaId") String cdaId,
-                                   @ApiParam(name = "versionCode", value = "标准版本代码")
-                                   @PathVariable(value = "versionCode") String versionCode,
-                                   @ApiParam(name = "xmlInfo", value = "XML文件信息")
-                                   @RequestParam(value = "xmlInfo") String xmlInfo) {
+            @ApiParam(name = "dataSetIds", value = "数据集ID(多ID以逗号隔开)")
+            @RequestParam(value = "dataSetIds") String dataSetIds,
+            @ApiParam(name = "cdaId", value = "cdaID")
+            @PathVariable(value = "cdaId") String cdaId,
+            @ApiParam(name = "versionCode", value = "标准版本代码")
+            @PathVariable(value = "versionCode") String versionCode,
+            @ApiParam(name = "xmlInfo", value = "XML文件信息")
+            @RequestParam(value = "xmlInfo") String xmlInfo) {
 
         Envelop envelop = new Envelop();
 
-//        boolean bo = cdaClient.saveCDADataSetRelationship(dataSetIds,cdaId,versionCode,xmlInfo);
-//
-//        envelop.setSuccessFlg(bo);
+        boolean bo = cdaClient.saveCDADataSetRelationship(dataSetIds,cdaId,versionCode,xmlInfo);
+
+        envelop.setSuccessFlg(bo);
 
         return envelop;
     }
@@ -204,7 +207,7 @@ public class CDAController extends BaseController{
             @ApiParam(name = "versionCode", value = "versionCode")
             @RequestParam(value = "versionCode") String versionCode,
             @ApiParam(name = "ids", value = "ids")
-            @RequestParam(value = "ids") String[] ids){
+            @RequestParam(value = "ids") String ids){
 
         Envelop envelop = new Envelop();
 
@@ -239,10 +242,10 @@ public class CDAController extends BaseController{
 
     @RequestMapping(value = "documentExist",method = RequestMethod.GET)
     public Object documentExist(
-                                @ApiParam(name = "code", value = "CDA代码")
-                                @RequestParam(value = "code") String code,
-                                @ApiParam(name = "versionCode", value = "标准版本代码")
-                                @PathVariable(value = "versionCode") String versionCode){
+            @ApiParam(name = "code", value = "CDA代码")
+            @RequestParam(value = "code") String code,
+            @ApiParam(name = "versionCode", value = "标准版本代码")
+            @PathVariable(value = "versionCode") String versionCode){
 
         return null;
     }
@@ -267,6 +270,24 @@ public class CDAController extends BaseController{
 //        }
 //      return envelop;
 //    }
+
+    @RequestMapping(value = "createCDASchemaFile",method = RequestMethod.POST)
+    @ApiOperation(value = "生成CDA文件")
+    public Envelop createCDASchemaFile(
+            @ApiParam(name = "versionCode", value = "versionCode")
+            @RequestParam(value = "versionCode") String versionCode,
+            @ApiParam(name = "cda_id", value = "cda_id")
+            @RequestParam(value = "cda_id") String cdaId){
+
+        Envelop envelop = new Envelop();
+
+        boolean bo = cdaClient.createCDASchemaFile(versionCode,cdaId);
+
+        envelop.setSuccessFlg(bo);
+
+        return envelop;
+    }
+
 
 
 }

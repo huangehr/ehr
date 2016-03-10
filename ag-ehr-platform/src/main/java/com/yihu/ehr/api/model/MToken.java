@@ -28,12 +28,12 @@ public class MToken {
         this.token = token;
     }
 
-    public void setToken_last_eight(String token_last_eight) {
-        this.token_last_eight = token_last_eight;
+    public void setTokenLastEight(String token_last_eight) {
+        this.tokenLastEight = token_last_eight;
     }
 
-    public void setHashed_token(String hashed_token) {
-        this.hashed_token = hashed_token;
+    public void setTokenHash(String tokenHash) {
+        this.tokenHash = tokenHash;
     }
 
     public void setApp(MApp app) {
@@ -44,16 +44,16 @@ public class MToken {
         this.note = note;
     }
 
-    public void setNote_url(String note_url) {
-        this.note_url = note_url;
+    public void setNoteUrl(String noteUrl) {
+        this.noteUrl = noteUrl;
     }
 
-    public void setUpdated_at(Date updated_at) {
-        this.updated_at = updated_at;
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
-    public void setCreated_at(Date created_at) {
-        this.created_at = created_at;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 
     public void setFingerprint(String fingerprint) {
@@ -76,12 +76,12 @@ public class MToken {
         return token;
     }
 
-    public String getToken_last_eight() {
-        return token_last_eight;
+    public String getTokenLastEight() {
+        return tokenLastEight;
     }
 
-    public String getHashed_token() {
-        return hashed_token;
+    public String getTokenHash() {
+        return tokenHash;
     }
 
     public MApp getApp() {
@@ -92,16 +92,16 @@ public class MToken {
         return note;
     }
 
-    public String getNote_url() {
-        return note_url;
+    public String getNoteUrl() {
+        return noteUrl;
     }
 
-    public Date getUpdated_at() {
-        return updated_at;
+    public Date getUpdatedAt() {
+        return updatedAt;
     }
 
-    public Date getCreated_at() {
-        return created_at;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
     public String getFingerprint() {
@@ -110,12 +110,13 @@ public class MToken {
 
     Set<String> scopes;
     String token;
-    String token_last_eight;
-    String hashed_token;
-    MApp app;
+    String tokenLastEight;
+    String tokenHash;
     String note;
-    String note_url;
-    Date updated_at;
-    Date created_at;
+    String noteUrl;
+    Date updatedAt;
+    Date createdAt;
     String fingerprint;
+
+    MApp app;
 }

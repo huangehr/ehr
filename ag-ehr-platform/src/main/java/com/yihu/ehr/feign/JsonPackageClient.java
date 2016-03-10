@@ -20,7 +20,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface JsonPackageClient {
-    @RequestMapping(value = "/package", method = POST)
+    @RequestMapping(value = "/packages", method = POST)
     void savePackage(
             @RequestParam(value = "user_name") String fileString,
             @RequestParam(value = "user_name") String userName,

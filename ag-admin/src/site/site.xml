@@ -1,26 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="微服务平台">
-    <!--bannerLeft>
-        <name>健康之路健康档案平台</name>
-        <src>images/logos/org-logo.png</src>
-        <href>http://www.yihu.com</href>
-    </bannerLeft-->
+<project name="${project.organization.name}">
     <bannerRight>
         <src>images/logos/platform-logo.png</src>
     </bannerRight>
     <body>
-        <menu name="API" ref="reports">
-            <item name="参考"/>
-            <item name="开发向导"/>
-            <item name="客户端"/>
+        <menu name="系统">
+            <item name="概览"/>
+            <item name="系统架构"/>
+            <item name="业务流程"/>
         </menu>
-        <menu name="开发者">
-            <item name="介绍" href="index.html"/>
-            <item name="下载" href="resource/download.html"/>
-            <item name="发布说明" href="resource/release-notes.html"/>
+        <menu name="模块">
+            <item name="概览" href="modules/modules.html"/>
+            <item name="服务发现" href=""/>
+            <item name="服务配置" href=""/>
+            <item name="系统字典" href=""/>
+            <item name="用户" href=""/>
+            <item name="机构" href=""/>
+            <item name="" href=""/>
+            <item name="系统字典" href=""/>
         </menu>
-        <menu name="博客" ref="reports"/>
-        <menu name="技术支持" ref=""/>
+        <menu name="开发">
+            <item name="概览" href="development/development.html"/>
+            <item name="职责与约定" href="development/specification/agreement.html"/>
+            <item name="前端规范" href="development/specification/front-end.html"/>
+            <item name="REST规范" href="development/specification/rest-api.html"/>
+            <item name="Thrift规范" href="development/specification/thrift-api.html"/>
+        </menu>
+        <menu name="部署">
+            <item name="概览" href="deployment/deployment.html"/>
+            <item name="环境"/>
+            <item name="要求"/>
+        </menu>
+        <menu name="支持">
+            <item name="概览"/>
+        </menu>
+        <menu name="解决方案">
+            <item name="概览" href="solutions/index.html"/>
+        </menu>
+        <menu name="团队">
+            <item name="概览"/>
+        </menu>
     </body>
     <skin>
         <groupId>lt.velykis.maven.skins</groupId>

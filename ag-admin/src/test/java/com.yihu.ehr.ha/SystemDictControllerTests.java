@@ -179,6 +179,9 @@ public class SystemDictControllerTests {
         envelop = systemDictController.getTagsList();
         assertNotEquals("获取标签字典项失败", envelop, null);
 
+//        envelop = sysDict.isAppNameExists("ChildHealth");
+//        assertTrue("获取标签字典项失败", envelop.isSuccessFlg());
+
     }
 
 }

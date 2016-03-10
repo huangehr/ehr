@@ -44,7 +44,7 @@ public interface CDAClient {
     @ApiOperation(value = "根据ids获取cda列表")
     List<MCDADocument> getCDADocumentById(
             @ApiParam(name = "ids", value = "版本号")
-            @RequestParam(value = "ids") List<String> ids,
+            @RequestParam(value = "ids") String ids,
             @ApiParam(name = "version_code", value = "version_code")
             @RequestParam(value = "version_code") String version);
 
@@ -80,7 +80,7 @@ public interface CDAClient {
     @RequestMapping(value = "/cda_data_set_relationships",method = RequestMethod.POST)
     boolean saveCDADataSetRelationship(
             @ApiParam(name = "data_set_ids", value = "data_set_ids")
-            @RequestParam(value = "data_set_ids") String[] dataSetIds,
+            @RequestParam(value = "data_set_ids") String dataSetIds,
             @ApiParam(name = "cda_id", value = "cda_id")
             @RequestParam(value = "cda_id") String cdaId,
             @ApiParam(name = "versionCode", value = "versionCode")
@@ -94,7 +94,7 @@ public interface CDAClient {
             @ApiParam(name = "versionCode", value = "versionCode")
             @RequestParam(value = "versionCode") String versionCode,
             @ApiParam(name = "ids", value = "ids")
-            @RequestParam(value = "ids") String[] ids);
+            @RequestParam(value = "ids") String ids);
 
     @RequestMapping(value = "/cda_data_set_relationships/cda_id" ,method = RequestMethod.GET)
     @ApiOperation(value = "根据cda_id获取getCDADataSetRelationship列表")
