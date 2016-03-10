@@ -53,7 +53,7 @@ public class OrgMetaDataController extends ExtendController<MOrgMetaData> {
         OrgMetaData orgMetaData = jsonToObj(model, OrgMetaData.class);
         boolean isExist = orgMetaDataService.isExistOrgMetaData(orgMetaData.getOrgDataSet(), orgMetaData.getOrganization(), orgMetaData.getCode());//重复验证
         if (isExist)
-            throw new ApiException(ErrorCode.RepeatOrgMetaData, "该数据元已存在!");
+            throw new ApiException(ErrorCode.RepeatCode);
 
         orgMetaData.setCreateDate(new Date());
         return getModel(orgMetaDataService.createOrgMetaData(orgMetaData));
@@ -76,8 +76,8 @@ public class OrgMetaDataController extends ExtendController<MOrgMetaData> {
             @ApiParam(name = "ids", value = "编号集", defaultValue = "")
             @RequestParam(value = "ids") String ids) throws Exception {
 
-        //if (ids != null && ids.length() > 0)
-        orgMetaDataService.delete(ids.split(","));
+        if (ids != null && ids.length() > 0)
+            orgMetaDataService.delete(strToLongArr(ids));
         return true;
     }
 
@@ -99,7 +99,7 @@ public class OrgMetaDataController extends ExtendController<MOrgMetaData> {
                 dataModel.setUpdateDate(new Date());
                 return getModel(orgMetaDataService.save(dataModel));
             } else
-                throw new ApiException(ErrorCode.RepeatOrgMetaData, "数据元代码重复！");
+                throw new ApiException(ErrorCode.RepeatCode);
         }
     }
 

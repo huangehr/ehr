@@ -2,6 +2,7 @@ package com.yihu.ehr.query;
 
 import com.yihu.ehr.constants.PageArg;
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -10,12 +11,14 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.EntityType;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -57,8 +60,8 @@ public class BaseJpaService<T, R> {
     }
 
     public void delete(Iterable ids) {
-        List<T> list = getJpaRepository().findAll(ids);
-        getJpaRepository().deleteInBatch(list);
+        Iterable list = getRepository().findAll(ids);
+        getRepository().delete(list);
     }
 
     public Class<T> getEntityClass() {
@@ -164,5 +167,24 @@ public class BaseJpaService<T, R> {
         return entityManager
                 .createQuery(query)
                 .getResultList() ;
+    }
+
+    public String getClzName(){
+        return getEntityClass().getName();
+    }
+
+    public String getEntityIdFiled(){
+        EntityType entityType = entityManager.getMetamodel().entity(getEntityClass());
+        javax.persistence.metamodel.Type type = entityType.getIdType();
+        String s = entityType.getId(type.getJavaType()).getName();
+        return s;
+    }
+
+
+    public int delete(Object[] ids){
+        String hql = " DELETE FROM "+getEntityClass().getName()+" WHERE "+getEntityIdFiled()+" in(:ids)";
+        Query query = currentSession().createQuery(hql);
+        query.setParameterList("ids", ids);
+        return query.executeUpdate();
     }
 }
