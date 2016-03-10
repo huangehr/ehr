@@ -22,7 +22,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 public interface JsonPackageClient {
     @RequestMapping(value = "/package", method = POST)
     void savePackage(
-            MultipartHttpServletRequest jsonPackage,
+            @RequestParam(value = "user_name") String fileString,
             @RequestParam(value = "user_name") String userName,
             @RequestParam(value = "package_crypto") String packageCrypto,
             @RequestParam(value = "md5") String md5

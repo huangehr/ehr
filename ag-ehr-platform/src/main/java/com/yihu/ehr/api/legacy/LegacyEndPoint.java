@@ -14,11 +14,13 @@ import com.yihu.ehr.model.security.MUserSecurity;
 import com.yihu.ehr.util.DateFormatter;
 import com.yihu.ehr.util.IdCardValidator;
 import com.yihu.ehr.util.RestEcho;
+import com.yihu.ehr.util.encode.Base64;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.IOException;
@@ -311,18 +313,20 @@ public class LegacyEndPoint {
     @ApiOperation(value = "上传档案包", response = String.class)
     @RequestMapping(value = "/json_package",method = RequestMethod.POST)
     public RestEcho uploadPackage(
-            @ApiParam(required = true, name = "package", value = "JSON档案包", allowMultiple = true)
+            @ApiParam(required = false, name = "package", value = "JSON档案包", allowMultiple = true)
             MultipartHttpServletRequest jsonPackage,
             @ApiParam(required = true, name = "user_name", value = "用户名")
             @RequestParam(value = "user_name") String userName,
             @ApiParam(required = true, name = "package_crypto", value = "档案包解压密码,二次加密")
             @RequestParam(value = "package_crypto") String packageCrypto,
             @ApiParam(required = true, name = "md5", value = "档案包MD5")
-            @RequestParam(value = "md5") String md5) {
-        jsonPackageClient.savePackage(jsonPackage,userName,packageCrypto,md5);
+            @RequestParam(value = "md5") String md5) throws Exception {
+        MultipartFile multipartFile = jsonPackage.getFile("file");
+        byte[] bytes = multipartFile.getBytes();
+        String fileString = Base64.encode(bytes);
+        jsonPackageClient.savePackage(fileString,userName,packageCrypto,md5);
         return new RestEcho().success().putMessage("ok");
     }
-
 
     @ApiOperation(value = "公钥", response = String.class)
     @RequestMapping(value = "/security/user_key/{login_code}",  method = RequestMethod.GET)
