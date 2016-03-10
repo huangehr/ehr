@@ -169,5 +169,4 @@ public interface ConventionalDictEntryClient {
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code);
 
-
 }

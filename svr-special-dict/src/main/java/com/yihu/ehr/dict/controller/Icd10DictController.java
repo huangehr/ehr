@@ -77,7 +77,7 @@ public class Icd10DictController extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(value = "/dict/ice10/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/dict/icd10", method = RequestMethod.PUT)
     @ApiOperation(value = "更新ICD10字典" )
     public MIcd10Dict updateIcd10Dict(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
@@ -89,7 +89,7 @@ public class Icd10DictController extends BaseRestController {
         return convertToModel(dict, MIcd10Dict.class);
     }
 
-    @RequestMapping(value = "/dict/ice10/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/icd10/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据ID获取相应的ICD10字典信息。" )
     public MIcd10Dict getIcd10Dict(
             @ApiParam(name = "id", value = "icd10字典内码")
@@ -138,7 +138,7 @@ public class Icd10DictController extends BaseRestController {
         return hpIcd10RelationService.isUsage(id);
     }
 
-    @RequestMapping(value = "/dict/icd10/{name}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/icd10/existence/name/{name}" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典名称是否已经存在")
     public boolean isNameExists(
             @ApiParam(name = "name", value = "name", defaultValue = "")
@@ -146,7 +146,7 @@ public class Icd10DictController extends BaseRestController {
         return icd10DictService.isNameExist(name);
     }
 
-    @RequestMapping(value = "/dict/icd10/{code}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/icd10/existence/code/{code}" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典代码是否已经存在")
     public boolean isCodeExists(
             @ApiParam(name = "code", value = "code", defaultValue = "")
@@ -169,7 +169,7 @@ public class Icd10DictController extends BaseRestController {
         return convertToModel(relation, MIcd10DrugRelation.class, null);
     }
 
-    @RequestMapping(value = "/dict/icd10/drug/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/dict/icd10/drug", method = RequestMethod.PUT)
     @ApiOperation(value = "为ICD10修改药品关联。" )
     public MIcd10DrugRelation updateIcd10DrugRelation(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
@@ -247,7 +247,7 @@ public class Icd10DictController extends BaseRestController {
         return convertToModel(relation, MIcd10IndicatorRelation.class, null);
     }
 
-    @RequestMapping(value = "/dict/icd10/indicator/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/dict/icd10/indicator", method = RequestMethod.PUT)
     @ApiOperation(value = "为ICD10修改指标关联。" )
     public MIcd10IndicatorRelation updateIcd10IndicatorRelation(
             @ApiParam(name = "dictionary", value = "字典JSON结构")

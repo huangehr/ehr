@@ -67,7 +67,7 @@ public class HealthProblemDictController extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(value = "/dict/hp/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/dict/hp", method = RequestMethod.PUT)
     @ApiOperation(value = "更新健康问题字典" )
     public MHealthProblemDict updateHpDict(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
@@ -119,7 +119,7 @@ public class HealthProblemDictController extends BaseRestController {
         }
     }
 
-    @RequestMapping(value = "/dict/hp/{name}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/hp/existence/name/{name}" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典名称是否已经存在")
     public boolean isNameExists(
             @ApiParam(name = "name", value = "name", defaultValue = "")
@@ -127,7 +127,7 @@ public class HealthProblemDictController extends BaseRestController {
         return hpDictService.isNameExist(name);
     }
 
-    @RequestMapping(value = "/dict/hp/{code}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/hp/existence/code/{code}" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典代码是否已经存在")
     public boolean isCodeExists(
             @ApiParam(name = "code", value = "code", defaultValue = "")
@@ -150,7 +150,7 @@ public class HealthProblemDictController extends BaseRestController {
         return convertToModel(relation, MHpIcd10Relation.class, null);
     }
 
-    @RequestMapping(value = "/dict/hp/icd10/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/dict/hp/icd10", method = RequestMethod.PUT)
     @ApiOperation(value = "为健康问题修改ICD10疾病关联。" )
     public MHpIcd10Relation updateHpIcd10Relation(
             @ApiParam(name = "dictionary", value = "字典JSON结构")

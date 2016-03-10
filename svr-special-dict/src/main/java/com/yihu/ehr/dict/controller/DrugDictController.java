@@ -57,7 +57,7 @@ public class DrugDictController extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(value = "/dict/drug/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/dict/drug", method = RequestMethod.PUT)
     @ApiOperation(value = "更新药品字典" )
     public MDrugDict updateDrugDict(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
@@ -118,7 +118,7 @@ public class DrugDictController extends BaseRestController {
         return icd10DrugRelationService.isUsage(id);
     }
 
-    @RequestMapping(value = "/dict/drug/{name}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/drug/existence/name/{name}" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典名称是否已经存在")
     public boolean isNameExist(
             @ApiParam(name = "name", value = "name", defaultValue = "")
@@ -126,7 +126,7 @@ public class DrugDictController extends BaseRestController {
         return drugDictService.isNameExist(name);
     }
 
-    @RequestMapping(value = "/dict/drug/{code}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/drug/existence/code/{code}" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典代码是否已经存在")
     public boolean isCodeExist(
             @ApiParam(name = "code", value = "code", defaultValue = "")
