@@ -51,11 +51,15 @@ eureka:
 spring:
   profiles: test
 
+keystore:
+  file: /home/tomcat.keystore
+  password: 123456
+
 eureka:
   instance:
-    ip-address: unknown
+    ip-address: 172.19.103.73
   client:
-    registerWithEureka: false
+    registerWithEureka: true
     fetchRegistry: true
     serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
 
