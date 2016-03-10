@@ -79,7 +79,7 @@
                         var orgCode = self.$orgCode.val();
                         var dataModel = $.DataModel.init();
                         dataModel.fetchRemote("${contextRoot}/organization/validationOrg", {
-                            data: {searchNm:orgCode},
+                            data: {orgCode:orgCode},
                             async: false,
                             success: function (data) {
                                 if (data.successFlg) {
