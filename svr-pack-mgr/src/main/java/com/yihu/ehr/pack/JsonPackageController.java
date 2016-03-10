@@ -17,10 +17,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import java.io.ByteArrayInputStream;
 import java.text.ParseException;
 import java.util.*;
 
@@ -32,7 +34,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "json_package_service", description = "Json数据包归档接口", tags = {"JSON", "健康档案包"})
+@Api(protocols = "https", value = "json_package_service", description = "Json数据包归档接口", tags = {"JSON,健康档案包"})
 public class JsonPackageController extends BaseRestController {
     @Autowired
     private SecurityClient securityClient;
@@ -71,11 +73,11 @@ public class JsonPackageController extends BaseRestController {
      *
      * @param packageCrypto zip密码密文, file 请求体中文件参数名
      */
-    @RequestMapping(value = "/package", method = {RequestMethod.POST})
+    @RequestMapping(value = "/package", method = RequestMethod.POST)
     @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
     public void savePackage(
-            @ApiParam(required = true, name = "package", value = "JSON档案包", allowMultiple = true)
-            MultipartHttpServletRequest jsonPackage,
+            @ApiParam(required = false, name = "file_string", value = "JSON档案包字符串")
+            @RequestParam(value = "user_name") String fileString,
             @ApiParam(required = true, name = "user_name", value = "用户名")
             @RequestParam(value = "user_name") String userName,
             @ApiParam(required = true, name = "package_crypto", value = "档案包解压密码,二次加密")
@@ -83,15 +85,14 @@ public class JsonPackageController extends BaseRestController {
             @ApiParam(required = true, name = "md5", value = "档案包MD5")
             @RequestParam(value = "md5") String md5) throws Exception {
 
-        MultipartFile file = jsonPackage.getFile("file");
-        if (null == file) throw new ApiException(ErrorCode.MissParameter, "file");
+        if (StringUtils.isEmpty(fileString)) throw new ApiException(ErrorCode.MissParameter, "file");
 
-        String privateKey = securityClient.getUserSecurityByUserName(userName);
+        String privateKey = securityClient.getUserSecurityByLoginCode(userName);
         if (null == privateKey) throw new ApiException(ErrorCode.GenerateUserKeyFailed);
-
         String unzipPwd = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
-        jsonPackageService.receive(file.getInputStream(), unzipPwd);
+        jsonPackageService.receive(new ByteArrayInputStream(fileString.getBytes()), unzipPwd);
     }
+
 
     /**
      * 获取档案包。
