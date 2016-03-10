@@ -34,7 +34,7 @@
                 <artifactId>maven-thrift-plugin</artifactId>
                 <version>0.1.11</version>
                 <configuration>
-                    <thriftExecutable>C:/Windows/thrift.exe</thriftExecutable>
+                    <thriftExecutable>${basedir}/src/main/thrift/thrift.exe</thriftExecutable>
                     <thriftSourceRoot>${basedir}/src/main/thrift</thriftSourceRoot>
                     <outputDirectory>${basedir}/src/main/java</outputDirectory>
                 </configuration>

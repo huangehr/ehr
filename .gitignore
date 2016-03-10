@@ -5,6 +5,7 @@ ehr.ids
 */*.iml
 */target
 .idea/*
+app-admin/.idea/*
 
 
 # ---> Java

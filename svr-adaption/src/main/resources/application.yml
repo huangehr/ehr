@@ -46,6 +46,12 @@ ehr:
   common:
     invalid:
       parameter: 参数解析错误！
+    query:
+      not:
+        found: 不存在该对象！
+  commons:
+    repeat:
+      code: 代码重复！
 ---
 spring:
   profiles: dev

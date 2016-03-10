@@ -66,14 +66,14 @@ public class CDAManager {
             return true;
         }
         List<CDADataSetRelationship> infos = new ArrayList<>();
-        for (int i = 0; i < dataSetIds.length; i++) {
+        for (int i = 0; i < infos.size(); i++) {
             String dataSetId = dataSetIds[i];
             CDADataSetRelationship info = new CDADataSetRelationship();
             info.setCdaId(cdaId);
             info.setDataSetId(dataSetId);
             infos.add(info);
         }
-//        cdaDataSetRelationshipManager.addRelationship(infos,versionCode);
+        cdaDataSetRelationshipManager.addRelationship(infos,versionCode);
         if(infos.size()>0){
             cdaDataSetRelationshipManager.addRelationship(infos,versionCode);
         }else{

@@ -13,11 +13,12 @@ import org.springframework.util.StringUtils;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * 对象池工具类
  *
- * 目前提供ORM动态映射解决方案并生成class  文件
+ * 目前提供ORM动�?映射解决方案并生成class  文件
  *
  * @author lincl
  * @version 1.0
@@ -28,13 +29,13 @@ public class ClassPoolUtils {
 
 
     /**
-     * 运行时动态ORM表映射
+     * 运行时动态ORM表映�?
      *
      *
-     * @param entityClassName   待映射的实体全限定类名
+     * @param entityClassName   待映射的实体全限定类�?
      * @param tableName         待映射的表名
-     * @param newClzName        新的实体全限定类名
-     * @return                   映射后的类对象
+     * @param newClzName        新的实体全限定类�?
+     * @return                   映射后的类对�?
      */
     public static Class<?> tableMapping(
             String entityClassName, String tableName, String newClzName)
@@ -71,8 +72,7 @@ public class ClassPoolUtils {
         //save class file
         DataOutputStream dataOutputStream =
                 new DataOutputStream(
-                        new FileOutputStream(new File(
-                                classNameTofilePath(newClzName))));
+                        new FileOutputStream(createFile(newClzName)));
         classFile.write(dataOutputStream);
         dataOutputStream.flush();
         dataOutputStream.close();
@@ -81,8 +81,30 @@ public class ClassPoolUtils {
         return clazz.toClass(loader , null);
     }
 
+    public static File createFile(String clzName) throws IOException {
+        String splitMark = System.getProperty("file.separator");
+        String path = System.getProperty("user.home") +splitMark+ "ehr"  +splitMark+ "std" + splitMark;
+        String clzPath = clzName.substring(0, clzName.lastIndexOf(".")).replace(".", splitMark);
+        String filePath = path + clzPath;
+        File pathFile = new File(filePath);
+        if(!pathFile.exists())
+            System.err.println(pathFile.mkdirs());
+        String simpleName = clzName.substring(clzName.lastIndexOf(".") + 1 )+".class";
+        File file = new File(filePath, simpleName);
+        if(file.exists())
+            file.delete();
+        file.createNewFile();
+        return file;
+    }
+
     public static String classNameTofilePath(String clzName) {
         String clzPath = System.getProperty("user.home") + "/ehr/std/";
+        File file = new File(clzPath);
+        boolean rs = file.exists();
+        System.err.println(rs);
+        if(!rs)
+            System.err.println(file.mkdir());
+
         String path = ClassPoolUtils.class.getClassLoader().getResource("").getPath();
         if(path.indexOf("test-classes")!=-1){
             path = path.replace("test-classes", "classes");

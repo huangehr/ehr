@@ -9,13 +9,16 @@ import com.yihu.ehr.api.esb.service.SimplifiedESBService;
 import com.yihu.ehr.config.FastDFSConfig;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.util.DateFormatter;
+import com.yihu.ehr.util.encode.Base64;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Date;
 
 /**
@@ -78,7 +81,7 @@ public class SimplifiedESBController {
             HosEsbMiniRelease h = simplifiedESBService.getUpdateFlag(versionCode, systemCode, orgCode);
             if (h != null) {
                 ObjectMapper om = new ObjectMapper();
-                return om.writeValueAsString(om);
+                return om.writeValueAsString(h);
             } else {
                 return "";
             }
@@ -93,17 +96,23 @@ public class SimplifiedESBController {
      *
      * @param systemCode
      * @param orgCode
-     * @param response
      */
     @RequestMapping(value = "/downUpdateWar", method = RequestMethod.POST)
     public String downUpdateWar(
-            @RequestParam(value = "versionCode", required = true) String systemCode,
-            @RequestParam(value = "versionCode", required = true) String orgCode,
-            @RequestParam(value = "versionCode", required = true) HttpServletResponse response) {
+            @RequestParam(value = "systemCode", required = true) String systemCode,
+            @RequestParam(value = "orgCode", required = true) String orgCode) {
         try {
             // path是指欲下载的文件的路径。
             HosEsbMiniRelease he = simplifiedESBService.getSimplifiedESBBySystemCodes(systemCode, orgCode);
             File file = new File(he.getFile());
+            InputStream i = new FileInputStream(file);
+            if (file.exists()) {
+                long l = file.length();
+                byte[] by = new byte[(int) l];
+                i.read(by);
+                return Base64.encode(by);
+            }
+            /*
             // 取得文件名。
             String filename = file.getName();
             // 取得文件的后缀名。
@@ -123,7 +132,7 @@ public class SimplifiedESBController {
             response.setContentType("application/octet-stream");
             toClient.write(buffer);
             toClient.flush();
-            toClient.close();
+            toClient.close();*/
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -9,46 +9,52 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * Created by Administrator on 2015/7/31.
+ * Token工具。
+ *
+ * @author Sand
+ * @version 1.0
+ * @created 2015.07.31 10:55
  */
 public class TokenUtil {
 
-    private final static String NUM_CHAR = "0123456789";
-    private static int charLen = NUM_CHAR.length();
-    public static final String PASS_WORD = "ha_passw0rd";
+    private final static String BASE = "abcdefghijklmnopqrstuvwxyz0123456789";
+    private final static String TOKEN_ENCRYPT_WORD = "ha_passw0rd";
 
-    //随机数生成
-    public static String getRandomNumberSeed(int randomNumberDigit) {
+    private final static int BASE_LENGTH = BASE.length();
 
+    /**
+     * 生成授权码
+     *
+     * @param length
+     * @return
+     */
+    public static String genToken(int length) {
         long seed = System.currentTimeMillis();  // 获得系统时间，作为生成随机数的种子
-        StringBuffer sb = new StringBuffer();    // 装载生成的随机数
-        Random random = new Random(seed);        // 调用种子生成随机数
+        StringBuffer sb = new StringBuffer(length);
+        Random random = new Random(seed);
 
-        for (int i = 0; i < randomNumberDigit; i++) {
-            sb.append(NUM_CHAR.charAt(random.nextInt(charLen)));
+        for (int i = 0; i < length; i++) {
+            sb.setCharAt(i, BASE.charAt(random.nextInt(BASE_LENGTH)));
         }
+
         return sb.toString();
     }
 
     /**
-     * 1. 生成授权码 (按日期生成随机码进行MD5加密)
+     * hash授权码 (按日期生成随机码进行MD5加密)
      *
      * @throws Exception
      */
-    public static String genToken() throws Exception {
-
-        //生成16位的随机数种子
-        String seed  = getRandomNumberSeed(16);
-        //MD5加密生成Token值
-        String token = MD5.hash(seed);
+    public static String hashToken(String token) throws Exception {
+        token = MD5.hash(token);
 
         return token;
     }
 
     /**
-     * 2. 生成授权码
-     * 2-1 将createDate换算成秒数 + expiresIn = 失效的日期的秒数,
-     * 2-2 秒数 + userId + appId进行组合DES加密。
+     * 加密授权码：
+     * 1.将createDate换算成秒数 + expiresIn = 失效的日期的秒数,
+     * 2.秒数 + userId + appId进行组合DES加密。
      *
      * @throws Exception
      */
@@ -70,14 +76,12 @@ public class TokenUtil {
             }
         }
 
-        String token = DES.encrypt(sb.toString(), PASS_WORD);
-
+        String token = DES.encrypt(sb.toString(), TOKEN_ENCRYPT_WORD);
         return token;
     }
 
     /**
-     * 3. 校验请求的签名是否合法
-     * token校验流程：
+     * 校验请求的签名是否合法，token校验流程：
      * 1. 将token值进行解密分解
      * 2. 将三个参数字符串放入数组中，分解为userId,appId,expiredTime
      *
@@ -85,22 +89,19 @@ public class TokenUtil {
      * @return
      */
     public static Map tokenDecrypt(String token) throws Exception {
-
         Map map = new HashMap<>();
 
-        String tokenStr = DES.decrypt(token, PASS_WORD);
+        String tokenStr = DES.decrypt(token, TOKEN_ENCRYPT_WORD);
 
         String[] tokenInfo = tokenStr.split(",");
 
         String userId = tokenInfo[0].toString();
         String appId = tokenInfo[1].toString();
-        long expriedTime = Long.valueOf(tokenInfo[2].toString()).longValue();
-
-        Date expriedDate = new Date(expriedTime);
+        Date expire = new Date(Long.valueOf(tokenInfo[2].toString()).longValue());
 
         map.put("userId", userId);
         map.put("appId", appId);
-        map.put("expriedTime", expriedDate.toString());
+        map.put("expire", expire.toString());
 
         return map;
     }
