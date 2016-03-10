@@ -21,17 +21,17 @@ public class EhrClientDetailsService implements ClientDetailsService {
     private Map<String, ClientDetails> clientDetailsStore = new HashMap<String, ClientDetails>();
 
     public EhrClientDetailsService(){
-        // 构建一个测试应用
+        // 直接在内存中添加简易ESB应用，重构后需要将此应用保存在数据库中
         BaseClientDetails baseClientDetails = new BaseClientDetails(
-                "client-with-registered-redirect",
+                "kHAbVppx44",
                 "ehr",
-                "user,user.demographic_id,user.health_profiles,organization",
+                "read,user,user.demographic_id,user.health_profiles,organization",
                 EhrTokenGranter.EhrAuthorizationCodeGranter.GRANT_TYPE,
                 "ROLE_CLIENT",
                 "http://www.yihu.com?key=value");
 
-        baseClientDetails.setClientSecret("secret123");
-        clientDetailsStore.put("client-with-registered-redirect", baseClientDetails);
+        baseClientDetails.setClientSecret("Bd2h8rdYhep6NKOO");
+        clientDetailsStore.put("kHAbVppx44", baseClientDetails);
     }
 
     public ClientDetails loadClientByClientId(String clientId) throws ClientRegistrationException {

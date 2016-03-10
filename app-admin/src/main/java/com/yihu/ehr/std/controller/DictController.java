@@ -24,7 +24,7 @@ import java.util.Map;
 @RequestMapping("/cdadict")
 @Controller(RestAPI.DictManagerController)
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
-public class DictController extends BaseRestController {
+public class DictController {
     private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
     private static   String username = ResourceProperties.getProperty("username");
     private static   String password = ResourceProperties.getProperty("password");

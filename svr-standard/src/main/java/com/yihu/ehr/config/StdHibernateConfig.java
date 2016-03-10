@@ -36,6 +36,9 @@ public class StdHibernateConfig extends HibernateConfig  {
 
     @Bean
     public StdSessionFactoryBean sessionFactory(BasicDataSource dataSource) throws Exception {
+        String clzPath = System.getProperty("user.home") + "/ehr/std/";
+        System.setProperty("java.class.path", clzPath);
+
         List<Class> tableClass = createEntity(dataSource);
         StdSessionFactoryBean sessionFactory = new StdSessionFactoryBean();
         //bind entity to session

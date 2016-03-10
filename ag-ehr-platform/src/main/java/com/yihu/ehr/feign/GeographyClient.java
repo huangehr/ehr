@@ -22,8 +22,8 @@ public interface GeographyClient {
     @RequestMapping(value = ApiVersion.Version1_0+"/geographies/{id}", method = RequestMethod.GET)
     MGeography getAddressById(@PathVariable(value = "id") String id);
 
-    @RequestMapping(value = ApiVersion.Version1_0+"/geographies", method =  RequestMethod.PUT)
-    String saveAddress(@RequestParam(value = "geography_model_json_data") String GeographyModelJsonData);
+    @RequestMapping(value = ApiVersion.Version1_0+"/geographies", method =  RequestMethod.POST)
+    String saveAddress(@RequestParam(value = "json_data") String jsonData);
 
     @RequestMapping(value = ApiVersion.Version1_0+"/geographies", method = RequestMethod.GET )
     List<String> search(

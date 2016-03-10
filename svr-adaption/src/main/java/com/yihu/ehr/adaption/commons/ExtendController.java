@@ -41,7 +41,7 @@ public class ExtendController<T> extends BaseRestController {
     }
 
     protected ApiException errParm(){
-        return new ApiException(ErrorCode.InvalidParameter, "参数解析错误！");
+        return new ApiException(ErrorCode.InvalidParameter);
     }
 
     protected ApiException errMissCode(){

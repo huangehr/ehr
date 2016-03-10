@@ -19,7 +19,7 @@
             <artifactId>fastDFS</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/fastdfs_lib.jar</systemPath>
+            <systemPath>${basedir}/../commons-data-fastdfs/lib/fastdfs_lib.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
