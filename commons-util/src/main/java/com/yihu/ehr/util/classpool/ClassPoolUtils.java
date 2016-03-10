@@ -18,7 +18,7 @@ import java.io.IOException;
 /**
  * 对象池工具类
  *
- * 目前提供ORM动态映射解决方案并生成class  文件
+ * 目前提供ORM动�?映射解决方案并生成class  文件
  *
  * @author lincl
  * @version 1.0
@@ -29,13 +29,13 @@ public class ClassPoolUtils {
 
 
     /**
-     * 运行时动态ORM表映射
+     * 运行时动态ORM表映�?
      *
      *
-     * @param entityClassName   待映射的实体全限定类名
+     * @param entityClassName   待映射的实体全限定类�?
      * @param tableName         待映射的表名
-     * @param newClzName        新的实体全限定类名
-     * @return                   映射后的类对象
+     * @param newClzName        新的实体全限定类�?
+     * @return                   映射后的类对�?
      */
     public static Class<?> tableMapping(
             String entityClassName, String tableName, String newClzName)
@@ -83,8 +83,7 @@ public class ClassPoolUtils {
 
     public static File createFile(String clzName) throws IOException {
         String splitMark = System.getProperty("file.separator");
-        String path = System.getProperty("java.io.tmpdir");
-        path += splitMark + "ehr" + splitMark + "std" + splitMark;
+        String path = System.getProperty("user.home") +splitMark+ "ehr"  +splitMark+ "std" + splitMark;
         String clzPath = clzName.substring(0, clzName.lastIndexOf(".")).replace(".", splitMark);
         String filePath = path + clzPath;
         File pathFile = new File(filePath);

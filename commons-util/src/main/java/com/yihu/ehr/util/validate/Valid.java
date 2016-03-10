@@ -10,7 +10,6 @@ import java.lang.annotation.Target;
  * @version 1.0
  * @created 2016/3/2
  */
-@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Valid {
 
