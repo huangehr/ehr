@@ -46,7 +46,7 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter{
     @Bean
     public TilesConfigurer tilesConfigurer(){
         TilesConfigurer tilesConfigurer = new TilesConfigurer();
-        tilesConfigurer.setDefinitions("/WEB-INF/ehr/commons/layout/layout.xml","/WEB-INF/ehr/commons/layout/browserLayout.xml");
+        tilesConfigurer.setDefinitions("/WEB-INF/ehr/commons/layout/layout.xml");
         return tilesConfigurer;
     }
 
