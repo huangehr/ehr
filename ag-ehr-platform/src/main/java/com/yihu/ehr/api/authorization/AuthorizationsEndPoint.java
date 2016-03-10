@@ -2,13 +2,13 @@ package com.yihu.ehr.api.authorization;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.netflix.discovery.converters.Auto;
 import com.yihu.ehr.api.model.MToken;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.service.oauth2.EhrClientDetailsService;
 import com.yihu.ehr.service.oauth2.EhrTokenStoreService;
 import com.yihu.ehr.service.oauth2.EhrUserDetailsService;
 import com.yihu.ehr.util.encode.HashUtil;
+import com.yihu.ehr.util.token.TokenUtil;
 import com.yihu.ehr.utils.BasicAuthorizationExtractor;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,12 +21,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.provider.ClientDetails;
-import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.OAuth2Request;
 import org.springframework.web.bind.annotation.*;
@@ -49,6 +47,7 @@ import java.util.*;
 @RequestMapping(ApiVersion.Version1_0 + "/authorizations")
 @Api(protocols = "https", value = "authorizations", description = "认证与授权服务。注意此API使用Basic认证。")
 public class AuthorizationsEndPoint {
+    private final static int TOKEN_LENGTH = 32;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -173,9 +172,9 @@ public class AuthorizationsEndPoint {
         }
 
         MToken mToken = new MToken();
-        mToken.setToken(UUID.randomUUID().toString());
-        mToken.setToken_last_eight(mToken.getToken().substring(mToken.getToken().length() - 8));
-        mToken.setUpdated_at(new Date());
+        mToken.setToken(TokenUtil.genToken(TOKEN_LENGTH));
+        mToken.setTokenLastEight(mToken.getToken().substring(mToken.getToken().length() - 8));
+        mToken.setUpdatedAt(new Date());
 
         return mToken;
     }
@@ -184,7 +183,7 @@ public class AuthorizationsEndPoint {
         String key = clientId + "-" + fingerprint;
         String token = appTokens.get(key);
         if (token == null) {
-            token = UUID.randomUUID().toString();
+            token = TokenUtil.genToken(TOKEN_LENGTH);
             appTokens.put(key, token);
         }
 
@@ -229,8 +228,8 @@ public class AuthorizationsEndPoint {
         MToken mToken = new MToken();
         mToken.setId(1);
         mToken.setToken(token);
-        mToken.setToken_last_eight(token.substring(token.length() - 8));
-        mToken.setUpdated_at(new Date());
+        mToken.setTokenLastEight(token.substring(token.length() - 8));
+        mToken.setUpdatedAt(new Date());
 
         return mToken;
     }

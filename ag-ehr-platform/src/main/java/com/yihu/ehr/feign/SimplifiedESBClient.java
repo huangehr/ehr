@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
-import javax.servlet.http.HttpServletResponse;
-
 /**
  * Created by chenweida on 2016/3/7.
  */
@@ -21,16 +19,15 @@ public interface SimplifiedESBClient {
                              @RequestParam(value = "file", required = true) String file);
 
 
-    @RequestMapping(value = "/getUpdateFlag", method = RequestMethod.POST)
+    @RequestMapping(value = "/getUpdateFlag", method = RequestMethod.GET)
     public String getUpdateFlag(@RequestParam(value = "versionCode", required = true) String versionCode,
                                 @RequestParam(value = "systemCode", required = true) String systemCode,
                                 @RequestParam(value = "orgCode", required = true) String orgCode);
 
 
-    @RequestMapping(value = "/downUpdateWar", method = RequestMethod.POST)
+    @RequestMapping(value = "/downUpdateWar", method = RequestMethod.GET)
     public String downUpdateWar(@RequestParam(value = "systemCode", required = true) String systemCode,
-                                @RequestParam(value = "orgCode", required = true) String orgCode,
-                                HttpServletResponse response);
+                                @RequestParam(value = "orgCode", required = true) String orgCode);
 
     @RequestMapping(value = "/uploadResult", method = RequestMethod.POST)
     public String uploadResult(@RequestParam(value = "systemCode", required = true) String systemCode,
@@ -46,9 +43,9 @@ public interface SimplifiedESBClient {
 
     @RequestMapping(value = "/changeFillMiningStatus", method = RequestMethod.POST)
     public String changeFillMiningStatus(
-                                         @RequestParam(value = "message", required = true) String message,
-                                         @RequestParam(value = "id", required = true) String id,
-                                         @RequestParam(value = "status", required = true) String status);
+            @RequestParam(value = "message", required = true) String message,
+            @RequestParam(value = "id", required = true) String id,
+            @RequestParam(value = "status", required = true) String status);
 
     @RequestMapping(value = "/hisPenetration", method = RequestMethod.POST)
     public String hisPenetration(@RequestParam(value = "systemCode", required = true) String systemCode,

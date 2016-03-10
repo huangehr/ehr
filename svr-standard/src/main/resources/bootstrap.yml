@@ -9,7 +9,7 @@ spring:
     config:
       username: user
       password: configuration
-      uri: http://172.19.103.73:1221
+      uri: http://localhost:1221
       label: dev
 
 ---
@@ -21,4 +21,3 @@ spring:
       password: configuration
       uri: http://172.19.103.73:1221
       label: dev
-

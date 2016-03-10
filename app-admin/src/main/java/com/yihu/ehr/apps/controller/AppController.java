@@ -5,8 +5,8 @@ import com.yihu.ehr.constants.RestAPI;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
-import com.yihu.ehr.util.ResourceProperties;
 import com.yihu.ehr.util.log.LogService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,10 +23,12 @@ import java.util.Map;
 @Controller(RestAPI.AppManagerController)
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
 public class AppController {
-    private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
-    private static   String username = ResourceProperties.getProperty("username");
-    private static   String password = ResourceProperties.getProperty("password");
-    private static   String version = ResourceProperties.getProperty("version");
+    @Value("${service-gateway.username}")
+    private String username;
+    @Value("${service-gateway.password}")
+    private String password;
+    @Value("${service-gateway.url}")
+    private String comUrl;
 
     @RequestMapping("template/appInfo")
     public String appInfoTemplate(Model model, String appId, String mode) {
@@ -34,11 +36,11 @@ public class AppController {
         String result ="";
         try {
             //mode定义：new modify view三种模式，新增，修改，查看
-            String url = "/rest/"+version+"/appcon/app";
+            String url = "/appcon/app";
             Map<String, Object> conditionMap = new HashMap<>();
             conditionMap.put("appId", appId);
             conditionMap.put("mode", mode);
-            result = HttpClientUtil.doGet(host + url, conditionMap, username, password);
+            result = HttpClientUtil.doGet(comUrl + url, conditionMap, username, password);
         }
         catch (Exception ex)
         {
@@ -79,7 +81,7 @@ public class AppController {
     @ResponseBody
     public Object getAppList(String searchNm, String catalog, String status, int page, int rows) {
 
-        String url = "/rest/"+version+"/appcon/apps";
+        String url = "/appcon/apps";
         Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("appId", searchNm);
         conditionMap.put("appName", searchNm);
@@ -93,7 +95,7 @@ public class AppController {
 
             //设置版本号
            // conditionMap.put("apiVersion",version);
-            _res = HttpClientUtil.doGet(host + url, conditionMap, username, password);
+            _res = HttpClientUtil.doGet(comUrl + url, conditionMap, username, password);
 
         } catch (Exception ex) {
             LogService.getLogger(AppController.class).error(ex.getMessage());
@@ -107,11 +109,11 @@ public class AppController {
     public Object deleteApp(String appId) {
         Envelop result = new Envelop();
         try {
-            String url = "/rest/"+version+"/appcon/app";
+            String url = "/appcon/app";
             Map<String, Object> conditionMap = new HashMap<>();
             conditionMap.put("appId", appId);
            // appManager.deleteApp(appId);
-            String _res = HttpClientUtil.doDelete(host + url, conditionMap, username, password);
+            String _res = HttpClientUtil.doDelete(comUrl + url, conditionMap, username, password);
             result.setSuccessFlg(true);
         } catch (Exception ex) {
             result.setSuccessFlg(false);
@@ -131,7 +133,7 @@ public class AppController {
         Envelop result = new Envelop();
 
         try {
-            String urlPath = "/rest/" + version + "/appcon/app";
+            String urlPath = "/appcon/app";
             Map<String, Object> conditionMap = new HashMap<>();
             conditionMap.put("name", name);
             conditionMap.put("catalog", catalog);
@@ -140,7 +142,7 @@ public class AppController {
             conditionMap.put("tags", tags);
             conditionMap.put("userId", userId);
 
-            String _res = HttpClientUtil.doPost(host + urlPath, conditionMap, username, password);
+            String _res = HttpClientUtil.doPost(comUrl + urlPath, conditionMap, username, password);
 
             if (_res.equals("")) {
                 result.setSuccessFlg(false);
@@ -162,11 +164,11 @@ public class AppController {
         Envelop result = new Envelop();
 
         try {
-            String url = "/rest/"+version+"/appcon/app";
+            String url = "/appcon/app";
             Map<String, Object> conditionMap = new HashMap<>();
             conditionMap.put("appId", appId);
             // appManager.deleteApp(appId);
-            String _res = HttpClientUtil.doGet(host + url, conditionMap, username, password);
+            String _res = HttpClientUtil.doGet(comUrl + url, conditionMap, username, password);
 
             Map<String, String> data = new HashMap<>();
             data.put("appModel", _res);
@@ -186,7 +188,7 @@ public class AppController {
 
         Envelop result = new Envelop();
         try {
-            String urlPath = "/rest/" + version + "/appcon/app";
+            String urlPath = "/appcon/app";
             Map<String, Object> conditionMap = new HashMap<>();
             conditionMap.put("name", name);
             conditionMap.put("catalog", catalog);
@@ -196,7 +198,7 @@ public class AppController {
             conditionMap.put("appId", appId);
             conditionMap.put("status", status);
             // appManager.deleteApp(appId);
-            String _res = HttpClientUtil.doPut(host + urlPath, conditionMap, username, password);
+            String _res = HttpClientUtil.doPut(comUrl + urlPath, conditionMap, username, password);
             if(_res.equals("success"))
             {
                 result.setSuccessFlg(true);
@@ -220,11 +222,11 @@ public class AppController {
         Envelop result = new Envelop();
 
         try {
-            String urlPath = "/rest/" + version + "/appcon/check";
+            String urlPath = "/appcon/check";
             Map<String, Object> conditionMap = new HashMap<>();
             conditionMap.put("appId", appId);
             conditionMap.put("status", status);
-            String _res = HttpClientUtil.doPut(host + urlPath, conditionMap, username, password);
+            String _res = HttpClientUtil.doPut(comUrl + urlPath, conditionMap, username, password);
 
             if (_res.equals("success")) {
                 result.setSuccessFlg(true);

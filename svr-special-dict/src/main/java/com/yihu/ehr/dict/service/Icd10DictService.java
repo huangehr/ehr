@@ -3,6 +3,9 @@ package com.yihu.ehr.dict.service;
 import com.yihu.ehr.query.BaseJpaService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,35 +35,26 @@ public class Icd10DictService extends BaseJpaService<Icd10Dict, XIcd10DictReposi
     @Autowired
     private XIcd10IndicatorRelationRepository icd10IndicatorReRepo;
 
-    //flag: 0 - create  1 - update
-    public boolean isCodeExist(String id, String code, String flag){
+    public boolean isCodeExist(String code){
         Icd10Dict icd10Dict = icd10DictRepo.findByCode(code);
-        if(icd10Dict != null){
-            if(StringUtils.equals(flag,"1")){
-                return (!icd10Dict.getId().equals(id));
-            }
-            return true;
-        }else{
-            return false;
-        }
-    }
-    public boolean isNameExist(String id, String name, String flag){
-        Icd10Dict icd10Dict = icd10DictRepo.findByName(name);
-        if(icd10Dict != null){
-            if(StringUtils.equals(flag,"1")){
-                return (!icd10Dict.getId().equals(id));
-            }
-            return true;
-        }else{
-            return false;
-        }
+        return icd10Dict != null;
     }
 
-    /*public boolean isNameExist(String name){
-        String fields = "name = " + name;
-        long result = getCount(fields);
-        return result != 0 ;
-    }*/
+    public boolean isNameExist(String name){
+        Icd10Dict icd10Dict = icd10DictRepo.findByName(name);
+        return icd10Dict != null;
+    }
+
+    public Icd10Dict createDict(Icd10Dict dict) {
+        dict.setName(dict.getName());
+        icd10DictRepo.save(dict);
+        return dict;
+    }
+
+    public Page<Icd10Dict> getDictList(String sorts, int page, int size) {
+        Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
+        return icd10DictRepo.findAll(pageable);
+    }
 
     public boolean isUsage(String id){
         boolean result = ((hpIcd10ReRepo.findByIcd10Id(id) != null)||(icd10DrugReRepo.findByIcd10Id(id) != null)||(icd10IndicatorReRepo.findByIcd10Id(id) != null));
