@@ -19,7 +19,7 @@
             <item name="技术支持" href="support/support.html"/>
         </menu>
 
-        <footer><![CDATA[All rights reserved.]]></footer>
+        <footer><![CDATA[保留所有权利。]]></footer>
     </body>
     <skin>
         <groupId>lt.velykis.maven.skins</groupId>

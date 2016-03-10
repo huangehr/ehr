@@ -34,8 +34,8 @@ public class TokenManager {
     public UserToken createUserToken(String userId, String appId) throws Exception {
 
         //生成token信息
-        String accessToken = TokenUtil.genToken();
-        String refreshToken = TokenUtil.genToken();
+        String accessToken = TokenUtil.genToken(16);
+        String refreshToken = TokenUtil.genToken(16);
         Integer expiresIn = 3600;
 
         //对生成的token信息进行保存
@@ -142,8 +142,8 @@ public class TokenManager {
 
         //如果用户的更新授权正确，则重新生成访问授权，并返回
         if (userToken.getRefreshToken().equals(refreshToken)) {
-            String accessToken = TokenUtil.genToken();
-            String newRefreshToken = TokenUtil.genToken();
+            String accessToken = TokenUtil.genToken(16);
+            String newRefreshToken = TokenUtil.genToken(16);
 
             userToken.setAccessToken(accessToken);
             userToken.setRefreshToken(newRefreshToken);

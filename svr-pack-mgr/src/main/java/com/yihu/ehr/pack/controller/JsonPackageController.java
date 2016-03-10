@@ -1,4 +1,4 @@
-package com.yihu.ehr.pack;
+package com.yihu.ehr.pack.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ArchiveStatus;
@@ -63,7 +63,7 @@ public class JsonPackageController extends BaseRestController {
         map.put("archiveStatus",archiveStatus);
         List<JsonPackage> jsonPackageList = jsonPackageService.searchArchives(map, pageable);
 
-        return convertToModels(jsonPackageList, new ArrayList<MJsonPackage>(jsonPackageList.size()),MJsonPackage.class,null);
+        return convertToModels(jsonPackageList, new ArrayList<>(jsonPackageList.size()),MJsonPackage.class,null);
     }
 
     /**
@@ -71,7 +71,7 @@ public class JsonPackageController extends BaseRestController {
      *
      * @param packageCrypto zip密码密文, file 请求体中文件参数名
      */
-    @RequestMapping(value = "/package", method = {RequestMethod.POST})
+    @RequestMapping(value = "/packages", method = {RequestMethod.POST})
     @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
     public void savePackage(
             @ApiParam(required = true, name = "package", value = "JSON档案包", allowMultiple = true)
@@ -94,12 +94,12 @@ public class JsonPackageController extends BaseRestController {
     }
 
     /**
-     * 获取档案包。
+     * 获取档案包信息。
      *
      * @param id
      * @return
      */
-    @RequestMapping(value = "/package/{id}", method = {RequestMethod.POST})
+    @RequestMapping(value = "/packages/{id}", method = {RequestMethod.GET})
     @ApiOperation(value = "获取档案包", notes = "获取档案包的信息")
     public MJsonPackage retrievePackage(
             @ApiParam(name = "id", value = "档案包编号", defaultValue = "v1.0")
@@ -108,7 +108,13 @@ public class JsonPackageController extends BaseRestController {
         return convertToModel(jsonPackage, MJsonPackage.class, null);
     }
 
-    @RequestMapping(value = "/package/{id}", method = {RequestMethod.DELETE})
+    /**
+     * 删除档案包。
+     *
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "/packages/{id}", method = {RequestMethod.DELETE})
     @ApiOperation(value = "删除档案", response = Object.class, notes = "删除一个数据包")
     public void deletePackage(
            @ApiParam(name = "id", value = "档案包编号")
