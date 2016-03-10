@@ -1,13 +1,10 @@
 package com.yihu.ehr.patient.controller;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
-import com.yihu.ehr.util.ResourceProperties;
-import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.log.LogService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +12,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,13 +24,13 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/patient")
-public class PatientController extends BaseRestController {
-    private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
-    private static   String username = ResourceProperties.getProperty("username");
-    private static   String password = ResourceProperties.getProperty("password");
-    private static   String module = ResourceProperties.getProperty("module");  //目前定义为rest
-    private static   String version = ResourceProperties.getProperty("version");
-    private static   String comUrl = host + module + version;
+public class PatientController {
+    @Value("${service-gateway.username}")
+    private String username;
+    @Value("${service-gateway.password}")
+    private String password;
+    @Value("${service-gateway.url}")
+    private String comUrl;
 
     public PatientController() {
     }
@@ -119,7 +119,7 @@ public class PatientController extends BaseRestController {
     @RequestMapping("searchPatient")
     @ResponseBody
     public Object searchPatient(String searchNm, String province, String city, String district, int page, int rows) {
-        String url = "/patient/patients";
+        String url = "/populations";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
@@ -248,13 +248,12 @@ public class PatientController extends BaseRestController {
     //注册或更新病人信息Header("Content-type: text/html; charset=UTF-8")
     public Object updatePatient(String patientJsonData,HttpServletRequest request, HttpServletResponse response) throws IOException {
         //将文件保存至服务器，返回文件的path，
-        String picPath = webupload(request, response);
+        //String picPath = webupload(request, response);//网关中处理webupload
         String url = "/patient/updatePatient";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("patientJsonData",patientJsonData);
-        params.put("picPath",picPath);//todo:网关调整添加参数
         try {
             //todo 后台转换成model后传前台
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
@@ -381,45 +380,45 @@ public class PatientController extends BaseRestController {
 //        return result.toJson();
     }
 
-    /**
-     * 人口信息头像图片上传
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     */
-    public String webupload(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try {
-            request.setCharacterEncoding("UTF-8");
-        } catch (UnsupportedEncodingException e1) {
-        }
-        InputStream inputStearm = request.getInputStream();
-        String fileName = (String) request.getParameter("name");
-        if(fileName == null){
-            return null;
-        }
-        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-        String description = null;
-        if ((fileName != null) && (fileName.length() > 0)) {
-            int dot = fileName.lastIndexOf('.');
-            if ((dot > -1) && (dot < (fileName.length()))) {
-                description = fileName.substring(0, dot);
-            }
-        }
-        ObjectNode objectNode = null;
-        FastDFSUtil dfsUtil = new FastDFSUtil();
-        String path = null;
-        try {
-            objectNode = dfsUtil.upload(inputStearm, fileExtension, description);
-            String groupName = objectNode.get("groupName").toString();
-            String remoteFileName = objectNode.get("remoteFileName").toString();
-            path = "{groupName:" + groupName + ",remoteFileName:" + remoteFileName + "}";
-        } catch (Exception e) {
-           //LogService.getLogger(DemographicInfo.class).error("人口头像图片上传失败；错误代码："+e);
-        }
-        //返回文件路径
-        return path;
-    }
+//    /**
+//     * 人口信息头像图片上传
+//     * @param request
+//     * @param response
+//     * @return
+//     * @throws IOException
+//     */
+//    public String webupload(HttpServletRequest request, HttpServletResponse response) throws IOException {
+//        try {
+//            request.setCharacterEncoding("UTF-8");
+//        } catch (UnsupportedEncodingException e1) {
+//        }
+//        InputStream inputStearm = request.getInputStream();
+//        String fileName = (String) request.getParameter("name");
+//        if(fileName == null){
+//            return null;
+//        }
+//        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+//        String description = null;
+//        if ((fileName != null) && (fileName.length() > 0)) {
+//            int dot = fileName.lastIndexOf('.');
+//            if ((dot > -1) && (dot < (fileName.length()))) {
+//                description = fileName.substring(0, dot);
+//            }
+//        }
+//        ObjectNode objectNode = null;
+//        FastDFSUtil dfsUtil = new FastDFSUtil();
+//        String path = null;
+//        try {
+//            objectNode = dfsUtil.upload(inputStearm, fileExtension, description);
+//            String groupName = objectNode.get("groupName").toString();
+//            String remoteFileName = objectNode.get("remoteFileName").toString();
+//            path = "{groupName:" + groupName + ",remoteFileName:" + remoteFileName + "}";
+//        } catch (Exception e) {
+//           //LogService.getLogger(DemographicInfo.class).error("人口头像图片上传失败；错误代码："+e);
+//        }
+//        //返回文件路径
+//        return path;
+//    }
 
 //    /**
 //     * 人口信息头像图片下载

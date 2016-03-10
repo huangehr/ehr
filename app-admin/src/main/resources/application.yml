@@ -14,3 +14,15 @@
 #server:
 #  contextPath: /ehr
 #  port: 8080
+
+service-gateway:
+  username: user
+  password: eureka
+  url: http://localhost:10000/api/v1.0/admin
+#  hopurl: http://172.19.103.55:8080/WSGW/services/ServiceGateWay
+#  org_code: 41872607-9
+#  module: api
+#  #serverip: 192.168.131.1
+#  serverip: localhost
+#  port: 10000
+#  version: v1.0

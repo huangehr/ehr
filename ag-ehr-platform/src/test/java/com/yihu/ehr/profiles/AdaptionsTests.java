@@ -1,6 +1,6 @@
 package com.yihu.ehr.profiles;
 
-import com.yihu.ehr.api.adaption.Adaptions;
+import com.yihu.ehr.api.adaption.AdaptionsEndPoint;
 import com.yihu.ehr.util.RestEcho;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -20,7 +20,7 @@ import static org.junit.Assert.assertTrue;
 public class AdaptionsTests {
 
 	@Autowired
-	private Adaptions adaptions;
+	private AdaptionsEndPoint adaptions;
 	String orgCode = "ceshi3";
 	String userName = "1019008";
 	String versionCode = "000000000000";

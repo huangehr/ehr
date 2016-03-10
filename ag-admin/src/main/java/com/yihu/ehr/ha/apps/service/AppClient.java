@@ -5,12 +5,10 @@ import com.yihu.ehr.model.app.MApp;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by AndyCai on 2016/1/19.
@@ -20,7 +18,7 @@ public interface AppClient {
 
     @RequestMapping(value = "/api/v1.0/apps", method = RequestMethod.GET)
     @ApiOperation(value = "获取App列表")
-    Collection<MApp> getApps(
+    ResponseEntity<List<MApp>> getApps(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，规则参见说明文档", defaultValue = "id,name,secret,url,createTime")

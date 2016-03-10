@@ -1,5 +1,5 @@
 server:
-  port: 7020
+  port: 10040
 
 #security:
 #  user:
@@ -21,8 +21,6 @@ data-source:
   test-on-borrow: true
   remove-abandoned-timeout: 55
 
-hibernate:
-  dialect: org.hibernate.dialect.MySQL5Dialect
 
 fast-dfs:
   pool:
@@ -32,9 +30,6 @@ fast-dfs:
 
   connect-timeout: 2
   network-timeout: 30
-  fast-dfs:
-    charset: ISO8859-1
-  tracker-server: l27.0.0.1
 
   http:
     tracker-http-port: 80
@@ -64,7 +59,7 @@ spring:
 
 eureka:
   instance:
-    hostname: localhost
+    address: localhost
   client:
     registerWithEureka: true
     fetchRegistry: true
@@ -87,12 +82,23 @@ spring:
 
 eureka:
   instance:
-    hostname: localhost
+    ip-address: 172.19.103.73
   client:
     registerWithEureka: true
     fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
+    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@172.19.103.73:8761}/eureka/
 
+data-source:
+  url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+  user-name: ha
+  password: ha
+
+hibernate:
+  show-sql: true
+  format-sql: true
+
+fast-dfs:
+  tracker-server: 172.19.103.54:22122
 ---
 spring:
   profiles: prod

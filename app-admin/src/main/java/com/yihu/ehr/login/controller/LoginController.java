@@ -3,8 +3,8 @@ package com.yihu.ehr.login.controller;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.ResourceProperties;
-import com.yihu.ehr.util.controller.BaseRestController;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -25,13 +25,13 @@ import java.util.*;
 @Controller
 @RequestMapping("/login")
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
-public class LoginController extends BaseRestController {
-    private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
-    private static   String username = ResourceProperties.getProperty("username");
-    private static   String password = ResourceProperties.getProperty("password");
-    private static   String module = ResourceProperties.getProperty("module");  //目前定义为rest
-    private static   String version = ResourceProperties.getProperty("version");
-    private static   String comUrl = host + module + version;
+public class LoginController {
+    @Value("${service-gateway.username}")
+    private String username;
+    @Value("${service-gateway.password}")
+    private String password;
+    @Value("${service-gateway.url}")
+    private String comUrl;
 
     @RequestMapping(value = "")
     public String login(Model model) {

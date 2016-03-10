@@ -6,6 +6,7 @@ import com.yihu.ehr.model.patient.MDemographicInfo;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,7 +25,7 @@ public interface PatientClient {
 
     @RequestMapping(value = "/populations",method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询人")
-    List<MDemographicInfo> searchPatient(
+    ResponseEntity<List<MDemographicInfo>> searchPatient(
             @ApiParam(name = "name", value = "姓名", defaultValue = "")
             @RequestParam(value = "name") String name,
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")

@@ -1,12 +1,9 @@
 package com.yihu.ehr.user.controller;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
-import com.yihu.ehr.util.ResourceProperties;
-import com.yihu.ehr.util.controller.BaseRestController;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +11,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,14 +25,13 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/user")
-public class UserController extends BaseRestController {
-    private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
-    private static   String username = ResourceProperties.getProperty("username");
-    private static   String password = ResourceProperties.getProperty("password");
-    private static   String module = ResourceProperties.getProperty("module");  //目前定义为rest
-    private static   String version = ResourceProperties.getProperty("version");
-    private static   String comUrl = host + module + version;
-
+public class UserController {
+    @Value("${service-gateway.username}")
+    private String username;
+    @Value("${service-gateway.password}")
+    private String password;
+    @Value("${service-gateway.url}")
+    private String comUrl;
     @RequestMapping("initial")
     public String userInitial(Model model) {
         model.addAttribute("contentPage", "user/user");
@@ -151,13 +150,12 @@ public class UserController extends BaseRestController {
     @ResponseBody
     public Object updateUser(String userModelJsonData, HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        String remotePath = upload(request, response);
+        //String remotePath = upload(request, response);网关中进行upload处理
         String url = "/user/updateUser";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("userModelJsonData",userModelJsonData);
-        params.put("remotePath",remotePath);//todo 网关中需要添加此参数
         try {
             //todo:传回的是usermodel，json格式
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
@@ -392,42 +390,42 @@ public class UserController extends BaseRestController {
 //        }
     }
 
-    public String upload(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try {
-            request.setCharacterEncoding("utf-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        //获取流
-        InputStream inputStream = request.getInputStream();
-        //获取文件名
-        String fileName = request.getParameter("name");
-        if (fileName == null || fileName.equals("")) {
-            return null;
-        }
-        //获取文件扩展名
-        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-        //获取文件名
-        String description = null;
-        if ((fileName.length() > 0)) {
-            int dot = fileName.lastIndexOf('.');
-            if ((dot > -1) && (dot < (fileName.length()))) {
-                description = fileName.substring(0, dot);
-            }
-        }
-        ObjectNode objectNode = null;
-        FastDFSUtil dfsUtil = new FastDFSUtil();
-        String path = null;
-        try {
-            objectNode = dfsUtil.upload(inputStream, fileExtension, description);
-            String groupName = objectNode.get("groupName").toString();
-            String remoteFileName = objectNode.get("remoteFileName").toString();
-            path = "{groupName:" + groupName + ",remoteFileName:" + remoteFileName + "}";
-        } catch (Exception e) {
-            //LogService.getLogger(AbstractUser.class).error("用户头像上传失败；错误代码："+e);
-        }
-        return path;
-    }
+//    public String upload(HttpServletRequest request, HttpServletResponse response) throws IOException {
+//        try {
+//            request.setCharacterEncoding("utf-8");
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+//        //获取流
+//        InputStream inputStream = request.getInputStream();
+//        //获取文件名
+//        String fileName = request.getParameter("name");
+//        if (fileName == null || fileName.equals("")) {
+//            return null;
+//        }
+//        //获取文件扩展名
+//        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+//        //获取文件名
+//        String description = null;
+//        if ((fileName.length() > 0)) {
+//            int dot = fileName.lastIndexOf('.');
+//            if ((dot > -1) && (dot < (fileName.length()))) {
+//                description = fileName.substring(0, dot);
+//            }
+//        }
+//        ObjectNode objectNode = null;
+//        FastDFSUtil dfsUtil = new FastDFSUtil();
+//        String path = null;
+//        try {
+//            objectNode = dfsUtil.upload(inputStream, fileExtension, description);
+//            String groupName = objectNode.get("groupName").toString();
+//            String remoteFileName = objectNode.get("remoteFileName").toString();
+//            path = "{groupName:" + groupName + ",remoteFileName:" + remoteFileName + "}";
+//        } catch (Exception e) {
+//            //LogService.getLogger(AbstractUser.class).error("用户头像上传失败；错误代码："+e);
+//        }
+//        return path;
+//    }
 
 //    public String download(UserModel userModel) throws IOException {
 //        String getUserUrl = "/user/downFile";

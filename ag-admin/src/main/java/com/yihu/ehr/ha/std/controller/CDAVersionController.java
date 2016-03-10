@@ -11,6 +11,7 @@ import com.yihu.ehr.util.operator.DateUtil;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -39,7 +40,8 @@ public class CDAVersionController extends BaseController {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) throws Exception {
-        Collection<MCDAVersion> mCdaVersions = cdaVersionClient.searchCDAVersions(fields, filters, sorts, size, page);
+        ResponseEntity<Collection<MCDAVersion>> responseEntity = cdaVersionClient.searchCDAVersions(fields, filters, sorts, size, page);
+        Collection<MCDAVersion> mCdaVersions = responseEntity.getBody();
         List<StdVersionModel> versionModelList = new ArrayList<>();
         for (MCDAVersion mCdaVersion : mCdaVersions) {
             StdVersionModel versionModel = convertToModel(mCdaVersion, StdVersionModel.class);
@@ -51,8 +53,7 @@ public class CDAVersionController extends BaseController {
             //MCDAVersion mcdaVersionBase = cdaVersionClient.getVersion(versionModel.getBaseVersion());
             versionModelList.add(versionModel);
         }
-        //TODO 取得符合条件的总记录数
-        int totalCount = 10;
+        int totalCount = getTotalCount(responseEntity);
         return getResult(versionModelList, totalCount, page, size);
     }
 
@@ -93,7 +94,6 @@ public class CDAVersionController extends BaseController {
     public boolean dropCDAVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @PathVariable(value = "version") String version) throws Exception {
-        //TODO 微服务没有去查询出version对应的标准版本，如下：版本对象的baseVersion为空，导致删除该版本后，该版本的子版本的baseVersion为空
         return cdaVersionClient.dropCDAVersion(version);
     }
 
@@ -146,7 +146,6 @@ public class CDAVersionController extends BaseController {
             return envelop;
         }
         envelop.setSuccessFlg(true);
-        //TODO 待日期类型统一，需要的是Date类型的日期，现在微服务返回Model是String类型，但又没有转换
         envelop.setObj(convertToModel(mcdaVersion, StdVersionDetailModel.class));
         return envelop;
     }

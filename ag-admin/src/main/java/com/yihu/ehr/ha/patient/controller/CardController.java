@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -59,8 +60,8 @@ public class CardController extends BaseController {
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
             @RequestParam(value = "rows") Integer rows) throws Exception {
-        List<MAbstractCard> mAbstractCards = cardClient.searchCardBinding(idCardNo, number, cardType, page, rows);
-
+        ResponseEntity<List<MAbstractCard>> responseEntity = cardClient.searchCardBinding(idCardNo, number, cardType, page, rows);
+        List<MAbstractCard> mAbstractCards=responseEntity.getBody();
         List<CardModel> cardModels = new ArrayList<>();
 
         for (MAbstractCard info : mAbstractCards) {
@@ -83,7 +84,7 @@ public class CardController extends BaseController {
 
             cardModels.add(cardModel);
         }
-        Envelop envelop = getResult(cardModels, 1, page, rows);
+        Envelop envelop = getResult(cardModels, getTotalCount(responseEntity), page, rows);
         return envelop;
     }
 
@@ -109,9 +110,9 @@ public class CardController extends BaseController {
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
             @RequestParam(value = "rows") Integer rows) throws Exception {
 
-        List<MAbstractCard> mAbstractCards  = cardClient.searchCardUnBinding(number, cardType, page, rows);
+        ResponseEntity<List<MAbstractCard>> responseEntity  = cardClient.searchCardUnBinding(number, cardType, page, rows);
+        List<MAbstractCard> mAbstractCards =responseEntity.getBody();
         List<CardModel> cardModels = new ArrayList<>();
-
         for (MAbstractCard info : mAbstractCards){
 
             CardModel cardModel = convertToModel(info, CardModel.class);
@@ -131,7 +132,7 @@ public class CardController extends BaseController {
             }
             cardModels.add(cardModel);
         }
-        Envelop envelop = getResult(cardModels, 1, page, rows);
+        Envelop envelop = getResult(cardModels, getTotalCount(responseEntity), page, rows);
         return envelop;
     }
 
