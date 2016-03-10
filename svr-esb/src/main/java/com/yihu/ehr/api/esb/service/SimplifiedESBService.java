@@ -28,12 +28,15 @@ public class SimplifiedESBService {
 
 
     public HosEsbMiniRelease getUpdateFlag(String versionCode, String systemCode, String orgCode) throws Exception {
-        HosEsbMiniRelease hemr = hosEsbMiniReleaseDao.findBySystemCode(systemCode).get(0);
-        //判断版本是否需要更新
-        if (Integer.valueOf(versionCode) < hemr.getVersionCode()) {
-            //判断该机构是否包含在更新的里面
-            if (hemr.getOrgCode().contains(orgCode)) {
-                return hemr;
+        List<HosEsbMiniRelease> hers = hosEsbMiniReleaseDao.findBySystemCode(systemCode);
+        if (hers != null && hers.size() > 0) {
+            HosEsbMiniRelease hemr = hers.get(0);
+            //判断版本是否需要更新
+            if (Integer.valueOf(versionCode) < hemr.getVersionCode()) {
+                //判断该机构是否包含在更新的里面
+                if (hemr.getOrgCode().contains(orgCode)) {
+                    return hemr;
+                }
             }
         }
         return null;
@@ -53,7 +56,7 @@ public class SimplifiedESBService {
     }
 
     @Transactional
-    public void changeFillMiningStatus(String id, String message, String result, String status) {
+    public void changeFillMiningStatus(String id, String message, String status) {
         HosAcqTask r = hosAcqTackDao.getOne(id);
         r.setMessage(message);
         r.setStatus(status);

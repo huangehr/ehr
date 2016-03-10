@@ -72,7 +72,7 @@ public interface SystemDictClient {
             @ApiParam(name = "page", value = "当前页", defaultValue = "")
             @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
-            @RequestParam(value = "rows", required = false) Integer rows) ;
+            @RequestParam(value = "rows", required = false) Integer size) ;
 
     @ApiOperation(value = "创建字典项")
     @RequestMapping(value = "/dictionaries/entries", method = RequestMethod.POST)
@@ -101,4 +101,10 @@ public interface SystemDictClient {
     MConventionalDict updateDictEntry(
             @ApiParam(name = "entry", value = "字典JSON结构")
             @RequestParam(value = "entry") String entryJson);
+
+    @RequestMapping(value = "/dictionaries/existence/{app_name}" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断提交的字典名称是否已经存在")
+    boolean isAppNameExists(
+            @ApiParam(name = "app_name", value = "app_name", defaultValue = "")
+            @PathVariable(value = "app_name") String appName);
 }

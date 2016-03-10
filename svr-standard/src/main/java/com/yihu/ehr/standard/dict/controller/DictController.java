@@ -126,7 +126,7 @@ public class DictController extends ExtendController<MStdDict> {
     @ApiOperation(value = "根据CdaVersion及字典ID查询相应版本的字典详细信息")
     public MStdDict getCdaDictInfo(
             @ApiParam(name = "id", value = "字典编号", defaultValue = "")
-            @RequestParam(value = "id") long id,
+            @PathVariable(value = "id") long id,
             @ApiParam(name = "version", value = "版本编号", defaultValue = "")
             @RequestParam(value = "version") String version) throws Exception{
 

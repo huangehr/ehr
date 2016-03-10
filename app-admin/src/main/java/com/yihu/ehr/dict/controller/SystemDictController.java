@@ -7,6 +7,7 @@ import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.ResourceProperties;
 import com.yihu.ehr.util.log.LogService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -24,12 +25,12 @@ import java.util.Map;
 @Controller(RestAPI.SystemDictManagerController)
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
 public class SystemDictController {
-    private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
-    private static   String username = ResourceProperties.getProperty("username");
-    private static   String password = ResourceProperties.getProperty("password");
-    private static   String module = ResourceProperties.getProperty("module");
-    private static   String version = ResourceProperties.getProperty("version");
-    private static   String comUrl = host + module + version;
+    @Value("${service-gateway.username}")
+    private String username;
+    @Value("${service-gateway.password}")
+    private String password;
+    @Value("${service-gateway.url}")
+    private String comUrl;
     @RequestMapping("initial")
     public String systemDictDialog(Model model) {
         model.addAttribute("contentPage","/dict/systemDict");
