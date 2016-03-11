@@ -1,6 +1,6 @@
 package com.yihu.ehr.ha.adapter.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.adapter.AdapterDataVoModel;
 import com.yihu.ehr.agModel.adapter.AdapterDataSetModel;
 import com.yihu.ehr.agModel.adapter.DataSetModel;
 import com.yihu.ehr.constants.ApiVersion;
@@ -11,7 +11,6 @@ import com.yihu.ehr.model.adaption.MAdapterDataSet;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.validate.Valid;
 import com.yihu.ehr.util.validate.ValidateResult;
-import feign.FeignException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +63,7 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
 
     @RequestMapping(value = "/plan/{planId}/datasets/{dataSetId}/datametas",method = RequestMethod.GET)
     @ApiOperation(value = "根据dataSetId搜索数据元适配关系")
-    public Collection<AdapterDataSetModel> searchAdapterMetaData(
+    public Collection<AdapterDataVoModel> searchAdapterMetaData(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "dataSetId", value = "数据集id", defaultValue = "")
@@ -82,7 +81,7 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
 
         return convertToModels(
                 adapterDataSetClient.searchAdapterMetaData(planId, dataSetId, code, name, sorts, size, page),
-                new ArrayList<>(), AdapterDataSetModel.class, ""
+                new ArrayList<>(), AdapterDataVoModel.class, ""
         );
     }
 

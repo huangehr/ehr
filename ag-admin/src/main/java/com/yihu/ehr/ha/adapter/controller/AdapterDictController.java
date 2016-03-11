@@ -6,6 +6,7 @@ import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.ha.adapter.service.AdapterDictClient;
 import com.yihu.ehr.ha.adapter.utils.ExtendController;
 import com.yihu.ehr.model.adaption.MAdapterDict;
+import com.yihu.ehr.model.adaption.MAdapterDictVo;
 import com.yihu.ehr.model.adaption.MDataSet;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.validate.ValidateResult;
@@ -48,7 +49,7 @@ public class AdapterDictController extends ExtendController<AdapterDictModel> {
     }
 
     @RequestMapping(value = "/plan/{planId}/dict/{dictId}/entrys", method = RequestMethod.GET)
-    public Collection<MAdapterDict> getAdapterDictEntryByDictId(
+    public Collection<MAdapterDictVo> getAdapterDictEntryByDictId(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "dictId", value = "字典编号", defaultValue = "")
