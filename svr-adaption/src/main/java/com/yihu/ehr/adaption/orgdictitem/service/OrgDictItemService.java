@@ -92,7 +92,7 @@ public class OrgDictItemService extends BaseJpaService<OrgDictItem, XOrgDictItem
     }
 
     public List findByDict(int orgDictSeq, String orgCode) {
-        String hql = " from OrgDictItem where orgDictSeq=:orgDictSeq and orgCode=:orgCode";
+        String hql = " from OrgDictItem where orgDict=:orgDictSeq and organization=:orgCode";
         Query query = currentSession().createQuery(hql);
         query.setParameter("orgDictSeq", orgDictSeq);
         query.setParameter("orgCode", orgCode);

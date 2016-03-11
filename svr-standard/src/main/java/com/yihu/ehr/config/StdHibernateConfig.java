@@ -9,6 +9,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 
 import javax.sql.DataSource;
+import java.io.File;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -34,10 +38,17 @@ public class StdHibernateConfig extends HibernateConfig  {
         vesionedEntitys.put("com.yihu.ehr.standard.dict.service.DictEntry", "std_dictionary_entry_");
     }
 
+    private static void addPath(File f) throws Exception {
+        URL u = f.toURL();
+        URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+        Class urlClass = URLClassLoader.class;
+        Method method = urlClass.getDeclaredMethod("addURL", new Class[]{URL.class});
+        method.setAccessible(true);
+        method.invoke(urlClassLoader, new Object[]{u});
+    }
+
     @Bean
     public StdSessionFactoryBean sessionFactory(BasicDataSource dataSource) throws Exception {
-        String clzPath = System.getProperty("user.home") + "/ehr/std/";
-        System.setProperty("java.class.path", clzPath);
 
         List<Class> tableClass = createEntity(dataSource);
         StdSessionFactoryBean sessionFactory = new StdSessionFactoryBean();
@@ -46,6 +57,10 @@ public class StdHibernateConfig extends HibernateConfig  {
         sessionFactory.setDataSource(dataSource);
         sessionFactory.getHibernateProperties().setProperty("hibernate.show_sql", "true");
         sessionFactory.getHibernateProperties().setProperty("hibernate.format_sql", formatSQL);
+
+        String splitMark = System.getProperty("file.separator");
+        String path = System.getProperty("user.home") +splitMark+ "ehr" + splitMark + "std" + splitMark;
+        addPath(new File(path));
         return sessionFactory;
     }
 

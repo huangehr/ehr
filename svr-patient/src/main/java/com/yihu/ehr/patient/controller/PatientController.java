@@ -138,7 +138,6 @@ public class PatientController extends BaseRestController {
     /**
      * 根据前端传回来的json新增一个人口信息
      * @param jsonData
-     * @param request
      * @return
      * @throws Exception
      */
@@ -146,17 +145,17 @@ public class PatientController extends BaseRestController {
     @ApiOperation(value = "根据前端传回来的json创建一个人口信息")
     public MDemographicInfo createPatient(
             @ApiParam(name = "json_data", value = "身份证号", defaultValue = "")
-            @RequestParam(value = "json_data") String jsonData,
-            HttpServletRequest request) throws Exception{
+            @RequestParam(value = "json_data") String jsonData/*,
+            HttpServletRequest request*/) throws Exception{
         //将文件保存至服务器，返回文件的path，
-        String picPath = webupload(request);
+        //String picPath = webupload(request);
         ObjectMapper objectMapper = new ObjectMapper();
         DemographicInfo demographicInfo = objectMapper.readValue(jsonData, DemographicInfo.class);
         //将文件path保存至数据库
-        demographicInfo.setPicPath(picPath);
-        if(!StringUtils.isEmpty(picPath)){
-            demographicInfo.setLocalPath("");
-        }
+//        demographicInfo.setPicPath(picPath);
+//        if(!StringUtils.isEmpty(picPath)){
+//            demographicInfo.setLocalPath("");
+//        }
         String pwd = "123456";
         demographicInfo.setPassword(HashUtil.hashStr(pwd));
         demographicService.savePatient(demographicInfo);
@@ -166,7 +165,6 @@ public class PatientController extends BaseRestController {
     /**
      * 根据前端传回来的json修改人口信息
      * @param patientModelJsonData
-     * @param request
      * @return
      * @throws Exception
      */
@@ -174,18 +172,18 @@ public class PatientController extends BaseRestController {
     @ApiOperation(value = "根据前端传回来的json修改人口信息")
     public MDemographicInfo updatePatient(
             @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
-            @RequestParam(value = "patient_model_json_data") String patientModelJsonData,
-            HttpServletRequest request) throws Exception{
+            @RequestParam(value = "patient_model_json_data") String patientModelJsonData/*,
+            HttpServletRequest request*/) throws Exception{
 
         //将文件保存至服务器，返回文件的path，
-        String picPath = webupload(request);
+        //String picPath = webupload(request);
         ObjectMapper objectMapper = new ObjectMapper();
         DemographicInfo demographicInfo = objectMapper.readValue(patientModelJsonData, DemographicInfo.class);
         //将文件path保存至数据库
-        demographicInfo.setPicPath(picPath);
-        if(picPath != null){
-            demographicInfo.setLocalPath("");
-        }
+//        demographicInfo.setPicPath(picPath);
+//        if(picPath != null){
+//            demographicInfo.setLocalPath("");
+//        }
         demographicService.savePatient(demographicInfo);
         return convertToModel(demographicInfo,MDemographicInfo.class,null);
     }

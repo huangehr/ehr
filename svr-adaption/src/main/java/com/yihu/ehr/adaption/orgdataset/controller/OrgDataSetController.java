@@ -78,7 +78,7 @@ public class OrgDataSetController extends ExtendController<MOrgDataSet> {
             @RequestParam(value = "model") String model) throws Exception{
 
         OrgDataSet dataModel = objectMapper.readValue(model, OrgDataSet.class);
-
+        dataModel.setUpdateDate(new Date());
         return getModel(orgDataSetService.save(dataModel));
 
     }
@@ -113,6 +113,7 @@ public class OrgDataSetController extends ExtendController<MOrgDataSet> {
             @RequestParam(value = "org_code")String orgCode,
             @ApiParam(name="code",value="数据集代码",defaultValue = "")
             @RequestParam(value = "code")String code){
+
        return orgDataSetService.isExistOrgDataSet(orgCode, code);
     }
 

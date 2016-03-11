@@ -3,6 +3,9 @@ package com.yihu.ehr.dict.service;
 import com.yihu.ehr.query.BaseJpaService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,28 +30,25 @@ public class DrugDictService extends BaseJpaService<DrugDict, XDrugDictRepositor
     @Autowired
     private XIcd10DrugRelationRepository icd10DrugReRepo;
 
-    //flag: 0 - create  1 - update
-    public boolean isCodeExist(String id, String code, String flag){
-        DrugDict drugDict = drugDictRepo.findByCode(code);
-        if(drugDict != null){
-            if(StringUtils.equals(flag,"1")){
-                return (!drugDict.getId().equals(id));
-            }
-            return true;
-        }else{
-            return false;
-        }
+    public Page<DrugDict> getDictList(String sorts, int page, int size) {
+        Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
+        return drugDictRepo.findAll(pageable);
     }
-    public boolean isNameExist(String id, String name, String flag){
+
+    public boolean isCodeExist(String code){
+        DrugDict drugDict = drugDictRepo.findByCode(code);
+        return drugDict != null;
+    }
+
+    public boolean isNameExist(String name){
         DrugDict drugDict = drugDictRepo.findByName(name);
-        if(drugDict != null){
-            if(StringUtils.equals(flag,"1")){
-                return (!drugDict.getId().equals(id));
-            }
-            return true;
-        }else{
-            return false;
-        }
+        return drugDict != null;
+    }
+
+    public DrugDict createDict(DrugDict dict) {
+        dict.setName(dict.getName());
+        drugDictRepo.save(dict);
+        return dict;
     }
 
     public boolean isUsage(String id){

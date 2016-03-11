@@ -3,6 +3,7 @@ package com.yihu.ehr.adaption.orgdictitem.service;
 import com.yihu.ehr.adaption.orgdataset.service.OrgDataSet;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -14,6 +15,9 @@ import java.util.List;
 public interface XOrgDictItemRepository extends PagingAndSortingRepository<OrgDictItem, Long> {
 
     @Query("select orgDictItem from OrgDictItem orgDictItem where orgDict =:orgDictSeq and organization = :orgCode and code = :code")
-    List<OrgDataSet> isExistOrgDictItem(int orgDictSeq,String orgCode,String code);
+    List<OrgDataSet> isExistOrgDictItem(
+            @Param("orgDictSeq")int orgDictSeq,
+            @Param("orgCode")String orgCode,
+            @Param("code")String code);
 
 }

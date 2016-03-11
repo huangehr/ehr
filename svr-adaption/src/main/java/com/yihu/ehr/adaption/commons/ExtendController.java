@@ -31,6 +31,14 @@ public class ExtendController<T> extends BaseRestController {
         return (Class) parameters[0];
     }
 
+    protected Long[] strToLongArr(String str){
+        String[] strArr = str.split(",");
+        Long[] longArr = new Long[strArr.length];
+        for(int i =0; i<strArr.length; i++){
+            longArr[i] = Long.parseLong(strArr[i]);
+        }
+        return longArr;
+    }
 
     /*******************************************************************************************/
     /****************    以下是错误返回信息方法              **********************************/
@@ -61,7 +69,7 @@ public class ExtendController<T> extends BaseRestController {
     }
 
     protected ApiException errNotFound(){
-        return new ApiException(ErrorCode.NotFoundObj, "不存在该对象！");
+        return new ApiException(ErrorCode.NotFoundObj);
     }
 
     protected ApiException errMissVersion(){

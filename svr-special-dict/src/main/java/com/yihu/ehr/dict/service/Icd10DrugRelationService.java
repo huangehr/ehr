@@ -3,6 +3,9 @@ package com.yihu.ehr.dict.service;
 import com.yihu.ehr.query.BaseJpaService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,17 +30,9 @@ public class Icd10DrugRelationService extends BaseJpaService<Icd10DrugRelation, 
     @Autowired
     private XIcd10DrugRelationRepository icd10DrugRelaRepo;
 
-    //flag: 0 - create  1 - update
-    public boolean isExist(String id, String icd10Id,String drugId, String flag){
+    public boolean isExist(String icd10Id,String drugId){
         Icd10DrugRelation icd10DrugRelation = icd10DrugRelaRepo.findByIcd10IdAndDrugId(icd10Id, drugId);
-        if(icd10DrugRelation != null){
-            if(StringUtils.equals(flag,"1")){
-                return (!icd10DrugRelation.getId().equals(id));
-            }
-            return true;
-        }else{
-            return false;
-        }
+        return icd10DrugRelation != null;
     }
 
     public List<Icd10DrugRelation> getIcd10DrugRelationListByIcd10Id(String icd10Id){
@@ -57,4 +52,8 @@ public class Icd10DrugRelationService extends BaseJpaService<Icd10DrugRelation, 
         return true;
     }
 
+    public Page<Icd10DrugRelation> getRelationList(String sorts, int page, int size) {
+        Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
+        return icd10DrugRelaRepo.findAll(pageable);
+    }
 }
