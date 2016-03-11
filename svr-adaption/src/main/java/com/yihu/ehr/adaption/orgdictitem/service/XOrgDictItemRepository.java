@@ -16,7 +16,7 @@ public interface XOrgDictItemRepository extends PagingAndSortingRepository<OrgDi
 
     @Query("select orgDictItem from OrgDictItem orgDictItem where orgDict =:orgDictSeq and organization = :orgCode and code = :code")
     List<OrgDataSet> isExistOrgDictItem(
-            @Param("orgDictSeq")int orgDictSeq,
+            @Param("orgDictSeq")long orgDictSeq,
             @Param("orgCode")String orgCode,
             @Param("code")String code);
 

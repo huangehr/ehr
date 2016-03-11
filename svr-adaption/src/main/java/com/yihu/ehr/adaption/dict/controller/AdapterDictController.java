@@ -7,7 +7,7 @@ import com.yihu.ehr.adaption.dict.service.AdapterDict;
 import com.yihu.ehr.adaption.dict.service.AdapterDictService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.adaption.MAdapterDict;
-import com.yihu.ehr.model.adaption.MDataSet;
+import com.yihu.ehr.model.adaption.MAdapterRelationship;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -38,7 +38,7 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
 
     @RequestMapping(value = "/plan/{planId}/dicts", method = RequestMethod.GET)
     @ApiOperation(value = "字典适配关系分页查询")
-    public Collection<MDataSet> searchAdapterDict(
+    public Collection<MAdapterRelationship> searchAdapterDict(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "code", value = "代码查询值", defaultValue = "")

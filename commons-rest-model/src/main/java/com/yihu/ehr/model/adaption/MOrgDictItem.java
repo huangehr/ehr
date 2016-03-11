@@ -20,7 +20,7 @@ public class MOrgDictItem {
     String description;
     String createUser;
     String updateUser;
-    Integer orgDict;
+    long orgDict;
     String organization;
     int sequence;
 
@@ -96,11 +96,11 @@ public class MOrgDictItem {
         this.updateUser = updateUser;
     }
 
-    public Integer getOrgDict() {
+    public long getOrgDict() {
         return orgDict;
     }
 
-    public void setOrgDict(Integer orgDict) {
+    public void setOrgDict(long orgDict) {
         this.orgDict = orgDict;
     }
 

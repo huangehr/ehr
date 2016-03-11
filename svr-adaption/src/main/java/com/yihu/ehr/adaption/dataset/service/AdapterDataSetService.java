@@ -6,7 +6,7 @@ import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanService;
 import com.yihu.ehr.adaption.dict.service.AdapterDictService;
 import com.yihu.ehr.adaption.feignclient.DictClient;
 import com.yihu.ehr.model.adaption.MAdapterDataSet;
-import com.yihu.ehr.model.adaption.MDataSet;
+import com.yihu.ehr.model.adaption.MAdapterRelationship;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
@@ -43,7 +43,7 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
     /**
      * 根据方案ID及查询条件查询数据集适配关系
      */
-    public List<MDataSet> searchAdapterDataSet(OrgAdapterPlan plan, String code, String name, String orders, int page, int rows) {
+    public List<MAdapterRelationship> searchAdapterDataSet(OrgAdapterPlan plan, String code, String name, String orders, int page, int rows) {
         long planId = plan.getId();
         String version = plan.getVersion();
         String dsTableName = CDAVersionUtil.getDataSetTableName(version);
@@ -69,7 +69,7 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
         page = page == 0 ? 1 : page;
         sqlQuery.setMaxResults(rows);
         sqlQuery.setFirstResult((page - 1) * rows);
-        sqlQuery.setResultTransformer(Transformers.aliasToBean(MDataSet.class));
+        sqlQuery.setResultTransformer(Transformers.aliasToBean(MAdapterRelationship.class));
         return sqlQuery.list();
     }
 

@@ -8,6 +8,7 @@ import com.yihu.ehr.ha.adapter.controller.AdapterOrgController;
 import com.yihu.ehr.ha.adapter.controller.OrgDictController;
 import com.yihu.ehr.util.Envelop;
 import org.junit.FixMethodOrder;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,7 @@ public class OrgDictControllerTests {
 
     ApplicationContext applicationContext;
 
+    @Test
     public void aTestOrgDict() throws Exception{
 
         applicationContext = new SpringApplicationBuilder()
@@ -49,9 +51,10 @@ public class OrgDictControllerTests {
         detailModel.setType("2");
         detailModel.setDescription("这是测试机构");
         detailModel.setOrg("CSJG1019002");
+        detailModel.setCode("CSJG1019002");
 
         Envelop envelop = adapterOrgController.addAdapterOrg(objectMapper.writeValueAsString(detailModel));
-        assertTrue("适配机构新增失败!", !envelop.isSuccessFlg());
+        assertTrue("适配机构新增失败!", envelop.isSuccessFlg());
 
         detailModel = (AdapterOrgDetailModel)envelop.getObj();
 
