@@ -13,6 +13,7 @@ import com.yihu.ehr.model.geogrephy.MGeography;
 import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
@@ -28,6 +29,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
+@Api(value = "patient", description = "人口管理接口，用于人口信息管理", tags = {"人口管理接口"})
 public class PatientController extends BaseController {
 
     @Autowired
@@ -79,7 +81,7 @@ public class PatientController extends BaseController {
                     if (StringUtils.isNotEmpty(geography.getStreet())) homeAddress += geography.getStreet();
                     if (StringUtils.isNotEmpty(geography.getExtra())) homeAddress += geography.getExtra();
                 }
-                patient.setAddress(homeAddress);
+                patient.setHomeAddress(homeAddress);
             }
             patients.add(patient);
         }
