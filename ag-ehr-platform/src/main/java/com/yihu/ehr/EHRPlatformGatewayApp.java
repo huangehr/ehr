@@ -29,7 +29,7 @@ public class EHRPlatformGatewayApp  {
     @Value("${keystore.file}")
     String keystore;
 
-    @Value("keystore.password")
+    @Value("${keystore.password}")
     String password;
 
 	public static void main(String[] args) {
