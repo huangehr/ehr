@@ -15,6 +15,8 @@
             // 用户类型字典Id
             var settledWayDictId = 15;
 
+            var isFirstPage = true;
+
             /* *************************** 函数定义 ******************************* */
             /**
              * 页面初始化。
@@ -26,13 +28,17 @@
             }
             //多条件查询参数设置
             function reloadGrid (url, params) {
+
+                if (isFirstPage){
+                    userInfoGrid.options.newPage = 1;
+                }
                 userInfoGrid.set({
                     url: url,
-                    parms: params,
-                    newPage:1
-
+                    parms: params
                 });
+
                 userInfoGrid.reload();
+                isFirstPage = true;
             }
 
             /* *************************** 模块初始化 ***************************** */
@@ -191,10 +197,13 @@
                         $.ligerDialog.confirm('确认删除该行信息？<br>如果是请点击确认按钮，否则请点击取消。',function(yes){
                             if(yes){
                                 var dataModel = $.DataModel.init();
-                                dataModel.updateRemote("${contextRoot}/user/deleteUser",{data:{userId:userId},
+                                dataModel.updateRemote("${contextRoot}/user/deleteUser",{
+                                    data:{userId:userId},
+                                    async:true,
                                     success: function(data) {
                                         if(data.successFlg){
                                             $.Notice.success('删除成功。');
+                                            isFirstPage=false;
                                             master.reloadGrid();
                                         }else{
                                             $.Notice.error('删除失败。');
