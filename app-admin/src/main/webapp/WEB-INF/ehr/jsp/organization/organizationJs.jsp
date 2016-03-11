@@ -99,14 +99,14 @@
                             district:''
                         },
                         columns: [
-                            {display:'机构类型',name:'orgTypeValue', width: '8%', align:"left"},
+                            {display:'机构类型',name:'orgTypeName', width: '8%', align:"left"},
                             {display:'机构代码',name:'orgCode', width: '9%', align:"left"},
                             {display:'机构全名',name:'fullName', width: '15%', align:"left"},
                             {display:'联系人',name:'admin', width: '10%', align:"left"},
                             {display:'联系方式',name:'tel', width: '10%', align:"left"},
-                            {display:'机构地址',name:'location', width: '20%', align:"left"},
-                            {display:'是否激活',name:'activityName',width: '8%',isAllowHide: false},
-                            {display:'入驻方式',name:'settledWayValue',width: '10%',isAllowHide: false},
+                            {display:'机构地址',name:'locationStrName', width: '20%', align:"left"},
+                            {display:'是否激活',name:'activityFlagName',width: '8%',isAllowHide: false},
+                            {display:'入驻方式',name:'settledWayName',width: '10%',isAllowHide: false},
                             {display:'操作', name: 'operator', width: '10%', render: function (row) {
                                 var html = '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:modify", row.orgCode,'modify') + '">编辑</a> / ';
                                 html += '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:del", row.orgCode, 'del') + '">删除</a> /';
