@@ -1,9 +1,10 @@
 package com.yihu.ehr.organization.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
-import com.yihu.ehr.util.ResourceProperties;
+import com.yihu.ehr.util.log.LogService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -41,28 +42,13 @@ public class OrganizationController {
         String resultStr = "";
         try{
             resultStr = HttpClientUtil.doGet(comUrl + getOrgUrl, username, password);
-            model.addAttribute("mode",mode);
-            //TODO 转化为对象
-            model.addAttribute("org",resultStr);
-            model.addAttribute("contentPage","organization/organizationInfoDialog");
-            return  "simpleView";
+        } catch (Exception e){
+            LogService.getLogger(OrganizationController.class).error(e.getMessage());
         }
-        catch (Exception e){
-            model.addAttribute("mode",mode);
-            model.addAttribute("org",resultStr);
-            model.addAttribute("contentPage","organization/organizationInfoDialog");
-            return  "simpleView";
-        }
-
-        /*
-        XOrganization org = orgManager.getOrg(orgCode);
-        OrgModel orgModel = orgManager.getOrgModel(org);
-
         model.addAttribute("mode",mode);
-        model.addAttribute("org",orgModel);
+        model.addAttribute("envelop",resultStr);
         model.addAttribute("contentPage","organization/organizationInfoDialog");
         return  "simpleView";
-        */
     }
 
     @RequestMapping("dialog/create")
@@ -122,66 +108,24 @@ public class OrganizationController {
             result.setErrorMsg(ErrorCode.SystemError.toString());
             return result;
         }
-
-        /*
-        Map<String, Object> conditionMap = new HashMap<>();
-        conditionMap.put("orgCode", searchNm);
-        conditionMap.put("fullName", searchNm);
-
-        conditionMap.put("searchWay", searchWay);
-        conditionMap.put("orgType", orgType);
-        conditionMap.put("province", province);
-        conditionMap.put("city", city);
-        conditionMap.put("district", district);
-
-        conditionMap.put("page", page);
-        conditionMap.put("pageSize", rows);
-
-        List<OrgDetailModel> detailModelList = orgManager.searchOrgDetailModel(conditionMap);
-        Integer totalCount = orgManager.searchInt(conditionMap);
-        Result result = getResult(detailModelList, totalCount, page, rows);
-
-        return result.toJson();*/
     }
 
     @RequestMapping("deleteOrg")
     @ResponseBody
     public Object deleteOrg(String orgCode) {
-
         String getOrgUrl = "/organizations/"+orgCode;
         String resultStr = "";
         Envelop result = new Envelop();
-
         Map<String, Object> params = new HashMap<>();
-        params.put("orgCode",orgCode);
-
         try {
             resultStr = HttpClientUtil.doDelete(comUrl + getOrgUrl, params, username, password);
-
-            if(Boolean.parseBoolean(resultStr)){
-                result.setSuccessFlg(true);
-            }
-            else {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.InvalidDelete.toString());
-            }
-            return result;
-
+            return resultStr;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-
-            return result;
         }
-        /*
-        try {
-            orgManager.delete(orgCode);
-            Result result = getSuccessResult(true);
-            return result.toJson();
-        } catch (Exception e) {
-            Result result = getSuccessResult(false);
-            return result.toJson();
-        }*/
+        return result;
+
     }
 
     /**
@@ -196,10 +140,7 @@ public class OrganizationController {
         String url = "/organizations/"+orgCode+"/"+activityFlag;
         String resultStr = "";
         Envelop result = new Envelop();
-
         Map<String, Object> params = new HashMap<>();
-        params.put("orgCode",orgCode);
-
         try {
             resultStr = HttpClientUtil.doPut(comUrl + url, params, username, password);
             if(Boolean.parseBoolean(resultStr)){
@@ -214,88 +155,30 @@ public class OrganizationController {
             result.setSuccessFlg(false);
             return result;
         }
-
-        /*
-        try {
-            XOrganization org = orgManager.getOrg(orgCode);
-            if("1".equals(activityFlag)){
-                org.setActivityFlag(0);
-                orgManager.update(org);
-            }else{
-                org.setActivityFlag(1);
-                orgManager.update(org);
-            }
-
-            Result result = getSuccessResult(true);
-            return result.toJson();
-        } catch (Exception e) {
-            Result result = getSuccessResult(false);
-            return result.toJson();
-        }*/
     }
 
     @RequestMapping("updateOrg")
     @ResponseBody
-    public Object updateOrg(String orgModel) {
-
-        String url = "/organizations/org";
+    public Object updateOrg(String orgModel,String mode) {
+        //新增或修改 根据mode 选择
+        String url = "/organizations";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("orgModel",orgModel);
+        params.put("mOrganizationJsonData",orgModel);
+        params.put("geographyModelJsonData",orgModel);
         try {
-            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
-            //todo: 需要在后台追加唯一性判断
-            result.setObj(resultStr);
-            result.setSuccessFlg(true);
-            return result;
+            if("new".equals(mode)){
+                resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
+            }else {
+                resultStr = HttpClientUtil.doPut(comUrl + url, params, username, password);
+            }
+            return resultStr;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
             return result;
         }
-
-        /*
-        Map<String, String> message = new HashMap<>();
-        Result result = new Result();
-        try {
-            if (orgModel.getUpdateFlg().equals("0")){
-                if(orgManager.isExistOrg(orgModel.getOrgCode())){
-                    result.setSuccessFlg(false);
-                    result.setErrorMsg("该机构已存在!");
-                    return result.toJson();
-                }
-                XOrganization org = orgManager.register(orgModel.getOrgCode(), orgModel.getFullName(), orgModel.getShortName());
-
-                org.setActivityFlag(1);
-                org.getLocation().setCity(orgModel.getCity());
-                org.getLocation().setDistrict(orgModel.getDistrict());
-                org.getLocation().setProvince(orgModel.getProvince());
-                org.getLocation().setTown(orgModel.getTown());
-                org.getLocation().setStreet(orgModel.getStreet());
-
-                org.setAdmin(orgModel.getAdmin());
-                org.setTel(orgModel.getTel());
-                org.setType(absDictEManage.getOrgType(orgModel.getOrgType()));
-                org.setSettleWay(absDictEManage.getSettledWay(orgModel.getSettledWay()));
-                org.addTag(orgModel.getTags());
-
-                orgManager.update(org);
-
-                result.setSuccessFlg(true);
-                return result.toJson();
-            }
-            else{
-                result.setSuccessFlg(orgManager.update(orgModel));
-                result.setErrorMsg("该机构不存在。");
-                return result.toJson();
-            }
-
-        } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg("更新失败，请联系管理员");
-            return result.toJson();
-        }*/
     }
 
     @RequestMapping("getOrg")
@@ -308,27 +191,14 @@ public class OrganizationController {
 
         Envelop envelop = new Envelop();
         String resultStr = "";
-
         try{
             resultStr = HttpClientUtil.doGet(comUrl + getOrgUrl, params, username, password);
-//            envelop.setObj(resultStr);
-//            envelop.setSuccessFlg(true);
-            return envelop;
+            return resultStr;
         } catch (Exception e) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg(ErrorCode.SystemError.toString());
             return envelop;
         }
-
-        /*
-        XOrganization org = orgManager.getOrg(orgCode);
-        OrgModel orgModel = orgManager.getOrgModel(org);
-        Map<String, OrgModel> data = new HashMap<>();
-        data.put("orgModel", orgModel);
-
-        Result result = new Result();
-        result.setObj(data);
-        return result.toJson();*/
     }
 
     @RequestMapping("distributeKey")
@@ -338,14 +208,10 @@ public class OrganizationController {
         String getOrgUrl = "/organizations/key";
         String resultStr = "";
         Envelop envelop = new Envelop();
-        //临时厕所数据
-        orgCode = "341321234";
         Map<String, Object> params = new HashMap<>();
-        params.put("orgCode",orgCode);
+        params.put("org_code",orgCode);
         try {
-            //TODO 要访问的是organizations/key" , method = RequestMethod.POST)
-            //TODO 实际访问的是/organizations/{org_code}", method = RequestMethod.GET)
-            resultStr = HttpClientUtil.doGet(comUrl + getOrgUrl, params, username, password);
+            resultStr = HttpClientUtil.doPost(comUrl + getOrgUrl, params, username, password);
             if(Boolean.parseBoolean(resultStr)){
                 envelop.setSuccessFlg(true);
             }
@@ -359,37 +225,6 @@ public class OrganizationController {
             envelop.setErrorMsg(ErrorCode.SystemError.toString());
             return envelop;
         }
-
-        /*
-        try {
-            Result result = getSuccessResult(true);
-            XUserSecurity userSecurity = securityManager.getUserPublicKeyByOrgCd(orgCode);
-            Map<String, String> keyMap = new HashMap<>();
-            if (userSecurity == null) {
-                userSecurity = securityManager.createSecurityByOrgCd(orgCode);
-
-            }else{
-                //result.setErrorMsg("公钥信息已存在。");
-                //这里删除原有的公私钥重新分配
-                String userKeyId = securityManager.getUserKeyByOrgCd(orgCode);
-                securityManager.deleteSecurity(userSecurity.getId());
-                securityManager.deleteUserKey(userKeyId);
-                userSecurity = securityManager.createSecurityByOrgCd(orgCode);
-            }
-            //String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT);
-            String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT)
-                    + "~" + DateUtil.toString(userSecurity.getExpiryDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT);
-
-            keyMap.put("publicKey", userSecurity.getPublicKey());
-            keyMap.put("validTime", validTime);
-            keyMap.put("startTime", DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT));
-            result.setObj(keyMap);
-            result.setSuccessFlg(true);
-            return result.toJson();
-        } catch (Exception ex) {
-            Result result = getSuccessResult(false);
-            return result.toJson();
-        }*/
     }
 
 
@@ -402,7 +237,7 @@ public class OrganizationController {
         Envelop result = new Envelop();
         try {
             resultStr = HttpClientUtil.doGet(comUrl + getOrgUrl, username, password);
-            if(Boolean.parseBoolean(resultStr)){
+            if(!Boolean.parseBoolean(resultStr)){
                 result.setSuccessFlg(true);
             }
             else {
@@ -415,14 +250,5 @@ public class OrganizationController {
             result.setErrorMsg(ErrorCode.SystemError.toString());
             return result;
         }
-
-        /*
-        XOrganization org = orgManager.getOrg(searchNm);
-        if(org == null){
-            Result result = getSuccessResult(true);
-            return result.toJson();
-        }
-        Result result = getSuccessResult(false);
-        return  result.toJson();*/
     }
 }

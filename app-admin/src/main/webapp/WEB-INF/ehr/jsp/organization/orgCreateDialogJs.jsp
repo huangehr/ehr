@@ -106,8 +106,7 @@
                             {city: orgAddress.names[1]},
                             {district: orgAddress.names[2]},
                             {town: ""},
-                            {street: orgAddress.names[3]},
-                            {updateFlg:'0'}
+                            {street: orgAddress.names[3]}
                     );
     /*                if(Util.isStrEquals($.trim(orgModel.orgCode),'')){
                         $.Notice.warn('组织机构代码不能为空');
@@ -129,8 +128,9 @@
                         $.Notice.warn('联系电话不能为空');
                         return;
                     }*/
+						debugger
                     dataModel.createRemote("${contextRoot}/organization/updateOrg", {
-                        data: orgModel,
+                        data: {orgModel:JSON.stringify(orgModel),mode:"new"},
                         success: function (data) {
                             if(data.successFlg){
                                 win.parent.closeAddOrgInfoDialog(function (){

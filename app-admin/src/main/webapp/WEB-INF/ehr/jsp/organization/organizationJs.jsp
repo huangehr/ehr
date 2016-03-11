@@ -179,6 +179,7 @@
                 bindEvents: function () {
                     var self = this;
                     $.subscribe('org:orgInfoDialog:modify', function (event, orgCode, mode) {
+						debugger
                         var title = '修改机构信息';
                             self.orgInfoDialog = $.ligerDialog.open({
                             isHidden: false,

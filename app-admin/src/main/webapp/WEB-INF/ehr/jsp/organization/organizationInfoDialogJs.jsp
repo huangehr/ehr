@@ -16,6 +16,9 @@
 
         //公钥管理弹框
         var publicKeyMsgDialog = null;
+		debugger
+		var envelop = JSON.parse('${envelop}');
+		var org = envelop.obj;
 
         /* *************************** 函数定义 ******************************* */
         function pageInit() {
@@ -83,43 +86,41 @@
 
                 this.initDDL(orgTypeDictId,this.$orgType);
                 this.initDDL(settledWayDictId,this.$settledWay);
+				this.$form.attrScan();
+//				tags = tags.substring(1,tags.length-1);
+				this.$form.Fields.fillValues({
+					orgCode: org.orgCode,
+					fullName: org.fullName,
+					shortName: org.shortName,
+					//location: org.location,
+					orgType: org.orgType,
+					settledWay: org.settledWay,
+					admin:org.admin,
+					tel: org.tel,
+//					tags: tags,
+					publicKey: org.publicKey,
+					validTime:org.validTime,
+					startTime:org.startTime
+				});
+				this.$publicKeyMessage.val(org.publicKey);
+				this.$publicKeyValidTime.html(org.validTime);
+				this.$publicKeyStartTime.html(org.startTime);
 
-                this.$form.attrScan();
-                var tags = '${org.tags}';
-                tags = tags.substring(1,tags.length-1);
-                this.$form.Fields.fillValues({
-                    orgCode: '${org.orgCode}',
-                    fullName: '${org.fullName}',
-                    shortName: '${org.shortName}',
-                    //location: '${org.location}',
-                    orgType: '${org.orgType}',
-                    settledWay: '${org.settledWay}',
-                    admin:'${org.admin}',
-                    tel: '${org.tel}',
-                    tags: tags,
-                    publicKey:'${org.publicKey}',
-                    validTime:'${org.validTime}',
-                    startTime:'${org.startTime}'
-                });
-                this.$publicKeyMessage.val('${org.publicKey}');
-                this.$publicKeyValidTime.html('${org.validTime}');
-                this.$publicKeyStartTime.html('${org.startTime}');
+				this.$form.Fields.location.setValue([org.province,org.city,org.district,org.street]);
 
-                this.$form.Fields.location.setValue(['${org.province}','${org.city}','${org.district}','${org.street}']);
-
-                if ('${mode}' == 'view') {
-                    this.$form.addClass("m-form-readonly");
-                    this.$publicKey.hide();
-                    this.$footer.hide();
-//                    this.$updateOrgBtn.hide();
-//                    this.$cancelBtn.hide();
-                    this.$selectPublicKeyMessage.show();
-                    this.$selectPublicKeyValidTime.show();
-                    this.$selectPublicKeyStartTime.show();
-                }
-                if ('${mode}' == 'modify') {
-                    //this.$publicManage.hide();
-                }
+                <%--if ('${mode}' == 'view') {--%>
+                    <%--this.$form.addClass("m-form-readonly");--%>
+                    <%--this.$publicKey.hide();--%>
+                    <%--this.$footer.hide();--%>
+<%--//                    this.$updateOrgBtn.hide();--%>
+<%--//                    this.$cancelBtn.hide();--%>
+                    <%--this.$selectPublicKeyMessage.show();--%>
+                    <%--this.$selectPublicKeyValidTime.show();--%>
+                    <%--this.$selectPublicKeyStartTime.show();--%>
+                <%--}--%>
+                <%--if ('${mode}' == 'modify') {--%>
+                    <%--//this.$publicManage.hide();--%>
+                <%--}--%>
             },
             initDDL: function (dictId, target) {
                 target.ligerComboBox({
@@ -147,8 +148,7 @@
                             {city: orgAddress.names[1]},
                             {district: orgAddress.names[2]},
                             {town: ""},
-                            {street: orgAddress.names[3]},
-                            {updateFlg:'1'}
+                            {street: orgAddress.names[3]}
                     );
                    /* if(Util.isStrEquals(orgModel.orgCode,'')){
                         $.Notice.warn('组织机构代码不能为空');
@@ -171,7 +171,7 @@
                         return;
                     }*/
                     dataModel.createRemote("${contextRoot}/organization/updateOrg", {
-                        data: orgModel,
+                        data:  {orgModel:JSON.stringify(orgModel),mode:"modify"},
                                 success: function (data) {
                                     if(data.successFlg){
                                         parent.reloadMasterGrid();
@@ -200,10 +200,13 @@
 
                         var code = self.$form.Fields.orgCode.getValue();
                         var dataModel = $.DataModel.init();
+						debugger
                         dataModel.createRemote('${contextRoot}/organization/distributeKey', {
                             data: {orgCode:code},
                             success: function (data) {
+								debugger
                                 if(data.successFlg){
+									debugger
                                     self.$publicKeyMessage.val(data.obj.publicKey);
                                     self.$publicKeyValidTime.html(data.obj.validTime);
                                     self.$publicKeyStartTime.html(data.obj.startTime);
