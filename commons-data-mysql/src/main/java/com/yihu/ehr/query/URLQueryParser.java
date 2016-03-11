@@ -145,16 +145,22 @@ public class URLQueryParser<T> {
         String[] filterArray = filters.split(";");
 
         for (int i = 0; i < filterArray.length; ++i) {
+
             String[] tokens = filterArray[i].split(" ");
             if (tokens.length > 2) throw new IllegalArgumentException("无效过滤参数");
 
             String group = null;
             if (tokens.length == 2) group = tokens[1];
 
-            Predicate predicate = splitFilter(filterArray[i], criteriaBuilder, root);
+            Predicate predicate = splitFilter(tokens[0], criteriaBuilder, root);
 
-            if (group != null)
-                predicateMap.put(group, criteriaBuilder.or(predicateMap.get(group), predicate));
+            if (group != null){
+                if(predicateMap.get(group)==null)
+                    predicateMap.put(group, predicate);
+                else
+                    predicateMap.put(group, criteriaBuilder.or(predicateMap.get(group), predicate));
+            }
+
             else
                 predicateMap.put(Integer.toString(i), predicate);
         }
