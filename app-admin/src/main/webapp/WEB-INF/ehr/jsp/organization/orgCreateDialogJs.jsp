@@ -96,55 +96,65 @@
                 }});
                 this.$updateOrgBtn.click(function () {
                     if(validator.validate()){
-                    var dataModel = $.DataModel.init();
+                    	var dataModel = $.DataModel.init();
+                    	self.$form.attrScan();
+                    	var orgAddress = self.$form.Fields.location.getValue();
+						var orgModel = self.$form.Fields.getValues();
+						//原location是对象，传到controller转化成model会报错--机构、地址分开传递（json串）
+						orgModel.location = "";
+						var addressModel = {
+							province:  orgAddress.names[0],
+							city: orgAddress.names[1],
+							district: orgAddress.names[2],
+							town: "",
+							street: orgAddress.names[3]
+						};
 
-                    self.$form.attrScan();
-                    var orgAddress = self.$form.Fields.location.getValue();
-                    var orgModel = $.extend({},self.$form.Fields.getValues(),
-                            {location: "" },
-                            {province:  orgAddress.names[0]},
-                            {city: orgAddress.names[1]},
-                            {district: orgAddress.names[2]},
-                            {town: ""},
-                            {street: orgAddress.names[3]}
-                    );
-    /*                if(Util.isStrEquals($.trim(orgModel.orgCode),'')){
-                        $.Notice.warn('组织机构代码不能为空');
-                        return;
-                    }
-                    if(Util.isStrEquals(orgModel.fullName,'')){
-                        $.Notice.warn('机构全名不能为空');
-                        return;
-                    }
-                    if(Util.isStrEquals(orgModel.shortName,'')){
-                        $.Notice.warn('组织简称不能为空');
-                        return;
-                    }
-                    if(Util.isStrEquals(orgModel.province,'')){
-                        $.Notice.warn('位置不能为空');
-                        return;
-                    }
-                    if(Util.isStrEquals(orgModel.tel,'')){
-                        $.Notice.warn('联系电话不能为空');
-                        return;
-                    }*/
+						/*var orgModel = $.extend({},self.$form.Fields.getValues(),
+						 {location: "" },
+						 {province:  orgAddress.names[0]},
+						 {city: orgAddress.names[1]},
+						 {district: orgAddress.names[2]},
+						 {town: ""},
+						 {street: orgAddress.names[3]}
+						 );*/
+						/*                if(Util.isStrEquals($.trim(orgModel.orgCode),'')){
+						 $.Notice.warn('组织机构代码不能为空');
+						 return;
+						 }
+						 if(Util.isStrEquals(orgModel.fullName,'')){
+						 $.Notice.warn('机构全名不能为空');
+						 return;
+						 }
+						 if(Util.isStrEquals(orgModel.shortName,'')){
+						 $.Notice.warn('组织简称不能为空');
+						 return;
+						 }
+						 if(Util.isStrEquals(orgModel.province,'')){
+						 $.Notice.warn('位置不能为空');
+						 return;
+						 }
+						 if(Util.isStrEquals(orgModel.tel,'')){
+						 $.Notice.warn('联系电话不能为空');
+						 return;
+						 }*/
 						debugger
-                    dataModel.createRemote("${contextRoot}/organization/updateOrg", {
-                        data: {orgModel:JSON.stringify(orgModel),mode:"new"},
-                        success: function (data) {
-                            if(data.successFlg){
-                                win.parent.closeAddOrgInfoDialog(function (){
-                                    win.parent.$.Notice.success('机构新增成功');
-                                });
-                                /*$.Notice.open({type: 'success', msg: '操作成功！'});
-                                parent.reloadMasterGrid();
-                                dialog.close();*/
-                            }else{
-                                window.top.$.Notice.error(data.errorMsg);
-                                //$.Notice.open({type: 'error', msg: data.errorMsg});
-                            }
-                        }
-                    })
+						dataModel.createRemote("${contextRoot}/organization/updateOrg", {
+							data: {orgModel:JSON.stringify(orgModel),addressModel:JSON.stringify(addressModel),mode:"new"},
+							success: function (data) {
+								if(data.successFlg){
+									win.parent.closeAddOrgInfoDialog(function (){
+										win.parent.$.Notice.success('机构新增成功');
+									});
+									/*$.Notice.open({type: 'success', msg: '操作成功！'});
+									 parent.reloadMasterGrid();
+									 dialog.close();*/
+								}else{
+									window.top.$.Notice.error(data.errorMsg);
+									//$.Notice.open({type: 'error', msg: data.errorMsg});
+								}
+							}
+						})
                     }else{
                         return;
                     }

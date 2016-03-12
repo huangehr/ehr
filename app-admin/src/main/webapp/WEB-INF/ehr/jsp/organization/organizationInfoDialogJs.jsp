@@ -16,7 +16,6 @@
 
         //公钥管理弹框
         var publicKeyMsgDialog = null;
-		debugger
 		var envelop = JSON.parse('${envelop}');
 		var org = envelop.obj;
 
@@ -108,19 +107,19 @@
 
 				this.$form.Fields.location.setValue([org.province,org.city,org.district,org.street]);
 
-                <%--if ('${mode}' == 'view') {--%>
-                    <%--this.$form.addClass("m-form-readonly");--%>
-                    <%--this.$publicKey.hide();--%>
-                    <%--this.$footer.hide();--%>
-<%--//                    this.$updateOrgBtn.hide();--%>
-<%--//                    this.$cancelBtn.hide();--%>
-                    <%--this.$selectPublicKeyMessage.show();--%>
-                    <%--this.$selectPublicKeyValidTime.show();--%>
-                    <%--this.$selectPublicKeyStartTime.show();--%>
-                <%--}--%>
-                <%--if ('${mode}' == 'modify') {--%>
-                    <%--//this.$publicManage.hide();--%>
-                <%--}--%>
+                if ('${mode}' == 'view') {
+                    this.$form.addClass("m-form-readonly");
+                    this.$publicKey.hide();
+                    this.$footer.hide();
+//                    this.$updateOrgBtn.hide();
+//                    this.$cancelBtn.hide();
+                    this.$selectPublicKeyMessage.show();
+                    this.$selectPublicKeyValidTime.show();
+                    this.$selectPublicKeyStartTime.show();
+                }
+                if ('${mode}' == 'modify') {
+                    //this.$publicManage.hide();
+                }
             },
             initDDL: function (dictId, target) {
                 target.ligerComboBox({
@@ -142,14 +141,24 @@
                     var dataModel = $.DataModel.init();
                     self.$form.attrScan();
                     var orgAddress = self.$form.Fields.location.getValue();
-                    var orgModel = $.extend({},self.$form.Fields.getValues(),
+					var orgModel = self.$form.Fields.getValues();
+					//原location是对象，传到controller转化成model会报错--机构、地址分开传递（json串）
+					orgModel.location = "";
+					var addressModel = {
+                            province:  orgAddress.names[0],
+                            city: orgAddress.names[1],
+                            district: orgAddress.names[2],
+                            town: "",
+                            street: orgAddress.names[3]
+					};
+                    /*var orgModel = $.extend({},self.$form.Fields.getValues(),
                             {location: "" },
                             {province:  orgAddress.names[0]},
                             {city: orgAddress.names[1]},
                             {district: orgAddress.names[2]},
                             {town: ""},
                             {street: orgAddress.names[3]}
-                    );
+                    );*/
                    /* if(Util.isStrEquals(orgModel.orgCode,'')){
                         $.Notice.warn('组织机构代码不能为空');
                         return;
@@ -171,8 +180,8 @@
                         return;
                     }*/
                     dataModel.createRemote("${contextRoot}/organization/updateOrg", {
-                        data:  {orgModel:JSON.stringify(orgModel),mode:"modify"},
-                                success: function (data) {
+                        data:  {orgModel:JSON.stringify(orgModel),addressModel:JSON.stringify(addressModel),mode:"modify"},
+						success: function (data) {
                                     if(data.successFlg){
                                         parent.reloadMasterGrid();
                                         $.Notice.success('操作成功');
@@ -200,13 +209,10 @@
 
                         var code = self.$form.Fields.orgCode.getValue();
                         var dataModel = $.DataModel.init();
-						debugger
                         dataModel.createRemote('${contextRoot}/organization/distributeKey', {
                             data: {orgCode:code},
                             success: function (data) {
-								debugger
                                 if(data.successFlg){
-									debugger
                                     self.$publicKeyMessage.val(data.obj.publicKey);
                                     self.$publicKeyValidTime.html(data.obj.validTime);
                                     self.$publicKeyStartTime.html(data.obj.startTime);

@@ -1,6 +1,7 @@
 package com.yihu.ehr.organization.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.org.OrgDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
@@ -159,18 +160,38 @@ public class OrganizationController {
 
     @RequestMapping("updateOrg")
     @ResponseBody
-    public Object updateOrg(String orgModel,String mode) {
+    public Object updateOrg(String orgModel,String addressModel,String mode) {
         //新增或修改 根据mode 选择
         String url = "/organizations";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("mOrganizationJsonData",orgModel);
-        params.put("geographyModelJsonData",orgModel);
+        params.put("geographyModelJsonData",addressModel);
         try {
             if("new".equals(mode)){
                 resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
             }else {
+                ObjectMapper objectMapper = new ObjectMapper();
+                //读取参数，转化为模型
+                OrgDetailModel org = objectMapper.readValue(orgModel,OrgDetailModel.class);
+                //查询数据库得到对应的模型
+                String getOrgUrl = "/organizations/"+org.getOrgCode();
+                resultStr = HttpClientUtil.doGet(comUrl + getOrgUrl, params, username, password);
+                Map<String,Object> map = objectMapper.readValue(resultStr,Map.class);
+                Object object = map.get("obj");
+                String strOrg = objectMapper.writeValueAsString(object);
+                OrgDetailModel orgForUpdate =(objectMapper.readValue(strOrg,OrgDetailModel.class));
+                //将修改值存储到查询返回的对象中
+                orgForUpdate.setFullName(org.getFullName());
+                orgForUpdate.setShortName(org.getShortName());
+                orgForUpdate.setSettledWay(org.getSettledWay());
+                orgForUpdate.setAdmin(org.getAdmin());
+                orgForUpdate.setTel(org.getTel());
+                orgForUpdate.setOrgType(org.getOrgType());
+                orgForUpdate.setTags(org.getTags());
+                String mOrgUpdateJson = objectMapper.writeValueAsString(orgForUpdate);
+                params.put("mOrganizationJsonData",mOrgUpdateJson);
                 resultStr = HttpClientUtil.doPut(comUrl + url, params, username, password);
             }
             return resultStr;
@@ -212,14 +233,7 @@ public class OrganizationController {
         params.put("org_code",orgCode);
         try {
             resultStr = HttpClientUtil.doPost(comUrl + getOrgUrl, params, username, password);
-            if(Boolean.parseBoolean(resultStr)){
-                envelop.setSuccessFlg(true);
-            }
-            else {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg(ErrorCode.InvalidUpdate.toString());
-            }
-            return envelop;
+            return resultStr;
         } catch (Exception e) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg(ErrorCode.SystemError.toString());
