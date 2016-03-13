@@ -1,29 +1,106 @@
-containers:
-  svr-address:
-    build: ./svr-address/src/main/docker
+discovery:
+  image: discovery:ehr
+  environment: spring.profiles.actve:default,test
+  expose: 8761
+  ports:
+   - 8761:8761
 
-  ehr-app-svr:
+config:
+  image: config:ehr
+  expose: 1221
+  ports:
+     - 1221:1221
+  links:
+   - discovery
 
-  ehr-archive-svr:
+svr-dict:
+  image: svr-dict:ehr
+  ports:
+     - 10050:10050
+  links:
+   - discovery
+   - config
 
-  ehr-config-svr:
+svr-geography:
+  image: svr-geography:ehr
+  ports:
+     - 10090:10090
+  links:
+   - discovery
+   - config
+   - svr-dict
 
-  ehr-dict-svr:
+svr-app:
+  image: svr-app:ehr
+  ports:
+     - 10080:10080
+  links:
+   - discovery
+   - config
+   - svr-dict
+   - svr-geography
 
-  ehr-discovery-svr:
+svr-organization:
+  image: svr-organization:ehr
+  ports:
+     - 10170:10170
+  links:
+   - discovery
+   - config
+   - svr-dict
+   - svr-geography
+   - svr-app
 
-  ehr-organization-svr:
+svr-patient:
+  image: svr-patient:ehr
+  ports:
+     - 10100:10100
+  links:
+   - discovery
+   - config
+   - svr-dict
+   - svr-geography
+   - svr-app
+   - svr-organization
 
-  ehr-pack-mgr-svr:
+svr-security:
+  image: svr-security:ehr
+  ports:
+     - 10110:10110
+  links:
+   - discovery
+   - config
+   - svr-dict
+   - svr-geography
+   - svr-app
+   - svr-organization
+   - svr-patient
 
-  ehr-pack-resolve-svr:
+svr-user:
+  image: svr-user:ehr
+  ports:
+     - 10120:10120
+  links:
+   - discovery
+   - config
+   - svr-dict
+   - svr-geography
+   - svr-app
+   - svr-organization
+   - svr-security
+   - svr-patient
 
-  ehr-resources-svr:
-
-  ehr-security-svr:
-
-  ehr-sso-svr:
-
-  ehr-standard-svr:
-
-  ehr-user-svr:
+svr-esb:
+  image: svr-esb:ehr
+  ports:
+     - 10130:10130
+  links:
+   - discovery
+   - config
+   - svr-dict
+   - svr-geography
+   - svr-app
+   - svr-organization
+   - svr-security
+   - svr-patient
+   - svr-user

@@ -34,7 +34,7 @@ public class TokenUtil {
         Random random = new Random(seed);
 
         for (int i = 0; i < length; i++) {
-            sb.setCharAt(i, BASE.charAt(random.nextInt(BASE_LENGTH)));
+            sb.append(BASE.charAt(random.nextInt(BASE_LENGTH)));
         }
 
         return sb.toString();

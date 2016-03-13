@@ -11,6 +11,7 @@ import org.springframework.boot.context.embedded.tomcat.TomcatConnectorCustomize
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
+import org.springframework.cloud.netflix.hystrix.dashboard.EnableHystrixDashboard;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +23,7 @@ import java.io.FileNotFoundException;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableFeignClients
+@EnableHystrixDashboard
 public class EHRPlatformGatewayApp  {
     @Value("${server.port}")
     int port;
@@ -29,7 +31,7 @@ public class EHRPlatformGatewayApp  {
     @Value("${keystore.file}")
     String keystore;
 
-    @Value("keystore.password")
+    @Value("${keystore.password}")
     String password;
 
 	public static void main(String[] args) {

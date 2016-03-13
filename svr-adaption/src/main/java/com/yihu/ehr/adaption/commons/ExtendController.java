@@ -17,8 +17,8 @@ import java.lang.reflect.Type;
 public class ExtendController<T> extends BaseRestController {
 
     protected <T> T jsonToObj(String json ,Class<T> clz) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(json, clz);
+
+        return toEntity(json, clz);
     }
 
     protected T getModel(Object o){
@@ -61,7 +61,7 @@ public class ExtendController<T> extends BaseRestController {
     }
 
     protected ApiException errRepeatCode(){
-        return new ApiException(ErrorCode.RepeatCode, "代码已存在!");
+        return new ApiException(ErrorCode.RepeatCode);
     }
 
     protected ApiException errMissParm(String msg){
