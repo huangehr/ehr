@@ -11,6 +11,7 @@ import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.patient.MAbstractCard;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
@@ -26,6 +27,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
+@Api(value = "card", description = "卡管理接口，用于卡信息管理", tags = {"卡管理接口"})
 public class CardController extends BaseController {
 
     @Autowired

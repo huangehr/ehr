@@ -7,8 +7,8 @@ public class PatientModel {
     private String idCardNo;
     private String name;
     private String gender;
-    private String telephone;
-    private String address;
+    private String telphoneNo;
+    private String homeAddress;
 
     public String getIdCardNo() {
         return idCardNo;
@@ -34,19 +34,20 @@ public class PatientModel {
         this.gender = gender;
     }
 
-    public String getTelephone() {
-        return telephone;
+    public String getHomeAddress() {
+        return homeAddress;
     }
 
-    public void setTelephone(String telephone) {
-        this.telephone = telephone;
+    public void setHomeAddress(String homeAddress) {
+        this.homeAddress = homeAddress;
     }
 
-    public String getAddress() {
-        return address;
+    public String getTelphoneNo() {
+        return telphoneNo;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setTelphoneNo(String telphoneNo) {
+        this.telphoneNo = telphoneNo;
     }
+
 }
