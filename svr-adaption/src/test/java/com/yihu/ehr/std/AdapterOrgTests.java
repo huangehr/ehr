@@ -29,13 +29,13 @@ public class AdapterOrgTests {
 
 	@Test
 	public void testAddAdapterOrg() throws Exception{
-		AdapterOrg adapterOrg = new AdapterOrg();
+		MAdapterOrg adapterOrg = new MAdapterOrg();
 		adapterOrg.setCode("testcode");
 		adapterOrg.setName("testname");
 		adapterOrg.setDescription("testdesc");
 		adapterOrg.setArea("testArea");
 		adapterOrg.setOrg("testorg");
-		adapterOrg.setParent("testparent");
+		adapterOrg.setParent("CSJG1020002");
 		adapterOrg.setType("testtype");
 
 		boolean b = adapterOrgController.isExistAdapterOrg("341321234");
@@ -53,7 +53,7 @@ public class AdapterOrgTests {
 
 		if(ls!=null && ls.size()>0){
 			rs = ls.get(0);
-			rs.setName("updateName");
+//			rs.setName("updateName");
 			rs = adapterOrgController.updateAdapterOrg(rs.getCode(), rs.getName(), "testUpdate");
 			assertTrue("修改失败", rs != null);
 		}
@@ -65,6 +65,7 @@ public class AdapterOrgTests {
 		b = adapterOrgController.delAdapterOrg(rs.getCode());
 		assertTrue("删除失败", rs != null);
 
+		adapterOrg.setCode("TESTCODE3");
 		rs = adapterOrgController.addAdapterOrg(
 				objectMapper.writeValueAsString(adapterOrg));
 

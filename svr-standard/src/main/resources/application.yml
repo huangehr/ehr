@@ -34,6 +34,9 @@ fast-dfs:
   connect-timeout: 2
   network-timeout: 30
 
+  fast-dfs:
+    charset: ISO8859-1
+
   http:
     tracker-http-port: 80
     anti-steal-token: no

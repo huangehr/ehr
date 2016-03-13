@@ -32,9 +32,6 @@ public class AdapterOrgController extends ExtendController<MAdapterOrg> {
     @Autowired
     private AdapterOrgService adapterOrgService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @RequestMapping(value = "/orgs", method = RequestMethod.GET)
     @ApiOperation(value = "适配采集标准")
     public Collection<MAdapterOrg> searchAdapterOrg(
@@ -75,8 +72,10 @@ public class AdapterOrgController extends ExtendController<MAdapterOrg> {
             @ApiParam(name = "json_data", value = "采集机构模型", defaultValue = "")
             @RequestParam(value = "json_data", required = false) String jsonData) throws Exception{
 
-        AdapterOrg adapterOrg = objectMapper.readValue(jsonData,AdapterOrg.class);//jsonToObj(jsonData, AdapterOrg.class);
-
+        AdapterOrg adapterOrg = jsonToObj(jsonData, AdapterOrg.class);
+        AdapterOrg exist = adapterOrgService.retrieve(adapterOrg.getCode());
+        if(exist!=null)
+            throw errRepeatCode();
         return getModel(adapterOrgService.addAdapterOrg(adapterOrg));
     }
 
