@@ -87,10 +87,10 @@ public class MetaDataService extends BaseHbmService<IMetaData>{
         Criteria criteria = currentSession().createCriteria(getServiceEntity(version));
         if (ids != null && ids.length != 0)
             criteria.add(Restrictions.in("id", ids));
-        List<MetaData> records = criteria.list();
+        List<IMetaData> records = criteria.list();
         Map<Long, Map<Long, String>> rs = new HashMap<>();
         Map<Long, String> ch;
-        for(MetaData metaData : records){
+        for(IMetaData metaData : records){
             ch = rs.get(metaData.getDataSetId());
             if (ch == null) {
                 ch = new HashMap<>();

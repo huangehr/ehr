@@ -3,7 +3,7 @@
 <!--######用户管理页面 > 用户信息对话框模板页######-->
 <div id="div_user_info_form" data-role-form class="m-form-inline f-mt20 f-pb30" style="overflow:auto">
     <input data-attr-scan="id" hidden="hidden"/>
-    <input data-attr-scan="orgCode" hidden="hidden"/>
+    <%--<input data-attr-scan="orgCode" hidden="hidden"/>--%>
     <%--保存初始数据-------yww--%>
     <input hidden="hidden" id="idCardCopy"/>
     <input hidden="hidden" id="emailCopy"/>
@@ -31,20 +31,20 @@
     <div class="m-form-group">
         <label><spring:message code="lbl.identity.card"/><spring:message code="spe.colon"/></label>
         <div class="l-text-wrapper m-form-control essential">
-            <input type="text" id="inp_idCard" class="required useTitle ajax validate-id-number"  required-title=<spring:message code="lbl.must.input"/> validate-id-number-title=<spring:message code="lbl.input.true.idCard"/> data-attr-scan="idCard"/>
+            <input type="text" id="inp_idCard" class="required useTitle ajax validate-id-number"  required-title=<spring:message code="lbl.must.input"/> validate-id-number-title=<spring:message code="lbl.input.true.idCard"/> data-attr-scan="idCardNo"/>
         </div>
     </div>
     <div class="m-form-group">
         <label><spring:message code="lbl.user.sex"/><spring:message code="spe.colon"/></label>
         <div class="u-checkbox-wrap m-form-control">
-            <input type="radio" value="Male" name="sex" data-attr-scan><spring:message code="lbl.male"/>
-            <input type="radio" value="Female" name="sex" data-attr-scan><spring:message code="lbl.female"/>
+            <input type="radio" value="Male" name="gender" data-attr-scan><spring:message code="lbl.male"/>
+            <input type="radio" value="Female" name="gender" data-attr-scan><spring:message code="lbl.female"/>
         </div>
     </div>
     <div class="m-form-group">
         <label><spring:message code="lbl.marriage.status"/><spring:message code="spe.colon"/></label>
         <div class="m-form-control">
-            <input type="text" id="inp_select_marriage" data-type="select" data-attr-scan="marriage">
+            <input type="text" id="inp_select_marriage" data-type="select" data-attr-scan="martialStatus">
         </div>
     </div>
     <div class="m-form-group">
@@ -56,7 +56,7 @@
     <div class="m-form-group">
         <label><spring:message code="lbl.user.tel"/><spring:message code="spe.colon"/></label>
         <div class="l-text-wrapper m-form-control essential">
-            <input type="text" id="inp_userTel" class="required useTitle validate-mobile-phone"  required-title=<spring:message code="lbl.must.input"/> validate-mobile-phone-title=<spring:message code="lbl.input.true.tel"/> data-attr-scan="tel"/>
+            <input type="text" id="inp_userTel" class="required useTitle validate-mobile-phone"  required-title=<spring:message code="lbl.must.input"/> validate-mobile-phone-title=<spring:message code="lbl.input.true.tel"/> data-attr-scan="telephone"/>
         </div>
     </div>
     <div class="m-form-group">
@@ -65,13 +65,13 @@
             <input type="text" id="inp_select_userType" data-type="select" data-attr-scan="userType">
         </div>
     </div>
-    <div class="m-form-group">
-        <label><spring:message code="lbl.org.belong"/><spring:message code="spe.colon"/></label>
-        <div class="l-text-wrapper m-form-control f-w240 ">
-            <input type="text" id="inp_org"  required-title=<spring:message code="lbl.must.input"/> data-type="comboSelect"
-                   data-attr-scan="organization" class="validate-org-length f-w240"/>
-        </div>
-    </div>
+    <%--<div class="m-form-group">--%>
+        <%--<label><spring:message code="lbl.org.belong"/><spring:message code="spe.colon"/></label>--%>
+        <%--<div class="l-text-wrapper m-form-control f-w240 ">--%>
+            <%--<input type="text" id="inp_org"  required-title=<spring:message code="lbl.must.input"/> data-type="comboSelect"--%>
+                   <%--data-attr-scan="organization" class="validate-org-length f-w240"/>--%>
+        <%--</div>--%>
+    <%--</div>--%>
     <div class="m-form-group" style="display: none" id="inp_major_div">
         <label><spring:message code="lbl.specialized.belong"/><spring:message code="spe.colon"/></label>
         <div class="l-text-wrapper m-form-control ">

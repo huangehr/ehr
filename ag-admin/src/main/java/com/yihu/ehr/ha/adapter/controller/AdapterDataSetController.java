@@ -1,5 +1,6 @@
 package com.yihu.ehr.ha.adapter.controller;
 
+import com.yihu.ehr.agModel.adapter.AdapterDataVoModel;
 import com.yihu.ehr.agModel.adapter.AdapterDataSetModel;
 import com.yihu.ehr.agModel.adapter.DataSetModel;
 import com.yihu.ehr.constants.ApiVersion;
@@ -8,6 +9,7 @@ import com.yihu.ehr.ha.adapter.service.AdapterDataSetClient;
 import com.yihu.ehr.ha.adapter.utils.ExtendController;
 import com.yihu.ehr.model.adaption.MAdapterDataSet;
 import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.validate.Valid;
 import com.yihu.ehr.util.validate.ValidateResult;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -61,7 +63,7 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
 
     @RequestMapping(value = "/plan/{planId}/datasets/{dataSetId}/datametas",method = RequestMethod.GET)
     @ApiOperation(value = "根据dataSetId搜索数据元适配关系")
-    public Collection<AdapterDataSetModel> searchAdapterMetaData(
+    public Collection<AdapterDataVoModel> searchAdapterMetaData(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "dataSetId", value = "数据集id", defaultValue = "")
@@ -79,7 +81,7 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
 
         return convertToModels(
                 adapterDataSetClient.searchAdapterMetaData(planId, dataSetId, code, name, sorts, size, page),
-                new ArrayList<>(), AdapterDataSetModel.class, ""
+                new ArrayList<>(), AdapterDataVoModel.class, ""
         );
     }
 
@@ -109,22 +111,19 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
     @RequestMapping(value = "/metadata", method = RequestMethod.POST)
     public Envelop addAdapterMetaData(
             @ApiParam(name = "model", value = "说明")
-            @RequestParam(value = "model") String model) {
+            @Valid @RequestParam(value = "model") AdapterDataSetModel model) throws Exception{
 
-        try {
-            AdapterDataSetModel dataModel = jsonToObj(model);
-            ValidateResult validateResult = validate(dataModel);
-            if(!validateResult.isRs()){
-                return failed(validateResult.getMsg());
-            }
-            return success(adapterDataSetClient.createAdapterMetaData(model));
-        } catch (ApiException e) {
-            e.printStackTrace();
-            return failed(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return failedSystem();
-        }
+//        try {
+//            throw new Exception("chucuo");
+            return success(
+                    adapterDataSetClient.createAdapterMetaData(  objToJson(model) ));
+//        } catch (Exception e) {
+//            if(e.getCause() instanceof FeignException){
+//                return failed((e.getCause()).getMessage());
+//            }
+//            e.printStackTrace();
+//            return failedSystem();
+//        }
     }
 
 

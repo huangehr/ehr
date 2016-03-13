@@ -24,7 +24,7 @@ import java.util.List;
  * Created by AndyCai on 2016/1/19.
  */
 
-@RequestMapping(ApiVersion.Version1_0 )
+@RequestMapping(ApiVersion.Version1_0+"/admin" )
 @RestController
 @Api(value = "app", description = "应用管理接口，用于接入应用管理", tags = {"应用管理接口"})
 public class AppController extends BaseController {

@@ -12,12 +12,15 @@ import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -32,118 +35,54 @@ public class DrugDictController extends BaseRestController {
 
     @RequestMapping(value = "/dict/drug", method = RequestMethod.POST)
     @ApiOperation(value = "创建新的药品字典" )
-    public Object createDrugDict(
-            @ApiParam(name = "code", value = "字典编码")
-            @RequestParam(value = "code", required = true) String code,
-            @ApiParam(name = "name", value = "字典名称")
-            @RequestParam(value = "name", required = true) String name,
-            @ApiParam(name = "type", value = "药品类别", defaultValue = "0")
-            @RequestParam(value = "type", required = true) String type,
-            @ApiParam(name = "flag", value = "处方/非处方标识", defaultValue = "0")
-            @RequestParam(value = "flag", required = true) String flag,
-            @ApiParam(name = "tradeName", value = "商品名")
-            @RequestParam(value = "tradeName", required = false) String tradeName,
-            @ApiParam(name = "unit", value = "单位")
-            @RequestParam(value = "unit", required = false) String unit,
-            @ApiParam(name = "specifications", value = "规格")
-            @RequestParam(value = "specifications", required = false) String specifications,
-            @ApiParam(name = "description", value = "描述", defaultValue = "")
-            @RequestParam(value = "description", required = false) String description) throws Exception {
+    public MDrugDict createDrugDict(
+            @ApiParam(name = "dictionary", value = "字典JSON结构")
+            @RequestParam(value = "dictionary") String dictJson) throws Exception {
 
-        DrugDict drugDict =  new DrugDict();
+        DrugDict dict = toEntity(dictJson, DrugDict.class);
         String id = getObjectId(BizObject.Dict);
-        if(drugDictService.isCodeExist(id,code,"0")){
-            throw new ApiException(ErrorCode.RepeatCode, "代码在系统中已存在，请确认。");
-        }
-        if(drugDictService.isNameExist(id,name,"0")){
-            throw new ApiException(ErrorCode.RepeatName, "名称在系统中已存在，请确认。");
-        }
-        drugDict.setId(id);
-        drugDict.setCode(code);
-        drugDict.setName(name);
-        drugDict.setType(type);
-        drugDict.setFlag(flag);
-        drugDict.setTradeName(tradeName);
-        drugDict.setUnit(unit);
-        drugDict.setSpecifications(specifications);
-        drugDict.setDescription(description);
+        dict.setId(id);
+        DrugDict drugDict = drugDictService.createDict(dict);
 
-        drugDictService.save(drugDict);
-
-        return true;
+        return convertToModel(drugDict, MDrugDict.class, null);
     }
 
     @RequestMapping(value = "dict/drug/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除药品字典")
     public boolean deleteDrugDict(
             @ApiParam(name = "id", value = "药品字典代码")
-            @PathVariable( value = "id") String id) {
+            @PathVariable( value = "id") String id) throws Exception {
 
         drugDictService.delete(id);
-
         return true;
     }
 
-    @RequestMapping(value = "/dict/drug/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/dict/drug", method = RequestMethod.PUT)
     @ApiOperation(value = "更新药品字典" )
-    public Object updateDrugDict(
-            @ApiParam(name = "id", value = "字典内码")
-            @PathVariable(value = "id") String id,
-            @ApiParam(name = "code", value = "字典编码")
-            @RequestParam(value = "code", required = true) String code,
-            @ApiParam(name = "name", value = "字典名称")
-            @RequestParam(value = "name", required = true) String name,
-            @ApiParam(name = "type", value = "药品类别", defaultValue = "0")
-            @RequestParam(value = "type", required = true) String type,
-            @ApiParam(name = "flag", value = "处方/非处方标识", defaultValue = "0")
-            @RequestParam(value = "flag", required = true) String flag,
-            @ApiParam(name = "tradeName", value = "商品名")
-            @RequestParam(value = "tradeName", required = false) String tradeName,
-            @ApiParam(name = "unit", value = "单位")
-            @RequestParam(value = "unit", required = false) String unit,
-            @ApiParam(name = "specifications", value = "规格")
-            @RequestParam(value = "specifications", required = false) String specifications,
-            @ApiParam(name = "description", value = "描述", defaultValue = "")
-            @RequestParam(value = "description", required = false) String description) throws Exception {
+    public MDrugDict updateDrugDict(
+            @ApiParam(name = "dictionary", value = "字典JSON结构")
+            @RequestParam(value = "dictionary") String dictJson)  throws Exception {
 
-        DrugDict drugDict = drugDictService.retrieve(id);
-        if(drugDictService.isCodeExist(id, code, "1")){
-            throw new ApiException(ErrorCode.RepeatCode, "代码在系统中已存在，请确认。");
-        }
-        if(drugDictService.isNameExist(id, name, "1")){
-            throw new ApiException(ErrorCode.RepeatName, "名称在系统中已存在，请确认。");
-        }
-        drugDict.setCode(code);
-        drugDict.setName(name);
-        drugDict.setType(type);
-        drugDict.setFlag(flag);
-        drugDict.setTradeName(tradeName);
-        drugDict.setUnit(unit);
-        drugDict.setSpecifications(specifications);
-        drugDict.setDescription(description);
-
-        drugDictService.save(drugDict);
-
-        return true;
+        DrugDict dict = toEntity(dictJson, DrugDict.class);
+        if (null == drugDictService.retrieve(dict.getId())) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
+        drugDictService.save(dict);
+        return convertToModel(dict, MDrugDict.class);
     }
 
     @RequestMapping(value = "/dict/drug/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据ID获取相应的药品字典信息。" )
-    public Object getDrugDict(
+    public MDrugDict getDrugDict(
             @ApiParam(name = "id", value = "字典内码")
             @PathVariable(value = "id") String id) throws Exception {
 
-        DrugDict drugDict = drugDictService.retrieve(id);
-        if(drugDict != null){
-            return convertToModel(drugDict, MDrugDict.class);
-        }else{
-            throw new ApiException(ErrorCode.QueryNoData," 查询无数据，请确认。");
-        }
+        DrugDict dict = drugDictService.retrieve(id);
+        if (dict == null) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
+        return convertToModel(dict, MDrugDict.class);
     }
 
     @RequestMapping(value = "/dict/drugs", method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件查询相应的ICD10字典信息。" )
-    public Object getDrugDictList(
+    public Collection<MDrugDict> getDrugDictList(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,code,name,type,flag,tradeName,unit,specifications,description")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
@@ -157,20 +96,41 @@ public class DrugDictController extends BaseRestController {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
 
-        List<DrugDict> drugDictList = drugDictService.search(fields, filters, sorts, page, size);
-        pagedResponse(request, response, drugDictService.getCount(filters), page, size);
+        page = reducePage(page);
 
-        return (List<MDrugDict>)convertToModels(drugDictList,
-                new ArrayList<MDrugDict>(drugDictList.size()), MDrugDict.class, fields);
-
+        if (StringUtils.isEmpty(filters)) {
+            Page<DrugDict> drugDictPage = drugDictService.getDictList(sorts, page, size);
+            pagedResponse(request, response, drugDictPage.getTotalElements(), page, size);
+            return convertToModels(drugDictPage.getContent(), new ArrayList<>(drugDictPage.getNumber()), MDrugDict.class, fields);
+        } else {
+            List<DrugDict> drugDictList = drugDictService.search(fields, filters, sorts, page, size);
+            pagedResponse(request, response, drugDictService.getCount(filters), page, size);
+            return convertToModels(drugDictList, new ArrayList<>(drugDictList.size()), MDrugDict.class, fields);
+        }
     }
 
-    @RequestMapping(value = "dict/drug/icd10/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/drug/icd10/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据drug的ID判断是否与ICD10字典存在关联。")
-    public boolean drugIsUsage(
+    public boolean isUsage(
             @ApiParam(name = "id", value = "药品字典代码")
-            @PathVariable( value = "id") String id) {
+            @PathVariable( value = "id") String id) throws Exception {
 
         return icd10DrugRelationService.isUsage(id);
+    }
+
+    @RequestMapping(value = "/dict/drug/existence/name/{name}" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断提交的字典名称是否已经存在")
+    public boolean isNameExist(
+            @ApiParam(name = "name", value = "name", defaultValue = "")
+            @PathVariable(value = "name") String name){
+        return drugDictService.isNameExist(name);
+    }
+
+    @RequestMapping(value = "/dict/drug/existence/code/{code}" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断提交的字典代码是否已经存在")
+    public boolean isCodeExist(
+            @ApiParam(name = "code", value = "code", defaultValue = "")
+            @PathVariable(value = "code") String code){
+        return drugDictService.isCodeExist(code);
     }
 }

@@ -114,7 +114,7 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
 
         if (StringUtils.isEmpty(ids))
             errMissId();
-        orgAdapterPlanService.deleteOrgAdapterPlan(ids.split(","));
+        orgAdapterPlanService.deleteOrgAdapterPlan(strToLongArr(ids));
         return true;
     }
 
@@ -327,6 +327,7 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
             throw errParm();
         }
         OrgAdapterPlan orgAdapterPlan = orgAdapterPlanService.retrieve(id);
+        orgAdapterPlan = orgAdapterPlan==null? new OrgAdapterPlan():orgAdapterPlan;
         boolean checkCode = true;
         if (plan.getId() != null && plan.getCode().equals(orgAdapterPlan.getCode()))
             checkCode = false;

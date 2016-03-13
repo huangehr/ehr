@@ -50,7 +50,7 @@ public class OrgDictController extends ExtendController<MOrgDict> {
 
         OrgDict orgDict = jsonToObj(model, OrgDict.class);
         if (orgDictService.isExistOrgDict(orgDict.getOrganization(), orgDict.getCode()))
-            throw new ApiException(ErrorCode.RepeatOrgDict, "该字典已存在！");
+            throw new ApiException(ErrorCode.RepeatCode);
 
         orgDict.setCreateDate(new Date());
         return getModel(orgDictService.createOrgDict(orgDict));
@@ -83,7 +83,7 @@ public class OrgDictController extends ExtendController<MOrgDict> {
             return getModel(orgDictService.save(dataModel));
         }
         else
-            throw new ApiException(ErrorCode.RepeatOrgDict, "该字典已存在！");
+            throw new ApiException(ErrorCode.RepeatCode);
     }
 
 
@@ -116,7 +116,7 @@ public class OrgDictController extends ExtendController<MOrgDict> {
             @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
             @RequestParam(value = "orgCode", required = false) String orgCode) throws Exception{
 
-        List<OrgDict> orgDictList = orgDictService.findByField(orgCode, "organization");
+        List<OrgDict> orgDictList = orgDictService.findByField("organization", orgCode);
         List<String> orgDicts = new ArrayList<>();
         for (OrgDict orgDict : orgDictList) {
             orgDicts.add(String.valueOf(orgDict.getSequence())+','+orgDict.getName());

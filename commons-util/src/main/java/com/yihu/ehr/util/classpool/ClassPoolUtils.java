@@ -83,8 +83,7 @@ public class ClassPoolUtils {
 
     public static File createFile(String clzName) throws IOException {
         String splitMark = System.getProperty("file.separator");
-        String path = System.getProperty("java.io.tmpdir");
-        path += splitMark + "ehr" + splitMark + "std" + splitMark;
+        String path = System.getProperty("user.home") +splitMark+ "ehr"  +splitMark+ "std" + splitMark;
         String clzPath = clzName.substring(0, clzName.lastIndexOf(".")).replace(".", splitMark);
         String filePath = path + clzPath;
         File pathFile = new File(filePath);

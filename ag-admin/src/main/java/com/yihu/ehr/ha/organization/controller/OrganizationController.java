@@ -133,8 +133,11 @@ public class OrganizationController extends BaseController {
             @RequestParam(value = "geography_model_json_data", required = false) String geographyModelJsonData ) throws Exception{
         Envelop envelop  = new Envelop();
         ObjectMapper objectMapper = new ObjectMapper();
-        String location = addressClient.saveAddress(geographyModelJsonData);
-        MOrganization mOrganization = objectMapper.readValue(mOrganizationJsonData,MOrganization.class);
+//        String location = addressClient.saveAddress(geographyModelJsonData);
+        OrgDetailModel orgDetailModel = objectMapper.readValue(mOrganizationJsonData,OrgDetailModel.class);
+        MOrganization mOrganization = convertToModel(orgDetailModel,MOrganization.class);
+        //TODO 临时测试数据
+        String location = "0dae000155fb8a5f3c5d6125d861170e";
         mOrganization.setLocation(location);
         String mOrganizationJson = objectMapper.writeValueAsString(mOrganization);
         MOrganization mOrgNew = orgClient.create(mOrganizationJson);
@@ -157,9 +160,11 @@ public class OrganizationController extends BaseController {
             @RequestParam(value = "geography_model_json_data", required = false) String geographyModelJsonData  ) throws Exception{
         Envelop envelop = new Envelop();
         ObjectMapper objectMapper = new ObjectMapper();
-        String locationId = addressClient.saveAddress(geographyModelJsonData);
+        //String locationId = addressClient.saveAddress(geographyModelJsonData);
         OrgDetailModel orgDetailModel = objectMapper.readValue(mOrganizationJsonData,OrgDetailModel.class);
         MOrganization mOrganization = convertToModel(orgDetailModel,MOrganization.class);
+        //临时测试数据
+        String locationId = "0dae000155fb8a5f3c5d6125d861170e";
         mOrganization.setLocation(locationId);
         String mOrganizationJson = objectMapper.writeValueAsString(mOrganization);
         MOrganization mOrgNew = orgClient.create(mOrganizationJson);
@@ -298,7 +303,7 @@ public class OrganizationController extends BaseController {
             @RequestParam(value = "org_code") String orgCode) {
         Envelop envelop = new Envelop();
         Map<String,String> key = orgClient.distributeKey(orgCode);
-        if(key!=null){
+        if(key.size()!=0){
             envelop.setSuccessFlg(true);
             envelop.setObj(key);
         }else{

@@ -8,15 +8,13 @@ package com.yihu.ehr.model.adaption;
 public class MAdapterPlan {
     public Long id;
     public Long parentId;
-    public String parentName;
     public String code = "";
     public String name = "";
     public String type = "";
-    public String typeValue;
     public String version = "";
     public String org = "";
-    public String orgValue;
     public String description = "";
+    private int status;
 
     public Long getId() {
         return id;
@@ -32,14 +30,6 @@ public class MAdapterPlan {
 
     public void setParentId(Long parentId) {
         this.parentId = parentId;
-    }
-
-    public String getParentName() {
-        return parentName;
-    }
-
-    public void setParentName(String parentName) {
-        this.parentName = parentName;
     }
 
     public String getCode() {
@@ -66,14 +56,6 @@ public class MAdapterPlan {
         this.type = type;
     }
 
-    public String getTypeValue() {
-        return typeValue;
-    }
-
-    public void setTypeValue(String typeValue) {
-        this.typeValue = typeValue;
-    }
-
     public String getVersion() {
         return version;
     }
@@ -90,19 +72,19 @@ public class MAdapterPlan {
         this.org = org;
     }
 
-    public String getOrgValue() {
-        return orgValue;
-    }
-
-    public void setOrgValue(String orgValue) {
-        this.orgValue = orgValue;
-    }
-
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

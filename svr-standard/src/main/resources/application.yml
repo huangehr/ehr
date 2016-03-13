@@ -20,6 +20,9 @@ data-source:
   validation-query: SELECT 1
   test-on-borrow: true
   remove-abandoned-timeout: 55
+  url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+  user-name: ha
+  password: ha
 
 
 fast-dfs:
@@ -30,6 +33,9 @@ fast-dfs:
 
   connect-timeout: 2
   network-timeout: 30
+
+  fast-dfs:
+    charset: ISO8859-1
 
   http:
     tracker-http-port: 80
@@ -89,9 +95,9 @@ eureka:
     serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@172.19.103.73:8761}/eureka/
 
 data-source:
-  url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
-  user-name: ha
-  password: ha
+  url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+  user-name: yuhaihua
+  password: yuhaihua
 
 hibernate:
   show-sql: true

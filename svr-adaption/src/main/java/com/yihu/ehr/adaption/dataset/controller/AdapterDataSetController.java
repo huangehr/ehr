@@ -6,6 +6,7 @@ import com.yihu.ehr.adaption.commons.ExtendController;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSet;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSetService;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.adaption.MAdapterDataVo;
 import com.yihu.ehr.model.adaption.MAdapterDataSet;
 import com.yihu.ehr.model.adaption.MDataSet;
 import io.swagger.annotations.Api;
@@ -66,7 +67,7 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
 
     @RequestMapping("/plan/{planId}/datasets/{dataSetId}/datametas")
     @ApiOperation(value = "根据dataSetId搜索数据元适配关系")
-    public Collection<MAdapterDataSet> searchAdapterMetaData(
+    public Collection<MAdapterDataVo> searchAdapterMetaData(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "dataSetId", value = "数据集id", defaultValue = "")
@@ -134,7 +135,7 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
 
         if (StringUtils.isEmpty(ids))
             throw errMissId();
-        adapterDataSetService.deleteAdapterDataSet(ids.split(","));
+        adapterDataSetService.deleteAdapterDataSet(strToLongArr(ids));
         return true;
     }
 

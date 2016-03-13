@@ -7,6 +7,7 @@ import com.yihu.ehr.adaption.dict.service.AdapterDict;
 import com.yihu.ehr.adaption.dict.service.AdapterDictService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.adaption.MAdapterDict;
+import com.yihu.ehr.model.adaption.MAdapterDictVo;
 import com.yihu.ehr.model.adaption.MDataSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -64,7 +65,7 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
 
     @RequestMapping(value = "/plan/{planId}/dict/{dictId}/entrys", method = RequestMethod.GET)
     @ApiOperation(value = "字典项适配关系分页查询")
-    public Collection<MAdapterDict> searchAdapterDictEntry(
+    public Collection<MAdapterDictVo> searchAdapterDictEntry(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "dictId", value = "字典编号", defaultValue = "")
@@ -136,7 +137,7 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
             @RequestParam("ids") String ids) throws Exception {
         if (StringUtils.isEmpty(ids))
             throw errMissId();
-        adapterDictService.delete(ids.split(","));
+        adapterDictService.delete(strToLongArr(ids));
         return true;
     }
 

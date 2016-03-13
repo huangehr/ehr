@@ -1,12 +1,16 @@
 package com.yihu.ehr.dict;
 
+import com.eureka2.shading.codehaus.jackson.map.ObjectMapper;
 import com.yihu.ehr.SvrSpecialDictApplication;
 import com.yihu.ehr.dict.controller.DrugDictController;
 import com.yihu.ehr.dict.controller.Icd10DictController;
 import com.yihu.ehr.dict.controller.IndicatorsDictController;
 import com.yihu.ehr.dict.service.*;
 import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.model.specialdict.MDrugDict;
 import com.yihu.ehr.model.specialdict.MIcd10Dict;
+import com.yihu.ehr.model.specialdict.MIcd10DrugRelation;
+import com.yihu.ehr.model.specialdict.MIndicatorsDict;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,7 +21,9 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -60,46 +66,24 @@ public class Icd10DictControllerTests {
         String infectiousFlag = "1";
         String description = "ICD10字典新增测试。";
 
-        icd10DictController.createIcd10Dict(code,name,chronicFlag,infectiousFlag,description);
-        Icd10Dict icd10Dict = icd10DictRepository.findByCode(code);
+        Map<String,String> retrieveMap01 = new HashMap<>();
+        retrieveMap01.put("code",code);
+        retrieveMap01.put("name",name);
+        retrieveMap01.put("chronicFlag",chronicFlag);
+        retrieveMap01.put("infectiousFlag",infectiousFlag);
+        retrieveMap01.put("description",description);
 
-        assertTrue("ICD10字典新增失败！" , icd10Dict != null);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json01 = objectMapper.writeValueAsString(retrieveMap01);
+
+        assertTrue("ICD10字典新增失败！" , icd10DictController.createIcd10Dict(json01) != null);
+
+        assertTrue("验证失败！", icd10DictController.isCodeExists("Icd10DictTest_01"));
+        assertTrue("验证失败！", icd10DictController.isNameExists("ICD10字典测试_01"));
     }
 
     @Test
-    public void btestCreateIcd10DictCodeRepeat() throws Exception{
-        try{
-            String code = "Icd10DictTest_01";
-            String name = "ICD10字典测试_02";
-            String chronicFlag = "0";
-            String infectiousFlag = "1";
-            String description = "ICD10字典新增测试。";
-
-            Object result = icd10DictController.createIcd10Dict(code,name,chronicFlag,infectiousFlag,description);
-        }
-        catch (ApiException e){
-            assertTrue("ICD10字典code重复验证失败！", true);
-        }
-    }
-
-    @Test
-    public void ctestCreateIcd10DictNameRepeat() throws Exception{
-        try{
-            String code = "Icd10DictTest_02";
-            String name = "ICD10字典测试_01";
-            String chronicFlag = "0";
-            String infectiousFlag = "1";
-            String description = "ICD10字典新增测试。";
-
-            Object result = icd10DictController.createIcd10Dict(code,name,chronicFlag,infectiousFlag,description);
-        }
-        catch (ApiException e){
-            assertTrue("ICD10字典name重复验证失败！", true);
-        }
-    }
-
-    @Test
-    public void dtestUpdateIcd10Dict() throws Exception{
+    public void btestUpdateIcd10Dict() throws Exception{
         String code = "Icd10DictTest_02";
         String name = "ICD10字典测试_02";
         String chronicFlag = "0";
@@ -109,7 +93,18 @@ public class Icd10DictControllerTests {
         Icd10Dict icd10Dict = icd10DictRepository.findByCode("Icd10DictTest_01");
         String id = icd10Dict.getId().toString();
 
-        icd10DictController.updateIcd10Dict(id,code,name,chronicFlag,infectiousFlag,description);
+        Map<String,String> retrieveMap01 = new HashMap<>();
+        retrieveMap01.put("id",id);
+        retrieveMap01.put("code",code);
+        retrieveMap01.put("name",name);
+        retrieveMap01.put("chronicFlag",chronicFlag);
+        retrieveMap01.put("infectiousFlag",infectiousFlag);
+        retrieveMap01.put("description",description);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json01 = objectMapper.writeValueAsString(retrieveMap01);
+
+        icd10DictController.updateIcd10Dict(json01);
 
         icd10Dict = icd10DictRepository.findByCode("Icd10DictTest_02");
         boolean result = icd10Dict.getId().toString().equals(id);
@@ -123,12 +118,12 @@ public class Icd10DictControllerTests {
     }
 
     @Test
-    public void etestGetIcd10DictById() throws Exception{
+    public void ctestGetIcd10DictById() throws Exception{
 
         Icd10Dict icd10Dict = icd10DictRepository.findByCode("Icd10DictTest_02");
         String id = icd10Dict.getId().toString();
 
-        MIcd10Dict result = (MIcd10Dict)icd10DictController.getIcd10Dict(id);
+        MIcd10Dict result = icd10DictController.getIcd10Dict(id);
 
         assertTrue("ICD10字典更新失败！", result != null);
     }
@@ -160,8 +155,18 @@ public class Icd10DictControllerTests {
         String chronicFlag = "0";
         String infectiousFlag = "1";
         String description_icd10 = "ICD10字典新增测试_06。";
-        icd10DictController.createIcd10Dict(code_icd10, name_icd10, chronicFlag, infectiousFlag, description_icd10);
-        Icd10Dict icd10Dict = icd10DictRepository.findByCode(code_icd10);
+
+        Map<String,String> retrieveMap01 = new HashMap<>();
+        retrieveMap01.put("code",code_icd10);
+        retrieveMap01.put("name",name_icd10);
+        retrieveMap01.put("chronicFlag",chronicFlag);
+        retrieveMap01.put("infectiousFlag",infectiousFlag);
+        retrieveMap01.put("description",description_icd10);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json01 = objectMapper.writeValueAsString(retrieveMap01);
+
+        MIcd10Dict icd10Dict = icd10DictController.createIcd10Dict(json01);
         String icd10Id = icd10Dict.getId().toString();
 
         String code = "DrugDictTest_06";
@@ -172,12 +177,32 @@ public class Icd10DictControllerTests {
         String unit = "盒";
         String specifications = "12包";
         String description = "Drug字典新增测试。";
-        drugDictController.createDrugDict(code, name, type, flag,tradeName,unit, specifications,description);
-        DrugDict drugDict = drugDictRepo.findByCode(code);
+
+        Map<String,String> retrieveMap02 = new HashMap<>();
+        retrieveMap02.put("code",code);
+        retrieveMap02.put("name",name);
+        retrieveMap02.put("type",type);
+        retrieveMap02.put("flag",flag);
+        retrieveMap02.put("tradeName",tradeName);
+        retrieveMap02.put("unit",unit);
+        retrieveMap02.put("specifications",specifications);
+        retrieveMap02.put("description",description);
+
+        String json02 = objectMapper.writeValueAsString(retrieveMap02);
+
+        MDrugDict drugDict = drugDictController.createDrugDict(json02);
         String drugId = drugDict.getId();
 
-        boolean result = (boolean)icd10DictController.createIcd10DrugRelation(icd10Id, drugId);
-        assertTrue("新增失败！", result);
+        Map<String,String> retrieveMap03 = new HashMap<>();
+        retrieveMap03.put("icd10Id",icd10Id);
+        retrieveMap03.put("drugId",drugId);
+
+        String json03 = objectMapper.writeValueAsString(retrieveMap03);
+        MIcd10DrugRelation icd10DrugRelation = icd10DictController.createIcd10DrugRelation(json03);
+
+        assertTrue("新增失败！",  icd10DrugRelation != null);
+
+        assertTrue("存在性验证失败！", icd10DictController.isIcd10DrugRelaExist(drugId,icd10Id));
     }
 
     @Test
@@ -187,7 +212,18 @@ public class Icd10DictControllerTests {
         String chronicFlag = "0";
         String infectiousFlag = "1";
         String description_icd10 = "ICD10字典新增测试_07。";
-        icd10DictController.createIcd10Dict(code_icd10, name_icd10, chronicFlag, infectiousFlag, description_icd10);
+
+        Map<String,String> retrieveMap01 = new HashMap<>();
+        retrieveMap01.put("code",code_icd10);
+        retrieveMap01.put("name",name_icd10);
+        retrieveMap01.put("chronicFlag",chronicFlag);
+        retrieveMap01.put("infectiousFlag",infectiousFlag);
+        retrieveMap01.put("description",description_icd10);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json01 = objectMapper.writeValueAsString(retrieveMap01);
+
+        icd10DictController.createIcd10Dict(json01);
         Icd10Dict icd10Dict = icd10DictRepository.findByCode(code_icd10);
         String icd10Id = icd10Dict.getId().toString();
 
@@ -199,18 +235,36 @@ public class Icd10DictControllerTests {
         String unit = "盒";
         String specifications = "12包";
         String description = "Drug字典新增测试。";
-        drugDictController.createDrugDict(code, name, type, flag,tradeName,unit, specifications,description);
+
+        Map<String,String> retrieveMap02 = new HashMap<>();
+        retrieveMap02.put("code",code);
+        retrieveMap02.put("name",name);
+        retrieveMap02.put("type",type);
+        retrieveMap02.put("flag",flag);
+        retrieveMap02.put("tradeName",tradeName);
+        retrieveMap02.put("unit",unit);
+        retrieveMap02.put("specifications",specifications);
+        retrieveMap02.put("description",description);
+
+        String json02 = objectMapper.writeValueAsString(retrieveMap02);
+
+        drugDictController.createDrugDict(json02);
         DrugDict drugDict = drugDictRepo.findByCode(code);
         String drugId = drugDict.getId();
 
         Icd10Dict icd10Dict1 = icd10DictRepository.findByCode("Icd10DictTest_06");
         String id = icd10Dict1.getId().toString();
-        List<Icd10DrugRelation> icd10DrugRelations = (List<Icd10DrugRelation>)icd10DrugRelationRepository.findByIcd10Id(id);
+        List<Icd10DrugRelation> icd10DrugRelations = icd10DrugRelationRepository.findByIcd10Id(id);
         String relaId = icd10DrugRelations.get(0).getId();
 
-        boolean result = (boolean)icd10DictController.updateIcd10DrugRelation(relaId, icd10Id, drugId);
+        Map<String,String> retrieveMap03 = new HashMap<>();
+        retrieveMap03.put("id",relaId);
+        retrieveMap03.put("icd10Id",icd10Id);
+        retrieveMap03.put("drugId",drugId);
 
-        assertTrue("修改关联失败！", result);
+        String json03 = objectMapper.writeValueAsString(retrieveMap03);
+
+        assertTrue("修改关联失败！", icd10DictController.updateIcd10DrugRelation(json03) != null);
 
         drugDictController.deleteDrugDict(drugId);
 
@@ -227,7 +281,18 @@ public class Icd10DictControllerTests {
         String chronicFlag = "0";
         String infectiousFlag = "1";
         String description_icd10 = "ICD10字典新增测试_08。";
-        icd10DictController.createIcd10Dict(code_icd10, name_icd10, chronicFlag, infectiousFlag, description_icd10);
+
+        Map<String,String> retrieveMap01 = new HashMap<>();
+        retrieveMap01.put("code",code_icd10);
+        retrieveMap01.put("name",name_icd10);
+        retrieveMap01.put("chronicFlag",chronicFlag);
+        retrieveMap01.put("infectiousFlag",infectiousFlag);
+        retrieveMap01.put("description",description_icd10);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json01 = objectMapper.writeValueAsString(retrieveMap01);
+
+        icd10DictController.createIcd10Dict(json01);
         Icd10Dict icd10Dict = icd10DictRepository.findByCode(code_icd10);
         String icd10Id = icd10Dict.getId().toString();
 
@@ -238,12 +303,31 @@ public class Icd10DictControllerTests {
         String upperLimit = "14度";
         String lowerLimit = "1度";
         String description = "指标字典新增测试_08。";
-        indicatorsDictController.createIndicatorsDict(code, name, type, unit, upperLimit, lowerLimit, description);
+
+        Map<String,String> retrieveMap02 = new HashMap<>();
+        retrieveMap02.put("code",code);
+        retrieveMap02.put("name",name);
+        retrieveMap02.put("type",type);
+        retrieveMap02.put("unit",unit);
+        retrieveMap02.put("upperLimit",upperLimit);
+        retrieveMap02.put("lowerLimit",lowerLimit);
+        retrieveMap02.put("description",description);
+
+        String json02 = objectMapper.writeValueAsString(retrieveMap02);
+
+        indicatorsDictController.createIndicatorsDict(json02);
         IndicatorsDict indicatorsDict = indicatorsDictRepo.findByCode(code);
         String indicatorsDictId = indicatorsDict.getId();
 
-        boolean result = (boolean)icd10DictController.createIcd10IndicatorRelation(icd10Id, indicatorsDictId);
-        assertTrue("新增失败！", result);
+        Map<String,String> retrieveMap03 = new HashMap<>();
+        retrieveMap03.put("icd10Id",icd10Id);
+        retrieveMap03.put("indicatorId",indicatorsDictId);
+
+        String json03 = objectMapper.writeValueAsString(retrieveMap03);
+
+        assertTrue("新增失败！", icd10DictController.createIcd10IndicatorRelation(json03) != null);
+
+        assertTrue("存在性验证失败！", icd10DictController.isIcd10IndicatorsRelaExist(indicatorsDictId,icd10Id));
     }
 
     @Test
@@ -253,8 +337,18 @@ public class Icd10DictControllerTests {
         String chronicFlag = "0";
         String infectiousFlag = "1";
         String description_icd10 = "ICD10字典新增测试_09。";
-        icd10DictController.createIcd10Dict(code_icd10, name_icd10, chronicFlag, infectiousFlag, description_icd10);
-        Icd10Dict icd10Dict = icd10DictRepository.findByCode(code_icd10);
+
+        Map<String,String> retrieveMap01 = new HashMap<>();
+        retrieveMap01.put("code",code_icd10);
+        retrieveMap01.put("name",name_icd10);
+        retrieveMap01.put("chronicFlag",chronicFlag);
+        retrieveMap01.put("infectiousFlag",infectiousFlag);
+        retrieveMap01.put("description",description_icd10);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json01 = objectMapper.writeValueAsString(retrieveMap01);
+
+        MIcd10Dict icd10Dict = icd10DictController.createIcd10Dict(json01);
         String icd10Id = icd10Dict.getId().toString();
 
         String code = "IndicatorDictTest_09";
@@ -264,8 +358,19 @@ public class Icd10DictControllerTests {
         String upperLimit = "14度";
         String lowerLimit = "1度";
         String description = "指标字典新增测试_09。";
-        indicatorsDictController.createIndicatorsDict(code, name, type, unit, upperLimit, lowerLimit, description);
-        IndicatorsDict indicatorsDict = indicatorsDictRepo.findByCode(code);
+
+        Map<String,String> retrieveMap02 = new HashMap<>();
+        retrieveMap02.put("code",code);
+        retrieveMap02.put("name",name);
+        retrieveMap02.put("type",type);
+        retrieveMap02.put("unit",unit);
+        retrieveMap02.put("upperLimit",upperLimit);
+        retrieveMap02.put("lowerLimit",lowerLimit);
+        retrieveMap02.put("description",description);
+
+        String json02 = objectMapper.writeValueAsString(retrieveMap02);
+
+        MIndicatorsDict indicatorsDict =indicatorsDictController.createIndicatorsDict(json02);
         String indicatorsDictId = indicatorsDict.getId();
 
         Icd10Dict icd10Dict1 = icd10DictRepository.findByCode("Icd10DictTest_08");
@@ -273,13 +378,18 @@ public class Icd10DictControllerTests {
         List<Icd10IndicatorRelation> icd10IndicatorRelations = (List<Icd10IndicatorRelation>)icd10IndicatorRelationRepository.findByIcd10Id(id);
         String relaId = icd10IndicatorRelations.get(0).getId();
 
-        boolean result = (boolean)icd10DictController.updateIcd10IndicatorRelation(relaId, icd10Id, indicatorsDictId);
-        assertTrue("修改关联失败！", result);
+        Map<String,String> retrieveMap03 = new HashMap<>();
+        retrieveMap03.put("id",relaId);
+        retrieveMap03.put("icd10Id",icd10Id);
+        retrieveMap03.put("indicatorId",indicatorsDictId);
+
+        String json03 = objectMapper.writeValueAsString(retrieveMap03);
+        assertTrue("修改关联失败！", icd10DictController.updateIcd10IndicatorRelation(json03) != null);
 
         indicatorsDictController.deleteIndicatorsDict(indicatorsDictId);
 
-        indicatorsDict = indicatorsDictRepo.findByCode("IndicatorDictTest_08");
-        indicatorsDictId = indicatorsDict.getId();
+        IndicatorsDict indicatorsDict01 = indicatorsDictRepo.findByCode("IndicatorDictTest_08");
+        indicatorsDictId = indicatorsDict01.getId();
         indicatorsDictController.deleteIndicatorsDict(indicatorsDictId);
     }
 
@@ -307,7 +417,5 @@ public class Icd10DictControllerTests {
         icd10Dict = icd10DictRepository.findByCode("Icd10DictTest_09");
         id = icd10Dict.getId().toString();
         icd10DictController.deleteIcd10Dict(id);
-
     }
-
 }
