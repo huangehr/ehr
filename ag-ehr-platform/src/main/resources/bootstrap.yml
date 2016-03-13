@@ -13,7 +13,7 @@ spring:
     config:
       username: user
       password: configuration
-      uri: http://172.19.103.74:1221
+      uri: http://localhost:1221
       label: dev
 
 ---
@@ -25,3 +25,14 @@ spring:
       password: configuration
       uri: http://192.168.131.151:1221
       label: dev
+
+
+---
+spring:
+  profiles: prod
+  cloud:
+    config:
+      username: user
+      password: configuration
+      uri: http://11.1.2.21:1221
+      label: master

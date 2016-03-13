@@ -127,7 +127,6 @@ public class SystemDictEntryService extends BaseJpaService<SystemDictEntry, XSys
 
     public void deleteDictEntry(long dictId, String code) {
         XSystemDictEntryRepository repo = (XSystemDictEntryRepository) getJpaRepository();
-
         repo.delete(new DictEntryKey(code, dictId));
     }
 }

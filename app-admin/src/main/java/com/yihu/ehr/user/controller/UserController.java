@@ -1,11 +1,14 @@
 package com.yihu.ehr.user.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
+import com.yihu.ehr.util.ResourceProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -26,12 +29,21 @@ import java.util.Map;
 @Controller
 @RequestMapping("/user")
 public class UserController {
+
+//    private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
+//    private static   String username = ResourceProperties.getProperty("username");
+//    private static   String password = ResourceProperties.getProperty("password");
+//    private static   String module = ResourceProperties.getProperty("module");  //目前定义为rest
+//    private static   String version = ResourceProperties.getProperty("version");
+//    private static   String comUrl = host +"/"+ module +"/"+ version;
+
     @Value("${service-gateway.username}")
     private String username;
     @Value("${service-gateway.password}")
     private String password;
     @Value("${service-gateway.url}")
     private String comUrl;
+
     @RequestMapping("initial")
     public String userInitial(Model model) {
         model.addAttribute("contentPage", "user/user");
@@ -48,15 +60,27 @@ public class UserController {
     @ResponseBody
     public Object searchUsers(String searchNm, String searchType, int page, int rows) {
 
-        String url = "/user/user";
+        String url = "/users";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("realName", searchNm);
-        params.put("orgCode", searchNm);
-        params.put("searchType", searchType);
+
+        StringBuffer stringBuffer = new StringBuffer();
+        if(!StringUtils.isEmpty(searchNm)){
+            stringBuffer.append("realName?"+searchNm+" g1;organization?"+searchNm+" g1;");
+        }
+        if(!StringUtils.isEmpty(searchType)){
+            stringBuffer.append("userType="+searchType);
+        }
+
+        params.put("filters", "");
+        String filters = stringBuffer.toString();
+        if(!StringUtils.isEmpty(filters)){
+            params.put("filters", filters);
+        }
+
         params.put("page", page);
-        params.put("rows", rows);
+        params.put("size", rows);
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             return resultStr;
@@ -82,17 +106,19 @@ public class UserController {
     @RequestMapping("deleteUser")
     @ResponseBody
     public Object deleteUser(String userId) {
-        String url = "/user/user";
+        String url = "/users/"+userId;
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+
         params.put("userId",userId);
         try {
             resultStr = HttpClientUtil.doDelete(comUrl + url, params, username, password);
-            if(Boolean.parseBoolean(resultStr)){
+            result = mapper.readValue(resultStr,Envelop.class);
+            if(result.isSuccessFlg()){
                 result.setSuccessFlg(true);
-            }
-            else {
+            } else {
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.InvalidDelete.toString());
             }

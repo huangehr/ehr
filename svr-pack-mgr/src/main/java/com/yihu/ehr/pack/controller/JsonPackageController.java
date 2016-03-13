@@ -1,11 +1,11 @@
-package com.yihu.ehr.pack;
+package com.yihu.ehr.pack.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.model.packs.MJsonPackage;
 import com.yihu.ehr.feign.SecurityClient;
+import com.yihu.ehr.model.packs.MJsonPackage;
 import com.yihu.ehr.pack.service.JsonPackage;
 import com.yihu.ehr.pack.service.JsonPackageService;
 import com.yihu.ehr.util.controller.BaseRestController;
@@ -19,8 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.ByteArrayInputStream;
 import java.text.ParseException;
@@ -87,7 +85,7 @@ public class JsonPackageController extends BaseRestController {
 
         if (StringUtils.isEmpty(fileString)) throw new ApiException(ErrorCode.MissParameter, "file");
 
-        String privateKey = securityClient.getUserSecurityByLoginCode(userName);
+        String privateKey = securityClient.getUserSecurityByLoginCode(userName).getPrivateKey();
         if (null == privateKey) throw new ApiException(ErrorCode.GenerateUserKeyFailed);
         String unzipPwd = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
         jsonPackageService.receive(new ByteArrayInputStream(fileString.getBytes()), unzipPwd);

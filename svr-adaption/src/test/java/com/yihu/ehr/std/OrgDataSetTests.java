@@ -1,6 +1,8 @@
+//
 //package com.yihu.ehr.std;
 //
 //import com.fasterxml.jackson.databind.ObjectMapper;
+//import com.yihu.ehr.AdaptionServiceApp;
 //import com.yihu.ehr.adaption.dict.controller.AdapterDictController;
 //import com.yihu.ehr.adaption.dict.service.AdapterDict;
 //import com.yihu.ehr.adaption.orgdataset.controller.OrgDataSetController;
@@ -16,54 +18,60 @@
 //import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 //import org.springframework.test.context.web.WebAppConfiguration;
 //
+//import java.util.List;
+//
 //import static org.junit.Assert.assertTrue;
 //
 //@RunWith(SpringJUnit4ClassRunner.class)
-//@SpringApplicationConfiguration(classes = OrgDataSetTests.class)
+//@SpringApplicationConfiguration(classes = AdaptionServiceApp.class)
 //@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-//@WebAppConfiguration
 //public class OrgDataSetTests {
 //
 //	long id = 1;
 //	@Autowired
 //	private OrgDataSetController orgDataSetController;
 //
+//	ObjectMapper objectMapper = new ObjectMapper();
+//
 //	@Test
 //	public void createOrgDataSet() throws Exception{
+//		MOrgDataSet dataSet = new MOrgDataSet();
+//		dataSet.setCode("testcode");
+//		dataSet.setName("testname");
+//		dataSet.setDescription("testdesc");
+//		dataSet.setOrganization("testorg");
+//		dataSet.setCreateUser("testuser");
 //
-//		String code = "CODE";
-//		String name = "NAME";
-//		String description = "DESC";
-//		String orgCode = "ORGCODE";
-//		String userId = "TEST";
-//		MOrgDataSet rs = orgDataSetController.createOrgDataSet("");
-//		assertTrue("新增失败", rs!=null);
+//		MOrgDataSet rs = orgDataSetController.createOrgDataSet(
+//				objectMapper.writeValueAsString(dataSet));
+//
+//		List<MOrgDataSet> ls = (List) orgDataSetController.searchAdapterOrg("", "code=testcode;name=testname", "+name", 15, 1, null, null);
+//		if(ls!=null && ls.size()>0){
+//			rs = ls.get(0);
+//			rs.setCode("updatecode");
+//			rs = orgDataSetController.updateOrgDataSet(
+//					objectMapper.writeValueAsString(rs));
+//		}
+//
+//
+//		rs = orgDataSetController.getOrgDataSet(rs.getId());
+//
+//		boolean b = orgDataSetController.deleteOrgDataSet(rs.getId());
+//
+//		assertTrue("测试失败", rs != null);
+//
+//
 //	}
+//
 //
 //	@Test
-//	public void updateAdapterMetaData() throws Exception{
-//		String code = "CODE";
-//		String name = "NAME";
-//		String description = "DESC";
-//		String orgCode = "ORGCODE";
-//		String userId = "TEST";
-//		MOrgDataSet rs = orgDataSetController.updateOrgDataSet("");
-//		assertTrue("修改失败！", rs!=null);
+//	public void dataSetIsExist() throws Exception{
+//		String orgCode = "dsa";
+//		String code = "1";
+//		boolean b = orgDataSetController.dataSetIsExist(orgCode, code);
+//
+//		assertTrue("不存在", b );
 //	}
 //
-//	@Test
-//	public void deleteOrgDataSet() throws Exception{
-//		String ids = "1,2";
-//		boolean rs = orgDataSetController.deleteOrgDataSet(id);
-//		assertTrue("删除失败！", rs);
-//	}
-//
-//
-//	@Test
-//	public void getOrgDataSet() throws Exception{
-//
-//		MOrgDataSet dataSet = orgDataSetController.getOrgDataSet(id);
-//		assertTrue("获取机构数据集失败", dataSet != null);
-//	}
 //
 //}

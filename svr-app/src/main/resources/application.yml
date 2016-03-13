@@ -39,10 +39,6 @@ eureka:
     fetchRegistry: true
     serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@192.168.131.151:8761}/eureka/
 
-data-source:
-  url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
-  user-name: yuhaihua
-  password: yuhaihua
 
 ---
 spring:
@@ -50,8 +46,8 @@ spring:
 
 eureka:
   instance:
-    ip-address: 172.19.103.73
+    ip-address: 11.1.2.21
   client:
     registerWithEureka: true
     fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@172.19.103.73:8761}/eureka/
+    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@11.1.2.21:8761}/eureka/
