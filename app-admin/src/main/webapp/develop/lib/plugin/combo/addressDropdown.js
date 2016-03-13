@@ -240,10 +240,11 @@
         var self = this;
         var dataTemp = [];
         for(var key in data) {
-            var name = data[key];
+            var id = data[key].id;
+            var name = data[key].name;
             var abbrChars = $.Pinyin.getAbbrChars(name);
             var fullChars = $.Pinyin.getFullChars(name);
-            dataTemp.push(Util.format("{0}||{1}||{2}||{3}",abbrChars,fullChars,key,name));
+            dataTemp.push(Util.format("{0}||{1}||{2}||{3}",abbrChars,fullChars,id,name));
         }
         dataTemp.sort();
 

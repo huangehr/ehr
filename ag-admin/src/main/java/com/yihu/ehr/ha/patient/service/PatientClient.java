@@ -26,10 +26,8 @@ public interface PatientClient {
     @RequestMapping(value = "/populations",method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询人")
     ResponseEntity<List<MDemographicInfo>> searchPatient(
-            @ApiParam(name = "name", value = "姓名", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
-            @RequestParam(value = "id_card_no") String idCardNo,
+            @ApiParam(name = "search", value = "搜索内容", defaultValue = "")
+            @RequestParam(value = "search") String search,
             @ApiParam(name = "province", value = "省", defaultValue = "")
             @RequestParam(value = "province") String province,
             @ApiParam(name = "city", value = "市", defaultValue = "")
