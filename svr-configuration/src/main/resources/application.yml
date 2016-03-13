@@ -22,7 +22,7 @@ spring:
     config:
       server:
         git:
-          uri: http://192.168.1.220:10080/EHR/ehr.config.git
+          uri: C:/Users/Administrator/Desktop/103环境/dev分支/ehr.config
         default-label: dev
 
 eureka:
