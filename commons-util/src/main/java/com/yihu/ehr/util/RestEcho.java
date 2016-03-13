@@ -13,8 +13,11 @@ import java.io.Serializable;
 /**
  * REST API return value, it's a json expression.
  * Created by Sand Wen on 2015.8.12.
+ *
+ * 仅供旧版本代码使用。
  */
 @ApiModel
+@Deprecated
 public class RestEcho implements Serializable {
     private final static String CodeNode = "code";
     private final static String ResultNode = "result";

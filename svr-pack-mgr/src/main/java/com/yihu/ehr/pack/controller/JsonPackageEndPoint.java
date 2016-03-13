@@ -6,6 +6,7 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.feign.SecurityClient;
 import com.yihu.ehr.model.packs.MJsonPackage;
+import com.yihu.ehr.model.security.MUserSecurity;
 import com.yihu.ehr.pack.service.JsonPackage;
 import com.yihu.ehr.pack.service.JsonPackageService;
 import com.yihu.ehr.util.controller.BaseRestController;
@@ -90,7 +91,8 @@ public class JsonPackageEndPoint extends BaseRestController {
 
         if (StringUtils.isEmpty(fileString)) throw new ApiException(ErrorCode.MissParameter, "file");
 
-        String privateKey = securityClient.getUserSecurityByLoginCode(userName);
+        MUserSecurity userSecurity = securityClient.getUserSecurityByLoginCode(userName);
+        String privateKey = userSecurity.getPrivateKey();
         if (null == privateKey) throw new ApiException(ErrorCode.GenerateUserKeyFailed);
         String unzipPwd = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
         jsonPackageService.receive(new ByteArrayInputStream(fileString.getBytes()), unzipPwd);

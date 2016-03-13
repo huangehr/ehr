@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.agModel.user.UsersModel;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.ha.organization.service.OrganizationClient;
 import com.yihu.ehr.ha.security.service.SecurityClient;
@@ -377,7 +376,7 @@ public class UserController extends BaseController {
     }
 
 
-    @RequestMapping(value = "/users/upload/", method = RequestMethod.POST)
+    /*@RequestMapping(value = "/users/upload/", method = RequestMethod.POST)
     @ApiOperation(value = "", notes = "")
     public String upload(
             @ApiParam(name = "request")
@@ -416,6 +415,6 @@ public class UserController extends BaseController {
             //LogService.getLogger(user.class).error("用户头像上传失败；错误代码："+e);
         }
         return path;
-    }
+    }*/
 
 }
