@@ -5,15 +5,18 @@ import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlan;
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanService;
 import com.yihu.ehr.adaption.dict.service.AdapterDictService;
 import com.yihu.ehr.adaption.feignclient.DictClient;
-import com.yihu.ehr.model.adaption.MAdapterDataSet;
+import com.yihu.ehr.model.adaption.MAdapterDataVo;
 import com.yihu.ehr.model.adaption.MDataSet;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.metamodel.binding.HibernateTypeDescriptor;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.StandardBasicTypes;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,8 +72,13 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
         page = page == 0 ? 1 : page;
         sqlQuery.setMaxResults(rows);
         sqlQuery.setFirstResult((page - 1) * rows);
-        sqlQuery.setResultTransformer(Transformers.aliasToBean(MDataSet.class));
-        return sqlQuery.list();
+//        return sqlQuery.addEntity(MDataSet.class).list();
+        return sqlQuery
+                .addScalar("id", StandardBasicTypes.LONG )
+                .addScalar("code", StandardBasicTypes.STRING)
+                .addScalar("name", StandardBasicTypes.STRING)
+                .setResultTransformer(Transformers.aliasToBean(MDataSet.class))
+                .list();
     }
 
     private String makeOrder(String orders) {
@@ -121,7 +129,7 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
     /**
      * 根据datasetId搜索数据元适配关系
      */
-    public List<MAdapterDataSet> searchAdapterMetaData(OrgAdapterPlan orgAdapterPlan, long dataSetId, String code, String name, String orders, int page, int rows) {
+    public List<MAdapterDataVo> searchAdapterMetaData(OrgAdapterPlan orgAdapterPlan, long dataSetId, String code, String name, String orders, int page, int rows) {
 
         String orgCode = orgAdapterPlan.getOrg();
         String dsTableName = CDAVersionUtil.getDataSetTableName(orgAdapterPlan.getVersion());
@@ -163,10 +171,27 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
         if (!StringUtils.isEmpty(name))
             sqlQuery.setParameter("name", "%" + name + "%");
         page = page == 0 ? 1 : page;
-        sqlQuery.setMaxResults(rows);
-        sqlQuery.setFirstResult((page - 1) * rows);
-        sqlQuery.setResultTransformer(Transformers.aliasToBean(MAdapterDataSet.class));
-        return sqlQuery.list();
+
+        sqlQuery.setMaxResults(rows)
+                .setFirstResult((page - 1) * rows);
+        return sqlQuery
+                .addScalar("id", StandardBasicTypes.LONG)
+                .addScalar("adapterPlanId", StandardBasicTypes.LONG)
+                .addScalar("dataSetId", StandardBasicTypes.LONG)
+                .addScalar("dataSetCode", StandardBasicTypes.STRING)
+                .addScalar("dataSetName", StandardBasicTypes.STRING)
+                .addScalar("metaDataId", StandardBasicTypes.LONG)
+                .addScalar("metaDataCode", StandardBasicTypes.STRING)
+                .addScalar("metaDataName", StandardBasicTypes.STRING)
+                .addScalar("dataTypeName", StandardBasicTypes.STRING)
+                .addScalar("orgDataSetSeq", StandardBasicTypes.LONG)
+                .addScalar("orgDataSetCode", StandardBasicTypes.STRING)
+                .addScalar("orgDataSetName", StandardBasicTypes.STRING)
+                .addScalar("orgMetaDataSeq", StandardBasicTypes.LONG)
+                .addScalar("orgMetaDataCode", StandardBasicTypes.STRING)
+                .addScalar("orgMetaDataName", StandardBasicTypes.STRING)
+                .setResultTransformer(Transformers.aliasToBean(MAdapterDataVo.class))
+                .list();
     }
 
 
@@ -254,13 +279,13 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
         Long stdDictId, planId;
         //要先删除数据字典映射
         for (Object id : ids) {
-            AdapterDataSet ds = retrieve(Long.parseLong((String) id));
+            AdapterDataSet ds = retrieve((Long) id);
             stdDictId = ds.getStdDict();
             if (stdDictId != null) {
                 planId = ds.getAdapterPlanId();
                 key = planId + "," + stdDictId;
                 if ((value = map.get("key")) == null)
-                    value = new ArrayList<Long>();
+                    value = new ArrayList<>();
                 value.add(ds.getId());
                 map.put(key, value);
             }

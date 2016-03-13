@@ -18,7 +18,7 @@ import java.io.IOException;
 /**
  * 对象池工具类
  *
- * 目前提供ORM动�?映射解决方案并生成class  文件
+ * 目前提供ORM动态映射解决方案并生成class  文件
  *
  * @author lincl
  * @version 1.0
@@ -29,13 +29,13 @@ public class ClassPoolUtils {
 
 
     /**
-     * 运行时动态ORM表映�?
+     * 运行时动态ORM表映射
      *
      *
-     * @param entityClassName   待映射的实体全限定类�?
+     * @param entityClassName   待映射的实体全限定类名
      * @param tableName         待映射的表名
-     * @param newClzName        新的实体全限定类�?
-     * @return                   映射后的类对�?
+     * @param newClzName        新的实体全限定类名
+     * @return                   映射后的类对象
      */
     public static Class<?> tableMapping(
             String entityClassName, String tableName, String newClzName)

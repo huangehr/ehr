@@ -22,10 +22,6 @@ public class AdapterOrg {
     private String org;
     private String area;
 
-    private String mAddress;
-    private String orgValue;
-    private String parentValue;
-    private String typeValue;
 
     @Id
     @GeneratedValue(generator = "Generator")
@@ -93,39 +89,4 @@ public class AdapterOrg {
         this.org = org;
     }
 
-    @Transient
-    public String getMAddress() {
-        return mAddress;
-    }
-
-    public void setMAddress(String mAddress) {
-        this.mAddress = mAddress;
-    }
-
-    @Transient
-    public String getOrgValue() {
-        return orgValue;
-    }
-
-    public void setOrgValue(String orgValue) {
-        this.orgValue = orgValue;
-    }
-
-    @Transient
-    public String getParentValue() {
-        return parentValue;
-    }
-
-    public void setParentValue(String parentValue) {
-        this.parentValue = parentValue;
-    }
-
-    @Transient
-    public String getTypeValue() {
-        return typeValue;
-    }
-
-    public void setTypeValue(String typeValue) {
-        this.typeValue = typeValue;
-    }
 }

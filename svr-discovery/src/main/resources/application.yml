@@ -10,6 +10,7 @@ info:
     name: DiscoveryService
     description: EHR platform global discovery service
     version: 1.0.0
+
 security:
   user:
     password: eureka
@@ -17,6 +18,11 @@ security:
 eureka:
   instance:
       hostname: localhost
+      prefer-ip-address: true
+      #leaseRenewalIntervalInSeconds: 15
+      #metadataMap:
+            #instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
   client:
     #don't register this app as a service in eureka
     register-with-eureka: false
@@ -27,8 +33,7 @@ eureka:
       wait-time-in-ms-when-sync-empty: 0
       enable-self-preservation: false
 
-    instance:
-      hostname: localhost
   server:
       enable-self-preservation: false
       waitTimeInMsWhenSyncEmpty: 500000
+

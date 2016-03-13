@@ -57,7 +57,7 @@ public class AdapterOrgService extends BaseJpaService<AdapterOrg, XAdapterOrgRep
         AdapterOrg adapterOrg;
         for (String code : codes) {
             adapterOrg = retrieve(code);
-            deleteData(adapterOrg.getOrg());
+            deleteData(adapterOrg.getCode());
             delete(adapterOrg);
         }
     }

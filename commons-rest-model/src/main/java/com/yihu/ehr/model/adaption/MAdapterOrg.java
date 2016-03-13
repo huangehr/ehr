@@ -1,8 +1,6 @@
 package com.yihu.ehr.model.adaption;
 
 
-import com.yihu.ehr.model.geogrephy.MGeography;
-
 /**
  * 适配管理映射机构
  *
@@ -13,16 +11,11 @@ import com.yihu.ehr.model.geogrephy.MGeography;
 public class MAdapterOrg {
     private String code;
     private String type;
-    private String typeValue;
     private String name;
     private String description;
     private String parent;
-    private String parentValue;
     private String org;
-    private String orgValue;
     private String area;
-
-    private MGeography mAddress;
 
 
     public String getCode() {
@@ -39,14 +32,6 @@ public class MAdapterOrg {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public String getTypeValue() {
-        return typeValue;
-    }
-
-    public void setTypeValue(String typeValue) {
-        this.typeValue = typeValue;
     }
 
     public String getName() {
@@ -73,28 +58,12 @@ public class MAdapterOrg {
         this.parent = parent;
     }
 
-    public String getParentValue() {
-        return parentValue;
-    }
-
-    public void setParentValue(String parentValue) {
-        this.parentValue = parentValue;
-    }
-
     public String getOrg() {
         return org;
     }
 
     public void setOrg(String org) {
         this.org = org;
-    }
-
-    public String getOrgValue() {
-        return orgValue;
-    }
-
-    public void setOrgValue(String orgValue) {
-        this.orgValue = orgValue;
     }
 
     public String getArea() {
@@ -104,13 +73,4 @@ public class MAdapterOrg {
     public void setArea(String area) {
         this.area = area;
     }
-
-    public MGeography getmAddress() {
-        return mAddress;
-    }
-
-    public void setmAddress(MGeography mAddress) {
-        this.mAddress = mAddress;
-    }
-
 }
