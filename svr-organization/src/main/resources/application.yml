@@ -8,10 +8,9 @@ info:
     description: EHR platform organization service.
     version: 1.0.0
 
-
 spring:
  jpa:
-  hibernate-dialect : org.hibernate.dialect.MySQL5Dialect
+  hibernate-dialect: org.hibernate.dialect.MySQL5Dialect
 ---
 spring:
   profiles: dev
@@ -28,11 +27,11 @@ spring:
   profiles: test
 eureka:
   instance:
-    ip-address: 192.168.131.151
+    ip-address: 172.19.103.73
   client:
     registerWithEureka: true
     fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@192.168.131.151:8761}/eureka/
+    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@172.19.103.73:8761}/eureka/
 
 
 ---
@@ -41,8 +40,8 @@ spring:
 
 eureka:
   instance:
-    ip-address: 11.1.2.21
+    ip-address: 172.19.103.73
   client:
     registerWithEureka: true
     fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@11.1.2.21:8761}/eureka/
+    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@172.19.103.73:8761}/eureka/

@@ -15,7 +15,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -54,10 +53,8 @@ public class PatientController extends BaseRestController {
     @RequestMapping(value = "/populations",method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询人")
     public List<MDemographicInfo> searchPatient(
-            @ApiParam(name = "name", value = "姓名", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
-            @RequestParam(value = "id_card_no") String idCardNo,
+            @ApiParam(name = "search", value = "搜索内容", defaultValue = "")
+            @RequestParam(value = "search") String search,
             @ApiParam(name = "province", value = "省", defaultValue = "")
             @RequestParam(value = "province") String province,
             @ApiParam(name = "city", value = "市", defaultValue = "")
@@ -71,8 +68,7 @@ public class PatientController extends BaseRestController {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
         Map<String, Object> conditionMap = new HashMap<>();
-        conditionMap.put("name", name);
-        conditionMap.put("idCardNo", idCardNo);
+        conditionMap.put("search", search);
         conditionMap.put("page", page);
         conditionMap.put("pageSize", rows);
         conditionMap.put("province", province);

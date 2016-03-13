@@ -123,8 +123,7 @@ public class PatientController {
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("name", searchNm);
-        params.put("id_card_no", searchNm);
+        params.put("search", searchNm);
         params.put("page", page);
         params.put("rows", rows);
         params.put("province", province);
