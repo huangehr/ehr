@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by AndyCai on 2016/1/21.
@@ -47,10 +48,8 @@ public class PatientController extends BaseController {
     @RequestMapping(value = "/populations", method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询人")
     public Envelop searchPatient(
-            @ApiParam(name = "name", value = "姓名", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
-            @RequestParam(value = "id_card_no") String idCardNo,
+            @ApiParam(name = "search", value = "搜索内容", defaultValue = "")
+            @RequestParam(value = "search") String search,
             @ApiParam(name = "province", value = "省", defaultValue = "")
             @RequestParam(value = "province") String province,
             @ApiParam(name = "city", value = "市", defaultValue = "")
@@ -62,7 +61,7 @@ public class PatientController extends BaseController {
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
             @RequestParam(value = "rows") Integer rows) throws Exception {
 
-        ResponseEntity<List<MDemographicInfo>> responseEntity = patientClient.searchPatient(name, idCardNo, province, city, district, page, rows);
+        ResponseEntity<List<MDemographicInfo>> responseEntity = patientClient.searchPatient(search, province, city, district, page, rows);
         List<MDemographicInfo> demographicInfos = responseEntity.getBody();
         List<PatientModel> patients = new ArrayList<>();
         for (MDemographicInfo patientInfo : demographicInfos) {
@@ -83,6 +82,22 @@ public class PatientController extends BaseController {
                 }
                 patient.setHomeAddress(homeAddress);
             }
+            //性别
+            if(StringUtils.isNotEmpty(patientInfo.getGender())) {
+                MConventionalDict dict = conventionalDictClient.getGender(patientInfo.getGender());
+                patient.setGender(dict == null ? "" : dict.getValue());
+            }
+            //联系电话
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, String> telphoneNo;
+            String tag="联系电话";
+            telphoneNo = mapper.readValue(patient.getTelphoneNo(), Map.class);
+            if (telphoneNo != null && telphoneNo.containsKey(tag)) {
+                patient.setTelphoneNo(telphoneNo.get(tag));
+            } else {
+                patient.setTelphoneNo(null);
+            }
+
             patients.add(patient);
         }
 

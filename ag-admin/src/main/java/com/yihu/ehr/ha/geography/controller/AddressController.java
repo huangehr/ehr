@@ -1,11 +1,11 @@
 package com.yihu.ehr.ha.geography.controller;
 
+import com.yihu.ehr.agModel.geogrephy.GeographyDictModel;
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.geography.service.AddressClient;
 import com.yihu.ehr.model.geogrephy.MGeography;
 import com.yihu.ehr.model.geogrephy.MGeographyDict;
-import com.yihu.ehr.agModel.geogrephy.GeographyDictModel;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.management.BufferPoolMXBean;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -140,18 +139,18 @@ public class AddressController extends BaseController{
             @RequestParam( value = "geography_model_json_data") String geographyModelJsonData) throws Exception{
 
         Envelop envelop = new Envelop();
-        GeographyDictModel geographyDictModel = new GeographyDictModel();
+        GeographyModel geographyModel = new GeographyModel();
 
         String id = addressClient.saveAddress(geographyModelJsonData);
 
         if(id != null){
             envelop.setSuccessFlg(true);
-            geographyDictModel.setId(id);
+            geographyModel.setId(id);
         }else{
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("地址新增失败");
         }
-        envelop.setObj(geographyDictModel);
+        envelop.setObj(geographyModel);
 
         return envelop;
     }
