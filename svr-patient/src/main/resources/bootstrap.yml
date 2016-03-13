@@ -24,7 +24,8 @@ spring:
 
 ---
 spring:
-  profiles: test
+  profiles: prod
+
   cloud:
     config:
       username: user

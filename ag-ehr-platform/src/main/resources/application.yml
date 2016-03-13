@@ -9,9 +9,23 @@ endpoints:
   health:
     sensitive: false
 
+#feign.hystrix.enabled: false
 
-keystore:
-  password: 123456
+hystrix:
+  stream:
+    bus:
+      enabled: true
+      sendRate: 600
+
+niws:
+  loadbalancer:
+    availabilityFilteringRule:
+      filterCircuitTripped: false
+
+logging:
+  level:
+    com:
+      netflix: DEBUG
 
 ---
 spring:
@@ -47,8 +61,8 @@ eureka:
   instance:
     ip-address: 127.0.0.1
   client:
-    registerWithEureka: false
-    fetchRegistry: false
+    registerWithEureka: true
+    fetchRegistry: true
     serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
 
 ---
@@ -70,6 +84,10 @@ eureka:
 ---
 spring:
   profiles: prod
+
+keystore:
+  file: tomcat.keystore
+  password: 123456
 
 eureka:
   instance:
