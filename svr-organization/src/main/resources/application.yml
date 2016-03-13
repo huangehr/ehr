@@ -10,7 +10,7 @@ info:
 
 spring:
  jpa:
-  hibernate-dialect :org.hibernate.dialect.MySQL5Dialect
+  hibernate-dialect: org.hibernate.dialect.MySQL5Dialect
 ---
 spring:
   profiles: dev
