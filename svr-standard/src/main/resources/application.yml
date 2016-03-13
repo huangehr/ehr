@@ -11,6 +11,8 @@ info:
     description: EHR platform standard service.
     version: 1.0.0
 
+<<<<<<< HEAD
+=======
 data-source:
   driver-class-name: com.mysql.jdbc.Driver
   initialize-size: 1
@@ -42,6 +44,7 @@ fast-dfs:
     anti-steal-token: no
     secret-key: FastDFS1234567890
 
+>>>>>>> 2120875034b64d2cef2951eb8b3bf97580a522fa
 ehr:
   commons:
     repeat:
@@ -105,7 +108,75 @@ hibernate:
 
 fast-dfs:
   tracker-server: 172.19.103.54:22122
----
+---server:
+     port: 10040
+
+   #security:
+   #  user:
+   #    password: standard
+
+   info:
+     app:
+       name: StandardService
+       description: EHR platform standard service.
+       version: 1.0.0
+
+   ehr:
+     commons:
+       repeat:
+         code: 代码已存在!
+     common:
+       query:
+         not:
+           found: 该{0}不存在：{1}
+       miss:
+         parameter:  参数不能为空：{0}！
+       notfound:
+         entity: 没有找到{0}实体：{}
+     std:
+       version:
+         invalid:
+           stage: 该版本不处于编辑状态！
+
+   ---
+   spring:
+     profiles: dev
+
+   eureka:
+     instance:
+       address: localhost
+     client:
+       registerWithEureka: true
+       fetchRegistry: true
+       serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
+
+
+   ---
+   spring:
+     profiles: test
+
+   eureka:
+     instance:
+       ip-address: 172.19.103.73
+     client:
+       registerWithEureka: true
+       fetchRegistry: true
+       serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@172.19.103.73:8761}/eureka/
+
+
+   ---
+   spring:
+     profiles: prod
+
+   eureka:
+     instance:
+       hostname: 11.1.2.21
+     client:
+       registerWithEureka: true
+       fetchRegistry: true
+       serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@11.1.2.21:8761}/eureka/
+
+
 spring:
   profiles: prod
 
