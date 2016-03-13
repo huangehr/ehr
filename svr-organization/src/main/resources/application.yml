@@ -8,13 +8,10 @@ info:
     description: EHR platform organization service.
     version: 1.0.0
 
-<<<<<<< HEAD
 
-=======
 spring:
  jpa:
   hibernate-dialect : org.hibernate.dialect.MySQL5Dialect
->>>>>>> 2120875034b64d2cef2951eb8b3bf97580a522fa
 ---
 spring:
   profiles: dev
