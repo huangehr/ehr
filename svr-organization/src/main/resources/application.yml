@@ -10,8 +10,12 @@ info:
 
 
 spring:
- jpa:
-  hibernate-dialect : org.hibernate.dialect.MySQL5Dialect
+  jpa:
+    show-sql: true
+    hibernate:
+      dialect: org.hibernate.dialect.MySQL5Dialect
+    database:
+      platform: org.hibernate.dialect.MySQL5Dialect
 ---
 spring:
   profiles: dev

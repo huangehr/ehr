@@ -6,6 +6,8 @@ spring:
     show-sql: true
     hibernate:
       dialect: org.hibernate.dialect.MySQL5Dialect
+    database:
+      platform: org.hibernate.dialect.MySQL5Dialect
 
 #security:
 #  user:

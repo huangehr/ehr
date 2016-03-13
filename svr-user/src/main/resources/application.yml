@@ -8,6 +8,14 @@ info:
     description: EHR platform user service.
     version: 1.0.0
 
+spring:
+  jpa:
+    show-sql: true
+    hibernate:
+      dialect: org.hibernate.dialect.MySQL5Dialect
+    database:
+      platform: org.hibernate.dialect.MySQL5Dialect
+
 ---
 spring:
   profiles: dev
