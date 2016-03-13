@@ -20,8 +20,8 @@
         var jValidation = $.jValidation;
 
         var allData = JSON.parse('${allData}');
-        var orgLoc = allData[0];
-        var user = allData[1];
+//        var orgLoc = allData[0];
+        var user = allData.obj;
 
         /* ************************** 变量定义结束 **************************** */
 
@@ -44,9 +44,9 @@
             $idCard: $('#inp_idCard'),
             $email: $('#inp_userEmail'),
             $tel: $('#inp_userTel'),
-            $org: $('#inp_org'),
+//            $org: $('#inp_org'),
             $major: $('#inp_major'),
-            $userSex: $('input[name="sex"]', this.$form),
+            $userSex: $('input[name="gender"]', this.$form),
             $marriage: $("#inp_select_marriage"),
             $userType: $("#inp_select_userType"),
             $updateUserDtn: $("#div_update_btn"),
@@ -93,22 +93,22 @@
                 this.$idCard.ligerTextBox({width: 240});
                 this.$email.ligerTextBox({width: 240});
                 this.$tel.ligerTextBox({width: 240});
-                this.$org.addressDropdown({
-                    tabsData: [
-                        {name: '省份', url: '${contextRoot}/address/getParent', params: {level: '1'}},
-                        {name: '城市', url: '${contextRoot}/address/getChildByParent'},
-                        {
-                            name: '医院', url: '${contextRoot}/address/getOrgs', beforeAjaxSend: function (ds, $options) {
-                            var province = $options.eq(0).attr('title'),
-                                    city = $options.eq(1).attr('title');
-                            ds.params = $.extend({}, ds.params, {
-                                province: province,
-                                city: city
-                            });
-                        }
-                        }
-                    ]
-                });
+                <%--this.$org.addressDropdown({--%>
+                    <%--tabsData: [--%>
+                        <%--{name: '省份', url: '${contextRoot}/address/getParent', params: {level: '1'}},--%>
+                        <%--{name: '城市', url: '${contextRoot}/address/getChildByParent'},--%>
+                        <%--{--%>
+                            <%--name: '医院', url: '${contextRoot}/address/getOrgs', beforeAjaxSend: function (ds, $options) {--%>
+                            <%--var province = $options.eq(0).attr('title'),--%>
+                                    <%--city = $options.eq(1).attr('title');--%>
+                            <%--ds.params = $.extend({}, ds.params, {--%>
+                                <%--province: province,--%>
+                                <%--city: city--%>
+                            <%--});--%>
+                        <%--}--%>
+                        <%--}--%>
+                    <%--]--%>
+                <%--});--%>
                 this.$major.ligerTextBox({width: 240});
                 this.$userSex.ligerRadio();
                 this.$marriage.ligerComboBox({
@@ -117,8 +117,8 @@
                     textField: 'value',
                     dataParmName: 'detailModelList',
                     urlParms: {
-                        dictId: 4
-                    }
+                    dictId: 4
+                }
                 });
 
                 this.$userType.ligerComboBox({
@@ -131,35 +131,36 @@
                     },
                     onSuccess: function () {
                         self.$form.Fields.fillValues({userType: user.userType});
-                        self.$form.Fields.fillValues({marriage: user.marriage});
+                        self.$form.Fields.fillValues({martialStatus: user.martialStatus});
                     },
                     onSelected: function (value) {
                         if (value == 'Doctor')
                             $('#inp_major_div').show();
                         else
                             $('#inp_major_div').hide();
-                        /*if (Util.isStrEquals(value, 'Doctor')) {
+                        if (Util.isStrEquals(value, 'Doctor')) {
                          userInfo.$major.parent().parent().addClass("essential");
                          userInfo.$major.addClass("required useTitle");
                          } else {
                          userInfo.$major.parent().parent().removeClass("essential");
                          userInfo.$major.removeClass("required useTitle");
-                         }*/
+                         }
                     }
                 });
 
+                debugger
                 this.$form.attrScan();
                 this.$form.Fields.fillValues({
                     id: user.id,
-                    orgCode: user.orgCode,
+                    organization: user.organization,
 
                     loginCode: user.loginCode,
                     realName: user.realName,
-                    idCard: user.idCard,
-                    sex: user.sex,
+                    idCardNo: user.idCardNo,
+                    gender: user.gender,
                     email: user.email,
-                    tel: user.tel,
-                    organization: [orgLoc.province, orgLoc.city, user.orgCode],
+                    telephone: user.telephone,
+//                    organization: [orgLoc.province, orgLoc.city, user.orgCode],
                     major: user.major,
                     publicKey: user.publicKey,
                     validTime: user.validTime,
@@ -169,7 +170,7 @@
                 self.$publicKeyValidTime.html(user.validTime);
                 self.$publicKeyStartTime.html(user.startTime);
                 /*---------yww*/
-                self.$idCardCopy.val(user.idCard);
+                self.$idCardCopy.val(user.idCardNo);
                 self.$emailCopy.val(user.email);
 
                 var pic = user.localPath;
@@ -235,10 +236,11 @@
 
                 //修改用户的点击事件
                 this.$updateUserDtn.click(function () {
+                    debugger
                     var userImgHtml = self.$imageShow.children().length;
-                    if (validator.validate()) {
+//                    if (validator.validate()) {
                         userModel = self.$form.Fields.getValues();
-                        var organizationKeys = userModel.organization['keys'];
+//                        var organizationKeys = userModel.organization['keys'];
                         /*取消所属机构必填限制
                          if(userModel.userType=='GovEmployee' &&  organizationKeys.length<3){
                          $.Notice.warn('用户类型为政府雇员时，所属机构必须选择到医院一级！');
@@ -248,8 +250,8 @@
                          $.Notice.warn('所属机构必须选择到医院一级！');
                          return;
                          }*/
-                        userModel.orgCode = organizationKeys[2];
-                        userModel.orgName = userModel.organization['names'][2];
+//                        userModel.orgCode = organizationKeys[2];
+//                        userModel.orgName = userModel.organization['names'][2];
 
                         if (userImgHtml == 0) {
                             updateUser(userModel);
@@ -257,6 +259,7 @@
                             var upload = self.$uploader.instance;
                             var image = upload.getFiles().length;
                             if (image) {
+                                debugger
                                 upload.options.formData.userModelJsonData = encodeURIComponent(JSON.stringify(userModel));
                                 upload.upload();
                                 win.closeUserInfoDialog();
@@ -268,9 +271,9 @@
                         /* var upload = self.$uploader.instance;
                          upload.options.formData.userModelJsonData =  JSON.stringify(userModel);
                          upload.upload();*/
-                    } else {
-                        return;
-                    }
+//                    } else {
+//                        return;
+//                    }
                 });
 
                 function updateUser(userModel) {
