@@ -22,12 +22,12 @@ spring:
     config:
       server:
         git:
-          uri: C:/Users/Administrator/Desktop/103环境/dev分支/ehr.config
+          uri: http://192.168.1.220:10080/EHR/ehr.config.git
         default-label: dev
 
 eureka:
   instance:
-    ip-address: 127.0.0.1
+    hostname: localhost
   client:
     registerWithEureka: true
     fetchRegistry: false
@@ -90,3 +90,6 @@ eureka:
     fetchRegistry: true
     serviceUrl:
       defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@11.1.2.21:8761}/eureka/
+  server:
+      enableSelfPreservation: false
+      waitTimeInMsWhenSyncEmpty: 0

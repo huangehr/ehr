@@ -25,6 +25,14 @@ std:
    invalid:
      stage: 该版本不处于编辑状态！
 
+spring:
+  jpa:
+    show-sql: true
+    hibernate:
+      dialect: org.hibernate.dialect.MySQL5Dialect
+    database:
+      platform: org.hibernate.dialect.MySQL5Dialect
+
 ---
 spring:
   profiles: dev
