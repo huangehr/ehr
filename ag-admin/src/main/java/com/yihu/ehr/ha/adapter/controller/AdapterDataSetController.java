@@ -71,7 +71,7 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
         List<AdapterRelationshipModel> adapterRelationshipModels = (List<AdapterRelationshipModel>) convertToModels(
                 mAdapterRelationships,
                 new ArrayList<AdapterRelationshipModel>(mAdapterRelationships.size()),
-                AdapterRelationshipModel.class, "");
+                AdapterRelationshipModel.class, null);
 
         return getResult(adapterRelationshipModels, getTotalCount(responseEntity), page, size);
     }
@@ -98,7 +98,7 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
         List<MAdapterDataSet> mAdapterDataSets = (List<MAdapterDataSet>) responseEntity.getBody();
         List<AdapterDataSetModel> adapterDataSetModels = (List<AdapterDataSetModel>) convertToModels(
                 mAdapterDataSets,
-                new ArrayList<>(), AdapterDataSetModel.class, "");
+                new ArrayList<>(), AdapterDataSetModel.class, null);
 
         return getResult(adapterDataSetModels, getTotalCount(responseEntity), page, size);
     }

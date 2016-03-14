@@ -4,9 +4,11 @@ import com.yihu.ehr.agModel.adapter.AdapterPlanDetailModel;
 import com.yihu.ehr.agModel.adapter.AdapterPlanModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.ha.adapter.service.PlanClient;
 import com.yihu.ehr.ha.adapter.utils.ExtendController;
 import com.yihu.ehr.model.adaption.MAdapterPlan;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.validate.ValidateResult;
 import io.swagger.annotations.ApiOperation;
@@ -33,6 +35,8 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
     @Autowired
     PlanClient planClient;
 
+    @Autowired
+    ConventionalDictEntryClient dictEntryClient;
 
     @RequestMapping(value = "/plan", method = RequestMethod.POST)
     @ApiOperation(value = "新增适配方案信息")
@@ -49,13 +53,14 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
                 return failed(validateResult.getMsg());
             }
 
-            AdapterPlanDetailModel detailModel = convertToModel(dataModel,AdapterPlanDetailModel.class);
+            AdapterPlanDetailModel detailModel = convertToModel(dataModel, AdapterPlanDetailModel.class);
 
             MAdapterPlan mAdapterPlan = planClient.saveAdapterPlan(objToJson(detailModel), isCover);
             if (mAdapterPlan == null) {
                 return failed("保存失败!");
             }
-            return success(convertToModel(mAdapterPlan, AdapterPlanModel.class));
+            AdapterPlanModel adapterPlanModel = ConvertAdapterPlanModel(convertToModel(mAdapterPlan, AdapterPlanModel.class));
+            return success(adapterPlanModel);
         } catch (Exception e) {
             e.printStackTrace();
             return failedSystem();
@@ -75,12 +80,13 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
             if (!validateResult.isRs()) {
                 return failed(validateResult.getMsg());
             }
-            AdapterPlanDetailModel detailModel = convertToModel(dataModel,AdapterPlanDetailModel.class);
+            AdapterPlanDetailModel detailModel = convertToModel(dataModel, AdapterPlanDetailModel.class);
             MAdapterPlan mAdapterPlan = planClient.updateAdapterPlan(detailModel.getId(), objToJson(detailModel));
             if (mAdapterPlan == null) {
                 return failed("保存失败!");
             }
-            return success(convertToModel(mAdapterPlan, AdapterPlanModel.class));
+            AdapterPlanModel adapterPlanModel = ConvertAdapterPlanModel(convertToModel(mAdapterPlan, AdapterPlanModel.class));
+            return success(adapterPlanModel);
         } catch (ApiException e) {
             e.printStackTrace();
             return failed(e.getMessage());
@@ -110,7 +116,27 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
             List<MAdapterPlan> mAdapterPlans = (List<MAdapterPlan>) responseEntity.getBody();
             List<AdapterPlanModel> adapterPlanModels = (List<AdapterPlanModel>) convertToModels(
                     mAdapterPlans,
-                    new ArrayList<AdapterPlanModel>(mAdapterPlans.size()), AdapterPlanModel.class, "");
+                    new ArrayList<AdapterPlanModel>(mAdapterPlans.size()), AdapterPlanModel.class, null);
+            if (adapterPlanModels != null) {
+                for (int i = 0; i < adapterPlanModels.size(); i++) {
+                    long planId = adapterPlanModels.get(i).getId();
+
+                    AdapterPlanModel adapterPlanModel = getModel(planClient.getAdapterPlanById(planId));
+                    if (adapterPlanModel != null) {
+                        adapterPlanModels.get(i).setParentName(adapterPlanModel.getName());
+                    }
+
+                    String type = adapterPlanModels.get(i).getType();
+                    if(StringUtils.isNotEmpty(type))
+                    {
+                        MConventionalDict dict =dictEntryClient.getAdapterType(type);
+                        if(dict!=null)
+                        {
+                            adapterPlanModels.get(i).setTypeValue(dict.getValue());
+                        }
+                    }
+                }
+            }
             return getResult(adapterPlanModels, getTotalCount(responseEntity), page, size);
         } catch (Exception e) {
             e.printStackTrace();
@@ -129,6 +155,7 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
             if (adapterPlanModel == null) {
                 return failed("数据获取失败!");
             }
+            adapterPlanModel = ConvertAdapterPlanModel(adapterPlanModel);
             return success(adapterPlanModel);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -190,4 +217,25 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
         return planClient.adapterDataSet(planId, customizeData);
     }
 
+    public AdapterPlanModel ConvertAdapterPlanModel(AdapterPlanModel adapterPlanModel)
+    {
+        long planId = adapterPlanModel.getId();
+
+        AdapterPlanModel planModel = getModel(planClient.getAdapterPlanById(planId));
+        if (adapterPlanModel != null) {
+            adapterPlanModel.setParentName(adapterPlanModel.getName());
+        }
+
+        String type = adapterPlanModel.getType();
+        if(StringUtils.isNotEmpty(type))
+        {
+            MConventionalDict dict =dictEntryClient.getAdapterType(type);
+            if(dict!=null)
+            {
+                adapterPlanModel.setTypeValue(dict.getValue());
+            }
+        }
+
+        return adapterPlanModel;
+    }
 }

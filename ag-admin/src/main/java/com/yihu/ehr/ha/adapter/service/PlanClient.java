@@ -79,7 +79,7 @@ public interface PlanClient {
             @ApiParam(name = "type", value = "类型", defaultValue = "")
             @RequestParam("type") String type,
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
-            @PathVariable(value = "version") String version) ;
+            @RequestParam(value = "version") String version) ;
 
 
     @RequestMapping(value = "/adapter/plan/{planId}/adapterCustomizes", method = RequestMethod.GET)

@@ -60,10 +60,10 @@ public class AdapterPlanControllerTests {
         adapterPlanModel.setDescription("这是测试方案!");
         adapterPlanModel.setType("1");
         Envelop envelop = planController.addAdapterPlan(objectMapper.writeValueAsString(adapterPlanModel),"true");
-        assertTrue("地址新增失败", envelop.isSuccessFlg());
+        assertTrue("新增失败", envelop.isSuccessFlg());
 
         String fields = "";
-        String filter = "name=test_cms_name";
+        String filter = "name=test_name_cms";
         int page = 1;
         int rows = 15;
         envelop = planController.searchAdapterPlan(fields,filter,"",rows,page);
