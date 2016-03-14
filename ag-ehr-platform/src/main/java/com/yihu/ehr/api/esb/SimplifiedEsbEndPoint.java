@@ -8,9 +8,11 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import springfox.documentation.spring.web.json.Json;
 
 /**
  * @author Sand
@@ -24,6 +26,7 @@ public class SimplifiedEsbEndPoint {
     @Autowired
     private SimplifiedESBClient simplifiedESBClient;
 
+    /*
     @ApiOperation("获取版本列表")
     @RequestMapping(value = "/applications", method = RequestMethod.GET)
     public ResponseEntity<Json> getApplications() {
@@ -37,7 +40,7 @@ public class SimplifiedEsbEndPoint {
                                                String id) {
         return new ResponseEntity<>(new Json(""), HttpStatus.OK);
     }
-
+*/
     @ApiOperation("日志上传")
     @RequestMapping(value = "/uploadLog", method = RequestMethod.POST)
     public ResponseEntity<String> uploadLogger(@ApiParam("orgCode") @RequestParam(value = "orgCode", required = true)
@@ -63,7 +66,7 @@ public class SimplifiedEsbEndPoint {
 
     ///api/v1.0/simplified-esb/downUpdateWar
     @ApiOperation("下载项目")
-    @RequestMapping(value = "/downUpdateWar", method = RequestMethod.GET)
+    @RequestMapping(value = "/downUpdateWar", method = RequestMethod.POST)
     public ResponseEntity downUpdateWar(@ApiParam("systemCode") @RequestParam(value = "systemCode", required = true)
                                         String systemCode,
                                         @ApiParam("orgCode") @RequestParam(value = "orgCode", required = true)

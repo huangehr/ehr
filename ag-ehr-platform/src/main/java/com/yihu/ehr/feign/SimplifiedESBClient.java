@@ -13,45 +13,45 @@ import springfox.documentation.annotations.ApiIgnore;
 @FeignClient(MicroServices.Simplifiedesb)
 @ApiIgnore
 public interface SimplifiedESBClient {
-    @RequestMapping(value = "/uploadLog", method = RequestMethod.POST)
+    @RequestMapping(value = "/esb/uploadLog", method = RequestMethod.POST)
     public boolean uploadLog(@RequestParam(value = "orgCode", required = true) String orgCode,
                              @RequestParam(value = "ip", required = true) String ip,
                              @RequestParam(value = "file", required = true) String file);
 
 
-    @RequestMapping(value = "/getUpdateFlag", method = RequestMethod.GET)
+    @RequestMapping(value = "/esb/getUpdateFlag", method = RequestMethod.GET)
     public String getUpdateFlag(@RequestParam(value = "versionCode", required = true) String versionCode,
                                 @RequestParam(value = "systemCode", required = true) String systemCode,
                                 @RequestParam(value = "orgCode", required = true) String orgCode);
 
 
-    @RequestMapping(value = "/downUpdateWar", method = RequestMethod.GET)
+    @RequestMapping(value = "/esb/downUpdateWar", method = RequestMethod.POST)
     public String downUpdateWar(@RequestParam(value = "systemCode", required = true) String systemCode,
                                 @RequestParam(value = "orgCode", required = true) String orgCode);
 
-    @RequestMapping(value = "/uploadResult", method = RequestMethod.POST)
+    @RequestMapping(value = "/esb/uploadResult", method = RequestMethod.POST)
     public String uploadResult(@RequestParam(value = "systemCode", required = true) String systemCode,
                                @RequestParam(value = "orgCode", required = true) String orgCode,
                                @RequestParam(value = "versionCode", required = true) String versionCode,
                                @RequestParam(value = "versionName", required = true) String versionName
             , @RequestParam(value = "updateDate", required = true) String updateDate);
 
-    @RequestMapping(value = "/fillMining", method = RequestMethod.POST)
+    @RequestMapping(value = "/esb/fillMining", method = RequestMethod.POST)
     public String fillMining(
             @RequestParam(value = "systemCode", required = true) String systemCode,
             @RequestParam(value = "orgCode", required = true) String orgCode);
 
-    @RequestMapping(value = "/changeFillMiningStatus", method = RequestMethod.POST)
+    @RequestMapping(value = "/esb/changeFillMiningStatus", method = RequestMethod.POST)
     public String changeFillMiningStatus(
             @RequestParam(value = "message", required = true) String message,
             @RequestParam(value = "id", required = true) String id,
             @RequestParam(value = "status", required = true) String status);
 
-    @RequestMapping(value = "/hisPenetration", method = RequestMethod.POST)
+    @RequestMapping(value = "/esb/hisPenetration", method = RequestMethod.POST)
     public String hisPenetration(@RequestParam(value = "systemCode", required = true) String systemCode,
                                  @RequestParam(value = "orgCode", required = true) String orgCode);
 
-    @RequestMapping(value = "/changeHisPenetrationStatus", method = RequestMethod.POST)
+    @RequestMapping(value = "/esb/changeHisPenetrationStatus", method = RequestMethod.POST)
     public String changeHisPenetrationStatus(@RequestParam(value = "result", required = true) String result,
                                              @RequestParam(value = "status", required = true) String status,
                                              @RequestParam(value = "id", required = true) String id);
