@@ -24,10 +24,10 @@ spring:
 
 ---
 spring:
-  profiles: test
+  profiles: prod
   cloud:
     config:
       username: user
       password: configuration
       uri: http://11.1.2.21:1221
-      label: dev
+      label: master
