@@ -117,7 +117,7 @@ public class PatientControllerTests {
         boolResult = cardController.detachCard(cardModel.getId(),cardModel.getCardType());
         assertTrue("解绑失败",boolResult);
 
-        envelop = patientController.searchPatient(detailModel.getName(),"","","","",1,15);
+        envelop = patientController.searchPatient(detailModel.getName(),"","","",1,15);
         assertTrue("病人列表获取失败",envelop.isSuccessFlg() && envelop.getDetailModelList().size()>0);
 
         envelop = patientController.deletePatient(detailModel.getIdCardNo());

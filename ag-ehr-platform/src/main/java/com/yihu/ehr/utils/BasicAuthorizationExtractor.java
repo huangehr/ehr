@@ -14,9 +14,8 @@ public class BasicAuthorizationExtractor {
 
         String base64 = authorization.substring(authorization.indexOf(' ') + 1);
 
-        String compose = new String(Base64.getDecoder().decode(base64));
-        int index = compose.indexOf(':');
+        String compose[] = new String(Base64.getDecoder().decode(base64)).split(":");
 
-        return new Pair<>(compose.substring(0, index), compose.substring(index + 1));
+        return new Pair<>(compose[0], compose.length > 1 ? compose[1] : "");
     }
 }

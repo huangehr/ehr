@@ -1,7 +1,6 @@
 package com.yihu.ehr;
 
 import com.yihu.ehr.config.TomcatConnCustomizer;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,11 +10,8 @@ import org.springframework.boot.context.embedded.tomcat.TomcatConnectorCustomize
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.ResourceUtils;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.io.FileNotFoundException;
 
@@ -29,7 +25,7 @@ public class EHRPlatformGatewayApp  {
     @Value("${keystore.file}")
     String keystore;
 
-    @Value("keystore.password")
+    @Value("${keystore.password}")
     String password;
 
 	public static void main(String[] args) {

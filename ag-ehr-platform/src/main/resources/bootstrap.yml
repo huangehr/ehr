@@ -2,10 +2,6 @@ spring:
   application:
     name: ag-ehr-platform
 
-
-encrypt:
-  failOnError: false
-
 ---
 spring:
   profiles: dev
@@ -23,5 +19,14 @@ spring:
     config:
       username: user
       password: configuration
-      uri: http://172.19.103.73:1221
+      uri: http://192.168.131.151:1221
       label: dev
+---
+spring:
+  profiles: prod
+  cloud:
+    config:
+      username: user
+      password: configuration
+      uri: http://11.1.2.21:1221
+      label: master

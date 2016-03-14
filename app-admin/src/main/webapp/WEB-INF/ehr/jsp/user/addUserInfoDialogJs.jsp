@@ -42,7 +42,7 @@
             $userTel: $('#inp_userTel'),
             $org: $('#inp_org'),
             $major: $('#inp_major'),
-            $sex: $('input[name="sex"]', this.$form),
+            $sex: $('input[name="gender"]', this.$form),
             $uploader: $("#div_user_img_upload"),
             $inp_select_marriage: $("#inp_select_marriage"),
             $inp_select_userType: $("#inp_select_userType"),
@@ -124,7 +124,7 @@
                             $('#inp_major_div').show();
                         else
                             $('#inp_major_div').hide();
-                        /*if (Util.isStrEquals(value, 'Doctor')) {
+                        /*if (Util.isStrEquals(value, 'Doctor')) {//henjjiu
                             addUserInfo.$major.parent().parent().addClass("essential");
                             addUserInfo.$major.addClass("required useTitle");
                         } else {
@@ -185,10 +185,10 @@
                 this.$addUserBtn.click(function () {
                     var userImgHtml = self.$imageShow.children().length;
                     var addUser = self.$form.Fields.getValues();
-                   if(validator.validate()){
-                        var organizationKeys = addUser.organization['keys'];
-                        addUser.orgCode = organizationKeys[2];
-                        addUser.orgName = addUser.organization['names'][2];
+//                   if(validator.validate()){
+//                        var organizationKeys = addUser.organization['keys'];
+//                        addUser.orgCode = organizationKeys[2];
+//                        addUser.orgName = addUser.organization['names'][2];
                     if (userImgHtml == 0) {
                         updateUser(addUser);
                     } else {
@@ -218,9 +218,13 @@
                                 }
                             }
                         });*/
-                    }else{
-                   return;
-                   }
+
+
+//                    }else{
+//                   return;
+//                   }
+
+
                 });
 
                 function updateUser(userModel) {

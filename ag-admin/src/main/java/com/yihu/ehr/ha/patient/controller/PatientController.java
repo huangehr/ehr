@@ -13,6 +13,7 @@ import com.yihu.ehr.model.geogrephy.MGeography;
 import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
@@ -22,12 +23,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by AndyCai on 2016/1/21.
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
+@Api(value = "patient", description = "人口管理接口，用于人口信息管理", tags = {"人口管理接口"})
 public class PatientController extends BaseController {
 
     @Autowired
@@ -45,10 +48,8 @@ public class PatientController extends BaseController {
     @RequestMapping(value = "/populations", method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询人")
     public Envelop searchPatient(
-            @ApiParam(name = "name", value = "姓名", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
-            @RequestParam(value = "id_card_no") String idCardNo,
+            @ApiParam(name = "search", value = "搜索内容", defaultValue = "")
+            @RequestParam(value = "search") String search,
             @ApiParam(name = "province", value = "省", defaultValue = "")
             @RequestParam(value = "province") String province,
             @ApiParam(name = "city", value = "市", defaultValue = "")
@@ -60,7 +61,7 @@ public class PatientController extends BaseController {
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
             @RequestParam(value = "rows") Integer rows) throws Exception {
 
-        ResponseEntity<List<MDemographicInfo>> responseEntity = patientClient.searchPatient(name, idCardNo, province, city, district, page, rows);
+        ResponseEntity<List<MDemographicInfo>> responseEntity = patientClient.searchPatient(search, province, city, district, page, rows);
         List<MDemographicInfo> demographicInfos = responseEntity.getBody();
         List<PatientModel> patients = new ArrayList<>();
         for (MDemographicInfo patientInfo : demographicInfos) {
@@ -79,8 +80,24 @@ public class PatientController extends BaseController {
                     if (StringUtils.isNotEmpty(geography.getStreet())) homeAddress += geography.getStreet();
                     if (StringUtils.isNotEmpty(geography.getExtra())) homeAddress += geography.getExtra();
                 }
-                patient.setAddress(homeAddress);
+                patient.setHomeAddress(homeAddress);
             }
+            //性别
+            if(StringUtils.isNotEmpty(patientInfo.getGender())) {
+                MConventionalDict dict = conventionalDictClient.getGender(patientInfo.getGender());
+                patient.setGender(dict == null ? "" : dict.getValue());
+            }
+            //联系电话
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, String> telphoneNo;
+            String tag="联系电话";
+            telphoneNo = mapper.readValue(patient.getTelphoneNo(), Map.class);
+            if (telphoneNo != null && telphoneNo.containsKey(tag)) {
+                patient.setTelphoneNo(telphoneNo.get(tag));
+            } else {
+                patient.setTelphoneNo(null);
+            }
+
             patients.add(patient);
         }
 

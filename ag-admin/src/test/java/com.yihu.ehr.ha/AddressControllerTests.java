@@ -1,9 +1,9 @@
 package com.yihu.ehr.ha;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 import com.yihu.ehr.ha.geography.controller.AddressController;
 import com.yihu.ehr.model.geogrephy.MGeography;
-import com.yihu.ehr.agModel.geogrephy.GeographyDictModel;
 import com.yihu.ehr.util.Envelop;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -60,7 +60,7 @@ public class AddressControllerTests {
         envelop = addressController.saveAddress(objectMapper.writeValueAsString(mGeography));
         assertNotEquals("地址新增失败", envelop, null);
 
-        String id = ((GeographyDictModel)envelop.getObj()).getId();
+        String id = ((GeographyModel)envelop.getObj()).getId();
         envelop = addressController.getAddressById(id);
         assertNotEquals("地址明细获取失败", envelop, null);
 

@@ -1,6 +1,7 @@
 package com.yihu.ehr.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
@@ -66,16 +67,16 @@ public class UserController {
         Map<String, Object> params = new HashMap<>();
 
         StringBuffer stringBuffer = new StringBuffer();
-        if(!StringUtils.isEmpty(searchNm)){
-            stringBuffer.append("realName?"+searchNm+" g1;organization?"+searchNm+" g1;");
+        if (!StringUtils.isEmpty(searchNm)) {
+            stringBuffer.append("realName?" + searchNm + " g1;organization?" + searchNm + " g1;");
         }
-        if(!StringUtils.isEmpty(searchType)){
-            stringBuffer.append("userType="+searchType);
+        if (!StringUtils.isEmpty(searchType)) {
+            stringBuffer.append("userType=" + searchType);
         }
 
         params.put("filters", "");
         String filters = stringBuffer.toString();
-        if(!StringUtils.isEmpty(filters)){
+        if (!StringUtils.isEmpty(filters)) {
             params.put("filters", filters);
         }
 
@@ -106,17 +107,17 @@ public class UserController {
     @RequestMapping("deleteUser")
     @ResponseBody
     public Object deleteUser(String userId) {
-        String url = "/users/"+userId;
+        String url = "/users/" + userId;
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         ObjectMapper mapper = new ObjectMapper();
 
-        params.put("userId",userId);
+        params.put("userId", userId);
         try {
             resultStr = HttpClientUtil.doDelete(comUrl + url, params, username, password);
-            result = mapper.readValue(resultStr,Envelop.class);
-            if(result.isSuccessFlg()){
+            result = mapper.readValue(resultStr, Envelop.class);
+            if (result.isSuccessFlg()) {
                 result.setSuccessFlg(true);
             } else {
                 result.setSuccessFlg(false);
@@ -141,16 +142,15 @@ public class UserController {
     @RequestMapping("activityUser")
     @ResponseBody
     public Object activityUser(String userId, boolean activated) {
-        String url = "/user/userStatus";
+        String url = "/users/"+userId;
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("userId",userId);
-        params.put("status",activated);
+        params.put("activity", activated);
         try {
-            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
+            resultStr = HttpClientUtil.doPut(comUrl + url, params, username, password);
 
-            if(Boolean.parseBoolean(resultStr)){
+            if (Boolean.parseBoolean(resultStr)) {
                 result.setSuccessFlg(true);
             } else {
                 result.setSuccessFlg(false);
@@ -174,23 +174,36 @@ public class UserController {
 
     @RequestMapping(value = "updateUser", produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public Object updateUser(String userModelJsonData, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public Object updateUser(String userModelJsonData,HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         //String remotePath = upload(request, response);网关中进行upload处理
-        String url = "/user/updateUser";
+        String url = "/users";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("userModelJsonData",userModelJsonData);
+        ObjectMapper mapper = new ObjectMapper();
+
+//        params.put("request", request);
+//        try {
+//            HttpClientUtil.doPost(comUrl+"/users/upload/",params,username,password);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+        UserDetailModel userDetailModel = mapper.readValue(userModelJsonData, UserDetailModel.class);
+        params.put("user_json_data", userModelJsonData);
         try {
             //todo:传回的是usermodel，json格式
-            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
-            return resultStr;
+            if (!StringUtils.isEmpty(userDetailModel.getId())) {
+                resultStr = HttpClientUtil.doPut(comUrl + url, params, username, password);
+            }else{
+                resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
+            }
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result;
         }
+        return resultStr;
 //        String strUser = URLDecoder.decode(userModelJsonData,"UTF-8");
 //
 //        ObjectMapper objectMapper = new ObjectMapper();
@@ -221,14 +234,14 @@ public class UserController {
     @RequestMapping("resetPass")
     @ResponseBody
     public Object resetPass(String userId) {
-        String url = "/user/resetPass";
+        String url = "/users/password/"+userId;
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("userId",userId);
+        params.put("userId", userId);
         try {
             resultStr = HttpClientUtil.doPut(comUrl + url, params, username, password);
-            if(Boolean.parseBoolean(resultStr)){
+            if (Boolean.parseBoolean(resultStr)) {
                 result.setSuccessFlg(true);
             } else {
                 result.setSuccessFlg(false);
@@ -255,11 +268,11 @@ public class UserController {
     @RequestMapping("getUser")
     public Object getUser(Model model, String userId, String mode) throws IOException {
         //todo:jsp展示需调整
-        String url = "/user/user";
+        String url = "/users/"+userId;
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("userId",userId);
+        params.put("userId", userId);
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             //todo：将机构地址与用户以对象数组形式一起传前台，前台接收解析
@@ -294,18 +307,17 @@ public class UserController {
     @RequestMapping("unbundling")
     @ResponseBody
     public Object unbundling(String userId, String type) {
-        String getUserUrl = "/user/unBundling";//解绑 todo 网关中需添加此方法
+        String getUserUrl = "/users/binding/"+userId;//解绑 todo 网关中需添加此方法
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("userId",userId);
-        params.put("type",type);
+        params.put("userId", userId);
+        params.put("type", type);
         try {
             resultStr = HttpClientUtil.doPost(comUrl + getUserUrl, params, username, password);
-            if(Boolean.parseBoolean(resultStr)){
+            if (Boolean.parseBoolean(resultStr)) {
                 result.setSuccessFlg(true);
-            }
-            else {
+            } else {
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.InvalidUpdate.toString());
             }
@@ -329,17 +341,16 @@ public class UserController {
     @RequestMapping("distributeKey")
     @ResponseBody
     public Object distributeKey(String loginCode) {
-        String getUserUrl = "/user/distributeKey";
+        String getUserUrl = "/users/key/"+loginCode;
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("loginCode",loginCode);
+        params.put("loginCode", loginCode);
         try {
-            resultStr = HttpClientUtil.doGet(comUrl + getUserUrl, params, username, password);
-            if(Boolean.parseBoolean(resultStr)){
+            resultStr = HttpClientUtil.doPut(comUrl + getUserUrl, params, username, password);
+            if (Boolean.parseBoolean(resultStr)) {
                 result.setSuccessFlg(true);
-            }
-            else {
+            } else {
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.InvalidUpdate.toString());
             }
@@ -394,8 +405,8 @@ public class UserController {
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("type",type);
-        params.put("value",searchNm);
+        params.put("type", type);
+        params.put("value", searchNm);
         try {
             //todo 后台转换成result后传前台
             resultStr = HttpClientUtil.doGet(comUrl + getUserUrl, params, username, password);
