@@ -129,10 +129,12 @@ public class SimplifiedEsbEndPoint {
     public ResponseEntity changeHisPenetrationStatus(
             @ApiParam("result") @RequestParam(value = "result", required = true)
             String result,
+            @ApiParam("message") @RequestParam(value = "message", required = true)
+            String message,
             @ApiParam("status") @RequestParam(value = "status", required = true)
             String status,
             @ApiParam("id") @RequestParam(value = "id", required = true)
             String id) {
-        return new ResponseEntity<>(simplifiedESBClient.changeHisPenetrationStatus(result, status, id), HttpStatus.OK);
+        return new ResponseEntity<>(simplifiedESBClient.changeHisPenetrationStatus(result, status, id,message), HttpStatus.OK);
     }
 }

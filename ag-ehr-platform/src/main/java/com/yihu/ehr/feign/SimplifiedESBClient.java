@@ -54,5 +54,6 @@ public interface SimplifiedESBClient {
     @RequestMapping(value = "/esb/changeHisPenetrationStatus", method = RequestMethod.POST)
     public String changeHisPenetrationStatus(@RequestParam(value = "result", required = true) String result,
                                              @RequestParam(value = "status", required = true) String status,
-                                             @RequestParam(value = "id", required = true) String id);
+                                             @RequestParam(value = "id", required = true) String id,
+                                             @RequestParam(value = "message", required = true) String message);
 }

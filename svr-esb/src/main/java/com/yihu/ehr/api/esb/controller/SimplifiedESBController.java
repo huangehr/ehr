@@ -244,9 +244,10 @@ public class SimplifiedESBController {
     public String changeHisPenetrationStatus(
             @ApiParam("result") @RequestParam(value = "result", required = true) String result,
             @ApiParam("status") @RequestParam(value = "status", required = true) String status,
+            @ApiParam("message") @RequestParam(value = "message", required = true) String message,
             @ApiParam("id") @RequestParam(value = "id", required = true) String id) {
         try {
-            simplifiedESBService.changeHisPenetrationStatus(id, status, result);
+            simplifiedESBService.changeHisPenetrationStatus(id, status, result,message);
         } catch (Exception e) {
             e.printStackTrace();
         }

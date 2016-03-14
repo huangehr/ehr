@@ -81,10 +81,11 @@ public class SimplifiedESBService {
     }
 
     @Transactional
-    public void changeHisPenetrationStatus(String id, String status, String result) {
+    public void changeHisPenetrationStatus(String id, String status, String result,String message) {
         HosSqlTask hqt = hosSqlTaskDao.getOne(id);
         hqt.setStatus(status);
         hqt.setResult(result);
+        hqt.setMessage(message);
     }
 
     @Transactional
