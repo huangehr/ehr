@@ -1,10 +1,17 @@
 server:
-   port: 10080
+   port: 10160
 
+spring:
+  jpa:
+    show-sql: true
+    hibernate:
+      dialect: org.hibernate.dialect.MySQL5Dialect
+    database:
+      platform: org.hibernate.dialect.MySQL5Dialect
 
-security:
-  user:
-    password: app
+#security:
+#  user:
+#    password: app
 
 info:
   app:
@@ -17,22 +24,23 @@ spring:
   profiles: dev
 eureka:
   instance:
-    ip-address: localhost
+    ip-address: 172.19.103.73
   client:
     registerWithEureka: true
     fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@localhost:8761}/eureka/
+    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@172.19.103.73:8761}/eureka/
 
 ---
 spring:
   profiles: test
 eureka:
   instance:
-    ip-address: 172.19.103.73
+    ip-address: 192.168.131.151
   client:
     registerWithEureka: true
     fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@172.19.103.73:8761}/eureka/
+    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@192.168.131.151:8761}/eureka/
+
 
 ---
 spring:
@@ -40,8 +48,8 @@ spring:
 
 eureka:
   instance:
-    ip-address: 172.19.103.73
+    ip-address: 11.1.2.21
   client:
     registerWithEureka: true
     fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@172.19.103.73:8761}/eureka/
+    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@11.1.2.21:8761}/eureka/

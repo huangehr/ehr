@@ -16,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -57,11 +59,19 @@ public class JsonPackageService {
         return jsonPackageRepo.findOne(id);
     }
 
+    public InputStream downloadFile(String id) throws Exception {
+        JsonPackage jsonPackage = jsonPackageRepo.findOne(id);
+        if (jsonPackage == null) return null;
+
+        String file[] = jsonPackage.getRemotePath().split(":");
+        byte[] data = fastDFSUtil.download(file[0], file[1]);
+
+        return new ByteArrayInputStream(data);
+    }
+
     public List<JsonPackage> searchArchives(Map<String, Object> args, Pageable pageable) throws ParseException {
-
-
-        Date from = DateFormatter.simpleDateTimeParse((String) args.get("fromTime"));
-        Date to = DateFormatter.simpleDateTimeParse((String) args.get("toTime"));
+        Date from = (Date)args.get("fromTime");
+        Date to = (Date)args.get("toTime");
         ArchiveStatus archiveStatus = (ArchiveStatus) args.get("archiveStatus");
 
         return jsonPackageRepo.findAll(archiveStatus, from, to, pageable);

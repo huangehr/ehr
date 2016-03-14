@@ -12,4 +12,8 @@ import java.util.List;
 public interface XUserRepository extends PagingAndSortingRepository<User, String> {
 
     List<User>  findByRealName(String userName);
+
+    List<User> findByLoginCode(String loginCode);
+
+    List<User> findByIdCardNo(String idCardNo);
 }

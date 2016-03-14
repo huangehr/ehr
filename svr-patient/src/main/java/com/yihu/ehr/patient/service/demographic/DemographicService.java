@@ -62,33 +62,28 @@ public class DemographicService {
 
     public List<DemographicInfo> searchPatient(Map<String, Object> args) {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
-        String name = (String) args.get("name");
-        String idCardNo = (String) args.get("idCardNo");
+        String search = (String) args.get("search");
         Integer page = (Integer) args.get("page");
         Integer pageSize = (Integer) args.get("pageSize");
 
         String province = (String) args.get("province");
         String city = (String) args.get("city");
         String district = (String) args.get("district");
-        List<String> homeAddressIdList = addressClient.search(province,city,district);
+        boolean addressNotNull=(!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) && !StringUtils.isEmpty(district));
+        List<String> homeAddressIdList = null;
         String hql = "from DemographicInfo where 1=1";
-        if (!StringUtils.isEmpty(idCardNo)) {
-            hql += " and id like :idCardNo)";
+        if (!StringUtils.isEmpty(search)) {
+            hql += " and ((id like :search) or (name like :search))";
         }
-        if (!StringUtils.isEmpty(name)) {
-            hql += " and name like :name)";
-        }
-        if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
+        if (addressNotNull) {
+            homeAddressIdList = addressClient.search(province,city,district);
             hql += " and homeAddress in (:homeAddressIdList)";
         }
         Query query = session.createQuery(hql);
-        if (!StringUtils.isEmpty(idCardNo)) {
-            query.setString("idCardNo", "%" + idCardNo + "%");
+        if (!StringUtils.isEmpty(search)) {
+            query.setString("search", "%" + search + "%");
         }
-        if (!StringUtils.isEmpty(name)) {
-            query.setString("name", "%" + name + "%");
-        }
-        if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
+        if (addressNotNull) {
             query.setParameterList("homeAddressIdList", homeAddressIdList);
         }
         query.setMaxResults(pageSize);
@@ -99,31 +94,26 @@ public class DemographicService {
 
     public Integer searchPatientTotalCount(Map<String, Object> args) {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
-        String name = (String) args.get("name");
-        String idCardNo = (String) args.get("idCardNo");
+        String search = (String) args.get("search");
 
         String province = (String) args.get("province");
         String city = (String) args.get("city");
         String district = (String) args.get("district");
-        List<String> homeAddressIdList = addressClient.search(province,city,district);
+        boolean addressNotNull=(!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) && !StringUtils.isEmpty(district));
+        List<String> homeAddressIdList = null;
         String hql = "from DemographicInfo where 1=1";
-        if (!StringUtils.isEmpty(idCardNo)) {
-            hql += " and id like :idCardNo)";
+        if (!StringUtils.isEmpty(search)) {
+            hql += " and ((id like :search) or (name like :search))";
         }
-        if (!StringUtils.isEmpty(name)) {
-            hql += " and name like :name)";
-        }
-        if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
+        if (addressNotNull) {
+            homeAddressIdList = addressClient.search(province,city,district);
             hql += " and homeAddress in (:homeAddressIdList)";
         }
         Query query = session.createQuery(hql);
-        if (!StringUtils.isEmpty(idCardNo)) {
-            query.setString("idCardNo", "%" + idCardNo + "%");
+        if (!StringUtils.isEmpty(search)) {
+            query.setString("search", "%" + search + "%");
         }
-        if (!StringUtils.isEmpty(name)) {
-            query.setString("name", "%" + name + "%");
-        }
-        if (!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) &&!StringUtils.isEmpty(district)) {
+        if (addressNotNull) {
             query.setParameterList("homeAddressIdList", homeAddressIdList);
         }
         return query.list().size();

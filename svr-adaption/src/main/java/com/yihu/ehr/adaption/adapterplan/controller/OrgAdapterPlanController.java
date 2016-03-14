@@ -12,11 +12,14 @@ import com.yihu.ehr.adaption.feignclient.DataSetClient;
 import com.yihu.ehr.adaption.feignclient.DispatchLogClient;
 import com.yihu.ehr.adaption.log.LogService;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.adaption.MAdapterPlan;
+import com.yihu.ehr.model.standard.MDispatchLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -108,7 +111,10 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
     public boolean delAdapterPlan(
             @ApiParam(name = "ids", value = "编号列表", defaultValue = "")
             @RequestParam("ids") String ids) throws Exception {
-        orgAdapterPlanService.deleteOrgAdapterPlan(ids.split(","));
+
+        if (StringUtils.isEmpty(ids))
+            errMissId();
+        orgAdapterPlanService.deleteOrgAdapterPlan(strToLongArr(ids));
         return true;
     }
 
@@ -321,6 +327,7 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
             throw errParm();
         }
         OrgAdapterPlan orgAdapterPlan = orgAdapterPlanService.retrieve(id);
+        orgAdapterPlan = orgAdapterPlan==null? new OrgAdapterPlan():orgAdapterPlan;
         boolean checkCode = true;
         if (plan.getId() != null && plan.getCode().equals(orgAdapterPlan.getCode()))
             checkCode = false;

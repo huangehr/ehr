@@ -36,8 +36,8 @@ public class UserController extends BaseRestController {
     @Autowired
     private SecurityClient securityClient;
 
-    @RequestMapping(value = "/users" , method = RequestMethod.GET)
-    @ApiOperation(value = "获取用户列表",notes = "根据查询条件获取用户列表在前端表格展示")
+    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户列表", notes = "根据查询条件获取用户列表在前端表格展示")
     public List<MUser> searchUsers(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
@@ -56,96 +56,96 @@ public class UserController extends BaseRestController {
         return (List<MUser>) convertToModels(userList, new ArrayList<MUser>(userList.size()), MUser.class, fields);
     }
 
-    @RequestMapping(value = "/users/{user_id}" , method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除用户",notes = "根据用户id删除用户")
+    @RequestMapping(value = "/users/{user_id}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除用户", notes = "根据用户id删除用户")
     public boolean deleteUser(
             @ApiParam(name = "user_id", value = "用户编号", defaultValue = "")
-            @PathVariable(value = "user_id") String userId) throws Exception{
+            @PathVariable(value = "user_id") String userId) throws Exception {
         userManager.deleteUser(userId);
         return true;
     }
 
 
-    @RequestMapping(value = "/users" , method = RequestMethod.POST)
-    @ApiOperation(value = "创建用户",notes = "重新绑定用户信息")
+    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    @ApiOperation(value = "创建用户", notes = "重新绑定用户信息")
     public MUser createUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "user_json_data") String userJsonData) throws Exception{
+            @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
         User user = new ObjectMapper().readValue(userJsonData, User.class);
         user.setId(getObjectId(BizObject.User));
         user.setCreateDate(new Date());
         user.setPassword(HashUtil.hashStr(user.getPassword()));
         user.setActivated(true);
         userManager.saveUser(user);
-        return convertToModel(user,MUser.class,null);
+        return convertToModel(user, MUser.class, null);
     }
 
 
-    @RequestMapping(value = "/users" , method = RequestMethod.PUT)
-    @ApiOperation(value = "修改用户",notes = "重新绑定用户信息")
+    @RequestMapping(value = "/users", method = RequestMethod.PUT)
+    @ApiOperation(value = "修改用户", notes = "重新绑定用户信息")
     public MUser updateUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "user_json_data") String userJsonData) throws Exception{
+            @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         User user = objectMapper.readValue(userJsonData, User.class);
         userManager.saveUser(user);
-        return convertToModel(user,MUser.class,null);
+        return convertToModel(user, MUser.class, null);
     }
 
 
-    @RequestMapping(value = "users/{user_id}" , method = RequestMethod.GET)
+    @RequestMapping(value = "users/{user_id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取获取用户信息")
     public MUser getUser(
             @ApiParam(name = "user_id", value = "", defaultValue = "")
             @PathVariable(value = "user_id") String userId) {
         User user = userManager.getUser(userId);
-        MUser userModel = convertToModel(user,MUser.class);
+        MUser userModel = convertToModel(user, MUser.class);
         return userModel;
     }
 
 
     /**
-     *
      * 根据loginCode 获取user
+     *
      * @param loginCode
      * @return
      */
-    @RequestMapping(value = "/users/login/{login_code}" , method = RequestMethod.GET)
-    @ApiOperation(value = "根据登录账号获取当前用户",notes = "根据登陆用户名及密码验证用户")
+    @RequestMapping(value = "/users/login/{login_code}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据登录账号获取当前用户", notes = "根据登陆用户名及密码验证用户")
     public MUser getUserByLoginCode(
             @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
             @PathVariable(value = "login_code") String loginCode) {
         User user = userManager.getUserByLoginCode(loginCode);
-        return convertToModel(user,MUser.class);
+        return convertToModel(user, MUser.class);
     }
 
 
-    @RequestMapping(value = "/users/{user_id}" , method = RequestMethod.PUT)
-    @ApiOperation(value = "改变用户状态",notes = "根据用户状态改变当前用户状态")
-    public boolean  activityUser (
+    @RequestMapping(value = "/users/{user_id}", method = RequestMethod.PUT)
+    @ApiOperation(value = "改变用户状态", notes = "根据用户状态改变当前用户状态")
+    public boolean activityUser(
             @ApiParam(name = "user_id", value = "id", defaultValue = "")
             @PathVariable(value = "user_id") String userId,
             @ApiParam(name = "activity", value = "激活状态", defaultValue = "")
-            @RequestParam(value = "activity") boolean activity) throws Exception{
+            @RequestParam(value = "activity") boolean activity) throws Exception {
         userManager.activityUser(userId, activity);
         return true;
     }
 
 
-    @RequestMapping(value = "users/password/{user_id}" , method = RequestMethod.PUT)
-    @ApiOperation(value = "重设密码",notes = "用户忘记密码管理员帮助重新还原密码，初始密码123456")
+    @RequestMapping(value = "users/password/{user_id}", method = RequestMethod.PUT)
+    @ApiOperation(value = "重设密码", notes = "用户忘记密码管理员帮助重新还原密码，初始密码123456")
     public boolean resetPass(
             @ApiParam(name = "user_id", value = "id", defaultValue = "")
-            @PathVariable(value = "user_id") String userId) throws Exception{
+            @PathVariable(value = "user_id") String userId) throws Exception {
         userManager.resetPass(userId);
         return true;
 
     }
 
 
-    @RequestMapping(value = "/users/binding/{user_id}" , method = RequestMethod.DELETE)
-    @ApiOperation(value = "取消关联绑定",notes = "取消相关信息绑定")
-    public boolean unBinding (
+    @RequestMapping(value = "/users/binding/{user_id}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "取消关联绑定", notes = "取消相关信息绑定")
+    public boolean unBinding(
             @ApiParam(name = "user_id", value = "", defaultValue = "")
             @PathVariable(value = "user_id") String userId,
             @ApiParam(name = "type", value = "", defaultValue = "")
@@ -161,7 +161,7 @@ public class UserController extends BaseRestController {
     }
 
     @RequestMapping(value = "/users/key/{user_id}", method = RequestMethod.PUT)
-    @ApiOperation(value = "重新分配密钥",notes = "重新分配密钥")
+    @ApiOperation(value = "重新分配密钥", notes = "重新分配密钥")
     public Map<String, String> distributeKey(
             @ApiParam(name = "user_id", value = "登录帐号", defaultValue = "")
             @PathVariable(value = "user_id") String userId) {
@@ -169,7 +169,7 @@ public class UserController extends BaseRestController {
         Map<String, String> keyMap = new HashMap<>();
         if (userSecurity == null) {
             userSecurity = securityClient.createSecurityByUserId(userId);
-        }else{
+        } else {
             //result.setErrorMsg("公钥信息已存在。");
             //这里删除原有的公私钥重新分配
             //1-1根据用户登陆名获取用户信息。
@@ -179,11 +179,11 @@ public class UserController extends BaseRestController {
             userSecurity = securityClient.createSecurityByUserId(userId);
 
         }
-        String validTime = DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd")
-                + "~" + DateFormatUtils.format(userSecurity.getExpiryDate(),"yyyy-MM-dd");
+        String validTime = DateFormatUtils.format(userSecurity.getFromDate(), "yyyy-MM-dd")
+                + "~" + DateFormatUtils.format(userSecurity.getExpiryDate(), "yyyy-MM-dd");
         keyMap.put("publicKey", userSecurity.getPublicKey());
         keyMap.put("validTime", validTime);
-        keyMap.put("startTime", DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd"));
+        keyMap.put("startTime", DateFormatUtils.format(userSecurity.getFromDate(), "yyyy-MM-dd"));
         return keyMap;
     }
 
@@ -194,30 +194,30 @@ public class UserController extends BaseRestController {
      * @param userName
      * @param password
      */
-    @RequestMapping(value = "/users/user_name/{user_name}/password/{password}" , method = RequestMethod.GET)
-    @ApiOperation(value = "根据登陆用户名及密码验证用户",notes = "根据登陆用户名及密码验证用户")
+    @RequestMapping(value = "/users/user_name/{user_name}/password/{password}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据登陆用户名及密码验证用户", notes = "根据登陆用户名及密码验证用户")
     public MUser getUserByNameAndPassword(
             @ApiParam(name = "user_name", value = "登录账号", defaultValue = "")
             @PathVariable(value = "user_name") String userName,
             @ApiParam(name = "password", value = "密码", defaultValue = "")
             @PathVariable(value = "password") String password) {
-        User user = userManager.loginVerification(userName,password);
-        return convertToModel(user,MUser.class);
+        User user = userManager.loginVerification(userName, password);
+        return convertToModel(user, MUser.class);
     }
 
-    @RequestMapping(value = "/users/existence/{login_code}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/users/existence/{login_code}", method = RequestMethod.GET)
     @ApiOperation(value = "判断账户是否存在")
     public boolean isLoginCodeExists(
             @ApiParam(name = "login_code", value = "login_code", defaultValue = "")
-            @PathVariable(value = "login_code") String loginCode){
-        return userManager.getUserByLoginCode(loginCode)!=null;
+            @PathVariable(value = "login_code") String loginCode) {
+        return userManager.getUserByLoginCode(loginCode) != null;
     }
 
-    @RequestMapping(value = "/users/is_exist/{id_card}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/users/is_exist/{id_card}", method = RequestMethod.GET)
     @ApiOperation(value = "判断账户是否存在")
     public boolean isIdCardExists(
             @ApiParam(name = "id_card", value = "id_card", defaultValue = "")
-            @PathVariable(value = "id_card") String idCard){
+            @PathVariable(value = "id_card") String idCard) {
         return userManager.getUserByIdCardNo(idCard) != null;
     }
 }

@@ -29,6 +29,7 @@
             //多条件查询参数设置
             function reloadGrid (url, params) {
 
+                debugger
                 if (isFirstPage){
                     userInfoGrid.options.newPage = 1;
                 }
@@ -89,21 +90,23 @@
                         columns: [
                             // 隐藏列：hide: true（隐藏），isAllowHide: false（列名右击菜单中不显示）
                             {name: 'id', hide: true, isAllowHide: false},
-                            {display: '用户类型', name: 'userTypeValue', width: '10%',align:'left'},
+                            {display: '用户类型', name: 'userTypeName', width: '10%',align:'left'},
                             {display: '姓名', name: 'realName', width: '8%',align:'left'},
                             {display: '账号',name: 'loginCode', width:'12%', isAllowHide: false,align:'left'},
-                            {display: '所属机构', name: 'organization', width: '17%',align:'left'},
+                            {display: '所属机构', name: 'organizationName', width: '17%',align:'left'},
                             {display: '联系方式', name: 'telephone',width: '12%',align:'left'},
                             {display: '用户邮箱', name: 'email', width: '12%', resizable: true,align:'left'},
-                            {display: '是否激活', name: 'activated', width: '5%', minColumnWidth: 20},
+                            {display: '是否激活', name: 'activated', width: '5%', minColumnWidth: 20,render:function(value){
+                                return value.activated == true ? "是":"否"
+                            }},
                             {display: '最近登录时间', name: 'lastLoginTime', width: '12%',align:'left'},
                             {
                                 display: '操作', name: 'operator', width: '12%', render: function (row) {
                                 var html = '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:open", row.id, 'modify') + '">编辑</a> / ';
                                     html+= '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoDialog:del", row.id, 'delete') + '">删除</a> / ';
-                                    if(Util.isStrEquals(row.activated,"是")){
+                                    if(Util.isStrEquals(row.activated,true)){
                                            html+= '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:failure", row.id,0) + '">失效</a>';
-                                       }else if(Util.isStrEquals(row.activated,"否")){
+                                       }else if(Util.isStrEquals(row.activated,false)){
                                            html+='<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:failure", row.id,1) + '">开启</a>';
                                        }
 
@@ -183,6 +186,7 @@
                                     success: function (data) {
                                         if (data.successFlg) {
                                             $.Notice.success('修改成功');
+                                            isFirstPage = false;
                                             master.reloadGrid();
                                         } else {
                                             $.Notice.error('修改失败');
@@ -203,7 +207,7 @@
                                     success: function(data) {
                                         if(data.successFlg){
                                             $.Notice.success('删除成功。');
-                                            isFirstPage=false;
+                                            isFirstPage = false;
                                             master.reloadGrid();
                                         }else{
                                             $.Notice.error('删除失败。');

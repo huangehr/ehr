@@ -4,151 +4,149 @@ import java.util.Date;
 
 /**
  * 卡抽象类，仅作为继承时的数据成员使用
+ *
  * @author Witness
  * @version 1.0
  * @updated 11-6月-2015 9:51:15
  */
 public class MAbstractCard {
+    String id;                    // 卡ID
+    String number;                // 卡号
+    String ownerName;            // 持有人姓名
+    String status;            // 状态 CardStatus
+    String cardType;                // 类型 CardType
+    String description;            // 描述
+    Date createDate;                // 创建日期
+    String idCardNo;
+    String DType;
 
+    //特殊字段
+    String local;                // 发行地/归属地
+    String releaseOrg;                // 发行机构
+    Date releaseDate;            // 发行时间
+    Date validityDateBegin;        // 有效期起始时间
+    Date validityDateEnd;        // 有效期结束时间
 
-	String id;				    // 卡ID
-	String number;				// 卡号
-	String ownerName;			// 持有人姓名
-	String status;			// 状态 CardStatus
-	String cardType;				// 类型 CardType
-	String description;			// 描述
-	Date createDate;				// 创建日期
-	String idCardNo;
-	String DType;
-	//特殊字段
-	String local;				// 发行地/归属地
-	String releaseOrg;				// 发行机构
-	Date releaseDate;			// 发行时间
-	Date validityDateBegin;		// 有效期起始时间
-	Date validityDateEnd;		// 有效期结束时间
+    public MAbstractCard() {
+    }
 
+    public boolean checkIsVirtualCard() {
+        if (this.getCardType().equals("VirtualCard")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-	public MAbstractCard(){;
-	}
+    public String getId() {
+        return id;
+    }
 
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public boolean checkIsVirtualCard(){
-		if(this.getCardType().equals("VirtualCard")){
-			return true;
-		}else{
-			return false;
-		}
-	}
+    public String getNumber() {
+        return number;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public void setNumber(String number) {
+        this.number = number;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public String getOwnerName() {
+        return ownerName;
+    }
 
-	public String getNumber() {
-		return number;
-	}
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
+    }
 
-	public void setNumber(String number) {
-		this.number = number;
-	}
+    public String getStatus() {
+        return status;
+    }
 
-	public String getOwnerName() {
-		return ownerName;
-	}
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-	public void setOwnerName(String ownerName) {
-		this.ownerName = ownerName;
-	}
+    public String getCardType() {
+        return cardType;
+    }
 
-	public String getStatus() {
-		return status;
-	}
+    public void setCardType(String cardType) {
+        this.cardType = cardType;
+    }
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public String getCardType() {
-		return cardType;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public void setCardType(String cardType) {
-		this.cardType = cardType;
-	}
+    public Date getCreateDate() {
+        return createDate;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public String getIdCardNo() {
+        return idCardNo;
+    }
 
-	public Date getCreateDate() {
-		return createDate;
-	}
+    public void setIdCardNo(String idCardNo) {
+        this.idCardNo = idCardNo;
+    }
 
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
-	}
+    public String getDType() {
+        return DType;
+    }
 
-	public String getIdCardNo() {
-		return idCardNo;
-	}
+    public void setDType(String DType) {
+        this.DType = DType;
+    }
 
-	public void setIdCardNo(String idCardNo) {
-		this.idCardNo = idCardNo;
-	}
+    public String getLocal() {
+        return local;
+    }
 
-	public String getDType() {
-		return DType;
-	}
+    public void setLocal(String local) {
+        this.local = local;
+    }
 
-	public void setDType(String DType) {
-		this.DType = DType;
-	}
+    public String getReleaseOrg() {
+        return releaseOrg;
+    }
 
-	public String getLocal() {
-		return local;
-	}
+    public void setReleaseOrg(String releaseOrg) {
+        this.releaseOrg = releaseOrg;
+    }
 
-	public void setLocal(String local) {
-		this.local = local;
-	}
+    public Date getReleaseDate() {
+        return releaseDate;
+    }
 
-	public String getReleaseOrg() {
-		return releaseOrg;
-	}
+    public void setReleaseDate(Date releaseDate) {
+        this.releaseDate = releaseDate;
+    }
 
-	public void setReleaseOrg(String releaseOrg) {
-		this.releaseOrg = releaseOrg;
-	}
+    public Date getValidityDateBegin() {
+        return validityDateBegin;
+    }
 
-	public Date getReleaseDate() {
-		return releaseDate;
-	}
+    public void setValidityDateBegin(Date validityDateBegin) {
+        this.validityDateBegin = validityDateBegin;
+    }
 
-	public void setReleaseDate(Date releaseDate) {
-		this.releaseDate = releaseDate;
-	}
+    public Date getValidityDateEnd() {
+        return validityDateEnd;
+    }
 
-	public Date getValidityDateBegin() {
-		return validityDateBegin;
-	}
-
-	public void setValidityDateBegin(Date validityDateBegin) {
-		this.validityDateBegin = validityDateBegin;
-	}
-
-	public Date getValidityDateEnd() {
-		return validityDateEnd;
-	}
-
-	public void setValidityDateEnd(Date validityDateEnd) {
-		this.validityDateEnd = validityDateEnd;
-	}
+    public void setValidityDateEnd(Date validityDateEnd) {
+        this.validityDateEnd = validityDateEnd;
+    }
 }

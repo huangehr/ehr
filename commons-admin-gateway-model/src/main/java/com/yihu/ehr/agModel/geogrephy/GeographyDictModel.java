@@ -5,7 +5,7 @@ package com.yihu.ehr.agModel.geogrephy;
  */
 public class GeographyDictModel {
 
-    private String id;   //序号
+    private int id;   //序号
 
     private String abbreviation;    //简称
 
@@ -21,11 +21,11 @@ public class GeographyDictModel {
 
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

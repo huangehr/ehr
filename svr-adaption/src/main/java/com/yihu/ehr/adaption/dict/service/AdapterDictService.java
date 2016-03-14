@@ -3,14 +3,17 @@ package com.yihu.ehr.adaption.dict.service;
 
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlan;
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanService;
+import com.yihu.ehr.model.adaption.MAdapterDataVo;
 import com.yihu.ehr.model.adaption.MAdapterDict;
-import com.yihu.ehr.model.adaption.MAdapterRelationship;
+import com.yihu.ehr.model.adaption.MAdapterDictVo;
+import com.yihu.ehr.model.adaption.MDataSet;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.StandardBasicTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -37,7 +40,7 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
      *
      */
     @Transactional(propagation = Propagation.NEVER)
-    public List<MAdapterRelationship> searchAdapterDict(OrgAdapterPlan orgAdapterPlan, String code, String name, String orders, int page, int rows) {
+    public List<MDataSet> searchAdapterDict(OrgAdapterPlan orgAdapterPlan, String code, String name, String orders, int page, int rows) {
         long planId = orgAdapterPlan.getId();
         String dictTableName = CDAVersionUtil.getDictTableName(orgAdapterPlan.getVersion());
         Session session = currentSession();
@@ -62,8 +65,12 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
         page = page == 0 ? 1 : page;
         sqlQuery.setMaxResults(rows);
         sqlQuery.setFirstResult((page - 1) * rows);
-        sqlQuery.setResultTransformer(Transformers.aliasToBean(MAdapterRelationship.class));
-        return sqlQuery.list();
+        return sqlQuery
+                .addScalar("id", StandardBasicTypes.LONG )
+                .addScalar("code", StandardBasicTypes.STRING)
+                .addScalar("name", StandardBasicTypes.STRING)
+                .setResultTransformer(Transformers.aliasToBean(MDataSet.class))
+                .list();
     }
 
     private String makeOrder(String orders) {
@@ -115,7 +122,7 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
      * 根据条件搜索字典项适配关系
      *
      */
-    public List<MAdapterDict> searchAdapterDictEntry(OrgAdapterPlan orgAdapterPlan, long dictId, String code, String name, String orders, int page, int rows) {
+    public List<MAdapterDictVo> searchAdapterDictEntry(OrgAdapterPlan orgAdapterPlan, long dictId, String code, String name, String orders, int page, int rows) {
         String orgCode = orgAdapterPlan.getOrg();
         String dictTableName = CDAVersionUtil.getDictTableName(orgAdapterPlan.getVersion());
         String deTableName = CDAVersionUtil.getDictEntryTableName(orgAdapterPlan.getVersion());
@@ -123,17 +130,17 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
         Session session = currentSession();
         StringBuilder sb = new StringBuilder();
         sb.append(" select ad.id                       ");
-        sb.append("       ,ad.plan_id                  ");
+        sb.append("       ,ad.plan_id as adapterPlanId         ");
         sb.append("       ,ds.id   as dictId ");
         sb.append("       ,ds.code as dictCode ");
         sb.append("       ,ds.name as dictName ");
         sb.append("       ,de.id  as dictEntryId    ");
-        sb.append("       ,de.code as DictEntrycode   ");
-        sb.append("       ,de.value as DictEntryName   ");
-        sb.append("       ,orgDict.id as orgDictId  ");
+        sb.append("       ,de.code as dictEntryCode   ");
+        sb.append("       ,de.value as dictEntryName   ");
+        sb.append("       ,orgDict.id as orgDictSeq  ");
         sb.append("       ,orgDict.code as orgDictCode");
-        sb.append("       ,orgDict.name as orgDictNanme");
-        sb.append("       ,orgDE.id as orgDictEntryId  ");
+        sb.append("       ,orgDict.name as orgDictName");
+        sb.append("       ,orgDE.id as orgDictEntrySeq  ");
         sb.append("       ,orgDE.code as orgDictEntryCode");
         sb.append("       ,orgDE.name as orgDictEntryName");
         sb.append("   from adapter_dict ad ");
@@ -156,8 +163,24 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
         page = page == 0 ? 1 : page;
         sqlQuery.setMaxResults(rows);
         sqlQuery.setFirstResult((page - 1) * rows);
-        sqlQuery.setResultTransformer(Transformers.aliasToBean(MAdapterDict.class));
-        return sqlQuery.list();
+
+        return sqlQuery
+                .addScalar("id", StandardBasicTypes.LONG)
+                .addScalar("adapterPlanId", StandardBasicTypes.LONG)
+                .addScalar("dictId", StandardBasicTypes.LONG)
+                .addScalar("dictCode", StandardBasicTypes.STRING)
+                .addScalar("dictName", StandardBasicTypes.STRING)
+                .addScalar("dictEntryId", StandardBasicTypes.LONG)
+                .addScalar("dictEntryCode", StandardBasicTypes.STRING)
+                .addScalar("dictEntryName", StandardBasicTypes.STRING)
+                .addScalar("orgDictSeq", StandardBasicTypes.LONG)
+                .addScalar("orgDictCode", StandardBasicTypes.STRING)
+                .addScalar("orgDictName", StandardBasicTypes.STRING)
+                .addScalar("orgDictEntrySeq", StandardBasicTypes.LONG)
+                .addScalar("orgDictEntryCode", StandardBasicTypes.STRING)
+                .addScalar("orgDictEntryName", StandardBasicTypes.STRING)
+                .setResultTransformer(Transformers.aliasToBean(MAdapterDictVo.class))
+                .list();
     }
 
     /**

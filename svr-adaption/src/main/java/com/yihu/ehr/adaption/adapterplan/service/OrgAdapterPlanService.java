@@ -145,7 +145,7 @@ public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAd
                 if (metaDataId != null) {
                     dataSet.setMetaDataId(metaDataId);
                 }
-                adapterDataSetService.addAdapterDataSet( dataSet, orgAdapterPlan);
+                adapterDataSetService.addAdapterDataSet(dataSet, orgAdapterPlan);
             }
             adapterFlag = true;
         }
@@ -153,6 +153,7 @@ public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAd
 
     /**
      * 删除取消的 数据元、字典
+     *
      * @param planId
      * @param adapterCustomizes
      * @return
@@ -260,6 +261,7 @@ public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAd
 
     /**
      * 判断适配代码是否重复
+     *
      * @param code
      * @return
      */
@@ -315,9 +317,9 @@ public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAd
         return true;
     }
 
-    public List<OrgAdapterPlan> getOrgAdapterPlanByOrgCode(Map<String, Object> args){
+    public List<OrgAdapterPlan> getOrgAdapterPlanByOrgCode(Map<String, Object> args) {
 
-        List<OrgAdapterPlan> orgAdapterPlans=null;
+        List<OrgAdapterPlan> orgAdapterPlans = null;
         try {
             Session session = currentSession();
             String orgcode = (String) args.get("orgcode");
@@ -325,9 +327,7 @@ public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAd
             Query query = session.createQuery("from OrgAdapterPlan where org = :org and status=1 order by version desc");
             query.setString("org", orgcode);
             orgAdapterPlans = query.list();
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
 
         }
         return orgAdapterPlans;

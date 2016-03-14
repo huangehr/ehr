@@ -45,11 +45,10 @@ public class AdaptionsEndPoint {
             @RequestParam(value = "current_version", required = false) String currentVersion) {
 
         MUserSecurity mUserSecurity = securityClient.getUserSecurityByLoginCode(userName);
-        if(mUserSecurity==null)
-        {
-            return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed,"获取用户密钥失败");
+        if (mUserSecurity == null) {
+            return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed, "获取用户密钥失败");
         }
-        Object restEcho = standardDispatchClient.getSchemeInfo(mUserSecurity.getPrivateKey(),updateVersion,currentVersion);
+        Object restEcho = standardDispatchClient.getSchemeInfo(mUserSecurity.getPrivateKey(), updateVersion, currentVersion);
         return restEcho;
     }
 
@@ -64,26 +63,22 @@ public class AdaptionsEndPoint {
             @ApiParam(required = true, name = "org_code", value = "机构代码")
             @RequestParam(value = "org_code", required = true) String orgCode) throws Exception {
         String errorMsg = null;
-        if(StringUtils.isEmpty(userName))
-        {
-            errorMsg +="缺失参数:user_name!";
+        if (StringUtils.isEmpty(userName)) {
+            errorMsg += "缺失参数:user_name!";
         }
-        if (StringUtils.isEmpty(versionCode))
-        {
-            errorMsg +="缺失参数:version_code!";
+        if (StringUtils.isEmpty(versionCode)) {
+            errorMsg += "缺失参数:version_code!";
         }
-        if(StringUtils.isEmpty(orgCode))
-        {
-            errorMsg +="缺失参数:org_code!";
+        if (StringUtils.isEmpty(orgCode)) {
+            errorMsg += "缺失参数:org_code!";
         }
-        if(StringUtils.isNotEmpty(errorMsg))
-            return new RestEcho().failed(ErrorCode.MissParameter,errorMsg);
+        if (StringUtils.isNotEmpty(errorMsg))
+            return new RestEcho().failed(ErrorCode.MissParameter, errorMsg);
         MUserSecurity mUserSecurity = securityClient.getUserSecurityByLoginCode(userName);
-        if(mUserSecurity==null)
-        {
-            return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed,"获取用户密钥失败");
+        if (mUserSecurity == null) {
+            return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed, "获取用户密钥失败");
         }
-        Object object = adapterDispatchClient.getSchemeMappingInfo(mUserSecurity.getPrivateKey(),versionCode,orgCode);
+        Object object = adapterDispatchClient.getSchemeMappingInfo(mUserSecurity.getPrivateKey(), versionCode, orgCode);
         return object;
     }
 
@@ -99,24 +94,20 @@ public class AdaptionsEndPoint {
             @RequestParam(value = "org_code", required = true) String orgCode) {
 
         String errorMsg = null;
-        if(StringUtils.isEmpty(userName))
-        {
-            errorMsg +="缺失参数:user_name!";
+        if (StringUtils.isEmpty(userName)) {
+            errorMsg += "缺失参数:user_name!";
         }
-        if (StringUtils.isEmpty(versionCode))
-        {
-            errorMsg +="缺失参数:version_code!";
+        if (StringUtils.isEmpty(versionCode)) {
+            errorMsg += "缺失参数:version_code!";
         }
-        if(StringUtils.isEmpty(orgCode))
-        {
-            errorMsg +="缺失参数:org_code!";
+        if (StringUtils.isEmpty(orgCode)) {
+            errorMsg += "缺失参数:org_code!";
         }
-        if(StringUtils.isNotEmpty(errorMsg))
-            return new RestEcho().failed(ErrorCode.MissParameter,errorMsg);
+        if (StringUtils.isNotEmpty(errorMsg))
+            return new RestEcho().failed(ErrorCode.MissParameter, errorMsg);
         MUserSecurity mUserSecurity = securityClient.getUserSecurityByLoginCode(userName);
-        if(mUserSecurity==null)
-        {
-            return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed,"获取用户密钥失败");
+        if (mUserSecurity == null) {
+            return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed, "获取用户密钥失败");
         }
         Object object = adapterDispatchClient.getALLSchemeMappingInfo(mUserSecurity.getPrivateKey(), versionCode, orgCode);
         return object;
@@ -128,9 +119,8 @@ public class AdaptionsEndPoint {
     public Object getCDAVersionInfoByOrgCode(
             @ApiParam(name = "org_code", value = "机构编码")
             @RequestParam(value = "org_code") String orgCode) throws Exception {
-        if(StringUtils.isEmpty(orgCode))
-        {
-            return new RestEcho().failed(ErrorCode.MissParameter,"缺失参数:org_code!");
+        if (StringUtils.isEmpty(orgCode)) {
+            return new RestEcho().failed(ErrorCode.MissParameter, "缺失参数:org_code!");
         }
         Object object = adapterDispatchClient.getCDAVersionInfoByOrgCode(orgCode);
         return object;
