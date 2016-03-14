@@ -167,7 +167,7 @@ public class OrganizationController {
         Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("mOrganizationJsonData",orgModel);
-        params.put("geographyModelJsonData",addressModel);
+        params.put("geography_model_json_data",addressModel);
         try {
             if("new".equals(mode)){
                 resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
