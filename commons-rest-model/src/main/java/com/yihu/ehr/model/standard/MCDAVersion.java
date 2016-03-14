@@ -11,7 +11,8 @@ import java.util.Date;
 public class MCDAVersion {
     private String author;
     private Date commitTime;
-    private boolean isInStage;
+
+    private Boolean isInStage;
     private String version;
     private String versionName;
     private String baseVersion;
@@ -24,12 +25,12 @@ public class MCDAVersion {
         this.author = author;
     }
 
-    public boolean isInStage() {
+    public Boolean isInStage() {
         return isInStage;
     }
 
-    public void setIsInStage(boolean isInStage) {
-        this.isInStage = isInStage;
+    public void setInStage(Boolean inStage) {
+        isInStage = inStage;
     }
 
     public String getVersion() {
