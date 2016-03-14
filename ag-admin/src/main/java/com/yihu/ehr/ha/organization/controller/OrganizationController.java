@@ -286,7 +286,7 @@ public class OrganizationController extends BaseController {
             @RequestParam(value = "district") String district) {
         Envelop envelop = new Envelop();
         Collection<MOrganization> mOrganizations = orgClient.getOrgsByAddress(province,city,district);
-        envelop.setObj(mOrganizations);
+        envelop.setDetailModelList((List) mOrganizations);
         envelop.setSuccessFlg(true);
         return envelop;
     }
