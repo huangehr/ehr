@@ -12,14 +12,11 @@ import com.yihu.ehr.adaption.feignclient.DataSetClient;
 import com.yihu.ehr.adaption.feignclient.DispatchLogClient;
 import com.yihu.ehr.adaption.log.LogService;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.adaption.MAdapterPlan;
-import com.yihu.ehr.model.standard.MDispatchLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -111,9 +108,6 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
     public boolean delAdapterPlan(
             @ApiParam(name = "ids", value = "编号列表", defaultValue = "")
             @RequestParam("ids") String ids) throws Exception {
-
-        if (StringUtils.isEmpty(ids))
-            errMissId();
         orgAdapterPlanService.deleteOrgAdapterPlan(ids.split(","));
         return true;
     }

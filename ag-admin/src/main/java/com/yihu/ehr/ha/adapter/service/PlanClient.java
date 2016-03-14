@@ -24,12 +24,11 @@ import java.util.Map;
  * @created 2016.2.3
  */
 @FeignClient(MicroServices.AdaptionMgr)
-@RequestMapping(ApiVersion.Version1_0  + "/adapter")
+@RequestMapping(ApiVersion.Version1_0 )
 @ApiIgnore
 public interface PlanClient {
 
-
-    @RequestMapping(value = "/plans", method = RequestMethod.GET)
+    @RequestMapping(value = "/adapter/plans", method = RequestMethod.GET)
     @ApiOperation(value = "适配方案搜索")
     ResponseEntity<Collection<MAdapterPlan>> searchAdapterPlan(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
@@ -41,75 +40,73 @@ public interface PlanClient {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page);
+            @RequestParam(value = "page", required = false) int page) ;
 
 
-    @RequestMapping(value = "/plan/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/adapter/plan/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "获取适配方案信息")
     MAdapterPlan getAdapterPlanById(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @PathVariable(value = "id") Long id);
+            @PathVariable(value = "id") Long id) ;
 
 
-    @RequestMapping(value = "/plan", method = RequestMethod.POST)
+    @RequestMapping(value = "/adapter/plan", method = RequestMethod.POST)
     @ApiOperation(value = "保存适配方案")
     MAdapterPlan saveAdapterPlan(
             @ApiParam(name = "parmJson", value = "数据模型", defaultValue = "")
             @RequestParam(value = "parmJson") String parmJson,
             @ApiParam(name = "isCover", value = "是否覆盖", defaultValue = "")
-            @RequestParam(value = "isCover") String isCover);
+            @RequestParam(value = "isCover") String isCover) ;
 
 
-    @RequestMapping(value = "/plan/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/adapter/plan/{id}", method = RequestMethod.PUT)
     @ApiOperation(value = "更新适配方案")
     MAdapterPlan updateAdapterPlan(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") Long id,
             @ApiParam(name = "parmJson", value = "数据模型", defaultValue = "")
-            @RequestParam(value = "parmJson") String parmJson);
+            @RequestParam(value = "parmJson") String parmJson) ;
 
-
-    @RequestMapping(value = "/plans", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/adapter/plans", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除适配方案")
     boolean delAdapterPlan(
             @ApiParam(name = "ids", value = "编号列表", defaultValue = "")
             @RequestParam("ids") String ids);
 
-
-    @RequestMapping(value = "/plans/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/adapter/plans/list", method = RequestMethod.GET)
     @ApiOperation(value = "根据类型跟版本号获取适配方案列表")
     List<Map<String, String>> getAdapterPlanList(
             @ApiParam(name = "type", value = "类型", defaultValue = "")
             @RequestParam("type") String type,
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
-            @PathVariable(value = "version") String version);
+            @PathVariable(value = "version") String version) ;
 
 
-    @RequestMapping(value = "/plan/adapterCustomizes/{planId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/adapter/plan/{planId}/adapterCustomizes", method = RequestMethod.GET)
     @ApiOperation(value = "获取定制信息")
     Map getAdapterCustomize(
             @ApiParam(name = "planId", value = "编号", defaultValue = "")
             @PathVariable("planId") Long planId,
             @ApiParam(name = "version", value = "版本", defaultValue = "")
-            @RequestParam("version") String version);
+            @RequestParam("version") String version) ;
 
 
-    @RequestMapping(value = "/plan/adapterDataSet/{planId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/adapter/plan/{planId}/adapterDataSet", method = RequestMethod.POST)
     @ApiOperation(value = "定制数据集")
     boolean adapterDataSet(
             @ApiParam(name = "planId", value = "编号", defaultValue = "")
             @PathVariable("planId") Long planId,
             @ApiParam(name = "customizeData", value = "customizeData", defaultValue = "")
-            @RequestParam("customizeData") String customizeData);
+            @RequestParam("customizeData") String customizeData) ;
 
     /**
      * 适配版本发布
      * 1.生成适配版本文件并记录文件位置；2.修改适配方案状态
      */
-    @RequestMapping(value = "/plan/dispatch/{planId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/adapter/plan/{planId}/dispatch", method = RequestMethod.POST)
     @ApiOperation(value = "适配版本发布")
     boolean adapterDispatch(
             @ApiParam(name = "planId", value = "方案编号", defaultValue = "")
-            @PathVariable("planId") Long planId);
+            @PathVariable("planId") Long planId) ;
 
 }

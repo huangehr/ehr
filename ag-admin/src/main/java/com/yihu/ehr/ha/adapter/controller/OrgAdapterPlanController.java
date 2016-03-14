@@ -1,5 +1,6 @@
 package com.yihu.ehr.ha.adapter.controller;
 
+import com.yihu.ehr.agModel.adapter.AdapterPlanDetailModel;
 import com.yihu.ehr.agModel.adapter.AdapterPlanModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.exception.ApiException;
@@ -39,21 +40,23 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
             @ApiParam(name = "model", value = "数据模型")
             @RequestParam(value = "model") String model,
             @ApiParam(name = "isCover", value = "是否覆盖")
-            @RequestParam(value = "isCover") String isCover)  {
+            @RequestParam(value = "isCover") String isCover) {
 
         try {
             AdapterPlanModel dataModel = jsonToObj(model);
             ValidateResult validateResult = validate(dataModel);
-            if(!validateResult.isRs()){
+            if (!validateResult.isRs()) {
                 return failed(validateResult.getMsg());
             }
-            MAdapterPlan mAdapterPlan = planClient.saveAdapterPlan(objToJson(dataModel), isCover);
-            if(mAdapterPlan==null)
-            {
+
+            AdapterPlanDetailModel detailModel = convertToModel(dataModel,AdapterPlanDetailModel.class);
+
+            MAdapterPlan mAdapterPlan = planClient.saveAdapterPlan(objToJson(detailModel), isCover);
+            if (mAdapterPlan == null) {
                 return failed("保存失败!");
             }
-            return success(convertToModel(mAdapterPlan,AdapterPlanModel.class));
-        } catch (Exception e){
+            return success(convertToModel(mAdapterPlan, AdapterPlanModel.class));
+        } catch (Exception e) {
             e.printStackTrace();
             return failedSystem();
         }
@@ -69,19 +72,19 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
         try {
             AdapterPlanModel dataModel = jsonToObj(model);
             ValidateResult validateResult = validate(dataModel);
-            if(!validateResult.isRs()){
+            if (!validateResult.isRs()) {
                 return failed(validateResult.getMsg());
             }
-            MAdapterPlan mAdapterPlan = planClient.updateAdapterPlan(dataModel.getId(), objToJson(dataModel));
-            if(mAdapterPlan==null)
-            {
+            AdapterPlanDetailModel detailModel = convertToModel(dataModel,AdapterPlanDetailModel.class);
+            MAdapterPlan mAdapterPlan = planClient.updateAdapterPlan(detailModel.getId(), objToJson(detailModel));
+            if (mAdapterPlan == null) {
                 return failed("保存失败!");
             }
-            return success(convertToModel(mAdapterPlan,AdapterPlanModel.class));
+            return success(convertToModel(mAdapterPlan, AdapterPlanModel.class));
         } catch (ApiException e) {
             e.printStackTrace();
             return failed(e.getMessage());
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return failedSystem();
         }
@@ -103,12 +106,12 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
             @RequestParam(value = "page", required = false) int page) {
 
         try {
-            ResponseEntity<Collection<MAdapterPlan>> responseEntity = planClient.searchAdapterPlan(fields, filters, sorts, size, page );
-            List<MAdapterPlan> mAdapterPlans = (List<MAdapterPlan>)responseEntity.getBody();
-            List<AdapterPlanModel> adapterPlanModels = (List<AdapterPlanModel>)convertToModels(
+            ResponseEntity<Collection<MAdapterPlan>> responseEntity = planClient.searchAdapterPlan(fields, filters, sorts, size, page);
+            List<MAdapterPlan> mAdapterPlans = (List<MAdapterPlan>) responseEntity.getBody();
+            List<AdapterPlanModel> adapterPlanModels = (List<AdapterPlanModel>) convertToModels(
                     mAdapterPlans,
                     new ArrayList<AdapterPlanModel>(mAdapterPlans.size()), AdapterPlanModel.class, "");
-            return getResult(adapterPlanModels,getTotalCount(responseEntity),page,size);
+            return getResult(adapterPlanModels, getTotalCount(responseEntity), page, size);
         } catch (Exception e) {
             e.printStackTrace();
             return failedSystem();
@@ -118,11 +121,19 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
 
     @RequestMapping(value = "/plan/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "获取适配方案信息")
-    public AdapterPlanModel getAdapterPlanById(
+    public Envelop getAdapterPlanById(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @PathVariable(value = "id") Long id) throws Exception {
-
-        return getModel(planClient.getAdapterPlanById(id));
+            @PathVariable(value = "id") Long id) {
+        try {
+            AdapterPlanModel adapterPlanModel = getModel(planClient.getAdapterPlanById(id));
+            if (adapterPlanModel == null) {
+                return failed("数据获取失败!");
+            }
+            return success(adapterPlanModel);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
+        }
     }
 
 
@@ -131,14 +142,12 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
     public Envelop delAdapterPlan(
             @ApiParam(name = "ids", value = "方案ID")
             @RequestParam("ids") String ids) throws Exception {
-        ids = trimEnd(ids,",");
-        if(StringUtils.isEmpty(ids))
-        {
+        ids = trimEnd(ids, ",");
+        if (StringUtils.isEmpty(ids)) {
             return failed("请选择需要删除的方案!");
         }
         boolean result = planClient.delAdapterPlan(ids);
-        if(!result)
-        {
+        if (!result) {
             return failed("删除失败!");
         }
 
@@ -158,11 +167,11 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
     }
 
 
-    @RequestMapping(value = "/plan/{planId}/adapterCustomizes", method = RequestMethod.GET)
+    @RequestMapping(value = "/plan/adapterCustomizes/{plan_id}", method = RequestMethod.GET)
     @ApiOperation(value = "获取定制信息")
     public Map getAdapterCustomize(
-            @ApiParam(name = "planId", value = "方案ID")
-            @RequestParam(value = "planId") long planId,
+            @ApiParam(name = "plan_id", value = "方案ID")
+            @PathVariable(value = "plan_id") long planId,
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam("version") String version) throws Exception {
 
@@ -170,13 +179,13 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
     }
 
 
-    @RequestMapping(value = "/plan/{planId}/adapterDataSet", method = RequestMethod.GET)
+    @RequestMapping(value = "/plan/adapterDataSet/{plan_id}", method = RequestMethod.GET)
     @ApiOperation(value = "定制数据集")
     public boolean adapterDataSet(
-            @ApiParam(name = "planId", value = "编号", defaultValue = "")
-            @PathVariable("planId") Long planId,
+            @ApiParam(name = "plan_id", value = "编号", defaultValue = "")
+            @PathVariable("plan_id") Long planId,
             @ApiParam(name = "customizeData", value = "customizeData", defaultValue = "")
-            @RequestParam("customizeData") String customizeData) throws Exception{
+            @RequestParam("customizeData") String customizeData) throws Exception {
 
         return planClient.adapterDataSet(planId, customizeData);
     }

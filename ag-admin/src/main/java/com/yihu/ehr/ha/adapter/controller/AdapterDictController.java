@@ -47,15 +47,22 @@ public class AdapterDictController extends ExtendController<AdapterDictModel> {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page) throws Exception {
+            @RequestParam(value = "page", required = false) int page) {
 
-        ResponseEntity<Collection<MAdapterRelationship>> responseEntity = adapterDictClient.searchAdapterDict(planId, code, name, sorts, size, page);
-        List<MAdapterRelationship> mAdapterRelationships = (List<MAdapterRelationship>) responseEntity.getBody();
-        List<AdapterRelationshipModel> relationshipModels = (List<AdapterRelationshipModel>)convertToModels(mAdapterRelationships,
-                                                                            new ArrayList<AdapterRelationshipModel>(mAdapterRelationships.size()),
-                                                                            AdapterRelationshipModel.class,null);
+        try {
+            ResponseEntity<Collection<MAdapterRelationship>> responseEntity = adapterDictClient.searchAdapterDict(planId, code, name, sorts, size, page);
+            List<MAdapterRelationship> mAdapterRelationships = (List<MAdapterRelationship>) responseEntity.getBody();
+            List<AdapterRelationshipModel> relationshipModels = (List<AdapterRelationshipModel>) convertToModels(mAdapterRelationships,
+                    new ArrayList<AdapterRelationshipModel>(mAdapterRelationships.size()),
+                    AdapterRelationshipModel.class, null);
 
-        return getResult(relationshipModels,getTotalCount(responseEntity),page,size);
+            return getResult(relationshipModels, getTotalCount(responseEntity), page, size);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
     }
 
     @RequestMapping(value = "/plan/{planId}/dict/{dictId}/entrys", method = RequestMethod.GET)
@@ -73,13 +80,20 @@ public class AdapterDictController extends ExtendController<AdapterDictModel> {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page) throws Exception {
+            @RequestParam(value = "page", required = false) int page) {
 
-        ResponseEntity<Collection<MAdapterDict>> responseEntity = adapterDictClient.searchAdapterDictEntry(planId, dictId, code, name, sorts, size, page);
-        List<MAdapterDict> mAdapterDicts = (List<MAdapterDict>)responseEntity.getBody();
-        List<AdapterDictModel> adapterDictModels = (List<AdapterDictModel>)convertToModels(mAdapterDicts,new ArrayList<AdapterDictModel>(mAdapterDicts.size())
-                                                    ,AdapterDictModel.class,null);
-        return getResult(adapterDictModels,getTotalCount(responseEntity),page,size);
+        try {
+            ResponseEntity<Collection<MAdapterDict>> responseEntity = adapterDictClient.searchAdapterDictEntry(planId, dictId, code, name, sorts, size, page);
+            List<MAdapterDict> mAdapterDicts = (List<MAdapterDict>) responseEntity.getBody();
+            List<AdapterDictModel> adapterDictModels = (List<AdapterDictModel>) convertToModels(mAdapterDicts, new ArrayList<AdapterDictModel>(mAdapterDicts.size())
+                    , AdapterDictModel.class, null);
+            return getResult(adapterDictModels, getTotalCount(responseEntity), page, size);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
     }
 
 
@@ -87,13 +101,18 @@ public class AdapterDictController extends ExtendController<AdapterDictModel> {
     public Envelop getAdapterDictEntry(
             @ApiParam(name = "id", value = "适配关系ID")
             @RequestParam(value = "id") long id) {
-
-        AdapterDictModel adapterDictModel = getModel(adapterDictClient.getAdapterDictEntry(id));
-        if(adapterDictModel==null)
-        {
-            return failed("数据获取失败!");
+        try {
+            AdapterDictModel adapterDictModel = getModel(adapterDictClient.getAdapterDictEntry(id));
+            if (adapterDictModel == null) {
+                return failed("数据获取失败!");
+            }
+            return success(adapterDictModel);
         }
-        return success(adapterDictModel);
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
     }
 
     @RequestMapping(value = "/dict/entry", method = RequestMethod.POST)
@@ -155,19 +174,24 @@ public class AdapterDictController extends ExtendController<AdapterDictModel> {
     @ApiOperation(value = "删除适配关系", notes = "根据适配关系ID删除适配关系，批量删除时ID以逗号隔开")
     public Envelop delAdapterDictEntry(
             @ApiParam(name = "ids", value = "适配关系ID")
-            @RequestParam(value = "ids") String ids) throws Exception{
+            @RequestParam(value = "ids") String ids){
 
-        ids = trimEnd(ids,",");
-        if(StringUtils.isEmpty(ids))
-        {
-            return failed("请选择需要删除的数据!");
+        try {
+            ids = trimEnd(ids, ",");
+            if (StringUtils.isEmpty(ids)) {
+                return failed("请选择需要删除的数据!");
+            }
+            boolean result = adapterDictClient.delDictEntry(ids);
+            if (!result) {
+                return failed("删除失败!");
+            }
+            return success(null);
         }
-        boolean result = adapterDictClient.delDictEntry(ids);
-        if(!result)
+        catch (Exception ex)
         {
-            return failed("删除失败!");
+            ex.printStackTrace();
+            return failedSystem();
         }
-        return success(null);
     }
 
 
