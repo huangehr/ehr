@@ -13,6 +13,7 @@ import java.util.Date;
 public class MOrganization implements Serializable{
     private String orgCode;         // 机构代码,对医院编码属性需要调研
     private String admin;            // 机构管理员
+
     private boolean settled;        // 是否已接入,对第三方平台有效.
     private String settledWay;    // 接入方式：直连/平台接入
     private String fullName;        // 全名
@@ -101,9 +102,10 @@ public class MOrganization implements Serializable{
         this.location = location;
     }
 
-    public boolean getSettled() {
+    public boolean isSettled() {
         return settled;
     }
+
     public void setSettled(boolean settled) {
         this.settled = settled;
     }

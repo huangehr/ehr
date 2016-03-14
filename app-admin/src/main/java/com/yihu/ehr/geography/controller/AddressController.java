@@ -1,9 +1,9 @@
 package com.yihu.ehr.geography.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
-import com.yihu.ehr.util.ResourceProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,17 +30,23 @@ public class AddressController {
     @RequestMapping("getParent")
     @ResponseBody
     public Object getParent(Integer level) {
-        String url = "/address/address/level";
+        String url = "/geography_entries/level/";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("level",level);
         try{
-            //todo 后台转换成Map后传前台
-            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            result.setObj(resultStr);
-            result.setSuccessFlg(true);
-            return result;
+            resultStr = HttpClientUtil.doGet(comUrl + url + level, params, username, password);
+            ObjectMapper mapper = new ObjectMapper();
+            Envelop envelop = mapper.readValue(resultStr, Envelop.class);
+            if (envelop.isSuccessFlg()) {
+                result.setObj(envelop.getDetailModelList());
+                result.setSuccessFlg(true);
+                return result;
+            }else{
+                result.setSuccessFlg(false);
+                return result;
+            }
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
@@ -60,17 +66,23 @@ public class AddressController {
     @RequestMapping("getChildByParent")
     @ResponseBody
     public Object getChildByParent(Integer pid) {
-        String url = "/address/address/pid";
+        String url = "/geography_entries/pid/";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("pid",pid);
         try{
-            //todo 后台转换成Map后传前台
-            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            result.setObj(resultStr);
-            result.setSuccessFlg(true);
-            return result;
+            resultStr = HttpClientUtil.doGet(comUrl + url + pid, params, username, password);
+            ObjectMapper mapper = new ObjectMapper();
+            Envelop envelop = mapper.readValue(resultStr, Envelop.class);
+            if (envelop.isSuccessFlg()) {
+                result.setObj(envelop.getDetailModelList());
+                result.setSuccessFlg(true);
+                return result;
+            }else{
+                result.setSuccessFlg(false);
+                return result;
+            }
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());

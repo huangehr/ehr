@@ -74,8 +74,8 @@
                         columns: [
                             {display: '姓名', name: 'name', width: '15%',align: 'left'},
                             {display: '身份证号', name: 'idCardNo', width: '20%', align: 'left'},
-                            {display: '性别', name: 'genderValue', width: '10%'},
-                            {display: '联系方式', name: 'tel', width: '15%', resizable: true,align: 'left'},
+                            {display: '性别', name: 'gender', width: '10%'},
+                            {display: '联系方式', name: 'telphoneNo', width: '15%', resizable: true,align: 'left'},
                             {display: '家庭地址', name: 'homeAddress', width: '30%', minColumnWidth: 20,align: 'left'},
                             {
                                 display: '操作', name: 'operator', width: '10%', render: function (row) {

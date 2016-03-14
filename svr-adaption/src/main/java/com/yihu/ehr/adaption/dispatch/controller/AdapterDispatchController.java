@@ -66,19 +66,19 @@ public class AdapterDispatchController {
             mapResult = adapterInfoSendService.getAdapterFileInfo(versionCode, orgcode);
 
             if (mapResult == null)
-                return new RestEcho().failed(ErrorCode.GenerateArchiveFailed," 标准化数据生成失败");
+                return new RestEcho().failed(ErrorCode.GenerateArchiveFailed, " 标准化数据生成失败");
 
             String group = (String) mapResult.get(FastDFSUtil.GroupField);
             String remoteFile = (String) mapResult.get(FastDFSUtil.RemoteFileField);
 
             if (group == null || remoteFile == null)
-                return new RestEcho().failed(ErrorCode.GenerateArchiveFailed," 标准化数据生成失败");
+                return new RestEcho().failed(ErrorCode.GenerateArchiveFailed, " 标准化数据生成失败");
 
             password = (String) mapResult.get("password");
             byte[] bytes = fastDFSUtil.download(group, remoteFile);
             fileBytes = Base64.encode(bytes);
         } catch (Exception e) {
-            return new RestEcho().failed(ErrorCode.DownArchiveFileFailed,"下载标准适配版本失败");
+            return new RestEcho().failed(ErrorCode.DownArchiveFileFailed, "下载标准适配版本失败");
         }
 
         try {
@@ -90,9 +90,9 @@ public class AdapterDispatchController {
             restEcho.putResult("zipfile", fileBytes);
             return restEcho;
         } catch (IOException ex) {
-            return new RestEcho().failed(ErrorCode.GenerateArchiveFileStreamFailed,"生成适配版本文件流失败");
+            return new RestEcho().failed(ErrorCode.GenerateArchiveFileStreamFailed, "生成适配版本文件流失败");
         } catch (Exception ex) {
-            return new RestEcho().failed(ErrorCode.GenerateFileCryptographFailed,"生成适配版本文件密码失败");
+            return new RestEcho().failed(ErrorCode.GenerateFileCryptographFailed, "生成适配版本文件密码失败");
         }
     }
 
@@ -119,19 +119,19 @@ public class AdapterDispatchController {
             mapResult = adapterInfoSendService.getStandardAndMappingInfo(versionCode, orgcode);
 
             if (mapResult == null)
-                return new RestEcho().failed(ErrorCode.GenerateArchiveFailed," 标准化数据生成失败");
+                return new RestEcho().failed(ErrorCode.GenerateArchiveFailed, " 标准化数据生成失败");
 
             String group = (String) mapResult.get(FastDFSUtil.GroupField);
             String remoteFile = (String) mapResult.get(FastDFSUtil.RemoteFileField);
 
-            if (StringUtils.isEmpty(group)|| StringUtils.isEmpty(remoteFile))
-                return new RestEcho().failed(ErrorCode.GenerateArchiveFailed," 标准化数据生成失败");
+            if (StringUtils.isEmpty(group) || StringUtils.isEmpty(remoteFile))
+                return new RestEcho().failed(ErrorCode.GenerateArchiveFailed, " 标准化数据生成失败");
 
             password = (String) mapResult.get("password");
             byte[] bytes = fastDFSUtil.download(group, remoteFile);
             fileBytes = Base64.encode(bytes);
         } catch (Exception e) {
-            return new RestEcho().failed(ErrorCode.DownArchiveFileFailed,"下载标准适配版本失败");
+            return new RestEcho().failed(ErrorCode.DownArchiveFileFailed, "下载标准适配版本失败");
         }
 
         try {
@@ -143,19 +143,19 @@ public class AdapterDispatchController {
             restEcho.putResult("zipfile", fileBytes);
             return restEcho;
         } catch (IOException ex) {
-            return new RestEcho().failed(ErrorCode.GenerateArchiveFileStreamFailed,"生成适配版本文件流失败");
+            return new RestEcho().failed(ErrorCode.GenerateArchiveFileStreamFailed, "生成适配版本文件流失败");
 
         } catch (Exception ex) {
-            return new RestEcho().failed(ErrorCode.GenerateFileCryptographFailed,"生成适配版本文件密码失败");
+            return new RestEcho().failed(ErrorCode.GenerateFileCryptographFailed, "生成适配版本文件密码失败");
         }
     }
 
 
     @RequestMapping(value = "/versionplan", method = RequestMethod.GET)
     @ApiOperation(value = "根据机构编码获取最新映射版本号 ", response = RestEcho.class, produces = "application/json", notes = "指定版本的信息")
-    public Object getCDAVersionInfoByOrgCode(
-            @ApiParam(name = "org_code", value = "机构编码")
-            @RequestParam(value = "org_code") String orgCode) throws Exception {
+    public Object getCDAVersionInfoByOrgCode(@ApiParam(name = "org_code", value = "机构编码")
+                                             @RequestParam(value = "org_code")
+                                             String orgCode) throws Exception {
 
         try {
 
@@ -171,10 +171,10 @@ public class AdapterDispatchController {
                 restEcho.putResult("timestamp", version.getCommitTime());
                 return restEcho;
             } else {
-                return new RestEcho().failed(ErrorCode.GetCDAVersionFailed,"标准版本获取失败");
+                return new RestEcho().failed(ErrorCode.GetCDAVersionFailed, "机构无适配数据");
             }
         } catch (Exception ex) {
-            return new RestEcho().failed(ErrorCode.GetCDAVersionFailed,"标准版本获取失败");
+            return new RestEcho().failed(ErrorCode.GetCDAVersionFailed, "标准版本获取失败：" + ex.getMessage());
         }
     }
 }
