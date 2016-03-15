@@ -61,7 +61,7 @@
 		<label><spring:message code="lbl.org.belong"/><spring:message code="spe.colon"/></label>
 		<div class="l-text-wrapper m-form-control  f-w240" id="inp_org1">
 			<input type="text" id="inp_org"  data-type="comboSelect" class="validate-org-length"
-				   data-attr-scan=""/>
+				   data-attr-scan="organization"/>
 		</div>
 	</div>
 	<div class="m-form-group" id="inp_major_div">
