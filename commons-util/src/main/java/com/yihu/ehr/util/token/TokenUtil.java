@@ -2,11 +2,11 @@ package com.yihu.ehr.util.token;
 
 import com.yihu.ehr.util.encrypt.DES;
 import com.yihu.ehr.util.encrypt.MD5;
+import org.apache.commons.lang.RandomStringUtils;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * Token工具。
@@ -16,11 +16,7 @@ import java.util.Random;
  * @created 2015.07.31 10:55
  */
 public class TokenUtil {
-
-    private final static String BASE = "abcdefghijklmnopqrstuvwxyz0123456789";
     private final static String TOKEN_ENCRYPT_WORD = "ha_passw0rd";
-
-    private final static int BASE_LENGTH = BASE.length();
 
     /**
      * 生成授权码
@@ -29,15 +25,7 @@ public class TokenUtil {
      * @return
      */
     public static String genToken(int length) {
-        long seed = System.currentTimeMillis();  // 获得系统时间，作为生成随机数的种子
-        StringBuffer sb = new StringBuffer(length);
-        Random random = new Random(seed);
-
-        for (int i = 0; i < length; i++) {
-            sb.append(BASE.charAt(random.nextInt(BASE_LENGTH)));
-        }
-
-        return sb.toString();
+        return RandomStringUtils.random(length, true, true);
     }
 
     /**

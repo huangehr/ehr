@@ -5,7 +5,7 @@ import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.feign.SecurityClient;
-import com.yihu.ehr.model.packs.MJsonPackage;
+import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.pack.service.JsonPackage;
 import com.yihu.ehr.pack.service.JsonPackageService;
@@ -48,19 +48,19 @@ public class JsonPackageEndPoint extends BaseRestController {
     private JsonPackageService jsonPackageService;
 
     @RequestMapping(value = "/packages", method = RequestMethod.GET)
-    @ApiOperation(value = "获取档案列表", response = MJsonPackage.class, responseContainer = "List", notes = "获取当前平台上的档案列表")
-    public Collection<MJsonPackage> packageList(@ApiParam(name = "archive_status", value = "档案包状态", defaultValue = "Received")
+    @ApiOperation(value = "获取档案列表", response = MPackage.class, responseContainer = "List", notes = "获取当前平台上的档案列表")
+    public Collection<MPackage> packageList(@ApiParam(name = "archive_status", value = "档案包状态", defaultValue = "Received")
                                                 @RequestParam(value = "archive_status")
                                                 ArchiveStatus archiveStatus,
-                                                @ApiParam(name = "since", value = "起始日期", defaultValue = "2015-12-01")
+                                            @ApiParam(name = "since", value = "起始日期", defaultValue = "2015-12-01")
                                                 @DateTimeFormat(pattern = "yyyy-MM-dd")
                                                 @RequestParam(value = "since") Date since,
-                                                @ApiParam(name = "to", value = "截止日期", defaultValue = "2015-12-31")
+                                            @ApiParam(name = "to", value = "截止日期", defaultValue = "2015-12-31")
                                                 @DateTimeFormat(pattern = "yyyy-MM-dd")
                                                 @RequestParam(value = "to") Date to,
-                                                @ApiParam(name = "page", value = "页面号，从1开始", defaultValue = "1")
+                                            @ApiParam(name = "page", value = "页面号，从1开始", defaultValue = "1")
                                                 @RequestParam(value = "page") int page,
-                                                @ApiParam(name = "page_size", value = "页面记录数", defaultValue = "15")
+                                            @ApiParam(name = "page_size", value = "页面记录数", defaultValue = "15")
                                                 @RequestParam(value = "page_size") int pageSize) throws ParseException {
 
         Pageable pageable = new PageRequest(page, pageSize);
@@ -70,7 +70,7 @@ public class JsonPackageEndPoint extends BaseRestController {
         map.put("archiveStatus", archiveStatus);
         List<JsonPackage> jsonPackageList = jsonPackageService.searchArchives(map, pageable);
 
-        return convertToModels(jsonPackageList, new ArrayList<>(jsonPackageList.size()), MJsonPackage.class, null);
+        return convertToModels(jsonPackageList, new ArrayList<>(jsonPackageList.size()), MPackage.class, null);
     }
 
     /**
@@ -133,13 +133,13 @@ public class JsonPackageEndPoint extends BaseRestController {
      */
     @RequestMapping(value = "/packages/{id}", method = {RequestMethod.GET})
     @ApiOperation(value = "获取档案包", notes = "获取档案包的信息")
-    public ResponseEntity<MJsonPackage> retrievePackage(@ApiParam(name = "id", value = "档案包编号")
+    public ResponseEntity<MPackage> retrievePackage(@ApiParam(name = "id", value = "档案包编号")
                                         @PathVariable(value = "id")
                                         String id) {
         JsonPackage jsonPackage = jsonPackageService.getJsonPackage(id);
-        if(jsonPackage == null) return new ResponseEntity<>((MJsonPackage)null, HttpStatus.NOT_FOUND);
+        if(jsonPackage == null) return new ResponseEntity<>((MPackage)null, HttpStatus.NOT_FOUND);
 
-        MJsonPackage pack = convertToModel(jsonPackage, MJsonPackage.class, null);
+        MPackage pack = convertToModel(jsonPackage, MPackage.class, null);
 
         return new ResponseEntity<>(pack, HttpStatus.OK);
     }
@@ -152,13 +152,13 @@ public class JsonPackageEndPoint extends BaseRestController {
      */
     @RequestMapping(value = "/packages/downloads/{id}", method = {RequestMethod.GET})
     @ApiOperation(value = "获取档案包", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE, notes = "获取档案包的信息")
-    public ResponseEntity<MJsonPackage> downloadPackage(@ApiParam(name = "id", value = "档案包编号")
+    public ResponseEntity<MPackage> downloadPackage(@ApiParam(name = "id", value = "档案包编号")
                                 @PathVariable(value = "id")
                                 String id,
-                                HttpServletResponse response) throws Exception {
+                                                    HttpServletResponse response) throws Exception {
         try {
             InputStream is = jsonPackageService.downloadFile(id);
-            if(is == null) return new ResponseEntity<>((MJsonPackage)null, HttpStatus.NOT_FOUND);
+            if(is == null) return new ResponseEntity<>((MPackage)null, HttpStatus.NOT_FOUND);
 
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
             response.setHeader("Content-Disposition", "attachment; filename=" + id + ".zip");
