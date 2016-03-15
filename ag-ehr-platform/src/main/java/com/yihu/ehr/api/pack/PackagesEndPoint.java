@@ -24,6 +24,7 @@ import java.io.IOException;
 @RequestMapping(ApiVersion.Version1_0 + "/packages")
 @Api(protocols = "https", value = "packages", description = "数据包服务")
 public class PackagesEndPoint {
+
     @Autowired
     JsonPackageClient jsonPackageClient;
 
