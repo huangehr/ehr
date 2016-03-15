@@ -6,9 +6,15 @@ import com.yihu.ehr.ha.adapter.controller.AdapterOrgController;
 import com.yihu.ehr.ha.adapter.controller.OrgDictController;
 import com.yihu.ehr.ha.adapter.controller.OrgDictEntryController;
 import com.yihu.ehr.util.Envelop;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 
@@ -17,6 +23,9 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by AndyCai on 2016/3/2.
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = AgAdminApplication.class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class OrgDictEntryControllerTests {
     @Autowired
     private AdapterOrgController adapterOrgController;
@@ -32,6 +41,7 @@ public class OrgDictEntryControllerTests {
 
     ApplicationContext applicationContext;
 
+    @Test
     public void aTestOrgDictEntry() throws Exception{
 
         applicationContext = new SpringApplicationBuilder()
@@ -42,9 +52,10 @@ public class OrgDictEntryControllerTests {
         detailModel.setType("2");
         detailModel.setDescription("这是测试机构");
         detailModel.setOrg("CSJG1019002");
+        detailModel.setCode("CSJG1019002");
 
         Envelop envelop = adapterOrgController.addAdapterOrg(objectMapper.writeValueAsString(detailModel));
-        assertTrue("适配机构新增失败!", !envelop.isSuccessFlg());
+        assertTrue("适配机构新增失败!", envelop.isSuccessFlg());
 
         detailModel = (AdapterOrgDetailModel)envelop.getObj();
 
@@ -67,6 +78,9 @@ public class OrgDictEntryControllerTests {
         String jsonData = objectMapper.writeValueAsString(envelop.getDetailModelList().get(0));
         OrgDictModel orgDictModel = objectMapper.readValue(jsonData,OrgDictModel.class);
 
+        envelop = orgDictController.getOrgDict(orgDictModel.getId());
+        OrgDictDetailModel orgDictDetailModel = (OrgDictDetailModel)envelop.getObj();
+
         OrgDictEntryDetailModel entryDetailModel = new OrgDictEntryDetailModel();
 //        entryDetailModel.setCode("test_cms_code");
 //        entryDetailModel.setName("test_cms_name");
@@ -79,7 +93,7 @@ public class OrgDictEntryControllerTests {
 
         entryDetailModel.setCode("test_cms_code");
         entryDetailModel.setName("test_cms_name");
-        entryDetailModel.setOrgDict(orgDictModel.getId());
+        entryDetailModel.setOrgDict(orgDictModel.getSequence());
         entryDetailModel.setOrganization(detailModel.getCode());
         envelop = entryController.saveOrgDictItem(objectMapper.writeValueAsString(entryDetailModel));
         assertTrue("新增字典项失败",envelop.isSuccessFlg());
@@ -98,10 +112,19 @@ public class OrgDictEntryControllerTests {
         envelop = entryController.saveOrgDictItem(objectMapper.writeValueAsString(entryDetailModel));
         assertTrue("修改失败",envelop.isSuccessFlg());
 
-        List<String> listDictEntry = entryController.getOrgDictEntry(orgDictModel.getSequence(),detailModel.getCode());
+        envelop = entryController.getOrgDictEntryBySequence(detailModel.getCode(),entryDetailModel.getSequence());
+        assertTrue("数据获取失败!",envelop.isSuccessFlg()&& envelop.getObj()!=null);
+
+        List<String> listDictEntry = entryController.getOrgDictEntry(orgDictDetailModel.getSequence(),detailModel.getCode());
         assertTrue("获取字典全部字典项失败",listDictEntry.size()>0);
 
         envelop = entryController.deleteOrgDictItem(String.valueOf(entryDetailModel.getId()));
         assertTrue("删除失败",envelop.isSuccessFlg());
+
+        envelop = orgDictController.deleteOrgDict(dictModel.getId());
+        assertTrue("字典删除失败!",envelop.isSuccessFlg());
+
+        envelop=adapterOrgController.delAdapterOrg(detailModel.getCode());
+        assertTrue("机构删除失败!",envelop.isSuccessFlg());
     }
 }

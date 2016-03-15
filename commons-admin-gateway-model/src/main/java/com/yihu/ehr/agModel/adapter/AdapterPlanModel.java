@@ -13,14 +13,15 @@ public class AdapterPlanModel {
     public Long id;
     public Long parentId;
     public String parentName;
-    public String code = "";
-    public String name = "";
-    public String type = "";
+    public String code;
+    public String name;
+    public String type;
     public String typeValue;
-    public String version = "";
-    public String org = "";
+    public String version;
+    public String org;
     public String orgValue;
-    public String description = "";
+    public String description;
+    private int status;
 
     public Long getId() {
         return id;
@@ -113,5 +114,13 @@ public class AdapterPlanModel {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

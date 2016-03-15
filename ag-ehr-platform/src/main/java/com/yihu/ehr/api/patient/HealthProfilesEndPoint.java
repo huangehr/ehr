@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -26,7 +27,7 @@ public class HealthProfilesEndPoint {
     ObjectMapper objectMapper;
 
     @RequestMapping(value = "/{demographic_id}", method = RequestMethod.GET)
-    @ApiOperation(value = "获取档案列表", produces = "application/json", notes = "获取档案列表")
+    @ApiOperation(value = "获取档案列表", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "获取档案列表")
     public Object getProfiles(
             @ApiParam(required = true, name = "demographic_id", value = "患者人口学ID")
             @PathVariable(value = "demographic_id") String demographicId,
@@ -42,7 +43,7 @@ public class HealthProfilesEndPoint {
     }
 
     @RequestMapping(value = "/profile", method = RequestMethod.GET)
-    @ApiOperation(value = "获取档案", produces = "application/json", notes = "指定档案")
+    @ApiOperation(value = "获取档案", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "指定档案")
     public Object getProfile(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,
@@ -55,7 +56,7 @@ public class HealthProfilesEndPoint {
     }
 
     @RequestMapping(value = "/data_set", method = RequestMethod.GET)
-    @ApiOperation(value = "获取数据集", produces = "application/json", notes = "返回指定数据集对象，若key不存在，返回错误信息")
+    @ApiOperation(value = "获取数据集", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "返回指定数据集对象，若key不存在，返回错误信息")
     public Object getDateSet(
             @ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
             @PathVariable(value = "api_version") String apiVersion,

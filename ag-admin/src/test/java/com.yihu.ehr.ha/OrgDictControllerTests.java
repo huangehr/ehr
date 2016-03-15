@@ -8,6 +8,7 @@ import com.yihu.ehr.ha.adapter.controller.AdapterOrgController;
 import com.yihu.ehr.ha.adapter.controller.OrgDictController;
 import com.yihu.ehr.util.Envelop;
 import org.junit.FixMethodOrder;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,7 @@ public class OrgDictControllerTests {
 
     ApplicationContext applicationContext;
 
+    @Test
     public void aTestOrgDict() throws Exception{
 
         applicationContext = new SpringApplicationBuilder()
@@ -49,9 +51,10 @@ public class OrgDictControllerTests {
         detailModel.setType("2");
         detailModel.setDescription("这是测试机构");
         detailModel.setOrg("CSJG1019002");
+        detailModel.setCode("CSJG1019002");
 
         Envelop envelop = adapterOrgController.addAdapterOrg(objectMapper.writeValueAsString(detailModel));
-        assertTrue("适配机构新增失败!", !envelop.isSuccessFlg());
+        assertTrue("适配机构新增失败!", envelop.isSuccessFlg());
 
         detailModel = (AdapterOrgDetailModel)envelop.getObj();
 
@@ -89,6 +92,9 @@ public class OrgDictControllerTests {
         dictModel.setName("test_cms_name_c");
         envelop = orgDictController.saveOrgDict(objectMapper.writeValueAsString(dictModel));
         assertTrue("修改失败!",envelop.isSuccessFlg());
+
+        envelop = orgDictController.getOrgDictBySequence(detailModel.getCode(),dictModel.getSequence());
+        assertTrue("数据获取失败!",envelop.isSuccessFlg()&&envelop.getObj()!=null);
 
         List<String> listDict = orgDictController.getOrgDict(detailModel.getCode());
         assertTrue("获取机构全部字典失败!",listDict.size()>0);

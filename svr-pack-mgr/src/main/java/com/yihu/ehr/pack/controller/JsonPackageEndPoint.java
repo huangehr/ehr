@@ -6,7 +6,7 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.feign.SecurityClient;
 import com.yihu.ehr.model.packs.MJsonPackage;
-import com.yihu.ehr.model.security.MUserSecurity;
+import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.pack.service.JsonPackage;
 import com.yihu.ehr.pack.service.JsonPackageService;
 import com.yihu.ehr.util.controller.BaseRestController;
@@ -78,10 +78,11 @@ public class JsonPackageEndPoint extends BaseRestController {
      *
      * @param packageCrypto zip密码密文, file 请求体中文件参数名
      */
-    @RequestMapping(value = "/packages", method = RequestMethod.POST)
+    @RequestMapping(value = "/packages", method = RequestMethod.PUT)
     @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
-    public void savePackage(@ApiParam(required = false, name = "file_string", value = "JSON档案包字符串")
-                            @RequestParam(value = "user_name") String fileString,
+    @Deprecated
+    public void savePackageWithUser(@ApiParam(required = false, name = "file_string", value = "JSON档案包字符串")
+                            @RequestParam(value = "file_string") String fileString,
                             @ApiParam(required = true, name = "user_name", value = "用户名")
                             @RequestParam(value = "user_name") String userName,
                             @ApiParam(required = true, name = "package_crypto", value = "档案包解压密码,二次加密")
@@ -91,9 +92,35 @@ public class JsonPackageEndPoint extends BaseRestController {
 
         if (StringUtils.isEmpty(fileString)) throw new ApiException(ErrorCode.MissParameter, "file");
 
-        MUserSecurity userSecurity = securityClient.getUserSecurityByLoginCode(userName);
+        MKey userSecurity = securityClient.getUserKey(userName);
         String privateKey = userSecurity.getPrivateKey();
         if (null == privateKey) throw new ApiException(ErrorCode.GenerateUserKeyFailed);
+        String unzipPwd = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
+        jsonPackageService.receive(new ByteArrayInputStream(fileString.getBytes()), unzipPwd);
+    }
+
+    /**
+     * 接收档案包。
+     *
+     * @param packageCrypto zip密码密文, file 请求体中文件参数名
+     */
+    @RequestMapping(value = "/packages", method = RequestMethod.POST)
+    @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
+    public void savePackageWithOrg(@ApiParam(required = false, name = "file_string", value = "JSON档案包字符串")
+                            @RequestParam(value = "file_string") String fileString,
+                            @ApiParam(required = true, name = "org_code", value = "机构代码")
+                            @RequestParam(value = "org_code") String orgCode,
+                            @ApiParam(required = true, name = "package_crypto", value = "档案包解压密码,二次加密")
+                            @RequestParam(value = "package_crypto") String packageCrypto,
+                            @ApiParam(required = true, name = "md5", value = "档案包MD5")
+                            @RequestParam(value = "md5") String md5) throws Exception {
+
+        if (StringUtils.isEmpty(fileString)) throw new ApiException(ErrorCode.MissParameter, "file");
+
+        MKey key = securityClient.getOrgKey(orgCode);
+        String privateKey = key.getPrivateKey();
+        if (null == privateKey) throw new ApiException(ErrorCode.GenerateUserKeyFailed);
+
         String unzipPwd = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
         jsonPackageService.receive(new ByteArrayInputStream(fileString.getBytes()), unzipPwd);
     }

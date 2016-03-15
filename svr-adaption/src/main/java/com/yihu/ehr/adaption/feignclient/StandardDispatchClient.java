@@ -1,7 +1,6 @@
 package com.yihu.ehr.adaption.feignclient;
 
-import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.constants.*;
 import com.yihu.ehr.util.RestEcho;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -16,7 +15,7 @@ import java.util.Map;
 /**
  * Created by AndyCai on 2016/3/3.
  */
-@FeignClient(MicroServices.StandardMgr)
+@FeignClient(name = MicroServiceName.Standard)
 @RequestMapping(ApiVersion.Version1_0 + "/standard-dispatcher")
 @ApiIgnore
 public interface StandardDispatchClient {

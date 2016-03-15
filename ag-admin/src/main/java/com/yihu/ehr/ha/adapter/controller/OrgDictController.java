@@ -11,15 +11,17 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
  * Created by AndyCai on 2016/1/27.
  */
-@RequestMapping(ApiVersion.Version1_0 + "/orgDict")
+@RequestMapping(ApiVersion.Version1_0 + "/admin/adapter/org")
 @RestController
 public class OrgDictController extends BaseController {
 
@@ -33,14 +35,13 @@ public class OrgDictController extends BaseController {
     @ApiOperation(value = "根据id查询实体")
     public Envelop getOrgDict(
             @ApiParam(name = "id", value = "查询条件", defaultValue = "")
-            @RequestParam(value = "id", required = false) long id) throws Exception{
+            @RequestParam(value = "id", required = false) long id) throws Exception {
 
         MOrgDict mOrgDict = orgDictClient.getOrgDict(id);
-        if(mOrgDict==null)
-        {
+        if (mOrgDict == null) {
             return failed("字典明细获取失败!");
         }
-        OrgDictDetailModel detailModel = convertToModel(mOrgDict,OrgDictDetailModel.class);
+        OrgDictDetailModel detailModel = convertToModel(mOrgDict, OrgDictDetailModel.class);
 
         return success(detailModel);
     }
@@ -49,9 +50,9 @@ public class OrgDictController extends BaseController {
     @ApiOperation(value = "创建机构字典")
     public Envelop saveOrgDict(
             @ApiParam(name = "json_data", value = "字典信息", defaultValue = "")
-            @RequestParam(value = "json_data") String jsonData) throws Exception{
+            @RequestParam(value = "json_data") String jsonData) throws Exception {
 
-        OrgDictDetailModel detailModel = objectMapper.readValue(jsonData,OrgDictDetailModel.class);
+        OrgDictDetailModel detailModel = objectMapper.readValue(jsonData, OrgDictDetailModel.class);
         String errorMsg = "";
         if (StringUtils.isEmpty(detailModel.getCode())) {
             errorMsg += "代码不能为空!";
@@ -66,12 +67,19 @@ public class OrgDictController extends BaseController {
             return failed(errorMsg);
         }
 
-        MOrgDict mOrgDict = convertToModel(detailModel,MOrgDict.class);
-        if(mOrgDict.getId()==0)
-        {
+        boolean isExist = orgDictClient.isExistDict(detailModel.getOrganization(), detailModel.getCode());
+        MOrgDict mOrgDict = convertToModel(detailModel, MOrgDict.class);
+        if (mOrgDict.getId() == 0) {
+            if (isExist) {
+                return failed("字典已存在!");
+            }
             mOrgDict = orgDictClient.createOrgDict(objectMapper.writeValueAsString(mOrgDict));
-        }
-        else {
+        } else {
+            MOrgDict orgDict = orgDictClient.getOrgDict(mOrgDict.getId());
+            if (!orgDict.getCode().equals(mOrgDict.getCode())
+                    && isExist) {
+                return failed("字典已存在");
+            }
             mOrgDict = orgDictClient.updateOrgDict(objectMapper.writeValueAsString(mOrgDict));
         }
 
@@ -91,8 +99,7 @@ public class OrgDictController extends BaseController {
             @PathVariable(value = "id") long id) {
 
         boolean result = orgDictClient.deleteOrgDict(id);
-        if(!result)
-        {
+        if (!result) {
             return failed("删除失败!");
         }
         return success(null);
@@ -111,15 +118,16 @@ public class OrgDictController extends BaseController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page) throws Exception{
+            @RequestParam(value = "page", required = false) int page) throws Exception {
 
-        List<MOrgDict> dicts = (List<MOrgDict>) orgDictClient.searchOrgDicts(fields, filters, sorts, size, page);
+        ResponseEntity<Collection<MOrgDict>> responseEntity = orgDictClient.searchOrgDicts(fields, filters, sorts, size, page);
+        List<MOrgDict> dicts = (List<MOrgDict>) responseEntity.getBody();
         List<OrgDictDetailModel> detailModels = (List<OrgDictDetailModel>) convertToModels(dicts,
-                                                                                            new ArrayList<OrgDictDetailModel>(dicts.size()),
-                                                                                            OrgDictDetailModel.class,
-                                                                                            null);
+                new ArrayList<OrgDictDetailModel>(dicts.size()),
+                OrgDictDetailModel.class,
+                null);
 
-        return getResult(detailModels,1,page,size);
+        return getResult(detailModels, getTotalCount(responseEntity), page, size);
     }
 
 
@@ -127,8 +135,22 @@ public class OrgDictController extends BaseController {
     @ApiOperation(value = "机构字典下拉")
     public List<String> getOrgDict(
             @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
-            @RequestParam(value = "orgCode", required = false) String orgCode) throws Exception{
+            @RequestParam(value = "orgCode", required = false) String orgCode) throws Exception {
 
         return orgDictClient.getOrgDict(orgCode);
+    }
+
+    @RequestMapping(value = "/dict/org_dict", method = RequestMethod.GET)
+    public Envelop getOrgDictBySequence(
+            @RequestParam(value = "org_code") String orgCode,
+            @RequestParam(value = "sequence") int sequence) {
+        try {
+            MOrgDict mOrgDict = orgDictClient.getOrgDictBySequence(orgCode, sequence);
+            OrgDictDetailModel detailModel = convertToModel(mOrgDict, OrgDictDetailModel.class);
+
+            return success(detailModel);
+        } catch (Exception ex) {
+            return failedSystem();
+        }
     }
 }

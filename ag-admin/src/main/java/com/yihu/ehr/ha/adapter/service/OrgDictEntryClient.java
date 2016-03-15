@@ -6,6 +6,7 @@ import com.yihu.ehr.model.adaption.MOrgDictItem;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,43 +23,43 @@ import java.util.Collection;
 @ApiIgnore
 public interface OrgDictEntryClient {
 
-    @RequestMapping(value = "/item/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/adapter/org/item/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "获取字典项信息")
     MOrgDictItem getOrgDictItem(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") long id) ;
 
-    @RequestMapping(value = "/item", method = RequestMethod.POST)
+    @RequestMapping(value = "/adapter/org/item", method = RequestMethod.POST)
     @ApiOperation(value = "新增字典项")
     MOrgDictItem createOrgDictItem(
-            @ApiParam(name = "json_data", value = "字典项信息", defaultValue = "")
-            @RequestParam(value = "json_data") String jsonData) ;
+            @ApiParam(name = "model", value = "字典项信息", defaultValue = "")
+            @RequestParam(value = "model") String jsonData) ;
 
 
-    @RequestMapping(value = "/item/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/adapter/org/item/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除字典项")
     boolean deleteOrgDictItem(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @RequestParam(value = "id", required = false) long id) ;
+            @PathVariable(value = "id") long id) ;
 
 
-    @RequestMapping(value = "/items", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/adapter/org/items", method = RequestMethod.DELETE)
     @ApiOperation(value = "批量删除字典项")
     boolean deleteOrgDictItemList(
             @ApiParam(name = "ids", value = "编号集", defaultValue = "")
             @RequestParam(value = "ids") String ids) ;
 
 
-    @RequestMapping(value = "/item/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/adapter/org/item", method = RequestMethod.PUT)
     @ApiOperation(value = "修改字典项")
     MOrgDictItem updateDictItem(
-            @ApiParam(name = "json_data", value = "字典项信息", defaultValue = "")
-            @RequestParam(value = "json_data") String jsonData);
+            @ApiParam(name = "model", value = "字典项信息", defaultValue = "")
+            @RequestParam(value = "model") String jsonData);
 
 
-    @RequestMapping(value = "/items", method = RequestMethod.GET)
+    @RequestMapping(value = "/adapter/org/items", method = RequestMethod.GET)
     @ApiOperation(value = "分页查询")
-    Collection<MOrgDictItem> searchOrgDictItems(
+    ResponseEntity<Collection<MOrgDictItem>> searchOrgDictItems(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -70,11 +71,22 @@ public interface OrgDictEntryClient {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page);
 
-    @RequestMapping(value = "/items/combo", method = RequestMethod.GET)
+    @RequestMapping(value = "/adapter/org/items/combo", method = RequestMethod.GET)
     @ApiOperation(value = "机构字典项下拉")
     Collection<String> getOrgDictEntry(
             @ApiParam(name = "orgDictSeq", value = "字典seq", defaultValue = "")
-            @RequestParam(value = "orgDictSeq") Integer orgDictSeq,
+            @RequestParam(value = "orgDictSeq") long orgDictSeq,
             @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
             @RequestParam(value = "orgCode") String orgCode);
+
+    @RequestMapping(value = "/adapter/org/item/is_exist",method = RequestMethod.GET)
+    boolean isExistDictItem(
+            @RequestParam(value = "dict_id")long dictId,
+            @RequestParam(value = "org_code")String orgCode,
+            @RequestParam(value = "item_code")String itemCode);
+
+    @RequestMapping(value = "/adapter/org/dict/dict_entry",method = RequestMethod.GET)
+    MOrgDictItem getOrgDicEntryBySequence(
+            @RequestParam(value = "org_code") String orgCode,
+            @RequestParam(value = "sequence") int sequence);
 }

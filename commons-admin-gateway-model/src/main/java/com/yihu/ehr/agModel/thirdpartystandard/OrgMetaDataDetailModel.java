@@ -12,6 +12,8 @@ public class OrgMetaDataDetailModel {
     String createUser;
     String updateUser;
     int orgDataSet;
+    String dataSetCode;
+    String dataSetName;
     String description;
     String organization;
     int sequence;
@@ -80,6 +82,22 @@ public class OrgMetaDataDetailModel {
 
     public void setOrgDataSet(int orgDataSet) {
         this.orgDataSet = orgDataSet;
+    }
+
+    public String getDataSetCode() {
+        return dataSetCode;
+    }
+
+    public void setDataSetCode(String dataSetCode) {
+        this.dataSetCode = dataSetCode;
+    }
+
+    public String getDataSetName() {
+        return dataSetName;
+    }
+
+    public void setDataSetName(String dataSetName) {
+        this.dataSetName = dataSetName;
     }
 
     public String getDescription() {

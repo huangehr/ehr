@@ -1,7 +1,9 @@
 package com.yihu.ehr.feign;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.constants.MicroServiceIpAddressStr;
+import com.yihu.ehr.constants.MicroServiceName;
+import com.yihu.ehr.constants.MicroServicePort;
 import com.yihu.ehr.model.geogrephy.MGeography;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,7 +17,7 @@ import java.util.List;
 /**
  * Created by Administrator on 2016/1/4.
  */
-@FeignClient(MicroServices.Geography)
+@FeignClient(name = MicroServiceName.Geography)
 @ApiIgnore
 public interface GeographyClient {
 
