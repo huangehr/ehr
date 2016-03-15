@@ -41,6 +41,15 @@ public class SimplifiedEsbEndPoint {
         return new ResponseEntity<>(new Json(""), HttpStatus.OK);
     }
 */
+
+    @ApiOperation("判断是否需要上传日志")
+    @RequestMapping(value = "/getUploadFlag", method = RequestMethod.GET)
+    public ResponseEntity<Boolean> getUploadFlag(@ApiParam("orgCode") @RequestParam(value = "orgCode", required = true)
+                                               String orgCode,
+                                           @ApiParam("systemCode") @RequestParam(value = "systemCode", required = true)
+                                               String systemCode) throws Exception {
+        return new ResponseEntity<>(simplifiedESBClient.getUploadFlag(orgCode, systemCode), HttpStatus.OK);
+    }
     @ApiOperation("日志上传")
     @RequestMapping(value = "/uploadLog", method = RequestMethod.POST)
     public ResponseEntity<String> uploadLogger(@ApiParam("orgCode") @RequestParam(value = "orgCode", required = true)

@@ -2,6 +2,7 @@ package com.yihu.ehr.feign;
 
 import com.yihu.ehr.constants.MicroServices;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,6 +14,11 @@ import springfox.documentation.annotations.ApiIgnore;
 @FeignClient(MicroServices.Simplifiedesb)
 @ApiIgnore
 public interface SimplifiedESBClient {
+
+    @RequestMapping(value = "/esb/getUploadFlag", method = RequestMethod.GET)
+    public boolean getUploadFlag(@RequestParam(value = "orgCode", required = true) String orgCode,
+                                   @RequestParam(value = "systemCode", required = true)String systemCode);
+
     @RequestMapping(value = "/esb/uploadLog", method = RequestMethod.POST)
     public boolean uploadLog(@RequestParam(value = "orgCode", required = true) String orgCode,
                              @RequestParam(value = "ip", required = true) String ip,
@@ -56,4 +62,5 @@ public interface SimplifiedESBClient {
                                              @RequestParam(value = "status", required = true) String status,
                                              @RequestParam(value = "id", required = true) String id,
                                              @RequestParam(value = "message", required = true) String message);
+
 }

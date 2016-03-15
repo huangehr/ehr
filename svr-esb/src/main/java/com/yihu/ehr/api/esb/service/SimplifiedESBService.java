@@ -25,6 +25,8 @@ public class SimplifiedESBService {
     private IHosLogDao hosLogDao;
     @Autowired
     private IHosSqlTaskDao hosSqlTaskDao;
+    @Autowired
+    private IHosLogStatusDao hosLogStatusDao;
 
 
     public HosEsbMiniRelease getUpdateFlag(String versionCode, String systemCode, String orgCode) throws Exception {
@@ -81,7 +83,7 @@ public class SimplifiedESBService {
     }
 
     @Transactional
-    public void changeHisPenetrationStatus(String id, String status, String result,String message) {
+    public void changeHisPenetrationStatus(String id, String status, String result, String message) {
         HosSqlTask hqt = hosSqlTaskDao.getOne(id);
         hqt.setStatus(status);
         hqt.setResult(result);
@@ -103,5 +105,14 @@ public class SimplifiedESBService {
         hosEsbMiniInstallLog.setInstallTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(updateDate));
         hosEsbMiniInstallLogDao.save(hosEsbMiniInstallLog);
         return "";
+    }
+
+    public boolean getUploadFlagByOrgCodeAndSystemCode(String orgCode, String systemCode) {
+        List<HosLogStatus> hlss = hosLogStatusDao.findBySystemCodeAndOrgCodeAndStatus(orgCode, systemCode);
+        if (hlss != null && hlss.size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
