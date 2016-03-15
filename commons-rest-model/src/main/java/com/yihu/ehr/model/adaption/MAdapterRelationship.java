@@ -8,16 +8,16 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
  * @created 2016.2.3
  */
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-public class MDataSet {
-    Long id;
+public class MAdapterRelationship {
+    long id;
     String code;
     String name;
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 

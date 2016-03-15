@@ -1,15 +1,21 @@
 package com.yihu.ehr.ha.adapter.controller;
 
+import com.yihu.ehr.agModel.adapter.AdapterPlanDetailModel;
 import com.yihu.ehr.agModel.adapter.AdapterPlanModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.ha.adapter.service.PlanClient;
 import com.yihu.ehr.ha.adapter.utils.ExtendController;
+import com.yihu.ehr.model.adaption.MAdapterPlan;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.validate.ValidateResult;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -29,6 +35,8 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
     @Autowired
     PlanClient planClient;
 
+    @Autowired
+    ConventionalDictEntryClient dictEntryClient;
 
     @RequestMapping(value = "/plan", method = RequestMethod.POST)
     @ApiOperation(value = "新增适配方案信息")
@@ -36,19 +44,24 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
             @ApiParam(name = "model", value = "数据模型")
             @RequestParam(value = "model") String model,
             @ApiParam(name = "isCover", value = "是否覆盖")
-            @RequestParam(value = "isCover") String isCover)  {
+            @RequestParam(value = "isCover") String isCover) {
 
         try {
             AdapterPlanModel dataModel = jsonToObj(model);
             ValidateResult validateResult = validate(dataModel);
-            if(!validateResult.isRs()){
+            if (!validateResult.isRs()) {
                 return failed(validateResult.getMsg());
             }
-            return success(planClient.saveAdapterPlan(objToJson(dataModel), isCover));
-        } catch (ApiException e) {
-            e.printStackTrace();
-            return failed(e.getMessage());
-        } catch (Exception e){
+
+            AdapterPlanDetailModel detailModel = convertToModel(dataModel, AdapterPlanDetailModel.class);
+
+            MAdapterPlan mAdapterPlan = planClient.saveAdapterPlan(objToJson(detailModel), isCover);
+            if (mAdapterPlan == null) {
+                return failed("保存失败!");
+            }
+            AdapterPlanModel adapterPlanModel = ConvertAdapterPlanModel(convertToModel(mAdapterPlan, AdapterPlanModel.class));
+            return success(adapterPlanModel);
+        } catch (Exception e) {
             e.printStackTrace();
             return failedSystem();
         }
@@ -64,14 +77,20 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
         try {
             AdapterPlanModel dataModel = jsonToObj(model);
             ValidateResult validateResult = validate(dataModel);
-            if(!validateResult.isRs()){
+            if (!validateResult.isRs()) {
                 return failed(validateResult.getMsg());
             }
-            return success(planClient.updateAdapterPlan(dataModel.getId(), objToJson(dataModel)));
+            AdapterPlanDetailModel detailModel = convertToModel(dataModel, AdapterPlanDetailModel.class);
+            MAdapterPlan mAdapterPlan = planClient.updateAdapterPlan(detailModel.getId(), objToJson(detailModel));
+            if (mAdapterPlan == null) {
+                return failed("保存失败!");
+            }
+            AdapterPlanModel adapterPlanModel = ConvertAdapterPlanModel(convertToModel(mAdapterPlan, AdapterPlanModel.class));
+            return success(adapterPlanModel);
         } catch (ApiException e) {
             e.printStackTrace();
             return failed(e.getMessage());
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return failedSystem();
         }
@@ -80,7 +99,7 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
 
     @RequestMapping(value = "/plans", method = RequestMethod.GET)
     @ApiOperation(value = "适配方案搜索")
-    public Collection<AdapterPlanModel> searchAdapterPlan(
+    public Envelop searchAdapterPlan(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -93,33 +112,73 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
             @RequestParam(value = "page", required = false) int page) {
 
         try {
-            return convertToModels(
-                    planClient.searchAdapterPlan(fields, filters, sorts, size, page ),
-                    new ArrayList<>(), AdapterPlanModel.class, "");
+            ResponseEntity<Collection<MAdapterPlan>> responseEntity = planClient.searchAdapterPlan(fields, filters, sorts, size, page);
+            List<MAdapterPlan> mAdapterPlans = (List<MAdapterPlan>) responseEntity.getBody();
+            List<AdapterPlanModel> adapterPlanModels = (List<AdapterPlanModel>) convertToModels(
+                    mAdapterPlans,
+                    new ArrayList<AdapterPlanModel>(mAdapterPlans.size()), AdapterPlanModel.class, null);
+            if (adapterPlanModels != null) {
+                for (int i = 0; i < adapterPlanModels.size(); i++) {
+                    long planId = adapterPlanModels.get(i).getId();
+
+                    AdapterPlanModel adapterPlanModel = getModel(planClient.getAdapterPlanById(planId));
+                    if (adapterPlanModel != null) {
+                        adapterPlanModels.get(i).setParentName(adapterPlanModel.getName());
+                    }
+
+                    String type = adapterPlanModels.get(i).getType();
+                    if(StringUtils.isNotEmpty(type))
+                    {
+                        MConventionalDict dict =dictEntryClient.getAdapterType(type);
+                        if(dict!=null)
+                        {
+                            adapterPlanModels.get(i).setTypeValue(dict.getValue());
+                        }
+                    }
+                }
+            }
+            return getResult(adapterPlanModels, getTotalCount(responseEntity), page, size);
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return failedSystem();
         }
     }
 
 
     @RequestMapping(value = "/plan/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "获取适配方案信息")
-    public AdapterPlanModel getAdapterPlanById(
+    public Envelop getAdapterPlanById(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @PathVariable(value = "id") Long id) throws Exception {
-
-        return getModel(planClient.getAdapterPlanById(id));
+            @PathVariable(value = "id") Long id) {
+        try {
+            AdapterPlanModel adapterPlanModel = getModel(planClient.getAdapterPlanById(id));
+            if (adapterPlanModel == null) {
+                return failed("数据获取失败!");
+            }
+            adapterPlanModel = ConvertAdapterPlanModel(adapterPlanModel);
+            return success(adapterPlanModel);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
+        }
     }
 
 
     @RequestMapping(value = "/plans", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除适配方案", notes = "删除适配方案信息，批量删除时，Id以逗号隔开")
-    public boolean delAdapterPlan(
+    public Envelop delAdapterPlan(
             @ApiParam(name = "ids", value = "方案ID")
             @RequestParam("ids") String ids) throws Exception {
+        ids = trimEnd(ids, ",");
+        if (StringUtils.isEmpty(ids)) {
+            return failed("请选择需要删除的方案!");
+        }
+        boolean result = planClient.delAdapterPlan(ids);
+        if (!result) {
+            return failed("删除失败!");
+        }
 
-        return planClient.delAdapterPlan(ids);
+        return success(null);
     }
 
 
@@ -135,11 +194,11 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
     }
 
 
-    @RequestMapping(value = "/plan/{planId}/adapterCustomizes", method = RequestMethod.GET)
+    @RequestMapping(value = "/plan/adapterCustomizes/{plan_id}", method = RequestMethod.GET)
     @ApiOperation(value = "获取定制信息")
     public Map getAdapterCustomize(
-            @ApiParam(name = "planId", value = "方案ID")
-            @RequestParam(value = "planId") long planId,
+            @ApiParam(name = "plan_id", value = "方案ID")
+            @PathVariable(value = "plan_id") long planId,
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam("version") String version) throws Exception {
 
@@ -147,32 +206,36 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
     }
 
 
-    @RequestMapping(value = "/plan/{planId}/adapterDataSet", method = RequestMethod.GET)
+    @RequestMapping(value = "/plan/adapterDataSet/{plan_id}", method = RequestMethod.GET)
     @ApiOperation(value = "定制数据集")
     public boolean adapterDataSet(
-            @ApiParam(name = "planId", value = "编号", defaultValue = "")
-            @PathVariable("planId") Long planId,
+            @ApiParam(name = "plan_id", value = "编号", defaultValue = "")
+            @PathVariable("plan_id") Long planId,
             @ApiParam(name = "customizeData", value = "customizeData", defaultValue = "")
-            @RequestParam("customizeData") String customizeData) throws Exception{
+            @RequestParam("customizeData") String customizeData) throws Exception {
 
         return planClient.adapterDataSet(planId, customizeData);
     }
 
+    public AdapterPlanModel ConvertAdapterPlanModel(AdapterPlanModel adapterPlanModel)
+    {
+        long planId = adapterPlanModel.getId();
 
+        AdapterPlanModel planModel = getModel(planClient.getAdapterPlanById(planId));
+        if (adapterPlanModel != null) {
+            adapterPlanModel.setParentName(adapterPlanModel.getName());
+        }
 
-    /********************************  放到第三方机构网关做  ******************************/
-    @RequestMapping(value = "/orgIsExistData", method = RequestMethod.GET)
-    public String orgIsExistData(@ApiParam(name = "api_version", value = "API版本号", defaultValue = "v1.0")
-                                 @PathVariable(value = "api_version") String apiVersion,
-                                 @ApiParam(name = "orgCode", value = "机构代码")
-                                 @RequestParam(value = "orgCode") String orgCode) {
-        return null;
-    }
+        String type = adapterPlanModel.getType();
+        if(StringUtils.isNotEmpty(type))
+        {
+            MConventionalDict dict =dictEntryClient.getAdapterType(type);
+            if(dict!=null)
+            {
+                adapterPlanModel.setTypeValue(dict.getValue());
+            }
+        }
 
-    @RequestMapping(value = "/getAdapterOrgList", method = RequestMethod.GET)
-    public String getAdapterOrgList(
-            @ApiParam(name = "type", value = "类型")
-            @RequestParam(value = "type") String type) {
-        return null;
+        return adapterPlanModel;
     }
 }

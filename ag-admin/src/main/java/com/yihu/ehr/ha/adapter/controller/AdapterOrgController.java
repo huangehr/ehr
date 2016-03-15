@@ -13,9 +13,11 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -45,11 +47,12 @@ public class AdapterOrgController extends BaseController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) throws Exception {
 
-        List<MAdapterOrg> mAdapterOrgs = (List<MAdapterOrg>) adapterOrgClient.searchAdapterOrg(fields, filters, sorts, size, page);
+        ResponseEntity<Collection<MAdapterOrg>> responseEntity = adapterOrgClient.searchAdapterOrg(fields, filters, sorts, size, page);
+        List<MAdapterOrg> mAdapterOrgs = (List<MAdapterOrg>) responseEntity.getBody();
 
         List<AdapterOrgModel> adapterOrgModels = (List<AdapterOrgModel>) convertToModels(mAdapterOrgs, new ArrayList<AdapterOrgModel>(mAdapterOrgs.size()), AdapterOrgModel.class, null);
 
-        return getResult(adapterOrgModels, 1, page, size);
+        return getResult(adapterOrgModels, getTotalCount(responseEntity), page, size);
     }
 
 

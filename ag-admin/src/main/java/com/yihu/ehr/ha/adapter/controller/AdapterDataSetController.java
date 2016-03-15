@@ -1,23 +1,26 @@
 package com.yihu.ehr.ha.adapter.controller;
 
-import com.yihu.ehr.agModel.adapter.AdapterDataVoModel;
 import com.yihu.ehr.agModel.adapter.AdapterDataSetModel;
-import com.yihu.ehr.agModel.adapter.DataSetModel;
+import com.yihu.ehr.agModel.adapter.AdapterRelationshipModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.ha.adapter.service.AdapterDataSetClient;
 import com.yihu.ehr.ha.adapter.utils.ExtendController;
 import com.yihu.ehr.model.adaption.MAdapterDataSet;
+import com.yihu.ehr.model.adaption.MAdapterRelationship;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.validate.Valid;
 import com.yihu.ehr.util.validate.ValidateResult;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author lincl
@@ -32,17 +35,24 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
     AdapterDataSetClient adapterDataSetClient;
 
     @RequestMapping(value = "/metadata/{id}", method = RequestMethod.GET)
-    public AdapterDataSetModel getAdapterMetaDataById(
+    public Envelop getAdapterMetaDataById(
             @ApiParam(name = "id", value = "适配关系ID")
-            @PathVariable(value = "id") Long id) throws Exception {
-
-        MAdapterDataSet dataSet = adapterDataSetClient.getAdapterMetaData(id);
-        return convertToModel(dataSet, AdapterDataSetModel.class);
+            @PathVariable(value = "id") Long id) {
+        try {
+            MAdapterDataSet dataSet = adapterDataSetClient.getAdapterMetaData(id);
+            if (dataSet == null) {
+                return failed("数据获取失败!");
+            }
+            return success(convertToModel(dataSet, AdapterDataSetModel.class));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
+        }
     }
 
     @RequestMapping(value = "/plan/{planId}/datasets", method = RequestMethod.GET)
     @ApiOperation(value = "根据方案ID及查询条件查询数据集适配关系")
-    public Collection<DataSetModel> searchAdapterDataSet(
+    public Envelop searchAdapterDataSet(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "code", value = "代码查询值", defaultValue = "")
@@ -56,14 +66,19 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) throws Exception {
 
-        return convertToModels(
-                adapterDataSetClient.searchAdapterDataSet(planId, code, name, sorts, size, page),
-                new ArrayList<>(), DataSetModel.class, "");
+        ResponseEntity<Collection<MAdapterRelationship>> responseEntity = adapterDataSetClient.searchAdapterDataSet(planId, code, name, sorts, size, page);
+        List<MAdapterRelationship> mAdapterRelationships = (List<MAdapterRelationship>) responseEntity.getBody();
+        List<AdapterRelationshipModel> adapterRelationshipModels = (List<AdapterRelationshipModel>) convertToModels(
+                mAdapterRelationships,
+                new ArrayList<AdapterRelationshipModel>(mAdapterRelationships.size()),
+                AdapterRelationshipModel.class, null);
+
+        return getResult(adapterRelationshipModels, getTotalCount(responseEntity), page, size);
     }
 
-    @RequestMapping(value = "/plan/{planId}/datasets/{dataSetId}/datametas",method = RequestMethod.GET)
+    @RequestMapping(value = "/plan/{planId}/datasets/{dataSetId}/datametas", method = RequestMethod.GET)
     @ApiOperation(value = "根据dataSetId搜索数据元适配关系")
-    public Collection<AdapterDataVoModel> searchAdapterMetaData(
+    public Envelop searchAdapterMetaData(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "dataSetId", value = "数据集id", defaultValue = "")
@@ -79,10 +94,13 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) throws Exception {
 
-        return convertToModels(
-                adapterDataSetClient.searchAdapterMetaData(planId, dataSetId, code, name, sorts, size, page),
-                new ArrayList<>(), AdapterDataVoModel.class, ""
-        );
+        ResponseEntity<Collection<MAdapterDataSet>> responseEntity = adapterDataSetClient.searchAdapterMetaData(planId, dataSetId, code, name, sorts, size, page);
+        List<MAdapterDataSet> mAdapterDataSets = (List<MAdapterDataSet>) responseEntity.getBody();
+        List<AdapterDataSetModel> adapterDataSetModels = (List<AdapterDataSetModel>) convertToModels(
+                mAdapterDataSets,
+                new ArrayList<>(), AdapterDataSetModel.class, null);
+
+        return getResult(adapterDataSetModels, getTotalCount(responseEntity), page, size);
     }
 
 
@@ -94,10 +112,14 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
         try {
             AdapterDataSetModel dataModel = jsonToObj(model);
             ValidateResult validateResult = validate(dataModel);
-            if(!validateResult.isRs()){
+            if (!validateResult.isRs()) {
                 return failed(validateResult.getMsg());
             }
-            return success(adapterDataSetClient.updateAdapterMetaData(dataModel.getId(), model));
+            MAdapterDataSet mAdapterDataSet = adapterDataSetClient.updateAdapterMetaData(dataModel.getId(), model);
+            if (mAdapterDataSet == null) {
+                return failed("保存失败!");
+            }
+            return success(getModel(mAdapterDataSet));
         } catch (ApiException e) {
             e.printStackTrace();
             return failed(e.getMessage());
@@ -111,67 +133,45 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
     @RequestMapping(value = "/metadata", method = RequestMethod.POST)
     public Envelop addAdapterMetaData(
             @ApiParam(name = "model", value = "说明")
-            @Valid @RequestParam(value = "model") AdapterDataSetModel model) throws Exception{
+            @Valid @RequestParam(value = "model") String model) throws Exception {
 
-//        try {
-//            throw new Exception("chucuo");
-            return success(
-                    adapterDataSetClient.createAdapterMetaData(  objToJson(model) ));
-//        } catch (Exception e) {
-//            if(e.getCause() instanceof FeignException){
-//                return failed((e.getCause()).getMessage());
-//            }
-//            e.printStackTrace();
-//            return failedSystem();
-//        }
+        try {
+            AdapterDataSetModel dataModel = jsonToObj(model);
+            ValidateResult validateResult = validate(dataModel);
+            if (!validateResult.isRs()) {
+                return failed(validateResult.getMsg());
+            }
+            MAdapterDataSet mAdapterDataSet = adapterDataSetClient.createAdapterMetaData(model);
+            if (mAdapterDataSet == null) {
+                return failed("保存失败!");
+            }
+            return success(getModel(mAdapterDataSet));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
+        }
     }
 
 
     @RequestMapping(value = "/metadatas", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除适配关系", notes = "根据适配关系ID删除适配关系，批量删除时ID以逗号隔开")
-    public boolean deleteAdapterMetaData(
+    public Envelop deleteAdapterMetaData(
             @ApiParam(name = "ids", value = "适配关系ID")
-            @RequestParam(value = "ids") String ids) throws Exception{
+            @RequestParam(value = "ids") String ids) {
 
-        return adapterDataSetClient.delMetaData(ids);
-    }
-
-
-
-
-    /***********************************  放到第三方  ******************************************/
-    @RequestMapping(value = "/getStdMetaData", method = RequestMethod.GET)
-    @ApiOperation(value = "获取标准数据元", produces = "application/json", notes = "获取未适配的标准数据元，查询条件(mode)为 modify/view")
-    public Object getStdMetaData(
-            @ApiParam(name = "apiVersion", value = "API版本号", defaultValue = "v1.0")
-            @PathVariable(value = "apiVersion") String apiVersion,
-            @ApiParam(name = "adapterPlanId", value = "方案ID")
-            @RequestParam(value = "adapterPlanId") long adapterPlanId,
-            @ApiParam(name = "dataSetId", value = "标准数据集ID")
-            @RequestParam(value = "dataSetId") long dataSetId,
-            @ApiParam(name = "mode", value = "查询条件")
-            @RequestParam(value = "mode") String mode) {
-
-        return null;
-    }
-
-    @RequestMapping(value = "/getOrgDataSet", method = RequestMethod.GET)
-    @ApiOperation(value = "获取机构数据集", produces = "application/json", notes = "获取机构数据集")
-    public Object getOrgDataSet(@ApiParam(name = "apiVersion", value = "API版本号", defaultValue = "v1.0")
-                                @PathVariable(value = "apiVersion") String apiVersion,
-                                @ApiParam(name = "adapterPlanId", value = "方案ID")
-                                @RequestParam(value = "adapterPlanId") long adapterPlanId) {
-        return null;
-    }
-
-    @RequestMapping("/getOrgMetaData")
-    @ApiOperation(value = "获取未适配的机构数据元", produces = "application/json", notes = "获取未适配的机构数据元")
-    public Object getOrgMetaData(@ApiParam(name = "apiVersion", value = "API版本号", defaultValue = "v1.0")
-                                 @PathVariable(value = "apiVersion") String apiVersion,
-                                 @ApiParam(name = "orgDataSetSeq", value = "机构数据集序号")
-                                 @RequestParam(value = "orgDataSetSeq") Integer orgDataSetSeq,
-                                 @ApiParam(name = "adapterPlanId", value = "适配方案ID")
-                                 @RequestParam(value = "adapterPlanId") Long adapterPlanId) {
-        return null;
+        try {
+            ids = trimEnd(ids, ",");
+            if (StringUtils.isEmpty(ids)) {
+                return failed("请选择需要删除的数据!");
+            }
+            boolean result = adapterDataSetClient.delMetaData(ids);
+            if (!result) {
+                return failed("删除失败!");
+            }
+            return success(null);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
+        }
     }
 }

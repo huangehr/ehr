@@ -23,7 +23,7 @@ public class OrgDictItemService extends BaseJpaService<OrgDictItem, XOrgDictItem
 
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public boolean isExistOrgDictItem(int orgDictSeq, String orgCode, String code) {
+    public boolean isExistOrgDictItem(long orgDictSeq, String orgCode, String code) {
         return ((XOrgDictItemRepository) getRepository()).isExistOrgDictItem(orgDictSeq, orgCode, code).size() != 0;
     }
 
@@ -91,7 +91,7 @@ public class OrgDictItemService extends BaseJpaService<OrgDictItem, XOrgDictItem
         return result;
     }
 
-    public List findByDict(int orgDictSeq, String orgCode) {
+    public List findByDict(long orgDictSeq, String orgCode) {
         String hql = " from OrgDictItem where orgDict=:orgDictSeq and organization=:orgCode";
         Query query = currentSession().createQuery(hql);
         query.setParameter("orgDictSeq", orgDictSeq);

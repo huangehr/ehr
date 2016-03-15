@@ -11,15 +11,17 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
  * Created by AndyCai on 2016/1/27.
  */
-@RequestMapping(ApiVersion.Version1_0 + "/orgDict")
+@RequestMapping(ApiVersion.Version1_0 + "/admin/adapter/org")
 @RestController
 public class OrgDictController extends BaseController {
 
@@ -66,12 +68,23 @@ public class OrgDictController extends BaseController {
             return failed(errorMsg);
         }
 
+        boolean isExist = orgDictClient.isExistDict(detailModel.getOrganization(),detailModel.getCode());
         MOrgDict mOrgDict = convertToModel(detailModel,MOrgDict.class);
         if(mOrgDict.getId()==0)
         {
+            if(isExist)
+            {
+                return failed("字典已存在!");
+            }
             mOrgDict = orgDictClient.createOrgDict(objectMapper.writeValueAsString(mOrgDict));
         }
         else {
+            MOrgDict orgDict = orgDictClient.getOrgDict(mOrgDict.getId());
+            if(!orgDict.getCode().equals(mOrgDict.getCode())
+                    && isExist)
+            {
+                return failed("字典已存在");
+            }
             mOrgDict = orgDictClient.updateOrgDict(objectMapper.writeValueAsString(mOrgDict));
         }
 
@@ -113,13 +126,14 @@ public class OrgDictController extends BaseController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) throws Exception{
 
-        List<MOrgDict> dicts = (List<MOrgDict>) orgDictClient.searchOrgDicts(fields, filters, sorts, size, page);
+        ResponseEntity<Collection<MOrgDict>> responseEntity = orgDictClient.searchOrgDicts(fields, filters, sorts, size, page);
+        List<MOrgDict> dicts = (List<MOrgDict>) responseEntity.getBody();
         List<OrgDictDetailModel> detailModels = (List<OrgDictDetailModel>) convertToModels(dicts,
                                                                                             new ArrayList<OrgDictDetailModel>(dicts.size()),
                                                                                             OrgDictDetailModel.class,
                                                                                             null);
 
-        return getResult(detailModels,1,page,size);
+        return getResult(detailModels,getTotalCount(responseEntity),page,size);
     }
 
 
