@@ -1,7 +1,6 @@
 package com.yihu.ehr.org.feign;
 
-import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.constants.*;
 import com.yihu.ehr.model.security.MUserSecurity;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,7 +13,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
 /**
  * Created by Administrator on 2016/1/4.
  */
-@FeignClient(MicroServices.Security)
+@FeignClient(name = MicroServiceName.Security,url = MicroServiceIpAddressStr.Security+ MicroServicePort.Security)
 @ApiIgnore
 public interface SecurityClient {
 

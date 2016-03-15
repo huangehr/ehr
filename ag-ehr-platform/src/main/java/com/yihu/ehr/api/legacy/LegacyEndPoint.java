@@ -328,8 +328,8 @@ public class LegacyEndPoint {
         return new RestEcho().success().putMessage("ok");
     }
 
-    @ApiOperation(value = "公钥", response = String.class)
-    @RequestMapping(value = "/security/user_key/{login_code}",  method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户公钥", response = String.class)
+    @RequestMapping(value = "/securities/user_key/{login_code}",  method = RequestMethod.GET)
     public RestEcho getUserKey(
             @ApiParam(name = "login_code", value = "用户名")
             @PathVariable(value = "login_code") String loginCode) {
@@ -352,17 +352,16 @@ public class LegacyEndPoint {
 //
 //    }
 //
-//
-//
-//    @RequestMapping(value = "/securities/{org_code}/org", method = RequestMethod.GET)
-//    @ApiOperation(value = "获取企业公钥", notes = "企业公钥，用于与健康档案平台之间传输数据的加密。")
-//    public String getUserSecurityByOrgCode(
-//            @ApiParam(name = "org_code", value = "机构代码")
-//            @PathVariable(value = "org_code") String orgCode) {
-//        MUserSecurity userSecurity = securityClient.getUserSecurityByOrgCode(orgCode);
-//        String publicKey = userSecurity.getPublicKey();
-//        return publicKey;
-//    }
+
+    @RequestMapping(value = "/securities/org_key/{org_code}", method = RequestMethod.GET)
+    @ApiOperation(value = "获取企业公钥", notes = "企业公钥，用于与健康档案平台之间传输数据的加密。")
+    public String getUserSecurityByOrgCode(
+            @ApiParam(name = "org_code", value = "机构代码")
+            @PathVariable(value = "org_code") String orgCode) {
+        MUserSecurity userSecurity = securityClient.getUserSecurityByOrgCode(orgCode);
+        String publicKey = userSecurity.getPublicKey();
+        return publicKey;
+    }
 
 
 

@@ -1,7 +1,6 @@
 package com.yihu.ehr.patient.feign;
 
-import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.constants.*;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,7 +14,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
  * @version 1.0
  * @created 2016.02.01 20:14
  */
-@FeignClient(MicroServices.PackageMgr)
+@FeignClient(name = MicroServiceName.Package,url = MicroServiceIpAddressStr.Package+ MicroServicePort.Package)
 @ApiIgnore
 public interface JsonPackageClient {
     @RequestMapping(value = ApiVersion.Version1_0+"/package", method = POST)

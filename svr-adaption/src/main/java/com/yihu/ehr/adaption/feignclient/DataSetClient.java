@@ -1,7 +1,6 @@
 package com.yihu.ehr.adaption.feignclient;
 
-import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.constants.*;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -19,7 +18,7 @@ import java.util.Map;
  * @created 2016.2.1
  */
 @ApiIgnore
-@FeignClient(MicroServices.StandardMgr)
+@FeignClient(name = MicroServiceName.Standard,url = MicroServiceIpAddressStr.Standard+ MicroServicePort.Standard)
 @RequestMapping(ApiVersion.Version1_0)
 public interface DataSetClient {
 

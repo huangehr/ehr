@@ -1,7 +1,6 @@
 package com.yihu.ehr.feign;
 
-import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.constants.*;
 import com.yihu.ehr.util.RestEcho;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -15,7 +14,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * Created by AndyCai on 2016/3/3.
  */
-@FeignClient(MicroServices.StandardMgr)
+@FeignClient(name = MicroServiceName.Standard,url = MicroServiceIpAddressStr.Standard+ MicroServicePort.Standard)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface StandardDispatchClient {

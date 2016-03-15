@@ -1,7 +1,6 @@
 package com.yihu.ehr.feign;
 
-import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.constants.*;
 import com.yihu.ehr.model.security.MUserSecurity;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -17,7 +16,7 @@ import java.util.Map;
 /**
  * Created by AndyCai on 2016/2/1.
  */
-@FeignClient(MicroServices.Security)
+@FeignClient(name = MicroServiceName.Security,url = MicroServiceIpAddressStr.Security+ MicroServicePort.Security)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface SecurityClient {

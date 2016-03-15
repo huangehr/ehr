@@ -82,21 +82,47 @@ public class AdaptionsEndPoint {
         return object;
     }
 
+//// TODO: 2016/3/15  增加新接口，根据orgCode来获取采集标准及适配方案信息 
+//    @RequestMapping(value = "/organization", method = RequestMethod.GET)
+//    @ApiOperation(value = "获取采集标准及适配方案信息", response = RestEcho.class, produces = "application/json", notes = "获取采集标准及适配方案信息，文件以Base64编码，压缩格式为zip")
+//    public Object getOrgAdaptions(
+//            @ApiParam(required = true, name = "user_name", value = "用户名")
+//            @RequestParam(value = "user_name", required = true) String userName,
+//            @ApiParam(required = true, name = "version_code", value = "适配标准版本")
+//            @RequestParam(value = "version_code", required = true) String versionCode,
+//            @ApiParam(required = true, name = "org_code", value = "机构代码")
+//            @RequestParam(value = "org_code", required = true) String orgCode) {
+//
+//        String errorMsg = null;
+//        if (StringUtils.isEmpty(userName)) {
+//            errorMsg += "缺失参数:user_name!";
+//        }
+//        if (StringUtils.isEmpty(versionCode)) {
+//            errorMsg += "缺失参数:version_code!";
+//        }
+//        if (StringUtils.isEmpty(orgCode)) {
+//            errorMsg += "缺失参数:org_code!";
+//        }
+//        if (StringUtils.isNotEmpty(errorMsg))
+//            return new RestEcho().failed(ErrorCode.MissParameter, errorMsg);
+//        MUserSecurity mUserSecurity = securityClient.getUserSecurityByLoginCode(userName);
+//        if (mUserSecurity == null) {
+//            return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed, "获取用户密钥失败");
+//        }
+//        Object object = adapterDispatchClient.getALLSchemeMappingInfo(mUserSecurity.getPrivateKey(), versionCode, orgCode);
+//        return object;
+//    }
+
 
     @RequestMapping(value = "/organization", method = RequestMethod.GET)
     @ApiOperation(value = "获取采集标准及适配方案信息", response = RestEcho.class, produces = "application/json", notes = "获取采集标准及适配方案信息，文件以Base64编码，压缩格式为zip")
     public Object getOrgAdaptions(
-            @ApiParam(required = true, name = "user_name", value = "用户名")
-            @RequestParam(value = "user_name", required = true) String userName,
             @ApiParam(required = true, name = "version_code", value = "适配标准版本")
             @RequestParam(value = "version_code", required = true) String versionCode,
             @ApiParam(required = true, name = "org_code", value = "机构代码")
             @RequestParam(value = "org_code", required = true) String orgCode) {
 
         String errorMsg = null;
-        if (StringUtils.isEmpty(userName)) {
-            errorMsg += "缺失参数:user_name!";
-        }
         if (StringUtils.isEmpty(versionCode)) {
             errorMsg += "缺失参数:version_code!";
         }
@@ -105,14 +131,13 @@ public class AdaptionsEndPoint {
         }
         if (StringUtils.isNotEmpty(errorMsg))
             return new RestEcho().failed(ErrorCode.MissParameter, errorMsg);
-        MUserSecurity mUserSecurity = securityClient.getUserSecurityByLoginCode(userName);
+        MUserSecurity mUserSecurity = securityClient.getUserSecurityByLoginCode(orgCode);
         if (mUserSecurity == null) {
             return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed, "获取用户密钥失败");
         }
         Object object = adapterDispatchClient.getALLSchemeMappingInfo(mUserSecurity.getPrivateKey(), versionCode, orgCode);
         return object;
     }
-
 
     @RequestMapping(value = "/version_plan", method = RequestMethod.GET)
     @ApiOperation(value = "根据机构编码获取最新映射版本号 ", response = RestEcho.class, produces = "application/json", notes = "指定版本的信息")
@@ -125,6 +150,9 @@ public class AdaptionsEndPoint {
         Object object = adapterDispatchClient.getCDAVersionInfoByOrgCode(orgCode);
         return object;
     }
+
+
+
 
 //
 //    @ApiOperation(value = "获取机构数据标准", produces = "application/gzip")
