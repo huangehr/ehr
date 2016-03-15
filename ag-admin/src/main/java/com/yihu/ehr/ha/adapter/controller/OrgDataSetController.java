@@ -77,15 +77,14 @@ public class OrgDataSetController extends BaseController {
 
             MOrgDataSet mOrgDataSet = convertToModel(detailModel, MOrgDataSet.class);
             if (detailModel.getId() == 0) {
-                if(isExist)
-                {
+                if (isExist) {
                     return failed("数据集已存在!");
                 }
                 mOrgDataSet = orgDataSetClient.createOrgDataSet(objectMapper.writeValueAsString(mOrgDataSet));
             } else {
                 MOrgDataSet orgDataSet = orgDataSetClient.getOrgDataSet(detailModel.getId());
-                if(!orgDataSet.getCode().equals(detailModel.getCode())
-                         && isExist){
+                if (!orgDataSet.getCode().equals(detailModel.getCode())
+                        && isExist) {
                     return failed("数据集已存在!");
                 }
                 //mOrgDataSet.setUpdateDate(new Date());
@@ -144,10 +143,26 @@ public class OrgDataSetController extends BaseController {
 
         try {
             ResponseEntity<Collection<MOrgDataSet>> responseEntity = orgDataSetClient.searchAdapterOrg(fields, filters, sorts, size, page);
-            List<MOrgDataSet> mOrgDataSets = (List<MOrgDataSet>)responseEntity.getBody();
+            List<MOrgDataSet> mOrgDataSets = (List<MOrgDataSet>) responseEntity.getBody();
             List<OrgDataSetDetailModel> detailModels = (List<OrgDataSetDetailModel>) convertToModels(mOrgDataSets, new ArrayList<OrgDataSetDetailModel>(mOrgDataSets.size()), OrgDataSetDetailModel.class, null);
 
             return getResult(detailModels, getTotalCount(responseEntity), page, size);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
+    @RequestMapping(value = "/data_set", method = RequestMethod.GET)
+    public Envelop getDataSetBySequence(
+            @RequestParam(value = "org_code") String orgCode,
+            @RequestParam(value = "sequence") long sequence) {
+
+        try {
+            MOrgDataSet mOrgDataSet = orgDataSetClient.getDataSetBySequence(orgCode, sequence);
+            OrgDataSetDetailModel dataSetModel = convertToModel(mOrgDataSet, OrgDataSetDetailModel.class);
+
+            return success(dataSetModel);
         } catch (Exception ex) {
             ex.printStackTrace();
             return failedSystem();

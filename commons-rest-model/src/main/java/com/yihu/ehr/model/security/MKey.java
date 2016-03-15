@@ -4,17 +4,17 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 医生
+ * 公钥。
  *
  * @author Sand
  * @version 1.0
  * @created 02-6月-2015 17:38:05
  */
-public class MUserSecurity implements Serializable{
+public class MKey implements Serializable{
 
-	public MUserSecurity() {
-
+	public MKey() {
 	}
+
 	private String id;
 	private String privateKey;
 	private String publicKey;

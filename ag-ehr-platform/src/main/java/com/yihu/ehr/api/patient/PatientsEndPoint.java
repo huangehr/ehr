@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.spring.web.json.Json;
@@ -81,7 +82,7 @@ public class PatientsEndPoint {
      * <p>
      * 患者注册信息
      */
-    @ApiOperation(value = "注册患者", response = boolean.class, produces = "application/json", notes = "根据患者的身份证号及其他患者信息在健康档案平台中注册患者")
+    @ApiOperation(value = "注册患者", response = boolean.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "根据患者的身份证号及其他患者信息在健康档案平台中注册患者")
     @RequestMapping(value = "", method = {RequestMethod.POST})
     public String registerPatient(@ApiParam(name = "json", value = "患者人口学数据集")
                                   @RequestParam(value = "json", required = true) String patientInfo) throws IOException, ParseException {
@@ -93,7 +94,7 @@ public class PatientsEndPoint {
         return "";
     }
 
-    @ApiOperation(value = "获取患者", response = boolean.class, produces = "application/json")
+    @ApiOperation(value = "获取患者", response = boolean.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @RequestMapping(value = "/{demographic_id}", method = {RequestMethod.GET})
     public ResponseEntity<Json> getPatient(@ApiParam(name = "demographic_id", value = "身份证号")
                                            @PathVariable(value = "demographic_id") String demographicId) {
@@ -104,7 +105,7 @@ public class PatientsEndPoint {
         return new ResponseEntity<>(new Json(""), HttpStatus.OK);
     }
 
-    @ApiOperation(value = "更新患者", response = boolean.class, produces = "application/json")
+    @ApiOperation(value = "更新患者", response = boolean.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @RequestMapping(value = "/{demographic_id}", method = {RequestMethod.PUT})
     public String updatePatient(@ApiParam(name = "demographic_id", value = "身份证号")
                                 @PathVariable(value = "demographic_id") String demographicId,

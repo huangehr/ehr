@@ -150,4 +150,18 @@ public class OrgDictEntryController extends BaseController {
 
         return (List<String>)orgDictEntryClient.getOrgDictEntry(orgDictSeq,orgCode);
     }
+
+    @RequestMapping(value = "/dict/dict_entry", method = RequestMethod.GET)
+    public Envelop getOrgDictEntryBySequence(
+            @RequestParam(value = "org_code") String orgCode,
+            @RequestParam(value = "sequence") int sequence) {
+        try {
+            MOrgDictItem mOrgDictItem = orgDictEntryClient.getOrgDicEntryBySequence(orgCode, sequence);
+            OrgDictEntryDetailModel detailModel = convertToModel(mOrgDictItem, OrgDictEntryDetailModel.class);
+
+            return success(detailModel);
+        } catch (Exception ex) {
+            return failedSystem();
+        }
+    }
 }

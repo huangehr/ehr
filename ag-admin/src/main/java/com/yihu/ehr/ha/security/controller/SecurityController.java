@@ -3,7 +3,7 @@ package com.yihu.ehr.ha.security.controller;
 import com.yihu.ehr.agModel.security.UserSecurityModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.security.service.SecurityClient;
-import com.yihu.ehr.model.security.MUserSecurity;
+import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
@@ -37,10 +37,10 @@ public class SecurityController extends BaseController{
 
         Envelop envelop = new Envelop();
 
-        MUserSecurity mUserSecurity = securityClient.getUserSecurityByLoginCode(loginCode);
-        UserSecurityModel userSecurityModel = convertToModel(mUserSecurity,UserSecurityModel.class);
+        MKey mKey = securityClient.getUserSecurityByLoginCode(loginCode);
+        UserSecurityModel userSecurityModel = convertToModel(mKey,UserSecurityModel.class);
 
-        if(mUserSecurity != null){
+        if(mKey != null){
             envelop.setSuccessFlg(true);
             envelop.setObj(userSecurityModel);
         }else {
@@ -61,8 +61,8 @@ public class SecurityController extends BaseController{
 
         Envelop envelop = new Envelop();
 
-        MUserSecurity mUserSecurity = securityClient.getUserSecurityByOrgCode(orgCode);
-        UserSecurityModel userSecurityModel = convertToModel(mUserSecurity,UserSecurityModel.class);
+        MKey mKey = securityClient.getUserSecurityByOrgCode(orgCode);
+        UserSecurityModel userSecurityModel = convertToModel(mKey,UserSecurityModel.class);
 
         if(userSecurityModel != null){
             envelop.setSuccessFlg(true);
@@ -195,8 +195,8 @@ public class SecurityController extends BaseController{
 
         Envelop envelop = new Envelop();
 
-        MUserSecurity mUserSecurity = securityClient.createSecurityByOrgCode(orgCode);
-        UserSecurityModel userSecurityModel = convertToModel(mUserSecurity,UserSecurityModel.class);
+        MKey mKey = securityClient.createSecurityByOrgCode(orgCode);
+        UserSecurityModel userSecurityModel = convertToModel(mKey,UserSecurityModel.class);
 
         if(userSecurityModel != null){
             envelop.setSuccessFlg(true);
@@ -307,7 +307,7 @@ public class SecurityController extends BaseController{
 //
 //        Envelop envelop = new Envelop();
 //
-//        MUserSecurity mUserSecurity = securityClient.getUserSecurityByUserName(loginCode);
+//        MKey mUserSecurity = securityClient.getUserSecurityByUserName(loginCode);
 //
 //        if(mUserSecurity != null){
 //            envelop.setSuccessFlg(true);
@@ -335,8 +335,8 @@ public class SecurityController extends BaseController{
 
         Envelop envelop = new Envelop();
 
-        MUserSecurity mUserSecurity = securityClient.createSecurityByUserId(userId);
-        UserSecurityModel userSecurityModel = convertToModel(mUserSecurity,UserSecurityModel.class);
+        MKey mKey = securityClient.createSecurityByUserId(userId);
+        UserSecurityModel userSecurityModel = convertToModel(mKey,UserSecurityModel.class);
 
         if(userSecurityModel != null){
             envelop.setSuccessFlg(true);
@@ -383,8 +383,8 @@ public class SecurityController extends BaseController{
 
         Envelop envelop = new Envelop();
 
-        MUserSecurity mUserSecurity = securityClient.getUserSecurityByUserId(userId);
-        UserSecurityModel userSecurityModel = convertToModel(mUserSecurity,UserSecurityModel.class);
+        MKey mKey = securityClient.getUserSecurityByUserId(userId);
+        UserSecurityModel userSecurityModel = convertToModel(mKey,UserSecurityModel.class);
 
         if(userSecurityModel != null){
             envelop.setSuccessFlg(true);

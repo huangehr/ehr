@@ -1,12 +1,12 @@
 package com.yihu.ehr.api.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.api.model.OrganizationModel;
-import com.yihu.ehr.api.model.UserModel;
+import com.yihu.ehr.api.model.MUser;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.feign.OrganizationClient;
+import com.yihu.ehr.feign.SecurityClient;
 import com.yihu.ehr.feign.UserClient;
-import com.yihu.ehr.model.user.MUser;
+import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -36,89 +36,48 @@ public class UsersEndPoint extends BaseController {
     private UserClient userClient;
 
     @Autowired
+    private SecurityClient securityClient;
+
+    @Autowired
     private OrganizationClient organizationClient;
 
     @ApiOperation("获取用户列表")
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public List<UserModel> getUsers() {
-        List<UserModel> userModels = new ArrayList<>();
-        List<MUser> mUsers = userClient.getUsers();
-        for (MUser mUser : mUsers) {
-            UserModel userModel = convertToModel(mUser, UserModel.class);
-            userModel.setOrganization(organizationClient.getOrg(mUser.getOrganization()));
-            userModels.add(userModel);
+    public List<MUser> getUsers() {
+        List<MUser> MUsers = new ArrayList<>();
+        List<com.yihu.ehr.model.user.MUser> mUsers = userClient.getUsers();
+        for (com.yihu.ehr.model.user.MUser mUser : mUsers) {
+            MUser MUser = convertToModel(mUser, MUser.class);
+            MUser.setOrganization(organizationClient.getOrg(mUser.getOrganization()));
+            MUsers.add(MUser);
         }
 
-        return userModels;
+        return MUsers;
     }
 
     @ApiOperation("获取用户")
     @RequestMapping(value = "/users/{user_name}", method = RequestMethod.GET)
-    public UserModel getUser(
+    public MUser getUser(
             @ApiParam("user_name")
             @PathVariable("user_name") String userName) {
-        MUser mUser = userClient.getUserByUserName(userName);
-        UserModel userModel = convertToModel(mUser, UserModel.class);
+        com.yihu.ehr.model.user.MUser mUser = userClient.getUserByUserName(userName);
+        MUser MUser = convertToModel(mUser, MUser.class);
 
         if (mUser.getOrganization() != null) {
-            userModel.setOrganization(organizationClient.getOrg(mUser.getOrganization()));
+            MUser.setOrganization(organizationClient.getOrg(mUser.getOrganization()));
         }
 
-        return userModel;
+        return MUser;
     }
 
-    @ApiOperation(value = "获取你自己的信息", notes = "/users/{user_name}的快捷方式")
-    @RequestMapping(value = "/user", method = RequestMethod.GET)
-    public String getAuthorizedUser(HttpServletRequest request) {
-        return "";
-    }
+    @ApiOperation("获取用户公钥")
+    @RequestMapping(value = "/users/{user_name}/key", method = RequestMethod.GET)
+    public MKey getPublicKey(@ApiParam("user_name")
+                             @PathVariable("user_name")
+                             String userName) {
+        MKey key = securityClient.getUserKey(userName);
+        key.setPrivateKey("");
 
-    @ApiOperation(value = "更新你自己的信息")
-    @RequestMapping(value = "/user", method = RequestMethod.PUT)
-    public String updateAuthorizedUser(@ApiParam("user")
-                                       @RequestParam("user")
-                                       String userJson,
-                                       HttpServletRequest request) {
-        return "";
-    }
-
-    //------ 用户RSA公钥 ------
-    @ApiOperation("获取用户公钥列表")
-    @RequestMapping(value = "/users/{user_name}/keys", method = RequestMethod.GET)
-    public List<String> getPublicKeys(@ApiParam("user_name")
-                                      @PathVariable("user_name")
-                                      String userName) {
-        return null;
-    }
-
-    @ApiOperation("获取你的公钥列表")
-    @RequestMapping(value = "/user/keys", method = RequestMethod.GET)
-    public List<String> getPublicKeys(HttpServletRequest request) {
-        return null;
-    }
-
-    @ApiOperation("为你创建公钥")
-    @RequestMapping(value = "/user/keys", method = RequestMethod.POST)
-    public List<String> createPublicKey(String userName,
-                                        @ApiParam("key_id")
-                                        @RequestParam("key_id")
-                                        String keyId) {
-        return null;
-    }
-
-    @ApiOperation("获取你的公钥")
-    @RequestMapping(value = "/user/keys/{key_id}", method = RequestMethod.GET)
-    public List<String> getPublicKey(@ApiParam("key_id")
-                                     @PathVariable("key_id")
-                                     String keyId) {
-        return null;
-    }
-
-    @ApiOperation("删除你的公钥")
-    @RequestMapping(value = "/user/keys/{key_id}", method = RequestMethod.DELETE)
-    public List<String> deletePublicKey(@ApiParam("key_id")
-                                        @PathVariable("key_id")
-                                        String keyId) {
-        return null;
+        return key;
     }
 }

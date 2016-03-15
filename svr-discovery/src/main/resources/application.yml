@@ -42,7 +42,7 @@ spring:
 
 eureka:
   instance:
-      ip-address: 192.168.131.151
+      ip-address: 172.19.103.73
       prefer-ip-address: true
       #leaseRenewalIntervalInSeconds: 15
       #metadataMap:
@@ -53,7 +53,7 @@ eureka:
     register-with-eureka: false
     fetch-registry: false
     serviceUrl:
-      defaultZone: http://192.168.131.151:8761/eureka/
+      defaultZone: http://172.19.103.73:8761/eureka/
     server:
       wait-time-in-ms-when-sync-empty: 0
       enable-self-preservation: false

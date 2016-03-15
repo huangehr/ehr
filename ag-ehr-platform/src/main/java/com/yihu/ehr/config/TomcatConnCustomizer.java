@@ -1,6 +1,6 @@
 package com.yihu.ehr.config;
 
-import org.apache.catalina.connector.Connector;
+//import org.apache.catalina.connector.Connector;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.embedded.tomcat.TomcatConnectorCustomizer;
 
@@ -9,6 +9,7 @@ import org.springframework.boot.context.embedded.tomcat.TomcatConnectorCustomize
  * @version 1.0
  * @created 2016.02.23 18:36
  */
+/*
 public class TomcatConnCustomizer implements TomcatConnectorCustomizer {
 
     int port;
@@ -38,4 +39,4 @@ public class TomcatConnCustomizer implements TomcatConnectorCustomizer {
         connector.setAttribute("keystorePass", keystorePassword);
         connector.setAttribute("keyPass", keystorePassword);
     }
-}
+}*/

@@ -11,7 +11,7 @@ import com.yihu.ehr.agModel.org.OrgModel;
 import com.yihu.ehr.ha.security.service.SecurityClient;
 import com.yihu.ehr.model.geogrephy.MGeography;
 import com.yihu.ehr.agModel.org.OrgDetailModel;
-import com.yihu.ehr.model.security.MUserSecurity;
+import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import com.yihu.ehr.util.operator.DateUtil;
@@ -294,7 +294,7 @@ public class OrganizationController extends BaseController {
             org.setExtra(addr.getExtra());
         }
         //获取公钥信息（公钥、有效区间、开始时间）
-        MUserSecurity security = securityClient.getUserSecurityByOrgCode(mOrg.getOrgCode());
+        MKey security = securityClient.getUserSecurityByOrgCode(mOrg.getOrgCode());
         if(security!=null){
             org.setPublicKey(security.getPublicKey());
             org.setValidTime(DateUtil.toString(security.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT)

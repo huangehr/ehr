@@ -119,4 +119,11 @@ public class OrgDictController extends ExtendController<MOrgDict> {
             @RequestParam(value = "dict_code") String dictCode){
         return orgDictService.isExistOrgDict(orgCode, dictCode);
     }
+
+    @RequestMapping(value = "/dict/org_dict",method = RequestMethod.GET)
+    public MOrgDict getOrgDictBySequence(
+            @RequestParam(value = "org_code") String orgCode,
+            @RequestParam(value = "sequence") int sequence) {
+        return convertToModel(orgDictService.getOrgDictBySequence(orgCode, sequence),MOrgDict.class);
+    }
 }
