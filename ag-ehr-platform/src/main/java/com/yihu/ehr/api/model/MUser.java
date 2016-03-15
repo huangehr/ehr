@@ -4,7 +4,7 @@ package com.yihu.ehr.api.model;
 import java.io.Serializable;
 import java.util.Date;
 
-public class UserModel implements Serializable{
+public class MUser implements Serializable{
 
     private String id;
     private Date createDate;
@@ -21,6 +21,7 @@ public class UserModel implements Serializable{
     private String gender;
     private String idCardNo;
     private OrganizationModel organization;
+
     // 未绑定属性
     private String orgPost;
     private String privilege;

@@ -8,14 +8,6 @@ info:
     description: EHR platform user service.
     version: 1.0.0
 
-spring:
-  jpa:
-    show-sql: true
-    hibernate:
-      dialect: org.hibernate.dialect.MySQL5Dialect
-    database:
-      platform: org.hibernate.dialect.MySQL5Dialect
-
 ---
 spring:
   profiles: dev
@@ -25,7 +17,7 @@ eureka:
   client:
     registerWithEureka: true
     fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
+    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@localhost:8761}/eureka/
 
 ---
 spring:

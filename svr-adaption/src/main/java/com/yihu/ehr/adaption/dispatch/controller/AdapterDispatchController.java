@@ -60,9 +60,6 @@ public class AdapterDispatchController {
         String fileBytes = null;
 
         try {
-//            if (StringUtils.isEmpty(versionCode) || StringUtils.isEmpty(orgcode))
-//                return new RestEcho().failed(ErrorCode.MissParameter," 缺失参数:updateVersion");
-
             mapResult = adapterInfoSendService.getAdapterFileInfo(versionCode, orgcode);
 
             if (mapResult == null)
@@ -164,7 +161,7 @@ public class AdapterDispatchController {
 
             List<OrgAdapterPlan> listPlan = orgAdapterPlanService.getOrgAdapterPlanByOrgCode(args);
 
-            if (listPlan != null && listPlan.size() > 0) {
+            if (false && listPlan != null && listPlan.size() > 0) {
                 RestEcho restEcho = new RestEcho().success();
                 MCDAVersion version = stdVersionClient.getVersion(listPlan.get(0).getVersion());
                 restEcho.putResult("version", version.getVersion());

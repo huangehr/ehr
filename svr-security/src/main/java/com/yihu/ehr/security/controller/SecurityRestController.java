@@ -1,7 +1,7 @@
 package com.yihu.ehr.security.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.model.security.MUserSecurity;
+import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.security.feign.AppClient;
 import com.yihu.ehr.security.feign.UserClient;
@@ -41,22 +41,20 @@ public class SecurityRestController extends BaseRestController {
 
     @RequestMapping(value = "/securities/login/{login_code}", method = RequestMethod.GET)
     @ApiOperation(value = "获取用户公钥" , notes = "用户在平台注册时，会分配一个公钥，此公钥用于与健康档案平台加密传输数据使用")
-    public MUserSecurity getUserSecurityByLoginCode(
+    public MKey getUserSecurityByLoginCode(
             @ApiParam(name = "login_code", value = "用户名")
             @PathVariable(value = "login_code") String loginCode) throws Exception {
         UserSecurity userSecurity = securityManager.getUserSecurityByLoginCode(loginCode);
-        return convertToModel(userSecurity,MUserSecurity.class);
+        return convertToModel(userSecurity,MKey.class);
     }
-
-
 
     @RequestMapping(value = "/securities/org/{org_code}", method = RequestMethod.GET)
     @ApiOperation(value = "获取企业公钥", produces = "application/json", notes = "企业公钥，用于与健康档案平台之间传输数据的加密。")
-    public MUserSecurity getUserSecurityByOrgCode(
+    public MKey getUserSecurityByOrgCode(
             @ApiParam(name = "org_code", value = "机构代码")
             @PathVariable(value = "org_code") String orgCode) {
         UserSecurity userSecurity = securityManager.getUserPublicKeyByOrgCd(orgCode);
-        return convertToModel(userSecurity,MUserSecurity.class);
+        return convertToModel(userSecurity,MKey.class);
     }
 
     /**
@@ -189,11 +187,11 @@ public class SecurityRestController extends BaseRestController {
 
     @RequestMapping(value = "/securities/org/{org_code}", method = RequestMethod.POST)
     @ApiOperation(value = "根据orgCode创建security")
-    public MUserSecurity createSecurityByOrgCode(
+    public MKey createSecurityByOrgCode(
             @ApiParam(name = "org_code", value = "机构代码")
             @PathVariable( value = "org_code") String orgCode) throws Exception {
         UserSecurity userSecurity = securityManager.createSecurityByOrgCode(orgCode);
-        return convertToModel(userSecurity,MUserSecurity.class);
+        return convertToModel(userSecurity,MKey.class);
     }
 
     /**
@@ -246,11 +244,11 @@ public class SecurityRestController extends BaseRestController {
      */
     @RequestMapping(value = "/securities/user/{user_id}", method = RequestMethod.POST)
     @ApiOperation(value = "根据userId创建Security" )
-    public MUserSecurity createSecurityByUserId(
+    public MKey createSecurityByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
             @PathVariable( value = "user_id") String userId) throws Exception {
         UserSecurity userSecurity = securityManager.createSecurityByUserId(userId);
-        return convertToModel(userSecurity,MUserSecurity.class);
+        return convertToModel(userSecurity,MKey.class);
     }
 
 
@@ -275,11 +273,11 @@ public class SecurityRestController extends BaseRestController {
      */
     @RequestMapping(value = "/securities/user/{user_id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据userId获取UserSecurity" )
-    public MUserSecurity getUserSecurityByUserId(
+    public MKey getUserSecurityByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
             @PathVariable( value = "user_id") String userId) {
         UserSecurity userSecurity = securityManager.getUserSecurityByUserId(userId);
-        return convertToModel(userSecurity,MUserSecurity.class);
+        return convertToModel(userSecurity,MKey.class);
     }
 
 

@@ -5,7 +5,7 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.ha.security.service.SecurityClient;
 import com.yihu.ehr.ha.std.service.AdapterDispatchClient;
 import com.yihu.ehr.ha.std.service.StandardDispatchClient;
-import com.yihu.ehr.model.security.MUserSecurity;
+import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.util.RestEcho;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -43,14 +43,14 @@ public class StandardDispatchController  {
             @ApiParam(required = true, name = "current_version", value = "用户当前使用的版本")
             @RequestParam(value = "current_version", required = true) String currentVersion) {
 
-        MUserSecurity mUserSecurity = securityClient.getUserSecurityByLoginCode(userName);
+        MKey mKey = securityClient.getUserSecurityByLoginCode(userName);
 
-        if(mUserSecurity==null)
+        if(mKey ==null)
         {
             return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed,"获取用户密钥失败");
         }
 
-        RestEcho restEcho = standardDispatchClient.getSchemeInfo(mUserSecurity.getPrivateKey(),updateVersion,currentVersion);
+        RestEcho restEcho = standardDispatchClient.getSchemeInfo(mKey.getPrivateKey(),updateVersion,currentVersion);
 
         return restEcho;
     }
@@ -81,14 +81,14 @@ public class StandardDispatchController  {
         if(StringUtils.isNotEmpty(errorMsg))
             return new RestEcho().failed(ErrorCode.MissParameter,errorMsg);
 
-        MUserSecurity mUserSecurity = securityClient.getUserSecurityByLoginCode(userName);
+        MKey mKey = securityClient.getUserSecurityByLoginCode(userName);
 
-        if(mUserSecurity==null)
+        if(mKey ==null)
         {
             return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed,"获取用户密钥失败");
         }
 
-        Object object = adapterDispatchClient.getSchemeMappingInfo(mUserSecurity.getPrivateKey(),versionCode,orgCode);
+        Object object = adapterDispatchClient.getSchemeMappingInfo(mKey.getPrivateKey(),versionCode,orgCode);
 
         return object;
     }
@@ -120,14 +120,14 @@ public class StandardDispatchController  {
         if(StringUtils.isNotEmpty(errorMsg))
             return new RestEcho().failed(ErrorCode.MissParameter,errorMsg);
 
-        MUserSecurity mUserSecurity = securityClient.getUserSecurityByLoginCode(userName);
+        MKey mKey = securityClient.getUserSecurityByLoginCode(userName);
 
-        if(mUserSecurity==null)
+        if(mKey ==null)
         {
             return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed,"获取用户密钥失败");
         }
 
-        Object object = adapterDispatchClient.getALLSchemeMappingInfo(mUserSecurity.getPrivateKey(), versionCode, orgCode);
+        Object object = adapterDispatchClient.getALLSchemeMappingInfo(mKey.getPrivateKey(), versionCode, orgCode);
 
         return object;
     }

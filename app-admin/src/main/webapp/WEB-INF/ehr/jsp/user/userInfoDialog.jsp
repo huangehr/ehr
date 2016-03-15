@@ -65,13 +65,13 @@
             <input type="text" id="inp_select_userType" data-type="select" data-attr-scan="userType">
         </div>
     </div>
-    <%--<div class="m-form-group">--%>
-        <%--<label><spring:message code="lbl.org.belong"/><spring:message code="spe.colon"/></label>--%>
-        <%--<div class="l-text-wrapper m-form-control f-w240 ">--%>
-            <%--<input type="text" id="inp_org"  required-title=<spring:message code="lbl.must.input"/> data-type="comboSelect"--%>
-                   <%--data-attr-scan="organization" class="validate-org-length f-w240"/>--%>
-        <%--</div>--%>
-    <%--</div>--%>
+    <div class="m-form-group">
+        <label><spring:message code="lbl.org.belong"/><spring:message code="spe.colon"/></label>
+        <div class="l-text-wrapper m-form-control f-w240 ">
+            <input type="text" id="inp_org"  required-title=<spring:message code="lbl.must.input"/> data-type="comboSelect"
+                   data-attr-scan="organization" class="validate-org-length f-w240"/>
+        </div>
+    </div>
     <div class="m-form-group" style="display: none" id="inp_major_div">
         <label><spring:message code="lbl.specialized.belong"/><spring:message code="spe.colon"/></label>
         <div class="l-text-wrapper m-form-control ">

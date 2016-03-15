@@ -6,6 +6,7 @@ import com.yihu.ehr.util.encode.Base64;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -23,23 +24,23 @@ import java.io.IOException;
 @RequestMapping(ApiVersion.Version1_0 + "/packages")
 @Api(protocols = "https", value = "packages", description = "数据包服务")
 public class PackagesEndPoint {
-    //@Autowired
+    @Autowired
     JsonPackageClient jsonPackageClient;
 
     /**
      * 归档病人档案-数据上传
      *
      * @param packageCrypto zip密码密文, file 请求体中文件参数名
-     * @param md5 文件内容MD5值。
-     *
+     * @param md5           文件内容MD5值。
      * @return
      */
     @RequestMapping(value = "/", method = {RequestMethod.POST})
     @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
     public void receiveJsonPackage(
-            @ApiParam(required = true, name = "package", value = "JSON档案包", allowMultiple = true) MultipartHttpServletRequest jsonPackage,
-            @ApiParam(required = true, name = "user_name", value = "用户名")
-            @RequestParam(value = "user_name") String userName,
+            @ApiParam(required = true, name = "package", value = "JSON档案包", allowMultiple = true)
+            MultipartHttpServletRequest jsonPackage,
+            @ApiParam(required = true, name = "org_code", value = "机构代码")
+            @RequestParam(value = "org_code") String orgCode,
             @ApiParam(required = true, name = "package_crypto", value = "档案包解压密码,二次加密")
             @RequestParam(value = "package_crypto") String packageCrypto,
             @ApiParam(required = true, name = "md5", value = "档案包MD5")
@@ -47,6 +48,6 @@ public class PackagesEndPoint {
         MultipartFile multipartFile = jsonPackage.getFile("file");
         byte[] bytes = multipartFile.getBytes();
         String fileString = Base64.encode(bytes);
-        jsonPackageClient.savePackage(fileString,userName,packageCrypto,md5);
+        jsonPackageClient.savePackageWithUser(fileString, orgCode, packageCrypto, md5);
     }
 }
