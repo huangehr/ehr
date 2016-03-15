@@ -133,11 +133,9 @@ public class OrganizationController extends BaseController {
             @RequestParam(value = "geography_model_json_data", required = false) String geographyModelJsonData ) throws Exception{
         Envelop envelop  = new Envelop();
         ObjectMapper objectMapper = new ObjectMapper();
-//        String location = addressClient.saveAddress(geographyModelJsonData);
+        String location = addressClient.saveAddress(geographyModelJsonData);
         OrgDetailModel orgDetailModel = objectMapper.readValue(mOrganizationJsonData,OrgDetailModel.class);
         MOrganization mOrganization = convertToModel(orgDetailModel,MOrganization.class);
-        //TODO 临时测试数据
-        String location = "0dae000155fb8a5f3c5d6125d861170e";
         mOrganization.setLocation(location);
         String mOrganizationJson = objectMapper.writeValueAsString(mOrganization);
         MOrganization mOrgNew = orgClient.create(mOrganizationJson);
@@ -160,11 +158,9 @@ public class OrganizationController extends BaseController {
             @RequestParam(value = "geography_model_json_data", required = false) String geographyModelJsonData  ) throws Exception{
         Envelop envelop = new Envelop();
         ObjectMapper objectMapper = new ObjectMapper();
-        //String locationId = addressClient.saveAddress(geographyModelJsonData);
+        String locationId = addressClient.saveAddress(geographyModelJsonData);
         OrgDetailModel orgDetailModel = objectMapper.readValue(mOrganizationJsonData,OrgDetailModel.class);
         MOrganization mOrganization = convertToModel(orgDetailModel,MOrganization.class);
-        //临时测试数据
-        String locationId = "0dae000155fb8a5f3c5d6125d861170e";
         mOrganization.setLocation(locationId);
         String mOrganizationJson = objectMapper.writeValueAsString(mOrganization);
         MOrganization mOrgNew = orgClient.create(mOrganizationJson);
@@ -290,7 +286,7 @@ public class OrganizationController extends BaseController {
             @RequestParam(value = "district") String district) {
         Envelop envelop = new Envelop();
         Collection<MOrganization> mOrganizations = orgClient.getOrgsByAddress(province,city,district);
-        envelop.setObj(mOrganizations);
+        envelop.setDetailModelList((List) mOrganizations);
         envelop.setSuccessFlg(true);
         return envelop;
     }
