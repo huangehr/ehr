@@ -1,7 +1,6 @@
 package com.yihu.ehr.api.esb.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.api.esb.model.HosEsbMiniRelease;
 import com.yihu.ehr.api.esb.model.HosLog;
 import com.yihu.ehr.api.esb.model.HosSqlTask;
@@ -11,8 +10,13 @@ import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.util.DateFormatter;
 import com.yihu.ehr.util.encode.Base64;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
@@ -26,6 +30,7 @@ import java.util.Date;
  */
 
 @RestController
+@RequestMapping(value = "/esb")
 @Api(protocols = "https", value = "simplified-esb", description = "简易ESB服务临时接口")
 public class SimplifiedESBController {
     @Resource(name = "simplifiedESBService")
@@ -34,26 +39,44 @@ public class SimplifiedESBController {
     private FastDFSConfig FastDFSConfig;
 
     /**
+     * 判斷是否需要上传日志
+     *
+     * @param orgCode
+     * @param systemCode
+     * @return
+     */
+    @ApiOperation("判斷是否需要上传日志")
+    @RequestMapping(value = "/getUploadFlag", method = RequestMethod.GET)
+    public boolean getUploadFlag(@RequestParam(value = "orgCode", required = true) String orgCode,
+                                 @RequestParam(value = "systemCode", required = true) String systemCode) {
+        try {
+            return simplifiedESBService.getUploadFlagByOrgCodeAndSystemCode(orgCode, systemCode);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
      * 上传日志
      *
      * @return
      */
-    @ResponseBody
+    @ApiOperation("日志上传")
     @RequestMapping(value = "/uploadLog", method = RequestMethod.POST)
     public boolean uploadLog(
-            @RequestParam(value = "orgCode", required = true) String orgCode,
-            @RequestParam(value = "ip", required = true) String ip,
-            @RequestParam(value = "file", required = true) String file) {
+            @ApiParam("orgCode") @RequestParam(value = "orgCode", required = true) String orgCode,
+            @ApiParam("ip") @RequestParam(value = "ip", required = true) String ip,
+            @ApiParam("file") @RequestParam(value = "file", required = true) String file) {
         try {
             InputStream in = new ByteArrayInputStream(file.getBytes());
             FastDFSUtil fdfs = FastDFSConfig.fastDFSUtil();
-            ObjectNode jsonResult = fdfs.upload(in, "log", "");
-            String filePath = jsonResult.get("fid").textValue();
-            fdfs.download(jsonResult.get("groupName").textValue(), jsonResult.get("remoteFileName").textValue(), "E:\\");
+            //   ObjectNode jsonResult = fdfs.upload(in, "log", "");
+            // String filePath = jsonResult.get("fid").textValue();
+            // fdfs.download(jsonResult.get("groupName").textValue(), jsonResult.get("remoteFileName").textValue(), "E:\\");
             HosLog lh = new HosLog();
             lh.setOrgCode(orgCode);
             lh.setUploadTime(DateFormatter.simpleDateTimeFormat(new Date()));
-            lh.setFilePath(filePath);
+            // lh.setFilePath(filePath);
             lh.setId(ip);
             simplifiedESBService.saveHosLog(lh);
             return true;
@@ -71,12 +94,12 @@ public class SimplifiedESBController {
      * @param orgCode
      * @return
      */
-    @ResponseBody
+    @ApiOperation("查询版本是否需要更新")
     @RequestMapping(value = "/getUpdateFlag", method = RequestMethod.GET)
     public String getUpdateFlag(
-            @RequestParam(value = "versionCode", required = true) String versionCode,
-            @RequestParam(value = "systemCode", required = true) String systemCode,
-            @RequestParam(value = "orgCode", required = true) String orgCode) {
+            @ApiParam("versionCode") @RequestParam(value = "versionCode", required = true) String versionCode,
+            @ApiParam("systemCode") @RequestParam(value = "systemCode", required = true) String systemCode,
+            @ApiParam("orgCode") @RequestParam(value = "orgCode", required = true) String orgCode) {
         try {
             HosEsbMiniRelease h = simplifiedESBService.getUpdateFlag(versionCode, systemCode, orgCode);
             if (h != null) {
@@ -98,9 +121,10 @@ public class SimplifiedESBController {
      * @param orgCode
      */
     @RequestMapping(value = "/downUpdateWar", method = RequestMethod.POST)
+    @ApiOperation("下载项目")
     public String downUpdateWar(
-            @RequestParam(value = "systemCode", required = true) String systemCode,
-            @RequestParam(value = "orgCode", required = true) String orgCode) {
+            @ApiParam("systemCode") @RequestParam(value = "systemCode", required = true) String systemCode,
+            @ApiParam("orgCode") @RequestParam(value = "orgCode", required = true) String orgCode) {
         try {
             // path是指欲下载的文件的路径。
             HosEsbMiniRelease he = simplifiedESBService.getSimplifiedESBBySystemCodes(systemCode, orgCode);
@@ -149,14 +173,14 @@ public class SimplifiedESBController {
      * @param updateDate
      * @return
      */
-    @ResponseBody
+    @ApiOperation("上传客户端升级信息")
     @RequestMapping(value = "/uploadResult", method = RequestMethod.POST)
     public String uploadResult(
-            @RequestParam(value = "systemCode", required = true) String systemCode,
-            @RequestParam(value = "orgCode", required = true) String orgCode,
-            @RequestParam(value = "versionCode", required = true) String versionCode,
-            @RequestParam(value = "versionName", required = true) String versionName,
-            @RequestParam(value = "updateDate", required = true) String updateDate) {
+            @ApiParam("systemCode") @RequestParam(value = "systemCode", required = true) String systemCode,
+            @ApiParam("orgCode") @RequestParam(value = "orgCode", required = true) String orgCode,
+            @ApiParam("versionCode") @RequestParam(value = "versionCode", required = true) String versionCode,
+            @ApiParam("versionName") @RequestParam(value = "versionName", required = true) String versionName,
+            @ApiParam("updateDate") @RequestParam(value = "updateDate", required = true) String updateDate) {
         String hsa = null;
         try {
             hsa = simplifiedESBService.uploadResult(systemCode, orgCode, versionCode, versionName, updateDate);
@@ -173,11 +197,11 @@ public class SimplifiedESBController {
      * @param orgCode
      * @return {"id":"xxxxx","startTime":"yyyy-MM-dd HH:mm:ss","endTime":"yyyy-MM-dd HH:mm:ss"}
      */
-    @ResponseBody
+    @ApiOperation("补采功能")
     @RequestMapping(value = "/fillMining", method = RequestMethod.POST)
     public String fillMining(
-            @RequestParam(value = "systemCode", required = true) String systemCode,
-            @RequestParam(value = "orgCode", required = true) String orgCode) {
+            @ApiParam("systemCode") @RequestParam(value = "systemCode", required = true) String systemCode,
+            @ApiParam("orgCode") @RequestParam(value = "orgCode", required = true) String orgCode) {
         String hsa = null;
         try {
             hsa = simplifiedESBService.fillMining(systemCode, orgCode);
@@ -193,12 +217,12 @@ public class SimplifiedESBController {
      *
      * @return
      */
-    @ResponseBody
+    @ApiOperation("改变补采状态")
     @RequestMapping(value = "/changeFillMiningStatus", method = RequestMethod.POST)
     public String changeFillMiningStatus(
-            @RequestParam(value = "message", required = true) String message,
-            @RequestParam(value = "id", required = true) String id,
-            @RequestParam(value = "status", required = true) String status) {
+            @ApiParam("message") @RequestParam(value = "message", required = true) String message,
+            @ApiParam("id") @RequestParam(value = "id", required = true) String id,
+            @ApiParam("status") @RequestParam(value = "status", required = true) String status) {
         try {
             simplifiedESBService.changeFillMiningStatus(id, message, status);
         } catch (Exception e) {
@@ -214,11 +238,11 @@ public class SimplifiedESBController {
      * @param orgCode
      * @return
      */
-    @ResponseBody
+    @ApiOperation(" his穿透查询")
     @RequestMapping(value = "/hisPenetration", method = RequestMethod.POST)
     public String hisPenetration(
-            @RequestParam(value = "systemCode", required = true) String systemCode,
-            @RequestParam(value = "orgCode", required = true) String orgCode) {
+            @ApiParam("systemCode") @RequestParam(value = "systemCode", required = true) String systemCode,
+            @ApiParam("orgCode") @RequestParam(value = "orgCode", required = true) String orgCode) {
         String returnString = "";
         try {
             HosSqlTask hq = simplifiedESBService.hisPenetration(systemCode, orgCode);
@@ -236,14 +260,15 @@ public class SimplifiedESBController {
      *
      * @return
      */
-    @ResponseBody
+    @ApiOperation("修改his穿透查询状态")
     @RequestMapping(value = "/changeHisPenetrationStatus", method = RequestMethod.POST)
     public String changeHisPenetrationStatus(
-            @RequestParam(value = "result", required = true) String result,
-            @RequestParam(value = "status", required = true) String status,
-            @RequestParam(value = "id", required = true) String id) {
+            @ApiParam("result") @RequestParam(value = "result", required = true) String result,
+            @ApiParam("status") @RequestParam(value = "status", required = true) String status,
+            @ApiParam("message") @RequestParam(value = "message", required = true) String message,
+            @ApiParam("id") @RequestParam(value = "id", required = true) String id) {
         try {
-            simplifiedESBService.changeHisPenetrationStatus(id, status, result);
+            simplifiedESBService.changeHisPenetrationStatus(id, status, result, message);
         } catch (Exception e) {
             e.printStackTrace();
         }

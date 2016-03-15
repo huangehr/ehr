@@ -20,7 +20,7 @@ import springfox.documentation.annotations.ApiIgnore;
 public interface SecurityClient {
 
 
-    @RequestMapping(value = "/securities/login/{login_code}", method = RequestMethod.GET)
+    @RequestMapping(value = "/securities/user/{login_code}", method = RequestMethod.GET)
     @ApiOperation(value = "获取用户公钥" , notes = "用户在平台注册时，会分配一个公钥，此公钥用于与健康档案平台加密传输数据使用")
     MKey getUserSecurityByLoginCode(
             @ApiParam(name = "login_code", value = "用户名")
