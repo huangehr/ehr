@@ -71,4 +71,9 @@ public interface OrgDataSetClient {
             @RequestParam(value = "org_code")String orgCode,
             @ApiParam(name="code",value="数据集代码",defaultValue = "")
             @RequestParam(value = "code")String code);
+
+    @RequestMapping(value = "/adapter/org/data_set",method = RequestMethod.GET)
+    MOrgDataSet getDataSetBySequence(
+            @RequestParam(value="org_code")String orgCode,
+            @RequestParam(value = "sequence")long sequence);
 }

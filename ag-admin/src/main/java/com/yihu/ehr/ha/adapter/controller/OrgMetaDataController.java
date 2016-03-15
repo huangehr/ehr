@@ -3,7 +3,9 @@ package com.yihu.ehr.ha.adapter.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.thirdpartystandard.OrgMetaDataDetailModel;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.ha.adapter.service.OrgDataSetClient;
 import com.yihu.ehr.ha.adapter.service.OrgMetaDataClient;
+import com.yihu.ehr.model.adaption.MOrgDataSet;
 import com.yihu.ehr.model.adaption.MOrgMetaData;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
@@ -29,6 +31,9 @@ public class OrgMetaDataController extends BaseController {
     private OrgMetaDataClient orgMetaDataClient;
 
     @Autowired
+    private OrgDataSetClient orgDataSetClient;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @RequestMapping(value = "/meta_data/{id}", method = RequestMethod.GET)
@@ -38,7 +43,7 @@ public class OrgMetaDataController extends BaseController {
             @PathVariable(value = "id") long id) throws Exception {
 
         MOrgMetaData mOrgMetaData = orgMetaDataClient.getOrgMetaData(id);
-        OrgMetaDataDetailModel detailModel = convertToModel(mOrgMetaData, OrgMetaDataDetailModel.class);
+        OrgMetaDataDetailModel detailModel = convertOrgMetaDataDetailModel(mOrgMetaData);
         if (detailModel == null) {
             return failed("数据元信息获取失败!");
         }
@@ -85,7 +90,7 @@ public class OrgMetaDataController extends BaseController {
            // mOrgMetaData.setUpdateDate(new Date());
             mOrgMetaData = orgMetaDataClient.updateOrgMetaData(objectMapper.writeValueAsString(mOrgMetaData));
         }
-        detailModel = convertToModel(mOrgMetaData, OrgMetaDataDetailModel.class);
+        detailModel = convertOrgMetaDataDetailModel(mOrgMetaData);
         if (detailModel == null) {
 
             return failed("保存失败!");
@@ -135,4 +140,34 @@ public class OrgMetaDataController extends BaseController {
         return getResult(detailModels,getTotalCount(responseEntity),page,size);
     }
 
+    @RequestMapping(value = "/meta_data", method = RequestMethod.GET)
+    public Envelop getMetaDataBySequence(
+            @RequestParam(value = "org_code") String orgCode,
+            @RequestParam(value = "sequence") int sequence) {
+
+        try {
+            MOrgMetaData mOrgMetaData = orgMetaDataClient.getMetaDataBySequence(orgCode, sequence);
+            OrgMetaDataDetailModel metaDataDetailModel = convertOrgMetaDataDetailModel(mOrgMetaData);
+
+            return success(metaDataDetailModel);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
+    public OrgMetaDataDetailModel convertOrgMetaDataDetailModel(MOrgMetaData mOrgMetaData)
+    {
+        OrgMetaDataDetailModel metaDataDetailModel = convertToModel(mOrgMetaData, OrgMetaDataDetailModel.class);
+
+        int dataSetSeq = metaDataDetailModel.getOrgDataSet();
+        if (dataSetSeq!=0)
+        {
+            MOrgDataSet mOrgDataSet = orgDataSetClient.getDataSetBySequence(metaDataDetailModel.getOrganization(),dataSetSeq);
+            metaDataDetailModel.setDataSetCode(mOrgDataSet==null?"":mOrgDataSet.getCode());
+            metaDataDetailModel.setDataSetName(mOrgDataSet==null?"":mOrgDataSet.getName());
+        }
+
+        return metaDataDetailModel;
+    }
 }

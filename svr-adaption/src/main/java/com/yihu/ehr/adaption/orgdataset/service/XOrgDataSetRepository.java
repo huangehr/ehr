@@ -16,4 +16,6 @@ public interface XOrgDataSetRepository extends PagingAndSortingRepository<OrgDat
     @Query("select dataset from OrgDataSet dataset where dataset.organization = :orgCode and dataset.code = :code")
     List<OrgDataSet> isExistOrgDataSet(@Param("orgCode") String orgCode, @Param("code") String code);
 
+    @Query("select dataset from OrgDataSet dataset where dataset.organization = :org_code and dataset.sequence = :sequence")
+    OrgDataSet getDataSetBySequence(@Param("org_code") String orgCode,@Param("sequence") int sequence);
 }

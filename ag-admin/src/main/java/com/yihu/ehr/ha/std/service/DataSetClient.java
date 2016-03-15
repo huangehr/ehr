@@ -1,6 +1,5 @@
 package com.yihu.ehr.ha.std.service;
 
-import com.yihu.ehr.agModel.standard.datasset.MetaDataModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.standard.MStdDataSet;
@@ -13,9 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
-//import com.yihu.ehr.standard.datasets.service.IMetaData;
 
 import java.util.Collection;
+
+//import com.yihu.ehr.standard.datasets.service.IMetaData;
 
 /**
  * Created by wq on 2016/2/29.
@@ -42,7 +42,7 @@ public interface DataSetClient {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version);
 
-    @RequestMapping(value = "/std/dataset/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/std/data_set/{id}", method = RequestMethod.DELETE)
     @ApiOperation("删除数据集信息")
     boolean deleteDataSet(
             @ApiParam(name = "id", value = "数据集编号", defaultValue = "")
@@ -50,7 +50,7 @@ public interface DataSetClient {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version);
 
-    @RequestMapping(value = "/std/datasets", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/std/data_sets", method = RequestMethod.DELETE)
     @ApiOperation(value = "批量删除数据集信息")
     boolean deleteDataSet(
             @ApiParam(name = "ids", value = "数据集编号", defaultValue = "")
@@ -58,7 +58,7 @@ public interface DataSetClient {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version);
 
-    @RequestMapping(value = "/std/dataset/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/std/data_set/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "获取数据集信息")
     public MStdDataSet getDataSet(
             @ApiParam(name = "id", value = "数据集编号", defaultValue = "")
@@ -75,7 +75,7 @@ public interface DataSetClient {
             @RequestParam(value = "model") String model);
 
 
-    @RequestMapping(value = "/std/dataset", method = RequestMethod.PUT)
+    @RequestMapping(value = "/std/data_set", method = RequestMethod.PUT)
     @ApiOperation(value = "修改数据集信息")
     public MStdDataSet updateDataSet(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
@@ -108,7 +108,7 @@ public interface DataSetClient {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version);
 
-    @RequestMapping(value = "/std/metadata/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/std/meta_data/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "获取数据元")
     MStdMetaData getMetaData(
             @ApiParam(name = "id", value = "数据元ID", defaultValue = "")
@@ -116,7 +116,7 @@ public interface DataSetClient {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version);
 
-    @RequestMapping(value = "/std/metadata", method = RequestMethod.PUT)
+    @RequestMapping(value = "/std/meta_data", method = RequestMethod.PUT)
     @ApiOperation(value = "更新数据元")
     MStdMetaData updataMetaSet(
             @ApiParam(name = "version", value = "版本", defaultValue = "")
@@ -124,7 +124,7 @@ public interface DataSetClient {
             @ApiParam(name = "model", value = "数据源模型", defaultValue = "")
             @RequestParam(value = "model", required = false) String model);
 
-    @RequestMapping(value = "/std/metadata/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/std/meta_data/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据元")
     boolean deleteMetaData(
             @ApiParam(name = "id", value = "编号集", defaultValue = "")
@@ -132,7 +132,7 @@ public interface DataSetClient {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version);
 
-    @RequestMapping(value = "/std/dataset/{dataSetId}/metadata", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/std/data_set/{dataSetId}/meta_data", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据集关联的数据元")
     boolean deleteMetaDataByDataSet(
             @ApiParam(name = "dataSetId", value = "数据集编号", defaultValue = "")
@@ -140,7 +140,7 @@ public interface DataSetClient {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version);
 
-    @RequestMapping(value = "/std/metadatas", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/std/meta_datas", method = RequestMethod.DELETE)
     @ApiOperation(value = "批量删除数据元")
     public boolean deleteMetaDatas(
             @ApiParam(name = "ids", value = "编号集", defaultValue = "")
@@ -148,7 +148,7 @@ public interface DataSetClient {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version);
 
-    @RequestMapping(value = "/std/metadata/validate/code", method = RequestMethod.GET)
+    @RequestMapping(value = "/std/meta_data/validate/code", method = RequestMethod.GET)
     @ApiOperation(value = "验证数据元代码是否重复")
     public boolean validateCode(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
@@ -158,7 +158,7 @@ public interface DataSetClient {
             @ApiParam(name = "code", value = "查询代码", defaultValue = "")
             @RequestParam(value = "code") String code);
 
-    @RequestMapping(value = "/std/metadata/validate/name", method = RequestMethod.GET)
+    @RequestMapping(value = "/std/meta_data/validate/name", method = RequestMethod.GET)
     @ApiOperation(value = "验证数据元名称是否重复")
     public boolean validatorName(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")

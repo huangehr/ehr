@@ -106,11 +106,18 @@ public class OrgMetaDataController extends ExtendController<MOrgMetaData> {
         return convertToModels(appList, new ArrayList<>(appList.size()), MOrgMetaData.class, fields);
     }
 
-    @RequestMapping(value = "/meta/is_exist",method = RequestMethod.GET)
+    @RequestMapping(value = "/meta/is_exist", method = RequestMethod.GET)
     public boolean isExistMetaData(
-           @RequestParam(value = "data_set_id") int dataSetId,
-           @RequestParam(value = "org_code") String orgCode,
-            @RequestParam(value = "meta_data_code")String metaDataCode) {
+            @RequestParam(value = "data_set_id") int dataSetId,
+            @RequestParam(value = "org_code") String orgCode,
+            @RequestParam(value = "meta_data_code") String metaDataCode) {
         return orgMetaDataService.isExistOrgMetaData(dataSetId, orgCode, metaDataCode);//重复验证
+    }
+
+    @RequestMapping(value = "/meta_data",method = RequestMethod.GET)
+    public MOrgMetaData getMetaDataBySequence(
+            @RequestParam(value = "org_code") String orgCode,
+            @RequestParam(value = "sequence") int sequence) {
+        return convertToModel(orgMetaDataService.getMetaDataBySequence(orgCode, sequence), MOrgMetaData.class);
     }
 }

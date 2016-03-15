@@ -93,6 +93,9 @@ public class OrgDictControllerTests {
         envelop = orgDictController.saveOrgDict(objectMapper.writeValueAsString(dictModel));
         assertTrue("修改失败!",envelop.isSuccessFlg());
 
+        envelop = orgDictController.getOrgDictBySequence(detailModel.getCode(),dictModel.getSequence());
+        assertTrue("数据获取失败!",envelop.isSuccessFlg()&&envelop.getObj()!=null);
+
         List<String> listDict = orgDictController.getOrgDict(detailModel.getCode());
         assertTrue("获取机构全部字典失败!",listDict.size()>0);
 

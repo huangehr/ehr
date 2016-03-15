@@ -84,4 +84,9 @@ public interface OrgDictEntryClient {
             @RequestParam(value = "dict_id")long dictId,
             @RequestParam(value = "org_code")String orgCode,
             @RequestParam(value = "item_code")String itemCode);
+
+    @RequestMapping(value = "/adapter/org/dict/dict_entry",method = RequestMethod.GET)
+    MOrgDictItem getOrgDicEntryBySequence(
+            @RequestParam(value = "org_code") String orgCode,
+            @RequestParam(value = "sequence") int sequence);
 }
