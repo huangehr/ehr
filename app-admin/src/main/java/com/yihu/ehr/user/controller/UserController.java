@@ -31,13 +31,6 @@ import java.util.Map;
 @RequestMapping("/user")
 public class UserController {
 
-//    private static   String host = "http://"+ ResourceProperties.getProperty("serverip")+":"+ResourceProperties.getProperty("port");
-//    private static   String username = ResourceProperties.getProperty("username");
-//    private static   String password = ResourceProperties.getProperty("password");
-//    private static   String module = ResourceProperties.getProperty("module");  //目前定义为rest
-//    private static   String version = ResourceProperties.getProperty("version");
-//    private static   String comUrl = host +"/"+ module +"/"+ version;
-
     @Value("${service-gateway.username}")
     private String username;
     @Value("${service-gateway.password}")
@@ -63,7 +56,7 @@ public class UserController {
 
         String url = "/users";
         String resultStr = "";
-        Envelop result = new Envelop();
+        Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
 
         StringBuffer stringBuffer = new StringBuffer();
@@ -86,22 +79,11 @@ public class UserController {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             return resultStr;
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result;
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            return envelop;
         }
-//        Map<String, Object> conditionMap = new HashMap<>();
-//        conditionMap.put("realName", searchNm);
-//        conditionMap.put("organization", searchNm);
-//        conditionMap.put("type", searchType);
-//        conditionMap.put("page", page);
-//        conditionMap.put("pageSize", rows);
-//        List<UserDetailModel> detailModelList = userManager.searchUserDetailModel(conditionMap);
-//
-//        Integer totalCount = userManager.searchUserInt(conditionMap);
-//        Result result = getResult(detailModelList, totalCount, page, rows);
-//
-//        return result.toJson();
+
     }
 
     @RequestMapping("deleteUser")
@@ -343,24 +325,26 @@ public class UserController {
     public Object distributeKey(String loginCode) {
         String getUserUrl = "/users/key/"+loginCode;
         String resultStr = "";
-        Envelop result = new Envelop();
+        Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+
         params.put("loginCode", loginCode);
         try {
             resultStr = HttpClientUtil.doPut(comUrl + getUserUrl, params, username, password);
-            if (Boolean.parseBoolean(resultStr)) {
-                result.setSuccessFlg(true);
+//            envelop = mapper.readValue(resultStr,Envelop.class);
+            if (!StringUtils.isEmpty(resultStr)) {
+                envelop.setObj(resultStr);
+                envelop.setSuccessFlg(true);
             } else {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.InvalidUpdate.toString());
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg(ErrorCode.InvalidUpdate.toString());
             }
-            return result;
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result;
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
-
+        return envelop;
 //        try {
 //            XUserSecurity userSecurity = securityManager.getUserSecurityByUserName(loginCode);
 //            Map<String, String> keyMap = new HashMap<>();
@@ -401,12 +385,11 @@ public class UserController {
     @RequestMapping("/searchUser")
     @ResponseBody
     public Object searchUser(String type, String searchNm) {
-        String getUserUrl = "/user/isUserExist";
+        String getUserUrl = "/users/existence/"+searchNm;
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("type", type);
-        params.put("value", searchNm);
+
         try {
             //todo 后台转换成result后传前台
             resultStr = HttpClientUtil.doGet(comUrl + getUserUrl, params, username, password);

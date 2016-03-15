@@ -6,12 +6,13 @@ import com.yihu.ehr.model.adaption.MOrgDataSet;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
-import javax.websocket.server.PathParam;
 import java.util.Collection;
 
 /**
@@ -26,32 +27,32 @@ public interface OrgDataSetClient {
     @ApiOperation(value = "根据id查询实体")
     MOrgDataSet getOrgDataSet(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @RequestParam(value = "id") long id);
+            @PathVariable(value = "id") long id);
 
     @RequestMapping(value = "/adapter/org/data_set", method = RequestMethod.POST)
     @ApiOperation(value = "创建机构数据集")
     MOrgDataSet createOrgDataSet(
-            @ApiParam(name = "json_data", value = "json_data", defaultValue = "")
-            @RequestParam(value = "json_data") String jsonData);
+            @ApiParam(name = "model", value = "json_data", defaultValue = "")
+            @RequestParam(value = "model") String jsonData);
 
 
     @RequestMapping(value = "/adapter/org/data_set/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除机构数据集")
     boolean deleteOrgDataSet(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @PathParam(value = "id") long id);
+            @PathVariable(value = "id") long id);
 
 
     @RequestMapping(value = "/adapter/org/data_set", method = RequestMethod.PUT)
     @ApiOperation(value = "修改机构数据集")
     MOrgDataSet updateOrgDataSet(
-            @ApiParam(name = "json_data", value = "json_data", defaultValue = "")
-            @RequestParam(value = "json_data") String jsonData);
+            @ApiParam(name = "model", value = "json_data", defaultValue = "")
+            @RequestParam(value = "model") String jsonData);
 
 
     @RequestMapping(value = "/adapter/org/data_sets", method = RequestMethod.GET)
     @ApiOperation(value = "条件查询")
-    Collection<MOrgDataSet> searchAdapterOrg(
+    ResponseEntity<Collection<MOrgDataSet>> searchAdapterOrg(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")

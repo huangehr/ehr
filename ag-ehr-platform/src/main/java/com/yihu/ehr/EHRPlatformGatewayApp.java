@@ -1,6 +1,5 @@
 package com.yihu.ehr;
 
-import com.yihu.ehr.config.TomcatConnCustomizer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,10 +10,11 @@ import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletCon
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
-import org.springframework.context.annotation.Bean;
 import org.springframework.util.ResourceUtils;
 
 import java.io.FileNotFoundException;
+
+//import com.yihu.ehr.config.TomcatConnCustomizer;
 
 @SpringBootApplication
 @EnableDiscoveryClient
@@ -34,11 +34,11 @@ public class EHRPlatformGatewayApp  {
 		SpringApplication.run(EHRPlatformGatewayApp.class, args);
 	}
 
-    @Bean
+    //@Bean
     public EmbeddedServletContainerCustomizer containerCustomizer() throws FileNotFoundException {
         final String absoluteKeystoreFile = ResourceUtils.getFile(keystore).getAbsolutePath();
 
-        final TomcatConnectorCustomizer customizer = new TomcatConnCustomizer(absoluteKeystoreFile, password, port);
+        final TomcatConnectorCustomizer customizer = null;//new TomcatConnCustomizer(absoluteKeystoreFile, password, port);
 
         return new EmbeddedServletContainerCustomizer() {
             @Override
@@ -50,5 +50,4 @@ public class EHRPlatformGatewayApp  {
             };
         };
     }
-
 }

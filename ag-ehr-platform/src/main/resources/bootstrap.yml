@@ -1,3 +1,6 @@
+server:
+  port: 443
+
 spring:
   application:
     name: ag-ehr-platform

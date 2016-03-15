@@ -1,17 +1,19 @@
 package com.yihu.ehr.api.adaption;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.feign.AdapterDispatchClient;
 import com.yihu.ehr.feign.SecurityClient;
 import com.yihu.ehr.feign.StandardDispatchClient;
-import com.yihu.ehr.model.security.MUserSecurity;
+import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.util.RestEcho;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -35,7 +37,7 @@ public class AdaptionsEndPoint {
     private AdapterDispatchClient adapterDispatchClient;
 
     @RequestMapping(value = "/organization/standard", method = RequestMethod.GET)
-    @ApiOperation(value = "获取适配方案摘要", produces = "application/json", notes = "获取两个指定版本的标准化数据差异与适配方案，文件以Base64编码，压缩格式为zip")
+    @ApiOperation(value = "获取适配方案摘要", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "获取两个指定版本的标准化数据差异与适配方案，文件以Base64编码，压缩格式为zip")
     public Object getOrgSchema(
             @ApiParam(required = true, name = "user_name", value = "用户名")
             @RequestParam(value = "user_name", required = true) String userName,
@@ -44,17 +46,17 @@ public class AdaptionsEndPoint {
             @ApiParam(required = true, name = "current_version", value = "用户当前使用的版本")
             @RequestParam(value = "current_version", required = false) String currentVersion) {
 
-        MUserSecurity mUserSecurity = securityClient.getUserSecurityByLoginCode(userName);
-        if (mUserSecurity == null) {
+        MKey mKey = securityClient.getUserKey(userName);
+        if (mKey == null) {
             return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed, "获取用户密钥失败");
         }
-        Object restEcho = standardDispatchClient.getSchemeInfo(mUserSecurity.getPrivateKey(), updateVersion, currentVersion);
+        Object restEcho = standardDispatchClient.getSchemeInfo(mKey.getPrivateKey(), updateVersion, currentVersion);
         return restEcho;
     }
 
 
     @RequestMapping(value = "/organization/adaption", method = RequestMethod.GET)
-    @ApiOperation(value = "获取适配方案映射信息", response = RestEcho.class, produces = "application/json", notes = "获取采集标准适配方案信息，文件以Base64编码，压缩格式为zip")
+    @ApiOperation(value = "获取适配方案映射信息", response = RestEcho.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "获取采集标准适配方案信息，文件以Base64编码，压缩格式为zip")
     public Object getOrgAdaption(
             @ApiParam(required = true, name = "user_name", value = "用户名")
             @RequestParam(value = "user_name", required = true) String userName,
@@ -74,55 +76,29 @@ public class AdaptionsEndPoint {
         }
         if (StringUtils.isNotEmpty(errorMsg))
             return new RestEcho().failed(ErrorCode.MissParameter, errorMsg);
-        MUserSecurity mUserSecurity = securityClient.getUserSecurityByLoginCode(userName);
-        if (mUserSecurity == null) {
+        MKey mKey = securityClient.getUserKey(userName);
+        if (mKey == null) {
             return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed, "获取用户密钥失败");
         }
-        Object object = adapterDispatchClient.getSchemeMappingInfo(mUserSecurity.getPrivateKey(), versionCode, orgCode);
+        Object object = adapterDispatchClient.getSchemeMappingInfo(mKey.getPrivateKey(), versionCode, orgCode);
         return object;
     }
 
-//// TODO: 2016/3/15  增加新接口，根据orgCode来获取采集标准及适配方案信息 
-//    @RequestMapping(value = "/organization", method = RequestMethod.GET)
-//    @ApiOperation(value = "获取采集标准及适配方案信息", response = RestEcho.class, produces = "application/json", notes = "获取采集标准及适配方案信息，文件以Base64编码，压缩格式为zip")
-//    public Object getOrgAdaptions(
-//            @ApiParam(required = true, name = "user_name", value = "用户名")
-//            @RequestParam(value = "user_name", required = true) String userName,
-//            @ApiParam(required = true, name = "version_code", value = "适配标准版本")
-//            @RequestParam(value = "version_code", required = true) String versionCode,
-//            @ApiParam(required = true, name = "org_code", value = "机构代码")
-//            @RequestParam(value = "org_code", required = true) String orgCode) {
-//
-//        String errorMsg = null;
-//        if (StringUtils.isEmpty(userName)) {
-//            errorMsg += "缺失参数:user_name!";
-//        }
-//        if (StringUtils.isEmpty(versionCode)) {
-//            errorMsg += "缺失参数:version_code!";
-//        }
-//        if (StringUtils.isEmpty(orgCode)) {
-//            errorMsg += "缺失参数:org_code!";
-//        }
-//        if (StringUtils.isNotEmpty(errorMsg))
-//            return new RestEcho().failed(ErrorCode.MissParameter, errorMsg);
-//        MUserSecurity mUserSecurity = securityClient.getUserSecurityByLoginCode(userName);
-//        if (mUserSecurity == null) {
-//            return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed, "获取用户密钥失败");
-//        }
-//        Object object = adapterDispatchClient.getALLSchemeMappingInfo(mUserSecurity.getPrivateKey(), versionCode, orgCode);
-//        return object;
-//    }
-
 
     @RequestMapping(value = "/organization", method = RequestMethod.GET)
-    @ApiOperation(value = "获取采集标准及适配方案信息", response = RestEcho.class, produces = "application/json", notes = "获取采集标准及适配方案信息，文件以Base64编码，压缩格式为zip")
+    @ApiOperation(value = "获取采集标准及适配方案信息", response = RestEcho.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "获取采集标准及适配方案信息，文件以Base64编码，压缩格式为zip")
     public Object getOrgAdaptions(
+            @ApiParam(required = true, name = "user_name", value = "用户名")
+            @RequestParam(value = "user_name", required = true) String userName,
             @ApiParam(required = true, name = "version_code", value = "适配标准版本")
             @RequestParam(value = "version_code", required = true) String versionCode,
             @ApiParam(required = true, name = "org_code", value = "机构代码")
             @RequestParam(value = "org_code", required = true) String orgCode) {
 
         String errorMsg = null;
+        if (StringUtils.isEmpty(userName)) {
+            errorMsg += "缺失参数:user_name!";
+        }
         if (StringUtils.isEmpty(versionCode)) {
             errorMsg += "缺失参数:version_code!";
         }
@@ -131,16 +107,18 @@ public class AdaptionsEndPoint {
         }
         if (StringUtils.isNotEmpty(errorMsg))
             return new RestEcho().failed(ErrorCode.MissParameter, errorMsg);
-        MUserSecurity mUserSecurity = securityClient.getUserSecurityByLoginCode(orgCode);
-        if (mUserSecurity == null) {
+        MKey mKey = securityClient.getUserKey(userName);
+        if (mKey == null) {
             return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed, "获取用户密钥失败");
         }
-        Object object = adapterDispatchClient.getALLSchemeMappingInfo(mUserSecurity.getPrivateKey(), versionCode, orgCode);
+        Object object = adapterDispatchClient.getALLSchemeMappingInfo(mKey.getPrivateKey(), versionCode, orgCode);
         return object;
     }
 
+
     @RequestMapping(value = "/version_plan", method = RequestMethod.GET)
-    @ApiOperation(value = "根据机构编码获取最新映射版本号 ", response = RestEcho.class, produces = "application/json", notes = "指定版本的信息")
+    @ApiOperation(value = "根据机构编码获取最新映射版本号 ", response = RestEcho.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "指定版本的信息")
+    @HystrixProperty(name = "hystrix.command.default.execution.timeout.enabled", value = "false")
     public Object getCDAVersionInfoByOrgCode(
             @ApiParam(name = "org_code", value = "机构编码")
             @RequestParam(value = "org_code") String orgCode) throws Exception {
@@ -150,9 +128,6 @@ public class AdaptionsEndPoint {
         Object object = adapterDispatchClient.getCDAVersionInfoByOrgCode(orgCode);
         return object;
     }
-
-
-
 
 //
 //    @ApiOperation(value = "获取机构数据标准", produces = "application/gzip")

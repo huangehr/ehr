@@ -5,6 +5,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,7 +24,7 @@ import java.util.Date;
 @RequestMapping(ApiVersion.Version1_0 + "/search")
 @Api(protocols = "https", value = "search", description = "搜索服务")
 public class SearchEndPoint {
-    @ApiOperation(value = "档案搜索", produces = "application/json", notes = "搜索健康档案")
+    @ApiOperation(value = "档案搜索", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "搜索健康档案")
     @RequestMapping(value = "/profiles", method = RequestMethod.GET)
     public Object searchProfiles(
             @ApiParam(required = true, name = "demographic_id", value = "患者人口学ID")
@@ -39,13 +40,13 @@ public class SearchEndPoint {
         return null;
     }
 
-    @ApiOperation(value = "患者搜索", produces = "application/json", notes = "搜索患者信息")
+    @ApiOperation(value = "患者搜索", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "搜索患者信息")
     @RequestMapping(value = "/users", method = RequestMethod.GET)
     public Object searchPatients() {
         return null;
     }
 
-    @ApiOperation(value = "组织机构搜索", produces = "application/json", notes = "组织机构搜索")
+    @ApiOperation(value = "组织机构搜索", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "组织机构搜索")
     @RequestMapping(value = "/organization", method = RequestMethod.GET)
     public Object searchOrganizations() {
         return null;

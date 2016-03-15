@@ -25,7 +25,7 @@ public class OrgDictItem {
     String description;
     String createUser;
     String updateUser;
-    Integer orgDict;
+    long orgDict;
     String organization;
     int sequence;
 
@@ -87,11 +87,11 @@ public class OrgDictItem {
     }
 
     @Column(name = "org_dict", unique = false, nullable = true)
-    public Integer getOrgDict() {
+    public long getOrgDict() {
         return orgDict;
     }
 
-    public void setOrgDict(Integer orgDict) {
+    public void setOrgDict(long orgDict) {
         this.orgDict = orgDict;
     }
 

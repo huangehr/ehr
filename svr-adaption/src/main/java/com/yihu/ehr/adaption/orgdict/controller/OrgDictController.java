@@ -4,8 +4,6 @@ import com.yihu.ehr.adaption.commons.ExtendController;
 import com.yihu.ehr.adaption.orgdict.service.OrgDict;
 import com.yihu.ehr.adaption.orgdict.service.OrgDictService;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.adaption.MOrgDict;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -17,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -49,10 +46,8 @@ public class OrgDictController extends ExtendController<MOrgDict> {
             @RequestParam(value = "model") String model) throws Exception{
 
         OrgDict orgDict = jsonToObj(model, OrgDict.class);
-        if (orgDictService.isExistOrgDict(orgDict.getOrganization(), orgDict.getCode()))
-            throw new ApiException(ErrorCode.RepeatCode);
 
-        orgDict.setCreateDate(new Date());
+        //orgDict.setCreateDate(new Date());
         return getModel(orgDictService.createOrgDict(orgDict));
     }
 
@@ -72,18 +67,12 @@ public class OrgDictController extends ExtendController<MOrgDict> {
     @ApiOperation(value = "修改机构字典")
     public MOrgDict updateOrgDict(
             @ApiParam(name = "model", value = "数据模型", defaultValue = "")
-            @RequestParam(value = "model") String model) throws Exception{
+            @RequestParam(value = "model") String model) throws Exception {
 
         OrgDict dataModel = jsonToObj(model, OrgDict.class);
-        OrgDict orgDict = orgDictService.retrieve(dataModel.getId());
-        if (orgDict == null)
-            throw errNotFound();
-        if (orgDict.getCode().equals(dataModel.getCode()) || !orgDictService.isExistOrgDict(dataModel.getOrganization(), dataModel.getCode())) {
-            dataModel.setUpdateDate(new Date());
-            return getModel(orgDictService.save(dataModel));
-        }
-        else
-            throw new ApiException(ErrorCode.RepeatCode);
+
+        return getModel(orgDictService.save(dataModel));
+
     }
 
 
@@ -124,4 +113,10 @@ public class OrgDictController extends ExtendController<MOrgDict> {
         return orgDicts;
     }
 
+    @RequestMapping(value = "/dict/is_exist",method = RequestMethod.GET)
+    public boolean isExistDict(
+            @RequestParam(value = "org_code") String orgCode,
+            @RequestParam(value = "dict_code") String dictCode){
+        return orgDictService.isExistOrgDict(orgCode, dictCode);
+    }
 }

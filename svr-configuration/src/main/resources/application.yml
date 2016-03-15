@@ -12,7 +12,7 @@ endpoints:
 info:
   app:
     name: ConfigurationService
-    description: EHR platform global configuration service
+    description: EHR平台全局配置服务
     version: 1.0.0
 
 ---

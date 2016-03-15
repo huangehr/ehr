@@ -4,19 +4,18 @@ import com.yihu.ehr.adaption.commons.ExtendController;
 import com.yihu.ehr.adaption.orgdictitem.service.OrgDictItem;
 import com.yihu.ehr.adaption.orgdictitem.service.OrgDictItemService;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.adaption.MOrgDictItem;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author lincl
@@ -47,13 +46,10 @@ public class OrgDictItemController extends ExtendController<MOrgDictItem> {
             @RequestParam(value = "model") String model) throws Exception{
 
         OrgDictItem orgDictItem = jsonToObj(model, OrgDictItem.class);
-        if (orgDictItemService.isExistOrgDictItem(orgDictItem.getOrgDict(), orgDictItem.getOrganization(), orgDictItem.getCode()))
-            throw new ApiException(ErrorCode.RepeatCode);
-
         if (orgDictItem.getSort() == 0)
             orgDictItem.setSort(orgDictItemService.getNextSort(orgDictItem.getOrgDict()));
 
-        orgDictItem.setCreateDate(new Date());
+//        orgDictItem.setCreateDate(new Date());
         return getModel(orgDictItemService.createOrgDictItem(orgDictItem));
     }
 
@@ -85,22 +81,10 @@ public class OrgDictItemController extends ExtendController<MOrgDictItem> {
     @ApiOperation(value = "修改字典项")
     public MOrgDictItem updateDictItem(
             @ApiParam(name = "model", value = "数据模型", defaultValue = "")
-            @RequestParam(value = "model") String model) throws Exception{
+            @RequestParam(value = "model") String model) throws Exception {
 
         OrgDictItem dataModel = jsonToObj(model, OrgDictItem.class);
-        OrgDictItem orgDictItem = orgDictItemService.retrieve(dataModel.getId());
-        if (orgDictItem == null) {
-            throw errNotFound();
-        } else {
-            //重复验证
-            boolean updateFlg = orgDictItem.getCode().equals(dataModel.getCode())
-                    || !orgDictItemService.isExistOrgDictItem(dataModel.getOrgDict(), dataModel.getOrganization(), dataModel.getCode());
-            if (updateFlg) {
-                dataModel.setUpdateDate(new Date());
-                return getModel(orgDictItemService.save(dataModel));
-            }
-            throw new ApiException(ErrorCode.RepeatCode);
-        }
+        return getModel(orgDictItemService.save(dataModel));
     }
 
 
@@ -129,7 +113,7 @@ public class OrgDictItemController extends ExtendController<MOrgDictItem> {
     @ApiOperation(value = "机构字典项下拉")
     public List<String> getOrgDictEntry(
             @ApiParam(name = "orgDictSeq", value = "字典seq", defaultValue = "")
-            @RequestParam(value = "orgDictSeq") Integer orgDictSeq,
+            @RequestParam(value = "orgDictSeq") long orgDictSeq,
             @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
             @RequestParam(value = "orgCode") String orgCode) throws Exception{
 
@@ -139,5 +123,13 @@ public class OrgDictItemController extends ExtendController<MOrgDictItem> {
             orgDictItems.add(String.valueOf(orgDictItem.getSequence()) + ',' + orgDictItem.getName());
         }
         return orgDictItems;
+    }
+
+    @RequestMapping(value = "/item/is_exist",method = RequestMethod.GET)
+    public boolean isExistDictItem(
+            @RequestParam(value = "dict_id")long dictId,
+            @RequestParam(value = "org_code")String orgCode,
+            @RequestParam(value = "item_code")String itemCode){
+        return orgDictItemService.isExistOrgDictItem(dictId,orgCode,itemCode);
     }
 }

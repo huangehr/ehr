@@ -4,8 +4,6 @@ import com.yihu.ehr.adaption.commons.ExtendController;
 import com.yihu.ehr.adaption.orgmetaset.service.OrgMetaData;
 import com.yihu.ehr.adaption.orgmetaset.service.OrgMetaDataService;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.adaption.MOrgMetaData;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -17,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -51,11 +48,7 @@ public class OrgMetaDataController extends ExtendController<MOrgMetaData> {
             @RequestParam(value = "model") String model) throws Exception {
 
         OrgMetaData orgMetaData = jsonToObj(model, OrgMetaData.class);
-        boolean isExist = orgMetaDataService.isExistOrgMetaData(orgMetaData.getOrgDataSet(), orgMetaData.getOrganization(), orgMetaData.getCode());//重复验证
-        if (isExist)
-            throw new ApiException(ErrorCode.RepeatCode);
-
-        orgMetaData.setCreateDate(new Date());
+        //orgMetaData.setCreateDate(new Date());
         return getModel(orgMetaDataService.createOrgMetaData(orgMetaData));
     }
 
@@ -88,19 +81,7 @@ public class OrgMetaDataController extends ExtendController<MOrgMetaData> {
             @RequestParam(value = "model") String model) throws Exception {
 
         OrgMetaData dataModel = jsonToObj(model, OrgMetaData.class);
-        OrgMetaData orgMetaData = orgMetaDataService.retrieve(dataModel.getId());
-        if (orgMetaData == null) {
-            throw errNotFound();
-        } else {
-            //重复验证
-            boolean updateFlg = orgMetaData.getCode().equals(dataModel.getCode())
-                    || !orgMetaDataService.isExistOrgMetaData(dataModel.getOrgDataSet(), dataModel.getOrganization(), dataModel.getCode());
-            if (updateFlg) {
-                dataModel.setUpdateDate(new Date());
-                return getModel(orgMetaDataService.save(dataModel));
-            } else
-                throw new ApiException(ErrorCode.RepeatCode);
-        }
+        return getModel(orgMetaDataService.save(dataModel));
     }
 
 
@@ -125,4 +106,11 @@ public class OrgMetaDataController extends ExtendController<MOrgMetaData> {
         return convertToModels(appList, new ArrayList<>(appList.size()), MOrgMetaData.class, fields);
     }
 
+    @RequestMapping(value = "/meta/is_exist",method = RequestMethod.GET)
+    public boolean isExistMetaData(
+           @RequestParam(value = "data_set_id") int dataSetId,
+           @RequestParam(value = "org_code") String orgCode,
+            @RequestParam(value = "meta_data_code")String metaDataCode) {
+        return orgMetaDataService.isExistOrgMetaData(dataSetId, orgCode, metaDataCode);//重复验证
+    }
 }
