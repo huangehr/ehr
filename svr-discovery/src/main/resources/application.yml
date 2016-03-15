@@ -1,7 +1,5 @@
-spring:
-  cloud:
-    config:
-      enabled: false
+server:
+  port: 8761
 
 info:
   app:
@@ -12,14 +10,17 @@ info:
 security:
   user:
     password: eureka
+---
+spring:
+  profiles: dev
 
 eureka:
   instance:
-    hostname: localhost
-    prefer-ip-address: true
-    #leaseRenewalIntervalInSeconds: 15
-    #metadataMap:
-          #instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+      ip-address: localhost
+      prefer-ip-address: true
+      #leaseRenewalIntervalInSeconds: 15
+      #metadataMap:
+            #instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
 
   client:
     #don't register this app as a service in eureka
@@ -27,6 +28,9 @@ eureka:
     fetch-registry: false
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
+    server:
+      wait-time-in-ms-when-sync-empty: 0
+      enable-self-preservation: false
 
   server:
       enable-self-preservation: false
@@ -34,15 +38,51 @@ eureka:
 
 ---
 spring:
-  profiles:
-    active: dev
+  profiles: test
+
+eureka:
+  instance:
+      ip-address: 192.168.131.151
+      prefer-ip-address: true
+      #leaseRenewalIntervalInSeconds: 15
+      #metadataMap:
+            #instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+  client:
+    #don't register this app as a service in eureka
+    register-with-eureka: false
+    fetch-registry: false
+    serviceUrl:
+      defaultZone: http://192.168.131.151:8761/eureka/
+    server:
+      wait-time-in-ms-when-sync-empty: 0
+      enable-self-preservation: false
+
+  server:
+      enable-self-preservation: false
+      waitTimeInMsWhenSyncEmpty: 500000
 
 ---
 spring:
-  profiles:
-    active: test
+  profiles: prod
 
----
-spring:
-  profiles:
-    active: prod
+eureka:
+  instance:
+      ip-address: 11.1.2.21
+      prefer-ip-address: true
+      #leaseRenewalIntervalInSeconds: 15
+      #metadataMap:
+            #instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+  client:
+    #don't register this app as a service in eureka
+    register-with-eureka: false
+    fetch-registry: false
+    serviceUrl:
+      defaultZone: http://11.1.2.21:8761/eureka/
+    server:
+      wait-time-in-ms-when-sync-empty: 0
+      enable-self-preservation: false
+  server:
+      enable-self-preservation: false
+      waitTimeInMsWhenSyncEmpty: 500000

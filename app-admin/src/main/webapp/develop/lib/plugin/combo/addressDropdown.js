@@ -49,6 +49,7 @@
       filterFields: ['name','abbrPY','fullPY'],
       content: ''
     };
+    var code,values;
 
     function init (opts) {
         var self = this;
@@ -110,6 +111,8 @@
     function renderTabPanel(index,value) {
         var p = this.opt;
         var ds = p.tabsData[index];
+        code = ds.code;
+        values = ds.values;
         var dm = $.DataModel.init();
         var self = this;
         value = value || [];
@@ -240,8 +243,8 @@
         var self = this;
         var dataTemp = [];
         for(var key in data) {
-            var id = data[key].id;
-            var name = data[key].name;
+            var id = data[key][code];
+            var name = data[key][values];
             var abbrChars = $.Pinyin.getAbbrChars(name);
             var fullChars = $.Pinyin.getFullChars(name);
             dataTemp.push(Util.format("{0}||{1}||{2}||{3}",abbrChars,fullChars,id,name));

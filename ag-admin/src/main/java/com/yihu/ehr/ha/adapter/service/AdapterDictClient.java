@@ -3,11 +3,11 @@ package com.yihu.ehr.ha.adapter.service;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.adaption.MAdapterDict;
-import com.yihu.ehr.model.adaption.MAdapterDictVo;
-import com.yihu.ehr.model.adaption.MDataSet;
+import com.yihu.ehr.model.adaption.MAdapterRelationship;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -30,7 +30,7 @@ public interface AdapterDictClient {
 
     @RequestMapping(value = "/plan/{planId}/dicts", method = RequestMethod.GET)
     @ApiOperation(value = "字典适配关系分页查询")
-    Collection<MDataSet> searchAdapterDict(
+    ResponseEntity<Collection<MAdapterRelationship>> searchAdapterDict(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "code", value = "代码查询值", defaultValue = "")
@@ -46,7 +46,7 @@ public interface AdapterDictClient {
 
     @RequestMapping(value = "/plan/{planId}/dict/{dictId}/entrys", method = RequestMethod.GET)
     @ApiOperation(value = "字典项适配关系分页查询")
-    Collection<MAdapterDictVo> searchAdapterDictEntry(
+    ResponseEntity<Collection<MAdapterDict>> searchAdapterDictEntry(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "dictId", value = "字典编号", defaultValue = "")
@@ -60,7 +60,7 @@ public interface AdapterDictClient {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page) ;
+            @RequestParam(value = "page", required = false) int page);
 
     @RequestMapping(value = "/entry/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据字典ID获取字典项适配关系明细")
@@ -70,21 +70,21 @@ public interface AdapterDictClient {
 
     @RequestMapping(value = "/entry", method = RequestMethod.POST)
     @ApiOperation(value = "保存字典项映射关系")
-    MAdapterDict createAdapterDictEntry(
+    public MAdapterDict createAdapterDictEntry(
             @ApiParam(name = "adapterDictModel", value = "字典数据模型", defaultValue = "")
-            @RequestParam(value = "adapterDictModel") String dictJsonModel) ;
+            @RequestParam(value = "adapterDictModel") String dictJsonModel) throws Exception ;
 
     @RequestMapping(value = "/entry/{id}", method = RequestMethod.PUT)
     @ApiOperation(value = "修改字典项映射关系")
-    MAdapterDict updateAdapterDictEntry(
+    public MAdapterDict updateAdapterDictEntry(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") Long id,
             @ApiParam(name = "adapterDictModel", value = "字典数据模型", defaultValue = "")
-            @RequestParam(value = "adapterDictModel") String dictJsonModel) ;
+            @RequestParam(value = "adapterDictModel") String dictJsonModel) throws Exception ;
 
     @RequestMapping(value = "/entrys", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除字典项映射")
-    boolean delDictEntry(
-            @RequestParam("ids") String ids) ;
+    public boolean delDictEntry(
+            @RequestParam("ids") String ids) throws Exception ;
 
 }

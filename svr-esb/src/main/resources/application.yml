@@ -33,8 +33,11 @@ fast-dfs:
 
 spring:
   jpa:
+    show-sql: true
     hibernate:
       dialect: org.hibernate.dialect.MySQL5Dialect
+    database:
+      platform: org.hibernate.dialect.MySQL5Dialect
 
 info:
   app:

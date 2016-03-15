@@ -5,10 +5,12 @@ import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.agModel.user.UsersModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
+import com.yihu.ehr.ha.geography.service.AddressClient;
 import com.yihu.ehr.ha.organization.service.OrganizationClient;
 import com.yihu.ehr.ha.security.service.SecurityClient;
 import com.yihu.ehr.ha.users.service.UserClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.model.geogrephy.MGeography;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MUser;
@@ -49,6 +51,9 @@ public class UserController extends BaseController {
 
     @Autowired
     private SecurityClient securityClient;
+
+    @Autowired
+    private AddressClient addressClient;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -328,6 +333,21 @@ public class UserController extends BaseController {
         return success(detailModel);
     }
 
+    @RequestMapping(value = "/users/existence/{login_code}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据登录账号获取当前用户", notes = "根据登陆用户名及密码验证用户")
+    public Envelop existence(
+            @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
+            @PathVariable(value = "login_code") String loginCode) {
+        Envelop envelop = new Envelop();
+
+        boolean bo = userClient.isLoginCodeExists(loginCode);
+        envelop.setSuccessFlg(bo);
+        return envelop;
+
+    }
+
+
+
     /**
      * 将 MUser 转为 UserDetailModel
      *
@@ -355,7 +375,9 @@ public class UserController extends BaseController {
         String orgCode = mUser.getOrganization();
         if(StringUtils.isNotEmpty(orgCode)) {
             MOrganization orgModel = orgClient.getOrg(orgCode);
-            detailModel.setOrganizationName(orgModel == null ? "" : orgModel.getFullName());
+            MGeography  mGeography = addressClient.getAddressById(orgModel.getLocation());
+            String orgAddress = mGeography.getProvince()+mGeography.getCity()+mGeography.getDistrict()+orgModel.getFullName();
+            detailModel.setOrganizationName(orgModel == null ? "" : orgAddress);
         }
         //获取秘钥信息
         MKey userSecurity = securityClient.getUserSecurityByUserId(mUser.getId());

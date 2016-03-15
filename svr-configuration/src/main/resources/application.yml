@@ -27,7 +27,7 @@ spring:
 
 eureka:
   instance:
-    ip-address: 127.0.0.1
+    hostname: localhost
   client:
     registerWithEureka: true
     fetchRegistry: false
@@ -90,3 +90,6 @@ eureka:
     fetchRegistry: true
     serviceUrl:
       defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@11.1.2.21:8761}/eureka/
+  server:
+      enableSelfPreservation: false
+      waitTimeInMsWhenSyncEmpty: 0
