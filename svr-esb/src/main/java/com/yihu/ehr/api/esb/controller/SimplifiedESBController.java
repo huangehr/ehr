@@ -13,7 +13,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
@@ -34,6 +37,24 @@ public class SimplifiedESBController {
     private SimplifiedESBService simplifiedESBService;
     @Autowired
     private FastDFSConfig FastDFSConfig;
+
+    /**
+     * 判斷是否需要上传日志
+     *
+     * @param orgCode
+     * @param systemCode
+     * @return
+     */
+    @ApiOperation("判斷是否需要上传日志")
+    @RequestMapping(value = "/getUploadFlag", method = RequestMethod.GET)
+    public boolean getUploadFlag(@RequestParam(value = "orgCode", required = true) String orgCode,
+                                 @RequestParam(value = "systemCode", required = true) String systemCode) {
+        try {
+            return simplifiedESBService.getUploadFlagByOrgCodeAndSystemCode(orgCode, systemCode);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     /**
      * 上传日志
@@ -244,9 +265,10 @@ public class SimplifiedESBController {
     public String changeHisPenetrationStatus(
             @ApiParam("result") @RequestParam(value = "result", required = true) String result,
             @ApiParam("status") @RequestParam(value = "status", required = true) String status,
+            @ApiParam("message") @RequestParam(value = "message", required = true) String message,
             @ApiParam("id") @RequestParam(value = "id", required = true) String id) {
         try {
-            simplifiedESBService.changeHisPenetrationStatus(id, status, result);
+            simplifiedESBService.changeHisPenetrationStatus(id, status, result, message);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -41,6 +41,15 @@ public class SimplifiedEsbEndPoint {
         return new ResponseEntity<>(new Json(""), HttpStatus.OK);
     }
 */
+
+    @ApiOperation("判断是否需要上传日志")
+    @RequestMapping(value = "/getUploadFlag", method = RequestMethod.GET)
+    public ResponseEntity<Boolean> getUploadFlag(@ApiParam("orgCode") @RequestParam(value = "orgCode", required = true)
+                                               String orgCode,
+                                           @ApiParam("systemCode") @RequestParam(value = "systemCode", required = true)
+                                               String systemCode) throws Exception {
+        return new ResponseEntity<>(simplifiedESBClient.getUploadFlag(orgCode, systemCode), HttpStatus.OK);
+    }
     @ApiOperation("日志上传")
     @RequestMapping(value = "/uploadLog", method = RequestMethod.POST)
     public ResponseEntity<String> uploadLogger(@ApiParam("orgCode") @RequestParam(value = "orgCode", required = true)
@@ -129,10 +138,12 @@ public class SimplifiedEsbEndPoint {
     public ResponseEntity changeHisPenetrationStatus(
             @ApiParam("result") @RequestParam(value = "result", required = true)
             String result,
+            @ApiParam("message") @RequestParam(value = "message", required = true)
+            String message,
             @ApiParam("status") @RequestParam(value = "status", required = true)
             String status,
             @ApiParam("id") @RequestParam(value = "id", required = true)
             String id) {
-        return new ResponseEntity<>(simplifiedESBClient.changeHisPenetrationStatus(result, status, id), HttpStatus.OK);
+        return new ResponseEntity<>(simplifiedESBClient.changeHisPenetrationStatus(result, status, id,message), HttpStatus.OK);
     }
 }
