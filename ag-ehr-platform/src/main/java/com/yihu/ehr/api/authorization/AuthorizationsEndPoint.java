@@ -62,20 +62,20 @@ public class AuthorizationsEndPoint {
     EhrClientDetailsService clientDetailsService;
 
     @ApiOperation(value = "获取用户所有应用授权", notes = "提供用户名/密码作为Basic验证")
-    @RequestMapping(value = "", produces = "application/json", method = RequestMethod.GET)
+    @RequestMapping(value = "", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.GET)
     public List<String> getAuthorizations() {
         return null;
     }
 
     @ApiOperation(value = "获取单个授权", notes = "提供用户名/密码作为Basic验证")
-    @RequestMapping(value = "/{token_id}", produces = "application/json", method = RequestMethod.GET)
+    @RequestMapping(value = "/{token_id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.GET)
     public List<String> getAuthorization(@ApiParam(value = "token_id")
                                          @PathVariable("token_id") long tokenId) {
         return null;
     }
 
     @ApiOperation(value = "更新授权", notes = "提供用户名/密码作为Basic验证")
-    @RequestMapping(value = "/{token_id}", produces = "application/json", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{token_id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.PUT)
     public List<String> updateAuthorization(@ApiParam(value = "token_id")
                                             @PathVariable(value = "token_id") long id,
                                             @ApiParam(value = "json")
@@ -84,21 +84,21 @@ public class AuthorizationsEndPoint {
     }
 
     @ApiOperation(value = "删除授权", notes = "提供用户名/密码作为Basic验证")
-    @RequestMapping(value = "/{token_id}", produces = "application/json", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{token_id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.DELETE)
     public void deleteAuthorization(@ApiParam(value = "token_id")
                                     @PathVariable(value = "token_id") long id) {
 
     }
 
     @ApiOperation(value = "为用户的多个应用创建授权", notes = "提供用户名/密码作为Basic验证")
-    @RequestMapping(value = "", produces = "application/json", method = RequestMethod.POST)
+    @RequestMapping(value = "", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.POST)
     public List<String> createAuthorizations(@ApiParam(value = "json")
                                              @RequestParam(value = "json") String json) {
         return null;
     }
 
     @ApiOperation(value = "为指定应用创建授权，若存在返回已有授权", notes = "提供Client Id/Secret作为Basic验证")
-    @RequestMapping(value = "/clients/{client_id}", produces = "application/json", method = RequestMethod.PUT)
+    @RequestMapping(value = "/clients/{client_id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.PUT)
     public ResponseEntity<Json> createClientAuthorization(@ApiParam(value = "client_id", defaultValue = "kHAbVppx44")
                                                           @PathVariable("client_id")
                                                           String clientId,

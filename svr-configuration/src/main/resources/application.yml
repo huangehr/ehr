@@ -12,7 +12,7 @@ endpoints:
 info:
   app:
     name: ConfigurationService
-    description: EHR platform global configuration service
+    description: EHR平台全局配置服务
     version: 1.0.0
 
 ---
@@ -22,7 +22,7 @@ spring:
     config:
       server:
         git:
-          uri: C:/Users/Administrator/Desktop/103环境/dev分支/ehr.config
+          uri: http://192.168.1.220:10080/EHR/ehr.config.git
         default-label: dev
 
 eureka:

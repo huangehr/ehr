@@ -3,7 +3,7 @@ package com.yihu.ehr.user.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
-import com.yihu.ehr.model.security.MUserSecurity;
+import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.user.feign.SecurityClient;
 import com.yihu.ehr.user.service.User;
@@ -33,6 +33,7 @@ public class UserController extends BaseRestController {
 
     @Autowired
     private UserManager userManager;
+
     @Autowired
     private SecurityClient securityClient;
 
@@ -165,7 +166,7 @@ public class UserController extends BaseRestController {
     public Map<String, String> distributeKey(
             @ApiParam(name = "user_id", value = "登录帐号", defaultValue = "")
             @PathVariable(value = "user_id") String userId) {
-        MUserSecurity userSecurity = securityClient.getUserSecurityByUserId(userId);
+        MKey userSecurity = securityClient.getUserSecurityByUserId(userId);
         Map<String, String> keyMap = new HashMap<>();
         if (userSecurity == null) {
             userSecurity = securityClient.createSecurityByUserId(userId);

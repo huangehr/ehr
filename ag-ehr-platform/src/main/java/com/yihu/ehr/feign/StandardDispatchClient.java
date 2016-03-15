@@ -6,6 +6,7 @@ import com.yihu.ehr.util.RestEcho;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,7 +22,7 @@ import springfox.documentation.annotations.ApiIgnore;
 public interface StandardDispatchClient {
 
     @RequestMapping(value = "/standard-dispatcher/schema", method = RequestMethod.GET)
-    @ApiOperation(value = "获取适配方案摘要", response = RestEcho.class, produces = "application/json",
+    @ApiOperation(value = "获取适配方案摘要", response = RestEcho.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
             notes = "获取两个指定版本的标准化数据差异与适配方案，文件以Base64编码，压缩格式为zip")
     Object getSchemeInfo(
             @ApiParam(required = true, name = "userPrivateKey", value = "用户私钥")
