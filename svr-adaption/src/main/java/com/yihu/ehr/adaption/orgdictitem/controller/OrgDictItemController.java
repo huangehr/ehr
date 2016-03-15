@@ -132,4 +132,12 @@ public class OrgDictItemController extends ExtendController<MOrgDictItem> {
             @RequestParam(value = "item_code")String itemCode){
         return orgDictItemService.isExistOrgDictItem(dictId,orgCode,itemCode);
     }
+
+    @RequestMapping(value = "/dict/dict_entry",method = RequestMethod.GET)
+    public MOrgDictItem getOrgDicEntryBySequence(
+            @RequestParam(value = "org_code") String orgCode,
+            @RequestParam(value = "sequence") int sequence){
+
+        return convertToModel(orgDictItemService.getOrgDicEntryBySequence(orgCode,sequence),MOrgDictItem.class);
+    }
 }

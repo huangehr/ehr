@@ -3,6 +3,7 @@ package com.yihu.ehr.ha.adapter.service;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.adaption.MAdapterDict;
+import com.yihu.ehr.model.adaption.MAdapterDictVo;
 import com.yihu.ehr.model.adaption.MAdapterRelationship;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -46,7 +47,7 @@ public interface AdapterDictClient {
 
     @RequestMapping(value = "/plan/{planId}/dict/{dictId}/entrys", method = RequestMethod.GET)
     @ApiOperation(value = "字典项适配关系分页查询")
-    ResponseEntity<Collection<MAdapterDict>> searchAdapterDictEntry(
+    ResponseEntity<Collection<MAdapterDictVo>> searchAdapterDictEntry(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "dictId", value = "字典编号", defaultValue = "")

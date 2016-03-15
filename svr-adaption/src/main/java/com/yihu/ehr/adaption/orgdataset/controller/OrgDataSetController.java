@@ -114,4 +114,10 @@ public class OrgDataSetController extends ExtendController<MOrgDataSet> {
        return orgDataSetService.isExistOrgDataSet(orgCode, code);
     }
 
+    @RequestMapping(value = "/data_set",method = RequestMethod.GET)
+    public MOrgDataSet getDataSetBySequence(
+            @RequestParam(value="org_code")String orgCode,
+            @RequestParam(value = "sequence")int sequence){
+        return convertToModel(orgDataSetService.getDataSetBySequence(orgCode,sequence),MOrgDataSet.class);
+    }
 }

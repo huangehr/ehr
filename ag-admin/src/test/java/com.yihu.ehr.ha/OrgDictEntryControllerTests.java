@@ -112,6 +112,9 @@ public class OrgDictEntryControllerTests {
         envelop = entryController.saveOrgDictItem(objectMapper.writeValueAsString(entryDetailModel));
         assertTrue("修改失败",envelop.isSuccessFlg());
 
+        envelop = entryController.getOrgDictEntryBySequence(detailModel.getCode(),entryDetailModel.getSequence());
+        assertTrue("数据获取失败!",envelop.isSuccessFlg()&& envelop.getObj()!=null);
+
         List<String> listDictEntry = entryController.getOrgDictEntry(orgDictDetailModel.getSequence(),detailModel.getCode());
         assertTrue("获取字典全部字典项失败",listDictEntry.size()>0);
 

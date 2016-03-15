@@ -67,4 +67,9 @@ public class OrgMetaDataService extends BaseJpaService<OrgMetaData, XOrgMetaData
         }
         return seq;
     }
+
+    public OrgMetaData getMetaDataBySequence(String orgCode,int sequence)
+    {
+        return ((XOrgMetaDataRepository) getRepository()).getMetaDataBySequence(orgCode,sequence);
+    }
 }

@@ -73,4 +73,9 @@ public class OrgDictService extends BaseJpaService<OrgDict, XOrgDictRepository> 
         delete(orgDict);
         orgDictItemManager.deleteOrgDictItemByDict(orgDict);
     }
+
+    public OrgDict getOrgDictBySequence(String orgCode,int sequence)
+    {
+        return ((XOrgDictRepository) getRepository()).getOrgDictBySequence(orgCode, sequence);
+    }
 }

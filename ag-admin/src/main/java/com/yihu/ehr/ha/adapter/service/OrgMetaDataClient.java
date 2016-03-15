@@ -75,4 +75,10 @@ public interface OrgMetaDataClient {
             @RequestParam(value = "data_set_id") int dataSetId,
             @RequestParam(value = "org_code") String orgCode,
             @RequestParam(value = "meta_data_code")String metaDataCode);
+
+
+    @RequestMapping(value = "/adapter/org/meta_data",method = RequestMethod.GET)
+    MOrgMetaData getMetaDataBySequence(
+            @RequestParam(value = "org_code") String orgCode,
+            @RequestParam(value = "sequence") int sequence);
 }
