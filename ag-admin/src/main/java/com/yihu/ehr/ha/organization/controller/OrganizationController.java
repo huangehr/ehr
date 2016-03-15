@@ -18,6 +18,7 @@ import com.yihu.ehr.util.operator.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
@@ -55,6 +56,8 @@ public class OrganizationController extends BaseController {
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
             @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "address", value = "所属地区", defaultValue = "")
+            @RequestParam(value = "address", required = false) String address,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
@@ -65,6 +68,16 @@ public class OrganizationController extends BaseController {
         for(MOrganization mOrg : organizations){
             OrgModel orgModel = changeToOrgModel(mOrg);
             orgModelList.add(orgModel);
+        }
+        //TODO 优化（该分页查询有设置个参数，还是加到过滤条件中在网关中拆分出来-检索地址）
+        if(!StringUtils.isEmpty(address)){
+            List<OrgModel> list = new ArrayList<>();
+            for (OrgModel orgModel : orgModelList){
+                if (orgModel.getLocationStrName().contains(address)){
+                    list.add(orgModel);
+                }
+            }
+            orgModelList = list;
         }
         int totalCount = getTotalCount(responseEntity);
         return getResult(orgModelList,totalCount,page,size);
@@ -86,7 +99,7 @@ public class OrganizationController extends BaseController {
         orgModel.setLocationStrName(locationStrName);
         //获取机构接入方式
         MConventionalDict settledWayDict = conDictEntryClient.getSettledWay(mOrg.getSettledWay());
-        orgModel.setSettledWayName(settledWayDict.getValue());
+        orgModel.setSettledWayName(settledWayDict == null? "" : settledWayDict.getValue());
         // 判断机构状态（是否已激活）
         orgModel.setActivityFlagName(mOrg.getActivityFlag() == 1 ? "是" : "否");
         //创建时间转化
@@ -108,6 +121,10 @@ public class OrganizationController extends BaseController {
             @ApiParam(name = "org_code", value = "机构代码", defaultValue = "")
             @PathVariable(value = "org_code") String orgCode) throws Exception{
         Envelop envelop = new Envelop();
+        if(StringUtils.isEmpty(orgCode)){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("机构代码不能为空！");
+        }
         if(orgClient.deleteOrg(orgCode)){
             envelop.setSuccessFlg(true);
         }else{
@@ -132,15 +149,39 @@ public class OrganizationController extends BaseController {
             @ApiParam(name = "geography_model_json_data",value = "地址信息Json",defaultValue = "")
             @RequestParam(value = "geography_model_json_data", required = false) String geographyModelJsonData ) throws Exception{
         Envelop envelop  = new Envelop();
+        envelop.setSuccessFlg(false);
         ObjectMapper objectMapper = new ObjectMapper();
+        if(StringUtils.isEmpty(geographyModelJsonData)){
+            envelop.setErrorMsg("机构地址不能为空！");
+            return envelop;
+        }
         String location = addressClient.saveAddress(geographyModelJsonData);
+        if(StringUtils.isEmpty(location)){
+            envelop.setErrorMsg("地址保存失败！");
+            return envelop;
+        }
         OrgDetailModel orgDetailModel = objectMapper.readValue(mOrganizationJsonData,OrgDetailModel.class);
         MOrganization mOrganization = convertToModel(orgDetailModel,MOrganization.class);
+        if(StringUtils.isEmpty(mOrganization.getOrgCode())){
+            envelop.setErrorMsg("机构代码不能为空！");
+            return envelop;
+        }
+        if(StringUtils.isEmpty(mOrganization.getFullName())){
+            envelop.setErrorMsg("机构全名不能为空！");
+            return envelop;
+        }
+        if(StringUtils.isEmpty(mOrganization.getShortName())){
+            envelop.setErrorMsg("机构简称不能为空！");
+            return envelop;
+        }
+        if(StringUtils.isEmpty(mOrganization.getTel())){
+            envelop.setErrorMsg("联系方式不能为空！");
+            return envelop;
+        }
         mOrganization.setLocation(location);
         String mOrganizationJson = objectMapper.writeValueAsString(mOrganization);
         MOrganization mOrgNew = orgClient.create(mOrganizationJson);
         if(mOrgNew==null){
-            envelop.setSuccessFlg(false);
             envelop.setErrorMsg("机构创建失败");
         }else{
             envelop.setSuccessFlg(true);
@@ -157,15 +198,39 @@ public class OrganizationController extends BaseController {
             @ApiParam(name = "geography_model_json_data",value = "地址信息Json",defaultValue = "")
             @RequestParam(value = "geography_model_json_data", required = false) String geographyModelJsonData  ) throws Exception{
         Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
         ObjectMapper objectMapper = new ObjectMapper();
+        if(StringUtils.isEmpty(geographyModelJsonData)){
+            envelop.setErrorMsg("机构地址不能为空！");
+            return envelop;
+        }
         String locationId = addressClient.saveAddress(geographyModelJsonData);
+        if(StringUtils.isEmpty(locationId)){
+            envelop.setErrorMsg("保存地址失败！");
+            return envelop;
+        }
         OrgDetailModel orgDetailModel = objectMapper.readValue(mOrganizationJsonData,OrgDetailModel.class);
         MOrganization mOrganization = convertToModel(orgDetailModel,MOrganization.class);
+        if(StringUtils.isEmpty(mOrganization.getOrgCode())){
+            envelop.setErrorMsg("机构代码不能为空！");
+            return envelop;
+        }
+        if(StringUtils.isEmpty(mOrganization.getFullName())){
+            envelop.setErrorMsg("机构全名不能为空！");
+            return envelop;
+        }
+        if(StringUtils.isEmpty(mOrganization.getShortName())){
+            envelop.setErrorMsg("机构简称不能为空！");
+            return envelop;
+        }
+        if(StringUtils.isEmpty(mOrganization.getTel())){
+            envelop.setErrorMsg("联系方式不能为空！");
+            return envelop;
+        }
         mOrganization.setLocation(locationId);
         String mOrganizationJson = objectMapper.writeValueAsString(mOrganization);
         MOrganization mOrgNew = orgClient.create(mOrganizationJson);
         if(mOrgNew == null){
-            envelop.setSuccessFlg(false);
             envelop.setErrorMsg("更新失败");
         }else {
             envelop.setSuccessFlg(true);
@@ -185,9 +250,13 @@ public class OrganizationController extends BaseController {
             @ApiParam(name = "org_code", value = "机构代码", defaultValue = "")
             @PathVariable(value = "org_code") String orgCode) throws Exception {
         Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        if (StringUtils.isEmpty(orgCode)){
+            envelop.setErrorMsg("机构代码不能为空！");
+            return envelop;
+        }
         MOrganization mOrg = orgClient.getOrg(orgCode);
         if (mOrg == null) {
-            envelop.setSuccessFlg(false);
             envelop.setErrorMsg("机构获取失败");
             return envelop;
         }
@@ -211,17 +280,19 @@ public class OrganizationController extends BaseController {
         org.setOrgTypeName(orgTypeDict == null ? "" : orgTypeDict.getValue());
         //获取接入方式字典字典值
         MConventionalDict settledWayDict = conDictEntryClient.getSettledWay(mOrg.getSettledWay());
-        org.setSettledWayName(settledWayDict.getValue());
+        org.setSettledWayName(settledWayDict == null ? "" : settledWayDict.getValue());
         //TODO 微服务返回model无tags属性
         //org.setTags(mOrg.getTags());
         //获取地址字典值明细
         MGeography addr = addressClient.getAddressById(mOrg.getLocation());
-        org.setProvince(addr.getProvince());
-        org.setCity(addr.getCity());
-        org.setDistrict(addr.getDistrict());
-        org.setTown(addr.getTown());
-        org.setStreet(addr.getStreet());
-        org.setExtra(addr.getExtra());
+        if(addr != null) {
+            org.setProvince(addr.getProvince());
+            org.setCity(addr.getCity());
+            org.setDistrict(addr.getDistrict());
+            org.setTown(addr.getTown());
+            org.setStreet(addr.getStreet());
+            org.setExtra(addr.getExtra());
+        }
         //获取公钥信息（公钥、有效区间、开始时间）
         MUserSecurity security = securityClient.getUserSecurityByOrgCode(mOrg.getOrgCode());
         if(security!=null){
@@ -286,7 +357,7 @@ public class OrganizationController extends BaseController {
             @RequestParam(value = "district") String district) {
         Envelop envelop = new Envelop();
         Collection<MOrganization> mOrganizations = orgClient.getOrgsByAddress(province,city,district);
-        envelop.setDetailModelList((List) mOrganizations);
+        envelop.setDetailModelList(mOrganizations == null ? null : (List) mOrganizations);
         envelop.setSuccessFlg(true);
         return envelop;
     }

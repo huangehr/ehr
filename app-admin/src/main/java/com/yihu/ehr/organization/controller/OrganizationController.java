@@ -69,7 +69,7 @@ public class OrganizationController {
         Map<String, Object> params = new HashMap<>();
         StringBuffer filters = new StringBuffer();
         if(!StringUtils.isEmpty(searchNm)){
-            filters.append("orgCode?"+searchNm+";");
+            filters.append("orgCode?"+searchNm+" g1;fullName?"+searchNm+" g1;");
         }
         if(!StringUtils.isEmpty(searchWay)){
             filters.append("settledWay="+searchWay+";");
@@ -77,30 +77,22 @@ public class OrganizationController {
         if(!StringUtils.isEmpty(orgType)){
             filters.append("orgType="+orgType+";");
         }
-        //有修改内容：js文件（属性名、检索值的取得）
-        //TODO 根据地址的过滤
-        //微服务单表查询，没办法
-        //api网关查出org，查出地址，在筛选-----
+        String address = "";
+        if(!StringUtils.isEmpty(province)){
+            address += province;
+        }
+        if(!StringUtils.isEmpty(city) && !city.equals(province)){
+            address += city;
+        }
+        if(!StringUtils.isEmpty(district)){
+            address += district;
+        }
         params.put("fields","");
         params.put("filters",filters);
         params.put("sorts","");
+        params.put("address",address);
         params.put("size",rows);
         params.put("page",page);
-
-//        String url = "/organization/organizations";
-//        String resultStr = "";
-//        Envelop result = new Envelop();
-//        Map<String, Object> params = new HashMap<>();
-//        params.put("orgCode", searchNm);
-//        params.put("fullName", searchNm);
-//        params.put("searchWay", searchWay);
-//        params.put("orgType", orgType);
-//        params.put("province", province);
-//        params.put("city", city);
-//        params.put("district", district);
-//        params.put("page", page);
-//        params.put("pageSize", rows);
-
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             return resultStr;

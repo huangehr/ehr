@@ -49,9 +49,9 @@
                 this.initDDL(settledWayDictId,this.$settledWay);
 
                 this.$location.addressDropdown({tabsData:[
-                    {name: '省份', url: '${contextRoot}/address/getParent', params: {level:'1'}},
-                    {name: '城市', url: '${contextRoot}/address/getChildByParent'},
-                    {name: '县区', url: '${contextRoot}/address/getChildByParent'},
+                    {name: '省份',code:'id',values:'name',url: '${contextRoot}/address/getParent', params: {level:'1'}},
+                    {name: '城市',code:'id',values:'name', url: '${contextRoot}/address/getChildByParent'},
+                    {name: '县区',code:'id',values:'name', url: '${contextRoot}/address/getChildByParent'},
                     {name: '街道', maxlength: 200}
                 ]});
                 this.$admin.ligerTextBox({width: 240, height:28});
