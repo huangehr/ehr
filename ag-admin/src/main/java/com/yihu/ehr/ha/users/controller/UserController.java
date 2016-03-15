@@ -17,6 +17,7 @@ import com.yihu.ehr.model.security.MUserSecurity;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.util.encode.Base64;
 import com.yihu.ehr.util.operator.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,9 +27,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -131,8 +135,11 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/users", method = RequestMethod.POST)
     @ApiOperation(value = "创建用户", notes = "重新绑定用户信息")
     public Envelop createUser(
+            @ApiParam(name = "imageStream", value = "", defaultValue = "")
+            @RequestParam(value = "imageStream") String imageStream,
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
+
 
         UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
 
@@ -172,13 +179,23 @@ public class UserController extends BaseController {
     }
 
 
-    @RequestMapping(value = "/users", method = RequestMethod.PUT)
+    @RequestMapping(value = "/users/", method = RequestMethod.PUT)
     @ApiOperation(value = "修改用户", notes = "重新绑定用户信息")
     public Envelop updateUser(
+            @ApiParam(name = "imageStream", value = "", defaultValue = "")
+            @RequestParam(value = "imageStream") String imageStream,
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
 
+        InputStream inputStream = new ByteArrayInputStream(imageStream.getBytes("UTF-8"));
+//        MultipartFile multipartFile = image.getFile("file");
+//        byte[] bytes = multipartFile.getBytes();
+//        String fileString = Base64.encode(bytes);
+
+
         UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
+
+
 
         String errorMsg = null;
         if (StringUtils.isEmpty(detailModel.getLoginCode())) {
@@ -339,19 +356,31 @@ public class UserController extends BaseController {
         return success(detailModel);
     }
 
-    @RequestMapping(value = "/users/existence/{login_code}", method = RequestMethod.GET)
+    @RequestMapping(value = "/users/existence", method = RequestMethod.GET)
     @ApiOperation(value = "根据登录账号获取当前用户", notes = "根据登陆用户名及密码验证用户")
     public Envelop existence(
-            @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
-            @PathVariable(value = "login_code") String loginCode) {
+            @ApiParam(name = "existenceType",value = "", defaultValue = "")
+            @RequestParam(value = "existenceType") String existenceType,
+            @ApiParam(name = "existenceNm",value = "", defaultValue = "")
+            @RequestParam(value = "existenceNm") String existenceNm) {
         Envelop envelop = new Envelop();
+        boolean bo;
+        //返回值：true>存在，false>不存在
+        if(existenceType.equals("login_code")){
+            bo = userClient.isLoginCodeExists(existenceNm);
+            envelop.setSuccessFlg(bo);
+        }
+        if (existenceType.equals("id_card_no")){
+            bo = userClient.isIdCardExists(existenceNm);
+            envelop.setSuccessFlg(bo);
+        }
+        if (existenceType.equals("email")) {
+            //todo:微服务缺少判断邮箱唯一性的验证
+        }
 
-        boolean bo = userClient.isLoginCodeExists(loginCode);
-        envelop.setSuccessFlg(bo);
         return envelop;
 
     }
-
 
 
     /**

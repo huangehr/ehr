@@ -28,8 +28,6 @@
             }
             //多条件查询参数设置
             function reloadGrid (url, params) {
-
-                debugger
                 if (isFirstPage){
                     userInfoGrid.options.newPage = 1;
                 }
@@ -229,6 +227,7 @@
                 master.reloadGrid();
             };
             win.closeUserInfoDialog = function (callback) {
+                isFirstPage = false;
                 if(callback){
                     callback.call(win);
                     master.reloadGrid();
@@ -236,6 +235,7 @@
                 master.userInfoDialog.close();
             };
             win.closeAddUserInfoDialog = function (callback) {
+                isFirstPage = false;
                 if(callback){
                     callback.call(win);
                     master.reloadGrid();
