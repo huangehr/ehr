@@ -20,7 +20,7 @@ import java.util.Map;
  * @created 2016.2.1
  */
 @ApiIgnore
-@FeignClient(name = MicroServiceName.Standard,url = MicroServiceIpAddressStr.Standard+ MicroServicePort.Standard)
+@FeignClient(name = MicroServiceName.Standard)
 @RequestMapping(ApiVersion.Version1_0 + "/std/")
 public interface DictClient {
 

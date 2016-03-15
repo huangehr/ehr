@@ -21,7 +21,7 @@ import springfox.documentation.annotations.ApiIgnore;
  * @created 2016.3.2
  */
 @ApiIgnore
-@FeignClient(name = MicroServiceName.Standard,url = MicroServiceIpAddressStr.Standard+ MicroServicePort.Standard)
+@FeignClient(name = MicroServiceName.Standard)
 @RequestMapping(ApiVersion.Version1_0 + "/std")
 public interface StdVersionClient {
 

@@ -14,7 +14,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * Created by chenweida on 2016/3/7.
  */
-@FeignClient(name = MicroServiceName.Esb,url = MicroServiceIpAddressStr.Esb+ MicroServicePort.Esb)
+@FeignClient(name = MicroServiceName.Esb)
 @ApiIgnore
 public interface SimplifiedESBClient {
 

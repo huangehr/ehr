@@ -19,7 +19,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  * @version 1.0
  * @created 2016.03.03 15:01
  */
-@FeignClient(name = MicroServiceName.Organization,url = MicroServiceIpAddressStr.Organization+ MicroServicePort.Organization)
+@FeignClient(name = MicroServiceName.Organization)
 @ApiIgnore
 public interface OrganizationClient {
 

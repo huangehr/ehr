@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @created 2016.2.1
  */
 @EnableFeignClients
-@FeignClient(name = MicroServiceName.Geography,url = MicroServiceIpAddressStr.Geography+ MicroServicePort.Geography)
+@FeignClient(name = MicroServiceName.Geography)
 @RequestMapping(ApiVersion.Version1_0)
 public interface AddressClient {
 

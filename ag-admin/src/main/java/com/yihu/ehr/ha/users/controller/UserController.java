@@ -318,7 +318,7 @@ public class UserController extends BaseController {
      * @param loginCode
      * @return
      */
-    @RequestMapping(value = "/users/login/{login_code}", method = RequestMethod.GET)
+    @RequestMapping(value = "/users/{login_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据登录账号获取当前用户", notes = "根据登陆用户名及密码验证用户")
     public Envelop getUserByLoginCode(
             @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")

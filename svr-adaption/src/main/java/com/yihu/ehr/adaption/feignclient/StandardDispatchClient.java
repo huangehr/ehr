@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * Created by AndyCai on 2016/3/3.
  */
-@FeignClient(name = MicroServiceName.Standard,url = MicroServiceIpAddressStr.Standard+ MicroServicePort.Standard)
+@FeignClient(name = MicroServiceName.Standard)
 @RequestMapping(ApiVersion.Version1_0 + "/standard-dispatcher")
 @ApiIgnore
 public interface StandardDispatchClient {
