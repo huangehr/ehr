@@ -12,9 +12,7 @@ import com.yihu.ehr.adaption.feignclient.DataSetClient;
 import com.yihu.ehr.adaption.feignclient.DispatchLogClient;
 import com.yihu.ehr.adaption.log.LogService;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.adaption.MAdapterPlan;
-import com.yihu.ehr.model.standard.MDispatchLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -125,7 +123,7 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
             @ApiParam(name = "type", value = "类型", defaultValue = "")
             @RequestParam("type") String type,
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
-            @PathVariable(value = "version") String version) throws Exception {
+            @RequestParam(value = "version") String version) throws Exception {
 
         List<OrgAdapterPlan> orgAdapterPlans = orgAdapterPlanService.findList(type, version);
         List<Map<String, String>> adapterPlan = new ArrayList<>();

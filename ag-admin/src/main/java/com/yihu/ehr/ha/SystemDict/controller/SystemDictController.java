@@ -255,13 +255,13 @@ public class SystemDictController extends BaseController {
     }
 
 
-    @RequestMapping(value = "/dictionaries/existence/{app_name}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dictionaries/existence/{dict_name}" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典名称是否已经存在")
     public Envelop isAppNameExists(
-            @ApiParam(name = "app_name", value = "app_name", defaultValue = "")
-            @PathVariable(value = "app_name") String appName){
+            @ApiParam(name = "dict_name", value = "dict_name", defaultValue = "")
+            @PathVariable(value = "dict_name") String dictName){
         Envelop envelop = new Envelop();
-        boolean bo = systemDictClient.isAppNameExists(appName);
+        boolean bo = systemDictClient.isAppNameExists(dictName);
         envelop.setSuccessFlg(bo);
         return envelop;
     }

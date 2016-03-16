@@ -65,7 +65,7 @@ public class OrganizationController {
         //TODO 能访问，地址检索问题、多条件检索问题
         String url = "/organizations";
         String resultStr = "";
-        Envelop result = new Envelop();
+        Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
         StringBuffer filters = new StringBuffer();
         if(!StringUtils.isEmpty(searchNm)){
@@ -84,8 +84,8 @@ public class OrganizationController {
         params.put("fields","");
         params.put("filters",filters);
         params.put("sorts","");
-        params.put("size",15);
-        params.put("page",1);
+        params.put("size",rows);
+        params.put("page",page);
 
 //        String url = "/organization/organizations";
 //        String resultStr = "";
@@ -105,9 +105,9 @@ public class OrganizationController {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             return resultStr;
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result;
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            return envelop;
         }
     }
 
@@ -116,16 +116,16 @@ public class OrganizationController {
     public Object deleteOrg(String orgCode) {
         String getOrgUrl = "/organizations/"+orgCode;
         String resultStr = "";
-        Envelop result = new Envelop();
+        Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
         try {
             resultStr = HttpClientUtil.doDelete(comUrl + getOrgUrl, params, username, password);
             return resultStr;
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result;
+        return envelop;
 
     }
 
@@ -140,21 +140,21 @@ public class OrganizationController {
 
         String url = "/organizations/"+orgCode+"/"+activityFlag;
         String resultStr = "";
-        Envelop result = new Envelop();
+        Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
         try {
             resultStr = HttpClientUtil.doPut(comUrl + url, params, username, password);
             if(Boolean.parseBoolean(resultStr)){
-                result.setSuccessFlg(true);
+                envelop.setSuccessFlg(true);
             }
             else {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.InvalidUpdate.toString());
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg(ErrorCode.InvalidUpdate.toString());
             }
-            return result;
+            return envelop;
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            return result;
+            envelop.setSuccessFlg(false);
+            return envelop;
         }
     }
 
@@ -164,10 +164,10 @@ public class OrganizationController {
         //新增或修改 根据mode 选择
         String url = "/organizations";
         String resultStr = "";
-        Envelop result = new Envelop();
+        Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("mOrganizationJsonData",orgModel);
-        params.put("geographyModelJsonData",addressModel);
+        params.put("geography_model_json_data",addressModel);
         try {
             if("new".equals(mode)){
                 resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
@@ -196,9 +196,9 @@ public class OrganizationController {
             }
             return resultStr;
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result;
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            return envelop;
         }
     }
 
@@ -248,21 +248,21 @@ public class OrganizationController {
         //通过
         String getOrgUrl = "/organizations/existence/"+orgCode;
         String resultStr = "";
-        Envelop result = new Envelop();
+        Envelop envelop = new Envelop();
         try {
             resultStr = HttpClientUtil.doGet(comUrl + getOrgUrl, username, password);
             if(!Boolean.parseBoolean(resultStr)){
-                result.setSuccessFlg(true);
+                envelop.setSuccessFlg(true);
             }
             else {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.InvalidUpdate.toString());
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg(ErrorCode.InvalidUpdate.toString());
             }
-            return result;
+            return envelop;
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result;
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            return envelop;
         }
     }
 }

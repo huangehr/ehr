@@ -2,12 +2,12 @@ package com.yihu.ehr.ha.adapter.service;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
-import com.yihu.ehr.model.adaption.MAdapterDataVo;
 import com.yihu.ehr.model.adaption.MAdapterDataSet;
-import com.yihu.ehr.model.adaption.MDataSet;
+import com.yihu.ehr.model.adaption.MAdapterRelationship;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -30,7 +30,7 @@ public interface AdapterDataSetClient {
 
     @RequestMapping(value = "/plan/{planId}/datasets", method = RequestMethod.GET)
     @ApiOperation(value = "根据方案ID及查询条件查询数据集适配关系")
-    Collection<MDataSet> searchAdapterDataSet(
+    ResponseEntity<Collection<MAdapterRelationship>> searchAdapterDataSet(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "code", value = "代码查询值", defaultValue = "")
@@ -46,7 +46,7 @@ public interface AdapterDataSetClient {
 
     @RequestMapping(value = "/plan/{planId}/datasets/{dataSetId}/datametas", method = RequestMethod.GET)
     @ApiOperation(value = "根据dataSetId搜索数据元适配关系")
-    Collection<MAdapterDataVo> searchAdapterMetaData(
+    ResponseEntity<Collection<MAdapterDataSet>> searchAdapterMetaData(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "dataSetId", value = "数据集id", defaultValue = "")

@@ -322,14 +322,14 @@ public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAd
         List<OrgAdapterPlan> orgAdapterPlans = null;
         try {
             Session session = currentSession();
-            String orgcode = (String) args.get("orgcode");
+            String orgCode = (String) args.get("orgcode");
 
             Query query = session.createQuery("from OrgAdapterPlan where org = :org and status=1 order by version desc");
-            query.setString("org", orgcode);
+            query.setString("org", orgCode);
             orgAdapterPlans = query.list();
         } catch (Exception ex) {
-
         }
+
         return orgAdapterPlans;
     }
 }

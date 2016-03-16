@@ -1,5 +1,8 @@
 package com.yihu.ehr.feign;
 
+import com.yihu.ehr.constants.MicroServiceIpAddressStr;
+import com.yihu.ehr.constants.MicroServiceName;
+import com.yihu.ehr.constants.MicroServicePort;
 import com.yihu.ehr.constants.MicroServices;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.HttpStatus;
@@ -11,7 +14,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * Created by chenweida on 2016/3/7.
  */
-@FeignClient(MicroServices.Simplifiedesb)
+@FeignClient(name = MicroServiceName.Esb)
 @ApiIgnore
 public interface SimplifiedESBClient {
 

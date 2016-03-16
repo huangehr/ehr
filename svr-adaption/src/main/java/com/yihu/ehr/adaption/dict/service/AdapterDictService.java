@@ -6,7 +6,7 @@ import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanService;
 import com.yihu.ehr.model.adaption.MAdapterDataVo;
 import com.yihu.ehr.model.adaption.MAdapterDict;
 import com.yihu.ehr.model.adaption.MAdapterDictVo;
-import com.yihu.ehr.model.adaption.MDataSet;
+import com.yihu.ehr.model.adaption.MAdapterRelationship;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
@@ -40,7 +40,7 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
      *
      */
     @Transactional(propagation = Propagation.NEVER)
-    public List<MDataSet> searchAdapterDict(OrgAdapterPlan orgAdapterPlan, String code, String name, String orders, int page, int rows) {
+    public List<MAdapterRelationship> searchAdapterDict(OrgAdapterPlan orgAdapterPlan, String code, String name, String orders, int page, int rows) {
         long planId = orgAdapterPlan.getId();
         String dictTableName = CDAVersionUtil.getDictTableName(orgAdapterPlan.getVersion());
         Session session = currentSession();
@@ -69,7 +69,7 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
                 .addScalar("id", StandardBasicTypes.LONG )
                 .addScalar("code", StandardBasicTypes.STRING)
                 .addScalar("name", StandardBasicTypes.STRING)
-                .setResultTransformer(Transformers.aliasToBean(MDataSet.class))
+                .setResultTransformer(Transformers.aliasToBean(MAdapterRelationship.class))
                 .list();
     }
 
