@@ -14,6 +14,10 @@
         var jValidation = $.jValidation;
         var dialog = frameElement.dialog;
         var dataModel = $.DataModel.init();
+        var patientModel = "";
+        if (!(Util.isStrEquals('${patientDialogType}', 'addPatient'))) {
+            patientModel  = (JSON.parse('${patientModel}')).obj;
+        }
         /* ************************** 变量定义结束 ******************************** */
 
         /* *************************** 函数定义 ******************************* */
@@ -44,7 +48,7 @@
             $resetArea: $("#reset_password"),
             $resetPassword: $("#div_resetPassword"),
             $patientImgUpload: $("#div_patient_img_upload"),
-            $parientCopyId:$("#inp_parientCopyId"),
+            $patientCopyId:$("#inp_patientCopyId"),
             $picPath:$('#div_file_list'),
 
             init: function () {
@@ -79,89 +83,61 @@
                 self.$realName.ligerTextBox({width: 240});
                 self.$idCardNo.ligerTextBox({width: 240});
                 self.$gender.ligerRadio();
+                self.initDDL(4,this.$patientMartialStatus);
                 self.initDDL(5, this.$patientNation);
                 self.$patientNation.ligerTextBox({width: 240});
                 self.$patientNativePlace.ligerTextBox({width: 240});
                 self.$patientBirthday.ligerDateEditor({format: "yyyy-MM-dd"});
-
-                self.$birthPlace.addressDropdown({tabsData:[
-                    {name: '省份', url: '${contextRoot}/address/getParent', params: {level:'1'}},
-                    {name: '城市', url: '${contextRoot}/address/getChildByParent'},
-                    {name: '县区', url: '${contextRoot}/address/getChildByParent'},
-                    {name: '街道', maxlength: 200}
-                ]});
-                self.$homeAddress.addressDropdown({tabsData:[
-                    {name: '省份', url: '${contextRoot}/address/getParent', params: {level:'1'}},
-                    {name: '城市', url: '${contextRoot}/address/getChildByParent'},
-                    {name: '县区', url: '${contextRoot}/address/getChildByParent'},
-                    {name: '街道', maxlength: 200}
-                ]});
-                self.$workAddress.addressDropdown({tabsData:[
-                    {name: '省份', url: '${contextRoot}/address/getParent', params: {level:'1'}},
-                    {name: '城市', url: '${contextRoot}/address/getChildByParent'},
-                    {name: '县区', url: '${contextRoot}/address/getChildByParent'},
-                    {name: '街道', maxlength: 200}
-                ]});
-
+                self.initAddress(self.$birthPlace);
+                self.initAddress(self.$homeAddress);
+                self.initAddress(self.$workAddress);
                 self.$residenceType.ligerRadio();
                 self.$patientTel.ligerTextBox({width: 240});
                 self.$patientEmail.ligerTextBox({width: 240});
-
-                self.$patientMartialStatus.ligerComboBox(
-                        {
-                            url: '${contextRoot}/dict/searchDictEntryList',
-                            valueField: 'code',
-                            textField: 'value',
-                            dataParmName: 'detailModelList',
-                            urlParms: {
-                                dictId: 4
-                            },
-                            onSuccess: function () {
-                                self.$form.Fields.fillValues({martialStatus: '${patientModel.martialStatus}'});
-                            },
-                            autocomplete: true
-                        });
-
                 self.$resetArea.hide();
                 self.$form.attrScan();
-                if (!(Util.isStrEquals('${patientDialogType}', 'addPanient'))) {
+                if (!(Util.isStrEquals('${patientDialogType}', 'addPatient'))) {
                     self.$resetArea.show();
                     self.$form.Fields.fillValues({
-                        name: '${patientModel.name}',
-                        idCardNo: '${patientModel.idCardNo}',
-                        gender: '${patientModel.gender}',
-                        nativePlace: '${patientModel.nativePlace}',
-                        birthday: '${patientModel.birthday}',
-                        birthPlace: ['${patientModel.birthPlace.province}', '${patientModel.birthPlace.city}','${patientModel.birthPlace.district}','${patientModel.birthPlace.street}'],
-                        homeAddress:['${patientModel.homeAddress.province}', '${patientModel.homeAddress.city}','${patientModel.homeAddress.district}','${patientModel.homeAddress.street}'] ,
-                        workAddress: ['${patientModel.workAddress.province}', '${patientModel.workAddress.city}','${patientModel.workAddress.district}','${patientModel.workAddress.street}'],
-
-                        residenceType: '${patientModel.residenceType}',
-                        tel: '${patientModel.tel}',
-                        email: '${patientModel.email}'
+                        name: patientModel.name,
+                        idCardNo: patientModel.idCardNo,
+                        gender: patientModel.gender,
+                        nativePlace: patientModel.nativePlace,
+                        birthday: patientModel.birthday,
+                        birthPlace: [patientModel.birthPlace.province, patientModel.birthPlace.city,patientModel.birthPlace.district,patientModel.birthPlace.street],
+                        homeAddress:[patientModel.homeAddress.province, patientModel.homeAddress.city,patientModel.homeAddress.district,patientModel.homeAddress.street] ,
+                        workAddress: [patientModel.workAddress.province, patientModel.workAddress.city,patientModel.workAddress.district,patientModel.workAddress.street],
+                        martialStatus: patientModel.martialStatus,
+                        nation: patientModel.nation,
+                        residenceType: patientModel.residenceType,
+                        tel: patientModel.telphoneNo,
+                        email: patientModel.email
                     });
-                    self.$parientCopyId.val('${patientModel.idCardNo}');
+                    self.$patientCopyId.val(patientModel.idCardNo);
 
-                   var pic = "${patientModel.localPath}";
+                   var pic = patientModel.localPath;
                     if(!(Util.isStrEquals(pic,null)||Util.isStrEquals(pic,""))){
                         self.$picPath.html('<img src="${contextRoot}/patient/showImage?localImgPath='+pic+'" class="f-w88 f-h110"></img>');
                     }
                 }
             },
             initDDL: function (dictId, target) {
-                var self = this;
                 target.ligerComboBox({
-                    url: "${contextRoot}/dict/autoSearchDictEntryList",
+                    url: "${contextRoot}/dict/searchDictEntryList",
                     dataParmName: 'detailModelList',
                     urlParms: {dictId: dictId},
                     valueField: 'code',
                     textField: 'value',
-                    autocomplete:true,
-                    cancelable:false,
-                    onSuccess: function () {
-                        self.$form.Fields.fillValues({nation: '${patientModel.nation}'});
-                    },
+                    autocomplete:true
                 });
+            },
+            initAddress: function (target){
+                target.addressDropdown({tabsData:[
+                    {name: '省份', url: '${contextRoot}/address/getParent', params: {level:'1'}},
+                    {name: '城市', url: '${contextRoot}/address/getChildByParent'},
+                    {name: '县区', url: '${contextRoot}/address/getChildByParent'},
+                    {name: '街道', maxlength: 200}
+                ]});
             },
 
             bindEvents: function () {
@@ -172,10 +148,11 @@
                 var idCardNo = self.$form.Fields.idCardNo.getValue();
                 var validator =  new jValidation.Validation(this.$form, {immediate: true, onSubmit: false,onElementValidateForAjax:function(elm){
                     if(Util.isStrEquals($(elm).attr('id'),'inp_idCardNo')){
-                        var copyCardNo = self.$parientCopyId.val();
+                        var copyCardNo = self.$patientCopyId.val();
                         var result = new jValidation.ajax.Result();
                         var idCardNo = self.$idCardNo.val();
                         var dataModel = $.DataModel.init();
+                        debugger;
                         if(Util.isStrEquals(idCardNo,copyCardNo)){
                             return true;
                         }
@@ -183,7 +160,7 @@
                             data: {searchNm:idCardNo},
                             async: false,
                             success: function (data) {
-                                if (data.successFlg) {
+                                if (!data.successFlg) {
                                     result.setResult(true);
                                 } else {
                                     result.setResult(false);
