@@ -1,4 +1,4 @@
-package com.yihu.ehr.standard.cda.service;
+package com.yihu.ehr.standard.document.service;
 import com.yihu.ehr.standard.datasets.service.DataSet;
 import com.yihu.ehr.standard.datasets.service.MetaData;
 import com.yihu.ehr.util.CDAVersionUtil;

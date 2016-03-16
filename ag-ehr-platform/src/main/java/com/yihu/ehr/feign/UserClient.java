@@ -30,4 +30,24 @@ public interface UserClient {
     MUser getUserByNameAndPassword(
             @PathVariable(value = "user_name") String userName,
             @PathVariable(value = "password") String password);
+
+    // hystrix fall back
+    static class UserClientFallback implements UserClient {
+        @Override
+        public List<MUser> getUsers() {
+            return null;
+        }
+
+        @Override
+        public MUser getUserByUserName(@PathVariable(value = "login_code") String loginCode) {
+            return null;
+        }
+
+        @Override
+        public MUser getUserByNameAndPassword(@PathVariable(value = "user_name") String userName, @PathVariable(value = "password") String password) {
+            return null;
+        }
+    }
 }
+
+
