@@ -2,9 +2,11 @@ package com.yihu.ehr.ha;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.thirdpartystandard.AdapterOrgDetailModel;
+import com.yihu.ehr.agModel.thirdpartystandard.AdapterOrgModel;
 import com.yihu.ehr.ha.adapter.controller.AdapterOrgController;
 import com.yihu.ehr.ha.adapter.controller.OrgDataSetController;
 import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.controller.BaseController;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +17,9 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -23,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = AgAdminApplication.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class AdapterOrgTests {
+public class AdapterOrgTests extends BaseController {
 
     @Autowired
     private AdapterOrgController adapterOrgController;
@@ -100,5 +105,28 @@ public class AdapterOrgTests {
 
         envelop1 = dataSetController.searchAdapterOrg(fields,filter,"",rows,page);
         assertTrue("删除成功!", envelop.isSuccessFlg() && envelop1.getDetailModelList().size()==0);
+    }
+
+    @Test
+    public void cTestConvertEnvelopModel() throws Exception{
+
+        applicationContext = new SpringApplicationBuilder()
+                .web(false).sources(AgAdminApplication.class).run();
+
+        String fields = "";
+        String filter = "";
+        int page = 1;
+        int rows = 15;
+        Envelop envelop = adapterOrgController.searchAdapterOrg(fields,filter,"",rows,page);
+
+        String jsonData = objectMapper.writeValueAsString(envelop);
+        List<AdapterOrgModel> adapterOrgModels = (List<AdapterOrgModel>)getEnvelopList(jsonData, new ArrayList<AdapterOrgModel>(), AdapterOrgModel.class);
+        assertTrue("列表数据转换失败!",adapterOrgModels!=null);
+
+        String orgCode = adapterOrgModels.get(0).getCode();
+        envelop = adapterOrgController.getAdapterOrg(orgCode);
+        jsonData = objectMapper.writeValueAsString(envelop);
+        AdapterOrgDetailModel adapterOrgDetailModel = getEnvelopModel(jsonData,AdapterOrgDetailModel.class);
+        assertTrue("数据转换失败!",adapterOrgDetailModel!=null);
     }
 }
