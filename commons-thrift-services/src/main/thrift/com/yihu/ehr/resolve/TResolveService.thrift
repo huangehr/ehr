@@ -5,7 +5,7 @@
  */
 namespace java com.yihu.ehr.resolve
 
-include "../pack/TJsonPackage.thrift"
+include "../pack/TPackage.thrift"
 
 service TResolveService {
 	void startResovlveScheduler(1:string cronExpression)

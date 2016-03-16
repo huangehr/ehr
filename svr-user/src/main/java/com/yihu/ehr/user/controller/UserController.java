@@ -57,7 +57,7 @@ public class UserController extends BaseRestController {
         return (List<MUser>) convertToModels(userList, new ArrayList<MUser>(userList.size()), MUser.class, fields);
     }
 
-    @RequestMapping(value = "/users/{user_id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/users/admin/{user_id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除用户", notes = "根据用户id删除用户")
     public boolean deleteUser(
             @ApiParam(name = "user_id", value = "用户编号", defaultValue = "")
@@ -94,7 +94,7 @@ public class UserController extends BaseRestController {
     }
 
 
-    @RequestMapping(value = "users/{user_id}", method = RequestMethod.GET)
+    @RequestMapping(value = "users/admin/{user_id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取获取用户信息")
     public MUser getUser(
             @ApiParam(name = "user_id", value = "", defaultValue = "")
@@ -121,7 +121,7 @@ public class UserController extends BaseRestController {
     }
 
 
-    @RequestMapping(value = "/users/{user_id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/users/admin/{user_id}", method = RequestMethod.PUT)
     @ApiOperation(value = "改变用户状态", notes = "根据用户状态改变当前用户状态")
     public boolean activityUser(
             @ApiParam(name = "user_id", value = "id", defaultValue = "")

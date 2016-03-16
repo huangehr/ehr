@@ -8,7 +8,7 @@ import java.util.Set;
 /**
  * Created by Sand Wen on 2016.3.8.
  */
-public class MToken {
+public class TokenModel {
     long id;
     String url;
 

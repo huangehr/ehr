@@ -5,7 +5,7 @@
  */
 namespace java com.yihu.ehr.pack
 
-struct TJsonPackage {
+struct TPackage {
     1:string id;
     2:string pwd;
     3:string remotePath;
