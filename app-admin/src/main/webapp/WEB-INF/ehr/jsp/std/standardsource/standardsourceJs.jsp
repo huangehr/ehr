@@ -64,8 +64,12 @@
                                 dataModel.updateRemote('${contextRoot}/standardsource/delStdSource',{
                                     data:{id:ids},
                                     success:function(data){
-                                        $.Notice.success( '操作成功！');
-                                        master.reloadGrid();
+										if(data.successFlg){
+											$.Notice.success( '操作成功！');
+											master.reloadGrid();
+										}else{
+											$.Notice.error('操作失败');
+										}
                                     }
                                 });
                             }
