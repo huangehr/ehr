@@ -18,10 +18,10 @@ import java.util.regex.Pattern;
  * 4、顺序码（第十五位至十七位）: 表示在同一地址码所标识的区域范围内，对同年、同月、同日出生的人编定的顺序号，顺序码的奇数分配给男性，偶数分配给女性。
  * 5、校验码（第十八位数）:
  * （1）十七位数字本体码加权求和公式 S = Sum(Ai * Wi), i = 0,  , 16 ，先对前17位数字的权求和
- *      Ai:表示第i位置上的身份证号码数字值 Wi:表示第i位置上的加权因子 Wi: 7 9 10 5 8 4 2 1 6 3 7 9 10 5 8 4 2
+ * Ai:表示第i位置上的身份证号码数字值 Wi:表示第i位置上的加权因子 Wi: 7 9 10 5 8 4 2 1 6 3 7 9 10 5 8 4 2
  * （2）计算模 Y = mod(S, 11) （3）通过模得到对应的校验码 Y: 0 1 2 3 4 5 6 7 8 9 10 校验码: 1 0 X 9 8 7 6 5 4 3 2
  *
-* @author Sand
+ * @author Sand
  * @version 1.0
  * @created 2016.02.03 14:13
  */
@@ -35,22 +35,18 @@ public class IdCardValidator {
      */
     @SuppressWarnings("unchecked")
     public static String doValidate(String IDStr) throws ParseException {
-        if(StringUtils.isEmpty(IDStr)) return "身份证号码长度应该为15位或18位。";
+        if (StringUtils.isEmpty(IDStr)) return "身份证号码长度应该为15位或18位。";
 
-        String errorInfo = "";      // 记录错误信息
-        String[] ValCodeArr = {"1", "0", "x", "9", "8", "7", "6", "5", "4",
-                "3", "2"};
-        String[] Wi = {"7", "9", "10", "5", "8", "4", "2", "1", "6", "3", "7",
-                "9", "10", "5", "8", "4", "2"};
+        String errorInfo = "";
+
+        String[] ValCodeArr = {"1", "0", "x", "9", "8", "7", "6", "5", "4", "3", "2"};
+        String[] Wi = {"7", "9", "10", "5", "8", "4", "2", "1", "6", "3", "7", "9", "10", "5", "8", "4", "2"};
         String Ai = "";
 
-        // ================ 号码的长度 15位或18位 ================
         if (IDStr.length() != 15 && IDStr.length() != 18) {
-            errorInfo = "身份证号码长度应该为15位或18位。";
-            return errorInfo;
+            return "Identity card no length must be 15 or 15.";
         }
 
-        // ================ 数字 除最后以为都为数字 ================
         if (IDStr.length() == 18) {
             Ai = IDStr.substring(0, 17);
         } else if (IDStr.length() == 15) {
@@ -58,17 +54,14 @@ public class IdCardValidator {
         }
 
         if (isNumeric(Ai) == false) {
-            errorInfo = "身份证15位号码都应为数字 ; 18位号码除最后一位外，都应为数字。";
-            return errorInfo;
+            return "Identity card no must be 15 digit or 17 digit except last";
         }
 
-        // ================ 出生年月是否有效 ================
-        String strYear = Ai.substring(6, 10);       // 年份
-        String strMonth = Ai.substring(10, 12);     // 月份
-        String strDay = Ai.substring(12, 14);       // 月份
+        String strYear = Ai.substring(6, 10);
+        String strMonth = Ai.substring(10, 12);
+        String strDay = Ai.substring(12, 14);
         if (isDate(strYear + "-" + strMonth + "-" + strDay) == false) {
-            errorInfo = "身份证生日无效。";
-            return errorInfo;
+            return "Birthday section is invalid.";
         }
 
         GregorianCalendar gc = new GregorianCalendar();
@@ -76,43 +69,37 @@ public class IdCardValidator {
         if ((gc.get(Calendar.YEAR) - Integer.parseInt(strYear)) > 150
                 || (gc.getTime().getTime() - s.parse(
                 strYear + "-" + strMonth + "-" + strDay).getTime()) < 0) {
-            errorInfo = "身份证生日不在有效范围。";
-            return errorInfo;
-        }
-        if (Integer.parseInt(strMonth) > 12 || Integer.parseInt(strMonth) == 0) {
-            errorInfo = "身份证月份无效";
-            return errorInfo;
-        }
-        if (Integer.parseInt(strDay) > 31 || Integer.parseInt(strDay) == 0) {
-            errorInfo = "身份证日期无效";
-            return errorInfo;
+            return "Birthday section is out of range.";
         }
 
-        // ================ 地区码时候有效 ================
+        if (Integer.parseInt(strMonth) > 12 || Integer.parseInt(strMonth) == 0) {
+            return "Invalid month.";
+        }
+
+        if (Integer.parseInt(strDay) > 31 || Integer.parseInt(strDay) == 0) {
+            return "Invalid date.";
+        }
+
         Hashtable h = GetAreaCode();
         if (h.get(Ai.substring(0, 2)) == null) {
-            errorInfo = "身份证地区编码错误。";
-            return errorInfo;
+            return "Region section is invalid.";
         }
 
-        // ================ 判断最后一位的值 ================
-        int TotalmulAiWi = 0;
+        int totalmulAiWi = 0;
         for (int i = 0; i < 17; i++) {
-            TotalmulAiWi = TotalmulAiWi
+            totalmulAiWi = totalmulAiWi
                     + Integer.parseInt(String.valueOf(Ai.charAt(i)))
                     * Integer.parseInt(Wi[i]);
         }
-        int modValue = TotalmulAiWi % 11;
+
+        int modValue = totalmulAiWi % 11;
         String strVerifyCode = ValCodeArr[modValue];
         Ai = Ai + strVerifyCode;
 
         if (IDStr.length() == 18) {
             if (Ai.equals(IDStr) == false) {
-                errorInfo = "身份证无效，不是合法的身份证号码";
-                return errorInfo;
+                return "Invalid identity card no.";
             }
-        } else {
-            return "";
         }
 
         return "";

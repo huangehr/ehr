@@ -16,7 +16,7 @@ import java.util.Map;
  * @created 2015.08.16 16:37
  */
 public interface XHBaseClient {
-    // 表格操作
+    // 表操作
     public boolean isTableExists(String tableName) throws IOException;
 
     public void createTable(String tableName, String... columnFamilies) throws IOException;

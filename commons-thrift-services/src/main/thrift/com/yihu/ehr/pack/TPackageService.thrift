@@ -5,10 +5,10 @@
  */
 namespace java com.yihu.ehr.pack
 
-include "TJsonPackage.thrift"
+include "TPackage.thrift"
 include "../data/domain/TPageable.thrift"
 
-service TJsonPackageService {
+service TPackageService {
 	/**
 	* 接收病人档案，先存储成功，再在数据库中保存一条待入库记录。
 	*
@@ -33,17 +33,18 @@ service TJsonPackageService {
 	* @param id
 	* @return
 	*/
-	TJsonPackage.TJsonPackage getPackage(1:string id)
+	TPackage.TPackage getPackage(1:string id)
+
+	/**
+	* 取得一份未解析JSON档案包.
+	*
+	* @param id
+	* @return
+	*/
+	TPackage.TPackage acquireArchive()
 
 	/**
 	* 获取未解析的包。若未解析的包数量小于 count，则只返回实际未解析的包。
 	**/
-	list<TJsonPackage.TJsonPackage> getUnresolvedPackages(1:i32 count)
-
-	/**
-	* 获取档案列表（分页）
-	* @param args
-	* @return
-	*/
-	list<TJsonPackage.TJsonPackage> search(1:map<string, string> criteria, 2:TPageable.TPageable pageable)
+	list<TPackage.TPackage> getUnresolvedPackages(1:i32 count)
 }

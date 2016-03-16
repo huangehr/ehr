@@ -4,7 +4,7 @@ package com.yihu.ehr.api.model;
 import java.io.Serializable;
 import java.util.Date;
 
-public class MUser implements Serializable{
+public class UserModel implements Serializable{
 
     private String id;
     private Date createDate;
@@ -20,7 +20,7 @@ public class MUser implements Serializable{
     private String martialStatus;
     private String gender;
     private String idCardNo;
-    private OrganizationModel organization;
+    private OrgModel organization;
 
     // 未绑定属性
     private String orgPost;
@@ -148,11 +148,11 @@ public class MUser implements Serializable{
         this.idCardNo = idCardNo;
     }
 
-    public OrganizationModel getOrganization() {
+    public OrgModel getOrganization() {
         return organization;
     }
 
-    public void setOrganization(OrganizationModel organization) {
+    public void setOrganization(OrgModel organization) {
         this.organization = organization;
     }
 

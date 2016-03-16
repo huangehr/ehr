@@ -12,9 +12,6 @@ import java.util.Date;
  */
 public class MKey implements Serializable{
 
-	public MKey() {
-	}
-
 	private String id;
 	private String privateKey;
 	private String publicKey;
