@@ -88,8 +88,8 @@
                         },
                         columns: [
                             { display: 'id', name: 'id', hide:true },
-                            { display: '类型代码', name: 'type',hide:true, isAllowHide: false },
-                            { display: '类型', name: 'typeName',width: '10%', isAllowHide: false },
+                            { display: '类型代码', name: 'sourceType',hide:true, isAllowHide: false },
+                            { display: '类型', name: 'sourceValue',width: '10%', isAllowHide: false },
                             { display: '编码', name: 'code',width: '20%',align:'left', isAllowHide: false },
                             { display: '名称',name: 'name', width: '35%',align:'left',isAllowHide: false },
                             { display: '创建时间',name: 'createDate', width: '20%',isAllowHide: false },

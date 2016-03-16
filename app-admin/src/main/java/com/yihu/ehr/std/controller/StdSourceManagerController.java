@@ -24,8 +24,12 @@ public class StdSourceManagerController {
     private String username;
     @Value("${service-gateway.password}")
     private String password;
-    @Value("${service-gateway.url}")
-    private String comUrl;
+//    @Value("${service-gateway.url}")
+//    private String comUrl;
+
+    //TODO 访问路径，一般有aimin而标准部分网关没有admin
+    String comUrl = "http://localhost:10000/api/v1.0/stdSource";
+
     public StdSourceManagerController() {
     }
 
@@ -37,16 +41,14 @@ public class StdSourceManagerController {
 
     @RequestMapping("template/stdInfo")
     public String stdInfoTemplate(Model model, String id, String mode) {
-        String url = "/stdSource/standardSource";
-        String _rus = "";
+        String url = "/source/"+id;
+        String envelopStr = "";
         try{
-            Map<String,Object> params = new HashMap<>();
-            params.put("id",id);
-            _rus = HttpClientUtil.doGet(comUrl + url, params, username, password);
+            envelopStr = HttpClientUtil.doGet(comUrl + url, username, password);
         }catch(Exception ex){
             LogService.getLogger(StdSourceManagerController.class).error(ex.getMessage());
         }
-        model.addAttribute("std", _rus); // 已修改jsp页面 var std = $.parseJSON('${std}');
+        model.addAttribute("std", envelopStr);
         model.addAttribute("mode",mode);
         model.addAttribute("contentPage","/std/standardsource/stdInfoDialog");
         return "simpleView";
@@ -74,38 +76,35 @@ public class StdSourceManagerController {
     @RequestMapping("searchStdSource")
     @ResponseBody
     public Object searchStdSource(String searchNm, String searchType, Integer page, Integer rows) {
-        Envelop result = new Envelop();
-        String url = "/stdSource/getStdSource";
+        Envelop envelop = new Envelop();
+        String url = "/sources";
+        StringBuffer filters = new StringBuffer();
+        if(!StringUtils.isEmpty(searchNm)){
+            filters.append("code?"+searchNm+" g1;name?"+searchNm+" g1;");
+        }
+        if(!StringUtils.isEmpty(searchType)){
+            filters.append("sourceType="+searchType+";");
+        }
         try{
             Map<String,Object> params = new HashMap<>();
-            params.put("code",searchNm);
-            params.put("name",searchNm);
-            params.put("type",searchType);
+            params.put("fields","");
+            params.put("filters",filters);
+            params.put("sorts","");
+            params.put("size",rows);
             params.put("page",page);
-            params.put("rows",rows);
-            String _rus = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.GetStandardSourceFailed.toString());
+            String envelopStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+            if(StringUtils.isEmpty(envelopStr)){
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg(ErrorCode.GetStandardSourceFailed.toString());
             }else{
-                return _rus;
+                return envelopStr;
             }
         }catch(Exception ex){
             LogService.getLogger(StdSourceManagerController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result;
-
-        /*List<XStandardSource> standardSources = xStandardSourceManager.getSourceByKey(searchNm,searchType, page, rows);
-        List<StandardSourceModel> standardSourceModels = new ArrayList<>();
-        for(XStandardSource standardSource:standardSources){
-            StandardSourceModel standardSourceModel = xStandardSourceManager.getSourceByKey(standardSource);
-            standardSourceModels.add(standardSourceModel);
-        }
-        Integer totalCount = xStandardSourceManager.getSourceByKeyInt(searchNm,searchType);
-        Result result = getResult(standardSourceModels, totalCount, page, rows);
-        return result.toJson();*/
+        return envelop;
     }
 
     @RequestMapping("getStdSource")
