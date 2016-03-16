@@ -1,9 +1,11 @@
 package com.yihu.ehr.login.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
+import com.yihu.ehr.web.DateFormatter;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -51,16 +53,18 @@ public class LoginController {
         String resultStr = "";
         Map<String, Object> params = new HashMap<>();
         ObjectMapper mapper = new ObjectMapper();
+
         params.put("psw", password);
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, this.password);
             Envelop envelop = mapper.readValue(resultStr, Envelop.class);
+            String userJson = mapper.writeValueAsString(envelop.getObj());
+            UserDetailModel userDetailModel = mapper.readValue(userJson,UserDetailModel.class);
 
             if (envelop.isSuccessFlg()){
+                String lastLoginTime = null;
 
-                boolean bo = Boolean.parseBoolean(String.valueOf((((Map)envelop.getObj()).get("activated"))));
-
-                if(!bo){
+                if(!userDetailModel.getActivated()){
 
                     model.addAttribute("userName", userName);
                     model.addAttribute("successFlg", false);
@@ -69,6 +73,15 @@ public class LoginController {
 
                     return "generalView";
                 }
+
+                if(userDetailModel.getLastLoginTime()!= null){
+                    lastLoginTime = DateFormatter.simpleDateTimeShortFormat(userDetailModel.getLastLoginTime());
+                }
+
+                model.addAttribute(SessionAttributeKeys.CurrentUser, userDetailModel);
+                request.getSession().setAttribute("last_login_time", lastLoginTime);
+                //todo 记录最近登入时间，目前没有提供接口
+//              userManager.lastLoginTime(user.getId(),new Date());
 
                 return "redirect:/index";
             }else{
