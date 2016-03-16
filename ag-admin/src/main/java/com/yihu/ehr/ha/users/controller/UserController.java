@@ -1,17 +1,18 @@
 package com.yihu.ehr.ha.users.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.agModel.user.UsersModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
+import com.yihu.ehr.ha.geography.service.AddressClient;
 import com.yihu.ehr.ha.organization.service.OrganizationClient;
 import com.yihu.ehr.ha.security.service.SecurityClient;
 import com.yihu.ehr.ha.users.service.UserClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.model.geogrephy.MGeography;
 import com.yihu.ehr.model.org.MOrganization;
-import com.yihu.ehr.model.security.MUserSecurity;
+import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
@@ -25,11 +26,6 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +51,9 @@ public class UserController extends BaseController {
 
     @Autowired
     private SecurityClient securityClient;
+
+    @Autowired
+    private AddressClient addressClient;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -108,7 +107,7 @@ public class UserController extends BaseController {
             @ApiParam(name = "user_id", value = "用户编号", defaultValue = "")
             @PathVariable(value = "user_id") String userId) throws Exception {
 
-        MUserSecurity userSecurity = securityClient.getUserSecurityByUserId(userId);
+        MKey userSecurity = securityClient.getUserSecurityByUserId(userId);
         if (userSecurity != null) {
             String userKeyId = securityClient.getUserKeyByUserId(userId);
             securityClient.deleteSecurity(userSecurity.getId());
@@ -319,7 +318,7 @@ public class UserController extends BaseController {
      * @param loginCode
      * @return
      */
-    @RequestMapping(value = "/users/login/{login_code}", method = RequestMethod.GET)
+    @RequestMapping(value = "/users/{login_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据登录账号获取当前用户", notes = "根据登陆用户名及密码验证用户")
     public Envelop getUserByLoginCode(
             @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
@@ -333,6 +332,21 @@ public class UserController extends BaseController {
 
         return success(detailModel);
     }
+
+    @RequestMapping(value = "/users/existence/{login_code}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据登录账号获取当前用户", notes = "根据登陆用户名及密码验证用户")
+    public Envelop existence(
+            @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
+            @PathVariable(value = "login_code") String loginCode) {
+        Envelop envelop = new Envelop();
+
+        boolean bo = userClient.isLoginCodeExists(loginCode);
+        envelop.setSuccessFlg(bo);
+        return envelop;
+
+    }
+
+
 
     /**
      * 将 MUser 转为 UserDetailModel
@@ -361,10 +375,12 @@ public class UserController extends BaseController {
         String orgCode = mUser.getOrganization();
         if(StringUtils.isNotEmpty(orgCode)) {
             MOrganization orgModel = orgClient.getOrg(orgCode);
-            detailModel.setOrganizationName(orgModel == null ? "" : orgModel.getFullName());
+            MGeography  mGeography = addressClient.getAddressById(orgModel.getLocation());
+            String orgAddress = mGeography.getProvince()+mGeography.getCity()+mGeography.getDistrict()+orgModel.getFullName();
+            detailModel.setOrganizationName(orgModel == null ? "" : orgAddress);
         }
         //获取秘钥信息
-        MUserSecurity userSecurity = securityClient.getUserSecurityByUserId(mUser.getId());
+        MKey userSecurity = securityClient.getUserSecurityByUserId(mUser.getId());
         if (userSecurity != null) {
             detailModel.setPublicKey(userSecurity.getPublicKey());
             String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT)

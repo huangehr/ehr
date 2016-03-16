@@ -12,15 +12,17 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
  * Created by AndyCai on 2016/3/2.
  */
-@RequestMapping(ApiVersion.Version1_0 + "/admin/orgDict")
+@RequestMapping(ApiVersion.Version1_0 + "/admin/adapter/org")
 @RestController
 public class OrgDictEntryController extends BaseController {
 
@@ -68,10 +70,24 @@ public class OrgDictEntryController extends BaseController {
         if (StringUtils.isNotEmpty(errorMsg)) {
             return failed(errorMsg);
         }
+
+        boolean isExist = orgDictEntryClient.isExistDictItem(detailModel.getOrgDict(),detailModel.getOrganization(),detailModel.getCode());
+
         MOrgDictItem mOrgDictItem = convertToModel(detailModel, MOrgDictItem.class);
         if (mOrgDictItem.getId() == 0) {
+            if(isExist)
+            {
+                return failed("字典项已存在!");
+            }
             mOrgDictItem = orgDictEntryClient.createOrgDictItem(objectMapper.writeValueAsString(mOrgDictItem));
         } else {
+            MOrgDictItem dictItem = orgDictEntryClient.getOrgDictItem(detailModel.getId());
+            if(!dictItem.getCode().equals(detailModel.getCode())
+                    && isExist)
+            {
+                return failed("字典项已存在!");
+            }
+
             mOrgDictItem = orgDictEntryClient.updateDictItem(objectMapper.writeValueAsString(mOrgDictItem));
         }
         if (mOrgDictItem == null) {
@@ -113,24 +129,39 @@ public class OrgDictEntryController extends BaseController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) throws Exception {
 
-        List<MOrgDictItem> dictItems = (List<MOrgDictItem>) orgDictEntryClient.searchOrgDictItems(fields, filters, sorts, size, page);
+        ResponseEntity<Collection<MOrgDictItem>> responseEntity = orgDictEntryClient.searchOrgDictItems(fields, filters, sorts, size, page);
+        List<MOrgDictItem> dictItems = (List<MOrgDictItem>) responseEntity.getBody();
         List<OrgDictEntryModel> detailModels = (List<OrgDictEntryModel>) convertToModels(dictItems,
                                                                                                     new ArrayList<OrgDictEntryModel>(dictItems.size()),
                                                                                                     OrgDictEntryModel.class,
                                                                                                     null);
 
-        return getResult(detailModels,1,page,size);
+        return getResult(detailModels,getTotalCount(responseEntity),page,size);
     }
 
     @RequestMapping(value = "/items/combo", method = RequestMethod.GET)
     @ApiOperation(value = "机构字典项下拉")
     public List<String> getOrgDictEntry(
             @ApiParam(name = "orgDictSeq", value = "字典seq", defaultValue = "")
-            @RequestParam(value = "orgDictSeq") Integer orgDictSeq,
+            @RequestParam(value = "orgDictSeq") long orgDictSeq,
             @ApiParam(name = "orgCode", value = "机构代码", defaultValue = "")
             @RequestParam(value = "orgCode") String orgCode) throws Exception {
 
 
         return (List<String>)orgDictEntryClient.getOrgDictEntry(orgDictSeq,orgCode);
+    }
+
+    @RequestMapping(value = "/dict/dict_entry", method = RequestMethod.GET)
+    public Envelop getOrgDictEntryBySequence(
+            @RequestParam(value = "org_code") String orgCode,
+            @RequestParam(value = "sequence") int sequence) {
+        try {
+            MOrgDictItem mOrgDictItem = orgDictEntryClient.getOrgDicEntryBySequence(orgCode, sequence);
+            OrgDictEntryDetailModel detailModel = convertToModel(mOrgDictItem, OrgDictEntryDetailModel.class);
+
+            return success(detailModel);
+        } catch (Exception ex) {
+            return failedSystem();
+        }
     }
 }

@@ -1,9 +1,7 @@
 package com.yihu.ehr.ha;
 
-import com.eureka2.shading.codehaus.jackson.map.ObjectMapper;
 import com.yihu.ehr.agModel.security.UserSecurityModel;
 import com.yihu.ehr.ha.security.controller.SecurityController;
-import com.yihu.ehr.model.security.MUserSecurity;
 import com.yihu.ehr.util.Envelop;
 import org.junit.FixMethodOrder;
 import org.junit.Test;

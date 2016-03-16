@@ -44,7 +44,7 @@
             $idCard: $('#inp_idCard'),
             $email: $('#inp_userEmail'),
             $tel: $('#inp_userTel'),
-//            $org: $('#inp_org'),
+            $org: $('#inp_org'),
             $major: $('#inp_major'),
             $userSex: $('input[name="gender"]', this.$form),
             $marriage: $("#inp_select_marriage"),
@@ -93,22 +93,22 @@
                 this.$idCard.ligerTextBox({width: 240});
                 this.$email.ligerTextBox({width: 240});
                 this.$tel.ligerTextBox({width: 240});
-                <%--this.$org.addressDropdown({--%>
-                    <%--tabsData: [--%>
-                        <%--{name: '省份', url: '${contextRoot}/address/getParent', params: {level: '1'}},--%>
-                        <%--{name: '城市', url: '${contextRoot}/address/getChildByParent'},--%>
-                        <%--{--%>
-                            <%--name: '医院', url: '${contextRoot}/address/getOrgs', beforeAjaxSend: function (ds, $options) {--%>
-                            <%--var province = $options.eq(0).attr('title'),--%>
-                                    <%--city = $options.eq(1).attr('title');--%>
-                            <%--ds.params = $.extend({}, ds.params, {--%>
-                                <%--province: province,--%>
-                                <%--city: city--%>
-                            <%--});--%>
-                        <%--}--%>
-                        <%--}--%>
-                    <%--]--%>
-                <%--});--%>
+                this.$org.addressDropdown({
+                    tabsData: [
+                        {name: '省份',code:'id',values:'name', url: '${contextRoot}/address/getParent', params: {level: '1'}},
+                        {name: '城市', code:'id',values:'name',url: '${contextRoot}/address/getChildByParent'},
+                        {
+                            name: '医院', code:'orgCode',values:'fullName',url: '${contextRoot}/address/getOrgs', beforeAjaxSend: function (ds, $options) {
+                            var province = $options.eq(0).attr('title'),
+                                    city = $options.eq(1).attr('title');
+                            ds.params = $.extend({}, ds.params, {
+                                province: province,
+                                city: city
+                            });
+                        }
+                        }
+                    ]
+                });
                 this.$major.ligerTextBox({width: 240});
                 this.$userSex.ligerRadio();
                 this.$marriage.ligerComboBox({
@@ -152,8 +152,7 @@
                 this.$form.attrScan();
                 this.$form.Fields.fillValues({
                     id: user.id,
-                    organization: user.organization,
-
+                    organization:user.organizationName,
                     loginCode: user.loginCode,
                     realName: user.realName,
                     idCardNo: user.idCardNo,
@@ -236,30 +235,19 @@
 
                 //修改用户的点击事件
                 this.$updateUserDtn.click(function () {
-                    debugger
+
                     var userImgHtml = self.$imageShow.children().length;
 //                    if (validator.validate()) {
                         userModel = self.$form.Fields.getValues();
-//                        var organizationKeys = userModel.organization['keys'];
-                        /*取消所属机构必填限制
-                         if(userModel.userType=='GovEmployee' &&  organizationKeys.length<3){
-                         $.Notice.warn('用户类型为政府雇员时，所属机构必须选择到医院一级！');
-                         return;
-                         }*/
-                        /* if(organizationKeys.length>1 && organizationKeys.length<3){
-                         $.Notice.warn('所属机构必须选择到医院一级！');
-                         return;
-                         }*/
-//                        userModel.orgCode = organizationKeys[2];
-//                        userModel.orgName = userModel.organization['names'][2];
+                        var organizationKeys = userModel.organization['keys'];
 
+                        userModel.organization = organizationKeys[2];
                         if (userImgHtml == 0) {
                             updateUser(userModel);
                         } else {
                             var upload = self.$uploader.instance;
                             var image = upload.getFiles().length;
                             if (image) {
-                                debugger
                                 upload.options.formData.userModelJsonData = encodeURIComponent(JSON.stringify(userModel));
                                 upload.upload();
                                 win.closeUserInfoDialog();
@@ -335,9 +323,10 @@
                         dataModel.createRemote('${contextRoot}/user/distributeKey', {
                             data: {loginCode: code},
                             success: function (data) {
-                                self.$publicKeyMessage.val(data.obj.publicKey);
-                                self.$publicKeyValidTime.html(data.obj.validTime);
-                                self.$publicKeyStartTime.html(data.obj.startTime);
+                                var keyData = $.parseJSON(data.obj);
+                                self.$publicKeyMessage.val(keyData.publicKey);
+                                self.$publicKeyValidTime.html(keyData.validTime);
+                                self.$publicKeyStartTime.html(keyData.startTime);
                                 $.ligerDialog.alert('分配公钥成功');
                             }
                         });

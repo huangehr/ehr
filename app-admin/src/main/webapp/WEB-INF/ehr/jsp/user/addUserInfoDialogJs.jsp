@@ -82,13 +82,14 @@
                 this.$sex.ligerRadio();
                 this.$org.addressDropdown({
                     tabsData: [
-                        {name: '省份', url: '${contextRoot}/address/getParent', params: {level: '1'}},
-                        {name: '城市', url: '${contextRoot}/address/getChildByParent'},
+                        {name: '省份', code:'id',values:'name',url: '${contextRoot}/address/getParent', params: {level: '1'}},
+                        {name: '城市', code:'id',values:'name',url: '${contextRoot}/address/getChildByParent'},
                         {
-                            name: '医院', url: '${contextRoot}/address/getOrgs', beforeAjaxSend: function (ds, $options) {
+                            name: '医院', code:'orgCode',values:'fullName',url: '${contextRoot}/address/getOrgs', beforeAjaxSend: function (ds, $options) {
                             var province = $options.eq(0).attr('title'),
                                     city = $options.eq(1).attr('title');
                             ds.params = $.extend({}, ds.params, {
+
                                 province: province,
                                 city: city
                             });
@@ -170,11 +171,12 @@
                         data: {type:type,searchNm:inputValue},
                         async: false,
                         success: function (data) {
+                            debugger
                             if (data.successFlg) {
-                                result.setResult(true);
-                            } else {
                                 result.setResult(false);
                                 result.setErrorMsg(errorMsg);
+                            } else {
+                                result.setResult(true);
                             }
                         }
                     });
@@ -186,9 +188,10 @@
                     var userImgHtml = self.$imageShow.children().length;
                     var addUser = self.$form.Fields.getValues();
 //                   if(validator.validate()){
-//                        var organizationKeys = addUser.organization['keys'];
+                        var organizationKeys = addUser.organization['keys'];
 //                        addUser.orgCode = organizationKeys[2];
 //                        addUser.orgName = addUser.organization['names'][2];
+                    addUser.organization = organizationKeys[2];
                     if (userImgHtml == 0) {
                         updateUser(addUser);
                     } else {

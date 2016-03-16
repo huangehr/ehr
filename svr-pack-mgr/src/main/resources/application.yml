@@ -1,6 +1,18 @@
 server:
   port: 6010
 
+#security:
+#  user:
+#    password: pack
+
+spring:
+  jpa:
+    show-sql: true
+    hibernate:
+      dialect: org.hibernate.dialect.MySQL5Dialect
+    database:
+      platform: org.hibernate.dialect.MySQL5Dialect
+
 info:
   app:
     name: JsonPackageService
@@ -35,16 +47,22 @@ eureka:
     fetchRegistry: true
     serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@localhost:8761}/eureka/
 
+fast-dfs:
+  tracker-server: 172.19.103.54:22122
+
 ---
 spring:
   profiles: test
 eureka:
   instance:
-    ip-address: 192.168.131.151
+    ip-address: 172.19.103.73
   client:
     registerWithEureka: true
     fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@192.168.131.151:8761}/eureka/
+    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@172.19.103.73:8761}/eureka/
+
+fast-dfs:
+  tracker-server: 172.19.103.54:22122
 
 ---
 spring:
@@ -57,3 +75,6 @@ eureka:
     registerWithEureka: true
     fetchRegistry: true
     serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@11.1.2.21:8761}/eureka/
+
+fast-dfs:
+  tracker-server: 172.19.103.54:22122

@@ -10,10 +10,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,7 +40,7 @@ public class OrgDataSetController extends ExtendController<MOrgDataSet> {
     @ApiOperation(value = "根据id查询实体")
     public MOrgDataSet getOrgDataSet(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @RequestParam(value = "id") Long id) throws Exception{
+            @PathVariable(value = "id") Long id) throws Exception{
 
         return getModel(orgDataSetService.retrieve(id));
     }
@@ -60,11 +57,11 @@ public class OrgDataSetController extends ExtendController<MOrgDataSet> {
     }
 
 
-    @RequestMapping(value = "/data_set", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/data_set/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除机构数据集")
     public boolean deleteOrgDataSet(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @RequestParam(value = "id") long id) throws Exception{
+            @PathVariable(value = "id") long id) throws Exception{
 
             orgDataSetService.deleteOrgDataSet(id);
             return true;
@@ -117,4 +114,10 @@ public class OrgDataSetController extends ExtendController<MOrgDataSet> {
        return orgDataSetService.isExistOrgDataSet(orgCode, code);
     }
 
+    @RequestMapping(value = "/data_set",method = RequestMethod.GET)
+    public MOrgDataSet getDataSetBySequence(
+            @RequestParam(value="org_code")String orgCode,
+            @RequestParam(value = "sequence")int sequence){
+        return convertToModel(orgDataSetService.getDataSetBySequence(orgCode,sequence),MOrgDataSet.class);
+    }
 }

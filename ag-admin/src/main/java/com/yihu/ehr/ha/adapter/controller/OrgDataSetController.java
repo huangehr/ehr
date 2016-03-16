@@ -2,7 +2,6 @@ package com.yihu.ehr.ha.adapter.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.thirdpartystandard.OrgDataSetDetailModel;
-import com.yihu.ehr.agModel.thirdpartystandard.OrgDataSetModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.adapter.service.OrgDataSetClient;
 import com.yihu.ehr.model.adaption.MOrgDataSet;
@@ -12,14 +11,11 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -39,11 +35,11 @@ public class OrgDataSetController extends BaseController {
     @ApiOperation(value = "根据id查询实体")
     public Envelop getOrgDataSet(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @PathParam(value = "id") long id) {
+            @PathVariable(value = "id") long id) {
 
         try {
             MOrgDataSet mOrgDataSet = orgDataSetClient.getOrgDataSet(id);
-            OrgDataSetModel dataSetModel = convertToModel(mOrgDataSet, OrgDataSetModel.class);
+            OrgDataSetDetailModel dataSetModel = convertToModel(mOrgDataSet, OrgDataSetDetailModel.class);
             if (dataSetModel == null) {
                 return failed("数据集信息获取失败!");
             }
@@ -81,18 +77,17 @@ public class OrgDataSetController extends BaseController {
 
             MOrgDataSet mOrgDataSet = convertToModel(detailModel, MOrgDataSet.class);
             if (detailModel.getId() == 0) {
-                if(isExist)
-                {
+                if (isExist) {
                     return failed("数据集已存在!");
                 }
                 mOrgDataSet = orgDataSetClient.createOrgDataSet(objectMapper.writeValueAsString(mOrgDataSet));
             } else {
                 MOrgDataSet orgDataSet = orgDataSetClient.getOrgDataSet(detailModel.getId());
-                if(!orgDataSet.getCode().equals(detailModel.getCode())
-                         && isExist){
+                if (!orgDataSet.getCode().equals(detailModel.getCode())
+                        && isExist) {
                     return failed("数据集已存在!");
                 }
-                mOrgDataSet.setUpdateDate(new Date());
+                //mOrgDataSet.setUpdateDate(new Date());
                 mOrgDataSet = orgDataSetClient.updateOrgDataSet(objectMapper.writeValueAsString(mOrgDataSet));
             }
 
@@ -112,7 +107,7 @@ public class OrgDataSetController extends BaseController {
     @ApiOperation(value = "删除机构数据集")
     public Envelop deleteOrgDataSet(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @PathParam(value = "id") long id) {
+            @PathVariable(value = "id") long id) {
 
         try {
             if (id == 0) {
@@ -147,10 +142,27 @@ public class OrgDataSetController extends BaseController {
             @RequestParam(value = "page", required = false) int page) {
 
         try {
-            List<MOrgDataSet> mOrgDataSets = (List<MOrgDataSet>) orgDataSetClient.searchAdapterOrg(fields, filters, sorts, size, page);
+            ResponseEntity<Collection<MOrgDataSet>> responseEntity = orgDataSetClient.searchAdapterOrg(fields, filters, sorts, size, page);
+            List<MOrgDataSet> mOrgDataSets = (List<MOrgDataSet>) responseEntity.getBody();
             List<OrgDataSetDetailModel> detailModels = (List<OrgDataSetDetailModel>) convertToModels(mOrgDataSets, new ArrayList<OrgDataSetDetailModel>(mOrgDataSets.size()), OrgDataSetDetailModel.class, null);
 
-            return getResult(detailModels, 1, page, size);
+            return getResult(detailModels, getTotalCount(responseEntity), page, size);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
+    @RequestMapping(value = "/data_set", method = RequestMethod.GET)
+    public Envelop getDataSetBySequence(
+            @RequestParam(value = "org_code") String orgCode,
+            @RequestParam(value = "sequence") long sequence) {
+
+        try {
+            MOrgDataSet mOrgDataSet = orgDataSetClient.getDataSetBySequence(orgCode, sequence);
+            OrgDataSetDetailModel dataSetModel = convertToModel(mOrgDataSet, OrgDataSetDetailModel.class);
+
+            return success(dataSetModel);
         } catch (Exception ex) {
             ex.printStackTrace();
             return failedSystem();

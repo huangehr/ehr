@@ -2,10 +2,8 @@ package com.yihu.ehr.org.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.org.MOrganization;
-import com.yihu.ehr.model.security.MUserSecurity;
+import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.org.feign.SecurityClient;
 import com.yihu.ehr.org.service.OrgService;
 import com.yihu.ehr.org.service.Organization;
@@ -210,7 +208,7 @@ public class OrganizationController extends BaseRestController {
     public Map<String, String> distributeKey(
             @ApiParam(name = "org_code", value = "机构代码")
             @RequestParam(value = "org_code") String orgCode) {
-        MUserSecurity userSecurity = securityClient.getUserSecurityByOrgCode(orgCode);
+        MKey userSecurity = securityClient.getUserSecurityByOrgCode(orgCode);
         Map<String, String> keyMap = new HashMap<>();
         if (userSecurity == null) {
             userSecurity = securityClient.createSecurityByOrgCode(orgCode);

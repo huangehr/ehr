@@ -2,7 +2,7 @@ package com.yihu.ehr.ha.security.service;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
-import com.yihu.ehr.model.security.MUserSecurity;
+import com.yihu.ehr.model.security.MKey;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -20,9 +20,9 @@ import springfox.documentation.annotations.ApiIgnore;
 public interface SecurityClient {
 
 
-    @RequestMapping(value = "/securities/login/{login_code}", method = RequestMethod.GET)
+    @RequestMapping(value = "/securities/user/{login_code}", method = RequestMethod.GET)
     @ApiOperation(value = "获取用户公钥" , notes = "用户在平台注册时，会分配一个公钥，此公钥用于与健康档案平台加密传输数据使用")
-    MUserSecurity getUserSecurityByLoginCode(
+    MKey getUserSecurityByLoginCode(
             @ApiParam(name = "login_code", value = "用户名")
             @PathVariable(value = "login_code") String loginCode) ;
 
@@ -30,7 +30,7 @@ public interface SecurityClient {
 
     @RequestMapping(value = "/securities/org/{org_code}", method = RequestMethod.GET)
     @ApiOperation(value = "获取企业公钥", produces = "application/json", notes = "企业公钥，用于与健康档案平台之间传输数据的加密。")
-    MUserSecurity getUserSecurityByOrgCode(
+    MKey getUserSecurityByOrgCode(
             @ApiParam(name = "org_code", value = "机构代码")
             @PathVariable(value = "org_code") String orgCode);
 
@@ -87,7 +87,7 @@ public interface SecurityClient {
 
     @RequestMapping(value = "/securities/org/{org_code}", method = RequestMethod.POST)
     @ApiOperation(value = "根据orgCode创建security")
-    MUserSecurity createSecurityByOrgCode(
+    MKey createSecurityByOrgCode(
             @ApiParam(name = "org_code", value = "机构代码")
             @PathVariable( value = "org_code") String orgCode) ;
 
@@ -130,7 +130,7 @@ public interface SecurityClient {
      */
 //    @RequestMapping(value = "/securities/user/{login_code}", method = RequestMethod.GET)
 //    @ApiOperation(value = "根据loginCode获取Security" )
-//    MUserSecurity getUserSecurityByUserName(
+//    MKey getUserSecurityByUserName(
 //            @ApiParam(name = "login_code", value = "用户登录代码")
 //            @PathVariable( value = "login_code") String loginCode) ;
 
@@ -142,7 +142,7 @@ public interface SecurityClient {
      */
     @RequestMapping(value = "/securities/user/{user_id}", method = RequestMethod.POST)
     @ApiOperation(value = "根据userId创建Security" )
-    MUserSecurity createSecurityByUserId(
+    MKey createSecurityByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
             @PathVariable( value = "user_id") String userId) ;
 
@@ -166,7 +166,7 @@ public interface SecurityClient {
      */
     @RequestMapping(value = "/securities/user/{user_id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据userId获取UserSecurity" )
-    MUserSecurity getUserSecurityByUserId(
+    MKey getUserSecurityByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
             @PathVariable( value = "user_id") String userId) ;
 
