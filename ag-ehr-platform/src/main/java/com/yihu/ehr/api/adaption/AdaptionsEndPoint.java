@@ -28,11 +28,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = ApiVersion.Version1_0 + "/adaptions")
 @Api(protocols = "https", value = "adaptions", description = "标准适配")
 public class AdaptionsEndPoint {
-
     @Autowired
     private SecurityClient securityClient;
+
     @Autowired
     private StandardDispatchClient standardDispatchClient;
+
     @Autowired
     private AdapterDispatchClient adapterDispatchClient;
 
@@ -50,6 +51,7 @@ public class AdaptionsEndPoint {
         if (mKey == null) {
             return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed, "获取用户密钥失败");
         }
+
         Object restEcho = standardDispatchClient.getSchemeInfo(mKey.getPrivateKey(), updateVersion, currentVersion);
         return restEcho;
     }

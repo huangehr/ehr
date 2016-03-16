@@ -5,14 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.cache.CachedMetaData;
 import com.yihu.ehr.cache.StdDataRedisCache;
+import com.yihu.ehr.cache.StdObjectQualifierTranslator;
 import com.yihu.ehr.constants.BizObject;
+import com.yihu.ehr.extractor.KeyDataExtractor;
 import com.yihu.ehr.pack.TPackage;
 import com.yihu.ehr.pack.TPackageService;
-import com.yihu.ehr.service.Profile;
-import com.yihu.ehr.service.ProfileDataSet;
-import com.yihu.ehr.service.ProfileService;
-import com.yihu.ehr.service.StdObjectQualifierTranslator;
-import com.yihu.ehr.service.extractor.KeyDataExtractor;
+import com.yihu.ehr.profile.Profile;
+import com.yihu.ehr.profile.ProfileDataSet;
+import com.yihu.ehr.profile.ProfileService;
 import com.yihu.ehr.util.DateFormatter;
 import com.yihu.ehr.util.ObjectId;
 import com.yihu.ehr.util.compress.Zipper;
@@ -53,7 +53,6 @@ public class PackageResolveTask {
     private final static KeyDataExtractor dataFilter = null;
 
     private static ObjectNode EhrSummaryDataSet = null;
-    private final static Pattern NumberPattern = Pattern.compile("([1-9]\\d*\\.?\\d*)|(0\\.\\d*[1-9])");
     private final static char PathSep = File.separatorChar;
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
     private final static String StdFolder = "standard";
@@ -139,7 +138,7 @@ public class PackageResolveTask {
      * @param files
      * @throws IOException
      */
-    void parseJsonDataSet(String packageId, Profile profile, File[] files, boolean isOriginDataSet) throws ParseException {
+    void parseJsonDataSet(String packageId, Profile profile, File[] files, boolean isOriginDataSet) throws ParseException, IOException {
         for (File file : files) {
             if (!file.getAbsolutePath().endsWith(JsonExt)) continue;
 
@@ -171,129 +170,14 @@ public class PackageResolveTask {
         }
     }
 
-    public ProfileDataSet generateDataSet(String packageId, Profile profile, File jsonFile, boolean isOrigin) {
-        ProfileDataSet dataSet = new ProfileDataSet();
-
-        try {
-            JsonNode jsonNode = objectMapper.readTree(jsonFile);
-            if (jsonNode.isNull()) {
-                throw new IOException("无效JSON文件，文件已损坏或数据格式不对");
-            }
-
-            String innerVersion = jsonNode.get("inner_version").asText();
-            String code = jsonNode.get("code").asText();
-            String eventNo = jsonNode.get("event_no").asText();
-            String patientId = jsonNode.get("patient_id").asText();
-            String orgCode = jsonNode.get("org_code").asText();
-            String eventDate = jsonNode.path("event_time").asText();        // 旧的数据包可能不存在这个属性
-
-            profile.setPatientId(patientId);
-            profile.setEventNo(eventNo);
-            profile.setCreateDate(new Date());
-            profile.setCdaVersion(innerVersion);
-            profile.setOrgCode(orgCode);
-            if(!StringUtils.isEmpty(eventDate)) profile.setEventDate(DateFormatter.simpleDateTimeParse(eventDate));
-
-            dataSet.setPatientId(patientId);
-            dataSet.setEventNo(eventNo);
-            dataSet.setCdaVersion(innerVersion);
-            dataSet.setCode(code);
-            dataSet.setOrgCode(orgCode);
-
-            JsonNode jsonRecords = jsonNode.get("data");
-            for (int i = 0; i < jsonRecords.size(); ++i) {
-                Map<String, String> record = new HashMap<>();
-
-                JsonNode jsonRecord = jsonRecords.get(i);
-                Iterator<Map.Entry<String, JsonNode>> iterator = jsonRecord.fields();
-                while (iterator.hasNext()) {
-                    Map.Entry<String, JsonNode> item = iterator.next();
-                    String key = item.getKey();
-                    if (key.equals("PATIENT_ID") || key.equals("EVENT_NO")) continue;
-
-                    if (key.contains("HDSA00_01_017") && !item.getValue().asText().contains("null")) {
-                        System.out.println(item.getValue().asText());
-                    }
-
-                    String[] standardizedMetaData = standardizeMetaData(packageId,
-                            innerVersion,
-                            code,
-                            isOrigin,
-                            key,
-                            item.getValue().isNull() ? "" : item.getValue().asText());
-                    if (standardizedMetaData != null) {
-                        record.put(standardizedMetaData[0], standardizedMetaData[1]);
-                        if (standardizedMetaData.length > 2)
-                            record.put(standardizedMetaData[2], standardizedMetaData[3]);
-                    }
-                }
-
-                dataSet.addRecord(new ObjectId((short) 0, BizObject.StdProfile).toString(), record);
-            }
-        } catch (NullPointerException ex) {
-            throw new RuntimeException("JsonFileParser.generateDataSet 出现空指针");
-        } catch (Exception ex) {
-            throw new RuntimeException(ex.getMessage());
-        } finally {
+    public ProfileDataSet generateDataSet(String packageId, Profile profile, File jsonFile, boolean isOrigin) throws IOException {
+        JsonNode jsonNode = objectMapper.readTree(jsonFile);
+        if (jsonNode.isNull()) {
+            throw new IOException("无效JSON文件，文件已损坏或数据格式不对");
         }
 
+        ProfileDataSet dataSet = ProfileDataSet.parseJsonDataSet(jsonNode, isOrigin);
         return dataSet;
-    }
-
-    /**
-     * 翻译数据元。
-     *
-     * @param jsonArchiveId
-     * @param innerVersion
-     * @param dataSetCode
-     * @param isOriginDataSet
-     * @param metaDataInnerCode
-     * @param actualData
-     * @return
-     */
-    String[] standardizeMetaData(String jsonArchiveId, String innerVersion, String dataSetCode, boolean isOriginDataSet,
-                                 String metaDataInnerCode, String actualData) {
-        actualData = (actualData == null) ? "" : actualData.trim();
-
-        // 找不到
-        CachedMetaData metaData = StdDataRedisCache.getMetaData(innerVersion, dataSetCode, metaDataInnerCode);
-        if (null == metaData) {
-            String msg = "版本 %1, 数据集 %2, 数据元 %3 在标准库中不存在, JSON档案ID: %4. 请检查此数据元的来历."
-                    .replace("%1", innerVersion)
-                    .replace("%2", dataSetCode)
-                    .replace("%3", metaDataInnerCode)
-                    .replace("%4", jsonArchiveId);
-
-            LogService.getLogger(PackageResolveTask.class).warn(msg);
-            return null;
-        }
-
-        // 仅对标准化数据集及有关联字典的数据元进行翻译
-        if (!isOriginDataSet && actualData != null && actualData.length() > 0 && metaData.dictId > 0) {
-            String[] tempQualifiers = StdObjectQualifierTranslator.splitInnerCodeAsCodeValue(metaDataInnerCode);
-
-            String codeQualifier = StdObjectQualifierTranslator.toHBaseQualifier(tempQualifiers[0], metaData.type);
-            String valueQualifier = StdObjectQualifierTranslator.toHBaseQualifier(tempQualifiers[1], metaData.type);
-
-            String value = StdDataRedisCache.getDictEntryValue(innerVersion, metaData.dictId, actualData);
-
-            return new String[]{codeQualifier, actualData, valueQualifier, value == null ? "" : value};
-        } else {
-            if (metaData.type.equals("D")) {
-                actualData = actualData.length() <= 10 ? actualData: actualData.substring(0, actualData.lastIndexOf(' ')) + " 00:00:00";
-            } else if(metaData.type.equals("DT")) {
-                actualData = actualData.contains(".") ? actualData.substring(0, actualData.lastIndexOf('.')) : actualData;
-            }else if (metaData.type.equals("N")) {
-                Matcher matcher = NumberPattern.matcher(actualData);
-                if (matcher.find()) {
-                    actualData = matcher.group();
-                } else {
-                    actualData = "";
-                }
-            }
-
-            return new String[]{StdObjectQualifierTranslator.toHBaseQualifier(metaDataInnerCode, metaData.type), actualData};
-        }
     }
 
     /**

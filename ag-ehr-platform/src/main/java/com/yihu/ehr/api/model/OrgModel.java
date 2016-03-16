@@ -4,13 +4,11 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 机构,由 XOrgManager 创建并维护.
- *
  * @author Sand
  * @version 1.0
  * @updated 21-5月-2015 10:51:30
  */
-public class OrganizationModel implements Serializable{
+public class OrgModel implements Serializable {
     private String orgCode;         // 机构代码,对医院编码属性需要调研
     private String admin;            // 机构管理员
     private boolean settled;        // 是否已接入,对第三方平台有效.
@@ -24,10 +22,10 @@ public class OrganizationModel implements Serializable{
     private String location;        // 地址
     private int activityFlag;
 
-
     public String getOrgCode() {
         return orgCode;
     }
+
     public void setOrgCode(String orgCode) {
         this.orgCode = orgCode;
     }
@@ -35,6 +33,7 @@ public class OrganizationModel implements Serializable{
     public String getAdmin() {
         return admin;
     }
+
     public void setAdmin(String admin) {
         this.admin = admin;
     }
@@ -42,6 +41,7 @@ public class OrganizationModel implements Serializable{
     public String getPyCode() {
         return pyCode;
     }
+
     public void setPyCode(String pyCode) {
         this.pyCode = pyCode;
     }
@@ -49,6 +49,7 @@ public class OrganizationModel implements Serializable{
     public Date getCreateDate() {
         return createDate;
     }
+
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
@@ -56,6 +57,7 @@ public class OrganizationModel implements Serializable{
     public String getShortName() {
         return shortName;
     }
+
     public void setShortName(String shortName) {
         this.shortName = shortName;
     }
@@ -63,6 +65,7 @@ public class OrganizationModel implements Serializable{
     public String getTel() {
         return tel;
     }
+
     public void setTel(String tel) {
         this.tel = tel;
     }
@@ -102,6 +105,7 @@ public class OrganizationModel implements Serializable{
     public boolean getSettled() {
         return settled;
     }
+
     public void setSettled(boolean settled) {
         this.settled = settled;
     }
@@ -113,5 +117,4 @@ public class OrganizationModel implements Serializable{
     public void setActivityFlag(int activityFlag) {
         this.activityFlag = activityFlag;
     }
-
 }

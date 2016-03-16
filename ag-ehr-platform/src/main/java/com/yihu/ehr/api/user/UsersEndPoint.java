@@ -1,7 +1,7 @@
 package com.yihu.ehr.api.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.api.model.MUser;
+import com.yihu.ehr.api.model.UserModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.feign.OrganizationClient;
 import com.yihu.ehr.feign.SecurityClient;
@@ -14,7 +14,6 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,31 +42,31 @@ public class UsersEndPoint extends BaseController {
 
     @ApiOperation("获取用户列表")
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public List<MUser> getUsers() {
-        List<MUser> MUsers = new ArrayList<>();
+    public List<UserModel> getUsers() {
+        List<UserModel> UserModels = new ArrayList<>();
         List<com.yihu.ehr.model.user.MUser> mUsers = userClient.getUsers();
         for (com.yihu.ehr.model.user.MUser mUser : mUsers) {
-            MUser MUser = convertToModel(mUser, MUser.class);
-            MUser.setOrganization(organizationClient.getOrg(mUser.getOrganization()));
-            MUsers.add(MUser);
+            UserModel UserModel = convertToModel(mUser, UserModel.class);
+            UserModel.setOrganization(organizationClient.getOrg(mUser.getOrganization()));
+            UserModels.add(UserModel);
         }
 
-        return MUsers;
+        return UserModels;
     }
 
     @ApiOperation("获取用户")
     @RequestMapping(value = "/users/{user_name}", method = RequestMethod.GET)
-    public MUser getUser(
+    public UserModel getUser(
             @ApiParam("user_name")
             @PathVariable("user_name") String userName) {
         com.yihu.ehr.model.user.MUser mUser = userClient.getUserByUserName(userName);
-        MUser MUser = convertToModel(mUser, MUser.class);
+        UserModel UserModel = convertToModel(mUser, UserModel.class);
 
         if (mUser.getOrganization() != null) {
-            MUser.setOrganization(organizationClient.getOrg(mUser.getOrganization()));
+            UserModel.setOrganization(organizationClient.getOrg(mUser.getOrganization()));
         }
 
-        return MUser;
+        return UserModel;
     }
 
     @ApiOperation("获取用户公钥")

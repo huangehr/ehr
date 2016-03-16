@@ -67,7 +67,7 @@ public class LegacyEndPoint {
 
     @ApiOperation(value = "下载标准版本列表", response = RestEcho.class)
     @RequestMapping(value = "/adapter-dispatcher/allSchemaMappingPlan", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
-    public Object getAllVerions(
+    public Object getVersions(
             @ApiParam(required = true, name = "user_name", value = "用户名")
             @RequestParam(value = "user_name", required = true) String userName,
             @ApiParam(required = true, name = "versionCode", value = "适配标准版本")
@@ -77,7 +77,6 @@ public class LegacyEndPoint {
 
         return adaptions.getOrgAdaptions(userName, versionCode, orgCode);
     }
-
 
     @ApiOperation(value = "机构数据元", response = RestEcho.class)
     @RequestMapping(value = "/adapter-dispatcher/schema", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
@@ -167,12 +166,6 @@ public class LegacyEndPoint {
         Map<String, Object> patient = patients.get(0);
 
         String inner_version = (String) fields.get("inner_version");
-//        String patient_id = (String) fields.get("patient_id");
-//        String event_no = (String) fields.get("event_no");
-//        String event_time = (String) fields.get("event_time");
-//        String org_code = (String) fields.get("org_code");
-//        String ds_code = (String) fields.get("code");
-
         String userName = "";   //本人姓名
         String idCardNo = "";   //身份证件号码
         String birthday = "";   //出生日期
@@ -325,6 +318,7 @@ public class LegacyEndPoint {
         byte[] bytes = multipartFile.getBytes();
         String fileString = Base64.encode(bytes);
         jsonPackageClient.savePackageWithUser(fileString, userName, packageCrypto, md5);
+
         return new RestEcho().success().putMessage("ok");
     }
 
@@ -337,6 +331,7 @@ public class LegacyEndPoint {
         String publicKey = userSecurity.getPublicKey();
         RestEcho restEcho = new RestEcho().success();
         restEcho.putResult("public_key", publicKey);
+
         return restEcho;
     }
 
@@ -357,7 +352,7 @@ public class LegacyEndPoint {
         restEcho.putResult("access_token", map.get("access_token"));
         restEcho.putResult("refresh_token", map.get("refresh_token"));
         restEcho.putResult("expires_in", map.get("expires_in"));
-        return restEcho;
 
+        return restEcho;
     }
 }

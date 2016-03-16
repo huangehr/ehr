@@ -1,9 +1,10 @@
-package com.yihu.ehr.service;
+package com.yihu.ehr.profile;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.cache.CachedMetaData;
 import com.yihu.ehr.cache.StdDataRedisCache;
+import com.yihu.ehr.cache.StdObjectQualifierTranslator;
 import com.yihu.ehr.data.HBaseClient;
 import com.yihu.ehr.data.ResultWrapper;
 import com.yihu.ehr.util.DateFormatter;
@@ -19,7 +20,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 
-import static com.yihu.ehr.service.ProfileTableOptions.*;
+import static com.yihu.ehr.profile.ProfileTableOptions.*;
 
 /**
  * 健康档案加载器. 可以根据健康档案ID或与之关联的事件ID加载档案.

@@ -1,4 +1,4 @@
-package com.yihu.ehr.service;
+package com.yihu.ehr.profile;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,13 +41,13 @@ public class ProfileService {
     }
 
     public void saveProfile(Profile profile) throws IOException {
-        EhrArchiveWriter writer = new EhrArchiveWriter();
+        ProfileWriter writer = new ProfileWriter();
         writer.writeArchive(profile);
     }
     
     public void deleteArchive(String archiveId) throws IOException {
         ResultWrapper archive = hbaseClient.getResultAsWrapper(ProfileTableOptions.ArchiveTable, archiveId);
-        if (archive == null) throw new RuntimeException("档案不存在");
+        if (archive == null) throw new RuntimeException("Profile not found");
 
         // 先删除数据集
         String dataSets = archive.getValueAsString(ProfileTableOptions.FamilyBasic, ProfileTableOptions.AcDataSets);

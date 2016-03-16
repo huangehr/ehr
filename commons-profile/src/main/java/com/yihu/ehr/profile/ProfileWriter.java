@@ -1,9 +1,12 @@
-package com.yihu.ehr.service;
+package com.yihu.ehr.profile;
 
 import com.yihu.ehr.data.XHBaseClient;
 import com.yihu.ehr.util.DateFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Date;
@@ -11,18 +14,22 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * 档案存储器。
+ *
  * @author Sand
  * @version 1.0
  * @created 2015.08.27 11:56
  */
-public class EhrArchiveWriter {
-    @Value("${max-batch-size}")
-    private int MaxBatchInsertSize;
+@Service
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+public class ProfileWriter {
+    @Value("${profile.data-buffer-size}")
+    private int DataBufferSize;
 
     @Autowired
     private XHBaseClient hbaseClient;
 
-    public EhrArchiveWriter() {
+    public ProfileWriter() {
     }
 
     public void writeArchive(Profile healthArchive) throws IOException {
@@ -52,7 +59,7 @@ public class EhrArchiveWriter {
             int rowIndex = 1;
             int totalRowCount = dataSet.getRecordKeys().size();
             for (String key : dataSet.getRecordKeys()) {
-                if (rowIndex == 1 || rowIndex == MaxBatchInsertSize) {
+                if (rowIndex == 1 || rowIndex > DataBufferSize) {
                     hbaseClient.beginBatchInsert(tableName, false);
                 }
 
@@ -78,8 +85,10 @@ public class EhrArchiveWriter {
                         hbDataArray[0],
                         hbDataArray[1]);
 
-                if (rowIndex == MaxBatchInsertSize || rowIndex == totalRowCount) {
+                if (rowIndex == DataBufferSize || rowIndex == totalRowCount) {
                     hbaseClient.endBatchInsert();
+
+                    totalRowCount -= rowIndex;
                     rowIndex = 1;
                 } else {
                     rowIndex++;

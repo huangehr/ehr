@@ -1,6 +1,6 @@
-package com.yihu.ehr.service.extractor;
+package com.yihu.ehr.extractor;
 
-import com.yihu.ehr.service.ProfileDataSet;
+import com.yihu.ehr.profile.ProfileDataSet;
 
 import java.text.ParseException;
 import java.util.Map;

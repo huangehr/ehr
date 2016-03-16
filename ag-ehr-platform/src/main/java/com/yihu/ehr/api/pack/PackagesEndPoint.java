@@ -36,9 +36,9 @@ public class PackagesEndPoint {
      * @return
      */
     @RequestMapping(value = "/", method = {RequestMethod.POST})
-    @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
+    @ApiOperation(value = "接收档案", notes = "接收健康档案数据包")
     public void receiveJsonPackage(
-            @ApiParam(required = true, name = "package", value = "JSON档案包", allowMultiple = true)
+            @ApiParam(required = true, name = "package", value = "档案包", allowMultiple = true)
             MultipartHttpServletRequest jsonPackage,
             @ApiParam(required = true, name = "org_code", value = "机构代码")
             @RequestParam(value = "org_code") String orgCode,
@@ -46,6 +46,7 @@ public class PackagesEndPoint {
             @RequestParam(value = "package_crypto") String packageCrypto,
             @ApiParam(required = true, name = "md5", value = "档案包MD5")
             @RequestParam(value = "md5", required = false) String md5) throws IOException {
+
         MultipartFile multipartFile = jsonPackage.getFile("file");
         byte[] bytes = multipartFile.getBytes();
         String fileString = Base64.encode(bytes);

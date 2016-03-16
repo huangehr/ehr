@@ -1,7 +1,7 @@
 package com.yihu.ehr.api.org;
 
-import com.yihu.ehr.api.model.MUser;
-import com.yihu.ehr.api.model.OrganizationModel;
+import com.yihu.ehr.api.model.UserModel;
+import com.yihu.ehr.api.model.OrgModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.feign.OrganizationClient;
 import com.yihu.ehr.feign.SecurityClient;
@@ -32,9 +32,9 @@ public class OrganizationsEndPoint extends BaseController {
     @Autowired
     private SecurityClient securityClient;
 
-    @ApiOperation(value = "根据机构代码获取机构")
+    @ApiOperation(value = "获取机构")
     @RequestMapping(value = "/{org_code}", method = RequestMethod.GET)
-    public OrganizationModel getOrg(
+    public OrgModel getOrg(
             @ApiParam(name = "org_code", value = "机构代码", defaultValue = "")
             @PathVariable(value = "org_code")
             String orgCode) throws Exception {
@@ -42,8 +42,8 @@ public class OrganizationsEndPoint extends BaseController {
     }
 
     @RequestMapping(value = "/{org_code}/administrator", method = RequestMethod.GET)
-    @ApiOperation(value = "根据机构代码获取管理员信息")
-    public MUser getOrgAdministrator(
+    @ApiOperation(value = "获取机构管理员信息")
+    public UserModel getOrgAdministrator(
             @ApiParam(name = "org_code", value = "管理员登录帐号", defaultValue = "")
             @PathVariable(value = "org_code")
             String orgCode) throws Exception {
@@ -51,7 +51,7 @@ public class OrganizationsEndPoint extends BaseController {
     }
 
     @RequestMapping(value = "/{org_code}/key", method = RequestMethod.GET)
-    @ApiOperation(value = "获取企业公钥", notes = "企业公钥，用于与健康档案平台之间传输数据的加密。")
+    @ApiOperation(value = "获取机构公钥", notes = "机构公钥")
     public MKey getPublicKey(
             @ApiParam(name = "org_code", value = "机构代码")
             @PathVariable(value = "org_code")
