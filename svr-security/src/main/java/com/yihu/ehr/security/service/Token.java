@@ -9,13 +9,16 @@ import java.util.Date;
 import java.util.UUID;
 
 /**
- * Created by wq on 2015/8/3.
+ * Token。
+ *
+ * @author wq
+ * @version 1.0
+ * @created 02-6月-2015 17:38:05
  */
-
 @Entity
 @Table(name = "user_token")
 @Access(value = AccessType.PROPERTY)
-public class UserToken implements Serializable {
+public class Token implements Serializable {
 
     private String tokenId;
     private String accessToken;
@@ -26,7 +29,7 @@ public class UserToken implements Serializable {
     private String userId;
     private String appId;
 
-    public UserToken() {
+    public Token() {
         tokenId = new ObjectVersion().toString();
     }
 

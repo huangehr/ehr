@@ -1,5 +1,6 @@
 package com.yihu.ehr.feign;
 
+import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.security.MKey;
@@ -22,17 +23,18 @@ import java.util.Map;
 @ApiIgnore
 public interface SecurityClient {
 
-    @RequestMapping(value = "/securities/user/{login_code}", method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Securities.UserPublicKey, method = RequestMethod.GET)
     @ApiOperation(value = "获取用户公钥" , notes = "用户在平台注册时，会分配一个公钥，此公钥用于与健康档案平台加密传输数据使用")
-    MKey getUserKey(@PathVariable(value = "login_code") String loginCode) ;
+    MKey getUserKey(@PathVariable(value = "user_id") String user_id) ;
 
-    @RequestMapping(value = "/securities/org/{org_code}", method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Securities.OrganizationPublicKey, method = RequestMethod.GET)
     @ApiOperation(value = "获取企业公钥", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "企业公钥，用于与健康档案平台之间传输数据的加密。")
     MKey getOrgKey(@PathVariable(value = "org_code") String orgCode) ;
 
-    @RequestMapping(value = "/tokens", method = RequestMethod.GET)
-    Map<String,Object> getUserToken(
-            @RequestParam(value = "login_code", required = true) String loginCode,
+    @RequestMapping(value = RestApi.Securities.UserToken, method = RequestMethod.GET)
+    Map<String,Object> getUserTempToken(
+            @PathVariable(value = "user_id") String userId,
+            @PathVariable(value = "token_id") String tokenId,
             @RequestParam(value = "rsa_pw", required = true) String rsaPWD,
             @RequestParam(value = "app_id", required = true) String appId,
             @RequestParam(value = "app_secret", required = true) String appSecret);

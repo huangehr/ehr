@@ -1,5 +1,6 @@
 package com.yihu.ehr.pack.controller;
 
+import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.ErrorCode;
@@ -48,7 +49,7 @@ public class JsonPackageEndPoint extends BaseRestController {
     @Autowired
     private JsonPackageService jsonPackageService;
 
-    @RequestMapping(value = "/packages", method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Packages.Packages, method = RequestMethod.GET)
     @ApiOperation(value = "获取档案列表", response = MPackage.class, responseContainer = "List", notes = "获取当前平台上的档案列表")
     public Collection<MPackage> packageList(@ApiParam(name = "archive_status", value = "档案包状态", defaultValue = "Received")
                                             @RequestParam(value = "archive_status")
@@ -79,7 +80,7 @@ public class JsonPackageEndPoint extends BaseRestController {
      *
      * @param packageCrypto zip密码密文, file 请求体中文件参数名
      */
-    @RequestMapping(value = "/packages", method = RequestMethod.PUT)
+    @RequestMapping(value = RestApi.Packages.Packages, method = RequestMethod.PUT)
     @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
     @Deprecated
     public void savePackageWithUser(@ApiParam(required = false, name = "file_string", value = "JSON档案包字符串")
@@ -105,7 +106,7 @@ public class JsonPackageEndPoint extends BaseRestController {
      *
      * @param packageCrypto zip密码密文, file 请求体中文件参数名
      */
-    @RequestMapping(value = "/packages", method = RequestMethod.POST)
+    @RequestMapping(value = RestApi.Packages.Packages, method = RequestMethod.POST)
     @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
     public void savePackageWithOrg(@ApiParam(required = false, name = "file_string", value = "JSON档案包字符串")
                                    @RequestParam(value = "file_string") String fileString,
@@ -132,7 +133,7 @@ public class JsonPackageEndPoint extends BaseRestController {
      * @param id
      * @return
      */
-    @RequestMapping(value = "/packages/{id}", method = {RequestMethod.GET})
+    @RequestMapping(value = RestApi.Packages.Package, method = {RequestMethod.GET})
     @ApiOperation(value = "获取档案包", notes = "获取档案包的信息")
     public ResponseEntity<MPackage> retrievePackage(@ApiParam(name = "id", value = "档案包编号")
                                                     @PathVariable(value = "id")
@@ -146,12 +147,26 @@ public class JsonPackageEndPoint extends BaseRestController {
     }
 
     /**
+     * 删除档案包。
+     *
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = RestApi.Packages.Package, method = {RequestMethod.DELETE})
+    @ApiOperation(value = "删除档案", response = Object.class, notes = "删除一个数据包")
+    public void deletePackage(@ApiParam(name = "id", value = "档案包编号")
+                              @PathVariable(value = "id")
+                              String id) {
+        jsonPackageService.deletePackage(id);
+    }
+
+    /**
      * 下载档案包。
      *
      * @param id
      * @return
      */
-    @RequestMapping(value = "/packages/downloads/{id}", method = {RequestMethod.GET})
+    @RequestMapping(value = RestApi.Packages.PackageDownloads, method = {RequestMethod.GET})
     @ApiOperation(value = "获取档案包", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE, notes = "获取档案包的信息")
     public ResponseEntity<MPackage> downloadPackage(@ApiParam(name = "id", value = "档案包编号")
                                                     @PathVariable(value = "id")
@@ -174,19 +189,4 @@ public class JsonPackageEndPoint extends BaseRestController {
 
         return null;
     }
-
-    /**
-     * 删除档案包。
-     *
-     * @param id
-     * @return
-     */
-    @RequestMapping(value = "/packages/{id}", method = {RequestMethod.DELETE})
-    @ApiOperation(value = "删除档案", response = Object.class, notes = "删除一个数据包")
-    public void deletePackage(@ApiParam(name = "id", value = "档案包编号")
-                              @PathVariable(value = "id")
-                              String id) {
-        jsonPackageService.deletePackage(id);
-    }
 }
-

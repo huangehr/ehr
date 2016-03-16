@@ -10,7 +10,7 @@ import com.yihu.ehr.ha.organization.service.OrganizationClient;
 import com.yihu.ehr.ha.security.service.SecurityClient;
 import com.yihu.ehr.ha.users.service.UserClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.geogrephy.MGeography;
+import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MUser;
@@ -154,7 +154,7 @@ public class UserController extends BaseController {
         if (StringUtils.isNotEmpty(errorMsg)) {
             return failed(errorMsg);
         }
-        if (userClient.isLoginCodeExists(detailModel.getLoginCode())) {
+        if (userClient.isUserNameExists(detailModel.getLoginCode())) {
             return failed("账户已存在!");
         }
         if (userClient.isIdCardExists(detailModel.getIdCardNo())) {
@@ -210,7 +210,7 @@ public class UserController extends BaseController {
         }
         MUser mUser = userClient.getUser(detailModel.getId());
         if (!mUser.getLoginCode().equals(detailModel.getLoginCode())
-                && userClient.isLoginCodeExists(detailModel.getLoginCode())) {
+                && userClient.isUserNameExists(detailModel.getLoginCode())) {
             return failed("账户已存在!");
         }
 
@@ -288,15 +288,15 @@ public class UserController extends BaseController {
     /**
      * 重新分配秘钥
      *
-     * @param loginCode 账号
+     * @param userName 账号
      * @return map  key{publicKey:公钥；validTime：有效时间; startTime：生效时间}
      */
     @RequestMapping(value = "/users/key/{login_code}", method = RequestMethod.PUT)
     @ApiOperation(value = "重新分配密钥", notes = "重新分配密钥")
     public Map<String, String> distributeKey(
             @ApiParam(name = "login_code", value = "登录帐号", defaultValue = "")
-            @PathVariable(value = "login_code") String loginCode) {
-        MUser mUser = userClient.getUserByLoginCode(loginCode);
+            @PathVariable(value = "login_code") String userName) {
+        MUser mUser = userClient.getUserByUserName(userName);
         if (mUser == null) {
             return null;
         }
@@ -307,18 +307,18 @@ public class UserController extends BaseController {
     /**
      * 根据登陆用户名及密码验证用户.
      *
-     * @param loginCode
+     * @param userName
      * @param psw
      */
     @RequestMapping(value = "/users/verification/{login_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据登陆用户名及密码验证用户", notes = "根据登陆用户名及密码验证用户")
     public Envelop loginVerification(
             @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
-            @PathVariable(value = "login_code") String loginCode,
+            @PathVariable(value = "login_code") String userName,
             @ApiParam(name = "psw", value = "密码", defaultValue = "")
             @RequestParam(value = "psw") String psw) {
 
-        MUser mUser = userClient.getUserByNameAndPassword(loginCode, psw);
+        MUser mUser = userClient.getUserByNameAndPassword(userName, psw);
         if (mUser == null) {
             return failed("用户信息获取失败!");
         }
@@ -330,19 +330,20 @@ public class UserController extends BaseController {
     /**
      * 根据loginCode 获取user
      *
-     * @param loginCode
+     * @param userName
      * @return
      */
     @RequestMapping(value = "/users/{login_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据登录账号获取当前用户", notes = "根据登陆用户名及密码验证用户")
     public Envelop getUserByLoginCode(
             @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
-            @PathVariable(value = "login_code") String loginCode) {
+            @PathVariable(value = "login_code") String userName) {
 
-        MUser mUser = userClient.getUserByLoginCode(loginCode);
+        MUser mUser = userClient.getUserByUserName(userName);
         if (mUser == null) {
             return failed("用户信息获取失败!");
         }
+
         UserDetailModel detailModel = MUserToUserDetailModel(mUser);
 
         return success(detailModel);
@@ -357,9 +358,10 @@ public class UserController extends BaseController {
             @RequestParam(value = "existenceNm") String existenceNm) {
         Envelop envelop = new Envelop();
         boolean bo;
+
         //返回值：true>存在，false>不存在
         if(existenceType.equals("login_code")){
-            bo = userClient.isLoginCodeExists(existenceNm);
+            bo = userClient.isUserNameExists(existenceNm);
             envelop.setSuccessFlg(bo);
         }
         if (existenceType.equals("id_card_no")){

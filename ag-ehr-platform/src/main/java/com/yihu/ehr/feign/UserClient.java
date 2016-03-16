@@ -1,5 +1,6 @@
 package com.yihu.ehr.feign;
 
+import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.*;
 import com.yihu.ehr.model.user.MUser;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -16,38 +17,20 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  * @version 1.0
  * @created 2016.03.03 15:01
  */
-@FeignClient(name = MicroServiceName.User)
 @ApiIgnore
+@FeignClient(name = MicroServiceName.User)
+@RequestMapping(ApiVersion.Version1_0)
 public interface UserClient {
 
-    @RequestMapping(value = ApiVersion.Version1_0 + "/users", method = GET)
+    @RequestMapping(value = RestApi.Users.Users, method = GET)
     List<MUser> getUsers();
 
-    @RequestMapping(value = ApiVersion.Version1_0 + "/users/{login_code}", method = GET)
-    MUser getUserByUserName(@PathVariable(value = "login_code") String loginCode);
+    @RequestMapping(value = RestApi.Users.User, method = GET)
+    MUser getUserByUserName(@PathVariable(value = "user_name") String userName);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + "/users/user_name/{user_name}/password/{password}", method = GET)
-    MUser getUserByNameAndPassword(
-            @PathVariable(value = "user_name") String userName,
-            @PathVariable(value = "password") String password);
-
-    // hystrix fall back
-    static class UserClientFallback implements UserClient {
-        @Override
-        public List<MUser> getUsers() {
-            return null;
-        }
-
-        @Override
-        public MUser getUserByUserName(@PathVariable(value = "login_code") String loginCode) {
-            return null;
-        }
-
-        @Override
-        public MUser getUserByNameAndPassword(@PathVariable(value = "user_name") String userName, @PathVariable(value = "password") String password) {
-            return null;
-        }
-    }
+    @RequestMapping(value = RestApi.Users.UserPassword, method = GET)
+    MUser getUserByNameAndPassword(@PathVariable(value = "user_name") String userName,
+                                   @PathVariable(value = "password") String password);
 }
 
 

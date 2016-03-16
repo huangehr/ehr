@@ -5,7 +5,7 @@ import com.yihu.ehr.api.adaption.AdaptionsEndPoint;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.feign.*;
-import com.yihu.ehr.model.geogrephy.MGeography;
+import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.util.DateFormatter;
@@ -373,7 +373,7 @@ public class LegacyEndPoint {
             @ApiParam(required = true, name = "app_secret", value = "APP 密码")
             @RequestParam(value = "app_secret", required = true) String appSecret) {
         RestEcho restEcho;
-        Map<String, Object> map = securityClient.getUserToken(loginCode, rsaPWD, appId, appSecret);
+        Map<String, Object> map = securityClient.getUserTempToken(loginCode, "temp", rsaPWD, appId, appSecret);
         restEcho = new RestEcho().success();
         restEcho.putResult("access_token", map.get("access_token"));
         restEcho.putResult("refresh_token", map.get("refresh_token"));

@@ -2,8 +2,8 @@ package com.yihu.ehr.ha.geography.service;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
-import com.yihu.ehr.model.geogrephy.MGeography;
-import com.yihu.ehr.model.geogrephy.MGeographyDict;
+import com.yihu.ehr.model.geography.MGeography;
+import com.yihu.ehr.model.geography.MGeographyDict;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;

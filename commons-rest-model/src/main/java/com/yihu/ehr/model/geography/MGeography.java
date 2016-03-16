@@ -1,8 +1,7 @@
-package com.yihu.ehr.model.geogrephy;
+package com.yihu.ehr.model.geography;
 
 
 import java.io.Serializable;
-import java.util.UUID;
 
 /**
  * @author Sand
