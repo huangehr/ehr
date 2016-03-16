@@ -1,6 +1,3 @@
-server:
-  port: 10120
-
 spring:
   application:
     name: svr-user
@@ -12,7 +9,7 @@ spring:
     config:
       username: user
       password: configuration
-      uri: http://192.168.1.151:1221
+      uri: http://localhost:1221
       label: dev
 
 ---

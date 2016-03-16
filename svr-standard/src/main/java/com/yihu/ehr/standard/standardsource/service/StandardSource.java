@@ -40,7 +40,7 @@ public class StandardSource {
         this.createUser = "Sys";
         this.OperationType = "";
 
-        Object objectID = new ObjectId(adminRegion, BizObject.StdArchive);
+        Object objectID = new ObjectId(adminRegion, BizObject.StdProfile);
         this.id = objectID.toString();
     }
 
@@ -53,7 +53,7 @@ public class StandardSource {
     }
     public void setId(String id) {
         if(id==null || "".equals(id.trim())){
-            Object objectID = new ObjectId(adminRegion, BizObject.StdArchive);
+            Object objectID = new ObjectId(adminRegion, BizObject.StdProfile);
             this.id = objectID.toString();
         }else
             this.id = id;

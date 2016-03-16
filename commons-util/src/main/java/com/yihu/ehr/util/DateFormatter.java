@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
+ * ʱ���ʽ�����ߣ�ʹ���̱߳��ر�����ʽ�Ż����󴴽����̣���ʡ��Դ��
  * @author Sand
  * @version 1.0
  * @created 2015.08.26 8:49
@@ -14,6 +15,14 @@ public class DateFormatter {
     static final String utcDateTimePattern = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     static final String slashDateTimePattern = "yyyy/MM/dd HH:mm:ss";
     static final String simpleDatePattern = "yyyy-MM-dd";
+    static final String simpleDateTimeShortPattern = "yyyy/MM/dd HH:mm";
+
+    private static ThreadLocal<SimpleDateFormat> simpleDateTimeShortFormat = new ThreadLocal<SimpleDateFormat>(){
+        @Override
+        protected synchronized SimpleDateFormat initialValue(){
+            return new SimpleDateFormat(simpleDateTimeShortPattern);
+        }
+    };
 
     private static ThreadLocal<SimpleDateFormat> simpleDateTimeFormat = new ThreadLocal<SimpleDateFormat>(){
         @Override
@@ -80,6 +89,16 @@ public class DateFormatter {
 
     public static Date simpleDateParse(final String date) throws ParseException {
         Date parsedDate = simpleDateFormat.get().parse(date);
+        return parsedDate;
+    }
+
+    public static String simpleDateTimeShortFormat(final Date date){
+        String result = simpleDateTimeShortFormat.get().format(date);
+        return result;
+    }
+
+    public static Date simpleDateTimeShortParse(final String date) throws ParseException {
+        Date parsedDate = simpleDateTimeShortFormat.get().parse(date);
         return parsedDate;
     }
 }

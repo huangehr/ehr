@@ -319,7 +319,7 @@ public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAd
 
     public List<OrgAdapterPlan> getOrgAdapterPlanByOrgCode(Map<String, Object> args) {
 
-        List<OrgAdapterPlan> orgAdapterPlans = null;
+        List<OrgAdapterPlan> orgAdapterPlans = new ArrayList<OrgAdapterPlan>();
         try {
             Session session = currentSession();
             String orgCode = (String) args.get("orgcode");

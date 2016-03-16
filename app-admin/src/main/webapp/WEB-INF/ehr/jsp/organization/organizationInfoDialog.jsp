@@ -26,8 +26,8 @@
 
     <div class="m-form-group">
         <label><spring:message code="lbl.local"/><spring:message code="spe.colon"/></label>
-        <div class="l-text-wrapper m-form-control ">
-            <input type="text" id="location"  class="f-w240 max-length-500 validate-special-char" data-type="comboSelect"  required-title=<spring:message code="lbl.must.input"/> data-attr-scan="location"/>
+        <div class="l-text-wrapper m-form-control essential">
+            <input type="text" id="location"  class="required useTitle f-w240 max-length-500 validate-special-char" data-type="comboSelect"  required-title=<spring:message code="lbl.must.input"/> data-attr-scan="location"/>
         </div>
     </div>
 

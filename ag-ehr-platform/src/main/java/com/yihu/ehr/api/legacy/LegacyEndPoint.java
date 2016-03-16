@@ -15,7 +15,6 @@ import com.yihu.ehr.util.encode.Base64;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,7 +54,10 @@ public class LegacyEndPoint {
     private JsonPackageClient jsonPackageClient;
 
     @Autowired
-    private AdapterDispatchClient adapterDispatchClient;
+    private AdapterDispatchClient adaptionClient;
+
+    @Autowired
+    private StandardDispatchClient standardDispatchClient;
 
     @ApiOperation(value = "下载标准版本", response = RestEcho.class)
     @RequestMapping(value = "/adapter-dispatcher/versionplan", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
@@ -63,7 +65,11 @@ public class LegacyEndPoint {
             @ApiParam(name = "org_code", value = "机构编码")
             @RequestParam(value = "org_code") String orgCode) throws Exception {
 
-        return adaptions.getCDAVersionInfoByOrgCode(orgCode);
+        if (org.apache.commons.lang.StringUtils.isEmpty(orgCode)) {
+            return new RestEcho().failed(ErrorCode.MissParameter, "缺失参数:org_code!");
+        }
+        Object object = adaptionClient.getCDAVersionInfoByOrgCode(orgCode);
+        return object;
     }
 
     @ApiOperation(value = "下载标准版本列表", response = RestEcho.class)
@@ -80,12 +86,9 @@ public class LegacyEndPoint {
         if (mKey == null) {
             return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed, "获取用户密钥失败");
         }
-        Object object = adapterDispatchClient.getALLSchemeMappingInfo(mKey.getPrivateKey(), versionCode, orgCode);
+        Object object = adaptionClient.getALLSchemeMappingInfo(mKey.getPrivateKey(), versionCode, orgCode);
         return object;
     }
-
-
-
 
     @ApiOperation(value = "机构数据元", response = RestEcho.class)
     @RequestMapping(value = "/adapter-dispatcher/schema", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
@@ -97,7 +100,13 @@ public class LegacyEndPoint {
             @ApiParam(required = true, name = "current_version", value = "用户当前使用的版本")
             @RequestParam(value = "current_version", required = false) String currentVersion) throws Exception {
 
-        return adaptions.getOrgSchema(userName, updateVersion, null);
+        MKey mKey = securityClient.getUserKey(userName);
+        if (mKey == null) {
+            return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed, "获取用户密钥失败");
+        }
+
+        Object restEcho = standardDispatchClient.getSchemeInfo(mKey.getPrivateKey(), updateVersion, currentVersion);
+        return restEcho;
     }
 
     @ApiOperation(value = "标准映射", response = RestEcho.class)
@@ -110,9 +119,13 @@ public class LegacyEndPoint {
             @ApiParam(required = true, name = "org_code", value = "机构代码")
             @RequestParam(value = "org_code", required = true) String orgCode) throws Exception {
 
-        return adaptions.getOrgAdaption(userName, versionCode, orgCode);
+        MKey mKey = securityClient.getUserKey(userName);
+        if (mKey == null) {
+            return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed, "获取用户密钥失败");
+        }
+        Object object = adaptionClient.getSchemeMappingInfo(mKey.getPrivateKey(), versionCode, orgCode);
+        return object;
     }
-
 
     /**
      * 病人注册。requestBody格式:

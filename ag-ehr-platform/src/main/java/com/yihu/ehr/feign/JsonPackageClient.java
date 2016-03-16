@@ -4,11 +4,12 @@ import com.yihu.ehr.constants.*;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import springfox.documentation.annotations.ApiIgnore;
 
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 /**
  * @author Sand
@@ -19,7 +20,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface JsonPackageClient {
-    @RequestMapping(value = "/packages", method = POST)
+    @RequestMapping(value = "/packages", method = RequestMethod.PUT)
     void savePackageWithUser(
             @RequestParam(value = "file_string") String fileString,
             @RequestParam(value = "user_name") String userName,
@@ -27,7 +28,7 @@ public interface JsonPackageClient {
             @RequestParam(value = "md5") String md5
     );
 
-    @RequestMapping(value = "/packages", method = POST)
+    @RequestMapping(value = "/packages", method = RequestMethod.POST)
     void savePackageWithOrg(
             @RequestParam(value = "file_string") String fileString,
             @RequestParam(value = "org_code") String orgCode,

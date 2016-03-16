@@ -1,4 +1,4 @@
-package com.yihu.ehr.standard.cda.controller;
+package com.yihu.ehr.standard.document.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
@@ -6,7 +6,7 @@ import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
-import com.yihu.ehr.standard.cda.service.*;
+import com.yihu.ehr.standard.document.service.*;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,12 +24,14 @@ import java.util.List;
 @RequestMapping(ApiVersion.Version1_0 + "/std")
 @RestController
 @Api(protocols = "https", value = "cda", description = "cda管理", tags = {"cda管理"})
-public class CdaController extends BaseRestController {
+public class DocumentEndPoint extends BaseRestController {
 
     @Autowired
     private CDADocumentManager cdaDocumentManager;
+
     @Autowired
     private CDAManager cdaManager;
+
     @Autowired
     private CDADataSetRelationshipManager cdaDatasetRelationshipManager;
 
@@ -37,7 +39,7 @@ public class CdaController extends BaseRestController {
     private FastDFSUtil fastDFSUtil;
 
     @RequestMapping(value = "/CDADocuments", method = RequestMethod.GET)
-    @ApiOperation(value = "根据条件获取cda列表")
+    @ApiOperation(value = "根据条件获取cda文档列表")
     public List<MCDADocument> GetCDADocuments(
             @ApiParam(name = "version_code", value = "版本号")
             @RequestParam(value = "version_code") String versionCode,
@@ -200,7 +202,6 @@ public class CdaController extends BaseRestController {
      * @return
      */
     @RequestMapping("/createCDASchemaFile")
-    @ResponseBody
     public boolean createCDASchemaFile(
             @ApiParam(name = "versionCode", value = "versionCode")
             @RequestParam(value = "versionCode") String versionCode,
@@ -220,7 +221,6 @@ public class CdaController extends BaseRestController {
      * @version 1.0.1 将临时目录转移至fastDFS。
      */
     @RequestMapping("/getCdaXmlFileInfo")
-    @ResponseBody
     public Object getCdaXmlFileInfo(String cdaId, String versionCode) throws Exception {
         String strXmlInfo = "";
         String strPath = System.getProperty("java.io.tmpdir");
@@ -263,5 +263,4 @@ public class CdaController extends BaseRestController {
         }
         return strXmlInfo;
     }
-
 }
