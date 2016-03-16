@@ -3,13 +3,11 @@ package com.yihu.ehr.patient.service.demographic;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.model.geogrephy.MGeography;
-import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.patient.dao.XDemographicInfoRepository;
 import com.yihu.ehr.patient.feign.GeographyClient;
 import com.yihu.ehr.util.encode.HashUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,7 +67,7 @@ public class DemographicService {
         String province = (String) args.get("province");
         String city = (String) args.get("city");
         String district = (String) args.get("district");
-        boolean addressNotNull=(!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) && !StringUtils.isEmpty(district));
+        boolean addressNotNull=(!StringUtils.isEmpty(province) || !StringUtils.isEmpty(city) || !StringUtils.isEmpty(district));
         List<String> homeAddressIdList = null;
         String hql = "from DemographicInfo where 1=1";
         if (!StringUtils.isEmpty(search)) {
@@ -99,7 +97,7 @@ public class DemographicService {
         String province = (String) args.get("province");
         String city = (String) args.get("city");
         String district = (String) args.get("district");
-        boolean addressNotNull=(!StringUtils.isEmpty(province) && !StringUtils.isEmpty(city) && !StringUtils.isEmpty(district));
+        boolean addressNotNull=(!StringUtils.isEmpty(province) || !StringUtils.isEmpty(city) || !StringUtils.isEmpty(district));
         List<String> homeAddressIdList = null;
         String hql = "from DemographicInfo where 1=1";
         if (!StringUtils.isEmpty(search)) {

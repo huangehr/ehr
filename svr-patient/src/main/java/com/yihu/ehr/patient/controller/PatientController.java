@@ -40,8 +40,7 @@ public class PatientController extends BaseRestController {
 
     /**
      * 根据条件查询人口信息
-     * @param name
-     * @param idCardNo
+     * @param search
      * @param province
      * @param city
      * @param district

@@ -131,7 +131,7 @@
                             height:600,
                             url:'${contextRoot}/patient/patientDialogType',
                             urlParms:{
-                                patientDialogType:'addPanient'
+                                patientDialogType:'addPatient'
                             }
                         })
                     });
@@ -145,7 +145,7 @@
                             url:'${contextRoot}/patient/patientDialogType',
                             urlParms:{
                                 idCardNo:idCardNo,
-                                patientDialogType:'updatePanient'
+                                patientDialogType:'updatePatient'
                             }
                         })
                     });
