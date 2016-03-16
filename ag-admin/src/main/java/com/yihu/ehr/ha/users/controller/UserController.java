@@ -1,7 +1,6 @@
 package com.yihu.ehr.ha.users.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.agModel.user.UsersModel;
 import com.yihu.ehr.constants.ApiVersion;
@@ -13,11 +12,10 @@ import com.yihu.ehr.ha.users.service.UserClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.geogrephy.MGeography;
 import com.yihu.ehr.model.org.MOrganization;
-import com.yihu.ehr.model.security.MUserSecurity;
+import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
-import com.yihu.ehr.util.encode.Base64;
 import com.yihu.ehr.util.operator.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,15 +25,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -117,7 +109,7 @@ public class UserController extends BaseController {
             @ApiParam(name = "user_id", value = "用户编号", defaultValue = "")
             @PathVariable(value = "user_id") String userId) throws Exception {
 
-        MUserSecurity userSecurity = securityClient.getUserSecurityByUserId(userId);
+        MKey userSecurity = securityClient.getUserSecurityByUserId(userId);
         if (userSecurity != null) {
             String userKeyId = securityClient.getUserKeyByUserId(userId);
             securityClient.deleteSecurity(userSecurity.getId());
@@ -415,7 +407,7 @@ public class UserController extends BaseController {
             detailModel.setOrganizationName(orgModel == null ? "" : orgAddress);
         }
         //获取秘钥信息
-        MUserSecurity userSecurity = securityClient.getUserSecurityByUserId(mUser.getId());
+        MKey userSecurity = securityClient.getUserSecurityByUserId(mUser.getId());
         if (userSecurity != null) {
             detailModel.setPublicKey(userSecurity.getPublicKey());
             String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT)
