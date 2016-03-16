@@ -13,4 +13,5 @@ import java.util.List;
 public interface IHosSqlTaskDao extends JpaRepository<HosSqlTask, String> {
     @Query("select e from HosSqlTask e where e.systemCode = :systemCode and e.orgCode= :orgCode and e.status='0' order by  e asc")
     List<HosSqlTask> findBySystemCodeAndOrgCode(@Param("systemCode") String systemCode, @Param("orgCode") String orgCode);
+
 }

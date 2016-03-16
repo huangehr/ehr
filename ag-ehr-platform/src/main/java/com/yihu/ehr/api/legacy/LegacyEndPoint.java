@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.api.adaption.AdaptionsEndPoint;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.feign.GeographyClient;
-import com.yihu.ehr.feign.JsonPackageClient;
-import com.yihu.ehr.feign.PatientClient;
-import com.yihu.ehr.feign.SecurityClient;
+import com.yihu.ehr.feign.*;
 import com.yihu.ehr.model.geogrephy.MGeography;
 import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.model.security.MKey;
@@ -18,6 +15,7 @@ import com.yihu.ehr.util.encode.Base64;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -56,6 +54,9 @@ public class LegacyEndPoint {
     @Autowired
     private JsonPackageClient jsonPackageClient;
 
+    @Autowired
+    private AdapterDispatchClient adapterDispatchClient;
+
     @ApiOperation(value = "下载标准版本", response = RestEcho.class)
     @RequestMapping(value = "/adapter-dispatcher/versionplan", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
     public Object getVersion(
@@ -75,8 +76,15 @@ public class LegacyEndPoint {
             @ApiParam(required = true, name = "orgcode", value = "机构代码")
             @RequestParam(value = "orgcode", required = true) String orgCode) {
 
-        return adaptions.getOrgAdaptions(userName, versionCode, orgCode);
+        MKey mKey = securityClient.getUserKey(userName);
+        if (mKey == null) {
+            return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed, "获取用户密钥失败");
+        }
+        Object object = adapterDispatchClient.getALLSchemeMappingInfo(mKey.getPrivateKey(), versionCode, orgCode);
+        return object;
     }
+
+
 
 
     @ApiOperation(value = "机构数据元", response = RestEcho.class)
