@@ -46,7 +46,10 @@ public class GeographyController extends BaseRestController{
             @ApiParam(name = "id", value = "地址代码", defaultValue = "")
             @PathVariable(value = "id") String id) {
         Geography address = geographyService.getAddressById(id);
-        String addressStr = geographyService.getCanonicalAddress(address);
+        String addressStr = "";
+        if(address != null){
+            addressStr = geographyService.getCanonicalAddress(address);
+        }
         return addressStr;
     }
 
