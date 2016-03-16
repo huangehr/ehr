@@ -128,5 +128,5 @@
             <span>关闭</span>
         </div>
     </div>
-    <input type="hidden" id="inp_parientCopyId">
+    <input type="hidden" id="inp_patientCopyId">
 </div>

@@ -1,15 +1,21 @@
 package com.yihu.ehr.ha.adapter.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.adapter.AdapterDataSetDetailModel;
 import com.yihu.ehr.agModel.adapter.AdapterDataSetModel;
 import com.yihu.ehr.agModel.adapter.AdapterRelationshipModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.ha.adapter.service.AdapterDataSetClient;
+import com.yihu.ehr.ha.adapter.service.OrgDataSetClient;
+import com.yihu.ehr.ha.adapter.service.OrgMetaDataClient;
+import com.yihu.ehr.ha.adapter.service.PlanClient;
 import com.yihu.ehr.ha.adapter.utils.ExtendController;
-import com.yihu.ehr.model.adaption.MAdapterDataSet;
-import com.yihu.ehr.model.adaption.MAdapterRelationship;
+import com.yihu.ehr.ha.std.service.DataSetClient;
+import com.yihu.ehr.model.adaption.*;
+import com.yihu.ehr.model.standard.MStdDataSet;
+import com.yihu.ehr.model.standard.MStdMetaData;
 import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.validate.Valid;
 import com.yihu.ehr.util.validate.ValidateResult;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -34,6 +40,21 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
     @Autowired
     AdapterDataSetClient adapterDataSetClient;
 
+    @Autowired
+    DataSetClient dataSetClient;
+
+    @Autowired
+    OrgDataSetClient orgDataSetClient;
+
+    @Autowired
+    OrgMetaDataClient orgMetaDataClient;
+
+    @Autowired
+    PlanClient planClient;
+
+    @Autowired
+    ObjectMapper objectMapper;
+
     @RequestMapping(value = "/metadata/{id}", method = RequestMethod.GET)
     public Envelop getAdapterMetaDataById(
             @ApiParam(name = "id", value = "适配关系ID")
@@ -50,11 +71,11 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
         }
     }
 
-    @RequestMapping(value = "/plan/{planId}/datasets", method = RequestMethod.GET)
+    @RequestMapping(value = "/plan/data_set/{plan_id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据方案ID及查询条件查询数据集适配关系")
     public Envelop searchAdapterDataSet(
-            @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
-            @PathVariable(value = "planId") Long planId,
+            @ApiParam(name = "plan_id", value = "适配方案id", defaultValue = "")
+            @PathVariable(value = "plan_id") long planId,
             @ApiParam(name = "code", value = "代码查询值", defaultValue = "")
             @RequestParam(value = "code", required = false) String code,
             @ApiParam(name = "name", value = "名称查询值", defaultValue = "")
@@ -76,13 +97,13 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
         return getResult(adapterRelationshipModels, getTotalCount(responseEntity), page, size);
     }
 
-    @RequestMapping(value = "/plan/{planId}/datasets/{dataSetId}/datametas", method = RequestMethod.GET)
+    @RequestMapping(value = "/plan/meta_data/{plan_id}/{set_id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据dataSetId搜索数据元适配关系")
     public Envelop searchAdapterMetaData(
-            @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
-            @PathVariable(value = "planId") Long planId,
-            @ApiParam(name = "dataSetId", value = "数据集id", defaultValue = "")
-            @PathVariable(value = "dataSetId") Long dataSetId,
+            @ApiParam(name = "plan_id", value = "适配方案id", defaultValue = "")
+            @PathVariable(value = "plan_id") Long planId,
+            @ApiParam(name = "set_id", value = "数据集id", defaultValue = "")
+            @PathVariable(value = "set_id") Long dataSetId,
             @ApiParam(name = "code", value = "代码查询值", defaultValue = "")
             @RequestParam(value = "code", required = false) String code,
             @ApiParam(name = "name", value = "名称查询值", defaultValue = "")
@@ -94,8 +115,8 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) throws Exception {
 
-        ResponseEntity<Collection<MAdapterDataSet>> responseEntity = adapterDataSetClient.searchAdapterMetaData(planId, dataSetId, code, name, sorts, size, page);
-        List<MAdapterDataSet> mAdapterDataSets = (List<MAdapterDataSet>) responseEntity.getBody();
+        ResponseEntity<Collection<MAdapterDataVo>> responseEntity = adapterDataSetClient.searchAdapterMetaData(planId, dataSetId, code, name, sorts, size, page);
+        List<MAdapterDataVo> mAdapterDataSets = (List<MAdapterDataVo>) responseEntity.getBody();
         List<AdapterDataSetModel> adapterDataSetModels = (List<AdapterDataSetModel>) convertToModels(
                 mAdapterDataSets,
                 new ArrayList<>(), AdapterDataSetModel.class, null);
@@ -115,11 +136,15 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
             if (!validateResult.isRs()) {
                 return failed(validateResult.getMsg());
             }
-            MAdapterDataSet mAdapterDataSet = adapterDataSetClient.updateAdapterMetaData(dataModel.getId(), model);
+
+            AdapterDataSetDetailModel detailModel = convertToModel(dataModel,AdapterDataSetDetailModel.class);
+
+            MAdapterDataSet mAdapterDataSet = adapterDataSetClient.updateAdapterMetaData(detailModel.getId(),objectMapper.writeValueAsString(detailModel));
             if (mAdapterDataSet == null) {
                 return failed("保存失败!");
             }
-            return success(getModel(mAdapterDataSet));
+            AdapterDataSetModel adapterDataSetModel = convertAdapterDataSetModel(mAdapterDataSet);
+            return success(adapterDataSetModel);
         } catch (ApiException e) {
             e.printStackTrace();
             return failed(e.getMessage());
@@ -133,7 +158,7 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
     @RequestMapping(value = "/metadata", method = RequestMethod.POST)
     public Envelop addAdapterMetaData(
             @ApiParam(name = "model", value = "说明")
-            @Valid @RequestParam(value = "model") String model) throws Exception {
+            @RequestParam(value = "model") String model) throws Exception {
 
         try {
             AdapterDataSetModel dataModel = jsonToObj(model);
@@ -141,11 +166,14 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
             if (!validateResult.isRs()) {
                 return failed(validateResult.getMsg());
             }
-            MAdapterDataSet mAdapterDataSet = adapterDataSetClient.createAdapterMetaData(model);
+
+            AdapterDataSetDetailModel detailModel = convertToModel(dataModel,AdapterDataSetDetailModel.class);
+            MAdapterDataSet mAdapterDataSet = adapterDataSetClient.createAdapterMetaData(objectMapper.writeValueAsString(detailModel));
             if (mAdapterDataSet == null) {
                 return failed("保存失败!");
             }
-            return success(getModel(mAdapterDataSet));
+            AdapterDataSetModel adapterDataSetModel = convertAdapterDataSetModel(mAdapterDataSet);
+            return success(adapterDataSetModel);
         } catch (Exception ex) {
             ex.printStackTrace();
             return failedSystem();
@@ -153,7 +181,7 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
     }
 
 
-    @RequestMapping(value = "/metadatas", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/meta_data", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除适配关系", notes = "根据适配关系ID删除适配关系，批量删除时ID以逗号隔开")
     public Envelop deleteAdapterMetaData(
             @ApiParam(name = "ids", value = "适配关系ID")
@@ -173,5 +201,44 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
             ex.printStackTrace();
             return failedSystem();
         }
+    }
+
+    public AdapterDataSetModel convertAdapterDataSetModel(MAdapterDataSet mAdapterDataSet){
+
+        AdapterDataSetModel adapterDataSetModel = convertToModel(mAdapterDataSet,AdapterDataSetModel.class);
+
+        long planId = adapterDataSetModel.getAdapterPlanId();
+        MAdapterPlan mAdapterPlan = planClient.getAdapterPlanById(planId);
+        String versionCode = mAdapterPlan.getVersion();
+
+        long dataSetId = adapterDataSetModel.getDataSetId()==null?0:adapterDataSetModel.getDataSetId();
+        if (dataSetId != 0) {
+            MStdDataSet mStdDataSet = dataSetClient.getDataSet(dataSetId, versionCode);
+            adapterDataSetModel.setDataSetCode(mStdDataSet == null ? "" : mStdDataSet.getCode());
+            adapterDataSetModel.setDataSetName(mStdDataSet == null ? "" : mStdDataSet.getName());
+        }
+
+        long metaDataId = adapterDataSetModel.getMetaDataId()==null?0:adapterDataSetModel.getMetaDataId();
+        if (metaDataId != 0) {
+            MStdMetaData mStdMetaData = dataSetClient.getMetaData(metaDataId, versionCode);
+            adapterDataSetModel.setMetaDataCode(mStdMetaData == null ? "" : mStdMetaData.getCode());
+            adapterDataSetModel.setMetaDataName(mStdMetaData == null ? "" : mStdMetaData.getName());
+        }
+
+        long orgDataSetSeq = adapterDataSetModel.getOrgDataSetSeq()==null?0:adapterDataSetModel.getOrgDataSetSeq();
+        if (orgDataSetSeq != 0) {
+            MOrgDataSet mOrgDataSet = orgDataSetClient.getDataSetBySequence(mAdapterPlan.getOrg(), orgDataSetSeq);
+            adapterDataSetModel.setOrgDataSetCode(mOrgDataSet == null ? "" : mOrgDataSet.getCode());
+            adapterDataSetModel.setOrgDataSetName(mOrgDataSet == null ? "" : mOrgDataSet.getName());
+        }
+
+        long orgMateDataSeq =  adapterDataSetModel.getOrgMetaDataSeq()==null?0:adapterDataSetModel.getOrgMetaDataSeq();
+        if(orgMateDataSeq!=0)
+        {
+            MOrgMetaData mOrgMetaData = orgMetaDataClient.getMetaDataBySequence(mAdapterPlan.getOrg(),Integer.parseInt(String.valueOf(orgMateDataSeq)));
+            adapterDataSetModel.setOrgMetaDataCode(mOrgMetaData==null?"":mOrgMetaData.getCode());
+            adapterDataSetModel.setOrgMetaDataName(mOrgMetaData==null?"":mOrgMetaData.getName());
+        }
+        return adapterDataSetModel;
     }
 }

@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -101,8 +102,7 @@ public class PatientController extends BaseController {
             patients.add(patient);
         }
 
-        Envelop envelop = getResult(patients, getTotalCount(responseEntity), page, rows);
-        return envelop;
+        return getResult(patients, getTotalCount(responseEntity), page, rows);
     }
 
 
@@ -164,7 +164,7 @@ public class PatientController extends BaseController {
             @RequestParam(value = "patientModelJsonData") String patientModelJsonData) throws Exception {
 
         PatientDetailModel detailModel = objectMapper.readValue(patientModelJsonData, PatientDetailModel.class);
-        String errorMsg = null;
+        String errorMsg = "";
         if (StringUtils.isEmpty(detailModel.getName())) {
             errorMsg += "姓名不能为空!";
         }
@@ -237,7 +237,7 @@ public class PatientController extends BaseController {
             @RequestParam(value = "patient_model_json_data") String patientModelJsonData) throws Exception {
 
         PatientDetailModel detailModel = objectMapper.readValue(patientModelJsonData, PatientDetailModel.class);
-        String errorMsg = null;
+        String errorMsg = "";
         if (StringUtils.isEmpty(detailModel.getName())) {
             errorMsg += "姓名不能为空!";
         }
@@ -293,6 +293,21 @@ public class PatientController extends BaseController {
     }
 
     /**
+     * 身份证是否已存在校验
+     *
+     * @param idCardNo
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/populations/is_exist/{id_card_no}", method = RequestMethod.GET)
+    @ApiOperation(value = "判断身份证是否存在")
+    public boolean isExistIdCardNo(
+            @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
+            @PathVariable(value = "id_card_no") String idCardNo) throws Exception {
+        return patientClient.isExistIdCardNo(idCardNo);
+    }
+
+    /**
      * 初始化密码
      *
      * @param idCardNo
@@ -310,10 +325,15 @@ public class PatientController extends BaseController {
     public PatientDetailModel MDemographicInfoToPatientDetailModel(MDemographicInfo demographicInfo) {
         PatientDetailModel detailModel = convertToModel(demographicInfo, PatientDetailModel.class);
 
-        MConventionalDict dict = conventionalDictClient.getMartialStatus(detailModel.getMartialStatus());
+        MConventionalDict dict = null;
+        if (detailModel.getMartialStatus()!=null){
+            dict = conventionalDictClient.getMartialStatus(detailModel.getMartialStatus());
+        }
         detailModel.setMartialStatusName(dict == null ? "" : dict.getValue());
 
-        dict = conventionalDictClient.getNation(detailModel.getNation());
+        if (detailModel.getNation()!=null){
+            dict = conventionalDictClient.getNation(detailModel.getNation());
+        }
         detailModel.setNationName(dict == null ? "" : dict.getValue());
 
         MGeography mGeography = null;
@@ -341,6 +361,22 @@ public class PatientController extends BaseController {
                 detailModel.setWorkAddressInfo(convertToModel(mGeography, GeographyModel.class));
             }
         }
+
+        //联系电话
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, String> telphoneNo;
+            String tag="联系电话";
+            telphoneNo = mapper.readValue(detailModel.getTelphoneNo(), Map.class);
+            if (telphoneNo != null && telphoneNo.containsKey(tag)) {
+                detailModel.setTelphoneNo(telphoneNo.get(tag));
+            } else {
+                detailModel.setTelphoneNo(null);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         return detailModel;
     }
 

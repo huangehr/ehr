@@ -89,6 +89,9 @@ public class OrgDataSetControllerTests {
         envelop = orgDataSetController.saveOrgDataSet(objectMapper.writeValueAsString(dataSetModel));
         assertTrue("修改失败!", envelop.isSuccessFlg() && envelop.getObj() != null && ((OrgDataSetDetailModel) envelop.getObj()).getName().equals("test_cms_name_c"));
 
+        envelop = orgDataSetController.getDataSetBySequence(detailModel.getCode(),dataSetModel.getSequence());
+        assertTrue("数据获取失败!",envelop.isSuccessFlg()&&envelop.getObj()!=null);
+
         envelop = orgDataSetController.deleteOrgDataSet(dataSetModel.getId());
         assertTrue("数据集删除失败!",envelop.isSuccessFlg());
 

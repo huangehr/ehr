@@ -1,12 +1,15 @@
 package com.yihu.ehr.api.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.api.model.OrgModel;
 import com.yihu.ehr.api.model.UserModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.feign.OrganizationClient;
 import com.yihu.ehr.feign.SecurityClient;
 import com.yihu.ehr.feign.UserClient;
+import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MKey;
+import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -47,7 +50,8 @@ public class UsersEndPoint extends BaseController {
         List<com.yihu.ehr.model.user.MUser> mUsers = userClient.getUsers();
         for (com.yihu.ehr.model.user.MUser mUser : mUsers) {
             UserModel UserModel = convertToModel(mUser, UserModel.class);
-            UserModel.setOrganization(organizationClient.getOrg(mUser.getOrganization()));
+            MOrganization mOrganization = organizationClient.getOrg(mUser.getOrganization());
+            UserModel.setOrganization(convertToModel(mOrganization, OrgModel.class));
             UserModels.add(UserModel);
         }
 
@@ -59,11 +63,12 @@ public class UsersEndPoint extends BaseController {
     public UserModel getUser(
             @ApiParam("user_name")
             @PathVariable("user_name") String userName) {
-        com.yihu.ehr.model.user.MUser mUser = userClient.getUserByUserName(userName);
+        MUser mUser = userClient.getUserByUserName(userName);
         UserModel UserModel = convertToModel(mUser, UserModel.class);
 
         if (mUser.getOrganization() != null) {
-            UserModel.setOrganization(organizationClient.getOrg(mUser.getOrganization()));
+            MOrganization mOrganization = organizationClient.getOrg(mUser.getOrganization());
+            UserModel.setOrganization(convertToModel(mOrganization, OrgModel.class));
         }
 
         return UserModel;

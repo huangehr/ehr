@@ -117,7 +117,7 @@ public interface UserClient {
      * @param loginCode
      * @return
      */
-    @RequestMapping(value = "/users/login/{login_code}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/users/{login_code}" , method = RequestMethod.GET)
     @ApiOperation(value = "根据登录账号获取当前用户",notes = "根据登陆用户名及密码验证用户")
     MUser getUserByLoginCode(
             @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
@@ -130,7 +130,7 @@ public interface UserClient {
             @PathVariable(value = "login_code") String loginCode);
 
     @RequestMapping(value = "/users/is_exist/{id_card}" , method = RequestMethod.GET)
-    @ApiOperation(value = "判断账户是否存在")
+    @ApiOperation(value = "判断身份证是否存在")
     boolean isIdCardExists(
             @ApiParam(name = "id_card", value = "id_card", defaultValue = "")
             @PathVariable(value = "id_card") String idCard);

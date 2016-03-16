@@ -1,5 +1,6 @@
 package com.yihu.ehr.patient.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
@@ -35,12 +36,6 @@ public class PatientController {
     public PatientController() {
     }
 
-/*    @RequestMapping("initial")
-    public String patientInitial(Model model) {
-
-        return "/patient/patient";
-    }*/
-
     @RequestMapping("initial")
     public String patientInitial(Model model) {
         model.addAttribute("contentPage", "/patient/patient");
@@ -60,17 +55,22 @@ public class PatientController {
                 model.addAttribute("contentPage", "patient/patientInfoDialog");
                 return "generalView";
             }else{
-                url = "/patient/patientDetail";
-                //todo 后台转换成model后传前台
+                url = "/populations/";
                 //todo 该controller的download方法放后台处理
-                resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-                model.addAttribute("patientModel", resultStr);
-                if (patientDialogType.equals("updatePatient")) {
-                    model.addAttribute("contentPage", "patient/patientInfoDialog");
-                    return "generalView";
-                }else if (patientDialogType.equals("patientInfoMessage")) {
-                    model.addAttribute("contentPage", "patient/patientBasicInfoDialog");
-                    return "simpleView";
+                resultStr = HttpClientUtil.doGet(comUrl + url + idCardNo, params, username, password);
+                ObjectMapper mapper = new ObjectMapper();
+                Envelop envelop = mapper.readValue(resultStr,Envelop.class);
+                if (envelop.isSuccessFlg()){
+                    model.addAttribute("patientModel", resultStr);
+                    if (patientDialogType.equals("updatePatient")) {
+                        model.addAttribute("contentPage", "patient/patientInfoDialog");
+                        return "generalView";
+                    }else if (patientDialogType.equals("patientInfoMessage")) {
+                        model.addAttribute("contentPage", "patient/patientBasicInfoDialog");
+                        return "simpleView";
+                    }
+                }else{
+                    return envelop.getErrorMsg();
                 }
                 return "";
             }
@@ -80,40 +80,6 @@ public class PatientController {
             result.setErrorMsg(ErrorCode.SystemError.toString());
             return result;
         }
-
-
-//        if (patientDialogType.equals("updatePatient")) {
-//            XDemographicInfo demographicInfo = demographicIndex.getDemographicInfo(new DemographicId(idCardNo));
-//            PatientModel patientModel = demographicIndex.getPatient(demographicInfo);
-//
-//            String localPath = download(patientModel);
-//            if(localPath != null){
-//                localPath = localPath.replaceAll("\\\\", "\\\\\\\\");
-//                patientModel.setLocalPath(localPath);
-//            }
-//            model.addAttribute("patientModel", patientModel);
-//            model.addAttribute("contentPage", "patient/patientInfoDialog");
-//            return "generalView";
-//        }
-//        if (patientDialogType.equals("addPatient")) {
-//            model.addAttribute("patientDialogType", "addPatient");
-//            model.addAttribute("contentPage", "patient/patientInfoDialog");
-//            return "generalView";
-//        }
-//        if (patientDialogType.equals("patientInfoMessage")) {
-//            XDemographicInfo demographicInfo = demographicIndex.getDemographicInfo(new DemographicId(idCardNo));
-//            PatientModel patientModel = demographicIndex.getPatient(demographicInfo);
-//
-//            String localPath = download(patientModel);
-//            if(localPath != null){
-//                localPath = localPath.replaceAll("\\\\", "\\\\\\\\");
-//                patientModel.setLocalPath(localPath);
-//            }
-//            model.addAttribute("patientModel", patientModel);
-//            model.addAttribute("contentPage", "patient/patientBasicInfoDialog");
-//            return "simpleView";
-//        }
-//        return null;
     }
 
     @RequestMapping("searchPatient")
@@ -130,7 +96,6 @@ public class PatientController {
         params.put("city", city);
         params.put("district", district);
         try {
-            //todo 返回result.toJson()
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             return resultStr;
         } catch (Exception e) {
@@ -138,21 +103,6 @@ public class PatientController {
             result.setErrorMsg(ErrorCode.SystemError.toString());
             return result;
         }
-//        Map<String, Object> conditionMap = new HashMap<>();
-//        conditionMap.put("name", searchNm);
-//        conditionMap.put("idCardNo", searchNm);
-//        conditionMap.put("page", page);
-//        conditionMap.put("pageSize", rows);
-//
-//        conditionMap.put("province", province);
-//        conditionMap.put("city", city);
-//        conditionMap.put("district", district);
-//
-//        List<PatientBrowseModel> patientBrowseModel = demographicIndex.searchPatientBrowseModel(conditionMap);
-//        Integer totalCount = demographicIndex.searchPatientInt(conditionMap);
-//        Result result = getResult(patientBrowseModel, totalCount, page, rows);
-//
-//        return result.toJson();
     }
 
     @RequestMapping("deletePatient")
@@ -161,11 +111,11 @@ public class PatientController {
     * "idCardNo":""  //身份证号
     */
     public Object deletePatient(String idCardNo) {
-        String url = "/patient/deletePatient";
+        String url = "/populations/"+idCardNo;
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("idCardNo",idCardNo);
+        params.put("id_card_no",idCardNo);
         try {
             resultStr = HttpClientUtil.doDelete(comUrl + url, params, username, password);
             if(Boolean.parseBoolean(resultStr)){
@@ -211,15 +161,14 @@ public class PatientController {
     /**
      * 检查身份证是否已经存在
      */
-    //todo 因暂时无法从后台获取到错误信息，所以网关中还要添加此方法来做判断是否存在身份证
     @RequestMapping("checkIdCardNo")
     @ResponseBody
     public Object checkIdCardNo(String searchNm) {
-        String url = "/patient/checkIdCardNo";
+        String url = "/populations/is_exist/"+searchNm;
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("searchNm",searchNm);
+        params.put("id_card_no",searchNm);
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             if(Boolean.parseBoolean(resultStr)){
@@ -248,14 +197,14 @@ public class PatientController {
     public Object updatePatient(String patientJsonData,HttpServletRequest request, HttpServletResponse response) throws IOException {
         //将文件保存至服务器，返回文件的path，
         //String picPath = webupload(request, response);//网关中处理webupload
-        String url = "/patient/updatePatient";
+        String url = "/populations";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("patientJsonData",patientJsonData);
+        params.put("patient_model_json_data",patientJsonData);
         try {
             //todo 后台转换成model后传前台
-            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+            resultStr = HttpClientUtil.doPut(comUrl + url, params, username, password);
             result.setObj(resultStr);
             result.setSuccessFlg(true);
             return result;

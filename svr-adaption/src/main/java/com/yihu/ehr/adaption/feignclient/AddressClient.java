@@ -3,6 +3,9 @@ package com.yihu.ehr.adaption.feignclient;
 
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.MicroServiceIpAddressStr;
+import com.yihu.ehr.constants.MicroServiceName;
+import com.yihu.ehr.constants.MicroServicePort;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
@@ -18,13 +21,13 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @created 2016.2.1
  */
 @EnableFeignClients
-@FeignClient("svr-address")
+@FeignClient(name = MicroServiceName.Geography)
 @RequestMapping(ApiVersion.Version1_0)
 public interface AddressClient {
 
     @RequestMapping(value = "/address/address", method = RequestMethod.PUT)
     @ApiOperation(value = "地址检查并保存")
-    public Object saveAddress(
+    Object saveAddress(
             @ApiParam(name = "country", value = "国家", defaultValue = "")
             @RequestParam(value = "country") String country,
             @ApiParam(name = "province", value = "省", defaultValue = "")

@@ -15,6 +15,9 @@ import java.util.List;
 public interface XOrgDictRepository extends PagingAndSortingRepository<OrgDict, Long> {
 
     @Query("select orgDict from OrgDict orgDict where organization = :orgCode and (code = :code )")
-    List<OrgDataSet> isExistOrgDict(@Param("orgCode") String orgCode, @Param("code") String code);
+    List<OrgDict> isExistOrgDict(@Param("orgCode") String orgCode, @Param("code") String code);
+
+    @Query("select orgDict from OrgDict orgDict where organization = :org_code and sequence = :sequence ")
+    OrgDict getOrgDictBySequence(@Param("org_code")String orgCode,@Param("sequence") int sequence);
 
 }

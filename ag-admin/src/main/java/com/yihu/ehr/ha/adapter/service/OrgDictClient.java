@@ -74,4 +74,9 @@ public interface OrgDictClient {
     boolean isExistDict(
             @RequestParam(value = "org_code") String orgCode,
             @RequestParam(value = "dict_code") String dictCode);
+
+    @RequestMapping(value = "/adapter/org/dict/org_dict",method = RequestMethod.GET)
+    MOrgDict getOrgDictBySequence(
+            @RequestParam(value = "org_code") String orgCode,
+            @RequestParam(value = "sequence") int sequence);
 }

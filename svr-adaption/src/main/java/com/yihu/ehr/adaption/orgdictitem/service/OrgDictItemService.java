@@ -99,4 +99,7 @@ public class OrgDictItemService extends BaseJpaService<OrgDictItem, XOrgDictItem
         return query.list();
     }
 
+    public OrgDictItem getOrgDicEntryBySequence(String orgCode,int sequence){
+        return ((XOrgDictItemRepository) getRepository()).getOrgDicEntryBySequence(orgCode, sequence);
+    }
 }

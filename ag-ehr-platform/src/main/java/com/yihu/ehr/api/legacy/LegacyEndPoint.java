@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.api.adaption.AdaptionsEndPoint;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.feign.GeographyClient;
-import com.yihu.ehr.feign.JsonPackageClient;
-import com.yihu.ehr.feign.PatientClient;
-import com.yihu.ehr.feign.SecurityClient;
+import com.yihu.ehr.feign.*;
 import com.yihu.ehr.model.geogrephy.MGeography;
 import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.model.security.MKey;
@@ -56,18 +53,28 @@ public class LegacyEndPoint {
     @Autowired
     private JsonPackageClient jsonPackageClient;
 
+    @Autowired
+    private AdapterDispatchClient adaptionClient;
+
+    @Autowired
+    private StandardDispatchClient standardDispatchClient;
+
     @ApiOperation(value = "下载标准版本", response = RestEcho.class)
     @RequestMapping(value = "/adapter-dispatcher/versionplan", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
     public Object getVersion(
             @ApiParam(name = "org_code", value = "机构编码")
             @RequestParam(value = "org_code") String orgCode) throws Exception {
 
-        return adaptions.getCDAVersionInfoByOrgCode(orgCode);
+        if (org.apache.commons.lang.StringUtils.isEmpty(orgCode)) {
+            return new RestEcho().failed(ErrorCode.MissParameter, "缺失参数:org_code!");
+        }
+        Object object = adaptionClient.getCDAVersionInfoByOrgCode(orgCode);
+        return object;
     }
 
     @ApiOperation(value = "下载标准版本列表", response = RestEcho.class)
     @RequestMapping(value = "/adapter-dispatcher/allSchemaMappingPlan", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
-    public Object getVersions(
+    public Object getAllVerions(
             @ApiParam(required = true, name = "user_name", value = "用户名")
             @RequestParam(value = "user_name", required = true) String userName,
             @ApiParam(required = true, name = "versionCode", value = "适配标准版本")
@@ -75,7 +82,12 @@ public class LegacyEndPoint {
             @ApiParam(required = true, name = "orgcode", value = "机构代码")
             @RequestParam(value = "orgcode", required = true) String orgCode) {
 
-        return adaptions.getOrgAdaptions(userName, versionCode, orgCode);
+        MKey mKey = securityClient.getUserKey(userName);
+        if (mKey == null) {
+            return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed, "获取用户密钥失败");
+        }
+        Object object = adaptionClient.getALLSchemeMappingInfo(mKey.getPrivateKey(), versionCode, orgCode);
+        return object;
     }
 
     @ApiOperation(value = "机构数据元", response = RestEcho.class)
@@ -88,7 +100,13 @@ public class LegacyEndPoint {
             @ApiParam(required = true, name = "current_version", value = "用户当前使用的版本")
             @RequestParam(value = "current_version", required = false) String currentVersion) throws Exception {
 
-        return adaptions.getOrgSchema(userName, updateVersion, null);
+        MKey mKey = securityClient.getUserKey(userName);
+        if (mKey == null) {
+            return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed, "获取用户密钥失败");
+        }
+
+        Object restEcho = standardDispatchClient.getSchemeInfo(mKey.getPrivateKey(), updateVersion, currentVersion);
+        return restEcho;
     }
 
     @ApiOperation(value = "标准映射", response = RestEcho.class)
@@ -101,9 +119,13 @@ public class LegacyEndPoint {
             @ApiParam(required = true, name = "org_code", value = "机构代码")
             @RequestParam(value = "org_code", required = true) String orgCode) throws Exception {
 
-        return adaptions.getOrgAdaption(userName, versionCode, orgCode);
+        MKey mKey = securityClient.getUserKey(userName);
+        if (mKey == null) {
+            return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed, "获取用户密钥失败");
+        }
+        Object object = adaptionClient.getSchemeMappingInfo(mKey.getPrivateKey(), versionCode, orgCode);
+        return object;
     }
-
 
     /**
      * 病人注册。requestBody格式:
@@ -166,6 +188,12 @@ public class LegacyEndPoint {
         Map<String, Object> patient = patients.get(0);
 
         String inner_version = (String) fields.get("inner_version");
+//        String patient_id = (String) fields.get("patient_id");
+//        String event_no = (String) fields.get("event_no");
+//        String event_time = (String) fields.get("event_time");
+//        String org_code = (String) fields.get("org_code");
+//        String ds_code = (String) fields.get("code");
+
         String userName = "";   //本人姓名
         String idCardNo = "";   //身份证件号码
         String birthday = "";   //出生日期
@@ -318,7 +346,6 @@ public class LegacyEndPoint {
         byte[] bytes = multipartFile.getBytes();
         String fileString = Base64.encode(bytes);
         jsonPackageClient.savePackageWithUser(fileString, userName, packageCrypto, md5);
-
         return new RestEcho().success().putMessage("ok");
     }
 
@@ -331,7 +358,6 @@ public class LegacyEndPoint {
         String publicKey = userSecurity.getPublicKey();
         RestEcho restEcho = new RestEcho().success();
         restEcho.putResult("public_key", publicKey);
-
         return restEcho;
     }
 
@@ -352,7 +378,7 @@ public class LegacyEndPoint {
         restEcho.putResult("access_token", map.get("access_token"));
         restEcho.putResult("refresh_token", map.get("refresh_token"));
         restEcho.putResult("expires_in", map.get("expires_in"));
-
         return restEcho;
+
     }
 }

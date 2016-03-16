@@ -8,6 +8,7 @@ import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomi
 import org.springframework.boot.context.embedded.tomcat.TomcatConnectorCustomizer;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.util.ResourceUtils;
 
@@ -18,6 +19,7 @@ import java.io.FileNotFoundException;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableFeignClients
+@EnableEurekaClient
 public class EHRPlatformGatewayApp  {
     @Value("${server.port}")
     int port;

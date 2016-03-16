@@ -138,17 +138,9 @@
                             $('#inp_major_div').show();
                         else
                             $('#inp_major_div').hide();
-                        if (Util.isStrEquals(value, 'Doctor')) {
-                         userInfo.$major.parent().parent().addClass("essential");
-                         userInfo.$major.addClass("required useTitle");
-                         } else {
-                         userInfo.$major.parent().parent().removeClass("essential");
-                         userInfo.$major.removeClass("required useTitle");
-                         }
                     }
                 });
 
-                debugger
                 this.$form.attrScan();
                 this.$form.Fields.fillValues({
                     id: user.id,
@@ -218,15 +210,15 @@
                 function checkDataSourceName(type, searchNm, errorMsg) {
                     var result = new jValidation.ajax.Result();
                     var dataModel = $.DataModel.init();
-                    dataModel.fetchRemote("${contextRoot}/user/searchUser", {
-                        data: {type: type, searchNm: searchNm},
+                    dataModel.fetchRemote("${contextRoot}/user/existence", {
+                        data: {existenceType: type, existenceNm: searchNm},
                         async: false,
                         success: function (data) {
                             if (data.successFlg) {
-                                result.setResult(true);
-                            } else {
                                 result.setResult(false);
                                 result.setErrorMsg(errorMsg);
+                            } else {
+                                result.setResult(true);
                             }
                         }
                     });
@@ -237,7 +229,7 @@
                 this.$updateUserDtn.click(function () {
 
                     var userImgHtml = self.$imageShow.children().length;
-//                    if (validator.validate()) {
+                    if (validator.validate()) {
                         userModel = self.$form.Fields.getValues();
                         var organizationKeys = userModel.organization['keys'];
 
@@ -256,12 +248,9 @@
                                 updateUser(userModel);
                             }
                         }
-                        /* var upload = self.$uploader.instance;
-                         upload.options.formData.userModelJsonData =  JSON.stringify(userModel);
-                         upload.upload();*/
-//                    } else {
-//                        return;
-//                    }
+                    } else {
+                        return;
+                    }
                 });
 
                 function updateUser(userModel) {

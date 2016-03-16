@@ -3,6 +3,7 @@ package com.yihu.ehr.ha.adapter.service;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.adaption.MAdapterDataSet;
+import com.yihu.ehr.model.adaption.MAdapterDataVo;
 import com.yihu.ehr.model.adaption.MAdapterRelationship;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -46,7 +47,7 @@ public interface AdapterDataSetClient {
 
     @RequestMapping(value = "/plan/{planId}/datasets/{dataSetId}/datametas", method = RequestMethod.GET)
     @ApiOperation(value = "根据dataSetId搜索数据元适配关系")
-    ResponseEntity<Collection<MAdapterDataSet>> searchAdapterMetaData(
+    ResponseEntity<Collection<MAdapterDataVo>> searchAdapterMetaData(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "dataSetId", value = "数据集id", defaultValue = "")
