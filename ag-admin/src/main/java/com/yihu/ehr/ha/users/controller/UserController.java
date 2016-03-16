@@ -103,7 +103,7 @@ public class UserController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = "/users/{user_id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/users/admin/{user_id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除用户", notes = "根据用户id删除用户")
     public Envelop deleteUser(
             @ApiParam(name = "user_id", value = "用户编号", defaultValue = "")
@@ -230,7 +230,7 @@ public class UserController extends BaseController {
     }
 
 
-    @RequestMapping(value = "users/{user_id}", method = RequestMethod.GET)
+    @RequestMapping(value = "users/admin/{user_id}", method = RequestMethod.GET)
     @ApiOperation(value = "获取用户信息", notes = "包括地址信息等")
     public Envelop getUser(
             @ApiParam(name = "user_id", value = "", defaultValue = "")
@@ -253,7 +253,7 @@ public class UserController extends BaseController {
     }
 
 
-    @RequestMapping(value = "/users/{user_id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/users/admin/{user_id}", method = RequestMethod.PUT)
     @ApiOperation(value = "改变用户状态", notes = "根据用户状态改变当前用户状态")
     public boolean activityUser(
             @ApiParam(name = "user_id", value = "id", defaultValue = "")
@@ -333,7 +333,7 @@ public class UserController extends BaseController {
      * @param loginCode
      * @return
      */
-    @RequestMapping(value = "/users/login/{login_code}", method = RequestMethod.GET)
+    @RequestMapping(value = "/users/{login_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据登录账号获取当前用户", notes = "根据登陆用户名及密码验证用户")
     public Envelop getUserByLoginCode(
             @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")

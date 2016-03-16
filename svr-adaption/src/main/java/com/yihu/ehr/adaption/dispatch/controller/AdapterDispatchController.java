@@ -150,18 +150,16 @@ public class AdapterDispatchController {
 
     @RequestMapping(value = "/versionplan", method = RequestMethod.GET)
     @ApiOperation(value = "根据机构编码获取最新映射版本号 ", response = RestEcho.class, produces = "application/json", notes = "指定版本的信息")
-    public Object getCDAVersionInfoByOrgCode(@ApiParam(name = "org_code", value = "机构编码")
-                                             @RequestParam(value = "org_code")
-                                             String orgCode) throws Exception {
-
+    public Object getCDAVersionInfoByOrgCode(
+             @ApiParam(name = "org_code", value = "机构编码")
+             @RequestParam(value = "org_code") String orgCode) throws Exception {
         try {
-
             Map<String, Object> args = new HashMap<>();
             args.put("orgcode", orgCode);
 
             List<OrgAdapterPlan> listPlan = orgAdapterPlanService.getOrgAdapterPlanByOrgCode(args);
 
-            if (false && listPlan != null && listPlan.size() > 0) {
+            if (listPlan != null && listPlan.size() > 0) {
                 RestEcho restEcho = new RestEcho().success();
                 MCDAVersion version = stdVersionClient.getVersion(listPlan.get(0).getVersion());
                 restEcho.putResult("version", version.getVersion());
