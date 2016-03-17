@@ -74,6 +74,18 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
         }
     }
 
+    public User getUserByEmail(String email) {
+        Map<String,String> map =new HashMap<>();
+        Session session = entityManager.unwrap(Session.class);
+        Query query = session.createQuery("from User where email = :email");
+        List<User> userList = query.setString("email", email).list();
+        if(userList.size()== 0) {
+            return null;
+        }else {
+            return userList.get(0);
+        }
+    }
+
     public String hashPassword(String pwd) {
         return HashUtil.hashStr(pwd);
     }
