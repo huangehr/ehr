@@ -14,7 +14,7 @@ public enum BizObject {
     User((short)0x0003),
     Card((short)0x0004),
     JsonPackage((short)0x0005),
-    StdArchive((short)0x0006),
+    StdProfile((short)0x0006),
     HealthEvent((short)0x0007),
     ADAPTER((short)0x0008),
     STANDARD((short)0x0009),

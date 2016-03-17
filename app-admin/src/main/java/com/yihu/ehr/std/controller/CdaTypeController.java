@@ -346,7 +346,7 @@ public class CdaTypeController {
             boolean iResult = false;
             if (info.getId() == "") {
                 XEnvironmentOption environmentOption = ServiceFactory.getService(Services.EnvironmentOption);
-                Object objectID = new ObjectId(Short.parseShort(environmentOption.getOption(EnvironmentOptions.AdminRegion)), BizObject.StdArchive);
+                Object objectID = new ObjectId(Short.parseShort(environmentOption.getOption(EnvironmentOptions.AdminRegion)), BizObject.StdProfile);
                 xcdaType.setId(objectID.toString());
                 iResult = xcdaTypeManager.insertCdaType(xcdaType);
             } else {

@@ -38,7 +38,7 @@ public interface UserClient {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) ;
 
-    @RequestMapping(value = "/users/{user_id}" , method = RequestMethod.DELETE)
+    @RequestMapping(value = "/users/admin/{user_id}" , method = RequestMethod.DELETE)
     @ApiOperation(value = "删除用户",notes = "根据用户id删除用户")
     boolean deleteUser(
             @ApiParam(name = "user_id", value = "用户编号", defaultValue = "")
@@ -59,14 +59,14 @@ public interface UserClient {
             @RequestParam(value = "user_json_data") String userJsonData);
 
 
-    @RequestMapping(value = "/users/{user_id}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/users/admin/{user_id}" , method = RequestMethod.GET)
     @ApiOperation(value = "获取用户信息",notes = "包括地址信息等")
     MUser getUser(
             @ApiParam(name = "user_id", value = "", defaultValue = "")
             @PathVariable(value = "user_id") String userId) ;
 
 
-    @RequestMapping(value = "/users/{user_id}" , method = RequestMethod.PUT)
+    @RequestMapping(value = "/users/admin/{user_id}" , method = RequestMethod.PUT)
     @ApiOperation(value = "改变用户状态",notes = "根据用户状态改变当前用户状态")
     boolean  activityUser (
             @ApiParam(name = "user_id", value = "id", defaultValue = "")

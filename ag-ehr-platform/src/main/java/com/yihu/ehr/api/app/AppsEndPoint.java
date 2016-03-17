@@ -1,6 +1,6 @@
 package com.yihu.ehr.api.app;
 
-import com.yihu.ehr.api.model.MToken;
+import com.yihu.ehr.api.model.TokenModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.service.oauth2.EhrTokenStoreService;
 import io.swagger.annotations.Api;
@@ -33,19 +33,19 @@ public class AppsEndPoint {
 
     @ApiOperation(value = "检查应用授权", notes = "提供用户名/密码作为Basic验证")
     @RequestMapping(value = "/{client_id}/tokens/{access_token}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.GET)
-    public MToken checkClientAuthorization(@ApiParam(value = "client_id")
+    public TokenModel checkClientAuthorization(@ApiParam(value = "client_id")
                                            @PathVariable("client_id") String clientId,
-                                           @ApiParam(value = "access_token")
+                                               @ApiParam(value = "access_token")
                                            @PathVariable("access_token") String accessToken) {
         OAuth2AccessToken token = tokenStoreService.readAccessToken(accessToken);
 
-        MToken mToken = new MToken();
-        mToken.setId(1);
-        mToken.setToken(token.getValue());
-        mToken.setTokenLastEight(token.getValue().substring(token.getValue().length() - 8));
-        mToken.setUpdatedAt(new Date());
+        TokenModel tokenModel = new TokenModel();
+        tokenModel.setId(1);
+        tokenModel.setToken(token.getValue());
+        tokenModel.setTokenLastEight(token.getValue().substring(token.getValue().length() - 8));
+        tokenModel.setUpdatedAt(new Date());
 
-        return mToken;
+        return tokenModel;
     }
 
     @ApiOperation(value = "重置应用授权", notes = "提供Client Id/Secret作为Basic验证")
