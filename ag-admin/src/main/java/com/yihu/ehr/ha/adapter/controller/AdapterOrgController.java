@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Created by AndyCai on 2016/1/26.
  */
-@RequestMapping(ApiVersion.Version1_0 + "/adapterOrg")
+@RequestMapping(ApiVersion.Version1_0 + "/admin/adapterOrg")
 @RestController
 public class AdapterOrgController extends BaseController {
 
