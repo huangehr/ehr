@@ -8,9 +8,12 @@
         var infoForm = null;
         var selForm = null;
         var jValidation = $.jValidation;
-//        var dialog = frameElement.dialog;
         var mode = '${mode}';
-        var info = JSON.parse('${info}');
+
+        if(!Util.isStrEquals(mode,'new')){
+            var info = JSON.parse('${info}');
+        }
+
         /* *************************** 函数定义 ******************************* */
         function pageInit() {
             infoForm.init();
@@ -48,31 +51,42 @@
                         selForm.show(true);
                     }});
                 this.$type.ligerComboBox({valueField: 'id',textField: 'name',readonly:mode=='modify'});
+                infoForm.initOrg(infoForm.$org, "");
+                infoForm.initAdapterOrg(infoForm.$parent, "");
                 this.initDDL(21, this.$type);
                 this.$name.ligerTextBox({width:240,validate:{required:true }});
                 this.$description.ligerTextBox({width:240,height:180 });
 
+
+                debugger
                 this.$form.attrScan();
-                var province = info.area.province || '';
-                var city =info.area.city || '';
-                var district =info.area.district || '';
-                var town =info.area.town || '';
-                var area=province;
-                if (province!=city){
-                    area +=city;
+                if(!Util.isStrEmpty(info)){
+                    var adapter = info.obj;
+                    var province = adapter.area.province || '';
+                    var city =adapter.area.city || '';
+                    var district =adapter.area.district || '';
+                    var town =adapter.area.town || '';
+                    var area=province;
+                    if (province!=city){
+                        area +=city;
+                    }
+                    area+=district+town;
+                    this.$area.ligerGetComboBoxManager().setValue(area);
+                    this.$area.ligerGetComboBoxManager().setText(area);
+                    this.$form.Fields.fillValues({
+                        code:adapter.code,
+                        name:adapter.name,
+                        description:adapter.description ,
+                        province : province ,
+                        city :city,
+                        district : district,
+                        town : town,
+                    });
                 }
-                area+=district+town;
-                this.$area.ligerGetComboBoxManager().setValue(area);
-                this.$area.ligerGetComboBoxManager().setText(area);
-                this.$form.Fields.fillValues({
-                    code:info.code,
-                    name:info.name,
-                    description:info.description ,
-                    province : province ,
-                    city :city,
-                    district : district,
-                    town : town
-                });
+
+
+
+
                 this.$form.show();
             },
             initDDL: function (dictId, target) {
@@ -107,13 +121,16 @@
                                 infoForm.initAdapterOrg(infoForm.$parent, type);
                             }
                         });
+                        if(!Util.isStrEmpty(info)){
+                            debugger
+                            var type = info.obj.type;
+                            var manager = target.ligerGetComboBoxManager();
+                            if(type)
+                                manager.selectValue(type);
+                            else
+                                manager.selectItemByIndex(0);
+                        }
 
-                        var type = info.type;
-                        var manager = target.ligerGetComboBoxManager();
-                        if(type)
-                            manager.selectValue(type);
-                        else
-                            manager.selectItemByIndex(0);
                     }});
 
 
@@ -171,8 +188,12 @@
                         g.grid.reload();
                     }
                 });
-                this.orgCodeCombo.setValue(info.org);
-                this.orgCodeCombo.setText(info.orgValue);
+
+                if(!Util.isStrEmpty(info)){
+                    debugger
+                    this.orgCodeCombo.setValue(info.obj.org);
+                    this.orgCodeCombo.setText(info.obj.orgValue);
+                }
                 var grid = this.orgCodeCombo.grid;
                 if(grid){
                     grid.set({
@@ -183,11 +204,14 @@
                 }
              },
             initAdapterOrg : function (target, type) {
+                debugger
+
+                var self = this;
                 var url = "${contextRoot}/adapterorg/searchAdapterOrgList?type="+type;
                 var gridOp = this.getGridOp([
                     {display : '名称', name :'name',width : 210}
                 ],url) ;
-                this.adapterOrgCombo = target.ligerComboBox({
+                self.adapterOrgCombo = target.ligerComboBox({
                     condition: { inputWidth: 90 ,width:0,labelWidth:0,hideSpace:true,fields: [{ name: 'param', label:''}] },//搜索框的字段, name 必须是服务器返回的字段
                     grid: gridOp,
                     valueField: 'code',
@@ -209,8 +233,11 @@
                         g.grid.reload();
                     }
                 });
-                this.adapterOrgCombo.setValue(info.parent);
-                this.adapterOrgCombo.setText(info.parentValue);
+
+                if(!Util.isStrEmpty(info)){
+                    self.adapterOrgCombo.setValue(info.obj.parent);
+                    self.adapterOrgCombo.setText(info.obj.parentValue);
+                }
                 var grid = this.adapterOrgCombo.grid;
                 if(grid){
                     grid.set({
@@ -314,6 +341,7 @@
                 area+=district+town;
                 this.$area.ligerGetComboBoxManager().setValue(area);
                 this.$area.ligerGetComboBoxManager().setText(area);
+
                 var org = this.$org.ligerGetComboBoxManager().getText();
                 if(area && org){
                     this.$name.val(org + '('+ area +')');
