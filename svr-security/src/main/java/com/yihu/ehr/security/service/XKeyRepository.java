@@ -7,7 +7,5 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  * @version 1.0
  * @created 2015.12.16 15:10
  */
-public interface XUserTokenRepository extends PagingAndSortingRepository<UserToken, String> {
-
-
+public interface XKeyRepository extends PagingAndSortingRepository<Key, String> {
 }
