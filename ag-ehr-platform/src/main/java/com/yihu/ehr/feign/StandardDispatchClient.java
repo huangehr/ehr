@@ -15,7 +15,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * Created by AndyCai on 2016/3/3.
  */
-@FeignClient(name = MicroServiceName.Standard)
+@FeignClient(name = MicroServiceName.Standard,url = MicroServiceIpAddressStr.Standard+MicroServicePort.Standard)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface StandardDispatchClient {

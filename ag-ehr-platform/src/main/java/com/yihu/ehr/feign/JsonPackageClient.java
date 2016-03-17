@@ -16,7 +16,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
  * @version 1.0
  * @created 2016.02.01 20:14
  */
-@FeignClient(name = MicroServiceName.Package)
+@FeignClient(name = MicroServiceName.Package,url = MicroServiceIpAddressStr.Package+MicroServicePort.Package)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface JsonPackageClient {
