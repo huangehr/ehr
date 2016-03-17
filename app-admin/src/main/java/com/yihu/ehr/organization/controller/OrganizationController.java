@@ -2,9 +2,11 @@ package com.yihu.ehr.organization.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.org.OrgDetailModel;
+import com.yihu.ehr.agModel.org.OrgModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
+import com.yihu.ehr.util.controller.BaseUIController;
 import com.yihu.ehr.util.log.LogService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -13,8 +15,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author zlf
@@ -23,7 +24,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/organization")
-public class OrganizationController {
+public class OrganizationController extends BaseUIController{
     @Value("${service-gateway.username}")
     private String username;
     @Value("${service-gateway.password}")
@@ -155,25 +156,26 @@ public class OrganizationController {
     public Object updateOrg(String orgModel,String addressModel,String mode) {
         //新增或修改 根据mode 选择
         String url = "/organizations";
-        String resultStr = "";
+        String envelopStr = "";
         Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("mOrganizationJsonData",orgModel);
         params.put("geography_model_json_data",addressModel);
         try {
             if("new".equals(mode)){
-                resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
+                envelopStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
             }else {
                 ObjectMapper objectMapper = new ObjectMapper();
                 //读取参数，转化为模型
                 OrgDetailModel org = objectMapper.readValue(orgModel,OrgDetailModel.class);
                 //查询数据库得到对应的模型
                 String getOrgUrl = "/organizations/"+org.getOrgCode();
-                resultStr = HttpClientUtil.doGet(comUrl + getOrgUrl, params, username, password);
-                Map<String,Object> map = objectMapper.readValue(resultStr,Map.class);
-                Object object = map.get("obj");
-                String strOrg = objectMapper.writeValueAsString(object);
-                OrgDetailModel orgForUpdate =(objectMapper.readValue(strOrg,OrgDetailModel.class));
+                String envelopStrGet = HttpClientUtil.doGet(comUrl + getOrgUrl, params, username, password);
+                envelop = objectMapper.readValue(envelopStrGet,Envelop.class);
+                if (!envelop.isSuccessFlg()){
+                    return envelop;
+                }
+                OrgDetailModel orgForUpdate = getEnvelopModel(envelop.getObj(),OrgDetailModel.class);
                 //将修改值存储到查询返回的对象中
                 orgForUpdate.setFullName(org.getFullName());
                 orgForUpdate.setShortName(org.getShortName());
@@ -184,9 +186,9 @@ public class OrganizationController {
                 orgForUpdate.setTags(org.getTags());
                 String mOrgUpdateJson = objectMapper.writeValueAsString(orgForUpdate);
                 params.put("mOrganizationJsonData",mOrgUpdateJson);
-                resultStr = HttpClientUtil.doPut(comUrl + url, params, username, password);
+                envelopStr = HttpClientUtil.doPut(comUrl + url, params, username, password);
             }
-            return resultStr;
+            return envelopStr;
         } catch (Exception e) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg(ErrorCode.SystemError.toString());
