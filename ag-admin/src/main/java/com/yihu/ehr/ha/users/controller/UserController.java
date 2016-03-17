@@ -10,7 +10,7 @@ import com.yihu.ehr.ha.organization.service.OrganizationClient;
 import com.yihu.ehr.ha.security.service.SecurityClient;
 import com.yihu.ehr.ha.users.service.UserClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.geogrephy.MGeography;
+import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MUser;
@@ -26,6 +26,8 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -101,7 +103,7 @@ public class UserController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = "/users/{user_id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/users/admin/{user_id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除用户", notes = "根据用户id删除用户")
     public Envelop deleteUser(
             @ApiParam(name = "user_id", value = "用户编号", defaultValue = "")
@@ -128,6 +130,7 @@ public class UserController extends BaseController {
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
 
+
         UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
 
         String errorMsg = null;
@@ -149,7 +152,7 @@ public class UserController extends BaseController {
         if (StringUtils.isNotEmpty(errorMsg)) {
             return failed(errorMsg);
         }
-        if (userClient.isLoginCodeExists(detailModel.getLoginCode())) {
+        if (userClient.isUserNameExists(detailModel.getLoginCode())) {
             return failed("账户已存在!");
         }
         if (userClient.isIdCardExists(detailModel.getIdCardNo())) {
@@ -166,7 +169,7 @@ public class UserController extends BaseController {
     }
 
 
-    @RequestMapping(value = "/users", method = RequestMethod.PUT)
+    @RequestMapping(value = "/users/", method = RequestMethod.PUT)
     @ApiOperation(value = "修改用户", notes = "重新绑定用户信息")
     public Envelop updateUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
@@ -195,7 +198,7 @@ public class UserController extends BaseController {
         }
         MUser mUser = userClient.getUser(detailModel.getId());
         if (!mUser.getLoginCode().equals(detailModel.getLoginCode())
-                && userClient.isLoginCodeExists(detailModel.getLoginCode())) {
+                && userClient.isUserNameExists(detailModel.getLoginCode())) {
             return failed("账户已存在!");
         }
 
@@ -215,7 +218,7 @@ public class UserController extends BaseController {
     }
 
 
-    @RequestMapping(value = "users/{user_id}", method = RequestMethod.GET)
+    @RequestMapping(value = "users/admin/{user_id}", method = RequestMethod.GET)
     @ApiOperation(value = "获取用户信息", notes = "包括地址信息等")
     public Envelop getUser(
             @ApiParam(name = "user_id", value = "", defaultValue = "")
@@ -238,7 +241,7 @@ public class UserController extends BaseController {
     }
 
 
-    @RequestMapping(value = "/users/{user_id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/users/admin/{user_id}", method = RequestMethod.PUT)
     @ApiOperation(value = "改变用户状态", notes = "根据用户状态改变当前用户状态")
     public boolean activityUser(
             @ApiParam(name = "user_id", value = "id", defaultValue = "")
@@ -273,15 +276,15 @@ public class UserController extends BaseController {
     /**
      * 重新分配秘钥
      *
-     * @param loginCode 账号
+     * @param userName 账号
      * @return map  key{publicKey:公钥；validTime：有效时间; startTime：生效时间}
      */
     @RequestMapping(value = "/users/key/{login_code}", method = RequestMethod.PUT)
     @ApiOperation(value = "重新分配密钥", notes = "重新分配密钥")
     public Map<String, String> distributeKey(
             @ApiParam(name = "login_code", value = "登录帐号", defaultValue = "")
-            @PathVariable(value = "login_code") String loginCode) {
-        MUser mUser = userClient.getUserByLoginCode(loginCode);
+            @PathVariable(value = "login_code") String userName) {
+        MUser mUser = userClient.getUserByUserName(userName);
         if (mUser == null) {
             return null;
         }
@@ -292,18 +295,18 @@ public class UserController extends BaseController {
     /**
      * 根据登陆用户名及密码验证用户.
      *
-     * @param loginCode
+     * @param userName
      * @param psw
      */
     @RequestMapping(value = "/users/verification/{login_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据登陆用户名及密码验证用户", notes = "根据登陆用户名及密码验证用户")
     public Envelop loginVerification(
             @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
-            @PathVariable(value = "login_code") String loginCode,
+            @PathVariable(value = "login_code") String userName,
             @ApiParam(name = "psw", value = "密码", defaultValue = "")
             @RequestParam(value = "psw") String psw) {
 
-        MUser mUser = userClient.getUserByNameAndPassword(loginCode, psw);
+        MUser mUser = userClient.getUserByNameAndPassword(userName, psw);
         if (mUser == null) {
             return failed("用户信息获取失败!");
         }
@@ -315,37 +318,51 @@ public class UserController extends BaseController {
     /**
      * 根据loginCode 获取user
      *
-     * @param loginCode
+     * @param userName
      * @return
      */
     @RequestMapping(value = "/users/{login_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据登录账号获取当前用户", notes = "根据登陆用户名及密码验证用户")
     public Envelop getUserByLoginCode(
             @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
-            @PathVariable(value = "login_code") String loginCode) {
+            @PathVariable(value = "login_code") String userName) {
 
-        MUser mUser = userClient.getUserByLoginCode(loginCode);
+        MUser mUser = userClient.getUserByUserName(userName);
         if (mUser == null) {
             return failed("用户信息获取失败!");
         }
+
         UserDetailModel detailModel = MUserToUserDetailModel(mUser);
 
         return success(detailModel);
     }
 
-    @RequestMapping(value = "/users/existence/{login_code}", method = RequestMethod.GET)
+    @RequestMapping(value = "/users/existence", method = RequestMethod.GET)
     @ApiOperation(value = "根据登录账号获取当前用户", notes = "根据登陆用户名及密码验证用户")
     public Envelop existence(
-            @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
-            @PathVariable(value = "login_code") String loginCode) {
+            @ApiParam(name = "existenceType",value = "", defaultValue = "")
+            @RequestParam(value = "existenceType") String existenceType,
+            @ApiParam(name = "existenceNm",value = "", defaultValue = "")
+            @RequestParam(value = "existenceNm") String existenceNm) {
         Envelop envelop = new Envelop();
+        boolean bo;
 
-        boolean bo = userClient.isLoginCodeExists(loginCode);
-        envelop.setSuccessFlg(bo);
+        //返回值：true>存在，false>不存在
+        if(existenceType.equals("login_code")){
+            bo = userClient.isUserNameExists(existenceNm);
+            envelop.setSuccessFlg(bo);
+        }
+        if (existenceType.equals("id_card_no")){
+            bo = userClient.isIdCardExists(existenceNm);
+            envelop.setSuccessFlg(bo);
+        }
+        if (existenceType.equals("email")) {
+            //todo:微服务缺少判断邮箱唯一性的验证
+        }
+
         return envelop;
 
     }
-
 
 
     /**

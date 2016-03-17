@@ -7,7 +7,7 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.geography.service.Geography;
 import com.yihu.ehr.geography.service.GeographyService;
-import com.yihu.ehr.model.geogrephy.MGeography;
+import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -46,7 +46,10 @@ public class GeographyController extends BaseRestController{
             @ApiParam(name = "id", value = "地址代码", defaultValue = "")
             @PathVariable(value = "id") String id) {
         Geography address = geographyService.getAddressById(id);
-        String addressStr = geographyService.getCanonicalAddress(address);
+        String addressStr = "";
+        if(address != null){
+            addressStr = geographyService.getCanonicalAddress(address);
+        }
         return addressStr;
     }
 

@@ -25,27 +25,21 @@ public interface AdapterDispatchClient {
     @RequestMapping(value = "/adapter-dispatcher/schemaMappingPlan", method = RequestMethod.GET)
     @ApiOperation(value = "获取适配方案映射信息", response = RestEcho.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "获取采集标准适配方案信息，文件以Base64编码，压缩格式为zip")
     Object getSchemeMappingInfo(
-            @ApiParam(required = true, name = "userkey", value = "用户私钥")
             @RequestParam(value = "userkey", required = true) String userkey,
-            @ApiParam(required = true, name = "versionCode", value = "适配标准版本")
             @RequestParam(value = "versionCode", required = true) String versionCode,
-            @ApiParam(required = true, name = "orgcode", value = "机构代码")
             @RequestParam(value = "orgcode", required = true) String orgcode);
 
 
     @RequestMapping(value = "/adapter-dispatcher/allSchemaMappingPlan", method = RequestMethod.GET)
     @ApiOperation(value = "获取采集标准及适配方案信息", response = RestEcho.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "获取采集标准及适配方案信息，文件以Base64编码，压缩格式为zip")
     Object getALLSchemeMappingInfo(
-            @ApiParam(required = true, name = "userkey", value = "用户名")
             @RequestParam(value = "userkey", required = true) String userkey,
-            @ApiParam(required = true, name = "versionCode", value = "适配标准版本")
             @RequestParam(value = "versionCode", required = true) String versionCode,
-            @ApiParam(required = true, name = "orgcode", value = "机构代码")
-            @RequestParam(value = "orgcode", required = true) String orgcode);
+            @RequestParam(value = "orgcode", required = true) String orgCode);
 
 
     @RequestMapping(value = "/adapter-dispatcher/versionplan", method = RequestMethod.GET)
-    @ApiOperation(value = "根据机构编码获取最新映射版本号 ", response = RestEcho.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "指定版本的信息")
+    @ApiOperation(value = "根据机构编码获取最新映射版本号", response = RestEcho.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "指定版本的信息")
     Object getCDAVersionInfoByOrgCode(
             @ApiParam(name = "org_code", value = "机构编码")
             @RequestParam(value = "org_code") String orgCode);

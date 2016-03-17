@@ -45,14 +45,20 @@ public class AdapterOrgController extends BaseController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page) throws Exception {
+            @RequestParam(value = "page", required = false) int page){
 
-        ResponseEntity<Collection<MAdapterOrg>> responseEntity = adapterOrgClient.searchAdapterOrg(fields, filters, sorts, size, page);
-        List<MAdapterOrg> mAdapterOrgs = (List<MAdapterOrg>) responseEntity.getBody();
+        try {
+            ResponseEntity<Collection<MAdapterOrg>> responseEntity = adapterOrgClient.searchAdapterOrg(fields, filters, sorts, size, page);
+            List<MAdapterOrg> mAdapterOrgs = (List<MAdapterOrg>) responseEntity.getBody();
 
-        List<AdapterOrgModel> adapterOrgModels = (List<AdapterOrgModel>) convertToModels(mAdapterOrgs, new ArrayList<AdapterOrgModel>(mAdapterOrgs.size()), AdapterOrgModel.class, null);
+            List<AdapterOrgModel> adapterOrgModels = (List<AdapterOrgModel>) convertToModels(mAdapterOrgs, new ArrayList<AdapterOrgModel>(mAdapterOrgs.size()), AdapterOrgModel.class, null);
 
-        return getResult(adapterOrgModels, getTotalCount(responseEntity), page, size);
+            return getResult(adapterOrgModels, getTotalCount(responseEntity), page, size);
+        }
+        catch (Exception ex)
+        {
+            return failedSystem();
+        }
     }
 
 

@@ -82,10 +82,10 @@
                 this.$sex.ligerRadio();
                 this.$org.addressDropdown({
                     tabsData: [
-                        {name: '省份', code:'id',values:'name',url: '${contextRoot}/address/getParent', params: {level: '1'}},
-                        {name: '城市', code:'id',values:'name',url: '${contextRoot}/address/getChildByParent'},
+                        {name: '省份', code:'id',value:'name',url: '${contextRoot}/address/getParent', params: {level: '1'}},
+                        {name: '城市', code:'id',value:'name',url: '${contextRoot}/address/getChildByParent'},
                         {
-                            name: '医院', code:'orgCode',values:'fullName',url: '${contextRoot}/address/getOrgs', beforeAjaxSend: function (ds, $options) {
+                            name: '医院', code:'orgCode',value:'fullName',url: '${contextRoot}/address/getOrgs', beforeAjaxSend: function (ds, $options) {
                             var province = $options.eq(0).attr('title'),
                                     city = $options.eq(1).attr('title');
                             ds.params = $.extend({}, ds.params, {
@@ -125,13 +125,6 @@
                             $('#inp_major_div').show();
                         else
                             $('#inp_major_div').hide();
-                        /*if (Util.isStrEquals(value, 'Doctor')) {//henjjiu
-                            addUserInfo.$major.parent().parent().addClass("essential");
-                            addUserInfo.$major.addClass("required useTitle");
-                        } else {
-                            addUserInfo.$major.parent().parent().removeClass("essential");
-                            addUserInfo.$major.removeClass("required useTitle");
-                        }*/
                     },
                     //autocomplete: true,
                     onSuccess: function (data) {
@@ -167,11 +160,10 @@
                 function checkDataSourceName(type,inputValue,errorMsg){
                     var result = new jValidation.ajax.Result();
                     var dataModel = $.DataModel.init();
-                    dataModel.fetchRemote("${contextRoot}/user/searchUser", {
-                        data: {type:type,searchNm:inputValue},
+                    dataModel.fetchRemote("${contextRoot}/user/existence", {
+                        data: {existenceType:type,existenceNm:inputValue},
                         async: false,
                         success: function (data) {
-                            debugger
                             if (data.successFlg) {
                                 result.setResult(false);
                                 result.setErrorMsg(errorMsg);
@@ -187,7 +179,7 @@
                 this.$addUserBtn.click(function () {
                     var userImgHtml = self.$imageShow.children().length;
                     var addUser = self.$form.Fields.getValues();
-//                   if(validator.validate()){
+                   if(validator.validate()){
                         var organizationKeys = addUser.organization['keys'];
 //                        addUser.orgCode = organizationKeys[2];
 //                        addUser.orgName = addUser.organization['names'][2];
@@ -204,28 +196,10 @@
                             updateUser(addUser);
                         }
                     }
-/*                        var upload = self.$uploader.instance;
-                        upload.options.formData.userModelJsonData =  JSON.stringify(addUser);
-                        upload.upload();*/
 
-                /*        var dataModel = $.DataModel.init();
-                        dataModel.createRemote("${contextRoot}/user/updateUser", {
-                            data: addUser,
-                            success: function (data) {
-                                if (data.successFlg) {
-                                    win.parent.closeAddUserInfoDialog(function () {
-                                        win.parent.$.Notice.success('用户新增成功');
-                                    });
-                                } else {
-                                    window.top.$.Notice.error(data.errorMsg);
-                                }
-                            }
-                        });*/
-
-
-//                    }else{
-//                   return;
-//                   }
+                    }else{
+                   return;
+                   }
 
 
                 });

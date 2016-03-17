@@ -23,6 +23,7 @@
 //        var orgLoc = allData[0];
         var user = allData.obj;
 
+
         /* ************************** 变量定义结束 **************************** */
 
         /* *************************** 函数定义 ******************************* */
@@ -95,10 +96,10 @@
                 this.$tel.ligerTextBox({width: 240});
                 this.$org.addressDropdown({
                     tabsData: [
-                        {name: '省份',code:'id',values:'name', url: '${contextRoot}/address/getParent', params: {level: '1'}},
-                        {name: '城市', code:'id',values:'name',url: '${contextRoot}/address/getChildByParent'},
+                        {name: '省份',code:'id',value:'name', url: '${contextRoot}/address/getParent', params: {level: '1'}},
+                        {name: '城市', code:'id',value:'name',url: '${contextRoot}/address/getChildByParent'},
                         {
-                            name: '医院', code:'orgCode',values:'fullName',url: '${contextRoot}/address/getOrgs', beforeAjaxSend: function (ds, $options) {
+                            name: '医院', code:'orgCode',value:'fullName',url: '${contextRoot}/address/getOrgs', beforeAjaxSend: function (ds, $options) {
                             var province = $options.eq(0).attr('title'),
                                     city = $options.eq(1).attr('title');
                             ds.params = $.extend({}, ds.params, {
@@ -138,28 +139,19 @@
                             $('#inp_major_div').show();
                         else
                             $('#inp_major_div').hide();
-                        if (Util.isStrEquals(value, 'Doctor')) {
-                         userInfo.$major.parent().parent().addClass("essential");
-                         userInfo.$major.addClass("required useTitle");
-                         } else {
-                         userInfo.$major.parent().parent().removeClass("essential");
-                         userInfo.$major.removeClass("required useTitle");
-                         }
                     }
                 });
-
                 debugger
                 this.$form.attrScan();
                 this.$form.Fields.fillValues({
                     id: user.id,
-                    organization:user.organizationName,
                     loginCode: user.loginCode,
                     realName: user.realName,
                     idCardNo: user.idCardNo,
                     gender: user.gender,
                     email: user.email,
                     telephone: user.telephone,
-//                    organization: [orgLoc.province, orgLoc.city, user.orgCode],
+//                    organization: ["安徽省",,""],
                     major: user.major,
                     publicKey: user.publicKey,
                     validTime: user.validTime,
@@ -218,15 +210,15 @@
                 function checkDataSourceName(type, searchNm, errorMsg) {
                     var result = new jValidation.ajax.Result();
                     var dataModel = $.DataModel.init();
-                    dataModel.fetchRemote("${contextRoot}/user/searchUser", {
-                        data: {type: type, searchNm: searchNm},
+                    dataModel.fetchRemote("${contextRoot}/user/existence", {
+                        data: {existenceType: type, existenceNm: searchNm},
                         async: false,
                         success: function (data) {
                             if (data.successFlg) {
-                                result.setResult(true);
-                            } else {
                                 result.setResult(false);
                                 result.setErrorMsg(errorMsg);
+                            } else {
+                                result.setResult(true);
                             }
                         }
                     });
@@ -237,7 +229,7 @@
                 this.$updateUserDtn.click(function () {
 
                     var userImgHtml = self.$imageShow.children().length;
-//                    if (validator.validate()) {
+                    if (validator.validate()) {
                         userModel = self.$form.Fields.getValues();
                         var organizationKeys = userModel.organization['keys'];
 
@@ -256,12 +248,9 @@
                                 updateUser(userModel);
                             }
                         }
-                        /* var upload = self.$uploader.instance;
-                         upload.options.formData.userModelJsonData =  JSON.stringify(userModel);
-                         upload.upload();*/
-//                    } else {
-//                        return;
-//                    }
+                    } else {
+                        return;
+                    }
                 });
 
                 function updateUser(userModel) {

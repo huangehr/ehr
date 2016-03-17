@@ -21,6 +21,7 @@ public class MUser implements Serializable{
     private String gender;
     private String idCardNo;
     private String organization;
+
     // 未绑定属性
     private String orgPost;
     private String privilege;

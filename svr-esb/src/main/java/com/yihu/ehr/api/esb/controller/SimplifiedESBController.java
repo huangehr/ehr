@@ -1,6 +1,7 @@
 package com.yihu.ehr.api.esb.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.api.esb.model.HosEsbMiniRelease;
 import com.yihu.ehr.api.esb.model.HosLog;
 import com.yihu.ehr.api.esb.model.HosSqlTask;
@@ -8,7 +9,6 @@ import com.yihu.ehr.api.esb.service.SimplifiedESBService;
 import com.yihu.ehr.config.FastDFSConfig;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.util.DateFormatter;
-import com.yihu.ehr.util.encode.Base64;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -19,10 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Date;
 
 /**
@@ -70,13 +67,13 @@ public class SimplifiedESBController {
         try {
             InputStream in = new ByteArrayInputStream(file.getBytes());
             FastDFSUtil fdfs = FastDFSConfig.fastDFSUtil();
-            //   ObjectNode jsonResult = fdfs.upload(in, "log", "");
-            // String filePath = jsonResult.get("fid").textValue();
+            ObjectNode jsonResult = fdfs.upload(in, "zip", "");
+             String filePath = jsonResult.get("fid").textValue();
             // fdfs.download(jsonResult.get("groupName").textValue(), jsonResult.get("remoteFileName").textValue(), "E:\\");
             HosLog lh = new HosLog();
             lh.setOrgCode(orgCode);
             lh.setUploadTime(DateFormatter.simpleDateTimeFormat(new Date()));
-            // lh.setFilePath(filePath);
+            lh.setFilePath(filePath);
             lh.setId(ip);
             simplifiedESBService.saveHosLog(lh);
             return true;
@@ -125,19 +122,26 @@ public class SimplifiedESBController {
     public String downUpdateWar(
             @ApiParam("systemCode") @RequestParam(value = "systemCode", required = true) String systemCode,
             @ApiParam("orgCode") @RequestParam(value = "orgCode", required = true) String orgCode) {
+        ByteArrayOutputStream outStream = null;
+        InputStream i = null;
         try {
             // path是指欲下载的文件的路径。
             HosEsbMiniRelease he = simplifiedESBService.getSimplifiedESBBySystemCodes(systemCode, orgCode);
             File file = new File(he.getFile());
-            InputStream i = new FileInputStream(file);
+            i = new FileInputStream(file);
             if (file.exists()) {
-                long l = file.length();
-                byte[] by = new byte[(int) l];
-                i.read(by);
-                return Base64.encode(by);
+                outStream = new ByteArrayOutputStream();
+                byte[] data = new byte[1024];
+                int count = -1;
+                while ((count = i.read(data, 0, 1024)) != -1)
+                    outStream.write(data, 0, count);
+                String a = new String(outStream.toByteArray(),"UTF-8");
+                return a;
             }
-            /*
+              /*
             // 取得文件名。
+            HosEsbMiniRelease he = simplifiedESBService.getSimplifiedESBBySystemCodes(systemCode, orgCode);
+            File file = new File(he.getFile());
             String filename = file.getName();
             // 取得文件的后缀名。
             String ext = filename.substring(filename.lastIndexOf(".") + 1).toUpperCase();
@@ -159,6 +163,15 @@ public class SimplifiedESBController {
             toClient.close();*/
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                if (outStream != null)
+                    outStream.close();
+                if (i != null)
+                    i.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return "";
     }

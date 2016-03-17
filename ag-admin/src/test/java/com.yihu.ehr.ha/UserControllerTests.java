@@ -13,6 +13,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import static org.junit.Assert.assertTrue;
 
@@ -29,6 +30,8 @@ public class UserControllerTests {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    private MultipartHttpServletRequest image;
 
     private static String version ="v1.0";
 

@@ -2,12 +2,10 @@ package com.yihu.ehr.standard.cdaversion.service;
 
 import com.yihu.ehr.config.StdHibernateConfig;
 import com.yihu.ehr.config.StdSessionFactoryBean;
-import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.log.LogService;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.CDAVersionUtil;
 import com.yihu.ehr.util.classpool.ClassPoolUtils;
+import com.yihu.ehr.util.log.LogService;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;

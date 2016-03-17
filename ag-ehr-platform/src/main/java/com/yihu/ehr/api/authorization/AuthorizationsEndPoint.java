@@ -2,7 +2,7 @@ package com.yihu.ehr.api.authorization;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.api.model.MToken;
+import com.yihu.ehr.api.model.TokenModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.service.oauth2.EhrClientDetailsService;
 import com.yihu.ehr.service.oauth2.EhrTokenStoreService;
@@ -125,7 +125,7 @@ public class AuthorizationsEndPoint {
             throw new InvalidParameterException("Client id or secret incorrect.");
         }
 
-        MToken token = createClientToken(clientId, fingerprint);
+        TokenModel token = createClientToken(clientId, fingerprint);
         if (token == null) {
             throw new AuthenticationServiceException("Create client token failed.");
         }
@@ -156,12 +156,12 @@ public class AuthorizationsEndPoint {
 
     @ApiOperation(value = "为指定用户创建授权，若存在返回已有授权", notes = "提供用户名/密码作为Basic验证")
     @RequestMapping(value = "/users/{user_name}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.PUT)
-    public MToken createUserAuthorization(@ApiParam(name = "user_name", value = "与Basic认证用户名一致")
+    public TokenModel createUserAuthorization(@ApiParam(name = "user_name", value = "与Basic认证用户名一致")
                                           @PathVariable("user_name")
                                           String userName,
-                                          @ApiParam(value = "info")
+                                              @ApiParam(value = "info")
                                           @RequestParam(value = "info", required = false) String info,
-                                          HttpServletRequest request) throws NoSuchAlgorithmException {
+                                              HttpServletRequest request) throws NoSuchAlgorithmException {
 
         Pair<String, String> basic = BasicAuthorizationExtractor.extract(request.getHeader("Authorization"));
         if (!basic.getKey().equals(userName)) throw new InvalidParameterException("Basic authorization user name MUST be same with url path.");
@@ -171,15 +171,15 @@ public class AuthorizationsEndPoint {
             throw new InvalidParameterException("User name or password incorrect.");
         }
 
-        MToken mToken = new MToken();
-        mToken.setToken(TokenUtil.genToken(TOKEN_LENGTH));
-        mToken.setTokenLastEight(mToken.getToken().substring(mToken.getToken().length() - 8));
-        mToken.setUpdatedAt(new Date());
+        TokenModel tokenModel = new TokenModel();
+        tokenModel.setToken(TokenUtil.genToken(TOKEN_LENGTH));
+        tokenModel.setTokenLastEight(tokenModel.getToken().substring(tokenModel.getToken().length() - 8));
+        tokenModel.setUpdatedAt(new Date());
 
-        return mToken;
+        return tokenModel;
     }
 
-    public MToken createClientToken(String clientId, String fingerprint) {
+    public TokenModel createClientToken(String clientId, String fingerprint) {
         String key = clientId + "-" + fingerprint;
         String token = appTokens.get(key);
         if (token == null) {
@@ -225,12 +225,12 @@ public class AuthorizationsEndPoint {
             tokenStoreService.storeAccessToken(accessToken, auth2Authentication);
         }
 
-        MToken mToken = new MToken();
-        mToken.setId(1);
-        mToken.setToken(token);
-        mToken.setTokenLastEight(token.substring(token.length() - 8));
-        mToken.setUpdatedAt(new Date());
+        TokenModel tokenModel = new TokenModel();
+        tokenModel.setId(1);
+        tokenModel.setToken(token);
+        tokenModel.setTokenLastEight(token.substring(token.length() - 8));
+        tokenModel.setUpdatedAt(new Date());
 
-        return mToken;
+        return tokenModel;
     }
 }

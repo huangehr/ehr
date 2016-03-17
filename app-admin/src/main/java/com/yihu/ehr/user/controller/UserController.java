@@ -1,24 +1,34 @@
 package com.yihu.ehr.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.fastdfs.FastDFSClientPool;
+import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.ResourceProperties;
+import com.yihu.ehr.util.encode.Base64;
+import com.yihu.ehr.util.log.LogService;
+import org.apache.commons.lang.ArrayUtils;
+import org.csource.common.NameValuePair;
+import org.csource.fastdfs.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
+import java.net.InetSocketAddress;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +40,16 @@ import java.util.Map;
 @Controller
 @RequestMapping("/user")
 public class UserController {
+    public static final String GroupField = "groupName";
+    public static final String RemoteFileField = "remoteFileName";
+    public static final String FileIdField = "fid";
+    public static final String FileUrlField = "fileUrl";
+
+    @Autowired
+    FastDFSUtil dfsUtil;
+
+    @Autowired
+    FastDFSClientPool clientPool;
 
     @Value("${service-gateway.username}")
     private String username;
@@ -41,6 +61,12 @@ public class UserController {
     @RequestMapping("initial")
     public String userInitial(Model model) {
         model.addAttribute("contentPage", "user/user");
+        return "pageView";
+    }
+
+    @RequestMapping("inChangePassword")
+    public String inChangePassword(Model model) {
+        model.addAttribute("contentPage", "user/changePassword");
         return "pageView";
     }
 
@@ -111,14 +137,7 @@ public class UserController {
             result.setErrorMsg(ErrorCode.SystemError.toString());
             return result;
         }
-//        try {
-//            userManager.deleteUser(userId);
-//            Result result = getSuccessResult(true);
-//            return result.toJson();
-//        } catch (Exception e) {
-//            Result result = getSuccessResult(false);
-//            return result.toJson();
-//        }
+
     }
 
     @RequestMapping("activityUser")
@@ -144,73 +163,70 @@ public class UserController {
             result.setErrorMsg(ErrorCode.SystemError.toString());
             return result;
         }
-//        try {
-//            userManager.activityUser(userId, activated);
-//            Result result = getSuccessResult(true);
-//            return result.toJson();
-//        } catch (Exception e) {
-//            Result result = getSuccessResult(false);
-//            return result.toJson();
-//        }
+
     }
 
     @RequestMapping(value = "updateUser", produces = "text/html;charset=UTF-8")
     @ResponseBody
     public Object updateUser(String userModelJsonData,HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        //String remotePath = upload(request, response);网关中进行upload处理
-        String url = "/users";
+        String url = "/users/";
         String resultStr = "";
-        Envelop result = new Envelop();
+        Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
         ObjectMapper mapper = new ObjectMapper();
 
-//        params.put("request", request);
-//        try {
-//            HttpClientUtil.doPost(comUrl+"/users/upload/",params,username,password);
-//        } catch (Exception e) {
-//            e.printStackTrace();
+//        InputStream inputStream = request.getInputStream();
+//        int actualRead = 0;
+//        int bufferSize = 1024;
+//        byte tempBuffer[] = new byte[1024];
+//        byte[] fileBuffer = new byte[0];
+//        while ((actualRead = inputStream.read(tempBuffer)) != -1) {
+//            fileBuffer = ArrayUtils.addAll(fileBuffer, ArrayUtils.subarray(tempBuffer, 0, actualRead));
 //        }
+//        String imageStream = Base64.encode(fileBuffer);
+//        params.put("imageStream", imageStream);
+//        RestTemplate
 
-        UserDetailModel userDetailModel = mapper.readValue(userModelJsonData, UserDetailModel.class);
-        params.put("user_json_data", userModelJsonData);
+        String userJsonDataModel = URLDecoder.decode(userModelJsonData,"UTF-8");
+        UserDetailModel userDetailModel = mapper.readValue(userJsonDataModel, UserDetailModel.class);
+
+        params.put("user_json_data", userJsonDataModel);
+
         try {
-            //todo:传回的是usermodel，json格式
             if (!StringUtils.isEmpty(userDetailModel.getId())) {
+                //修改
+                String getUser = HttpClientUtil.doGet(comUrl + "/users/"+userDetailModel.getId(), params, username, password);
+                envelop = mapper.readValue(getUser,Envelop.class);
+                String userJsonModel = mapper.writeValueAsString(envelop.getObj());
+                UserDetailModel userModel = mapper.readValue(userJsonModel,UserDetailModel.class);
+                userModel.setRealName(userDetailModel.getRealName());
+                userModel.setIdCardNo(userDetailModel.getIdCardNo());
+                userModel.setGender(userDetailModel.getGender());
+                userModel.setMartialStatus(userDetailModel.getMartialStatus());
+                userModel.setEmail(userDetailModel.getEmail());
+                userModel.setTelephone(userDetailModel.getTelephone());
+                userModel.setUserType(userDetailModel.getUserType());
+                userModel.setOrganization(userDetailModel.getOrganization());
+                userModel.setMajor("");
+                if(userDetailModel.getUserType().equals("Doctor")){
+                    userModel.setMajor(userDetailModel.getMajor());
+                }
+
+                userJsonDataModel = mapper.writeValueAsString(userModel);
+                params.put("user_json_data", userJsonDataModel);
+
                 resultStr = HttpClientUtil.doPut(comUrl + url, params, username, password);
             }else{
+                //新增
                 resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
             }
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
         return resultStr;
-//        String strUser = URLDecoder.decode(userModelJsonData,"UTF-8");
-//
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        UserModel userModel = objectMapper.readValue(strUser, UserModel.class);
-//
-//        try {
-//            String remotePath = upload(request, response);
-//            userModel.setRemotePath(remotePath);
-//            if (remotePath != null){
-//                userModel.setLocalPath("");
-//            }
-//            Map<ErrorCode, String> message = userManager.updateUser(userModel);
-//            if (message != null) {
-//                Result result = getSuccessResult(false);
-//                result.setObj(message);
-//                return result.toJson();
-//            }
-//
-//            Result result = getSuccessResult(true);
-//            return result.toJson();
-//        } catch (Exception e) {
-//
-//            Result result = getSuccessResult(false);
-//            return result.toJson();
-//        }
+
     }
 
     @RequestMapping("resetPass")
@@ -249,41 +265,25 @@ public class UserController {
 
     @RequestMapping("getUser")
     public Object getUser(Model model, String userId, String mode) throws IOException {
-        //todo:jsp展示需调整
         String url = "/users/"+userId;
         String resultStr = "";
-        Envelop result = new Envelop();
+        Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+
         params.put("userId", userId);
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            //todo：将机构地址与用户以对象数组形式一起传前台，前台接收解析
-            //todo 该controller的download方法放后台处理
+
             model.addAttribute("allData", resultStr);
             model.addAttribute("mode", mode);
             model.addAttribute("contentPage", "user/userInfoDialog");
             return "simpleView";
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result;
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            return envelop;
         }
-//        XUser user = userManager.getUser(userId);
-//        UserModel userModel = userManager.getUser(user);
-//
-//        String localPath = download(userModel);
-//
-//        if(localPath != null){
-//            localPath = localPath.replaceAll("\\\\", "\\\\\\\\");
-//            userModel.setLocalPath(localPath);
-//        }
-//        XOrganization org = orgManager.getOrg(userModel.getOrgCode());
-//        XAddress orgLoc = org == null ? new Address() : org.getLocation();
-//        model.addAttribute("orgLoc", orgLoc);
-//        model.addAttribute("user", userModel);
-//        model.addAttribute("mode", mode);
-//        model.addAttribute("contentPage", "user/userInfoDialog");
-//        return "simpleView";
     }
 
     @RequestMapping("unbundling")
@@ -382,16 +382,17 @@ public class UserController {
 //        }
     }
 
-    @RequestMapping("/searchUser")
+    @RequestMapping("/existence")
     @ResponseBody
-    public Object searchUser(String type, String searchNm) {
-        String getUserUrl = "/users/existence/"+searchNm;
+    public Object searchUser(String existenceType, String existenceNm) {
+        String getUserUrl = "/users/existence";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
+        params.put("existenceType",existenceType);
+        params.put("existenceNm",existenceNm);
 
         try {
-            //todo 后台转换成result后传前台
             resultStr = HttpClientUtil.doGet(comUrl + getUserUrl, params, username, password);
             return resultStr;
         } catch (Exception e) {
@@ -400,14 +401,6 @@ public class UserController {
             return result;
         }
 
-//        boolean bo = userManager.searchUser(type, searchNm);
-//        if (bo) {
-//            Result result = getSuccessResult(true);
-//            return result.toJson();
-//        } else {
-//            Result result = getSuccessResult(false);
-//            return result.toJson();
-//        }
     }
 
 //    public String upload(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -434,15 +427,16 @@ public class UserController {
 //            }
 //        }
 //        ObjectNode objectNode = null;
-//        FastDFSUtil dfsUtil = new FastDFSUtil();
 //        String path = null;
 //        try {
 //            objectNode = dfsUtil.upload(inputStream, fileExtension, description);
+////            objectNode = upload(inputStream, fileExtension, description);
 //            String groupName = objectNode.get("groupName").toString();
 //            String remoteFileName = objectNode.get("remoteFileName").toString();
 //            path = "{groupName:" + groupName + ",remoteFileName:" + remoteFileName + "}";
 //        } catch (Exception e) {
-//            //LogService.getLogger(AbstractUser.class).error("用户头像上传失败；错误代码："+e);
+//            e.printStackTrace();
+////            LogService.getLogger(AbstractUser.class).error("用户头像上传失败；错误代码："+e);
 //        }
 //        return path;
 //    }

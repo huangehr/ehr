@@ -55,10 +55,10 @@ public class AdapterDictController extends ExtendController<AdapterDictModel> {
     @Autowired
     PlanClient planClient;
 
-    @RequestMapping(value = "/plan/{planId}/dicts", method = RequestMethod.GET)
-    public Envelop searchDictse(
-            @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
-            @PathVariable(value = "planId") Long planId,
+    @RequestMapping(value = "/plan/{plan_id}/dicts", method = RequestMethod.GET)
+    public Envelop searchDicts(
+            @ApiParam(name = "plan_id", value = "适配方案id", defaultValue = "")
+            @PathVariable(value = "plan_id") Long planId,
             @ApiParam(name = "code", value = "代码查询值", defaultValue = "")
             @RequestParam(value = "code", required = false) String code,
             @ApiParam(name = "name", value = "名称查询值", defaultValue = "")
@@ -86,12 +86,12 @@ public class AdapterDictController extends ExtendController<AdapterDictModel> {
         }
     }
 
-    @RequestMapping(value = "/plan/{planId}/dict/{dictId}/entrys", method = RequestMethod.GET)
+    @RequestMapping(value = "/plan/dict/entrys/{plan_id}/{dict_id}", method = RequestMethod.GET)
     public Envelop getAdapterDictEntryByDictId(
-            @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
-            @PathVariable(value = "planId") Long planId,
-            @ApiParam(name = "dictId", value = "字典编号", defaultValue = "")
-            @PathVariable(value = "dictId") Long dictId,
+            @ApiParam(name = "plan_id", value = "适配方案id", defaultValue = "")
+            @PathVariable(value = "plan_id") Long planId,
+            @ApiParam(name = "dict_id", value = "字典编号", defaultValue = "")
+            @PathVariable(value = "dict_id") Long dictId,
             @ApiParam(name = "code", value = "代码查询值", defaultValue = "")
             @RequestParam(value = "code", required = false) String code,
             @ApiParam(name = "name", value = "名称查询值", defaultValue = "")
@@ -121,7 +121,7 @@ public class AdapterDictController extends ExtendController<AdapterDictModel> {
     @RequestMapping(value = "/dict/entry/{id}", method = RequestMethod.GET)
     public Envelop getAdapterDictEntry(
             @ApiParam(name = "id", value = "适配关系ID")
-            @RequestParam(value = "id") long id) {
+            @PathVariable(value = "id") long id) {
         try {
             MAdapterDict mAdapterDict = adapterDictClient.getAdapterDictEntry(id);
             AdapterDictModel adapterDictModel = convertAdapterDictModel(mAdapterDict);
