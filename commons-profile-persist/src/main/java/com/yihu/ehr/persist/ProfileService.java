@@ -1,15 +1,18 @@
-package com.yihu.ehr.profile;
+package com.yihu.ehr.persist;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.data.HBaseClient;
 import com.yihu.ehr.data.ResultWrapper;
+import com.yihu.ehr.profile.Profile;
+import com.yihu.ehr.profile.ProfileDataSet;
+import com.yihu.ehr.profile.ProfileTableOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.*;
+import java.util.Iterator;
 
 /**
  * 健康档案管理器。实现档案、健康事件及数据集的获取接口。也可以搜索某段时间内病人的数据。

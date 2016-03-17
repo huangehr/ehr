@@ -1,6 +1,9 @@
-package com.yihu.ehr.profile;
+package com.yihu.ehr.persist;
 
 import com.yihu.ehr.data.XHBaseClient;
+import com.yihu.ehr.profile.Profile;
+import com.yihu.ehr.profile.ProfileDataSet;
+import com.yihu.ehr.profile.ProfileTableOptions;
 import com.yihu.ehr.util.DateFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

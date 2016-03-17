@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile;
+package com.yihu.ehr.persist;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,6 +7,9 @@ import com.yihu.ehr.cache.StdDataRedisCache;
 import com.yihu.ehr.cache.StdObjectQualifierTranslator;
 import com.yihu.ehr.data.HBaseClient;
 import com.yihu.ehr.data.ResultWrapper;
+import com.yihu.ehr.profile.Profile;
+import com.yihu.ehr.profile.ProfileDataSet;
+import com.yihu.ehr.profile.ProfileTableOptions;
 import com.yihu.ehr.util.DateFormatter;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -74,17 +77,17 @@ public class ProfileLoader {
         String cdaVersion = record.getValueAsString(FamilyBasic, AcInnerVersion);
         String dataSets = record.getValueAsString(FamilyBasic, AcDataSets);
 
-        Profile healthArchive = new Profile();
-        healthArchive.setId(archiveId);
-        healthArchive.setCardId(cardId);
-        healthArchive.setOrgCode(orgCode);
-        healthArchive.setPatientId(patientId);
-        healthArchive.setEventNo(eventNo);
-        healthArchive.setEventDate(DateFormatter.utcDateTimeParse(eventDate));
-        healthArchive.setSummary(summary);
-        healthArchive.setDemographicId(demographicId);
-        healthArchive.setCreateDate(DateFormatter.utcDateTimeParse(createDate));
-        healthArchive.setCdaVersion(cdaVersion);
+        Profile profile = new Profile();
+        profile.setId(archiveId);
+        profile.setCardId(cardId);
+        profile.setOrgCode(orgCode);
+        profile.setPatientId(patientId);
+        profile.setEventNo(eventNo);
+        profile.setEventDate(DateFormatter.utcDateTimeParse(eventDate));
+        profile.setSummary(summary);
+        profile.setDemographicId(demographicId);
+        profile.setCreateDate(DateFormatter.utcDateTimeParse(createDate));
+        profile.setCdaVersion(cdaVersion);
 
         // 加载数据集列表
         JsonNode root = objectMapper.readTree(dataSets);
@@ -97,22 +100,22 @@ public class ProfileLoader {
                 if (loadStdDataSet) {
                     if (!dataSetCode.contains(StdObjectQualifierTranslator.OriginDataSetFlag)) {
                         Pair<String, ProfileDataSet> pair = loadFullDataSet(cdaVersion, dataSetCode, rowKeys);
-                        healthArchive.addDataSet(pair.getLeft(), pair.getRight());
+                        profile.addDataSet(pair.getLeft(), pair.getRight());
                     }
                 }
                 if (loadOriginDataSet) {
                     if (dataSetCode.contains(StdObjectQualifierTranslator.OriginDataSetFlag)){
                         Pair<String, ProfileDataSet> pair = loadFullDataSet(cdaVersion, dataSetCode, rowKeys);
-                        healthArchive.addDataSet(pair.getLeft(), pair.getRight());
+                        profile.addDataSet(pair.getLeft(), pair.getRight());
                     }
                 }
             } else {
                 Pair<String, ProfileDataSet> pair = loadOnlyIndexedDataSet(cdaVersion, dataSetCode, rowKeys);
-                healthArchive.addDataSet(pair.getLeft(), pair.getRight());
+                profile.addDataSet(pair.getLeft(), pair.getRight());
             }
         }
 
-        return healthArchive;
+        return profile;
     }
 
     /**

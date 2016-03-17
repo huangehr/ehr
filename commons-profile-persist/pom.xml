@@ -10,18 +10,13 @@
         <relativePath>../commons-dependencies/pom.xml</relativePath>
     </parent>
 
-    <artifactId>commons-profile</artifactId>
+    <artifactId>commons-profile-persist</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.3.2</version>
-        </dependency>
-        <dependency>
             <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-util</artifactId>
+            <artifactId>commons-profile-core</artifactId>
             <version>1.1.0</version>
         </dependency>
         <dependency>

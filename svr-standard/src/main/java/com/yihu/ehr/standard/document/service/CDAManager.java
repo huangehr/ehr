@@ -36,7 +36,6 @@ public class CDAManager {
     @Autowired
     private FastDFSUtil fastDFSUtil;
 
-
     /**
      * 保存CDA信息
      * 1.先删除CDA数据集关联关系信息与cda文档XML文件，在新增信息
@@ -50,10 +49,8 @@ public class CDAManager {
 
         cdaDataSetRelationshipManager.deleteRelationshipByCdaId(versionCode,new String[]{cdaId});
         List<CDADocument> cdaDocuments = cdaDocumentManager.getDocumentList(new String[]{cdaId},versionCode);
-        if (cdaDocuments.size() <= 0) {
-            return false;
-            //请先选择CDA
-        }
+        if (cdaDocuments.size() <= 0) return false;
+
         CDADocument cdaDocument = cdaDocuments.get(0);
         if (cdaDocument.getFileGroup() != null
                 && !cdaDocument.getFileGroup().equals("")
@@ -61,10 +58,8 @@ public class CDAManager {
                 && !cdaDocument.getSchema().equals("")) {
             fastDFSUtil.delete(cdaDocument.getFileGroup(), cdaDocument.getSchema());
         }
-        if (dataSetIds==null) {
-            //关系保存成功
-            return true;
-        }
+        if (dataSetIds==null) return true;
+
         List<CDADataSetRelationship> infos = new ArrayList<>();
         for (int i = 0; i < infos.size(); i++) {
             String dataSetId = dataSetIds[i];
@@ -80,23 +75,20 @@ public class CDAManager {
             throw new ApiException(ErrorCode.GetStdVersionFailed);
         }
         String strFilePath = SaveCdaFile(xmlInfo, versionCode, cdaId);
+
         //将文件上传到服务器中
         ObjectNode msg = fastDFSUtil.upload(strFilePath, "");
-        String strFileGroup = msg.get(FastDFSUtil.GroupField).asText();//setFilePath
-        String strSchemePath = msg.get(FastDFSUtil.RemoteFileField).asText();//setFileName
+        String strFileGroup = msg.get(FastDFSUtil.GroupField).asText();
+        String strSchemePath = msg.get(FastDFSUtil.RemoteFileField).asText();
         File file = new File(strFilePath);
+
         // 路径为文件且不为空则进行删除
         if (file.isFile() && file.exists()) {
             file.delete();
         }
+
         boolean bRes = SaveXmlFilePath(new String[]{cdaId}, versionCode, strFileGroup, strSchemePath);
-        if (bRes) {
-            //关系保存成功
-            return true;
-        } else {
-            //关系保存失败
-            return false;
-        }
+        return bRes;
     }
 
     /**
@@ -110,6 +102,7 @@ public class CDAManager {
         String strPath = System.getProperty("java.io.tmpdir");
         String splitMark = System.getProperty("file.separator");
         strPath += splitMark+"StandardFiles";
+
         //文件路径
         String strXMLFilePath = strPath + splitMark + "xml" + splitMark + versionCode + splitMark + "createfile" + splitMark + cdaId + ".xml";
 
@@ -132,13 +125,14 @@ public class CDAManager {
     public boolean SaveXmlFilePath(String[] cdaIds, String versionCode, String fileGroup, String filePath) {
         List<CDADocument> cdaDocuments = cdaDocumentManager.getDocumentList(cdaIds,versionCode);
         if (cdaDocuments.size() <= 0) {
-            //未找到CDA
             return false;
         }
+
         CDADocument cdaDocument = cdaDocuments.get(0);
         cdaDocument.setFileGroup(fileGroup);
         cdaDocument.setSchema(filePath);
         cdaDocument.setVersionCode(versionCode);
+
         return cdaDocumentManager.saveDocument(cdaDocument);
     }
 
@@ -148,10 +142,8 @@ public class CDAManager {
         if(cdaDocumentManager.isDocumentExist(cdaInfo.getVersionCode(), cdaInfo.getCode(), cdaInfo.getId())){
             throw new Exception("已存在");
         }
+
         cdaDocumentManager.saveDocument(cdaInfo);
         return cdaInfo;
     }
-
-
-
 }

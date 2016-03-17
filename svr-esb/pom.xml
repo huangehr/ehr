@@ -14,30 +14,6 @@
     <packaging>jar</packaging>
     <name>svr-esb</name>
 
-    <repositories>
-        <repository>
-            <id>Releases</id>
-            <name>local private nexus</name>
-            <url>http://172.19.103.47:8081/nexus/content/repositories/releases/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>snapshots</id>
-            <name>local private nexus</name>
-            <url>http://172.19.103.47:8081/nexus/content/repositories/snapshots/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -111,11 +87,6 @@
                     <groupId>org.slf4j</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>happy.fish</groupId>
-            <artifactId>fastDFS</artifactId>
-            <version>1.1.0</version>
         </dependency>
     </dependencies>
 </project>
