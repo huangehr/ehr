@@ -13,6 +13,11 @@ public class RestApi {
     }
 
     public static class Apps{
+        public static final String Apps                 = "/apps";
+        public static final String App                  = "/apps/{app_id}";
+        public static final String AppExistence         = "/apps/{app_id}/existence";
+        public static final String AppStatus            = "/apps/{app_id}/status";
+        public static final String AppNameExistence     = "/app/{app_name}/existence";
     }
 
     public static class Dictionaries{
@@ -49,6 +54,7 @@ public class RestApi {
         public static final String UserToken                = "/securities/users/{user_id}/tokens/{token_id}";
         public static final String OrganizationKey          = "/securities/organizations/{org_code}/key";
         public static final String OrganizationPublicKey    = "/securities/organizations/{org_code}/key/public";
+        public static final String ClientTokens             = "/securities/clients/{client_id}/tokens";
 
         public static final String Keys                     = "/securities/keys/{id}";
         public static final String Tokens                   = "/securities/tokens/{id}";
