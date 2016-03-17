@@ -1,9 +1,7 @@
 package com.yihu.ehr.ha.SystemDict.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.dict.SystemDictEntryModel;
 import com.yihu.ehr.agModel.dict.SystemDictModel;
-import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.SystemDict.service.SystemDictClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
@@ -14,21 +12,20 @@ import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
  * Created by AndyCai on 2016/1/21.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersion.Version1_0+"/admin")
+@RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
 @Api(value = "sys_dict", description = "系统字典接口，用于系统全局字典管理", tags = {"系统字典接口"})
 public class SystemDictController extends BaseController {
@@ -51,43 +48,44 @@ public class SystemDictController extends BaseController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) Integer size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) Integer page){
+            @RequestParam(value = "page", required = false) Integer page) {
 
-        List<MSystemDict> systemDicts =(List<MSystemDict>)systemDictClient.getDictionaries(fields,filters,sorts,size,page);
-        List<SystemDictModel> systemDictModelList = new ArrayList<>();
+        try {
+            ResponseEntity<Collection<MSystemDict>> responseEntity = systemDictClient.getDictionaries(fields, filters, sorts, size, page);
+            List<MSystemDict> systemDicts = (List<MSystemDict>) responseEntity.getBody();
+            List<SystemDictModel> systemDictModelList = (List<SystemDictModel>) convertToModels(systemDicts
+                    , new ArrayList<SystemDictModel>(systemDicts.size())
+                    , SystemDictModel.class
+                    , null);
 
-        for (MSystemDict mSystemDict:systemDicts){
-            SystemDictModel systemDictModel = convertToModel(mSystemDict,SystemDictModel.class);
-            systemDictModelList.add(systemDictModel);
+            Envelop envelop = getResult(systemDictModelList, getTotalCount(responseEntity), page, size);
+
+            return envelop;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
         }
-
-//        String count = response.getHeader(AgAdminConstants.ResourceCount);
-//        int totalCount = StringUtils.isNotEmpty(count) ? Integer.parseInt(count) : 0;
-
-        Envelop envelop = getResult(systemDictModelList,0,page,size);
-
-       return envelop;
     }
 
     @ApiOperation(value = "创建字典", response = MSystemDict.class, produces = "application/json")
     @RequestMapping(value = "/dictionaries", method = RequestMethod.POST)
     public Envelop createDictionary(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson){
+            @RequestParam(value = "dictionary") String dictJson) {
 
-        Envelop envelop = new Envelop();
-        MSystemDict systemDict = systemDictClient.createDictionary(dictJson);
-        SystemDictModel systemDictModel = convertToModel(systemDict,SystemDictModel.class);
+        try {
+            MSystemDict systemDict = systemDictClient.createDictionary(dictJson);
+            SystemDictModel systemDictModel = convertToModel(systemDict, SystemDictModel.class);
 
-        if(systemDictModel != null){
-            envelop.setSuccessFlg(true);
-            envelop.setObj(systemDictModel);
-        }else {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("创建字典失败");
+            if (systemDictModel == null) {
+                return failed("字典新增失败!");
+            }
+
+            return success(systemDictModel);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
         }
-
-        return envelop;
     }
 
 
@@ -95,21 +93,20 @@ public class SystemDictController extends BaseController {
     @RequestMapping(value = "/dictionaries/{id}", method = RequestMethod.GET)
     public Envelop getDictionary(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "id") long id){
-        Envelop envelop = new Envelop();
+            @PathVariable(value = "id") long id) {
+        try {
+            MSystemDict systemDict = systemDictClient.getDictionary(id);
+            SystemDictModel systemDictModel = convertToModel(systemDict, SystemDictModel.class);
 
-        MSystemDict systemDict = systemDictClient.getDictionary(id);
-        SystemDictModel systemDictModel = convertToModel(systemDict,SystemDictModel.class);
+            if (systemDictModel == null) {
+                return failed("获取字典失败!");
+            }
 
-        if(systemDictModel != null){
-            envelop.setSuccessFlg(true);
-            envelop.setObj(systemDictModel);
-        }else {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("获取字典失败");
+            return success(systemDictModel);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
         }
-
-        return envelop;
     }
 
     @ApiOperation(value = "修改字典")
@@ -117,20 +114,18 @@ public class SystemDictController extends BaseController {
     public Envelop updateDictionary(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
             @RequestParam(value = "dictionary") String dictJson) {
-        Envelop envelop = new Envelop();
+        try {
+            MSystemDict systemDict = systemDictClient.updateDictionary(dictJson);
+            SystemDictModel systemDictModel = convertToModel(systemDict, SystemDictModel.class);
 
-        MSystemDict systemDict = systemDictClient.updateDictionary(dictJson);
-        SystemDictModel systemDictModel = convertToModel(systemDict,SystemDictModel.class);
-
-        if(systemDictModel != null){
-            envelop.setSuccessFlg(true);
-            envelop.setObj(systemDictModel);
-        }else {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("修改字典失败");
+            if (systemDictModel == null) {
+                return failed("修改字典失败!");
+            }
+            return success(systemDictModel);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
         }
-
-        return envelop;
     }
 
     @ApiOperation(value = "删除字典")
@@ -138,12 +133,16 @@ public class SystemDictController extends BaseController {
     public Envelop deleteDictionary(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") long id) {
-        Envelop envelop = new Envelop();
-
-        Boolean bo = systemDictClient.deleteDictionary(id);
-
-        envelop.setSuccessFlg(bo);
-        return envelop;
+        try {
+            boolean bo = systemDictClient.deleteDictionary(id);
+            if (!bo) {
+                return failed("删除失败!");
+            }
+            return success(null);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
+        }
     }
 
     @ApiOperation(value = "获取字典项列表")
@@ -158,20 +157,21 @@ public class SystemDictController extends BaseController {
             @ApiParam(name = "size", value = "行数", defaultValue = "")
             @RequestParam(value = "size", required = false) Integer size) {
 
-        List<MDictionaryEntry> dictionaryEntries = (List<MDictionaryEntry>)systemDictClient.getDictEntries(id,value,page,size);
-        List<SystemDictEntryModel> systemDictEntryModelList = new ArrayList<>();
+        try {
+            ResponseEntity<Collection<MDictionaryEntry>> responseEntity = systemDictClient.getDictEntries(id, value, page, size);
+            List<MDictionaryEntry> dictionaryEntries = (List<MDictionaryEntry>) responseEntity.getBody();
+            List<SystemDictEntryModel> systemDictEntryModelList = (List<SystemDictEntryModel>) convertToModels(dictionaryEntries
+                    , new ArrayList<SystemDictEntryModel>(dictionaryEntries.size())
+                    , SystemDictEntryModel.class
+                    , null);
 
-        for (MDictionaryEntry mDictionaryEntry: dictionaryEntries){
-            SystemDictEntryModel systemDictEntryModel = convertToModel(mDictionaryEntry,SystemDictEntryModel.class);
-            systemDictEntryModelList.add(systemDictEntryModel);
+            Envelop envelop = getResult(systemDictEntryModelList, getTotalCount(responseEntity), page, size);
+
+            return envelop;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
         }
-
-//        String count = response.getHeader(AgAdminConstants.ResourceCount);
-//        int totalCount = StringUtils.isNotEmpty(count) ? Integer.parseInt(count) : 0;
-
-        Envelop envelop = getResult(systemDictEntryModelList,0,page,size);
-
-        return envelop;
     }
 
     @ApiOperation(value = "创建字典项")
@@ -179,20 +179,20 @@ public class SystemDictController extends BaseController {
     public Envelop createDictEntry(
             @ApiParam(name = "entry", value = "字典JSON结构")
             @RequestParam(value = "entry") String entryJson) {
-        Envelop envelop = new Envelop();
+        try {
 
-        MConventionalDict mConventionalDict= systemDictClient.createDictEntry(entryJson);
-        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
+            MConventionalDict mConventionalDict = systemDictClient.createDictEntry(entryJson);
+            SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict, SystemDictEntryModel.class);
 
-        if(systemDictEntryModel != null){
-            envelop.setSuccessFlg(true);
-            envelop.setObj(systemDictEntryModel);
-        }else {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("创建字典项失败");
+            if (systemDictEntryModel == null) {
+                return failed("新增失败！");
+            }
+
+            return success(systemDictEntryModel);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
         }
-
-        return envelop;
     }
 
     @ApiOperation(value = "获取字典项")
@@ -202,20 +202,19 @@ public class SystemDictController extends BaseController {
             @PathVariable(value = "id") long id,
             @ApiParam(name = "code", value = "字典项代码", defaultValue = "")
             @PathVariable(value = "code") String code) {
-        Envelop envelop = new Envelop();
+        try {
 
-        MDictionaryEntry mDictionaryEntry= systemDictClient.getDictEntry(id, code);
-        SystemDictEntryModel systemDictEntryModel = convertToModel(mDictionaryEntry,SystemDictEntryModel.class);
+            MDictionaryEntry mDictionaryEntry = systemDictClient.getDictEntry(id, code);
+            SystemDictEntryModel systemDictEntryModel = convertToModel(mDictionaryEntry, SystemDictEntryModel.class);
 
-        if(systemDictEntryModel != null){
-            envelop.setSuccessFlg(true);
-            envelop.setObj(systemDictEntryModel);
-        }else {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("获取字典项失败");
+            if (systemDictEntryModel == null) {
+                return failed("获取字典项失败");
+            }
+            return success(systemDictEntryModel);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
         }
-
-        return envelop;
     }
 
     @ApiOperation(value = "删除字典项")
@@ -225,12 +224,19 @@ public class SystemDictController extends BaseController {
             @PathVariable(value = "id") long id,
             @ApiParam(name = "code", value = "字典ID", defaultValue = "")
             @PathVariable(value = "code") String code) {
-        Envelop envelop = new Envelop();
 
-        Boolean bo= systemDictClient.deleteDictEntry(id, code);
+        try {
+            boolean bo = systemDictClient.deleteDictEntry(id, code);
 
-        envelop.setSuccessFlg(bo);
-        return envelop;
+            if (!bo) {
+                return failed("删除失败!");
+            }
+
+            return success(null);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
+        }
     }
 
     @ApiOperation(value = "修改字典项")
@@ -238,31 +244,29 @@ public class SystemDictController extends BaseController {
     public Envelop updateDictEntry(
             @ApiParam(name = "entry", value = "字典JSON结构")
             @RequestParam(value = "entry") String entryJson) {
-        Envelop envelop = new Envelop();
+        try {
 
-        MConventionalDict mConventionalDict= systemDictClient.updateDictEntry(entryJson);
-        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
+            MConventionalDict mConventionalDict = systemDictClient.updateDictEntry(entryJson);
+            SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict, SystemDictEntryModel.class);
 
-        if(systemDictEntryModel != null){
-            envelop.setSuccessFlg(true);
-            envelop.setObj(systemDictEntryModel);
-        }else {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("修改字典项失败");
+            if (systemDictEntryModel == null) {
+                return failed("修改失败！");
+            }
+
+            return success(systemDictEntryModel);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
         }
-
-        return envelop;
     }
 
 
-    @RequestMapping(value = "/dictionaries/existence/{dict_name}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dictionaries/existence/{dict_name}", method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典名称是否已经存在")
-    public Envelop isAppNameExists(
+    public boolean isAppNameExists(
             @ApiParam(name = "dict_name", value = "dict_name", defaultValue = "")
-            @PathVariable(value = "dict_name") String dictName){
-        Envelop envelop = new Envelop();
-        boolean bo = systemDictClient.isAppNameExists(dictName);
-        envelop.setSuccessFlg(bo);
-        return envelop;
+            @PathVariable(value = "dict_name") String dictName) {
+
+        return systemDictClient.isAppNameExists(dictName);
     }
 }

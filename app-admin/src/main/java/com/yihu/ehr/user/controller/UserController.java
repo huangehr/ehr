@@ -64,6 +64,12 @@ public class UserController {
         return "pageView";
     }
 
+    @RequestMapping("inChangePassword")
+    public String inChangePassword(Model model) {
+        model.addAttribute("contentPage", "user/changePassword");
+        return "pageView";
+    }
+
     @RequestMapping("addUserInfoDialog")
     public String addUser(Model model) {
         model.addAttribute("contentPage", "user/addUserInfoDialog");
@@ -166,85 +172,62 @@ public class UserController {
 
         String url = "/users/";
         String resultStr = "";
-        Envelop result = new Envelop();
+        Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
         ObjectMapper mapper = new ObjectMapper();
 
-        InputStream inputStream = request.getInputStream();
-
-        int actualRead = 0;
-        int bufferSize = 1024;
-        byte tempBuffer[] = new byte[1024];
-        byte[] fileBuffer = new byte[0];
-        while ((actualRead = inputStream.read(tempBuffer)) != -1) {
-            fileBuffer = ArrayUtils.addAll(fileBuffer, ArrayUtils.subarray(tempBuffer, 0, actualRead));
-        }
-
-        String imageStream = Base64.encode(fileBuffer);
+//        InputStream inputStream = request.getInputStream();
+//        int actualRead = 0;
+//        int bufferSize = 1024;
+//        byte tempBuffer[] = new byte[1024];
+//        byte[] fileBuffer = new byte[0];
+//        while ((actualRead = inputStream.read(tempBuffer)) != -1) {
+//            fileBuffer = ArrayUtils.addAll(fileBuffer, ArrayUtils.subarray(tempBuffer, 0, actualRead));
+//        }
+//        String imageStream = Base64.encode(fileBuffer);
+//        params.put("imageStream", imageStream);
+//        RestTemplate
 
         String userJsonDataModel = URLDecoder.decode(userModelJsonData,"UTF-8");
         UserDetailModel userDetailModel = mapper.readValue(userJsonDataModel, UserDetailModel.class);
-        params.put("user_json_data", userDetailModel);
-        params.put("imageStream", imageStream);
+
+        params.put("user_json_data", userJsonDataModel);
+
         try {
             if (!StringUtils.isEmpty(userDetailModel.getId())) {
                 //修改
+                String getUser = HttpClientUtil.doGet(comUrl + "/users/"+userDetailModel.getId(), params, username, password);
+                envelop = mapper.readValue(getUser,Envelop.class);
+                String userJsonModel = mapper.writeValueAsString(envelop.getObj());
+                UserDetailModel userModel = mapper.readValue(userJsonModel,UserDetailModel.class);
+                userModel.setRealName(userDetailModel.getRealName());
+                userModel.setIdCardNo(userDetailModel.getIdCardNo());
+                userModel.setGender(userDetailModel.getGender());
+                userModel.setMartialStatus(userDetailModel.getMartialStatus());
+                userModel.setEmail(userDetailModel.getEmail());
+                userModel.setTelephone(userDetailModel.getTelephone());
+                userModel.setUserType(userDetailModel.getUserType());
+                userModel.setOrganization(userDetailModel.getOrganization());
+                userModel.setMajor("");
+                if(userDetailModel.getUserType().equals("Doctor")){
+                    userModel.setMajor(userDetailModel.getMajor());
+                }
+
+                userJsonDataModel = mapper.writeValueAsString(userModel);
+                params.put("user_json_data", userJsonDataModel);
+
                 resultStr = HttpClientUtil.doPut(comUrl + url, params, username, password);
             }else{
                 //新增
                 resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
             }
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
         return resultStr;
 
     }
-//    public String upload(HttpServletRequest request, HttpServletResponse response) throws IOException {
-//        try {
-//            request.setCharacterEncoding("utf-8");
-//        } catch (UnsupportedEncodingException e) {
-//            e.printStackTrace();
-//        }
-//        //获取流
-//        InputStream inputStream = request.getInputStream();
-//        //获取文件名
-//        String fileName = request.getParameter("name");
-//        if (fileName == null || fileName.equals("")) {
-//            return null;
-//        }
-//        //获取文件扩展名
-//        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-//        //获取文件名
-//        String description = null;
-//        if ((fileName.length() > 0)) {
-//            int dot = fileName.lastIndexOf('.');
-//            if ((dot > -1) && (dot < (fileName.length()))) {
-//                description = fileName.substring(0, dot);
-//            }
-//        }
-//        ObjectNode objectNode = null;
-//        String path = null;
-//        try {
-//            objectNode = dfsUtil.upload(inputStream, fileExtension, description);
-////            objectNode = upload(inputStream, fileExtension, description);
-//            String groupName = objectNode.get("groupName").toString();
-//            String remoteFileName = objectNode.get("remoteFileName").toString();
-//            path = "{groupName:" + groupName + ",remoteFileName:" + remoteFileName + "}";
-//        } catch (Exception e) {
-//            e.printStackTrace();
-////            LogService.getLogger(AbstractUser.class).error("用户头像上传失败；错误代码："+e);
-//        }
-//        return path;
-//    }
-
-
-
-
-
-
-
 
     @RequestMapping("resetPass")
     @ResponseBody
@@ -284,19 +267,22 @@ public class UserController {
     public Object getUser(Model model, String userId, String mode) throws IOException {
         String url = "/users/"+userId;
         String resultStr = "";
-        Envelop result = new Envelop();
+        Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+
         params.put("userId", userId);
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+
             model.addAttribute("allData", resultStr);
             model.addAttribute("mode", mode);
             model.addAttribute("contentPage", "user/userInfoDialog");
             return "simpleView";
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result;
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            return envelop;
         }
     }
 

@@ -56,7 +56,7 @@ public class UserControllerTests {
         userModel.setMajor("");
 
         String userModelJson = objectMapper.writeValueAsString(userModel);
-        Envelop envelop = userController.createUser("",userModelJson);
+        Envelop envelop = userController.createUser(userModelJson);
         assertTrue("非空验证失败！", !envelop.isSuccessFlg());
 
         userModel.setLoginCode("test_cms");
@@ -65,17 +65,17 @@ public class UserControllerTests {
         userModel.setEmail("555@qq.com");
         userModel.setTelephone("11111111111");
         userModelJson = objectMapper.writeValueAsString(userModel);
-        envelop = userController.createUser("",userModelJson);
+        envelop = userController.createUser(userModelJson);
         assertTrue("新增失败", envelop.isSuccessFlg());
 
         userModel = (UserDetailModel)envelop.getObj();
 
-        envelop = userController.createUser("",userModelJson);
+        envelop = userController.createUser(userModelJson);
         assertTrue("账户重复校验失败", !envelop.isSuccessFlg());
 
         userModel.setLoginCode("test_cms_1");
         userModelJson = objectMapper.writeValueAsString(userModel);
-        envelop = userController.createUser("",userModelJson);
+        envelop = userController.createUser(userModelJson);
         assertTrue("身份证号重复校验失败", !envelop.isSuccessFlg());
 
         userModel.setLoginCode("test_cms");
@@ -89,7 +89,7 @@ public class UserControllerTests {
         userModel = (UserDetailModel)envelop.getObj();
         userModel.setRealName("test_cms_1");
         userModelJson = objectMapper.writeValueAsString(userModel);
-        envelop = userController.updateUser("",userModelJson);
+        envelop = userController.updateUser(userModelJson);
         assertTrue("修改失败", envelop.isSuccessFlg() && ((UserDetailModel)envelop.getObj()).getRealName().equals("test_cms_1"));
 
 
