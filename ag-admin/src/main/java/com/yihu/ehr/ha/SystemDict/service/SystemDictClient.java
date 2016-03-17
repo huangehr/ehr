@@ -8,6 +8,7 @@ import com.yihu.ehr.model.dict.MSystemDict;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -26,7 +27,7 @@ public interface SystemDictClient {
 
     @ApiOperation(value = "获取字典列表")
     @RequestMapping(value = "/dictionaries", method = RequestMethod.GET)
-    Collection<MSystemDict> getDictionaries(
+    ResponseEntity<Collection<MSystemDict>> getDictionaries(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器", defaultValue = "")
@@ -64,7 +65,7 @@ public interface SystemDictClient {
 
     @ApiOperation(value = "获取字典项列表")
     @RequestMapping(value = "/dictionaries/{id}/entries", method = RequestMethod.GET)
-    Collection<MDictionaryEntry> getDictEntries(
+    ResponseEntity<Collection<MDictionaryEntry>> getDictEntries(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") long id,
             @ApiParam(name = "value", value = "字典项值", defaultValue = "")

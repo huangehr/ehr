@@ -8,7 +8,6 @@ package com.yihu.ehr.constants;
  * @created 2016.01.11 8:54
  */
 public class MicroServiceName {
-
     public static final String Adaption = "svr-adaption";
     public static final String App = "svr-app";
     public static final String Dict = "svr-dict";

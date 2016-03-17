@@ -1,6 +1,5 @@
 package com.yihu.ehr.security.service;
 
-
 import com.yihu.ehr.util.token.TokenUtil;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -8,19 +7,21 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
- * Created by wq on 2015/8/3.
+ * Token管理。
+ *
+ * @author wq
+ * @version 1.0
+ * @created 02-6月-2015 17:38:05
  */
-
 @Transactional
 @Service
 public class TokenManager {
@@ -29,44 +30,33 @@ public class TokenManager {
     protected EntityManager entityManager;
 
     @Autowired
-    private XUserTokenRepository userTokenRepository;
+    private XTokenRepository tokenRepository;
 
-    public UserToken createUserToken(String userId, String appId) throws Exception {
-
-        //生成token信息
+    public Token createUserToken(String userId, String appId) throws Exception {
         String accessToken = TokenUtil.genToken(16);
         String refreshToken = TokenUtil.genToken(16);
         Integer expiresIn = 3600;
 
-        //对生成的token信息进行保存
-        UserToken userToken = new UserToken();
+        Token token = new Token();
+        token.setAccessToken(accessToken);
+        token.setRefreshToken(refreshToken);
+        token.setExpiresIn(expiresIn);
+        token.setUserId(userId);
+        token.setAppId(appId);
+        token.setCreateDate(new Date());
+        token.setUpdateDate(new Date());
 
-        userToken.setAccessToken(accessToken);
-        userToken.setRefreshToken(refreshToken);
-        userToken.setExpiresIn(expiresIn);
-        userToken.setUserId(userId);
-        userToken.setAppId(appId);
-        userToken.setCreateDate(new Date());
-        userToken.setUpdateDate(new Date());
-
-        userTokenRepository.save(userToken);
-        return userToken;
-    }
-
-    /**
-     * 根据授权ID查询用户授权信息
-     */
-    public UserToken getUserToken(String tokenId) {
-        UserToken token = userTokenRepository.findOne(tokenId);
+        tokenRepository.save(token);
         return token;
     }
 
-    public UserToken getUserTokenByUserId(String userId,String appId) {
+    public Token getToken(String tokenId) {
+        Token token = tokenRepository.findOne(tokenId);
 
-        //这里获取User服务和App服务
+        return token;
+    }
 
-
-        //1-1根据用户ID获取用户信息。
+    public Token getTokenByUserId(String userId, String appId) {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         HashMap resultMap = new HashMap();
         StringBuilder sb = new StringBuilder();
@@ -82,7 +72,6 @@ public class TokenManager {
         sb.append("    and app_id  = '" + appId + "'  ");
 
         String sql = sb.toString();
-
         SQLQuery sqlQuery = session.createSQLQuery(sql);
 
         if (sqlQuery.list().size() == 0) {
@@ -91,31 +80,28 @@ public class TokenManager {
         } else {
             Object[] userTokenInfo = (Object[]) sqlQuery.list().get(0);
 
-//            UserModel user = userClient.getUser(userId);
-//            AppModel app = appClient.getApp(appId);
+            Token token = new Token();
+            token.setTokenId(userTokenInfo[0].toString());
+            token.setAppId(appId);
+            token.setUserId(userId);
+            token.setAccessToken(userTokenInfo[1].toString());
+            token.setRefreshToken(userTokenInfo[2].toString());
+            token.setExpiresIn((Integer) userTokenInfo[3]);
+            token.setCreateDate((Date) userTokenInfo[4]);
+            token.setUpdateDate((Date) userTokenInfo[5]);
 
-            UserToken userToken = new UserToken();
-            userToken.setTokenId(userTokenInfo[0].toString());
-            userToken.setAppId(appId);
-            userToken.setUserId(userId);
-            userToken.setAccessToken(userTokenInfo[1].toString());
-            userToken.setRefreshToken(userTokenInfo[2].toString());
-            userToken.setExpiresIn((Integer) userTokenInfo[3]);
-            userToken.setCreateDate((Date) userTokenInfo[4]);
-            userToken.setUpdateDate((Date) userTokenInfo[5]);
-
-            return userToken;
+            return token;
         }
     }
 
-    public List<UserToken> getUserTokenList(int from, int count) {
+    public List<Token> getTokenList(int from, int count) {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
-        Criteria criteria = session.createCriteria(UserToken.class);
-        if (from >= 0 && count > 0){
+        Criteria criteria = session.createCriteria(Token.class);
+        if (from >= 0 && count > 0) {
             criteria.setFirstResult(from);
             criteria.setMaxResults(count);
         }
-        List<UserToken> list = criteria.list();
+        List<Token> list = criteria.list();
 
         return list;
     }
@@ -123,33 +109,32 @@ public class TokenManager {
     public boolean revokeToken(String accessToken) {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         Query query = session.createQuery("from UserToken where accessToken= :accessToken");
-        List<UserToken> userTokens = query.setString("accessToken", accessToken).list();
-        if (userTokens.size() == 0) {
+        List<Token> tokens = query.setString("accessToken", accessToken).list();
+        if (tokens.size() == 0) {
             return false;
         } else {
-            userTokenRepository.delete(userTokens.get(0).getTokenId());
+            tokenRepository.delete(tokens.get(0).getTokenId());
             return true;
         }
     }
 
-    public void updateUserToken(UserToken userToken) {
-        userTokenRepository.save(userToken);
+    public void updateToken(Token token) {
+        tokenRepository.save(token);
     }
 
-    public UserToken refreshAccessToken(String userId, String refreshToken,String appId) throws Exception {
-
-        UserToken userToken = getUserTokenByUserId(userId,appId);
+    public Token refreshAccessToken(String userId, String refreshToken, String appId) throws Exception {
+        Token token = getTokenByUserId(userId, appId);
 
         //如果用户的更新授权正确，则重新生成访问授权，并返回
-        if (userToken.getRefreshToken().equals(refreshToken)) {
+        if (token.getRefreshToken().equals(refreshToken)) {
             String accessToken = TokenUtil.genToken(16);
             String newRefreshToken = TokenUtil.genToken(16);
 
-            userToken.setAccessToken(accessToken);
-            userToken.setRefreshToken(newRefreshToken);
-            userToken.setUpdateDate(new Date());
-            updateUserToken(userToken);
-            return userToken;
+            token.setAccessToken(accessToken);
+            token.setRefreshToken(newRefreshToken);
+            token.setUpdateDate(new Date());
+            updateToken(token);
+            return token;
 
         } else {
             return null;

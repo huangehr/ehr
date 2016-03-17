@@ -1,7 +1,6 @@
 package com.yihu.ehr.ha.users.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.agModel.user.UsersModel;
 import com.yihu.ehr.constants.ApiVersion;
@@ -11,13 +10,12 @@ import com.yihu.ehr.ha.organization.service.OrganizationClient;
 import com.yihu.ehr.ha.security.service.SecurityClient;
 import com.yihu.ehr.ha.users.service.UserClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.geogrephy.MGeography;
+import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.org.MOrganization;
-import com.yihu.ehr.model.security.MUserSecurity;
+import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
-import com.yihu.ehr.util.encode.Base64;
 import com.yihu.ehr.util.operator.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,15 +25,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -111,13 +103,13 @@ public class UserController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = "/users/{user_id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/users/admin/{user_id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除用户", notes = "根据用户id删除用户")
     public Envelop deleteUser(
             @ApiParam(name = "user_id", value = "用户编号", defaultValue = "")
             @PathVariable(value = "user_id") String userId) throws Exception {
 
-        MUserSecurity userSecurity = securityClient.getUserSecurityByUserId(userId);
+        MKey userSecurity = securityClient.getUserSecurityByUserId(userId);
         if (userSecurity != null) {
             String userKeyId = securityClient.getUserKeyByUserId(userId);
             securityClient.deleteSecurity(userSecurity.getId());
@@ -135,8 +127,6 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/users", method = RequestMethod.POST)
     @ApiOperation(value = "创建用户", notes = "重新绑定用户信息")
     public Envelop createUser(
-            @ApiParam(name = "imageStream", value = "", defaultValue = "")
-            @RequestParam(value = "imageStream") String imageStream,
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
 
@@ -162,7 +152,7 @@ public class UserController extends BaseController {
         if (StringUtils.isNotEmpty(errorMsg)) {
             return failed(errorMsg);
         }
-        if (userClient.isLoginCodeExists(detailModel.getLoginCode())) {
+        if (userClient.isUserNameExists(detailModel.getLoginCode())) {
             return failed("账户已存在!");
         }
         if (userClient.isIdCardExists(detailModel.getIdCardNo())) {
@@ -182,20 +172,10 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/users/", method = RequestMethod.PUT)
     @ApiOperation(value = "修改用户", notes = "重新绑定用户信息")
     public Envelop updateUser(
-            @ApiParam(name = "imageStream", value = "", defaultValue = "")
-            @RequestParam(value = "imageStream") String imageStream,
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
 
-        InputStream inputStream = new ByteArrayInputStream(imageStream.getBytes("UTF-8"));
-//        MultipartFile multipartFile = image.getFile("file");
-//        byte[] bytes = multipartFile.getBytes();
-//        String fileString = Base64.encode(bytes);
-
-
         UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
-
-
 
         String errorMsg = null;
         if (StringUtils.isEmpty(detailModel.getLoginCode())) {
@@ -218,7 +198,7 @@ public class UserController extends BaseController {
         }
         MUser mUser = userClient.getUser(detailModel.getId());
         if (!mUser.getLoginCode().equals(detailModel.getLoginCode())
-                && userClient.isLoginCodeExists(detailModel.getLoginCode())) {
+                && userClient.isUserNameExists(detailModel.getLoginCode())) {
             return failed("账户已存在!");
         }
 
@@ -238,7 +218,7 @@ public class UserController extends BaseController {
     }
 
 
-    @RequestMapping(value = "users/{user_id}", method = RequestMethod.GET)
+    @RequestMapping(value = "users/admin/{user_id}", method = RequestMethod.GET)
     @ApiOperation(value = "获取用户信息", notes = "包括地址信息等")
     public Envelop getUser(
             @ApiParam(name = "user_id", value = "", defaultValue = "")
@@ -261,7 +241,7 @@ public class UserController extends BaseController {
     }
 
 
-    @RequestMapping(value = "/users/{user_id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/users/admin/{user_id}", method = RequestMethod.PUT)
     @ApiOperation(value = "改变用户状态", notes = "根据用户状态改变当前用户状态")
     public boolean activityUser(
             @ApiParam(name = "user_id", value = "id", defaultValue = "")
@@ -296,15 +276,15 @@ public class UserController extends BaseController {
     /**
      * 重新分配秘钥
      *
-     * @param loginCode 账号
+     * @param userName 账号
      * @return map  key{publicKey:公钥；validTime：有效时间; startTime：生效时间}
      */
     @RequestMapping(value = "/users/key/{login_code}", method = RequestMethod.PUT)
     @ApiOperation(value = "重新分配密钥", notes = "重新分配密钥")
     public Map<String, String> distributeKey(
             @ApiParam(name = "login_code", value = "登录帐号", defaultValue = "")
-            @PathVariable(value = "login_code") String loginCode) {
-        MUser mUser = userClient.getUserByLoginCode(loginCode);
+            @PathVariable(value = "login_code") String userName) {
+        MUser mUser = userClient.getUserByUserName(userName);
         if (mUser == null) {
             return null;
         }
@@ -315,18 +295,18 @@ public class UserController extends BaseController {
     /**
      * 根据登陆用户名及密码验证用户.
      *
-     * @param loginCode
+     * @param userName
      * @param psw
      */
     @RequestMapping(value = "/users/verification/{login_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据登陆用户名及密码验证用户", notes = "根据登陆用户名及密码验证用户")
     public Envelop loginVerification(
             @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
-            @PathVariable(value = "login_code") String loginCode,
+            @PathVariable(value = "login_code") String userName,
             @ApiParam(name = "psw", value = "密码", defaultValue = "")
             @RequestParam(value = "psw") String psw) {
 
-        MUser mUser = userClient.getUserByNameAndPassword(loginCode, psw);
+        MUser mUser = userClient.getUserByNameAndPassword(userName, psw);
         if (mUser == null) {
             return failed("用户信息获取失败!");
         }
@@ -338,19 +318,20 @@ public class UserController extends BaseController {
     /**
      * 根据loginCode 获取user
      *
-     * @param loginCode
+     * @param userName
      * @return
      */
-    @RequestMapping(value = "/users/login/{login_code}", method = RequestMethod.GET)
+    @RequestMapping(value = "/users/{login_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据登录账号获取当前用户", notes = "根据登陆用户名及密码验证用户")
     public Envelop getUserByLoginCode(
             @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
-            @PathVariable(value = "login_code") String loginCode) {
+            @PathVariable(value = "login_code") String userName) {
 
-        MUser mUser = userClient.getUserByLoginCode(loginCode);
+        MUser mUser = userClient.getUserByUserName(userName);
         if (mUser == null) {
             return failed("用户信息获取失败!");
         }
+
         UserDetailModel detailModel = MUserToUserDetailModel(mUser);
 
         return success(detailModel);
@@ -365,9 +346,10 @@ public class UserController extends BaseController {
             @RequestParam(value = "existenceNm") String existenceNm) {
         Envelop envelop = new Envelop();
         boolean bo;
+
         //返回值：true>存在，false>不存在
         if(existenceType.equals("login_code")){
-            bo = userClient.isLoginCodeExists(existenceNm);
+            bo = userClient.isUserNameExists(existenceNm);
             envelop.setSuccessFlg(bo);
         }
         if (existenceType.equals("id_card_no")){
@@ -415,7 +397,7 @@ public class UserController extends BaseController {
             detailModel.setOrganizationName(orgModel == null ? "" : orgAddress);
         }
         //获取秘钥信息
-        MUserSecurity userSecurity = securityClient.getUserSecurityByUserId(mUser.getId());
+        MKey userSecurity = securityClient.getUserSecurityByUserId(mUser.getId());
         if (userSecurity != null) {
             detailModel.setPublicKey(userSecurity.getPublicKey());
             String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT)

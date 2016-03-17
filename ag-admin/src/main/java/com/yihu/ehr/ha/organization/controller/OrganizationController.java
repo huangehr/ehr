@@ -9,7 +9,7 @@ import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.agModel.org.OrgModel;
 import com.yihu.ehr.ha.security.service.SecurityClient;
-import com.yihu.ehr.model.geogrephy.MGeography;
+import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.agModel.org.OrgDetailModel;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.util.Envelop;

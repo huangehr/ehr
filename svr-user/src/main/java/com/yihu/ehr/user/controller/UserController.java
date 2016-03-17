@@ -1,6 +1,7 @@
 package com.yihu.ehr.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.security.MKey;
@@ -37,7 +38,7 @@ public class UserController extends BaseRestController {
     @Autowired
     private SecurityClient securityClient;
 
-    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Users.Users, method = RequestMethod.GET)
     @ApiOperation(value = "获取用户列表", notes = "根据查询条件获取用户列表在前端表格展示")
     public List<MUser> searchUsers(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
@@ -57,17 +58,7 @@ public class UserController extends BaseRestController {
         return (List<MUser>) convertToModels(userList, new ArrayList<MUser>(userList.size()), MUser.class, fields);
     }
 
-    @RequestMapping(value = "/users/{user_id}", method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除用户", notes = "根据用户id删除用户")
-    public boolean deleteUser(
-            @ApiParam(name = "user_id", value = "用户编号", defaultValue = "")
-            @PathVariable(value = "user_id") String userId) throws Exception {
-        userManager.deleteUser(userId);
-        return true;
-    }
-
-
-    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    @RequestMapping(value = RestApi.Users.Users, method = RequestMethod.POST)
     @ApiOperation(value = "创建用户", notes = "重新绑定用户信息")
     public MUser createUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
@@ -81,8 +72,7 @@ public class UserController extends BaseRestController {
         return convertToModel(user, MUser.class, null);
     }
 
-
-    @RequestMapping(value = "/users", method = RequestMethod.PUT)
+    @RequestMapping(value = RestApi.Users.Users, method = RequestMethod.PUT)
     @ApiOperation(value = "修改用户", notes = "重新绑定用户信息")
     public MUser updateUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
@@ -93,8 +83,7 @@ public class UserController extends BaseRestController {
         return convertToModel(user, MUser.class, null);
     }
 
-
-    @RequestMapping(value = "users/{user_id}", method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Users.UserAdmin, method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取获取用户信息")
     public MUser getUser(
             @ApiParam(name = "user_id", value = "", defaultValue = "")
@@ -104,25 +93,17 @@ public class UserController extends BaseRestController {
         return userModel;
     }
 
-
-    /**
-     * 根据loginCode 获取user
-     *
-     * @param loginCode
-     * @return
-     */
-    @RequestMapping(value = "/users/{login_code}", method = RequestMethod.GET)
-    @ApiOperation(value = "根据登录账号获取当前用户", notes = "根据登陆用户名及密码验证用户")
-    public MUser getUserByLoginCode(
-            @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
-            @PathVariable(value = "login_code") String loginCode) {
-        User user = userManager.getUserByLoginCode(loginCode);
-        return convertToModel(user, MUser.class);
+    @RequestMapping(value = RestApi.Users.UserAdmin, method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除用户", notes = "根据id删除用户")
+    public boolean deleteUser(
+            @ApiParam(name = "user_id", value = "用户编号", defaultValue = "")
+            @PathVariable(value = "user_id") String userId) throws Exception {
+        userManager.deleteUser(userId);
+        return true;
     }
 
-
-    @RequestMapping(value = "/users/{user_id}", method = RequestMethod.PUT)
-    @ApiOperation(value = "改变用户状态", notes = "根据用户状态改变当前用户状态")
+    @RequestMapping(value = RestApi.Users.UserAdmin, method = RequestMethod.PUT)
+    @ApiOperation(value = "改变用户状态", notes = "根据id更新用户")
     public boolean activityUser(
             @ApiParam(name = "user_id", value = "id", defaultValue = "")
             @PathVariable(value = "user_id") String userId,
@@ -132,36 +113,32 @@ public class UserController extends BaseRestController {
         return true;
     }
 
+    /**
+     * 根据用户名获取user
+     *
+     * @param userName
+     * @return
+     */
+    @RequestMapping(value = RestApi.Users.User, method = RequestMethod.GET)
+    @ApiOperation(value = "根据登录账号获取当前用户", notes = "根据登陆用户名及密码验证用户")
+    public MUser getUserByLoginCode(
+            @ApiParam(name = "user_name", value = "登录账号", defaultValue = "")
+            @PathVariable(value = "user_name") String userName) {
+        User user = userManager.getUserByLoginCode(userName);
+        return convertToModel(user, MUser.class);
+    }
 
-    @RequestMapping(value = "users/password/{user_id}", method = RequestMethod.PUT)
+    @RequestMapping(value = RestApi.Users.UserAdminPassword, method = RequestMethod.PUT)
     @ApiOperation(value = "重设密码", notes = "用户忘记密码管理员帮助重新还原密码，初始密码123456")
     public boolean resetPass(
             @ApiParam(name = "user_id", value = "id", defaultValue = "")
             @PathVariable(value = "user_id") String userId) throws Exception {
         userManager.resetPass(userId);
-        return true;
 
-    }
-
-
-    @RequestMapping(value = "/users/binding/{user_id}", method = RequestMethod.DELETE)
-    @ApiOperation(value = "取消关联绑定", notes = "取消相关信息绑定")
-    public boolean unBinding(
-            @ApiParam(name = "user_id", value = "", defaultValue = "")
-            @PathVariable(value = "user_id") String userId,
-            @ApiParam(name = "type", value = "", defaultValue = "")
-            @RequestParam(value = "type") String type) {
-        User user = userManager.getUser(userId);
-        if (type.equals("tel")) {
-            user.setTelephone("");
-        } else {
-            user.setEmail("");
-        }
-        userManager.saveUser(user);
         return true;
     }
 
-    @RequestMapping(value = "/users/key/{user_id}", method = RequestMethod.PUT)
+    @RequestMapping(value = RestApi.Users.UserAdminKey, method = RequestMethod.PUT)
     @ApiOperation(value = "重新分配密钥", notes = "重新分配密钥")
     public Map<String, String> distributeKey(
             @ApiParam(name = "user_id", value = "登录帐号", defaultValue = "")
@@ -171,9 +148,7 @@ public class UserController extends BaseRestController {
         if (userSecurity == null) {
             userSecurity = securityClient.createSecurityByUserId(userId);
         } else {
-            //result.setErrorMsg("公钥信息已存在。");
-            //这里删除原有的公私钥重新分配
-            //1-1根据用户登陆名获取用户信息。
+            // 删除原有的公私钥重新分配
             String userKeyId = securityClient.getUserKeyByUserId(userId);
             securityClient.deleteSecurity(userSecurity.getId());
             securityClient.deleteUserKey(userKeyId);
@@ -195,7 +170,7 @@ public class UserController extends BaseRestController {
      * @param userName
      * @param password
      */
-    @RequestMapping(value = "/users/user_name/{user_name}/password/{password}", method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Users.UserPassword, method = RequestMethod.GET)
     @ApiOperation(value = "根据登陆用户名及密码验证用户", notes = "根据登陆用户名及密码验证用户")
     public MUser getUserByNameAndPassword(
             @ApiParam(name = "user_name", value = "登录账号", defaultValue = "")
@@ -206,19 +181,37 @@ public class UserController extends BaseRestController {
         return convertToModel(user, MUser.class);
     }
 
-    @RequestMapping(value = "/users/existence/{login_code}", method = RequestMethod.GET)
-    @ApiOperation(value = "判断账户是否存在")
-    public boolean isLoginCodeExists(
+    @RequestMapping(value = RestApi.Users.UserExistence, method = RequestMethod.GET)
+    @ApiOperation(value = "判断用户名是否存在")
+    public boolean isUserNameExists(
             @ApiParam(name = "login_code", value = "login_code", defaultValue = "")
-            @PathVariable(value = "login_code") String loginCode) {
-        return userManager.getUserByLoginCode(loginCode) != null;
+            @PathVariable(value = "login_code") String userName) {
+        return userManager.getUserByLoginCode(userName) != null;
     }
 
-    @RequestMapping(value = "/users/is_exist/{id_card}", method = RequestMethod.GET)
-    @ApiOperation(value = "判断账户是否存在")
+    @RequestMapping(value = RestApi.Users.UserIdCardNoExistence, method = RequestMethod.GET)
+    @ApiOperation(value = "判断用户身份证号是否存在")
     public boolean isIdCardExists(
             @ApiParam(name = "id_card", value = "id_card", defaultValue = "")
             @PathVariable(value = "id_card") String idCard) {
         return userManager.getUserByIdCardNo(idCard) != null;
+    }
+
+    @RequestMapping(value = RestApi.Users.UserAdminContact, method = RequestMethod.DELETE)
+    @ApiOperation(value = "用户联系方式解绑", notes = "将用户电话或邮件地址设置为空")
+    public boolean delteContact(
+            @ApiParam(name = "user_id", value = "", defaultValue = "")
+            @PathVariable(value = "user_id") String userId,
+            @ApiParam(name = "type", value = "", defaultValue = "")
+            @RequestParam(value = "type") String type) {
+        User user = userManager.getUser(userId);
+        if (type.equals("tel")) {
+            user.setTelephone("");
+        } else {
+            user.setEmail("");
+        }
+
+        userManager.saveUser(user);
+        return true;
     }
 }
