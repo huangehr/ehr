@@ -11,6 +11,17 @@ import java.util.Set;
 public class TokenModel {
     long id;
     String url;
+    Set<String> scopes;
+    String token;
+    String tokenLastEight;
+    String tokenHash;
+    String note;
+    String noteUrl;
+    Date updatedAt;
+    Date createdAt;
+    String fingerprint;
+
+    MApp app;
 
     public void setId(long id) {
         this.id = id;
@@ -107,16 +118,4 @@ public class TokenModel {
     public String getFingerprint() {
         return fingerprint;
     }
-
-    Set<String> scopes;
-    String token;
-    String tokenLastEight;
-    String tokenHash;
-    String note;
-    String noteUrl;
-    Date updatedAt;
-    Date createdAt;
-    String fingerprint;
-
-    MApp app;
 }

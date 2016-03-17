@@ -1,11 +1,7 @@
 package com.yihu.ehr.model.app;
-import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.user.MUser;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * APP Model。
