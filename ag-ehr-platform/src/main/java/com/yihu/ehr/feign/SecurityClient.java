@@ -31,7 +31,7 @@ public interface SecurityClient {
     @ApiOperation(value = "获取企业公钥", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "企业公钥，用于与健康档案平台之间传输数据的加密。")
     MKey getOrgKey(@PathVariable(value = "org_code") String orgCode) ;
 
-    @RequestMapping(value = RestApi.Securities.UserToken, method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Securities.UserToken, method = RequestMethod.PUT)
     Map<String,Object> getUserTempToken(
             @PathVariable(value = "user_id") String userId,
             @PathVariable(value = "token_id") String tokenId,
