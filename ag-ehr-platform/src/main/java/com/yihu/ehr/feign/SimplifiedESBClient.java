@@ -1,11 +1,7 @@
 package com.yihu.ehr.feign;
 
-import com.yihu.ehr.constants.MicroServiceIpAddressStr;
 import com.yihu.ehr.constants.MicroServiceName;
-import com.yihu.ehr.constants.MicroServicePort;
-import com.yihu.ehr.constants.MicroServices;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,7 +16,7 @@ public interface SimplifiedESBClient {
 
     @RequestMapping(value = "/esb/getUploadFlag", method = RequestMethod.GET)
     public boolean getUploadFlag(@RequestParam(value = "orgCode", required = true) String orgCode,
-                                   @RequestParam(value = "systemCode", required = true)String systemCode);
+                                 @RequestParam(value = "systemCode", required = true) String systemCode);
 
     @RequestMapping(value = "/esb/uploadLog", method = RequestMethod.POST)
     public boolean uploadLog(@RequestParam(value = "orgCode", required = true) String orgCode,
@@ -42,8 +38,9 @@ public interface SimplifiedESBClient {
     public String uploadResult(@RequestParam(value = "systemCode", required = true) String systemCode,
                                @RequestParam(value = "orgCode", required = true) String orgCode,
                                @RequestParam(value = "versionCode", required = true) String versionCode,
-                               @RequestParam(value = "versionName", required = true) String versionName
-            , @RequestParam(value = "updateDate", required = true) String updateDate);
+                               @RequestParam(value = "versionName", required = true) String versionName,
+                               @RequestParam(value = "updateDate", required = true) String updateDate,
+                               @RequestParam(value = "message", required = true) String message);
 
     @RequestMapping(value = "/esb/fillMining", method = RequestMethod.POST)
     public String fillMining(

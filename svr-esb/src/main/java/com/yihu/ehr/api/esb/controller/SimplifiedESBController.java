@@ -193,10 +193,11 @@ public class SimplifiedESBController {
             @ApiParam("orgCode") @RequestParam(value = "orgCode", required = true) String orgCode,
             @ApiParam("versionCode") @RequestParam(value = "versionCode", required = true) String versionCode,
             @ApiParam("versionName") @RequestParam(value = "versionName", required = true) String versionName,
+            @ApiParam("message") @RequestParam(value = "message", required = true) String message,
             @ApiParam("updateDate") @RequestParam(value = "updateDate", required = true) String updateDate) {
         String hsa = null;
         try {
-            hsa = simplifiedESBService.uploadResult(systemCode, orgCode, versionCode, versionName, updateDate);
+            hsa = simplifiedESBService.uploadResult(systemCode, orgCode, versionCode, versionName, updateDate,message);
         } catch (Exception e) {
             e.printStackTrace();
         }
