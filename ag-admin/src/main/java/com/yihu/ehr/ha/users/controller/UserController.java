@@ -127,8 +127,6 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/users", method = RequestMethod.POST)
     @ApiOperation(value = "创建用户", notes = "重新绑定用户信息")
     public Envelop createUser(
-            @ApiParam(name = "imageStream", value = "", defaultValue = "")
-            @RequestParam(value = "imageStream") String imageStream,
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
 
@@ -174,20 +172,10 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/users/", method = RequestMethod.PUT)
     @ApiOperation(value = "修改用户", notes = "重新绑定用户信息")
     public Envelop updateUser(
-            @ApiParam(name = "imageStream", value = "", defaultValue = "")
-            @RequestParam(value = "imageStream") String imageStream,
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
 
-        InputStream inputStream = new ByteArrayInputStream(imageStream.getBytes("UTF-8"));
-//        MultipartFile multipartFile = image.getFile("file");
-//        byte[] bytes = multipartFile.getBytes();
-//        String fileString = Base64.encode(bytes);
-
-
         UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
-
-
 
         String errorMsg = null;
         if (StringUtils.isEmpty(detailModel.getLoginCode())) {
