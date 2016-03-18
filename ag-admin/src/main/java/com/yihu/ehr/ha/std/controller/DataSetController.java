@@ -154,7 +154,7 @@ public class DataSetController extends BaseController{
 
         }else {
 
-            MStdDataSet mStdDataSet = dataSetClient.updateDataSet(version,datasetJsonModel);
+            MStdDataSet mStdDataSet = dataSetClient.updateDataSet(version, Long.parseLong(id), datasetJsonModel);
             dataSetModel = convertToModel(mStdDataSet,DataSetModel.class);
             if(dataSetModel != null){
                 envelop.setSuccessFlg(true);
@@ -272,7 +272,7 @@ public class DataSetController extends BaseController{
 
         if(metaDataModel.getId()>0){
 
-            mStdMetaData = dataSetClient.updataMetaSet(version, metaDataJson);
+            mStdMetaData = dataSetClient.updataMetaSet(version, metaDataModel.getId(), metaDataJson);
             metaDataModel = convertToModel(mStdMetaData,MetaDataModel.class);
             if(metaDataModel != null){
                 envelop.setSuccessFlg(true);
