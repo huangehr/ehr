@@ -19,20 +19,20 @@ import java.io.Serializable;
  */
 @Configuration
 public class RedisConfig {
-    @Value("${redis.pool.min-idle}")
-    private int minIdle;
+    //@Value("${redis.pool.min-idle}")
+    private int minIdle = 5;
 
-    @Value("${redis.pool.max-idle}")
-    private int maxIdle;
+    //@Value("${redis.pool.max-idle}")
+    private int maxIdle = 10;
 
-    @Value("${redis.pool.max-total}")
-    private int maxTotal;
+    //@Value("${redis.pool.max-total}")
+    private int maxTotal = 15;
 
-    @Value("${redis.connection-factory.host-name}")
-    private String hostName;
+    //@Value("${redis.connection-factory.host-name}")
+    private String hostName = "172.17.110.68";
 
-    @Value("${redis.connection-factory.port}")
-    private int port;
+    //@Value("${redis.connection-factory.port}")
+    private int port  = 6379;
 
     @Bean
     JedisPoolConfig jedisPoolConfig(){
