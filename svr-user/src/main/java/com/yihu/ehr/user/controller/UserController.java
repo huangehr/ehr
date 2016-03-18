@@ -214,4 +214,11 @@ public class UserController extends BaseRestController {
         userManager.saveUser(user);
         return true;
     }
+
+    @RequestMapping(value = RestApi.Users.UserEmailNoExistence, method = RequestMethod.GET)
+    @ApiOperation(value = "判断用户邮件是否存在")
+    public boolean isEmailExists(@RequestParam(value = "email") String email) {
+
+        return userManager.getUserByEmail(email) != null;
+    }
 }

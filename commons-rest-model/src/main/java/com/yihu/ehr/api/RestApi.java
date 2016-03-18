@@ -128,5 +128,6 @@ public class RestApi {
         public static final String UserAdminKey             = "/users/admin/{user_id}/key";
         public static final String UserAdminContact         = "/users/admin/{user_id}/contact";
         public static final String UserIdCardNoExistence    = "/user/id_card_no/existence";
+        public static final String UserEmailNoExistence    = "/user/email/existence";
     }
 }
