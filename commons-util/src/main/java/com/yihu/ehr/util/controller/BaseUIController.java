@@ -1,17 +1,38 @@
 package com.yihu.ehr.util.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.util.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-/**
+/** UI用controller工具类
  * Created by Administrator on 2016/3/16.
  */
 public class BaseUIController {
     @Autowired
     ObjectMapper objectMapper;
+
+    public Envelop getEnvelop(String json){
+        try {
+            return objectMapper.readValue(json,Envelop.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public String toJson(Object data){
+        try {
+            String json = objectMapper.writeValueAsString(data);
+            return json;
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     /**
      *将envelop中的obj串转化为model
@@ -45,10 +66,9 @@ public class BaseUIController {
      */
     public <T> Collection<T> getEnvelopList(List modelList, Collection<T> targets, Class<T> targetCls) {
         try {
-            for(int i=0;i<modelList.size();i++)
-            {
-                String objJsonData = objectMapper.writeValueAsString(modelList.get(i));
-                T model = objectMapper.readValue(objJsonData,targetCls);
+            for (Object aModelList : modelList) {
+                String objJsonData = objectMapper.writeValueAsString(aModelList);
+                T model = objectMapper.readValue(objJsonData, targetCls);
                 targets.add(model);
             }
             return targets;
