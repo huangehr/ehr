@@ -1,5 +1,6 @@
 package com.yihu.ehr.ha.std.service;
 
+import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.util.RestEcho;
@@ -19,7 +20,7 @@ import springfox.documentation.annotations.ApiIgnore;
 @ApiIgnore
 public interface StandardDispatchClient {
 
-    @RequestMapping(value = "/standard-dispatcher/schema", method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Standards.Dispatches, method = RequestMethod.GET)
     @ApiOperation(value = "获取适配方案摘要", produces = "application/json",
             notes = "获取两个指定版本的标准化数据差异与适配方案，文件以Base64编码，压缩格式为zip")
     RestEcho getSchemeInfo(

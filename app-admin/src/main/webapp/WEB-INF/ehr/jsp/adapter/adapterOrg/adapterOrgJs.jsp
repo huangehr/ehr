@@ -45,7 +45,6 @@
         initDDL: function (dictId, target) {
           var target = $(target);
           var dataModel = $.DataModel.init();
-
           dataModel.fetchRemote("${contextRoot}/dict/searchDictEntryList",{data:{dictId: dictId,page: 1, rows: 10},
             success: function(data) {
               target.ligerComboBox({

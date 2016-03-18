@@ -1,6 +1,6 @@
 package com.yihu.ehr.standard.datasets.service;
 
-import com.yihu.ehr.standard.cdaversion.service.CDAVersion;
+import com.yihu.ehr.standard.version.service.CDAVersion;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;

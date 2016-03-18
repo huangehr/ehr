@@ -1,5 +1,6 @@
 package com.yihu.ehr.standard.datasets.controller;
 
+import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
@@ -26,8 +27,8 @@ import java.util.Map;
  * @created 2016.2.15
  */
 @RestController
-@RequestMapping(ApiVersion.Version1_0 + "/std")
-@Api(protocols = "https", value = "std/dataset", description = "标准数据集", tags = {"标准数据集"})
+@RequestMapping(ApiVersion.Version1_0)
+@Api(protocols = "https", value = "dataset", description = "标准数据集", tags = {"标准数据集"})
 public class DataSetsController extends ExtendController<MStdDataSet> {
 
     @Autowired
@@ -38,7 +39,7 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
     }
 
 
-    @RequestMapping(value = "/data_sets", method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Standards.DataSets, method = RequestMethod.GET)
     @ApiOperation(value = "查询数据集的方法")
     public Collection<MStdDataSet> searchDataSets(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -63,7 +64,7 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
     }
 
 
-    @RequestMapping(value = "/data_set/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = RestApi.Standards.DataSet, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据集信息")
     public boolean deleteDataSet(
             @ApiParam(name = "id", value = "数据集编号", defaultValue = "")
@@ -74,7 +75,8 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
         return dataSetService.removeDataSet(new Long[]{id}, version) > 0;
     }
 
-    @RequestMapping(value = "/data_sets", method = RequestMethod.DELETE)
+
+    @RequestMapping(value = RestApi.Standards.DataSets, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据集信息")
     public boolean deleteDataSet(
             @ApiParam(name = "ids", value = "数据集编号", defaultValue = "")
@@ -85,7 +87,8 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
         return dataSetService.removeDataSet(strToLongArr(ids), version) > 0;
     }
 
-    @RequestMapping(value = "/data_set/{id}", method = RequestMethod.GET)
+
+    @RequestMapping(value = RestApi.Standards.DataSet, method = RequestMethod.GET)
     @ApiOperation(value = "获取数据集信息")
     public MStdDataSet getDataSet(
             @ApiParam(name = "id", value = "数据集编号", defaultValue = "")
@@ -97,7 +100,7 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
     }
 
 
-    @RequestMapping(value = "/data_set", method = RequestMethod.POST)
+    @RequestMapping(value = RestApi.Standards.DataSets, method = RequestMethod.POST)
     @ApiOperation(value = "新增数据集信息")
     public MStdDataSet saveDataSet(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
@@ -109,32 +112,36 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
         IDataSet dataSet = (IDataSet) jsonToObj(model, entityClass);
         if (dataSetService.isExistByField("code", dataSet.getCode(), entityClass))
             throw new ApiException(ErrorCode.RapeatDataSetCode, "代码重复！");
-        if(dataSetService.add(dataSet))
+        if(dataSetService.add(dataSet, version))
             return getModel(dataSet);
         return null;
     }
 
-    @RequestMapping(value = "/data_set", method = RequestMethod.PUT)
+
+    @RequestMapping(value = RestApi.Standards.DataSet, method = RequestMethod.PUT)
     @ApiOperation(value = "修改数据集信息")
     public MStdDataSet updateDataSet(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
             @RequestParam(value = "version") String version,
+            @ApiParam(name = "id", value = "数据集编号", defaultValue = "")
+            @PathVariable(value = "id") long id,
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam(value = "model") String model) throws Exception{
 
         Class entityClass = getServiceEntity(version);
         IDataSet dataSetModel = (IDataSet) jsonToObj(model, entityClass);
-        IDataSet dataSet = dataSetService.retrieve(dataSetModel.getId(), entityClass);
+        IDataSet dataSet = dataSetService.retrieve(id, entityClass);
         if(!dataSet.getCode().equals(dataSetModel.getCode())){
             if(dataSetService.isExistByField("code", dataSetModel.getCode(), entityClass))
                 throw new ApiException(ErrorCode.RapeatDataSetCode, "代码重复！");
         }
+        dataSetModel.setId(id);
         dataSetService.save(dataSetModel);
         return getModel(dataSetModel);
     }
 
 
-    @RequestMapping(value = "/data_sets/map", method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Standards.DataSetsName, method = RequestMethod.GET)
     @ApiOperation(value = "获取数据集 id-name : map集")
     public Map getDataSetMapByIds(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")

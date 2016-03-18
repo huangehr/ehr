@@ -1,8 +1,9 @@
 package com.yihu.ehr.adaption.feignclient;
 
-import com.yihu.ehr.constants.*;
+import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.MicroServices;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -18,23 +19,20 @@ import java.util.Map;
  * @created 2016.2.1
  */
 @ApiIgnore
-@FeignClient(name = MicroServiceName.Standard)
+@FeignClient(name = MicroServices.StandardMgr)
 @RequestMapping(ApiVersion.Version1_0)
 public interface DataSetClient {
 
-    @RequestMapping(value = "/std/data_sets/map", method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Standards.DataSetsName, method = RequestMethod.GET)
     @ApiOperation(value = "获取数据集 id-name : map集")
     Map getDataSetMapByIds(
-            @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @RequestParam(value = "version") String version,
-            @ApiParam(name = "ids", value = "数据集编号", defaultValue = "")
             @RequestParam(value = "ids") String ids);
 
-    @RequestMapping(value = "/std/meta_datas/map", method = RequestMethod.GET)
+
+    @RequestMapping(value = RestApi.Standards.MetaDatasName, method = RequestMethod.GET)
     @ApiOperation(value = "获取数据元 id-name : map集")
     Map getMetaDataMapByIds(
-            @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @RequestParam(value = "version") String version,
-            @ApiParam(name = "medaIds", value = "数据元编号", defaultValue = "")
             @RequestParam(value = "medaIds") String metaIds);
 }

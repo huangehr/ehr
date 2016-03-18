@@ -91,7 +91,7 @@ public class CDATypeController extends BaseController {
             @ApiParam(name = "name", value = "名称")
             @RequestParam(value = "name") String name) {
         Envelop envelop = new Envelop();
-        List<MCDAType> mCdaTypeList = cdaTypeClient.getCdaTypeByCodeOrName(code, name);
+        List<MCDAType> mCdaTypeList = (List) cdaTypeClient.searchType("","code?"+code+" g1;name?"+name+" g1", "", 100, 1);
         if (mCdaTypeList.size() == 0){
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("没有匹配条件的cda类别！");
@@ -127,7 +127,7 @@ public class CDATypeController extends BaseController {
             @ApiParam(name = "ids", value = "ids")
             @PathVariable(value = "ids") String ids) {
         Envelop envelop = new Envelop();
-        List<MCDAType> mCdaTypeList = cdaTypeClient.getCdaTypeByIds(ids);
+        List<MCDAType> mCdaTypeList = (List) cdaTypeClient.searchType("","id="+ids, "", 100, 1);
         if (mCdaTypeList.size() == 0){
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("没有匹配条件的cda类别！");
@@ -183,7 +183,7 @@ public class CDATypeController extends BaseController {
         mCdaTypeOld.setUpdateDate(new Date());
         String jsonDataNew = objectMapper.writeValueAsString(mCdaTypeOld);
 
-        MCDAType mCdaTypeNew = cdaTypeClient.updateCDAType(jsonDataNew);
+        MCDAType mCdaTypeNew = cdaTypeClient.updateCDAType(mCdaTypeOld.getId(), jsonDataNew);
         if (mCdaTypeNew == null) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("更新cda类别失败！");
