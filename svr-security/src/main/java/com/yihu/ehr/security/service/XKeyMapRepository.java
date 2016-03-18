@@ -13,9 +13,9 @@ import java.util.List;
  */
 public interface XKeyMapRepository extends PagingAndSortingRepository<KeyMap, String> {
 
-    @Query("select userKey from RSAKey userKey where userKey.user =:userId and userKey.keyType = 'Personal'")
+    @Query("select userKey from KeyMap userKey where userKey.user =:userId and userKey.keyType = 'Personal'")
     List<KeyMap> findByUserId(@Param("userId") String userId);
 
-    @Query("select userKey from RSAKey userKey where userKey.org =:orgCode and userKey.keyType = 'Org'")
+    @Query("select userKey from KeyMap userKey where userKey.org =:orgCode and userKey.keyType = 'Org'")
     List<KeyMap> findByOrgCdode(@Param("orgCode") String orgCode);
 }

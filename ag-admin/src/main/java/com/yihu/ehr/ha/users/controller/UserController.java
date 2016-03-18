@@ -3,6 +3,7 @@ package com.yihu.ehr.ha.users.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.agModel.user.UsersModel;
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.ha.geography.service.AddressClient;
@@ -26,8 +27,6 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -158,7 +157,7 @@ public class UserController extends BaseController {
         if (userClient.isIdCardExists(detailModel.getIdCardNo())) {
             return failed("身份证号已存在!");
         }
-
+        detailModel.setPassword( AgAdminConstants.DefaultPassword);
         MUser mUser = convertToModel(detailModel, MUser.class);
         mUser = userClient.createUser(objectMapper.writeValueAsString(mUser));
         if (mUser == null) {
@@ -392,9 +391,12 @@ public class UserController extends BaseController {
         String orgCode = mUser.getOrganization();
         if(StringUtils.isNotEmpty(orgCode)) {
             MOrganization orgModel = orgClient.getOrg(orgCode);
-            MGeography  mGeography = addressClient.getAddressById(orgModel.getLocation());
-            String orgAddress = mGeography.getProvince()+mGeography.getCity()+mGeography.getDistrict()+orgModel.getFullName();
-            detailModel.setOrganizationName(orgModel == null ? "" : orgAddress);
+            detailModel.setOrganizationName(orgModel == null ? "" : orgModel.getFullName());
+            if(StringUtils.isNotEmpty(orgModel.getLocation())) {
+                MGeography mGeography = addressClient.getAddressById(orgModel.getLocation());
+                detailModel.setProvince(mGeography==null?"":mGeography.getProvince());
+                detailModel.setCity(mGeography==null?"":mGeography.getCity());
+            }
         }
         //获取秘钥信息
         MKey userSecurity = securityClient.getUserSecurityByUserId(mUser.getId());

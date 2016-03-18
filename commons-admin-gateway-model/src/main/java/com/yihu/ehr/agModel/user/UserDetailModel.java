@@ -12,7 +12,7 @@ public class UserDetailModel {
     private String email;
     private String loginCode;
     private String realName;
-    private String password="123456";
+    private String password;
     private Boolean activated;
     private String validateCode;
     private String userType;
@@ -24,6 +24,8 @@ public class UserDetailModel {
     private String idCardNo;
     private String organization;
     private String organizationName;
+    private String province;
+    private String city;
 
     // 未绑定属性
     private String orgPost;
@@ -282,5 +284,21 @@ public class UserDetailModel {
 
     public void setStartTime(String startTime) {
         this.startTime = startTime;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

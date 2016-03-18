@@ -65,11 +65,10 @@ public class OrganizationsEndPoint extends BaseController {
             @PathVariable(value = "org_code")
             String orgCode) {
 
-        MKey key = securityClient.getOrgKey(orgCode);
-
+        String keyId = securityClient.getOrgKey(orgCode);
+        MKey key = securityClient.getKey(keyId);
         KeyModel model = new KeyModel();
-        BeanUtils.copyProperties(key, model, "privateKey");
-
+        BeanUtils.copyProperties(key, model, "privateKey","fromDate","expiryDate");
         return model;
     }
 }

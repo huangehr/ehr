@@ -47,9 +47,9 @@ public class DataSetService extends BaseHbmService<IDataSet>{
 
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public boolean add(IDataSet dataSet){
+    public boolean add(IDataSet dataSet, String version){
         String sql =
-                "INSERT INTO " + getTaleName(dataSet.getStdVersion()) +
+                "INSERT INTO " + getTaleName(version) +
                 "(code, name, ref_standard, std_version, summary, hash, document_id, lang) " +
                 "VALUES (:code, :name, :refStandard, :version, :summary, :hashCode, :documentId, :lang)";
         Query query = currentSession().createSQLQuery(sql);
