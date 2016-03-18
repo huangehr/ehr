@@ -3,6 +3,7 @@ package com.yihu.ehr.query;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import com.yihu.ehr.util.URLQueryBuilder;
 
 import static org.junit.Assert.*;
 

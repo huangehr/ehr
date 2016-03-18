@@ -21,6 +21,6 @@ public class StandardServiceApp implements ApplicationContextAware {
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         //force the bean to get loaded as soon as possible
-        applicationContext.getBean("requestMappingHandlerAdapter");
+//        applicationContext.getBean("requestMappingHandlerAdapter");
     }
 }

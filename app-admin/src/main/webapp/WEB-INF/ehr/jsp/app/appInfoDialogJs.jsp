@@ -16,7 +16,6 @@
 
         var dialog = frameElement.dialog;
 
-        debugger;
         /* *************************** 函数定义 ******************************* */
         function pageInit() {
             appInfoForm.init();
@@ -41,12 +40,6 @@
                 this.bindEvents();
             },
             initForm: function () {
-                var mode = '${mode}';
-
-                if(mode == 'view'){
-                    $("input,select", this.$form).prop('disabled', false);
-                }
-
                 this.initDDL(catalogDictId, this.$catalog);
                 this.initDDL(statusDictId, this.$status);
 
@@ -57,18 +50,24 @@
                 this.$secret.ligerTextBox({width:240});
                 this.$description.ligerTextBox({width:240, height: 100 });
 
+                var mode = '${mode}';
+                if(mode == 'view'){
+                    $("input,select", this.$form).prop('disabled', false);
+                }
                 this.$form.attrScan();
-                this.$form.Fields.fillValues({
-                    name:'${app.name}',
-                    catalog: '${app.catalog.code}',
-                    status:'${app.status.code}',
-                    tags:'${app.tags}',
-                    appId:'${app.id}',
-                    appSecret:'${app.secret}',
-                    url:'${app.url}',
-                    description:'${app.description}'
-                });
-
+                if(mode !='new'){
+                    var app = (JSON.parse('${app}')).obj;
+                    this.$form.Fields.fillValues({
+                        name:app.name,
+                        catalog: app.catalog,
+                        status:app.status,
+                        tags:app.tags,
+                        id:app.id,
+                        secret:app.secret,
+                        url:app.url,
+                        description:app.description
+                    });
+                }
                 this.$form.show();
             },
             initDDL: function (dictId, target) {

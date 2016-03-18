@@ -1,4 +1,4 @@
-package com.yihu.ehr.standard.cdaversion.service;
+package com.yihu.ehr.standard.version.service;
 
 import com.yihu.ehr.config.StdHibernateConfig;
 import com.yihu.ehr.config.StdSessionFactoryBean;

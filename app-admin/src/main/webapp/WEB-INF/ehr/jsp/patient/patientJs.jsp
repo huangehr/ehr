@@ -43,9 +43,9 @@
                 init: function () {
                     this.$element.show();
                     this.$homeAddress.addressDropdown({tabsData:[
-                        {name: '省份', url: '${contextRoot}/address/getParent', params: {level:'1'}},
-                        {name: '城市', url: '${contextRoot}/address/getChildByParent'},
-                        {name: '县区', url: '${contextRoot}/address/getChildByParent'}
+                        {name: '省份',code:'id',values:'name', url: '${contextRoot}/address/getParent', params: {level:'1'}},
+                        {name: '城市',code:'id',values:'name', url: '${contextRoot}/address/getChildByParent'},
+                        {name: '县区',code:'id',values:'name', url: '${contextRoot}/address/getChildByParent'}
                     ]});
                     this.$searchPatient.ligerTextBox({width: 240 });
                     this.bindEvents();

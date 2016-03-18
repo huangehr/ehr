@@ -1,5 +1,7 @@
 package com.yihu.ehr.agModel.user;
 
+import java.util.Date;
+
 /**
  * Created by AndyCai on 2016/2/19.
  */
@@ -14,7 +16,7 @@ public class UsersModel {
     private String telephone;
     private String email;
     private boolean activated;
-    private String lastLoginTime;
+    private Date lastLoginTime;
 
     public String getId() {
         return id;
@@ -96,11 +98,11 @@ public class UsersModel {
         this.activated = activated;
     }
 
-    public String getLastLoginTime() {
+    public Date getLastLoginTime() {
         return lastLoginTime;
     }
 
-    public void setLastLoginTime(String lastLoginTime) {
+    public void setLastLoginTime(Date lastLoginTime) {
         this.lastLoginTime = lastLoginTime;
     }
 }
