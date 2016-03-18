@@ -137,7 +137,7 @@ public class DictController extends BaseController{
 
         }else {
 
-            mStdDict = dictClient.updateDict(stdVersion, dictJsonModel);
+            mStdDict = dictClient.updateDict(stdVersion, Long.valueOf(dictId), dictJsonModel);
             dictModel = convertToModel(mStdDict,DictModel.class);
             if (dictModel != null) {
                 envelop.setSuccessFlg(true);
@@ -317,7 +317,7 @@ public class DictController extends BaseController{
 
         }else {
 
-            mStdDictEntry = dictClient.updateDictEntry(versionCode,dictEntryJsonModel);
+            mStdDictEntry = dictClient.updateDictEntry(versionCode, Long.valueOf(entryId), dictEntryJsonModel);
             dictEntryModel = convertToModel(mStdDictEntry,DictEntryModel.class);
             if (dictEntryModel != null){
                 envelop.setSuccessFlg(true);
@@ -441,11 +441,11 @@ public class DictController extends BaseController{
 
         if (entryIds.split(",").length>1){
             //批量删除
-            bo = dictClient.deleteDictEntrys(versionCode,dictId,entryIds);
+            bo = dictClient.deleteDictEntrys(versionCode, entryIds);
         }else{
             //单个删除
             long id = Long.valueOf(entryIds);
-            bo = dictClient.deleteDictEntry(versionCode,dictId,id);
+            bo = dictClient.deleteDictEntry(versionCode, id);
         }
 
         envelop.setSuccessFlg(bo);

@@ -1,5 +1,6 @@
 package com.yihu.ehr.ha.std.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.cdadocument.CDAModel;
 import com.yihu.ehr.agModel.standard.cdadocument.CdaDataSetRelationshipModel;
 import com.yihu.ehr.constants.ApiVersion;
@@ -26,7 +27,8 @@ public class CDAController extends BaseController{
 
     @Autowired
     private CDAClient cdaClient;
-
+    @Autowired
+    ObjectMapper objectMapper;
 
     @RequestMapping(value = "/cdas", method = RequestMethod.GET)
     @ApiOperation(value = "根据条件获取cda列表")
@@ -113,8 +115,8 @@ public class CDAController extends BaseController{
             @RequestParam(value = "cdaInfoJson") String cdaInfoJson) {
 
         Envelop envelop = new Envelop();
-
-        MCDADocument mcdaDocument = cdaClient.updateCDADocuments(cdaInfoJson);
+        MCDADocument model = toEntity(cdaInfoJson, MCDADocument.class);
+        MCDADocument mcdaDocument = cdaClient.updateCDADocuments(model.getId(), cdaInfoJson);
         CDAModel cdaModel = convertToModel(mcdaDocument,CDAModel.class);
 
         if (cdaModel != null){
