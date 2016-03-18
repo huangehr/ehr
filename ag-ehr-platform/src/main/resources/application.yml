@@ -32,6 +32,9 @@ spring:
   thymeleaf:
     cache: false
 
+fast-dfs:
+  tracker-server: 172.19.103.54:22122
+
 server:
   ssl:
     key-store: C:/Windows/tomcat.keystore
@@ -59,6 +62,10 @@ server:
     key-store-password: 123456
     key-password: 123456
 
+
+fast-dfs:
+  tracker-server: 172.19.103.54:22122
+
 eureka:
   instance:
     ip-address: 127.0.0.1
@@ -72,6 +79,10 @@ spring:
   profiles: test
   thymeleaf:
     cache: false
+
+
+fast-dfs:
+  tracker-server: 172.19.103.13:22122
 
 server:
   ssl:
@@ -94,6 +105,9 @@ server:
   ssl:
     key-store-password: 123456
     key-password: 123456
+
+fast-dfs:
+  tracker-server: 11.1.2.9:22122
 
 eureka:
   instance:
