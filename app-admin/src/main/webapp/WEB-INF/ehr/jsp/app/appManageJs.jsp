@@ -88,22 +88,19 @@
                             { display: '名称', name: 'name',width: '15%', isAllowHide: false },
                             { display: 'APP ID',name: 'id', width: '10%',isAllowHide: false },
                             { display: 'APP Secret', name: 'secret', width: '10%', minColumnWidth: 60 },
-                            { display: '类型', name: 'catalog', width: '10%',render: function (row){
-                                return row.catalog.value;
-                            }},
+                            { display: '类型', name: 'catalogName', width: '10%'},
                             { display: '回调URL', name: 'url', width: '25%',align:'left'},
-                            { display: '状态', name: 'status', width: '10%',resizable: true, render: function (row){
-                                return row.status.value;
-                            }},
+                            { display: 'status', name: 'status',hide:true},
+                            { display: '状态', name: 'statusName', width: '10%',resizable: true},
                             { display: '审核', name: 'checkStatus', width: '10%',minColumnWidth: 20,render: function (row){
-                                if(Util.isStrEquals( row.status.code,'WaitingForApprove')) {
+                                if(Util.isStrEquals( row.status,'WaitingForApprove')) {
                                     return '<a data-toggle="model"  class="checkPass" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","appInfo:appInfoGrid:approved", row.id)+'">'+'通过'+'</a> /' +
                                             ' <a class="veto" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","appInfo:appInfoGrid:reject", row.id)+'">'+'否决'+'</a>'
-                                } else if(Util.isStrEquals( row.status.code,'Approved')){
+                                } else if(Util.isStrEquals( row.status,'Approved')){
                                     return '<a data-toggle="model"  class="Forbidden" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","appInfo:appInfoGrid:forbidden", row.id)+'">'+'禁用'+'</a>'
-                                }else if(Util.isStrEquals( row.status.code,'Forbidden')){
+                                }else if(Util.isStrEquals( row.status,'Forbidden')){
                                     return '<a data-toggle="model"  class="checkPass" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","appInfo:appInfoGrid:open", row.id)+'">'+'开启'+'</a>'
-                                }else if(Util.isStrEquals( row.status.code,'Reject')){
+                                }else if(Util.isStrEquals( row.status,'Reject')){
                                     return '无'
                                 }
                             }},
@@ -115,6 +112,7 @@
                         enabledEdit: true,
                         validate : true,
                         unSetValidateAttr:false,
+                        allowHideColumn: false,
                         onDblClickRow : function (row){
                             var mode = 'view';
                             master.appInfoDialog = $.ligerDialog.open({

@@ -1,7 +1,8 @@
 package com.yihu.ehr.adaption.feignclient;
 
-import com.yihu.ehr.constants.*;
-import com.yihu.ehr.util.RestEcho;
+import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.MicroServices;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -15,15 +16,15 @@ import java.util.Map;
 /**
  * Created by AndyCai on 2016/3/3.
  */
-@FeignClient(name = MicroServiceName.Standard)
-@RequestMapping(ApiVersion.Version1_0 + "/standard-dispatcher")
+@FeignClient(name = MicroServices.StandardMgr)
+@RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface StandardDispatchClient {
 
-    @RequestMapping(value = "/schema", method = RequestMethod.POST)
+    @RequestMapping(value = RestApi.Standards.Dispatches, method = RequestMethod.POST)
     @ApiOperation(value = "生成适配方案摘要", produces = "application/json",
             notes = "")
-    public Map createSchemeInfo(
+    Map createSchemeInfo(
             @ApiParam(required = true, name = "version", value = "要生成的目标版本")
             @RequestParam(value = "version", required = true) String version) throws Exception;
 }
