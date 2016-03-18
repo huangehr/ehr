@@ -44,8 +44,7 @@ public class AdaptionsEndPoint {
             @ApiParam(name = "org_code", value = "机构编码")
             @PathVariable(value = "org_code") String orgCode) throws Exception {
 
-        String keyId = securityClient.getOrgKey(orgCode);
-        MKey mKey = securityClient.getKey(keyId);
+        MKey mKey = securityClient.getOrgKey(orgCode);
         Object o = adapterDispatchClient.downAdaptions(mKey.getPrivateKey(), versionCode, orgCode).toString();
         return new ResponseEntity<>(
                 o.toString(), HttpStatus.OK);
