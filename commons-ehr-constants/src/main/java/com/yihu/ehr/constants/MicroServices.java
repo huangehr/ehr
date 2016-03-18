@@ -14,16 +14,16 @@ public class MicroServices {
     public static final String Configuration = "svr-configuration";
     public static final String DictMgr = "svr-dict";
     public static final String Discovery = "svr-discovery";
-    public static final String Geography = "svr-geography";
+    public static final String GeographyMgr = "svr-geography";
     public static final String HealthProfiles = "svr-health-profiles";
     public static final String OrganizationMgr = "svr-org";
     public static final String PackageMgr = "svr-pack-mgr";
     public static final String PackageResolve = "svr-pack-resolve";
     public static final String PatientMgr = "svr-patient";
     public static final String ResourcesMgr = "svr-resources";
-    public static final String Security = "svr-security";
+    public static final String SecurityMgr = "svr-security";
     public static final String StandardMgr = "svr-standard";
-    public static final String User = "svr-user";
+    public static final String UserMgr = "svr-user";
 
-    public static final String SimplifiedESB = "svr-esb";
+    public static final String EsbMgr = "svr-esb";
 }

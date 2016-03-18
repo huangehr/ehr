@@ -1,8 +1,7 @@
 package com.yihu.ehr.feign;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
-import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.constants.*;
 import com.yihu.ehr.util.RestEcho;
 import com.yihu.ehr.util.encrypt.RSA;
 import io.swagger.annotations.ApiOperation;
@@ -22,7 +21,7 @@ import java.util.Map;
 /**
  * Created by AndyCai on 2016/3/3.
  */
-@FeignClient(MicroServices.AdaptionMgr)
+@FeignClient(name = MicroServices.AdaptionMgr,url = MicroServiceIpAddressStr.Adaption+ MicroServicePort.Adaption)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface AdapterDispatchClient {

@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +27,6 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
 
     @Autowired
     private XUserRepository userRepository;
-    @PersistenceContext
-    private EntityManager entityManager;
     @Value("default.password")
     private String default_password = "123456";
 
@@ -51,26 +47,20 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
      * @param loginCode
      */
     public User getUserByLoginCode(String loginCode) {
-        Map<String,String> map =new HashMap<>();
-        Session session = entityManager.unwrap(Session.class);
-        Query query = session.createQuery("from User where loginCode = :loginCode");
-        List<User> userList = query.setString("loginCode", loginCode).list();
-        if(userList.size()== 0) {
-            return null;
+        List<User> users = userRepository.findByLoginCode(loginCode);
+        if(users.size()>0){
+            return users.get(0);
         }else {
-            return userList.get(0);
+            return null;
         }
     }
 
     public User getUserByIdCardNo(String idCardNo) {
-        Map<String,String> map =new HashMap<>();
-        Session session = entityManager.unwrap(Session.class);
-        Query query = session.createQuery("from User where idCardNo = :idCardNo");
-        List<User> userList = query.setString("idCardNo", idCardNo).list();
-        if(userList.size()== 0) {
-            return null;
+        List<User> users = userRepository.findByIdCardNo(idCardNo);
+        if(users.size()>0){
+            return users.get(0);
         }else {
-            return userList.get(0);
+            return null;
         }
     }
 
