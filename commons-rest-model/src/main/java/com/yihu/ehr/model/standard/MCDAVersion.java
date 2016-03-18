@@ -12,7 +12,7 @@ public class MCDAVersion {
     private String author;
     private Date commitTime;
 
-    private Boolean isInStage;
+    private boolean inStage;
     private String version;
     private String versionName;
     private String baseVersion;
@@ -25,12 +25,12 @@ public class MCDAVersion {
         this.author = author;
     }
 
-    public Boolean isInStage() {
-        return isInStage;
+    public boolean isInStage() {
+        return inStage;
     }
 
-    public void setInStage(Boolean inStage) {
-        isInStage = inStage;
+    public void setInStage(boolean inStage) {
+        this.inStage = inStage;
     }
 
     public String getVersion() {

@@ -95,4 +95,8 @@ public interface UserClient {
     @RequestMapping(value = RestApi.Users.UserIdCardNoExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断身份证是否存在")
     boolean isIdCardExists(@PathVariable(value = "id_card") String idCard);
+
+    @RequestMapping(value = RestApi.Users.UserEmailNoExistence, method = RequestMethod.GET)
+    @ApiOperation(value = "判断用户邮件是否存在")
+    boolean isEmailExists(@RequestParam(value = "email") String email);
 }

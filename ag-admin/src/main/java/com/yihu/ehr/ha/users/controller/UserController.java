@@ -157,6 +157,11 @@ public class UserController extends BaseController {
         if (userClient.isIdCardExists(detailModel.getIdCardNo())) {
             return failed("身份证号已存在!");
         }
+        if(userClient.isEmailExists(detailModel.getEmail()))
+        {
+            return failed("邮箱已存在!");
+        }
+
         detailModel.setPassword( AgAdminConstants.DefaultPassword);
         MUser mUser = convertToModel(detailModel, MUser.class);
         mUser = userClient.createUser(objectMapper.writeValueAsString(mUser));
@@ -204,6 +209,12 @@ public class UserController extends BaseController {
         if (!mUser.getIdCardNo().equals(detailModel.getIdCardNo())
                 && userClient.isIdCardExists(detailModel.getIdCardNo())) {
             return failed("身份证号已存在!");
+        }
+
+        if(!mUser.getEmail().equals(detailModel.getEmail())
+                && userClient.isEmailExists(detailModel.getEmail()))
+        {
+            return failed("邮箱已存在!");
         }
 
         mUser = convertToModel(detailModel, MUser.class);
@@ -344,20 +355,21 @@ public class UserController extends BaseController {
             @ApiParam(name = "existenceNm",value = "", defaultValue = "")
             @RequestParam(value = "existenceNm") String existenceNm) {
         Envelop envelop = new Envelop();
-        boolean bo;
+        boolean bo=false;
 
-        //返回值：true>存在，false>不存在
-        if(existenceType.equals("login_code")){
-            bo = userClient.isUserNameExists(existenceNm);
-            envelop.setSuccessFlg(bo);
+        switch (existenceType)
+        {
+            case "login_code":
+                bo = userClient.isUserNameExists(existenceNm);
+                break;
+            case "id_card_no":
+                bo = userClient.isIdCardExists(existenceNm);
+                break;
+            case "email":
+                bo = userClient.isEmailExists(existenceNm);
+                break;
         }
-        if (existenceType.equals("id_card_no")){
-            bo = userClient.isIdCardExists(existenceNm);
-            envelop.setSuccessFlg(bo);
-        }
-        if (existenceType.equals("email")) {
-            //todo:微服务缺少判断邮箱唯一性的验证
-        }
+        envelop.setSuccessFlg(bo);
 
         return envelop;
 

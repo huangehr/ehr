@@ -122,4 +122,9 @@ public class StandardSourceController extends ExtendController<MStdSource> {
         return true;
     }
 
+    @RequestMapping(value = RestApi.Standards.IsSourceCodeExist,method = RequestMethod.GET)
+    public boolean isCodeExist(@RequestParam(value="code")String code){
+
+        return stdSourceService.isSourceCodeExist(code);
+    }
 }

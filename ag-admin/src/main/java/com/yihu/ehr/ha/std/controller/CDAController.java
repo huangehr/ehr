@@ -12,6 +12,7 @@ import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ import java.util.List;
 /**
  * Created by AndyCai on 2016/1/21.
  */
-@RequestMapping(ApiVersion.Version1_0 + "/cda")
+@RequestMapping(ApiVersion.Version1_0 + "/admin/cda")
 @RestController
 public class CDAController extends BaseController{
 
@@ -46,12 +47,9 @@ public class CDAController extends BaseController{
             @ApiParam(name = "rows", value = "每页行数", defaultValue = "20")
             @RequestParam(value = "rows") int rows) {
 
-        List<MCDADocument> mcdaDocumentList = cdaClient.GetCDADocuments(versionCode,code,name,cdaType,page,rows);
-        List<CDAModel> cdaModels = (List<CDAModel>)convertToModels(mcdaDocumentList,new ArrayList<CDAModel>(mcdaDocumentList.size()),CDAModel.class,null);
-        //TODO:获取总条数
-//        String count = response.getHeader(AgAdminConstants.ResourceCount);
-//        int totalCount = StringUtils.isNotEmpty(count) ? Integer.parseInt(count) : 0;
-        Envelop envelop = getResult(cdaModels,0,page,rows);
+        ResponseEntity<List<MCDADocument>> responseEntity = cdaClient.GetCDADocuments(versionCode,code,name,cdaType,page,rows);
+        List<CDAModel> cdaModels = (List<CDAModel>)convertToModels(responseEntity.getBody(),new ArrayList<CDAModel>(responseEntity.getBody().size()),CDAModel.class,null);
+        Envelop envelop = getResult(cdaModels,getTotalCount(responseEntity),page,rows);
 
         return envelop;
     }
@@ -59,33 +57,34 @@ public class CDAController extends BaseController{
     @RequestMapping(value = "/cda", method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取cda")
     public Envelop getCDAInfoById(
-            @ApiParam(name = "cdaId", value = "cdaID")
-            @PathVariable(value = "cdaId") String cdaId,
-            @ApiParam(name = "versionCode", value = "标准版本代码")
-            @PathVariable(value = "versionCode") String versionCode) {
+            @ApiParam(name = "cda_id", value = "cda_id")
+            @RequestParam(value = "cda_id") String cdaId,
+            @ApiParam(name = "version_code", value = "标准版本代码")
+            @RequestParam(value = "version_code") String versionCode) {
 
-        Envelop envelop = new Envelop();
-        CDAModel cdaModel = null;
+        try {
 
-        List<MCDADocument> mcdaDocumentList = cdaClient.getCDADocumentById(cdaId, versionCode);
-        for (MCDADocument mcdaDocument:mcdaDocumentList){
-            cdaModel = convertToModel(mcdaDocument,CDAModel.class);
-        }
+            List<MCDADocument> mcdaDocumentList = cdaClient.getCDADocumentById(cdaId, versionCode);
+            List<CDAModel> cdaModelList = (List<CDAModel>)convertToModels(mcdaDocumentList,new ArrayList<CDAModel>(mcdaDocumentList.size()),CDAModel.class,null);
 
-        if (cdaModel != null){
+            if (cdaModelList == null) {
+                return failed("数据获取失败!");
+            }
+
+            Envelop envelop = new Envelop();
             envelop.setSuccessFlg(true);
-            envelop.setObj(cdaModel);
-        }else {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("查询失败");
+            envelop.setDetailModelList(cdaModelList);
+            return envelop;
         }
-
-        return envelop;
+        catch (Exception ex)
+        {
+            return failedSystem();
+        }
     }
 
 
 
-    @RequestMapping(value = "cda",method = RequestMethod.POST)
+    @RequestMapping(value = "/cda",method = RequestMethod.POST)
     @ApiOperation(value = "保存CDADocuments")
     public Envelop SaveCdaInfo(
             @ApiParam(name = "cdaInfoJson", value = "CDAJson")
@@ -108,7 +107,7 @@ public class CDAController extends BaseController{
     }
 
 
-    @RequestMapping(value = "uploadCDA",method = RequestMethod.POST)
+    @RequestMapping(value = "/cda",method = RequestMethod.PUT)
     @ApiOperation(value = "修改CDADocuments")
     public Envelop updateCDADocuments(
             @ApiParam(name = "cdaInfoJson", value = "CDAJson")

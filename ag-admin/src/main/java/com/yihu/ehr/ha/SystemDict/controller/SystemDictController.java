@@ -1,5 +1,6 @@
 package com.yihu.ehr.ha.SystemDict.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.dict.SystemDictEntryModel;
 import com.yihu.ehr.agModel.dict.SystemDictModel;
 import com.yihu.ehr.constants.ApiVersion;
@@ -12,6 +13,7 @@ import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +35,7 @@ public class SystemDictController extends BaseController {
     @Autowired
     private SystemDictClient systemDictClient;
 
+    private ObjectMapper objectMapper;
 //    @Autowired
 //    private BaseRestController baseRestController;
 
@@ -74,8 +77,17 @@ public class SystemDictController extends BaseController {
             @RequestParam(value = "dictionary") String dictJson) {
 
         try {
-            MSystemDict systemDict = systemDictClient.createDictionary(dictJson);
-            SystemDictModel systemDictModel = convertToModel(systemDict, SystemDictModel.class);
+            SystemDictModel systemDictModel = objectMapper.readValue(dictJson,SystemDictModel.class);
+            if(StringUtils.isEmpty(systemDictModel.getName()))
+            {
+                return failed("名称不能为空!");
+            }
+            if(systemDictClient.isDictNameExists(systemDictModel.getName()))
+            {
+                return failed("名称已存在!");
+            }
+            MSystemDict systemDict = systemDictClient.createDictionary(objectMapper.writeValueAsString(systemDictModel));
+            systemDictModel = convertToModel(systemDict, SystemDictModel.class);
 
             if (systemDictModel == null) {
                 return failed("字典新增失败!");
@@ -115,8 +127,25 @@ public class SystemDictController extends BaseController {
             @ApiParam(name = "dictionary", value = "字典JSON结构")
             @RequestParam(value = "dictionary") String dictJson) {
         try {
-            MSystemDict systemDict = systemDictClient.updateDictionary(dictJson);
-            SystemDictModel systemDictModel = convertToModel(systemDict, SystemDictModel.class);
+            SystemDictModel systemDictModel = objectMapper.readValue(dictJson,SystemDictModel.class);
+            if(StringUtils.isEmpty(systemDictModel.getName()))
+            {
+                return failed("名称不能为空!");
+            }
+
+            MSystemDict systemDict = systemDictClient.getDictionary(systemDictModel.getId());
+            if(systemDict==null)
+            {
+                return failed("系统字典不存在，请确认!");
+            }
+            if(!systemDict.getName().equals(systemDictModel.getName())
+                    && systemDictClient.isDictNameExists(systemDictModel.getName()))
+            {
+                return failed("名称已存在!");
+            }
+
+            systemDict = systemDictClient.updateDictionary(dictJson);
+            systemDictModel = convertToModel(systemDict, SystemDictModel.class);
 
             if (systemDictModel == null) {
                 return failed("修改字典失败!");
@@ -148,18 +177,24 @@ public class SystemDictController extends BaseController {
     @ApiOperation(value = "获取字典项列表")
     @RequestMapping(value = "/dictionaries/{id}/entries", method = RequestMethod.GET)
     public Envelop getDictEntries(
-            @ApiParam(name = "id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "id") long id,
-            @ApiParam(name = "value", value = "字典项值", defaultValue = "")
-            @RequestParam(value = "value", required = false) String value,
-            @ApiParam(name = "page", value = "当前页", defaultValue = "")
-            @RequestParam(value = "page", required = false) Integer page,
-            @ApiParam(name = "size", value = "行数", defaultValue = "")
-            @RequestParam(value = "size", required = false) Integer size) {
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序", defaultValue = "")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) Integer size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) Integer page) {
 
         try {
-            ResponseEntity<Collection<MDictionaryEntry>> responseEntity = systemDictClient.getDictEntries(id, value, page, size);
-            List<MDictionaryEntry> dictionaryEntries = (List<MDictionaryEntry>) responseEntity.getBody();
+            if(size==null)
+            {
+                size=999;
+            }
+            ResponseEntity<List<MDictionaryEntry>> responseEntity = systemDictClient.getDictEntries(fields,filters,sorts,size,page);
+            List<MDictionaryEntry> dictionaryEntries = responseEntity.getBody();
             List<SystemDictEntryModel> systemDictEntryModelList = (List<SystemDictEntryModel>) convertToModels(dictionaryEntries
                     , new ArrayList<SystemDictEntryModel>(dictionaryEntries.size())
                     , SystemDictEntryModel.class
@@ -263,10 +298,23 @@ public class SystemDictController extends BaseController {
 
     @RequestMapping(value = "/dictionaries/existence/{dict_name}", method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典名称是否已经存在")
-    public boolean isAppNameExists(
+    public boolean isDictNameExists(
             @ApiParam(name = "dict_name", value = "dict_name", defaultValue = "")
             @PathVariable(value = "dict_name") String dictName) {
 
-        return systemDictClient.isAppNameExists(dictName);
+        return systemDictClient.isDictNameExists(dictName);
     }
+
+    @RequestMapping(value = "/dictionaries/existence/{dict_id}/{code}" , method = RequestMethod.GET)
+    @ApiOperation(value = "根基dictId和code判断提交的字典项名称是否已经存在")
+    public  boolean isDictEntryCodeExists(
+            @ApiParam(name = "dict_id", value = "dict_id", defaultValue = "")
+            @PathVariable(value = "dict_id") long dictId,
+            @ApiParam(name = "code", value = "code", defaultValue = "")
+            @PathVariable(value = "code") String code){
+        return systemDictClient.isDictEntryCodeExists(dictId,code);
+    }
+
+
+
 }
