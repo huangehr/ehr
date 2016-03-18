@@ -95,9 +95,11 @@ public class SimplifiedEsbEndPoint {
             @ApiParam("versionName") @RequestParam(value = "versionName", required = true)
             String versionName,
             @ApiParam("updateDate") @RequestParam(value = "updateDate", required = true)
-            String updateDate) {
+            String updateDate,
+            @ApiParam("message") @RequestParam(value = "message", required = true)
+            String message) {
 
-        return new ResponseEntity<>(simplifiedESBClient.uploadResult(systemCode, orgCode, versionCode, versionName, updateDate), HttpStatus.OK);
+        return new ResponseEntity<>(simplifiedESBClient.uploadResult(systemCode, orgCode, versionCode, versionName, updateDate,message), HttpStatus.OK);
     }
 
     @ApiOperation("补采功能")
