@@ -1,5 +1,6 @@
 package com.yihu.ehr.standard.cdatype.service;
 
+import com.yihu.ehr.query.BaseJpaService;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,17 +20,12 @@ import java.util.Map;
  */
 @Transactional
 @Service
-public class CDATypeManager{
+public class CDATypeManager extends BaseJpaService<CDAType, XcdaTypeRepository>{
 
-    @PersistenceContext
-    private EntityManager entityManager;
-    @Autowired
-    private XcdaTypeRepository cdaTypeRepository;
 
-    Session currentSession(){
-        return entityManager.unwrap(org.hibernate.Session.class);
-    }
-
+   public XcdaTypeRepository getXcdaTypeRepository(){
+       return (XcdaTypeRepository) getRepository();
+   }
 
     /**
      * 根据查询条件获取cda类别
@@ -64,7 +60,7 @@ public class CDATypeManager{
      * @param info
      */
     public CDAType save(CDAType info) {
-        return cdaTypeRepository.save(info);
+        return getXcdaTypeRepository().save(info);
     }
 
     /**
@@ -89,7 +85,7 @@ public class CDATypeManager{
      * @param id
      */
     public CDAType getCdaTypeById(String id) {
-        return cdaTypeRepository.findOne(id);
+        return getXcdaTypeRepository().findOne(id);
     }
 
 
@@ -98,7 +94,7 @@ public class CDATypeManager{
      * @param ids
      */
     public List<CDAType> getCDATypeByIds(String[] ids) {
-        return cdaTypeRepository.findCDATypeByIds(ids);
+        return getXcdaTypeRepository().findCDATypeByIds(ids);
     }
     /**
      * 判断代码是否重复

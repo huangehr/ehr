@@ -1,9 +1,10 @@
 package com.yihu.ehr.adaption.feignclient;
 
-import com.yihu.ehr.constants.*;
+import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.MicroServiceName;
+import com.yihu.ehr.constants.MicroServices;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,18 +21,15 @@ import java.util.Map;
  * @created 2016.2.1
  */
 @ApiIgnore
-@FeignClient(name = MicroServiceName.Standard)
-@RequestMapping(ApiVersion.Version1_0 + "/std/")
+@FeignClient(name = MicroServices.StandardMgr)
+@RequestMapping(ApiVersion.Version1_0)
 public interface DictClient {
 
-    @RequestMapping(value = "/dict/map", method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Standards.MetaDataWithDict, method = RequestMethod.GET)
     @ApiOperation(value = "获取字典 map集")
     Map getDictMapByIds(
-            @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @RequestParam(value = "version") String version,
-            @ApiParam(name = "dataSetId", value = "数据集编号", defaultValue = "")
-            @RequestParam(value = "dataSetId") Long dataSetId,
-            @ApiParam(name = "metaDataId", value = "数据元编号", defaultValue = "")
-            @RequestParam(value = "metaDataId") Long metaDataId);
+            @PathVariable(value = "data_set_id") Long dataSetId,
+            @PathVariable(value = "meta_data_id") Long metaDataId);
 
 }
