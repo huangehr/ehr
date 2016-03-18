@@ -10,17 +10,15 @@ import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.profile.ProfileDataSet;
 import com.yihu.ehr.util.DateFormatter;
 import com.yihu.ehr.util.IdCardValidator;
-import com.yihu.ehr.util.RestEcho;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.spring.web.json.Json;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -43,6 +41,7 @@ public class PatientsEndPoint {
     @Autowired
     private PatientClient patientClient;
 
+    @ApiIgnore
     @ApiOperation(value = "患者注册", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "根据患者的身份证号在健康档案平台中注册患者")
     @RequestMapping(value = "/{demographic_id}", method = {RequestMethod.POST})
     public void registerPatient(@ApiParam(value = "身份证号")

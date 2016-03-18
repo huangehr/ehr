@@ -3,7 +3,7 @@ package com.yihu.ehr.ha;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 import com.yihu.ehr.ha.geography.controller.AddressController;
-import com.yihu.ehr.model.geogrephy.MGeography;
+import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.util.Envelop;
 import org.junit.FixMethodOrder;
 import org.junit.Test;

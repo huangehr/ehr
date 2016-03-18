@@ -23,6 +23,7 @@
 //        var orgLoc = allData[0];
         var user = allData.obj;
 
+
         /* ************************** 变量定义结束 **************************** */
 
         /* *************************** 函数定义 ******************************* */
@@ -95,10 +96,10 @@
                 this.$tel.ligerTextBox({width: 240});
                 this.$org.addressDropdown({
                     tabsData: [
-                        {name: '省份',code:'id',values:'name', url: '${contextRoot}/address/getParent', params: {level: '1'}},
-                        {name: '城市', code:'id',values:'name',url: '${contextRoot}/address/getChildByParent'},
+                        {name: '省份',code:'id',value:'name', url: '${contextRoot}/address/getParent', params: {level: '1'}},
+                        {name: '城市', code:'id',value:'name',url: '${contextRoot}/address/getChildByParent'},
                         {
-                            name: '医院', code:'orgCode',values:'fullName',url: '${contextRoot}/address/getOrgs', beforeAjaxSend: function (ds, $options) {
+                            name: '医院', code:'orgCode',value:'fullName',url: '${contextRoot}/address/getOrgs', beforeAjaxSend: function (ds, $options) {
                             var province = $options.eq(0).attr('title'),
                                     city = $options.eq(1).attr('title');
                             ds.params = $.extend({}, ds.params, {
@@ -140,18 +141,17 @@
                             $('#inp_major_div').hide();
                     }
                 });
-
+                debugger
                 this.$form.attrScan();
                 this.$form.Fields.fillValues({
                     id: user.id,
-                    organization:user.organizationName,
                     loginCode: user.loginCode,
                     realName: user.realName,
                     idCardNo: user.idCardNo,
                     gender: user.gender,
                     email: user.email,
                     telephone: user.telephone,
-//                    organization: [orgLoc.province, orgLoc.city, user.orgCode],
+//                    organization: ["安徽省",,""],
                     major: user.major,
                     publicKey: user.publicKey,
                     validTime: user.validTime,

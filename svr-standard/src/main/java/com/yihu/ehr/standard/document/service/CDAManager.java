@@ -1,4 +1,4 @@
-package com.yihu.ehr.standard.cda.service;
+package com.yihu.ehr.standard.document.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;

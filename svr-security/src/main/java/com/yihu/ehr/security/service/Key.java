@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 医生
+ * 公-私钥。
  *
  * @author Sand
  * @version 1.0
@@ -17,12 +17,11 @@ import java.util.Date;
 @Entity
 @Table(name = "user_security")
 @Access(value = AccessType.PROPERTY)
-public class UserSecurity implements Serializable {
+public class Key implements Serializable {
 
-	public UserSecurity() {
+	public Key() {
 		id  = new ObjectVersion().toString();
 	}
-
 
 	private String id;
 	private String privateKey;
@@ -30,9 +29,6 @@ public class UserSecurity implements Serializable {
 	private Date fromDate;
 	private Date expiryDate;
 	private Integer valid;
-
-
-
 
 	@Id
 	@GeneratedValue(generator = "Generator")

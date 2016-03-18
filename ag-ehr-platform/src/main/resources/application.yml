@@ -6,10 +6,10 @@ endpoints:
   health:
     sensitive: false
 
-logging:
-  level:
-    com:
-      netflix: INFO
+#logging:
+#  level:
+#    com:
+#      netflix: INFO
 
 ---
 spring:
@@ -39,9 +39,11 @@ spring:
   thymeleaf:
       cache: false
 
-keystore:
-  file: C:/Windows/tomcat.keystore
-  password: 123456
+server:
+  ssl:
+    key-store: C:/Windows/tomcat.keystore
+    key-store-password: 123456
+    key-password: 123456
 
 eureka:
   instance:
@@ -54,10 +56,13 @@ eureka:
 ---
 spring:
   profiles: test
+  thymeleaf:
+    cache: false
 
-keystore:
-  file: /tomcat.keystore
-  password: 123456
+server:
+  ssl:
+    key-store-password: 123456
+    key-password: 123456
 
 eureka:
   instance:
@@ -71,9 +76,10 @@ eureka:
 spring:
   profiles: prod
 
-keystore:
-  file: tomcat.keystore
-  password: 123456
+server:
+  ssl:
+    key-store-password: 123456
+    key-password: 123456
 
 eureka:
   instance:

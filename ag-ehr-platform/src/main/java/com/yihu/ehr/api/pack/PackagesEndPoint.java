@@ -21,7 +21,7 @@ import java.io.IOException;
  * @created 2015.09.17 14:22
  */
 @RestController
-@RequestMapping(ApiVersion.Version1_0 + "/packages")
+@RequestMapping(ApiVersion.Version1_0)
 @Api(protocols = "https", value = "packages", description = "数据包服务")
 public class PackagesEndPoint {
 
@@ -35,9 +35,9 @@ public class PackagesEndPoint {
      * @param md5           文件内容MD5值。
      * @return
      */
-    @RequestMapping(value = "/", method = {RequestMethod.POST})
+    @RequestMapping(value = "/json_package", method = RequestMethod.GET)
     @ApiOperation(value = "接收档案", notes = "接收健康档案数据包")
-    public void receiveJsonPackage(
+    public void uploadPackage(
             @ApiParam(required = true, name = "package", value = "档案包", allowMultiple = true)
             MultipartHttpServletRequest jsonPackage,
             @ApiParam(required = true, name = "org_code", value = "机构代码")
@@ -50,6 +50,6 @@ public class PackagesEndPoint {
         MultipartFile multipartFile = jsonPackage.getFile("file");
         byte[] bytes = multipartFile.getBytes();
         String fileString = Base64.encode(bytes);
-        jsonPackageClient.savePackageWithUser(fileString, orgCode, packageCrypto, md5);
+        jsonPackageClient.savePackageWithOrg(fileString, orgCode, packageCrypto, md5);
     }
 }
