@@ -31,13 +31,13 @@
     <div class="m-form-group">
         <label><spring:message code="lbl.internal.code"/><spring:message code="spe.colon"/></label>
         <div class="l-text-wrapper m-form-control u-ui-readonly">
-            <input type="text" id="inp_app_id" data-attr-scan="appId"/>
+            <input type="text" id="inp_app_id" data-attr-scan="id"/>
         </div>
     </div>
     <div class="m-form-group">
         <label><spring:message code="lbl.secret.key"/><spring:message code="spe.colon"/></label>
         <div class="l-text-wrapper m-form-control u-ui-readonly">
-            <input type="text" id="inp_app_secret"  data-attr-scan="appSecret"/>
+            <input type="text" id="inp_app_secret"  data-attr-scan="secret"/>
         </div>
     </div>
     <div class="m-form-group">

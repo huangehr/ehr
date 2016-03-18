@@ -1,4 +1,4 @@
-package com.yihu.ehr.standard.cdaversion.service;
+package com.yihu.ehr.standard.version.service;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
 
