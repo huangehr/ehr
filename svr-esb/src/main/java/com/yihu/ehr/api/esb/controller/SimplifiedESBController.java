@@ -1,13 +1,11 @@
 package com.yihu.ehr.api.esb.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.api.esb.model.HosEsbMiniRelease;
 import com.yihu.ehr.api.esb.model.HosLog;
 import com.yihu.ehr.api.esb.model.HosSqlTask;
 import com.yihu.ehr.api.esb.service.SimplifiedESBService;
 import com.yihu.ehr.config.FastDFSConfig;
-import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.util.DateFormatter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -44,8 +42,8 @@ public class SimplifiedESBController {
      */
     @ApiOperation("判斷是否需要上传日志")
     @RequestMapping(value = "/getUploadFlag", method = RequestMethod.GET)
-    public boolean getUploadFlag(@RequestParam(value = "orgCode", required = true) String orgCode,
-                                 @RequestParam(value = "systemCode", required = true) String systemCode) {
+    public boolean getUploadFlag(@ApiParam("orgCode") @RequestParam(value = "orgCode", required = true) String orgCode,
+                                 @ApiParam("systemCode") @RequestParam(value = "systemCode", required = true) String systemCode) {
         try {
             return simplifiedESBService.getUploadFlagByOrgCodeAndSystemCode(orgCode, systemCode);
         } catch (Exception e) {
@@ -62,18 +60,18 @@ public class SimplifiedESBController {
     @RequestMapping(value = "/uploadLog", method = RequestMethod.POST)
     public boolean uploadLog(
             @ApiParam("orgCode") @RequestParam(value = "orgCode", required = true) String orgCode,
-            @ApiParam("ip") @RequestParam(value = "ip", required = true) String ip,
+            @ApiParam("ip") @RequestParam(value = "ip", required = false) String ip,
             @ApiParam("file") @RequestParam(value = "file", required = true) String file) {
         try {
-            InputStream in = new ByteArrayInputStream(file.getBytes());
-            FastDFSUtil fdfs = FastDFSConfig.fastDFSUtil();
-            ObjectNode jsonResult = fdfs.upload(in, "zip", "");
-             String filePath = jsonResult.get("fid").textValue();
+            // InputStream in = new ByteArrayInputStream(file.getBytes());
+            // FastDFSUtil fdfs = FastDFSConfig.fastDFSUtil();
+            // ObjectNode jsonResult = fdfs.upload(in, "zip", "");
+            //  String filePath = jsonResult.get("fid").textValue();
             // fdfs.download(jsonResult.get("groupName").textValue(), jsonResult.get("remoteFileName").textValue(), "E:\\");
             HosLog lh = new HosLog();
             lh.setOrgCode(orgCode);
             lh.setUploadTime(DateFormatter.simpleDateTimeFormat(new Date()));
-            lh.setFilePath(filePath);
+            lh.setFilePath(file);
             lh.setId(ip);
             simplifiedESBService.saveHosLog(lh);
             return true;
@@ -135,7 +133,7 @@ public class SimplifiedESBController {
                 int count = -1;
                 while ((count = i.read(data, 0, 1024)) != -1)
                     outStream.write(data, 0, count);
-                String a = new String(outStream.toByteArray(),"UTF-8");
+                String a = new String(outStream.toByteArray(), "UTF-8");
                 return a;
             }
               /*
@@ -197,7 +195,7 @@ public class SimplifiedESBController {
             @ApiParam("updateDate") @RequestParam(value = "updateDate", required = true) String updateDate) {
         String hsa = null;
         try {
-            hsa = simplifiedESBService.uploadResult(systemCode, orgCode, versionCode, versionName, updateDate,message);
+            hsa = simplifiedESBService.uploadResult(systemCode, orgCode, versionCode, versionName, updateDate, message);
         } catch (Exception e) {
             e.printStackTrace();
         }
