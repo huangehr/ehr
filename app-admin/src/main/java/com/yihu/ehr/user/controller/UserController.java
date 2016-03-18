@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.fastdfs.FastDFSClientPool;
-import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.ResourceProperties;
@@ -44,12 +42,6 @@ public class UserController {
     public static final String RemoteFileField = "remoteFileName";
     public static final String FileIdField = "fid";
     public static final String FileUrlField = "fileUrl";
-
-    @Autowired
-    FastDFSUtil dfsUtil;
-
-    @Autowired
-    FastDFSClientPool clientPool;
 
     @Value("${service-gateway.username}")
     private String username;

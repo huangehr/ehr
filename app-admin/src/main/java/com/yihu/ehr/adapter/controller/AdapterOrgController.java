@@ -1,18 +1,18 @@
 package com.yihu.ehr.adapter.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.thirdpartystandard.AdapterOrgDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
-import com.yihu.ehr.util.ResourceProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,7 +42,8 @@ public class AdapterOrgController {
 
     @RequestMapping("template/adapterOrgInfo")
     public Object adapterOrgInfoTemplate(Model model, String code, String type, String mode) {
-        String url = "/adapterOrg/adapterOrg";
+        String url = "/adapterOrg/org/"+code;
+
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
@@ -99,21 +100,29 @@ public class AdapterOrgController {
 //        return "simpleView";
     }
 
+    //适配采集标准
     @RequestMapping("searchAdapterOrg")
     @ResponseBody
-    //适配采集标准
     public Object searchAdapterOrg(String searchNm, int page, int rows, String type) {
-        String url = "/adapterOrg/adapterOrgs";
+        String url = "/adapterOrg/orgs";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("code",searchNm);
-        params.put("name",searchNm);
-        params.put("type",type);
+
+        String filters = "";
+        if(!StringUtils.isEmpty(searchNm)){
+            filters+="name?"+searchNm+" g1;";
+        }
+        if(!StringUtils.isEmpty(type)){
+            filters+= "type="+type+" g2";
+        }
+
+        params.put("sorts","");
+        params.put("filters",filters);
+        params.put("fields","");
         params.put("page",page);
-        params.put("rows",rows);
+        params.put("size",rows);
         try{
-            //todo 后台转换成result后传前台
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             return resultStr;
         } catch (Exception e) {
@@ -121,33 +130,7 @@ public class AdapterOrgController {
             result.setErrorMsg(ErrorCode.SystemError.toString());
             return result;
         }
-//        Map<String, Object> conditionMap = new HashMap<>();
-//        conditionMap.put("key", searchNm);
-//        conditionMap.put("page", page);
-//        conditionMap.put("pageSize", rows);
-//        //conditionMap.put("type", oryType);
-//
-//        List typeLs = new ArrayList<>();
-//        if (StringUtil.isEmpty(type)) {
-//            typeLs.add(conventionalDictEntry.getAdapterType("1"));
-//            typeLs.add(conventionalDictEntry.getAdapterType("2"));
-//            typeLs.add(conventionalDictEntry.getAdapterType("3"));
-//        } else {
-//            typeLs.add(conventionalDictEntry.getAdapterType(type));
-//        }
-//
-//        conditionMap.put("typeLs", typeLs);
-//
-//        Result result = new Result();
-//        try {
-//            List<AdapterOrgModel> adapterOrgs = adapterOrgManager.searchAdapterOrgs(conditionMap);
-//            Integer totalCount = adapterOrgManager.searchAdapterOrgInt(conditionMap);
-//            result = getResult(adapterOrgs, totalCount, page, rows);
-//            result.setSuccessFlg(true);
-//        } catch (Exception ex) {
-//            result.setSuccessFlg(false);
-//        }
-//        return result.toJson();
+
     }
 
     @RequestMapping("getAdapterOrg")
@@ -191,7 +174,8 @@ public class AdapterOrgController {
     @RequestMapping("addAdapterOrg")
     @ResponseBody
     //新增采集标准
-    public Object addAdapterOrg(String code,String name,String description,String parent,String org,String type,String area) {
+    public Object addAdapterOrg(AdapterOrgDetailModel adapterPlanModel) {
+//        String code,String name,String description,String parent,String org,String type,String area
 //        String code = adapterOrgModel.getCode();
 //        String name = adapterOrgModel.getName();
 //        String description = adapterOrgModel.getDescription();
@@ -201,61 +185,35 @@ public class AdapterOrgController {
 //        Address area = adapterOrgModel.getArea();
         String url="";
         String resultStr = "";
-        Envelop result = new Envelop();
+        Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        try{
-            url="/adapterOrg/isAdapterOrgExist";//todo:网关没有该对应的接口
-            params.put("code",code);
-            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            if(Boolean.parseBoolean(resultStr)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg("该标准已存在！");
-                return result;
-            }
+        ObjectMapper mapper = new ObjectMapper();
 
-            //todo ：网关有orgName属性，没有area属性
-            url="/adapterOrg/addAdapterOrg";
-            params.put("name", name);
-            params.put("description",description);
-            params.put("parent",parent);
-            params.put("orgCode",org);
-            params.put("type",type);
-            params.put("area",area);
-            //todo 失败，返回的错误信息怎么体现？
-            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//创建第三方标准
-//            ObjectMapper mapper = new ObjectMapper();
-//            AdapterOrgModel adapterOrgModelNew = mapper.readValue(resultStr, AdapterOrgModel.class);
-            result.setObj(resultStr);
-            result.setSuccessFlg(true);
-            return result;
-        } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result;
-        }
-//        Result result = new Result();
-//        try {
-//            XAdapterOrg adapterOrg = new AdapterOrg();
-//            String code = adapterOrgModel.getCode();
-//            if (adapterOrgManager.getAdapterOrg(code) != null) {
-//                result.setErrorMsg("该机构已存在采集标准");
-//                result.setSuccessFlg(false);
-//            } else {
-//                adapterOrg.setCode(code);
-//                adapterOrg.setName(adapterOrgModel.getName());
-//                adapterOrg.setDescription(adapterOrgModel.getDescription());
-//                adapterOrg.setParent(adapterOrgModel.getParent());
-//                adapterOrg.setOrg(orgManager.getOrg(adapterOrgModel.getOrg()));
-//                adapterOrg.setType(conventionalDictEntry.getAdapterType(adapterOrgModel.getType()));
-//                adapterOrg.setArea(adapterOrgModel.getArea());
-//                adapterOrgManager.addAdapterOrg(adapterOrg);
-//                result.setSuccessFlg(true);
+        try{
+//            url="/"+adapterPlanModel.getCode()+"/isExistAdapterData";
+//            params.put("code",adapterPlanModel.getCode());
+//            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+//            if(Boolean.parseBoolean(resultStr)){
+//                envelop.setSuccessFlg(false);
+//                envelop.setErrorMsg("该标准已存在！");
+//                return envelop;
 //            }
-//            return result.toJson();
-//        } catch (Exception e) {
-//            result.setSuccessFlg(false);
-//            return result.toJson();
-//        }
+
+            url="/adapterOrg/org";
+            String adapterJsonModel = mapper.writeValueAsString(adapterPlanModel);
+            params.put("adapterOrg", adapterJsonModel);
+
+            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
+
+            envelop = mapper.readValue(resultStr,Envelop.class);
+            envelop.setObj(resultStr);
+
+            return envelop;
+        } catch (Exception e) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            return envelop;
+        }
     }
 
     @RequestMapping("updateAdapterOrg")
@@ -298,14 +256,14 @@ public class AdapterOrgController {
     @ResponseBody
     //删除采集标准
     public Object delAdapterOrg(String code) {
-        String codeTemp[] = code.split(",");
-        List<String> codes = Arrays.asList(codeTemp);
+//        String codeTemp[] = code.split(",");
+//        List<String> codes = Arrays.asList(codeTemp);
 
-        String url = "/adapterOrg/adapterOrg";
+        String url = "/adapterOrg/orgs";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("code",codes);
+        params.put("codes",code);
         try {
             resultStr = HttpClientUtil.doDelete(comUrl + url, params, username, password);
             if(Boolean.parseBoolean(resultStr)){
@@ -433,22 +391,33 @@ public class AdapterOrgController {
     @ResponseBody
     //查询机构列表
     public Object searchOrgList(String type, String param, int page, int rows) {
-        String url = "/adapterOrg/searchOrgList";
+        String url = "/organizations";
+//        String url = "/adapterOrg/searchOrgList";
         String resultStr = "";
-        Envelop result = new Envelop();
+        String filters = "";
+        Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("type",type);
-        params.put("orgCode",param);
+
+        if(!StringUtils.isEmpty(type)){
+            filters += "orgType=Hospital";
+        }
+        if(!StringUtils.isEmpty(param)){
+            filters += "orgCode?"+param+" g1;fullName?"+param+" g1;";
+        }
+
+        params.put("fields","");
+        params.put("filters",filters);
+        params.put("sorts","");
+        params.put("address","");
+        params.put("size",rows);
         params.put("page",page);
-        params.put("rows",rows);
         try {
-            //todo 返回result.toJson()
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             return resultStr;
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result;
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            return envelop;
         }
 //        List typeLs = new ArrayList<>();
 //        Map<String, Object> adapterOrgMap = new HashMap<>();
@@ -495,15 +464,25 @@ public class AdapterOrgController {
     @RequestMapping("searchAdapterOrgList")
     @ResponseBody
     public Object searchAdapterOrgList(String type, String param, int page, int rows) {
-        String url = "/adapterOrg/searchAdapterOrgList";
+        String url = "/adapterOrg/orgs";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("type",type);
-        params.put("code",param);
-        params.put("name",param);
+
+        String filters = "";
+        if(!StringUtils.isEmpty(param)){
+            filters+="name?"+param+" g1;";
+        }
+        if(!StringUtils.isEmpty(type)){
+            filters+= "type="+type+" g2";
+        }
+
+        params.put("sorts","");
+        params.put("filters",filters);
+        params.put("fields","");
         params.put("page",page);
-        params.put("rows",rows);
+        params.put("size",rows);
+
         try {
             //todo 返回result.toJson()
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);

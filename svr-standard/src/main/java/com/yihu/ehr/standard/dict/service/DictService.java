@@ -42,9 +42,9 @@ public class DictService extends BaseHbmService<IDict> {
     }
 
     @Transactional(propagation= Propagation.REQUIRED)
-    public boolean add(IDict dict){
+    public boolean add(IDict dict, String version){
         String sql =
-                "INSERT INTO " + getTaleName(dict.getStdVersion()) +
+                "INSERT INTO " + getTaleName(version) +
                         "(code, name, author, base_dict, create_date, description, source, std_version, hash) " +
                         "VALUES (:code, :name, :author, :base_dict, :create_date, :description, :source, :std_version, :hash)";
         Query query = currentSession().createSQLQuery(sql);

@@ -107,7 +107,7 @@ public class StandardSourceController extends BaseController {
         MStdSource mStdSourceOld = convertToModel(sourceDetailModel, MStdSource.class);
         mStdSourceOld.setUpdateDate(new Date());
         String jsonData = objectMapper.writeValueAsString(mStdSourceOld);
-        MStdSource mStdSource = stdSourcrClient.updateStdSource(jsonData);
+        MStdSource mStdSource = stdSourcrClient.updateStdSource(sourceDetailModel.getId(), jsonData);
         if (mStdSource == null) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("标准来源更新失败！");

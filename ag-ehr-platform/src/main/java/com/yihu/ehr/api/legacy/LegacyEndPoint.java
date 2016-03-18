@@ -86,7 +86,7 @@ public class LegacyEndPoint {
         if (mKey == null) {
             return new RestEcho().failed(ErrorCode.GenerateUserKeyFailed, "获取用户密钥失败");
         }
-        Object object = adaptionClient.getALLSchemeMappingInfo(mKey.getPrivateKey(), versionCode, orgCode);
+        Object object = adaptionClient.downAdaptions(mKey.getPrivateKey(), versionCode, orgCode);
         return object;
     }
 

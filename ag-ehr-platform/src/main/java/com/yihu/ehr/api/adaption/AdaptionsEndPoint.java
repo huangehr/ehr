@@ -1,27 +1,17 @@
 package com.yihu.ehr.api.adaption;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.feign.AdapterDispatchClient;
 import com.yihu.ehr.feign.SecurityClient;
-import com.yihu.ehr.feign.StandardDispatchClient;
+import com.yihu.ehr.model.security.MKey;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 标准适配。标准适配分为两个方面：机构数据标准与适配方案。前者用于定义医疗机构信息化系统的数据视图，
@@ -39,34 +29,19 @@ public class AdaptionsEndPoint {
     private SecurityClient securityClient;
 
     @Autowired
-    private StandardDispatchClient standardDispatchClient;
-
-    @Autowired
     private AdapterDispatchClient adapterDispatchClient;
 
     @RequestMapping(value = "/{org_code}", method = RequestMethod.GET)
     @ApiOperation(value = "获取机构最新适配", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE, notes = "此包内容包含：平台标准，机构标准与二者适配")
     public ResponseEntity<String> getOrgAdaption(
+            @ApiParam(required = true, name = "version_code", value = "适配标准版本")
+            @RequestParam(value = "version_code", required = true) String versionCode,
             @ApiParam(name = "org_code", value = "机构编码")
-            @PathVariable(value = "org_code") String orgCode,
-            HttpServletResponse response) throws Exception {
-        try {
-            InputStream is = null;
-            if (is == null) return new ResponseEntity<>((String) null, HttpStatus.NOT_FOUND);
+            @PathVariable(value = "org_code") String orgCode) throws Exception {
 
-            response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-            response.setHeader("Content-Disposition", "attachment; filename=" + orgCode + ".zip");
-
-            IOUtils.copy(is, response.getOutputStream());
-            response.flushBuffer();
-        } catch (IOException ex) {
-            throw new ApiException(HttpStatus.NOT_ACCEPTABLE, ErrorCode.SystemError,
-                    "Cannot download adaption package from server. " + ex.getMessage());
-        } catch (Exception ex) {
-            throw new ApiException(HttpStatus.NOT_ACCEPTABLE, ErrorCode.SystemError,
-                    "Cannot download adaption package from server. " + ex.getMessage());
-        }
-
-        return new ResponseEntity<>((String) null, HttpStatus.OK);
+        MKey mKey = securityClient.getOrgKey(orgCode);
+        Object o = adapterDispatchClient.downAdaptions(mKey.getPrivateKey(), versionCode, orgCode).toString();
+        return new ResponseEntity<>(
+                o.toString(), HttpStatus.OK);
     }
 }

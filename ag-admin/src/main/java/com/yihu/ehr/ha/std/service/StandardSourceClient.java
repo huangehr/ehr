@@ -1,6 +1,8 @@
 package com.yihu.ehr.ha.std.service;
 
+import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.standard.MStdSource;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -12,17 +14,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.*;
+import java.util.Collection;
 
 /**
  * Created by yww on 2016/3/1.
  */
-@FeignClient("svr-standard")
-@RequestMapping(ApiVersion.Version1_0 + "/std")
+@FeignClient(MicroServices.StandardMgr)
+@RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface StandardSourceClient {
 
-    @RequestMapping(value = "/sources", method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Standards.Sources, method = RequestMethod.GET)
     @ApiOperation(value = "标准来源分页搜索")
     ResponseEntity<Collection<MStdSource>> searchSources(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
@@ -37,35 +39,37 @@ public interface StandardSourceClient {
             @RequestParam(value = "page", required = false) int page);
 
 
-    @RequestMapping(value = "/source/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Standards.Source, method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取标准来源信息")
     MStdSource getStdSource(
             @ApiParam(name = "id", value = "标准来源编号", defaultValue = "")
             @PathVariable(value = "id") String id);
 
 
-    @RequestMapping(value = "/source", method = RequestMethod.PUT)
+    @RequestMapping(value = RestApi.Standards.Source, method = RequestMethod.PUT)
     @ApiOperation(value = "修改标准来源，通过id取数据，取不到数据时新增，否则修改")
     MStdSource updateStdSource(
+            @ApiParam(name = "id", value = "标准来源编号", defaultValue = "")
+            @PathVariable(value = "id") String id,
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam(value = "model") String model);
 
 
-    @RequestMapping(value = "/source", method = RequestMethod.POST)
+    @RequestMapping(value = RestApi.Standards.Sources, method = RequestMethod.POST)
     @ApiOperation(value = "新增标准来源")
     MStdSource addStdSource(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam(value = "model") String model);
 
 
-    @RequestMapping(value = "/sources", method = RequestMethod.DELETE)
+    @RequestMapping(value = RestApi.Standards.Sources, method = RequestMethod.DELETE)
     @ApiOperation(value = "通过id组删除标准来源，多个id以,分隔")
     boolean delStdSources(
             @ApiParam(name = "ids", value = "标准来源编号", defaultValue = "")
             @RequestParam(value = "ids") String ids);
 
 
-    @RequestMapping(value = "/source/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = RestApi.Standards.Source, method = RequestMethod.DELETE)
     @ApiOperation(value = "通过id删除标准来源")
     boolean delStdSource(
             @ApiParam(name = "id", value = "标准来源编号", defaultValue = "")
