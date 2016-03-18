@@ -12,7 +12,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
 /**
  * Created by Administrator on 2016/1/4.
  */
-@FeignClient(name = MicroServiceName.Security,url = MicroServiceIpAddressStr.Security+ MicroServicePort.Security)
+@FeignClient(name = MicroServices.SecurityMgr,url = MicroServiceIpAddressStr.Security+ MicroServicePort.Security)
 @ApiIgnore
 public interface SecurityClient {
 

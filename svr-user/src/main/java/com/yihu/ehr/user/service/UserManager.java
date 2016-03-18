@@ -2,12 +2,16 @@ package com.yihu.ehr.user.service;
 
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.encode.HashUtil;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户管理接口实现类.

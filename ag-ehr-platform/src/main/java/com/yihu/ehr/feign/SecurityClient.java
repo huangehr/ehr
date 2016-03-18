@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * Created by AndyCai on 2016/2/1.
  */
-@FeignClient(name = MicroServiceName.Security,url = MicroServiceIpAddressStr.Security+ MicroServicePort.Security)
+@FeignClient(name = MicroServices.SecurityMgr,url = MicroServiceIpAddressStr.Security+ MicroServicePort.Security)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface SecurityClient {

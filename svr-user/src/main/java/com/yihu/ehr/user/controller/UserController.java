@@ -103,6 +103,16 @@ public class UserController extends BaseRestController {
         return userModel;
     }
 
+    @RequestMapping(value = RestApi.Users.User, method = RequestMethod.GET)
+    @ApiOperation(value = "根据id获取获取用户信息")
+    public MUser getUserByUserName(
+            @ApiParam(name = "user_name", value = "", defaultValue = "")
+            @PathVariable(value = "user_name") String userName) {
+        User user = userManager.getUserByLoginCode(userName);
+        MUser userModel = convertToModel(user, MUser.class);
+        return userModel;
+    }
+
     @RequestMapping(value = RestApi.Users.UserAdmin, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除用户", notes = "根据id删除用户")
     public boolean deleteUser(

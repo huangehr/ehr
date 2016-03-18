@@ -111,7 +111,7 @@ public class JsonPackageEndPoint extends BaseRestController {
      *
      * @param packageCrypto zip密码密文, file 请求体中文件参数名
      */
-    @RequestMapping(value = RestApi.Packages.Packages, method = RequestMethod.POST)
+    @RequestMapping(value = "/packages", method = RequestMethod.POST)
     @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
     public void savePackageWithOrg(@ApiParam(required = false, name = "file_string", value = "JSON档案包字符串")
                                    @RequestParam(value = "file_string") String fileString,

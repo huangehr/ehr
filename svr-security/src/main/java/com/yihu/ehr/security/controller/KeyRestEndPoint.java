@@ -162,14 +162,6 @@ public class KeyRestEndPoint extends BaseRestController {
         return convertToModel(key, MKey.class);
     }
 
-    public  void main(String[] args) throws Exception {
-
-        MKey aaa =  createOrgKey("426600661");
-
-    }
-
-
-
     @RequestMapping(value = RestApi.Securities.OrganizationPublicKey, method = RequestMethod.GET)
     @ApiOperation(value = "获取机构公钥")
     public String getOrgPublicKey(

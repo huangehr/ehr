@@ -32,7 +32,7 @@ import java.util.Map;
  * @created 2016.02.03 14:15
  */
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0 + "/patients")
+@RequestMapping(value = ApiVersion.Version1_0)
 @Api(protocols = "https", value = "patients", description = "患者服务")
 public class PatientsEndPoint {
     @Autowired
@@ -41,15 +41,13 @@ public class PatientsEndPoint {
     @Autowired
     private PatientClient patientClient;
 
-    @ApiIgnore
-    @ApiOperation(value = "患者注册", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "根据患者的身份证号在健康档案平台中注册患者")
-    @RequestMapping(value = "/{demographic_id}", method = {RequestMethod.POST})
-    public void registerPatient(@ApiParam(value = "身份证号")
-                                @PathVariable("demographic_id")
-                                String demographicId,
-                                @ApiParam(name = "json", value = "患者人口学数据集")
-                                @RequestParam(value = "json", required = true)
-                                String patientInfo) throws IOException, ParseException {
+    @ApiOperation(value = "患者注册", notes = "根据患者的身份证号在健康档案平台中注册患者")
+    @RequestMapping(value = "/patients/{demographic_id}", method = RequestMethod.POST)
+    public void registerPatient(
+            @ApiParam(value = "身份证号")
+            @PathVariable("demographic_id") String demographicId,
+            @ApiParam(name = "json", value = "患者人口学数据集")
+            @RequestParam(value = "json", required = true) String patientInfo) throws IOException, ParseException {
         ObjectNode patientNode = (ObjectNode) objectMapper.readTree(patientInfo);
         ProfileDataSet dataSet = ProfileDataSet.parseJsonDataSet(patientNode, false);
 
@@ -99,7 +97,7 @@ public class PatientsEndPoint {
     }
 
     @ApiOperation(value = "更新患者", response = boolean.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @RequestMapping(value = "/{demographic_id}", method = {RequestMethod.PATCH})
+    @RequestMapping(value = "/patients/{demographic_id}", method = {RequestMethod.PATCH})
     public String updatePatient(@ApiParam(name = "demographic_id", value = "身份证号")
                                 @PathVariable(value = "demographic_id") String demographicId,
                                 @ApiParam(name = "json", value = "患者人口学数据集")
