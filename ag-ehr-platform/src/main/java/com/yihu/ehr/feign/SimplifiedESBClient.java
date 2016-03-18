@@ -1,9 +1,6 @@
 package com.yihu.ehr.feign;
 
-import com.yihu.ehr.constants.MicroServiceIpAddressStr;
 import com.yihu.ehr.constants.MicroServiceName;
-import com.yihu.ehr.constants.MicroServicePort;
-import com.yihu.ehr.constants.MicroServices;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,7 +20,7 @@ public interface SimplifiedESBClient {
 
     @RequestMapping(value = "/esb/uploadLog", method = RequestMethod.POST)
     public boolean uploadLog(@RequestParam(value = "orgCode", required = true) String orgCode,
-                             @RequestParam(value = "ip", required = true) String ip,
+                             @RequestParam(value = "ip", required = false) String ip,
                              @RequestParam(value = "file", required = true) String file);
 
 
