@@ -55,7 +55,11 @@
 							{display: '创建时间', name: 'commitTime', width: '15%', align: 'left'},
 							{display: '继承版本', name: 'baseVersion', width: '15%', align: 'left'},
 							{display: '状态码', name: 'inStage', align: 'left',hide: true},
-							{display: '状态', name: 'stageName', width: '15%', align: 'center'},
+							{display: '状态', name: 'inStage', width: '15%', align: 'center',
+								render:function(value){
+									return value == true ? "未发布":"已发布"
+								}
+							},
 							{
 								display: '操作', name: 'operator', width: '15%', align: 'center',render: function(row){
 								var _title = "";
