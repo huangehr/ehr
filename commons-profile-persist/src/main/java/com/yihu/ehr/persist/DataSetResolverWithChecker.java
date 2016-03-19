@@ -5,6 +5,7 @@ import com.yihu.ehr.cache.StdDataRedisCache;
 import com.yihu.ehr.cache.StdObjectQualifierTranslator;
 import com.yihu.ehr.profile.SimpleDataSetResolver;
 import com.yihu.ehr.util.log.LogService;
+import org.springframework.stereotype.Component;
 
 import java.util.regex.Matcher;
 
@@ -15,6 +16,7 @@ import java.util.regex.Matcher;
  * @version 1.0
  * @created 2015.08.16 10:44
  */
+@Component
 public class DataSetResolverWithChecker extends SimpleDataSetResolver {
     /**
      * 翻译数据元。
