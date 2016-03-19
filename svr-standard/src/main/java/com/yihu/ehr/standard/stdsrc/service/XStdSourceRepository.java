@@ -1,11 +1,10 @@
-package com.yihu.ehr.standard.standardsource.service;
+package com.yihu.ehr.standard.stdsrc.service;
 
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * @author lincl

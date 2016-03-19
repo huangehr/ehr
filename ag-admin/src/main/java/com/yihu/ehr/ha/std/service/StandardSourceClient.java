@@ -75,6 +75,6 @@ public interface StandardSourceClient {
             @ApiParam(name = "id", value = "标准来源编号", defaultValue = "")
             @PathVariable(value = "id") String id);
 
-    @RequestMapping(value = RestApi.Standards.IsSourceCodeExist,method = RequestMethod.GET)
+    //@RequestMapping(value = RestApi.Standards.IsSourceCodeExist,method = RequestMethod.GET)
     boolean isCodeExist(@RequestParam(value="code")String code);
 }

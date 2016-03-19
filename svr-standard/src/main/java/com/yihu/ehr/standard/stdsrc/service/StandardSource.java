@@ -1,4 +1,4 @@
-package com.yihu.ehr.standard.standardsource.service;
+package com.yihu.ehr.standard.stdsrc.service;
 
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.util.ObjectId;
