@@ -3,7 +3,6 @@ package com.yihu.ehr.ha;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.standardversion.StdVersionModel;
 import com.yihu.ehr.ha.std.controller.CDAVersionController;
-import com.yihu.ehr.model.standard.MCDAVersion;
 import com.yihu.ehr.util.Envelop;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -16,8 +15,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
+
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
@@ -117,6 +116,13 @@ public class CDAVersionTests {
         int page = 1;
         envelop = cdaVersionController.searchCDAVersions(fields, filters, sorts, size, page);
         assertNotEquals("没有匹配条件的cda版本！", envelop.isSuccessFlg(), false);
+    }
+
+    @Test
+    public void cTestCommitVersion() throws  Exception{
+        String version = "56395d75b854";
+        Envelop envelop = cdaVersionController.commitVersion(version);
+        assertTrue("发布失败!",envelop.isSuccessFlg());
     }
 
 }

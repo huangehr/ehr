@@ -29,7 +29,7 @@ public class SecurityController extends BaseController{
     private SecurityClient securityClient;
 
 
-    @RequestMapping(value = "/securities/{login_code}", method = RequestMethod.GET)
+    @RequestMapping(value = "/securities/user/{login_code}", method = RequestMethod.GET)
     @ApiOperation(value = "获取用户公钥" , notes = "用户在平台注册时，会分配一个公钥，此公钥用于与健康档案平台加密传输数据使用")
     public Envelop getUserSecurityByLoginCode(
             @ApiParam(name = "login_code", value = "用户名")
@@ -53,7 +53,7 @@ public class SecurityController extends BaseController{
 
 
 
-    @RequestMapping(value = "/securities/{org_code}", method = RequestMethod.GET)
+    @RequestMapping(value = "/securities/org/{org_code}", method = RequestMethod.GET)
     @ApiOperation(value = "获取企业公钥", produces = "application/json", notes = "企业公钥，用于与健康档案平台之间传输数据的加密。")
     public Envelop getUserSecurityByOrgCode(
             @ApiParam(name = "org_code", value = "机构代码")
@@ -187,7 +187,7 @@ public class SecurityController extends BaseController{
      * 4
      */
 
-    @RequestMapping(value = "/securities/{org_code}", method = RequestMethod.POST)
+    @RequestMapping(value = "/securities/org/{org_code}", method = RequestMethod.POST)
     @ApiOperation(value = "根据orgCode创建security")
     public Envelop createSecurityByOrgCode(
             @ApiParam(name = "org_code", value = "机构代码")
@@ -236,7 +236,7 @@ public class SecurityController extends BaseController{
      * 5
      */
 
-    @RequestMapping(value = "/user_keys/{org_code}", method = RequestMethod.GET)
+    @RequestMapping(value = "/user_keys/org/{org_code}", method = RequestMethod.GET)
     @ApiOperation(value = "根据orgCode获取security")
     public String getUserKeyIdByOrgCd(
             @ApiParam(name = "org_code", value = "机构代码")
@@ -327,7 +327,7 @@ public class SecurityController extends BaseController{
      * @throws Exception
      * 1
      */
-    @RequestMapping(value = "/securities/{user_id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/securities/user/{user_id}", method = RequestMethod.POST)
     @ApiOperation(value = "根据userId创建Security" )
     public Envelop createSecurityByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
@@ -356,7 +356,7 @@ public class SecurityController extends BaseController{
      * @return
      *1
      */
-    @RequestMapping(value = "/user_keys/{user_id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/user_keys/user/{user_id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据userId获取user_key" )
     public String getUserKeyByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
@@ -375,7 +375,7 @@ public class SecurityController extends BaseController{
      * @return
      * 2
      */
-    @RequestMapping(value = "/securities/{user_id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/securities/admin/user/{user_id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据userId获取UserSecurity" )
     public Envelop getUserSecurityByUserId(
             @ApiParam(name = "user_id", value = "用户代码")
