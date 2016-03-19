@@ -1,8 +1,6 @@
 package com.yihu.ehr.ha.std.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ConcurrentHashMultiset;
 import com.yihu.ehr.agModel.standard.dict.DictEntryModel;
 import com.yihu.ehr.agModel.standard.dict.DictModel;
 import com.yihu.ehr.constants.ApiVersion;
@@ -13,26 +11,32 @@ import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by AndyCai on 2016/1/25.
  */
-@RequestMapping(ApiVersion.Version1_0 + "/dict")
+@RequestMapping(ApiVersion.Version1_0 + "/admin/std")
 @RestController
-public class DictController extends BaseController{
+public class DictController extends BaseController {
 
     @Autowired
     private DictClient dictClient;
 
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    @RequestMapping(value = "/dicts",method = RequestMethod.GET)
+    @RequestMapping(value = "/dicts", method = RequestMethod.GET)
     @ApiOperation(value = "查询字典")
     public Envelop searchDicts(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -48,108 +52,78 @@ public class DictController extends BaseController{
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version) throws Exception {
 
-        Collection<MStdDict> mStdDictCollection = dictClient.searchDict(fields, filters, sorts, size, page, version);
+        ResponseEntity<Collection<MStdDict>> responseEntity = dictClient.searchDict(fields, filters, sorts, size, page, version);
 
-        List<DictModel> dictModelList = (List<DictModel>)convertToModels(mStdDictCollection,new ArrayList<DictModel>(mStdDictCollection.size()),DictModel.class,null);
+        List<DictModel> dictModelList = (List<DictModel>) convertToModels(responseEntity.getBody(), new ArrayList<DictModel>(responseEntity.getBody().size()), DictModel.class, null);
 
-        //TODO:获取总条数
-//        String count = response.getHeader(AgAdminConstants.ResourceCount);
-//        int totalCount = StringUtils.isNotEmpty(count) ? Integer.parseInt(count) : 0;
-
-        Envelop envelop = getResult(dictModelList,0,page,size);
+        Envelop envelop = getResult(dictModelList, getTotalCount(responseEntity), page, size);
 
         return envelop;
     }
 
-    @RequestMapping(value = "/dict",method = RequestMethod.GET)
+    @RequestMapping(value = "/dict", method = RequestMethod.GET)
     @ApiOperation(value = "根据dictid，version获取字典信息")
     public Envelop getDictById(
-                              @ApiParam(name = "versionCode", value = "标准版本代码")
-                              @RequestParam(value = "versionCode") String versionCode,
-                              @ApiParam(name = "dictId",value = "字典ID")
-                              @RequestParam(value = "dictId")long dictId){
-
-        Envelop envelop = new Envelop();
+            @ApiParam(name = "version_code", value = "标准版本代码")
+            @RequestParam(value = "version_code") String versionCode,
+            @ApiParam(name = "dictId", value = "字典ID")
+            @RequestParam(value = "dictId") long dictId) {
 
         MStdDict mStdDict = dictClient.getCdaDictInfo(dictId, versionCode);
-        DictModel dictModel = convertToModel(mStdDict,DictModel.class);
+        DictModel dictModel = convertToModel(mStdDict, DictModel.class);
 
-        if(dictModel != null){
-            envelop.setObj(dictModel);
-            envelop.setSuccessFlg(true);
-        }else {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("获取字典信息失败");
+        if (dictModel != null) {
+            return failed("数据获取失败!");
         }
 
-        return envelop;
+        return success(dictModel);
     }
 
 
-
-    @RequestMapping(value = "/createDict",method = RequestMethod.POST)
+    @RequestMapping(value = "/save_dict", method = RequestMethod.POST)
     public Envelop saveDict(
-                           @ApiParam(name = "dictId", value = "字典ID")
-                           @RequestParam(value = "dictId") String dictId,
-                           @ApiParam(name = "code", value = "字典代码")
-                           @RequestParam(value = "code") String code,
-                           @ApiParam(name = "name", value = "字典名称")
-                           @RequestParam(value = "name") String name,
-                           @ApiParam(name = "baseDict", value = "父级字典ID")
-                           @RequestParam(value = "baseDict") String baseDict,
-                           @ApiParam(name = "stdSource", value = "标准来源ID")
-                           @RequestParam(value = "stdSource") String stdSource,
-                           @ApiParam(name = "stdVersion", value = "标准版本号")
-                           @RequestParam(value = "stdVersion") String stdVersion,
-                           @ApiParam(name = "description", value = "说明")
-                           @RequestParam(value = "description") String description,
-                           @ApiParam(name = "userId", value = "用户ID")
-                           @RequestParam(value = "userId") String userId) throws JsonProcessingException {
+            @ApiParam(name = "version_code", value = "版本号")
+            @RequestParam(value = "version_code") String versionCode,
+            @ApiParam(name = "json_data", value = "字典信息")
+            @RequestParam(value = "json_data") String jsonData) {
 
-        Envelop envelop = new Envelop();
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String,Object> dictMap = new HashMap<>();
-        MStdDict mStdDict;
-        DictModel dictModel;
-
-        dictMap.put("id",dictId);
-        dictMap.put("code",code);
-        dictMap.put("name",name);
-        dictMap.put("baseDict",baseDict);
-        dictMap.put("sourceId",stdSource);
-        dictMap.put("description",description);
-        dictMap.put("author",userId);
-        dictMap.put("stdVersion",stdVersion);
-
-        String dictJsonModel = mapper.writeValueAsString(dictMap);
-
-        if(Long.valueOf(dictId) == 0||dictId == ""||dictId == null){
-
-            mStdDict = dictClient.addDict(stdVersion, dictJsonModel);
-            dictModel = convertToModel(mStdDict,DictModel.class);
-            if (dictModel != null) {
-                envelop.setSuccessFlg(true);
-                envelop.setObj(dictModel);
-            }else {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("标准字典新增失败");
+        try {
+            DictModel dictModel = objectMapper.readValue(jsonData, DictModel.class);
+            String errorMsg = "";
+            if (StringUtils.isEmpty(versionCode)) {
+                errorMsg += "版本号不能为空!";
+            }
+            if (StringUtils.isEmpty(dictModel.getCode())) {
+                errorMsg += "代码不能为空!";
+            }
+            if (StringUtils.isEmpty(dictModel.getName())) {
+                errorMsg += "名称不能为空!";
+            }
+            if (StringUtils.isNotEmpty(errorMsg)) {
+                return failed(errorMsg);
             }
 
-        }else {
+            //TODO:代码唯一性校验
 
-            mStdDict = dictClient.updateDict(stdVersion, Long.valueOf(dictId), dictJsonModel);
-            dictModel = convertToModel(mStdDict,DictModel.class);
-            if (dictModel != null) {
-                envelop.setSuccessFlg(true);
-                envelop.setObj(dictModel);
-            }else {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("标准字典修改失败");
+            MStdDict mStdDict = convertToModel(dictModel, MStdDict.class);
+            if (dictModel.getId() == 0) {
+                mStdDict = dictClient.addDict(versionCode, objectMapper.writeValueAsString(mStdDict));
+                dictModel = convertToModel(mStdDict, DictModel.class);
+                if (dictModel == null) {
+                    return failed("保存失败!");
+                }
+            } else {
+                mStdDict = dictClient.updateDict(versionCode, mStdDict.getId(), objectMapper.writeValueAsString(mStdDict));
+                dictModel = convertToModel(mStdDict, DictModel.class);
+                if (dictModel == null) {
+                    return failed("保存失败!");
+                }
             }
 
+            return success(dictModel);
+        } catch (Exception ex) {
+            return failedSystem();
         }
-
-        return envelop;
     }
 
 //    @RequestMapping(value = "/updateDict",method = RequestMethod.POST)
@@ -201,34 +175,25 @@ public class DictController extends BaseController{
 //        return envelop;
 //    }
 
-    @RequestMapping(value = "deleteDict",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/dict", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除字典")
     public Envelop deleteDict(
-                             @ApiParam(name = "versionCode", value = "标准版本代码")
-                             @RequestParam(value = "versionCode") String versionCode,
-                             @ApiParam(name = "dictId", value = "字典ID")
-                             @RequestParam(value = "dictId") String ids) {
+            @ApiParam(name = "versionCode", value = "标准版本代码")
+            @RequestParam(value = "versionCode") String versionCode,
+            @ApiParam(name = "dictId", value = "字典ID")
+            @RequestParam(value = "dictId") String ids) {
 
-        Envelop envelop = new Envelop();
-
-        String[] dictId = ids.split(",");
-        boolean bo;
-
-        if(dictId.length>1){
-            //批量删除
-            bo = dictClient.deleteDicts(versionCode,ids);
-        }else {
-            //单个删除
-            long id = Long.valueOf(ids);
-            bo = dictClient.deleteDict(versionCode,id);
+        ids = trimEnd(ids, ",");
+        if (StringUtils.isEmpty(ids)) {
+            return failed("请选择需要删除的数据!");
         }
+        boolean result = dictClient.deleteDicts(versionCode, ids);
 
-        envelop.setSuccessFlg(bo);
-
-        return envelop;
+        if (!result) {
+            return failed("删除失败!");
+        }
+        return success(null);
     }
-
-
 
 
 //    @RequestMapping(value = "/getCdaDictList",method = RequestMethod.GET)
@@ -263,73 +228,53 @@ public class DictController extends BaseController{
 //    }
 
 
-
-
-
-
-
-
-
-
-
-    @RequestMapping(value = "/createDictEntry",method = RequestMethod.POST)
+    @RequestMapping(value = "/dict_entry", method = RequestMethod.POST)
     @ApiOperation(value = "新增字典项")
-      public Envelop saveDictEntry(
-                                    @ApiParam(name = "versionCode", value = "标准版本代码")
-                                    @RequestParam(value = "versionCode") String versionCode,
-                                    @ApiParam(name = "dictId", value = "字典ID")
-                                    @RequestParam(value = "dictId") String dictId,
-                                    @ApiParam(name = "entryId",value = "字典项ID")
-                                    @RequestParam(value = "entryId")String entryId,
-                                    @ApiParam(name = "entryCode",value = "字典项代码")
-                                    @RequestParam(value = "entryCode")String entryCode,
-                                    @ApiParam(name = "entryValue",value = "字典项值")
-                                    @RequestParam(value = "entryValue")String entryValue,
-                                    @ApiParam(name = "description",value = "说明")
-                                    @RequestParam(value = "description")String description) throws JsonProcessingException {
+    public Envelop saveDictEntry(
+            @ApiParam(name = "version_code", value = "标准版本代码")
+            @RequestParam(value = "version_code") String versionCode,
+            @ApiParam(name = "json_data", value = "标准版本代码")
+            @RequestParam(value = "json_data") String jsonData) {
 
-        Envelop envelop = new Envelop();
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String,Object> dictEntryMap = new HashMap<>();
+        try {
+            DictEntryModel dictEntryModel = objectMapper.readValue(jsonData, DictEntryModel.class);
 
-        dictEntryMap.put("id",entryId);
-        dictEntryMap.put("dictId",dictId);
-        dictEntryMap.put("code",entryCode);
-        dictEntryMap.put("value",entryValue);
-        dictEntryMap.put("desc",description);
-
-        String  dictEntryJsonModel = mapper.writeValueAsString(dictEntryMap);
-
-        MStdDictEntry mStdDictEntry;
-        DictEntryModel dictEntryModel;
-
-        if(entryId == ""||entryId == null){
-
-            mStdDictEntry = dictClient.addDictEntry(versionCode, dictEntryJsonModel);
-            dictEntryModel = convertToModel(mStdDictEntry,DictEntryModel.class);
-            if (dictEntryModel != null){
-                envelop.setSuccessFlg(true);
-                envelop.setObj(dictEntryModel);
-            }else {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("字典项新增失败");
+            String errorMsg = "";
+            if (StringUtils.isEmpty(versionCode)) {
+                errorMsg += "版本号不能为空!";
+            }
+            if (StringUtils.isEmpty(dictEntryModel.getCode())) {
+                errorMsg += "代码不能为空!";
+            }
+            if (StringUtils.isEmpty(dictEntryModel.getValue())) {
+                errorMsg += "值不能为空!";
+            }
+            if (dictEntryModel.getDictId() == 0) {
+                errorMsg += "请选择对应的字典!";
+            }
+            if (StringUtils.isNotEmpty(errorMsg)) {
+                return failed(errorMsg);
+            }
+            //TODO:代码唯一性校验
+            MStdDictEntry mStdDictEntry = convertToModel(dictEntryModel, MStdDictEntry.class);
+            if (dictEntryModel.getId() == 0) {
+                mStdDictEntry = dictClient.addDictEntry(versionCode, objectMapper.writeValueAsString(mStdDictEntry));
+                dictEntryModel = convertToModel(mStdDictEntry, DictEntryModel.class);
+                if (dictEntryModel == null) {
+                    return failed("保存失败!");
+                }
+            } else {
+                mStdDictEntry = dictClient.updateDictEntry(versionCode, mStdDictEntry.getId(), objectMapper.writeValueAsString(mStdDictEntry));
+                dictEntryModel = convertToModel(mStdDictEntry, DictEntryModel.class);
+                if (dictEntryModel == null) {
+                    return failed("保存失败!");
+                }
             }
 
-        }else {
-
-            mStdDictEntry = dictClient.updateDictEntry(versionCode, Long.valueOf(entryId), dictEntryJsonModel);
-            dictEntryModel = convertToModel(mStdDictEntry,DictEntryModel.class);
-            if (dictEntryModel != null){
-                envelop.setSuccessFlg(true);
-                envelop.setObj(dictEntryModel);
-            }else {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("修改字典项失败");
-            }
-
+            return success(dictEntryModel);
+        } catch (Exception ex) {
+            return failedSystem();
         }
-
-        return envelop;
     }
 
 //    @RequestMapping(value = "/updateDictEntry",method = RequestMethod.POST)
@@ -374,7 +319,7 @@ public class DictController extends BaseController{
 //        return envelop;
 //    }
 
-    @RequestMapping(value = "/std/dict/entrys", method = RequestMethod.GET)
+    @RequestMapping(value = "/dict_entrys", method = RequestMethod.GET)
     @ApiOperation(value = "查询字典项")
     public Envelop searchDictEntry(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -388,68 +333,53 @@ public class DictController extends BaseController{
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page,
             @ApiParam(name = "version", value = "版本", defaultValue = "")
-            @RequestParam(value = "version") String version){
+            @RequestParam(value = "version") String version) {
 
-        Collection<MStdDictEntry> mStdDictEntryCollection = dictClient.searchDictEntry(fields, filters, sorts, size, page, version);
-        List<DictEntryModel> dictModelList = (List<DictEntryModel>)convertToModels(mStdDictEntryCollection,new ArrayList<DictEntryModel>(mStdDictEntryCollection.size()),DictEntryModel.class,null);
+        ResponseEntity<Collection<MStdDictEntry>> responseEntity = dictClient.searchDictEntry(fields, filters, sorts, size, page, version);
+        List<DictEntryModel> dictModelList = (List<DictEntryModel>) convertToModels(responseEntity.getBody(), new ArrayList<DictEntryModel>(responseEntity.getBody().size()), DictEntryModel.class, null);
 
-        //TODO:获取总条数
-//        String count = response.getHeader(AgAdminConstants.ResourceCount);
-//        int totalCount = StringUtils.isNotEmpty(count) ? Integer.parseInt(count) : 0;
-
-        Envelop envelop = getResult(dictModelList,0,page,size);
+        Envelop envelop = getResult(dictModelList, getTotalCount(responseEntity), page, size);
 
         return envelop;
     }
 
-    @RequestMapping(value = "/dictEntry",method = RequestMethod.GET)
+    @RequestMapping(value = "/dict_entry", method = RequestMethod.GET)
     @ApiOperation(value = "获取字典项")
     public Envelop getDictEntryById(
-                                   @ApiParam(name = "versionCode", value = "标准版本代码")
-                                   @RequestParam(value = "versionCode") String versionCode,
-                                   @ApiParam(name="entryId",value = "字典项ID")
-                                   @RequestParam(value = "entryId")long entryId){
+            @ApiParam(name = "versionCode", value = "标准版本代码")
+            @RequestParam(value = "versionCode") String versionCode,
+            @ApiParam(name = "entryId", value = "字典项ID")
+            @RequestParam(value = "entryId") long entryId) {
 
-        Envelop envelop = new Envelop();
+        MStdDictEntry mStdDictEntry = dictClient.getDictEntry(entryId, versionCode);
+        DictEntryModel dictEntryModel = convertToModel(mStdDictEntry, DictEntryModel.class);
 
-        MStdDictEntry mStdDictEntry = dictClient.getDictEntry(entryId,versionCode);
-        DictEntryModel dictEntryModel = convertToModel(mStdDictEntry,DictEntryModel.class);
-
-        if (dictEntryModel != null){
-            envelop.setSuccessFlg(true);
-            envelop.setObj(dictEntryModel);
-        }else {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("获取字典项失败");
+        if (dictEntryModel == null) {
+            return failed("数据获取失败!");
         }
 
-        return envelop;
+        return success(null);
     }
 
-    @RequestMapping(value = "/dictEntry",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/dict_entry", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除字典项", produces = "application/json", notes = "删除字典项信息，多ID删除时，Id以逗号隔开")
     public Envelop deleteDictEntry(
-                                  @ApiParam(name = "versionCode", value = "标准版本代码")
-                                  @RequestParam(value = "versionCode") String versionCode,
-                                  @ApiParam(name = "dictId", value = "字典ID")
-                                  @RequestParam(value = "dictId") long dictId,
-                                  @ApiParam(name = "entryIds", value = "字典项ID")
-                                  @RequestParam(value = "entryIds") String entryIds) {
+            @ApiParam(name = "versionCode", value = "标准版本代码")
+            @RequestParam(value = "versionCode") String versionCode,
+            @ApiParam(name = "dictId", value = "字典ID")
+            @RequestParam(value = "dictId") long dictId,
+            @ApiParam(name = "entryIds", value = "字典项ID")
+            @RequestParam(value = "entryIds") String entryIds) {
 
-        Envelop envelop = new Envelop();
-        boolean bo;
-
-        if (entryIds.split(",").length>1){
-            //批量删除
-            bo = dictClient.deleteDictEntrys(versionCode, entryIds);
-        }else{
-            //单个删除
-            long id = Long.valueOf(entryIds);
-            bo = dictClient.deleteDictEntry(versionCode, id);
+        entryIds = trimEnd(entryIds, ",");
+        if (StringUtils.isEmpty(entryIds)) {
+            return failed("请选择需要删除的数据!");
         }
-
-        envelop.setSuccessFlg(bo);
-        return envelop;
+        boolean result = dictClient.deleteDictEntrys(versionCode, entryIds);
+        if (!result) {
+            return failed("删除失败!");
+        }
+        return success(null);
     }
 
 }

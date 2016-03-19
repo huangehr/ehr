@@ -16,7 +16,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
 /**
  * Created by wq on 2016/3/2.
  */
@@ -41,13 +40,13 @@ public class DictControllerTests {
 
         applicationContext = new SpringApplicationBuilder().web(false).sources(AgAdminApplication.class).run();
 
-
-        envelop = dictController.saveDict("0", "code_test1", "name_test", "32156412", "source_test", version, "test", "0dae0003561e059a49f6321ee017ef88");
-        envelop = dictController.saveDict("0", "code_test2", "name_test", "32156412", "source_test", version, "test", "0dae0003561e059a49f6321ee017ef88");
-        envelop = dictController.saveDict("0", "code_test3", "name_test", "32156412", "source_test", version, "test", "0dae0003561e059a49f6321ee017ef88");
-        envelop = dictController.saveDict("0", "code_test4", "name_test", "32156412", "source_test", version, "test", "0dae0003561e059a49f6321ee017ef88");
-        envelop = dictController.saveDict("0", "code_test5", "name_test", "32156412", "source_test", version, "test", "0dae0003561e059a49f6321ee017ef88");
-        assertNotEquals("字典新增失败",envelop,null);
+//
+//        envelop = dictController.saveDict("0", "code_test1", "name_test", "32156412", "source_test", version, "test", "0dae0003561e059a49f6321ee017ef88");
+//        envelop = dictController.saveDict("0", "code_test2", "name_test", "32156412", "source_test", version, "test", "0dae0003561e059a49f6321ee017ef88");
+//        envelop = dictController.saveDict("0", "code_test3", "name_test", "32156412", "source_test", version, "test", "0dae0003561e059a49f6321ee017ef88");
+//        envelop = dictController.saveDict("0", "code_test4", "name_test", "32156412", "source_test", version, "test", "0dae0003561e059a49f6321ee017ef88");
+//        envelop = dictController.saveDict("0", "code_test5", "name_test", "32156412", "source_test", version, "test", "0dae0003561e059a49f6321ee017ef88");
+//        assertNotEquals("字典新增失败",envelop,null);
 
         envelop = dictController.searchDicts("", "name=name_test", "", 15, 1, version);
         assertNotEquals("查询字典失败",envelop,null);
@@ -60,8 +59,8 @@ public class DictControllerTests {
         Envelop envelop1 = dictController.deleteDict(version, ids.toString());
         assertNotEquals("批量删除字典失败",envelop,null);
 
-        envelop = dictController.saveDict(String.valueOf(((DictModel) envelop.getDetailModelList().get(0)).getId()), "code_test_copy", "name_test_copy", "22", "source_test_copy", version, "test", "0dae0003561e059a49f6321ee017ef88");
-        assertNotEquals("字典修改失败",envelop,null);
+//        envelop = dictController.saveDict(String.valueOf(((DictModel) envelop.getDetailModelList().get(0)).getId()), "code_test_copy", "name_test_copy", "22", "source_test_copy", version, "test", "0dae0003561e059a49f6321ee017ef88");
+//        assertNotEquals("字典修改失败",envelop,null);
 
         envelop = dictController.getDictById(version, ((DictModel)envelop.getObj()).getId());
         assertNotEquals("获取字典信息失败",envelop,null);
@@ -72,14 +71,14 @@ public class DictControllerTests {
 
     @Test
     public void btestDict() throws JsonProcessingException {
-
-        envelop = dictController.saveDictEntry(version, dictId, "", "entry_code_test1", "value_test", "test1");
-        envelop = dictController.saveDictEntry(version, dictId, "", "entry_code_test2", "value_test", "test2");
-        envelop = dictController.saveDictEntry(version, dictId, "", "entry_code_test3", "value_test", "test3");
-        envelop = dictController.saveDictEntry(version, dictId, "", "entry_code_test4", "value_test", "test4");
-        envelop = dictController.saveDictEntry(version, dictId, "", "entry_code_test5", "value_test", "test5");
-        envelop = dictController.saveDictEntry(version, dictId, "", "entry_code_test6", "value_test", "test6");
-        envelop = dictController.saveDictEntry(version, dictId, "", "entry_code_test7", "value_test", "test7");
+//
+//        envelop = dictController.saveDictEntry(version, dictId, "", "entry_code_test1", "value_test", "test1");
+//        envelop = dictController.saveDictEntry(version, dictId, "", "entry_code_test2", "value_test", "test2");
+//        envelop = dictController.saveDictEntry(version, dictId, "", "entry_code_test3", "value_test", "test3");
+//        envelop = dictController.saveDictEntry(version, dictId, "", "entry_code_test4", "value_test", "test4");
+//        envelop = dictController.saveDictEntry(version, dictId, "", "entry_code_test5", "value_test", "test5");
+//        envelop = dictController.saveDictEntry(version, dictId, "", "entry_code_test6", "value_test", "test6");
+//        envelop = dictController.saveDictEntry(version, dictId, "", "entry_code_test7", "value_test", "test7");
         assertNotEquals("字典项新增失败",envelop,null);
 
         envelop = dictController.searchDictEntry("","value=value_test","",15,1,version);
@@ -93,8 +92,8 @@ public class DictControllerTests {
         Envelop envelop1 = dictController.deleteDictEntry(version,Long.valueOf(dictId),ids.toString());
         assertNotEquals("批量删除字典项失败",envelop1,null);
 
-        envelop = dictController.saveDictEntry(version,dictId,String.valueOf(((DictEntryModel) envelop.getDetailModelList().get(0)).getId()),"entry_code_test_copy","value_test_copy","test_copy");
-        assertNotEquals("字典项修改失败",envelop,null);
+//        envelop = dictController.saveDictEntry(version,dictId,String.valueOf(((DictEntryModel) envelop.getDetailModelList().get(0)).getId()),"entry_code_test_copy","value_test_copy","test_copy");
+//        assertNotEquals("字典项修改失败",envelop,null);
 
         envelop = dictController.getDictEntryById(version,((DictEntryModel)envelop.getObj()).getId());
         assertNotEquals("获取字典项失败",envelop,null);

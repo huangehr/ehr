@@ -5,8 +5,6 @@ import com.yihu.ehr.agModel.dict.SystemDictEntryModel;
 import com.yihu.ehr.agModel.dict.SystemDictModel;
 import com.yihu.ehr.ha.SystemDict.controller.ConventionalDictEntryController;
 import com.yihu.ehr.ha.SystemDict.controller.SystemDictController;
-import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.dict.MSystemDict;
 import com.yihu.ehr.util.Envelop;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -18,7 +16,6 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Collection;
 import java.util.Date;
 
 import static org.junit.Assert.assertNotEquals;
@@ -97,8 +94,8 @@ public class SystemDictControllerTests {
         envelop = sysDict.getDictEntry(46,"3");
         assertNotEquals("字典项获取失败",envelop,null);
 
-        envelop = sysDict.getDictEntries(systemDictModel.getId(),"", 1, 15);
-        assertNotEquals("字典项列表获取失败", envelop, null);
+//        envelop = sysDict.getDictEntries(systemDictModel.getId(),"", 1, 15);
+//        assertNotEquals("字典项列表获取失败", envelop, null);
 
         envelop = sysDict.deleteDictEntry(systemDictModel.getId(),systemDictEntryModel.getCode());
         assertTrue("字典项删除失败", envelop.isSuccessFlg());

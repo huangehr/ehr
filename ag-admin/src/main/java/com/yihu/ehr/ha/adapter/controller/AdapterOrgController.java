@@ -5,8 +5,12 @@ import com.yihu.ehr.agModel.thirdpartystandard.AdapterOrgDetailModel;
 import com.yihu.ehr.agModel.thirdpartystandard.AdapterOrgModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.ha.adapter.service.AdapterOrgClient;
+import com.yihu.ehr.ha.organization.service.OrganizationClient;
 import com.yihu.ehr.model.adaption.MAdapterOrg;
+import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.ApiOperation;
@@ -31,6 +35,12 @@ public class AdapterOrgController extends BaseController {
     private AdapterOrgClient adapterOrgClient;
 
     @Autowired
+    private ConventionalDictEntryClient dictEntryClient;
+
+    @Autowired
+    private OrganizationClient organizationClient;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @RequestMapping(value = "/orgs", method = RequestMethod.GET)
@@ -51,7 +61,31 @@ public class AdapterOrgController extends BaseController {
             ResponseEntity<Collection<MAdapterOrg>> responseEntity = adapterOrgClient.searchAdapterOrg(fields, filters, sorts, size, page);
             List<MAdapterOrg> mAdapterOrgs = (List<MAdapterOrg>) responseEntity.getBody();
 
-            List<AdapterOrgModel> adapterOrgModels = (List<AdapterOrgModel>) convertToModels(mAdapterOrgs, new ArrayList<AdapterOrgModel>(mAdapterOrgs.size()), AdapterOrgModel.class, null);
+            List<AdapterOrgModel> adapterOrgModels = new ArrayList<>();
+
+            for (MAdapterOrg mAdapterOrg : mAdapterOrgs)
+            {
+                AdapterOrgModel adapterOrgModel = convertToModel(mAdapterOrg,AdapterOrgModel.class);
+                String type = adapterOrgModel.getType();
+                if(StringUtils.isNotEmpty(type))
+                {
+                    MConventionalDict dict = dictEntryClient.getAdapterType(type);
+                    adapterOrgModel.setTypeValue(dict==null?"":dict.getValue());
+                }
+                String orgCode = adapterOrgModel.getCode();
+                if(StringUtils.isNotEmpty(orgCode))
+                {
+                    MOrganization mOrganization = organizationClient.getOrg(orgCode);
+                    adapterOrgModel.setOrgValue(mAdapterOrg==null?"":mOrganization.getFullName());
+                }
+                String parentId = adapterOrgModel.getParent();
+                if(StringUtils.isNotEmpty(parentId))
+                {
+                    MAdapterOrg adapterOrg = adapterOrgClient.getAdapterOrg(parentId);
+                    adapterOrgModel.setParentValue(adapterOrg==null?"":adapterOrg.getName());
+                }
+                adapterOrgModels.add(adapterOrgModel);
+            }
 
             return getResult(adapterOrgModels, getTotalCount(responseEntity), page, size);
         }
@@ -70,7 +104,7 @@ public class AdapterOrgController extends BaseController {
 
         MAdapterOrg mAdapterOrg = adapterOrgClient.getAdapterOrg(code);
 
-        AdapterOrgDetailModel adapterOrgModel = convertToModel(mAdapterOrg, AdapterOrgDetailModel.class);
+        AdapterOrgDetailModel adapterOrgModel = convertAdapterOrgDetailModel(mAdapterOrg);
         if (adapterOrgModel == null) {
             return failed("适配机构信息获取失败!");
         }
@@ -116,7 +150,7 @@ public class AdapterOrgController extends BaseController {
             ex.printStackTrace();
             return failedSystem();
         }
-        return success(convertToModel(mAdapterOrg,AdapterOrgDetailModel.class));
+        return success(convertAdapterOrgDetailModel(mAdapterOrg));
     }
 
 
@@ -147,7 +181,7 @@ public class AdapterOrgController extends BaseController {
         if (mAdapterOrg == null) {
             return failed("修改失败!");
         }
-        return success(convertToModel(mAdapterOrg,AdapterOrgDetailModel.class));
+        return success(convertAdapterOrgDetailModel(mAdapterOrg));
     }
 
 
@@ -180,5 +214,30 @@ public class AdapterOrgController extends BaseController {
             @PathVariable(value = "org_code") String orgCode) throws Exception {
 
         return adapterOrgClient.orgIsExistData(orgCode);
+    }
+
+    public AdapterOrgDetailModel convertAdapterOrgDetailModel(MAdapterOrg mAdapterOrg)
+    {
+        AdapterOrgDetailModel detailModel = convertToModel(mAdapterOrg,AdapterOrgDetailModel.class);
+        String type = detailModel.getType();
+        if(StringUtils.isNotEmpty(type))
+        {
+            MConventionalDict dict = dictEntryClient.getAdapterType(type);
+            detailModel.setTypeValue(dict==null?"":dict.getValue());
+        }
+        String orgCode = detailModel.getCode();
+        if(StringUtils.isNotEmpty(orgCode))
+        {
+            MOrganization mOrganization = organizationClient.getOrg(orgCode);
+            detailModel.setOrgValue(mAdapterOrg==null?"":mOrganization.getFullName());
+        }
+        String parentId = detailModel.getParent();
+        if(StringUtils.isNotEmpty(parentId))
+        {
+            MAdapterOrg adapterOrg = adapterOrgClient.getAdapterOrg(parentId);
+            detailModel.setParentValue(adapterOrg==null?"":adapterOrg.getName());
+        }
+
+        return detailModel;
     }
 }

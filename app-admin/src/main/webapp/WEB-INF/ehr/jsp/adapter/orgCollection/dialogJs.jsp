@@ -7,11 +7,13 @@
         var Util = $.Util;
         var infoForm = null;
         var jValidation = $.jValidation;
-//        var dialog = frameElement.dialog;
         var orgCode = parent.getOrgCode();
         var seq = parent.getSeq();
         var mode = '${mode}';
-        var info = JSON.parse('${info}');
+        if(!Util.isStrEquals(mode,'new')){
+            var orgDataSetJsonModel = '${info}';
+            var info = $.parseJSON(orgDataSetJsonModel);
+        }
         var cfgModel = parent.getDialogOpener();
         var cfg = [
             {new:'/orgdataset/createOrgDataSet', modify:'/orgdataset/updateOrgDataSet'},
@@ -47,16 +49,24 @@
                 this.$description.ligerTextBox({width:240,height:180 });
 
                 this.$form.attrScan();
+                if(!Util.isStrEmpty(info)){
+                    var orgDataSet = info.obj;
+                    this.$form.Fields.fillValues({
+                        name:orgDataSet.name,
+                        code: orgDataSet.code,
+                        description:orgDataSet.description,
+                        id:orgDataSet.id,
+                        sort: '${sort}',
+
+                    });
+                }
+
                 this.$form.Fields.fillValues({
-                    name:info.name,
-                    code: info.code,
-                    description:info.description,
-                    id:info.id,
-                    sort: '${sort}'  ,
-                    orgDataSetSeq: seq,
-                    orgDictSeq: seq,
-                    orgCode: orgCode
+                        orgDataSetSeq: seq,
+                        orgDictSeq: seq,
+                        organization: orgCode
                 });
+
                 this.setSortShow();
                 this.$form.show();
             },
@@ -69,16 +79,16 @@
                 });
 
                 this.$btnSave.click(function () {
-                    var values = self.$form.Fields.getValues();
+                    var orgDataSetDetailModel = self.$form.Fields.getValues();
                     if(!validator.validate()){
                         return;
                     }
                     self.$btnSave.attr('disabled','disabled');
                     var dataModel = $.DataModel.init();
-                    dataModel.updateRemote("${contextRoot}"+cfg[cfgModel][mode],{data: $.extend({}, values),
+                    dataModel.updateRemote("${contextRoot}"+cfg[cfgModel][mode],{
+                        data: {jsonDataModel:JSON.stringify(orgDataSetDetailModel)},
                         success: function(data) {
                             if(data.successFlg){
-                                var app = data.obj;
                                 parent.reloadMasterGrid();
                                 parent.closeDialog( '保存成功！');
                             }else{

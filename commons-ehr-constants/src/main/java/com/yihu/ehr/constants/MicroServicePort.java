@@ -1,5 +1,7 @@
 package com.yihu.ehr.constants;
 
+import org.springframework.beans.factory.annotation.Value;
+
 /**
  * 全局微服务名称枚举。用于Feign及Thrift客户端。
  *
@@ -8,15 +10,36 @@ package com.yihu.ehr.constants;
  * @created 2016.01.11 8:54
  */
 public class MicroServicePort {
-    public static final int Adaption = 10150;
-    public static final int App = 10160;
-    public static final int Dict = 10050;
-    public static final int Esb = 10130;
-    public static final int Geography = 10090;
-    public static final int Organization = 10070;
-    public static final int Package = 6010;
-    public static final int Patient = 10100;
-    public static final int Security = 10110;
-    public static final int Standard = 10040;
-    public static final int User = 10120;
+    @Value("${micro.service.adaption.port}")
+    public static final String Adaption = "";
+
+    @Value("${micro.service.app.port}")
+    public static final String App = "";
+
+    @Value("${micro.service.dict.port}")
+    public static final String Dict = "";
+
+    @Value("${micro.service.esb.port}")
+    public static final String Esb = "";
+
+    @Value("${micro.service.geography.port}")
+    public static final String Geography = "";
+
+    @Value("${micro.service.organization.port}")
+    public static final String Organization = "";
+
+    @Value("${micro.service.package.port}")
+    public static final String Package = "";
+
+    @Value("${micro.service.patient.port}")
+    public static final String Patient = "";
+
+    @Value("${micro.service.security.port}")
+    public static final String Security = "";
+
+    @Value("${micro.service.standard.port}")
+    public static final String Standard = "";
+
+    @Value("${micro.service.user.port}")
+    public static final String User = "";
 }

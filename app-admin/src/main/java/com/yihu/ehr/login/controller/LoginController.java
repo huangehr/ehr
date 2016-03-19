@@ -78,6 +78,7 @@ public class LoginController {
                     lastLoginTime = DateFormatter.simpleDateTimeShortFormat(userDetailModel.getLastLoginTime());
                 }
 
+
                 model.addAttribute(SessionAttributeKeys.CurrentUser, userDetailModel);
                 request.getSession().setAttribute("last_login_time", lastLoginTime);
                 //todo 记录最近登入时间，目前没有提供接口
@@ -85,6 +86,7 @@ public class LoginController {
 
                 return "redirect:/index";
             }else{
+
                 model.addAttribute("userName", userName);
                 model.addAttribute("successFlg", false);
                 model.addAttribute("failMsg", "用户名或密码错误，请重新输入。");

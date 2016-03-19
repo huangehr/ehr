@@ -7,7 +7,7 @@
     <input type="hidden" id="id" data-attr-scan="id"/>
     <input type="hidden" id="orgDataSetSeq" data-attr-scan="orgDataSetSeq"/>
     <input type="hidden" id="orgDictSeq" data-attr-scan="orgDictSeq"/>
-    <input type="hidden" id="orgCode" data-attr-scan="orgCode"/>
+    <input type="hidden" id="orgCode" data-attr-scan="organization"/>
 
     <div class="m-form-group">
         <label style="width:80px"><spring:message code="lbl.encoding"/><spring:message code="spe.colon"/></label>
