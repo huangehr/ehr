@@ -58,7 +58,7 @@ public class PatientsEndPoint {
         for (String key : dataSet.getRecordKeys()) {
             Map<String, String> record = dataSet.getRecord(key);
 
-            if (!StringUtils.isEmpty(demographicId)) {
+            if (StringUtils.isEmpty(demographicId)) {
                 throw new ApiException(HttpStatus.NOT_ACCEPTABLE, ErrorCode.MissParameter, "Missing identity card no.");
             }
 
