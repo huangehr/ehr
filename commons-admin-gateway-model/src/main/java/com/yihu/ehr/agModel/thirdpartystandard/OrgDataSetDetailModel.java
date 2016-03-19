@@ -14,6 +14,9 @@ public class OrgDataSetDetailModel {
     String updateUser;
     String description;
     String organization;
+    String orgDataSetSeq;
+    String orgDictSeq;
+
     int sequence;
 
     public long getId() {
@@ -94,5 +97,21 @@ public class OrgDataSetDetailModel {
 
     public void setSequence(int sequence) {
         this.sequence = sequence;
+    }
+
+    public String getOrgDataSetSeq() {
+        return orgDataSetSeq;
+    }
+
+    public void setOrgDataSetSeq(String orgDataSetSeq) {
+        this.orgDataSetSeq = orgDataSetSeq;
+    }
+
+    public String getOrgDictSeq() {
+        return orgDictSeq;
+    }
+
+    public void setOrgDictSeq(String orgDictSeq) {
+        this.orgDictSeq = orgDictSeq;
     }
 }
