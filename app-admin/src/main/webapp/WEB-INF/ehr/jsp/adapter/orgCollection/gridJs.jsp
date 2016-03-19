@@ -15,6 +15,7 @@
       var cfgModel = 0;
       var changeFlag=false;
       var dialogOpener = null;
+      var isFirstPage = true;
       var cfg = [
         {
           left:{title:'数据集', cls:'', search:'/orgdataset/searchOrgDataSets', goAdd:'/orgdataset/template/orgDataInfo', del:'/orgdataset/deleteOrgDataSet'},
@@ -67,7 +68,7 @@
           dataModel.fetchRemote("${contextRoot}/adapterorg/getAdapterOrg",{
             data:{code:orgCode},
             success: function(data) {
-              var model = data.obj.adapterOrg;
+              var model = data.obj;
               $("#adapterorg_name").val(model.name);
 				$('#adapterorg_type').val(model.typeValue);
 				$('#adapterorg_org').val(model.orgValue);
@@ -134,9 +135,6 @@
               { display: '操作', name: 'operator', width: '34%', render: function (row) {
                 var html = '<div class="grid_edit" name="edit_click" style="" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","grid:left:open", row.id,'modify')+'"></div> ' +
                             '<div class="grid_delete" name="delete_click" style="" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","grid:left:delete", row.id)+'"></div>'
-
-//                var html = '<a href="#" class="grid_edit" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","grid:left:open", row.id,'modify')+'"><div  class="grid_edit"></div></a>' +
-//                        ' / <a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","grid:left:delete", row.id)+'"><div  class="grid_delete"></div></a>';
                 return html;
               }}
             ],
@@ -161,16 +159,19 @@
           this.grid.adjustToWidth();
         },
         reloadGrid: function () {
+          if(isFirstPage){
+            this.grid.options.newPage = 1;
+          }
           var searchNm = $("#searchNm").val();
           var values = {
-            codename: searchNm,
+            codeOrName: searchNm,
             orgCode: orgCode
           };
           if (changeFlag){
             var url = '${contextRoot}' + cfg[cfgModel].left.search;
-            this.grid.setOptions({url:url,parms: $.extend({},values), newPage:1});
+            this.grid.setOptions({url:url,parms: $.extend({},values)});
           }else{
-            this.grid.setOptions({parms: $.extend({},values), newPage:1});
+            this.grid.setOptions({parms: $.extend({},values)});
             //重新查询
             this.grid.loadData(true);
           }
@@ -203,8 +204,14 @@
                 dataModel.updateRemote('${contextRoot}'+ cfg[cfgModel].left.del,{
                   data:{id:id},
                   success:function(data){
-                    $.Notice.success( '操作成功！');
-                    master.reloadGrid();
+                    if(data.successFlg){
+                      $.Notice.success( '操作成功！');
+                      isFirstPage = false;
+                      master.reloadGrid();
+                    }else{
+                      $.Notice.success( '操作失败！');
+                    }
+
                   }
                 });
               }
@@ -272,7 +279,7 @@
           }
           var values = {
             orgCode :orgCode,
-            codename: searchNmEntry,
+            codeOrName: searchNmEntry,
             orgDataSetSeq:seq,
             orgDictSeq:seq
           };
@@ -320,21 +327,23 @@
           });
 
           $.subscribe('grid:right:delete',function(event,ids) {
+            debugger
             if(!ids){
               var rows = entryMater.grid.getSelectedRows();
               if(rows.length==0){
                 $.Notice.warn( '请选择要删除的数据行！');
                 return;
               }
-              ids = [];
+              ids ="";
               for(var i=0;i<rows.length;i++){
-                ids.push(rows[i].id)
+                ids += rows[i].id+",";
               }
             }
             else
-              ids = [ids];
+              ids = ids;
 
             $.Notice.confirm('确认删除所选数据？', function (r) {
+              debugger
               if(r){
                 var dataModel = $.DataModel.init();
                 dataModel.updateRemote('${contextRoot}'+cfg[cfgModel].right.delLs,{
@@ -354,6 +363,7 @@
       };
       /* ******************Dialog页面回调接口****************************** */
       win.reloadMasterGrid = function () {
+        isFirstPage = false;
         if(dialogOpener==0||dialogOpener==2)
           master.reloadGrid();
         else

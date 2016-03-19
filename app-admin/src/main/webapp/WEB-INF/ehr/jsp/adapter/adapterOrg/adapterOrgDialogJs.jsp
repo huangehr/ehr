@@ -57,8 +57,6 @@
                 this.$name.ligerTextBox({width:240,validate:{required:true }});
                 this.$description.ligerTextBox({width:240,height:180 });
 
-
-                debugger
                 this.$form.attrScan();
                 if(!Util.isStrEmpty(info)){
                     var adapter = info.obj;
@@ -122,7 +120,6 @@
                             }
                         });
                         if(!Util.isStrEmpty(info)){
-                            debugger
                             var type = info.obj.type;
                             var manager = target.ligerGetComboBoxManager();
                             if(type)
@@ -190,7 +187,6 @@
                 });
 
                 if(!Util.isStrEmpty(info)){
-                    debugger
                     this.orgCodeCombo.setValue(info.obj.org);
                     this.orgCodeCombo.setText(info.obj.orgValue);
                 }
@@ -204,7 +200,6 @@
                 }
              },
             initAdapterOrg : function (target, type) {
-                debugger
 
                 var self = this;
                 var url = "${contextRoot}/adapterorg/searchAdapterOrgList?type="+type;
@@ -266,7 +261,7 @@
                     var values = self.$form.Fields.getValues();
                     var ajaxFun;
                     if(!validator.validate()){
-                        return;
+//                        return;
                     }
                     self.$btnSave.attr('disabled','disabled');
                     if(mode=='new'){
