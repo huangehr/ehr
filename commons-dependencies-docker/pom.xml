@@ -18,6 +18,7 @@
     <properties>
         <docker.host></docker.host>
         <docker.expose.port></docker.expose.port>
+        <maven.test.skip>true</maven.test.skip>
     </properties>
 
     <modules>

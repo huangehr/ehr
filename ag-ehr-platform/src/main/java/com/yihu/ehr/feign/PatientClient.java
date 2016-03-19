@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Created by Administrator on 2016/1/4.
  */
-@FeignClient(name= MicroServiceName.Patient)
+@FeignClient(name= MicroServices.PatientMgr,url = MicroServiceIpAddressStr.Patient+MicroServicePort.Patient)
 @ApiIgnore
 public interface PatientClient {
 

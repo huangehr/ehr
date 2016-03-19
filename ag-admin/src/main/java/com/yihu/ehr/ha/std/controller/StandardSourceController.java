@@ -13,16 +13,20 @@ import com.yihu.ehr.util.controller.BaseController;
 import com.yihu.ehr.util.operator.DateUtil;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by yww on 2016/3/1.
  */
-@RequestMapping(ApiVersion.Version1_0 + "/stdSource")
+@RequestMapping(ApiVersion.Version1_0 + "/admin/standard_source")
 @RestController
 public class StandardSourceController extends BaseController {
 
@@ -102,20 +106,41 @@ public class StandardSourceController extends BaseController {
     public Envelop updateStdSource(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam(value = "model") String model) throws Exception {
-        Envelop envelop = new Envelop();
+
         StdSourceDetailModel sourceDetailModel = objectMapper.readValue(model, StdSourceDetailModel.class);
-        MStdSource mStdSourceOld = convertToModel(sourceDetailModel, MStdSource.class);
+
+        String errorMsg = "";
+        if (StringUtils.isEmpty(sourceDetailModel.getSourceType())) {
+            errorMsg += "类别不能为空!";
+        }
+        if (StringUtils.isEmpty(sourceDetailModel.getCode())) {
+            errorMsg += "代码不能为空！";
+        }
+        if (StringUtils.isEmpty(sourceDetailModel.getName())) {
+            errorMsg += "名称不能为空！";
+        }
+        if (StringUtils.isNotEmpty(errorMsg)) {
+            return failed(errorMsg);
+        }
+        MStdSource mStdSourceOld = stdSourcrClient.getStdSource(sourceDetailModel.getId());
+        if(mStdSourceOld==null)
+        {
+            return failed("标准来源不存在,请确认!");
+        }
+        if(!mStdSourceOld.getCode().equals(sourceDetailModel.getCode())
+                &&stdSourcrClient.isCodeExist(sourceDetailModel.getCode()))
+        {
+            return failed("代码已存在!");
+        }
+
+        mStdSourceOld = convertToModel(sourceDetailModel, MStdSource.class);
         mStdSourceOld.setUpdateDate(new Date());
         String jsonData = objectMapper.writeValueAsString(mStdSourceOld);
-        MStdSource mStdSource = stdSourcrClient.updateStdSource(jsonData);
+        MStdSource mStdSource = stdSourcrClient.updateStdSource(sourceDetailModel.getId(), jsonData);
         if (mStdSource == null) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("标准来源更新失败！");
-            return envelop;
+            return failed("保存失败!");
         }
-        envelop.setSuccessFlg(true);
-        envelop.setObj(getStdSourceDetailModel(mStdSource));
-        return envelop;
+        return success(getStdSourceDetailModel(mStdSource));
     }
 
     @RequestMapping(value = "/source", method = RequestMethod.POST)
@@ -123,20 +148,35 @@ public class StandardSourceController extends BaseController {
     public Envelop addStdSource(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam(value = "model") String model) throws Exception {
-        Envelop envelop = new Envelop();
+
         StdSourceDetailModel sourceDetailModel = objectMapper.readValue(model, StdSourceDetailModel.class);
+
+        String errorMsg = "";
+        if (StringUtils.isEmpty(sourceDetailModel.getSourceType())) {
+            errorMsg += "类别不能为空!";
+        }
+        if (StringUtils.isEmpty(sourceDetailModel.getCode())) {
+            errorMsg += "代码不能为空！";
+        }
+        if (StringUtils.isEmpty(sourceDetailModel.getName())) {
+            errorMsg += "名称不能为空！";
+        }
+        if (StringUtils.isNotEmpty(errorMsg)) {
+            return failed(errorMsg);
+        }
+        if(stdSourcrClient.isCodeExist(sourceDetailModel.getCode()))
+        {
+            return failed("代码已存在!");
+        }
+
         MStdSource mStdSourceOld = convertToModel(sourceDetailModel, MStdSource.class);
         mStdSourceOld.setCreateDate(new Date());
         String jsonData = objectMapper.writeValueAsString(mStdSourceOld);
         MStdSource mStdSource = stdSourcrClient.addStdSource(jsonData);
         if (mStdSource == null) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("新增标准来源失败！");
-            return envelop;
+            return failed("保存失败!");
         }
-        envelop.setSuccessFlg(true);
-        envelop.setObj(getStdSourceDetailModel(mStdSource));
-        return envelop;
+        return success(getStdSourceDetailModel(mStdSource));
     }
 
 
@@ -158,4 +198,10 @@ public class StandardSourceController extends BaseController {
 
         return stdSourcrClient.delStdSource(id);
     }
+
+    @RequestMapping(value = "/source/is_exist", method = RequestMethod.GET)
+    public boolean isCodeExist(@RequestParam(value = "code") String code) {
+        return stdSourcrClient.isCodeExist(code);
+    }
+
 }

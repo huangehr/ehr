@@ -1,5 +1,7 @@
 package com.yihu.ehr.constants;
 
+import org.springframework.beans.factory.annotation.Value;
+
 /**
  * 全局微服务名称枚举。用于Feign及Thrift客户端。
  *
@@ -8,15 +10,37 @@ package com.yihu.ehr.constants;
  * @created 2016.01.11 8:54
  */
 public class MicroServiceIpAddressStr {
-    public static final String Adaption = "http://172.19.103.73:";
-    public static final String App = "http://172.19.103.73:";
-    public static final String Dict = "http://172.19.103.74:";
-    public static final String Esb = "http://172.19.103.74:";
-    public static final String Geography = "http://172.19.103.74:";
-    public static final String Organization = "http://172.19.103.74:";
-    public static final String Package = "http://172.19.103.74:";
-    public static final String Patient = "http://172.19.103.75:";
-    public static final String Security = "http://172.19.103.75:";
-    public static final String Standard = "http://172.19.103.75:";
-    public static final String User = "http://172.19.103.75:";
+
+    @Value("${micro.service.adaption.address-str}")
+    public static final String Adaption = "";
+
+    @Value("${micro.service.app.address-str}")
+    public static final String App = "";
+
+    @Value("${micro-.service.dict.address-str}")
+    public static final String Dict = "";
+
+    @Value("${micro.service.esb.address-str}")
+    public static final String Esb = "";
+
+    @Value("${micro.service.geography.address-str}")
+    public static final String Geography = "";
+
+    @Value("${micro.service.organization.address-str}")
+    public static final String Organization = "";
+
+    @Value("${micro.service.package.address-str}")
+    public static final String Package = "";
+
+    @Value("${micro.service.patient.address-str}")
+    public static final String Patient = "";
+
+    @Value("${micro.service.security.address-str}")
+    public static final String Security = "";
+
+    @Value("${micro.service.standard.address-str}")
+    public static final String Standard = "";
+
+    @Value("${micro.service.user.address-str}")
+    public static final String User = "";
 }

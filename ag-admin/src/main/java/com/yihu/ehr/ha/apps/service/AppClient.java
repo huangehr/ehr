@@ -32,11 +32,6 @@ public interface AppClient {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page);
 
-    /**
-     * @param appJson
-     * @return
-     * @throws Exception
-     */
     @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Apps.Apps, method = RequestMethod.POST)
     @ApiOperation(value = "创建App")
     MApp createApp(
@@ -70,15 +65,13 @@ public interface AppClient {
             @RequestParam(value = "app_status") String appStatus);
 
     @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Apps.AppExistence, method = RequestMethod.GET)
-    @ApiOperation(value = "验证")
-    boolean isAppExistence(
+    boolean isAppExists(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
             @PathVariable(value = "app_id") String appId,
             @ApiParam(name = "secret", value = "", defaultValue = "")
             @RequestParam(value = "secret") String secret);
 
     @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Apps.AppNameExistence, method = RequestMethod.GET)
-    @ApiOperation(value = "验证")
     boolean isAppNameExists(
             @ApiParam(value = "app_name")
             @PathVariable(value = "app_name") String appName);

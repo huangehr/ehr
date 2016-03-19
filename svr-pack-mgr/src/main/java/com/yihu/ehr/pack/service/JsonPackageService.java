@@ -4,11 +4,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
-import com.yihu.ehr.util.DateFormatter;
 import com.yihu.ehr.util.ObjectId;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.csource.common.MyException;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -168,7 +165,7 @@ public class JsonPackageService {
         try {
             String[] meta = remotePath.split(JsonPackage.pathSeparator);
             return fastDFSUtil.download(meta[0], meta[1], localPath);
-        } catch (IOException | MyException ex) {
+        } catch (Exception ex) {
             throw new RuntimeException("fastDFS - " + ex.getMessage());
         }
     }

@@ -46,8 +46,7 @@ public class CDAVersionController extends BaseController {
         for (MCDAVersion mCdaVersion : mCdaVersions) {
             StdVersionModel versionModel = convertToModel(mCdaVersion, StdVersionModel.class);
             versionModel.setCommitTime(DateUtil.formatDate(mCdaVersion.getCommitTime(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT));
-            //TODO 没有字典
-            versionModel.setStageName(mCdaVersion.isInStage() ? "已发布" : "未发布");
+
             //基础版本名字
             //versionModel.setBaseVersionName();
             //MCDAVersion mcdaVersionBase = cdaVersionClient.getVersion(versionModel.getBaseVersion());
@@ -108,11 +107,23 @@ public class CDAVersionController extends BaseController {
 
     @RequestMapping(value = "/version/{version}/commit", method = RequestMethod.PUT)
     @ApiOperation(value = "发布新版本")
-    public boolean commitVersion(
+    public Envelop commitVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
-            @PathVariable(value = "version") String version) throws Exception {
+            @PathVariable(value = "version") String version) {
 
-        return cdaVersionClient.commitVersion(version);
+        try {
+            boolean result = cdaVersionClient.commitVersion(version);
+            if(!result)
+            {
+                return failed("发布失败!");
+            }
+
+            return success(null);
+        }
+        catch (Exception ex)
+        {
+            return failedSystem();
+        }
     }
 
     @RequestMapping(value = "/version/{version}/rollback_stage", method = RequestMethod.PUT)

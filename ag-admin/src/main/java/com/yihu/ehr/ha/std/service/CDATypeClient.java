@@ -35,7 +35,7 @@ public interface CDATypeClient {
     @ApiOperation(value = "根据父级类别获取父级类别所在以下所有子集类别（包括当前父级列表）")
     List<MCDAType> getChildIncludeSelfByParentIdsAndKey(
             @ApiParam(name = "patient_ids", value = "父级id")
-            @RequestParam(value = "patient_ids") String[] patientIds,
+            @RequestParam(value = "patient_ids") String patientIds,
             @ApiParam(name = "key", value = "查询条件")
             @RequestParam(value = "key") String key);
 
@@ -75,7 +75,7 @@ public interface CDATypeClient {
     @ApiOperation(value = "删除CDA类别，若该类别存在子类别，将一并删除子类别")
     public boolean deleteCDATypeByPatientIds(
             @ApiParam(name = "ids", value = "ids")
-            @RequestParam(value = "ids") String[] ids);
+            @RequestParam(value = "ids") String ids);
 
 
     @RequestMapping(value = RestApi.Standards.Types, method = RequestMethod.GET)
@@ -91,20 +91,5 @@ public interface CDATypeClient {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page);
-
-    //废弃  请使用 searchType 方法， 确认后删除
-//    @RequestMapping(value = "/cda_types/ids/{ids}", method = RequestMethod.GET)
-//    @ApiOperation(value = "根据ids获取CDAType列表")
-//    List<MCDAType> getCdaTypeByIds(
-//            @ApiParam(name = "ids", value = "ids")
-//            @PathVariable(value = "ids") String ids);
-
-//    @RequestMapping(value = "/cda_types/code_name", method = RequestMethod.GET)
-//    @ApiOperation(value = "根据code或者name获取CDAType列表")
-//    List<MCDAType> getCdaTypeByCodeOrName(
-//            @ApiParam(name = "code", value = "代码")
-//            @RequestParam(value = "code") String code,
-//            @ApiParam(name = "name", value = "名称")
-//            @RequestParam(value = "name") String name);
 
 }
