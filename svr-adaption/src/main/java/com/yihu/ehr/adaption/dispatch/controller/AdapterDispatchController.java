@@ -43,10 +43,8 @@ public class AdapterDispatchController {
     @Autowired
     FastDFSUtil fastDFSUtil;
 
-    @Value("${fast-dfs.tracker-server}")
-    private String trackerServers;
-    @Value("${fast-dfs.http.tracker-http-port}")
-    private int httpPort;
+    @Value("${fast-dfs.public-server}")
+    private String fastDfsPublicServers;
 
     @RequestMapping(value = "/{org_code}", method = RequestMethod.GET)
     @ApiOperation(value = "下载适配数据包，此包内容包含：平台标准，机构标准与二者适配", response = RestEcho.class, produces = "application/json", notes = "获取采集标准及适配方案信息，文件以Base64编码，压缩格式为zip")
@@ -201,7 +199,7 @@ public class AdapterDispatchController {
         }
         Map<String, String> rs = new HashMap<>();
         rs.put("password", encryptPwd);
-        rs.put("url", trackerServers + "/" + group + "/" + remoteFile);
+        rs.put("url", fastDfsPublicServers + "/" + group + "/" + remoteFile);
         return rs;
     }
 }
