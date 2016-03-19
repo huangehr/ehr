@@ -52,8 +52,6 @@ public class AdapterOrgController {
         params.put("type",type);
         try {
             if(mode.equals("view") || mode.equals("modify")) {
-                //todo 后台转换成model后传前台
-                //todo 新增时要初始type
                 resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
                 model.addAttribute("rs", "success");
             }
@@ -137,38 +135,22 @@ public class AdapterOrgController {
     @ResponseBody
     //获取采集标准
     public Object getAdapterOrg(String code) {
-        String url = "/adapterOrg/adapterOrg";
+
+        String url = "/adapterOrg/org/"+code;
         String resultStr = "";
-        Envelop result = new Envelop();
+        Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("code",code);
+
         try{
-            //todo 后台转换成model后传前台
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-//            ObjectMapper mapper = new ObjectMapper();
-//            AdapterOrgModel adapterOrgModel = mapper.readValue(resultStr, AdapterOrgModel.class);
-//            Map<String, AdapterOrgModel> data = new HashMap<>();
-//            data.put("adapterOrg", adapterOrgModel);
-            result.setObj(resultStr);
-            result.setSuccessFlg(true);
-            return result;
+
+            return resultStr;
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result;
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+
+            return envelop;
         }
-//        Result result = new Result();
-//        try {
-//            XAdapterOrg adapterOrg = adapterOrgManager.getAdapterOrg(code);
-//            AdapterOrgModel adapterOrgModel = adapterOrgManager.getAdapterOrg(adapterOrg);
-//            Map<String, AdapterOrgModel> data = new HashMap<>();
-//            data.put("adapterOrg", adapterOrgModel);
-//            result.setObj(data);
-//            result.setSuccessFlg(true);
-//        } catch (Exception ex) {
-//            result.setSuccessFlg(false);
-//        }
-//        return result.toJson();
     }
 
     @RequestMapping("addAdapterOrg")
@@ -216,11 +198,11 @@ public class AdapterOrgController {
         }
     }
 
+    //更新采集标准
     @RequestMapping("updateAdapterOrg")
     @ResponseBody
-    //更新采集标准
     public Object updateAdapterOrg(String code, String name, String description) {
-        String url="/adapterOrg/updateAdapterOrg";
+        String url="/adapterOrg/org/"+code;
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
@@ -228,9 +210,7 @@ public class AdapterOrgController {
         params.put("name",name);
         params.put("description",description);
         try {
-            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
-//            ObjectMapper mapper = new ObjectMapper();
-//            AdapterOrgModel adapterOrgModelNew = mapper.readValue(resultStr, AdapterOrgModel.class);
+            resultStr = HttpClientUtil.doPut(comUrl + url, params, username, password);
             result.setObj(resultStr);
             result.setSuccessFlg(true);
             return result;
@@ -239,25 +219,12 @@ public class AdapterOrgController {
             result.setErrorMsg(ErrorCode.SystemError.toString());
             return result;
         }
-//        try {
-//            XAdapterOrg adapterOrg = adapterOrgManager.getAdapterOrg(code);
-//            adapterOrg.setName(name);
-//            adapterOrg.setDescription(description);
-//            adapterOrgManager.updateAdapterOrg(adapterOrg);
-//            Result result = getSuccessResult(true);
-//            return result.toJson();
-//        } catch (Exception e) {
-//            Result result = getSuccessResult(false);
-//            return result.toJson();
-//        }
     }
 
+    //删除采集标准
     @RequestMapping("delAdapterOrg")
     @ResponseBody
-    //删除采集标准
     public Object delAdapterOrg(String code) {
-//        String codeTemp[] = code.split(",");
-//        List<String> codes = Arrays.asList(codeTemp);
 
         String url = "/adapterOrg/orgs";
         String resultStr = "";
@@ -279,11 +246,7 @@ public class AdapterOrgController {
             result.setErrorMsg(ErrorCode.SystemError.toString());
             return result;
         }
-//        String codeTemp[] = code.split(",");
-//        List<String> codes = Arrays.asList(codeTemp);
-//        int rtn = adapterOrgManager.deleteAdapterOrg(codes);
-//        Result result = rtn > 0 ? getSuccessResult(true) : getSuccessResult(false);
-//        return result.toJson();
+
     }
 
     @RequestMapping("getAdapterOrgList")

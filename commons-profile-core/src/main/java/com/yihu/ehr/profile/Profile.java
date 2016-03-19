@@ -18,7 +18,7 @@ import java.util.*;
 public class Profile {
     private ObjectMapper objectMapper = SpringContext.getService("objectMapper");
 
-    private ProfileId archiveID;                     // 健康档案ID
+    private ProfileId archiveID;                        // 健康档案ID
     private String cardId;                              // 就诊时用的就诊卡ID
     private String orgCode;                             // 机构代码
     private String orgName;                             // 机构名称
@@ -30,7 +30,9 @@ public class Profile {
 
     private Date createDate;                            // EhrArchive创建时间，由JSON包中提取
     private String cdaVersion;
-    private Map<String, ProfileDataSet> dataSets;          // 档案包含的数据集, key 为数据集的表名, 标准数据情况下, 表名为数据集代码, 原始数据集情况下, 表名为"数据集代码_ORIGIN"
+
+    // 档案包含的数据集, key 为数据集的表名, 标准数据情况下, 表名为数据集代码, 原始数据集情况下, 表名为"数据集代码_ORIGIN"
+    private Map<String, ProfileDataSet> dataSets;
 
     public Profile() {
         this.cardId = "";
@@ -54,7 +56,7 @@ public class Profile {
         return archiveID.toString();
     }
 
-    void setId(String archiveId){
+    public void setId(String archiveId){
         this.archiveID = new ProfileId(archiveId);
     }
     

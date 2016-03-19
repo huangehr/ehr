@@ -18,7 +18,7 @@ import java.util.Date;
 public class CDAVersion{
     private String author;
     private Date commitTime;
-    private boolean isInStage;
+    private boolean inStage;
     private ObjectVersion version;
     private String versionName;
     private ObjectVersion baseVersion;
@@ -30,7 +30,7 @@ public class CDAVersion{
         //this.baseVersion = baseVersion == null ? null : new ObjectVersion(baseVersion);
         this.author = author;
         this.commitTime = null;
-        this.isInStage = true;
+        this.inStage = true;
         this.version = new ObjectVersion();
         if (baseVersion == null) {
             this.versionName = versionName;
@@ -94,10 +94,10 @@ public class CDAVersion{
 
     @Column(name = "staged", unique = false, nullable = true )
     public boolean isInStage() {
-        return isInStage;
-    }
-    public void setInStage(boolean isInStage) {
-        this.isInStage = isInStage;
+        return inStage;
     }
 
+    public void setInStage(boolean inStage) {
+        this.inStage = inStage;
+    }
 }

@@ -21,7 +21,7 @@ import java.util.Map;
 
 @RequestMapping("/adapterDataSet")
 @Controller
-public class AdapterDataSetController {
+public class AdapterDataSetController extends ExtendController{
     @Value("${service-gateway.username}")
     private String username;
     @Value("${service-gateway.password}")
@@ -30,18 +30,12 @@ public class AdapterDataSetController {
     private String comUrl;
 
 
-    @RequestMapping("/initialOld")
-    public String adapterDataSetOldInitial(HttpServletRequest request,String adapterPlanId){
-        request.setAttribute("adapterPlanId",adapterPlanId);
-        return "/adapter/adapterDataSet";
-    }
-
-    @RequestMapping("/initial")
-    public String adapterDataSetInitial(Model model,String adapterPlanId){
-        model.addAttribute("adapterPlanId",adapterPlanId);
-        model.addAttribute("contentPage","/adapter/adapterDataSet/grid");
-        return "pageView";
-    }
+//    @RequestMapping("/initial")
+//    public String adapterDataSetInitial(Model model,String adapterPlanId){
+//        model.addAttribute("adapterPlanId",adapterPlanId);
+//        model.addAttribute("contentPage","/adapter/adapterDataSet/grid");
+//        return "pageView";
+//    }
 
     @RequestMapping("template/adapterMetaDataInfo")
     public Object adapterMetaDataInfoTemplate(Model model, Long id, String mode) {

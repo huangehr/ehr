@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -42,6 +43,8 @@ public class AdapterDispatchController {
     @Autowired
     FastDFSUtil fastDFSUtil;
 
+    @Value("${fast-dfs.public-server}")
+    private String fastDfsPublicServers;
 
     @RequestMapping(value = "/{org_code}", method = RequestMethod.GET)
     @ApiOperation(value = "下载适配数据包，此包内容包含：平台标准，机构标准与二者适配", response = RestEcho.class, produces = "application/json", notes = "获取采集标准及适配方案信息，文件以Base64编码，压缩格式为zip")
@@ -161,5 +164,42 @@ public class AdapterDispatchController {
         } catch (Exception ex) {
             return new RestEcho().failed(ErrorCode.GetCDAVersionFailed, "标准版本获取失败：" + ex.getMessage());
         }
+    }
+
+
+
+    @RequestMapping(value = "/{org_code}/source", method = RequestMethod.GET)
+    @ApiOperation(value = "下载适配数据包，此包内容包含：平台标准，机构标准与二者适配", response = RestEcho.class, produces = "application/json", notes = "获取采集标准及适配方案信息，文件以Base64编码，压缩格式为zip")
+    public Map getAdaptionUrl(
+            @ApiParam(required = true, name = "private_key", value = "用户名")
+            @RequestParam(value = "private_key", required = true) String privateKey,
+            @ApiParam(required = true, name = "version_code", value = "适配标准版本")
+            @RequestParam(value = "version_code", required = true) String versionCode,
+            @ApiParam(required = true, name = "org_code", value = "机构代码")
+            @PathVariable(value = "org_code") String orgcode) throws Exception{
+
+        Map<String, Object> mapResult;
+        try {
+            if ((mapResult = adapterInfoSendService.getStandardAndMappingInfo(versionCode, orgcode)) == null)
+                return null;
+        } catch (Exception e) {
+            throw new Exception("获取远程文件路径出错！", e);
+        }
+        String group = (String) mapResult.get(FastDFSUtil.GroupField);
+        String remoteFile = (String) mapResult.get(FastDFSUtil.RemoteFileField);
+
+        if (StringUtils.isEmpty(group) || StringUtils.isEmpty(remoteFile))
+            return null;
+
+        String encryptPwd = null;
+        try {
+            encryptPwd = RSA.encrypt((String) mapResult.get("password"), RSA.genPrivateKey(privateKey));
+        } catch (Exception e) {
+            throw new Exception("加密失败！", e);
+        }
+        Map<String, String> rs = new HashMap<>();
+        rs.put("password", encryptPwd);
+        rs.put("url", fastDfsPublicServers + "/" + group + "/" + remoteFile);
+        return rs;
     }
 }

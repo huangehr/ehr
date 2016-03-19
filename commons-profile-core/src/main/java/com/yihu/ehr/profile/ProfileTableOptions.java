@@ -1,8 +1,5 @@
 package com.yihu.ehr.profile;
 
-import com.yihu.ehr.data.HBaseClient;
-
-import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -144,13 +141,5 @@ public class ProfileTableOptions {
         }
 
         return array;
-    }
-
-    public static void createArchiveTable(HBaseClient hBaseDAO) throws IOException {
-        hBaseDAO.createTable(ArchiveTable, getColumnFamilies(Table.ArchiveTable));
-    }
-
-    public static void createDataSetTable(HBaseClient xhBaseClient, String tableName) throws IOException{
-        xhBaseClient.createTable(tableName, getColumnFamilies(Table.DataSetTable));
     }
 }

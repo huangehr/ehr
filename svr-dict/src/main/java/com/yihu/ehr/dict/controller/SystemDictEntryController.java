@@ -9,15 +9,13 @@ import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Sand
@@ -36,28 +34,31 @@ public class SystemDictEntryController extends BaseRestController {
 
     @ApiOperation(value = "获取字典项列表")
     @RequestMapping(value = "/dictionaries/{dict_id}/entries", method = RequestMethod.GET)
-    public Collection<MDictionaryEntry> getDictEntries(
-            @ApiParam(name = "dict_id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "dict_id") Long dictId,
-            @ApiParam(name = "value", value = "字典项值", defaultValue = "")
-            @RequestParam(value = "value", required = false) String value,
+    public List<MDictionaryEntry> getDictEntries(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序", defaultValue = "")
+            @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
-            @RequestParam(value = "size", required = false, defaultValue = "15") Integer size,
+            @RequestParam(value = "size", required = false) Integer size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+            @RequestParam(value = "page", required = false) Integer page,
             HttpServletRequest request,
             HttpServletResponse response) {
-        page = reducePage(page);
+//        page = reducePage(page);
 
-        Page<SystemDictEntry> p = null;
-        if (StringUtils.isEmpty(value)) {
-            p = systemDictEntryService.findByDictIdAndValueLike(dictId, "%" + value + "%", page, size);
-        } else {
-            p = systemDictEntryService.findByDictId(dictId, page, size);
-        }
+//        Page<SystemDictEntry> p = null;
+//        if (StringUtils.isEmpty(value)) {
+//            p = systemDictEntryService.findByDictIdAndValueLike(dictId, "%" + value + "%", page, size);
+//        } else {
+//            p = systemDictEntryService.findByDictId(dictId, page, size);
+//        }
 
-        pagedResponse(request, response, p.getTotalElements(), page, size);
-        return convertToModels(p.getContent(), new ArrayList<>(p.getNumber()), MDictionaryEntry.class, null);
+        List<SystemDictEntry> systemDictEntryList = systemDictEntryService.search(fields,filters,sorts,page,size);
+        pagedResponse(request, response,systemDictEntryService.getCount(filters), page, size);
+        return (List<MDictionaryEntry>)convertToModels(systemDictEntryList,new ArrayList<MDictionaryEntry>(systemDictEntryList.size()),MDictionaryEntry.class,null);
     }
 
     @ApiOperation(value = "创建字典项")
@@ -117,7 +118,7 @@ public class SystemDictEntryController extends BaseRestController {
 
     @RequestMapping(value = "/dictionaries/existence/{dict_id}/{code}" , method = RequestMethod.GET)
     @ApiOperation(value = "根基dictId和code判断提交的字典项名称是否已经存在")
-    boolean isAppNameExists(
+    public boolean isDictEntryCodeExists(
             @ApiParam(name = "dict_id", value = "dict_id", defaultValue = "")
             @PathVariable(value = "dict_id") long dictId,
             @ApiParam(name = "code", value = "code", defaultValue = "")

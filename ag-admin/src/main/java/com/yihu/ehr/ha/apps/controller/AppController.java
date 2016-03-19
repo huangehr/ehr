@@ -151,7 +151,7 @@ public class AppController extends BaseController {
             @PathVariable(value = "app_id") String appId,
             @ApiParam(name = "secret",value = "密钥",defaultValue = "")
             @RequestParam(value = "secret") String secret)throws Exception{
-        return appClient.isAppExistence(appId, secret);
+        return appClient.isAppExists(appId, secret);
     }
 
     @RequestMapping(value = "apps/existence/app_name/{app_name}",method = RequestMethod.GET)

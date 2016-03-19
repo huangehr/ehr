@@ -1,4 +1,4 @@
-package com.yihu.ehr.standard.standardsource.controller;
+package com.yihu.ehr.standard.stdsrc.controller;
 
 import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
@@ -6,8 +6,8 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.standard.MStdSource;
 import com.yihu.ehr.standard.commons.ExtendController;
-import com.yihu.ehr.standard.standardsource.service.StandardSource;
-import com.yihu.ehr.standard.standardsource.service.StdSourceService;
+import com.yihu.ehr.standard.stdsrc.service.StandardSource;
+import com.yihu.ehr.standard.stdsrc.service.StdSourceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -122,4 +122,9 @@ public class StandardSourceController extends ExtendController<MStdSource> {
         return true;
     }
 
+    //@RequestMapping(value = RestApi.Standards.IsSourceCodeExist,method = RequestMethod.GET)
+    public boolean isCodeExist(@RequestParam(value="code")String code){
+
+        return stdSourceService.isSourceCodeExist(code);
+    }
 }

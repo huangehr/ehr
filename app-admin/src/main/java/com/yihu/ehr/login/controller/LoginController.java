@@ -3,9 +3,9 @@ package com.yihu.ehr.login.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.constants.SessionAttributeKeys;
+import com.yihu.ehr.util.DateFormatter;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
-import com.yihu.ehr.web.DateFormatter;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -78,6 +78,7 @@ public class LoginController {
                     lastLoginTime = DateFormatter.simpleDateTimeShortFormat(userDetailModel.getLastLoginTime());
                 }
 
+
                 model.addAttribute(SessionAttributeKeys.CurrentUser, userDetailModel);
                 request.getSession().setAttribute("last_login_time", lastLoginTime);
                 //todo 记录最近登入时间，目前没有提供接口
@@ -85,6 +86,7 @@ public class LoginController {
 
                 return "redirect:/index";
             }else{
+
                 model.addAttribute("userName", userName);
                 model.addAttribute("successFlg", false);
                 model.addAttribute("failMsg", "用户名或密码错误，请重新输入。");

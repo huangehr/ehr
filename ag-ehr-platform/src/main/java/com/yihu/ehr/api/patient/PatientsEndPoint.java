@@ -8,6 +8,7 @@ import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.feign.PatientClient;
 import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.profile.ProfileDataSet;
+import com.yihu.ehr.profile.SimpleDataSetResolver;
 import com.yihu.ehr.util.DateFormatter;
 import com.yihu.ehr.util.IdCardValidator;
 import io.swagger.annotations.Api;
@@ -36,6 +37,9 @@ import java.util.Map;
 @Api(protocols = "https", value = "patients", description = "患者服务")
 public class PatientsEndPoint {
     @Autowired
+    SimpleDataSetResolver dataSetResolver;
+
+    @Autowired
     ObjectMapper objectMapper;
 
     @Autowired
@@ -49,12 +53,12 @@ public class PatientsEndPoint {
             @ApiParam(name = "json", value = "患者人口学数据集")
             @RequestParam(value = "json", required = true) String patientInfo) throws IOException, ParseException {
         ObjectNode patientNode = (ObjectNode) objectMapper.readTree(patientInfo);
-        ProfileDataSet dataSet = ProfileDataSet.parseJsonDataSet(patientNode, false);
+        ProfileDataSet dataSet = dataSetResolver.parseJsonDataSet(patientNode, false);
 
         for (String key : dataSet.getRecordKeys()) {
             Map<String, String> record = dataSet.getRecord(key);
 
-            if (!StringUtils.isEmpty(demographicId)) {
+            if (StringUtils.isEmpty(demographicId)) {
                 throw new ApiException(HttpStatus.NOT_ACCEPTABLE, ErrorCode.MissParameter, "Missing identity card no.");
             }
 

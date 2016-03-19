@@ -12,6 +12,12 @@ info:
     description: EHR platform json app service.
     version: 1.0.0
 
+
+zuul:
+  prefix: /esb/**
+  routes:
+    - /esb/**
+
 ---
 spring:
   profiles: dev
