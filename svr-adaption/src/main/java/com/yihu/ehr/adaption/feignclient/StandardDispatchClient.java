@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * Created by AndyCai on 2016/3/3.
  */
-@FeignClient(name = MicroServices.StandardMgr)
+@FeignClient(name = MicroServices.Standard)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface StandardDispatchClient {

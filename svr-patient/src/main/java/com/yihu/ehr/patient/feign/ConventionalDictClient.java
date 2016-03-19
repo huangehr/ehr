@@ -15,7 +15,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 /**
  * Created by Administrator on 2016/1/4.
  */
-@FeignClient(name = MicroServices.DictMgr,url = MicroServiceIpAddressStr.Dict+MicroServicePort.Dict)
+@FeignClient(name = MicroServices.Dictionary,url = MicroServiceIpAddressStr.Dict+MicroServicePort.Dict)
 @RequestMapping(value = ApiVersion.Version1_0)
 @ApiIgnore
 public interface ConventionalDictClient {

@@ -103,16 +103,6 @@ public class UserController extends BaseRestController {
         return userModel;
     }
 
-    @RequestMapping(value = RestApi.Users.User, method = RequestMethod.GET)
-    @ApiOperation(value = "根据id获取获取用户信息")
-    public MUser getUserByUserName(
-            @ApiParam(name = "user_name", value = "", defaultValue = "")
-            @PathVariable(value = "user_name") String userName) {
-        User user = userManager.getUserByLoginCode(userName);
-        MUser userModel = convertToModel(user, MUser.class);
-        return userModel;
-    }
-
     @RequestMapping(value = RestApi.Users.UserAdmin, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除用户", notes = "根据id删除用户")
     public boolean deleteUser(
@@ -133,18 +123,12 @@ public class UserController extends BaseRestController {
         return true;
     }
 
-    /**
-     * 根据用户名获取user
-     *
-     * @param userName
-     * @return
-     */
     @RequestMapping(value = RestApi.Users.User, method = RequestMethod.GET)
     @ApiOperation(value = "根据登录账号获取当前用户", notes = "根据登陆用户名及密码验证用户")
     public MUser getUserByLoginCode(
             @ApiParam(name = "user_name", value = "登录账号", defaultValue = "")
             @PathVariable(value = "user_name") String userName) {
-        User user = userManager.getUserByLoginCode(userName);
+        User user = userManager.getUserByUserName(userName);
         return convertToModel(user, MUser.class);
     }
 
@@ -206,7 +190,7 @@ public class UserController extends BaseRestController {
     public boolean isUserNameExists(
             @ApiParam(name = "user_name", value = "user_name", defaultValue = "")
             @PathVariable(value = "user_name") String userName) {
-        return userManager.getUserByLoginCode(userName) != null;
+        return userManager.getUserByUserName(userName) != null;
     }
 
     @RequestMapping(value = RestApi.Users.UserIdCardNoExistence, method = RequestMethod.GET)

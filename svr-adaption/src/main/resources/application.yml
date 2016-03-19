@@ -1,24 +1,14 @@
 server:
   port: 10150
 
-#security:
-#  user:
-#    password: adaption
-
-spring:
-  jpa:
-    show-sql: true
-    hibernate:
-      dialect: org.hibernate.dialect.MySQL5Dialect
-    database:
-      platform: org.hibernate.dialect.MySQL5Dialect
+management:
+  port: ${server.port}
 
 info:
   app:
     name: AdaptionService
     description: EHR platform adaption service.
     version: 1.0.0
-
 
 ehr:
   common:
@@ -30,41 +20,27 @@ ehr:
   commons:
     repeat:
       code: 代码重复！
----
 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://user:eureka@${eureka-server-ip}/eureka/
+
+---
 spring:
   profiles: dev
 
-eureka:
-  instance:
-    hostname: localhost
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@localhost:8761}/eureka/
-
+eureka-server-ip: 127.0.0.1:8761
 
 ---
 spring:
   profiles: test
 
-eureka:
-  instance:
-    hostname: 172.19.103.73
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@172.19.103.73:8761}/eureka/
+eureka-server-ip: 172.19.103.73:8761
 
 ---
 spring:
   profiles: prod
 
-eureka:
-  instance:
-    hostname: 11.1.2.21
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@11.1.2.21:8761}/eureka/
+eureka-server-ip: 11.1.2.21:8761
 

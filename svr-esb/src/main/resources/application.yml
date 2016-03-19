@@ -1,6 +1,9 @@
 server:
   port: 10130
 
+management:
+  port: ${server.port}
+
 data-source:
   driver-class-name: com.mysql.jdbc.Driver
   initialize-size: 1
