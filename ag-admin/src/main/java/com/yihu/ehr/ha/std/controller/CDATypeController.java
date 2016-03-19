@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Created by yww on 2016/3/1.
  */
-@RequestMapping(ApiVersion.Version1_0 + "/cdatype")
+@RequestMapping(ApiVersion.Version1_0 + "/admin/cda_type")
 @RestController
 public class CDATypeController extends BaseController {
 

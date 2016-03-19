@@ -135,4 +135,12 @@ public class UserControllerTests {
         assertTrue("列表获取失败", envelop.isSuccessFlg() && envelop.getDetailModelList()!=null);
 
     }
+
+    public void cTestBug()
+    {
+        applicationContext = new SpringApplicationBuilder()
+                .web(false).sources(AgAdminApplication.class).run();
+
+
+    }
 }
