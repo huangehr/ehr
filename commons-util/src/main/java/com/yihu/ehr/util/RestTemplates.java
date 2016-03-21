@@ -1,6 +1,7 @@
 package com.yihu.ehr.util;
 
 import org.springframework.http.HttpMethod;
+import org.springframework.web.client.HttpMessageConverterExtractor;
 import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -48,30 +49,42 @@ public class RestTemplates extends RestTemplate{
     //PUT
     public String doPut(String url, Object request, Object... urlVariables) throws RestClientException {
         RequestCallback requestCallback = httpEntityCallback(request);
-        return execute(url, HttpMethod.PUT, requestCallback, null, urlVariables);
+        HttpMessageConverterExtractor<String> responseExtractor =
+                new HttpMessageConverterExtractor<String>(String.class, getMessageConverters());
+        return execute(url, HttpMethod.PUT, requestCallback, responseExtractor, urlVariables);
     }
 
     public String doPut(String url, Object request, Map<String, ?> urlVariables) throws RestClientException {
         RequestCallback requestCallback = httpEntityCallback(request);
-        return execute(url, HttpMethod.PUT, requestCallback, null, urlVariables);
+        HttpMessageConverterExtractor<String> responseExtractor =
+                new HttpMessageConverterExtractor<String>(String.class, getMessageConverters());
+        return execute(url, HttpMethod.PUT, requestCallback, responseExtractor, urlVariables);
     }
 
     //---
     public String doPut(URI url, Object request) throws RestClientException {
         RequestCallback requestCallback = httpEntityCallback(request);
-        return execute(url, HttpMethod.PUT, requestCallback, null);
+        HttpMessageConverterExtractor<String> responseExtractor =
+                new HttpMessageConverterExtractor<String>(String.class, getMessageConverters());
+        return execute(url, HttpMethod.PUT, requestCallback, responseExtractor);
     }
     //DELETE
     public String doDelete(String url, Object... urlVariables) throws RestClientException {
-        return execute(url, HttpMethod.DELETE, null, null, urlVariables);
+        HttpMessageConverterExtractor<String> responseExtractor =
+                new HttpMessageConverterExtractor<String>(String.class, getMessageConverters());
+        return execute(url, HttpMethod.DELETE, null, responseExtractor, urlVariables);
     }
 
     //---
     public String doDelete(String url, Map<String, ?> urlVariables) throws RestClientException {
-        return execute(url, HttpMethod.DELETE, null, null, urlVariables);
+        HttpMessageConverterExtractor<String> responseExtractor =
+                new HttpMessageConverterExtractor<String>(String.class, getMessageConverters());
+        return execute(url, HttpMethod.DELETE, null, responseExtractor, urlVariables);
     }
 
     public String doDelete(URI url) throws RestClientException {
-        return execute(url, HttpMethod.DELETE, null, null);
+        HttpMessageConverterExtractor<String> responseExtractor =
+                new HttpMessageConverterExtractor<String>(String.class, getMessageConverters());
+        return execute(url, HttpMethod.DELETE, null, responseExtractor);
     }
 }
