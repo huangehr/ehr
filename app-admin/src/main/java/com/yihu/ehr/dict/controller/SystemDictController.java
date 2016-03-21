@@ -6,6 +6,8 @@ import com.yihu.ehr.constants.RestAPI;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
+import com.yihu.ehr.util.RestTemplates;
+import com.yihu.ehr.util.URLQueryBuilder;
 import com.yihu.ehr.util.log.LogService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -512,12 +514,12 @@ public class SystemDictController {
 
         try {
             Map<String, Object> params = new HashMap<>();
-            params.put("dictId",dictId);
-            params.put("value","");
-            params.put("page",1);
-            params.put("size",15);
-            String urlCheckDict = "/dictionaries/"+dictId+"/entries";
-            String _rusDict = HttpClientUtil.doGet(comUrl+urlCheckDict,params,username,password);
+            URLQueryBuilder builder = new URLQueryBuilder();
+            builder.addFilter("dictId", "=", String.valueOf(dictId),null);
+
+            String urlCheckDict = "/dictionaries/entries";
+            RestTemplates template = new RestTemplates();
+            String _rusDict = template.doGet(comUrl+urlCheckDict+"?"+builder.toString());
             result = mapper.readValue(_rusDict,Envelop.class);
             if(!StringUtils.isEmpty(result)){
                 result.setSuccessFlg(true);

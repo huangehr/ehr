@@ -1,11 +1,13 @@
 package com.yihu.ehr.std.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.standard.datasset.MetaDataModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
-import com.yihu.ehr.util.ResourceProperties;
-import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.util.controller.BaseUIController;
 import com.yihu.ehr.util.log.LogService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,7 +15,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -24,17 +28,22 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/std/dataset")
-public class DataSetsController {
+public class DataSetsController extends BaseUIController {
     @Value("${service-gateway.username}")
     private String username;
     @Value("${service-gateway.password}")
     private String password;
-    @Value("${service-gateway.url}")
-    private String comUrl;
+    /*@Value("${service-gateway.url}")
+    private String comUrl;*/
+    //TODO 访问路径，一般有aimin而标准部分网关没有admin
+    String comUrl = "http://localhost:10000/api/v1.0/dataSet";
+
 //    @RequestMapping("/initial")
 //    public String dataSetInitial() {
 //        return "/std/dataset/dataSet";
 //    }
+    @Autowired
+    ObjectMapper objectMapper ;
 
     @RequestMapping("/initial")
     public String setInitial(Model model) {
@@ -109,37 +118,32 @@ public class DataSetsController {
     @RequestMapping("/searchDataSets")
     @ResponseBody
     public Object searchDataSets(String codename, String version, int page, int rows) {
-        Envelop result = new Envelop();
-        String strErrMessage = "";
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
         if (StringUtils.isEmpty(version)) {
-            strErrMessage += "请选择版本号!";
+            envelop.setErrorMsg("请选择版本号！");
+            return envelop;
         }
-        if (!StringUtils.isEmpty(strErrMessage)) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(strErrMessage);
-            return result;
+        String filters = "";
+        if (!StringUtils.isEmpty(codename)){
+            filters += "code?"+codename+" g1;name?"+codename+" g1;";
         }
-        String url = "/dataSet/dataSets";
+        String url = "/dataSets";
         try{
             Map<String,Object> params = new HashMap<>();
-            params.put("versionCode",version);
-            params.put("code",codename);
-            params.put("name",codename);
+            params.put("fields","");
+            params.put("filters",filters);
+            params.put("sorts","");
             params.put("page",page);
-            params.put("rows",rows);
-            String _rus = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.GetDataSetListFailed.toString());
-            }else{
-                return _rus;
-            }
+            params.put("size",15);
+            params.put("version",version);
+            String envelopStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+            return envelopStr;
         }catch(Exception ex){
             LogService.getLogger(DataSetsController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result;
+        return envelop;
 
         /*CDAVersion cdaVersion = new CDAVersion();
         Result result = new Result();
@@ -416,15 +420,19 @@ public class DataSetsController {
             result.setErrorMsg("数据元id、标准版本不能为空!");
             return result;
         }
-        String url = "/dataSet/metaDatas";
+        String url = "/metaDatas";
+        String filters = "dataSetId="+id+";";
+        if(!StringUtils.isEmpty(metaDataCode)){
+            filters += "code?"+metaDataCode+" g1;name?"+metaDataCode+" g1;";
+        }
         try{
             Map<String,Object> params = new HashMap<>();
-            params.put("id",id);
-            params.put("versionCode",version);
-            params.put("metaDataCode",metaDataCode);
-            params.put("metaDataName",metaDataCode);
+            params.put("fields","");
+            params.put("filters",filters);
+            params.put("sorts","");
             params.put("page",page);
-            params.put("rows",rows);
+            params.put("size",rows);
+            params.put("version",version);
             String _rus = HttpClientUtil.doGet(comUrl + url, params, username, password);
             if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
@@ -538,7 +546,7 @@ public class DataSetsController {
     @RequestMapping(value = "/getMetaData", produces = "text/html;charset=UTF-8")
     @ResponseBody
     public Object getMetaData(Long dataSetId, Long metaDataId, String version) {
-        Envelop result = new Envelop();
+        Envelop envelop = new Envelop();
         String strErrMessage = "";
         if (StringUtils.isEmpty(dataSetId) || dataSetId.equals(0)) {
             strErrMessage += "请先选择数据集!";
@@ -550,223 +558,115 @@ public class DataSetsController {
             strErrMessage += "请先选择标准版本!";
         }
         if (strErrMessage != "") {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(strErrMessage);
-            return result;
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(strErrMessage);
+            return envelop;
         }
         try {
-            String url = "/dataSet/getMetaData";
+            String url = "/getMetaData";
             Map<String,Object> params = new HashMap<>();
-            params.put("dataSetId",dataSetId);
             params.put("metaDataId",metaDataId);
             params.put("versionCode",version);
-            String _rus = HttpClientUtil.doGet(comUrl+url,params,username,password);
-            if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.GetMetaDataFailed.toString());
-            }else {
-                //TODO 有转化成为对象在存入result中
-//                ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-//                XMetaDataForInterface metaData = objectMapper.readValue(_rus,XMetaDataForInterface.class);
-//                List<XMetaDataForInterface> elementList = new ArrayList<>();
-//                elementList.add(metaData);
-                result.setSuccessFlg(true);
-                result.setObj(_rus);
+            String envulopStr = HttpClientUtil.doGet(comUrl+url,params,username,password);
+            Envelop envelopGet = objectMapper.readValue(envulopStr,Envelop.class);
+            if(envelopGet.isSuccessFlg()){
+                MetaDataModel metaDataModel = getEnvelopModel(envelopGet.getObj(),MetaDataModel.class);
+                List<MetaDataModel> list = new ArrayList<>();
+                list.add(metaDataModel);
+                envelop.setSuccessFlg(true);
+                envelop.setDetailModelList(list);
+                String _rus = objectMapper.writeValueAsString(envelop);
+                return _rus;
             }
+            return envulopStr;
         } catch (Exception ex) {
             LogService.getLogger(DataSetsController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            return result;
+            envelop.setSuccessFlg(false);
+            return envelop;
         }
-        return result;
-
-
-        /*CDAVersion cdaVersion = new CDAVersion();
-        Result result = new Result();
-        String strErrMessage = "";
-        if (dataSetId == null || dataSetId.equals(0) || dataSetId.equals("")) {
-            strErrMessage += "请先选择数据集!";
-        }
-        if (metaDataId == null || metaDataId.equals(0) || metaDataId.equals("")) {
-            strErrMessage += "请先选择数据元!";
-        }
-        if (version == null || version.equals(0) || version.equals("")) {
-            strErrMessage += "请先选择标准版本!";
-        }
-        if (strErrMessage != "") {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(strErrMessage);
-            return result.toJson();
-        }
-        DataSet dataSet = new DataSet();
-        dataSet.setId(dataSetId);
-        cdaVersion.setVersion(version);
-        dataSet.setInnerVersion(cdaVersion);
-        List<XMetaDataForInterface> elementList = null;
-        try {
-            List<XMetaData> metaDataList = metaDataManager.getMetaDatas(dataSet, metaDataId);
-            if (metaDataList.size() > 0) {
-                elementList = new ArrayList<>();
-                for (int i = 0; i < metaDataList.size(); i++) {
-                    XMetaData metaData = (XMetaData) metaDataList.get(i);
-                    XMetaDataForInterface info = new MetaDataForInterface();
-                    XMetaDataMapping xMetaDataMapping = (XMetaDataMapping) metaData;
-                    info.setDatasetId(String.valueOf(metaData.getDataSetId()));
-                    info.setCode(metaData.getCode());
-                    info.setInnerCode(metaData.getInnerCode());
-                    info.setName(metaData.getName());
-                    info.setType(metaData.getType());
-                    info.setFormatType(metaData.getFormat());
-                    info.setDefinition(metaData.getDefinition());
-                    info.setNullable(xMetaDataMapping.isNullable() ? "1" : "0");
-                    info.setColumnType(xMetaDataMapping.getColumnType());
-                    info.setColumnName(xMetaDataMapping.getColumnName());
-                    info.setColumnLength(xMetaDataMapping.getColumnLength());
-                    info.setPrimaryKey(xMetaDataMapping.isPrimaryKey() ? "1" : "0");
-                    info.setHashCode(String.valueOf(metaData.getHashCode()));
-                    info.setId(String.valueOf(metaData.getId()));
-                    info.setDictId(String.valueOf(metaData.getDictId()));
-                    info.setDictName(metaData.getDictName());
-                    elementList.add(info);
-                }
-                result.setSuccessFlg(true);
-                result.setDetailModelList(elementList);
-            } else {
-                result.setSuccessFlg(false);
-            }
-        } catch (Exception e) {
-            result.setSuccessFlg(false);
-            return result.toJson();
-        }
-        return result.toJson();*/
-
     }
 
     @RequestMapping(value = "/updataMetaSet", produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public Object updataMetaSet(String info) {
-        Envelop result = new Envelop();
+    public Object updataMetaSet(String info,String version) {
+        //TODO 新增、合二为一
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
         try {
-            String strErrMessage = "";
-            //todo: 前台js做为空判断
-//            if (StringUtil.isEmpty(info.getVersion()) || info.getVersion().equals(0)) {
-//                strErrMessage += "请先选择标准版本!";
-//            }
-//            if (StringUtil.isEmpty(info.getDatasetId())|| info.getDatasetId().equals(0)) {
-//                strErrMessage += "请先选择数据集!";
-//            }
-//            if (StringUtil.isEmpty(info.getCode())|| info.getCode().equals(0)) {
-//                strErrMessage += "代码不能为空!";
-//            }
-//            if (StringUtil.isEmpty(info.getName())|| info.getName().equals(0)) {
-//                strErrMessage += "名称不能为空!";
-//            }
-//            if (StringUtil.isEmpty(info.getInnerCode()) || info.getInnerCode().equals(0)) {
-//                strErrMessage += "内部代码不能为空!";
-//            }
-//            if (StringUtil.isEmpty(info.getColumnName())|| info.getColumnName().equals(0)) {
-//                strErrMessage += "字段名称不能为空!";
-//            }
-            if (!strErrMessage.equals("")) {
-                result.setErrorMsg(strErrMessage);
-                result.setSuccessFlg(false);
-                return result;
+            MetaDataModel model = objectMapper.readValue(info,MetaDataModel.class);
+            if(StringUtils.isEmpty(version)){
+                envelop.setErrorMsg("标准版本号不能为空！");
+                return envelop;
             }
-            String url = "/dataSet/updataMetaSet";
-            //todo
-//            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-//            String _MetaDataForInterface = objectMapper.writeValueAsString(info);
+            if(model.getDataSetId() == 0){
+                envelop.setErrorMsg("数据集id不能为空！");
+                return envelop;
+            }
+            if(StringUtils.isEmpty(model.getCode())){
+                envelop.setErrorMsg("数据元编码不能为空！");
+                return envelop;
+            }
+            if(StringUtils.isEmpty(model.getName())){
+                envelop.setErrorMsg("数据元名称不能为空！");
+                return envelop;
+            }
+            if(StringUtils.isEmpty(model.getInnerCode())){
+                envelop.setErrorMsg("数据元内部编码不能为空！");
+                return envelop;
+            }
+            if(StringUtils.isEmpty(model.getColumnName())){
+                envelop.setErrorMsg("数据元对应列名不能为空！");
+                return envelop;
+            }
+
+            String url = "/MetaData";
             Map<String,Object> params = new HashMap<>();
-            params.put("metaDataJson",info);
-            String _rus = HttpClientUtil.doPost(comUrl+url,params,username,password);
-            if (StringUtils.isEmpty(_rus)) {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.SaveMetaDataFailed.toString());
-            } else {
-                result.setSuccessFlg(true);
+            params.put("version",version);
+
+            //新增数据元操作
+            if(model.getId() ==0){
+                params.put("metaDataJson",info);
+                String envelopStrNew = HttpClientUtil.doPost(comUrl+url,params,username,password);
+                return envelopStrNew;
             }
+
+            //修改数据元操作
+            //获取原数据元对象
+            String urlGet = "/getMetaData";
+            Map<String,Object> args = new HashMap<>();
+            args.put("versionCode",version);
+            args.put("metaDataId",model.getId());
+            String envelopStrGet = HttpClientUtil.doGet(comUrl+url,params,username,password);
+            Envelop envelopGet = objectMapper.readValue(envelopStrGet,Envelop.class);
+            if(!envelopGet.isSuccessFlg()){
+                envelop.setErrorMsg("数据元不存在！");
+                return envelop;
+            }
+            MetaDataModel modelForUpdate = getEnvelopModel(envelop.getObj(),MetaDataModel.class);
+
+            //设置修改值
+            modelForUpdate.setCode(model.getCode());
+            modelForUpdate.setName(model.getName());
+            modelForUpdate.setInnerCode(model.getInnerCode());
+            modelForUpdate.setType(model.getType());
+            modelForUpdate.setDictId(model.getDictId());
+            modelForUpdate.setFormat(model.getFormat());
+            modelForUpdate.setDefinition(model.getDefinition());
+            modelForUpdate.setColumnName(model.getColumnName());
+            modelForUpdate.setColumnLength(model.getColumnLength());
+            modelForUpdate.setColumnType(model.getColumnType());
+            modelForUpdate.setNullable(model.isNullable());
+            modelForUpdate.setPrimaryKey(model.isPrimaryKey());
+            String metaDataJson = objectMapper.writeValueAsString(modelForUpdate);
+            params.put("metaDataJson",metaDataJson);
+            String envelopStrUpdate = HttpClientUtil.doPost(comUrl+url,params,username,password);
+            return envelopStrUpdate;
         } catch (Exception ex) {
             LogService.getLogger(DataSetsController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result;
-
-        /*CDAVersion cdaVersion = new CDAVersion();
-        Result result = new Result();
-        try {
-            String strErrMessage = "";
-            if (info.getVersion() == null || info.getVersion().equals(0) || info.getVersion().equals("")) {
-                strErrMessage += "请先选择标准版本!";
-            }
-            if (info.getDatasetId() == null || info.getDatasetId().equals(0) || info.getDatasetId().equals("")) {
-                strErrMessage += "请先选择数据集!";
-            }
-            if (info.getCode() == null || info.getCode().equals(0) || info.getCode().equals("")) {
-                strErrMessage += "代码不能为空!";
-            }
-            if (info.getName() == null || info.getName().equals(0) || info.getName().equals("")) {
-                strErrMessage += "名称不能为空!";
-            }
-            if (info.getInnerCode() == null || info.getInnerCode().equals(0) || info.getInnerCode().equals("")) {
-                strErrMessage += "内部代码不能为空!";
-            }
-            if (info.getColumnName() == null || info.getColumnName().equals(0) || info.getColumnName().equals("")) {
-                strErrMessage += "字段名称不能为空!";
-            }
-            if (info.getId().equals("0")) {
-                if (metaDataManager.getCountByCode(info.getVersion(), info.getInnerCode(), info.getDatasetId()) > 0) {
-                    strErrMessage += "代码不能重复!";
-                }
-                if (metaDataManager.getCountByColumnName(info.getVersion(), info.getColumnName(), info.getDatasetId()) > 0) {
-                    strErrMessage += "字段名不能重复!";
-                }
-            }else {
-                //if ()
-            }
-            if (!strErrMessage.equals("")) {
-                result.setErrorMsg(strErrMessage);
-                result.setSuccessFlg(false);
-                return result.toJson();
-            }
-            DataSet dataSetModel = new DataSet();
-            MetaData metaData = new MetaData();
-            cdaVersion.setVersion(info.getVersion());
-            dataSetModel.setInnerVersion(cdaVersion);
-            dataSetModel.setId(Long.parseLong(info.getDatasetId()));
-            metaData.setId(Long.parseLong(info.getId()));
-            metaData.setDataSet(dataSetModel);
-            metaData.setCode(info.getCode());
-            metaData.setName(info.getName());
-            metaData.setInnerCode(info.getInnerCode());
-            metaData.setType(info.getType());
-            metaData.setDictId(info.getDictId() == "" ? 0 : Long.parseLong(info.getDictId()));
-            metaData.setFormat(info.getFormatType());
-            metaData.setDefinition(info.getDefinition());
-            metaData.setColumnName(info.getColumnName());
-            metaData.setColumnLength(info.getColumnLength());
-            metaData.setColumnType(info.getColumnType());
-            if (info.getPrimaryKey().equals("1")) {
-                metaData.setPrimaryKey(true);
-            } else {
-                metaData.setPrimaryKey(false);
-            }
-            if (info.getNullable().equals("1")) {
-                metaData.setNullable(true);
-            } else {
-                metaData.setNullable(false);
-            }
-            int res = metaDataManager.saveMetaData(dataSetModel, metaData);
-            if (res > 0) {
-                result.setSuccessFlg(true);
-            } else {
-                result.setSuccessFlg(false);
-            }
-        } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(e.getMessage());
-        }
-        return result.toJson();*/
+        return envelop;
     }
 
     /**
@@ -778,53 +678,8 @@ public class DataSetsController {
     @RequestMapping("getStdSourceList")
     @ResponseBody
     public Object getStdSourceList(String version) {
-        Envelop result = new Envelop();
-        String strJson = "";
-        try {
-            if (StringUtils.isEmpty(version)) {
-                result.setSuccessFlg(false);
-                result.setErrorMsg("版本号不能为空");
-                return result;
-            }
-            String url = "/stdSource/standardSources";
-            Map<String,Object> params = new HashMap<>();
-            params.put("",version);
-            String _rus = HttpClientUtil.doGet(comUrl+url,params,username,password);
-            if (StringUtils.isEmpty(_rus)) {
-                result.setSuccessFlg(false);
-                result.setErrorMsg("没有标准来源");
-                return result;
-            }
-            return _rus;
-//            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-//            List<StandardSourceForInterface> resultInfos = Arrays.asList(objectMapper.readValue(_rus,StandardSourceForInterface[].class));
-//            strJson = objectMapper.writeValueAsString(resultInfos);
-        } catch (Exception ex) {
-            LogService.getLogger(DataSetsController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg("获取标准来源出错!");
-            return result;
-        }
-        /*Result result = new Result();
-        String strJson = "";
-        try {
-            if (version == null || version == "") {
-                return missParameter("version_code");
-            }
-            XStandardSource[] xStandardSources = xStandardSourceManager.getSourceList();
-            if (xStandardSources == null) {
-                return failed(ErrorCode.GetStandardSourceFailed);
-            }
-            List<StandardSourceForInterface> resultInfos = GetStandardSourceForInterface(xStandardSources);
-            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-            strJson = objectMapper.writeValueAsString(resultInfos);
-        } catch (Exception ex) {
-            LogService.getLogger(StdManagerRestController.class).error(ex.getMessage());
-            return failed(ErrorCode.GetStandardSourceFailed);
-        }
-        RestEcho echo = new RestEcho().success();
-        echo.putResultToList(strJson);
-        return echo;*/
+        //TODO 页面调用的是标准字典Controller的方法
+        return null;
     }
 
 

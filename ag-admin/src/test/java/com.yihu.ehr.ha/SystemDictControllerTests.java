@@ -41,14 +41,12 @@ public class SystemDictControllerTests {
 
     private String version = "v1.0";
 
-    ApplicationContext applicationContext;
+    ApplicationContext applicationContext= new SpringApplicationBuilder().web(false).sources(AgAdminApplication.class).run();
 
     Envelop envelop = new Envelop();
 
     @Test
     public void atestSystemDict() throws Exception{
-
-        applicationContext = new SpringApplicationBuilder().web(false).sources(AgAdminApplication.class).run();
 
         SystemDictModel systemDictModel = new SystemDictModel();
         systemDictModel.setName("test_dict_cms");
@@ -179,6 +177,24 @@ public class SystemDictControllerTests {
 //        envelop = sysDict.isAppNameExists("ChildHealth");
 //        assertTrue("获取标签字典项失败", envelop.isSuccessFlg());
 
+    }
+
+    @Test
+    public void cTestSearchEntry() throws Exception{
+        String fields = "";
+        String filter = "";
+        int page = 1;
+        int rows = 15;
+        Envelop envelop = sysDict.getDictionaries(fields,filter,"",15,1);
+        assertTrue("数据获取失败!",envelop.getDetailModelList().size()>0);
+
+        String jsonData = objectMapper.writeValueAsString(envelop.getDetailModelList().get(0));
+        SystemDictModel systemDictModel = objectMapper.readValue(jsonData,SystemDictModel.class);
+
+        long dictId = systemDictModel.getId();
+        filter="dictId="+dictId;
+        envelop = sysDict.getDictEntries(fields,filter,"",15,1);
+        assertTrue("字典项数据获取失败!",envelop.getDetailModelList().size()>0);
     }
 
 }

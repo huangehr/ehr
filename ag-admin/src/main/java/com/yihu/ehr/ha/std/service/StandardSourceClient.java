@@ -19,7 +19,7 @@ import java.util.Collection;
 /**
  * Created by yww on 2016/3/1.
  */
-@FeignClient(MicroServices.Standard)
+@FeignClient(MicroServices.StandardMgr)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface StandardSourceClient {
@@ -76,5 +76,5 @@ public interface StandardSourceClient {
             @PathVariable(value = "id") String id);
 
     //@RequestMapping(value = RestApi.Standards.IsSourceCodeExist,method = RequestMethod.GET)
-    boolean isCodeExist(@RequestParam(value="code")String code);
+//    boolean isCodeExist(@RequestParam(value="code")String code);
 }
