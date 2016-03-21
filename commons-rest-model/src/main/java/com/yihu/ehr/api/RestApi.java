@@ -38,6 +38,7 @@ public class RestApi {
 
     public static class Packages{
         public static final String Packages                 = "/packages";
+        public static final String OldPackages              = "/old_packages";
         public static final String Package                  = "/packages/{id}";
         public static final String PackageDownloads         = "/packages/{id}/downloads";
     }

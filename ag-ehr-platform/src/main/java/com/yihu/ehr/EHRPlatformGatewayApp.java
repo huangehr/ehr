@@ -10,16 +10,15 @@ import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletCon
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
+import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.util.ResourceUtils;
 
 import java.io.FileNotFoundException;
-
-//import com.yihu.ehr.config.TomcatConnCustomizer;
-
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableFeignClients
 @EnableEurekaClient
+@EnableZuulProxy
 public class EHRPlatformGatewayApp  {
     @Value("${server.port}")
     int port;

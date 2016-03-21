@@ -29,7 +29,7 @@ fast-dfs:
 
 eureka:
   instance:
-    ip-address: localhost
+    ip-address: 127.0.0.1
   client:
     registerWithEureka: true
     fetchRegistry: true
