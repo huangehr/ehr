@@ -37,7 +37,7 @@ public class AppController extends BaseUIController {
     private String comUrl;
 
 //    @Autowired
-//    private RestTemplate template;
+//    private RestTemplates template;
 
     @RequestMapping("template/appInfo")
     public String appInfoTemplate(Model model, String appId, String mode) {
@@ -55,7 +55,6 @@ public class AppController extends BaseUIController {
                 conditionMap.put("app_id", appId);
                 RestTemplates template = new RestTemplates();
                 result = template.doGet(comUrl+url,conditionMap);
-                //result = template.getForObject(comUrl + url, String.class,conditionMap);
                 Envelop envelop = getEnvelop(result);
                 if(envelop.isSuccessFlg()){
                     app = result;
@@ -119,7 +118,6 @@ public class AppController extends BaseUIController {
         try {
             RestTemplates template = new RestTemplates();
             resultStr = template.doGet(comUrl+url+"?"+param);
-            //resultStr = template.getForObject(comUrl+url+"?"+param,String.class);
         } catch (Exception ex) {
             LogService.getLogger(AppController.class).error(ex.getMessage());
         }
@@ -137,10 +135,8 @@ public class AppController extends BaseUIController {
             MultiValueMap<String, String> conditionMap = new LinkedMultiValueMap<>();
             conditionMap.add("app_id", appId);
             RestTemplates template = new RestTemplates();
-            resultStr = template.doDelete(comUrl+url,conditionMap);
-            //template.delete(comUrl + url, conditionMap);
-            //todo:没有返回值
-            result.setSuccessFlg(true);
+            resultStr = template.doDelete(comUrl+url);
+            result.setSuccessFlg(getEnvelop(resultStr).isSuccessFlg());
         } catch (Exception ex) {
             result.setSuccessFlg(false);
             LogService.getLogger(AppController.class).error(ex.getMessage());
@@ -156,13 +152,11 @@ public class AppController extends BaseUIController {
         String resultStr="";
         String url="/apps";
         MultiValueMap<String,String> conditionMap = new LinkedMultiValueMap<String, String>();
-        appDetailModel.setCreator("296test");//todo:创建用户不能为空
+        appDetailModel.setCreator("system");//todo:用户不能为空
         conditionMap.add("app", toJson(appDetailModel));
         try {
             RestTemplates template = new RestTemplates();
-            resultStr = template.doPut(comUrl+url,conditionMap);
-            //resultStr = template.postForObject(comUrl + url, conditionMap, String.class);
-
+            resultStr = template.doPost(comUrl + url, conditionMap);
             Envelop envelop = getEnvelop(resultStr);
             if (envelop.isSuccessFlg()){
                 result.setSuccessFlg(true);
@@ -181,7 +175,10 @@ public class AppController extends BaseUIController {
     @RequestMapping("updateApp")
     @ResponseBody
     public Object updateApp(AppDetailModel appDetailModel) {
-
+        if (appDetailModel.getDescription().equals("del")){
+            deleteApp(appDetailModel.getId());
+            return false;
+        }
         Envelop result = new Envelop();
         Envelop envelop = new Envelop();
         String resultStr="";
@@ -193,7 +190,6 @@ public class AppController extends BaseUIController {
             MultiValueMap<String,String> map = new LinkedMultiValueMap<>();
             map.add("app_id", id);
             resultStr = template.doGet(comUrl+url+'/'+id,map);
-            //resultStr = template.getForObject(comUrl + url+'/'+id, String.class,map);
             envelop = getEnvelop(resultStr);
             if(envelop.isSuccessFlg()){
                 AppDetailModel appUpdate = getEnvelopModel(envelop.getObj(), AppDetailModel.class);
@@ -207,11 +203,13 @@ public class AppController extends BaseUIController {
                 //更新
                 MultiValueMap<String,String> conditionMap = new LinkedMultiValueMap<String, String>();
                 conditionMap.add("app", toJson(appUpdate));
-                template.doPut(comUrl+url,conditionMap);
-                //template.put(comUrl+url,conditionMap);
-                //todo:没有返回值
-                result.setObj(appUpdate);
-                result.setSuccessFlg(true);
+                resultStr = template.doPut(comUrl + url, conditionMap);
+                envelop = getEnvelop(resultStr);
+                if (envelop.isSuccessFlg()){
+                    result.setSuccessFlg(true);
+                }else{
+                    result.setSuccessFlg(false);
+                }
             }
         }
         catch (Exception ex)
@@ -234,9 +232,7 @@ public class AppController extends BaseUIController {
         try {
             RestTemplates template = new RestTemplates();
             resultStr = template.doPut(comUrl+urlPath,conditionMap);
-            //template.put(comUrl + urlPath, conditionMap);
-            //todo:没有返回值
-            result.setSuccessFlg(true);
+            result.setSuccessFlg(Boolean.parseBoolean(resultStr));
         } catch (Exception e) {
             result.setSuccessFlg(false);
         }
