@@ -1,6 +1,7 @@
 package com.yihu.ehr.config;
 
 
+import com.yihu.ehr.standard.datasets.service.IDataSet;
 import com.yihu.ehr.util.classpool.ClassPoolUtils;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.hibernate.SessionFactory;
@@ -39,8 +40,9 @@ public class StdHibernateConfig extends HibernateConfig  {
     }
 
     private static void addPath(File f) throws Exception {
-        URL u = f.toURL();
-        URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+        URL u = f.toURI().toURL();
+        URLClassLoader urlClassLoader = (URLClassLoader) IDataSet.class.getClassLoader();
+//        URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
         Class urlClass = URLClassLoader.class;
         Method method = urlClass.getDeclaredMethod("addURL", new Class[]{URL.class});
         method.setAccessible(true);

@@ -8,6 +8,7 @@ import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -17,14 +18,14 @@ import java.util.List;
  * Created by wq on 2016/3/4.
  */
 
-@FeignClient(MicroServices.StandardMgr)
+@FeignClient(MicroServices.Standard)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface CDAClient {
 
     @RequestMapping(value = RestApi.Standards.Documents ,method = RequestMethod.GET)
     @ApiOperation(value = "根据条件获取cda列表")
-    List<MCDADocument> GetCDADocuments(
+    ResponseEntity<List<MCDADocument>> GetCDADocuments(
             @ApiParam(name = "version_code", value = "版本号")
             @RequestParam(value = "version_code") String versionCode,
             @ApiParam(name = "code", value = "code")

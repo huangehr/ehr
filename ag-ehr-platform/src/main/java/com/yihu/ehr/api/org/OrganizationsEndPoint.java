@@ -66,10 +66,8 @@ public class OrganizationsEndPoint extends BaseController {
             String orgCode) {
 
         MKey key = securityClient.getOrgKey(orgCode);
-
         KeyModel model = new KeyModel();
-        BeanUtils.copyProperties(key, model, "privateKey");
-
+        BeanUtils.copyProperties(key, model, "privateKey","fromDate","expiryDate");
         return model;
     }
 }

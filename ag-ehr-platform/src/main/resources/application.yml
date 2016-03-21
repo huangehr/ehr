@@ -1,3 +1,9 @@
+server:
+  port: 443
+
+management:
+  port: ${server.port}
+
 endpoints:
   restart:
     enabled: true
@@ -6,17 +12,15 @@ endpoints:
   health:
     sensitive: false
 
-logging:
-  level:
-    com:
-      netflix: INFO
-
 ---
 spring:
   profiles: dev
 
   thymeleaf:
     cache: false
+
+fast-dfs:
+  tracker-server: 172.19.103.54:22122
 
 server:
   ssl:
@@ -39,9 +43,15 @@ spring:
   thymeleaf:
       cache: false
 
-keystore:
-  file: C:/Windows/tomcat.keystore
-  password: 123456
+server:
+  ssl:
+    key-store: C:/Windows/tomcat.keystore
+    key-store-password: 123456
+    key-password: 123456
+
+
+fast-dfs:
+  tracker-server: 172.19.103.54:22122
 
 eureka:
   instance:
@@ -54,10 +64,17 @@ eureka:
 ---
 spring:
   profiles: test
+  thymeleaf:
+    cache: false
 
-keystore:
-  file: /tomcat.keystore
-  password: 123456
+
+fast-dfs:
+  tracker-server: 172.19.103.13:22122
+
+server:
+  ssl:
+    key-store-password: 123456
+    key-password: 123456
 
 eureka:
   instance:
@@ -71,9 +88,13 @@ eureka:
 spring:
   profiles: prod
 
-keystore:
-  file: tomcat.keystore
-  password: 123456
+server:
+  ssl:
+    key-store-password: 123456
+    key-password: 123456
+
+fast-dfs:
+  tracker-server: 11.1.2.9:22122
 
 eureka:
   instance:

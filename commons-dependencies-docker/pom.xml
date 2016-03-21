@@ -18,6 +18,7 @@
     <properties>
         <docker.host></docker.host>
         <docker.expose.port></docker.expose.port>
+        <maven.test.skip>true</maven.test.skip>
     </properties>
 
     <modules>
@@ -27,7 +28,7 @@
         <module>../svr-dict</module>
         <module>../svr-discovery</module>
         <module>../svr-geography</module>
-        <module>../svr-health-profiles</module>
+        <module>../svr-health-profile</module>
         <module>../svr-organization</module>
         <module>../svr-pack-mgr</module>
         <module>../svr-pack-resolve</module>

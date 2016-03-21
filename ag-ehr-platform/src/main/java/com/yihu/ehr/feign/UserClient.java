@@ -18,17 +18,16 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  * @created 2016.03.03 15:01
  */
 @ApiIgnore
-@FeignClient(name = MicroServiceName.User)
-@RequestMapping(ApiVersion.Version1_0)
+@FeignClient(name = MicroServices.User,url = MicroServiceIpAddressStr.User+MicroServicePort.User)
 public interface UserClient {
 
-    @RequestMapping(value = RestApi.Users.Users, method = GET)
+    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Users.Users, method = GET)
     List<MUser> getUsers();
 
-    @RequestMapping(value = RestApi.Users.User, method = GET)
+    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Users.User, method = GET)
     MUser getUserByUserName(@PathVariable(value = "user_name") String userName);
 
-    @RequestMapping(value = RestApi.Users.UserPassword, method = GET)
+    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Users.UserPassword, method = GET)
     MUser getUserByNameAndPassword(@PathVariable(value = "user_name") String userName,
                                    @PathVariable(value = "password") String password);
 }

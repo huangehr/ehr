@@ -16,6 +16,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,8 +31,11 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "users", description = "用户管理接口", tags = {"用户", "登录帐号", "密码"})
+@Api(protocols = "https", value = "users", description = "用户管理接口", tags = {"用户,登录帐号,密码"})
 public class UserController extends BaseRestController {
+
+    @Value("default.password")
+    private String default_password = "123456";
 
     @Autowired
     private UserManager userManager;
@@ -66,7 +71,12 @@ public class UserController extends BaseRestController {
         User user = new ObjectMapper().readValue(userJsonData, User.class);
         user.setId(getObjectId(BizObject.User));
         user.setCreateDate(new Date());
-        user.setPassword(HashUtil.hashStr(user.getPassword()));
+        if (!StringUtils.isEmpty(user.getPassword())){
+            user.setPassword(HashUtil.hashStr(user.getPassword()));
+        }else {
+            user.setPassword(HashUtil.hashStr(default_password));
+        }
+
         user.setActivated(true);
         userManager.saveUser(user);
         return convertToModel(user, MUser.class, null);
@@ -113,18 +123,12 @@ public class UserController extends BaseRestController {
         return true;
     }
 
-    /**
-     * 根据用户名获取user
-     *
-     * @param userName
-     * @return
-     */
     @RequestMapping(value = RestApi.Users.User, method = RequestMethod.GET)
     @ApiOperation(value = "根据登录账号获取当前用户", notes = "根据登陆用户名及密码验证用户")
     public MUser getUserByLoginCode(
             @ApiParam(name = "user_name", value = "登录账号", defaultValue = "")
             @PathVariable(value = "user_name") String userName) {
-        User user = userManager.getUserByLoginCode(userName);
+        User user = userManager.getUserByUserName(userName);
         return convertToModel(user, MUser.class);
     }
 
@@ -184,17 +188,17 @@ public class UserController extends BaseRestController {
     @RequestMapping(value = RestApi.Users.UserExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断用户名是否存在")
     public boolean isUserNameExists(
-            @ApiParam(name = "login_code", value = "login_code", defaultValue = "")
-            @PathVariable(value = "login_code") String userName) {
-        return userManager.getUserByLoginCode(userName) != null;
+            @ApiParam(name = "user_name", value = "user_name", defaultValue = "")
+            @PathVariable(value = "user_name") String userName) {
+        return userManager.getUserByUserName(userName) != null;
     }
 
     @RequestMapping(value = RestApi.Users.UserIdCardNoExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断用户身份证号是否存在")
     public boolean isIdCardExists(
-            @ApiParam(name = "id_card", value = "id_card", defaultValue = "")
-            @PathVariable(value = "id_card") String idCard) {
-        return userManager.getUserByIdCardNo(idCard) != null;
+            @ApiParam(name = "id_card_no", value = "id_card_no", defaultValue = "")
+            @PathVariable(value = "id_card_no") String idCardNo) {
+        return userManager.getUserByIdCardNo(idCardNo) != null;
     }
 
     @RequestMapping(value = RestApi.Users.UserAdminContact, method = RequestMethod.DELETE)

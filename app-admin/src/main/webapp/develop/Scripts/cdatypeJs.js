@@ -46,9 +46,8 @@ cdaType.list = {
             dataType: "json",
             data: null,
             success: function (data) {
-
-                var result = eval(data);
-
+                var envelop = eval(data);
+                var result = envelop.detailModelList;
                 if (result != null) {
                     cdaType.list.setUserList(result);
                 }
@@ -140,7 +139,8 @@ cdaType.list = {
             dataType: "json",
             data: {ids: ids},
             success: function (data) {
-                var _res = eval(data);
+                var envelop = eval(data);
+                var _res = envelop.detailModelList;
                 if (_res != null && _res.length > 0) {
                     debugger;
 
@@ -282,8 +282,8 @@ cdaType.attr = {
             data: {strIds: id},
             success: function (data) {
 
-                var result = eval(data);
-                var info = result.obj;
+                var envelop = eval(data);
+                var info = envelop.obj;
                 if (info != null) {
                     cdaType.attr.type_form.attrScan();
                     cdaType.attr.type_form.Fields.fillValues(info);
@@ -320,7 +320,7 @@ cdaType.attr = {
             url: _url,
             type: "POST",
             dataType: "json",
-            data: dataJson[0],
+            data: {dataJson:JSON.stringify(dataJson[0])},
             success: function (data) {
                 if (data != null) {
 

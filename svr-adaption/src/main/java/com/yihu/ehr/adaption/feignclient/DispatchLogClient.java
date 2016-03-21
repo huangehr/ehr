@@ -20,7 +20,7 @@ import springfox.documentation.annotations.ApiIgnore;
  * @created 2016.3.2
  */
 @ApiIgnore
-@FeignClient(name = MicroServices.StandardMgr)
+@FeignClient(name = MicroServices.Standard)
 @RequestMapping(ApiVersion.Version1_0)
 public interface DispatchLogClient {
 

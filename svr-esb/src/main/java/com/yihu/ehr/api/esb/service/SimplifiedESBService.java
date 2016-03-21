@@ -96,12 +96,13 @@ public class SimplifiedESBService {
     }
 
     @Transactional
-    public String uploadResult(String systemCode, String orgCode, String versionCode, String versionName, String updateDate) throws Exception {
+    public String uploadResult(String systemCode, String orgCode, String versionCode, String versionName, String updateDate, String message) throws Exception {
         HosEsbMiniInstallLog hosEsbMiniInstallLog = new HosEsbMiniInstallLog();
         hosEsbMiniInstallLog.setOrgCode(orgCode);
         hosEsbMiniInstallLog.setSystemCode(systemCode);
         hosEsbMiniInstallLog.setCurrentVersionCode(versionCode);
         hosEsbMiniInstallLog.setCurrentVersionName(versionName);
+        hosEsbMiniInstallLog.setMessage(message);
         hosEsbMiniInstallLog.setInstallTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(updateDate));
         hosEsbMiniInstallLogDao.save(hosEsbMiniInstallLog);
         return "";

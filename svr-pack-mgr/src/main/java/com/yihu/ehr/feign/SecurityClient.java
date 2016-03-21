@@ -2,6 +2,8 @@ package com.yihu.ehr.feign;
 
 import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.MicroServiceIpAddressStr;
+import com.yihu.ehr.constants.MicroServicePort;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.security.MKey;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -17,12 +19,11 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  * @created 2016.02.01 14:58
  */
 @ApiIgnore
-@FeignClient(MicroServices.Security)
-@RequestMapping(ApiVersion.Version1_0)
+@FeignClient(value = MicroServices.Security,url = MicroServiceIpAddressStr.Security+ MicroServicePort.Security)
 public interface SecurityClient {
-    @RequestMapping(value = RestApi.Securities.UserKey, method = GET)
+    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Securities.UserKey, method = GET)
     MKey getUserKey(@PathVariable(value = "user_id") String userId);
 
-    @RequestMapping(value = RestApi.Securities.OrganizationKey, method = GET)
+    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Securities.OrganizationKey, method = GET)
     MKey getOrgKey(@PathVariable(value = "org_code") String orgCode);
 }

@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 /**
  * @author Sand
  * @version 1.0
@@ -45,20 +48,26 @@ public class SimplifiedEsbEndPoint {
     @ApiOperation("判断是否需要上传日志")
     @RequestMapping(value = "/getUploadFlag", method = RequestMethod.GET)
     public ResponseEntity<Boolean> getUploadFlag(@ApiParam("orgCode") @RequestParam(value = "orgCode", required = true)
-                                               String orgCode,
-                                           @ApiParam("systemCode") @RequestParam(value = "systemCode", required = true)
-                                               String systemCode) throws Exception {
+                                                 String orgCode,
+                                                 @ApiParam("systemCode") @RequestParam(value = "systemCode", required = true)
+                                                 String systemCode) throws Exception {
         return new ResponseEntity<>(simplifiedESBClient.getUploadFlag(orgCode, systemCode), HttpStatus.OK);
     }
+
     @ApiOperation("日志上传")
     @RequestMapping(value = "/uploadLog", method = RequestMethod.POST)
-    public ResponseEntity<String> uploadLogger(@ApiParam("orgCode") @RequestParam(value = "orgCode", required = true)
-                                               String orgCode,
-                                               @ApiParam("ip") @RequestParam(value = "ip", required = true)
-                                               String ip,
-                                               @ApiParam("file") @RequestParam(value = "file", required = true)
-                                               MultipartFile file) throws Exception {
-        return new ResponseEntity<>(simplifiedESBClient.uploadLog(orgCode, ip, new String(file.getBytes(), "UTF-8")) + "", HttpStatus.OK);
+    public ResponseEntity<Boolean> uploadLogger(@ApiParam("orgCode") @RequestParam(value = "orgCode", required = true)
+                                                String orgCode,
+                                                @ApiParam("ip") @RequestParam(value = "ip", required = false)
+                                                String ip,
+                                                @ApiParam("file") @RequestParam(value = "file", required = true)
+                                                MultipartFile file) throws Exception {
+        /*InputStream in = new ByteArrayInputStream(file.getBytes());
+        FastDFSUtil fdfs = FastDFSConfig.fastDFSUtil();
+        ObjectNode jsonResult = fdfs.upload(in, "zip", "");
+        String filePath = jsonResult.get("fid").textValue();
+        return new ResponseEntity<Boolean>(simplifiedESBClient.uploadLog(orgCode, ip, filePath), HttpStatus.OK);*/
+        return null;
     }
 
     @ApiOperation("查询版本是否需要更新")
@@ -95,9 +104,11 @@ public class SimplifiedEsbEndPoint {
             @ApiParam("versionName") @RequestParam(value = "versionName", required = true)
             String versionName,
             @ApiParam("updateDate") @RequestParam(value = "updateDate", required = true)
-            String updateDate) {
+            String updateDate,
+            @ApiParam("message") @RequestParam(value = "message", required = true)
+            String message) {
 
-        return new ResponseEntity<>(simplifiedESBClient.uploadResult(systemCode, orgCode, versionCode, versionName, updateDate), HttpStatus.OK);
+        return new ResponseEntity<>(simplifiedESBClient.uploadResult(systemCode, orgCode, versionCode, versionName, updateDate, message), HttpStatus.OK);
     }
 
     @ApiOperation("补采功能")
@@ -144,6 +155,6 @@ public class SimplifiedEsbEndPoint {
             String status,
             @ApiParam("id") @RequestParam(value = "id", required = true)
             String id) {
-        return new ResponseEntity<>(simplifiedESBClient.changeHisPenetrationStatus(result, status, id,message), HttpStatus.OK);
+        return new ResponseEntity<>(simplifiedESBClient.changeHisPenetrationStatus(result, status, id, message), HttpStatus.OK);
     }
 }

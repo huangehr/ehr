@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Created by Administrator on 2016/1/4.
  */
-@FeignClient(name = MicroServiceName.Geography)
+@FeignClient(name = MicroServices.Geography,url = MicroServiceIpAddressStr.Geography+MicroServicePort.Geography)
 @RequestMapping(value = ApiVersion.Version1_0)
 @ApiIgnore
 public interface GeographyClient {

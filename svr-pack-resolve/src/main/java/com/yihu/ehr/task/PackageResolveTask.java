@@ -3,21 +3,16 @@ package com.yihu.ehr.task;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.cache.CachedMetaData;
-import com.yihu.ehr.cache.StdDataRedisCache;
 import com.yihu.ehr.cache.StdObjectQualifierTranslator;
-import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.extractor.KeyDataExtractor;
 import com.yihu.ehr.pack.TPackage;
 import com.yihu.ehr.pack.TPackageService;
+import com.yihu.ehr.persist.DataSetResolverWithChecker;
 import com.yihu.ehr.profile.Profile;
 import com.yihu.ehr.profile.ProfileDataSet;
-import com.yihu.ehr.profile.ProfileService;
-import com.yihu.ehr.util.DateFormatter;
-import com.yihu.ehr.util.ObjectId;
+import com.yihu.ehr.persist.ProfileService;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +23,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Date;
+import java.util.Properties;
 
 /**
  * 档案归档任务.
@@ -41,6 +35,9 @@ import java.util.regex.Pattern;
  */
 @Component
 public class PackageResolveTask {
+    @Autowired
+    DataSetResolverWithChecker dataSetResolver;
+
     @Autowired
     ObjectMapper objectMapper;
 
@@ -176,7 +173,7 @@ public class PackageResolveTask {
             throw new IOException("无效JSON文件，文件已损坏或数据格式不对");
         }
 
-        ProfileDataSet dataSet = ProfileDataSet.parseJsonDataSet(jsonNode, isOrigin);
+        ProfileDataSet dataSet = dataSetResolver.parseJsonDataSet(jsonNode, isOrigin);
         return dataSet;
     }
 

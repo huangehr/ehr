@@ -8,6 +8,7 @@ import com.yihu.ehr.model.standard.MStdDictEntry;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,14 +22,14 @@ import java.util.Map;
  * Created by wq on 2016/3/2.
  */
 
-@FeignClient(MicroServices.StandardMgr)
+@FeignClient(MicroServices.Standard)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface DictClient {
 
     @RequestMapping(value = RestApi.Standards.Dictionaries, method = RequestMethod.GET)
     @ApiOperation(value = "查询字典")
-    Collection<MStdDict> searchDict(
+    ResponseEntity<Collection<MStdDict>> searchDict(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -122,7 +123,7 @@ public interface DictClient {
 
     @RequestMapping(value = RestApi.Standards.Entries, method = RequestMethod.GET)
     @ApiOperation(value = "查询字典项")
-    Collection<MStdDictEntry> searchDictEntry(
+    ResponseEntity<Collection<MStdDictEntry>> searchDictEntry(
             @RequestParam(value = "fields", required = false) String fields,
             @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,
