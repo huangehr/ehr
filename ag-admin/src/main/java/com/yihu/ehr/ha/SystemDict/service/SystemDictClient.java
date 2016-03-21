@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * Created by AndyCai on 2016/2/1.
  */
-@FeignClient(MicroServices.Dictionary)
+@FeignClient(MicroServices.DictMgr)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface SystemDictClient {

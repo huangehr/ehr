@@ -18,7 +18,7 @@ import java.util.Collection;
 /**
  * Created by AndyCai on 2016/3/1.
  */
-@FeignClient(MicroServices.Adaption)
+@FeignClient(MicroServices.AdaptionMgr)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface OrgMetaDataClient {
