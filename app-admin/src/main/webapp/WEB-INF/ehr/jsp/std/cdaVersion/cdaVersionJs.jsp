@@ -57,7 +57,7 @@
 							{display: '状态码', name: 'inStage', align: 'left',hide: true},
 							{display: '状态', name: 'inStage', width: '15%', align: 'center',
 								render:function(value){
-									return value == true ? "未发布":"已发布"
+									return value.inStage == true ? "未发布":"已发布";
 								}
 							},
 							{
