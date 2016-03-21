@@ -35,6 +35,7 @@ public class SystemDictController extends BaseController {
     @Autowired
     private SystemDictClient systemDictClient;
 
+    @Autowired
     private ObjectMapper objectMapper;
 //    @Autowired
 //    private BaseRestController baseRestController;

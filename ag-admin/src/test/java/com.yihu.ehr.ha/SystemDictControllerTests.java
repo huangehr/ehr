@@ -181,6 +181,19 @@ public class SystemDictControllerTests {
 
     @Test
     public void cTestSearchEntry() throws Exception{
+
+        SystemDictModel systemDictModel = new SystemDictModel();
+        systemDictModel.setName("test_cms_dict");
+        systemDictModel.setAuthorId("0dae0003561cc415c72d9111e8cb88aa");
+        systemDictModel.setCreateDate(new Date());
+
+        envelop = sysDict.createDictionary(objectMapper.writeValueAsString(systemDictModel));
+        assertTrue("新增失败!",envelop.isSuccessFlg()&&envelop.getObj()!=null);
+
+        systemDictModel = (SystemDictModel)envelop.getObj();
+        envelop = sysDict.deleteDictionary(systemDictModel.getId());
+        assertTrue("删除失败!",envelop.isSuccessFlg());
+
         String fields = "";
         String filter = "";
         int page = 1;
@@ -189,7 +202,7 @@ public class SystemDictControllerTests {
         assertTrue("数据获取失败!",envelop.getDetailModelList().size()>0);
 
         String jsonData = objectMapper.writeValueAsString(envelop.getDetailModelList().get(0));
-        SystemDictModel systemDictModel = objectMapper.readValue(jsonData,SystemDictModel.class);
+        systemDictModel = objectMapper.readValue(jsonData,SystemDictModel.class);
 
         long dictId = systemDictModel.getId();
         filter="dictId="+dictId;
