@@ -5,8 +5,8 @@
 <div id="div_info_form" data-role-form class="m-form-inline f-mt20 f-ml30" data-role-form>
 
     <input type="hidden" id="id" data-attr-scan="id"/>
-    <input type="hidden" id="orgDataSetSeq" data-attr-scan="orgDataSetSeq"/>
-    <input type="hidden" id="orgDictSeq" data-attr-scan="orgDictSeq"/>
+    <input type="hidden" id="orgDataSetSeq" data-attr-scan="orgDataSet"/>
+    <input type="hidden" id="orgDictSeq" data-attr-scan="orgDict"/>
     <input type="hidden" id="orgCode" data-attr-scan="organization"/>
 
     <div class="m-form-group">
