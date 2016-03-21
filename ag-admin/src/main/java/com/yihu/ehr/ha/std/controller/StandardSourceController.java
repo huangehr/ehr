@@ -127,11 +127,11 @@ public class StandardSourceController extends BaseController {
         {
             return failed("标准来源不存在,请确认!");
         }
-//        if(!mStdSourceOld.getCode().equals(sourceDetailModel.getCode())
-//                &&stdSourcrClient.isCodeExist(sourceDetailModel.getCode()))
-//        {
-//            return failed("代码已存在!");
-//        }
+        if(!mStdSourceOld.getCode().equals(sourceDetailModel.getCode())
+                &&stdSourcrClient.isCodeExist(sourceDetailModel.getCode()))
+        {
+            return failed("代码已存在!");
+        }
 
         mStdSourceOld = convertToModel(sourceDetailModel, MStdSource.class);
         mStdSourceOld.setUpdateDate(new Date());
@@ -164,10 +164,10 @@ public class StandardSourceController extends BaseController {
         if (StringUtils.isNotEmpty(errorMsg)) {
             return failed(errorMsg);
         }
-//        if(stdSourcrClient.isCodeExist(sourceDetailModel.getCode()))
-//        {
-//            return failed("代码已存在!");
-//        }
+        if(stdSourcrClient.isCodeExist(sourceDetailModel.getCode()))
+        {
+            return failed("代码已存在!");
+        }
 
         MStdSource mStdSourceOld = convertToModel(sourceDetailModel, MStdSource.class);
         mStdSourceOld.setCreateDate(new Date());
@@ -199,9 +199,9 @@ public class StandardSourceController extends BaseController {
         return stdSourcrClient.delStdSource(id);
     }
 
-//    @RequestMapping(value = "/source/is_exist", method = RequestMethod.GET)
-//    public boolean isCodeExist(@RequestParam(value = "code") String code) {
-//        return stdSourcrClient.isCodeExist(code);
-//    }
+    @RequestMapping(value = "/source/is_exist", method = RequestMethod.GET)
+    public boolean isCodeExist(@RequestParam(value = "code") String code) {
+        return stdSourcrClient.isCodeExist(code);
+    }
 
 }

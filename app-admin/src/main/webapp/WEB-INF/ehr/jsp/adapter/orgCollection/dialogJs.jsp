@@ -56,14 +56,14 @@
                         code: orgDataSet.code,
                         description:orgDataSet.description,
                         id:orgDataSet.id,
-                        sort: '${sort}',
+                        sort: orgDataSet.sort,
 
                     });
                 }
 
                 this.$form.Fields.fillValues({
-                        orgDataSetSeq: seq,
-                        orgDictSeq: seq,
+                        orgDataSet: seq,
+                        orgDict: seq,
                         organization: orgCode
                 });
 
@@ -79,14 +79,15 @@
                 });
 
                 this.$btnSave.click(function () {
-                    var orgDataSetDetailModel = self.$form.Fields.getValues();
+                    var adapterModel = self.$form.Fields.getValues();
+                    adapterModel.sequence = seq;
                     if(!validator.validate()){
                         return;
                     }
                     self.$btnSave.attr('disabled','disabled');
                     var dataModel = $.DataModel.init();
                     dataModel.updateRemote("${contextRoot}"+cfg[cfgModel][mode],{
-                        data: {jsonDataModel:JSON.stringify(orgDataSetDetailModel)},
+                        data: {jsonDataModel:JSON.stringify(adapterModel)},
                         success: function(data) {
                             if(data.successFlg){
                                 parent.reloadMasterGrid();

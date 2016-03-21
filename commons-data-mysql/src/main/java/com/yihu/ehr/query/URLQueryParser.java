@@ -189,7 +189,7 @@ public class URLQueryParser<T> {
             Pair<Path, String> pair = getPair(filter, "=", root);
 
             if (pair.getValue().contains(",")) {
-                predicate = cb.in(pair.getKey().in(pair.getValue().split(",")));
+                predicate = pair.getKey().in(pair.getValue().split(","));
             } else {
                 predicate = cb.equal(pair.getKey(), pair.getValue());
             }

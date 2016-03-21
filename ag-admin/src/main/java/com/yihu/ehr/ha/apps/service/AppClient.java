@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Created by AndyCai on 2016/1/19.
  */
-@FeignClient(MicroServices.AppMgr)
+@FeignClient(MicroServices.Application)
 public interface AppClient {
 
     @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Apps.Apps, method = RequestMethod.GET)
