@@ -6,7 +6,6 @@ import com.yihu.ehr.apps.service.AppService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.constants.RestAPI;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.util.controller.BaseRestController;
@@ -99,10 +98,11 @@ public class AppEndPoint extends BaseRestController {
 
     @RequestMapping(value = RestApi.Apps.App, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除App")
-    public void deleteApp(
+    public boolean deleteApp(
             @ApiParam(name = "app_id", value = "id")
             @PathVariable(value = "app_id") String appId) throws Exception {
         appService.delete(appId);
+        return true;
     }
 
     @RequestMapping(value = RestApi.Apps.AppStatus, method = RequestMethod.PUT)

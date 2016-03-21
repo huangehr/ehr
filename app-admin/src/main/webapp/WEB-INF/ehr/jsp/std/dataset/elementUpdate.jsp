@@ -64,7 +64,7 @@
                     </td>
                     <td class="td-left">
                         <input id="metaDataFormat" class="max-length-50 validate-special-char" style="width: 227px;"
-                               data-attr-scan="formatType"/>
+                               data-attr-scan="format"/>
                     </td>
                 </tr>
                 <tr>
