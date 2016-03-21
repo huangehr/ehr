@@ -2,7 +2,6 @@ package com.yihu.ehr.adaption.feignclient;
 
 import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.MicroServiceName;
 import com.yihu.ehr.constants.MicroServices;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -21,7 +20,7 @@ import java.util.Map;
  * @created 2016.2.1
  */
 @ApiIgnore
-@FeignClient(name = MicroServices.StandardMgr)
+@FeignClient(name = MicroServices.Standard)
 @RequestMapping(ApiVersion.Version1_0)
 public interface DictClient {
 

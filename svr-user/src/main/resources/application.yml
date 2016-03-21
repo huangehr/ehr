@@ -1,10 +1,8 @@
 server:
   port: 10120
 
-logging:
-  level:
-    com:
-      netflix: DEBUG
+management:
+  port: ${server.port}
 
 info:
   app:
@@ -12,48 +10,25 @@ info:
     description: EHR platform user service.
     version: 1.0.0
 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://user:eureka@${eureka-server-ip}/eureka/
+
 ---
 spring:
   profiles: dev
-eureka:
-  instance:
-    ip-address: localhost
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@localhost:8761}/eureka/
 
----
-spring:
-  profiles: sand-home-dev
-
-eureka:
-  instance:
-    ip-address: localhost
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
+eureka-server-ip: 127.0.0.1:8761
 
 ---
 spring:
   profiles: test
-eureka:
-  instance:
-    ip-address: 172.19.103.73
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@172.19.103.73:8761}/eureka/
+
+eureka-server-ip: 172.19.103.73:8761
 
 ---
 spring:
   profiles: prod
 
-eureka:
-  instance:
-    ip-address: 11.1.2.21
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@11.1.2.21:8761}/eureka/
+eureka-server-ip: 11.1.2.21:8761

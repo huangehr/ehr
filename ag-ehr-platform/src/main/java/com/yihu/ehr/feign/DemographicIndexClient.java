@@ -8,7 +8,7 @@ import org.springframework.cloud.netflix.feign.FeignClient;
  * @version 1.0
  * @created 2016.02.03 11:54
  */
-@FeignClient(MicroServices.PatientMgr)
+@FeignClient(MicroServices.Patient)
 public interface DemographicIndexClient {
     boolean isRegistered(String demographicId);
 }

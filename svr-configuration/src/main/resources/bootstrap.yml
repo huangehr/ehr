@@ -1,3 +1,15 @@
-server:
+spring:
   application:
-    name: configurations
+    name: svr-configurations
+
+---
+spring:
+  profiles: dev
+
+---
+spring:
+  profiles: test
+
+---
+spring:
+  profiles: prod

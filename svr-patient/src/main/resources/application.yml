@@ -1,17 +1,9 @@
 server:
   port: 10100
 
-#security:
-#  user:
-#    password: configuration
+management:
+  port: ${server.port}
 
-spring:
-  jpa:
-    show-sql: true
-    hibernate:
-      dialect: org.hibernate.dialect.MySQL5Dialect
-    database:
-      platform: org.hibernate.dialect.MySQL5Dialect
 
 info:
   app:
@@ -19,48 +11,25 @@ info:
     description: EHR platform json patient service.
     version: 1.0.0
 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://user:eureka@${eureka-server-ip}/eureka/
 
 ---
 spring:
   profiles: dev
 
-fast-dfs:
-  tracker-server: 172.19.103.54:22122
-
-eureka:
-  instance:
-    ip-address: 127.0.0.1
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
+eureka-server-ip: 127.0.0.1:8761
 
 ---
 spring:
   profiles: test
 
-fast-dfs:
-  tracker-server: 172.19.103.13:22122
-
-eureka:
-  instance:
-    ip-address: 172.19.103.73
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@172.19.103.73:8761}/eureka/
-
+eureka-server-ip: 172.19.103.73:8761
 
 ---
 spring:
   profiles: prod
 
-eureka:
-  instance:
-    ip-address: 11.1.2.21
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@11.1.2.21:8761}/eureka/
-fast-dfs:
-  tracker-server: 172.19.103.54:22122
+eureka-server-ip: 11.1.2.21:8761

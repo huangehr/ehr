@@ -26,10 +26,10 @@ logging:
     com:
       netflix: TRACE
 
-#zuul:
-#  ignored-services: "*"
-#  routes:
-#    svr-pack-mgr: /**
+zuul:
+  ignored-services: "*"
+  routes:
+    svr-pack-mgr: /api/v1.0/packages
 
 ---
 spring:
