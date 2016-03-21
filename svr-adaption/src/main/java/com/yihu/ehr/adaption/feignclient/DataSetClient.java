@@ -19,7 +19,7 @@ import java.util.Map;
  * @created 2016.2.1
  */
 @ApiIgnore
-@FeignClient(name = MicroServices.StandardMgr)
+@FeignClient(name = MicroServices.Standard)
 @RequestMapping(ApiVersion.Version1_0)
 public interface DataSetClient {
 

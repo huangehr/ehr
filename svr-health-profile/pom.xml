@@ -9,9 +9,9 @@
         <relativePath>../commons-dependencies-docker</relativePath>
 	</parent>
 
-	<artifactId>svr-health-profiles</artifactId>
+	<artifactId>svr-health-profile</artifactId>
 	<packaging>jar</packaging>
-	<name>svr-health-profiles</name>
+	<name>svr-health-profile</name>
 	<description>EHR platform health profiles service</description>
 
 	<properties>

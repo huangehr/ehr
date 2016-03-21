@@ -126,12 +126,21 @@ public class AppController extends BaseController {
     @ApiOperation(value = "删除app")
     public Envelop deleteApp(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
-            @PathVariable(value = "app_id") String appId) throws Exception {
-        Envelop envelop = new Envelop();
-        //TODO 微服务无返回值
-        appClient.deleteApp(appId);
-        envelop.setSuccessFlg(true);
-        return envelop;
+            @PathVariable(value = "app_id") String appId){
+        try {
+            boolean result = appClient.deleteApp(appId);
+            if(!result)
+            {
+                return failed("删除失败!");
+            }
+
+            return success(null);
+        }
+        catch (Exception ex)
+        {
+            return failedSystem();
+        }
+
     }
 
     @RequestMapping(value = "/apps/status",method = RequestMethod.PUT)
@@ -140,7 +149,7 @@ public class AppController extends BaseController {
             @ApiParam(name= "app_id",value = "app_id",defaultValue = "")
             @RequestParam(value = "app_id") String appId,
             @ApiParam(name = "status",value = "状态",defaultValue = "")
-            @RequestParam(value = "api_status") String appStatus)throws Exception{
+            @RequestParam(value = "app_status") String appStatus)throws Exception{
         return appClient.updateStatus(appId, appStatus);
     }
 

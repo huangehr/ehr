@@ -46,7 +46,7 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
      *
      * @param loginCode
      */
-    public User getUserByLoginCode(String loginCode) {
+    public User getUserByUserName(String loginCode) {
         List<User> users = userRepository.findByLoginCode(loginCode);
         if(users.size()>0){
             return users.get(0);
@@ -92,7 +92,7 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
      */
     public User loginVerification(String loginCode,String psw) {
 
-        User user = getUserByLoginCode(loginCode);
+        User user = getUserByUserName(loginCode);
         boolean result = isPasswordRight(user,psw);
         if(result) {
             return user;

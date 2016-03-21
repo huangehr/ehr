@@ -1,11 +1,7 @@
 package com.yihu.ehr.adaption.feignclient;
 
-
-
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.MicroServiceIpAddressStr;
-import com.yihu.ehr.constants.MicroServiceName;
-import com.yihu.ehr.constants.MicroServicePort;
+import com.yihu.ehr.constants.MicroServices;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
@@ -21,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @created 2016.2.1
  */
 @EnableFeignClients
-@FeignClient(name = MicroServiceName.Geography)
+@FeignClient(name = MicroServices.Geography)
 @RequestMapping(ApiVersion.Version1_0)
 public interface AddressClient {
 

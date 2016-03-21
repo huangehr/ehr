@@ -14,7 +14,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  *
  */
 @ApiIgnore
-@FeignClient(name = MicroServices.UserMgr,url = MicroServiceIpAddressStr.User+ MicroServicePort.User)
+@FeignClient(name = MicroServices.User)
 @RequestMapping(ApiVersion.Version1_0)
 public interface UserClient {
 

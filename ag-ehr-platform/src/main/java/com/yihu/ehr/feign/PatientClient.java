@@ -1,7 +1,6 @@
 package com.yihu.ehr.feign;
 
 import com.yihu.ehr.constants.*;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,12 +8,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * Created by Administrator on 2016/1/4.
  */
-@FeignClient(name= MicroServices.PatientMgr,url = MicroServiceIpAddressStr.Patient+MicroServicePort.Patient)
+@FeignClient(name= MicroServices.Patient)
 @ApiIgnore
 public interface PatientClient {
 
