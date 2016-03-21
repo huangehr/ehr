@@ -1,14 +1,22 @@
 server:
-  port: 10000
+   port: 10000
 
-management:
-  port: ${server.port}
+
+#security:
+#  user:
+#    password: app
 
 info:
   app:
     name: AgAdminService
     description: EHR platform json app service.
     version: 1.0.0
+
+
+zuul:
+  prefix: /esb/**
+  routes:
+    - /esb/**
 
 ---
 spring:

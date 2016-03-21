@@ -23,7 +23,7 @@ import java.util.Map;
  * @version 1.0
  * @created 2016.2.3
  */
-@FeignClient(MicroServices.Adaption)
+@FeignClient(MicroServices.AdaptionMgr)
 @RequestMapping(ApiVersion.Version1_0 )
 @ApiIgnore
 public interface PlanClient {

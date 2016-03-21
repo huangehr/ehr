@@ -44,7 +44,7 @@ public class IdCardValidator {
         String Ai = "";
 
         if (IDStr.length() != 15 && IDStr.length() != 18) {
-            return "Identity card no length must be 15 or 15.";
+            return "Identity card no length must be 15 or 18.";
         }
 
         if (IDStr.length() == 18) {

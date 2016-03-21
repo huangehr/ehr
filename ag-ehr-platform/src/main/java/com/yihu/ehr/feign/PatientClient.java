@@ -11,7 +11,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * Created by Administrator on 2016/1/4.
  */
-@FeignClient(name= MicroServices.Patient,url = MicroServiceIpAddressStr.Patient+MicroServicePort.Patient)
+@FeignClient(name= MicroServices.Patient)
 @ApiIgnore
 public interface PatientClient {
 

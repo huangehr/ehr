@@ -33,3 +33,9 @@ spring:
 
 eureka-server-ip: 11.1.2.21:8761
 
+---
+spring:
+  profiles: ha
+
+eureka-server-ip: 192.168.1.220:8761
+

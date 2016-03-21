@@ -1,9 +1,3 @@
-server:
-  port: 443
-
-management:
-  port: ${server.port}
-
 endpoints:
   restart:
     enabled: true
@@ -11,6 +5,31 @@ endpoints:
     enabled: true
   health:
     sensitive: false
+
+fast-dfs:
+  pool:
+    init-size: 5
+    max-size: 20
+    wait-time: 500
+  connect-timeout: 2
+  network-timeout: 30
+  tracker-server: 172.19.103.54:22122
+  fast-dfs:
+    charset: ISO8859-1
+  http:
+    tracker-http-port: 80
+    anti-steal-token: no
+    secret-key: FastDFS1234567890
+
+logging:
+  level:
+    com:
+      netflix: TRACE
+
+zuul:
+  ignored-services: "*"
+  routes:
+    svr-pack-mgr: /api/v1.0/packages
 
 ---
 spring:
@@ -31,6 +50,9 @@ server:
 eureka:
   instance:
     ip-address: localhost
+    statusPageUrl: http://${eureka.hostname}/info
+    healthCheckUrl: http://${eureka.hostname}/health
+    homePageUrl: http://${eureka.hostname}/
   client:
     registerWithEureka: true
     fetchRegistry: true

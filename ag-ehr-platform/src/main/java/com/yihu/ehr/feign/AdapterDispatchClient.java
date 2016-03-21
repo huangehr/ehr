@@ -3,8 +3,10 @@ package com.yihu.ehr.feign;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import com.yihu.ehr.constants.*;
 import com.yihu.ehr.util.RestEcho;
+import com.yihu.ehr.util.encrypt.RSA;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,12 +15,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by AndyCai on 2016/3/3.
  */
-@FeignClient(name = MicroServices.Adaption, url = MicroServiceIpAddressStr.Adaption + MicroServicePort.Adaption)
+@FeignClient(name = MicroServices.Adaption)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface AdapterDispatchClient {
@@ -55,5 +58,5 @@ public interface AdapterDispatchClient {
             @ApiParam(required = true, name = "version_code", value = "适配标准版本")
             @RequestParam(value = "version_code", required = true) String versionCode,
             @ApiParam(required = true, name = "org_code", value = "机构代码")
-            @PathVariable(value = "org_code") String orgcode);
+            @PathVariable(value = "org_code") String orgcode) ;
 }
