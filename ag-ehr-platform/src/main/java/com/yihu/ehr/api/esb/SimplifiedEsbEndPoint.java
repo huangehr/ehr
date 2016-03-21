@@ -1,9 +1,6 @@
 package com.yihu.ehr.api.esb;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.config.FastDFSConfig;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.feign.SimplifiedESBClient;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,8 +28,6 @@ import java.io.InputStream;
 public class SimplifiedEsbEndPoint {
     @Autowired
     private SimplifiedESBClient simplifiedESBClient;
-    @Autowired
-    private FastDFSConfig FastDFSConfig;
 
     /*
     @ApiOperation("获取版本列表")
@@ -67,11 +62,12 @@ public class SimplifiedEsbEndPoint {
                                                 String ip,
                                                 @ApiParam("file") @RequestParam(value = "file", required = true)
                                                 MultipartFile file) throws Exception {
-        InputStream in = new ByteArrayInputStream(file.getBytes());
+        /*InputStream in = new ByteArrayInputStream(file.getBytes());
         FastDFSUtil fdfs = FastDFSConfig.fastDFSUtil();
         ObjectNode jsonResult = fdfs.upload(in, "zip", "");
         String filePath = jsonResult.get("fid").textValue();
-        return new ResponseEntity<Boolean>(simplifiedESBClient.uploadLog(orgCode, ip, filePath), HttpStatus.OK);
+        return new ResponseEntity<Boolean>(simplifiedESBClient.uploadLog(orgCode, ip, filePath), HttpStatus.OK);*/
+        return null;
     }
 
     @ApiOperation("查询版本是否需要更新")

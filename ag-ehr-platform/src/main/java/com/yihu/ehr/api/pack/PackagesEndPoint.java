@@ -39,7 +39,7 @@ public class PackagesEndPoint {
      * @param md5           文件内容MD5值。
      * @return
      */
-    @RequestMapping(value = "/json_package", method = RequestMethod.POST)
+    @RequestMapping(value = "/packages", method = RequestMethod.POST)
     @ApiOperation(value = "接收档案", notes = "接收健康档案数据包")
     public ResponseEntity<Boolean> uploadPackage(
             @ApiParam(required = true, name = "package", value = "档案包", allowMultiple = true)

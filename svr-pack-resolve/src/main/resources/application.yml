@@ -1,9 +1,8 @@
 server:
-  port: 0
+  port: 10170
 
-security:
-  user:
-    password: resolve
+management:
+  port: ${server.port}
 
 info:
   app:
@@ -11,38 +10,25 @@ info:
     description: EHR platform json package resolve service, resolve package to hbase.
     version: 1.1.0
 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://user:eureka@${eureka-server-ip}/eureka/
+
 ---
 spring:
   profiles: dev
 
-eureka:
-  instance:
-    hostname: localhost
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
+eureka-server-ip: 127.0.0.1:8761
 
 ---
 spring:
   profiles: test
 
-eureka:
-  instance:
-    hostname: localhost
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
+eureka-server-ip: 172.19.103.73:8761
 
 ---
 spring:
   profiles: prod
 
-eureka:
-  instance:
-    hostname: localhost
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
+eureka-server-ip: 11.1.2.21:8761
