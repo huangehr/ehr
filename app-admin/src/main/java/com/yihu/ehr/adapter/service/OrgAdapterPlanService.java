@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
  * @created 2016/3/19
  */
 @Service
-public class OrgAdapterService extends ExtendService<MAdapterPlan> {
+public class OrgAdapterPlanService extends ExtendService<MAdapterPlan> {
 
-    public OrgAdapterService() {
+    public OrgAdapterPlanService() {
         init(
                 "/adapter/plans",        //searchUrl
                 "/adapter/plan/{id}",   //modelUrl

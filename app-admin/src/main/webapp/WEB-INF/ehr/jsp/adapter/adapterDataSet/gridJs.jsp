@@ -9,15 +9,15 @@
       var retrieve = null;
       var master = null;
       var conditionArea = null;
-      var adapterPlanId = ${adapterPlanId};
+      var adapterPlanId = ${dataModel};
       var entryRetrieve = null;
       var entryMater = null;
       var cfgModel = 0;
       var changeFlag=false;
       var cfg = [
         {
-          left:{title:'平台数据集', cls:'', search:'/adapterDataSet/searchAdapterDataSet', goAdd:'', del:''},
-          right:{title:'数据元映射', cls:'', search:'/adapterDataSet/searchAdapterMetaData', goAdd:'/adapterDataSet/template/adapterMetaDataInfo', del:'/adapterDataSet/delMetaData',delLs:'/adapterDataSet/delMetaData'}
+          left:{title:'平台数据集', cls:'', search:'/adapterDataSet/dataSetList', goAdd:'', del:''},
+          right:{title:'数据元映射', cls:'', search:'/adapterDataSet/metaDataList', goAdd:'/adapterDataSet/gotoModify', del:'/adapterDataSet/delMetaData',delLs:'/adapterDataSet/delMetaData'}
         },
         {
           left:{title:'平台字典', cls:'', search:'/adapterDict/searchAdapterDict', goAdd:'', del:''},
@@ -77,7 +77,7 @@
           var dataModel = $.DataModel.init();
 			conditionArea.$adapter_plan_org.css({width: 200})
 
-          dataModel.fetchRemote("${contextRoot}/adapter/getAdapterPlanById",{
+          dataModel.fetchRemote("${contextRoot}/adapter/model",{
             data:{id:adapterPlanId},
             success: function(data) {
               var model = data.obj;
@@ -170,7 +170,7 @@
 
           var searchNm = $("#searchNm").val();
           var values = {
-            strKey: searchNm,
+            searchNm: searchNm,
             adapterPlanId: adapterPlanId
           };
           if (changeFlag){
@@ -196,10 +196,10 @@
           var columnCfg =[];
           var code = 'code';
           var name = 'name';
-          if(cfgModel==1){
-            code = 'dictCode';
-            name = 'dictName';
-          }
+//          if(cfgModel==1){
+//            code = 'dictCode';
+//            name = 'dictName';
+//          }
           columnCfg = [
             { display: 'id', name: 'id', hide:true },
             { display: '代码', name: code,width: '50%', isAllowHide: false ,align:'left' },
@@ -263,7 +263,7 @@
           }
           var values = {
             adapterPlanId :adapterPlanId,
-            strKey: searchNmEntry,
+            searchNmEntry: searchNmEntry,
             dataSetId:parentId,
             dictId:parentId
           };
