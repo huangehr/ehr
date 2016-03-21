@@ -33,7 +33,7 @@ public class SystemDictEntryController extends BaseRestController {
     SystemDictEntryService systemDictEntryService;
 
     @ApiOperation(value = "获取字典项列表")
-    @RequestMapping(value = "/dictionaries/{dict_id}/entries", method = RequestMethod.GET)
+    @RequestMapping(value = "/dictionaries/entries", method = RequestMethod.GET)
     public List<MDictionaryEntry> getDictEntries(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
