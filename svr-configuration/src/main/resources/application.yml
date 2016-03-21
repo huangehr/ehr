@@ -74,3 +74,15 @@ spring:
 
 eureka-server-ip: 11.1.2.21:8761
 
+---
+spring:
+  profiles: ha
+
+  cloud:
+    config:
+      server:
+        git:
+          uri: http://192.168.1.220:10080/EHR/ehr.config.git
+        default-label: dev
+
+eureka-server-ip: 192.168.1.220:8761

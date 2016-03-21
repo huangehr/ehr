@@ -18,7 +18,7 @@ import java.util.Collection;
 /**
  * Created by AndyCai on 2016/3/2.
  */
-@FeignClient(MicroServices.Adaption)
+@FeignClient(MicroServices.AdaptionMgr)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface OrgDictEntryClient {

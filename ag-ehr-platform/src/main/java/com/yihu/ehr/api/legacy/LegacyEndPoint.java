@@ -15,8 +15,11 @@ import com.yihu.ehr.util.encode.Base64;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -344,8 +347,14 @@ public class LegacyEndPoint {
             @RequestParam(value = "md5") String md5) throws Exception {
         MultipartFile multipartFile = jsonPackage.getFile("file");
         byte[] bytes = multipartFile.getBytes();
-        String fileString = Base64.encode(bytes);
-        jsonPackageClient.savePackageWithUser(fileString, userName, packageCrypto, md5);
+        String fileString = new String(bytes, "UTF-8");
+        MultiValueMap<String, String> conditionMap = new LinkedMultiValueMap<>();
+        conditionMap.add("file_string", fileString);
+        conditionMap.add("user_name", userName);
+        conditionMap.add("package_crypto", packageCrypto);
+        conditionMap.add("md5", md5);
+        RestTemplate template = new RestTemplate();
+        template.postForObject("http://localhost:6010/api/v1.0/packages", conditionMap, String.class);
         return new RestEcho().success().putMessage("ok");
     }
 

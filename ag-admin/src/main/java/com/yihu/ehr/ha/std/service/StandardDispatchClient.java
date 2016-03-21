@@ -15,7 +15,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * Created by AndyCai on 2016/3/3.
  */
-@FeignClient(MicroServices.Standard)
+@FeignClient(MicroServices.StandardMgr)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface StandardDispatchClient {

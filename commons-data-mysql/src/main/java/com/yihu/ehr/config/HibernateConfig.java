@@ -50,7 +50,7 @@ public class HibernateConfig {
     int removeAbandonedTimeout;
 
     @Value("${hibernate.format-sql}")
-    String formatSQL = "true";
+    String formatSQL;
 
     @Bean
     public BasicDataSource dataSource() throws SQLException {
