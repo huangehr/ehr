@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * Created by AndyCai on 2016/3/3.
  */
-@FeignClient(name = MicroServices.Adaption,url = MicroServiceIpAddressStr.Adaption+ MicroServicePort.Adaption)
+@FeignClient(name = MicroServices.Adaption)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface AdapterDispatchClient {

@@ -12,7 +12,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 /**
  * Created by Administrator on 2016/1/4.
  */
-@FeignClient(name = MicroServices.Application,url = MicroServiceIpAddressStr.App+MicroServicePort.App)
+@FeignClient(name = MicroServices.Application)
 @ApiIgnore
 public interface AppClient {
 
