@@ -82,6 +82,8 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
     }
 
     private String makeOrder(String orders) {
+        if(StringUtils.isEmpty(orders))
+            return "";
         String sql = "";
         for (String order : orders.split(",")) {
             if (order.startsWith("+"))
@@ -160,10 +162,17 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
         sb.append("        left join org_std_metadata orgMD on (orgMD.sequence = ads.org_metadata and orgMD.organization='" + orgCode + "')  ");
         sb.append("  where ads.plan_id = " + planId);
         sb.append("        and ads.std_dataset = " + dataSetId);
-        if (!StringUtils.isEmpty(code))
-            sb.append("     and md.inner_code like :code");
-        if (!StringUtils.isEmpty(name))
-            sb.append("     and md.name like :name");
+        if (!StringUtils.isEmpty(code)){
+            if (!StringUtils.isEmpty(name)){
+                sb.append("     and (md.inner_code like :code ");
+                sb.append("         or md.name like :name)");
+            }else
+                sb.append("     and md.inner_code like :code ");
+        }
+        else if (!StringUtils.isEmpty(name)){
+            sb.append("   and md.name like :name)");
+        }
+
         sb.append(makeOrder(orders));
         SQLQuery sqlQuery = session.createSQLQuery(sb.toString());
         if (!StringUtils.isEmpty(code))

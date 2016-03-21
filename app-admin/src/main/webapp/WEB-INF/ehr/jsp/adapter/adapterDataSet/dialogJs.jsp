@@ -11,7 +11,7 @@
         var adapterPlanId = parent.getAdapterPlanId();
         var parentId = parent.getParentId();
         var mode = '${mode}';
-        var info = JSON.parse('${info}');
+        var info = JSON.parse('${model}');
         var dictUrl = [
                 '/adapterDataSet/getStdMetaData',
                 '/adapterDataSet/getOrgDataSet',
@@ -66,7 +66,6 @@
                 dataModel.fetchRemote(url,{
                     data:data,
                     success: function(data) {
-                        debugger;
                         data = self.toJson(data.obj);
                         target.ligerComboBox({
                             selectBoxHeight:220,
@@ -77,7 +76,6 @@
                             onSelected : self.getSelectFunc(dictId),
                             cancelable:false
                         });
-                        debugger;
                         var manager = target.ligerGetComboBoxManager();
                         manager.selectValue(value);
                     }
