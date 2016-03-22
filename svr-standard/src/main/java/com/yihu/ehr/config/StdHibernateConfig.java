@@ -58,7 +58,7 @@ public class StdHibernateConfig extends HibernateConfig  {
         sessionFactory.setAnnotatedClasses(tableClass.toArray(new Class[tableClass.size()]));
         sessionFactory.setDataSource(dataSource);
         sessionFactory.getHibernateProperties().setProperty("hibernate.show_sql", "true");
-        sessionFactory.getHibernateProperties().setProperty("hibernate.format_sql", formatSQL);
+        sessionFactory.getHibernateProperties().setProperty("hibernate.format_sql", "true");
 
         String splitMark = System.getProperty("file.separator");
         String path = System.getProperty("user.home") +splitMark+ "ehr" + splitMark + "std" + splitMark;
