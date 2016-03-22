@@ -16,7 +16,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * Created by AndyCai on 2016/2/1.
  */
-@FeignClient(MicroServices.Security)
+@FeignClient(name=MicroServices.Security)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface SecurityClient {

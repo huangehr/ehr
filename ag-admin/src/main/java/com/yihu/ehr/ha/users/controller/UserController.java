@@ -79,6 +79,7 @@ public class UserController extends BaseController {
         SimpleDateFormat sdf = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss ");
         for (MUser mUser : mUsers) {
             UsersModel usersModel = convertToModel(mUser, UsersModel.class);
+            usersModel.setLastLoginTime(DateToString( mUser.getLastLoginTime(),"yyyy-MM-dd HH:mm:ss"));
             //获取用户类别字典
             if(StringUtils.isNotEmpty(mUser.getUserType())) {
                 MConventionalDict dict = conventionalDictClient.getUserType(mUser.getUserType());
@@ -173,12 +174,12 @@ public class UserController extends BaseController {
             }
 
             detailModel.setPassword(AgAdminConstants.DefaultPassword);
-            MUser mUser = convertToModel(detailModel, MUser.class);
+            MUser mUser = convertUserDetailModelToMUser(detailModel);
             mUser = userClient.createUser(objectMapper.writeValueAsString(mUser));
             if (mUser == null) {
                 return failed("保存失败!");
             }
-            detailModel = convertToModel(mUser, UserDetailModel.class);
+            detailModel = MUserToUserDetailModel(mUser);
             return success(detailModel);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -230,12 +231,12 @@ public class UserController extends BaseController {
                 return failed("邮箱已存在!");
             }
 
-            mUser = convertToModel(detailModel, MUser.class);
+            mUser = convertUserDetailModelToMUser(detailModel);
             mUser = userClient.updateUser(objectMapper.writeValueAsString(mUser));
             if (mUser == null) {
                 return failed("保存失败!");
             }
-            detailModel = convertToModel(mUser, UserDetailModel.class);
+            detailModel = MUserToUserDetailModel(mUser);
 
             return success(detailModel);
         }
@@ -448,6 +449,9 @@ public class UserController extends BaseController {
 
         UserDetailModel detailModel = convertToModel(mUser, UserDetailModel.class);
 
+        detailModel.setCreateDate(DateToString(mUser.getCreateDate(),"yyyy-MM-dd HH:mm:ss"));
+        detailModel.setLastLoginTime(DateToString(mUser.getLastLoginTime(),"yyyy-MM-dd HH:mm:ss"));
+
         //获取婚姻状态代码
         String marryCode = mUser.getMartialStatus();
         MConventionalDict dict=null;
@@ -484,46 +488,12 @@ public class UserController extends BaseController {
         return detailModel;
     }
 
+    public MUser convertUserDetailModelToMUser(UserDetailModel detailModel)
+    {
+        MUser mUser = convertToModel(detailModel,MUser.class);
+        mUser.setCreateDate(StringToDate(detailModel.getCreateDate(),"yyyy-MM-dd HH:mm:ss"));
+        mUser.setLastLoginTime(StringToDate(detailModel.getLastLoginTime(),"yyyy-MM-dd HH:mm:ss"));
 
-    /*@RequestMapping(value = "/users/upload/", method = RequestMethod.POST)
-    @ApiOperation(value = "", notes = "")
-    public String upload(
-            @ApiParam(name = "request")
-            @RequestParam(value = "request")HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try {
-            request.setCharacterEncoding("utf-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        //获取流
-        InputStream inputStream = request.getInputStream();
-        //获取文件名
-        String fileName = request.getParameter("name");
-        if (fileName == null || fileName.equals("")) {
-            return null;
-        }
-        //获取文件扩展名
-        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-        //获取文件名
-        String description = null;
-        if ((fileName != null) && (fileName.length() > 0)) {
-            int dot = fileName.lastIndexOf('.');
-            if ((dot > -1) && (dot < (fileName.length()))) {
-                description = fileName.substring(0, dot);
-            }
-        }
-        ObjectNode objectNode = null;
-        String path = null;
-        try {
-            FastDFSUtil fastDFSUtil = new FastDFSUtil();
-            objectNode = fastDFSUtil.upload(inputStream, fileExtension, description);
-            String groupName = objectNode.get("groupName").toString();
-            String remoteFileName = objectNode.get("remoteFileName").toString();
-            path = "{groupName:" + groupName + ",remoteFileName:" + remoteFileName + "}";
-        } catch (Exception e) {
-            //LogService.getLogger(user.class).error("用户头像上传失败；错误代码："+e);
-        }
-        return path;
-    }*/
-
+        return mUser;
+    }
 }
