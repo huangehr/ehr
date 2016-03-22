@@ -49,9 +49,6 @@ public class HibernateConfig {
     @Value("${data-source.remove-abandoned-timeout}")
     int removeAbandonedTimeout;
 
-    @Value("${hibernate.format-sql}")
-    String formatSQL;
-
     @Bean
     public BasicDataSource dataSource() throws SQLException {
         BasicDataSource basicDataSource = new BasicDataSource();

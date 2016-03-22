@@ -58,6 +58,11 @@ eureka:
     fetchRegistry: true
     serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@localhost:8761}/eureka/
 
+micro:
+  service:
+    adaption:
+      ip-address: "http://localhost:10140"
+
 ---
 spring:
   profiles: sand-home-dev
@@ -83,6 +88,10 @@ eureka:
     fetchRegistry: true
     serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
 
+micro:
+  service:
+    adaption:
+      ip-address: "http://localhost:10140"
 ---
 spring:
   profiles: test
@@ -106,6 +115,10 @@ eureka:
     fetchRegistry: true
     serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@172.19.103.73:8761}/eureka/
 
+micro:
+  service:
+    adaption:
+      ip-address: "http://172.19.103.73:10140"
 ---
 spring:
   profiles: prod
@@ -125,3 +138,9 @@ eureka:
     registerWithEureka: true
     fetchRegistry: true
     serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@11.1.2.21:8761}/eureka/
+
+
+micro:
+  service:
+    adaption:
+      ip-address: "http://11.1.2.21:10140"

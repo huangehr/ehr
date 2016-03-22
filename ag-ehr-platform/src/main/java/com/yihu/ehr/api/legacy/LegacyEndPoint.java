@@ -2,6 +2,7 @@ package com.yihu.ehr.api.legacy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.api.adaption.AdaptionsEndPoint;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.feign.*;
@@ -15,6 +16,7 @@ import com.yihu.ehr.util.encode.Base64;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
@@ -41,6 +43,9 @@ import java.util.regex.Pattern;
 @RestController
 @RequestMapping("/rest/v1.0")
 public class LegacyEndPoint {
+    @Value("${micro-service.adaption.ip-address}")
+    String adaptionIpAddress;
+
     @Autowired
     AdaptionsEndPoint adaptions;
 
@@ -354,7 +359,7 @@ public class LegacyEndPoint {
         conditionMap.add("package_crypto", packageCrypto);
         conditionMap.add("md5", md5);
         RestTemplate template = new RestTemplate();
-        template.postForObject("http://localhost:6010/api/v1.0/packages", conditionMap, String.class);
+        template.postForObject(adaptionIpAddress+ ApiVersion.Version1_0+"/packages", conditionMap, String.class);
         return new RestEcho().success().putMessage("ok");
     }
 
