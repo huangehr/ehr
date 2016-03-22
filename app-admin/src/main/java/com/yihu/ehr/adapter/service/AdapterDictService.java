@@ -16,9 +16,9 @@ public class AdapterDictService extends ExtendService<MAdapterDict> {
         init(
                 "",        //searchUrl
                 "/adapter/dict/entry/{id}",   //modelUrl
-                "/adapter/plan",        //addUrl
-                "/adapter/plan",        //modifyUrl
-                "/adapter/plans"        //deleteUrl
+                "/adapter/dict/entry",        //addUrl
+                "/adapter/dict/entry",        //modifyUrl
+                "/adapter/dict/entrys"        //deleteUrl
         );
     }
 

@@ -152,10 +152,15 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
         sb.append("        left join org_std_dictentry orgDE on ( orgDE.sequence = ad.org_dictentry and orgDE.organization='" + orgCode + "' ) ");
         sb.append("  where ad.plan_id = " + orgAdapterPlan.getId());
         sb.append("    and ad.std_dict = " + dictId);
-        if (!StringUtils.isEmpty(code))
-            sb.append("     and de.code like :code");
-        if (!StringUtils.isEmpty(name))
-            sb.append("     and de.name like :name");
+
+        if (!StringUtils.isEmpty(code)){
+            if (!StringUtils.isEmpty(name))
+                sb.append("     and (de.code like :code or de.value like :name)");
+            else
+                sb.append("     and de.code like :code ");
+        }else if (!StringUtils.isEmpty(name))
+            sb.append("     and de.value like :name");
+
         sb.append(makeOrder(orders));
         SQLQuery sqlQuery = session.createSQLQuery(sb.toString());
         if (!StringUtils.isEmpty(code))
@@ -197,13 +202,13 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
         StringBuilder sb = new StringBuilder();
         sb.append(" select count(*)    ");
         sb.append("   from adapter_dict ad     ");
-        sb.append("        left join " + deTableName + " on ad.std_dictentry = " + deTableName + ".id ");
+        sb.append("        left join " + deTableName + " de on ad.std_dictentry = de.id ");
         sb.append("  where ad.plan_id = " + orgAdapterPlan.getId());
         sb.append("    and ad.std_dict = " + dictId);
         if (!StringUtils.isEmpty(code))
-            sb.append("     and md.inner_code like :code");
+            sb.append("     and de.code like :code");
         if (!StringUtils.isEmpty(name))
-            sb.append("     and md.name like :name");
+            sb.append("     and de.value like :name");
         SQLQuery sqlQuery = session.createSQLQuery(sb.toString());
         if (!StringUtils.isEmpty(code))
             sqlQuery.setParameter("code", "%" + code + "%");

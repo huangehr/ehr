@@ -17,11 +17,11 @@
       var cfg = [
         {
           left:{title:'平台数据集', cls:'', search:'/adapterDataSet/dataSetList', goAdd:'', del:''},
-          right:{title:'数据元映射', cls:'', search:'/adapterDataSet/metaDataList', goAdd:'/adapterDataSet/gotoModify', del:'/adapterDataSet/delMetaData',delLs:'/adapterDataSet/delMetaData'}
+          right:{title:'数据元映射', cls:'', search:'/adapterDataSet/metaDataList', goAdd:'/adapterDataSet/gotoModify', del:'/adapterDataSet/delete',delLs:'/adapterDataSet/delete'}
         },
         {
           left:{title:'平台字典', cls:'', search:'/adapterDict/searchAdapterDict', goAdd:'', del:''},
-          right:{title:'字典项映射', cls:'', search:'/adapterDict/searchAdapterDictEntry', goAdd:'/adapterDict/template/adapterMetaDataInfo', del:'/adapterDict/delDictEntry',delLs:'/adapterDict/delDictEntry'}
+          right:{title:'字典项映射', cls:'', search:'/adapterDict/searchAdapterDictEntry', goAdd:'/adapterDict/gotoModify', del:'/adapterDict/delete',delLs:'/adapterDict/delete'}
         }
       ];
       /* *************************** 函数定义 ******************************* */
@@ -308,6 +308,7 @@
           });
 
           $.subscribe('grid:right:delete',function(event,ids) {
+            debugger
             if(!ids){
               var rows = entryMater.grid.getSelectedRows();
               if(rows.length==0){
@@ -324,7 +325,7 @@
               if(r){
                 var dataModel = $.DataModel.init();
                 dataModel.updateRemote('${contextRoot}'+cfg[cfgModel].right.delLs,{
-                  data:{id:ids},
+                  data:{ids:ids},
                   success:function(data){
                     if (data.successFlg) {
                       $.Notice.success('操作成功！');
