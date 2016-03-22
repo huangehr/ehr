@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Created by AndyCai on 2016/1/20.
  */
-@FeignClient(MicroServices.Geography)
+@FeignClient(name=MicroServices.Geography)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface AddressClient {

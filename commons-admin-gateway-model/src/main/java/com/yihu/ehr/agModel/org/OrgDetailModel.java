@@ -1,8 +1,5 @@
 package com.yihu.ehr.agModel.org;
 
-import java.util.Date;
-import java.util.HashSet;
-
 /**
  * Created by yww on 2016/2/22.
  */
@@ -18,7 +15,7 @@ public class OrgDetailModel{
     private String settledWayName;
     private int activityFlg;
     private String activityFlgName;
-    private Date createDate;
+    private String createDate;
     private String location;
     private String province;
     private String city;
@@ -122,11 +119,11 @@ public class OrgDetailModel{
         this.activityFlgName = activityFlgName;
     }
 
-    public Date getCreateDate() {
+    public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(String createDate) {
         this.createDate = createDate;
     }
 

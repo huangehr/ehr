@@ -2,8 +2,6 @@ package com.yihu.ehr.standard.stdsrc.controller;
 
 import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.standard.MStdSource;
 import com.yihu.ehr.standard.commons.ExtendController;
 import com.yihu.ehr.standard.stdsrc.service.StandardSource;
@@ -79,11 +77,8 @@ public class StandardSourceController extends ExtendController<MStdSource> {
         if (standardSource == null)
             throw errNotFound("标准来源", standardSourceModel.getId());
 
-        if (!standardSource.getCode().equals(standardSourceModel.getCode())
-                && stdSourceService.isSourceCodeExist(standardSourceModel.getCode()))
-            throw new ApiException(ErrorCode.RepeatCode, "代码重复！");
-
         standardSourceModel.setId(id);
+        standardSourceModel.setUpdateDate(new Date());
         return getModel(stdSourceService.save(standardSourceModel));
     }
 
@@ -122,7 +117,7 @@ public class StandardSourceController extends ExtendController<MStdSource> {
         return true;
     }
 
-    //@RequestMapping(value = RestApi.Standards.IsSourceCodeExist,method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Standards.IsSourceCodeExist,method = RequestMethod.GET)
     public boolean isCodeExist(@RequestParam(value="code")String code){
 
         return stdSourceService.isSourceCodeExist(code);

@@ -27,7 +27,6 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -76,9 +75,9 @@ public class UserController extends BaseController {
         ResponseEntity<List<MUser>> responseEntity = userClient.searchUsers(fields, filters, sorts, size, page);
         List<MUser> mUsers = responseEntity.getBody();
         List<UsersModel> usersModels = new ArrayList<>();
-        SimpleDateFormat sdf = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss ");
         for (MUser mUser : mUsers) {
             UsersModel usersModel = convertToModel(mUser, UsersModel.class);
+            usersModel.setLastLoginTime(DateToString( mUser.getLastLoginTime(),AgAdminConstants.DateTimeFormat));
             //获取用户类别字典
             if(StringUtils.isNotEmpty(mUser.getUserType())) {
                 MConventionalDict dict = conventionalDictClient.getUserType(mUser.getUserType());
@@ -106,20 +105,31 @@ public class UserController extends BaseController {
     @ApiOperation(value = "删除用户", notes = "根据用户id删除用户")
     public Envelop deleteUser(
             @ApiParam(name = "user_id", value = "用户编号", defaultValue = "")
-            @PathVariable(value = "user_id") String userId) throws Exception {
+            @PathVariable(value = "user_id") String userId) {
 
-        MKey userSecurity = securityClient.getUserSecurityByUserId(userId);
-        if (userSecurity != null) {
-            String userKeyId = securityClient.getUserKeyByUserId(userId);
-            securityClient.deleteSecurity(userSecurity.getId());
-            securityClient.deleteUserKey(userKeyId);
-        }
+//        MKey userSecurity = securityClient.getUserSecurityByUserId(userId);
+//        if (userSecurity != null) {
+//            String userKeyId = securityClient.getUserKeyByUserId(userId);
+//            securityClient.deleteSecurity(userSecurity.getId());
+//            securityClient.deleteUserKey(userKeyId);
+//        }
+        try {
+            // 删除用户秘钥信息
+            boolean _res = securityClient.deleteKeyByUserId(userId);
 
-        boolean result = userClient.deleteUser(userId);
-        if (!result) {
-            return failed("删除失败!");
+            if (!_res) {
+                return failed("删除失败!");
+            }
+
+            boolean result = userClient.deleteUser(userId);
+            if (!result) {
+                return failed("删除失败!");
+            }
+            return success(null);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
         }
-        return success(null);
     }
 
 
@@ -127,49 +137,52 @@ public class UserController extends BaseController {
     @ApiOperation(value = "创建用户", notes = "重新绑定用户信息")
     public Envelop createUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
+            @RequestParam(value = "user_json_data") String userJsonData) {
 
+        try {
+            UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
 
-        UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
+            String errorMsg = null;
+            if (StringUtils.isEmpty(detailModel.getLoginCode())) {
+                errorMsg += "账户不能为空";
+            }
+            if (StringUtils.isEmpty(detailModel.getRealName())) {
+                errorMsg += "姓名不能为空!";
+            }
+            if (StringUtils.isEmpty(detailModel.getIdCardNo())) {
+                errorMsg += "身份证号不能为空!";
+            }
+            if (StringUtils.isEmpty(detailModel.getEmail())) {
+                errorMsg += "邮箱不能为空!";
+            }
+            if (StringUtils.isEmpty(detailModel.getTelephone())) {
+                errorMsg += "电话号码不能为空!";
+            }
+            if (StringUtils.isNotEmpty(errorMsg)) {
+                return failed(errorMsg);
+            }
+            if (userClient.isUserNameExists(detailModel.getLoginCode())) {
+                return failed("账户已存在!");
+            }
+            if (userClient.isIdCardExists(detailModel.getIdCardNo())) {
+                return failed("身份证号已存在!");
+            }
+            if (userClient.isEmailExists(detailModel.getEmail())) {
+                return failed("邮箱已存在!");
+            }
 
-        String errorMsg = null;
-        if (StringUtils.isEmpty(detailModel.getLoginCode())) {
-            errorMsg += "账户不能为空";
+            detailModel.setPassword(AgAdminConstants.DefaultPassword);
+            MUser mUser = convertToMUser(detailModel);
+            mUser = userClient.createUser(objectMapper.writeValueAsString(mUser));
+            if (mUser == null) {
+                return failed("保存失败!");
+            }
+            detailModel = convertToUserDetailModel(mUser);
+            return success(detailModel);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
         }
-        if (StringUtils.isEmpty(detailModel.getRealName())) {
-            errorMsg += "姓名不能为空!";
-        }
-        if (StringUtils.isEmpty(detailModel.getIdCardNo())) {
-            errorMsg += "身份证号不能为空!";
-        }
-        if (StringUtils.isEmpty(detailModel.getEmail())) {
-            errorMsg += "邮箱不能为空!";
-        }
-        if (StringUtils.isEmpty(detailModel.getTelephone())) {
-            errorMsg += "电话号码不能为空!";
-        }
-        if (StringUtils.isNotEmpty(errorMsg)) {
-            return failed(errorMsg);
-        }
-        if (userClient.isUserNameExists(detailModel.getLoginCode())) {
-            return failed("账户已存在!");
-        }
-        if (userClient.isIdCardExists(detailModel.getIdCardNo())) {
-            return failed("身份证号已存在!");
-        }
-        if(userClient.isEmailExists(detailModel.getEmail()))
-        {
-            return failed("邮箱已存在!");
-        }
-
-        detailModel.setPassword( AgAdminConstants.DefaultPassword);
-        MUser mUser = convertToModel(detailModel, MUser.class);
-        mUser = userClient.createUser(objectMapper.writeValueAsString(mUser));
-        if (mUser == null) {
-            return failed("保存失败!");
-        }
-        detailModel = convertToModel(mUser, UserDetailModel.class);
-        return success(detailModel);
     }
 
 
@@ -177,54 +190,59 @@ public class UserController extends BaseController {
     @ApiOperation(value = "修改用户", notes = "重新绑定用户信息")
     public Envelop updateUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
+            @RequestParam(value = "user_json_data") String userJsonData) {
+        try {
+            UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
 
-        UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
+            String errorMsg = null;
+            if (StringUtils.isEmpty(detailModel.getLoginCode())) {
+                errorMsg += "账户不能为空";
+            }
+            if (StringUtils.isEmpty(detailModel.getRealName())) {
+                errorMsg += "姓名不能为空!";
+            }
+            if (StringUtils.isEmpty(detailModel.getIdCardNo())) {
+                errorMsg += "身份证号不能为空!";
+            }
+            if (StringUtils.isEmpty(detailModel.getEmail())) {
+                errorMsg += "邮箱不能为空!";
+            }
+            if (StringUtils.isEmpty(detailModel.getTelephone())) {
+                errorMsg += "电话号码不能为空!";
+            }
+            if (StringUtils.isNotEmpty(errorMsg)) {
+                return failed(errorMsg);
+            }
+            MUser mUser = userClient.getUser(detailModel.getId());
+            if (!mUser.getLoginCode().equals(detailModel.getLoginCode())
+                    && userClient.isUserNameExists(detailModel.getLoginCode())) {
+                return failed("账户已存在!");
+            }
 
-        String errorMsg = null;
-        if (StringUtils.isEmpty(detailModel.getLoginCode())) {
-            errorMsg += "账户不能为空";
-        }
-        if (StringUtils.isEmpty(detailModel.getRealName())) {
-            errorMsg += "姓名不能为空!";
-        }
-        if (StringUtils.isEmpty(detailModel.getIdCardNo())) {
-            errorMsg += "身份证号不能为空!";
-        }
-        if (StringUtils.isEmpty(detailModel.getEmail())) {
-            errorMsg += "邮箱不能为空!";
-        }
-        if (StringUtils.isEmpty(detailModel.getTelephone())) {
-            errorMsg += "电话号码不能为空!";
-        }
-        if (StringUtils.isNotEmpty(errorMsg)) {
-            return failed(errorMsg);
-        }
-        MUser mUser = userClient.getUser(detailModel.getId());
-        if (!mUser.getLoginCode().equals(detailModel.getLoginCode())
-                && userClient.isUserNameExists(detailModel.getLoginCode())) {
-            return failed("账户已存在!");
-        }
+            if (!mUser.getIdCardNo().equals(detailModel.getIdCardNo())
+                    && userClient.isIdCardExists(detailModel.getIdCardNo())) {
+                return failed("身份证号已存在!");
+            }
 
-        if (!mUser.getIdCardNo().equals(detailModel.getIdCardNo())
-                && userClient.isIdCardExists(detailModel.getIdCardNo())) {
-            return failed("身份证号已存在!");
-        }
+            if (!mUser.getEmail().equals(detailModel.getEmail())
+                    && userClient.isEmailExists(detailModel.getEmail())) {
+                return failed("邮箱已存在!");
+            }
 
-        if(!mUser.getEmail().equals(detailModel.getEmail())
-                && userClient.isEmailExists(detailModel.getEmail()))
+            mUser = convertToMUser(detailModel);
+            mUser = userClient.updateUser(objectMapper.writeValueAsString(mUser));
+            if (mUser == null) {
+                return failed("保存失败!");
+            }
+            detailModel = convertToUserDetailModel(mUser);
+
+            return success(detailModel);
+        }
+        catch (Exception ex)
         {
-            return failed("邮箱已存在!");
+            ex.printStackTrace();
+            return failedSystem();
         }
-
-        mUser = convertToModel(detailModel, MUser.class);
-        mUser = userClient.updateUser(objectMapper.writeValueAsString(mUser));
-        if (mUser == null) {
-            return failed("保存失败!");
-        }
-        detailModel = convertToModel(mUser, UserDetailModel.class);
-
-        return success(detailModel);
     }
 
 
@@ -239,7 +257,7 @@ public class UserController extends BaseController {
             if (mUser == null) {
                 return failed("用户信息获取失败!");
             }
-            UserDetailModel detailModel = MUserToUserDetailModel(mUser);
+            UserDetailModel detailModel = convertToUserDetailModel(mUser);
 
             return success(detailModel);
         }
@@ -257,8 +275,15 @@ public class UserController extends BaseController {
             @ApiParam(name = "user_id", value = "id", defaultValue = "")
             @PathVariable(value = "user_id") String userId,
             @ApiParam(name = "activity", value = "激活状态", defaultValue = "")
-            @RequestParam(value = "activity") boolean activity) throws Exception {
-        return userClient.activityUser(userId, activity);
+            @RequestParam(value = "activity") boolean activity) {
+        try {
+            return userClient.activityUser(userId, activity);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return false;
+        }
     }
 
 
@@ -266,9 +291,15 @@ public class UserController extends BaseController {
     @ApiOperation(value = "重设密码", notes = "用户忘记密码管理员帮助重新还原密码，初始密码123456")
     public boolean resetPass(
             @ApiParam(name = "user_id", value = "id", defaultValue = "")
-            @PathVariable(value = "user_id") String userId) throws Exception {
-
-        return userClient.resetPass(userId);
+            @PathVariable(value = "user_id") String userId) {
+        try {
+            return userClient.resetPass(userId);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return false;
+        }
     }
 
 
@@ -279,8 +310,14 @@ public class UserController extends BaseController {
             @PathVariable(value = "user_id") String userId,
             @ApiParam(name = "type", value = "", defaultValue = "")
             @RequestParam(value = "type") String type) {
-
-        return userClient.unBinding(userId, type);
+        try {
+            return userClient.unBinding(userId, type);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return false;
+        }
     }
 
     /**
@@ -294,11 +331,18 @@ public class UserController extends BaseController {
     public Map<String, String> distributeKey(
             @ApiParam(name = "login_code", value = "登录帐号", defaultValue = "")
             @PathVariable(value = "login_code") String userName) {
-        MUser mUser = userClient.getUserByUserName(userName);
-        if (mUser == null) {
+        try {
+            MUser mUser = userClient.getUserByUserName(userName);
+            if (mUser == null) {
+                return null;
+            }
+            return userClient.distributeKey(mUser.getId());
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
             return null;
         }
-        return userClient.distributeKey(mUser.getId());
     }
 
 
@@ -315,14 +359,20 @@ public class UserController extends BaseController {
             @PathVariable(value = "login_code") String userName,
             @ApiParam(name = "psw", value = "密码", defaultValue = "")
             @RequestParam(value = "psw") String psw) {
+        try {
+            MUser mUser = userClient.getUserByNameAndPassword(userName, psw);
+            if (mUser == null) {
+                return failed("用户信息获取失败!");
+            }
+            UserDetailModel detailModel = convertToUserDetailModel(mUser);
 
-        MUser mUser = userClient.getUserByNameAndPassword(userName, psw);
-        if (mUser == null) {
-            return failed("用户信息获取失败!");
+            return success(detailModel);
         }
-        UserDetailModel detailModel = MUserToUserDetailModel(mUser);
-
-        return success(detailModel);
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
     }
 
     /**
@@ -336,15 +386,21 @@ public class UserController extends BaseController {
     public Envelop getUserByLoginCode(
             @ApiParam(name = "login_code", value = "登录账号", defaultValue = "")
             @PathVariable(value = "login_code") String userName) {
+        try {
+            MUser mUser = userClient.getUserByUserName(userName);
+            if (mUser == null) {
+                return failed("用户信息获取失败!");
+            }
 
-        MUser mUser = userClient.getUserByUserName(userName);
-        if (mUser == null) {
-            return failed("用户信息获取失败!");
+            UserDetailModel detailModel = convertToUserDetailModel(mUser);
+
+            return success(detailModel);
         }
-
-        UserDetailModel detailModel = MUserToUserDetailModel(mUser);
-
-        return success(detailModel);
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
     }
 
     @RequestMapping(value = "/users/existence", method = RequestMethod.GET)
@@ -354,24 +410,29 @@ public class UserController extends BaseController {
             @RequestParam(value = "existenceType") String existenceType,
             @ApiParam(name = "existenceNm",value = "", defaultValue = "")
             @RequestParam(value = "existenceNm") String existenceNm) {
-        Envelop envelop = new Envelop();
-        boolean bo=false;
+        try {
+            Envelop envelop = new Envelop();
+            boolean bo = false;
+            switch (existenceType) {
+                case "login_code":
+                    bo = userClient.isUserNameExists(existenceNm);
+                    break;
+                case "id_card_no":
+                    bo = userClient.isIdCardExists(existenceNm);
+                    break;
+                case "email":
+                    bo = userClient.isEmailExists(existenceNm);
+                    break;
+            }
+            envelop.setSuccessFlg(bo);
 
-        switch (existenceType)
-        {
-            case "login_code":
-                bo = userClient.isUserNameExists(existenceNm);
-                break;
-            case "id_card_no":
-                bo = userClient.isIdCardExists(existenceNm);
-                break;
-            case "email":
-                bo = userClient.isEmailExists(existenceNm);
-                break;
+            return envelop;
         }
-        envelop.setSuccessFlg(bo);
-
-        return envelop;
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
 
     }
 
@@ -382,9 +443,15 @@ public class UserController extends BaseController {
      * @param mUser
      * @return UserDetailModel
      */
-    public UserDetailModel MUserToUserDetailModel(MUser mUser) {
-
+    public UserDetailModel convertToUserDetailModel(MUser mUser) {
+        if(mUser==null)
+        {
+            return null;
+        }
         UserDetailModel detailModel = convertToModel(mUser, UserDetailModel.class);
+
+        detailModel.setCreateDate(DateToString(mUser.getCreateDate(),AgAdminConstants.DateTimeFormat));
+        detailModel.setLastLoginTime(DateToString(mUser.getLastLoginTime(),AgAdminConstants.DateTimeFormat));
 
         //获取婚姻状态代码
         String marryCode = mUser.getMartialStatus();
@@ -411,7 +478,7 @@ public class UserController extends BaseController {
             }
         }
         //获取秘钥信息
-        MKey userSecurity = securityClient.getUserSecurityByUserId(mUser.getId());
+        MKey userSecurity = securityClient.getUserKey(mUser.getId());
         if (userSecurity != null) {
             detailModel.setPublicKey(userSecurity.getPublicKey());
             String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT)
@@ -422,46 +489,16 @@ public class UserController extends BaseController {
         return detailModel;
     }
 
-
-    /*@RequestMapping(value = "/users/upload/", method = RequestMethod.POST)
-    @ApiOperation(value = "", notes = "")
-    public String upload(
-            @ApiParam(name = "request")
-            @RequestParam(value = "request")HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try {
-            request.setCharacterEncoding("utf-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        //获取流
-        InputStream inputStream = request.getInputStream();
-        //获取文件名
-        String fileName = request.getParameter("name");
-        if (fileName == null || fileName.equals("")) {
+    public MUser convertToMUser(UserDetailModel detailModel)
+    {
+        if(detailModel==null)
+        {
             return null;
         }
-        //获取文件扩展名
-        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-        //获取文件名
-        String description = null;
-        if ((fileName != null) && (fileName.length() > 0)) {
-            int dot = fileName.lastIndexOf('.');
-            if ((dot > -1) && (dot < (fileName.length()))) {
-                description = fileName.substring(0, dot);
-            }
-        }
-        ObjectNode objectNode = null;
-        String path = null;
-        try {
-            FastDFSUtil fastDFSUtil = new FastDFSUtil();
-            objectNode = fastDFSUtil.upload(inputStream, fileExtension, description);
-            String groupName = objectNode.get("groupName").toString();
-            String remoteFileName = objectNode.get("remoteFileName").toString();
-            path = "{groupName:" + groupName + ",remoteFileName:" + remoteFileName + "}";
-        } catch (Exception e) {
-            //LogService.getLogger(user.class).error("用户头像上传失败；错误代码："+e);
-        }
-        return path;
-    }*/
+        MUser mUser = convertToModel(detailModel,MUser.class);
+        mUser.setCreateDate(StringToDate(detailModel.getCreateDate(),AgAdminConstants.DateTimeFormat));
+        mUser.setLastLoginTime(StringToDate(detailModel.getLastLoginTime(),AgAdminConstants.DateTimeFormat));
 
+        return mUser;
+    }
 }

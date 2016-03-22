@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * Created by AndyCai on 2016/2/1.
  */
-@FeignClient(MicroServices.Dictionary)
+@FeignClient(name=MicroServices.Dictionary)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface SystemDictClient {
@@ -65,7 +65,7 @@ public interface SystemDictClient {
             @PathVariable(value = "id") long id);
 
     @ApiOperation(value = "获取字典项列表")
-    @RequestMapping(value = "/dictionaries/{id}/entries", method = RequestMethod.GET)
+    @RequestMapping(value = "/dictionaries/entries", method = RequestMethod.GET)
     ResponseEntity<List<MDictionaryEntry>> getDictEntries(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,

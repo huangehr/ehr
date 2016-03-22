@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 import com.yihu.ehr.agModel.org.OrgDetailModel;
 import com.yihu.ehr.ha.organization.controller.OrganizationController;
-import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.util.Envelop;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -15,6 +14,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import static org.junit.Assert.assertNotEquals;
 
 
@@ -68,12 +68,11 @@ public class OrganizationControllerTests {
 
         String orgCreateJson = objectMapper.writeValueAsString(orgDetailModel);
         String addrCreateJson = objectMapper.writeValueAsString(addrCreate);
-        envelop = orgController.update(orgCreateJson, addrCreateJson);
+        envelop = orgController.create(orgCreateJson, addrCreateJson);
         assertNotEquals("机构新增失败！", envelop.isSuccessFlg(), false);
 
         // 新创建的orgDetailModel对象，用于下面的操作
-        MOrganization mOrg = (MOrganization) envelop.getObj();
-        OrgDetailModel orgNew = orgController.changeToOrgDetailModel(mOrg);
+        OrgDetailModel orgNew = (OrgDetailModel) envelop.getObj();
 
         //修改刚新建的机构 ----------------------2ok
         GeographyModel addrUpdate = new GeographyModel();
@@ -97,10 +96,9 @@ public class OrganizationControllerTests {
         String fields = "";
         String filters = "";
         String sorts = "";
-        String address = "";
         int size = 2;
         int page = 1;
-        envelop = orgController.searchOrgs(fields,filters,sorts,address,size,page);
+        envelop = orgController.searchOrgs(fields,filters,sorts,size,page);
         assertNotEquals("机构列表数据获取失败！", envelop.isSuccessFlg(), false);
 
         //根据机构的code查询机构------------------------4ok

@@ -14,6 +14,7 @@ import com.yihu.ehr.ha.adapter.utils.ExtendController;
 import com.yihu.ehr.ha.std.service.DataSetClient;
 import com.yihu.ehr.model.adaption.*;
 import com.yihu.ehr.model.standard.MStdDataSet;
+import com.yihu.ehr.model.standard.MStdDictEntry;
 import com.yihu.ehr.model.standard.MStdMetaData;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.validate.ValidateResult;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -139,7 +141,7 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
 
             AdapterDataSetDetailModel detailModel = convertToModel(dataModel,AdapterDataSetDetailModel.class);
 
-            MAdapterDataSet mAdapterDataSet = adapterDataSetClient.updateAdapterMetaData(detailModel.getId(),objectMapper.writeValueAsString(detailModel));
+            MAdapterDataSet mAdapterDataSet = adapterDataSetClient.updateAdapterMetaData(detailModel.getId(), URLEncoder.encode(objectMapper.writeValueAsString(detailModel), "UTF-8"));
             if (mAdapterDataSet == null) {
                 return failed("保存失败!");
             }
@@ -202,6 +204,66 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
             return failedSystem();
         }
     }
+
+    /**
+     * 标准字典项的下拉
+     * @return
+     */
+    @RequestMapping("/std_meta_data/combo")
+    @ResponseBody
+    public Envelop getStdDictEntry(
+            @ApiParam(name = "plan_id", value = "方案编号")
+            @RequestParam(value = "plan_id") Long planId,
+            @ApiParam(name = "data_set_id", value = "字典编号")
+            @RequestParam(value = "data_set_id") Long dataSetId,
+            @ApiParam(name = "mode", value = "编辑模式： modify、new")
+            @RequestParam(value = "mode") String mode){
+
+        Envelop result = new Envelop();
+        try {
+
+            MAdapterPlan orgAdapterPlan = planClient.getAdapterPlanById(planId);
+            String version = orgAdapterPlan.getVersion();
+            ResponseEntity<Collection<MStdMetaData>> metaDataRs = dataSetClient.searchMetaDatas("", "dataSetId=" + dataSetId, "", 10000, 1, version);
+
+            List<String> dictEntries = new ArrayList<>();
+            Collection<MStdMetaData> metaDataList = metaDataRs.getBody();
+            if (!metaDataList.isEmpty()){
+                if("modify".equals(mode) || "view".equals(mode)){
+                    for (MStdMetaData metaData : metaDataList) {
+                        dictEntries.add(String.valueOf(metaData.getId())+','+metaData.getName());
+                    }
+                }
+                else{
+                    ResponseEntity<Collection<MAdapterDataVo>> adapterDataSetModelRs = adapterDataSetClient.searchAdapterMetaData(planId, dataSetId, "", "", "", 10000, 1);
+                    Collection<MAdapterDataVo> adapterDataSetModels = adapterDataSetModelRs.getBody();
+                    boolean exist = false;
+                    for (MStdMetaData metaData : metaDataList) {
+                        exist = false;
+                        for(MAdapterDataVo model : adapterDataSetModels){
+                            if(metaData.getId()==model.getMetaDataId()){
+                                exist = true;
+                                break;
+                            }
+                        }
+                        if(!exist)
+                            dictEntries.add(String.valueOf(metaData.getId())+','+metaData.getName());
+                    }
+                }
+
+                result.setSuccessFlg(true);
+            } else {
+                result.setSuccessFlg(false);
+            }
+            result.setObj(dictEntries);
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setErrorMsg(e.getMessage());
+            return result;
+        }
+    }
+
 
     public AdapterDataSetModel convertAdapterDataSetModel(MAdapterDataSet mAdapterDataSet){
 

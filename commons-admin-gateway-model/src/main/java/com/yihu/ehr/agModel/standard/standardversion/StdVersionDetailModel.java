@@ -1,13 +1,11 @@
 package com.yihu.ehr.agModel.standard.standardversion;
 
-import java.util.Date;
-
 /**
  * Created by yww on 2016/3/2.
  */
 public class StdVersionDetailModel {
     private String author;
-    private Date commitTime;
+    private String commitTime;
     private boolean isInStage;
     private String stageName;
     private String version;
@@ -23,11 +21,11 @@ public class StdVersionDetailModel {
         this.author = author;
     }
 
-    public Date getCommitTime() {
+    public String getCommitTime() {
         return commitTime;
     }
 
-    public void setCommitTime(Date commitTime) {
+    public void setCommitTime(String commitTime) {
         this.commitTime = commitTime;
     }
 

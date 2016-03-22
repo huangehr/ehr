@@ -1,7 +1,5 @@
 package com.yihu.ehr.agModel.security;
 
-import java.util.Date;
-
 public class UserSecurityModel{
 
 	private String id;
@@ -10,9 +8,9 @@ public class UserSecurityModel{
 
 	private String publicKey;
 
-	private Date fromDate;
+	private String fromDate;
 
-	private Date expiryDate;
+	private String expiryDate;
 
 	private Integer valid;
 
@@ -41,19 +39,19 @@ public class UserSecurityModel{
 		this.publicKey = publicKey;
 	}
 
-	public Date getFromDate() {
+	public String getFromDate() {
 		return fromDate;
 	}
 
-	public void setFromDate(Date fromDate) {
+	public void setFromDate(String fromDate) {
 		this.fromDate = fromDate;
 	}
 
-	public Date getExpiryDate() {
+	public String getExpiryDate() {
 		return expiryDate;
 	}
 
-	public void setExpiryDate(Date expiryDate) {
+	public void setExpiryDate(String expiryDate) {
 		this.expiryDate = expiryDate;
 	}
 

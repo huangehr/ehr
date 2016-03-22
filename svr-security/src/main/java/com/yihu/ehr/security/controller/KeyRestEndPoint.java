@@ -7,7 +7,6 @@ import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.security.feign.AppClient;
 import com.yihu.ehr.security.feign.UserClient;
 import com.yihu.ehr.security.service.*;
-import com.yihu.ehr.security.service.Key;
 import com.yihu.ehr.util.DateUtil;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.encrypt.RSA;
@@ -18,9 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URLDecoder;
-import java.security.*;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -144,6 +143,18 @@ public class KeyRestEndPoint extends BaseRestController {
         return map;
     }
 
+    @RequestMapping(value = RestApi.Securities.deleteUserKey, method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据id删除Key")
+    public boolean deleteKeyByUserId(
+            @ApiParam(name = "user_id", value = "user_id")
+            @PathVariable(value = "user_id") String userId) throws Exception{
+
+        List<KeyMap> keyMaps =  keyManager.getKeyMapByUserId(userId);
+        keyManager.deleteKey(keyMaps);
+        return true;
+    }
+
+
     @RequestMapping(value = RestApi.Securities.OrganizationKey, method = RequestMethod.GET)
     @ApiOperation(value = "获取机构Key", produces = "application/json", notes = "公-私钥用于与健康档案平台加密传输数据使用")
     public MKey getOrgKey(
@@ -170,14 +181,14 @@ public class KeyRestEndPoint extends BaseRestController {
         return keyManager.getOrgKey(orgCode);
     }
 
-    @RequestMapping(value = RestApi.Securities.Keys, method = RequestMethod.DELETE)
+    @RequestMapping(value = RestApi.Securities.deleteOrgKey, method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除Key")
-    public boolean deleteKey(
-            @ApiParam(name = "id", value = "security代码")
-            @PathVariable(value = "id") String id) {
-        keyManager.deleteKey(id);
-        keyManager.deleteKeyMap(id);
+    public boolean deleteKeyByOrgCode(
+            @ApiParam(name = "org_code", value = "org_code")
+            @PathVariable(value = "org_code") String orgCode) {
 
+        List<KeyMap> keyMaps =  keyManager.getKeyMapByOrgCode(orgCode);
+        keyManager.deleteKey(keyMaps);
         return true;
     }
 

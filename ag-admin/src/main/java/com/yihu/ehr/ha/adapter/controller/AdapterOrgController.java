@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.thirdpartystandard.AdapterOrgDetailModel;
 import com.yihu.ehr.agModel.thirdpartystandard.AdapterOrgModel;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.ha.adapter.service.AdapterOrgClient;
 import com.yihu.ehr.ha.organization.service.OrganizationClient;
@@ -55,7 +54,7 @@ public class AdapterOrgController extends BaseController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page){
+            @RequestParam(value = "page", required = false) int page) {
 
         try {
             ResponseEntity<Collection<MAdapterOrg>> responseEntity = adapterOrgClient.searchAdapterOrg(fields, filters, sorts, size, page);
@@ -63,34 +62,28 @@ public class AdapterOrgController extends BaseController {
 
             List<AdapterOrgModel> adapterOrgModels = new ArrayList<>();
 
-            for (MAdapterOrg mAdapterOrg : mAdapterOrgs)
-            {
-                AdapterOrgModel adapterOrgModel = convertToModel(mAdapterOrg,AdapterOrgModel.class);
+            for (MAdapterOrg mAdapterOrg : mAdapterOrgs) {
+                AdapterOrgModel adapterOrgModel = convertToModel(mAdapterOrg, AdapterOrgModel.class);
                 String type = adapterOrgModel.getType();
-                if(StringUtils.isNotEmpty(type))
-                {
+                if (StringUtils.isNotEmpty(type)) {
                     MConventionalDict dict = dictEntryClient.getAdapterType(type);
-                    adapterOrgModel.setTypeValue(dict==null?"":dict.getValue());
+                    adapterOrgModel.setTypeValue(dict == null ? "" : dict.getValue());
                 }
                 String orgCode = adapterOrgModel.getCode();
-                if(StringUtils.isNotEmpty(orgCode))
-                {
+                if (StringUtils.isNotEmpty(orgCode)) {
                     MOrganization mOrganization = organizationClient.getOrg(orgCode);
-                    adapterOrgModel.setOrgValue(mAdapterOrg==null?"":mOrganization.getFullName());
+                    adapterOrgModel.setOrgValue(mAdapterOrg == null ? "" : mOrganization.getFullName());
                 }
                 String parentId = adapterOrgModel.getParent();
-                if(StringUtils.isNotEmpty(parentId))
-                {
+                if (StringUtils.isNotEmpty(parentId)) {
                     MAdapterOrg adapterOrg = adapterOrgClient.getAdapterOrg(parentId);
-                    adapterOrgModel.setParentValue(adapterOrg==null?"":adapterOrg.getName());
+                    adapterOrgModel.setParentValue(adapterOrg == null ? "" : adapterOrg.getName());
                 }
                 adapterOrgModels.add(adapterOrgModel);
             }
 
             return getResult(adapterOrgModels, getTotalCount(responseEntity), page, size);
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             return failedSystem();
         }
     }
@@ -135,8 +128,7 @@ public class AdapterOrgController extends BaseController {
                 return failed(errorMsg);
             }
 
-            if(adapterOrgClient.isExistAdapterOrg(detailModel.getCode()))
-            {
+            if (adapterOrgClient.isExistAdapterOrg(detailModel.getCode())) {
                 return failed("该机构已存在采集标准！");
             }
 
@@ -145,8 +137,7 @@ public class AdapterOrgController extends BaseController {
             if (mAdapterOrg == null) {
                 return failed("新增失败!");
             }
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return failedSystem();
         }
@@ -189,17 +180,17 @@ public class AdapterOrgController extends BaseController {
     @ApiOperation(value = "删除采集标准")
     public Envelop delAdapterOrg(
             @ApiParam(name = "codes", value = "代码", defaultValue = "")
-            @PathVariable(value = "codes") String codes) {
+            @RequestParam(value = "codes") String codes) {
         try {
+            codes = trimEnd(codes, ",");
+            if (StringUtils.isEmpty(codes)) {
+                return failed("请选择需要删除的内容!");
+            }
             boolean result = adapterOrgClient.delAdapterOrg(codes);
             if (!result) {
                 return failed("删除失败!");
             }
-        } catch (ApiException ex) {
-            ex.printStackTrace();
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return failedSystem();
         }
@@ -216,26 +207,22 @@ public class AdapterOrgController extends BaseController {
         return adapterOrgClient.orgIsExistData(orgCode);
     }
 
-    public AdapterOrgDetailModel convertAdapterOrgDetailModel(MAdapterOrg mAdapterOrg)
-    {
-        AdapterOrgDetailModel detailModel = convertToModel(mAdapterOrg,AdapterOrgDetailModel.class);
+    public AdapterOrgDetailModel convertAdapterOrgDetailModel(MAdapterOrg mAdapterOrg) {
+        AdapterOrgDetailModel detailModel = convertToModel(mAdapterOrg, AdapterOrgDetailModel.class);
         String type = detailModel.getType();
-        if(StringUtils.isNotEmpty(type))
-        {
+        if (StringUtils.isNotEmpty(type)) {
             MConventionalDict dict = dictEntryClient.getAdapterType(type);
-            detailModel.setTypeValue(dict==null?"":dict.getValue());
+            detailModel.setTypeValue(dict == null ? "" : dict.getValue());
         }
         String orgCode = detailModel.getCode();
-        if(StringUtils.isNotEmpty(orgCode))
-        {
+        if (StringUtils.isNotEmpty(orgCode)) {
             MOrganization mOrganization = organizationClient.getOrg(orgCode);
-            detailModel.setOrgValue(mAdapterOrg==null?"":mOrganization.getFullName());
+            detailModel.setOrgValue(mAdapterOrg == null ? "" : mOrganization.getFullName());
         }
         String parentId = detailModel.getParent();
-        if(StringUtils.isNotEmpty(parentId))
-        {
+        if (StringUtils.isNotEmpty(parentId)) {
             MAdapterOrg adapterOrg = adapterOrgClient.getAdapterOrg(parentId);
-            detailModel.setParentValue(adapterOrg==null?"":adapterOrg.getName());
+            detailModel.setParentValue(adapterOrg == null ? "" : adapterOrg.getName());
         }
 
         return detailModel;

@@ -38,6 +38,7 @@ public class RestApi {
 
     public static class Packages{
         public static final String Packages                 = "/packages";
+        public static final String LegacyPackages           = "/json_package";
         public static final String Package                  = "/packages/{id}";
         public static final String PackageDownloads         = "/packages/{id}/downloads";
     }
@@ -57,6 +58,8 @@ public class RestApi {
         public static final String ClientTokens             = "/securities/clients/{client_id}/tokens";
 
         public static final String Keys                     = "/securities/keys/{id}";
+        public static final String deleteOrgKey                ="/securities/org/keys/{org_code}";
+        public static final String deleteUserKey                ="/securities/user/keys/{user_id}";
         public static final String Tokens                   = "/securities/tokens/{id}";
     }
 
@@ -67,6 +70,7 @@ public class RestApi {
     public static class Standards{
         public static final String Sources                  = "/std/sources";
         public static final String Source                   = "/std/sources/{id}";
+        public static final String IsSourceCodeExist         ="/std/sources/code_is_exist";
 
         public static final String Types                    = "/std/types";
         public static final String Type                     = "/std/types/{id}";

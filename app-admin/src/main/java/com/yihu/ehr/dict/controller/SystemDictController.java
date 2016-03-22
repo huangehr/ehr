@@ -1,11 +1,14 @@
 package com.yihu.ehr.dict.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.dict.SystemDictEntryModel;
+import com.yihu.ehr.agModel.dict.SystemDictModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.RestAPI;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
+import com.yihu.ehr.util.controller.BaseUIController;
 import com.yihu.ehr.util.log.LogService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +28,7 @@ import java.util.Map;
 @RequestMapping("/dict")
 @Controller(RestAPI.SystemDictManagerController)
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
-public class SystemDictController {
+public class SystemDictController extends BaseUIController {
     @Value("${service-gateway.username}")
     private String username;
     @Value("${service-gateway.password}")
@@ -38,135 +42,103 @@ public class SystemDictController {
         return "pageView";
     }
 
-    @RequestMapping("createDict")
+    @RequestMapping("/createDict")
     @ResponseBody
     public Object createDict(String name, String reference, String userId) {
+
+        Map<String, Object> params = new HashMap<>();
         Envelop result = new Envelop();
+        String resultStr = "";
+
         if(StringUtils.isEmpty(name)){
             result.setSuccessFlg(false);
             result.setErrorMsg("字典名字不能为空");
             return result;
         }
+        SystemDictModel systemDictModel= new SystemDictModel();
+        systemDictModel.setName(name);
+        systemDictModel.setAuthorId("System");
+        params.put("dictionary",toJson(systemDictModel));
+
         try{
-            Map<String,Object> params = new HashMap();
-            params.put("name",name);
-            //TODO 缺少验证字典名唯一性api（原有）
-            String urlCheck = "/sys_dict/isExistDict*********";
-            String _msg = HttpClientUtil.doGet(comUrl+urlCheck,params,username,password);
-            if(Boolean.parseBoolean(_msg)){
+            String urlCheck = "/dictionaries/existence/"+ name;
+            Map<String, Object> paramsCheck = new HashMap<>();
+            paramsCheck.put("dict_name",name);
+            String resultCheckStr = HttpClientUtil.doGet(comUrl + urlCheck, paramsCheck, username, password);
+
+            if(Boolean.parseBoolean(resultCheckStr)){
                 result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.RepeatSysDictName.toString());
+                result.setErrorMsg("字典名字在系统中已存在。");
                 return result;
             }
-            String url = "/sys_dict/dictionaries";
-            params.put("reference",reference);
-            params.put("userId",userId);
-            String _rus = HttpClientUtil.doPost(comUrl+url,params,username,password);
-            if (StringUtils.isEmpty(_rus)) {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.InvalidCreateSysDict.toString());
-            } else {
-                result.setSuccessFlg(true);
-                //TODO 若不转化则需修改前端页面显示
-                result.setObj(_rus);
-            }
+
+            String url = "/dictionaries";
+            resultStr = HttpClientUtil.doPost(comUrl+url,params,username,password);
+            return resultStr;
+
         }catch (Exception ex){
             result.setSuccessFlg(false);
             LogService.getLogger(SystemDictController.class).error(ex.getMessage());
             result.setErrorMsg(ErrorCode.SystemError.toString());
-        }
-        return result;
 
-        /*XSystemDict systemDict = systemDictManager.createDict(name, reference, user);
-        if (systemDict == null) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.InvalidCreateSysDict.toString());
-            return result.toJson();
+            return result;
         }
-        result.setSuccessFlg(true);
-        result.setObj(systemDict);
-        return result.toJson();*/
     }
 
     @RequestMapping("deleteDict")
     @ResponseBody
     public Object deleteDict(long dictId) {
+
         Envelop result = new Envelop();
+        String resultStr = "";
+
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("dictId",dictId);
-            String urlCheckDict = "/sys_dict/dictionaries/{id}";
-            String _rusDict = HttpClientUtil.doGet(comUrl+urlCheckDict,params,username,password);
-            if(StringUtils.isEmpty(_rusDict)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.NotExistSysDict.toString());
-                return  result;
-            }
-            String url ="/sys_dict/dictionaries/{id}";
-            String _msg = HttpClientUtil.doDelete(comUrl + url, params, username, password);
-            if(Boolean.parseBoolean(_msg)){
-                result.setSuccessFlg(true);
-            }
+
+            String url ="/dictionaries/" + dictId;
+            resultStr = HttpClientUtil.doDelete(comUrl + url, params, username, password);
+            return resultStr;
+
         }catch (Exception ex){
             result.setSuccessFlg(false);
             LogService.getLogger(SystemDictController.class).error(ex.getMessage());
-            result.setErrorMsg(ErrorCode.SystemError.toString());        }
-        return result;
+            result.setErrorMsg(ErrorCode.SystemError.toString());
 
-        /*Result result = new Result();
-        XSystemDict systemDict = systemDictManager.getDict(dictId);
-        if (systemDict == null) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.NotExistSysDict.toString());
-            return result.toJson();
+            return result;
         }
-        try {
-            systemDictManager.deleteDict(dictId);
-            result.setSuccessFlg(true);
-            return result.toJson();
-        } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.InvalidDelSysDict.toString());
-            return result.toJson();
-        }*/
     }
 
     @RequestMapping("updateDict")
     @ResponseBody
     public Object updateDict(long dictId, String name) {
+
+        Map<String, Object> params = new HashMap<>();
         Envelop result = new Envelop();
-        if(StringUtils.isEmpty(name)){
+        String resultStr = "";
+
+        if(StringUtils.isEmpty(name)) {
             result.setSuccessFlg(false);
             result.setErrorMsg("字典名字不能为空！");
             return result;
         }
+
         try {
-            Map<String,Object> args = new HashMap<>();
-            args.put("name",name);
-            //TODO 缺少验证字典名唯一性api（原有）
-            String urlCheckName = "/sys_dict/isExistDict******";
-            String _msg = HttpClientUtil.doGet(comUrl + urlCheckName, args, username, password);
-            if(Boolean.parseBoolean(_msg)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.RepeatSysDictName.toString());
-            }
-            Map<String, Object> params = new HashMap<>();
-            params.put("dictId",dictId);
-            String urlCheckDict = "/sys_dict/dictionaries/{id}";
-            String _rusDict = HttpClientUtil.doGet(comUrl + urlCheckDict, params, username, password);
-            if(StringUtils.isEmpty(_rusDict)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.NotExistSysDict.toString());
-                return  result;
-            }
-            params.put("name",name);
-            String url = "/sys_dict/dictionaries/{id}";
-            String _rus = HttpClientUtil.doPut(comUrl + url, params, username, password);
-            if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.InvalidUpdateSysDict.toString());
-            }else{
-                result.setSuccessFlg(true);
+            String urlGetDict = "/dictionaries/" + dictId;
+            Map<String, Object> dictParams = new HashMap<>();
+            dictParams.put("id",dictId);
+            String dictResultStr = HttpClientUtil.doGet(comUrl + urlGetDict, dictParams, username, password);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            result = objectMapper.readValue(dictResultStr, Envelop.class);
+            if(result.isSuccessFlg()){
+                SystemDictModel systemDictModel = (SystemDictModel)result.getObj();
+                systemDictModel.setName(name);
+                params.put("dictionary",toJson(systemDictModel));
+
+                String urlCheckDict = "/dictionaries";
+                resultStr = HttpClientUtil.doPut(comUrl + urlCheckDict, params, username, password);
+                return resultStr;
             }
         }catch (Exception ex){
             LogService.getLogger(SystemDictController.class).error(ex.getMessage());
@@ -174,68 +146,49 @@ public class SystemDictController {
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
         return result;
-
-        /*Result result = new Result();
-        XSystemDict systemDict = systemDictManager.getDict(dictId);
-        if (systemDict == null) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.NotExistSysDict.toString());
-            return result.toJson();
-        }
-        try {
-            systemDict.setName(name);
-            systemDictManager.updateDict(systemDict);
-            result.setSuccessFlg(true);
-            return result.toJson();
-        } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.InvalidUpdateSysDict.toString());
-            return result.toJson();
-        }*/
     }
 
     @RequestMapping("searchSysDicts")
     @ResponseBody
     public Object searchSysDicts(String searchNm, Integer page, Integer rows) {
+
+        String resultStr = "";
         Envelop result = new Envelop();
-        String url ="/sys_dict/dictionaries";
+        Map<String, Object> params = new HashMap<>();
+
+        StringBuffer stringBuffer = new StringBuffer();
+        if (!StringUtils.isEmpty(searchNm)) {
+            stringBuffer.append("name?" + searchNm + " g1;phoneticCode?" + searchNm + " g1");
+        }
+        String filters = stringBuffer.toString();
+        params.put("filters", "");
+        if (!StringUtils.isEmpty(filters)) {
+            params.put("filters", filters);
+        }
+        params.put("page", page);
+        params.put("size", rows);
+
         try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("name",searchNm);
-            params.put("phoneticCode",searchNm);
-            params.put("page",page);
-            params.put("rows",rows);
-            String _rus = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.NotExistSysDict.toString());
-            }else{
-                return _rus;
-            }
+            String url ="/dictionaries";
+            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+            return resultStr;
         }catch (Exception ex){
             LogService.getLogger(SystemDictController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
+
+            return result;
         }
-        return result;
-
-
-
-       /* Map<String, Object> conditionMap = new HashMap<>();
-        conditionMap.put("name",searchNm);
-        conditionMap.put("phoneticCode", searchNm);
-        conditionMap.put("page", page);
-        conditionMap.put("rows", rows);
-        List<XSystemDict> systemDicts = systemDictManager.searchSysDicts(conditionMap);
-        Integer totalCount = systemDictManager.searchAppsInt(conditionMap);
-        Result result = getResult(systemDicts, totalCount, page, rows);
-        return result.toJson();*/
     }
 
     @RequestMapping("createDictEntry")
     @ResponseBody
     public Object createDictEntry(Long dictId, String code, String value, Integer sort, String catalog) {
+
+        Map<String, Object> params = new HashMap<>();
         Envelop result = new Envelop();
+        String resultStr = "";
+
         if(StringUtils.isEmpty(dictId)){
             result.setSuccessFlg(false);
             result.setErrorMsg("字典Id不能为空！");
@@ -251,135 +204,73 @@ public class SystemDictController {
             result.setErrorMsg("字典项值不能为空！");
             return result;
         }
+
+        SystemDictEntryModel dictEntryModel = new SystemDictEntryModel();
+        dictEntryModel.setDictId(dictId);
+        dictEntryModel.setCode(code);
+        dictEntryModel.setValue(value);
+        dictEntryModel.setSort(sort);
+        dictEntryModel.setCatalog(catalog);
+        params.put("entry",toJson(dictEntryModel));
+
         try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("dictId",dictId);
-            String urlCheckDict = "/sys_dict/dictionaries/{id}";
-            String _rusDict = HttpClientUtil.doGet(comUrl + urlCheckDict, params, username,password);
-            if(StringUtils.isEmpty(_rusDict)){
+            String urlCheck = "/dictionaries/existence/" + dictId + "/" + code;
+            Map<String, Object> paramsCheck = new HashMap<>();
+            paramsCheck.put("dict_id",dictId);
+            paramsCheck.put("code",code);
+            String resultCheckStr = HttpClientUtil.doGet(comUrl + urlCheck, paramsCheck, username, password);
+
+            if(Boolean.parseBoolean(resultCheckStr)){
                 result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.NotExistSysDict.toString());
-                return  result;
-            }
-            params.put("code",code);
-            String urlCheckCode = "/sys_dict/dictionaries/{id}/entries/{code}";
-            String _rusDictEntry = HttpClientUtil.doGet(comUrl+urlCheckCode,params,username,password);
-            if(StringUtils.isEmpty(_rusDictEntry)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.RepeatSysDictEntryName.toString());
+                result.setErrorMsg("代码在该字典中已存在。");
                 return result;
             }
-            params.put("value",value);
-            params.put("sort",sort);
-            params.put("catalog",catalog);
-            String url = "/sys_dict/dictionaries/{id}/entries";
-            String _rus = HttpClientUtil.doPost(comUrl + url, params, username, password);
-            if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.InvalidCreateSysDictEntry.toString());
-            }else{
-                result.setSuccessFlg(true);
-                //TODO 若不转化则需修改前端页面显示
-                result.setObj(_rus);
-            }
+
+            String url = "/dictionaries/entries";
+            resultStr = HttpClientUtil.doPost(comUrl+url,params,username,password);
+            return resultStr;
+
         }catch (Exception ex){
             result.setSuccessFlg(false);
             LogService.getLogger(SystemDictController.class).error(ex.getMessage());
             result.setErrorMsg(ErrorCode.SystemError.toString());
-        }
-        return result;
 
-        /*Result result = new Result();
-        XSystemDict systemDict = systemDictManager.getDict(dictId);
-        if (systemDict == null) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.NotExistSysDict.toString());
-            return result.toJson();
+            return result;
         }
-        if (systemDict.containEntry(code)) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.RepeatSysDictEntryName.toString());
-            return result.toJson();
-        }
-        int nextSort;
-        if (sort != null) {
-            nextSort = sort;
-        } else {
-            nextSort = systemDictManager.getNextSort(dictId);
-        }
-        XSystemDictEntry systemDictEntry = systemDict.insertEntry(code, value, nextSort, catalog);
-        if (systemDictEntry == null) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.InvalidCreateSysDictEntry.toString());
-            return result.toJson();
-        }
-        result.setSuccessFlg(true);
-        result.setObj(systemDictEntry);
-        return result.toJson();*/
     }
 
     @RequestMapping("deleteDictEntry")
     @ResponseBody
     public Object deleteDictEntry(long dictId, String code) {
+
         Envelop result = new Envelop();
-        if (StringUtils.isEmpty(code)){
-            result.setSuccessFlg(false);
-            result.setErrorMsg("字典项编码不能为空！");
-        }
+        String resultStr = "";
+        Map<String, Object> params = new HashMap<>();
+        params.put("id",dictId);
+        params.put("code",code);
+
+        String url = "/dictionaries/"+ dictId + "/entries/"+ code;
+
         try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("dictId",dictId);
-            params.put("code",code);
-            String urlCheckEntry = "/sys_dict/dictionaries/{id}/entries/{code}";
-            String _rusDictEntry = HttpClientUtil.doGet(comUrl+urlCheckEntry,params,username,password);
-            if(StringUtils.isEmpty(_rusDictEntry)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.InvalidSysDictEntry.toString());
-                return result;
-            }
-            String url = "/sys_dict/dictionaries/{id}/entries/{code}";
-            String _msg = HttpClientUtil.doDelete(comUrl + url, params, username, password);
-            if(Boolean.parseBoolean(_msg)){
-                result.setSuccessFlg(true);
-            }else{
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.DeleteDictEntryFailed.toString());
-            }
+            resultStr = HttpClientUtil.doDelete(comUrl+url,params,username,password);
+            return resultStr;
         }catch (Exception ex){
             LogService.getLogger(SystemDictController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-        }
-        return result;
 
-       /* Result result = new Result();
-        XSystemDict systemDict = systemDictManager.getDict(dictId);
-        if (systemDict == null) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.NotExistSysDict.toString());
-            return result.toJson();
+            return result;
         }
-        if (!systemDict.containEntry(code)) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.InvalidSysDictEntry.toString());
-            return result.toJson();
-        }
-        try {
-            systemDict.deleteEntry(code);
-            result.setSuccessFlg(true);
-            return result.toJson();
-        } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.InvalidDelSysDictEntry.toString());
-            return result.toJson();
-        }*/
-
     }
 
     @RequestMapping("updateDictEntry")
     @ResponseBody
     public Object updateDictEntry(Long dictId, String code, String value, Integer sort, String catalog) {
+
+        Map<String, Object> params = new HashMap<>();
         Envelop result = new Envelop();
+        String resultStr = "";
+
         if(StringUtils.isEmpty(dictId)){
             result.setSuccessFlg(false);
             result.setErrorMsg("字典id不能为空！");
@@ -390,20 +281,35 @@ public class SystemDictController {
             result.setErrorMsg("字典项编码code不能为空！");
             return result;
         }
-        String url = "/sys_dict/dictionaries/{id}/entries/{code}";
+
+        SystemDictEntryModel dictEntryModel = new SystemDictEntryModel();
+        dictEntryModel.setDictId(dictId);
+        dictEntryModel.setCode(code);
+        dictEntryModel.setValue(value);
+        dictEntryModel.setSort(sort);
+        dictEntryModel.setCatalog(catalog);
+        params.put("dictionary",toJson(dictEntryModel));
+
         try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("dictId",dictId);
-            params.put("code",code);
-            params.put("value",value);
-            params.put("sort",sort);
-            params.put("catalog",catalog);
-            String _rus = HttpClientUtil.doPut(comUrl + url, params, username, password);
-            if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.InvalidUpdateSysDictEntry.toString());
-            }else{
-                result.setSuccessFlg(true);
+            String deictEntryUrl = "/dictionaries/" + dictId + "/entries/" + code;
+            Map<String, Object> dictEntrpparams = new HashMap<>();
+            dictEntrpparams.put("id",dictId);
+            dictEntrpparams.put("code",code);
+            String dictEntryResultStr = HttpClientUtil.doGet(comUrl + deictEntryUrl, params, username, password);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            result = objectMapper.readValue(dictEntryResultStr, Envelop.class);
+            if(result.isSuccessFlg()){
+                SystemDictEntryModel systemDictEntryModel = (SystemDictEntryModel)result.getObj();
+                systemDictEntryModel.setCode(code);
+                systemDictEntryModel.setValue(value);
+                systemDictEntryModel.setSort(sort);
+                systemDictEntryModel.setCatalog(catalog);
+                params.put("entry",toJson(systemDictEntryModel));
+
+                String urlCheckDict = "/dictionaries/entries";
+                resultStr = HttpClientUtil.doPut(comUrl + urlCheckDict, params, username, password);
+                return resultStr;
             }
         }catch (Exception ex){
             LogService.getLogger(SystemDictController.class).error(ex.getMessage());
@@ -411,138 +317,114 @@ public class SystemDictController {
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
         return result;
-
-        /*Result result = new Result();
-        try {
-            XSystemDict systemDict = systemDictManager.getDict(dictId);
-            systemDict.setEntryValue(code, value, sort, catalog);
-            result.setSuccessFlg(true);
-            return result.toJson();
-        } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.InvalidUpdateSysDictEntry.toString());
-            return result.toJson();
-        }*/
     }
 
     @RequestMapping("searchDictEntryListForManage")
     @ResponseBody
     public Object searchDictEntryList(Long dictId, Integer page, Integer rows) {
+
+        String resultStr = "";
         Envelop result = new Envelop();
-        String url = "/admin/dictionaries/"+dictId+"/entries";
+        Map<String, Object> params = new HashMap<>();
+
+        StringBuffer stringBuffer = new StringBuffer();
+        if (!StringUtils.isEmpty(dictId)) {
+            stringBuffer.append("dictId=" + dictId);
+        }
+        String filters = stringBuffer.toString();
+        params.put("filters", "");
+        if (!StringUtils.isEmpty(filters)) {
+            params.put("filters", filters);
+        }
+        params.put("page", page);
+        params.put("size", rows);
+
         try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("dictId",dictId);
-            params.put("value","");
-            params.put("page",page);
-            params.put("rows",rows);
-            String _rus = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.InvalidSysDictEntry.toString());
-            }else{
-                result.setSuccessFlg(true);
-                return _rus;
-            }
+            String url ="/dictionaries/entries";
+            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+            return resultStr;
         }catch (Exception ex){
-            LogService.getLogger(SystemDictController.class).error(ex.getMessage());
+            LogService.getLogger(SystemDictEntryModel.class).error(ex.getMessage());
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
+
+            return result;
         }
-        return result;
-
-
-        /*Map<String, Object> conditionMap = new HashMap<>();
-        conditionMap.put("dictId", dictId);
-        conditionMap.put("page", page);
-        conditionMap.put("rows", rows);
-
-//        XSystemDict systemDict = systemDictManager.getDict(dictId);
-//        if(systemDict.getEntryList().length == 0){
-//            result.setSuccessFlg(true);
-//            return  result.toJson();
-//        }
-//        XSystemDictEntry[] systemDictEntrys = systemDict.getEntryList();
-        //List<XSystemDictEntry> systemDictEntryList = Arrays.asList(systemDictEntrys);
-        Map<String, Object> infoMap = null;
-        infoMap = systemDictManager.searchEntryList(conditionMap);
-        List<XSystemDictEntry> systemDictEntryList = (List<XSystemDictEntry>) infoMap.get("SystemDictEntry");
-        Integer totalCount = (Integer) infoMap.get("totalCount");
-        Result result = new Result();
-        result.setSuccessFlg(true);
-        result = getResult(systemDictEntryList, totalCount, page, rows);
-
-        return result.toJson();*/
     }
 
     @RequestMapping("selecttags")
     @ResponseBody
     public Object selectTags() {
+
+        String resultStr = "";
         Envelop result = new Envelop();
-        //TODO  无对应
-        String url = "/sys_dict/***********";
+        Map<String, Object> params = new HashMap<>();
+
         try {
-            String _tags = HttpClientUtil.doGet(comUrl + url,username, password);
-            if(StringUtils.isEmpty(_tags)){
-                result.setSuccessFlg(false);
-            }else{
-                result.setSuccessFlg(true);
-                //TODO 若不转化则需修改前端页面显示
-                result.setObj(_tags);
-            }
+            String url ="/dictionaries/tags";
+            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            result = objectMapper.readValue(resultStr, Envelop.class);
+            result.setObj(result.getDetailModelList());
+
+            return result;
         }catch (Exception ex){
             LogService.getLogger(SystemDictController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
+
+            return result;
         }
-        return result;
-
-       /* List<Tags> tags = abstractDictEntryManage.getTagsList();
-        Result result = new Result();
-        result.setObj(tags);
-        return result.toJson();*/
-
     }
 
     @RequestMapping("searchDictEntryList")
     @ResponseBody
     public Object searchDictEntryListForDDL(Long dictId, Integer page, Integer rows) {
+
+        String resultStr = "";
         Envelop result = new Envelop();
-        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> params = new HashMap<>();
+
+        StringBuffer stringBuffer = new StringBuffer();
+        if (!StringUtils.isEmpty(dictId)) {
+            stringBuffer.append("dictId=" + dictId);
+        }
+        String filters = stringBuffer.toString();
+        params.put("filters", "");
+        if (!StringUtils.isEmpty(filters)) {
+            params.put("filters", filters);
+        }
+        params.put("page", page);
+        params.put("size", rows);
 
         try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("dictId",dictId);
-            params.put("value","");
-            params.put("page",1);
-            params.put("size",15);
-            String urlCheckDict = "/dictionaries/"+dictId+"/entries";
-            String _rusDict = HttpClientUtil.doGet(comUrl+urlCheckDict,params,username,password);
-            result = mapper.readValue(_rusDict,Envelop.class);
-            if(!StringUtils.isEmpty(result)){
-                result.setSuccessFlg(true);
-            }else{
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.NotExistSysDict.toString());
-            }
+            String url ="/dictionaries/entries";
+            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+            return resultStr;
         }catch (Exception ex){
-            LogService.getLogger(SystemDictController.class).error(ex.getMessage());
+            LogService.getLogger(SystemDictEntryModel.class).error(ex.getMessage());
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-        }
-        return result;
 
+            return result;
+        }
     }
+
     @RequestMapping("validator")
     @ResponseBody
     public Object validator(String systemName){
         Envelop result = new Envelop();
-        String url ="/sys_dict/isExistDictName**********";
+        String resultStr = "";
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("dict_name",systemName);
+
         try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("code",systemName);
-            String _msg = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            if(Boolean.parseBoolean(_msg)){
+            String url ="/dictionaries/existence/" + systemName;
+            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+
+            if(Boolean.parseBoolean(resultStr)){
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.RepeatSysDictName.toString());
             }else{
@@ -559,41 +441,8 @@ public class SystemDictController {
     @RequestMapping("autoSearchDictEntryList")
     @ResponseBody
     public Object autoSearchDictEntryList(Long dictId,String key){
-        // key参数为value值
-        Envelop result = new Envelop();
-        //TODO 提供api，返回字典项列表
-        String url = "/sys_dict/searchByValue*****";
-        try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("dictId",dictId);
-            params.put("dictName",key);
-            String _rus = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.NotExistSysDict.toString());
-            }else{
-                result.setSuccessFlg(true);
-                // TODO 若不转化要修改前端页面
-                result.setObj(_rus);
-            }
-        }catch (Exception ex){
-            LogService.getLogger(SystemDictController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
-        }
-        return result;
 
-        /*Result result = new Result();
-        XSystemDictEntry[] xSystemDictEntrys = null;
-        try {
-            xSystemDictEntrys = systemDictManager.getDict(dictId,key);
-            List<XSystemDictEntry> systemDictEntryList = Arrays.asList(xSystemDictEntrys);
-            result.setSuccessFlg(true);
-            result.setDetailModelList(systemDictEntryList);
-        } catch (Exception e) {
-            result.setSuccessFlg(false);
-        }
-        return result.toJson();*/
+        return null;
     }
 
 }

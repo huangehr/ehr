@@ -327,7 +327,6 @@
           });
 
           $.subscribe('grid:right:delete',function(event,ids) {
-            debugger
             if(!ids){
               var rows = entryMater.grid.getSelectedRows();
               if(rows.length==0){
@@ -343,7 +342,6 @@
               ids = ids;
 
             $.Notice.confirm('确认删除所选数据？', function (r) {
-              debugger
               if(r){
                 var dataModel = $.DataModel.init();
                 dataModel.updateRemote('${contextRoot}'+cfg[cfgModel].right.delLs,{

@@ -108,19 +108,26 @@ set.list = {
     getVersionList: function () {
         var u = set.list;
         $.ajax({
-            url: u._url + "/cdadict/getCdaVersionList",
+           // url: u._url + "/cdadict/getCdaVersionList",
+            //调通测试暂时使用
+            url: u._url + "/cdaVersion/getVersionList",
             type: "post",
             dataType: "json",
             data: {page: "1", rows: "100"},
             success: function (data) {
-                var result = eval(data.result);
+                var envelop = eval(data);
+                var result = envelop.detailModelList;
+                debugger;
+                //var result = eval(data.result);
                 var option = [];
                 for (var i = 0; i < result.length; i++) {
-                    var version = result[i].version;
-                    var versionArr = version.split(",");
+                    //var version = result[i].version;
+                    //var versionArr = version.split(",");
                     option.push({
-                        text: versionArr[1],
-                        id: versionArr[0]
+                        //text: versionArr[1],
+                        //id: versionArr[0]
+                        text: result[i].versionName,
+                        id: result[i].version
                     });
                 }
                 var select = $("#cdaVersion").ligerComboBox({
@@ -140,7 +147,7 @@ set.list = {
         $.ajax({
             type: "get",
             url: u._url + "/std/dataset/searchDataSets",
-            data: {codename: u.setSearch.getValue(), version: versionCode, page: 1, rows: 0},// 你的formid
+            data: {codename: u.setSearch.getValue(), version: versionCode, page: 1, rows: 100},// 你的formid
             async: true,
             dataType: "json",
             error: function (request) {
@@ -150,8 +157,10 @@ set.list = {
                 //清空数组
                 u.enableData = [];
                 var resultData = eval(data);
-                if (data != null) {
-                    var _result = data.detailModelList;
+                //if (data != null) {
+                if (resultData.successFlg) {
+
+                        var _result = data.detailModelList;
                     for (var i = 0; i < _result.length; i++) {
                         u.enableData.push(_result[i]);
                     }
@@ -411,7 +420,6 @@ set.list = {
 set.attr = {
     set_form: $("#div_set_info_form"),
     init: function () {
-        debugger;
         var versionCode = $.Util.getUrlQueryString('versioncode');
         $("#hdversion").val(versionCode);
         var setId = $.Util.getUrlQueryString('id');
@@ -426,13 +434,18 @@ set.attr = {
             u._url = $("#hd_url").val();
         }
         var cdaVersion = $("#hdversion").val();
+        debugger
         $.ajax({
-            url: u._url + "/cdadict/getStdSourceList",
+            //url: u._url + "/cdadict/getStdSourceList",
+            url: u._url + "/std/dataset/getStdSourceList",
             type: "post",
             dataType: "json",
-            data: {strVersionCode: cdaVersion},
+           // data: {strVersionCode: cdaVersion},
+            data: {version: cdaVersion},
             success: function (data) {
-                var result = eval(data.result);
+                //var result = eval(data.result);
+                var envelop = eval(data);
+                var result = envelop.detailModelList;
                 var option = [];
                 if (result != null) {
                     for (var i = 0; i < result.length; i++) {
@@ -561,6 +574,7 @@ set.elementAttr = {
         this.getElementInfo();
     },
     getDictList: function (initValue, initText) {
+
         var version = $("#hdversion").val();
         set.elementAttr.dict_select = $("#criterionDict").ligerComboBox({
             url: set.list._url + "/std/dataset/getMetaDataDict?version=" + version,
@@ -605,7 +619,6 @@ set.elementAttr = {
             data: {dataSetId: dataSetId, metaDataId: metaDataId, version: version},
             async: true,
             success: function (data) {
-                debugger;
                 if (data != null) {
                     var info = eval(data).detailModelList;
                     set.elementAttr.element_form.attrScan();
@@ -615,7 +628,6 @@ set.elementAttr = {
                     $("#datatype").val(info[0].columnType);
                     //set.elementAttr.dict_select.setValue(info[0].dictId);
                     set.elementAttr.getDictList(info[0].dictId, info[0].dictName);
-                    debugger;
                     $("#primaryKey").attr('checked', false);
                     if (info[0].primaryKey == "1") {
                         $("#primaryKey").attr('checked', true);
@@ -627,7 +639,6 @@ set.elementAttr = {
                 }
             },
             error: function (data) {
-
             },
             complete: function () {
                 set.elementAttr.event();
@@ -643,12 +654,14 @@ set.elementAttr = {
         if (id == "")
             id = "0";
         dataJson[0]["id"] = id;
+        debugger
 
         var versionCode = $("#hdversion").val();
-        dataJson[0]["version"] = versionCode;
+        //dataJson[0]["version"] = versionCode;
+        var version = versionCode;
 
         var setId = $("#hdsetid").val();
-        dataJson[0]["datasetId"] = setId;
+        dataJson[0]["dataSetId"] = setId;
 
 
         var dictId = set.elementAttr.dict_select.getValue();
@@ -671,7 +684,7 @@ set.elementAttr = {
             url: _url,
             type: "POST",
             dataType: "json",
-            data: dataJson[0],
+            data: {info:JSON.stringify(dataJson[0]),version:version},
             success: function (data) {
                 if (data != null) {
                     var _res = eval(data);
