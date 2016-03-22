@@ -2,6 +2,7 @@ package com.yihu.ehr.ha.patient.controller;
 
 import com.yihu.ehr.agModel.patient.CardDetailModel;
 import com.yihu.ehr.agModel.patient.CardModel;
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.ha.organization.service.OrganizationClient;
@@ -69,7 +70,7 @@ public class CardController extends BaseController {
         for (MAbstractCard info : mAbstractCards) {
 
             CardModel cardModel = convertToModel(info, CardModel.class);
-
+            cardModel.setCreateDate(DateToString(info.getCreateDate(),AgAdminConstants.DateFormat));
             MConventionalDict dict =null;
             if(!StringUtils.isEmpty(cardModel.getCardType())) {
                 dict = conventionalDictEntryClient.getCardType(cardModel.getCardType());
@@ -118,7 +119,7 @@ public class CardController extends BaseController {
         for (MAbstractCard info : mAbstractCards){
 
             CardModel cardModel = convertToModel(info, CardModel.class);
-
+            cardModel.setCreateDate(DateToString(info.getCreateDate(),AgAdminConstants.DateFormat));
             MConventionalDict dict =null;
             if(!StringUtils.isEmpty(cardModel.getCardType())) {
                 dict = conventionalDictEntryClient.getCardType(cardModel.getCardType());
@@ -156,6 +157,10 @@ public class CardController extends BaseController {
 
         MAbstractCard cardInfo = cardClient.getCard(id, cardType);
         CardDetailModel detailModel = convertToModel(cardInfo,CardDetailModel.class);
+        detailModel.setCreateDate(DateToString(cardInfo.getCreateDate(), AgAdminConstants.DateFormat));
+        detailModel.setReleaseDate(DateToString(cardInfo.getReleaseDate(),AgAdminConstants.DateTimeFormat));
+        detailModel.setValidityDateBegin(DateToString(cardInfo.getValidityDateBegin(),AgAdminConstants.DateTimeFormat));
+        detailModel.setValidityDateEnd(DateToString(cardInfo.getValidityDateEnd(),AgAdminConstants.DateTimeFormat));
         if(detailModel!=null)
         {
             return failed("数据获取失败!");

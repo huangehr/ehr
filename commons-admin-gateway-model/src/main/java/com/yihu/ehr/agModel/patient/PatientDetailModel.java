@@ -2,14 +2,12 @@ package com.yihu.ehr.agModel.patient;
 
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 
-import java.util.Date;
-
 /**
  * Created by AndyCai on 2016/2/25.
  */
 public class PatientDetailModel {
     private String idCardNo;                       // 身份证
-    private Date birthday;                            // 出生日期
+    private String birthday;                            // 出生日期
     private String birthPlace;
     private GeographyModel birthPlaceInfo;                    // 户籍地址
     private String birthPlaceFull;
@@ -42,11 +40,11 @@ public class PatientDetailModel {
         this.idCardNo = idCardNo;
     }
 
-    public Date getBirthday() {
+    public String getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(Date birthday) {
+    public void setBirthday(String birthday) {
         this.birthday = birthday;
     }
 
