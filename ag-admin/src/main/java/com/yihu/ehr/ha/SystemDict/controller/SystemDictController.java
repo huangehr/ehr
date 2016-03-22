@@ -176,7 +176,7 @@ public class SystemDictController extends BaseController {
     }
 
     @ApiOperation(value = "获取字典项列表")
-    @RequestMapping(value = "/dictionaries/{id}/entries", method = RequestMethod.GET)
+    @RequestMapping(value = "/dictionaries/entries", method = RequestMethod.GET)
     public Envelop getDictEntries(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
