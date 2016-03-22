@@ -277,12 +277,15 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
         //数据集
         String ids = adapterDataSetList.toString();
         ids = ids.substring(1, ids.length() - 1);
-        Map<Integer, String> map = (Map<Integer, String>) dataSetClient.getDataSetMapByIds(version, ids);
+        Map<String, String> map = (Map<String, String>) dataSetClient.getDataSetMapByIds(version, ids);
+        String text = "";
         for (Long adapterDataSet : adapterDataSetList) {
+            if(StringUtils.isEmpty(text = map.get(String.valueOf(adapterDataSet))))
+                continue;
             AdapterCustomize parent = new AdapterCustomize();
             parent.setId("adapterDataSet" + adapterDataSet);
             parent.setPid("adapter0");
-            parent.setText(map.get(adapterDataSet.intValue()));
+            parent.setText(text);
             parent.setIschecked(true);
             adapterCustomizeList.add(parent);
             adapter = true;
@@ -294,13 +297,16 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
             metaDataIds += "," + adapterDataSet.getMetaDataId();
         }
         Map metaDatas = dataSetClient.getMetaDataMapByIds(version, metaDataIds.substring(1));
-        Map tmp;
+        Map<String, String> tmp;
         for (AdapterDataSet adapterDataSet : adapterMetaDataList) {
+            if ((tmp = (Map) metaDatas.get(String.valueOf(adapterDataSet.getDataSetId()))) == null
+                    ||  (text = tmp.get(String.valueOf(adapterDataSet.getMetaDataId())))==null)
+                continue;
+
             AdapterCustomize child = new AdapterCustomize();
             child.setId("adapterMetaData" + adapterDataSet.getMetaDataId());
             child.setPid("adapterDataSet" + adapterDataSet.getDataSetId());
-            if ((tmp = (Map) metaDatas.get(adapterDataSet.getDataSetId().intValue())) != null)
-                child.setText(((String) tmp.get(adapterDataSet.getMetaDataId().intValue())));
+            child.setText(text);
             child.setIschecked(true);
             adapterCustomizeList.add(child);
             adapter = true;

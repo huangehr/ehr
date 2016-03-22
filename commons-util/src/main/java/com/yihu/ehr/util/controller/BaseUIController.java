@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class BaseUIController {
     @Autowired
-    ObjectMapper objectMapper;
+    public ObjectMapper objectMapper;
 
     public Envelop getEnvelop(String json){
         try {

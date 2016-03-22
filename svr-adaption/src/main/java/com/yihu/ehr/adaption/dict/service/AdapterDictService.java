@@ -51,7 +51,7 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
         sb.append("       ,ds.name  ");
         sb.append("   from adapter_dict ad          ");
         sb.append("        left join " + dictTableName + " ds on ad.std_dict = ds.id  ");
-        sb.append("  where ad.plan_id = " + planId);
+        sb.append("  where ad.plan_id = " + planId + " and ds.id is not null ");
         if (!StringUtils.isEmpty(code))
             sb.append("     and ds.code like :code");
         if (!StringUtils.isEmpty(name))
@@ -74,6 +74,8 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
     }
 
     private String makeOrder(String orders) {
+        if(StringUtils.isEmpty(orders))
+            return "";
         String sql = "";
         for (String order : orders.split(",")) {
             if (order.startsWith("+"))

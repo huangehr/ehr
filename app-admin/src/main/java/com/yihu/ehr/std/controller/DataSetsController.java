@@ -1,6 +1,7 @@
 package com.yihu.ehr.std.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.standard.datasset.DataSetModel;
 import com.yihu.ehr.agModel.standard.datasset.MetaDataModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.Envelop;
@@ -33,10 +34,8 @@ public class DataSetsController extends BaseUIController {
     private String username;
     @Value("${service-gateway.password}")
     private String password;
-    /*@Value("${service-gateway.url}")
-    private String comUrl;*/
-    //TODO 访问路径，一般有aimin而标准部分网关没有admin
-    String comUrl = "http://localhost:10000/api/v1.0/dataSet";
+    @Value("${service-gateway.url}")
+    private String comUrl;
 
 //    @RequestMapping("/initial")
 //    public String dataSetInitial() {
@@ -126,16 +125,18 @@ public class DataSetsController extends BaseUIController {
         }
         String filters = "";
         if (!StringUtils.isEmpty(codename)){
-            filters += "code?"+codename+" g1;name?"+codename+" g1;";
+            //filters += "code?"+codename+" g1;name?"+codename+" g1;";
+            filters += "name?%"+codename+"%";
+
         }
-        String url = "/dataSets";
+        String url = "/std/data_sets";
         try{
             Map<String,Object> params = new HashMap<>();
             params.put("fields","");
             params.put("filters",filters);
             params.put("sorts","");
             params.put("page",page);
-            params.put("size",15);
+            params.put("size",rows);
             params.put("version",version);
             String envelopStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             return envelopStr;
@@ -192,7 +193,7 @@ public class DataSetsController extends BaseUIController {
             result.setErrorMsg("数据集id和版本号不能为空!");
             return result;
         }
-        String url = "/dataSet/dataSet";
+        String url = "/std/data_set";
         try{
             Map<String,Object> params = new HashMap<>();
             params.put("versionCode",version);
@@ -243,7 +244,7 @@ public class DataSetsController extends BaseUIController {
             result.setErrorMsg("数据集Id和版本号不能为空!");
             return result;
         }
-        String url = "/dataSet/dataSet";
+        String url = "/std/data_set";
         try{
             Map<String,Object> params = new HashMap<>();
             params.put("versionCode",versionCode);
@@ -300,7 +301,7 @@ public class DataSetsController extends BaseUIController {
     @RequestMapping("/saveDataSet")
     @ResponseBody
     public Object saveDataSet(long id, String code, String name, String type, String refStandard, String summary, String versionCode) {
-        Envelop result = new Envelop();
+        Envelop envelop = new Envelop();
         String strErrorMsg = "";
         if(StringUtils.isEmpty(code)) {
             strErrorMsg += "代码不能为空!";
@@ -315,34 +316,57 @@ public class DataSetsController extends BaseUIController {
             strErrorMsg += "标准版本不能为空!";
         }
         if (StringUtils.isEmpty(strErrorMsg)) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(strErrorMsg);
-            return result;
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(strErrorMsg);
+            return envelop;
         }
-        String url = "/dataSet/dataSet";
+        String url = "/std/data_set";
         try{
             Map<String,Object> params = new HashMap<>();
-            params.put("id",id);
-            params.put("code",code);
-            //TODO 提供code不能从复验证api
-            params.put("name",name);
-            params.put("type",type);
-            params.put("refStandard",refStandard);
-            params.put("summary",summary);
-            params.put("versionCode",versionCode);
-            String _rus = HttpClientUtil.doPost(comUrl+url,params,username,password);
-            if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.SavedatasetFailed.toString());
-            }else{
-                result.setSuccessFlg(true);
+            params.put("version_code",versionCode);
+            //新增数据集
+            if(id == 0){
+                DataSetModel modelNew = new DataSetModel();
+                modelNew.setCode(code);
+                modelNew.setName(name);
+                modelNew.setReference(refStandard);
+                modelNew.setSummary(summary);
+                //TODO 数库保存的是版本名称，待查询
+                modelNew.setStdVersion(versionCode);
+                String jsonDataNew = objectMapper.writeValueAsString(modelNew);
+                params.put("json_data",jsonDataNew);
+                String envelopStrNew = HttpClientUtil.doPost(comUrl+url,params,username,password);
+                return envelopStrNew;
             }
+
+            //修改数据集
+            //获取原数据集对象
+            String urlGet = "std/data_set";
+            Map<String,Object> args = new HashMap<>();
+            args.put("id",id);
+            args.put("version",versionCode);
+            String envelopStrGet = HttpClientUtil.doGet(comUrl+urlGet,params,username,password);
+            Envelop envelopGet = objectMapper.readValue(envelopStrGet,Envelop.class);
+            if (!envelopGet.isSuccessFlg()){
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("获取标准数据集失败！");
+                return envelop;
+            }
+            DataSetModel modelForUpdate = getEnvelopModel(envelopGet.getObj(),DataSetModel.class);
+            modelForUpdate.setCode(code);
+            modelForUpdate.setName(name);
+            modelForUpdate.setReference(refStandard);
+            modelForUpdate.setSummary(summary);
+            String dataJsonUpdate = objectMapper.writeValueAsString(modelForUpdate);
+            params.put("json_data",dataJsonUpdate);
+            String envelopStrUpdate = HttpClientUtil.doPost(comUrl+url,params,username,password);
+            return envelopStrUpdate;
         }catch(Exception ex){
             LogService.getLogger(DataSetsController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result;
+        return envelop;
 
         /*CDAVersion cdaVersion = new CDAVersion();
         cdaVersion.setVersion(versionCode);
@@ -420,10 +444,11 @@ public class DataSetsController extends BaseUIController {
             result.setErrorMsg("数据元id、标准版本不能为空!");
             return result;
         }
-        String url = "/metaDatas";
+        String url = "/std/meta_datas";
         String filters = "dataSetId="+id+";";
         if(!StringUtils.isEmpty(metaDataCode)){
-            filters += "code?"+metaDataCode+" g1;name?"+metaDataCode+" g1;";
+            //TODO
+//            filters += "code?"+metaDataCode+" g1;name?"+metaDataCode+" g1;";
         }
         try{
             Map<String,Object> params = new HashMap<>();
@@ -497,7 +522,7 @@ public class DataSetsController extends BaseUIController {
             return result;
         }
         try {
-            String url = "/dataSet/metaData";
+            String url = "/std/meta_data";
             Map<String,Object> params = new HashMap<>();
             params.put("ids",ids);// TODO api参数为Long ids  ---批量删除传递过来的是ids字符串
             params.put("versionCode",version);
@@ -563,7 +588,7 @@ public class DataSetsController extends BaseUIController {
             return envelop;
         }
         try {
-            String url = "/getMetaData";
+            String url = "/std/meta_datas";
             Map<String,Object> params = new HashMap<>();
             params.put("metaDataId",metaDataId);
             params.put("versionCode",version);
@@ -619,7 +644,7 @@ public class DataSetsController extends BaseUIController {
                 return envelop;
             }
 
-            String url = "/MetaData";
+            String url = "/std/meta_data";
             Map<String,Object> params = new HashMap<>();
             params.put("version",version);
 
@@ -632,11 +657,11 @@ public class DataSetsController extends BaseUIController {
 
             //修改数据元操作
             //获取原数据元对象
-            String urlGet = "/getMetaData";
+            String urlGet = "/std/meta_data";
             Map<String,Object> args = new HashMap<>();
             args.put("versionCode",version);
             args.put("metaDataId",model.getId());
-            String envelopStrGet = HttpClientUtil.doGet(comUrl+url,params,username,password);
+            String envelopStrGet = HttpClientUtil.doGet(comUrl+urlGet,params,username,password);
             Envelop envelopGet = objectMapper.readValue(envelopStrGet,Envelop.class);
             if(!envelopGet.isSuccessFlg()){
                 envelop.setErrorMsg("数据元不存在！");
@@ -679,7 +704,30 @@ public class DataSetsController extends BaseUIController {
     @ResponseBody
     public Object getStdSourceList(String version) {
         //TODO 页面调用的是标准字典Controller的方法
-        return null;
+
+        //临时测试用方法
+        Envelop envelop = new Envelop();
+        String url = "/standard_source/sources";
+        try{
+            Map<String,Object> params = new HashMap<>();
+            params.put("fields","");
+            params.put("filters","");
+            params.put("sorts","");
+            params.put("size",100);
+            params.put("page",1);
+            String envelopStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+            if(StringUtils.isEmpty(envelopStr)){
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg(ErrorCode.GetStandardSourceFailed.toString());
+            }else{
+                return envelopStr;
+            }
+        }catch(Exception ex){
+            LogService.getLogger(StdSourceManagerController.class).error(ex.getMessage());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+        }
+        return envelop;
     }
 
 
@@ -767,7 +815,7 @@ public class DataSetsController extends BaseUIController {
     @ResponseBody
     public Object validatorMetadata(String version, String datasetId, String searchNm, String metaDataCodeMsg) {
         Envelop result = new Envelop();
-        String url ="/dataSet/validatorMetadata";
+        String url ="/std/dataSet/validatorMetadata";
         String _msg = "";
         try{
             Map<String,Object> params = new HashMap<>();
@@ -814,7 +862,7 @@ public class DataSetsController extends BaseUIController {
         //TODO 无对应
         Envelop result = new Envelop();
         try {
-            String url = "/dataSet/*******";
+            String url = "/std/dataSet/*******";
             Map<String,Object> params = new  HashMap<>();
             params.put("setId",setId);
             params.put("versionCode",versionCode);
