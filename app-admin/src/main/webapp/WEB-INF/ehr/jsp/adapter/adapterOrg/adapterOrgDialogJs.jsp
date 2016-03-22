@@ -59,11 +59,18 @@
 
                 this.$form.attrScan();
                 if(!Util.isStrEmpty(info)){
+
                     var adapter = info.obj;
-                    var province = adapter.area.province || '';
-                    var city =adapter.area.city || '';
-                    var district =adapter.area.district || '';
-                    var town =adapter.area.town || '';
+
+//                    var province = adapter.address.province || '';
+//                    var city =adapter.address.city || '';
+//                    var district =adapter.address.district || '';
+//                    var town =adapter.address.town || '';
+
+                    var province = "省";
+                    var city ="市";
+                    var district ="县";
+                    var town ="街道/地址测试";
                     var area=province;
                     if (province!=city){
                         area +=city;
@@ -81,9 +88,6 @@
                         town : town,
                     });
                 }
-
-
-
 
                 this.$form.show();
             },
@@ -176,6 +180,7 @@
                         $('#inp_adapterorg_name').val(name);
                     },
                     conditionSearchClick: function (g) {
+                        debugger;
                         var param = g.rules.length>0? g.rules[0].value : '';
                         param = {param:param }
                         g.grid.set({
@@ -261,7 +266,7 @@
                     var values = self.$form.Fields.getValues();
                     var ajaxFun;
                     if(!validator.validate()){
-//                        return;
+                        return;
                     }
                     self.$btnSave.attr('disabled','disabled');
                     if(mode=='new'){
@@ -276,7 +281,7 @@
                             values.town = '';
                         }
                         dataMode = "type="+values.type+"&org="+values.org
-                                +"&area.province="+values.province+"&area.city="+values.city+"&area.district="+values.district+"&area.town="+values.town
+                                +"&address.province="+values.province+"&address.city="+values.city+"&address.district="+values.district+"&address.town="+values.town
                                 +"&code="+code+"&name="+values.name+"&parent="+values.parent+"&description="+values.description;
                         ajaxFun = 'addAdapterOrg';
                     }
@@ -324,6 +329,7 @@
                 });
             },
             setAreaInfo: function (province, city, district, town, areaCode) {
+                debugger
                 this.$province.val(province);
                 this.$city.val(city);
                 this.$district.val(district);
@@ -389,13 +395,13 @@
                     width:160,
                     allowBlank:true,
                     selectBoxHeight:200,
-                    url :"${contextRoot}/patient/"+ajaxFunc,
+                    url :"${contextRoot}/address/"+ajaxFunc,
                     parms:parms,
                     dataGetter: function (result) {
                         var rs = [];
                         for(var p in result.obj){
                             if(p)
-                                rs.push({id:p,value:result.obj[p]})
+                                rs.push({id:result.obj[p].id,value:result.obj[p].name})
                         }
                         return rs;
                     },
