@@ -181,7 +181,6 @@ public class KeyRestEndPoint extends BaseRestController {
         return true;
     }
 
-
     @RequestMapping(value = RestApi.Securities.Keys, method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取Key")
     public MKey getKey(

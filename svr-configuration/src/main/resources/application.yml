@@ -8,69 +8,20 @@ security:
   user:
     password: configuration
 
-endpoints:
-  restart:
-    enabled: true
-
 info:
   app:
     name: ConfigurationService
     description: EHR平台全局配置服务
     version: 1.0.0
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://user:eureka@${eureka-server-ip}/eureka/
-
 ---
 spring:
   profiles: dev
-
-  cloud:
-    config:
-      server:
-        git:
-          uri: http://192.168.1.220:10080/EHR/ehr.config.git
-        default-label: dev
-
-eureka-server-ip: 127.0.0.1:8761
-
----
-spring:
-  profiles: sand-home-dev
-
-  cloud:
-    config:
-      server:
-        git:
-          uri: file://D:/Workspace/ehr.config
-        default-label: dev
-
-eureka-server-ip: 127.0.0.1:8761
 
 ---
 spring:
   profiles: test
 
-  cloud:
-    config:
-      server:
-        git:
-          uri: http://192.168.1.220:10080/EHR/ehr.config.git
-        default-label: dev
-
-eureka-server-ip: 172.19.103.73:8761
-
 ---
 spring:
   profiles: prod
-  cloud:
-    config:
-      server:
-        git:
-          uri: http://11.1.2.8:3000/ehr_admin/ehr.config.git
-        default-label: master
-
-eureka-server-ip: 11.1.2.21:8761
-

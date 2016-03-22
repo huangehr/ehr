@@ -8,6 +8,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.interceptor.RateLimitInterceptor;
 import com.yihu.ehr.interceptor.UserAgentInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.netflix.eureka.EurekaInstanceConfigBean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -30,9 +31,6 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
     @Autowired
     private UserAgentInterceptor userAgentInterceptor;
 
-    @Autowired
-    EurekaClient eurekaClient;
-
     /**
      * 注册截取器。
      *
@@ -42,19 +40,6 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
     public void addInterceptors(InterceptorRegistry registry) {
         //registry.addInterceptor(userAgentInterceptor).addPathPatterns(ApiVersion.Version1_0 + "/**");
         //registry.addInterceptor(rateLimitInterceptor).addPathPatterns("/**").excludePathPatterns("/swagger**");
-
-        Applications applications = eurekaClient.getApplications();
-        for (Application application : applications.getRegisteredApplications()) {
-            List<InstanceInfo> instanceInfoList = application.getInstances();
-            for (InstanceInfo instanceInfo : instanceInfoList) {
-                String serviceIP = instanceInfo.getIPAddr();
-                int port = instanceInfo.getPort() + 1;
-                int connTimeout = 10000;
-
-                System.out.println("App:" + instanceInfo.getAppName() +
-                        ", Host: " + serviceIP + ", port: " + port);
-            }
-        }
     }
 
     /**

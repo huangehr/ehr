@@ -35,9 +35,12 @@ public class PackagesEndPoint {
     /**
      * 归档病人档案-数据上传
      *
-     * @param packageCrypto zip密码密文, file 请求体中文件参数名
-     * @param md5           文件内容MD5值。
+     * @param jsonPackage
+     * @param orgCode
+     * @param packageCrypto
+     * @param md5
      * @return
+     * @throws IOException
      */
     @RequestMapping(value = "/packages", method = RequestMethod.POST)
     @ApiOperation(value = "接收档案", notes = "接收健康档案数据包")

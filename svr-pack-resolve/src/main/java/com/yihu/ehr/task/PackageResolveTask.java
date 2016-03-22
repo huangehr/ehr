@@ -76,12 +76,10 @@ public class PackageResolveTask {
      */
     @Scheduled(cron = "0/2 * * * * ?")
     public void archive() throws TException {
-        /*TPackage pack = packageService.acquireArchive();
+        TPackage pack = packageService.acquireArchive();
         if (pack == null) return;
 
-        doArchive(pack);*/
-        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-        System.out.println("The time is now " + dateFormat.format(new Date()));
+        doArchive(pack);
     }
 
     public void doArchive(TPackage pack){

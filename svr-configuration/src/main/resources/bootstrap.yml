@@ -6,10 +6,30 @@ spring:
 spring:
   profiles: dev
 
+  cloud:
+    config:
+      server:
+        git:
+          uri: http://192.168.1.220:10080/EHR/ehr.config.git
+        default-label: dev
+
 ---
 spring:
   profiles: test
 
+  cloud:
+    config:
+      server:
+        git:
+          uri: http://192.168.1.220:10080/EHR/ehr.config.git
+        default-label: dev
+
 ---
 spring:
   profiles: prod
+  cloud:
+    config:
+      server:
+        git:
+          uri: http://11.1.2.8:3000/ehr_admin/ehr.config.git
+        default-label: master
