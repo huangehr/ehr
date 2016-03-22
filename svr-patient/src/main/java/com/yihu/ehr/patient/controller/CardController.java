@@ -61,7 +61,7 @@ public class CardController extends BaseRestController {
         conditionMap.put("page",page);
         conditionMap.put("rows",rows);
         List<AbstractCard> cardAbstractCardList = cardManager.searchAbstractCard(conditionMap);
-        Long totalCount = Long.parseLong(cardManager.searchCardInt(conditionMap, false).toString());
+        Long totalCount = Long.parseLong(cardManager.searchCardInt(conditionMap).toString());
         pagedResponse(request, response, totalCount, page, rows);
         return (List<MAbstractCard>)convertToModels(cardAbstractCardList,new ArrayList<MAbstractCard>(cardAbstractCardList.size()), MAbstractCard.class, null);
 
@@ -81,10 +81,10 @@ public class CardController extends BaseRestController {
     @RequestMapping(value = "/cards",method = RequestMethod.GET)
     @ApiOperation(value = "查询未绑定的卡列表")
     public List<MAbstractCard> searchCardUnBinding(
-            @ApiParam(name = "number", value = "卡号", defaultValue = "")
-            @RequestParam(value = "number") String number,
+            @ApiParam(name = "number",required = true,value = "卡号", defaultValue = "")
+            @RequestParam(value = "number",required = true) String number,
             @ApiParam(name = "card_type", value = "卡类别", defaultValue = "")
-            @RequestParam(value = "card_type") String cardType,
+            @RequestParam(value = "card_type",required = false) String cardType,
             @ApiParam(name = "page", value = "当前页", defaultValue = "")
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
@@ -103,7 +103,7 @@ public class CardController extends BaseRestController {
 //        return getResult(mAbstractCards, totalCount);
 
         List<AbstractCard> cardAbstractCardList = cardManager.searchAbstractCard(conditionMap);
-        Long totalCount = Long.parseLong(cardManager.searchCardInt(conditionMap, false).toString());
+        Long totalCount = Long.parseLong(cardManager.searchCardInt(conditionMap).toString());
         pagedResponse(request, response, totalCount, page, rows);
         return (List<MAbstractCard>)convertToModels(cardAbstractCardList,new ArrayList<MAbstractCard>(cardAbstractCardList.size()), MAbstractCard.class, null);
     }
