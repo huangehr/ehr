@@ -22,7 +22,7 @@ import java.util.Map;
  * Created by wq on 2016/3/2.
  */
 
-@FeignClient(MicroServices.Standard)
+@FeignClient(name=MicroServices.Standard)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface DictClient {

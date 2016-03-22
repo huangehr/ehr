@@ -22,7 +22,7 @@ import java.util.Collection;
  * Created by wq on 2016/2/29.
  */
 
-@FeignClient(MicroServices.Standard)
+@FeignClient(name=MicroServices.Standard)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface DataSetClient {
