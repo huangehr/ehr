@@ -120,9 +120,15 @@
                     }
                     self.$btnSave.attr('disabled','disabled');
                     var values = self.$dataMataForm.Fields.getValues();
-                    var v = self.$dataMataForm.Fields.toSerializedString() +'&adapterPlanId='+adapterPlanId+'&dataSetId='+parentId;
+                    values.adapterPlanId = adapterPlanId;
+                    values.dataSetId = parentId;
+                    var parms = {
+                        id: values.id,
+                        model: JSON.stringify(values)
+                    }
                     var dataModel = $.DataModel.init();
-                    dataModel.updateRemote("${contextRoot}/adapterDataSet/updateAdapterMetaData",{data: v,
+                    dataModel.updateRemote("${contextRoot}/adapterDataSet/update",{
+                        data: parms,
                         success: function(data) {
                             if(data.successFlg){
                                 var app = data.obj;
