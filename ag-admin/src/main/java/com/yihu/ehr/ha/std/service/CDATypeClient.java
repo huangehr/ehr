@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Created by yww on 2016/3/1.
  */
-@FeignClient(MicroServices.StandardMgr)
+@FeignClient(MicroServices.Standard)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface CDATypeClient {

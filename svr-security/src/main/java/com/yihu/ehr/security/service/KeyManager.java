@@ -1,6 +1,5 @@
 package com.yihu.ehr.security.service;
 
-import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.security.feign.UserClient;
 import com.yihu.ehr.util.DateUtil;
 import com.yihu.ehr.util.encrypt.RSA;
@@ -152,4 +151,27 @@ public class KeyManager {
         keyMapRepository.delete(id);
     }
 
+    public  List<KeyMap> getKeyMapByOrgCode(String orgCode)
+    {
+        return keyMapRepository.findByOrgCdode(orgCode);
+    }
+
+    public List<KeyMap> getKeyMapByUserId(String userId)
+    {
+        return keyMapRepository.findByUserId(userId);
+    }
+
+    public void deleteKey(List<KeyMap> keyMaps){
+
+        if(keyMaps!=null && keyMaps.size()>0)
+        {
+            for (KeyMap keyMap:keyMaps)
+            {
+                String keyMapId = keyMap.getId();
+                String keyId = keyMap.getKey();
+                this.deleteKey(keyId);// user_security
+                this.deleteKeyMap(keyMapId);//user_key
+            }
+        }
+    }
 }

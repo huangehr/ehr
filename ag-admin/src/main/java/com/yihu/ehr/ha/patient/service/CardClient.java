@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Created by AndyCai on 2016/2/16.
  */
-@FeignClient(MicroServices.PatientMgr)
+@FeignClient(MicroServices.Patient)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface CardClient {

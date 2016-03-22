@@ -17,7 +17,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Date;
 
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -94,15 +93,16 @@ public class AppControllerTests {
         Boolean flag2 = appController.isAppExistence(appIdForTest,appSecretForTest);
         assertTrue("app不存在！", flag2);
 
+        //判断指定name的app是否存在-----------7 ok
+
+        Boolean flag3 = appController.isAppNameExists("wwcs111");
+        assertTrue("该名称已存在！", flag3);
+
         //删除刚创建的app--------------8
 
         envelop = appController.deleteApp(appIdForTest);
         assertTrue("app删除失败！", envelop.isSuccessFlg());
 
-        //判断指定name的app是否存在-----------7 ok
-
-        Boolean flag3 = appController.isAppNameExists("测试APP");
-        //assertTrue("该名称已存在！", flag3);
 
     }
 

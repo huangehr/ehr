@@ -41,6 +41,11 @@ public class ExtendService<T> {
         return doGet(comUrl + searchUrl, parms);
     }
 
+    public String search(String url, Map parms) throws Exception{
+
+        return doGet(comUrl + url, parms);
+    }
+
     public String getModel(Map parms) throws Exception{
 
         return doGet(comUrl + modelUrl.replace("{id}", String.valueOf(parms.get("id"))), parms);
@@ -49,6 +54,26 @@ public class ExtendService<T> {
     public String delete(Map parms) throws Exception{
 
         return doDelete(comUrl + deleteUrl, parms);
+    }
+
+    public String update(Map parms) throws Exception{
+
+        return doPut(comUrl + modifyUrl.replace("{id}", String.valueOf(parms.get("id"))), parms);
+    }
+
+    public String add(Map parms) throws Exception{
+
+        return doPost(comUrl + addUrl, parms);
+    }
+
+    public String doPut(String url, Map parms) throws Exception{
+
+        return HttpClientUtil.doPut(url, parms, username, password);
+    }
+
+    public String doPost(String url, Map parms) throws Exception{
+
+        return HttpClientUtil.doPost(url, parms, username, password);
     }
 
     public String doGet(String url, Map parms) throws Exception{

@@ -16,7 +16,7 @@
         var dataModel = $.DataModel.init();
         var patientModel = "";
         if (!(Util.isStrEquals('${patientDialogType}', 'addPatient'))) {
-            patientModel  = (JSON.parse('${patientModel}')).obj;
+            patientModel =${patientModel}.obj;
         }
         /* ************************** 变量定义结束 ******************************** */
 
@@ -104,9 +104,9 @@
                         gender: patientModel.gender,
                         nativePlace: patientModel.nativePlace,
                         birthday: patientModel.birthday,
-                        birthPlace: [patientModel.birthPlace.province, patientModel.birthPlace.city,patientModel.birthPlace.district,patientModel.birthPlace.street],
-                        homeAddress:[patientModel.homeAddress.province, patientModel.homeAddress.city,patientModel.homeAddress.district,patientModel.homeAddress.street] ,
-                        workAddress: [patientModel.workAddress.province, patientModel.workAddress.city,patientModel.workAddress.district,patientModel.workAddress.street],
+                        birthPlace: [patientModel.birthPlaceInfo.province, patientModel.birthPlaceInfo.city,patientModel.birthPlaceInfo.district,patientModel.birthPlaceInfo.street],
+                        homeAddress:[patientModel.homeAddressInfo.province, patientModel.homeAddressInfo.city,patientModel.homeAddressInfo.district,patientModel.homeAddressInfo.street] ,
+                        workAddress: [patientModel.workAddressInfo.province, patientModel.workAddressInfo.city,patientModel.workAddressInfo.district,patientModel.workAddressInfo.street],
                         martialStatus: patientModel.martialStatus,
                         nation: patientModel.nation,
                         residenceType: patientModel.residenceType,
@@ -133,10 +133,10 @@
             },
             initAddress: function (target){
                 target.addressDropdown({tabsData:[
-                    {name: '省份',code:'id',values:'name', url: '${contextRoot}/address/getParent', params: {level:'1'}},
-                    {name: '城市',code:'id',values:'name', url: '${contextRoot}/address/getChildByParent'},
-                    {name: '县区',code:'id',values:'name', url: '${contextRoot}/address/getChildByParent'},
-                    {name: '街道',code:'id',values:'name', maxlength: 200}
+                    {name: '省份',code:'id',value:'name', url: '${contextRoot}/address/getParent', params: {level:'1'}},
+                    {name: '城市',code:'id',value:'name', url: '${contextRoot}/address/getChildByParent'},
+                    {name: '县区',code:'id',value:'name', url: '${contextRoot}/address/getChildByParent'},
+                    {name: '街道',maxlength: 200}
                 ]});
             },
 

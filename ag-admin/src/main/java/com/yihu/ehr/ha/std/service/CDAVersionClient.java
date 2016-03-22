@@ -19,7 +19,7 @@ import java.util.Collection;
 /**
  * Created by AndyCai on 2016/2/1.
  */
-@FeignClient(MicroServices.StandardMgr)
+@FeignClient(MicroServices.Standard)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface CDAVersionClient {

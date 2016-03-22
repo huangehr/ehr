@@ -11,7 +11,7 @@
         var adapterPlanId = parent.getAdapterPlanId();
         var parentId = parent.getParentId();
         var mode = '${mode}';
-        var info = JSON.parse('${info}');
+        var info = JSON.parse('${model}');
         var cfgModel = parent.getDialogOpener();
         var cfg = [
             {new:'', modify:'/adapterDataSet/updateAdapterMetaData'},

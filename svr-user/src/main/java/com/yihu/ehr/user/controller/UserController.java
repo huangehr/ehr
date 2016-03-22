@@ -147,18 +147,16 @@ public class UserController extends BaseRestController {
     public Map<String, String> distributeKey(
             @ApiParam(name = "user_id", value = "登录帐号", defaultValue = "")
             @PathVariable(value = "user_id") String userId) {
-        MKey userSecurity = securityClient.getUserSecurityByUserId(userId);
+        MKey userSecurity = securityClient.getUserKey(userId);
         Map<String, String> keyMap = new HashMap<>();
-        if (userSecurity == null) {
-            userSecurity = securityClient.createSecurityByUserId(userId);
-        } else {
+        if (userSecurity != null) {
             // 删除原有的公私钥重新分配
-            String userKeyId = securityClient.getUserKeyByUserId(userId);
-            securityClient.deleteSecurity(userSecurity.getId());
-            securityClient.deleteUserKey(userKeyId);
-            userSecurity = securityClient.createSecurityByUserId(userId);
+            boolean result = securityClient.deleteKeyByUserId(userId);
 
         }
+
+        userSecurity = securityClient.createUserKey(userId);
+
         String validTime = DateFormatUtils.format(userSecurity.getFromDate(), "yyyy-MM-dd")
                 + "~" + DateFormatUtils.format(userSecurity.getExpiryDate(), "yyyy-MM-dd");
         keyMap.put("publicKey", userSecurity.getPublicKey());
@@ -197,7 +195,7 @@ public class UserController extends BaseRestController {
     @ApiOperation(value = "判断用户身份证号是否存在")
     public boolean isIdCardExists(
             @ApiParam(name = "id_card_no", value = "id_card_no", defaultValue = "")
-            @PathVariable(value = "id_card_no") String idCardNo) {
+            @RequestParam(value = "id_card_no") String idCardNo) {
         return userManager.getUserByIdCardNo(idCardNo) != null;
     }
 

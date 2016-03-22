@@ -74,16 +74,18 @@ public class StdVersionController extends BaseUIController {
     @ResponseBody
     //获取版本列表用于下拉框
     public Object getVersionList() {
-        //TODO 未使用
+        //使用 标准数据集页面、++
+        //TODO 暂时使用的方法，原来流程是通过标准字典controller得到
+        //TODO 原方法将编码、名字组成（"version,name")形式，到前端页面在拆分，，现在返回对象、不再去封装，页面直接取对应的值（标准数据集页面）
         Envelop envelop = new Envelop();
-        String url = "/version/versions";
+        String url = "/versions";
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("fields", "");
             params.put("filters", "");
             params.put("sorts", "");
             params.put("page", 1);
-            params.put("size", 50);
+            params.put("size", 100);
             String envelopStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             Envelop en = objectMapper.readValue(envelopStr,Envelop.class);
             if (en.isSuccessFlg()){
