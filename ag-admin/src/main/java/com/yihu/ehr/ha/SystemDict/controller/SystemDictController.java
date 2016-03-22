@@ -3,6 +3,7 @@ package com.yihu.ehr.ha.SystemDict.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.dict.SystemDictEntryModel;
 import com.yihu.ehr.agModel.dict.SystemDictModel;
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.SystemDict.service.SystemDictClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
@@ -57,10 +58,12 @@ public class SystemDictController extends BaseController {
         try {
             ResponseEntity<Collection<MSystemDict>> responseEntity = systemDictClient.getDictionaries(fields, filters, sorts, size, page);
             List<MSystemDict> systemDicts = (List<MSystemDict>) responseEntity.getBody();
-            List<SystemDictModel> systemDictModelList = (List<SystemDictModel>) convertToModels(systemDicts
-                    , new ArrayList<SystemDictModel>(systemDicts.size())
-                    , SystemDictModel.class
-                    , null);
+            List<SystemDictModel> systemDictModelList = new ArrayList<>();
+            for(MSystemDict mSystemDict : systemDicts)
+            {
+                SystemDictModel dictModel = convertToSysDictModel(mSystemDict);
+                systemDictModelList.add(dictModel);
+            }
 
             Envelop envelop = getResult(systemDictModelList, getTotalCount(responseEntity), page, size);
 
@@ -87,8 +90,9 @@ public class SystemDictController extends BaseController {
             {
                 return failed("名称已存在!");
             }
-            MSystemDict systemDict = systemDictClient.createDictionary(objectMapper.writeValueAsString(systemDictModel));
-            systemDictModel = convertToModel(systemDict, SystemDictModel.class);
+            MSystemDict systemDict = convertToMSystemDict(systemDictModel);
+            systemDict = systemDictClient.createDictionary(objectMapper.writeValueAsString(systemDict));
+            systemDictModel = convertToSysDictModel(systemDict);
 
             if (systemDictModel == null) {
                 return failed("字典新增失败!");
@@ -144,9 +148,9 @@ public class SystemDictController extends BaseController {
             {
                 return failed("名称已存在!");
             }
-
-            systemDict = systemDictClient.updateDictionary(dictJson);
-            systemDictModel = convertToModel(systemDict, SystemDictModel.class);
+            systemDict = convertToMSystemDict(systemDictModel);
+            systemDict = systemDictClient.updateDictionary(objectMapper.writeValueAsString(systemDict));
+            systemDictModel = convertToSysDictModel(systemDict);
 
             if (systemDictModel == null) {
                 return failed("修改字典失败!");
@@ -316,6 +320,25 @@ public class SystemDictController extends BaseController {
         return systemDictClient.isDictEntryCodeExists(dictId,code);
     }
 
+    public SystemDictModel convertToSysDictModel(MSystemDict mSystemDict)
+    {
+        if(mSystemDict==null)
+        {
+            return null;
+        }
+        SystemDictModel dictModel = convertToModel(mSystemDict,SystemDictModel.class);
+        dictModel.setCreateDate(DateToString(mSystemDict.getCreateDate(), AgAdminConstants.DateTimeFormat));
+        return dictModel;
+    }
 
-
+    public MSystemDict convertToMSystemDict(SystemDictModel dictModel)
+    {
+        if(dictModel==null)
+        {
+            return null;
+        }
+        MSystemDict mSystemDict = convertToModel(dictModel,MSystemDict.class);
+        mSystemDict.setCreateDate(StringToDate(dictModel.getCreateDate(),AgAdminConstants.DateTimeFormat));
+        return  mSystemDict;
+    }
 }

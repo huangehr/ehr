@@ -3,6 +3,7 @@ package com.yihu.ehr.ha.adapter.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.thirdpartystandard.OrgDictEntryDetailModel;
 import com.yihu.ehr.agModel.thirdpartystandard.OrgDictEntryModel;
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.adapter.service.OrgDictEntryClient;
 import com.yihu.ehr.model.adaption.MOrgDictItem;
@@ -42,7 +43,7 @@ public class OrgDictEntryController extends BaseController {
         if (mOrgDictItem == null) {
             return failed("字典明细获取失败!");
         }
-        OrgDictEntryDetailModel detailModel = convertToModel(mOrgDictItem, OrgDictEntryDetailModel.class);
+        OrgDictEntryDetailModel detailModel = convertToOrgDictEntryDetailModel(mOrgDictItem);
 
         return success(detailModel);
     }
@@ -73,7 +74,7 @@ public class OrgDictEntryController extends BaseController {
 
         boolean isExist = orgDictEntryClient.isExistDictItem(detailModel.getOrgDict(),detailModel.getOrganization(),detailModel.getCode());
 
-        MOrgDictItem mOrgDictItem = convertToModel(detailModel, MOrgDictItem.class);
+        MOrgDictItem mOrgDictItem = convertToMOrgDictItem(detailModel);
         if (mOrgDictItem.getId() == 0) {
             if(isExist)
             {
@@ -93,7 +94,7 @@ public class OrgDictEntryController extends BaseController {
         if (mOrgDictItem == null) {
             return failed("保存失败!");
         }
-        detailModel = convertToModel(mOrgDictItem, OrgDictEntryDetailModel.class);
+        detailModel = convertToOrgDictEntryDetailModel(mOrgDictItem);
 
         return success(detailModel);
     }
@@ -157,11 +158,36 @@ public class OrgDictEntryController extends BaseController {
             @RequestParam(value = "sequence") int sequence) {
         try {
             MOrgDictItem mOrgDictItem = orgDictEntryClient.getOrgDicEntryBySequence(orgCode, sequence);
-            OrgDictEntryDetailModel detailModel = convertToModel(mOrgDictItem, OrgDictEntryDetailModel.class);
+            OrgDictEntryDetailModel detailModel = convertToOrgDictEntryDetailModel(mOrgDictItem);
 
             return success(detailModel);
         } catch (Exception ex) {
             return failedSystem();
         }
+    }
+
+    public OrgDictEntryDetailModel convertToOrgDictEntryDetailModel(MOrgDictItem mOrgDictItem)
+    {
+        if(mOrgDictItem==null)
+        {
+            return null;
+        }
+        OrgDictEntryDetailModel detailModel = convertToModel(mOrgDictItem,OrgDictEntryDetailModel.class);
+        detailModel.setCreateDate(DateToString(mOrgDictItem.getCreateDate(), AgAdminConstants.DateTimeFormat));
+        detailModel.setUpdateDate(DateToString(mOrgDictItem.getUpdateDate(),AgAdminConstants.DateTimeFormat));
+        return detailModel;
+    }
+
+    public MOrgDictItem convertToMOrgDictItem(OrgDictEntryDetailModel detailModel)
+    {
+        if(detailModel==null)
+        {
+            return null;
+        }
+        MOrgDictItem mOrgDictItem = convertToModel(detailModel,MOrgDictItem.class);
+        mOrgDictItem.setCreateDate(StringToDate(detailModel.getCreateDate(),AgAdminConstants.DateTimeFormat));
+        mOrgDictItem.setUpdateDate(StringToDate(detailModel.getUpdateDate(),AgAdminConstants.DateTimeFormat));
+
+        return mOrgDictItem;
     }
 }

@@ -2,6 +2,7 @@ package com.yihu.ehr.ha.adapter.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.thirdpartystandard.OrgDictDetailModel;
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.adapter.service.OrgDictClient;
 import com.yihu.ehr.model.adaption.MOrgDict;
@@ -68,7 +69,7 @@ public class OrgDictController extends BaseController {
         }
 
         boolean isExist = orgDictClient.isExistDict(detailModel.getOrganization(), detailModel.getCode());
-        MOrgDict mOrgDict = convertToModel(detailModel, MOrgDict.class);
+        MOrgDict mOrgDict = convertToMOrgDict(detailModel);
         if (mOrgDict.getId() == 0) {
             if (isExist) {
                 return failed("字典已存在!");
@@ -86,7 +87,7 @@ public class OrgDictController extends BaseController {
         if (mOrgDict == null) {
             return failed("保存失败");
         }
-        detailModel = convertToModel(mOrgDict, OrgDictDetailModel.class);
+        detailModel = convertToOrgDictDetailModel(mOrgDict);
 
         return success(detailModel);
     }
@@ -122,10 +123,12 @@ public class OrgDictController extends BaseController {
 
         ResponseEntity<Collection<MOrgDict>> responseEntity = orgDictClient.searchOrgDicts(fields, filters, sorts, size, page);
         List<MOrgDict> dicts = (List<MOrgDict>) responseEntity.getBody();
-        List<OrgDictDetailModel> detailModels = (List<OrgDictDetailModel>) convertToModels(dicts,
-                new ArrayList<OrgDictDetailModel>(dicts.size()),
-                OrgDictDetailModel.class,
-                null);
+        List<OrgDictDetailModel> detailModels =new ArrayList<> ();
+        for(MOrgDict mOrgDict : dicts)
+        {
+            OrgDictDetailModel detailModel = convertToOrgDictDetailModel(mOrgDict);
+            detailModels.add(detailModel);
+        }
 
         return getResult(detailModels, getTotalCount(responseEntity), page, size);
     }
@@ -146,11 +149,35 @@ public class OrgDictController extends BaseController {
             @RequestParam(value = "sequence") int sequence) {
         try {
             MOrgDict mOrgDict = orgDictClient.getOrgDictBySequence(orgCode, sequence);
-            OrgDictDetailModel detailModel = convertToModel(mOrgDict, OrgDictDetailModel.class);
+            OrgDictDetailModel detailModel = convertToOrgDictDetailModel(mOrgDict);
 
             return success(detailModel);
         } catch (Exception ex) {
             return failedSystem();
         }
+    }
+
+    public OrgDictDetailModel convertToOrgDictDetailModel(MOrgDict mOrgDict)
+    {
+        if(mOrgDict==null)
+        {
+            return null;
+        }
+        OrgDictDetailModel detailModel = convertToModel(mOrgDict,OrgDictDetailModel.class);
+        detailModel.setCreateDate(DateToString(mOrgDict.getCreateDate(), AgAdminConstants.DateTimeFormat));
+        detailModel.setUpdateDate(DateToString(mOrgDict.getUpdateDate(),AgAdminConstants.DateTimeFormat));
+        return detailModel;
+    }
+
+    public MOrgDict convertToMOrgDict(OrgDictDetailModel detailModel)
+    {
+        if(detailModel==null)
+        {
+            return null;
+        }
+        MOrgDict mOrgDict = convertToModel(detailModel,MOrgDict.class);
+        mOrgDict.setCreateDate(StringToDate(detailModel.getCreateDate(),AgAdminConstants.DateTimeFormat));
+        mOrgDict.setUpdateDate(StringToDate(detailModel.getUpdateDate(),AgAdminConstants.DateTimeFormat));
+        return mOrgDict;
     }
 }

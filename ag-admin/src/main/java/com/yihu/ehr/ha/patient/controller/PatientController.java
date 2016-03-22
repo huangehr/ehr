@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 import com.yihu.ehr.agModel.patient.PatientDetailModel;
 import com.yihu.ehr.agModel.patient.PatientModel;
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.ha.geography.service.AddressClient;
@@ -144,7 +145,7 @@ public class PatientController extends BaseController {
         if (demographicInfo == null) {
             return failed("数据获取失败！");
         }
-        PatientDetailModel detailModel = MDemographicInfoToPatientDetailModel(demographicInfo);
+        PatientDetailModel detailModel = convertToPatientDetailModel(demographicInfo);
 
         return success(detailModel);
     }
@@ -183,8 +184,7 @@ public class PatientController extends BaseController {
         if (StringUtils.isNotEmpty(errorMsg)) {
             return failed(errorMsg);
         }
-
-        //TODO:身份证校验
+        //身份证校验
         if(patientClient.isExistIdCardNo(detailModel.getIdCardNo()))
         {
             return failed("身份证号已存在!");
@@ -215,11 +215,12 @@ public class PatientController extends BaseController {
 
         //新增人口信息
         MDemographicInfo info = (MDemographicInfo) convertToModel(detailModel, MDemographicInfo.class);
+        info.setBirthday(StringToDate(detailModel.getBirthday(),AgAdminConstants.DateFormat));
         info = patientClient.createPatient(objectMapper.writeValueAsString(info));
         if (info == null) {
             return failed("保存失败!");
         }
-        detailModel = MDemographicInfoToPatientDetailModel(info);
+        detailModel = convertToPatientDetailModel(info);
         return success(detailModel);
     }
 
@@ -282,12 +283,13 @@ public class PatientController extends BaseController {
 
         //修改人口信息
         MDemographicInfo info = (MDemographicInfo) convertToModel(detailModel, MDemographicInfo.class);
+        info.setBirthday(StringToDate(detailModel.getBirthday(),AgAdminConstants.DateFormat));
         info = patientClient.updatePatient(objectMapper.writeValueAsString(info));
         if (info == null) {
             return failed("保存失败!");
         }
 
-        detailModel = MDemographicInfoToPatientDetailModel(info);
+        detailModel = convertToPatientDetailModel(info);
         return success(detailModel);
 
     }
@@ -322,9 +324,15 @@ public class PatientController extends BaseController {
         return patientClient.resetPass(idCardNo);
     }
 
-    public PatientDetailModel MDemographicInfoToPatientDetailModel(MDemographicInfo demographicInfo) {
-        PatientDetailModel detailModel = convertToModel(demographicInfo, PatientDetailModel.class);
+    public PatientDetailModel convertToPatientDetailModel(MDemographicInfo demographicInfo) {
 
+        if(demographicInfo==null)
+        {
+            return null;
+        }
+
+        PatientDetailModel detailModel = convertToModel(demographicInfo, PatientDetailModel.class);
+        detailModel.setBirthday(DateToString(demographicInfo.getBirthday(), AgAdminConstants.DateFormat));
         MConventionalDict dict = null;
         if (detailModel.getMartialStatus()!=null){
             dict = conventionalDictClient.getMartialStatus(detailModel.getMartialStatus());

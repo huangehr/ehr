@@ -1,7 +1,5 @@
 package com.yihu.ehr.agModel.patient;
 
-import java.util.Date;
-
 /**
  * Created by AndyCai on 2016/2/25.
  */
@@ -14,16 +12,16 @@ public class CardDetailModel {
     String cardType;				// 类型 CardType
     String typeName;
     String description;			// 描述
-    Date createDate;				// 创建日期
+    String createDate;				// 创建日期
     String idCardNo;
     String DType;
     //特殊字段
     String local;				// 发行地/归属地
     String releaseOrg;				// 发行机构
     String releaseOrgName;
-    Date releaseDate;			// 发行时间
-    Date validityDateBegin;		// 有效期起始时间
-    Date validityDateEnd;		// 有效期结束时间
+    String releaseDate;			// 发行时间
+    String validityDateBegin;		// 有效期起始时间
+    String validityDateEnd;		// 有效期结束时间
 
     public String getId() {
         return id;
@@ -73,11 +71,11 @@ public class CardDetailModel {
         this.description = description;
     }
 
-    public Date getCreateDate() {
+    public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(String createDate) {
         this.createDate = createDate;
     }
 
@@ -113,27 +111,27 @@ public class CardDetailModel {
         this.releaseOrg = releaseOrg;
     }
 
-    public Date getReleaseDate() {
+    public String getReleaseDate() {
         return releaseDate;
     }
 
-    public void setReleaseDate(Date releaseDate) {
+    public void setReleaseDate(String releaseDate) {
         this.releaseDate = releaseDate;
     }
 
-    public Date getValidityDateBegin() {
+    public String getValidityDateBegin() {
         return validityDateBegin;
     }
 
-    public void setValidityDateBegin(Date validityDateBegin) {
+    public void setValidityDateBegin(String validityDateBegin) {
         this.validityDateBegin = validityDateBegin;
     }
 
-    public Date getValidityDateEnd() {
+    public String getValidityDateEnd() {
         return validityDateEnd;
     }
 
-    public void setValidityDateEnd(Date validityDateEnd) {
+    public void setValidityDateEnd(String validityDateEnd) {
         this.validityDateEnd = validityDateEnd;
     }
 

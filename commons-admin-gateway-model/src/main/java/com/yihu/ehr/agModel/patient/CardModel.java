@@ -1,7 +1,5 @@
 package com.yihu.ehr.agModel.patient;
 
-import java.util.Date;
-
 /**
  * Created by AndyCai on 2016/2/25.
  */
@@ -13,7 +11,7 @@ public class CardModel {
     String statusName;
     String cardType;				// 类型 CardType
     String typeName;
-    Date createDate;				// 创建日期
+    String createDate;				// 创建日期
     String releaseOrg;
     String releaseOrgName;
 
@@ -65,11 +63,11 @@ public class CardModel {
         this.cardType = cardType;
     }
 
-    public Date getCreateDate() {
+    public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(String createDate) {
         this.createDate = createDate;
     }
 

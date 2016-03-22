@@ -2,6 +2,7 @@ package com.yihu.ehr.ha.adapter.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.thirdpartystandard.OrgMetaDataDetailModel;
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.adapter.service.OrgDataSetClient;
 import com.yihu.ehr.ha.adapter.service.OrgMetaDataClient;
@@ -43,7 +44,7 @@ public class OrgMetaDataController extends BaseController {
             @PathVariable(value = "id") long id) throws Exception {
 
         MOrgMetaData mOrgMetaData = orgMetaDataClient.getOrgMetaData(id);
-        OrgMetaDataDetailModel detailModel = convertOrgMetaDataDetailModel(mOrgMetaData);
+        OrgMetaDataDetailModel detailModel = convertToOrgMetaDataDetailModel(mOrgMetaData);
         if (detailModel == null) {
             return failed("数据元信息获取失败!");
         }
@@ -74,7 +75,7 @@ public class OrgMetaDataController extends BaseController {
             return failed(errorMsg);
         }
         boolean isExist = orgMetaDataClient.isExistMetaData(detailModel.getOrgDataSet(),detailModel.getOrganization(),detailModel.getCode());
-        MOrgMetaData mOrgMetaData = convertToModel(detailModel, MOrgMetaData.class);
+        MOrgMetaData mOrgMetaData = convertToMOrgMetaData(detailModel);
         if (detailModel.getId() == 0) {
             if(isExist)
             {
@@ -90,7 +91,7 @@ public class OrgMetaDataController extends BaseController {
            // mOrgMetaData.setUpdateDate(new Date());
             mOrgMetaData = orgMetaDataClient.updateOrgMetaData(objectMapper.writeValueAsString(mOrgMetaData));
         }
-        detailModel = convertOrgMetaDataDetailModel(mOrgMetaData);
+        detailModel = convertToOrgMetaDataDetailModel(mOrgMetaData);
         if (detailModel == null) {
 
             return failed("保存失败!");
@@ -135,8 +136,12 @@ public class OrgMetaDataController extends BaseController {
         ResponseEntity<Collection<MOrgMetaData>> responseEntity = orgMetaDataClient.searchOrgMetaDatas(fields,filters,sorts,size,page);
 
         List<MOrgMetaData> mOrgMetaDatas = (List<MOrgMetaData>)responseEntity.getBody();
-        List<OrgMetaDataDetailModel> detailModels = (List<OrgMetaDataDetailModel>)convertToModels(mOrgMetaDatas,new ArrayList<OrgMetaDataDetailModel>(mOrgMetaDatas.size()),OrgMetaDataDetailModel.class,null);
-
+        List<OrgMetaDataDetailModel> detailModels = new ArrayList<> ();//List<OrgMetaDataDetailModel>)convertToModels(mOrgMetaDatas,new ArrayList<OrgMetaDataDetailModel>(mOrgMetaDatas.size()),OrgMetaDataDetailModel.class,null);
+        for(MOrgMetaData mOrgMetaData:mOrgMetaDatas)
+        {
+            OrgMetaDataDetailModel detailModel = convertToOrgMetaDataDetailModel(mOrgMetaData);
+            detailModels.add(detailModel);
+        }
         return getResult(detailModels,getTotalCount(responseEntity),page,size);
     }
 
@@ -147,7 +152,7 @@ public class OrgMetaDataController extends BaseController {
 
         try {
             MOrgMetaData mOrgMetaData = orgMetaDataClient.getMetaDataBySequence(orgCode, sequence);
-            OrgMetaDataDetailModel metaDataDetailModel = convertOrgMetaDataDetailModel(mOrgMetaData);
+            OrgMetaDataDetailModel metaDataDetailModel = convertToOrgMetaDataDetailModel(mOrgMetaData);
 
             return success(metaDataDetailModel);
         } catch (Exception ex) {
@@ -156,9 +161,15 @@ public class OrgMetaDataController extends BaseController {
         }
     }
 
-    public OrgMetaDataDetailModel convertOrgMetaDataDetailModel(MOrgMetaData mOrgMetaData)
+    public OrgMetaDataDetailModel convertToOrgMetaDataDetailModel(MOrgMetaData mOrgMetaData)
     {
+        if(mOrgMetaData==null)
+        {
+            return null;
+        }
         OrgMetaDataDetailModel metaDataDetailModel = convertToModel(mOrgMetaData, OrgMetaDataDetailModel.class);
+        metaDataDetailModel.setCreateDate(DateToString(mOrgMetaData.getCreateDate(), AgAdminConstants.DateTimeFormat));
+        metaDataDetailModel.setUpdateDate(DateToString(mOrgMetaData.getUpdateDate(),AgAdminConstants.DateTimeFormat));
 
         int dataSetSeq = metaDataDetailModel.getOrgDataSet();
         if (dataSetSeq!=0)
@@ -169,5 +180,18 @@ public class OrgMetaDataController extends BaseController {
         }
 
         return metaDataDetailModel;
+    }
+
+    public MOrgMetaData convertToMOrgMetaData(OrgMetaDataDetailModel detailModel)
+    {
+        if(detailModel==null)
+        {
+            return null;
+        }
+        MOrgMetaData mOrgMetaData = convertToModel(detailModel,MOrgMetaData.class);
+        mOrgMetaData.setCreateDate(StringToDate(detailModel.getCreateDate(),AgAdminConstants.DateTimeFormat));
+        mOrgMetaData.setUpdateDate(StringToDate(detailModel.getUpdateDate(),AgAdminConstants.DateTimeFormat));
+
+        return mOrgMetaData;
     }
 }

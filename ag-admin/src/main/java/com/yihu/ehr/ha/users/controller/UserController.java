@@ -27,7 +27,6 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -76,10 +75,9 @@ public class UserController extends BaseController {
         ResponseEntity<List<MUser>> responseEntity = userClient.searchUsers(fields, filters, sorts, size, page);
         List<MUser> mUsers = responseEntity.getBody();
         List<UsersModel> usersModels = new ArrayList<>();
-        SimpleDateFormat sdf = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss ");
         for (MUser mUser : mUsers) {
             UsersModel usersModel = convertToModel(mUser, UsersModel.class);
-            usersModel.setLastLoginTime(DateToString( mUser.getLastLoginTime(),"yyyy-MM-dd HH:mm:ss"));
+            usersModel.setLastLoginTime(DateToString( mUser.getLastLoginTime(),AgAdminConstants.DateTimeFormat));
             //获取用户类别字典
             if(StringUtils.isNotEmpty(mUser.getUserType())) {
                 MConventionalDict dict = conventionalDictClient.getUserType(mUser.getUserType());
@@ -174,12 +172,12 @@ public class UserController extends BaseController {
             }
 
             detailModel.setPassword(AgAdminConstants.DefaultPassword);
-            MUser mUser = convertUserDetailModelToMUser(detailModel);
+            MUser mUser = convertToMUser(detailModel);
             mUser = userClient.createUser(objectMapper.writeValueAsString(mUser));
             if (mUser == null) {
                 return failed("保存失败!");
             }
-            detailModel = MUserToUserDetailModel(mUser);
+            detailModel = convertToUserDetailModel(mUser);
             return success(detailModel);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -231,12 +229,12 @@ public class UserController extends BaseController {
                 return failed("邮箱已存在!");
             }
 
-            mUser = convertUserDetailModelToMUser(detailModel);
+            mUser = convertToMUser(detailModel);
             mUser = userClient.updateUser(objectMapper.writeValueAsString(mUser));
             if (mUser == null) {
                 return failed("保存失败!");
             }
-            detailModel = MUserToUserDetailModel(mUser);
+            detailModel = convertToUserDetailModel(mUser);
 
             return success(detailModel);
         }
@@ -259,7 +257,7 @@ public class UserController extends BaseController {
             if (mUser == null) {
                 return failed("用户信息获取失败!");
             }
-            UserDetailModel detailModel = MUserToUserDetailModel(mUser);
+            UserDetailModel detailModel = convertToUserDetailModel(mUser);
 
             return success(detailModel);
         }
@@ -366,7 +364,7 @@ public class UserController extends BaseController {
             if (mUser == null) {
                 return failed("用户信息获取失败!");
             }
-            UserDetailModel detailModel = MUserToUserDetailModel(mUser);
+            UserDetailModel detailModel = convertToUserDetailModel(mUser);
 
             return success(detailModel);
         }
@@ -394,7 +392,7 @@ public class UserController extends BaseController {
                 return failed("用户信息获取失败!");
             }
 
-            UserDetailModel detailModel = MUserToUserDetailModel(mUser);
+            UserDetailModel detailModel = convertToUserDetailModel(mUser);
 
             return success(detailModel);
         }
@@ -445,12 +443,15 @@ public class UserController extends BaseController {
      * @param mUser
      * @return UserDetailModel
      */
-    public UserDetailModel MUserToUserDetailModel(MUser mUser) {
-
+    public UserDetailModel convertToUserDetailModel(MUser mUser) {
+        if(mUser==null)
+        {
+            return null;
+        }
         UserDetailModel detailModel = convertToModel(mUser, UserDetailModel.class);
 
-        detailModel.setCreateDate(DateToString(mUser.getCreateDate(),"yyyy-MM-dd HH:mm:ss"));
-        detailModel.setLastLoginTime(DateToString(mUser.getLastLoginTime(),"yyyy-MM-dd HH:mm:ss"));
+        detailModel.setCreateDate(DateToString(mUser.getCreateDate(),AgAdminConstants.DateTimeFormat));
+        detailModel.setLastLoginTime(DateToString(mUser.getLastLoginTime(),AgAdminConstants.DateTimeFormat));
 
         //获取婚姻状态代码
         String marryCode = mUser.getMartialStatus();
@@ -488,11 +489,15 @@ public class UserController extends BaseController {
         return detailModel;
     }
 
-    public MUser convertUserDetailModelToMUser(UserDetailModel detailModel)
+    public MUser convertToMUser(UserDetailModel detailModel)
     {
+        if(detailModel==null)
+        {
+            return null;
+        }
         MUser mUser = convertToModel(detailModel,MUser.class);
-        mUser.setCreateDate(StringToDate(detailModel.getCreateDate(),"yyyy-MM-dd HH:mm:ss"));
-        mUser.setLastLoginTime(StringToDate(detailModel.getLastLoginTime(),"yyyy-MM-dd HH:mm:ss"));
+        mUser.setCreateDate(StringToDate(detailModel.getCreateDate(),AgAdminConstants.DateTimeFormat));
+        mUser.setLastLoginTime(StringToDate(detailModel.getLastLoginTime(),AgAdminConstants.DateTimeFormat));
 
         return mUser;
     }

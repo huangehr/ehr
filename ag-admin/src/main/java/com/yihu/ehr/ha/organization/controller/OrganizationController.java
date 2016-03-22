@@ -1,5 +1,6 @@
 package com.yihu.ehr.ha.organization.controller;
 
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.organization.service.OrganizationClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -68,7 +69,7 @@ public class OrganizationController extends BaseController {
             ResponseEntity<List<MOrganization>> responseEntity = orgClient.searchOrgs(fields, filters, sorts, size, page);
             List<MOrganization> organizations = responseEntity.getBody();
             for (MOrganization mOrg : organizations) {
-                OrgModel orgModel = changeToOrgModel(mOrg);
+                OrgModel orgModel = convertToOrgModel(mOrg);
                 orgModelList.add(orgModel);
             }
             int totalCount = getTotalCount(responseEntity);
@@ -87,7 +88,13 @@ public class OrganizationController extends BaseController {
      * @param mOrg
      * @return
      */
-    public OrgModel changeToOrgModel(MOrganization mOrg) {
+    public OrgModel convertToOrgModel(MOrganization mOrg) {
+
+        if(mOrg==null)
+        {
+            return null;
+        }
+
         OrgModel orgModel = convertToModel(mOrg, OrgModel.class);
         // 获取机构类别字典
         MConventionalDict orgTypeDict = conDictEntryClient.getOrgType(mOrg.getOrgType());
@@ -160,7 +167,7 @@ public class OrganizationController extends BaseController {
             }
 
             OrgDetailModel orgDetailModel = objectMapper.readValue(mOrganizationJsonData, OrgDetailModel.class);
-            MOrganization mOrganization = convertToModel(orgDetailModel, MOrganization.class);
+            MOrganization mOrganization = convertToMOrganization(orgDetailModel);
             if (StringUtils.isEmpty(mOrganization.getOrgCode())) {
                 errorMsg+="机构代码不能为空！";
             }
@@ -188,7 +195,7 @@ public class OrganizationController extends BaseController {
             if (mOrgNew == null) {
                 return failed("保存失败!");
             }
-            return success(changeToOrgDetailModel(mOrgNew));
+            return success(convertToOrgDetailModel(mOrgNew));
         }
         catch (Exception ex)
         {
@@ -211,7 +218,7 @@ public class OrganizationController extends BaseController {
           }
 
           OrgDetailModel orgDetailModel = objectMapper.readValue(mOrganizationJsonData, OrgDetailModel.class);
-          MOrganization mOrganization = convertToModel(orgDetailModel, MOrganization.class);
+          MOrganization mOrganization = convertToMOrganization(orgDetailModel);
           if (StringUtils.isEmpty(mOrganization.getOrgCode())) {
               errorMsg+="机构代码不能为空！";
           }
@@ -235,7 +242,7 @@ public class OrganizationController extends BaseController {
           if (mOrgNew == null) {
              return  failed("更新失败");
           }
-          return success(changeToOrgDetailModel(mOrgNew));
+          return success(convertToOrgDetailModel(mOrgNew));
       }
       catch (Exception ex)
       {
@@ -262,7 +269,7 @@ public class OrganizationController extends BaseController {
             if (mOrg == null) {
                 return failed("机构获取失败");
             }
-            OrgDetailModel org = changeToOrgDetailModel(mOrg);
+            OrgDetailModel org = convertToOrgDetailModel(mOrg);
 
             return success(org);
         }
@@ -279,8 +286,10 @@ public class OrganizationController extends BaseController {
      * @return
      */
 
-    public OrgDetailModel changeToOrgDetailModel(MOrganization mOrg) {
+    public OrgDetailModel convertToOrgDetailModel(MOrganization mOrg) {
         OrgDetailModel org = convertToModel(mOrg, OrgDetailModel.class);
+        org.setCreateDate(DateToString(mOrg.getCreateDate(), AgAdminConstants.DateTimeFormat));
+
         //获取机构类别字典值
         MConventionalDict orgTypeDict = conDictEntryClient.getOrgType(mOrg.getOrgType());
         org.setOrgTypeName(orgTypeDict == null ? "" : orgTypeDict.getValue());
@@ -422,5 +431,16 @@ public class OrganizationController extends BaseController {
             ex.printStackTrace();
             return false;
         }
+    }
+
+    public MOrganization convertToMOrganization(OrgDetailModel detailModel)
+    {
+        if(detailModel==null)
+        {
+            return null;
+        }
+        MOrganization mOrganization = convertToModel(detailModel, MOrganization.class);
+        mOrganization.setCreateDate(StringToDate(detailModel.getCreateDate(),AgAdminConstants.DateTimeFormat));
+        return mOrganization;
     }
 }

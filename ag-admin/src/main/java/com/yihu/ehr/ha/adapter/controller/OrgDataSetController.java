@@ -2,6 +2,7 @@ package com.yihu.ehr.ha.adapter.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.thirdpartystandard.OrgDataSetDetailModel;
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.adapter.service.OrgDataSetClient;
 import com.yihu.ehr.model.adaption.MOrgDataSet;
@@ -39,7 +40,7 @@ public class OrgDataSetController extends BaseController {
 
         try {
             MOrgDataSet mOrgDataSet = orgDataSetClient.getOrgDataSet(id);
-            OrgDataSetDetailModel dataSetModel = convertToModel(mOrgDataSet, OrgDataSetDetailModel.class);
+            OrgDataSetDetailModel dataSetModel = convertToOrgDataSetDetailModel(mOrgDataSet);
             if (dataSetModel == null) {
                 return failed("数据集信息获取失败!");
             }
@@ -75,7 +76,7 @@ public class OrgDataSetController extends BaseController {
             }
             boolean isExist = orgDataSetClient.dataSetIsExist(detailModel.getOrganization(), detailModel.getCode());
 
-            MOrgDataSet mOrgDataSet = convertToModel(detailModel, MOrgDataSet.class);
+            MOrgDataSet mOrgDataSet = convertToMOrgDataSet(detailModel);
             if (detailModel.getId() == 0) {
                 if (isExist) {
                     return failed("数据集已存在!");
@@ -91,7 +92,7 @@ public class OrgDataSetController extends BaseController {
                 mOrgDataSet = orgDataSetClient.updateOrgDataSet(objectMapper.writeValueAsString(mOrgDataSet));
             }
 
-            detailModel = convertToModel(mOrgDataSet, OrgDataSetDetailModel.class);
+            detailModel = convertToOrgDataSetDetailModel(mOrgDataSet);
             if (detailModel == null) {
                 return failed("保存失败!");
             }
@@ -144,8 +145,13 @@ public class OrgDataSetController extends BaseController {
         try {
             ResponseEntity<Collection<MOrgDataSet>> responseEntity = orgDataSetClient.searchAdapterOrg(fields, filters, sorts, size, page);
             List<MOrgDataSet> mOrgDataSets = (List<MOrgDataSet>) responseEntity.getBody();
-            List<OrgDataSetDetailModel> detailModels = (List<OrgDataSetDetailModel>) convertToModels(mOrgDataSets, new ArrayList<OrgDataSetDetailModel>(mOrgDataSets.size()), OrgDataSetDetailModel.class, null);
-
+            List<OrgDataSetDetailModel> detailModels =new ArrayList<> ();
+            //List<OrgDataSetDetailModel>) convertToModels(mOrgDataSets, new ArrayList<OrgDataSetDetailModel>(mOrgDataSets.size()), OrgDataSetDetailModel.class, null);
+            for(MOrgDataSet mOrgDataSet : mOrgDataSets)
+            {
+                OrgDataSetDetailModel detailModel = convertToOrgDataSetDetailModel(mOrgDataSet);
+                detailModels.add(detailModel);
+            }
             return getResult(detailModels, getTotalCount(responseEntity), page, size);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -160,12 +166,36 @@ public class OrgDataSetController extends BaseController {
 
         try {
             MOrgDataSet mOrgDataSet = orgDataSetClient.getDataSetBySequence(orgCode, sequence);
-            OrgDataSetDetailModel dataSetModel = convertToModel(mOrgDataSet, OrgDataSetDetailModel.class);
+            OrgDataSetDetailModel dataSetModel = convertToOrgDataSetDetailModel(mOrgDataSet);
 
             return success(dataSetModel);
         } catch (Exception ex) {
             ex.printStackTrace();
             return failedSystem();
         }
+    }
+
+    public MOrgDataSet convertToMOrgDataSet(OrgDataSetDetailModel detailModel)
+    {
+        if(detailModel==null)
+        {
+            return null;
+        }
+        MOrgDataSet mOrgDataSet = convertToModel(detailModel,MOrgDataSet.class);
+        mOrgDataSet.setCreateDate(StringToDate(detailModel.getCreateDate(), AgAdminConstants.DateTimeFormat));
+        mOrgDataSet.setUpdateDate(StringToDate(detailModel.getUpdateDate(),AgAdminConstants.DateTimeFormat));
+        return mOrgDataSet;
+    }
+
+    public OrgDataSetDetailModel convertToOrgDataSetDetailModel(MOrgDataSet mOrgDataSet)
+    {
+        if(mOrgDataSet==null)
+        {
+            return null;
+        }
+        OrgDataSetDetailModel detailModel = convertToModel(mOrgDataSet, OrgDataSetDetailModel.class);
+        detailModel.setCreateDate(DateToString(mOrgDataSet.getCreateDate(),AgAdminConstants.DateTimeFormat));
+        detailModel.setUpdateDate(DateToString(mOrgDataSet.getUpdateDate(),AgAdminConstants.DateTimeFormat));
+        return detailModel;
     }
 }

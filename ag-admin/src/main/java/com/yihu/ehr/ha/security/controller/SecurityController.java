@@ -1,6 +1,7 @@
 package com.yihu.ehr.ha.security.controller;
 
 import com.yihu.ehr.agModel.security.UserSecurityModel;
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.security.service.SecurityClient;
 import com.yihu.ehr.ha.users.service.UserClient;
@@ -44,7 +45,7 @@ public class SecurityController extends BaseController{
 
         MUser mUser = userClient.getUserByUserName(loginCode);
         MKey mKey = securityClient.getUserKey(mUser.getId());
-        UserSecurityModel userSecurityModel = convertToModel(mKey,UserSecurityModel.class);
+        UserSecurityModel userSecurityModel = convertToUserSecurityModel(mKey);
 
         if(mKey != null){
             envelop.setSuccessFlg(true);
@@ -73,7 +74,7 @@ public class SecurityController extends BaseController{
         Envelop envelop = new Envelop();
 
         MKey mKey = securityClient.createUserKey(userId);
-        UserSecurityModel userSecurityModel = convertToModel(mKey,UserSecurityModel.class);
+        UserSecurityModel userSecurityModel = convertToUserSecurityModel(mKey);
 
         if(userSecurityModel != null){
             envelop.setSuccessFlg(true);
@@ -101,7 +102,7 @@ public class SecurityController extends BaseController{
         Envelop envelop = new Envelop();
 
         MKey mKey = securityClient.getUserKey(userId);
-        UserSecurityModel userSecurityModel = convertToModel(mKey,UserSecurityModel.class);
+        UserSecurityModel userSecurityModel = convertToUserSecurityModel(mKey);
 
         if(userSecurityModel != null){
             envelop.setSuccessFlg(true);
@@ -138,7 +139,7 @@ public class SecurityController extends BaseController{
         Envelop envelop = new Envelop();
 
         MKey mKey = securityClient.getOrgKey(orgCode);
-        UserSecurityModel userSecurityModel = convertToModel(mKey,UserSecurityModel.class);
+        UserSecurityModel userSecurityModel = convertToUserSecurityModel(mKey);
 
         if(userSecurityModel != null){
             envelop.setSuccessFlg(true);
@@ -169,7 +170,7 @@ public class SecurityController extends BaseController{
         Envelop envelop = new Envelop();
 
         MKey mKey = securityClient.createOrgKey(orgCode);
-        UserSecurityModel userSecurityModel = convertToModel(mKey,UserSecurityModel.class);
+        UserSecurityModel userSecurityModel = convertToUserSecurityModel(mKey);
 
         if(userSecurityModel != null){
             envelop.setSuccessFlg(true);
@@ -201,4 +202,16 @@ public class SecurityController extends BaseController{
     }
     /***************************** 机构秘钥信息 cms End ***************************************/
 
+    public UserSecurityModel convertToUserSecurityModel(MKey mKey)
+    {
+        if(mKey==null)
+        {
+            return null;
+        }
+
+        UserSecurityModel userSecurityModel = convertToModel(mKey,UserSecurityModel.class);
+        userSecurityModel.setExpiryDate(DateToString(mKey.getExpiryDate(), AgAdminConstants.DateTimeFormat));
+        userSecurityModel.setFromDate(DateToString(mKey.getFromDate(), AgAdminConstants.DateTimeFormat));
+        return userSecurityModel;
+    }
 }
