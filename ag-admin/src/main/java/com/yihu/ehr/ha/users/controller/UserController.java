@@ -27,7 +27,6 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -76,9 +75,9 @@ public class UserController extends BaseController {
         ResponseEntity<List<MUser>> responseEntity = userClient.searchUsers(fields, filters, sorts, size, page);
         List<MUser> mUsers = responseEntity.getBody();
         List<UsersModel> usersModels = new ArrayList<>();
-        SimpleDateFormat sdf = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss ");
         for (MUser mUser : mUsers) {
             UsersModel usersModel = convertToModel(mUser, UsersModel.class);
+            usersModel.setLastLoginTime(DateToString( mUser.getLastLoginTime(),AgAdminConstants.DateTimeFormat));
             //获取用户类别字典
             if(StringUtils.isNotEmpty(mUser.getUserType())) {
                 MConventionalDict dict = conventionalDictClient.getUserType(mUser.getUserType());
@@ -173,12 +172,12 @@ public class UserController extends BaseController {
             }
 
             detailModel.setPassword(AgAdminConstants.DefaultPassword);
-            MUser mUser = convertToModel(detailModel, MUser.class);
+            MUser mUser = convertToMUser(detailModel);
             mUser = userClient.createUser(objectMapper.writeValueAsString(mUser));
             if (mUser == null) {
                 return failed("保存失败!");
             }
-            detailModel = convertToModel(mUser, UserDetailModel.class);
+            detailModel = convertToUserDetailModel(mUser);
             return success(detailModel);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -230,12 +229,12 @@ public class UserController extends BaseController {
                 return failed("邮箱已存在!");
             }
 
-            mUser = convertToModel(detailModel, MUser.class);
+            mUser = convertToMUser(detailModel);
             mUser = userClient.updateUser(objectMapper.writeValueAsString(mUser));
             if (mUser == null) {
                 return failed("保存失败!");
             }
-            detailModel = convertToModel(mUser, UserDetailModel.class);
+            detailModel = convertToUserDetailModel(mUser);
 
             return success(detailModel);
         }
@@ -258,7 +257,7 @@ public class UserController extends BaseController {
             if (mUser == null) {
                 return failed("用户信息获取失败!");
             }
-            UserDetailModel detailModel = MUserToUserDetailModel(mUser);
+            UserDetailModel detailModel = convertToUserDetailModel(mUser);
 
             return success(detailModel);
         }
@@ -365,7 +364,7 @@ public class UserController extends BaseController {
             if (mUser == null) {
                 return failed("用户信息获取失败!");
             }
-            UserDetailModel detailModel = MUserToUserDetailModel(mUser);
+            UserDetailModel detailModel = convertToUserDetailModel(mUser);
 
             return success(detailModel);
         }
@@ -393,7 +392,7 @@ public class UserController extends BaseController {
                 return failed("用户信息获取失败!");
             }
 
-            UserDetailModel detailModel = MUserToUserDetailModel(mUser);
+            UserDetailModel detailModel = convertToUserDetailModel(mUser);
 
             return success(detailModel);
         }
@@ -444,9 +443,15 @@ public class UserController extends BaseController {
      * @param mUser
      * @return UserDetailModel
      */
-    public UserDetailModel MUserToUserDetailModel(MUser mUser) {
-
+    public UserDetailModel convertToUserDetailModel(MUser mUser) {
+        if(mUser==null)
+        {
+            return null;
+        }
         UserDetailModel detailModel = convertToModel(mUser, UserDetailModel.class);
+
+        detailModel.setCreateDate(DateToString(mUser.getCreateDate(),AgAdminConstants.DateTimeFormat));
+        detailModel.setLastLoginTime(DateToString(mUser.getLastLoginTime(),AgAdminConstants.DateTimeFormat));
 
         //获取婚姻状态代码
         String marryCode = mUser.getMartialStatus();
@@ -484,46 +489,16 @@ public class UserController extends BaseController {
         return detailModel;
     }
 
-
-    /*@RequestMapping(value = "/users/upload/", method = RequestMethod.POST)
-    @ApiOperation(value = "", notes = "")
-    public String upload(
-            @ApiParam(name = "request")
-            @RequestParam(value = "request")HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try {
-            request.setCharacterEncoding("utf-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        //获取流
-        InputStream inputStream = request.getInputStream();
-        //获取文件名
-        String fileName = request.getParameter("name");
-        if (fileName == null || fileName.equals("")) {
+    public MUser convertToMUser(UserDetailModel detailModel)
+    {
+        if(detailModel==null)
+        {
             return null;
         }
-        //获取文件扩展名
-        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-        //获取文件名
-        String description = null;
-        if ((fileName != null) && (fileName.length() > 0)) {
-            int dot = fileName.lastIndexOf('.');
-            if ((dot > -1) && (dot < (fileName.length()))) {
-                description = fileName.substring(0, dot);
-            }
-        }
-        ObjectNode objectNode = null;
-        String path = null;
-        try {
-            FastDFSUtil fastDFSUtil = new FastDFSUtil();
-            objectNode = fastDFSUtil.upload(inputStream, fileExtension, description);
-            String groupName = objectNode.get("groupName").toString();
-            String remoteFileName = objectNode.get("remoteFileName").toString();
-            path = "{groupName:" + groupName + ",remoteFileName:" + remoteFileName + "}";
-        } catch (Exception e) {
-            //LogService.getLogger(user.class).error("用户头像上传失败；错误代码："+e);
-        }
-        return path;
-    }*/
+        MUser mUser = convertToModel(detailModel,MUser.class);
+        mUser.setCreateDate(StringToDate(detailModel.getCreateDate(),AgAdminConstants.DateTimeFormat));
+        mUser.setLastLoginTime(StringToDate(detailModel.getLastLoginTime(),AgAdminConstants.DateTimeFormat));
 
+        return mUser;
+    }
 }

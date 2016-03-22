@@ -136,11 +136,34 @@ public class UserControllerTests {
 
     }
 
-    public void cTestBug()
+    @Test
+    public void cTestBugDate()throws Exception
     {
         applicationContext = new SpringApplicationBuilder()
                 .web(false).sources(AgAdminApplication.class).run();
 
+        Envelop envelop = userController.getUser("0dae0003561cc415c72d9111e8cb88aa");
+        assertTrue("数据获取失败", envelop.isSuccessFlg() && envelop.getObj()!=null);
+
+
+        UserDetailModel userModel = new UserDetailModel();
+
+        userModel.setGender("Male");
+        userModel.setMartialStatus("10");
+        userModel.setUserType("Nurse");
+        userModel.setOrganization("341321234");
+        userModel.setMajor("");
+
+        userModel.setLoginCode("test_cms");
+        userModel.setRealName("test_cms");
+        userModel.setIdCardNo("111111111111111111");
+        userModel.setEmail("555@qq.com");
+        userModel.setTelephone("11111111111");
+        userModel.setCreateDate("2016-03-22 10:31:00");
+        userModel.setLastLoginTime("2016-03-22 10:32:00");
+        String userModelJson = objectMapper.writeValueAsString(userModel);
+        envelop = userController.createUser(userModelJson);
+        assertTrue("新增失败", envelop.isSuccessFlg());
 
     }
 }

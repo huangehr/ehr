@@ -280,7 +280,7 @@
                                         $.Notice.success('更新成功');
                                         self.searchSystemDict();
                                     } else {
-                                        $.Notice.error('更新失败');
+                                        $.Notice.error("更新失败");
                                     }
                                     systemDictUpdateDialog.close();
                                 }
@@ -317,11 +317,11 @@
                                 data: {dictId: systemDictId, code: code, value: value, sort: sort, catalog: catalog},
                                 success: function (data) {
                                     if (data.successFlg) {
-                                        $.Notice.success('更新成功');
+                                        $.Notice.success('保存成功');
                                         //self.searchSystemDict();
                                         master.initSystemDictEntity(master.$systemDictId.val());
                                     } else {
-                                        $.Notice.error('更新失败');
+                                        $.Notice.error(data.errorMsg);
                                     }
                                     addSystemDictEntityDialog.close();
                                 }

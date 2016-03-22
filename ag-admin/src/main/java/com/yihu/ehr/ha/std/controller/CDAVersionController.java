@@ -2,6 +2,7 @@ package com.yihu.ehr.ha.std.controller;
 
 import com.yihu.ehr.agModel.standard.standardversion.StdVersionDetailModel;
 import com.yihu.ehr.agModel.standard.standardversion.StdVersionModel;
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.std.service.CDAVersionClient;
 import com.yihu.ehr.model.standard.MCDAVersion;
@@ -21,7 +22,7 @@ import java.util.List;
 /**
  * Created by yww on 2016/3/1.
  */
-@RequestMapping(ApiVersion.Version1_0 + "/version")
+@RequestMapping(ApiVersion.Version1_0 + "/admin/version")
 @RestController
 public class CDAVersionController extends BaseController {
     @Autowired
@@ -84,6 +85,9 @@ public class CDAVersionController extends BaseController {
         }
         envelop.setSuccessFlg(true);
         StdVersionDetailModel stdVersionDetailModel = convertToModel(mcdaVersion, StdVersionDetailModel.class);
+        if(stdVersionDetailModel!=null) {
+            stdVersionDetailModel.setCommitTime(DateToString(mcdaVersion.getCommitTime(), AgAdminConstants.DateTimeFormat));
+        }
         envelop.setObj(stdVersionDetailModel);
         return envelop;
     }
@@ -155,6 +159,11 @@ public class CDAVersionController extends BaseController {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("标准版本更新失败！");
             return envelop;
+        }
+        StdVersionDetailModel stdVersionDetailModel = convertToModel(mcdaVersion, StdVersionDetailModel.class);
+        if(stdVersionDetailModel!=null)
+        {
+            stdVersionDetailModel.setCommitTime(DateToString(mcdaVersion.getCommitTime(),AgAdminConstants.DateTimeFormat));
         }
         envelop.setSuccessFlg(true);
         envelop.setObj(convertToModel(mcdaVersion, StdVersionDetailModel.class));

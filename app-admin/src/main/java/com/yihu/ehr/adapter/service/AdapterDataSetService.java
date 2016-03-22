@@ -16,9 +16,9 @@ public class AdapterDataSetService extends ExtendService<MAdapterDataSet> {
         init(
                 "/adapter/plan/data_set/{plan_id}",        //searchUrl
                 "/adapter//metadata/{id}",   //modelUrl
-                "/adapter/plan",        //addUrl
-                "/adapter/plan",        //modifyUrl
-                "/adapter/plans"        //deleteUrl
+                "/adapter/metadata",        //addUrl
+                "/adapter/metadata",        //modifyUrl
+                "/adapter/meta_data"        //deleteUrl
         );
     }
 

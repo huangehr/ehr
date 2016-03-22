@@ -1,14 +1,12 @@
 package com.yihu.ehr.agModel.user;
 
-import java.util.Date;
-
 /**
  * Created by AndyCai on 2016/2/22.
  */
 public class UserDetailModel {
     private String id;
-    private Date createDate;
-    private Date lastLoginTime;
+    private String createDate;
+    private String lastLoginTime;
     private String email;
     private String loginCode;
     private String realName;
@@ -54,19 +52,19 @@ public class UserDetailModel {
         this.id = id;
     }
 
-    public Date getCreateDate() {
+    public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(String createDate) {
         this.createDate = createDate;
     }
 
-    public Date getLastLoginTime() {
+    public String getLastLoginTime() {
         return lastLoginTime;
     }
 
-    public void setLastLoginTime(Date lastLoginTime) {
+    public void setLastLoginTime(String lastLoginTime) {
         this.lastLoginTime = lastLoginTime;
     }
 

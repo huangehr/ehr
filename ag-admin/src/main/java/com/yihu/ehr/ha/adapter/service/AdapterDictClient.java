@@ -23,7 +23,7 @@ import java.util.Collection;
  * @version 1.0
  * @created 2016.2.3
  */
-@FeignClient(MicroServices.Adaption)
+@FeignClient(name=MicroServices.Adaption)
 @RequestMapping(ApiVersion.Version1_0  + "/adapter")
 @ApiIgnore
 public interface AdapterDictClient {
