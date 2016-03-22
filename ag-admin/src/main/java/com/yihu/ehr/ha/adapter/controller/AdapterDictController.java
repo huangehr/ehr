@@ -3,6 +3,7 @@ package com.yihu.ehr.ha.adapter.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.adapter.AdapterDictDetailModel;
 import com.yihu.ehr.agModel.adapter.AdapterDictModel;
+import com.yihu.ehr.agModel.adapter.AdapterPlanModel;
 import com.yihu.ehr.agModel.adapter.AdapterRelationshipModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.exception.ApiException;
@@ -13,6 +14,7 @@ import com.yihu.ehr.ha.adapter.service.PlanClient;
 import com.yihu.ehr.ha.adapter.utils.ExtendController;
 import com.yihu.ehr.ha.std.service.DictClient;
 import com.yihu.ehr.model.adaption.*;
+import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.standard.MStdDict;
 import com.yihu.ehr.model.standard.MStdDictEntry;
 import com.yihu.ehr.util.Envelop;
@@ -24,9 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author lincl
@@ -219,6 +219,67 @@ public class AdapterDictController extends ExtendController<AdapterDictModel> {
             return failedSystem();
         }
     }
+
+
+    /**
+     * 标准字典项的下拉
+     * @return
+     */
+    @RequestMapping("/std_dict_entries/combo")
+    @ResponseBody
+    public Envelop getStdDictEntry(
+            @ApiParam(name = "plan_id", value = "方案编号")
+            @RequestParam(value = "plan_id") Long planId,
+            @ApiParam(name = "dict_id", value = "字典编号")
+            @RequestParam(value = "dict_id") Long dictId,
+            @ApiParam(name = "mode", value = "编辑模式： modify、new")
+            @RequestParam(value = "mode") String mode){
+
+        Envelop result = new Envelop();
+        try {
+
+            MAdapterPlan orgAdapterPlan = planClient.getAdapterPlanById(planId);
+            String version = orgAdapterPlan.getVersion();
+            ResponseEntity<Collection<MStdDictEntry>> dictEntryRs = dictClient.searchDictEntry("", "dictId=" + dictId, "", 10000, 1, version);
+
+            List<String> dictEntries = new ArrayList<>();
+            Collection<MStdDictEntry> dictEntryList = dictEntryRs.getBody();
+            if (!dictEntryList.isEmpty()){
+                if("modify".equals(mode) || "view".equals(mode)){
+                    for (MStdDictEntry dictEntry : dictEntryList) {
+                        dictEntries.add(String.valueOf(dictEntry.getId())+','+dictEntry.getValue());
+                    }
+                }
+                else{
+                    ResponseEntity<Collection<MAdapterDictVo>> adapterDictModelRs = adapterDictClient.searchAdapterDictEntry(planId, dictId, "", "", "", 10000, 1);
+                    Collection<MAdapterDictVo> adapterDictModels = adapterDictModelRs.getBody();
+                    boolean exist = false;
+                    for (MStdDictEntry dictEntry : dictEntryList) {
+                        exist = false;
+                        for(MAdapterDictVo model : adapterDictModels){
+                            if(dictEntry.getId()==model.getDictEntryId()){
+                                exist = true;
+                                break;
+                            }
+                        }
+                        if(!exist)
+                            dictEntries.add(String.valueOf(dictEntry.getId())+','+dictEntry.getValue());
+                    }
+                }
+
+                result.setSuccessFlg(true);
+            } else {
+                result.setSuccessFlg(false);
+            }
+            result.setObj(dictEntries);
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setErrorMsg(e.getMessage());
+            return result;
+        }
+    }
+
 
     public AdapterDictModel convertAdapterDictModel(MAdapterDict mAdapterDict)
     {

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.List;
 
@@ -115,6 +116,7 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
         AdapterDataSet adapterDataSet = adapterDataSetService.retrieve(id);
         if(adapterDataSet==null)
             throw errNotFound();
+        jsonModel = URLDecoder.decode(jsonModel, "UTF-8");
         return getModel(saveAdapterMetaData(adapterDataSet, jsonModel));
     }
 
