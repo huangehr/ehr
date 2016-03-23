@@ -1,7 +1,10 @@
 package com.yihu.ehr.model.app;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * APP Model。
@@ -23,6 +26,7 @@ public class MApp implements Serializable {
     private String catalog;
     private String status;
     private String description;
+    private String tags;
 
 	public MApp(){
     }
@@ -113,5 +117,12 @@ public class MApp implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String[] getTags() {
+        return tags.split(" ");
+    }
+    public void setTags(String[] tags) {
+        this.tags = Arrays.toString(tags);
     }
 }
