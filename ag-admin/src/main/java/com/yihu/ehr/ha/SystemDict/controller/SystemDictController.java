@@ -114,7 +114,7 @@ public class SystemDictController extends BaseController {
         try {
             MSystemDict systemDict = systemDictClient.getDictionary(id);
             SystemDictModel systemDictModel = convertToModel(systemDict, SystemDictModel.class);
-
+            systemDictModel.setCreateDate(DateToString(systemDict.getCreateDate(),AgAdminConstants.DateTimeFormat));
             if (systemDictModel == null) {
                 return failed("获取字典失败!");
             }
