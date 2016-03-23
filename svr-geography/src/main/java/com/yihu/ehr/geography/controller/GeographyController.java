@@ -92,11 +92,11 @@ public class GeographyController extends BaseRestController{
     @ApiOperation(value = "根据省市县查询地址并返回地址编号列表")
     public List<String> search(
             @ApiParam(name = "province", value = "省", defaultValue = "")
-            @RequestParam(value = "province") String province,
+            @RequestParam(value = "province",required = true) String province,
             @ApiParam(name = "city", value = "市", defaultValue = "")
-            @RequestParam(value = "city") String city,
+            @RequestParam(value = "city",required = false) String city,
             @ApiParam(name = "district", value = "县", defaultValue = "")
-            @RequestParam(value = "district") String district) {
+            @RequestParam(value = "district",required = false) String district) {
         List<String> idList =  geographyService.search(province,city,district);
         return idList;
     }
@@ -109,7 +109,7 @@ public class GeographyController extends BaseRestController{
     @RequestMapping(value = "geographies/{id}" , method = RequestMethod.DELETE)
     @ApiOperation(value = "根据地址编号删除地址")
     public boolean delete(
-            @ApiParam(name = "/id" , value = "地址代码" ,defaultValue = "")
+            @ApiParam(name = "id" , value = "地址代码" ,defaultValue = "")
             @PathVariable (value = "id") String id) {
         Geography address = geographyService.getAddressById(id);
         if(address==null){
@@ -120,8 +120,8 @@ public class GeographyController extends BaseRestController{
     }
 
 
-    @RequestMapping(value = "/geographies/existence" , method = RequestMethod.GET)
-    @ApiOperation(value = "判断是否是个地址")
+    @RequestMapping(value = "/geographies/is_null" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断是否是个空地址")
     public boolean isNullAddress(
             @ApiParam(name = "json_data", value = "地址json字符串")
             @RequestParam( value = "json_data") String jsonData) throws Exception{

@@ -6,6 +6,7 @@ import com.yihu.ehr.model.user.MUser;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -24,9 +25,9 @@ public interface UserClient {
     @RequestMapping(value = RestApi.Users.UserAdmin, method = GET)
     MUser getUser(@PathVariable(value = "user_id") String userId);
 
-    @RequestMapping(value = RestApi.Users.UserPassword, method = GET)
+    @RequestMapping(value = RestApi.Users.UserVerification, method = GET)
     MUser getUserByNameAndPassword(
-            @PathVariable(value = "user_name") String userName,
-            @PathVariable(value = "password") String password);
+            @RequestParam(value = "user_name") String userName,
+            @RequestParam(value = "password") String password);
 
 }

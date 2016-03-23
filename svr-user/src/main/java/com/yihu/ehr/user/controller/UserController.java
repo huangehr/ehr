@@ -34,7 +34,7 @@ import java.util.*;
 @Api(protocols = "https", value = "users", description = "用户管理接口", tags = {"用户,登录帐号,密码"})
 public class UserController extends BaseRestController {
 
-    @Value("default.password")
+    @Value("${default.password}")
     private String default_password = "123456";
 
     @Autowired
@@ -78,7 +78,7 @@ public class UserController extends BaseRestController {
         }
 
         user.setActivated(true);
-        userManager.saveUser(user);
+        user = userManager.saveUser(user);
         return convertToModel(user, MUser.class, null);
     }
 
@@ -90,7 +90,7 @@ public class UserController extends BaseRestController {
         ObjectMapper objectMapper = new ObjectMapper();
         User user = objectMapper.readValue(userJsonData, User.class);
         userManager.saveUser(user);
-        return convertToModel(user, MUser.class, null);
+        return convertToModel(user, MUser.class);
     }
 
     @RequestMapping(value = RestApi.Users.UserAdmin, method = RequestMethod.GET)
@@ -138,7 +138,6 @@ public class UserController extends BaseRestController {
             @ApiParam(name = "user_id", value = "id", defaultValue = "")
             @PathVariable(value = "user_id") String userId) throws Exception {
         userManager.resetPass(userId);
-
         return true;
     }
 
@@ -172,13 +171,13 @@ public class UserController extends BaseRestController {
      * @param userName
      * @param password
      */
-    @RequestMapping(value = RestApi.Users.UserPassword, method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Users.UserVerification, method = RequestMethod.GET)
     @ApiOperation(value = "根据登陆用户名及密码验证用户", notes = "根据登陆用户名及密码验证用户")
     public MUser getUserByNameAndPassword(
             @ApiParam(name = "user_name", value = "登录账号", defaultValue = "")
-            @PathVariable(value = "user_name") String userName,
+            @RequestParam(value = "user_name") String userName,
             @ApiParam(name = "password", value = "密码", defaultValue = "")
-            @PathVariable(value = "password") String password) {
+            @RequestParam(value = "password") String password) {
         User user = userManager.loginVerification(userName, password);
         return convertToModel(user, MUser.class);
     }
