@@ -208,7 +208,6 @@ public class AppController extends BaseController {
         app.setCreateTime(DateToString(mApp.getCreateTime(), AgAdminConstants.DateTimeFormat));
         app.setAuditTime(DateToString(mApp.getAuditTime(),AgAdminConstants.DateTimeFormat));
 
-        //TODO 微服务提供的model缺少tags标签属性
         //获取app类别字典值
         MConventionalDict catalopDict = conDictEntryClient.getAppCatalog(mApp.getCatalog());
         app.setCatalogName(catalopDict == null ? "" : catalopDict.getValue());

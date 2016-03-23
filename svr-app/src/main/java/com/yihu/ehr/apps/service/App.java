@@ -1,6 +1,5 @@
 package com.yihu.ehr.apps.service;
 
-import com.yihu.ehr.util.ObjectVersion;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -28,7 +27,7 @@ public class    App {
     private String catalog;
     private String status;
     private String description;
-
+    private String tags;
 	public App(){
 //        id  = new ObjectVersion().toString();
     }
@@ -122,5 +121,14 @@ public class    App {
     }
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Column(name = "tags",  nullable = true)
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 }
