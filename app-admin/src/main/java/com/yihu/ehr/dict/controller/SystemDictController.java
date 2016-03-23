@@ -395,6 +395,12 @@ public class SystemDictController extends BaseUIController {
         if (!StringUtils.isEmpty(filters)) {
             params.put("filters", filters);
         }
+        if(StringUtils.isEmpty(page) || page == 0){
+            page = 1;
+        }
+        if(StringUtils.isEmpty(rows) || rows == 0){
+            rows = 50;
+        }
         params.put("page", page);
         params.put("size", rows);
 
