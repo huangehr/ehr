@@ -8,6 +8,7 @@ import com.yihu.ehr.util.controller.BaseRestController;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.URLDecoder;
 
 /**
  * @author lincl
@@ -15,6 +16,11 @@ import java.lang.reflect.Type;
  * @created 2016/2/4
  */
 public class ExtendController<T> extends BaseRestController {
+
+    protected <T> T toDecodeObj(String json ,Class<T> clz) throws IOException {
+
+        return toEntity(URLDecoder.decode(json, "UTF-8"), clz)  ;
+    }
 
     protected <T> T jsonToObj(String json ,Class<T> clz) throws IOException {
 
