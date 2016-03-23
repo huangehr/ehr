@@ -4,7 +4,6 @@
     (function ($, win) {
 
         /* ************************** 变量定义 ******************************** */
-        var idCardNo = '${patientModel.idCardNo}';
         // 通用工具类库
         var Util = $.Util;
 
@@ -14,7 +13,8 @@
         var cardInfoGrid = null;
 
         var cardFormInit = null;
-
+        var patientModel =${patientModel}.obj;
+        var idCardNo =patientModel.idCardNo;
         /* ************************** 变量定义结束 ******************************** */
 
         /* *************************** 函数定义 ******************************* */
@@ -143,22 +143,22 @@
 
                 this.$form.attrScan();
                 this.$form.Fields.fillValues({
-                    name: '${patientModel.name}',
+                    name: patientModel.name,
                     idCardNo: idCardNo,
-                    gender: '${patientModel.gender}',
-                    nation: '${patientModel.nation}',
-                    nativePlace: '${patientModel.nativePlace}',
-                    martialStatus: '${patientModel.martialStatus}',
-                    birthday: '${patientModel.birthday}',
-                    birthPlaceFull: '${patientModel.birthPlaceFull}',
-                    homeAddressFull: '${patientModel.homeAddressFull}',
-                    workAddressFull: '${patientModel.workAddressFull}',
-                    residenceType: '${patientModel.residenceType}',
-                    tel: '${patientModel.tel}',
-                    email: '${patientModel.email}'
+                    gender: patientModel.gender,
+                    nation: patientModel.nation,
+                    nativePlace: patientModel.nativePlace,
+                    martialStatus: patientModel.martialStatus,
+                    birthday: patientModel.birthday,
+                    birthPlaceFull: patientModel.birthPlaceFull,
+                    homeAddressFull: patientModel.homeAddressFull,
+                    workAddressFull: patientModel.workAddressFull,
+                    residenceType: patientModel.residenceType,
+                    tel: patientModel.tel,
+                    email: patientModel.email
                 });
                 this.$cardForm.attrScan();
-                var pic = "${patientModel.localPath}";
+                var pic = patientModel.localPath;
                 if(!(Util.isStrEquals(pic,null)||Util.isStrEquals(pic,""))){
                     this.picPath.html('<img src="${contextRoot}/patient/showImage?localImgPath='+pic+'" class="f-w88 f-h110" ></img>');
                 }

@@ -11,9 +11,9 @@
 #    suffix: .jsp
 #
 
-#server:
+server:
 #  contextPath: /ehr
-#  port: 8080
+  port: 8080
 
 service-gateway:
   username: user

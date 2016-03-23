@@ -34,6 +34,16 @@ public class BaseUIController {
         }
     }
 
+    public <T> T toModel(String json,Class<T> targetCls){
+        try {
+            T model = objectMapper.readValue(json, targetCls);
+            return model;
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     /**
      *将envelop中的obj串转化为model
      * Envelop envelop = objectMapper.readValue(resultStr,Envelop.class)
