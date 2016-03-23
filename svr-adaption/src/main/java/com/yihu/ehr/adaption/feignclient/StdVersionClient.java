@@ -20,11 +20,9 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 @ApiIgnore
 @FeignClient(name = MicroServices.Standard)
-@RequestMapping(ApiVersion.Version1_0)
 public interface StdVersionClient {
 
-    @RequestMapping(value = RestApi.Standards.Version, method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Standards.Version, method = RequestMethod.GET)
     @ApiOperation(value = "获取版本信息")
-    MCDAVersion getVersion(
-            @PathVariable(value = "version") String version) throws Exception;
+    MCDAVersion getVersion(@PathVariable(value = "version") String version) throws Exception;
 }
