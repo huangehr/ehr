@@ -196,9 +196,9 @@ public class OrganizationController extends BaseRestController {
             @ApiParam(name = "province", value = "省")
             @RequestParam(value = "province") String province,
             @ApiParam(name = "city", value = "市")
-            @RequestParam(value = "city") String city,
+            @RequestParam(value = "city",required = false) String city,
             @ApiParam(name = "district", value = "县")
-            @RequestParam(value = "district") String district) {
+            @RequestParam(value = "district",required = false) String district) {
         List<Organization> orgList = orgService.searchByAddress(province,city,district);
         return (List<MOrganization>)convertToModels(orgList, new ArrayList<MOrganization>(orgList.size()), MOrganization.class,null);
     }
@@ -208,19 +208,19 @@ public class OrganizationController extends BaseRestController {
     public Map<String, String> distributeKey(
             @ApiParam(name = "org_code", value = "机构代码")
             @RequestParam(value = "org_code") String orgCode) {
-        MKey userSecurity = securityClient.getOrgKey(orgCode);
+        MKey key = securityClient.getOrgKey(orgCode);
         Map<String, String> keyMap = new HashMap<>();
-        if (userSecurity != null) {
-            boolean result = securityClient.deleteKeyByOrgCode(orgCode);
+        if (key != null) {
+            securityClient.deleteKeyByOrgCode(orgCode);
         }
 
-        userSecurity = securityClient.createOrgKey(orgCode);
+        key = securityClient.createOrgKey(orgCode);
 
-        String validTime = DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd")
-                + "~" + DateFormatUtils.format(userSecurity.getExpiryDate(),"yyyy-MM-dd");
-        keyMap.put("publicKey", userSecurity.getPublicKey());
+        String validTime = DateFormatUtils.format(key.getFromDate(),"yyyy-MM-dd")
+                + "~" + DateFormatUtils.format(key.getExpiryDate(),"yyyy-MM-dd");
+        keyMap.put("publicKey", key.getPublicKey());
         keyMap.put("validTime", validTime);
-        keyMap.put("startTime", DateFormatUtils.format(userSecurity.getFromDate(),"yyyy-MM-dd"));
+        keyMap.put("startTime", DateFormatUtils.format(key.getFromDate(),"yyyy-MM-dd"));
         return keyMap;
     }
 

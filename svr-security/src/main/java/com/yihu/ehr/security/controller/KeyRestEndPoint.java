@@ -82,66 +82,64 @@ public class KeyRestEndPoint extends BaseRestController {
      * "app_secret": "mPTZvuEFB6C32fko"
      * }
      */
-    @RequestMapping(value = RestApi.Securities.UserToken, method = RequestMethod.PUT)
-    @ApiOperation(value = "获取用户登录用的临时会话Token", produces = "application/json", notes = "此Token用于客户与平台之间的会话，时效性时差为20分钟")
-    public Object createTempUserToken(
-            @ApiParam(required = true, name = "user_id", value = "用户名")
-            @RequestParam(value = "user_id", required = true) String userId,
-            @ApiParam(required = true, name = "rsa_pw", value = "用户密码，以RSA加密")
-            @RequestParam(value = "rsa_pw", required = true) String rsaPWD,
-            @ApiParam(required = true, name = "app_id", value = "APP ID")
-            @RequestParam(value = "app_id", required = true) String appId,
-            @ApiParam(required = true, name = "app_secret", value = "APP 密码")
-            @RequestParam(value = "app_secret", required = true) String appSecret) throws Exception {
-
-        boolean isAppExistence = appClient.isAppExistence(appId, appSecret);
-        if (!isAppExistence) return null;
-
-        Key key = keyManager.getKeyByUserId(userId);
-        String privateKey = key.getPrivateKey();
-
-        java.security.Key priKey = RSA.genPrivateKey(privateKey);
-        String psw = RSA.decrypt(rsaPWD, priKey);
-
-        userId = URLDecoder.decode(userId, "UTF-8");
-        appId = URLDecoder.decode(appId, "UTF-8");
-
-        MUser user = userClient.getUserByNameAndPassword(userId, psw);
-        if (user == null) return null;
-
-        Token token = tokenManager.getTokenByUserId(user.getId(), appId);
-        if (token == null) {
-            token = tokenManager.createUserToken(user.getId(), appId);
-
-            Map<String, Object> map = new HashMap<>();
-            map.put("access_token", token.getAccessToken());
-            map.put("refresh_token", token.getRefreshToken());
-            map.put("expires_in", token.getExpiresIn());
-            map.put("token_id", token.getTokenId());
-
-            return map;
-        }
-
-        Date currentDate = new Date();
-        boolean result = DateUtil.isExpire(token.getUpdateDate(), currentDate, token.getExpiresIn());
-        if (result == true) {
-            token = tokenManager.refreshAccessToken(user.getId(), token.getRefreshToken(), appId);
-
-            Map<String, Object> map = new HashMap<>();
-            map.put("access_token", token.getAccessToken());
-            map.put("refresh_token", token.getRefreshToken());
-            map.put("expires_in", token.getExpiresIn());
-
-            return map;
-        }
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("access_token", token.getAccessToken());
-        map.put("refresh_token", token.getRefreshToken());
-        map.put("expires_in", token.getExpiresIn());
-
-        return map;
-    }
+    //现在tocken通过网关认证来获取
+//    @RequestMapping(value = RestApi.Securities.UserToken, method = RequestMethod.PUT)
+//    @ApiOperation(value = "获取用户登录用的临时会话Token", produces = "application/json", notes = "此Token用于客户与平台之间的会话，时效性时差为20分钟")
+//    public Object createTempUserToken(
+//            @ApiParam(required = true, name = "user_name", value = "用户名")
+//            @RequestParam(value = "user_name", required = true) String userNmae,
+//            @ApiParam(required = true, name = "rsa_pw", value = "用户密码，以RSA加密")
+//            @RequestParam(value = "rsa_pw", required = true) String rsaPWD,
+//            @ApiParam(required = true, name = "app_id", value = "APP ID")
+//            @RequestParam(value = "app_id", required = true) String appId,
+//            @ApiParam(required = true, name = "app_secret", value = "APP 密码")
+//            @RequestParam(value = "app_secret", required = true) String appSecret) throws Exception {
+//
+//        boolean isAppExistence = appClient.isAppExistence(appId, appSecret);
+//        if (!isAppExistence) return null;
+//        MUser user1 = userClient.getUserByLoginCode(userNmae);
+//        Key key = keyManager.getKeyByUserId(user1.getId());
+//        String privateKey = key.getPrivateKey();
+//
+//        java.security.Key priKey = RSA.genPrivateKey(privateKey);
+//        String psw = RSA.decrypt(rsaPWD, priKey);
+//
+//        MUser user = userClient.getUserByNameAndPassword(userNmae, psw);
+//        if (user == null) return null;
+//
+//        Token token = tokenManager.getTokenByUserId(user.getId(), appId);
+//        if (token == null) {
+//            token = tokenManager.createUserToken(user.getId(), appId);
+//
+//            Map<String, Object> map = new HashMap<>();
+//            map.put("access_token", token.getAccessToken());
+//            map.put("refresh_token", token.getRefreshToken());
+//            map.put("expires_in", token.getExpiresIn());
+//            map.put("token_id", token.getTokenId());
+//
+//            return map;
+//        }
+//
+//        Date currentDate = new Date();
+//        boolean result = DateUtil.isExpire(token.getUpdateDate(), currentDate, token.getExpiresIn());
+//        if (result == true) {
+//            token = tokenManager.refreshAccessToken(user.getId(), token.getRefreshToken(), appId);
+//
+//            Map<String, Object> map = new HashMap<>();
+//            map.put("access_token", token.getAccessToken());
+//            map.put("refresh_token", token.getRefreshToken());
+//            map.put("expires_in", token.getExpiresIn());
+//
+//            return map;
+//        }
+//
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("access_token", token.getAccessToken());
+//        map.put("refresh_token", token.getRefreshToken());
+//        map.put("expires_in", token.getExpiresIn());
+//
+//        return map;
+//    }
 
     @RequestMapping(value = RestApi.Securities.deleteUserKey, method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除Key")
@@ -156,11 +154,14 @@ public class KeyRestEndPoint extends BaseRestController {
 
 
     @RequestMapping(value = RestApi.Securities.OrganizationKey, method = RequestMethod.GET)
-    @ApiOperation(value = "获取机构Key", produces = "application/json", notes = "公-私钥用于与健康档案平台加密传输数据使用")
+    @ApiOperation(value = "获取机构Key", notes = "公-私钥用于与健康档案平台加密传输数据使用")
     public MKey getOrgKey(
             @ApiParam(name = "org_code", value = "机构代码")
             @PathVariable(value = "org_code") String orgCode) {
         Key key = keyManager.getKeyByOrgCode(orgCode);
+        if (key==null){
+            return null;
+        }
         return convertToModel(key, MKey.class);
     }
 

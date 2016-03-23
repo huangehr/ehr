@@ -112,12 +112,12 @@ public class GeographyService extends BaseJpaService<Geography,XGeographyReposit
 
     public boolean isNullAddress(Geography geography) {
         return
-                geography.getProvince() == null
-                && geography.getCity() == null
-                && geography.getDistrict() == null
-                && geography.getTown() == null
-                && geography.getCountry() == null
-                && geography.getStreet() == null;
+                StringUtils.isEmpty(geography.getProvince())
+                && StringUtils.isEmpty(geography.getCity())
+                && StringUtils.isEmpty(geography.getDistrict())
+                && StringUtils.isEmpty(geography.getTown())
+                && StringUtils.isEmpty(geography.getCountry())
+                && StringUtils.isEmpty(geography.getStreet());
     }
 
 
