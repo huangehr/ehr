@@ -83,8 +83,8 @@ public class AppService extends BaseJpaService<App, XAppRepository> {
         appRepo.save(app);
     }
 
-    public List<App> findByIdAndSecret(String appId, String secret) {
-        return appRepo.findByIdAndSecret(appId,secret);
+    public boolean findByIdAndSecret(String appId, String secret) {
+        return appRepo.findByIdAndSecret(appId,secret).size()>0;
     }
 
 }

@@ -2,9 +2,12 @@ package com.yihu.ehr.adapter.controller;
 
 
 import com.yihu.ehr.adapter.service.AdapterDataSetService;
+import com.yihu.ehr.adapter.service.OrgAdapterPlanService;
+import com.yihu.ehr.adapter.service.PageParms;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -12,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /** 适配管理方案适配管理
@@ -23,17 +28,14 @@ import java.util.Map;
 @Controller
 public class AdapterDataSetController extends ExtendController<AdapterDataSetService>{
 
+    @Autowired
+    OrgAdapterPlanService orgAdapterPlanService;
+
     public AdapterDataSetController() {
         this.init(
                 "/adapter/adapterDataSet/grid",       //列表页面url
                 "/adapter/adapterDataSet/dialog"      //编辑页面url
         );
-
-        Map<String, String> comboKv = new HashMap<>();
-        comboKv.put("code", "id");
-        comboKv.put("value", "name");
-        comboKv.put("org", "org");
-        this.comboKv = comboKv;
     }
 
     @RequestMapping("/dataSetList")
@@ -78,6 +80,129 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetSer
         }
     }
 
+
+    /**
+     * 标准数据元的下拉
+     * @return
+     */
+    @RequestMapping("/getStdMetaData")
+    @ResponseBody
+    public Object getStdMetaData(Long adapterPlanId, Long dataSetId, String mode){
+
+        try {
+            String stdMetaDataComboUrl = "/adapter/std_meta_data/combo";
+            Map<String, Object> params = new HashMap<>();
+            params.put("plan_id",adapterPlanId);
+            params.put("data_set_id",dataSetId);
+            params.put("mode",mode);
+            String resultStr = service.search(stdMetaDataComboUrl, params);
+            return resultStr;
+        } catch (Exception e) {
+            return systemError();
+        }
+    }
+
+
+    /**
+     * 机构数据集下拉
+     */
+    @RequestMapping("/getOrgDataSet")
+    @ResponseBody
+    public Object getOrgDataSet(Long adapterPlanId){
+
+        try {
+            Envelop result = new Envelop();
+            result.setSuccessFlg(true);
+
+            Map<String, Object> params = new HashMap<>();
+            params.put("id",adapterPlanId);
+            String modelJson = orgAdapterPlanService.getModel(params);
+            Envelop rs = getEnvelop(modelJson);
+
+            if(rs.getObj()==null)
+                return result;
+
+            String url = "/adapter/org/data_sets";
+            PageParms pageParms = new PageParms("organization=" + ((Map) rs.getObj()).get("org"));
+            String resultStr = service.search(url, pageParms);
+            rs = getEnvelop(resultStr);
+            List<Map> orgDataList = rs.getDetailModelList()!=null ? rs.getDetailModelList() : new ArrayList<>();
+
+            List<String> orgDicts = new ArrayList<>();
+            for (Map orgDict : orgDataList) {
+                orgDicts.add(String.valueOf(orgDict.get("sequence")) + ',' + orgDict.get("name"));
+            }
+
+            result.setObj(orgDicts);
+            return result;
+        } catch (Exception e) {
+            return systemError();
+        }
+    }
+
+
+
+    /**
+     * 机构数据元下拉
+     */
+    @RequestMapping("/getOrgMetaData")
+    @ResponseBody
+    public Object getOrgMetaData(Integer orgDataSetSeq, Long adapterPlanId){
+
+        try {
+            Envelop result = new Envelop();
+            result.setSuccessFlg(true);
+
+            Map<String, Object> params = new HashMap<>();
+            params.put("id",adapterPlanId);
+            String modelJson = orgAdapterPlanService.getModel(params);
+            Envelop rs = getEnvelop(modelJson);
+
+            if(rs.getObj()==null)
+                return result;
+            String url = "/adapter/org/meta_datas";
+            PageParms pageParms = new PageParms(
+                    "organization=" + ((Map) rs.getObj()).get("org")
+                            + (orgDataSetSeq==null ? "" : ";orgDataSet=" + orgDataSetSeq)
+            );
+            String resultStr = service.search(url, pageParms);
+            rs = getEnvelop(resultStr);
+            List<Map> orgDictList = rs.getDetailModelList()!=null ? rs.getDetailModelList() : new ArrayList<>();
+
+            List<String> orgDicts = new ArrayList<>();
+            for (Map orgDict : orgDictList) {
+                orgDicts.add(String.valueOf(orgDict.get("sequence")) + ',' + orgDict.get("name"));
+            }
+
+            result.setObj(orgDicts);
+            return result;
+        } catch (Exception e) {
+            return systemError();
+        }
+
+//        Result result = new Result();
+//        try {
+//            XOrgAdapterPlan orgAdapterPlan = orgAdapterPlanManager.getOrgAdapterPlan(adapterPlanId);
+//            String orgCode = orgAdapterPlan.getOrg();
+//            Map<String, Object> conditionMap = new HashMap<>();
+//            conditionMap.put("orgDataSetSeq", orgDataSetSeq);
+//            conditionMap.put("orgCode", orgCode);
+//            List<XOrgMetaData> orgMetaDataList = orgMetaDataManager.searchOrgMetaData(conditionMap);
+//            List<String> orgMetaDatas = new ArrayList<>();
+//            if (!orgMetaDataList.isEmpty()){
+//                for (XOrgMetaData orgMetaData : orgMetaDataList) {
+//                    orgMetaDatas.add(String.valueOf(orgMetaData.getSequence())+','+orgMetaData.getName());
+//                }
+//                result.setSuccessFlg(true);
+//            } else {
+//                result.setSuccessFlg(false);
+//            }
+//            result.setObj(orgMetaDatas);
+//        } catch (Exception e) {
+//            result.setSuccessFlg(false);
+//        }
+//        return result.toJson();
+    }
 
 //    @RequestMapping("template/adapterMetaDataInfo")
 //    public Object adapterMetaDataInfoTemplate(Model model, Long id, String mode) {
@@ -403,101 +528,4 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetSer
 ////        return result.toJson();
 //    }
 //
-//    /**
-//     * 机构数据集下拉
-//     * @return
-//     */
-//    @RequestMapping("/getOrgDataSet")
-//    @ResponseBody
-//    public Object getOrgDataSet(Long adapterPlanId){
-//        String url = "/adapterSet/getOrgDataSet";
-//        String resultStr = "";
-//        Envelop result = new Envelop();
-//        Map<String, Object> params = new HashMap<>();
-//        params.put("adapterPlanId",adapterPlanId);
-//        try {
-//            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-////            ObjectMapper mapper = new ObjectMapper();
-////            List<String> orgDataSet = Arrays.asList(mapper.readValue(resultStr, String[].class));
-//            result.setSuccessFlg(true);
-//            result.setObj(resultStr);
-//            return result;
-//        } catch (Exception e) {
-//            result.setSuccessFlg(false);
-//            result.setErrorMsg(ErrorCode.SystemError.toString());
-//            return result;
-//        }
-////        Result result = new Result();
-////        try {
-////            XOrgAdapterPlan orgAdapterPlan = orgAdapterPlanManager.getOrgAdapterPlan(adapterPlanId);
-////            String orgCode = orgAdapterPlan.getOrg();
-////            Map<String, Object> conditionMap = new HashMap<>();
-////            conditionMap.put("orgCode", orgCode);
-////            List<XOrgDataSet>  orgDataSetList = orgDataSetManager.searchOrgDataSet(conditionMap);
-////            List<String> orgDataSets = new ArrayList<>();
-////            if (!orgDataSetList.isEmpty()){
-////                for (XOrgDataSet orgDataSet : orgDataSetList) {
-////                    orgDataSets.add(String.valueOf(orgDataSet.getSequence())+','+orgDataSet.getName());
-////                }
-////                result.setSuccessFlg(true);
-////            } else {
-////                result.setSuccessFlg(false);
-////            }
-////            result.setObj(orgDataSets);
-////        } catch (Exception e) {
-////            result.setSuccessFlg(false);
-////        }
-////        return result.toJson();
-//    }
-//
-//    /**
-//     * 机构数据元下拉
-//     * @param orgDataSetSeq
-//     * @return
-//     */
-//    @RequestMapping("/getOrgMetaData")
-//    @ResponseBody
-//    public Object getOrgMetaData(Integer orgDataSetSeq,Long adapterPlanId){
-//        String url = "/adapterSet/getOrgMetaData";
-//        String resultStr = "";
-//        Envelop result = new Envelop();
-//        Map<String, Object> params = new HashMap<>();
-//        params.put("orgDataSetSeq",orgDataSetSeq);
-//        params.put("adapterPlanId",adapterPlanId);
-//        try {
-//            //网关没有url没有请求方式
-//            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-////            ObjectMapper mapper = new ObjectMapper();
-////            List<String> orgMetaData = Arrays.asList(mapper.readValue(resultStr, String[].class));
-//            result.setSuccessFlg(true);
-//            result.setObj(resultStr);
-//            return result;
-//        } catch (Exception e) {
-//            result.setSuccessFlg(false);
-//            result.setErrorMsg(ErrorCode.SystemError.toString());
-//            return result;
-//        }
-////        Result result = new Result();
-////        try {
-////            XOrgAdapterPlan orgAdapterPlan = orgAdapterPlanManager.getOrgAdapterPlan(adapterPlanId);
-////            String orgCode = orgAdapterPlan.getOrg();
-////            Map<String, Object> conditionMap = new HashMap<>();
-////            conditionMap.put("orgDataSetSeq", orgDataSetSeq);
-////            conditionMap.put("orgCode", orgCode);
-////            List<XOrgMetaData> orgMetaDataList = orgMetaDataManager.searchOrgMetaData(conditionMap);
-////            List<String> orgMetaDatas = new ArrayList<>();
-////            if (!orgMetaDataList.isEmpty()){
-////                for (XOrgMetaData orgMetaData : orgMetaDataList) {
-////                    orgMetaDatas.add(String.valueOf(orgMetaData.getSequence())+','+orgMetaData.getName());
-////                }
-////                result.setSuccessFlg(true);
-////            } else {
-////                result.setSuccessFlg(false);
-////            }
-////            result.setObj(orgMetaDatas);
-////        } catch (Exception e) {
-////            result.setSuccessFlg(false);
-////        }
-////        return result.toJson();
-//    }
 }

@@ -1,5 +1,5 @@
 server:
-  port: 9009
+  port: ${svr-health-profiles.server.port}
 
 management:
   port: ${server.port}
@@ -7,28 +7,17 @@ management:
 info:
   app:
     name: BrowserService
-    description: EHR platform json browser service.
+    description: EHR platform health profile service.
     version: 1.0.0
-
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://user:eureka@${eureka-server-ip}/eureka/
 
 ---
 spring:
   profiles: dev
 
-eureka-server-ip: 127.0.0.1:8761
-
 ---
 spring:
   profiles: test
 
-eureka-server-ip: 172.19.103.73:8761
-
 ---
 spring:
   profiles: prod
-
-eureka-server-ip: 11.1.2.21:8761

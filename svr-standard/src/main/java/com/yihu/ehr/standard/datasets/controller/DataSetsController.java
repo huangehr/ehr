@@ -2,8 +2,6 @@ package com.yihu.ehr.standard.datasets.controller;
 
 import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.standard.MStdDataSet;
 import com.yihu.ehr.standard.commons.ExtendController;
 import com.yihu.ehr.standard.datasets.service.DataSetService;
@@ -110,8 +108,8 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
 
         Class entityClass = getServiceEntity(version);
         IDataSet dataSet = (IDataSet) jsonToObj(model, entityClass);
-        if (dataSetService.isExistByField("code", dataSet.getCode(), entityClass))
-            throw new ApiException(ErrorCode.RapeatDataSetCode, "代码重复！");
+//        if (dataSetService.isExistByField("code", dataSet.getCode(), entityClass))
+//            throw new ApiException(ErrorCode.RapeatDataSetCode, "代码重复！");
         if(dataSetService.add(dataSet, version))
             return getModel(dataSet);
         return null;
@@ -130,11 +128,11 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
 
         Class entityClass = getServiceEntity(version);
         IDataSet dataSetModel = (IDataSet) jsonToObj(model, entityClass);
-        IDataSet dataSet = dataSetService.retrieve(id, entityClass);
-        if(!dataSet.getCode().equals(dataSetModel.getCode())){
-            if(dataSetService.isExistByField("code", dataSetModel.getCode(), entityClass))
-                throw new ApiException(ErrorCode.RapeatDataSetCode, "代码重复！");
-        }
+//        IDataSet dataSet = dataSetService.retrieve(id, entityClass);
+//        if(!dataSet.getCode().equals(dataSetModel.getCode())){
+//            if(dataSetService.isExistByField("code", dataSetModel.getCode(), entityClass))
+//                throw new ApiException(ErrorCode.RapeatDataSetCode, "代码重复！");
+//        }
         dataSetModel.setId(id);
         dataSetService.save(dataSetModel);
         return getModel(dataSetModel);
@@ -152,6 +150,15 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
         return dataSetService.getDataSetMapByIds(
                 ids==null || ids.trim().length()==0? new String[]{} : ids.split(","),
                 version);
+    }
+
+    @RequestMapping(value = RestApi.Standards.DataSetCodeIsExist,method = RequestMethod.GET)
+    public boolean isExistCode(
+            @RequestParam(value = "code")String code,
+            @RequestParam(value = "version_code")String versionCode)
+    {
+        Class entityClass = getServiceEntity(versionCode);
+        return dataSetService.isExistByField("code", code, entityClass);
     }
 
 }

@@ -261,13 +261,13 @@ public class URLHqlQueryParser<T> {
     private boolean isInteger(String fieldName) throws NoSuchFieldException {
 
         Field field = getField(fieldName);
-        return field.getAnnotatedType().getType().equals(Integer.TYPE);
+        return field.getType().equals(Integer.class) || field.getType().equals(Integer.TYPE);
     }
 
     private boolean isLong(String fieldName) throws NoSuchFieldException {
 
         Field field = getField(fieldName);
-        return field.getAnnotatedType().getType().equals(Long.TYPE);
+        return field.getType().equals(Long.class) || field.getType().equals(Long.TYPE);
     }
 
     private Field getField(String fieldName) throws NoSuchFieldException {

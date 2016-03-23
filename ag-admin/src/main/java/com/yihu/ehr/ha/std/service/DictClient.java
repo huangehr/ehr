@@ -101,7 +101,10 @@ public interface DictClient {
             @PathVariable(value = "meta_data_id") Long metaDataId);
 
 
-
+    @RequestMapping(value = RestApi.Standards.DictCodeIsExist,method = RequestMethod.GET)
+    boolean isExistDictCode(
+            @RequestParam(value = "dict_code")String dictCode,
+            @RequestParam("version_code")String versionCode);
 
 
 
@@ -159,4 +162,8 @@ public interface DictClient {
             @RequestParam(value = "version") String version,
             @PathVariable(value = "dict_id") long dictId);
 
+    @RequestMapping(value = RestApi.Standards.EntryCodeIsExist,method = RequestMethod.GET)
+    boolean isExistEntryCode(
+            @RequestParam(value = "code")String code,
+            @RequestParam(value = "version_code")String versionCode);
 }

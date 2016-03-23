@@ -40,6 +40,15 @@ public class AdapterOrgController {
         return "pageView";
     }
 
+
+    /**
+     * 第三方标准：新增、修改窗口
+     * @param model
+     * @param code
+     * @param type
+     * @param mode
+     * @return
+     */
     @RequestMapping("template/adapterOrgInfo")
     public Object adapterOrgInfoTemplate(Model model, String code, String type, String mode) {
         String url = "/adapterOrg/org/"+code;
@@ -48,7 +57,6 @@ public class AdapterOrgController {
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("code",code);
-//      params.put("mode",mode);
         params.put("type",type);
         try {
             if(mode.equals("view") || mode.equals("modify")) {
@@ -65,40 +73,9 @@ public class AdapterOrgController {
             result.setErrorMsg(ErrorCode.SystemError.toString());
             return result;
         }
-//        AdapterOrgModel adapterOrgModel = new AdapterOrgModel();
-//        //mode定义：new modify view三种模式，新增，修改，查看
-//        if (mode.equals("view") || mode.equals("modify")) {
-//            try {
-//                XAdapterOrg adapterOrg = adapterOrgManager.getAdapterOrg(code);
-//                adapterOrgModel.setCode(StringUtil.latinString(adapterOrg.getCode()));
-//                adapterOrgModel.setName(StringUtil.latinString(adapterOrg.getName()));
-//                adapterOrgModel.setDescription(StringUtil.latinString(adapterOrg.getDescription()));
-//                String parent = adapterOrg.getParent();
-//                if (parent != null && !parent.equals("")) {
-//                    adapterOrgModel.setParent(parent);
-//                    adapterOrgModel.setParentValue(StringUtil.latinString(adapterOrgManager.getAdapterOrg(parent).getName()));
-//                }
-//                adapterOrgModel.setOrg(adapterOrg.getOrg().getOrgCode());
-//                adapterOrgModel.setOrgValue(StringUtil.latinString(adapterOrg.getOrg().getFullName()));
-//                adapterOrgModel.setArea((Address) adapterOrg.getArea());
-//                adapterOrgModel.setType(adapterOrg.getType().getCode());
-//                adapterOrgModel.setTypeValue(adapterOrg.getType().getValue());
-//                if (adapterOrg.getArea() != null) {
-//                    adapterOrgModel.setArea((Address) adapterOrg.getArea());
-//                }
-//            } catch (Exception ex) {
-//
-//            }
-//        } else {
-//            adapterOrgModel.setType(type);//初始类别
-//        }
-//        model.addAttribute("info", adapterOrgModel);
-//        model.addAttribute("mode", mode);
-//        model.addAttribute("contentPage", "/adapter/adapterOrg/adapterOrgDialog");
-//        return "simpleView";
     }
 
-    //适配采集标准
+    //检索第三方标准列表
     @RequestMapping("searchAdapterOrg")
     @ResponseBody
     public Object searchAdapterOrg(String searchNm, int page, int rows, String type) {
@@ -153,35 +130,17 @@ public class AdapterOrgController {
         }
     }
 
+    //新增采集标准
     @RequestMapping("addAdapterOrg")
     @ResponseBody
-    //新增采集标准
     public Object addAdapterOrg(AdapterOrgDetailModel adapterPlanModel) {
-//        String code,String name,String description,String parent,String org,String type,String area
-//        String code = adapterOrgModel.getCode();
-//        String name = adapterOrgModel.getName();
-//        String description = adapterOrgModel.getDescription();
-//        String parent = adapterOrgModel.getParent();
-//        String org = adapterOrgModel.getOrg();
-//        String type = adapterOrgModel.getType();
-//        Address area = adapterOrgModel.getArea();
-        String url="";
+        String url="/adapterOrg/org";
         String resultStr = "";
         Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
         ObjectMapper mapper = new ObjectMapper();
 
         try{
-//            url="/"+adapterPlanModel.getCode()+"/isExistAdapterData";
-//            params.put("code",adapterPlanModel.getCode());
-//            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-//            if(Boolean.parseBoolean(resultStr)){
-//                envelop.setSuccessFlg(false);
-//                envelop.setErrorMsg("该标准已存在！");
-//                return envelop;
-//            }
-
-            url="/adapterOrg/org";
             String adapterJsonModel = mapper.writeValueAsString(adapterPlanModel);
             params.put("adapterOrg", adapterJsonModel);
 
@@ -233,14 +192,8 @@ public class AdapterOrgController {
         params.put("codes",code);
         try {
             resultStr = HttpClientUtil.doDelete(comUrl + url, params, username, password);
-            if(Boolean.parseBoolean(resultStr)){
-                result.setSuccessFlg(true);
-            }
-            else {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.InvalidDelete.toString());
-            }
-            return result;
+
+            return resultStr;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
@@ -355,14 +308,22 @@ public class AdapterOrgController {
     //查询机构列表
     public Object searchOrgList(String type, String param, int page, int rows) {
         String url = "/organizations";
-//        String url = "/adapterOrg/searchOrgList";
         String resultStr = "";
         String filters = "";
         Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
+        String orgType = "";
 
         if(!StringUtils.isEmpty(type)){
-            filters += "orgType=Hospital";
+            switch (type){
+                case "1":
+                    orgType = "ThirdPartyPlatform";
+                    break;
+                case "2":
+                    orgType = "Hospital";
+                    break;
+            }
+            filters += "orgType="+orgType;
         }
         if(!StringUtils.isEmpty(param)){
             filters += "orgCode?"+param+" g1;fullName?"+param+" g1;";
@@ -382,46 +343,6 @@ public class AdapterOrgController {
             envelop.setErrorMsg(ErrorCode.SystemError.toString());
             return envelop;
         }
-//        List typeLs = new ArrayList<>();
-//        Map<String, Object> adapterOrgMap = new HashMap<>();
-//        Map<String, Object> conditionMap = new HashMap<>();
-//
-//        param = param == null ? "" : param;
-//        String searchWay = "";
-//        if (type.equals("1")) {
-//            //厂商
-//            searchWay = "ThirdPartyPlatform";
-//        } else if (type.equals("2")) {
-//            //医院
-//            searchWay = "Hospital";
-//        }
-//
-//        typeLs.add(conventionalDictEntry.getAdapterType("1"));
-//        typeLs.add(conventionalDictEntry.getAdapterType("2"));
-//        typeLs.add(conventionalDictEntry.getAdapterType("3"));
-//
-//        adapterOrgMap.put("typeLs", typeLs);
-//        adapterOrgMap.put("key", "");
-//
-//        conditionMap.put("orgCode", param);
-//        conditionMap.put("fullName", param);
-//        conditionMap.put("orgType", searchWay);
-//        conditionMap.put("page", page);
-//        conditionMap.put("pageSize", rows);
-//
-//        Result result = new Result();
-//        try {
-//            //排除已经存在的第三方标准的机构   adapterOrgs == 已经存在的第三方标准的机构列表
-//            List<AdapterOrgModel> adapterOrgs = adapterOrgManager.searchAdapterOrgs(adapterOrgMap);
-//            List<XOrganization> organizations = orgManager.search(conditionMap,adapterOrgs);
-//            conditionMap.put("adapterOrgs", adapterOrgs);
-//            int total = orgManager.searchInt(conditionMap);
-//            result = getResult(organizations, total, page, rows);
-//            result.setSuccessFlg(true);
-//        } catch (Exception ex) {
-//            result.setSuccessFlg(false);
-//        }
-//        return result.toJson();
     }
 
     @RequestMapping("searchAdapterOrgList")

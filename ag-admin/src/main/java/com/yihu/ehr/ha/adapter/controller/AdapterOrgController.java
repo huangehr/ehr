@@ -69,7 +69,7 @@ public class AdapterOrgController extends BaseController {
                     MConventionalDict dict = dictEntryClient.getAdapterType(type);
                     adapterOrgModel.setTypeValue(dict == null ? "" : dict.getValue());
                 }
-                String orgCode = adapterOrgModel.getCode();
+                String orgCode = adapterOrgModel.getOrg();
                 if (StringUtils.isNotEmpty(orgCode)) {
                     MOrganization mOrganization = organizationClient.getOrg(orgCode);
                     adapterOrgModel.setOrgValue(mAdapterOrg == null ? "" : mOrganization.getFullName());
@@ -214,7 +214,7 @@ public class AdapterOrgController extends BaseController {
             MConventionalDict dict = dictEntryClient.getAdapterType(type);
             detailModel.setTypeValue(dict == null ? "" : dict.getValue());
         }
-        String orgCode = detailModel.getCode();
+        String orgCode = detailModel.getOrg();
         if (StringUtils.isNotEmpty(orgCode)) {
             MOrganization mOrganization = organizationClient.getOrg(orgCode);
             detailModel.setOrgValue(mAdapterOrg == null ? "" : mOrganization.getFullName());

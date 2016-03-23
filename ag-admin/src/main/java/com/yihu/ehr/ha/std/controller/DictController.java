@@ -3,6 +3,7 @@ package com.yihu.ehr.ha.std.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.dict.DictEntryModel;
 import com.yihu.ehr.agModel.standard.dict.DictModel;
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.std.service.DictClient;
 import com.yihu.ehr.model.standard.MStdDict;
@@ -103,23 +104,36 @@ public class DictController extends BaseController {
                 return failed(errorMsg);
             }
 
-            //TODO:代码唯一性校验
+            //代码唯一性校验
+            boolean isExist = dictClient.isExistDictCode(dictModel.getCode(),versionCode);
 
             MStdDict mStdDict = convertToModel(dictModel, MStdDict.class);
             if (dictModel.getId() == 0) {
+                if(isExist)
+                {
+                    return failed("代码已存在!");
+                }
                 mStdDict = dictClient.addDict(versionCode, objectMapper.writeValueAsString(mStdDict));
-                dictModel = convertToModel(mStdDict, DictModel.class);
-                if (dictModel == null) {
-                    return failed("保存失败!");
-                }
             } else {
-                mStdDict = dictClient.updateDict(versionCode, mStdDict.getId(), objectMapper.writeValueAsString(mStdDict));
-                dictModel = convertToModel(mStdDict, DictModel.class);
-                if (dictModel == null) {
-                    return failed("保存失败!");
+                MStdDict stdDict = dictClient.getCdaDictInfo(mStdDict.getId(),versionCode);
+                if(stdDict==null)
+                {
+                    return failed("字典不存在!");
                 }
-            }
+                if(!stdDict.getCode().equals(mStdDict.getCode())
+                        && isExist)
+                {
+                    return failed("代码已存在!");
+                }
 
+                mStdDict.setCreatedate(StringToDate(dictModel.getCreateDate(), AgAdminConstants.DateTimeFormat));
+                mStdDict = dictClient.updateDict(versionCode, mStdDict.getId(), objectMapper.writeValueAsString(mStdDict));
+            }
+            dictModel = convertToModel(mStdDict, DictModel.class);
+            if (dictModel == null) {
+                return failed("保存失败!");
+            }
+            dictModel.setCreateDate(DateToString(mStdDict.getCreatedate(),AgAdminConstants.DateTimeFormat));
             return success(dictModel);
         } catch (Exception ex) {
             return failedSystem();
@@ -255,22 +269,33 @@ public class DictController extends BaseController {
             if (StringUtils.isNotEmpty(errorMsg)) {
                 return failed(errorMsg);
             }
-            //TODO:代码唯一性校验
+            //代码唯一性校验
+            boolean isExist = dictClient.isExistEntryCode(dictEntryModel.getCode(),versionCode);
             MStdDictEntry mStdDictEntry = convertToModel(dictEntryModel, MStdDictEntry.class);
             if (dictEntryModel.getId() == 0) {
+                if(isExist)
+                {
+                    return failed("代码已存在!");
+                }
                 mStdDictEntry = dictClient.addDictEntry(versionCode, objectMapper.writeValueAsString(mStdDictEntry));
-                dictEntryModel = convertToModel(mStdDictEntry, DictEntryModel.class);
-                if (dictEntryModel == null) {
-                    return failed("保存失败!");
-                }
             } else {
-                mStdDictEntry = dictClient.updateDictEntry(versionCode, mStdDictEntry.getId(), objectMapper.writeValueAsString(mStdDictEntry));
-                dictEntryModel = convertToModel(mStdDictEntry, DictEntryModel.class);
-                if (dictEntryModel == null) {
-                    return failed("保存失败!");
+                MStdDictEntry dictEntry = dictClient.getDictEntry(mStdDictEntry.getId(),versionCode);
+                if(dictEntry==null)
+                {
+                    return failed("字典项不存在!");
                 }
-            }
+                if(!dictEntry.getCode().equals(mStdDictEntry.getCode())
+                        && isExist)
+                {
+                    return failed("代码已存在!");
+                }
 
+                mStdDictEntry = dictClient.updateDictEntry(versionCode, mStdDictEntry.getId(), objectMapper.writeValueAsString(mStdDictEntry));
+            }
+            dictEntryModel = convertToModel(mStdDictEntry, DictEntryModel.class);
+            if (dictEntryModel == null) {
+                return failed("保存失败!");
+            }
             return success(dictEntryModel);
         } catch (Exception ex) {
             return failedSystem();
@@ -380,6 +405,20 @@ public class DictController extends BaseController {
             return failed("删除失败!");
         }
         return success(null);
+    }
+
+    @RequestMapping(value = "/dict/is_exist/code",method = RequestMethod.GET)
+    public boolean isExistDictCode(
+            @RequestParam(value = "dict_code")String dictCode,
+            @RequestParam("version_code")String versionCode){
+        return dictClient.isExistDictCode(dictCode,versionCode);
+    }
+
+    @RequestMapping(value = "/dict_entry/is_exist/code",method = RequestMethod.GET)
+    public boolean isExistEntryCode(
+            @RequestParam(value = "code")String code,
+            @RequestParam(value = "version_code")String versionCode){
+        return dictClient.isExistEntryCode(code,versionCode);
     }
 
 }

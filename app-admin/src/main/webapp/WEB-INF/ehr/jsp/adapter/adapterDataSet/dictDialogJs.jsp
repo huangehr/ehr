@@ -109,28 +109,37 @@
                         return;
                     }
                     self.$btnSave.attr('disabled','disabled');
-                    var values = self.$dictForm.Fields.getValues();
-                    var v = self.$dictForm.Fields.toSerializedString() +'&adapterPlanId='+adapterPlanId+'&dictId='+parentId;
+                    var model = self.$dictForm.Fields.getValues();
+                    model.adapterPlanId = adapterPlanId;
+                    model.dictId = parentId;
+                    var parms = {
+                        model: JSON.stringify(model),
+                        id: model.id
+                    }
                     var dataModel = $.DataModel.init();
-                    dataModel.updateRemote("${contextRoot}/adapterDict/updateAdapterDictEntry",{data: v,
-                        success: function(data) {
-                            if(data.successFlg){
-                                var app = data.obj;
-                                parent.reloadEntryMasterGrid();
-                                parent.closeDialog('保存成功！');
-                            }else{
-                                if(data.errorMsg)
-                                    $.Notice.error( data.errorMsg);
-                                else
+                    dataModel.updateRemote(
+                            "${contextRoot}/adapterDict/update",
+                            {
+                                data: parms,
+                                success: function(data) {
+                                    if(data.successFlg){
+                                        var app = data.obj;
+                                        parent.reloadEntryMasterGrid();
+                                        parent.closeDialog('保存成功！');
+                                    }else{
+                                        if(data.errorMsg)
+                                            $.Notice.error( data.errorMsg);
+                                        else
+                                            $.Notice.error( '保存失败！');
+                                    }
+                                    self.$btnSave.removeAttr('disabled');
+                                },
+                                error: function () {
                                     $.Notice.error( '保存失败！');
+                                    self.$btnSave.removeAttr('disabled');
+                                }
                             }
-                            self.$btnSave.removeAttr('disabled');
-                        },
-                        error: function () {
-                            $.Notice.error( '保存失败！');
-                            self.$btnSave.removeAttr('disabled');
-                        }
-                    });
+                    );
                 });
                 $('#btn_cancel_dict').click(function () {
                     parent.closeDialog();

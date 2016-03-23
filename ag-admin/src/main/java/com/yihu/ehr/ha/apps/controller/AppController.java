@@ -149,7 +149,7 @@ public class AppController extends BaseController {
     public boolean updateStatus(
             @ApiParam(name= "app_id",value = "app_id",defaultValue = "")
             @RequestParam(value = "app_id") String appId,
-            @ApiParam(name = "status",value = "状态",defaultValue = "")
+            @ApiParam(name = "app_status",value = "状态",defaultValue = "")
             @RequestParam(value = "app_status") String appStatus)throws Exception{
         return appClient.updateStatus(appId, appStatus);
     }
@@ -208,7 +208,6 @@ public class AppController extends BaseController {
         app.setCreateTime(DateToString(mApp.getCreateTime(), AgAdminConstants.DateTimeFormat));
         app.setAuditTime(DateToString(mApp.getAuditTime(),AgAdminConstants.DateTimeFormat));
 
-        //TODO 微服务提供的model缺少tags标签属性
         //获取app类别字典值
         MConventionalDict catalopDict = conDictEntryClient.getAppCatalog(mApp.getCatalog());
         app.setCatalogName(catalopDict == null ? "" : catalopDict.getValue());
