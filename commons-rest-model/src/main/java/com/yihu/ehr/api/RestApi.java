@@ -102,18 +102,21 @@ public class RestApi {
         public static final String Dictionaries             = "/std/dictionaries";
         public static final String Dictionary               = "/std/dictionaries/{id}";
         public static final String MetaDataWithDict         = "/std/data_set/{data_set_id}/meta_datas/{meta_data_id}/dictionaries";
+        public static final String DictCodeIsExist          = "/std/dictionaries/is_exist/code";
 
         public static final String Entry                    = "/std/dictionaries/entries/{id}";
         public static final String Entries                  = "/std/dictionaries/entries";
         public static final String EntriesWithDictionary    = "/std/dictionary/{dict_id}/entries";
+        public static final String EntryCodeIsExist         ="/std/dictionaries/entries/is_exist/code";
 
         public static final String DataSets                 = "/std/data_sets";
         public static final String DataSet                  = "/std/data_sets/{id}";
         public static final String DataSetsName             = "/std/data_sets/name";
+        public static final String DataSetCodeIsExist       ="/std/data_set/is_exist/code";
 
         public static final String MetaDatas                = "/std/data_sets/meta_datas";
         public static final String MetaData                 = "/std/data_sets/meta_datas/{id}";
-        public static final String MetaDataCodeExistence    = "/std/data_sets/{data_set_id}/meta_data/code/existence";
+        public static final String MetaDataCodeExistence    = "/std/data_sets/{data_set_id}/meta_data/inner_code/existence";
         public static final String MetaDataNameExistence    = "/std/data_sets/{data_set_id}/meta_data/name/existence";
         public static final String MetaDatasName            = "/std/data_sets/meta_datas/name";
         public static final String MetaDatasWithDataSet     = "/std/data_sets/{data_set_id}/meta_datas";

@@ -119,21 +119,33 @@ public class DataSetController extends BaseController {
                 return failed(errorMsg);
             }
 
-            //TODO:代码唯一性校验
+            //代码唯一性校验
+            boolean isExist = dataSetClient.isExistCode(dataSetModel.getCode(),versionCode);
 
             MStdDataSet mStdDataSet = convertToModel(dataSetModel, MStdDataSet.class);
             if (dataSetModel.getId() == 0) {
+                if(isExist)
+                {
+                    return failed("代码已存在!");
+                }
                 mStdDataSet = dataSetClient.saveDataSet(versionCode, objectMapper.writeValueAsString(mStdDataSet));
-                dataSetModel = convertToModel(mStdDataSet, DataSetModel.class);
-                if (dataSetModel == null) {
-                    return failed("保存失败!");
-                }
+
             } else {
-                mStdDataSet = dataSetClient.updateDataSet(versionCode, mStdDataSet.getId(), objectMapper.writeValueAsString(mStdDataSet));
-                dataSetModel = convertToModel(mStdDataSet, DataSetModel.class);
-                if (dataSetModel == null) {
-                    return failed("保存失败!");
+                MStdDataSet dataSet = dataSetClient.getDataSet(mStdDataSet.getId(),versionCode);
+                if(dataSet==null)
+                {
+                    return failed("数据集不存在!");
                 }
+                if(!dataSet.getCode().equals(mStdDataSet.getCode())
+                        && isExist)
+                {
+                    return failed("代码已存在!");
+                }
+                mStdDataSet = dataSetClient.updateDataSet(versionCode, mStdDataSet.getId(), objectMapper.writeValueAsString(mStdDataSet));
+            }
+            dataSetModel = convertToModel(mStdDataSet, DataSetModel.class);
+            if (dataSetModel == null) {
+                return failed("保存失败!");
             }
             return success(dataSetModel);
         } catch (Exception ex) {
@@ -233,11 +245,11 @@ public class DataSetController extends BaseController {
             if (StringUtils.isNotEmpty(errorMsg)) {
                 return failed(errorMsg);
             }
-            boolean isExist = dataSetClient.validateCode(version, metaDataModel.getDataSetId(), metaDataModel.getCode());
+            boolean isExist = dataSetClient.validateInnerCode(version, metaDataModel.getDataSetId(), metaDataModel.getInnerCode());
             MStdMetaData mStdMetaData = convertToModel(metaDataModel, MStdMetaData.class);
             if (metaDataModel.getId() > 0) {
                 mStdMetaData = dataSetClient.getMetaData( metaDataModel.getId(),version);
-                if(!metaDataModel.getCode().equals(metaDataModel.getCode())
+                if(!metaDataModel.getInnerCode().equals(metaDataModel.getInnerCode())
                         && isExist)
                 {
                     return failed("代码已存在!");
@@ -262,17 +274,17 @@ public class DataSetController extends BaseController {
         }
     }
 
-    @RequestMapping(value = "/is_exist/code", method = RequestMethod.GET)
+    @RequestMapping(value = "/meta_data/is_exist/inner_code", method = RequestMethod.GET)
     @ApiOperation(value = "验证数据元代码是否重复")
     public boolean isMetaDataCodeExists(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @RequestParam(value = "version") String version,
             @ApiParam(name = "dataSetId", value = "数据集编号", defaultValue = "")
             @RequestParam(value = "dataSetId") long dataSetId,
-            @ApiParam(name = "code", value = "查询代码", defaultValue = "")
-            @RequestParam(value = "code") String code) {
+            @ApiParam(name = "inner_code", value = "查询代码", defaultValue = "")
+            @RequestParam(value = "inner_code") String innerCode) {
 
-        return dataSetClient.validateCode(version, dataSetId, code);
+        return dataSetClient.validateInnerCode(version, dataSetId, innerCode);
     }
 
 //    @RequestMapping(value = "/is_exist/name", method = RequestMethod.GET)
@@ -287,4 +299,13 @@ public class DataSetController extends BaseController {
 //
 //        return dataSetClient.validatorName(version, dataSetId, name);
 //    }
+
+    @RequestMapping(value = "/data_set/is_exist/code",method = RequestMethod.GET)
+    public boolean isExistDataSetCode(
+            @RequestParam(value = "code")String code,
+            @RequestParam(value = "version_code")String versionCode){
+        return dataSetClient.isExistCode(code,versionCode);
+    }
+
+
 }
