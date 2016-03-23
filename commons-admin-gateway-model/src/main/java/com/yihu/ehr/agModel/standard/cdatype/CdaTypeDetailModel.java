@@ -1,7 +1,5 @@
 package com.yihu.ehr.agModel.standard.cdatype;
 
-import java.util.Date;
-
 /**
  * Created by Administrator on 2016/3/1.
  */
@@ -10,9 +8,9 @@ public class CdaTypeDetailModel {
     private String code;
     private String name;
     private String parentId;
-    private Date createDate;
+    private String createDate;
     private String createUser;
-    private Date updateDate;
+    private String updateDate;
     private String updateUser;
     private String description;
 
@@ -48,11 +46,11 @@ public class CdaTypeDetailModel {
         this.parentId = parentId;
     }
 
-    public Date getCreateDate() {
+    public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(String createDate) {
         this.createDate = createDate;
     }
 
@@ -64,11 +62,11 @@ public class CdaTypeDetailModel {
         this.createUser = createUser;
     }
 
-    public Date getUpdateDate() {
+    public String getUpdateDate() {
         return updateDate;
     }
 
-    public void setUpdateDate(Date updateDate) {
+    public void setUpdateDate(String updateDate) {
         this.updateDate = updateDate;
     }
 

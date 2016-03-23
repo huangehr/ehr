@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -193,4 +194,43 @@ public class BaseController extends AbstractController {
         }
 
     }
+
+    /**
+     * 将字符串转为Data
+     * @param dateTime 日期字符串
+     * @param formatRule 转换格式
+     * @return 时间格式的日期
+     */
+    public Date StringToDate(String dateTime,String formatRule)
+    {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(formatRule);
+            return sdf.parse(dateTime);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 将日期转为字符串
+     * @param dateTime 日期
+     * @param formatRule 转换格式
+     * @return 日期字符串
+     */
+    public String DateToString(Date dateTime,String formatRule)
+    {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(formatRule);
+            return sdf.format(dateTime);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
 }

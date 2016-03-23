@@ -10,7 +10,7 @@ import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.profile.ProfileDataSet;
 import com.yihu.ehr.profile.SimpleDataSetResolver;
 import com.yihu.ehr.util.DateFormatter;
-import com.yihu.ehr.util.IdCardValidator;
+import com.yihu.ehr.util.IdValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -20,7 +20,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -63,7 +62,7 @@ public class PatientsEndPoint {
                 throw new ApiException(HttpStatus.NOT_ACCEPTABLE, ErrorCode.MissParameter, "Missing identity card no.");
             }
 
-            String error = IdCardValidator.doValidate(demographicId);
+            String error = IdValidator.validateIdCardNo(demographicId);
             if (!StringUtils.isEmpty(error)) {
                 throw new ApiException(HttpStatus.NOT_ACCEPTABLE, ErrorCode.InvalidIdentityNo, error);
             }

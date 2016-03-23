@@ -3,6 +3,7 @@ package com.yihu.ehr.ha.std.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeDetailModel;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeModel;
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.std.service.CDATypeClient;
 import com.yihu.ehr.model.standard.MCDAType;
@@ -42,7 +43,7 @@ public class CDATypeController extends BaseController {
         Envelop envelop = new Envelop();
         List<MCDAType> mCdaTypeList = cdaTypeClient.getChildrenByPatientId(parentId);
         envelop.setSuccessFlg(true);
-        envelop.setDetailModelList(changeToCdaTypeModels(mCdaTypeList));
+        envelop.setDetailModelList(convertToCdaTypeModels(mCdaTypeList));
         return envelop;
     }
 
@@ -52,7 +53,7 @@ public class CDATypeController extends BaseController {
      * @param mCdaTypeList
      * @return
      */
-    private List<CdaTypeModel> changeToCdaTypeModels(List<MCDAType> mCdaTypeList) {
+    private List<CdaTypeModel> convertToCdaTypeModels(List<MCDAType> mCdaTypeList) {
         List<CdaTypeModel> cdaTypeModelList = (List<CdaTypeModel>) convertToModels(mCdaTypeList, new ArrayList<CdaTypeModel>(mCdaTypeList.size()), CdaTypeModel.class, null);
         return cdaTypeModelList;
     }
@@ -79,7 +80,7 @@ public class CDATypeController extends BaseController {
             return envelop;
         }
         envelop.setSuccessFlg(true);
-        envelop.setDetailModelList(changeToCdaTypeModels(mCdaTypeList));
+        envelop.setDetailModelList(convertToCdaTypeModels(mCdaTypeList));
         return envelop;
     }
 
@@ -98,7 +99,7 @@ public class CDATypeController extends BaseController {
             return envelop;
         }
         envelop.setSuccessFlg(true);
-        envelop.setDetailModelList(changeToCdaTypeModels(mCdaTypeList));
+        envelop.setDetailModelList(convertToCdaTypeModels(mCdaTypeList));
         return envelop;
     }
 
@@ -115,7 +116,7 @@ public class CDATypeController extends BaseController {
             envelop.setErrorMsg("获取CDAType失败！");
             return envelop;
         }
-        CdaTypeDetailModel cdaTypeDetailModel = convertToModel(mCdaType, CdaTypeDetailModel.class);
+        CdaTypeDetailModel cdaTypeDetailModel = convertToCdaTypeDetailModel(mCdaType);
         envelop.setSuccessFlg(true);
         envelop.setObj(cdaTypeDetailModel);
         return envelop;
@@ -134,7 +135,7 @@ public class CDATypeController extends BaseController {
             return envelop;
         }
         envelop.setSuccessFlg(true);
-        envelop.setDetailModelList(changeToCdaTypeModels(mCdaTypeList));
+        envelop.setDetailModelList(convertToCdaTypeModels(mCdaTypeList));
         return envelop;
     }
 
@@ -146,7 +147,7 @@ public class CDATypeController extends BaseController {
             @RequestParam(value = "jsonData") String jsonData) throws Exception {
         Envelop envelop = new Envelop();
         CdaTypeDetailModel cdaTypeDetailModel = objectMapper.readValue(jsonData, CdaTypeDetailModel.class);
-        MCDAType mCdaTypeOld = convertToModel(cdaTypeDetailModel, MCDAType.class);
+        MCDAType mCdaTypeOld = convertToMCDAType(cdaTypeDetailModel);
         if (cdaTypeClient.isCDATypeExists(mCdaTypeOld.getCode())){
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("该cda类别代码已经存在！");
@@ -161,7 +162,7 @@ public class CDATypeController extends BaseController {
             envelop.setErrorMsg("创建cda类别失败！");
         }
         envelop.setSuccessFlg(true);
-        CdaTypeDetailModel detailModel = convertToModel(mCdaTypeNew, CdaTypeDetailModel.class);
+        CdaTypeDetailModel detailModel = convertToCdaTypeDetailModel(mCdaTypeNew);
         envelop.setObj(detailModel);
         return envelop;
     }
@@ -174,7 +175,7 @@ public class CDATypeController extends BaseController {
 
         Envelop envelop = new Envelop();
         CdaTypeDetailModel cdaTypeDetailModel = objectMapper.readValue(jsonData, CdaTypeDetailModel.class);
-        MCDAType mCdaTypeOld = convertToModel(cdaTypeDetailModel, MCDAType.class);
+        MCDAType mCdaTypeOld = convertToMCDAType(cdaTypeDetailModel);
         if (cdaTypeClient.isCDATypeExists(mCdaTypeOld.getCode())){
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("该cda类别代码已经存在！");
@@ -189,7 +190,7 @@ public class CDATypeController extends BaseController {
             envelop.setErrorMsg("更新cda类别失败！");
         }
         envelop.setSuccessFlg(true);
-        CdaTypeDetailModel detailModel = convertToModel(mCdaTypeNew, CdaTypeDetailModel.class);
+        CdaTypeDetailModel detailModel = convertToCdaTypeDetailModel(mCdaTypeNew);
         envelop.setObj(detailModel);
         return envelop;
     }
@@ -213,5 +214,31 @@ public class CDATypeController extends BaseController {
             @ApiParam(name = "ids", value = "ids")
             @PathVariable(value = "ids") String ids) {
         return cdaTypeClient.deleteCDATypeByPatientIds(ids);
+    }
+
+    public MCDAType convertToMCDAType (CdaTypeDetailModel detailModel)
+    {
+        if(detailModel==null)
+        {
+            return null;
+        }
+        MCDAType mcdaType = convertToModel(detailModel,MCDAType.class);
+        mcdaType.setCreateDate(StringToDate(detailModel.getCreateDate(), AgAdminConstants.DateFormat));
+        mcdaType.setUpdateDate(StringToDate(detailModel.getUpdateDate(), AgAdminConstants.DateFormat));
+
+        return mcdaType;
+    }
+
+    public CdaTypeDetailModel convertToCdaTypeDetailModel(MCDAType mcdaType)
+    {
+        if(mcdaType==null)
+        {
+            return null;
+        }
+        CdaTypeDetailModel detailModel = convertToModel(mcdaType,CdaTypeDetailModel.class);
+        detailModel.setCreateDate(DateToString(mcdaType.getCreateDate(),AgAdminConstants.DateFormat));
+        detailModel.setUpdateDate(DateToString(mcdaType.getUpdateDate(),AgAdminConstants.DateFormat));
+
+        return detailModel;
     }
 }

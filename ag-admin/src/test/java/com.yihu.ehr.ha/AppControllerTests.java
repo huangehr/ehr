@@ -64,7 +64,7 @@ public class AppControllerTests {
         AppDetailModel appDetailModel = (AppDetailModel)envelop.getObj();
         String appIdForTest = appDetailModel.getId();
         String appSecretForTest = appDetailModel.getSecret();
-        Date appCreateTime = appDetailModel.getCreateTime();
+        String appCreateTime = appDetailModel.getCreateTime();
 
         //根据id获取app------------3 ok
 

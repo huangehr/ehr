@@ -3,6 +3,7 @@ package com.yihu.ehr.ha.std.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.dict.DictEntryModel;
 import com.yihu.ehr.agModel.standard.dict.DictModel;
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.std.service.DictClient;
 import com.yihu.ehr.model.standard.MStdDict;
@@ -113,13 +114,14 @@ public class DictController extends BaseController {
                     return failed("保存失败!");
                 }
             } else {
+                mStdDict.setCreatedate(StringToDate(dictModel.getCreateDate(), AgAdminConstants.DateTimeFormat));
                 mStdDict = dictClient.updateDict(versionCode, mStdDict.getId(), objectMapper.writeValueAsString(mStdDict));
                 dictModel = convertToModel(mStdDict, DictModel.class);
                 if (dictModel == null) {
                     return failed("保存失败!");
                 }
             }
-
+            dictModel.setCreateDate(DateToString(mStdDict.getCreatedate(),AgAdminConstants.DateTimeFormat));
             return success(dictModel);
         } catch (Exception ex) {
             return failedSystem();

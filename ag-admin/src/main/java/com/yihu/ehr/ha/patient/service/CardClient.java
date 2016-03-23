@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Created by AndyCai on 2016/2/16.
  */
-@FeignClient(MicroServices.Patient)
+@FeignClient(name=MicroServices.Patient)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface CardClient {
@@ -79,7 +79,7 @@ public interface CardClient {
     @ApiOperation(value = "根据卡号和卡类型查找卡")
     MAbstractCard getCard(
             @ApiParam(name = "id", value = "卡号", defaultValue = "")
-            @RequestParam(value = "id") String id,
+            @PathVariable(value = "id") String id,
             @ApiParam(name = "card_type", value = "卡类别", defaultValue = "")
             @RequestParam(value = "card_type") String cardType) ;
 
@@ -94,7 +94,7 @@ public interface CardClient {
     @ApiOperation(value = "根据卡号和卡类型解绑卡")
         boolean detachCard(
             @ApiParam(name = "id", value = "卡号", defaultValue = "")
-            @RequestParam(value = "id") String id,
+            @PathVariable(value = "id") String id,
             @ApiParam(name = "card_type", value = "卡类别", defaultValue = "")
             @RequestParam(value = "card_type") String cardType) ;
 

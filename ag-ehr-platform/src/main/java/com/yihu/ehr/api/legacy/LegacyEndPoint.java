@@ -10,7 +10,7 @@ import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.util.DateFormatter;
-import com.yihu.ehr.util.IdCardValidator;
+import com.yihu.ehr.util.IdValidator;
 import com.yihu.ehr.util.RestEcho;
 import com.yihu.ehr.util.encode.Base64;
 import io.swagger.annotations.ApiOperation;
@@ -283,7 +283,7 @@ public class LegacyEndPoint {
         if (StringUtils.isEmpty(idCardNo)) {
             throw new ApiException(ErrorCode.MissParameter);
         }
-        String errorInfo = IdCardValidator.doValidate(idCardNo);
+        String errorInfo = IdValidator.validateIdCardNo(idCardNo);
         if (!StringUtils.isEmpty(errorInfo)) {
             throw new ApiException(ErrorCode.InvalidIdentityNo, errorInfo);
         }

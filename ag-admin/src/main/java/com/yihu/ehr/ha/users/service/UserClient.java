@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Created by AndyCai on 2016/1/29.
  */
-@FeignClient(MicroServices.User)
+@FeignClient(name=MicroServices.User)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface UserClient {

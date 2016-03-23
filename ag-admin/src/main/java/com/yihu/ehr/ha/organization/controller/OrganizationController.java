@@ -1,5 +1,7 @@
 package com.yihu.ehr.ha.organization.controller;
 
+import com.yihu.ehr.agModel.geogrephy.GeographyModel;
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.organization.service.OrganizationClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -68,7 +70,7 @@ public class OrganizationController extends BaseController {
             ResponseEntity<List<MOrganization>> responseEntity = orgClient.searchOrgs(fields, filters, sorts, size, page);
             List<MOrganization> organizations = responseEntity.getBody();
             for (MOrganization mOrg : organizations) {
-                OrgModel orgModel = changeToOrgModel(mOrg);
+                OrgModel orgModel = convertToOrgModel(mOrg);
                 orgModelList.add(orgModel);
             }
             int totalCount = getTotalCount(responseEntity);
@@ -87,7 +89,13 @@ public class OrganizationController extends BaseController {
      * @param mOrg
      * @return
      */
-    public OrgModel changeToOrgModel(MOrganization mOrg) {
+    public OrgModel convertToOrgModel(MOrganization mOrg) {
+
+        if(mOrg==null)
+        {
+            return null;
+        }
+
         OrgModel orgModel = convertToModel(mOrg, OrgModel.class);
         // 获取机构类别字典
         MConventionalDict orgTypeDict = conDictEntryClient.getOrgType(mOrg.getOrgType());
@@ -155,12 +163,15 @@ public class OrganizationController extends BaseController {
             @RequestParam(value = "geography_model_json_data", required = false) String geographyModelJsonData ){
         try {
             String errorMsg = "";
-            if (StringUtils.isEmpty(geographyModelJsonData)) {
+
+            GeographyModel geographyModel = convertToModel(geographyModelJsonData,GeographyModel.class);
+
+            if (!isNullAddress(geographyModel)) {
                 errorMsg+="机构地址不能为空！";
             }
 
             OrgDetailModel orgDetailModel = objectMapper.readValue(mOrganizationJsonData, OrgDetailModel.class);
-            MOrganization mOrganization = convertToModel(orgDetailModel, MOrganization.class);
+            MOrganization mOrganization = convertToMOrganization(orgDetailModel);
             if (StringUtils.isEmpty(mOrganization.getOrgCode())) {
                 errorMsg+="机构代码不能为空！";
             }
@@ -177,7 +188,7 @@ public class OrganizationController extends BaseController {
             {
                 return failed(errorMsg);
             }
-            String location = addressClient.saveAddress(geographyModelJsonData);
+            String location = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             if (StringUtils.isEmpty(location)) {
                 return failed("保存失败!");
             }
@@ -188,7 +199,7 @@ public class OrganizationController extends BaseController {
             if (mOrgNew == null) {
                 return failed("保存失败!");
             }
-            return success(changeToOrgDetailModel(mOrgNew));
+            return success(convertToOrgDetailModel(mOrgNew));
         }
         catch (Exception ex)
         {
@@ -206,12 +217,14 @@ public class OrganizationController extends BaseController {
             @RequestParam(value = "geography_model_json_data", required = false) String geographyModelJsonData  ) {
       try {
           String errorMsg ="";
-          if (StringUtils.isEmpty(geographyModelJsonData)) {
+          GeographyModel geographyModel = convertToModel(geographyModelJsonData,GeographyModel.class);
+
+          if (!isNullAddress(geographyModel)) {
               errorMsg+="机构地址不能为空！";
           }
 
           OrgDetailModel orgDetailModel = objectMapper.readValue(mOrganizationJsonData, OrgDetailModel.class);
-          MOrganization mOrganization = convertToModel(orgDetailModel, MOrganization.class);
+          MOrganization mOrganization = convertToMOrganization(orgDetailModel);
           if (StringUtils.isEmpty(mOrganization.getOrgCode())) {
               errorMsg+="机构代码不能为空！";
           }
@@ -224,7 +237,7 @@ public class OrganizationController extends BaseController {
           if (StringUtils.isEmpty(mOrganization.getTel())) {
               errorMsg+="联系方式不能为空！";
           }
-          String locationId = addressClient.saveAddress(geographyModelJsonData);
+          String locationId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
           if (StringUtils.isEmpty(locationId)) {
               return failed("保存地址失败！");
           }
@@ -235,7 +248,7 @@ public class OrganizationController extends BaseController {
           if (mOrgNew == null) {
              return  failed("更新失败");
           }
-          return success(changeToOrgDetailModel(mOrgNew));
+          return success(convertToOrgDetailModel(mOrgNew));
       }
       catch (Exception ex)
       {
@@ -262,7 +275,7 @@ public class OrganizationController extends BaseController {
             if (mOrg == null) {
                 return failed("机构获取失败");
             }
-            OrgDetailModel org = changeToOrgDetailModel(mOrg);
+            OrgDetailModel org = convertToOrgDetailModel(mOrg);
 
             return success(org);
         }
@@ -279,8 +292,10 @@ public class OrganizationController extends BaseController {
      * @return
      */
 
-    public OrgDetailModel changeToOrgDetailModel(MOrganization mOrg) {
+    public OrgDetailModel convertToOrgDetailModel(MOrganization mOrg) {
         OrgDetailModel org = convertToModel(mOrg, OrgDetailModel.class);
+        org.setCreateDate(DateToString(mOrg.getCreateDate(), AgAdminConstants.DateTimeFormat));
+
         //获取机构类别字典值
         MConventionalDict orgTypeDict = conDictEntryClient.getOrgType(mOrg.getOrgType());
         org.setOrgTypeName(orgTypeDict == null ? "" : orgTypeDict.getValue());
@@ -422,5 +437,33 @@ public class OrganizationController extends BaseController {
             ex.printStackTrace();
             return false;
         }
+    }
+
+    public MOrganization convertToMOrganization(OrgDetailModel detailModel)
+    {
+        if(detailModel==null)
+        {
+            return null;
+        }
+        MOrganization mOrganization = convertToModel(detailModel, MOrganization.class);
+        mOrganization.setCreateDate(StringToDate(detailModel.getCreateDate(),AgAdminConstants.DateTimeFormat));
+        return mOrganization;
+    }
+
+    public boolean isNullAddress (GeographyModel geographyModel)
+    {
+        if(geographyModel==null)
+            return true;
+        if(StringUtils.isEmpty(geographyModel.getProvince())
+                && StringUtils.isEmpty(geographyModel.getCity())
+                && StringUtils.isEmpty(geographyModel.getDistrict())
+                && StringUtils.isEmpty(geographyModel.getTown())
+                && StringUtils.isEmpty(geographyModel.getStreet())
+                && StringUtils.isEmpty(geographyModel.getExtra()))
+        {
+            return true;
+        }
+
+        return false;
     }
 }

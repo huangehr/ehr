@@ -1,8 +1,6 @@
 package com.yihu.ehr.agModel.dict;
 
 
-import java.util.Date;
-
 /**
  * Created by wq on 2016/2/19.
  */
@@ -18,7 +16,7 @@ public class SystemDictModel {
 
     private String phoneticCode;
 
-    private Date createDate;
+    private String createDate;
 
     public long getId() {
         return id;
@@ -60,11 +58,11 @@ public class SystemDictModel {
         this.phoneticCode = phoneticCode;
     }
 
-    public Date getCreateDate() {
+    public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(String createDate) {
         this.createDate = createDate;
     }
 }

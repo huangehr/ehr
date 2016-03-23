@@ -3,6 +3,7 @@ package com.yihu.ehr.ha.std.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.standardsource.StdSourceDetailModel;
 import com.yihu.ehr.agModel.standard.standardsource.StdSourceModel;
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.ha.std.service.StandardSourceClient;
@@ -80,7 +81,7 @@ public class StandardSourceController extends BaseController {
             envelop.setErrorMsg("标准来源不存在！");
             return envelop;
         }
-        StdSourceDetailModel sourceDetailModel = getStdSourceDetailModel(mStdSource);
+        StdSourceDetailModel sourceDetailModel = convertToStdSourceDetailModel(mStdSource);
         envelop.setSuccessFlg(true);
         envelop.setObj(sourceDetailModel);
         return envelop;
@@ -92,8 +93,16 @@ public class StandardSourceController extends BaseController {
      * @param mStdSource
      * @return
      */
-    private StdSourceDetailModel getStdSourceDetailModel(MStdSource mStdSource) {
+    private StdSourceDetailModel convertToStdSourceDetailModel(MStdSource mStdSource) {
+
+        if(mStdSource==null)
+        {
+            return null;
+        }
+
         StdSourceDetailModel sourceDetailModel = convertToModel(mStdSource, StdSourceDetailModel.class);
+        sourceDetailModel.setCreateDate(DateToString(mStdSource.getCreateDate(), AgAdminConstants.DateTimeFormat));
+        sourceDetailModel.setUpdateDate(DateToString(mStdSource.getUpdateDate(),AgAdminConstants.DateTimeFormat));
         //标准来源类型字典
         MConventionalDict sourcerTypeDict = conDictEntryClient.getStdSourceType(mStdSource.getSourceType());
         sourceDetailModel.setSourceValue(sourcerTypeDict == null ? "" : sourcerTypeDict.getValue());
@@ -133,14 +142,14 @@ public class StandardSourceController extends BaseController {
             return failed("代码已存在!");
         }
 
-        mStdSourceOld = convertToModel(sourceDetailModel, MStdSource.class);
+        mStdSourceOld = convertToMStdSource(sourceDetailModel);
         mStdSourceOld.setUpdateDate(new Date());
         String jsonData = objectMapper.writeValueAsString(mStdSourceOld);
         MStdSource mStdSource = stdSourcrClient.updateStdSource(sourceDetailModel.getId(), jsonData);
         if (mStdSource == null) {
             return failed("保存失败!");
         }
-        return success(getStdSourceDetailModel(mStdSource));
+        return success(convertToStdSourceDetailModel(mStdSource));
     }
 
     @RequestMapping(value = "/source", method = RequestMethod.POST)
@@ -169,14 +178,14 @@ public class StandardSourceController extends BaseController {
             return failed("代码已存在!");
         }
 
-        MStdSource mStdSourceOld = convertToModel(sourceDetailModel, MStdSource.class);
-        mStdSourceOld.setCreateDate(new Date());
-        String jsonData = objectMapper.writeValueAsString(mStdSourceOld);
-        MStdSource mStdSource = stdSourcrClient.addStdSource(jsonData);
+        MStdSource mStdSource = convertToMStdSource(sourceDetailModel);
+        mStdSource.setCreateDate(new Date());
+        String jsonData = objectMapper.writeValueAsString(mStdSource);
+        mStdSource = stdSourcrClient.addStdSource(jsonData);
         if (mStdSource == null) {
             return failed("保存失败!");
         }
-        return success(getStdSourceDetailModel(mStdSource));
+        return success(convertToStdSourceDetailModel(mStdSource));
     }
 
 
@@ -204,4 +213,16 @@ public class StandardSourceController extends BaseController {
         return stdSourcrClient.isCodeExist(code);
     }
 
+    public MStdSource convertToMStdSource(StdSourceDetailModel detailModel)
+    {
+        if(detailModel==null)
+        {
+            return null;
+        }
+        MStdSource mStdSource = convertToModel(detailModel,MStdSource.class);
+        mStdSource.setCreateDate(StringToDate(detailModel.getCreateDate(),AgAdminConstants.DateTimeFormat));
+        mStdSource.setUpdateDate(StringToDate(detailModel.getUpdateDate(),AgAdminConstants.DateTimeFormat));
+
+        return mStdSource;
+    }
 }

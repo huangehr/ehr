@@ -19,7 +19,7 @@ import java.util.Collection;
 /**
  * Created by yww on 2016/3/1.
  */
-@FeignClient(MicroServices.Standard)
+@FeignClient(name=MicroServices.Standard)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface StandardSourceClient {

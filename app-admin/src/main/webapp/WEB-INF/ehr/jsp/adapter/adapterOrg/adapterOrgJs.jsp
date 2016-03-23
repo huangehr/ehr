@@ -190,8 +190,11 @@
                 dataModel.updateRemote('${contextRoot}/adapterorg/delAdapterOrg',{
                   data:{code:code},
                   success:function(data){
-                    $.Notice.success( '操作成功！');
-                    master.reloadGrid();
+                    if(data.successFlg){
+                      $.Notice.success( '删除成功！');
+                      master.reloadGrid();
+                    } else
+                      $.Notice.error( '删除失败！');
                   }
                 });
               }

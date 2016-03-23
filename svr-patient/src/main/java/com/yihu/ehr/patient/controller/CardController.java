@@ -119,7 +119,7 @@ public class CardController extends BaseRestController {
     @ApiOperation(value = "根据卡号和卡类型查找卡")
     public MAbstractCard getCard(
             @ApiParam(name = "id", value = "卡号", defaultValue = "")
-            @RequestParam(value = "id") String id,
+            @PathVariable(value = "id") String id,
             @ApiParam(name = "card_type", value = "卡类别", defaultValue = "")
             @RequestParam(value = "card_type") String cardType) throws Exception{
         AbstractCard card = cardManager.getCard(id, cardType);
@@ -137,7 +137,7 @@ public class CardController extends BaseRestController {
     @ApiOperation(value = "根据卡号和卡类型解绑卡")
     public boolean detachCard(
             @ApiParam(name = "id", value = "卡号", defaultValue = "")
-            @RequestParam(value = "id") String id,
+            @PathVariable(value = "id") String id,
             @ApiParam(name = "card_type", value = "卡类别", defaultValue = "")
             @RequestParam(value = "card_type") String cardType) throws Exception{
         AbstractCard card = cardManager.getCard(id, cardType);

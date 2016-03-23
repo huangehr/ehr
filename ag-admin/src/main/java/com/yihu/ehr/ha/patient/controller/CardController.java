@@ -2,6 +2,7 @@ package com.yihu.ehr.ha.patient.controller;
 
 import com.yihu.ehr.agModel.patient.CardDetailModel;
 import com.yihu.ehr.agModel.patient.CardModel;
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.ha.organization.service.OrganizationClient;
@@ -49,7 +50,7 @@ public class CardController extends BaseController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/cards/id_card_no", method = RequestMethod.GET)
+    @RequestMapping(value = "/cards/binding", method = RequestMethod.GET)
     @ApiOperation(value = "根据身份证好查询相对应的卡列表")
     public Envelop searchCardBinding(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
@@ -69,7 +70,7 @@ public class CardController extends BaseController {
         for (MAbstractCard info : mAbstractCards) {
 
             CardModel cardModel = convertToModel(info, CardModel.class);
-
+            cardModel.setCreateDate(DateToString(info.getCreateDate(),AgAdminConstants.DateFormat));
             MConventionalDict dict =null;
             if(!StringUtils.isEmpty(cardModel.getCardType())) {
                 dict = conventionalDictEntryClient.getCardType(cardModel.getCardType());
@@ -100,7 +101,7 @@ public class CardController extends BaseController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/cards", method = RequestMethod.GET)
+    @RequestMapping(value = "/cards/un_binding", method = RequestMethod.GET)
     @ApiOperation(value = "查询未绑定的卡列表")
     public Envelop searchCardUnBinding(
             @ApiParam(name = "number", value = "卡号", defaultValue = "")
@@ -118,7 +119,7 @@ public class CardController extends BaseController {
         for (MAbstractCard info : mAbstractCards){
 
             CardModel cardModel = convertToModel(info, CardModel.class);
-
+            cardModel.setCreateDate(DateToString(info.getCreateDate(),AgAdminConstants.DateFormat));
             MConventionalDict dict =null;
             if(!StringUtils.isEmpty(cardModel.getCardType())) {
                 dict = conventionalDictEntryClient.getCardType(cardModel.getCardType());
@@ -146,16 +147,20 @@ public class CardController extends BaseController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/cards/id/card_type", method = RequestMethod.GET)
+    @RequestMapping(value = "/cards/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据卡号和卡类型查找卡")
     public Envelop getCard(
             @ApiParam(name = "id", value = "卡号", defaultValue = "")
-            @RequestParam(value = "id") String id,
+            @PathVariable(value = "id") String id,
             @ApiParam(name = "card_type", value = "卡类别", defaultValue = "")
             @RequestParam(value = "card_type") String cardType) throws Exception {
 
         MAbstractCard cardInfo = cardClient.getCard(id, cardType);
         CardDetailModel detailModel = convertToModel(cardInfo,CardDetailModel.class);
+        detailModel.setCreateDate(DateToString(cardInfo.getCreateDate(), AgAdminConstants.DateFormat));
+        detailModel.setReleaseDate(DateToString(cardInfo.getReleaseDate(),AgAdminConstants.DateTimeFormat));
+        detailModel.setValidityDateBegin(DateToString(cardInfo.getValidityDateBegin(),AgAdminConstants.DateTimeFormat));
+        detailModel.setValidityDateEnd(DateToString(cardInfo.getValidityDateEnd(),AgAdminConstants.DateTimeFormat));
         if(detailModel!=null)
         {
             return failed("数据获取失败!");
@@ -180,11 +185,11 @@ public class CardController extends BaseController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/cards/id/{card_type}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/cards/detach/{id}", method = RequestMethod.PUT)
     @ApiOperation(value = "根据卡号和卡类型解绑卡")
     public boolean detachCard(
             @ApiParam(name = "id", value = "卡号", defaultValue = "")
-            @RequestParam(value = "id") String id,
+            @PathVariable(value = "id") String id,
             @ApiParam(name = "card_type", value = "卡类别", defaultValue = "")
             @RequestParam(value = "card_type") String cardType) throws Exception {
         return cardClient.detachCard(id, cardType);
