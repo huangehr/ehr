@@ -1,7 +1,9 @@
 package com.yihu.ehr.api.legacy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.api.adaption.AdaptionsEndPoint;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.feign.*;
@@ -9,14 +11,18 @@ import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.util.DateFormatter;
-import com.yihu.ehr.util.IdCardValidator;
+import com.yihu.ehr.util.IdValidator;
 import com.yihu.ehr.util.RestEcho;
 import com.yihu.ehr.util.encode.Base64;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -38,6 +44,9 @@ import java.util.regex.Pattern;
 @RestController
 @RequestMapping("/rest/v1.0")
 public class LegacyEndPoint {
+    @Value("${svr-package.ip-address}")
+    String packageIpAddress;
+
     @Autowired
     AdaptionsEndPoint adaptions;
 
@@ -275,7 +284,7 @@ public class LegacyEndPoint {
         if (StringUtils.isEmpty(idCardNo)) {
             throw new ApiException(ErrorCode.MissParameter);
         }
-        String errorInfo = IdCardValidator.doValidate(idCardNo);
+        String errorInfo = IdValidator.validateIdCardNo(idCardNo);
         if (!StringUtils.isEmpty(errorInfo)) {
             throw new ApiException(ErrorCode.InvalidIdentityNo, errorInfo);
         }
@@ -344,8 +353,14 @@ public class LegacyEndPoint {
             @RequestParam(value = "md5") String md5) throws Exception {
         MultipartFile multipartFile = jsonPackage.getFile("file");
         byte[] bytes = multipartFile.getBytes();
-        String fileString = Base64.encode(bytes);
-        jsonPackageClient.savePackageWithUser(fileString, userName, packageCrypto, md5);
+        String fileString = new String(bytes, "UTF-8");
+        MultiValueMap<String, String> conditionMap = new LinkedMultiValueMap<>();
+        conditionMap.add("file_string", fileString);
+        conditionMap.add("user_name", userName);
+        conditionMap.add("package_crypto", packageCrypto);
+        conditionMap.add("md5", md5);
+        RestTemplate template = new RestTemplate();
+        template.postForObject(packageIpAddress+ ApiVersion.Version1_0+ RestApi.Packages.LegacyPackages, conditionMap, String.class);
         return new RestEcho().success().putMessage("ok");
     }
 

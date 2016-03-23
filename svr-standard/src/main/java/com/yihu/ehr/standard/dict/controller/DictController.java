@@ -69,8 +69,8 @@ public class DictController extends ExtendController<MStdDict> {
 
         Class entityClass = getServiceEntity(version);
         IDict dict = (IDict) jsonToObj(model, entityClass);
-        if(dictService.isExistByField("code", dict.getCode(), entityClass))
-            throw errRepeatCode();
+//        if(dictService.isExistByField("code", dict.getCode(), entityClass))
+//            throw errRepeatCode();
 
         dict.setCreatedate(new Date());
         if(dictService.add(dict, version))
@@ -91,10 +91,10 @@ public class DictController extends ExtendController<MStdDict> {
 
         Class entityClass = getServiceEntity(version);
         IDict dictModel = (IDict) jsonToObj(model, entityClass);
-        IDict dict = dictService.retrieve(id, entityClass);
-        if(!dict.getCode().equals(dictModel.getCode()) &&
-                dictService.isExistByField("code", dictModel.getCode(), entityClass))
-            throw errRepeatCode();
+//        IDict dict = dictService.retrieve(id, entityClass);
+//        if(!dict.getCode().equals(dictModel.getCode()) &&
+//                dictService.isExistByField("code", dictModel.getCode(), entityClass))
+//            throw errRepeatCode();
         dictModel.setId(id);
         dictService.save(dictModel);
         return getModel(dictModel);
@@ -148,5 +148,14 @@ public class DictController extends ExtendController<MStdDict> {
             @PathVariable(value = "meta_data_id") Long metaDataId) {
 
         return dictService.getDictMapByIds(version, dataSetId, metaDataId);
+    }
+
+    @RequestMapping(value = RestApi.Standards.DictCodeIsExist,method = RequestMethod.GET)
+    public boolean isExistDictCode(
+            @RequestParam(value = "dict_code")String dictCode,
+            @RequestParam("version_code")String versionCode)
+    {
+        Class entityClass = getServiceEntity(versionCode);
+        return dictService.isExistByField("code",dictCode , entityClass);
     }
 }

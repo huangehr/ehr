@@ -1,105 +1,23 @@
 server:
-  port: 443
+  port: ${ag-ehr-platform.server.port}
 
 management:
   port: ${server.port}
 
-endpoints:
-  restart:
-    enabled: true
-  shutdown:
-    enabled: true
-  health:
-    sensitive: false
+zuul:
+  ignored-services: "*"
+  routes:
+    svr-pack-mgr: /api/v1.0/packages
+    svr-esb: /api/v1.0/esb/uploadLog
 
 ---
 spring:
   profiles: dev
 
-  thymeleaf:
-    cache: false
-
-fast-dfs:
-  tracker-server: 172.19.103.54:22122
-
-server:
-  ssl:
-    key-store: C:/Windows/tomcat.keystore
-    key-store-password: 123456
-    key-password: 123456
-
-eureka:
-  instance:
-    ip-address: localhost
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@localhost:8761}/eureka/
-
----
-spring:
-  profiles: sand-home-dev
-
-  thymeleaf:
-      cache: false
-
-server:
-  ssl:
-    key-store: C:/Windows/tomcat.keystore
-    key-store-password: 123456
-    key-password: 123456
-
-
-fast-dfs:
-  tracker-server: 172.19.103.54:22122
-
-eureka:
-  instance:
-    ip-address: 127.0.0.1
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
-
 ---
 spring:
   profiles: test
-  thymeleaf:
-    cache: false
-
-
-fast-dfs:
-  tracker-server: 172.19.103.13:22122
-
-server:
-  ssl:
-    key-store-password: 123456
-    key-password: 123456
-
-eureka:
-  instance:
-    ip-address: 172.19.103.73
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@172.19.103.73:8761}/eureka/
 
 ---
 spring:
   profiles: prod
-
-server:
-  ssl:
-    key-store-password: 123456
-    key-password: 123456
-
-fast-dfs:
-  tracker-server: 11.1.2.9:22122
-
-eureka:
-  instance:
-    ip-address: 11.1.2.21
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@11.1.2.21:8761}/eureka/

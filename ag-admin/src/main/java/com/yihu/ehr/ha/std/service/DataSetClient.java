@@ -22,7 +22,7 @@ import java.util.Collection;
  * Created by wq on 2016/2/29.
  */
 
-@FeignClient(MicroServices.Standard)
+@FeignClient(name=MicroServices.Standard)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface DataSetClient {
@@ -91,7 +91,10 @@ public interface DataSetClient {
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam(value = "model") String model);
 
-
+    @RequestMapping(value = RestApi.Standards.DataSetCodeIsExist,method = RequestMethod.GET)
+    boolean isExistCode(
+            @RequestParam(value = "code")String code,
+            @RequestParam(value = "version_code")String versionCode);
 
     //以下是数据元部分
     @RequestMapping(value = RestApi.Standards.MetaDatas, method = RequestMethod.POST)
@@ -166,13 +169,13 @@ public interface DataSetClient {
 
     @RequestMapping(value = RestApi.Standards.MetaDataCodeExistence, method = RequestMethod.GET)
     @ApiOperation(value = "验证数据元代码是否重复")
-    boolean validateCode(
+    boolean validateInnerCode(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @RequestParam(value = "version") String version,
             @ApiParam(name = "data_set_id", value = "数据集编号", defaultValue = "")
             @RequestParam(value = "data_set_id") long dataSetId,
-            @ApiParam(name = "code", value = "查询代码", defaultValue = "")
-            @RequestParam(value = "code") String code);
+            @ApiParam(name = "inner_code", value = "查询代码", defaultValue = "")
+            @RequestParam(value = "inner_code") String innerCode);
 
     @RequestMapping(value = RestApi.Standards.MetaDataNameExistence, method = RequestMethod.GET)
     @ApiOperation(value = "验证数据元名称是否重复")

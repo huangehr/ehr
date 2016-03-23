@@ -8,11 +8,13 @@ import com.yihu.ehr.util.validate.*;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,11 +25,15 @@ import java.util.List;
  */
 public class ExtendController<T> extends BaseController {
     public static String ERR_SYSREM_DES = "系统错误！";
-    private ObjectMapper objectMapper = new ObjectMapper();
 
     protected String objToJson(Object obj) throws JsonProcessingException {
 
         return objectMapper.writeValueAsString(obj);
+    }
+
+    protected String toEncodeJson(Object obj) throws JsonProcessingException, UnsupportedEncodingException {
+
+        return URLEncoder.encode(objectMapper.writeValueAsString(obj), "UTF-8") ;
     }
 
     protected <T> T jsonToObj(String json) throws IOException {

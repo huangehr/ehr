@@ -13,10 +13,10 @@ import springfox.documentation.annotations.ApiIgnore;
  * @version 1.0
  * @created 2016.02.01 20:14
  */
-@FeignClient(name = MicroServices.Package,url = MicroServiceIpAddressStr.Package+MicroServicePort.Package)
+@FeignClient(name = MicroServices.Package)
 @ApiIgnore
 public interface JsonPackageClient {
-    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Packages.Packages, method = RequestMethod.PUT)
+    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Packages.LegacyPackages, method = RequestMethod.POST)
     void savePackageWithUser(
             @RequestParam(value = "file_string") String fileString,
             @RequestParam(value = "user_name") String userName,

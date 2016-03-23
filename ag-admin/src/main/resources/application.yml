@@ -1,5 +1,5 @@
 server:
-  port: 10000
+  port: ${ag-admin.server.port}
 
 management:
   port: ${server.port}
@@ -14,34 +14,11 @@ info:
 spring:
   profiles: dev
 
-eureka:
-  instance:
-    hostname: localhost
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
-
 ---
 spring:
   profiles: test
-
-eureka:
-  instance:
-    hostname: localhost
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
 
 ---
 spring:
   profiles: prod
 
-eureka:
-  instance:
-    hostname: localhost
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/

@@ -17,7 +17,6 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
@@ -54,7 +53,7 @@ public class PatientControllerTests {
 //        detailModel.setNation("1");
         detailModel.setGender("Male");
         detailModel.setMartialStatus("10");
-        detailModel.setBirthday(new Date());
+        detailModel.setBirthday("2016-03-22");
         detailModel.setEmail("584264571@qq.com");
         detailModel.setResidenceType("temp");
 
@@ -73,7 +72,7 @@ public class PatientControllerTests {
 
         detailModel.setName("test_cms");
         detailModel.setIdCardNo("350625199010211030");
-        detailModel.setTelphoneNo("15959208182");
+        detailModel.setTelephoneNo("15959208182");
         detailModel.setNativePlace("福建漳州");
         detailModel.setNation("1");
         dataJson = objectMapper.writeValueAsString(detailModel);

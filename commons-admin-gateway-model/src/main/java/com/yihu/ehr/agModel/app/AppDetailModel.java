@@ -1,7 +1,5 @@
 package com.yihu.ehr.agModel.app;
 
-import java.util.Date;
-
 /**
  * Created by yww on 2016/2/23.
  */
@@ -12,8 +10,8 @@ public class AppDetailModel {
     private String url;
     private String creator;
     private String auditor;
-    private Date createTime;
-    private Date auditTime;
+    private String createTime;
+    private String auditTime;
     private String catalog;
     private String catalogName;
     private String status;
@@ -69,19 +67,19 @@ public class AppDetailModel {
         this.auditor = auditor;
     }
 
-    public Date getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 
-    public Date getAuditTime() {
+    public String getAuditTime() {
         return auditTime;
     }
 
-    public void setAuditTime(Date auditTime) {
+    public void setAuditTime(String auditTime) {
         this.auditTime = auditTime;
     }
 

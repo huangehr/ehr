@@ -1,5 +1,5 @@
 server:
-  port: 10180
+  port: ${svr-special-dict.server.port}
 
 management:
   port: ${server.port}
@@ -10,25 +10,14 @@ info:
     description: EHR platform special dictionary service.
     version: 1.0.0
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://user:eureka@${eureka-server-ip}/eureka/
-
 ---
 spring:
   profiles: dev
-
-eureka-server-ip: 127.0.0.1:8761
 
 ---
 spring:
   profiles: test
 
-eureka-server-ip: 172.19.103.73:8761
-
 ---
 spring:
   profiles: prod
-
-eureka-server-ip: 11.1.2.21:8761

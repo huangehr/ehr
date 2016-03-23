@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -55,7 +56,7 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
 
             AdapterPlanDetailModel detailModel = convertToModel(dataModel, AdapterPlanDetailModel.class);
 
-            MAdapterPlan mAdapterPlan = planClient.saveAdapterPlan(objToJson(detailModel), isCover);
+            MAdapterPlan mAdapterPlan = planClient.saveAdapterPlan(toEncodeJson(detailModel), isCover);
             if (mAdapterPlan == null) {
                 return failed("保存失败!");
             }
@@ -81,7 +82,7 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
                 return failed(validateResult.getMsg());
             }
             AdapterPlanDetailModel detailModel = convertToModel(dataModel, AdapterPlanDetailModel.class);
-            MAdapterPlan mAdapterPlan = planClient.updateAdapterPlan(detailModel.getId(), objToJson(detailModel));
+            MAdapterPlan mAdapterPlan = planClient.updateAdapterPlan(detailModel.getId(), toEncodeJson(detailModel));
             if (mAdapterPlan == null) {
                 return failed("保存失败!");
             }
@@ -201,20 +202,30 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
             @PathVariable(value = "plan_id") long planId,
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam("version") String version) throws Exception {
-
-        return planClient.getAdapterCustomize(planId, version);
+        Map map = planClient.getAdapterCustomize(planId, version);
+        return map;
     }
 
 
-    @RequestMapping(value = "/plan/adapterDataSet/{plan_id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/plan/adapterDataSet/{plan_id}", method = RequestMethod.POST)
     @ApiOperation(value = "定制数据集")
     public boolean adapterDataSet(
             @ApiParam(name = "plan_id", value = "编号", defaultValue = "")
             @PathVariable("plan_id") Long planId,
-            @ApiParam(name = "customizeData", value = "customizeData", defaultValue = "")
+            @ApiParam(name = "customizeData", value = "customizeData", allowMultiple = true, defaultValue = "")
             @RequestParam("customizeData") String customizeData) throws Exception {
 
         return planClient.adapterDataSet(planId, customizeData);
+    }
+
+    @RequestMapping(value = "/plan/{plan_id}/public", method = RequestMethod.PUT)
+    @ApiOperation(value = "获取定制信息")
+    public boolean adapterDispatch(
+            @ApiParam(name = "plan_id", value = "方案ID")
+            @PathVariable(value = "plan_id") long planId) throws Exception {
+
+        boolean b = planClient.adapterDispatch(planId);
+        return b;
     }
 
     public AdapterPlanModel ConvertAdapterPlanModel(AdapterPlanModel adapterPlanModel)

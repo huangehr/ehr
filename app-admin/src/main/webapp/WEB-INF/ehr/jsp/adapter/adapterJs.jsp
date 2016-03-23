@@ -33,7 +33,7 @@
                     width: 440,
                     title: title,
                     load: true,
-                    url: '${contextRoot}/adapter/getAdapterPlan',
+                    url: '${contextRoot}/adapter/gotoModify',
                     urlParms: {
                         id: id,
                         mode: mode
@@ -46,18 +46,16 @@
             function delAdapterPlan(id) {
                 var dialog = $.ligerDialog.waitting('正在删除中,请稍候...');
                 var dataModel = $.DataModel.init();
-                dataModel.updateRemote('${contextRoot}/adapter/delAdapterPlan', {
-                    data: {id: [].concat(id)},
+                dataModel.updateRemote('${contextRoot}/adapter/delete', {
+                    data: {ids: id},
                     success: function (data) {
                         if (data.successFlg) {
-                            //todo:信息提醒不行
-                            //$.Notice.open({type: 'success', msg: '操作成功！'});
+                            $.Notice.success('操作成功！');
                             //重新刷新Grid
                             master.reloadGrid();
                         } else {
-                            //$.Notice.open({type: 'error', msg: data.errorMsg});
+                            $.Notice.error(data.errorMsg);
                         }
-
                     },
                     complete: function () {
                         dialog.close();
@@ -68,12 +66,13 @@
             function initSearchType(target, type) {
                 target.ligerComboBox(
                         {
-                            url: '${contextRoot}/adapter/getAdapterOrgList',
+                            url: '${contextRoot}/adapter/getOrgList',
                             valueField: 'code',
-                            textField: 'value',
+                            textField: 'name',
                             dataParmName: 'detailModelList',
                             urlParms: {
-                                type: type
+                                type: type,
+                                mode: "modify"
                             }
                         });
             }
@@ -121,6 +120,8 @@
                         textField: 'value',
                         dataParmName: 'detailModelList',
                         urlParms: {
+                            page: 1,
+                            rows: 1000,
                             dictId: adapterType
                         },
                         onSelected: function (value) {
@@ -144,12 +145,8 @@
                 adapterCustomize: null,
                 init: function () {
                     adapterGrid = $("#div_adapter_info_grid").ligerGrid($.LigerGridEx.config({
-                        url: '${contextRoot}/adapter/searchAdapterPlan',
-                        parms: {
-                            searchNm: "",
-                            searchType: "",
-                            searchOrg: ""
-                        },
+                        url: '${contextRoot}/adapter/list',
+                        parms: this.formatParms(),
                         columns: [
                             {display: 'ID', name: 'id', hide: true},
                             {display: '方案类别', name: 'typeValue', width: '5%', align: 'left'},
@@ -200,11 +197,32 @@
                     adapterGrid.adjustToWidth();
                 },
                 reloadGrid: function () {
-                    var values = retrieve.$element.Fields.getValues();
+                    var values = this.formatParms(retrieve.$element.Fields.getValues());
                     adapterGrid.options.newPage = 1;
                     adapterGrid.setOptions({parms: $.extend({}, values)});
                     //重新查询
                     adapterGrid.loadData(true);
+                },
+                formatParms: function (values) {
+                    var filters = "";
+                    if(values) {
+                        if (values.searchNm) {
+                            filters += ";code?" + values.searchNm + " g1;name?" + values.searchNm + " g1"
+                        }
+                        if (values.searchType) {
+                            filters += ";type=" + values.searchType;
+                        } else {
+                            filters += ";type=1,2,3";
+                        }
+                        if (values.searchOrg) {
+                            filters += ";org=" + values.searchOrg ;
+                        }
+                    }
+                    return {
+                        filters: filters.length>0 ? filters.substring(1) : "",
+                        fields: "",
+                        sorts: ""
+                    };
                 },
                 bindEvents: function () {
                     var self = this;
@@ -267,7 +285,7 @@
                     });
                     //适配
                     $.subscribe('adapter:adapterInfo:adapter', function (event, id, mode) {
-                        var url = '${contextRoot}/adapterDataSet/initial?treePid=4&treeId=26&adapterPlanId=' + id;
+                        var url = '${contextRoot}/adapterDataSet/initial?treePid=4&treeId=26&dataModel=' + id;
                         $("#contentPage").empty();
                         $("#contentPage").load(url);
 

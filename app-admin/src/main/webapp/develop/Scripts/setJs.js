@@ -147,7 +147,7 @@ set.list = {
         $.ajax({
             type: "get",
             url: u._url + "/std/dataset/searchDataSets",
-            data: {codename: u.setSearch.getValue(), version: versionCode, page: 1, rows: 0},// 你的formid
+            data: {codename: u.setSearch.getValue(), version: versionCode, page: 1, rows: 100},// 你的formid
             async: true,
             dataType: "json",
             error: function (request) {
@@ -420,7 +420,6 @@ set.list = {
 set.attr = {
     set_form: $("#div_set_info_form"),
     init: function () {
-        debugger;
         var versionCode = $.Util.getUrlQueryString('versioncode');
         $("#hdversion").val(versionCode);
         var setId = $.Util.getUrlQueryString('id');
@@ -435,13 +434,18 @@ set.attr = {
             u._url = $("#hd_url").val();
         }
         var cdaVersion = $("#hdversion").val();
+        debugger
         $.ajax({
-            url: u._url + "/cdadict/getStdSourceList",
+            //url: u._url + "/cdadict/getStdSourceList",
+            url: u._url + "/std/dataset/getStdSourceList",
             type: "post",
             dataType: "json",
-            data: {strVersionCode: cdaVersion},
+           // data: {strVersionCode: cdaVersion},
+            data: {version: cdaVersion},
             success: function (data) {
-                var result = eval(data.result);
+                //var result = eval(data.result);
+                var envelop = eval(data);
+                var result = envelop.detailModelList;
                 var option = [];
                 if (result != null) {
                     for (var i = 0; i < result.length; i++) {

@@ -2,14 +2,12 @@ package com.yihu.ehr.agModel.patient;
 
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 
-import java.util.Date;
-
 /**
  * Created by AndyCai on 2016/2/25.
  */
 public class PatientDetailModel {
     private String idCardNo;                       // 身份证
-    private Date birthday;                            // 出生日期
+    private String birthday;                            // 出生日期
     private String birthPlace;
     private GeographyModel birthPlaceInfo;                    // 户籍地址
     private String birthPlaceFull;
@@ -30,7 +28,7 @@ public class PatientDetailModel {
     private GeographyModel homeAddressInfo;                    // 家庭地址
     private String homeAddressFull;
     private String password;                        //密码
-    private String telphoneNo ;                     // 电话号码，之前是个电话号码列表
+    private String telephoneNo ;                     // 电话号码，之前是个电话号码列表
     private String picPath = "";
     private String localPath = "";
 
@@ -42,11 +40,11 @@ public class PatientDetailModel {
         this.idCardNo = idCardNo;
     }
 
-    public Date getBirthday() {
+    public String getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(Date birthday) {
+    public void setBirthday(String birthday) {
         this.birthday = birthday;
     }
 
@@ -102,12 +100,12 @@ public class PatientDetailModel {
         this.password = password;
     }
 
-    public String getTelphoneNo() {
-        return telphoneNo;
+    public String getTelephoneNo() {
+        return telephoneNo;
     }
 
-    public void setTelphoneNo(String telphoneNo) {
-        this.telphoneNo = telphoneNo;
+    public void setTelephoneNo(String telephoneNo) {
+        this.telephoneNo = telephoneNo;
     }
 
     public String getPicPath() {

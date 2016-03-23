@@ -1,6 +1,3 @@
-server:
-  port: 443
-
 spring:
   application:
     name: ag-ehr-platform
@@ -12,7 +9,7 @@ spring:
     config:
       username: user
       password: configuration
-      uri: http://localhost:1221
+      uri: http://192.168.1.220:1221
       label: dev
 
 ---

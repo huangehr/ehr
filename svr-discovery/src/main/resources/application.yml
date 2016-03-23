@@ -1,19 +1,17 @@
 server:
   port: 8761
 
-security:
-  user:
-    password: eureka
+spring:
+  cloud:
+    config:
+      enabled: false
 
 eureka:
-  instance:
-    preferIpAddress: true
-
   client:
     register-with-eureka: false
     fetch-registry: false
     serviceUrl:
-      defaultZone: http://${eureka.instance.ipAddress}:${server.port}/eureka/
+      defaultZone: http://127.0.0.1:${server.port}/eureka/
 
 info:
   app:
@@ -25,22 +23,10 @@ info:
 spring:
   profiles: dev
 
-eureka:
-  instance:
-    ipAddress: 127.0.0.1
-
 ---
 spring:
   profiles: test
 
-eureka:
-  instance:
-    ipAddress: 172.19.103.73
-
 ---
 spring:
   profiles: prod
-
-eureka:
-  instance:
-    ipAddress: 11.1.2.21

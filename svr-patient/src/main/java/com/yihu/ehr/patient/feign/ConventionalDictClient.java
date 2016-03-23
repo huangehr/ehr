@@ -15,37 +15,31 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 /**
  * Created by Administrator on 2016/1/4.
  */
-@FeignClient(name = MicroServices.Dictionary,url = MicroServiceIpAddressStr.Dict+MicroServicePort.Dict)
-@RequestMapping(value = ApiVersion.Version1_0)
+@FeignClient(name = MicroServices.Dictionary)
 @ApiIgnore
 public interface ConventionalDictClient {
 
-    @ApiIgnore
-    @RequestMapping(value = "/dictionaries/martial_status", method = GET )
+    @RequestMapping(value = ApiVersion.Version1_0+"/dictionaries/martial_status", method = GET )
     MConventionalDict getMartialStatus(@RequestParam(value = "code") String code);
 
-    @ApiIgnore
-    @RequestMapping(value = "/dictionaries/gender", method = GET )
+    @RequestMapping(value = ApiVersion.Version1_0+"/dictionaries/gender", method = GET )
     MConventionalDict getGender(@RequestParam(value = "code") String code);
 
-    @ApiIgnore
-    @RequestMapping(value = "/dictionaries/user_type", method = GET )
+    @RequestMapping(value = ApiVersion.Version1_0+"/dictionaries/user_type", method = GET )
     MConventionalDict getUserType(@RequestParam(value = "code") String code);
 
 
-    @RequestMapping(value = "/dictionaries/residence_type", method = GET )
+    @RequestMapping(value = ApiVersion.Version1_0+"/dictionaries/residence_type", method = GET )
     MConventionalDict getResidenceType(@RequestParam(value = "code") String code);
 
-    @ApiIgnore
-    @RequestMapping(value = "/dictionaries/card_status", method = GET )
+    @RequestMapping(value = ApiVersion.Version1_0+"/dictionaries/card_status", method = GET )
     MConventionalDict getCardStatus(@RequestParam(value = "code") String code);
 
-    @ApiIgnore
-    @RequestMapping(value = "/dictionaries/card_type", method = GET )
+    @RequestMapping(value = ApiVersion.Version1_0+"/dictionaries/card_type", method = GET )
     MConventionalDict getCardType(@RequestParam(value = "code") String code);
 
 
-    @RequestMapping(value = "/dictionaries/std_source_types", method = GET )
+    @RequestMapping(value = ApiVersion.Version1_0+"/dictionaries/std_source_types", method = GET )
     Collection<MConventionalDict> getStdSourceTypeList(@RequestParam(value = "codes") List<String> codes);
 
 

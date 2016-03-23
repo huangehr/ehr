@@ -32,13 +32,13 @@ public class AbstractCard {
 	public AbstractCard(){
 	}
 
-	public boolean checkIsVirtualCard(){
-		if(this.getCardType().equals("VirtualCard")){
-			return true;
-		}else{
-			return false;
-		}
-	}
+//	public boolean checkIsVirtualCard(){
+//		if(this.getCardType().equals("VirtualCard")){
+//			return true;
+//		}else{
+//			return false;
+//		}
+//	}
 
     public String getId() {
         return id;

@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.feign.AdapterDispatchClient;
 import com.yihu.ehr.feign.SecurityClient;
 import com.yihu.ehr.model.security.MKey;
+import com.yihu.ehr.util.RestEcho;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

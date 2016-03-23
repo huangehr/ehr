@@ -16,8 +16,6 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Date;
-
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -71,7 +69,7 @@ public class SystemDictControllerTests {
         systemDictModel.setName("test_dict_cms_c");
         systemDictModel.setId(230);
         systemDictModel.setPhoneticCode("TEST_DICT_CMS_C");
-        systemDictModel.setCreateDate(new Date());
+        systemDictModel.setCreateDate("2016-03-22");
 
         envelop = sysDict.updateDictionary(objectMapper.writeValueAsString(systemDictModel));
         assertTrue("字典修改失败", ((SystemDictModel) envelop.getObj()).getName().equals("test_dict_cms_c"));
@@ -181,6 +179,19 @@ public class SystemDictControllerTests {
 
     @Test
     public void cTestSearchEntry() throws Exception{
+
+        SystemDictModel systemDictModel = new SystemDictModel();
+        systemDictModel.setName("test_cms_dict");
+        systemDictModel.setAuthorId("0dae0003561cc415c72d9111e8cb88aa");
+        systemDictModel.setCreateDate("2016-03-22");
+
+        envelop = sysDict.createDictionary(objectMapper.writeValueAsString(systemDictModel));
+        assertTrue("新增失败!",envelop.isSuccessFlg()&&envelop.getObj()!=null);
+
+        systemDictModel = (SystemDictModel)envelop.getObj();
+        envelop = sysDict.deleteDictionary(systemDictModel.getId());
+        assertTrue("删除失败!",envelop.isSuccessFlg());
+
         String fields = "";
         String filter = "";
         int page = 1;
@@ -189,7 +200,7 @@ public class SystemDictControllerTests {
         assertTrue("数据获取失败!",envelop.getDetailModelList().size()>0);
 
         String jsonData = objectMapper.writeValueAsString(envelop.getDetailModelList().get(0));
-        SystemDictModel systemDictModel = objectMapper.readValue(jsonData,SystemDictModel.class);
+        systemDictModel = objectMapper.readValue(jsonData,SystemDictModel.class);
 
         long dictId = systemDictModel.getId();
         filter="dictId="+dictId;

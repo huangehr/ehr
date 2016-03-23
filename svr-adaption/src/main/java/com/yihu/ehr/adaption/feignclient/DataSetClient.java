@@ -20,17 +20,16 @@ import java.util.Map;
  */
 @ApiIgnore
 @FeignClient(name = MicroServices.Standard)
-@RequestMapping(ApiVersion.Version1_0)
 public interface DataSetClient {
 
-    @RequestMapping(value = RestApi.Standards.DataSetsName, method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Standards.DataSetsName, method = RequestMethod.GET)
     @ApiOperation(value = "获取数据集 id-name : map集")
     Map getDataSetMapByIds(
             @RequestParam(value = "version") String version,
             @RequestParam(value = "ids") String ids);
 
 
-    @RequestMapping(value = RestApi.Standards.MetaDatasName, method = RequestMethod.GET)
+    @RequestMapping(value =ApiVersion.Version1_0+ RestApi.Standards.MetaDatasName, method = RequestMethod.GET)
     @ApiOperation(value = "获取数据元 id-name : map集")
     Map getMetaDataMapByIds(
             @RequestParam(value = "version") String version,

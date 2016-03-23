@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Created by AndyCai on 2016/1/29.
  */
-@FeignClient(MicroServices.User)
+@FeignClient(name=MicroServices.User)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface UserClient {
@@ -76,13 +76,13 @@ public interface UserClient {
     @ApiOperation(value = "重新分配密钥", notes = "重新分配密钥")
     Map<String, String> distributeKey(@PathVariable(value = "user_id") String userId);
 
-    @RequestMapping(value = RestApi.Users.UserPassword, method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Users.UserVerification, method = RequestMethod.GET)
     @ApiOperation(value = "根据用户名及密码获取用户", notes = "根据用户名及密码获取用户")
     MUser getUserByNameAndPassword(
             @ApiParam(name = "user_name", value = "登录账号", defaultValue = "")
-            @PathVariable(value = "user_name") String userName,
+            @RequestParam(value = "user_name") String userName,
             @ApiParam(name = "password", value = "密码", defaultValue = "")
-            @PathVariable(value = "password") String password);
+            @RequestParam(value = "password") String password);
 
     @RequestMapping(value = RestApi.Users.User, method = RequestMethod.GET)
     @ApiOperation(value = "根据用户名获取用户", notes = "根据用户名获取用户")
@@ -94,7 +94,7 @@ public interface UserClient {
 
     @RequestMapping(value = RestApi.Users.UserIdCardNoExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断身份证是否存在")
-    boolean isIdCardExists(@PathVariable(value = "id_card") String idCard);
+    boolean isIdCardExists(@RequestParam(value = "id_card_no") String idCardNo);
 
     @RequestMapping(value = RestApi.Users.UserEmailNoExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断用户邮件是否存在")

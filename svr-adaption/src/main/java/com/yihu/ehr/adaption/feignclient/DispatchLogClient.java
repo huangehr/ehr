@@ -21,11 +21,10 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 @ApiIgnore
 @FeignClient(name = MicroServices.Standard)
-@RequestMapping(ApiVersion.Version1_0)
 public interface DispatchLogClient {
 
 
-    @RequestMapping(value = RestApi.Standards.DispatchLogs, method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Standards.DispatchLogs, method = RequestMethod.GET)
     @ApiOperation(value = "获取日志信息")
     MDispatchLog getLog(
             @ApiParam(required = true, name = "version", value = "版本号")
@@ -34,7 +33,7 @@ public interface DispatchLogClient {
             @RequestParam(value = "org_code", required = true) String orgCode);
 
 
-    @RequestMapping(value = RestApi.Standards.DispatchLogs, method = RequestMethod.DELETE)
+    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Standards.DispatchLogs, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除日志信息")
     boolean deleteLog(
             @ApiParam(required = true, name = "version", value = "版本号")
@@ -42,7 +41,7 @@ public interface DispatchLogClient {
             @ApiParam(required = true, name = "org_code", value = "机构代码")
             @RequestParam(value = "org_code", required = true) String orgCode);
 
-    @RequestMapping(value = RestApi.Standards.DispatchLogs, method = RequestMethod.POST)
+    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Standards.DispatchLogs, method = RequestMethod.POST)
     @ApiOperation(value = "新增日志信息")
     MDispatchLog saveLog(
             @ApiParam(name = "model", value = "数据模型")

@@ -110,7 +110,7 @@ public class AppEndPoint extends BaseRestController {
     public boolean updateStatus(
             @ApiParam(name = "app_id", value = "id")
             @PathVariable(value = "app_id") String appId,
-            @ApiParam(name = "status", value = "状态")
+            @ApiParam(name = "app_status", value = "状态")
             @RequestParam(value = "app_status") String appStatus) throws Exception {
         appService.checkStatus(appId, appStatus);
         return true;
@@ -123,7 +123,7 @@ public class AppEndPoint extends BaseRestController {
             @PathVariable(value = "app_id") String appId,
             @ApiParam(name = "secret", value = "")
             @RequestParam(value = "secret") String secret) throws Exception {
-        return appService.findByIdAndSecret(appId, secret) != null;
+        return appService.findByIdAndSecret(appId, secret);
     }
 
     @RequestMapping(value = RestApi.Apps.AppNameExistence, method = RequestMethod.GET)

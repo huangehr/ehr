@@ -1,6 +1,7 @@
 package com.yihu.ehr.ha.apps.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.ha.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.apps.service.AppClient;
@@ -53,7 +54,7 @@ public class AppController extends BaseController {
         ResponseEntity<List<MApp>> responseEntity = appClient.getApps(fields,filters,sort,size,page);
         List<MApp> mAppList = responseEntity.getBody();
         for(MApp app :mAppList){
-            appModelList.add(changeToAppModel(app));
+            appModelList.add(convertToAppModel(app));
         }
         Integer totalCount = getTotalCount(responseEntity);
         Envelop envelop = getResult(appModelList,totalCount,page,size);
@@ -73,14 +74,14 @@ public class AppController extends BaseController {
         Envelop envelop = new Envelop();
         //传入的appJson里包含userId
         AppDetailModel appDetailModel = objectMapper.readValue(appJson,AppDetailModel.class);
-        MApp app = convertToModel(appDetailModel,MApp.class);
+        MApp app = convertToMApp(appDetailModel);
         MApp mApp = appClient.createApp(objectMapper.writeValueAsString(app));
         if(mApp==null){
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("app创建失败！");
         }else{
             envelop.setSuccessFlg(true);
-            envelop.setObj(changeToAppDetailModel(mApp));
+            envelop.setObj(convertToAppDetailModel(mApp));
         }
         return envelop;
     }
@@ -97,7 +98,7 @@ public class AppController extends BaseController {
             envelop.setErrorMsg("app获取失败");
         }else{
             envelop.setSuccessFlg(true);
-            envelop.setObj(changeToAppDetailModel(mApp));
+            envelop.setObj(convertToAppDetailModel(mApp));
         }
         return envelop;
     }
@@ -110,14 +111,14 @@ public class AppController extends BaseController {
             @RequestParam(value = "app", required = false) String appJson) throws Exception {
         Envelop envelop = new Envelop();
         AppDetailModel appDetailModel = objectMapper.readValue(appJson,AppDetailModel.class);
-        MApp app = convertToModel(appDetailModel,MApp.class);
+        MApp app = convertToMApp(appDetailModel);
         MApp mApp = appClient.updateApp(objectMapper.writeValueAsString(app));
         if(mApp==null){
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("app更新失败！");
         }else{
             envelop.setSuccessFlg(true);
-            envelop.setObj(changeToAppDetailModel(mApp));
+            envelop.setObj(convertToAppDetailModel(mApp));
         }
         return envelop;
     }
@@ -148,7 +149,7 @@ public class AppController extends BaseController {
     public boolean updateStatus(
             @ApiParam(name= "app_id",value = "app_id",defaultValue = "")
             @RequestParam(value = "app_id") String appId,
-            @ApiParam(name = "status",value = "状态",defaultValue = "")
+            @ApiParam(name = "app_status",value = "状态",defaultValue = "")
             @RequestParam(value = "app_status") String appStatus)throws Exception{
         return appClient.updateStatus(appId, appStatus);
     }
@@ -176,7 +177,11 @@ public class AppController extends BaseController {
      * @param mApp
      * @return AppModel
      */
-    private AppModel changeToAppModel(MApp mApp) {
+    private AppModel convertToAppModel(MApp mApp) {
+        if(mApp==null)
+        {
+            return null;
+        }
         AppModel appModel = convertToModel(mApp, AppModel.class);
         //获取app类别字典值
         MConventionalDict catalogDict = conDictEntryClient.getAppCatalog(mApp.getCatalog());
@@ -192,9 +197,17 @@ public class AppController extends BaseController {
      * @param mApp
      * @return
      */
-    private AppDetailModel changeToAppDetailModel(MApp mApp){
+    private AppDetailModel convertToAppDetailModel(MApp mApp){
+        if(mApp==null)
+        {
+            return null;
+        }
+
         AppDetailModel app = convertToModel(mApp, AppDetailModel.class);
-        //TODO 微服务提供的model缺少tags标签属性
+
+        app.setCreateTime(DateToString(mApp.getCreateTime(), AgAdminConstants.DateTimeFormat));
+        app.setAuditTime(DateToString(mApp.getAuditTime(),AgAdminConstants.DateTimeFormat));
+
         //获取app类别字典值
         MConventionalDict catalopDict = conDictEntryClient.getAppCatalog(mApp.getCatalog());
         app.setCatalogName(catalopDict == null ? "" : catalopDict.getValue());
@@ -202,5 +215,18 @@ public class AppController extends BaseController {
         MConventionalDict statusDict = conDictEntryClient.getAppStatus(mApp.getStatus());
         app.setStatusName(statusDict == null ? "" : statusDict.getValue());
         return app;
+    }
+
+    private MApp convertToMApp(AppDetailModel detailModel)
+    {
+        if(detailModel==null)
+        {
+            return null;
+        }
+        MApp mApp = convertToModel(detailModel,MApp.class);
+        mApp.setCreateTime(StringToDate(detailModel.getCreateTime(),AgAdminConstants.DateTimeFormat));
+        mApp.setAuditTime(StringToDate(detailModel.getAuditTime(),AgAdminConstants.DateTimeFormat));
+
+        return mApp;
     }
 }
