@@ -14,6 +14,7 @@
       var entryMater = null;
       /* *************************** 函数定义 ******************************* */
       function pageInit() {
+
         resizeContent();
         dictRetrieve.init();
         conditionArea.init();
@@ -42,11 +43,11 @@
         },
         initDDL: function (target) {
           var dataModel = $.DataModel.init();
-          dataModel.fetchRemote("${contextRoot}/standardsource/getVersionList",{
+          dataModel.fetchRemote("${contextRoot}/cdaVersion/getVersionList",{
             success: function(data) {
               target.ligerComboBox({
-                valueField: 'code',
-                textField: 'value',
+                valueField: 'version',
+                textField: 'versionName',
                 data: data.detailModelList,
                 initValue:1,
                 allowBlank: false,
