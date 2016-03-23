@@ -54,9 +54,6 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
     @Autowired
     PlanClient planClient;
 
-    @Autowired
-    ObjectMapper objectMapper;
-
     @RequestMapping(value = "/metadata/{id}", method = RequestMethod.GET)
     public Envelop getAdapterMetaDataById(
             @ApiParam(name = "id", value = "适配关系ID")
@@ -141,7 +138,8 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
 
             AdapterDataSetDetailModel detailModel = convertToModel(dataModel,AdapterDataSetDetailModel.class);
 
-            MAdapterDataSet mAdapterDataSet = adapterDataSetClient.updateAdapterMetaData(detailModel.getId(), URLEncoder.encode(objectMapper.writeValueAsString(detailModel), "UTF-8"));
+            MAdapterDataSet mAdapterDataSet = adapterDataSetClient.
+                    updateAdapterMetaData(detailModel.getId(), toEncodeJson(detailModel));
             if (mAdapterDataSet == null) {
                 return failed("保存失败!");
             }
@@ -170,7 +168,7 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
             }
 
             AdapterDataSetDetailModel detailModel = convertToModel(dataModel,AdapterDataSetDetailModel.class);
-            MAdapterDataSet mAdapterDataSet = adapterDataSetClient.createAdapterMetaData(objectMapper.writeValueAsString(detailModel));
+            MAdapterDataSet mAdapterDataSet = adapterDataSetClient.createAdapterMetaData(toEncodeJson(detailModel));
             if (mAdapterDataSet == null) {
                 return failed("保存失败!");
             }

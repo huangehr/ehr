@@ -173,17 +173,25 @@ public class URLQueryParser<T> {
         if (filter.contains("?")) {
             Pair<Path, String> pair = getPair(filter, "[?]", root);
             predicate = cb.like(pair.getKey(), "%" + pair.getValue() + "%");
-        } else if (filter.contains(">")) {
-            Pair<Path, String> pair = getPair(filter, ">", root);
-            predicate = cb.gt(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
+        } else if (filter.contains("<>")) {
+            Pair<Path, String> pair = getPair(filter, "<>", root);
+
+            if (pair.getValue().contains(",")) {
+                predicate = cb.not(pair.getKey().in(pair.getValue().split(",")));
+            } else {
+                predicate = cb.notEqual(pair.getKey(), pair.getValue());
+            }
         } else if (filter.contains(">=")) {
             Pair<Path, String> pair = getPair(filter, ">=", root);
+            predicate = cb.gt(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
+        } else if (filter.contains(">")) {
+            Pair<Path, String> pair = getPair(filter, ">", root);
             predicate = cb.ge(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
-        } else if (filter.contains("<")) {
-            Pair<Path, String> pair = getPair(filter, "<", root);
-            predicate = cb.lt(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
         } else if (filter.contains("<=")) {
             Pair<Path, String> pair = getPair(filter, "<=", root);
+            predicate = cb.lt(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
+        } else if (filter.contains("<")) {
+            Pair<Path, String> pair = getPair(filter, "<", root);
             predicate = cb.le(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
         } else if (filter.contains("=")) {
             Pair<Path, String> pair = getPair(filter, "=", root);
