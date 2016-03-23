@@ -29,7 +29,7 @@
 
         /* *************************** 模块初始化 ***************************** */
         infoForm = {
-            orgDictEntrySeq : info.orgDictItemSeq,
+            orgDictEntrySeq : info.orgDictEntrySeq,
             $dictForm: $("#div_dict_form"),
             $btnSave:$("#btn_save_dict"),
             init: function () {

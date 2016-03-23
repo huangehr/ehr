@@ -296,7 +296,7 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
         for (AdapterDataSet adapterDataSet : adapterMetaDataList) {
             metaDataIds += "," + adapterDataSet.getMetaDataId();
         }
-        Map metaDatas = dataSetClient.getMetaDataMapByIds(version, metaDataIds.substring(1));
+        Map metaDatas = dataSetClient.getMetaDataMapByIds(version, metaDataIds.length()>0 ? metaDataIds.substring(1) : "");
         Map<String, String> tmp;
         for (AdapterDataSet adapterDataSet : adapterMetaDataList) {
             if ((tmp = (Map) metaDatas.get(String.valueOf(adapterDataSet.getDataSetId()))) == null
@@ -326,7 +326,7 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
     private OrgAdapterPlan saveModel(String parmJson, String isCover, Long id) {
         OrgAdapterPlan plan = null;
         try {
-            plan = jsonToObj(parmJson, OrgAdapterPlan.class);
+            plan = toDecodeObj(parmJson, OrgAdapterPlan.class);
         } catch (IOException e) {
             throw errParm();
         }

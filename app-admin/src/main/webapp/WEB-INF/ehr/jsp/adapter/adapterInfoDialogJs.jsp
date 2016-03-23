@@ -64,6 +64,8 @@
                             textField: 'value',
                             dataParmName: 'detailModelList',
                             urlParms: {
+                                page: 1,
+                                rows: 1000,
                                 dictId: adapterType
                             },
                             onSelected: function (value) {
@@ -94,11 +96,13 @@
                 versions = self.$version.ligerComboBox(
                         {
                             cancelable: false,
-                            url: '${contextRoot}/standardsource/getVersionList',
-                            valueField: 'code',
-                            textField: 'value',
+                            url: '${contextRoot}/adapter/versions',
+                            valueField: 'version',
+                            textField: 'versionName',
                             dataParmName: 'detailModelList',
                             urlParms: {
+                                page: 1,
+                                rows: 1000,
                                 dictId: 4
                             },
                             onSelected: function (value) {
@@ -145,7 +149,7 @@
                         {
                             url: '${contextRoot}/adapter/getOrgList',
                             valueField: 'code',
-                            textField: 'value',
+                            textField: 'name',
                             dataParmName: 'detailModelList',
                             urlParms: {
                                 type: types.getValue(),
@@ -186,19 +190,19 @@
                 this.$updateAdapterBtn.click(function () {
                     self.$form.attrScan();
                     adapterPlanModel = self.$form.Fields.getValues();
-//          if(!validator.validate()){
-//            return;
-//          }
+                    if(!validator.validate()){
+                        return;
+                    }
                     var parms = {
                         id: adapterPlanModel.id,
                         model: JSON.stringify(adapterPlanModel),
-                        extParms: ''
+                        extParms: '{"isCover": "false"}'
                     }
                     var pv = self.$parent.ligerGetComboBoxManager().getValue();
                     if (pv) {
                         var parent = self.$parent.ligerGetComboBoxManager().getSelected();
                         $.Notice.confirm("映射机构采集标准与复方案采集标准不一致，是否覆盖映射机构采集标准？", function (r) {
-                            parms.extParms = '{isCover:"' + r + '"}';
+                            parms.extParms = '{"isCover":"' + r + '"}';
                             updata(parms);
                         })
                     }

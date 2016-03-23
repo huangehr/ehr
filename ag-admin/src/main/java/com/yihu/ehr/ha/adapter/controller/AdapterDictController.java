@@ -150,7 +150,7 @@ public class AdapterDictController extends ExtendController<AdapterDictModel> {
                 return failed(validateResult.getMsg());
             }
             AdapterDictDetailModel detailModel = convertToModel(adapterDictModel,AdapterDictDetailModel.class);
-            MAdapterDict mAdapterDict = adapterDictClient.createAdapterDictEntry(objectMapper.writeValueAsString(detailModel));
+            MAdapterDict mAdapterDict = adapterDictClient.createAdapterDictEntry(toEncodeJson(detailModel));
             if(mAdapterDict==null)
             {
                 return failed("保存失败!");
@@ -179,7 +179,7 @@ public class AdapterDictController extends ExtendController<AdapterDictModel> {
                 return failed(validateResult.getMsg());
             }
             AdapterDictDetailModel detailModel = convertToModel(adapterDictModel,AdapterDictDetailModel.class);
-            MAdapterDict mAdapterDict =adapterDictClient.updateAdapterDictEntry(detailModel.getId(), objectMapper.writeValueAsString(detailModel));
+            MAdapterDict mAdapterDict =adapterDictClient.updateAdapterDictEntry(detailModel.getId(), toEncodeJson(detailModel));
             if(mAdapterDict==null)
             {
                 return  failed("保存失败!");
