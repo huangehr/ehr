@@ -10,14 +10,32 @@ public class DictModel {
     String name;//字典名称
     String author;// 作者
     Long baseDict;//参考/继承的字典
+    String baseDictName;//参考/继承的字典
     String createDate;//创建日期
     String description;//字典描述
     String sourceId;
+    String sourceName;
     String stdVersion;// 标准化版本
     int hashCode;
     String OperationType;
     String innerVersion;
     int inStage;
+
+    public String getBaseDictName() {
+        return baseDictName;
+    }
+
+    public void setBaseDictName(String baseDictName) {
+        this.baseDictName = baseDictName;
+    }
+
+    public String getSourceName() {
+        return sourceName;
+    }
+
+    public void setSourceName(String sourceName) {
+        this.sourceName = sourceName;
+    }
 
     public long getId() {
         return id;

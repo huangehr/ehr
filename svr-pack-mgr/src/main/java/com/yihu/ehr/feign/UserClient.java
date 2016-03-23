@@ -17,8 +17,6 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @ApiIgnore
 @FeignClient(name = MicroServices.User)
 public interface UserClient {
-
-
     @RequestMapping(value = ApiVersion.Version1_0+RestApi.Users.User, method = GET)
     MUser getUserByUserName(@PathVariable(value = "user_name") String userName);
 
