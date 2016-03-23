@@ -34,9 +34,9 @@ public interface UserClient {
     @RequestMapping(value = ApiVersion.Version1_0+RestApi.Users.User, method = GET)
     MUser getUserByUserName(@PathVariable(value = "user_name") String userName);
 
-    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Users.UserPassword, method = GET)
-    MUser getUserByNameAndPassword(@PathVariable(value = "user_name") String userName,
-                                   @PathVariable(value = "password") String password);
+    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Users.UserVerification, method = GET)
+    MUser getUserByNameAndPassword(@RequestParam(value = "user_name") String userName,
+                                   @RequestParam(value = "password") String password);
 }
 
 

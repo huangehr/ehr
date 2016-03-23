@@ -1,5 +1,7 @@
 package com.yihu.ehr.api;
 
+import org.springframework.web.bind.annotation.RequestMapping;
+
 /**
  * REST API URL. 此处定义的URL可用于服务对外提供的地址及HTTP客户端请求地址.
  * URL定义遵循健康档案平台REST规范.
@@ -129,7 +131,7 @@ public class RestApi {
         public static final String Users                    = "/users";
         public static final String User                     = "/users/{user_name}";
         public static final String UserExistence            = "/users/{user_name}/existence";
-        public static final String UserPassword             = "/users/{user_name}/{password}";
+        public static final String UserVerification             = "/users/verification";
         public static final String UserAdmin                = "/users/admin/{user_id}";
         public static final String UserAdminPassword        = "/users/admin/{user_id}/password";
         public static final String UserAdminKey             = "/users/admin/{user_id}/key";

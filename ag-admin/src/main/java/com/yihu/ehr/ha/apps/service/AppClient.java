@@ -61,7 +61,7 @@ public interface AppClient {
     boolean updateStatus(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
             @PathVariable(value = "app_id") String appId,
-            @ApiParam(name = "status", value = "状态", defaultValue = "")
+            @ApiParam(name = "app_status", value = "状态", defaultValue = "")
             @RequestParam(value = "app_status") String appStatus);
 
     @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Apps.AppExistence, method = RequestMethod.GET)
