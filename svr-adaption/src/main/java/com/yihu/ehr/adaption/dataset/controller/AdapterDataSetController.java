@@ -116,7 +116,6 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
         AdapterDataSet adapterDataSet = adapterDataSetService.retrieve(id);
         if(adapterDataSet==null)
             throw errNotFound();
-        jsonModel = URLDecoder.decode(jsonModel, "UTF-8");
         return getModel(saveAdapterMetaData(adapterDataSet, jsonModel));
     }
 
@@ -145,7 +144,7 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
     private AdapterDataSet saveAdapterMetaData(AdapterDataSet adapterDataSet, String jsonModel)  {
         AdapterDataSet adapterDataSetModel = null;
         try {
-            adapterDataSetModel = jsonToObj(jsonModel, AdapterDataSet.class);
+            adapterDataSetModel = toDecodeObj(jsonModel, AdapterDataSet.class);
         } catch (IOException e) {
             throw errParm();
         }

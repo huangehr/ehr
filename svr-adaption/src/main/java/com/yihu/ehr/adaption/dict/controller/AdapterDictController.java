@@ -107,7 +107,7 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
             @RequestParam(value = "adapterDictModel") String dictJsonModel) throws Exception {
 
         try {
-            return getModel(save(jsonToObj(dictJsonModel, MAdapterDict.class), new AdapterDict()));
+            return getModel(save(dictJsonModel, new AdapterDict()));
         } catch (IOException e) {
             throw errParm();
         }
@@ -125,7 +125,7 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
             AdapterDict adapterDict = adapterDictService.retrieve(id);
             if (adapterDict == null)
                 throw errNotFound();
-            return getModel(save(jsonToObj(dictJsonModel, MAdapterDict.class), adapterDict));
+            return getModel(save(dictJsonModel, adapterDict));
         } catch (IOException e) {
             throw errParm();
         }
@@ -145,8 +145,9 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
         return convertToModel(adapterDictService.retrieve(id), MAdapterDict.class);
     }
 
-    private AdapterDict save(MAdapterDict adapterDictModel, AdapterDict adapterDict) {
+    private AdapterDict save(String dictJsonModel, AdapterDict adapterDict) throws IOException {
 
+        MAdapterDict adapterDictModel = toDecodeObj(dictJsonModel, MAdapterDict.class);
         adapterDict.setAdapterPlanId(adapterDictModel.getAdapterPlanId());
         adapterDict.setDictEntryId(adapterDictModel.getDictEntryId());
         adapterDict.setDictId(adapterDictModel.getDictId());

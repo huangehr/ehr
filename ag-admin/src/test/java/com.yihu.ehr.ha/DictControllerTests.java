@@ -81,7 +81,7 @@ public class DictControllerTests {
 //        envelop = dictController.saveDictEntry(version, dictId, "", "entry_code_test7", "value_test", "test7");
         assertNotEquals("字典项新增失败",envelop,null);
 
-        envelop = dictController.searchDictEntry("","value=value_test","",15,1,version);
+        envelop = dictController.searchDictEntry("","dictId=2","",15,1,version);
         assertNotEquals("查询字典项失败",envelop,null);
 
         StringBuffer ids = new StringBuffer();

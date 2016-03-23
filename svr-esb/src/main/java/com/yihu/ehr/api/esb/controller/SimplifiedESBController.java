@@ -6,6 +6,7 @@ import com.yihu.ehr.api.esb.model.HosLog;
 import com.yihu.ehr.api.esb.model.HosSqlTask;
 import com.yihu.ehr.api.esb.service.SimplifiedESBService;
 import com.yihu.ehr.config.FastDFSConfig;
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.util.DateFormatter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,7 +26,7 @@ import java.util.Date;
  */
 
 @RestController
-@RequestMapping(value = "/esb")
+@RequestMapping(value = ApiVersion.Version1_0+"/esb")
 @Api(protocols = "https", value = "simplified-esb", description = "简易ESB服务临时接口")
 public class SimplifiedESBController {
     @Resource(name = "simplifiedESBService")
