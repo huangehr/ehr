@@ -19,6 +19,8 @@ service-gateway:
   username: user
   password: eureka
   url: http://localhost:10000/api/v1.0/admin
+  stdurl: http://localhost:10000/api/v1.0/admin/std
+  versionurl: http://localhost:10000/api/v1.0/admin/version
 #  hopurl: http://172.19.103.55:8080/WSGW/services/ServiceGateWay
 #  org_code: 41872607-9
 #  module: api

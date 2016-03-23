@@ -77,7 +77,7 @@ public class User {
         this.lastLoginTime = lastLoginTime;
     }
 
-    @Column(name = "email",  nullable = false)
+    @Column(name = "email",  nullable = true)
     public String getEmail() {
         return email;
     }

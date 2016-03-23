@@ -302,7 +302,6 @@ public class OrganizationController extends BaseController {
         //获取接入方式字典字典值
         MConventionalDict settledWayDict = conDictEntryClient.getSettledWay(mOrg.getSettledWay());
         org.setSettledWayName(settledWayDict == null ? "" : settledWayDict.getValue());
-        //TODO 微服务返回model无tags属性
         //org.setTags(mOrg.getTags());
         //获取地址字典值明细
         MGeography addr = addressClient.getAddressById(mOrg.getLocation());

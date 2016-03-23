@@ -23,7 +23,7 @@ public class MApp implements Serializable {
     private String catalog;
     private String status;
     private String description;
-
+    private String tags;
 	public MApp(){
     }
 
@@ -113,5 +113,13 @@ public class MApp implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 }

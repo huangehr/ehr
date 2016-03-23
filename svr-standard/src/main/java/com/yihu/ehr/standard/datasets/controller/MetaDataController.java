@@ -9,7 +9,6 @@ import com.yihu.ehr.standard.datasets.service.MetaDataService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -158,15 +157,15 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
 
     @RequestMapping(value = RestApi.Standards.MetaDataCodeExistence, method = RequestMethod.GET)
     @ApiOperation(value = "验证数据元代码是否重复")
-    public boolean validateCode(
+    public boolean validateInnerCode(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @RequestParam(value = "version") String version,
             @ApiParam(name = "data_set_id", value = "数据集编号", defaultValue = "")
             @PathVariable(value = "data_set_id") long dataSetId,
-            @ApiParam(name = "code", value = "查询代码", defaultValue = "")
-            @RequestParam(value = "code") String code) throws Exception{
+            @ApiParam(name = "inner_code", value = "查询代码", defaultValue = "")
+            @RequestParam(value = "inner_code") String innerCode) throws Exception{
 
-        return metaDataService.isColumnValExsit(dataSetId, "code", code, getServiceEntity(version));
+        return metaDataService.isColumnValExsit(dataSetId, "innerCode", innerCode, getServiceEntity(version));
     }
 
 

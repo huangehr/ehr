@@ -92,7 +92,7 @@ public class MetaDataTests {
     @Test
     public void testValidateCode() throws Exception{
         String code = "";
-        boolean rs = metaDataController.validateCode(version, dataSetId, code);
+        boolean rs = metaDataController.validateInnerCode(version, dataSetId, code);
         assertTrue("code不重复！", rs);
     }
 
