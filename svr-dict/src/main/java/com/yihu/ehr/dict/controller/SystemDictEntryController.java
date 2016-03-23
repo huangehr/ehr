@@ -77,7 +77,7 @@ public class SystemDictEntryController extends BaseRestController {
     }
 
     @ApiOperation(value = "获取字典项")
-    @RequestMapping(value = "/dictionaries/{dict_id}/entries/{code}", method = RequestMethod.POST)
+    @RequestMapping(value = "/dictionaries/{dict_id}/entries/{code}", method = RequestMethod.GET)
     public MDictionaryEntry getDictEntry(
             @ApiParam(name = "dict_id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "dict_id") long dictId,

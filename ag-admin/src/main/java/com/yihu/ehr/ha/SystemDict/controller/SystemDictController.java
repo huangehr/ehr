@@ -236,7 +236,7 @@ public class SystemDictController extends BaseController {
     }
 
     @ApiOperation(value = "获取字典项")
-    @RequestMapping(value = "/dictionaries/{id}/entries/{code}", method = RequestMethod.POST)
+    @RequestMapping(value = "/dictionaries/{id}/entries/{code}", method = RequestMethod.GET)
     public Envelop getDictEntry(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") long id,
@@ -298,16 +298,6 @@ public class SystemDictController extends BaseController {
             ex.printStackTrace();
             return failedSystem();
         }
-    }
-
-
-    @RequestMapping(value = "/dictionaries/existence/{dict_name}", method = RequestMethod.GET)
-    @ApiOperation(value = "判断提交的字典名称是否已经存在")
-    public boolean isDictNameExists(
-            @ApiParam(name = "dict_name", value = "dict_name", defaultValue = "")
-            @PathVariable(value = "dict_name") String dictName) {
-
-        return systemDictClient.isDictNameExists(dictName);
     }
 
     @RequestMapping(value = "/dictionaries/existence/{dict_id}/{code}" , method = RequestMethod.GET)
