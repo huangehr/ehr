@@ -21,10 +21,9 @@ import java.util.Map;
  */
 @ApiIgnore
 @FeignClient(name = MicroServices.Standard)
-@RequestMapping(ApiVersion.Version1_0)
 public interface DictClient {
 
-    @RequestMapping(value = RestApi.Standards.MetaDataWithDict, method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Standards.MetaDataWithDict, method = RequestMethod.GET)
     @ApiOperation(value = "获取字典 map集")
     Map getDictMapByIds(
             @RequestParam(value = "version") String version,

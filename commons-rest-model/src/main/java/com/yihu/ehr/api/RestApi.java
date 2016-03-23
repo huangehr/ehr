@@ -131,7 +131,7 @@ public class RestApi {
         public static final String Users                    = "/users";
         public static final String User                     = "/users/{user_name}";
         public static final String UserExistence            = "/users/{user_name}/existence";
-        public static final String UserVerification             = "/users/verification";
+        public static final String UserVerification         = "/users/verification";
         public static final String UserAdmin                = "/users/admin/{user_id}";
         public static final String UserAdminPassword        = "/users/admin/{user_id}/password";
         public static final String UserAdminKey             = "/users/admin/{user_id}/key";
