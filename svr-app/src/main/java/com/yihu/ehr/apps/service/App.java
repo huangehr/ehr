@@ -1,9 +1,12 @@
 package com.yihu.ehr.apps.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  * APP对象。
@@ -14,8 +17,12 @@ import java.util.Date;
 
 @Entity
 @Table(name = "apps")
-@Access(value = AccessType.PROPERTY)
+@Access(value = AccessType.FIELD)
 public class    App {
+    @Id
+    @GeneratedValue(generator = "Generator")
+    @GenericGenerator(name = "Generator", strategy = "assigned")
+    @Column(name = "id", unique = true, nullable = false)
     private String id;
     private String name;
     private String secret;
@@ -28,14 +35,12 @@ public class    App {
     private String status;
     private String description;
     private String tags;
+
 	public App(){
 //        id  = new ObjectVersion().toString();
     }
 
-    @Id
-    @GeneratedValue(generator = "Generator")
-    @GenericGenerator(name = "Generator", strategy = "assigned")
-    @Column(name = "id", unique = true, nullable = false)
+
     public String getId() {
         return id;
     }
@@ -124,11 +129,12 @@ public class    App {
     }
 
     @Column(name = "tags",  nullable = true)
-    public String getTags() {
-        return tags;
+    public List<String> getTags() {
+        String[] arr = tags.split("  ");
+        List<String> list = Arrays.asList(arr);
+        return list;
     }
-
-    public void setTags(String tags) {
-        this.tags = tags;
+    public void setTags(List<String> tags) {
+        this.tags = StringUtils.join(tags.toArray(),"  ");
     }
 }
