@@ -1,12 +1,12 @@
 package com.yihu.ehr.apps.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 /**
  * APP对象。
@@ -129,10 +129,12 @@ public class    App {
     }
 
     @Column(name = "tags",  nullable = true)
-    public String[] getTags() {
-        return tags.split(",");
+    public List<String> getTags() {
+        String[] arr = tags.split("  ");
+        List<String> list = Arrays.asList(arr);
+        return list;
     }
-    public void setTags(String[] tags) {
-        this.tags = Arrays.toString(tags);
+    public void setTags(List<String> tags) {
+        this.tags = StringUtils.join(tags.toArray(),"  ");
     }
 }
