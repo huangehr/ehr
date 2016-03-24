@@ -28,11 +28,11 @@ public class StdSourceManagerController extends BaseUIController {
     private String username;
     @Value("${service-gateway.password}")
     private String password;
+    @Value("${service-gateway.stdsourceurl}")
+    private String comUrl;
 
     @Autowired
     ObjectMapper objectMapper;
-    @Value("${service-gateway.url}")
-    private String comUrl;
 
     public StdSourceManagerController() {
     }
@@ -45,7 +45,7 @@ public class StdSourceManagerController extends BaseUIController {
 
     @RequestMapping("template/stdInfo")
     public String stdInfoTemplate(Model model, String id, String mode) {
-        String url = "/standard_source/source/"+id;
+        String url = "/source/"+id;
         String envelopStr = "";
         try{
             envelopStr = HttpClientUtil.doGet(comUrl + url, username, password);
@@ -62,7 +62,7 @@ public class StdSourceManagerController extends BaseUIController {
     @ResponseBody
     public Object searchStdSource(String searchNm, String searchType, Integer page, Integer rows) {
         Envelop envelop = new Envelop();
-        String url = "/standard_source/sources";
+        String url = "/sources";
         StringBuffer filters = new StringBuffer();
         if(!StringUtils.isEmpty(searchNm)){
             filters.append("code?"+searchNm+" g1;name?"+searchNm+" g1;");
@@ -97,7 +97,7 @@ public class StdSourceManagerController extends BaseUIController {
     //获取标准来源信息
     public Object getStdSource(String id) {
         Envelop envelop = new Envelop();
-        String url = "/standard_source/stdSource/"+id;
+        String url = "/stdSource/"+id;
         String envelopStr = "";
         try{
             envelopStr = HttpClientUtil.doGet(comUrl + url, username, password);
@@ -126,7 +126,7 @@ public class StdSourceManagerController extends BaseUIController {
         //TODO 非空、唯一性（前端/网关）
         Envelop envelop = new Envelop();
         String envelopStr = "";
-        String urlGet = "/standard_source/source/"+id;
+        String urlGet = "/source/"+id;
 
         try{
             Map<String,Object> params = new HashMap<>();
@@ -154,7 +154,7 @@ public class StdSourceManagerController extends BaseUIController {
             modelForUpdate.setName(name);
             modelForUpdate.setSourceType(type);
             modelForUpdate.setDescription(description);
-            String urlUpdate = "/standard_source/source";
+            String urlUpdate = "/source";
 
             String modelJsonUpdate = objectMapper.writeValueAsString(modelForUpdate);
             params.put("model",modelJsonUpdate);
@@ -173,7 +173,7 @@ public class StdSourceManagerController extends BaseUIController {
     //删除标准来源-可批量删除
     public Object delStdSource(String id) {
         Envelop result = new Envelop();
-        String url = "/standard_source/sources";
+        String url = "/sources";
         try{
             Map<String,Object> params = new HashMap<>();
             params.put("ids",id);
