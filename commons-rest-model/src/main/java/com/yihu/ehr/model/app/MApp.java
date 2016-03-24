@@ -119,11 +119,21 @@ public class MApp implements Serializable {
     }
 
     public List<String> getTags() {
-        String[] arr = tags.split("  ");
-        List<String> list = Arrays.asList(arr);
-        return list;
+        if(org.springframework.util.StringUtils.isEmpty(tags)){
+            return null;
+        }else {
+            String[] arr = tags.split("  ");
+            List<String> list = Arrays.asList(arr);
+            return list;
+        }
+
     }
     public void setTags(List<String> tags) {
-        this.tags = StringUtils.join(tags.toArray(),"  ");
+        if(tags.size()>0){
+            this.tags = StringUtils.join(tags.toArray(),"  ");
+        }else {
+            this.tags = "";
+        }
+
     }
 }
