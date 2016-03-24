@@ -1,9 +1,9 @@
 package com.yihu.ehr.api.esb;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.config.FastDFSConfig;
+//import com.yihu.ehr.config.FastDFSConfig;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.fastdfs.FastDFSUtil;
+//import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.feign.SimplifiedESBClient;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,8 +31,8 @@ import java.io.InputStream;
 public class SimplifiedEsbEndPoint {
     @Autowired
     private SimplifiedESBClient simplifiedESBClient;
-    @Autowired
-    private FastDFSConfig FastDFSConfig;
+    //@Autowired
+    //private FastDFSConfig FastDFSConfig;
 
     /*
     @ApiOperation("获取版本列表")
@@ -59,7 +59,7 @@ public class SimplifiedEsbEndPoint {
         return new ResponseEntity<>(simplifiedESBClient.getUploadFlag(orgCode, systemCode), HttpStatus.OK);
     }
 
-    @ApiOperation("日志上传")
+    /*@ApiOperation("日志上传")
     @RequestMapping(value = "/uploadLog", method = RequestMethod.POST)
     public ResponseEntity<Boolean> uploadLogger(@ApiParam("orgCode") @RequestParam(value = "orgCode", required = true)
                                                 String orgCode,
@@ -72,7 +72,7 @@ public class SimplifiedEsbEndPoint {
         ObjectNode jsonResult = fdfs.upload(in, "zip", "");
         String filePath = jsonResult.get("fid").textValue();
         return new ResponseEntity<Boolean>(simplifiedESBClient.uploadLog(orgCode, ip, filePath), HttpStatus.OK);
-    }
+    }*/
 
     @ApiOperation("查询版本是否需要更新")
     @RequestMapping(value = "/getUpdateFlag", method = RequestMethod.GET)
