@@ -48,10 +48,10 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
 
         Class entityClass = getServiceEntity(version);
         IDictEntry dictEntryModel = (IDictEntry) jsonToObj(model, entityClass);
-        IDictEntry dictEntry = dictEntryService.retrieve(id, entityClass);
-        if(!dictEntry.getCode().equals(dictEntryModel.getCode())
-                && dictEntryService.isExistByField("code", dictEntryModel.getCode(), entityClass))
-            throw errRepeatCode();
+//        IDictEntry dictEntry = dictEntryService.retrieve(id, entityClass);
+//        if(!dictEntry.getCode().equals(dictEntryModel.getCode())
+//                && dictEntryService.isExistByField("code", dictEntryModel.getCode(), entityClass))
+//            throw errRepeatCode();
 
         dictEntryModel.setId(id);
         dictEntryService.save(dictEntryModel);
@@ -69,8 +69,8 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
 
         Class entityClass = getServiceEntity(version);
         IDictEntry dictEntry = (IDictEntry) jsonToObj(model, entityClass);
-        if(dictEntryService.isExistByField("code", dictEntry.getCode(), entityClass))
-            throw errRepeatCode();
+//        if(dictEntryService.isExistByField("code", dictEntry.getCode(), entityClass))
+//            throw errRepeatCode();
         if (dictEntryService.add(dictEntry, version))
             return getModel(dictEntry);
         return null;
@@ -149,4 +149,12 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
         return getModel(dictEntryService.retrieve(id, getServiceEntity(version)));
     }
 
+    @RequestMapping(value = RestApi.Standards.EntryCodeIsExist,method = RequestMethod.GET)
+    public boolean isExistEntryCode(
+            @RequestParam(value = "code")String code,
+            @RequestParam(value = "version_code")String versionCode)
+    {
+        Class entityClass = getServiceEntity(versionCode);
+        return dictEntryService.isExistByField("code", code, entityClass);
+    }
 }

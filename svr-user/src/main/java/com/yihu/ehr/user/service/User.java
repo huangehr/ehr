@@ -40,6 +40,7 @@ public class User {
     private String medicalRole;
     private String techTitle;
     private String adminTitle;
+    private String DType;
 
     private String imgRemotePath;
     private String imgLocalPath;
@@ -77,7 +78,7 @@ public class User {
         this.lastLoginTime = lastLoginTime;
     }
 
-    @Column(name = "email",  nullable = false)
+    @Column(name = "email",  nullable = true)
     public String getEmail() {
         return email;
     }
@@ -227,6 +228,14 @@ public class User {
     }
     public void setAdminTitle(String adminTitle) {
         this.adminTitle = adminTitle;
+    }
+
+    @Column(name = "DType",  nullable = true)
+    public String getDType() {
+        return DType;
+    }
+    public void setDType(String DType) {
+        this.DType = DType;
     }
 
     @Column(name = "img_remote_path",  nullable = true)

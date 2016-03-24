@@ -66,12 +66,13 @@
             function initSearchType(target, type) {
                 target.ligerComboBox(
                         {
-                            url: '${contextRoot}/adapter/getAdapterOrgList',
+                            url: '${contextRoot}/adapter/getOrgList',
                             valueField: 'code',
-                            textField: 'value',
+                            textField: 'name',
                             dataParmName: 'detailModelList',
                             urlParms: {
-                                type: type
+                                type: type,
+                                mode: "modify"
                             }
                         });
             }
@@ -119,6 +120,8 @@
                         textField: 'value',
                         dataParmName: 'detailModelList',
                         urlParms: {
+                            page: 1,
+                            rows: 1000,
                             dictId: adapterType
                         },
                         onSelected: function (value) {

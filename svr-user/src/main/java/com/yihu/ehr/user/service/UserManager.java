@@ -1,5 +1,6 @@
 package com.yihu.ehr.user.service;
 
+import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.encode.HashUtil;
 import org.hibernate.Query;
@@ -27,7 +28,7 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
 
     @Autowired
     private XUserRepository userRepository;
-    @Value("default.password")
+    @Value("${default.password}")
     private String default_password = "123456";
 
     /**
@@ -113,8 +114,9 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
     }
 
 
-    public void saveUser(User user) {
+    public User saveUser(User user) {
         userRepository.save(user);
+        return user;
     }
 
     public void deleteUser(String userId) {

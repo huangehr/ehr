@@ -17,13 +17,11 @@ import java.util.Map;
  * Created by AndyCai on 2016/3/3.
  */
 @FeignClient(name = MicroServices.Standard)
-@RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface StandardDispatchClient {
 
-    @RequestMapping(value = RestApi.Standards.Dispatches, method = RequestMethod.POST)
-    @ApiOperation(value = "生成适配方案摘要", produces = "application/json",
-            notes = "")
+    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Standards.Dispatches, method = RequestMethod.POST)
+    @ApiOperation(value = "生成适配方案摘要", produces = "application/json", notes = "")
     Map createSchemeInfo(
             @ApiParam(required = true, name = "version", value = "要生成的目标版本")
             @RequestParam(value = "version", required = true) String version) throws Exception;

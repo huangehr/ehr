@@ -29,14 +29,11 @@ public class StdVersionController extends BaseUIController {
     private String username;
     @Value("${service-gateway.password}")
     private String password;
+    @Value("${service-gateway.versionurl}")
+    private String comUrl;
 
     @Autowired
     ObjectMapper objectMapper;
-//    @Value("${service-gateway.url}")
-//    private String comUrl;
-
-    //TODO 访问路径，一般有aimin而标准部分网关没有admin
-    String comUrl = "http://localhost:10000/api/v1.0/version";
 
     @RequestMapping("initial")
     public String cdaVersionInitial(Model model){
@@ -75,8 +72,8 @@ public class StdVersionController extends BaseUIController {
     //获取版本列表用于下拉框
     public Object getVersionList() {
         //使用 标准数据集页面、++
-        //TODO 暂时使用的方法，原来流程是通过标准字典controller得到
-        //TODO 原方法将编码、名字组成（"version,name")形式，到前端页面在拆分，，现在返回对象、不再去封装，页面直接取对应的值（标准数据集页面）
+        //暂时使用的方法，原来流程是通过标准字典controller得到
+        //原方法将编码、名字组成（"version,name")形式，到前端页面在拆分，，现在返回对象、不再去封装，页面直接取对应的值（标准数据集页面）
         Envelop envelop = new Envelop();
         String url = "/versions";
         try {

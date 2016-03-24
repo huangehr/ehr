@@ -128,11 +128,10 @@ public class SystemDictController extends BaseUIController {
             Map<String, Object> dictParams = new HashMap<>();
             dictParams.put("id",dictId);
             String dictResultStr = HttpClientUtil.doGet(comUrl + urlGetDict, dictParams, username, password);
+            result = getEnvelop(dictResultStr);
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            result = objectMapper.readValue(dictResultStr, Envelop.class);
             if(result.isSuccessFlg()){
-                SystemDictModel systemDictModel = (SystemDictModel)result.getObj();
+                SystemDictModel systemDictModel = getEnvelopModel(result.getObj(),SystemDictModel.class);
                 systemDictModel.setName(name);
                 params.put("dictionary",toJson(systemDictModel));
 
@@ -291,17 +290,15 @@ public class SystemDictController extends BaseUIController {
         params.put("dictionary",toJson(dictEntryModel));
 
         try {
-            String deictEntryUrl = "/dictionaries/" + dictId + "/entries/" + code;
-            Map<String, Object> dictEntrpparams = new HashMap<>();
-            dictEntrpparams.put("id",dictId);
-            dictEntrpparams.put("code",code);
-            String dictEntryResultStr = HttpClientUtil.doGet(comUrl + deictEntryUrl, params, username, password);
+            String dictEntryUrl = "/dictionaries/" + dictId + "/entries/" + code;
+            Map<String, Object> dictEntryParams = new HashMap<>();
+            dictEntryParams.put("id",dictId);
+            dictEntryParams.put("code",code);
+            String dictEntryResultStr = HttpClientUtil.doPost(comUrl + dictEntryUrl, dictEntryParams, username, password);
+            result = getEnvelop(dictEntryResultStr);
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            result = objectMapper.readValue(dictEntryResultStr, Envelop.class);
             if(result.isSuccessFlg()){
-                SystemDictEntryModel systemDictEntryModel = (SystemDictEntryModel)result.getObj();
-                systemDictEntryModel.setCode(code);
+                SystemDictEntryModel systemDictEntryModel = getEnvelopModel(result.getObj(),SystemDictEntryModel.class);
                 systemDictEntryModel.setValue(value);
                 systemDictEntryModel.setSort(sort);
                 systemDictEntryModel.setCatalog(catalog);
@@ -394,6 +391,12 @@ public class SystemDictController extends BaseUIController {
         params.put("filters", "");
         if (!StringUtils.isEmpty(filters)) {
             params.put("filters", filters);
+        }
+        if(StringUtils.isEmpty(page) || page == 0){
+            page = 1;
+        }
+        if(StringUtils.isEmpty(rows) || rows == 0){
+            rows = 50;
         }
         params.put("page", page);
         params.put("size", rows);

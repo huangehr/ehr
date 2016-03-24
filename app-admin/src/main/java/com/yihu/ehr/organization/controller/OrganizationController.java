@@ -63,39 +63,51 @@ public class OrganizationController extends BaseUIController{
     @RequestMapping(value = "searchOrgs",produces = "text/html;charset=UTF-8")
     @ResponseBody
     public Object searchOrgs(String searchNm, String searchWay,String orgType, String province, String city, String district, int page, int rows) {
-        //TODO 能访问，地址检索问题、多条件检索问题
-        String url = "/organizations";
-        String resultStr = "";
+        //TODO 能访问，地址检索问题
         Envelop envelop = new Envelop();
-        Map<String, Object> params = new HashMap<>();
-        StringBuffer filters = new StringBuffer();
-        if(!StringUtils.isEmpty(searchNm)){
-            filters.append("orgCode?"+searchNm+" g1;fullName?"+searchNm+" g1;");
-        }
-        if(!StringUtils.isEmpty(searchWay)){
-            filters.append("settledWay="+searchWay+";");
-        }
-        if(!StringUtils.isEmpty(orgType)){
-            filters.append("orgType="+orgType+";");
-        }
-        String address = "";
-        if(!StringUtils.isEmpty(province)){
-            address += province;
-        }
-        if(!StringUtils.isEmpty(city) && !city.equals(province)){
-            address += city;
-        }
-        if(!StringUtils.isEmpty(district)){
-            address += district;
-        }
-        params.put("fields","");
-        params.put("filters",filters);
-        params.put("sorts","");
-        params.put("address",address);
-        params.put("size",rows);
-        params.put("page",page);
         try {
-            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+            //获取地址的 ids
+//            String addrIds = "";
+//            if(!"".equals(province)){
+//                String urlAddr = "/geographies";
+//                Map<String,Object> args = new HashMap<>();
+//                args.put("province",province);
+//                args.put("city",city);
+//                args.put("district",district);
+//                String envelopStrAddr = HttpClientUtil.doGet(comUrl+urlAddr,args,username,password);
+//                Envelop envelopAddr = getEnvelop(envelopStrAddr);
+//                if (envelopAddr.isSuccessFlg()){
+//                    List<String> addrList = (List<String>)getEnvelopList(envelopAddr.getDetailModelList(),new ArrayList<String>(),String.class);
+//                    for(String id : addrList){
+//                        addrIds += id + ",";
+//                    }
+//                }
+//            }
+
+            //分页查询机构列表
+            String url = "/organizations";
+            String filters = "";
+            Map<String, Object> params = new HashMap<>();
+            if(!StringUtils.isEmpty(searchNm)){
+                filters += "orgCode?"+searchNm+" g1;fullName?"+searchNm+" g1;";
+            }
+            if(!StringUtils.isEmpty(searchWay)){
+                filters += "settledWay="+searchWay+";";
+            }
+            if(!StringUtils.isEmpty(orgType)){
+                filters += "orgType="+orgType+";";
+            }
+            //添加地址过滤条件
+//            if(!"".equals(addrIds)){
+//                addrIds = addrIds.substring(0,addrIds.length()-1);
+//                filters += "loaction="+addrIds+";";
+//            }
+            params.put("fields","");
+            params.put("filters",filters);
+            params.put("sorts","");
+            params.put("size",rows);
+            params.put("page",page);
+            String resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             return resultStr;
         } catch (Exception e) {
             envelop.setSuccessFlg(false);

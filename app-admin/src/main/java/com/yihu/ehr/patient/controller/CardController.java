@@ -3,6 +3,8 @@ package com.yihu.ehr.patient.controller;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
+import com.yihu.ehr.util.RestTemplates;
+import com.yihu.ehr.util.controller.BaseUIController;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,7 +19,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/card")
-public class CardController{
+public class CardController extends BaseUIController {
     @Value("${service-gateway.username}")
     private String username;
     @Value("${service-gateway.password}")
@@ -44,17 +46,16 @@ public class CardController{
     @RequestMapping("searchCard")
     @ResponseBody
     public Object searchCard(String idCardNo,String searchNm, String cardType, int page, int rows){
-        String url = "/card/getCards";
+        String url = "/cards/id_card_no";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("idCardNo", idCardNo);
-        params.put("cardNo", searchNm);
-        params.put("cardType", cardType);
+        params.put("id_card_no", idCardNo);
+        params.put("number", searchNm);
+        params.put("card_type", cardType);
         params.put("page", page);
         params.put("rows", rows);
         try {
-            //todo 返回result.toJson()
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             return resultStr;
         } catch (Exception e) {
@@ -62,33 +63,19 @@ public class CardController{
             result.setErrorMsg(ErrorCode.SystemError.toString());
             return result;
         }
-//        Map<String, Object> conditionMap = new HashMap<>();
-//        Map<String, Object> infoMap = null;
-//        conditionMap.put("idCardNo",encodeStr(idCardNo));
-//        conditionMap.put("number",searchNm);
-//        conditionMap.put("type",cardType);
-//        conditionMap.put("page",page);
-//        conditionMap.put("rows",rows);
-//
-//        List<CardBrowseModel> cardBrowseModelList = cardManager.searchCardBrowseModel(conditionMap);
-//        Integer totalCount = cardManager.searchCardInt(conditionMap, false);
-//
-//        Result result = getResult(cardBrowseModelList, totalCount, page, rows);
-//
-//        return result.toJson();
     }
 
     @RequestMapping("searchNewCard")
     @ResponseBody
     //搜索新卡
     public Object searchNewCard(String idCardNo,String searchNm,String searchType, int page, int rows){
-        String url = "/card/newCards";
+        String url = "/cards";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("idCardNo", idCardNo);
-        params.put("cardNo", searchNm);
-        params.put("cardType", searchType);
+        params.put("number", searchNm);
+        params.put("card_type", searchType);
         params.put("page", page);
         params.put("rows", rows);
         try {
@@ -119,17 +106,23 @@ public class CardController{
     @RequestMapping("getCard")
     @ResponseBody
     public Object getCard(String objectId,String type){
-        String url = "/card/cardDetail";
+        String url = "/cards/id/card_type";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("cardId",objectId);
-        params.put("cardType",type);
+        params.put("id",objectId);
+        params.put("card_type",type);
         try{
-            //todo 后台转换成model后传前台
-            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            result.setObj(resultStr);
-            result.setSuccessFlg(true);
+            RestTemplates templates = new RestTemplates();
+            resultStr = templates.doGet(comUrl+url,params);
+            Envelop envelop = getEnvelop(resultStr);
+            if (envelop.isSuccessFlg()){
+                result.setObj(envelop.getObj());
+                result.setSuccessFlg(true);
+            }else {
+                result.setSuccessFlg(false);
+                result.setErrorMsg(envelop.getErrorMsg());
+            }
             return result;
         } catch (Exception e) {
             result.setSuccessFlg(false);
@@ -150,14 +143,15 @@ public class CardController{
     @RequestMapping("detachCard")
     @ResponseBody
     public Object detachCard(String objectId,String type){
-        String url = "/card/detachCard";
+        String url = "/cards/id/";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("cardId",objectId);
-        params.put("cardType",type);
+        params.put("id",objectId);
+        params.put("card_type",type);
         try {
-            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+            RestTemplates templates = new RestTemplates();
+            resultStr = templates.doPut(comUrl + url + type, params);
             if(Boolean.parseBoolean(resultStr)){
                 result.setSuccessFlg(true);
             }
@@ -179,15 +173,15 @@ public class CardController{
     @RequestMapping("attachCard")
     @ResponseBody
     public Object attachCard(String idCardNo,String objectId,String type){
-        String url = "/card/attachCard";
+        String url = "/cards/attach/";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("idCardNo",idCardNo);
-        params.put("cardId",objectId);
-        params.put("cardType",type);
+        params.put("id_card_no",idCardNo);
+        params.put("card_type",type);
         try {
-            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
+            RestTemplates templates = new RestTemplates();
+            resultStr = templates.doPut(comUrl + url + objectId, params);
             if(Boolean.parseBoolean(resultStr)){
                 result.setSuccessFlg(true);
             }

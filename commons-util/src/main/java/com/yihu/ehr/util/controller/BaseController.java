@@ -28,7 +28,7 @@ public class BaseController extends AbstractController {
     private static String X_Total_Count = "X-Total-Count";
 
     @Autowired
-    ObjectMapper objectMapper;
+    public ObjectMapper objectMapper;
 
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
@@ -232,4 +232,5 @@ public class BaseController extends AbstractController {
         }
         return null;
     }
+
 }

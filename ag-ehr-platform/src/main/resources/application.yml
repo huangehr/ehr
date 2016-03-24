@@ -4,6 +4,12 @@ server:
 management:
   port: ${server.port}
 
+zuul:
+  ignored-services: "*"
+  routes:
+    svr-pack-mgr: /api/v1.0/packages
+    svr-esb: /api/v1.0/esb/uploadLog
+
 ---
 spring:
   profiles: dev

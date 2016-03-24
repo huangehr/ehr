@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -90,14 +89,13 @@ public class PatientController extends BaseController {
                 patient.setGender(dict == null ? "" : dict.getValue());
             }
             //联系电话
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, String> telphoneNo;
+            Map<String, String> telephoneNo;
             String tag="联系电话";
-            telphoneNo = mapper.readValue(patient.getTelphoneNo(), Map.class);
-            if (telphoneNo != null && telphoneNo.containsKey(tag)) {
-                patient.setTelphoneNo(telphoneNo.get(tag));
+            telephoneNo = objectMapper.readValue(patient.getTelephoneNo(), Map.class);
+            if (telephoneNo != null && telephoneNo.containsKey(tag)) {
+                patient.setTelephoneNo(telephoneNo.get(tag));
             } else {
-                patient.setTelphoneNo(null);
+                patient.setTelephoneNo(null);
             }
 
             patients.add(patient);
@@ -172,7 +170,7 @@ public class PatientController extends BaseController {
         if (StringUtils.isEmpty(detailModel.getIdCardNo())) {
             errorMsg += "身份证号不能为空!";
         }
-        if (StringUtils.isEmpty(detailModel.getTelphoneNo())) {
+        if (StringUtils.isEmpty(detailModel.getTelephoneNo())) {
             errorMsg += "联系方式不能为空!";
         }
         if (StringUtils.isEmpty(detailModel.getNativePlace())) {
@@ -193,14 +191,14 @@ public class PatientController extends BaseController {
         //新增家庭地址信息
         GeographyModel geographyModel = detailModel.getHomeAddressInfo();
         detailModel.setHomeAddress("");
-        if (geographyModel != null) {
+        if (!isNullAddress(geographyModel)) {
             String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             detailModel.setHomeAddress(addressId);
         }
         //新增户籍地址信息
         geographyModel = detailModel.getBirthPlaceInfo();
         detailModel.setBirthPlace("");
-        if (geographyModel != null) {
+        if (!isNullAddress(geographyModel)) {
             String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             detailModel.setBirthPlace(addressId);
         }
@@ -208,7 +206,7 @@ public class PatientController extends BaseController {
         //新增工作地址信息
         geographyModel = detailModel.getWorkAddressInfo();
         detailModel.setWorkAddress("");
-        if (geographyModel != null) {
+        if (!isNullAddress(geographyModel)) {
             String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             detailModel.setWorkAddress(addressId);
         }
@@ -245,7 +243,7 @@ public class PatientController extends BaseController {
         if (StringUtils.isEmpty(detailModel.getIdCardNo())) {
             errorMsg += "身份证号不能为空!";
         }
-        if (StringUtils.isEmpty(detailModel.getTelphoneNo())) {
+        if (StringUtils.isEmpty(detailModel.getTelephoneNo())) {
             errorMsg += "联系方式不能为空!";
         }
         if (StringUtils.isEmpty(detailModel.getNativePlace())) {
@@ -261,14 +259,14 @@ public class PatientController extends BaseController {
         //新增家庭地址信息
         GeographyModel geographyModel = detailModel.getHomeAddressInfo();
         detailModel.setHomeAddress("");
-        if (geographyModel != null) {
+        if (!isNullAddress(geographyModel)) {
             String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             detailModel.setHomeAddress(addressId);
         }
         //新增户籍地址信息
         geographyModel = detailModel.getBirthPlaceInfo();
         detailModel.setBirthPlace("");
-        if (geographyModel != null) {
+        if (!isNullAddress(geographyModel)) {
             String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             detailModel.setBirthPlace(addressId);
         }
@@ -276,7 +274,7 @@ public class PatientController extends BaseController {
         //新增工作地址信息
         geographyModel = detailModel.getWorkAddressInfo();
         detailModel.setWorkAddress("");
-        if (geographyModel != null) {
+        if (!isNullAddress(geographyModel)) {
             String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             detailModel.setWorkAddress(addressId);
         }
@@ -324,22 +322,21 @@ public class PatientController extends BaseController {
         return patientClient.resetPass(idCardNo);
     }
 
-    public PatientDetailModel convertToPatientDetailModel(MDemographicInfo demographicInfo) {
+    public PatientDetailModel convertToPatientDetailModel(MDemographicInfo demographicInfo) throws Exception {
 
-        if(demographicInfo==null)
-        {
+        if (demographicInfo == null) {
             return null;
         }
 
         PatientDetailModel detailModel = convertToModel(demographicInfo, PatientDetailModel.class);
         detailModel.setBirthday(DateToString(demographicInfo.getBirthday(), AgAdminConstants.DateFormat));
         MConventionalDict dict = null;
-        if (detailModel.getMartialStatus()!=null){
+        if (StringUtils.isNotEmpty(detailModel.getMartialStatus())) {
             dict = conventionalDictClient.getMartialStatus(detailModel.getMartialStatus());
         }
         detailModel.setMartialStatusName(dict == null ? "" : dict.getValue());
 
-        if (detailModel.getNation()!=null){
+        if (StringUtils.isNotEmpty(detailModel.getNation())) {
             dict = conventionalDictClient.getNation(detailModel.getNation());
         }
         detailModel.setNationName(dict == null ? "" : dict.getValue());
@@ -371,18 +368,11 @@ public class PatientController extends BaseController {
         }
 
         //联系电话
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, String> telphoneNo;
-            String tag="联系电话";
-            telphoneNo = mapper.readValue(detailModel.getTelphoneNo(), Map.class);
-            if (telphoneNo != null && telphoneNo.containsKey(tag)) {
-                detailModel.setTelphoneNo(telphoneNo.get(tag));
-            } else {
-                detailModel.setTelphoneNo(null);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        String tag = "联系电话";
+        Map<String, String> telephoneNo = objectMapper.readValue(detailModel.getTelephoneNo(), Map.class);
+        detailModel.setTelephoneNo(null);
+        if (telephoneNo != null && telephoneNo.containsKey(tag)) {
+            detailModel.setTelephoneNo(telephoneNo.get(tag));
         }
 
         return detailModel;
@@ -399,5 +389,22 @@ public class PatientController extends BaseController {
         if (StringUtils.isNotEmpty(geography.getExtra())) fullAddress += geography.getExtra();
 
         return fullAddress;
+    }
+
+    public boolean isNullAddress (GeographyModel geographyModel)
+    {
+        if(geographyModel==null)
+            return true;
+        if(StringUtils.isEmpty(geographyModel.getProvince())
+                && StringUtils.isEmpty(geographyModel.getCity())
+                && StringUtils.isEmpty(geographyModel.getDistrict())
+                && StringUtils.isEmpty(geographyModel.getTown())
+                && StringUtils.isEmpty(geographyModel.getStreet())
+                && StringUtils.isEmpty(geographyModel.getExtra()))
+        {
+            return true;
+        }
+
+        return false;
     }
 }

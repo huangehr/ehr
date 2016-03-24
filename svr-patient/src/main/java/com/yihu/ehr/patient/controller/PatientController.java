@@ -154,7 +154,7 @@ public class PatientController extends BaseRestController {
         String pwd = "123456";
         demographicInfo.setPassword(HashUtil.hashStr(pwd));
         demographicService.savePatient(demographicInfo);
-        return convertToModel(demographicInfo,MDemographicInfo.class,null);
+        return convertToModel(demographicInfo,MDemographicInfo.class);
     }
 
     /**
@@ -180,7 +180,7 @@ public class PatientController extends BaseRestController {
 //            demographicInfo.setLocalPath("");
 //        }
         demographicService.savePatient(demographicInfo);
-        return convertToModel(demographicInfo,MDemographicInfo.class,null);
+        return convertToModel(demographicInfo,MDemographicInfo.class);
     }
 
 

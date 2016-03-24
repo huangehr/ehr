@@ -6,20 +6,36 @@ package com.yihu.ehr.agModel.standard.dict;
 public class DictModel {
 
     long id;
-
     String code;//字典代码
-
     String name;//字典名称
-
     String author;// 作者
-
     Long baseDict;//参考/继承的字典
-
+    String baseDictName;//参考/继承的字典
+    String createDate;//创建日期
     String description;//字典描述
-
     String sourceId;
-
+    String sourceName;
     String stdVersion;// 标准化版本
+    int hashCode;
+    String OperationType;
+    String innerVersion;
+    int inStage;
+
+    public String getBaseDictName() {
+        return baseDictName;
+    }
+
+    public void setBaseDictName(String baseDictName) {
+        this.baseDictName = baseDictName;
+    }
+
+    public String getSourceName() {
+        return sourceName;
+    }
+
+    public void setSourceName(String sourceName) {
+        this.sourceName = sourceName;
+    }
 
     public long getId() {
         return id;
@@ -61,6 +77,14 @@ public class DictModel {
         this.baseDict = baseDict;
     }
 
+    public String getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(String createDate) {
+        this.createDate = createDate;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -83,5 +107,37 @@ public class DictModel {
 
     public void setStdVersion(String stdVersion) {
         this.stdVersion = stdVersion;
+    }
+
+    public int getHashCode() {
+        return hashCode;
+    }
+
+    public void setHashCode(int hashCode) {
+        this.hashCode = hashCode;
+    }
+
+    public String getOperationType() {
+        return OperationType;
+    }
+
+    public void setOperationType(String operationType) {
+        OperationType = operationType;
+    }
+
+    public String getInnerVersion() {
+        return innerVersion;
+    }
+
+    public void setInnerVersion(String innerVersion) {
+        this.innerVersion = innerVersion;
+    }
+
+    public int getInStage() {
+        return inStage;
+    }
+
+    public void setInStage(int inStage) {
+        this.inStage = inStage;
     }
 }

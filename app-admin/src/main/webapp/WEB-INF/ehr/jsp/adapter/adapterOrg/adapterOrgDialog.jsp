@@ -22,10 +22,10 @@
 
     <div id="areaDiv" class="m-form-group">
         <label class="label_title">地区<spring:message code="spe.colon"/></label>
-        <input id="province" name="area.province" type="hidden" data-attr-scan="province">
-        <input id="city" name="area.city" type="hidden" data-attr-scan="city">
-        <input id="district" name="area.district" type="hidden" data-attr-scan="district">
-        <input id="town" name="area.town" type="hidden" data-attr-scan="town">
+        <input id="province" name="address.province" type="hidden" data-attr-scan="province">
+        <input id="city" name="address.city" type="hidden" data-attr-scan="city">
+        <input id="district" name="address.district" type="hidden" data-attr-scan="district">
+        <input id="town" name="address.town" type="hidden" data-attr-scan="town">
         <input id="area_code" type="hidden" data-attr-scan="areaCode">
         <div class="l-text-wrapper m-form-control">
             <input type="text" id="inp_adapterorg_area" class=" f-w240"  required-title=<spring:message code="lbl.must.input"/> placeholder="请选择地址"  data-attr-scan="area"

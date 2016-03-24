@@ -15,27 +15,26 @@ import java.util.List;
 /**
  * Created by Administrator on 2016/1/4.
  */
-@FeignClient(name = MicroServices.Geography,url = MicroServiceIpAddressStr.Geography+MicroServicePort.Geography)
-@RequestMapping(value = ApiVersion.Version1_0)
+@FeignClient(name = MicroServices.Geography)
 @ApiIgnore
 public interface GeographyClient {
 
 
-    @RequestMapping(value = "/geographies/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0+"/geographies/{id}", method = RequestMethod.GET)
     MGeography getAddressById(@PathVariable(value = "id") String id);
 
-    @RequestMapping(value = "/geographies", method =  RequestMethod.PUT)
+    @RequestMapping(value = ApiVersion.Version1_0+"/geographies", method =  RequestMethod.PUT)
     String saveAddress(@RequestParam( value = "json_data") String GeographyModelJsonData);
 
 
-    @RequestMapping(value = "/geographies", method = RequestMethod.GET )
+    @RequestMapping(value = ApiVersion.Version1_0+"/geographies", method = RequestMethod.GET )
     List<String> search(
             @RequestParam(value = "province") String province,
             @RequestParam(value = "city") String city,
             @RequestParam(value = "district") String district);
 
 
-    @RequestMapping(value = "/geographies/existence", method = RequestMethod.GET )
+    @RequestMapping(value = ApiVersion.Version1_0+"/geographies/existence", method = RequestMethod.GET )
     boolean isNullAddress(@RequestParam(value = "json_data") String geographyModelJsonData);
 
 }

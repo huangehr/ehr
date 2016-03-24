@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MUser;
+import com.yihu.ehr.user.feign.ConventionalDictClient;
 import com.yihu.ehr.user.feign.SecurityClient;
 import com.yihu.ehr.user.service.User;
 import com.yihu.ehr.user.service.UserManager;
@@ -34,7 +36,7 @@ import java.util.*;
 @Api(protocols = "https", value = "users", description = "用户管理接口", tags = {"用户,登录帐号,密码"})
 public class UserController extends BaseRestController {
 
-    @Value("default.password")
+    @Value("${default.password}")
     private String default_password = "123456";
 
     @Autowired
@@ -42,6 +44,9 @@ public class UserController extends BaseRestController {
 
     @Autowired
     private SecurityClient securityClient;
+
+    @Autowired
+    private ConventionalDictClient conventionalDictClient;
 
     @RequestMapping(value = RestApi.Users.Users, method = RequestMethod.GET)
     @ApiOperation(value = "获取用户列表", notes = "根据查询条件获取用户列表在前端表格展示")
@@ -76,9 +81,13 @@ public class UserController extends BaseRestController {
         }else {
             user.setPassword(HashUtil.hashStr(default_password));
         }
-
+        String userType = user.getUserType();
+        MConventionalDict dict = conventionalDictClient.getUserType(userType);
+        if(dict!=null){
+            user.setDType(userType);
+        }
         user.setActivated(true);
-        userManager.saveUser(user);
+        user = userManager.saveUser(user);
         return convertToModel(user, MUser.class, null);
     }
 
@@ -89,8 +98,13 @@ public class UserController extends BaseRestController {
             @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         User user = objectMapper.readValue(userJsonData, User.class);
+        String userType = user.getUserType();
+        MConventionalDict dict = conventionalDictClient.getUserType(userType);
+        if(dict!=null){
+            user.setDType(userType);
+        }
         userManager.saveUser(user);
-        return convertToModel(user, MUser.class, null);
+        return convertToModel(user, MUser.class);
     }
 
     @RequestMapping(value = RestApi.Users.UserAdmin, method = RequestMethod.GET)
@@ -138,7 +152,6 @@ public class UserController extends BaseRestController {
             @ApiParam(name = "user_id", value = "id", defaultValue = "")
             @PathVariable(value = "user_id") String userId) throws Exception {
         userManager.resetPass(userId);
-
         return true;
     }
 
@@ -172,13 +185,13 @@ public class UserController extends BaseRestController {
      * @param userName
      * @param password
      */
-    @RequestMapping(value = RestApi.Users.UserPassword, method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Users.UserVerification, method = RequestMethod.GET)
     @ApiOperation(value = "根据登陆用户名及密码验证用户", notes = "根据登陆用户名及密码验证用户")
     public MUser getUserByNameAndPassword(
             @ApiParam(name = "user_name", value = "登录账号", defaultValue = "")
-            @PathVariable(value = "user_name") String userName,
+            @RequestParam(value = "user_name") String userName,
             @ApiParam(name = "password", value = "密码", defaultValue = "")
-            @PathVariable(value = "password") String password) {
+            @RequestParam(value = "password") String password) {
         User user = userManager.loginVerification(userName, password);
         return convertToModel(user, MUser.class);
     }
