@@ -3,6 +3,7 @@ package com.yihu.ehr.ha.std.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeDetailModel;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeModel;
+import com.yihu.ehr.agModel.standard.cdatype.CdaTypeTreeModel;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.ha.std.service.CDATypeClient;
@@ -11,6 +12,7 @@ import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,6 +61,91 @@ public class CDATypeController extends BaseController {
     }
 
     /**
+     * 获取可以作为父类别的cda类别列表
+     * （不含该类别及子类别、子类别的子类类别。。所剩下的类别）
+     * @param id
+     * @param key
+     * @return
+     */
+    @RequestMapping(value = "/cda_types/as_parent_type", method = RequestMethod.GET)
+    @ApiOperation(value = "根据cda类别Id获取可作为该cda类别父级的cda类别（不含自身及其以下子集）")
+    public Envelop getAsParentType(
+            @ApiParam(name = "id", value = "父级id")
+            @RequestParam(value = "id") String id,
+            @ApiParam(name = "key", value = "查询条件")
+            @RequestParam(value = "key") String key) throws Exception {
+        //TODO 待微服务提供not in
+        Envelop envelop = new Envelop();
+        List<String> ids = new ArrayList<>();
+        if(!StringUtils.isEmpty(id)){
+            List<MCDAType> mCdaTypeSomeList = cdaTypeClient.getChildIncludeSelfByParentIdsAndKey(id, "");
+            for(MCDAType m : mCdaTypeSomeList){
+                ids.add(m.getId());
+            }
+        }
+        List<MCDAType> mCdaTypeAllList = (List) cdaTypeClient.searchType("","","", 999, 1);
+        if(ids.size()==0){
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(convertToCdaTypeModels(mCdaTypeAllList));
+            return envelop;
+
+        }
+        List<MCDAType> mCdaTypeList = new ArrayList<>();
+        for (MCDAType m : mCdaTypeAllList){
+            if (!ids.contains(m.getId())){
+                mCdaTypeList.add(m);
+            }
+        }
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(convertToCdaTypeModels(mCdaTypeList));
+        return envelop;
+    }
+
+
+    /**
+     * 用于cda类别前端页面树形显示
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/cda_types/cda_types_tree", method = RequestMethod.GET)
+    @ApiOperation(value = "获取所有cda类别转成的CdaTypeTreeModel列表，初始页面显示")
+    public Envelop getCdaTypeTreeModels() throws Exception {
+        Envelop envelop = new Envelop();
+        //cda类别的顶级父id原为null，查询报错，现暂时定为32个0
+        String parentId = "00000000000000000000000000000000";
+        List<MCDAType> mCdaTypeList = cdaTypeClient.getChildrenByPatientId(parentId);
+        if (mCdaTypeList.size() == 0){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("没有匹配条件的cda类别！");
+            return envelop;
+        }
+        List<CdaTypeTreeModel> treeList = getCdaTypeChild(mCdaTypeList);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(treeList);
+        return envelop;
+    }
+
+    /**
+     *
+     * 根据父级信息获取全部的子级信息（树形model）
+     * @param info 父级信息
+     * @return 全部子级信息
+     */
+    public List<CdaTypeTreeModel> getCdaTypeChild(List<MCDAType> info) {
+        List<CdaTypeTreeModel> treeInfo = new ArrayList<>();
+        for (int i = 0; i < info.size(); i++) {
+            MCDAType typeInfo = info.get(i);
+            CdaTypeTreeModel tree = new CdaTypeTreeModel();
+            tree = convertToModel(typeInfo,CdaTypeTreeModel.class);
+            List<MCDAType> listChild = cdaTypeClient.getChildrenByPatientId(typeInfo.getId());
+            List<CdaTypeTreeModel> listChildTree = getCdaTypeChild(listChild);
+            tree.setChildren(listChildTree);
+            treeInfo.add(tree);
+        }
+        return treeInfo;
+    }
+
+    /**
      * 根据父级类别获取父级类别所在以下所有子集类别（包括当前父级列表）
      *
      * @param patientIds 父级ID
@@ -92,7 +179,7 @@ public class CDATypeController extends BaseController {
             @ApiParam(name = "name", value = "名称")
             @RequestParam(value = "name") String name) {
         Envelop envelop = new Envelop();
-        List<MCDAType> mCdaTypeList = (List) cdaTypeClient.searchType("","code?"+code+" g1;name?"+name+" g1", "", 100, 1);
+        List<MCDAType> mCdaTypeList = (List) cdaTypeClient.searchType("","code?"+code+" g1;name?"+name+" g1", "", 1000, 1);
         if (mCdaTypeList.size() == 0){
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("没有匹配条件的cda类别！");
@@ -176,7 +263,8 @@ public class CDATypeController extends BaseController {
         Envelop envelop = new Envelop();
         CdaTypeDetailModel cdaTypeDetailModel = objectMapper.readValue(jsonData, CdaTypeDetailModel.class);
         MCDAType mCdaTypeOld = convertToMCDAType(cdaTypeDetailModel);
-        if (cdaTypeClient.isCDATypeExists(mCdaTypeOld.getCode())){
+        MCDAType mcdaType = cdaTypeClient.getCdaTypeById(mCdaTypeOld.getId());
+        if (cdaTypeClient.isCDATypeExists(mCdaTypeOld.getCode()) && !mCdaTypeOld.getCode().equals(mcdaType.getCode())){
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("该cda类别代码已经存在！");
             return envelop;
