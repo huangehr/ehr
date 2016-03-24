@@ -171,8 +171,8 @@ public class PatientController extends BaseUIController {
             //联系电话
             Map<String, String> telphoneNo = new HashMap<String, String>();
             String tag="联系电话";
-            telphoneNo.put(tag,patientDetailModel.getTelphoneNo());
-            patientDetailModel.setTelphoneNo(toJson(telphoneNo));
+            telphoneNo.put(tag,patientDetailModel.getTelephoneNo());
+            patientDetailModel.setTelephoneNo(toJson(telphoneNo));
             params.add("patientModelJsonData", toJson(patientDetailModel));
         }else{
             String idCardNo = patientDetailModel.getIdCardNo();
@@ -195,7 +195,7 @@ public class PatientController extends BaseUIController {
                 //联系电话
                 Map<String, String> telphoneNo = null;
                 String tag = "联系电话";
-                telphoneNo = toModel(updatePatient.getTelphoneNo(),Map.class);
+                telphoneNo = toModel(updatePatient.getTelephoneNo(),Map.class);
                 if (telphoneNo!=null){
                     if (telphoneNo.containsKey(tag)) {
                         telphoneNo.remove(tag);
@@ -203,8 +203,8 @@ public class PatientController extends BaseUIController {
                 }else{
                     telphoneNo = new HashMap<String, String>();
                 }
-                telphoneNo.put(tag, patientDetailModel.getTelphoneNo());
-                updatePatient.setTelphoneNo(toJson(telphoneNo));
+                telphoneNo.put(tag, patientDetailModel.getTelephoneNo());
+                updatePatient.setTelephoneNo(toJson(telphoneNo));
                 updatePatient.setEmail(patientDetailModel.getEmail());
 
                 params.add("patient_model_json_data", toJson(updatePatient));

@@ -7,7 +7,7 @@ public class PatientModel {
     private String idCardNo;
     private String name;
     private String gender;
-    private String telphoneNo;
+    private String telephoneNo;
     private String homeAddress;
 
     public String getIdCardNo() {
@@ -42,12 +42,12 @@ public class PatientModel {
         this.homeAddress = homeAddress;
     }
 
-    public String getTelphoneNo() {
-        return telphoneNo;
+    public String getTelephoneNo() {
+        return telephoneNo;
     }
 
-    public void setTelphoneNo(String telphoneNo) {
-        this.telphoneNo = telphoneNo;
+    public void setTelephoneNo(String telephoneNo) {
+        this.telephoneNo = telephoneNo;
     }
 
 }
