@@ -154,7 +154,7 @@
                     homeAddressFull: patientModel.homeAddressFull,
                     workAddressFull: patientModel.workAddressFull,
                     residenceType: patientModel.residenceType,
-                    tel: patientModel.tel,
+                    telephoneNo: patientModel.telephoneNo,
                     email: patientModel.email
                 });
                 this.$cardForm.attrScan();

@@ -24,7 +24,7 @@ public class MDemographicInfo {
     private String workAddress;                    // 工作地址
     private String homeAddress;                    // 家庭地址
     private String password;                        //密码
-    private String telphoneNo ;                     // 电话号码，之前是个电话号码列表
+    private String telephoneNo ;                     // 电话号码，之前是个电话号码列表
     private String picPath = "";
     private String localPath = "";
 
@@ -135,12 +135,12 @@ public class MDemographicInfo {
         this.password = password;
     }
 
-    public String getTelphoneNo() {
-        return telphoneNo;
+    public String getTelephoneNo() {
+        return telephoneNo;
     }
 
-    public void setTelphoneNo(String telphoneNo) {
-        this.telphoneNo = telphoneNo;
+    public void setTelephoneNo(String telephoneNo) {
+        this.telephoneNo = telephoneNo;
     }
 
     public String getPicPath() {
