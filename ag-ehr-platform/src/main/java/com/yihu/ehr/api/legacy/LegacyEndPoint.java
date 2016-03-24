@@ -318,7 +318,7 @@ public class LegacyEndPoint {
 
             demoInfo.setBirthday(DateFormatter.simpleDateParse(birthday));
             demoInfo.setNativePlace(nativePlace);
-            demoInfo.setTelphoneNo(telMap.get(0));
+            demoInfo.setTelephoneNo(telMap.get(0));
 
 
             if (!StringUtils.isEmpty(birthProvince)) {

@@ -81,7 +81,7 @@ public class PatientsEndPoint {
                 demoInfo.setMartialStatus(record.get("HDSA00_01_015"));
                 demoInfo.setNativePlace(record.get("HDSA00_01_022"));
                 demoInfo.setEmail(record.get("HDSA00_01_021"));
-                demoInfo.setTelphoneNo(record.get("HDSA00_01_019"));
+                demoInfo.setTelephoneNo(record.get("HDSA00_01_019"));
             } else {
                 demoInfo.setName(record.get("HDSD00_01_002"));
                 demoInfo.setIdCardNo(record.get("HDSA00_01_017"));
@@ -91,7 +91,7 @@ public class PatientsEndPoint {
                 demoInfo.setMartialStatus(record.get("HDSD00_01_017"));
                 demoInfo.setNativePlace(record.get("HDSA00_11_051"));
                 demoInfo.setEmail(record.get("HDSA00_01_021"));
-                demoInfo.setTelphoneNo(record.get("HDSD00_01_008"));
+                demoInfo.setTelephoneNo(record.get("HDSD00_01_008"));
             }
 
             patientClient.createPatient(objectMapper.writeValueAsString(demoInfo));
