@@ -11,9 +11,9 @@
 #    suffix: .jsp
 #
 
-#server:
+server:
 #  contextPath: /ehr
-#  port: 8080
+  port: 8080
 
 service-gateway:
   username: user
@@ -21,6 +21,10 @@ service-gateway:
   url: http://localhost:10000/api/v1.0/admin
   stdurl: http://localhost:10000/api/v1.0/admin/std
   versionurl: http://localhost:10000/api/v1.0/admin/version
+  cdatypeurl: http://localhost:10000/api/v1.0/admin/cda_type
+  stdsourceurl: http://localhost:10000/api/v1.0/admin/standard_source
+
+
 #  hopurl: http://172.19.103.55:8080/WSGW/services/ServiceGateWay
 #  org_code: 41872607-9
 #  module: api

@@ -85,18 +85,18 @@ public interface SystemDictClient {
             @RequestParam(value = "entry") String entryJson) ;
 
     @ApiOperation(value = "获取字典项")
-    @RequestMapping(value = "/dictionaries/{id}/entries/{code}", method = RequestMethod.POST)
+    @RequestMapping(value = "/dictionaries/{dict_id}/entries/{code}", method = RequestMethod.GET)
     MDictionaryEntry getDictEntry(
-            @ApiParam(name = "id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "id") long id,
+            @ApiParam(name = "dict_id", value = "字典ID", defaultValue = "")
+            @PathVariable(value = "dict_id") long id,
             @ApiParam(name = "code", value = "字典项代码", defaultValue = "")
             @PathVariable(value = "code") String code) ;
 
     @ApiOperation(value = "删除字典项")
-    @RequestMapping(value = "/dictionaries/{id}/entries/{code}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/dictionaries/{dict_id}/entries/{code}", method = RequestMethod.DELETE)
     boolean deleteDictEntry(
-            @ApiParam(name = "id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "id") long id,
+            @ApiParam(name = "dict_id", value = "字典ID", defaultValue = "")
+            @PathVariable(value = "dict_id") long id,
             @ApiParam(name = "code", value = "字典ID", defaultValue = "")
             @PathVariable(value = "code") String code) ;
 
