@@ -14,14 +14,30 @@ info:
     description: EHR平台全局配置服务
     version: 1.0.0
 
+eureka:
+  instance:
+    prefer-ip-address: true
+
 ---
 spring:
   profiles: dev
+
+eureka:
+  instance:
+    ip-address: 192.168.1.220:8761
 
 ---
 spring:
   profiles: test
 
+eureka:
+  instance:
+    ip-address: 172.19.103.73:8761
+
 ---
 spring:
   profiles: prod
+
+eureka:
+  instance:
+    ip-address: 11.1.2.21:8761
