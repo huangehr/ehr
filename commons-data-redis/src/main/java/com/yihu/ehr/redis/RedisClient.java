@@ -21,28 +21,26 @@ import java.util.Set;
  * @created 2015.08.04 11:12
  */
 @Service
-public class RedisClient implements XRedisClient {
+public class RedisClient {
     @Autowired
     private RedisTemplate<String, Serializable> redisTemplate;
 
-    @Override
     public void set(final String key, final Serializable value) {
         redisTemplate.execute(new RedisCallback<Object>() {
-            @Override
+            
             public Object doInRedis(RedisConnection connection) throws DataAccessException {
                 byte[] key_ = key.getBytes();
                 byte[] value_ = toByteArray(value);
                 connection.set(key_, value_);
-                return true;
 
+                return true;
             }
         });
     }
 
-    @Override
     public <T> T get(final String key) {
         return (T)redisTemplate.execute(new RedisCallback<Serializable>() {
-            @Override
+            
             public Serializable doInRedis(RedisConnection connection) throws DataAccessException {
                 byte[] keyBytes = key.getBytes();
                 byte[] bytes = connection.get(keyBytes);
@@ -51,22 +49,20 @@ public class RedisClient implements XRedisClient {
         });
     }
 
-    @Override
     public void delete(String key) {
         redisTemplate.execute(new RedisCallback<Serializable>() {
-            @Override
+            
             public Serializable doInRedis(RedisConnection connection) throws DataAccessException {
                 return connection.del(key.getBytes());
             }
         });
     }
 
-    @Override
     public void delete(Collection<String> keys) {
         redisTemplate.delete(keys);
 
         redisTemplate.execute(new RedisCallback<Serializable>() {
-            @Override
+            
             public Serializable doInRedis(RedisConnection connection) throws DataAccessException {
                 for (String key : keys){
                     connection.del(key.getBytes());
@@ -76,11 +72,10 @@ public class RedisClient implements XRedisClient {
             }
         });
     }
-
-    @Override
+    
     public <T> Set<String> keys(String pattern) {
         return redisTemplate.execute(new RedisCallback<Set<String>>() {
-            @Override
+            
             public Set<String> doInRedis(RedisConnection connection) throws DataAccessException {
                 Set<byte[]> keys = connection.keys(pattern.getBytes());
 
@@ -94,7 +89,6 @@ public class RedisClient implements XRedisClient {
         });
     }
 
-    @Override
     public boolean hasKey(String key) {
         return redisTemplate.execute(new RedisCallback<Boolean>() {
             public Boolean doInRedis(RedisConnection connection)

@@ -42,10 +42,6 @@ public class CardInfoExtractor extends KeyDataExtractor {
             }
         }
 
-        if (nextExtractor != null) {
-            return nextExtractor.extract(dataSet, filter);
-        } else {
-            return null;
-        }
+        return null;
     }
 }

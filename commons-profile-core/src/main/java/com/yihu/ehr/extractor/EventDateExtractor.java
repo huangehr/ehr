@@ -33,10 +33,6 @@ public class EventDateExtractor extends KeyDataExtractor {
             }
         }
 
-        if (nextExtractor != null) {
-            return nextExtractor.extract(dataSet, filter);
-        } else {
-            return "";
-        }
+        return null;
     }
 }

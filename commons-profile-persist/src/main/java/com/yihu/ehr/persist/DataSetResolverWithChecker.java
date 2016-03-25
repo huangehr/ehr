@@ -1,10 +1,12 @@
 package com.yihu.ehr.persist;
 
-import com.yihu.ehr.cache.CachedMetaData;
-import com.yihu.ehr.cache.StdDataRedisCache;
-import com.yihu.ehr.cache.StdObjectQualifierTranslator;
 import com.yihu.ehr.profile.SimpleDataSetResolver;
+import com.yihu.ehr.schema.StdObjectQualifierTranslator;
+import com.yihu.ehr.schema.StdRedisCacheAccessor;
 import com.yihu.ehr.util.log.LogService;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.regex.Matcher;
 
@@ -15,7 +17,11 @@ import java.util.regex.Matcher;
  * @version 1.0
  * @created 2015.08.16 10:44
  */
+@Component
 public class DataSetResolverWithChecker extends SimpleDataSetResolver {
+    @Autowired
+    StdRedisCacheAccessor redisCache;
+
     /**
      * 翻译数据元。
      *
@@ -31,10 +37,10 @@ public class DataSetResolverWithChecker extends SimpleDataSetResolver {
                                            String metaDataInnerCode,
                                            String actualData,
                                            boolean isOriginDataSet) {
-        actualData = (actualData == null) ? "" : actualData.trim();
+        if (StringUtils.isEmpty(actualData)) return null;
 
-        CachedMetaData metaData = StdDataRedisCache.getMetaData(innerVersion, dataSetCode, metaDataInnerCode);
-        if (null == metaData) {
+        String type = redisCache.getMetaDataType(innerVersion, dataSetCode, metaDataInnerCode);
+        if (StringUtils.isEmpty(type)) {
             String msg = "Meta data %1 of data set %2 is NOT found in version %3. Please check the meta data."
                     .replace("%1", metaDataInnerCode)
                     .replace("%2", dataSetCode)
@@ -44,22 +50,25 @@ public class DataSetResolverWithChecker extends SimpleDataSetResolver {
             return null;
         }
 
+        actualData = actualData.trim();
+
         // 仅对标准化数据集及有关联字典的数据元进行翻译
-        if (!isOriginDataSet && actualData != null && actualData.length() > 0 && metaData.dictId > 0) {
+        long dictId = redisCache.getMetaDataDict(innerVersion, dataSetCode, metaDataInnerCode);
+        if (!isOriginDataSet && StringUtils.isNotEmpty(actualData) && dictId > 0) {
             String[] tempQualifiers = StdObjectQualifierTranslator.splitInnerCodeAsCodeValue(metaDataInnerCode);
 
-            String codeQualifier = StdObjectQualifierTranslator.toHBaseQualifier(tempQualifiers[0], metaData.type);
-            String valueQualifier = StdObjectQualifierTranslator.toHBaseQualifier(tempQualifiers[1], metaData.type);
+            String codeQualifier = StdObjectQualifierTranslator.toHBaseQualifier(tempQualifiers[0], type);
+            String valueQualifier = StdObjectQualifierTranslator.toHBaseQualifier(tempQualifiers[1], type);
 
-            String value = StdDataRedisCache.getDictEntryValue(innerVersion, metaData.dictId, actualData);
+            String value = redisCache.getDictEntryValue(innerVersion, dictId, actualData);
 
             return new String[]{codeQualifier, actualData, valueQualifier, value == null ? "" : value};
         } else {
-            if (metaData.type.equals("D")) {
+            if (type.equals("D")) {
                 actualData = actualData.length() <= 10 ? actualData : actualData.substring(0, actualData.lastIndexOf(' ')) + " 00:00:00";
-            } else if (metaData.type.equals("DT")) {
+            } else if (type.equals("DT")) {
                 actualData = actualData.contains(".") ? actualData.substring(0, actualData.lastIndexOf('.')) : actualData;
-            } else if (metaData.type.equals("N")) {
+            } else if (type.equals("N")) {
                 Matcher matcher = NumberPattern.matcher(actualData);
                 if (matcher.find()) {
                     actualData = matcher.group();
@@ -68,7 +77,7 @@ public class DataSetResolverWithChecker extends SimpleDataSetResolver {
                 }
             }
 
-            return new String[]{StdObjectQualifierTranslator.toHBaseQualifier(metaDataInnerCode, metaData.type), actualData};
+            return new String[]{StdObjectQualifierTranslator.toHBaseQualifier(metaDataInnerCode, type), actualData};
         }
     }
 }

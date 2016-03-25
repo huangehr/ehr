@@ -12,7 +12,6 @@ import java.text.ParseException;
  * @created 2015.10.13 9:12
  */
 public abstract class KeyDataExtractor {
-    protected KeyDataExtractor nextExtractor;
 
     public enum Filter{
         CardInfo,
@@ -21,10 +20,4 @@ public abstract class KeyDataExtractor {
     }
 
     public abstract Object extract(ProfileDataSet dataSet, Filter filter) throws ParseException;
-
-    public KeyDataExtractor setNextExtractor(KeyDataExtractor nextExtractor){
-        this.nextExtractor = nextExtractor;
-
-        return nextExtractor;
-    }
 }

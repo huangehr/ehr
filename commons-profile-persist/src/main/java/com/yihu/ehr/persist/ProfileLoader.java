@@ -2,9 +2,9 @@ package com.yihu.ehr.persist;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.cache.CachedMetaData;
-import com.yihu.ehr.cache.StdDataRedisCache;
-import com.yihu.ehr.cache.StdObjectQualifierTranslator;
+import com.yihu.ehr.schema.CachedMetaData;
+import com.yihu.ehr.schema.StdRedisCacheAccessor;
+import com.yihu.ehr.schema.StdObjectQualifierTranslator;
 import com.yihu.ehr.data.HBaseClient;
 import com.yihu.ehr.data.ResultWrapper;
 import com.yihu.ehr.profile.Profile;
@@ -206,7 +206,7 @@ public class ProfileLoader {
                                                            String[] innerCodes) throws IOException {
         List<String> metaDataInnerCode = new ArrayList<>(innerCodes.length);
         for (int i = 0; i < innerCodes.length; ++i) {
-            CachedMetaData metaData = StdDataRedisCache.getMetaData(cdaVersion, dataSetCode, innerCodes[i]);
+            CachedMetaData metaData = StdRedisCacheAccessor.getMetaData(cdaVersion, dataSetCode, innerCodes[i]);
             if (metaData == null) {
                 continue;
             } else if (metaData.dictId == 0) {

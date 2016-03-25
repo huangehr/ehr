@@ -3,7 +3,7 @@ package com.yihu.ehr.task;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.cache.StdObjectQualifierTranslator;
+import com.yihu.ehr.schema.StdObjectQualifierTranslator;
 import com.yihu.ehr.extractor.KeyDataExtractor;
 import com.yihu.ehr.pack.TPackage;
 import com.yihu.ehr.pack.TPackageService;
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
@@ -50,6 +49,7 @@ public class PackageResolveTask {
     private final static KeyDataExtractor dataFilter = null;
 
     private static ObjectNode EhrSummaryDataSet = null;
+
     private final static char PathSep = File.separatorChar;
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
     private final static String StdFolder = "standard";
@@ -76,8 +76,12 @@ public class PackageResolveTask {
      */
     @Scheduled(cron = "0/2 * * * * ?")
     public void archive() throws TException {
-        TPackage pack = packageService.acquireArchive();
-        if (pack == null) return;
+        /*TPackage pack = packageService.acquireArchive();
+        if (pack == null) return;*/
+
+        TPackage pack = new TPackage();
+        pack.setId("0dae0005565d0350b5956e31b69f7959");
+        pack.setPwd("f354fe25-e439-40fa-98dd-070779106a7a");
 
         doArchive(pack);
     }
@@ -91,7 +95,7 @@ public class PackageResolveTask {
                     LocalTempPath + PathSep + pack.getId(),
                     pack.getPwd());
             if (unZippedPath == null || !unZippedPath.isDirectory() || unZippedPath.list().length == 0) {
-                throw new RuntimeException("Invalid package zip file, package id: " + pack.getId());
+                throw new RuntimeException("Invalid package file, package id: " + pack.getId());
             }
 
             // build profile model
@@ -109,7 +113,7 @@ public class PackageResolveTask {
             makeEventSummary(profile);
 
             // save to HBase
-            importToHBase(profile);
+            //importToHBase(profile);
 
             // report as finished
             //packageService.reportArchiveFinished(pack.getId(), "Identity card no: " + profile.getDemographicId() + ", archive id: " + profile.getId());
@@ -140,7 +144,7 @@ public class PackageResolveTask {
             ProfileDataSet dataSet = generateDataSet(packageId, profile, file, isOriginDataSet);
 
             // 原始数据存储在单独的表中, 表名为"数据集代码_ORIGIN"
-            String dataSetTable = isOriginDataSet ? StdObjectQualifierTranslator.makeOriginDataSetTable(dataSet.getCode()) : dataSet.getCode();
+            String dataSetTable = isOriginDataSet ? StdObjectQualifierTranslator.originDataTable(dataSet.getCode()) : dataSet.getCode();
             profile.addDataSet(dataSetTable, dataSet);
             dataSet.setCode(dataSetTable);
 

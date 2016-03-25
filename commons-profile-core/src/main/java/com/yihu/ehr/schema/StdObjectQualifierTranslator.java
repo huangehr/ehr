@@ -1,4 +1,4 @@
-package com.yihu.ehr.cache;
+package com.yihu.ehr.schema;
 
 import com.yihu.ehr.util.StringBuilderUtil;
 
@@ -20,12 +20,16 @@ public class StdObjectQualifierTranslator {
      *
      * @param dataSetCode
      */
-    public static String makeOriginDataSetTable(String dataSetCode) {
+    public static String originDataTable(String dataSetCode) {
         return dataSetCode + OriginDataSetFlag;
     }
 
     public static boolean isOriginDataSet(String dataSetCode){
         return dataSetCode.endsWith(OriginDataSetFlag);
+    }
+
+    boolean isOriginDataSetCode(String dataSetCode) {
+        return dataSetCode.contains(OriginDataSetFlag);
     }
 
     /**
@@ -43,9 +47,5 @@ public class StdObjectQualifierTranslator {
                 innerCode + MetaDataCodeSuffix,
                 innerCode + MetaDataValueSuffix
         };
-    }
-
-    boolean isOriginDataSetCode(String dataSetCode) {
-        return dataSetCode.contains(OriginDataSetFlag);
     }
 }

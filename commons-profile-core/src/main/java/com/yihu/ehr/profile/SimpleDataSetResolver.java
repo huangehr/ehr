@@ -32,7 +32,7 @@ public class SimpleDataSetResolver {
             String eventNo = jsonNode.get("event_no").asText();
             String patientId = jsonNode.get("patient_id").asText();
             String orgCode = jsonNode.get("org_code").asText();
-            String eventDate = jsonNode.path("event_time").asText();        // 旧数据包可能不存在这个属性
+            String eventDate = jsonNode.path("event_time").asText();        // 旧数据集结构可能不存在这个属性
 
             dataSet.setPatientId(patientId);
             dataSet.setEventNo(eventNo);

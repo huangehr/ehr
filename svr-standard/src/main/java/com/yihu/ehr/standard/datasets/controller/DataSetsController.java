@@ -36,7 +36,6 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
         return dataSetService.getServiceEntity(version);
     }
 
-
     @RequestMapping(value = RestApi.Standards.DataSets, method = RequestMethod.GET)
     @ApiOperation(value = "查询数据集的方法")
     public Collection<MStdDataSet> searchDataSets(
