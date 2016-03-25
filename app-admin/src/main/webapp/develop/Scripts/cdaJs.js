@@ -15,6 +15,7 @@ cda.list = {
     relationSearch: null,
     relationIds: "",//关系IDs
     manager: null,
+
     init: function () {
         this.top = $.Util.getTopWindowDOM();
         //CDA 列名
@@ -46,11 +47,14 @@ cda.list = {
 
         this.cdaSearch = $("#searchNm").ligerTextBox({
             width: 240, isSearch: true, search: function () {
+                debugger
                 var versionCode = $("#cdaVersion").ligerGetComboBoxManager().getValue();
                 cda.list.getCDAList();
             }
         });
         $("#searchNm").keyup(function (e) {
+
+            debugger
             if (e.keyCode == 13) {
                 var versionCode = $("#cdaVersion").ligerGetComboBoxManager().getValue();
                 cda.list.getCDAList();
@@ -59,15 +63,18 @@ cda.list = {
 
         this.relationSearch = $("#searchNmEntry").ligerTextBox({
             width: 240, isSearch: true, search: function () {
+                debugger
                 var versionCode = $("#cdaVersion").ligerGetComboBoxManager().getValue();
                 var cdaid = $("#hdId").val();
                 cda.list.getRelationShipList(versionCode, cdaid);
             }
         });
         $("#searchNmEntry").keyup(function (e) {
+            debugger
             if (e.keyCode == 13) {
                 var versionCode = $("#cdaVersion").ligerGetComboBoxManager().getValue();
                 var cdaid = $("#hdId").val();
+                debugger
                 cda.list.getRelationShipList(versionCode, cdaid);
             }
         });
@@ -104,20 +111,17 @@ cda.list = {
 
         var u = cda.list;
         $.ajax({
-            url: u._url + "/cdadict/getCdaVersionList",
+            url: u._url + "/cdaVersion/getVersionList",
             type: "post",
             dataType: "json",
             data: {page: "1", rows: "100"},
             success: function (data) {
-                var result = eval(data.result);
+                var cdaVersionList = data.detailModelList;
                 var option = [];
-                for (var i = 0; i < result.length; i++) {
-                    var version = result[i].version;
-                    var versionArr = version.split(",");
-
+                for (var i = 0; i < cdaVersionList.length; i++) {
                     option.push({
-                        text: versionArr[1],
-                        id: versionArr[0]
+                        text: cdaVersionList[i].versionName,
+                        id: cdaVersionList[i].version
                     });
                 }
                 var select = $("#cdaVersion").ligerComboBox({
@@ -181,13 +185,13 @@ cda.list = {
         }
     },
     getTypeTree: function () {
-        debugger
         var flag = true;
         var u = cda.list;
         var typeTree = $("#div_typeTree").ligerTree({
             nodeWidth: 260,
             url: u._url + '/cdatype/getCDATypeListByParentId?ids=',
             isLeaf: function (data) {
+                debugger
                 if (!data) return false;
                 return data.type == "employee";
             },
@@ -200,20 +204,21 @@ cda.list = {
             textFieldName: 'name',
             slide: false,
             onSelect: function (data) {
-                var id = data.data.id;
-                $("#hdType").val(id);
-                $("#hdTypeName").val(data.data.name);
-                cda.list.getCDAList();
+                //临时注释
+                //var id = data.data.id;
+                //$("#hdType").val(id);
+                //$("#hdTypeName").val(data.data.name);
+                //cda.list.getCDAList();
             },
             onSuccess: function (data) {
                 if (flag) {
-                    flag = false;
-                    $("#div_typeTree").css({});
-                    var id = data[0].id;
-                    $("#hdType").val(id);
-                    cda.list.getCDAList();
-                    //$(".l-body").removeClass("l-selected");
-                    $("#" + id + " div:first").addClass("l-selected");
+                    //flag = false;
+                    //$("#div_typeTree").css({});
+                    //var id = data[0].id;
+                    //$("#hdType").val(id);
+                    //cda.list.getCDAList();
+                    ////$(".l-body").removeClass("l-selected");
+                    //$("#" + id + " div:first").addClass("l-selected");
                 }
                 $("#div_typeTree li div span").css({
                     "line-height": "22px",
@@ -223,7 +228,9 @@ cda.list = {
 
         });
     },
+
     getRelationShipList: function (versionCode, cdaid) {
+        debugger
         var u = cda.list;
         var strkey = u.relationSearch.getValue();
 
@@ -401,6 +408,7 @@ cda.attr = {
             dataType: "json",
             data: {strKey: "", page: 1, rows: 0},
             success: function (data) {
+                debugger
                 var result = eval(data.detailModelList);
                 var option = [];
                 if (result != null) {
@@ -430,11 +438,12 @@ cda.attr = {
                 //}
             },
             complete: function () {
-                cda.attr.getStandardSource();
+                //cda.attr.getStandardSource();
             }
         });
     },
     //加载标准来源下拉框
+
     getStandardSource: function () {
         var u = cda.list;
         if (u._url == "" || u._url == null) {
@@ -442,12 +451,16 @@ cda.attr = {
         }
         var cdaVersion = $("#hdversion").val();
         $.ajax({
-            url: u._url + "/cdadict/getStdSourceList",
+            //url: u._url + "/cdadict/getStdSourceList",
+            url: u._url + "/standardsource/searchStdSource",
             type: "post",
             dataType: "json",
             data: {strVersionCode: cdaVersion},
             success: function (data) {
-                var result = eval(data.result);
+                debugger
+                //var result = eval(data.result);
+                var result = data.detailModelList;
+
                 var option = [];
                 if (result != null) {
                     for (var i = 0; i < result.length; i++) {
@@ -485,7 +498,7 @@ cda.attr = {
         if (id == "") {
             return;
         }
-
+debugger
         $.ajax({
             url: u._url + "/cda/getCDAInfoById",
             type: "get",
