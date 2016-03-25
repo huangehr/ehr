@@ -5,8 +5,7 @@ import org.apache.commons.lang.StringUtils;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * URL 查询构建器，在设置好需要的字段后，生成查询字段以方便URL使用。字段请使用Model中的名称。
@@ -88,6 +87,23 @@ public class URLQueryBuilder {
             stringBuilder.append(String.join(";", sorter)).append("&");
         }
         stringBuilder.append("page=").append(pageNo).append("&").append("size=").append(pageSize);
+        return stringBuilder.toString();
+    }
+
+    public String toString(Map<String, Object>  params) {
+        StringBuilder stringBuilder = new StringBuilder();
+        int i=0;
+        for (Object responseBody : params.keySet()) {
+            i++;
+            String encodedName = encode((String) responseBody);
+            String encodedValue = encode(String.valueOf(params.get(responseBody)));
+            if (i>1){
+                stringBuilder.append("&");
+            }
+            stringBuilder.append(encodedName).append("=");
+            stringBuilder.append(encodedValue);
+        }
+
         return stringBuilder.toString();
     }
 

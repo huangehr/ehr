@@ -63,16 +63,16 @@
                 searchType:''
               },
               columns: [
-                { name: 'objectId',hide: true},
-                { name: 'type',hide: true},
-                {display: '类型', name: 'typeValue', width: '10%'},
+                { name: 'id',hide: true},
+                { name: 'cardType',hide: true},
+                {display: '类型', name: 'typeName', width: '10%'},
                 {display: '卡号', name: 'number', width: '30%'},
-                {display: '发行机构', name: 'releaseOrg', width: '20%'},
+                {display: '发行机构', name: 'releaseOrgName', width: '20%'},
                 {display: '就诊时间', name: 'createDate', width: '20%'},
-                {display: '状态', name: 'statusValue', width: '10%'},
+                {display: '状态', name: 'statusName', width: '10%'},
                 {
                   display: '操作', name: 'operator', width: '10%', render: function (row) {
-                  var html = '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "card:cardInfoModifyDialog:open",row.objectId, row.type) + '">关联</a>  ';
+                  var html = '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "card:cardInfoModifyDialog:open",row.id, row.cardType) + '">关联</a>  ';
                   return html;
                 }
                 }
@@ -89,12 +89,12 @@
 
         bindEvents: function () {
           //绑定卡信息
-          $.subscribe('card:cardInfoModifyDialog:open',function(event,objectId,type){
+          $.subscribe('card:cardInfoModifyDialog:open',function(event,id,cardType){
             $.ligerDialog.confirm('确认关联该卡信息？<br>如果是请点击确认按钮，否则请点击取消。', function (yes) {
               if (yes) {
                 var dataModel = $.DataModel.init();
                 dataModel.updateRemote('${contextRoot}/card/attachCard', {
-                  data: {idCardNo:'${idCardNo}',objectId: objectId,type:type},
+                  data: {idCardNo:'${idCardNo}',id: id,cardType:cardType},
                   success: function (data) {
                     if (data.successFlg) {
                       $.Notice.success('关联成功');

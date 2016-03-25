@@ -15,9 +15,9 @@ import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -157,22 +157,29 @@ public class CardController extends BaseController {
 
         MAbstractCard cardInfo = cardClient.getCard(id, cardType);
         CardDetailModel detailModel = convertToModel(cardInfo,CardDetailModel.class);
+        if(detailModel==null)
+        {
+            return failed("数据获取失败!");
+        }
         detailModel.setCreateDate(DateToString(cardInfo.getCreateDate(), AgAdminConstants.DateFormat));
         detailModel.setReleaseDate(DateToString(cardInfo.getReleaseDate(),AgAdminConstants.DateTimeFormat));
         detailModel.setValidityDateBegin(DateToString(cardInfo.getValidityDateBegin(),AgAdminConstants.DateTimeFormat));
         detailModel.setValidityDateEnd(DateToString(cardInfo.getValidityDateEnd(),AgAdminConstants.DateTimeFormat));
-        if(detailModel!=null)
-        {
-            return failed("数据获取失败!");
+        MConventionalDict dict=null;
+        if (!StringUtils.isEmpty(detailModel.getCardType())) {
+            dict = conventionalDictEntryClient.getCardType(detailModel.getCardType());
+            detailModel.setTypeName(dict.getValue());
         }
-        MConventionalDict dict = conventionalDictEntryClient.getCardType(detailModel.getCardType());
-        detailModel.setTypeName(dict.getValue());
 
-        dict = conventionalDictEntryClient.getCardStatus(detailModel.getStatus());
-        detailModel.setStatusName(dict.getValue());
+        if (!StringUtils.isEmpty(detailModel.getStatus())) {
+            dict = conventionalDictEntryClient.getCardStatus(detailModel.getStatus());
+            detailModel.setStatusName(dict.getValue());
+        }
 
-        MOrganization organization = orgClient.getOrg(detailModel.getReleaseOrg());
-        detailModel.setReleaseOrgName(organization.getFullName());
+        if (!StringUtils.isEmpty(detailModel.getReleaseOrg())){
+            MOrganization organization = orgClient.getOrg(detailModel.getReleaseOrg());
+            detailModel.setReleaseOrgName(organization.getFullName());
+        }
 
         return success(detailModel);
     }
