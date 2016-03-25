@@ -18,9 +18,6 @@ info:
     name: DiscoveryService
     description: EHR platform global discovery service
     version: 1.0.0
----
-spring:
-  profiles: lincl
 
 ---
 spring:
