@@ -36,8 +36,8 @@ public class CdaTypeController extends BaseRestController {
     @RequestMapping(value = RestApi.Standards.TypeChildren, method = RequestMethod.GET)
     @ApiOperation(value = "根据父级ID获取下级")
     public List<MCDAType> getChildrenByPatientId(
-            @ApiParam(name = "id", value = "父级id")
-            @PathVariable(value = "id") String parentId) throws Exception {
+            @ApiParam(name = "id", value = "父级id",defaultValue = "")
+            @RequestParam(value = "id",required = false) String parentId) throws Exception {
 
         List<CDAType> listType = cdaTypeManager.getChildrenCDATypeByParentId(parentId);
         return (List<MCDAType>)convertToModels(listType,new ArrayList<MCDAType>(listType.size()),MCDAType.class,"");

@@ -27,8 +27,8 @@ public interface CDATypeClient {
     @RequestMapping(value = RestApi.Standards.TypeChildren, method = RequestMethod.GET)
     @ApiOperation(value = "根据父级ID获取下级")
     List<MCDAType> getChildrenByPatientId(
-            @ApiParam(name = "id", value = "父级id")
-            @PathVariable(value = "id") String parentId);
+            @ApiParam(name = "id", value = "父级id",defaultValue = "")
+            @RequestParam(value = "id",required = false) String parentId);
 
 
     @RequestMapping(value = RestApi.Standards.TypesChildren, method = RequestMethod.GET)

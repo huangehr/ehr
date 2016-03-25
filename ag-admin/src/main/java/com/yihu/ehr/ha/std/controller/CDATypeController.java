@@ -111,9 +111,8 @@ public class CDATypeController extends BaseController {
     @ApiOperation(value = "获取所有cda类别转成的CdaTypeTreeModel列表，初始页面显示")
     public Envelop getCdaTypeTreeModels() throws Exception {
         Envelop envelop = new Envelop();
-        //cda类别的顶级父id原为null，查询报错，现暂时定为32个0
-        String parentId = "00000000000000000000000000000000";
-        List<MCDAType> mCdaTypeList = cdaTypeClient.getChildrenByPatientId(parentId);
+        //顶级cda类别的父级id在数库是为空的
+        List<MCDAType> mCdaTypeList = cdaTypeClient.getChildrenByPatientId("");
         if (mCdaTypeList.size() == 0){
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("没有匹配条件的cda类别！");
