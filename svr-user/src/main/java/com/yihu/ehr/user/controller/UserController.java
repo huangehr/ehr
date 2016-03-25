@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MUser;
+import com.yihu.ehr.user.feign.ConventionalDictClient;
 import com.yihu.ehr.user.feign.SecurityClient;
 import com.yihu.ehr.user.service.User;
 import com.yihu.ehr.user.service.UserManager;
@@ -43,6 +45,9 @@ public class UserController extends BaseRestController {
     @Autowired
     private SecurityClient securityClient;
 
+    @Autowired
+    private ConventionalDictClient conventionalDictClient;
+
     @RequestMapping(value = RestApi.Users.Users, method = RequestMethod.GET)
     @ApiOperation(value = "获取用户列表", notes = "根据查询条件获取用户列表在前端表格展示")
     public List<MUser> searchUsers(
@@ -76,7 +81,11 @@ public class UserController extends BaseRestController {
         }else {
             user.setPassword(HashUtil.hashStr(default_password));
         }
-
+        String userType = user.getUserType();
+        MConventionalDict dict = conventionalDictClient.getUserType(userType);
+        if(dict!=null){
+            user.setDType(userType);
+        }
         user.setActivated(true);
         user = userManager.saveUser(user);
         return convertToModel(user, MUser.class, null);
@@ -89,6 +98,11 @@ public class UserController extends BaseRestController {
             @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         User user = objectMapper.readValue(userJsonData, User.class);
+        String userType = user.getUserType();
+        MConventionalDict dict = conventionalDictClient.getUserType(userType);
+        if(dict!=null){
+            user.setDType(userType);
+        }
         userManager.saveUser(user);
         return convertToModel(user, MUser.class);
     }

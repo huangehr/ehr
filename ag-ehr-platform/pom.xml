@@ -4,9 +4,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yihu.ehr</groupId>
-        <artifactId>commons-dependencies</artifactId>
+        <artifactId>commons-dependencies-native</artifactId>
         <version>1.1.0</version>
-        <relativePath>../commons-dependencies-docker</relativePath>
+        <relativePath>../commons-dependencies-native</relativePath>
     </parent>
 
     <url>https://ehr.yihu.com</url>
@@ -69,10 +69,10 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!--<dependency>-->
-        <!--<groupId>org.springframework.boot</groupId>-->
-        <!--<artifactId>spring-boot-starter-thymeleaf</artifactId>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
@@ -102,11 +102,6 @@
             <artifactId>commons-profile-core</artifactId>
             <version>1.1.0</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>com.yihu.ehr</groupId>-->
-            <!--<artifactId>commons-data-fastdfs</artifactId>-->
-            <!--<version>1.1.0</version>-->
-        <!--</dependency>-->
     </dependencies>
 
     <build>
