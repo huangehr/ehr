@@ -1,6 +1,7 @@
 package com.yihu.ehr.api.legacy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.api.adaption.AdaptionsEndPoint;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
@@ -43,8 +44,8 @@ import java.util.regex.Pattern;
 @RestController
 @RequestMapping("/rest/v1.0")
 public class LegacyEndPoint {
-    @Value("${micro-service.adaption.ip-address}")
-    String adaptionIpAddress;
+    @Value("${svr-package.ip-address}")
+    String packageIpAddress;
 
     @Autowired
     AdaptionsEndPoint adaptions;
@@ -317,7 +318,7 @@ public class LegacyEndPoint {
 
             demoInfo.setBirthday(DateFormatter.simpleDateParse(birthday));
             demoInfo.setNativePlace(nativePlace);
-            demoInfo.setTelphoneNo(telMap.get(0));
+            demoInfo.setTelephoneNo(telMap.get(0));
 
 
             if (!StringUtils.isEmpty(birthProvince)) {
@@ -339,29 +340,29 @@ public class LegacyEndPoint {
     }
 
 
-    @ApiOperation(value = "上传档案包", response = String.class)
-    @RequestMapping(value = "/json_package", method = RequestMethod.POST)
-    public RestEcho uploadPackage(
-            @ApiParam(required = false, name = "package", value = "JSON档案包", allowMultiple = true)
-            MultipartHttpServletRequest jsonPackage,
-            @ApiParam(required = true, name = "user_name", value = "用户名")
-            @RequestParam(value = "user_name") String userName,
-            @ApiParam(required = true, name = "package_crypto", value = "档案包解压密码,二次加密")
-            @RequestParam(value = "package_crypto") String packageCrypto,
-            @ApiParam(required = true, name = "md5", value = "档案包MD5")
-            @RequestParam(value = "md5") String md5) throws Exception {
-        MultipartFile multipartFile = jsonPackage.getFile("file");
-        byte[] bytes = multipartFile.getBytes();
-        String fileString = new String(bytes, "UTF-8");
-        MultiValueMap<String, String> conditionMap = new LinkedMultiValueMap<>();
-        conditionMap.add("file_string", fileString);
-        conditionMap.add("user_name", userName);
-        conditionMap.add("package_crypto", packageCrypto);
-        conditionMap.add("md5", md5);
-        RestTemplate template = new RestTemplate();
-        template.postForObject(adaptionIpAddress+ ApiVersion.Version1_0+"/packages", conditionMap, String.class);
-        return new RestEcho().success().putMessage("ok");
-    }
+//    @ApiOperation(value = "上传档案包", response = String.class)
+//    @RequestMapping(value = "/json_package", method = RequestMethod.POST)
+//    public RestEcho uploadPackage(
+//            @ApiParam(required = false, name = "package", value = "JSON档案包", allowMultiple = true)
+//            MultipartHttpServletRequest jsonPackage,
+//            @ApiParam(required = true, name = "user_name", value = "用户名")
+//            @RequestParam(value = "user_name") String userName,
+//            @ApiParam(required = true, name = "package_crypto", value = "档案包解压密码,二次加密")
+//            @RequestParam(value = "package_crypto") String packageCrypto,
+//            @ApiParam(required = true, name = "md5", value = "档案包MD5")
+//            @RequestParam(value = "md5") String md5) throws Exception {
+//        MultipartFile multipartFile = jsonPackage.getFile("file");
+//        byte[] bytes = multipartFile.getBytes();
+//        String fileString = new String(bytes, "UTF-8");
+//        MultiValueMap<String, String> conditionMap = new LinkedMultiValueMap<>();
+//        conditionMap.add("file_string", fileString);
+//        conditionMap.add("user_name", userName);
+//        conditionMap.add("package_crypto", packageCrypto);
+//        conditionMap.add("md5", md5);
+//        RestTemplate template = new RestTemplate();
+//        template.postForObject(packageIpAddress+ ApiVersion.Version1_0+ RestApi.Packages.LegacyPackages, conditionMap, String.class);
+//        return new RestEcho().success().putMessage("ok");
+//    }
 
     @ApiOperation(value = "公钥", response = String.class)
     @RequestMapping(value = "/security/user_key/{login_code}", method = RequestMethod.GET)

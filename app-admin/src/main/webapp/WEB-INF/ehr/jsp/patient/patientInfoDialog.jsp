@@ -65,7 +65,7 @@
             <label>户籍地址：</label>
 
             <div class="m-form-control f-w240">
-                <input type="text" id="inp_birthPlace" class="validate-special-char" data-type="comboSelect" data-attr-scan="birthPlace">
+                <input type="text" id="inp_birthPlace" class="validate-special-char" data-type="comboSelect" data-attr-scan="birthPlaceInfo">
             </div>
         </div>
 
@@ -74,7 +74,7 @@
 
             <div class="m-form-control f-w240">
                 <input type="text" id="inp_homeAddress" class="validate-special-char" data-type="comboSelect"
-                       data-attr-scan="homeAddress"/>
+                       data-attr-scan="homeAddressInfo"/>
             </div>
         </div>
         <div class="m-form-group">
@@ -82,7 +82,7 @@
 
             <div class="m-form-control f-w240">
                 <input type="text" id="inp_workAddress" class="validate-special-char"  data-type="comboSelect"
-                       data-attr-scan="workAddress"/>
+                       data-attr-scan="workAddressInfo"/>
             </div>
         </div>
         <div class="m-form-group">
@@ -97,7 +97,7 @@
             <label>联系方式：</label>
 
             <div class="l-text-wrapper m-form-control essential">
-                <input type="text" id="inp_patientTel" class="required useTitle validate-mobile-phone"  required-title=<spring:message code="lbl.must.input"/> validate-mobile-phone-title="请输入正确的手机号码" data-attr-scan="tel"/>
+                <input type="text" id="inp_patientTel" class="required useTitle validate-mobile-phone"  required-title=<spring:message code="lbl.must.input"/> validate-mobile-phone-title="请输入正确的手机号码" data-attr-scan="telephoneNo"/>
             </div>
         </div>
         <div class="m-form-group">

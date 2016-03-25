@@ -4,6 +4,16 @@ spring:
 
 ---
 spring:
+  profiles: lincl
+  cloud:
+    config:
+      username: user
+      password: configuration
+      uri: http://127.0.0.1:1221
+      label: dev
+
+---
+spring:
   profiles: dev
   cloud:
     config:

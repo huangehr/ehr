@@ -322,6 +322,9 @@ public class AdapterOrgController {
                 case "2":
                     orgType = "Hospital";
                     break;
+                default:
+                    orgType = "Govement";
+                    break;
             }
             filters += "orgType="+orgType;
         }
@@ -368,7 +371,7 @@ public class AdapterOrgController {
         params.put("size",rows);
 
         try {
-            //todo 返回result.toJson()
+
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             return resultStr;
         } catch (Exception e) {

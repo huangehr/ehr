@@ -35,11 +35,8 @@ public class CdaTypeController extends BaseUIController{
     private String username;
     @Value("${service-gateway.password}")
     private String password;
-//    @Value("${service-gateway.url}")
-//    private String comUrl;
-
-    //TODO 访问路径，一般有aimin而标准部分网关没有admin
-    String comUrl = "http://localhost:10000/api/v1.0/cdatype";
+    @Value("${service-gateway.cdatypeurl}")
+    private String comUrl;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -52,7 +49,7 @@ public class CdaTypeController extends BaseUIController{
 
     @RequestMapping("typeupdate")
     public String typeupdate(Model model,String userId) {
-        //TODO 临时测试数据
+        //TODO 临时测试数据 需要获取当前登入用户信息
         userId = "wwcs";
         model.addAttribute("UserId", userId);
         model.addAttribute("contentPage", "std/cdaType/CdaTypeDetail");

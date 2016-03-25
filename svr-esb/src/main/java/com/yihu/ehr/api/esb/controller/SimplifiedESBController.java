@@ -1,11 +1,14 @@
 package com.yihu.ehr.api.esb.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.api.esb.model.HosEsbMiniRelease;
 import com.yihu.ehr.api.esb.model.HosLog;
 import com.yihu.ehr.api.esb.model.HosSqlTask;
 import com.yihu.ehr.api.esb.service.SimplifiedESBService;
 import com.yihu.ehr.config.FastDFSConfig;
+import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.util.DateFormatter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.*;
@@ -25,7 +29,7 @@ import java.util.Date;
  */
 
 @RestController
-@RequestMapping(value = "/esb")
+@RequestMapping(value = ApiVersion.Version1_0 + "/esb")
 @Api(protocols = "https", value = "simplified-esb", description = "简易ESB服务临时接口")
 public class SimplifiedESBController {
     @Resource(name = "simplifiedESBService")
@@ -61,17 +65,17 @@ public class SimplifiedESBController {
     public boolean uploadLog(
             @ApiParam("orgCode") @RequestParam(value = "orgCode", required = true) String orgCode,
             @ApiParam("ip") @RequestParam(value = "ip", required = false) String ip,
-            @ApiParam("file") @RequestParam(value = "file", required = true) String file) {
+            @ApiParam("file") @RequestParam(value = "file", required = true) MultipartFile file) {
         try {
-            // InputStream in = new ByteArrayInputStream(file.getBytes());
-            // FastDFSUtil fdfs = FastDFSConfig.fastDFSUtil();
-            // ObjectNode jsonResult = fdfs.upload(in, "zip", "");
-            //  String filePath = jsonResult.get("fid").textValue();
-            // fdfs.download(jsonResult.get("groupName").textValue(), jsonResult.get("remoteFileName").textValue(), "E:\\");
+            InputStream in = new ByteArrayInputStream(file.getBytes());
+            FastDFSUtil fdfs = FastDFSConfig.fastDFSUtil();
+            ObjectNode jsonResult = fdfs.upload(in, "zip", "");
+            String filePath = jsonResult.get("fid").textValue();
+            //fdfs.download(jsonResult.get("groupName").textValue(), jsonResult.get("remoteFileName").textValue(), "E:\\");
             HosLog lh = new HosLog();
             lh.setOrgCode(orgCode);
             lh.setUploadTime(DateFormatter.simpleDateTimeFormat(new Date()));
-            lh.setFilePath(file);
+            lh.setFilePath(filePath);
             lh.setId(ip);
             simplifiedESBService.saveHosLog(lh);
             return true;

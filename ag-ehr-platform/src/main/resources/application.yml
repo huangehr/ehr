@@ -4,6 +4,7 @@ server:
 management:
   port: ${server.port}
 
+
 ---
 spring:
   profiles: dev

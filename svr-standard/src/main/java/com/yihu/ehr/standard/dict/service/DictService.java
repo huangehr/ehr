@@ -3,7 +3,9 @@ package com.yihu.ehr.standard.dict.service;
 
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.model.standard.MStdDict;
 import com.yihu.ehr.query.BaseHbmService;
+import com.yihu.ehr.standard.cdatype.service.CDAType;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -94,6 +97,15 @@ public class DictService extends BaseHbmService<IDict> {
             map.put("datasetId", os[2]);
         }
         return map;
+    }
+
+    public List getOtherCdaDict(String id,String version) {
+        Session session = currentSession();
+        Class clz = getServiceEntity(version);
+        String hql = " from " +clz.getSimpleName()+" dict where 1 = 1 and dict.id !="+id;
+        Query query = session.createQuery(hql);
+        List o = query.list();
+        return o;
     }
 
     //TODO: 从excel导入字典、字典项
