@@ -96,8 +96,8 @@ public class AdapterPlanControllerTests {
         customModel1.setText("机构名称");
         customModels.add(customModel1);
 
-        boolean result = planController.adapterDataSet(adapterPlanModel.getId(),objectMapper.writeValueAsString( customModels));
-        assertTrue("定制失败!",result);
+//        boolean result = planController.adapterDataSet(adapterPlanModel.getId(),objectMapper.writeValueAsString( customModels));
+//        assertTrue("定制失败!",result);
 
         envelop = planController.delAdapterPlan(String.valueOf(adapterPlanModel.getId()));
         assertTrue("删除失败!",envelop.isSuccessFlg());

@@ -207,16 +207,16 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
     }
 
 
-    @RequestMapping(value = "/plan/adapterDataSet/{plan_id}", method = RequestMethod.POST)
-    @ApiOperation(value = "定制数据集")
-    public boolean adapterDataSet(
-            @ApiParam(name = "plan_id", value = "编号", defaultValue = "")
-            @PathVariable("plan_id") Long planId,
-            @ApiParam(name = "customizeData", value = "customizeData", allowMultiple = true, defaultValue = "")
-            @RequestParam("customizeData") String customizeData) throws Exception {
-
-        return planClient.adapterDataSet(planId, customizeData);
-    }
+//    @RequestMapping(value = "/plan/adapterDataSet/{plan_id}", method = RequestMethod.POST)
+//    @ApiOperation(value = "定制数据集")
+//    public boolean adapterDataSet(
+//            @ApiParam(name = "plan_id", value = "编号", defaultValue = "")
+//            @PathVariable("plan_id") Long planId,
+//            @ApiParam(name = "customizeData", value = "customizeData", allowMultiple = true, defaultValue = "")
+//            @RequestParam("customizeData") String customizeData) throws Exception {
+//
+//        return planClient.adapterDataSet(planId, customizeData);
+//    }
 
     @RequestMapping(value = "/plan/{plan_id}/public", method = RequestMethod.PUT)
     @ApiOperation(value = "获取定制信息")

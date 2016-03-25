@@ -183,16 +183,16 @@ public class URLQueryParser<T> {
             }
         } else if (filter.contains(">=")) {
             Pair<Path, String> pair = getPair(filter, ">=", root);
-            predicate = cb.gt(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
+            predicate = cb.ge(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
         } else if (filter.contains(">")) {
             Pair<Path, String> pair = getPair(filter, ">", root);
-            predicate = cb.ge(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
+            predicate = cb.gt(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
         } else if (filter.contains("<=")) {
             Pair<Path, String> pair = getPair(filter, "<=", root);
-            predicate = cb.lt(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
+            predicate = cb.le(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
         } else if (filter.contains("<")) {
             Pair<Path, String> pair = getPair(filter, "<", root);
-            predicate = cb.le(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
+            predicate = cb.lt(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
         } else if (filter.contains("=")) {
             Pair<Path, String> pair = getPair(filter, "=", root);
 

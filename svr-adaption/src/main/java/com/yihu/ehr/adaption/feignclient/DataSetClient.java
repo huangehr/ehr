@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,9 +31,8 @@ public interface DataSetClient {
             @RequestParam(value = "ids") String ids);
 
 
-    @RequestMapping(value = RestApi.Standards.MetaDatasName, method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Standards.MetaDatasName, method = RequestMethod.POST)
     @ApiOperation(value = "获取数据元 id-name : map集")
     Map getMetaDataMapByIds(
-            @RequestParam(value = "version") String version,
-            @RequestParam(value = "medaIds") String metaIds);
+            @RequestBody String parmModel);
 }
