@@ -74,11 +74,12 @@ public class RestApi {
         public static final String Source                           = "/std/sources/{id}";
         public static final String IsSourceCodeExist                ="/std/sources/code_is_exist";
 
-        public static final String Types                            = "/std/types";
-        public static final String Type                             = "/std/types/{id}";
-        public static final String TypesCodeExistence               = "/std/type/code/existence";
-        public static final String TypeChildren                     = "/std/types/{id}/childrens";
-        public static final String TypesChildren                    = "/std/types/childrens";
+        public static final String Types                    = "/std/types";
+        public static final String Type                     = "/std/types/{id}";
+        public static final String TypesCodeExistence       = "/std/type/code/existence";
+        public static final String TypeChildren             = "/std/types/{id}/childrens";
+        public static final String TypesChildren            = "/std/types/childrens";
+        public static final String TypeOther                = "/std/types/{id}/other";
 
         public static final String Versions                         = "/std/versions";
         public static final String Version                          = "/std/versions/{version}";
@@ -99,15 +100,17 @@ public class RestApi {
         public static final String DataSetRelationships             = "/std/documents/data_set_relationships";
         public static final String DataSetRelationship              = "/std/documents/data_set_relationships/{id}";
 
-        public static final String Dictionaries                     = "/std/dictionaries";
-        public static final String Dictionary                       = "/std/dictionaries/{id}";
-        public static final String MetaDataWithDict                 = "/std/data_set/{data_set_id}/meta_datas/{meta_data_id}/dictionaries";
-        public static final String DictCodeIsExist                  = "/std/dictionaries/is_exist/code";
+        public static final String Dictionaries             = "/std/dictionaries";
+        public static final String Dictionary               = "/std/dictionaries/{id}";
+        public static final String MetaDataWithDict         = "/std/data_set/{data_set_id}/meta_datas/{meta_data_id}/dictionaries";
+        public static final String DictCodeIsExist          = "/std/dictionaries/is_exist/code";
+        public static final String DictOther                = "/std/dictionaries/{id}/other";
 
-        public static final String Entry                            = "/std/dictionaries/entries/{id}";
-        public static final String Entries                          = "/std/dictionaries/entries";
-        public static final String EntriesWithDictionary            = "/std/dictionary/{dict_id}/entries";
-        public static final String EntryCodeIsExist                 = "/std/dictionaries/entries/is_exist/code";
+        public static final String Entry                    = "/std/dictionaries/entries/{id}";
+        public static final String Entries                  = "/std/dictionaries/entries";
+        public static final String EntriesWithDictionary    = "/std/dictionary/{dict_id}/entries";
+        public static final String EntryCodeIsExist         = "/std/dictionaries/entries/is_exist/code";
+        public static final String EntryCodeIsExist         ="/std/dictionaries/entries/is_exist/code";
 
         public static final String DataSets                         = "/std/data_sets";
         public static final String DataSet                          = "/std/data_sets/{id}";
