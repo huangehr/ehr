@@ -1,5 +1,6 @@
 package com.yihu.ehr.util.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ErrorCode;
@@ -42,7 +43,7 @@ public class BaseRestController extends AbstractController {
     @Autowired
     protected EntityManager entityManager;
     @Autowired
-    ObjectMapper objectMapper;
+    protected ObjectMapper objectMapper;
 
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
@@ -76,6 +77,13 @@ public class BaseRestController extends AbstractController {
         }
     }
 
+    public String toJson(Object obj){
+        try {
+            return objectMapper.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
+    }
     /**
      * 将实体集合转换为模型集合。
      *

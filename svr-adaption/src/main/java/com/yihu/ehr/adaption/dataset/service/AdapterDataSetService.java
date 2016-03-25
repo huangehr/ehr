@@ -240,7 +240,7 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
         String cdaVersion = orgAdapterPlan.getVersion();
         Map map = dictClient.getDictMapByIds(cdaVersion, adapterDataSet.getDataSetId(), adapterDataSet.getMetaDataId());
         if (map != null) {
-            Long dictId = Long.parseLong((String) map.get("dictId"));
+            Long dictId = Long.parseLong(String.valueOf(map.get("dictId")));
             adapterDataSet.setStdDict(dictId);
             if (!adapterDictService.isExist(planId, dictId)) {
                 adapterDictService.addAdapterDict(planId, dictId, cdaVersion);

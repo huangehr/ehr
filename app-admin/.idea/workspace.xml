@@ -44,19 +44,20 @@
         <option value="$PROJECT_DIR$/src/main/java/com/yihu/ehr/adapter/service/ExtendString.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/yihu/ehr/adapter/service/OrgAdapterService.java" />
         <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/ehr/jsp/adapter/adapterInfoDialog.jsp" />
-        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/ehr/jsp/adapter/adapterInfoDialogJs.jsp" />
         <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/ehr/jsp/adapter/adapterCustomizeJs.jsp" />
-        <option value="$PROJECT_DIR$/src/main/java/com/yihu/ehr/adapter/controller/OrgAdapterPlanController.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/yihu/ehr/adapter/service/ExtendService.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/yihu/ehr/adapter/controller/ExtendController.java" />
-        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/ehr/jsp/adapter/adapterJs.jsp" />
         <option value="$PROJECT_DIR$/src/main/java/com/yihu/ehr/adapter/service/AdapterDataSetService.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/yihu/ehr/adapter/controller/AdapterDataSetController.java" />
-        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/ehr/jsp/adapter/adapterDataSet/dictDialogJs.jsp" />
         <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/ehr/jsp/adapter/adapterDataSet/dialogJs.jsp" />
         <option value="$PROJECT_DIR$/src/main/java/com/yihu/ehr/adapter/service/AdapterDictService.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/yihu/ehr/adapter/controller/AdapterDictController.java" />
         <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/ehr/jsp/adapter/adapterDataSet/gridJs.jsp" />
+        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/ehr/jsp/adapter/adapterInfoDialogJs.jsp" />
+        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/ehr/jsp/adapter/adapterDataSet/dictDialogJs.jsp" />
+        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/ehr/jsp/adapter/adapterJs.jsp" />
+        <option value="$PROJECT_DIR$/src/main/java/com/yihu/ehr/adapter/service/PageParms.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/yihu/ehr/adapter/controller/OrgAdapterPlanController.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/yihu/ehr/adapter/service/ExtendService.java" />
       </list>
     </option>
   </component>
@@ -150,94 +151,6 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app-admin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app-admin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app-admin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app-admin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app-admin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app-admin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ehr" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app-admin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app-admin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ehr" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="controller" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
         </subPane>
       </pane>
       <pane id="Scope" />
@@ -246,10 +159,11 @@
   </component>
   <component name="PropertiesComponent">
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/pom.xml" />
+    <property name="last_opened_file_path" value="F:/lcl工作目录/IdeaPro/ha/pom.xml" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="recentsLimit" value="5" />
     <property name="dynamic.classpath" value="false" />
+    <property name="FullScreen" value="false" />
   </component>
   <component name="RecentsManager">
     <key name="CopyClassDialog.RECENTS_KEY">
@@ -536,6 +450,9 @@
     </recent_temporary>
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="bde63220-ca95-4047-85cf-e414dba345e7" name="Default" comment="" />
@@ -544,11 +461,16 @@
       <updated>1458366659877</updated>
       <workItem from="1458366661314" duration="15004000" />
       <workItem from="1458520485311" duration="28626000" />
+      <workItem from="1458639804017" duration="707000" />
+      <workItem from="1458692974204" duration="11526000" />
+      <workItem from="1458721157547" duration="6735000" />
+      <workItem from="1458804478705" duration="8492000" />
+      <workItem from="1458866259199" duration="7318000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="43634000" />
+    <option name="totallyTimeSpent" value="78408000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -575,11 +497,11 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.37372014" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24054463" sideWeight="0.49186993" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.1482602" sideWeight="0.49186993" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Bean Validation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25340393" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25340393" sideWeight="0.4817073" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25340393" sideWeight="0.4817073" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25340393" sideWeight="0.51829267" order="4" side_tool="true" content_ui="tabs" />
@@ -621,6 +543,14 @@
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25340393" sideWeight="0.51829267" order="4" side_tool="true" content_ui="tabs" />
     </layout-to-restore>
   </component>
+  <component name="Vcs.Log.UiProperties">
+    <option name="RECENTLY_FILTERED_USER_GROUPS">
+      <collection />
+    </option>
+    <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+      <collection />
+    </option>
+  </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
   </component>
@@ -628,21 +558,23 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/yihu/ehr/adapter/controller/OrgAdapterPlanController.java</url>
-          <line>92</line>
+          <url>file://$PROJECT_DIR$/src/main/java/com/yihu/ehr/std/controller/StdVersionController.java</url>
+          <line>76</line>
           <properties />
-          <option name="timeStamp" value="59" />
+          <option name="timeStamp" value="76" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/yihu/ehr/std/controller/StdVersionController.java</url>
+          <line>46</line>
+          <properties />
+          <option name="timeStamp" value="79" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="72" />
+      <option name="time" value="121" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
-        <watch expression="service.comUrl + url" language="JAVA" custom="" />
-        <watch expression="ex" language="JAVA" custom="" />
-        <watch expression="createRequest(url, method)" language="JAVA" custom="" />
-        <watch expression="handleResponse(url, method, response)" language="JAVA" custom="" />
-        <watch expression="service.searchUrl.replace(&quot;{plan_id}&quot;, adapterPlanId)" language="JAVA" custom="" />
+        <watch expression="returnValue1" language="JAVA" custom="" />
       </configuration>
     </watches-manager>
   </component>

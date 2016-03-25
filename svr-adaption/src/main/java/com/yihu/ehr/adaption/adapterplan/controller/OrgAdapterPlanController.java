@@ -159,11 +159,11 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
     }
 
 
-    @RequestMapping(value = "/plan/{planId}/adapterDataSet", method = RequestMethod.POST)
+    @RequestMapping(value = "/plan/adapterDataSet", method = RequestMethod.POST)
     @ApiOperation(value = "定制数据集")
     public boolean adapterDataSet(
             @ApiParam(name = "planId", value = "编号", defaultValue = "")
-            @PathVariable("planId") Long planId,
+            @RequestParam("planId") Long planId,
             @ApiParam(name = "customizeData", value = "customizeData", defaultValue = "")
             @RequestParam("customizeData") String customizeData) throws Exception {
 
@@ -220,7 +220,10 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
         List<AdapterCustomize> stdCustomizeList = new ArrayList<>();
 
         Map<String, String> map = (Map<String, String>) dataSetClient.getDataSetMapByIds(version, "");
-        Map<String, Map> metaDatas = (Map<String, Map>) dataSetClient.getMetaDataMapByIds(version, "");
+        Map parms = new HashMap<>();
+        parms.put("version", version);
+        parms.put("metaIds", "");
+        Map<String, Map> metaDatas = (Map<String, Map>) dataSetClient.getMetaDataMapByIds(toJson(parms));
         for (String dataSetId : map.keySet()) {
             AdapterCustomize parent = new AdapterCustomize();
             parent.setId("stdDataSet" + dataSetId);
@@ -296,7 +299,10 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
         for (AdapterDataSet adapterDataSet : adapterMetaDataList) {
             metaDataIds += "," + adapterDataSet.getMetaDataId();
         }
-        Map metaDatas = dataSetClient.getMetaDataMapByIds(version, metaDataIds.length()>0 ? metaDataIds.substring(1) : "");
+        Map parms = new HashMap<>();
+        parms.put("version", version);
+        parms.put("metaIds", metaDataIds.length()>0 ? metaDataIds.substring(1) : "");
+        Map metaDatas = dataSetClient.getMetaDataMapByIds(toJson(parms));
         Map<String, String> tmp;
         for (AdapterDataSet adapterDataSet : adapterMetaDataList) {
             if ((tmp = (Map) metaDatas.get(String.valueOf(adapterDataSet.getDataSetId()))) == null

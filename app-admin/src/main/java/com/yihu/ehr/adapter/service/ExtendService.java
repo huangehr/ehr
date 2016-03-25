@@ -1,10 +1,22 @@
 package com.yihu.ehr.adapter.service;
 
 import com.yihu.ehr.util.HttpClientUtil;
+import org.apache.commons.httpclient.*;
+import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
+import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.message.BasicNameValuePair;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -74,6 +86,52 @@ public class ExtendService<T> {
     public String doPost(String url, Map parms) throws Exception{
 
         return HttpClientUtil.doPost(url, parms, username, password);
+    }
+
+    public String doLargePost(String url, Map<String, Object> params) throws Exception {
+        HttpClient httpClient = new HttpClient();
+        String response = "";
+        PostMethod postMethod = null;
+        new StringBuilder();
+
+        try {
+            try {
+                if(!StringUtils.isEmpty(username) && !StringUtils.isEmpty(password)) {
+                    UsernamePasswordCredentials e = new UsernamePasswordCredentials(username, password);
+                    httpClient.getState().setCredentials(AuthScope.ANY, e);
+                }
+//                int so = httpClient.getHttpConnectionManager().getParams().getSoTimeout();
+//                so = httpClient.getHttpConnectionManager().getParams().getConnectionTimeout();
+//                httpClient.getHttpConnectionManager().getParams().setSoTimeout(6000);
+//                httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(6000);
+                postMethod = new PostMethod(url);
+                postMethod.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "UTF-8");
+                for(Object key : params.keySet()){
+                    postMethod.addParameter((String) key, String.valueOf(params.get(key)));
+                }
+
+                postMethod.getParams().setParameter("http.method.retry-handler", new DefaultHttpMethodRetryHandler());
+                int e2 = httpClient.executeMethod(postMethod);
+//                HttpConnectionManagerParams httpConnectionManagerParams = new HttpConnectionManagerParams();
+//                httpClient.getHttpConnectionManager().setParams();
+                if(e2 != 200) {
+                    throw new Exception("请求出错: " + postMethod.getStatusLine());
+                }
+
+                byte[] responseBody1 = postMethod.getResponseBody();
+                response = new String(responseBody1, "UTF-8");
+            } catch (HttpException var16) {
+                var16.printStackTrace();
+            } catch (IOException var17) {
+                var17.printStackTrace();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+            return response;
+        } finally {
+            ;
+        }
     }
 
     public String doGet(String url, Map parms) throws Exception{
