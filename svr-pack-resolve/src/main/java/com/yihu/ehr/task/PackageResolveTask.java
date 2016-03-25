@@ -35,12 +35,12 @@ import java.util.Properties;
 @Component
 public class PackageResolveTask {
     @Autowired
-    DataSetResolverWithChecker dataSetResolver;
+    DataSetResolverWithChecker dataSetResolverWithChecker;
 
     @Autowired
     ObjectMapper objectMapper;
 
-    @Autowired
+    //@Autowired
     TPackageService.Client packageService;
 
     @Autowired
@@ -175,7 +175,7 @@ public class PackageResolveTask {
             throw new IOException("无效JSON文件，文件已损坏或数据格式不对");
         }
 
-        ProfileDataSet dataSet = dataSetResolver.parseJsonDataSet(jsonNode, isOrigin);
+        ProfileDataSet dataSet = dataSetResolverWithChecker.parseJsonDataSet(jsonNode, isOrigin);
         return dataSet;
     }
 
