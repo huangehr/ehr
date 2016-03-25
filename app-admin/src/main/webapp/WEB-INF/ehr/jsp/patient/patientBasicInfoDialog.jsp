@@ -130,7 +130,7 @@
                         <label>类型：</label>
 
                         <div class="l-text-wrapper m-form-control">
-                            <input type="text" id="inp_cardType" class="required useTitle" data-attr-scan="type"/>
+                            <input type="text" id="inp_cardType" class="required useTitle" data-attr-scan="cardType"/>
                         </div>
                     </div>
                     <div class="m-form-group">
@@ -159,7 +159,7 @@
                         <label>发行机构：</label>
 
                         <div class="l-text-wrapper m-form-control">
-                            <input type="text" id="inp_issueOrg" class="required useTitle" data-attr-scan="releaseOrg"/>
+                            <input type="text" id="inp_issueOrg" class="required useTitle" data-attr-scan="releaseOrgName"/>
                         </div>
                     </div>
                     <div class="m-form-group">
@@ -174,7 +174,7 @@
 
                         <div class="l-text-wrapper m-form-control">
                             <input type="text" id="inp_cardStatus" class="required useTitle"
-                                   data-attr-scan="statusValue"/>
+                                   data-attr-scan="statusName"/>
                         </div>
                     </div>
                     <div class="m-form-group">
