@@ -67,13 +67,15 @@ public class StdVersionController extends BaseUIController {
         }
     }
 
+    /**
+     * 通用的用于下拉列表框（所有的版本，发布/未发布）
+     * @return
+     */
+
     @RequestMapping("getVersionList")
     @ResponseBody
-    //获取版本列表用于下拉框
     public Object getVersionList() {
-        //使用 标准数据集页面、++
-        //暂时使用的方法，原来流程是通过标准字典controller得到
-        //原方法将编码、名字组成（"version,name")形式，到前端页面在拆分，，现在返回对象、不再去封装，页面直接取对应的值（标准数据集页面）
+        //原来流程是通过标准字典controller得到
         Envelop envelop = new Envelop();
         String url = "/versions";
         try {
@@ -82,12 +84,9 @@ public class StdVersionController extends BaseUIController {
             params.put("filters", "");
             params.put("sorts", "");
             params.put("page", 1);
-            params.put("size", 100);
+            params.put("size", 999);
             String envelopStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             Envelop en = objectMapper.readValue(envelopStr,Envelop.class);
-            if (en.isSuccessFlg()){
-                List<StdVersionModel> list = (List<StdVersionModel>)getEnvelopList(en.getDetailModelList(),new ArrayList<StdVersionModel>(),StdVersionModel.class);
-            }
             return envelopStr;
         } catch (Exception ex) {
             LogService.getLogger(StdVersionController.class).error(ex.getMessage());
@@ -142,7 +141,7 @@ public class StdVersionController extends BaseUIController {
         params.put("userLoginCode",userLoginCode);
         try{
             String envelopStr = HttpClientUtil.doPost(comUrl+url,params,username,password);
-            //TODO 新增成功单无法返回数据（会报超时异常，微服务操作过程中的重启）
+            // 新增成功单无法返回数据（会报超时异常，微服务操作过程中的重启）
             return envelopStr;
         }catch (Exception ex){
             LogService.getLogger(StdVersionController.class).error(ex.getMessage());

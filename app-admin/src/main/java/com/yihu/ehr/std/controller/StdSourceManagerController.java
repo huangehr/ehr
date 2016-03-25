@@ -241,4 +241,35 @@ public class StdSourceManagerController extends BaseUIController {
         result.setDetailModelList(versions);
         return result.toJson();*/
     }
+
+    /**
+     * 通用的用于下拉列表框(获取所有标准来源)
+     * @return
+     */
+    @RequestMapping("getStdSourceList")
+    @ResponseBody
+    public Object getStdSourceList() {
+        Envelop envelop = new Envelop();
+        String url = "/sources";
+        try{
+            Map<String,Object> params = new HashMap<>();
+            params.put("fields","");
+            params.put("filters","");
+            params.put("sorts","");
+            params.put("page",1);
+            params.put("size",999);
+            String envelopStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+            if(StringUtils.isEmpty(envelopStr)){
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg(ErrorCode.GetStandardSourceFailed.toString());
+            }else{
+                return envelopStr;
+            }
+        }catch(Exception ex){
+            LogService.getLogger(StdSourceManagerController.class).error(ex.getMessage());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+        }
+        return envelop;
+    }
 }

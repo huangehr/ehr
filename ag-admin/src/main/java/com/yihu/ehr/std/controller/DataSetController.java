@@ -57,7 +57,7 @@ public class DataSetController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = "/data_set", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/data_set/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据集信息")
     public Envelop deleteDataSet(
             @ApiParam(name = "id", value = "数据集编号", defaultValue = "")
@@ -76,7 +76,7 @@ public class DataSetController extends BaseController {
         return success(null);
     }
 
-    @RequestMapping(value = "/data_set", method = RequestMethod.GET)
+    @RequestMapping(value = "/data_set/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "获取数据集信息")
     public Envelop getDataSet(
             @ApiParam(name = "id", value = "数据集编号", defaultValue = "")
@@ -248,8 +248,8 @@ public class DataSetController extends BaseController {
             boolean isExist = dataSetClient.validateInnerCode(version, metaDataModel.getDataSetId(), metaDataModel.getInnerCode());
             MStdMetaData mStdMetaData = convertToModel(metaDataModel, MStdMetaData.class);
             if (metaDataModel.getId() > 0) {
-                mStdMetaData = dataSetClient.getMetaData( metaDataModel.getId(),version);
-                if(!metaDataModel.getInnerCode().equals(metaDataModel.getInnerCode())
+                MStdMetaData mStdMetaDataGet = dataSetClient.getMetaData( metaDataModel.getId(),version);
+                if(!mStdMetaDataGet.getInnerCode().equals(metaDataModel.getInnerCode())
                         && isExist)
                 {
                     return failed("代码已存在!");

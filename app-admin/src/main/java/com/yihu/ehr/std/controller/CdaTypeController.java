@@ -79,9 +79,8 @@ public class CdaTypeController extends BaseUIController{
     @RequestMapping("GetCdaTypeListByKey")
     @ResponseBody
     public Object GetCdaTypeListByKey(String strKey, Integer page, Integer rows) {
-        // TODO  未使用
         Envelop result = new Envelop();
-        String url = "/cdaType/***********";
+        String url = "/cda_type/cda_types/patient_ids/key";
         try{
             Map<String,Object> params = new HashMap<>();
             params.put("strKey",strKey);
@@ -101,31 +100,6 @@ public class CdaTypeController extends BaseUIController{
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
         return result;
-
-        /*Result result = new Result();
-        try {
-            Map<String, Object> mapKey = new HashMap<>();
-            mapKey.put("key", strKey);
-            mapKey.put("page", page);
-            mapKey.put("rows", rows);
-            List<XCDAType> listType = xcdaTypeManager.getCDATypeListByKey(mapKey);
-            if (listType == null) {
-                result.setSuccessFlg(false);
-                result.setErrorMsg("数据获取失败!");
-                return result;
-            }
-            List<CDATypeForInterface> listInfo = getTypeForInterface(listType);
-            if(rows<=0)
-            {
-                rows=1;
-            }
-            result = getResult(listInfo, 1, page, rows);
-        } catch (Exception ex) {
-            LogService.getLogger(CdaTypeController_w.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg("系统错误，请联系管理员!");
-        }
-        return result;*/
     }
 
     @RequestMapping("getCdaTypeById")
@@ -142,21 +116,6 @@ public class CdaTypeController extends BaseUIController{
             envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
         return envelop;
-
-       /* Result result = new Result();
-        result.setSuccessFlg(false);
-        try {
-            List<XCDAType> listType = xcdaTypeManager.getCdatypeInfoByIds(strIds);
-            if (listType.size() > 0) {
-                result.setSuccessFlg(true);
-                List<CDATypeForInterface> listInfo = getTypeForInterface(listType);
-                result.setObj(listInfo.get(0));
-            }
-        } catch (Exception ex) {
-            LogService.getLogger(CdaController.class).error(ex.getMessage());
-            result.setErrorMsg("系统错误，请联系管理员!");
-        }
-        return result;*/
     }
 
     @RequestMapping("delteCdaTypeInfo")
@@ -269,9 +228,9 @@ public class CdaTypeController extends BaseUIController{
             modelForUpdate.setParentId(detailModel.getParentId());
             modelForUpdate.setUpdateUser(createUser);
             String typeJson = objectMapper.writeValueAsString(modelForUpdate);
-            params.put("typeJson", typeJson);
+            params.put("jsonData", typeJson);
 
-            String envelopStrUpdate = HttpClientUtil.doPost(comUrl+url,params,username,password);
+            String envelopStrUpdate = HttpClientUtil.doPut(comUrl + url, params, username, password);
             return envelopStrUpdate;
         } catch (Exception ex){
             LogService.getLogger(CdaTypeController.class).error(ex.getMessage());
@@ -290,13 +249,31 @@ public class CdaTypeController extends BaseUIController{
      */
     @RequestMapping("getParentType")
     @ResponseBody
-    public String getParentType(String strId, String key) {
+    public String getAsParentType(String strId, String key) {
         //TODO 待网关提供接口
-        String url = "/cda_types/patient_ids/key";
+//        String url = "/cda_types/patient_ids/key";
+//        String strResult = "";
+//        try{
+//            Map<String,Object> params = new HashMap<>();
+//            params.put("patient_ids",strId);
+//            params.put("key",key);
+//            String envelopStr = HttpClientUtil.doGet(comUrl+url,params,username,password);
+//            Envelop envelop = objectMapper.readValue(envelopStr,Envelop.class);
+//            if (envelop.isSuccessFlg()) {
+//                List<CdaTypeModel> cdaModelList = (List<CdaTypeModel>) getEnvelopList(envelop.getDetailModelList(), new ArrayList<CdaTypeModel>(), CdaTypeModel.class);
+//                strResult = objectMapper.writeValueAsString(cdaModelList);
+//            }
+//        }catch(Exception ex){
+//            LogService.getLogger(CdaTypeController.class).error(ex.getMessage());
+//        }
+//        return strResult;
+
+        // ***临时使用***
+        String url = "/cda_types/as_parent_type";
         String strResult = "";
         try{
             Map<String,Object> params = new HashMap<>();
-            params.put("patient_ids",strId);
+            params.put("id",strId);
             params.put("key",key);
             String envelopStr = HttpClientUtil.doGet(comUrl+url,params,username,password);
             Envelop envelop = objectMapper.readValue(envelopStr,Envelop.class);

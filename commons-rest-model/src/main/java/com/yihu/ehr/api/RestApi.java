@@ -77,7 +77,7 @@ public class RestApi {
         public static final String Types                            = "/std/types";
         public static final String Type                             = "/std/types/{id}";
         public static final String TypesCodeExistence               = "/std/type/code/existence";
-        public static final String TypeChildren                     = "/std/types/{id}/childrens";
+        public static final String TypeChildren                     = "/std/types/parent_id/childrens";
         public static final String TypesChildren                    = "/std/types/childrens";
         public static final String TypeOther                        = "/std/types/{id}/other";
 
