@@ -176,6 +176,17 @@ public class CdaTypeController extends BaseRestController {
         return cdaTypeManager.deleteCdaType(childrenIds);
     }
 
+    @RequestMapping(value = RestApi.Standards.TypeOther, method = RequestMethod.GET)
+    @ApiOperation(value = "获取cdaType列表（不包含本身）")
+    public List<MCDAType> getOtherCDAType(
+            @ApiParam(name = "id", value = "cdaType编号")
+            @PathVariable(value = "id") String id) throws Exception {
+        List<CDAType> listType = cdaTypeManager.getOtherCDAType(id);
+        return (List<MCDAType>)convertToModels(listType,new ArrayList<MCDAType>(listType.size()),MCDAType.class,"");
+    }
+
+
+
     /**
      * 根据父级类别获取父级类别所在以下所有子集类别（包括当前父级列表）
      * @param parentTypes 父级信息
