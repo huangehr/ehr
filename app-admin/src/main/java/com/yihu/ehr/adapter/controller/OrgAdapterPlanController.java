@@ -36,11 +36,6 @@ public class OrgAdapterPlanController extends ExtendController<OrgAdapterPlanSer
 
     /**
      * 跳转至定制页面
-     *
-     * @param model
-     * @param planId
-     * @param version
-     * @return
      */
     @RequestMapping("/getAdapterCustomize")
     public Object getAdapterCustomize(Model model, Long planId, String version) {
@@ -63,11 +58,6 @@ public class OrgAdapterPlanController extends ExtendController<OrgAdapterPlanSer
 
     /**
      * 定制数据集
-     * 2015-12-31  定制速度优化以及添加事务控制 by lincl
-     *
-     * @param planId
-     * @param customizeData
-     * @return
      */
     @RequestMapping("/adapterDataSet")
     @ResponseBody
@@ -75,13 +65,14 @@ public class OrgAdapterPlanController extends ExtendController<OrgAdapterPlanSer
 
         try {
             customizeData = customizeData.replace("DataSet", "").replace("MetaData", "");
-            String url = "/adapter/plan/adapterDataSet/" + planId;
+            String url = "http://localhost:10000/api/v1.0/adapter/plan/adapterDataSet" ;
             String resultStr = "";
             Envelop result = new Envelop();
             Map<String, Object> params = new HashMap<>();
             params.put("customizeData", customizeData);
+            params.put("planId", planId);
 
-            resultStr = HttpClientUtil.doPost(service.comUrl + url, params, service.username, service.password);
+            resultStr = service.doLargePost(url, params);
 //            RestTemplate template = new RestTemplate();
 //            Map<String,Object> conditionMap = new HashMap<>();
 //            conditionMap.put("customizeData", toJson(customizeData));

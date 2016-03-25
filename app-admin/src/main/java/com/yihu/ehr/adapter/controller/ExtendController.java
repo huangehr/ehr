@@ -254,6 +254,11 @@ public class ExtendController<T extends ExtendService> extends BaseUIController 
         return faild(ErrorCode.SystemError.toString());
     }
 
+    public Envelop pramsError(){
+
+        return faild("参数出错！");
+    }
+
     public Envelop faild(String msg){
         Envelop result = new Envelop();
         result.setSuccessFlg(false);

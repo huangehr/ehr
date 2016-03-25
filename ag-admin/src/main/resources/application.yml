@@ -9,6 +9,25 @@ info:
     name: AgAdminService
     description: EHR platform json app service.
     version: 1.0.0
+  component: Zuul Server
+
+hystrix:
+  command:
+    default:
+      execution:
+#        timeout:
+#          enabled: false
+        isolation:
+          thread:
+            timeoutInMilliseconds: 30000
+ribbon:
+  ReadTimeout: 30000
+  ConnectTimeout: 6000
+
+zuul:
+  ignored-services: "*"
+  routes:
+    svr-adaption: /api/v1.0/adapter/plan/adapterDataSet
 
 ---
 spring:
