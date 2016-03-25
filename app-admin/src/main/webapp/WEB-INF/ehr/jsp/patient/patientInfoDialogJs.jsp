@@ -112,7 +112,7 @@
                         homeAddressInfo: homeAddressInfo&&[homeAddressInfo.province,homeAddressInfo.city,homeAddressInfo.district,homeAddressInfo.street] ,
                         workAddressInfo: workAddressInfo&&[workAddressInfo.province,workAddressInfo.city,workAddressInfo.district,workAddressInfo.street],
                         residenceType: patientModel.residenceType,
-                        telphoneNo: patientModel.telphoneNo,
+                        telephoneNo: patientModel.telephoneNo,
                         email: patientModel.email
                     });
                     self.$patientCopyId.val(patientModel.idCardNo);

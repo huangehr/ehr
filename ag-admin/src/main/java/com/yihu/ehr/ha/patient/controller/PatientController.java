@@ -89,14 +89,13 @@ public class PatientController extends BaseController {
                 patient.setGender(dict == null ? "" : dict.getValue());
             }
             //联系电话
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, String> telphoneNo;
+            Map<String, String> telephoneNo;
             String tag="联系电话";
-            telphoneNo = mapper.readValue(patient.getTelphoneNo(), Map.class);
-            if (telphoneNo != null && telphoneNo.containsKey(tag)) {
-                patient.setTelphoneNo(telphoneNo.get(tag));
+            telephoneNo = objectMapper.readValue(patient.getTelephoneNo(), Map.class);
+            if (telephoneNo != null && telephoneNo.containsKey(tag)) {
+                patient.setTelephoneNo(telephoneNo.get(tag));
             } else {
-                patient.setTelphoneNo(null);
+                patient.setTelephoneNo(null);
             }
 
             patients.add(patient);
@@ -370,10 +369,10 @@ public class PatientController extends BaseController {
 
         //联系电话
         String tag = "联系电话";
-        Map<String, String> telphoneNo = objectMapper.readValue(detailModel.getTelephoneNo(), Map.class);
+        Map<String, String> telephoneNo = objectMapper.readValue(detailModel.getTelephoneNo(), Map.class);
         detailModel.setTelephoneNo(null);
-        if (telphoneNo != null && telphoneNo.containsKey(tag)) {
-            detailModel.setTelephoneNo(telphoneNo.get(tag));
+        if (telephoneNo != null && telephoneNo.containsKey(tag)) {
+            detailModel.setTelephoneNo(telephoneNo.get(tag));
         }
 
         return detailModel;

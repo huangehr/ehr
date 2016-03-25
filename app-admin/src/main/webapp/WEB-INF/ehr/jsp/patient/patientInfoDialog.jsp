@@ -97,7 +97,7 @@
             <label>联系方式：</label>
 
             <div class="l-text-wrapper m-form-control essential">
-                <input type="text" id="inp_patientTel" class="required useTitle validate-mobile-phone"  required-title=<spring:message code="lbl.must.input"/> validate-mobile-phone-title="请输入正确的手机号码" data-attr-scan="telphoneNo"/>
+                <input type="text" id="inp_patientTel" class="required useTitle validate-mobile-phone"  required-title=<spring:message code="lbl.must.input"/> validate-mobile-phone-title="请输入正确的手机号码" data-attr-scan="telephoneNo"/>
             </div>
         </div>
         <div class="m-form-group">

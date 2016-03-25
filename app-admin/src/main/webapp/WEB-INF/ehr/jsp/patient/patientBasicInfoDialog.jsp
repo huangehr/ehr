@@ -90,7 +90,7 @@
         <label>联系方式：</label>
 
         <div class="l-text-wrapper m-form-control">
-            <input type="text" id="inp_patientTel" class="required useTitle" data-attr-scan="tel"/>
+            <input type="text" id="inp_patientTel" class="required useTitle" data-attr-scan="telephoneNo"/>
         </div>
     </div>
     <div class="m-form-group">
