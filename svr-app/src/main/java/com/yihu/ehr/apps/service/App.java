@@ -134,7 +134,7 @@ public class    App {
         List<String> list = new ArrayList<>();
         if(org.springframework.util.StringUtils.isEmpty(tags)){
         }else {
-            String[] arr = tags.split("  ");
+            String[] arr = tags.split(",");
             list = Arrays.asList(arr);
         }
         return list;

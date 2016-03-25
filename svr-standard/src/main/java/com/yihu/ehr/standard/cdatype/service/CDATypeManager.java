@@ -22,8 +22,10 @@ import java.util.Map;
 @Service
 public class CDATypeManager extends BaseJpaService<CDAType, XcdaTypeRepository>{
 
+    @Autowired
+    private XcdaTypeRepository cdaTypeRepository;
 
-   public XcdaTypeRepository getXcdaTypeRepository(){
+    public XcdaTypeRepository getXcdaTypeRepository(){
        return (XcdaTypeRepository) getRepository();
    }
 
@@ -155,4 +157,8 @@ public class CDATypeManager extends BaseJpaService<CDAType, XcdaTypeRepository>{
     }
 
 
+    public List<CDAType> getOtherCDAType(String id) {
+        List<CDAType> list = cdaTypeRepository.getOtherCDAType(id);
+        return list;
+    }
 }
