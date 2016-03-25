@@ -291,4 +291,39 @@ public class PatientController extends BaseRestController {
         return demographicService.getDemographicInfo(new DemographicId(idCardNo)) != null;
     }
 
+
+    /**
+     * 人口信息头像图片上传
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     */
+    @RequestMapping(value = "/populations/picture",method = RequestMethod.POST)
+    @ApiOperation(value = "人口信息头像图片上传")
+    public String webupload(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        request.setCharacterEncoding("UTF-8");
+        InputStream inputStearm = request.getInputStream();
+        String fileName = (String) request.getParameter("name");
+        if(fileName == null){
+            return null;
+        }
+        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+        String description = null;
+        if ((fileName != null) && (fileName.length() > 0)) {
+            int dot = fileName.lastIndexOf('.');
+            if ((dot > -1) && (dot < (fileName.length()))) {
+                description = fileName.substring(0, dot);
+            }
+        }
+        ObjectNode objectNode;
+        objectNode = fastDFSUtil.upload(inputStearm, fileExtension, description);
+        String groupName = objectNode.get("groupName").toString();
+        String remoteFileName = objectNode.get("remoteFileName").toString();
+        String path  = "{groupName:" + groupName + ",remoteFileName:" + remoteFileName + "}";
+        //返回文件路径
+        return path;
+    }
+
+
 }

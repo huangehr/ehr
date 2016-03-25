@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -130,14 +131,13 @@ public class    App {
 
     @Column(name = "tags",  nullable = true)
     public List<String> getTags() {
+        List<String> list = new ArrayList<>();
         if(org.springframework.util.StringUtils.isEmpty(tags)){
-            return null;
         }else {
             String[] arr = tags.split("  ");
-            List<String> list = Arrays.asList(arr);
-            return list;
+            list = Arrays.asList(arr);
         }
-
+        return list;
     }
     public void setTags(List<String> tags) {
         if(tags.size()>0){
