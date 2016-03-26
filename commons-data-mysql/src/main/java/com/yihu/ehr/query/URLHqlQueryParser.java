@@ -139,9 +139,9 @@ public class URLHqlQueryParser<T> {
             String group = null;
             if (tokens.length == 2) group = tokens[1];
 
-            Criterion criterion = splitFilter(filterArray[i], classMetadata);
+            Criterion criterion = splitFilter(tokens[0], classMetadata);
 
-            if (group != null)
+            if (group == null)
                 group = Integer.toString(i);
 
             criterionMap.put(group,
@@ -175,7 +175,7 @@ public class URLHqlQueryParser<T> {
         Criterion criterion = null;
         if (filter.contains("?")) {
             Pair<Property, Object> pair = getPair(filter, "[?]", classMetadata);
-            criterion = pair.getKey().like(pair.getValue());
+            criterion = pair.getKey().like("%"+pair.getValue()+"%");
         } else if (filter.contains(">")) {
             Pair<Property, Object> pair = getPair(filter, ">", classMetadata);
             //todo:  转成对应类型
