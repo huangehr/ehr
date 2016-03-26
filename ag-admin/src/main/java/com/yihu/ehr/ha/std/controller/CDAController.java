@@ -133,9 +133,9 @@ public class CDAController extends BaseController{
     @ApiOperation(value = "删除CDADocuments")
     public Envelop deleteCdaInfo(
             @ApiParam(name = "cdaId", value = "cdaID")
-            @PathVariable(value = "cdaId") String cdaId,
+            @RequestParam(value = "cdaId") String cdaId,
             @ApiParam(name = "versionCode", value = "标准版本代码")
-            @PathVariable(value = "versionCode") String versionCode) {
+            @RequestParam(value = "versionCode") String versionCode) {
 
         Envelop envelop = new Envelop();
 

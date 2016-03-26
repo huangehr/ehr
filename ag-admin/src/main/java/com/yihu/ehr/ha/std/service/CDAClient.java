@@ -26,8 +26,8 @@ public interface CDAClient {
     @RequestMapping(value = RestApi.Standards.Documents ,method = RequestMethod.GET)
     @ApiOperation(value = "根据条件获取cda列表")
     ResponseEntity<List<MCDADocument>> GetCDADocuments(
-            @ApiParam(name = "version_code", value = "版本号")
-            @RequestParam(value = "version_code") String versionCode,
+            @ApiParam(name = "version", value = "版本号")
+            @RequestParam(value = "version") String versionCode,
             @ApiParam(name = "code", value = "code")
             @RequestParam(value = "code") String code,
             @ApiParam(name = "name", value = "name")
