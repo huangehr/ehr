@@ -570,7 +570,7 @@ set.elementAttr = {
         $("#hdId").val(elementId);
         var setid = $.Util.getUrlQueryString('setid');
         $("#hdsetid").val(setid);
-        //this.getDictList();
+        this.getDictList();
         this.getElementInfo();
     },
     getDictList: function (initValue, initText) {
@@ -626,8 +626,8 @@ set.elementAttr = {
                     $("#metaDataCodeCopy").val(info.innerCode);
                     $("#fieldNameCopy").val(info.columnName);
                     $("#datatype").val(info.columnType);
-                    //set.elementAttr.dict_select.setValue(info[0].dictId);
-                    //set.elementAttr.getDictList(info.dictId, info.dictName);
+                    set.elementAttr.dict_select.setValue(info.dictId);
+                    set.elementAttr.getDictList(info.dictId, info.dictName);
                     $("#primaryKey").attr('checked', false);
                     if (info.primaryKey == "1") {
                         $("#primaryKey").attr('checked', true);
@@ -664,8 +664,8 @@ set.elementAttr = {
         dataJson[0]["dataSetId"] = setId;
 
 
-        //var dictId = set.elementAttr.dict_select.getValue();
-        //dataJson[0]["dictId"] = dictId;
+        var dictId = set.elementAttr.dict_select.getValue();
+        dataJson[0]["dictId"] = dictId;
 
         var columnType = $("#datatype").val();
         dataJson[0]["columnType"] = columnType;

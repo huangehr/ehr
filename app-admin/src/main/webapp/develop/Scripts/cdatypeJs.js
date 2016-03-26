@@ -243,7 +243,7 @@ cdaType.attr = {
     },
     getParentType: function (initValue, initText) {
         cdaType.attr.parent_select = $("#ipt_select").ligerComboBox({
-            url: cdaType.list._url + "/cdatype/getParentType?strId=" + $("#hdId").val(),
+            url: cdaType.list._url + "/cdatype/getOtherCDAType?strId=" + $("#hdId").val(),
             valueField: 'id',
             textField: 'name',
             selectBoxWidth: 240,

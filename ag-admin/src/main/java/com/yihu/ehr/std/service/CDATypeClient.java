@@ -94,4 +94,12 @@ public interface CDATypeClient {
 
     @RequestMapping(value = RestApi.Standards.TypeOther, method = RequestMethod.GET)
     List<MCDAType> getOtherCDAType(@RequestParam(value = "id") String id);
+
+    @RequestMapping(value = RestApi.Standards.TypeList, method = RequestMethod.GET)
+    @ApiOperation(value = "标准类别分页搜索")
+    List<MCDAType> getCdaTypeList(@ApiParam(name = "code", value = "code")
+                                  @RequestParam(value = "code") String code,
+                                  @ApiParam(name = "name", value = "name")
+                                  @RequestParam(value = "name") String name);
+
 }
