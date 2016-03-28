@@ -39,8 +39,10 @@ public class BaseRestController extends AbstractController {
 
     @Value("${deploy.region}")
     Short deployRegion = 3502;
+
     @Autowired
     protected EntityManager entityManager;
+
     @Autowired
     ObjectMapper objectMapper;
 

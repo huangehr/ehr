@@ -1,8 +1,9 @@
 package com.yihu.ehr.persist;
 
+import com.yihu.ehr.cache.CacheReader;
 import com.yihu.ehr.profile.SimpleDataSetResolver;
-import com.yihu.ehr.schema.StdObjectQualifierTranslator;
-import com.yihu.ehr.schema.StdRedisCacheAccessor;
+import com.yihu.ehr.profile.StdObjectQualifierTranslator;
+import com.yihu.ehr.schema.StdKeySchema;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,10 @@ import java.util.regex.Matcher;
 @Component
 public class DataSetResolverWithChecker extends SimpleDataSetResolver {
     @Autowired
-    StdRedisCacheAccessor redisCache;
+    CacheReader cacheReader;
+
+    @Autowired
+    StdKeySchema keySchema;
 
     /**
      * 翻译数据元。
@@ -39,8 +43,8 @@ public class DataSetResolverWithChecker extends SimpleDataSetResolver {
                                            boolean isOriginDataSet) {
         if (StringUtils.isEmpty(actualData)) return null;
 
-        String type = redisCache.getMetaDataType(innerVersion, dataSetCode, metaDataInnerCode);
-        if (StringUtils.isEmpty(type)) {
+        String typeKey = cacheReader.read(keySchema.metaDataType(innerVersion, dataSetCode, metaDataInnerCode));
+        if (StringUtils.isEmpty(typeKey)) {
             String msg = "Meta data %1 of data set %2 is NOT found in version %3. Please check the meta data."
                     .replace("%1", metaDataInnerCode)
                     .replace("%2", dataSetCode)
@@ -53,22 +57,22 @@ public class DataSetResolverWithChecker extends SimpleDataSetResolver {
         actualData = actualData.trim();
 
         // 仅对标准化数据集及有关联字典的数据元进行翻译
-        long dictId = redisCache.getMetaDataDict(innerVersion, dataSetCode, metaDataInnerCode);
+        long dictId = cacheReader.read(keySchema.metaDataDict(innerVersion, dataSetCode, metaDataInnerCode));
         if (!isOriginDataSet && StringUtils.isNotEmpty(actualData) && dictId > 0) {
             String[] tempQualifiers = StdObjectQualifierTranslator.splitInnerCodeAsCodeValue(metaDataInnerCode);
 
-            String codeQualifier = StdObjectQualifierTranslator.toHBaseQualifier(tempQualifiers[0], type);
-            String valueQualifier = StdObjectQualifierTranslator.toHBaseQualifier(tempQualifiers[1], type);
+            String codeQualifier = StdObjectQualifierTranslator.toHBaseQualifier(tempQualifiers[0], typeKey);
+            String valueQualifier = StdObjectQualifierTranslator.toHBaseQualifier(tempQualifiers[1], typeKey);
 
-            String value = redisCache.getDictEntryValue(innerVersion, dictId, actualData);
+            String value = cacheReader.read(keySchema.dictEntryValue(innerVersion, Long.toString(dictId), actualData));
 
             return new String[]{codeQualifier, actualData, valueQualifier, value == null ? "" : value};
         } else {
-            if (type.equals("D")) {
+            if (typeKey.equals("D")) {
                 actualData = actualData.length() <= 10 ? actualData : actualData.substring(0, actualData.lastIndexOf(' ')) + " 00:00:00";
-            } else if (type.equals("DT")) {
+            } else if (typeKey.equals("DT")) {
                 actualData = actualData.contains(".") ? actualData.substring(0, actualData.lastIndexOf('.')) : actualData;
-            } else if (type.equals("N")) {
+            } else if (typeKey.equals("N")) {
                 Matcher matcher = NumberPattern.matcher(actualData);
                 if (matcher.find()) {
                     actualData = matcher.group();
@@ -77,7 +81,7 @@ public class DataSetResolverWithChecker extends SimpleDataSetResolver {
                 }
             }
 
-            return new String[]{StdObjectQualifierTranslator.toHBaseQualifier(metaDataInnerCode, type), actualData};
+            return new String[]{StdObjectQualifierTranslator.toHBaseQualifier(metaDataInnerCode, typeKey), actualData};
         }
     }
 }

@@ -206,6 +206,7 @@
         <module>../commons-data-mysql</module>
         <module>../commons-data-redis</module>
         <module>../commons-data-solr</module>
+        <module>../commons-redis-cache</module>
         <module>../commons-profile-core</module>
         <module>../commons-profile-persist</module>
         <module>../commons-thrift-services</module>

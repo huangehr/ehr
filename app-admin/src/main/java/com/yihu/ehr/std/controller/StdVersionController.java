@@ -3,7 +3,6 @@ package com.yihu.ehr.std.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.standardversion.StdVersionModel;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.constants.RestAPI;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
@@ -22,7 +21,6 @@ import java.util.*;
  * Created by yww on 2016/3/17.
  */
 @RequestMapping("/cdaVersion")
-@Controller(RestAPI.CdaVersionController)
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
 public class StdVersionController extends BaseUIController {
     @Value("${service-gateway.username}")

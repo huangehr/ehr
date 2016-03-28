@@ -11,6 +11,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @created 2015.09.09 15:04
  */
 public class RestApi {
+    public static class Caches{
+        public static final String Organizations                   = "/caches/organizations";
+        public static final String Organization                    = "/caches/organizations/{org_code}";
+        public static final String Standards                       = "/caches/standards";
+    }
+
     public static class Adaptions{
     }
 
@@ -40,9 +46,10 @@ public class RestApi {
 
     public static class Packages{
         public static final String Packages                         = "/packages";
-        public static final String LegacyPackages                   = "/json_package";
         public static final String Package                          = "/packages/{id}";
         public static final String PackageDownloads                 = "/packages/{id}/downloads";
+
+        public static final String LegacyPackages                   = "/json_package";
     }
 
     public static class Patients{

@@ -1,7 +1,6 @@
 package com.yihu.ehr.adapter.controller;
 
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.constants.RestAPI;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
@@ -21,7 +20,6 @@ import java.util.Map;
  * Created by Administrator on 2015/8/12.
  */
 @RequestMapping("/orgdict")
-@Controller(RestAPI.OrgDictController)
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
 public class OrgDictController {
 

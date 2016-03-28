@@ -1,7 +1,6 @@
 package com.yihu.ehr.std.controller;
 
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.constants.RestAPI;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
@@ -23,7 +22,6 @@ import java.util.Map;
  * Created by Administrator on 2015/8/12.
  */
 @RequestMapping("/cdadict")
-@Controller(RestAPI.DictManagerController)
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
 public class DictController {
     @Value("${service-gateway.username}")

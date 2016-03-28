@@ -45,8 +45,8 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "json_package_service", description = "档案数据包服务")
-public class JsonPackageEndPoint extends BaseRestController {
+@Api(protocols = "https", value = "package_service", description = "档案包服务")
+public class PackageEndPoint extends BaseRestController {
     @Autowired
     private SecurityClient securityClient;
 
@@ -82,36 +82,6 @@ public class JsonPackageEndPoint extends BaseRestController {
 
         return convertToModels(jsonPackageList, new ArrayList<>(jsonPackageList.size()), MPackage.class, null);
     }
-
-    /**
-     * 接收档案包(兼容旧接口)
-     *
-     * @param packageCrypto zip密码密文, file 请求体中文件参数名
-     */
-    @RequestMapping(value = RestApi.Packages.LegacyPackages, method = RequestMethod.POST)
-    @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
-    @Deprecated
-    public void savePackageWithUser(
-            @ApiParam(required = true, name = "package", value = "档案包", allowMultiple = true)
-            MultipartHttpServletRequest jsonPackage,
-            @ApiParam(required = true, name = "user_name", value = "用户名")
-            @RequestParam(value = "user_name") String userName,
-            @ApiParam(required = true, name = "package_crypto", value = "档案包解压密码,二次加密")
-            @RequestParam(value = "package_crypto") String packageCrypto,
-            @ApiParam(required = true, name = "md5", value = "档案包MD5")
-            @RequestParam(value = "md5") String md5) throws Exception {
-
-        if (jsonPackage.getFile("file")==null) throw new ApiException(ErrorCode.MissParameter, "file");
-        MultipartFile multipartFile = jsonPackage.getFile("file");
-        byte[] bytes = multipartFile.getBytes();
-        MUser user = userClient.getUserByUserName(userName);
-        MKey key = securityClient.getUserKey(user.getId());
-        String privateKey = key.getPrivateKey();
-        if (null == privateKey) throw new ApiException(ErrorCode.GenerateUserKeyFailed);
-        String unzipPwd = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
-        jsonPackageService.receive(new ByteArrayInputStream(bytes), unzipPwd);
-    }
-
 
     /**
      * 接收档案包。
@@ -201,5 +171,34 @@ public class JsonPackageEndPoint extends BaseRestController {
         }
 
         return null;
+    }
+
+    /**
+     * 接收档案包(兼容旧接口)
+     *
+     * @param packageCrypto zip密码密文, file 请求体中文件参数名
+     */
+    @RequestMapping(value = RestApi.Packages.LegacyPackages, method = RequestMethod.POST)
+    @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
+    @Deprecated
+    public void savePackageWithUser(
+            @ApiParam(required = true, name = "package", value = "档案包", allowMultiple = true)
+                    MultipartHttpServletRequest jsonPackage,
+            @ApiParam(required = true, name = "user_name", value = "用户名")
+            @RequestParam(value = "user_name") String userName,
+            @ApiParam(required = true, name = "package_crypto", value = "档案包解压密码,二次加密")
+            @RequestParam(value = "package_crypto") String packageCrypto,
+            @ApiParam(required = true, name = "md5", value = "档案包MD5")
+            @RequestParam(value = "md5") String md5) throws Exception {
+
+        if (jsonPackage.getFile("file")==null) throw new ApiException(ErrorCode.MissParameter, "file");
+        MultipartFile multipartFile = jsonPackage.getFile("file");
+        byte[] bytes = multipartFile.getBytes();
+        MUser user = userClient.getUserByUserName(userName);
+        MKey key = securityClient.getUserKey(user.getId());
+        String privateKey = key.getPrivateKey();
+        if (null == privateKey) throw new ApiException(ErrorCode.GenerateUserKeyFailed);
+        String unzipPwd = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
+        jsonPackageService.receive(new ByteArrayInputStream(bytes), unzipPwd);
     }
 }

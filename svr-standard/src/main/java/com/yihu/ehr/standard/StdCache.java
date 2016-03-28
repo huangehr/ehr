@@ -1,18 +1,16 @@
-package com.yihu.ehr.cache;
+package com.yihu.ehr.standard;
 
+import com.yihu.ehr.config.StdSessionFactoryBean;
+import com.yihu.ehr.redis.RedisClient;
 import com.yihu.ehr.schema.StdKeySchema;
-import com.yihu.ehr.schema.XKeySchema;
 import com.yihu.ehr.standard.version.service.CDAVersion;
 import com.yihu.ehr.standard.version.service.CDAVersionService;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 
 /**
@@ -26,30 +24,20 @@ import java.util.List;
  */
 @Component
 public class StdCache {
-    XKeySchema keySchema;
 
     static String DataSetQuery = "SELECT code, name FROM data.set.table";
     static String MetaDataQuery = "SELECT a.code AS data_set_code, b.inner_code, b.type, b.dict_id FROM data.set.table a, " +
             "meta.data.table b WHERE a.id = b.dataset_id";
     static String DictEntryQuery = "SELECT t.dict_id, t.code, t.value FROM dict.entry.table t";
 
-    //@Autowired
-    //StdKeySchema keySchema;
+    @Autowired
+    RedisClient redisClient;
 
     @Autowired
-    RedisTemplate<String, String> redisTemplate;
-
-    @Value("${redis-key-schema.std.}")
-    private String DataSetTable = "std_data_set_";
-
-    @Value("${redis-key-schema.std.}")
-    private String MetaDataTable = "std_meta_data_";
-
-    @Value("${redis-key-schema.std.}")
-    private String DictEntryTable = "std_dictionary_entry_";
+    StdKeySchema keySchema;
 
     @Autowired
-    EntityManager entityManager;
+    protected StdSessionFactoryBean localSessionFactoryBean;
 
     @Autowired
     CDAVersionService versionService;
@@ -59,18 +47,16 @@ public class StdCache {
      *
      * @param version 内部版本号
      */
-    public void loadStdData(String version, boolean force) {
-        String versionKey = keySchema.makeKey(version);
-        if (force) {
-            redisTemplate.opsForHash().get(versionKey, versionKey.hashCode());
-        }
-
-        Session session = entityManager.unwrap(Session.class);
+    public void cacheData(String version) {
+        Session session = openSession();
         try {
+            CDAVersion cdaVersion = versionService.getVersion(version);
+            String versionName = keySchema.versionName(version);
+
             String dataSetTable = CDAVersionUtil.getDataSetTableName(version);
             String metaDataTable = CDAVersionUtil.getMetaDataTableName(version);
             String dictEntryTable = CDAVersionUtil.getDictEntryTableName(version);
-            Query query = null;
+            Query query;
 
             // 缓存数据元
             {
@@ -85,8 +71,8 @@ public class StdCache {
                     String metaDataTypeKey = keySchema.metaDataType(version, dataSetCode, innerCode);
                     String metaDataDictKey = keySchema.metaDataDict(version, dataSetCode, innerCode);
 
-                    redisTemplate.opsForHash().put(metaDataTypeKey, metaDataTypeKey.hashCode(), type);
-                    redisTemplate.opsForHash().put(metaDataDictKey, metaDataDictKey.hashCode(), dictId);
+                    redisClient.set(metaDataTypeKey, type);
+                    redisClient.set(metaDataDictKey, dictId);
                 }
             }
 
@@ -95,20 +81,19 @@ public class StdCache {
                 query = session.createSQLQuery(DictEntryQuery.replace("dict.entry.table", dictEntryTable));
                 List<Object[]> entryList = query.list();
                 for (Object[] record : entryList) {
-                    long dictId = (Integer) record[0];
+                    String dictId = record[0].toString();
                     String code = (String) record[1];
                     String value = (String) record[2];
 
                     String entryValueKey = keySchema.dictEntryValue(version, dictId, code);
-                    redisTemplate.opsForHash().put(entryValueKey, entryValueKey.hashCode(), value);
+                    redisClient.set(entryValueKey, value);
                 }
             }
 
-            redisTemplate.opsForHash().put(versionKey, versionKey.hashCode(), version);
+            redisClient.set(versionName, version);
         } finally {
-            session.close();
+            if(null != session) session.close();
         }
-
     }
 
     /**
@@ -117,12 +102,12 @@ public class StdCache {
      * @param version
      */
     public void clearStdData(String version) {
-        String versionKey = keySchema.versionName(version);
+        String versionName = keySchema.versionName(version);
 
-        redisTemplate.delete(versionKey);
-        redisTemplate.delete(DataSetTable + version + "*");
-        redisTemplate.delete(MetaDataTable + version + "*");
-        redisTemplate.delete(DictEntryTable + version + "*");
+        redisClient.delete(versionName);
+        redisClient.delete(keySchema.metaDataDict(version, "*", "*"));
+        redisClient.delete(keySchema.metaDataType(version, "*", "*"));
+        redisClient.delete(keySchema.dictEntryValue(version, "*", "*"));
     }
 
     /**
@@ -132,10 +117,14 @@ public class StdCache {
      */
     public void reloadStdCache(String version) {
         clearStdData(version);
-        loadStdData(version, true);
+        cacheData(version);
     }
 
     public boolean isCached(String version) {
-        return redisTemplate.hasKey(keySchema.versionName(version));
+        return redisClient.hasKey(keySchema.versionName(version));
+    }
+
+    private Session openSession(){
+        return localSessionFactoryBean.getObject().openSession();
     }
 }

@@ -2,7 +2,6 @@ package com.yihu.ehr.apps.controller;
 
 import com.yihu.ehr.agModel.app.AppDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.constants.RestAPI;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.RestTemplates;
@@ -26,7 +25,6 @@ import java.util.Map;
  * Created by Administrator on 2015/8/12.
  */
 @RequestMapping("/app")
-@Controller(RestAPI.AppManagerController)
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
 public class AppController extends BaseUIController {
     @Value("${service-gateway.username}")

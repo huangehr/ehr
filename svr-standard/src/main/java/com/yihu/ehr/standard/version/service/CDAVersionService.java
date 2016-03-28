@@ -32,6 +32,7 @@ public class CDAVersionService extends BaseJpaService<CDAVersion, XCDAVersionRep
 
     @Autowired
     StdSessionFactoryBean sessionFactory;
+
     /**
      * 创建一个阶段性版本. 参数中的版本不能处于编辑状态.
      *

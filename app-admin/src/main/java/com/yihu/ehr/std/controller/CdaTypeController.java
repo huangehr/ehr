@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeDetailModel;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeModel;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.constants.RestAPI;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
@@ -28,7 +27,6 @@ import java.util.Map;
  * Created by AndyCai on 2015/12/14.
  */
 @RequestMapping("/cdatype")
-@Controller(RestAPI.StandardCDATypeController)
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
 public class CdaTypeController extends BaseUIController{
     @Value("${service-gateway.username}")
