@@ -154,10 +154,10 @@
                         columns: [
                             {display: 'sort', name: 'sort', hide: true},
                             {display: 'catalog', name: 'catalog', hide: true},
-                            {display: '字典代码', name: 'code', width: '45%'},
+                            {display: '字典代码', name: 'code', width: '40%'},
                             {display: '值', name: 'value', width: '45%'},
                             {
-                                display: '操作', name: 'operator', width: '10%', render: function (row) {
+                                display: '操作', name: 'operator', width: '15%', render: function (row) {
                                 var html = '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}','{4}'])", "systemDictEntity:systemDictEntityInfoModifyDialog:update", row.code, row.value, row.sort, row.catalog) + '">修改</a>/' +
                                         '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "systemDictEntity:systemDictEntityInfoModifyDialog:delete", row.code) + '">删除</a> ';
                                 return html;
