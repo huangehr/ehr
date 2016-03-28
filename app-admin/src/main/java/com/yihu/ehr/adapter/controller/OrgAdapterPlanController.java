@@ -4,9 +4,12 @@ import com.yihu.ehr.adapter.service.OrgAdapterPlanService;
 import com.yihu.ehr.adapter.service.PageParms;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
+import com.yihu.ehr.util.RestTemplates;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -20,6 +23,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/adapter")
 public class OrgAdapterPlanController extends ExtendController<OrgAdapterPlanService> {
+
 
     public OrgAdapterPlanController() {
         this.init(
@@ -61,26 +65,20 @@ public class OrgAdapterPlanController extends ExtendController<OrgAdapterPlanSer
      */
     @RequestMapping("/adapterDataSet")
     @ResponseBody
-    public Object adapterDataSet(Long planId, String customizeData) {
+    public Object adapterDataSet(String planId, String customizeData) {
 
         try {
             customizeData = customizeData.replace("DataSet", "").replace("MetaData", "");
             String url = "http://localhost:10000/api/v1.0/adapter/plan/adapterDataSet" ;
             String resultStr = "";
             Envelop result = new Envelop();
-            Map<String, Object> params = new HashMap<>();
-            params.put("customizeData", customizeData);
-            params.put("planId", planId);
+            MultiValueMap<String,String> conditionMap = new LinkedMultiValueMap<String, String>();
+            conditionMap.add("customizeData", customizeData);
+            conditionMap.add("planId", planId);
 
-            resultStr = service.doLargePost(url, params);
-//            RestTemplate template = new RestTemplate();
-//            Map<String,Object> conditionMap = new HashMap<>();
-//            conditionMap.put("customizeData", toJson(customizeData));
-//            resultStr = template.postForObject(service.comUrl+url,conditionMap,String.class);
-//            RestTemplates template = new RestTemplates();
-//            MultiValueMap<String,String> conditionMap = new LinkedMultiValueMap<String, String>();
-//            conditionMap.add("customizeData", customizeData);
-//            resultStr = template.doPost(service.comUrl+url, conditionMap);
+            RestTemplates template = new RestTemplates();
+            resultStr = template.doPost(url, conditionMap);
+//            resultStr = service.doLargePost(url, params);
             if (Boolean.parseBoolean(resultStr)) {
                 result.setSuccessFlg(true);
             } else {
