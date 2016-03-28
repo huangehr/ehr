@@ -2,8 +2,11 @@ package com.yihu.ehr.standard.dict.controller;
 
 import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.standard.MCDAType;
 import com.yihu.ehr.model.standard.MStdDict;
+import com.yihu.ehr.standard.cdatype.service.CDAType;
 import com.yihu.ehr.standard.commons.ExtendController;
+import com.yihu.ehr.standard.dict.service.Dict;
 import com.yihu.ehr.standard.dict.service.DictService;
 import com.yihu.ehr.standard.dict.service.IDict;
 import io.swagger.annotations.Api;
@@ -158,4 +161,17 @@ public class DictController extends ExtendController<MStdDict> {
         Class entityClass = getServiceEntity(versionCode);
         return dictService.isExistByField("code",dictCode , entityClass);
     }
+
+
+    @RequestMapping(value = RestApi.Standards.DictOther, method = RequestMethod.GET)
+    @ApiOperation(value = "获取cdaDict列表（不包含本身）")
+    public List<MStdDict> getOtherCdaDict(
+            @ApiParam(name = "id", value = "字典编号", defaultValue = "")
+            @PathVariable(value = "id") String id,
+            @ApiParam(name = "version", value = "版本编号", defaultValue = "")
+            @RequestParam(value = "version") String version) throws Exception {
+        List list = dictService.getOtherCdaDict(id,version);
+        return (List<MStdDict>)convertToModels(list,new ArrayList<MStdDict>(list.size()),MStdDict.class,"");
+    }
+
 }

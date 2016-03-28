@@ -71,7 +71,7 @@ public class SimplifiedESBController {
             FastDFSUtil fdfs = FastDFSConfig.fastDFSUtil();
             ObjectNode jsonResult = fdfs.upload(in, "zip", "");
             String filePath = jsonResult.get("fid").textValue();
-            fdfs.download(jsonResult.get("groupName").textValue(), jsonResult.get("remoteFileName").textValue(), "E:\\");
+            //fdfs.download(jsonResult.get("groupName").textValue(), jsonResult.get("remoteFileName").textValue(), "E:\\");
             HosLog lh = new HosLog();
             lh.setOrgCode(orgCode);
             lh.setUploadTime(DateFormatter.simpleDateTimeFormat(new Date()));

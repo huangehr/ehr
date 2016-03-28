@@ -108,28 +108,34 @@ public class StdSourceManagerController extends BaseUIController {
             envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
         return envelop;
-
-        /*List<String> ids = new ArrayList<>();
-        ids.add(id);
-        XStandardSource[] xStandardSources = xStandardSourceManager.getSourceById(ids);
-        Map<String, XStandardSource> data = new HashMap<>();
-        data.put("stdSourceModel", xStandardSources[0]);
-        Result result = new Result();
-        result.setObj(data);
-        return result.toJson();*/
     }
 
     @RequestMapping("updateStdSource")
     @ResponseBody
-    //更新标准来源
     public Object updateStdSource(String id,String code, String name, String type, String description) {
-        //TODO 非空、唯一性（前端/网关）
+        //新增、修改标准来源
         Envelop envelop = new Envelop();
         String envelopStr = "";
-        String urlGet = "/source/"+id;
+        //非空判断
+        if (StringUtils.isEmpty(code)){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("标准来源编码不能为空！");
+            return envelop;
+        }
+        if (StringUtils.isEmpty(name)){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("标准来源名称不能为空！");
+            return envelop;
+        }
+        if (StringUtils.isEmpty(code)){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("标准来源类别不能为空！");
+            return envelop;
+        }
 
         try{
             Map<String,Object> params = new HashMap<>();
+            // new
             if (StringUtils.isEmpty(id)){
                 String urlNew = "/source";
                 StdSourceDetailModel detailModel = new StdSourceDetailModel();
@@ -144,18 +150,21 @@ public class StdSourceManagerController extends BaseUIController {
                 return envelopStr;
             }
 
-            envelopStr = HttpClientUtil.doGet(comUrl+urlGet,username,password);
-            envelop = objectMapper.readValue(envelopStr,Envelop.class);
-            if (!envelop.isSuccessFlg()){
-                return envelopStr;
+            // get
+            String urlGet = "/source/"+id;
+            String envelopStrGet = HttpClientUtil.doGet(comUrl+urlGet,username,password);
+            Envelop envelopGet = objectMapper.readValue(envelopStrGet,Envelop.class);
+            if (!envelopGet.isSuccessFlg()){
+                return envelopStrGet;
             }
             StdSourceDetailModel modelForUpdate = getEnvelopModel(envelop.getObj(),StdSourceDetailModel.class);
+
+            //update
             modelForUpdate.setCode(code);
             modelForUpdate.setName(name);
             modelForUpdate.setSourceType(type);
             modelForUpdate.setDescription(description);
             String urlUpdate = "/source";
-
             String modelJsonUpdate = objectMapper.writeValueAsString(modelForUpdate);
             params.put("model",modelJsonUpdate);
             envelopStr = HttpClientUtil.doPut(comUrl+urlUpdate,params,username,password);
@@ -170,75 +179,77 @@ public class StdSourceManagerController extends BaseUIController {
 
     @RequestMapping("delStdSource")
     @ResponseBody
-    //删除标准来源-可批量删除
     public Object delStdSource(String id) {
-        Envelop result = new Envelop();
+        Envelop envelop = new Envelop();
+        if (StringUtils.isEmpty(id)){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("标准来源id号不能为空！");
+            return envelop;
+        }
         String url = "/sources";
         try{
             Map<String,Object> params = new HashMap<>();
             params.put("ids",id);
             String _msg = HttpClientUtil.doDelete(comUrl+url,params,username,password);
             if(Boolean.parseBoolean(_msg)){
-                result.setSuccessFlg(true);
+                envelop.setSuccessFlg(true);
             }else{
-                result.setSuccessFlg(false);
-                result.setErrorMsg("标准来源删除失败");
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("标准来源删除失败");
             }
         }catch(Exception ex){
             LogService.getLogger(StdSourceManagerController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result;
+        return envelop;
     }
 
     @RequestMapping("isSourceCodeExit")
     @ResponseBody
-    //判断标准来源编码是否已存在
     public boolean isSourceCodeExit(String code) {
-        //TODO 网关要提供接口
-        String url = "";
-
-        return true;
-    }
-
-    @RequestMapping("isSourceNameExit")
-    @ResponseBody
-    //判断标准来源名称是否已存在
-    public boolean isSourceNameExit(String name) {
-        //TODO 网关要提供接口
-        String url = "";
-
-        return true;
-    }
-
-
-    @RequestMapping("getVersionList")
-    @ResponseBody
-    //获取版本号用于下拉框
-    public Object getVersionList() {
-        Envelop result = new Envelop();
-        //TODO 前端页面未使用
-        String url = "/version/allVersions";
+        String url = "/source/is_exist";
         try{
-            String  _rus = HttpClientUtil.doGet(comUrl+url,username,password);
-            result.setSuccessFlg(true);
-            result.setObj(_rus);
+            Map<String,Object> params = new HashMap<>();
+            params.put("code",code);
+            String _msg = HttpClientUtil.doGet(comUrl+url,params,username,password);
+            if(Boolean.parseBoolean(_msg)){
+                return true;
+            }
         }catch (Exception ex){
             LogService.getLogger(StdSourceManagerController.class).error(ex.getMessage());
         }
-        return result;
+        return false;
+    }
 
-       /* XCDAVersion[] cdaVersions = cdaVersionManager.getVersionList();
-        List<Map> versions = new ArrayList<>();
-        for (XCDAVersion cdaVersion : cdaVersions) {
-            Map<String,String> map = new HashMap<>();
-            map.put("code",cdaVersion.getVersion());
-            map.put("value",cdaVersion.getVersionName());
-            versions.add(map);
+    /**
+     * 通用的用于下拉列表框(获取所有标准来源)
+     * @return
+     */
+    @RequestMapping("getStdSourceList")
+    @ResponseBody
+    public Object getStdSourceList() {
+        Envelop envelop = new Envelop();
+        String url = "/sources";
+        try{
+            Map<String,Object> params = new HashMap<>();
+            params.put("fields","");
+            params.put("filters","");
+            params.put("sorts","");
+            params.put("page",1);
+            params.put("size",999);
+            String envelopStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+            if(StringUtils.isEmpty(envelopStr)){
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg(ErrorCode.GetStandardSourceFailed.toString());
+            }else{
+                return envelopStr;
+            }
+        }catch(Exception ex){
+            LogService.getLogger(StdSourceManagerController.class).error(ex.getMessage());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        Result result = new Result();
-        result.setDetailModelList(versions);
-        return result.toJson();*/
+        return envelop;
     }
 }

@@ -1,0 +1,118 @@
+package com.yihu.ehr.specialdict.service;
+
+import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.dict.MSystemDict;
+import com.yihu.ehr.model.specialdict.MDrugDict;
+import com.yihu.ehr.model.specialdict.MHealthProblemDict;
+import com.yihu.ehr.model.specialdict.MHpIcd10Relation;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.Collection;
+
+/**
+ * Created by CWS on 2016/2/29.
+ */
+@FeignClient("svr-special-dict")
+@RequestMapping(ApiVersion.Version1_0)
+@ApiIgnore
+public interface HealthProblemDictClient {
+
+    @RequestMapping(value = "/dict/hp", method = RequestMethod.POST)
+    @ApiOperation(value = "创建新的健康问题字典" )
+    MHealthProblemDict createHpDict(
+            @ApiParam(name = "dictionary", value = "字典JSON结构")
+            @RequestParam(value = "dictionary") String dictJson) ;
+
+    @RequestMapping(value = "dict/hp/{id}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据id删除健康问题字典（含健康问题字典及与ICD10的关联关系。）")
+    boolean deleteHpDict(
+            @ApiParam(name = "id", value = "字典ID")
+            @PathVariable(value = "id") String id) ;
+
+    @RequestMapping(value = "/dict/hp", method = RequestMethod.PUT)
+    @ApiOperation(value = "更新健康问题字典" )
+    MHealthProblemDict updateHpDict(
+            @ApiParam(name = "dictionary", value = "字典JSON结构")
+            @RequestParam(value = "dictionary") String dictJson) ;
+
+    @RequestMapping(value = "/dict/hp/{id}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据ID获取相应的健康问题字典信息。" )
+    MHealthProblemDict getHpDict(
+            @ApiParam(name = "id", value = "字典内码")
+            @PathVariable(value = "id") String id);
+
+    @RequestMapping(value = "/dict/hps", method = RequestMethod.GET)
+    @ApiOperation(value = "根据查询条件查询相应的ICD10字典信息。" )
+    Collection<MHealthProblemDict> getHpDictList(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,code,name,description")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+code,+name")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page);
+
+    @RequestMapping(value = "/dict/hp/existence/name/{name}" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断提交的字典名称是否已经存在")
+    boolean isNameExists(
+            @ApiParam(name = "name", value = "name", defaultValue = "")
+            @PathVariable(value = "name") String name);
+
+    @RequestMapping(value = "/dict/hp/existence/code/{code}" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断提交的字典代码是否已经存在")
+    boolean isCodeExists(
+            @ApiParam(name = "code", value = "code", defaultValue = "")
+            @PathVariable(value = "code") String code);
+
+    //-------------------------健康问题与ICD10之间关联关系管理---------------------------------------------------------
+
+    @RequestMapping(value = "/dict/hp/icd10", method = RequestMethod.POST)
+    @ApiOperation(value = "为健康问题增加ICD10疾病关联。" )
+    MHpIcd10Relation createHpIcd10Relation(
+            @ApiParam(name = "dictionary", value = "字典JSON结构")
+            @RequestParam(value = "dictionary") String dictJson);
+
+    @RequestMapping(value = "/dict/hp/icd10", method = RequestMethod.PUT)
+    @ApiOperation(value = "为健康问题修改ICD10疾病关联。" )
+    MHpIcd10Relation updateHpIcd10Relation(
+            @ApiParam(name = "dictionary", value = "字典JSON结构")
+            @RequestParam(value = "dictionary") String dictJson);
+
+    @RequestMapping(value = "/dict/hp/icd10", method = RequestMethod.DELETE)
+    @ApiOperation(value = "为健康问题删除ICD10疾病关联。" )
+    boolean deleteHpIcd10Relation(
+            @ApiParam(name = "id", value = "关联ID", defaultValue = "")
+            @RequestParam(value = "id", required = true) String id);
+
+    @RequestMapping(value = "/dict/hp/icd10s", method = RequestMethod.GET)
+    @ApiOperation(value = "根据健康问题查询相应的ICD10关联列表信息。" )
+    Collection<MHpIcd10Relation> getHpIcd10RelationList(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,hpId,icd10Id")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+hpId")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page);
+
+    @RequestMapping(value = "/dict/hp/icd10/existence" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断健康问题与ICD10的关联关系在系统中是否已存在")
+    boolean isHpIcd10RelaExist(
+            @ApiParam(name = "hpId", value = "健康问题内码")
+            @RequestParam(value = "hpId", required = false) String hpId,
+            @ApiParam(name = "icd10Id", value = "Icd10内码", defaultValue = "")
+            @RequestParam(value = "icd10Id", required = false) String icd10Id);
+}

@@ -20,13 +20,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/** 适配管理方案适配管理
+/**
+ * 适配管理方案适配管理
  * Created by wq on 2015/11/1.
  */
 
 @RequestMapping("/adapterDataSet")
 @Controller
-public class AdapterDataSetController extends ExtendController<AdapterDataSetService>{
+public class AdapterDataSetController extends ExtendController<AdapterDataSetService> {
 
     @Autowired
     OrgAdapterPlanService orgAdapterPlanService;
@@ -40,16 +41,16 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetSer
 
     @RequestMapping("/dataSetList")
     @ResponseBody
-    public Object search(String adapterPlanId, String searchNm, int page, int rows){
+    public Object search(String adapterPlanId, String searchNm, int page, int rows) {
 
-        try{
-            Map<String, Object> params = new HashMap<>();
-            params.put("code", nullToSpace(searchNm));
-            params.put("name", nullToSpace(searchNm));
-            params.put("page", page);
-            params.put("size", rows);
-            String resultStr = service.search(service.searchUrl.replace("{plan_id}", adapterPlanId), params);
-            return resultStr;
+        try {
+            searchNm = nullToSpace(searchNm);
+
+            return service.search(
+                    service.searchUrl.replace("{plan_id}", adapterPlanId),
+                    new PageParms(rows, page)
+                            .addExt("code", searchNm)
+                            .addExt("name", searchNm));
         } catch (Exception e) {
             e.printStackTrace();
             return systemError();
@@ -58,22 +59,22 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetSer
 
     @RequestMapping("/metaDataList")
     @ResponseBody
-    public Object searchmetaData(String adapterPlanId, String dataSetId, String searchNmEntry, int page, int rows){
+    public Object searchmetaData(String adapterPlanId, String dataSetId, String searchNmEntry, int page, int rows) {
 
-        try{
-            if(StringUtils.isEmpty(adapterPlanId)
+        try {
+            if (StringUtils.isEmpty(adapterPlanId)
                     || StringUtils.isEmpty(dataSetId))
-                return systemError();
+                return pramsError();
 
             String url = "/adapter/plan/meta_data/{plan_id}/{set_id}";
             url = url.replace("{plan_id}", adapterPlanId).replace("{set_id}", dataSetId);
-            Map<String, Object> params = new HashMap<>();
-            params.put("code", nullToSpace(searchNmEntry));
-            params.put("name", nullToSpace(searchNmEntry));
-            params.put("page", page);
-            params.put("size", rows);
-            String resultStr = service.search(url, params);
-            return resultStr;
+            searchNmEntry = nullToSpace(searchNmEntry);
+
+            return service.search(
+                    url,
+                    new PageParms(rows, page)
+                            .addExt("code", searchNmEntry)
+                            .addExt("name", searchNmEntry));
         } catch (Exception e) {
             e.printStackTrace();
             return systemError();
@@ -83,20 +84,21 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetSer
 
     /**
      * 标准数据元的下拉
+     *
      * @return
      */
     @RequestMapping("/getStdMetaData")
     @ResponseBody
-    public Object getStdMetaData(Long adapterPlanId, Long dataSetId, String mode){
+    public Object getStdMetaData(Long adapterPlanId, Long dataSetId, String mode) {
 
         try {
-            String stdMetaDataComboUrl = "/adapter/std_meta_data/combo";
-            Map<String, Object> params = new HashMap<>();
-            params.put("plan_id",adapterPlanId);
-            params.put("data_set_id",dataSetId);
-            params.put("mode",mode);
-            String resultStr = service.search(stdMetaDataComboUrl, params);
-            return resultStr;
+
+            return service.search(
+                    "/adapter/std_meta_data/combo",
+                    new PageParms()
+                            .addExt("plan_id", adapterPlanId)
+                            .addExt("data_set_id", dataSetId)
+                            .addExt("mode", mode));
         } catch (Exception e) {
             return systemError();
         }
@@ -108,25 +110,24 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetSer
      */
     @RequestMapping("/getOrgDataSet")
     @ResponseBody
-    public Object getOrgDataSet(Long adapterPlanId){
+    public Object getOrgDataSet(Long adapterPlanId) {
 
         try {
             Envelop result = new Envelop();
             result.setSuccessFlg(true);
 
-            Map<String, Object> params = new HashMap<>();
-            params.put("id",adapterPlanId);
-            String modelJson = orgAdapterPlanService.getModel(params);
-            Envelop rs = getEnvelop(modelJson);
+            Envelop rs = getEnvelop(
+                    orgAdapterPlanService.getModel(
+                        new PageParms().addExt("id", adapterPlanId)));
 
-            if(rs.getObj()==null)
+            if (rs.getObj() == null)
                 return result;
 
-            String url = "/adapter/org/data_sets";
-            PageParms pageParms = new PageParms("organization=" + ((Map) rs.getObj()).get("org"));
-            String resultStr = service.search(url, pageParms);
+            String resultStr = service.search(
+                    "/adapter/org/data_sets",
+                    new PageParms().addEqual("organization", ((Map) rs.getObj()).get("org")));
             rs = getEnvelop(resultStr);
-            List<Map> orgDataList = rs.getDetailModelList()!=null ? rs.getDetailModelList() : new ArrayList<>();
+            List<Map> orgDataList = rs.getDetailModelList() != null ? rs.getDetailModelList() : new ArrayList<>();
 
             List<String> orgDicts = new ArrayList<>();
             for (Map orgDict : orgDataList) {
@@ -141,33 +142,31 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetSer
     }
 
 
-
     /**
      * 机构数据元下拉
      */
     @RequestMapping("/getOrgMetaData")
     @ResponseBody
-    public Object getOrgMetaData(Integer orgDataSetSeq, Long adapterPlanId){
+    public Object getOrgMetaData(Integer orgDataSetSeq, Long adapterPlanId) {
 
         try {
             Envelop result = new Envelop();
             result.setSuccessFlg(true);
 
-            Map<String, Object> params = new HashMap<>();
-            params.put("id",adapterPlanId);
-            String modelJson = orgAdapterPlanService.getModel(params);
-            Envelop rs = getEnvelop(modelJson);
+            Envelop rs = getEnvelop(
+                    orgAdapterPlanService.getModel(
+                        new PageParms().addExt("id", adapterPlanId)));
 
-            if(rs.getObj()==null)
+            if (rs.getObj() == null)
                 return result;
-            String url = "/adapter/org/meta_datas";
-            PageParms pageParms = new PageParms(
-                    "organization=" + ((Map) rs.getObj()).get("org")
-                            + (orgDataSetSeq==null ? "" : ";orgDataSet=" + orgDataSetSeq)
-            );
-            String resultStr = service.search(url, pageParms);
-            rs = getEnvelop(resultStr);
-            List<Map> orgDictList = rs.getDetailModelList()!=null ? rs.getDetailModelList() : new ArrayList<>();
+
+            rs = getEnvelop(
+                    service.search(
+                        "/adapter/org/meta_datas",
+                        new PageParms()
+                                .addEqual("organization", ((Map) rs.getObj()).get("org"))
+                                .addEqualNotNull("orgDataSet", orgDataSetSeq)));
+            List<Map> orgDictList = rs.getDetailModelList() != null ? rs.getDetailModelList() : new ArrayList<>();
 
             List<String> orgDicts = new ArrayList<>();
             for (Map orgDict : orgDictList) {

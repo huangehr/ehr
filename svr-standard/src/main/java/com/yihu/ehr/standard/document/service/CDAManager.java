@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
+import com.yihu.ehr.query.BaseHbmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -25,7 +27,9 @@ import java.util.List;
  */
 @Service
 @Transactional
-public class CDAManager {
+public class CDAManager extends BaseHbmService<ICDADataSetRelationship> {
+
+
 
     @Autowired
     private CDADataSetRelationshipManager cdaDataSetRelationshipManager;
@@ -35,6 +39,22 @@ public class CDAManager {
 
     @Autowired
     private FastDFSUtil fastDFSUtil;
+
+    public Class getServiceEntity(String version){
+        try {
+            return Class.forName("com.yihu.ehr.standard.document.service.CDADocument" + version);
+        } catch (ClassNotFoundException e) {
+            throw new ApiException(ErrorCode.NotFoundEntity, "CDA文档", version);
+        }
+    }
+
+    public Class getRelationshipServiceEntity(String version){
+        try {
+            return Class.forName("com.yihu.ehr.standard.datasets.service.CDADataSetRelationship" + version);
+        } catch (ClassNotFoundException e) {
+            throw new ApiException(ErrorCode.NotFoundEntity, "CDA数据集关系", version);
+        }
+    }
 
     /**
      * 保存CDA信息
@@ -46,12 +66,14 @@ public class CDAManager {
      * @return 操作结果
      */
     public boolean SaveDataSetRelationship(String[] dataSetIds,String cdaId,String versionCode, String xmlInfo) throws Exception {
+        cdaDataSetRelationshipManager.deleteRelationshipByCdaIds(versionCode,new String[]{cdaId});
 
-        cdaDataSetRelationshipManager.deleteRelationshipByCdaId(versionCode,new String[]{cdaId});
-        List<CDADocument> cdaDocuments = cdaDocumentManager.getDocumentList(new String[]{cdaId},versionCode);
+        Class entityClass = getServiceEntity(versionCode);
+        List<CDADocument> cdaDocuments = cdaDocumentManager.search(entityClass, "id="+ cdaId);
+
         if (cdaDocuments.size() <= 0) return false;
 
-        CDADocument cdaDocument = cdaDocuments.get(0);
+        ICDADocument cdaDocument = cdaDocuments.get(0);
         if (cdaDocument.getFileGroup() != null
                 && !cdaDocument.getFileGroup().equals("")
                 && cdaDocument.getSchema() != null
@@ -61,14 +83,14 @@ public class CDAManager {
         if (dataSetIds==null) return true;
 
         List<CDADataSetRelationship> infos = new ArrayList<>();
-        for (int i = 0; i < infos.size(); i++) {
+        for (int i = 0; i < dataSetIds.length; i++) {
             String dataSetId = dataSetIds[i];
             CDADataSetRelationship info = new CDADataSetRelationship();
             info.setCdaId(cdaId);
             info.setDataSetId(dataSetId);
             infos.add(info);
         }
-        cdaDataSetRelationshipManager.addRelationship(infos,versionCode);
+        //cdaDataSetRelationshipManager.addRelationship(infos,versionCode);
         if(infos.size()>0){
             cdaDataSetRelationshipManager.addRelationship(infos,versionCode);
         }else{
@@ -123,17 +145,21 @@ public class CDAManager {
     }
 
     public boolean SaveXmlFilePath(String[] cdaIds, String versionCode, String fileGroup, String filePath) {
-        List<CDADocument> cdaDocuments = cdaDocumentManager.getDocumentList(cdaIds,versionCode);
+
+        Class entityClass  = getServiceEntity(versionCode);
+
+        List<CDADocument> cdaDocuments = cdaDocumentManager.search(entityClass, "id="+ String.join(",",cdaIds));
         if (cdaDocuments.size() <= 0) {
             return false;
         }
 
-        CDADocument cdaDocument = cdaDocuments.get(0);
+        ICDADocument cdaDocument = cdaDocuments.get(0);
         cdaDocument.setFileGroup(fileGroup);
         cdaDocument.setSchema(filePath);
         cdaDocument.setVersionCode(versionCode);
 
-        return cdaDocumentManager.saveDocument(cdaDocument);
+        cdaDocumentManager.save(cdaDocument);
+        return true;
     }
 
     public CDADocument saveCdaInfo(String cdaDocumentJsonData) throws Exception {
@@ -143,7 +169,7 @@ public class CDAManager {
             throw new Exception("已存在");
         }
 
-        cdaDocumentManager.saveDocument(cdaInfo);
+        cdaDocumentManager.save(cdaInfo);
         return cdaInfo;
     }
 }
