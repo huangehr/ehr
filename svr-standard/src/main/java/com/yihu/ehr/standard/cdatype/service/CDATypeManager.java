@@ -176,6 +176,8 @@ public class CDATypeManager extends BaseJpaService<CDAType, XcdaTypeRepository>{
     }
 
     public List<CDAType> getCdaTypeExcludeSelfAndChildren(String childrenIds) {
-        return null;
+        String[] ids = childrenIds.split(",");
+        List<CDAType> cdaTypes = getXcdaTypeRepository().getCdaTypeExcludeSelfAndChildren(ids);
+        return cdaTypes;
     }
 }

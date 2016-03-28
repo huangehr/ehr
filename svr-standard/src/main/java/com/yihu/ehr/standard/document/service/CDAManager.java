@@ -123,7 +123,7 @@ public class CDAManager extends BaseHbmService<ICDADataSetRelationship> {
         fileInfo = fileInfo.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
         String strPath = System.getProperty("java.io.tmpdir");
         String splitMark = System.getProperty("file.separator");
-        strPath += splitMark+"StandardFiles";
+        strPath += "StandardFiles";
 
         //文件路径
         String strXMLFilePath = strPath + splitMark + "xml" + splitMark + versionCode + splitMark + "createfile" + splitMark + cdaId + ".xml";

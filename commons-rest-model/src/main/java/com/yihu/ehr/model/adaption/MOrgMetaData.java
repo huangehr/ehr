@@ -125,7 +125,7 @@ public class MOrgMetaData {
         return columnLength;
     }
 
-    public void setColumnLength(int columnLength) {
-        this.columnLength = columnLength;
+    public void setColumnLength(Integer columnLength) {
+        this.columnLength = columnLength==null?0:columnLength;
     }
 }
