@@ -236,10 +236,10 @@ public class SystemDictController extends BaseController {
     }
 
     @ApiOperation(value = "获取字典项")
-    @RequestMapping(value = "/dictionaries/{id}/entries/{code}", method = RequestMethod.GET)
+    @RequestMapping(value = "/dictionaries/{dict_id}/entries/{code}", method = RequestMethod.GET)
     public Envelop getDictEntry(
-            @ApiParam(name = "id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "id") long id,
+            @ApiParam(name = "dict_id", value = "字典ID", defaultValue = "")
+            @PathVariable(value = "dict_id") long id,
             @ApiParam(name = "code", value = "字典项代码", defaultValue = "")
             @PathVariable(value = "code") String code) {
         try {

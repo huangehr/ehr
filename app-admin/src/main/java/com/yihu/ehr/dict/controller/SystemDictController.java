@@ -292,9 +292,9 @@ public class SystemDictController extends BaseUIController {
         try {
             String dictEntryUrl = "/dictionaries/" + dictId + "/entries/" + code;
             Map<String, Object> dictEntryParams = new HashMap<>();
-            dictEntryParams.put("id",dictId);
+            dictEntryParams.put("dict_id",dictId);
             dictEntryParams.put("code",code);
-            String dictEntryResultStr = HttpClientUtil.doPost(comUrl + dictEntryUrl, dictEntryParams, username, password);
+            String dictEntryResultStr = HttpClientUtil.doGet(comUrl + dictEntryUrl, dictEntryParams, username, password);
             result = getEnvelop(dictEntryResultStr);
 
             if(result.isSuccessFlg()){
