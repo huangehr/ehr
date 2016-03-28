@@ -21,6 +21,10 @@ public class CDAModel {
 
     private String typeId;
 
+    private String user;
+
+    private String schema;
+
     public String getCode() {
         return code;
     }
@@ -83,5 +87,21 @@ public class CDAModel {
 
     public void setTypeId(String typeId) {
         this.typeId = typeId;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public String getSchema() {
+        return schema;
+    }
+
+    public void setSchema(String schema) {
+        this.schema = schema;
     }
 }

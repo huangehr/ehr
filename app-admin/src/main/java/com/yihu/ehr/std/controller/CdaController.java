@@ -1,6 +1,8 @@
 package com.yihu.ehr.std.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.standard.cdadocument.CDAModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.RestAPI;
 import com.yihu.ehr.constants.SessionAttributeKeys;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -89,37 +92,21 @@ public class CdaController {
         }
         return result;
 
-        /*Result result = new Result();
-        if (strVersion == null) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg("请选择标准版本!");
-            return result;
-        }
-        try {
-            XCDADocument[] xcdaDocuments = xcdaDocumentManager.getDocumentList(strVersion, strKey, strType, page, rows);
-            if (xcdaDocuments == null) {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.GetCDAInfoFailed.toString());
-                return result;
-            }
-            List<CDAForInterface> resultInfos = GetCDAForInterface(xcdaDocuments);
-            int resultCount = xcdaDocumentManager.getDocumentCount(strVersion, strKey,strType);
-            if (rows == 0)
-                rows = 1;
-            result = getResult(resultInfos, resultCount, page, rows);
-        } catch (Exception ex) {
-            LogService.getLogger(CdaController_w.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.GetCDAInfoFailed.toString());
-        }
-        return result.toJson();*/
     }
 
     @RequestMapping("getCDAInfoById")
     @ResponseBody
     public Object getCDAInfoById(String strId, String strVersion) {
-        Envelop result = new Envelop();
+
+        String url = "/cda/cda";
         String strErrorMsg = "";
+
+        Envelop result = new Envelop();
+        Map<String,Object> params = new HashMap<>();
+
+        params.put("version_code",strVersion);
+        params.put("cda_id",strId);
+
         if (StringUtils.isEmpty(strVersion)) {
             strErrorMsg += "请选择标准版本!";
         }
@@ -132,22 +119,10 @@ public class CdaController {
             return result;
         }
         try {
-            String url = "/cda/cda";
-            Map<String,Object> params = new HashMap<>();
-            params.put("versionCode",strVersion);
-            params.put("cdaId",strId);
+
             String _rus = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            if (StringUtils.isEmpty(_rus)) {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.GetCDAInfoFailed.toString());
-            }else {
-                result.setSuccessFlg(true);
-                //TODO 要转换为对象
-//                ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-//                CDAForInterface cdaForInterfaces = objectMapper.readValue(_rus,CDAForInterface.class);
-//                result.setObj(cdaForInterfaces);
-                result.setObj(_rus);
-            }
+
+            return _rus;
         } catch (Exception ex) {
             LogService.getLogger(CdaController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
@@ -310,36 +285,24 @@ public class CdaController {
 
     @RequestMapping("SaveCdaInfo")
     @ResponseBody
-    public Object SaveCdaInfo(String info) {
+    public Object SaveCdaInfo(String cdaJson) throws IOException {
+
+        String url = "/cda/cda";
+        String resultStr = "";
         Envelop result = new Envelop();
-        String strErrorMsg = "";
-        //todo 前台js做为空判断
-//        if (StringUtil.isEmpty(info.getCode())) {
-//        strErrorMsg += "代码不能为空！";
-//    }
-//    if (StringUtil.isEmpty(info.getName())) {
-//        strErrorMsg += "名称不能为空！";
-//    }
-//    if (StringUtil.isEmpty(info.getSourceId())) {
-//        strErrorMsg += "标准来源不能为空！";
-//    }
-//    if (StringUtil.isEmpty(info.getVersionCode())) {
-//        strErrorMsg += "标准版本不能为空！";
-//    }
-//    if (strErrorMsg != "") {
-//        result.setSuccessFlg(false);
-//        result.setErrorMsg(strErrorMsg);
-//        return result;
-//    }
+        Map<String,Object> params = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+
+        params.put("cdaInfoJson",cdaJson);
+
         try {
-            //TODO 唯一性验证api
-            ObjectMapper objectMapper = new ObjectMapper();
-            String cdaInfoJson = objectMapper.writeValueAsString(info);
-            String url = "/cda/cda";
-            Map<String,Object> params = new HashMap<>();
-            params.put("cdaInfoJson",cdaInfoJson);
-            String _rus = HttpClientUtil.doPost(comUrl+url,params,username,password);
-            if(StringUtils.isEmpty(_rus)){
+            CDAModel cdaModel = mapper.readValue(cdaJson,CDAModel.class);
+            if(StringUtils.isEmpty(cdaModel.getId()))
+                resultStr = HttpClientUtil.doPost(comUrl+url,params,username,password);//新增
+            else
+                resultStr = HttpClientUtil.doPut(comUrl + url, params, username, password);//修改
+
+            if(StringUtils.isEmpty(resultStr)){
                 result.setSuccessFlg(false);
                 result.setErrorMsg("CDA保存失败");
             }else {
@@ -352,67 +315,22 @@ public class CdaController {
         }
         return result;
 
-        /*Result result = new Result();
-        try {
-            XCDADocument cdaInfo = new CDADocument();
-            String strErrorMsg = "";
-            if (info.getCode() == null || info.getCode() == "") {
-                strErrorMsg += "代码不能为空！";
-            }
-            if (info.getName() == null || info.getName() == "") {
-                strErrorMsg += "名称不能为空！";
-            }
-            if (info.getSourceId() == null || info.getSourceId() == "") {
-                strErrorMsg += "标准来源不能为空！";
-            }
-            if (info.getVersionCode() == null || info.getVersionCode() == "") {
-                strErrorMsg += "标准版本不能为空！";
-            }
-            if (info.getId() == null || info.getId().equals("")) {
-                if (xcdaDocumentManager.isDocumentExist(info.getVersionCode(), info.getCode())) {
-                    strErrorMsg += "代码不能重复！";
-                }
-                cdaInfo.setCreateUser(info.getUser());
-            } else {
-                if (xcdaDocumentManager.isDocumentExist(info.getVersionCode(), info.getCode(), info.getId())) {
-                    strErrorMsg += "代码不能重复！";
-                } else {
-                    cdaInfo = xcdaDocumentManager.getDocument(info.getVersionCode(), info.getId());
-                    cdaInfo.setUpdateUser(info.getUser());
-                }
-            }
-            if (strErrorMsg != "") {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(strErrorMsg);
-                return result;
-            }
-            cdaInfo.setCode(info.getCode());
-            cdaInfo.setName(info.getName());
-            cdaInfo.setSchema(info.getSchema());
-            cdaInfo.setSourceId(info.getSourceId());
-            cdaInfo.setVersionCode(info.getVersionCode());
-            cdaInfo.setDescription(info.getDescription());
-            cdaInfo.setTypeId(info.getTypeId());
-            int iResult = xcdaDocumentManager.saveDocument(cdaInfo);
-            if (iResult >= 1) {
-                result.setSuccessFlg(true);
-            } else {
-                result.setSuccessFlg(false);
-                result.setErrorMsg("CDA保存失败!");
-            }
-        } catch (Exception ex) {
-            LogService.getLogger(CdaController_w.class).error(ex.getMessage());
-
-            result.setSuccessFlg(false);
-            result.setErrorMsg("CDA保存失败!");
-        }
-        return result;*/
     }
 
     @RequestMapping("deleteCdaInfo")
     @ResponseBody
     public Object deleteCdaInfo(String ids, String strVersionCode) {
-        Envelop result = new Envelop();
+
+        String url = "/cda/cda";
+        String resultStr = "";
+
+        Envelop envelop = new Envelop();
+        Map<String,Object> params = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+
+        params.put("cdaId",ids);
+        params.put("versionCode",strVersionCode);
+
         String strErrorMsg = "";
         if (StringUtils.isEmpty(strVersionCode)) {
             strErrorMsg += "标准版本不能为空!";
@@ -421,55 +339,22 @@ public class CdaController {
             strErrorMsg += "请先选择将要删除的CDA";
         }
         if (!StringUtils.isEmpty(strErrorMsg)) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(strErrorMsg);
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(strErrorMsg);
+            return envelop;
         }
         try {
-            String url = "/cda/cda";
-            Map<String,Object> params = new HashMap<>();
-            params.put("cdaId",ids);
-            params.put("versionCode",strVersionCode);
-            String _msg = HttpClientUtil.doDelete(comUrl+url,params,username,password);
-            if(Boolean.parseBoolean(_msg)){
-                result.setSuccessFlg(true);
-            }else {
-                result.setSuccessFlg(false);
-                result.setErrorMsg("CDA删除失败");
-            }
+
+            resultStr = HttpClientUtil.doDelete(comUrl+url,params,username,password);
+            return resultStr;
+
         } catch (Exception ex) {
             LogService.getLogger(CdaController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result;
+        return envelop;
 
-       /* Result result = new Result();
-        try {
-            String strErrorMsg = "";
-            if (strVersionCode == null || strVersionCode == "") {
-                strErrorMsg += "标准版本不能为空!";
-            }
-            if (ids == null || ids == "") {
-                strErrorMsg += "请先选择将要删除的CDA！";
-            }
-            if (strErrorMsg != "") {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(strErrorMsg);
-            }
-            List<String> listIds = Arrays.asList(ids.split(","));
-            int iReault = xcdaDocumentManager.deleteDocument(strVersionCode, listIds);
-            if (iReault >= 0) {
-                result.setSuccessFlg(true);
-            } else {
-                result.setSuccessFlg(false);
-                result.setErrorMsg("CDA删除失败!");
-            }
-        } catch (Exception ex) {
-            LogService.getLogger(CdaController_w.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg("CDA删除失败!");
-        }
-        return result;*/
     }
 
     /**
