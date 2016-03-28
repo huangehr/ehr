@@ -72,15 +72,7 @@ public class PatientController extends BaseController {
             String homeAddressId = patientInfo.getHomeAddress();
             if(StringUtils.isNotEmpty(homeAddressId)) {
                 MGeography geography = addressClient.getAddressById(homeAddressId);
-                String homeAddress = "";
-                if (geography != null) {
-                    if (StringUtils.isNotEmpty(geography.getProvince())) homeAddress += geography.getProvince();
-                    if (StringUtils.isNotEmpty(geography.getCity())) homeAddress += geography.getCity();
-                    if (StringUtils.isNotEmpty(geography.getDistrict())) homeAddress += geography.getDistrict();
-                    if (StringUtils.isNotEmpty(geography.getTown())) homeAddress += geography.getTown();
-                    if (StringUtils.isNotEmpty(geography.getStreet())) homeAddress += geography.getStreet();
-                    if (StringUtils.isNotEmpty(geography.getExtra())) homeAddress += geography.getExtra();
-                }
+                String homeAddress = geography.getCanonicalAddress();
                 patient.setHomeAddress(homeAddress);
             }
             //性别
@@ -191,14 +183,14 @@ public class PatientController extends BaseController {
         //新增家庭地址信息
         GeographyModel geographyModel = detailModel.getHomeAddressInfo();
         detailModel.setHomeAddress("");
-        if (!isNullAddress(geographyModel)) {
+        if (!geographyModel.isNullAddress()) {
             String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             detailModel.setHomeAddress(addressId);
         }
         //新增户籍地址信息
         geographyModel = detailModel.getBirthPlaceInfo();
         detailModel.setBirthPlace("");
-        if (!isNullAddress(geographyModel)) {
+        if (!geographyModel.isNullAddress()) {
             String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             detailModel.setBirthPlace(addressId);
         }
@@ -206,7 +198,7 @@ public class PatientController extends BaseController {
         //新增工作地址信息
         geographyModel = detailModel.getWorkAddressInfo();
         detailModel.setWorkAddress("");
-        if (!isNullAddress(geographyModel)) {
+        if (!geographyModel.isNullAddress()) {
             String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             detailModel.setWorkAddress(addressId);
         }
@@ -259,14 +251,14 @@ public class PatientController extends BaseController {
         //新增家庭地址信息
         GeographyModel geographyModel = detailModel.getHomeAddressInfo();
         detailModel.setHomeAddress("");
-        if (!isNullAddress(geographyModel)) {
+        if (!geographyModel.isNullAddress()) {
             String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             detailModel.setHomeAddress(addressId);
         }
         //新增户籍地址信息
         geographyModel = detailModel.getBirthPlaceInfo();
         detailModel.setBirthPlace("");
-        if (!isNullAddress(geographyModel)) {
+        if (!geographyModel.isNullAddress()) {
             String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             detailModel.setBirthPlace(addressId);
         }
@@ -274,7 +266,7 @@ public class PatientController extends BaseController {
         //新增工作地址信息
         geographyModel = detailModel.getWorkAddressInfo();
         detailModel.setWorkAddress("");
-        if (!isNullAddress(geographyModel)) {
+        if (!geographyModel.isNullAddress()) {
             String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             detailModel.setWorkAddress(addressId);
         }
@@ -346,7 +338,7 @@ public class PatientController extends BaseController {
             //家庭地址
             mGeography = addressClient.getAddressById(demographicInfo.getHomeAddress());
             if (mGeography != null) {
-                detailModel.setHomeAddressFull(getFullAddress(mGeography));
+                detailModel.setHomeAddressFull(mGeography.getCanonicalAddress());
                 detailModel.setHomeAddressInfo(convertToModel(mGeography, GeographyModel.class));
             }
         }
@@ -354,7 +346,7 @@ public class PatientController extends BaseController {
             //户籍地址
             mGeography = addressClient.getAddressById(demographicInfo.getBirthPlace());
             if (mGeography != null) {
-                detailModel.setBirthPlaceFull(getFullAddress(mGeography));
+                detailModel.setBirthPlaceFull(mGeography.getCanonicalAddress());
                 detailModel.setBirthPlaceInfo(convertToModel(mGeography, GeographyModel.class));
             }
         }
@@ -362,7 +354,7 @@ public class PatientController extends BaseController {
         if (!StringUtils.isEmpty(demographicInfo.getWorkAddress())) {
             mGeography = addressClient.getAddressById(demographicInfo.getWorkAddress());
             if (mGeography != null) {
-                detailModel.setWorkAddressFull(getFullAddress(mGeography));
+                detailModel.setWorkAddressFull(mGeography.getCanonicalAddress());
                 detailModel.setWorkAddressInfo(convertToModel(mGeography, GeographyModel.class));
             }
         }
@@ -376,35 +368,5 @@ public class PatientController extends BaseController {
         }
 
         return detailModel;
-    }
-
-    public String getFullAddress(MGeography geography) {
-        String fullAddress = "";
-
-        if (StringUtils.isNotEmpty(geography.getProvince())) fullAddress += geography.getProvince();
-        if (StringUtils.isNotEmpty(geography.getCity())) fullAddress += geography.getCity();
-        if (StringUtils.isNotEmpty(geography.getDistrict())) fullAddress += geography.getDistrict();
-        if (StringUtils.isNotEmpty(geography.getTown())) fullAddress += geography.getTown();
-        if (StringUtils.isNotEmpty(geography.getStreet())) fullAddress += geography.getStreet();
-        if (StringUtils.isNotEmpty(geography.getExtra())) fullAddress += geography.getExtra();
-
-        return fullAddress;
-    }
-
-    public boolean isNullAddress (GeographyModel geographyModel)
-    {
-        if(geographyModel==null)
-            return true;
-        if(StringUtils.isEmpty(geographyModel.getProvince())
-                && StringUtils.isEmpty(geographyModel.getCity())
-                && StringUtils.isEmpty(geographyModel.getDistrict())
-                && StringUtils.isEmpty(geographyModel.getTown())
-                && StringUtils.isEmpty(geographyModel.getStreet())
-                && StringUtils.isEmpty(geographyModel.getExtra()))
-        {
-            return true;
-        }
-
-        return false;
     }
 }
