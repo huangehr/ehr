@@ -1,4 +1,4 @@
-package com.yihu.ehr.controller;
+package com.yihu.ehr.browser.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import io.swagger.annotations.ApiOperation;

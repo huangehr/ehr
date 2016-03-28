@@ -80,6 +80,7 @@ public class RestApi {
         public static final String TypeChildren                     = "/std/types/parent_id/childrens";
         public static final String TypesChildren                    = "/std/types/childrens";
         public static final String TypeOther                        = "/std/types/{id}/other";
+        public static final String TypeList                         = "/cda_types/code_name";
 
         public static final String Versions                         = "/std/versions";
         public static final String Version                          = "/std/versions/{version}";

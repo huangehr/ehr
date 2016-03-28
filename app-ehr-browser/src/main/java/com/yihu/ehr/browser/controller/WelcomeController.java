@@ -1,4 +1,4 @@
-package com.yihu.ehr.controller;
+package com.yihu.ehr.browser.controller;
 
 import java.util.Date;
 import java.util.Map;
