@@ -168,7 +168,7 @@ public class PackageResolver {
 
             recursiveDelete(unZippedPath);
         } catch (Exception e) {
-            LogService.getLogger(PackageResolver.class).error("文档清除失败:" + e.getMessage());
+            LogService.getLogger(PackageResolver.class).error("House keep failed when package resolve finished:" + e.getMessage());
         }
     }
 
