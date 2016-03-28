@@ -100,7 +100,7 @@ public class UserController {
     @RequestMapping("deleteUser")
     @ResponseBody
     public Object deleteUser(String userId) {
-        String url = "/users/" + userId;
+        String url = "/users/admin/" + userId;
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
@@ -128,7 +128,7 @@ public class UserController {
     @RequestMapping("activityUser")
     @ResponseBody
     public Object activityUser(String userId, boolean activated) {
-        String url = "/users/"+userId;
+        String url = "/users/admin/"+userId;
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
@@ -227,7 +227,7 @@ public class UserController {
 
     @RequestMapping("getUser")
     public Object getUser(Model model, String userId, String mode) throws IOException {
-        String url = "/users/"+userId;
+        String url = "/users/admin/"+userId;
         String resultStr = "";
         Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();

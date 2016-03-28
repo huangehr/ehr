@@ -52,7 +52,7 @@ public class OrgAdapterPlanController extends ExtendController<OrgAdapterPlanSer
             resultStr = HttpClientUtil.doGet(service.comUrl + url, params, service.username, service.password);
             model.addAttribute("planId", planId);
             model.addAttribute("allData", resultStr);
-            model.addAttribute("contentPage", "adapter/adapterCustomize");
+            model.addAttribute("contentPage", "/adapter/adapterCustomize");
             return "generalView";
         } catch (Exception e) {
             return systemError();
