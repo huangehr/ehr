@@ -3,15 +3,11 @@ package com.yihu.ehr.standard.cdatype.service;
 import com.yihu.ehr.query.BaseJpaService;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author AndyCai
@@ -22,8 +18,6 @@ import java.util.Map;
 @Service
 public class CDATypeManager extends BaseJpaService<CDAType, XcdaTypeRepository>{
 
-    @Autowired
-    private XcdaTypeRepository cdaTypeRepository;
 
     public XcdaTypeRepository getXcdaTypeRepository(){
        return (XcdaTypeRepository) getRepository();
@@ -137,7 +131,7 @@ public class CDATypeManager extends BaseJpaService<CDAType, XcdaTypeRepository>{
 
 
 
-    public List<CDAType> getParentType(String strId, String strKey) {
+    public List<CDAType> getChildrenType(String strId, String strKey) {
         List<CDAType> listType = null;
         Session session = currentSession();
         String strSql = "from CDAType a where 1=1 ";
@@ -157,8 +151,31 @@ public class CDATypeManager extends BaseJpaService<CDAType, XcdaTypeRepository>{
     }
 
 
+//    public List<CDAType> getParentType(String strId, String strKey) {
+//        List<CDAType> listType = null;
+//        Session session = currentSession();
+//        String strSql = "from CDAType a where 1=1 ";
+//        if (strId != null && !strId.equals("")) {
+//            strId="'"+strId.replaceAll(",","','")+"'";
+//            strSql += " and a.id not in ("+strId+")";
+//        }
+//        if (strKey != null && !strKey.equals("")) {
+//            strSql += " and (a.code like :strkey or a.name like :strkey)";
+//        }
+//        Query query = session.createQuery(strSql);
+//        if (strKey != null && !strKey.equals("")) {
+//            query.setString("strkey", "%" + strKey + "%");
+//        }
+//        listType = query.list();
+//        return listType;
+//    }
+
     public List<CDAType> getOtherCDAType(String id) {
-        List<CDAType> list = cdaTypeRepository.getOtherCDAType(id);
+        List<CDAType> list = getXcdaTypeRepository().getOtherCDAType(id);
         return list;
+    }
+
+    public List<CDAType> getCdaTypeExcludeSelfAndChildren(String childrenIds) {
+        return null;
     }
 }

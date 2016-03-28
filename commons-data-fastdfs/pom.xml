@@ -13,13 +13,13 @@
     <name>commons-data-fastdfs</name>
 
     <dependencies>
-        <dependency>
-            <groupId>happy.fish</groupId>
-            <artifactId>fastDFS</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/fastdfs_lib.jar</systemPath>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>happy.fish</groupId>-->
+            <!--<artifactId>fastDFS</artifactId>-->
+            <!--<version>1.0</version>-->
+            <!--<scope>system</scope>-->
+            <!--<systemPath>${basedir}/lib/fastdfs_lib.jar</systemPath>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-util</artifactId>
