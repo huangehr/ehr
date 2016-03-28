@@ -107,7 +107,7 @@ public class MGeography implements Serializable {
         this.postalCode = postalCode;
     }
 
-    public String getCanonicalAddress() {
+    public String fullAddress() {
         String addressStr="";
         if (!StringUtils.isEmpty(province)){
             addressStr += province;
@@ -132,7 +132,7 @@ public class MGeography implements Serializable {
         return addressStr;
     }
 
-    public boolean isNullAddress() {
+    public boolean nullAddress() {
         return
                 StringUtils.isEmpty(province)
                         && StringUtils.isEmpty(city)
