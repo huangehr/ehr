@@ -73,7 +73,7 @@ public class DictController extends BaseController {
         MStdDict mStdDict = dictClient.getCdaDictInfo(dictId, versionCode);
         DictModel dictModel = convertToModel(mStdDict, DictModel.class);
 
-        if (dictModel != null) {
+        if (dictModel == null) {
             return failed("数据获取失败!");
         }
 
@@ -106,7 +106,6 @@ public class DictController extends BaseController {
 
             //代码唯一性校验
             boolean isExist = dictClient.isExistDictCode(dictModel.getCode(),versionCode);
-
             MStdDict mStdDict = convertToModel(dictModel, MStdDict.class);
             if (dictModel.getId() == 0) {
                 if(isExist)
@@ -269,7 +268,7 @@ public class DictController extends BaseController {
             if (StringUtils.isNotEmpty(errorMsg)) {
                 return failed(errorMsg);
             }
-            //代码唯一性校验
+
             boolean isExist = dictClient.isExistEntryCode(dictEntryModel.getCode(),versionCode);
             MStdDictEntry mStdDictEntry = convertToModel(dictEntryModel, MStdDictEntry.class);
             if (dictEntryModel.getId() == 0) {
@@ -301,48 +300,6 @@ public class DictController extends BaseController {
             return failedSystem();
         }
     }
-
-//    @RequestMapping(value = "/updateDictEntry",method = RequestMethod.POST)
-//    @ApiOperation(value = "修改字典项")
-//    public Envelop updateDictEntry(
-//                                  @ApiParam(name = "versionCode", value = "标准版本代码")
-//                                  @RequestParam(value = "versionCode") String versionCode,
-//                                  @ApiParam(name = "dictId", value = "字典ID")
-//                                  @RequestParam(value = "dictId") String dictId,
-//                                  @ApiParam(name = "entryId",value = "字典项ID")
-//                                  @RequestParam(value = "entryId")String entryId,
-//                                  @ApiParam(name = "entryCode",value = "字典项代码")
-//                                  @RequestParam(value = "entryCode")String entryCode,
-//                                  @ApiParam(name = "entryValue",value = "字典项值")
-//                                  @RequestParam(value = "entryValue")String entryValue,
-//                                  @ApiParam(name = "description",value = "说明")
-//                                  @RequestParam(value = "description")String description) throws JsonProcessingException {
-//
-//        Envelop envelop = new Envelop();
-//        ObjectMapper mapper = new ObjectMapper();
-//        Map<String,Object> dictEntryMap = new HashMap<>();
-//
-//        dictEntryMap.put("id",entryId);
-//        dictEntryMap.put("dictId",dictId);
-//        dictEntryMap.put("code",entryCode);
-//        dictEntryMap.put("value",entryValue);
-//        dictEntryMap.put("desc",description);
-//
-//        String dictEntryJsonModel = mapper.writeValueAsString(dictEntryMap);
-//
-//        MStdDictEntry mStdDictEntry = dictClient.updateDictEntry(versionCode,dictEntryJsonModel);
-//        DictEntryModel dictEntryModel = convertToModel(mStdDictEntry,DictEntryModel.class);
-//
-//        if (dictEntryModel != null){
-//            envelop.setSuccessFlg(true);
-//            envelop.setObj(dictEntryModel);
-//        }else {
-//            envelop.setSuccessFlg(false);
-//            envelop.setErrorMsg("修改字典项失败");
-//        }
-//
-//        return envelop;
-//    }
 
     @RequestMapping(value = "/dict_entrys", method = RequestMethod.GET)
     @ApiOperation(value = "查询字典项")
@@ -382,8 +339,7 @@ public class DictController extends BaseController {
         if (dictEntryModel == null) {
             return failed("数据获取失败!");
         }
-
-        return success(null);
+        return success(dictEntryModel);
     }
 
     @RequestMapping(value = "/dict_entry", method = RequestMethod.DELETE)
@@ -391,8 +347,8 @@ public class DictController extends BaseController {
     public Envelop deleteDictEntry(
             @ApiParam(name = "versionCode", value = "标准版本代码")
             @RequestParam(value = "versionCode") String versionCode,
-            @ApiParam(name = "dictId", value = "字典ID")
-            @RequestParam(value = "dictId") long dictId,
+            /*@ApiParam(name = "dictId", value = "字典ID")
+            @RequestParam(value = "dictId") long dictId,*/
             @ApiParam(name = "entryIds", value = "字典项ID")
             @RequestParam(value = "entryIds") String entryIds) {
 

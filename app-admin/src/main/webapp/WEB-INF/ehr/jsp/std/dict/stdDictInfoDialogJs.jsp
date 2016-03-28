@@ -44,12 +44,13 @@
                 this.$description.ligerTextBox({width:240,height:100 });
 
                 this.$form.attrScan();
+
 				var info = $.parseJSON('${info}')
                 this.$form.Fields.fillValues({
                     name: info.name,
                     code: info.code,
-                    <%--baseDictId: info.baseDictId,--%>
-                    stdSource : info.stdSource,
+                    baseDictId: info.baseDictId,
+                    stdSource : info.sourceId,
                     stdVersion : info.stdVersion,
                     id: info.id ,
                     description: info.description,
@@ -62,15 +63,15 @@
                 var strVersionCode = parent.getStrVersion();
                 var url = '';
                 if(dictId==1){
-                    url = "${contextRoot}/cdadict/getStdSourceList?strVersionCode="+strVersionCode;
+                    url = "${contextRoot}/cdadict/getStdSourceList";
                     dataModel.fetchRemote(url,{
                         success: function(data) {
-                            var d = eval('('+ data.result +')');
+                            //var d = eval('('+ data.detailModelList +')');
                             target.ligerComboBox({
                                 selectBoxHeight:220,
                                 valueField: 'id',
                                 textField: 'name',
-                                data: d
+                                data: data.detailModelList
                             });
                     }});
                 }

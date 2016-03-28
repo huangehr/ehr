@@ -46,8 +46,8 @@ public interface DictClient {
     @RequestMapping(value = RestApi.Standards.Dictionaries, method = RequestMethod.POST)
     @ApiOperation(value = "新增字典")
     MStdDict addDict(
-            @ApiParam(name = "stdVersion", value = "标准版本", defaultValue = "")
-            @RequestParam(value = "stdVersion") String stdVersion,
+            @ApiParam(name = "version", value = "标准版本", defaultValue = "")
+            @RequestParam(value = "version") String stdVersion,
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam(value = "model") String model);
 
