@@ -71,7 +71,7 @@ public class DictController extends BaseController {
         MStdDict mStdDict = dictClient.getCdaDictInfo(dictId, versionCode);
         DictModel dictModel = convertToModel(mStdDict, DictModel.class);
 
-        if (dictModel != null) {
+        if (dictModel == null) {
             return failed("数据获取失败!");
         }
 
@@ -380,8 +380,7 @@ public class DictController extends BaseController {
         if (dictEntryModel == null) {
             return failed("数据获取失败!");
         }
-
-        return success(null);
+        return success(dictEntryModel);
     }
 
     @RequestMapping(value = "/dict_entry", method = RequestMethod.DELETE)
@@ -389,8 +388,8 @@ public class DictController extends BaseController {
     public Envelop deleteDictEntry(
             @ApiParam(name = "versionCode", value = "标准版本代码")
             @RequestParam(value = "versionCode") String versionCode,
-            @ApiParam(name = "dictId", value = "字典ID")
-            @RequestParam(value = "dictId") long dictId,
+            /*@ApiParam(name = "dictId", value = "字典ID")
+            @RequestParam(value = "dictId") long dictId,*/
             @ApiParam(name = "entryIds", value = "字典项ID")
             @RequestParam(value = "entryIds") String entryIds) {
 
