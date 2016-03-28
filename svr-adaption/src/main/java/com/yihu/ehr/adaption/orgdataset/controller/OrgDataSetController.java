@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/adapter/org")
-@Api(protocols = "https", value = "orgdataset", description = "机构数据集管理接口", tags = {"机构数据集"})
+@Api(protocols = "https", value = "orgdataset", description = "机构数据集管理接口", tags = {"机构数据集管理接口"})
 
 public class OrgDataSetController extends ExtendController<MOrgDataSet> {
 
@@ -75,6 +75,9 @@ public class OrgDataSetController extends ExtendController<MOrgDataSet> {
             @RequestParam(value = "model") String model) throws Exception{
 
         OrgDataSet dataModel = objectMapper.readValue(model, OrgDataSet.class);
+        if(orgDataSetService.retrieve(dataModel.getId())==null)
+            throw errNotFound();
+
         dataModel.setUpdateDate(new Date());
         return getModel(orgDataSetService.save(dataModel));
 

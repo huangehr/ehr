@@ -36,8 +36,8 @@ public class CdaTypeController extends BaseRestController {
     @RequestMapping(value = RestApi.Standards.TypeChildren, method = RequestMethod.GET)
     @ApiOperation(value = "根据父级ID获取下级")
     public List<MCDAType> getChildrenByPatientId(
-            @ApiParam(name = "id", value = "父级id")
-            @PathVariable(value = "id") String parentId) throws Exception {
+            @ApiParam(name = "id", value = "父级id",defaultValue = "")
+            @RequestParam(value = "id",required = false) String parentId) throws Exception {
 
         List<CDAType> listType = cdaTypeManager.getChildrenCDATypeByParentId(parentId);
         return (List<MCDAType>)convertToModels(listType,new ArrayList<MCDAType>(listType.size()),MCDAType.class,"");
@@ -57,22 +57,22 @@ public class CdaTypeController extends BaseRestController {
         if(childrenIds.length()>0) {
             childrenIds = childrenIds.substring(0, childrenIds.length() - 1);
         }
-        List<CDAType> cdaTypeList = cdaTypeManager.getParentType(childrenIds,key);
+        List<CDAType> cdaTypeList = cdaTypeManager.getChildrenType(childrenIds,key);
         return  (List<MCDAType>)convertToModels(cdaTypeList,new ArrayList<MCDAType>(cdaTypeList.size()),MCDAType.class,"");
     }
 
 
-//    @RequestMapping(value = "/cda_types/code_name",method = RequestMethod.GET)
-//    @ApiOperation(value = "根据code或者name获取CDAType列表")
-//    public List<MCDAType> getCdaTypeByCodeOrName(
-//            @ApiParam(name = "code", value = "代码")
-//            @RequestParam(value = "code") String code,
-//            @ApiParam(name = "name", value = "名称")
-//            @RequestParam(value = "name") String name) {
-//
-//        List<CDAType> cdaTypeList = cdaTypeManager.GetCdaTypeByCodeOrName(code,name);
-//        return  (List<MCDAType>)convertToModels(cdaTypeList,new ArrayList<MCDAType>(cdaTypeList.size()),MCDAType.class,"");
-//    }
+    @RequestMapping(value = RestApi.Standards.TypeList,method = RequestMethod.GET)
+    @ApiOperation(value = "根据code或者name获取CDAType列表")
+    public List<MCDAType> getCdaTypeByCodeOrName(
+            @ApiParam(name = "code", value = "代码")
+            @RequestParam(value = "code") String code,
+            @ApiParam(name = "name", value = "名称")
+            @RequestParam(value = "name") String name) {
+
+        List<CDAType> cdaTypeList = cdaTypeManager.GetCdaTypeByCodeOrName(code,name);
+        return  (List<MCDAType>)convertToModels(cdaTypeList,new ArrayList<MCDAType>(cdaTypeList.size()),MCDAType.class,"");
+    }
 
 
 //    @RequestMapping(value = "/cda_types/ids/{ids}",method = RequestMethod.GET)
@@ -162,7 +162,7 @@ public class CdaTypeController extends BaseRestController {
      * 删除CDA类别，若该类别存在子类别，将一并删除子类别
      * 先根据当前的类别ID获取全部子类别ID，再进行删除
      */
-    @RequestMapping(value = RestApi.Standards.Types, method = RequestMethod.DELETE)
+    @RequestMapping(value = "/test", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除CDA类别，若该类别存在子类别，将一并删除子类别")
     public boolean deleteCDATypeByPatientIds(
             @ApiParam(name = "ids", value = "ids")
@@ -175,6 +175,37 @@ public class CdaTypeController extends BaseRestController {
         }
         return cdaTypeManager.deleteCdaType(childrenIds);
     }
+
+    @RequestMapping(value = RestApi.Standards.TypeOther, method = RequestMethod.GET)
+    @ApiOperation(value = "获取cdaType列表（不包含本身）")
+    public List<MCDAType> getOtherCDAType(
+            @ApiParam(name = "id", value = "cdaType编号")
+            @PathVariable(value = "id") String id) throws Exception {
+        List<CDAType> listType = cdaTypeManager.getOtherCDAType(id);
+        return (List<MCDAType>)convertToModels(listType,new ArrayList<MCDAType>(listType.size()),MCDAType.class,"");
+    }
+
+
+    @RequestMapping(value = "/test", method = RequestMethod.GET)
+    @ApiOperation(value = "根据父级类别获取父级类别所在以下所有子集类别（包括当前父级列表）")
+    public List<MCDAType> getCdaTypeExcludeSelfAndChildren(
+            @ApiParam(name = "id", value = "id")
+            @RequestParam(value = "id") String id,
+            @ApiParam(name = "key", value = "查询条件")
+            @RequestParam(value = "key") String key) throws Exception {
+
+        List<CDAType> parentTypes = cdaTypeManager.getCDATypeByIds(new String[]{"id"});
+        String childrenIds = getChildIncludeSelfByParentsAndChildrenIds(parentTypes,"");   //递归获取
+        List<CDAType> cdaTypes = cdaTypeManager.getCdaTypeExcludeSelfAndChildren(childrenIds);
+
+        return  (List<MCDAType>)convertToModels(cdaTypes,new ArrayList<MCDAType>(cdaTypes.size()),MCDAType.class,"");
+    }
+
+
+
+
+
+
 
     /**
      * 根据父级类别获取父级类别所在以下所有子集类别（包括当前父级列表）

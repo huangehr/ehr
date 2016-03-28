@@ -37,6 +37,8 @@ public class StdHibernateConfig extends HibernateConfig  {
         vesionedEntitys.put("com.yihu.ehr.standard.datasets.service.MetaData", "std_meta_data_");
         vesionedEntitys.put("com.yihu.ehr.standard.dict.service.Dict", "std_dictionary_");
         vesionedEntitys.put("com.yihu.ehr.standard.dict.service.DictEntry", "std_dictionary_entry_");
+        vesionedEntitys.put("com.yihu.ehr.standard.document.service.CDADocument", "std_cda_document_");
+        vesionedEntitys.put("com.yihu.ehr.standard.document.service.CDADataSetRelationship", "std_cda_data_set_relationship_");
     }
 
     private static void addPath(File f) throws Exception {

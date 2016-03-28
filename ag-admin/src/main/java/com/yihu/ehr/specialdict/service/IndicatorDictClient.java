@@ -1,0 +1,82 @@
+package com.yihu.ehr.specialdict.service;
+
+import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.dict.MSystemDict;
+import com.yihu.ehr.model.specialdict.MDrugDict;
+import com.yihu.ehr.model.specialdict.MIndicatorsDict;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.Collection;
+
+/**
+ * Created by CWS on 2016/2/29.
+ */
+@FeignClient("svr-special-dict")
+@RequestMapping(ApiVersion.Version1_0)
+@ApiIgnore
+public interface IndicatorDictClient {
+
+    @RequestMapping(value = "/dict/indicator", method = RequestMethod.POST)
+    @ApiOperation(value = "创建新的指标字典" )
+    MIndicatorsDict createIndicatorsDict(
+            @ApiParam(name = "dictionary", value = "字典JSON结构")
+            @RequestParam(value = "dictionary") String dictJson);
+
+    @RequestMapping(value = "dict/indicator/{id}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据id删除指标字典")
+    boolean deleteIndicatorsDict(
+            @ApiParam(name = "id", value = "指标字典代码")
+            @PathVariable( value = "id") String id);
+
+    @RequestMapping(value = "/dict/indicator", method = RequestMethod.PUT)
+    @ApiOperation(value = "更新指标字典" )
+    MIndicatorsDict updateIndicatorsDict(
+            @ApiParam(name = "dictionary", value = "字典JSON结构")
+            @RequestParam(value = "dictionary") String dictJson) ;
+
+    @RequestMapping(value = "/dict/indicator/{id}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据ID获取相应的指标字典信息。" )
+    MIndicatorsDict getIndicatorsDict(
+            @ApiParam(name = "id", value = "字典内码")
+            @PathVariable(value = "id") String id);
+
+    @RequestMapping(value = "/dict/indicators", method = RequestMethod.GET)
+    @ApiOperation(value = "根据查询条件查询相应的指标字典信息。" )
+    Collection<MIndicatorsDict> getIndicatorsDictList(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,code,name,type,unit,upperLimit,lowerLimit,description")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+code,+name")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) ;
+
+    @RequestMapping(value = "dict/indicator/icd10/{id}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据指标的ID判断是否与ICD10字典存在关联。")
+    boolean indicatorIsUsage(
+            @ApiParam(name = "id", value = "指标字典代码")
+            @PathVariable( value = "id") String id);
+
+    @RequestMapping(value = "/dict/indicator/existence/name/{name}" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断提交的字典名称是否已经存在")
+    boolean isNameExists(
+            @ApiParam(name = "name", value = "name", defaultValue = "")
+            @PathVariable(value = "name") String name);
+
+    @RequestMapping(value = "/dict/indicator/existence/code/{code}" , method = RequestMethod.GET)
+    @ApiOperation(value = "判断提交的字典代码是否已经存在")
+    boolean isCodeExists(
+            @ApiParam(name = "code", value = "code", defaultValue = "")
+            @PathVariable(value = "code") String code);
+
+}

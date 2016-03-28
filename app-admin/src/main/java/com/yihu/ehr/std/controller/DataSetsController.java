@@ -3,6 +3,7 @@ package com.yihu.ehr.std.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.datasset.DataSetModel;
 import com.yihu.ehr.agModel.standard.datasset.MetaDataModel;
+import com.yihu.ehr.agModel.standard.dict.DictModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
@@ -16,10 +17,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -34,8 +32,10 @@ public class DataSetsController extends BaseUIController {
     private String username;
     @Value("${service-gateway.password}")
     private String password;
-    @Value("${service-gateway.url}")
+    @Value("${service-gateway.stdurl}")
     private String comUrl;
+    @Value("${service-gateway.url}")
+    private String adminUrl;
 
 //    @RequestMapping("/initial")
 //    public String dataSetInitial() {
@@ -63,52 +63,7 @@ public class DataSetsController extends BaseUIController {
     }
 
     /**
-     * 数据集版本号查询的方法
-     *
-     * @return
-     */
-    @RequestMapping("/searchVersion")
-    @ResponseBody
-    public Object searchVersion() {
-        Envelop result = new Envelop();
-        try {
-            String url = "/version/allVersions";
-            String  _rus = HttpClientUtil.doGet(comUrl+url,username,password);
-            //todo:ת��MAP
-//            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-//            CDAVersionModel[] cdaVersionModels = objectMapper.readValue(_rus, CDAVersionModel[].class);
-//            List<String> cdaVersionslist = new ArrayList<>();
-//            for (CDAVersionModel cdaVersionModel : cdaVersionModels) {
-//                cdaVersionslist.add(cdaVersionModel.getVersion());
-//            }
-//            result.setObj(cdaVersionslist);
-            result.setObj(_rus);
-            result.setSuccessFlg(true);
-        } catch (Exception ex) {
-            LogService.getLogger(DataSetsController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-        }
-        return result;
-
-        /*Result result = new Result();
-        try {
-            XCDAVersion[] cdaVersions = xcdaVersionManager.getVersionList();
-            List<String> cdaVersionslist = new ArrayList<String>();
-            for (XCDAVersion xcdaVersion : cdaVersions) {
-                cdaVersionslist.add(xcdaVersion.getVersion());
-            }
-            result.setObj(cdaVersionslist);
-            result.setSuccessFlg(true);
-            return result.toJson();
-        } catch (Exception e) {
-            result.setSuccessFlg(false);
-            return result.toJson();
-        }*/
-    }
-
-    /**
-     * 查询数据集的方法
-     *
+     * 数据集分页查询
      * @param codename
      * @param page
      * @param rows
@@ -117,6 +72,7 @@ public class DataSetsController extends BaseUIController {
     @RequestMapping("/searchDataSets")
     @ResponseBody
     public Object searchDataSets(String codename, String version, int page, int rows) {
+        //TODO 过滤问题
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         if (StringUtils.isEmpty(version)) {
@@ -129,7 +85,7 @@ public class DataSetsController extends BaseUIController {
             filters += "name?%"+codename+"%";
 
         }
-        String url = "/std/data_sets";
+        String url = "/data_sets";
         try{
             Map<String,Object> params = new HashMap<>();
             params.put("fields","");
@@ -145,162 +101,60 @@ public class DataSetsController extends BaseUIController {
             envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
         return envelop;
-
-        /*CDAVersion cdaVersion = new CDAVersion();
-        Result result = new Result();
-        String strErrMessage = "";
-        if (version == null || version == "") {
-            strErrMessage += "请选择版本号!";
-        }
-        if (strErrMessage != "") {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(strErrMessage);
-            return result.toJson();
-        }
-        cdaVersion.setVersion(version);
-        List<DataSetModel> dataSet = null;
-        Integer totalCount = null;
-        try {
-            dataSet = dataSetManager.searchDataSetList(codename, page, rows, cdaVersion);
-            totalCount = dataSetManager.searchDataSetInt(cdaVersion);
-            if (dataSet == null) {
-                result.setSuccessFlg(false);
-            } else {
-                if (rows == 0)
-                    rows = 1;
-                result = getResult(dataSet, totalCount, page, rows);
-                result.setSuccessFlg(true);
-            }
-        } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(e.getMessage());
-        }
-        return result.toJson();*/
     }
 
-    /**
-     * 删除数据集信息的方法
-     *
-     * @param dataSetId
-     * @return
-     */
     @RequestMapping("/deleteDataSet")
     @ResponseBody
     public Object deleteDataSet(Long dataSetId, String version) {
-        Envelop result = new Envelop();
+        Envelop envelop = new Envelop();
         if (StringUtils.isEmpty(dataSetId) || dataSetId.equals(0)) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg("数据集id和版本号不能为空!");
-            return result;
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("数据集id和版本号不能为空!");
+            return envelop;
         }
-        String url = "/std/data_set";
+        String url = "/data_set/"+dataSetId;
         try{
             Map<String,Object> params = new HashMap<>();
-            params.put("versionCode",version);
-            params.put("dataSetId",dataSetId);
-            String _msg = HttpClientUtil.doDelete(comUrl + url, params, username, password);
-            if(Boolean.parseBoolean(_msg)){
-                result.setSuccessFlg(true);
-            }else{
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.DeleteDataSetFailed.toString());
-            }
+            params.put("version",version);
+            params.put("id",dataSetId);
+            String envelopStr = HttpClientUtil.doDelete(comUrl + url, params, username, password);
+            return envelopStr;
         }catch(Exception ex){
             LogService.getLogger(DataSetsController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result;
-
-
-        /*Result result = new Result();
-        if (dataSetId == null || dataSetId.equals("") || dataSetId.equals(0)) {
-            result.setSuccessFlg(false);
-            return result.toJson();
-        }
-        try {
-            int iResult = metaDataManager.removeMetaDataBySetId(version, dataSetId);
-            if (iResult >= 0) {
-                iResult = dataSetManager.deleteDataSet(dataSetId, version);
-                if (iResult >= 0)
-                    result.setSuccessFlg(true);
-                else
-                    result.setSuccessFlg(false);
-            } else {
-                result.setSuccessFlg(false);
-            }
-        } catch (Exception e) {
-            result.setSuccessFlg(false);
-        }
-        return result.toJson();*/
+        return envelop;
     }
 
     @RequestMapping(value = "/getDataSet", produces = "text/html;charset=UTF-8")
     @ResponseBody
     public Object getDataSet(Long dataSetId,String versionCode) {
-        Envelop result = new Envelop();
+        Envelop envelop = new Envelop();
         if (StringUtils.isEmpty(dataSetId) || dataSetId.equals(0)) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg("数据集Id和版本号不能为空!");
-            return result;
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("数据集Id和版本号不能为空!");
+            return envelop;
         }
-        String url = "/std/data_set";
+        String url = "/data_set/"+dataSetId;
         try{
             Map<String,Object> params = new HashMap<>();
-            params.put("versionCode",versionCode);
-            params.put("dataSetId",dataSetId);
-            String _rus = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.GetDataSetFailed.toString());
-            }else {
-                result.setSuccessFlg(true);
-                //TODO 要转化为对象在存储到result中
-                result.setObj(_rus);
-            }
+            params.put("version",versionCode);
+            params.put("id",dataSetId);
+            String envelopStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+            return envelopStr;
         }catch(Exception ex){
             LogService.getLogger(DataSetsController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result;
-
-       /* CDAVersion cdaVersion = new CDAVersion();
-        cdaVersion.setVersion(versionCode);
-        Result result = new Result();
-        if (dataSetId == null || dataSetId.equals("") || dataSetId.equals(0)) {
-            result.setSuccessFlg(false);
-            return result.toJson();
-        }
-        try {
-            XDataSet dataSet = dataSetManager.getDataSet(dataSetId, cdaVersion);
-            DataSetModel dataSetModel = dataSetManager.getDataSet(dataSet);
-            if (dataSet == null) {
-                result.setSuccessFlg(false);
-            } else {
-                result.setSuccessFlg(true);
-                result.setObj(dataSetModel);
-            }
-        } catch (Exception ex) {
-            result.setSuccessFlg(false);
-        }
-        return result.toJson();*/
+        return envelop;
     }
 
-    /**
-     * 数据集信息修改的方法
-     *
-     * @param id
-     * @param code
-     * @param name
-     * @param type
-     * @param refStandard
-     * @param summary
-     * @return
-     */
     @RequestMapping("/saveDataSet")
     @ResponseBody
     public Object saveDataSet(long id, String code, String name, String type, String refStandard, String summary, String versionCode) {
+        //新增、修改数据集
         Envelop envelop = new Envelop();
         String strErrorMsg = "";
         if(StringUtils.isEmpty(code)) {
@@ -320,7 +174,7 @@ public class DataSetsController extends BaseUIController {
             envelop.setErrorMsg(strErrorMsg);
             return envelop;
         }
-        String url = "/std/data_set";
+        String url = "/data_set";
         try{
             Map<String,Object> params = new HashMap<>();
             params.put("version_code",versionCode);
@@ -341,11 +195,11 @@ public class DataSetsController extends BaseUIController {
 
             //修改数据集
             //获取原数据集对象
-            String urlGet = "std/data_set";
+            String urlGet = "/data_set/"+id;
             Map<String,Object> args = new HashMap<>();
             args.put("id",id);
             args.put("version",versionCode);
-            String envelopStrGet = HttpClientUtil.doGet(comUrl+urlGet,params,username,password);
+            String envelopStrGet = HttpClientUtil.doGet(comUrl+urlGet,args,username,password);
             Envelop envelopGet = objectMapper.readValue(envelopStrGet,Envelop.class);
             if (!envelopGet.isSuccessFlg()){
                 envelop.setSuccessFlg(false);
@@ -367,74 +221,8 @@ public class DataSetsController extends BaseUIController {
             envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
         return envelop;
-
-        /*CDAVersion cdaVersion = new CDAVersion();
-        cdaVersion.setVersion(versionCode);
-        Result result = new Result();
-        String strErrorMsg = "";
-        try {
-            if (code == null || code == "") {
-                strErrorMsg += "代码不能为空！";
-            }
-            if (name == null || name == "") {
-                strErrorMsg += "名称不能为空！";
-            }
-            if (refStandard == null || refStandard == "") {
-                strErrorMsg += "标准来源不能为空！";
-            }
-            if (cdaVersion == null || cdaVersion.getVersion() == "") {
-                strErrorMsg += "标准版本不能为空！";
-            }
-            XDataSet dataSet = new DataSet();
-            //新增时代码不能重复
-            if (id == 0) {
-                XDataSet dataSetCode = (XDataSet) dataSetManager.getDataSet(code, cdaVersion.getVersion());
-                if (dataSetCode != null) {
-                    strErrorMsg += "代码不能重复！";
-                }
-            } else {
-                //修改时代码不能重复
-                dataSet = (XDataSet) dataSetManager.getDataSet(code, cdaVersion.getVersion());
-                if (dataSet != null && dataSet.getId() != id) {
-                    strErrorMsg += "代码不能重复！";
-                }
-                else {
-                    dataSet = dataSetManager.getDataSet(id, cdaVersion);
-                }
-            }
-            if (strErrorMsg != "") {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(strErrorMsg);
-                return result.toJson();
-            }
-             dataSet.setInnerVersion(cdaVersion);
-            dataSet.setCode(code);
-            dataSet.setName(name);
-            dataSet.setReference(refStandard);
-            dataSet.setSummary(summary);
-            boolean bo = dataSetManager.saveDataSet(dataSet);
-            if (bo) {
-                result.setSuccessFlg(true);
-            } else {
-                result.setSuccessFlg(false);
-            }
-        } catch (Exception ex) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ex.getMessage());
-        }
-        return result.toJson();*/
     }
 
-    /**
-     * 查询数据源的方法
-     *
-     * @param id
-     * @param version
-     * @param metaDataCode
-     * @param page
-     * @param rows
-     * @return
-     */
     @RequestMapping("/searchMetaData")
     @ResponseBody
     public Object searchMetaData(Long id, String version, String metaDataCode, int page, int rows) {
@@ -444,11 +232,12 @@ public class DataSetsController extends BaseUIController {
             result.setErrorMsg("数据元id、标准版本不能为空!");
             return result;
         }
-        String url = "/std/meta_datas";
+        String url = "/meta_datas";
         String filters = "dataSetId="+id+";";
         if(!StringUtils.isEmpty(metaDataCode)){
-            //TODO
-//            filters += "code?"+metaDataCode+" g1;name?"+metaDataCode+" g1;";
+            //TODO 过滤问题
+//            filters += "code?"+metaDataCode+" g1;name?"+metaDataCode+" g1;"
+            filters += "name?"+metaDataCode;
         }
         try{
             Map<String,Object> params = new HashMap<>();
@@ -471,44 +260,12 @@ public class DataSetsController extends BaseUIController {
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
         return result;
-
-        /*List<MetaDataModel> metaDataModel = new ArrayList<>();
-        CDAVersion cdaVersion = new CDAVersion();
-        Result result = new Result();
-        if (id == null || id.equals(0) || id.equals("") || version == null || version.equals(0) || version.equals("")) {
-            result.setSuccessFlg(false);
-            return result.toJson();
-        }
-        DataSet dataSetModel = new DataSet();
-        cdaVersion.setVersion(version);
-        dataSetModel.setId(id);
-        dataSetModel.setInnerVersion(cdaVersion);
-        dataSetModel.setCode(metaDataCode);
-        dataSetModel.setName(metaDataCode);
-        Integer totalCount = null;
-        try {
-            metaDataModel = metaDataManager.searchMetaDataList(dataSetModel, page, rows);
-
-            totalCount = metaDataManager.searchDataSetInt(dataSetModel);
-            result.setSuccessFlg(true);
-            result = getResult(metaDataModel, totalCount, page, rows);
-        } catch (Exception e) {
-            result.setSuccessFlg(false);
-            return result.toJson();
-        }
-        return result.toJson();*/
     }
 
-    /**
-     * 删除数据元的方法
-     *
-     * @param ids
-     * @return
-     */
     @RequestMapping("/deleteMetaData")
     @ResponseBody
     public Object deleteMetaData(String ids, String version) {
-        Envelop result = new Envelop();
+        Envelop envelop = new Envelop();
         String strErrMessage = "";
         if (StringUtils.isEmpty(ids)) {
             strErrMessage += "请选择数据元!";
@@ -517,55 +274,23 @@ public class DataSetsController extends BaseUIController {
             strErrMessage += "请选择标准版本!";
         }
         if (!strErrMessage.equals("")) {
-            result.setErrorMsg(strErrMessage);
-            result.setSuccessFlg(false);
-            return result;
+            envelop.setErrorMsg(strErrMessage);
+            envelop.setSuccessFlg(false);
+            return envelop;
         }
         try {
-            String url = "/std/meta_data";
+            String url = "/meta_data";
             Map<String,Object> params = new HashMap<>();
-            params.put("ids",ids);// TODO api参数为Long ids  ---批量删除传递过来的是ids字符串
-            params.put("versionCode",version);
-            String _msg = HttpClientUtil.doDelete(comUrl+url,params,username,password);
-            if(Boolean.parseBoolean(_msg)){
-                result.setSuccessFlg(true);
-            }else{
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.DeleteMetaDataFailed.toString());
-            }
+            params.put("ids",ids);
+            params.put("version_code",version);
+            String envelopStr = HttpClientUtil.doDelete(comUrl+url,params,username,password);
+            return envelopStr;
         } catch (Exception ex) {
             LogService.getLogger(DataSetsController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result;
-
-        /*Result result = new Result();
-        String strErrMessage = "";
-       if (ids == null || ids.equals("")) {
-            strErrMessage += "请选择数据元!";
-        }
-        if (version == null || version.equals("")) {
-            strErrMessage += "请选择标准版本!";
-        }
-        if (!strErrMessage.equals("")) {
-            result.setErrorMsg(strErrMessage);
-            result.setSuccessFlg(false);
-            return result.toJson();
-        }
-        try {
-            int res = metaDataManager.deleteMetaDatas(ids, version);
-            if (res > -1) {
-                result.setSuccessFlg(true);
-            } else {
-                result.setSuccessFlg(false);
-            }
-        } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(e.getMessage());
-            return result.toJson();
-        }
-        return result.toJson();*/
+        return envelop;
     }
 
     @RequestMapping(value = "/getMetaData", produces = "text/html;charset=UTF-8")
@@ -588,22 +313,12 @@ public class DataSetsController extends BaseUIController {
             return envelop;
         }
         try {
-            String url = "/std/meta_datas";
+            String url = "/meta_data";
             Map<String,Object> params = new HashMap<>();
             params.put("metaDataId",metaDataId);
             params.put("versionCode",version);
-            String envulopStr = HttpClientUtil.doGet(comUrl+url,params,username,password);
-            Envelop envelopGet = objectMapper.readValue(envulopStr,Envelop.class);
-            if(envelopGet.isSuccessFlg()){
-                MetaDataModel metaDataModel = getEnvelopModel(envelopGet.getObj(),MetaDataModel.class);
-                List<MetaDataModel> list = new ArrayList<>();
-                list.add(metaDataModel);
-                envelop.setSuccessFlg(true);
-                envelop.setDetailModelList(list);
-                String _rus = objectMapper.writeValueAsString(envelop);
-                return _rus;
-            }
-            return envulopStr;
+            String envelopStr = HttpClientUtil.doGet(comUrl+url,params,username,password);
+            return envelopStr;
         } catch (Exception ex) {
             LogService.getLogger(DataSetsController.class).error(ex.getMessage());
             envelop.setSuccessFlg(false);
@@ -614,7 +329,7 @@ public class DataSetsController extends BaseUIController {
     @RequestMapping(value = "/updataMetaSet", produces = "text/html;charset=UTF-8")
     @ResponseBody
     public Object updataMetaSet(String info,String version) {
-        //TODO 新增、合二为一
+        //新增、合二为一
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
@@ -644,31 +359,31 @@ public class DataSetsController extends BaseUIController {
                 return envelop;
             }
 
-            String url = "/std/meta_data";
+            String url = "/meta_data";
             Map<String,Object> params = new HashMap<>();
             params.put("version",version);
 
             //新增数据元操作
             if(model.getId() ==0){
-                params.put("metaDataJson",info);
+                params.put("json_data",info);
                 String envelopStrNew = HttpClientUtil.doPost(comUrl+url,params,username,password);
                 return envelopStrNew;
             }
 
             //修改数据元操作
             //获取原数据元对象
-            String urlGet = "/std/meta_data";
+            String urlGet = "/meta_data";
             Map<String,Object> args = new HashMap<>();
             args.put("versionCode",version);
             args.put("metaDataId",model.getId());
-            String envelopStrGet = HttpClientUtil.doGet(comUrl+urlGet,params,username,password);
+            String envelopStrGet = HttpClientUtil.doGet(comUrl+urlGet,args,username,password);
             Envelop envelopGet = objectMapper.readValue(envelopStrGet,Envelop.class);
             if(!envelopGet.isSuccessFlg()){
                 envelop.setErrorMsg("数据元不存在！");
                 return envelop;
             }
-            MetaDataModel modelForUpdate = getEnvelopModel(envelop.getObj(),MetaDataModel.class);
-
+            String mStr = objectMapper.writeValueAsString(envelopGet.getObj());
+            MetaDataModel modelForUpdate = objectMapper.readValue(mStr, MetaDataModel.class);
             //设置修改值
             modelForUpdate.setCode(model.getCode());
             modelForUpdate.setName(model.getName());
@@ -683,7 +398,7 @@ public class DataSetsController extends BaseUIController {
             modelForUpdate.setNullable(model.isNullable());
             modelForUpdate.setPrimaryKey(model.isPrimaryKey());
             String metaDataJson = objectMapper.writeValueAsString(modelForUpdate);
-            params.put("metaDataJson",metaDataJson);
+            params.put("json_data",metaDataJson);
             String envelopStrUpdate = HttpClientUtil.doPost(comUrl+url,params,username,password);
             return envelopStrUpdate;
         } catch (Exception ex) {
@@ -695,160 +410,68 @@ public class DataSetsController extends BaseUIController {
     }
 
     /**
-     * 标准来源下拉框的查询
-     *
-     * @param version
-     * @return
-     */
-    @RequestMapping("getStdSourceList")
-    @ResponseBody
-    public Object getStdSourceList(String version) {
-        //TODO 页面调用的是标准字典Controller的方法
-
-        //临时测试用方法
-        Envelop envelop = new Envelop();
-        String url = "/standard_source/sources";
-        try{
-            Map<String,Object> params = new HashMap<>();
-            params.put("fields","");
-            params.put("filters","");
-            params.put("sorts","");
-            params.put("size",100);
-            params.put("page",1);
-            String envelopStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            if(StringUtils.isEmpty(envelopStr)){
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg(ErrorCode.GetStandardSourceFailed.toString());
-            }else{
-                return envelopStr;
-            }
-        }catch(Exception ex){
-            LogService.getLogger(StdSourceManagerController.class).error(ex.getMessage());
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(ErrorCode.SystemError.toString());
-        }
-        return envelop;
-    }
-
-
-   /* public List<StandardSourceForInterface> GetStandardSourceForInterface(XStandardSource[] xStandardSources) {
-        List<StandardSourceForInterface> results = new ArrayList<>();
-        for (XStandardSource xStandardSource : xStandardSources) {
-            StandardSourceForInterface info = new StandardSourceForInterface();
-            info.setId(xStandardSource.getId());
-            info.setCode(xStandardSource.getCode());
-            info.setName(xStandardSource.getName());
-            info.setSourceType(xStandardSource.getSourceType().getCode());
-            info.setDescription(xStandardSource.getDescription());
-            results.add(info);
-        }
-
-        return results;
-    }
-*/
-
-    /**
      * 检验字典查询的方法
-     *
      * @param version
-     * @param key
      * @return
      */
     @RequestMapping(value = "/getMetaDataDict", produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public String getMetaDataDict(String version, String key) {
+    public String getMetaDataDict(String version) {
         String strResult = "[]";
         try {
-            //TODO 无对应
-            String url = "/******";
+            //TODO
+            String url = "/std/dicts";
             Map<String,Object> params = new HashMap<>();
-            params.put("versionCode",version);
-            params.put("code",key);
-            params.put("name",key);
-            String _rus = HttpClientUtil.doGet(comUrl+url,params,username,password);
-            if (!StringUtils.isEmpty(_rus)) {
-//                ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-//                List<XDictForInterface> xDictForInterfaces = Arrays.asList(objectMapper.readValue(_rus,XDictForInterface.class));
-//                strResult = objectMapper.writeValueAsString(xDictForInterfaces);
-                return _rus;
+            params.put("fields","");
+            params.put("filters","");
+            params.put("sorts","");
+            params.put("page","1");
+            params.put("size","999");
+            params.put("version",version);
+            String envelopStr = HttpClientUtil.doGet(adminUrl+url,params,username,password);
+            Envelop envelopGet = objectMapper.readValue(envelopStr,Envelop.class);
+            if (envelopGet.isSuccessFlg()) {
+                List<DictModel> dictModels = (List<DictModel>)getEnvelopList(envelopGet.getDetailModelList(),new ArrayList<DictModel>(),DictModel.class);
+                strResult = objectMapper.writeValueAsString(dictModels);
             }
         } catch (Exception ex) {
             LogService.getLogger(DataSetsController.class).error(ex.getMessage());
         }
         return strResult;
-
-        /*CDAVersion cdaVersion = new CDAVersion();
-        cdaVersion.setVersion(version);
-        String strResult = "[]";
-        XDict[] xDicts = null;
-        try {
-            xDicts = dictManager.getDictLists(cdaVersion, key);
-            if (xDicts != null) {
-                XDictForInterface[] infos = new DictForInterface[xDicts.length];
-                int i = 0;
-                for (XDict xDict : xDicts) {
-                    XDictForInterface info = new DictForInterface();
-                    info.setId(String.valueOf(xDict.getId()));
-                    info.setCode(xDict.getCode());
-                    info.setName(xDict.getName());
-                    info.setAuthor(xDict.getAuthor());
-                    info.setBaseDictId(String.valueOf(xDict.getBaseDictId()));
-                    info.setCreateDate(String.valueOf(xDict.getCreateDate()));
-                    info.setDescription(xDict.getDescription());
-                    info.setStdVersion(xDict.getStdVersion());
-                    info.setHashCode(String.valueOf(xDict.getHashCode()));
-                    info.setInnerVersionId(xDict.getInnerVersionId());
-                    infos[i] = info;
-                    i++;
-                }
-                List<XDictForInterface> xDictForInterfaces = Arrays.asList(infos);
-                ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-                strResult = objectMapper.writeValueAsString(xDictForInterfaces);
-            }
-        } catch (Exception ex) {
-            LogService.getLogger(StdManagerRestController.class).error(ex.getMessage());
-        }
-        return strResult;*/
     }
 
+
+    /**
+     * 验证数据元内部编码是否存在
+     * @param version
+     * @param datasetId
+     * @param searchNm
+     * @param metaDataCodeMsg
+     * @return
+     */
     @RequestMapping("/validatorMetadata")
     @ResponseBody
     public Object validatorMetadata(String version, String datasetId, String searchNm, String metaDataCodeMsg) {
-        Envelop result = new Envelop();
-        String url ="/std/dataSet/validatorMetadata";
-        String _msg = "";
+        Envelop envelop = new Envelop();
+        String url ="/meta_data/is_exist/inner_code";
         try{
             Map<String,Object> params = new HashMap<>();
-            params.put("versionCode",version);
-            params.put("datasetId",datasetId);
-            params.put("searchNm",searchNm);
-            params.put("metaDataCodeMsg",metaDataCodeMsg);
-            _msg = HttpClientUtil.doGet(comUrl+url,params,username,password);
+            params.put("version",version);
+            params.put("dataSetId",datasetId);
+            params.put("inner_code",searchNm);
+            String _msg = HttpClientUtil.doGet(comUrl+url,params,username,password);
             if(Boolean.parseBoolean(_msg)){
-                result.setSuccessFlg(true);
+                envelop.setSuccessFlg(true);
             }else{
-                result.setSuccessFlg(false);
-                result.setErrorMsg("验证失败");
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("验证失败");
             }
         }catch(Exception ex){
             LogService.getLogger(DataSetsController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result;
-
-
-       /* if (metaDataCodeMsg.equals("metaDataCodeMsg")) {
-            if (metaDataManager.getCountByCode(version, searchNm, datasetId) > 0) {
-                return getSuccessResult(false).toJson();
-            }
-        }
-        if (metaDataCodeMsg.equals("fieldNameMsg")) {
-            if (metaDataManager.getCountByColumnName(version, searchNm, datasetId) > 0) {
-                return getSuccessResult(false).toJson();
-            }
-        }
-        return getSuccessResult(true).toJson();*/
+        return envelop;
     }
 
     /**
@@ -862,7 +485,7 @@ public class DataSetsController extends BaseUIController {
         //TODO 无对应
         Envelop result = new Envelop();
         try {
-            String url = "/std/dataSet/*******";
+            String url = "/dataSet/*******";
             Map<String,Object> params = new  HashMap<>();
             params.put("setId",setId);
             params.put("versionCode",versionCode);

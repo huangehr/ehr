@@ -58,9 +58,8 @@ public class CdaTypeController extends BaseUIController{
 
     @RequestMapping("getTreeGridData")
     @ResponseBody
-    //获取TreeData 用于初始页面显示
+    //获取TreeData 用于初始页面显示嵌套model
     public Object getTreeGridData() {
-        //TODO 待网关提供接口
         Envelop envelop = new Envelop();
         String url = "/cda_types/cda_types_tree";
         String strResult = "";
@@ -75,62 +74,36 @@ public class CdaTypeController extends BaseUIController{
         }
     }
 
-
-    @RequestMapping("GetCdaTypeListByKey")
+    @RequestMapping("GetCdaTypeList")
     @ResponseBody
-    public Object GetCdaTypeListByKey(String strKey, Integer page, Integer rows) {
-        // TODO  未使用
-        Envelop result = new Envelop();
-        String url = "/cdaType/***********";
+    public Object GetCdaTypeList(String strKey, Integer page, Integer rows) {
+        Envelop envelop = new Envelop();
+        String url = "/cda_types";
         try{
             Map<String,Object> params = new HashMap<>();
-            params.put("strKey",strKey);
-            params.put("page",page);
-            params.put("rows",rows);
+            params.put("code","");
+            params.put("name","");
             String _rus = HttpClientUtil.doGet(comUrl+url,params,username,password);
             if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg("cda类别获取失败");
-            }else{
-                //result.setSuccessFlg(true);
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("cda类别获取失败");
+            }else
                 return _rus;
-            }
+
         }catch (Exception ex){
             LogService.getLogger(CdaTypeController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result;
+        return envelop;
 
-        /*Result result = new Result();
-        try {
-            Map<String, Object> mapKey = new HashMap<>();
-            mapKey.put("key", strKey);
-            mapKey.put("page", page);
-            mapKey.put("rows", rows);
-            List<XCDAType> listType = xcdaTypeManager.getCDATypeListByKey(mapKey);
-            if (listType == null) {
-                result.setSuccessFlg(false);
-                result.setErrorMsg("数据获取失败!");
-                return result;
-            }
-            List<CDATypeForInterface> listInfo = getTypeForInterface(listType);
-            if(rows<=0)
-            {
-                rows=1;
-            }
-            result = getResult(listInfo, 1, page, rows);
-        } catch (Exception ex) {
-            LogService.getLogger(CdaTypeController_w.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg("系统错误，请联系管理员!");
-        }
-        return result;*/
     }
 
     @RequestMapping("getCdaTypeById")
     @ResponseBody
     public Object getCdaTypeById(String strIds) {
+        //TODO　需要修改接口（ids可以为空，解除url的id绑定）
+        //cda文档功能中使用到
         Envelop envelop = new Envelop();
         String url = "/cda_types/id/"+strIds;
         try{
@@ -142,21 +115,6 @@ public class CdaTypeController extends BaseUIController{
             envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
         return envelop;
-
-       /* Result result = new Result();
-        result.setSuccessFlg(false);
-        try {
-            List<XCDAType> listType = xcdaTypeManager.getCdatypeInfoByIds(strIds);
-            if (listType.size() > 0) {
-                result.setSuccessFlg(true);
-                List<CDATypeForInterface> listInfo = getTypeForInterface(listType);
-                result.setObj(listInfo.get(0));
-            }
-        } catch (Exception ex) {
-            LogService.getLogger(CdaController.class).error(ex.getMessage());
-            result.setErrorMsg("系统错误，请联系管理员!");
-        }
-        return result;*/
     }
 
     @RequestMapping("delteCdaTypeInfo")
@@ -191,42 +149,13 @@ public class CdaTypeController extends BaseUIController{
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
         return result;
-
-
-       /* try {
-            String strErrorMsg = "";
-            if (ids == null || ids == "") {
-                strErrorMsg += "请先选择将要删除的数据";
-            }
-            if (strErrorMsg != "") {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(strErrorMsg);
-            }
-            List<XCDAType> listParentType = xcdaTypeManager.getCdatypeInfoByIds(ids);
-            String childrenIds = getCdaTypeChildId(listParentType, "");
-            if(childrenIds.length()>0) {
-                childrenIds = childrenIds.substring(0, childrenIds.length() - 1);
-            }
-            boolean reault = xcdaTypeManager.deleteCdaType(childrenIds);
-            if (reault) {
-                result.setSuccessFlg(true);
-            } else {
-                result.setSuccessFlg(false);
-                result.setErrorMsg("删除失败!");
-            }
-        } catch (Exception ex) {
-            LogService.getLogger(CdaController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg("系统错误，请联系管理员!");
-        }
-        return result;*/
     }
 
     @RequestMapping("SaveCdaType")
     @ResponseBody
     //新增、修改的保存合二为一
     public Object SaveCdaType(String dataJson) {
-        //TODO 用户code  (待网关的获取下拉列表的接口）
+        //TODO 用户code
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         String url = "/cda_types";
@@ -243,8 +172,6 @@ public class CdaTypeController extends BaseUIController{
                 return envelop;
             }
             Map<String,Object> params = new HashMap<>();
-            //TODO 暂时根据id是否空来判断新增、修改--（或改成通过传递参数 new/modify）
-
             String cdaTypeId = detailModel.getId();
             // 新增cda类别
             String envelopStr = "";
@@ -269,9 +196,9 @@ public class CdaTypeController extends BaseUIController{
             modelForUpdate.setParentId(detailModel.getParentId());
             modelForUpdate.setUpdateUser(createUser);
             String typeJson = objectMapper.writeValueAsString(modelForUpdate);
-            params.put("typeJson", typeJson);
+            params.put("jsonData", typeJson);
 
-            String envelopStrUpdate = HttpClientUtil.doPost(comUrl+url,params,username,password);
+            String envelopStrUpdate = HttpClientUtil.doPut(comUrl + url, params, username, password);
             return envelopStrUpdate;
         } catch (Exception ex){
             LogService.getLogger(CdaTypeController.class).error(ex.getMessage());
@@ -288,15 +215,16 @@ public class CdaTypeController extends BaseUIController{
      * @param key
      * @return
      */
-    @RequestMapping("getParentType")
+    @RequestMapping("getOtherCDAType")
     @ResponseBody
-    public String getParentType(String strId, String key) {
+    public String getOtherCDAType(String strId, String key) {
         //TODO 待网关提供接口
-        String url = "/cda_types/patient_ids/key";
+        // ***临时使用***
+        String url = "/cda_types/as_parent_type";
         String strResult = "";
         try{
             Map<String,Object> params = new HashMap<>();
-            params.put("patient_ids",strId);
+            params.put("id",strId);
             params.put("key",key);
             String envelopStr = HttpClientUtil.doGet(comUrl+url,params,username,password);
             Envelop envelop = objectMapper.readValue(envelopStr,Envelop.class);
@@ -315,6 +243,7 @@ public class CdaTypeController extends BaseUIController{
     //根据父级ID获取下一级cda类别（不含子类的子类。。）
     public Object getCDATypeListByParentId(String ids) {
         Envelop envelop = new Envelop();
+        ObjectMapper mapper = new ObjectMapper();
         String url = "/children_cda_types/"+ids;
         if (StringUtils.isEmpty(ids)){
             envelop.setSuccessFlg(false);
@@ -323,7 +252,9 @@ public class CdaTypeController extends BaseUIController{
         }
         try {
             String envelopStr = HttpClientUtil.doGet(comUrl + url, username, password);
-            return envelopStr;
+            envelop = mapper.readValue(envelopStr,Envelop.class);
+
+            return envelop.getDetailModelList();
         } catch (Exception ex) {
             LogService.getLogger(CdaTypeController.class).error(ex.getMessage());
             envelop.setSuccessFlg(false);
@@ -331,4 +262,5 @@ public class CdaTypeController extends BaseUIController{
         }
         return envelop;
     }
+
 }
