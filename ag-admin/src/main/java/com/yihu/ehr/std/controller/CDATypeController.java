@@ -3,7 +3,6 @@ package com.yihu.ehr.std.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeDetailModel;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeModel;
-import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeTreeModel;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
@@ -330,12 +329,37 @@ public class CDATypeController extends BaseController {
         return detailModel;
     }
 
-    @RequestMapping(value = RestApi.Standards.TypeOther, method = RequestMethod.GET)
-    @ApiOperation(value = "获取cdaType列表（不包含本身）")
+    @RequestMapping(value = "/types/parent_id/other", method = RequestMethod.GET)
+    @ApiOperation(value = "获取cdaType列表（不包含本身及其子类）")
     public List<MCDAType> getOtherCDAType(
             @ApiParam(name = "id", value = "cdaType编号")
-            @PathVariable(value = "id") String id) throws Exception {
+            @RequestParam(value = "id") String id) throws Exception {
         List<MCDAType> listType = cdaTypeClient.getOtherCDAType(id);
         return listType;
+    }
+
+    /**
+     * 获取CDAType列表
+     * @param code
+     * @param name
+     * @return
+     */
+    @RequestMapping(value = "/cda_types", method = RequestMethod.GET)
+    @ApiOperation(value = "获取CDAType列表")
+    public Envelop getCdaTypeList(
+            @ApiParam(name = "code", value = "代码")
+            @RequestParam(value = "code") String code,
+            @ApiParam(name = "name", value = "名称")
+            @RequestParam(value = "name") String name) {
+        Envelop envelop = new Envelop();
+        List<MCDAType> mCdaTypeList = (List) cdaTypeClient.getCdaTypeList(code,name);
+        if (mCdaTypeList.size() == 0){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("没有匹配条件的cda类别！");
+        }else {
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(convertToCdaTypeModels(mCdaTypeList));
+        }
+        return envelop;
     }
 }
