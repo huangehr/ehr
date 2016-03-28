@@ -1,9 +1,11 @@
 package com.yihu.ehr.std.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.org.OrgModel;
 import com.yihu.ehr.agModel.standard.cdadocument.CDAModel;
 import com.yihu.ehr.agModel.standard.cdadocument.CdaDataSetRelationshipModel;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.std.service.CDAClient;
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
@@ -15,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,24 +38,26 @@ public class CDAController extends BaseController{
     @RequestMapping(value = "/cdas", method = RequestMethod.GET)
     @ApiOperation(value = "根据条件获取cda列表")
     public Envelop GetCdaListByKey(
-            @ApiParam(name = "code", value = "CDA代码")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "CDA名称")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "versionCode", value = "标准版本代码")
-            @RequestParam(value = "versionCode") String versionCode,
-            @ApiParam(name = "cdaType", value = "cda类别")
-            @RequestParam(value = "cdaType") String cdaType,
-            @ApiParam(name = "page", value = "当前页", defaultValue = "1")
-            @RequestParam(value = "page") int page,
-            @ApiParam(name = "rows", value = "每页行数", defaultValue = "20")
-            @RequestParam(value = "rows") int rows) {
-
-        ResponseEntity<List<MCDADocument>> responseEntity = cdaClient.GetCDADocuments(versionCode,code,name,cdaType,page,rows);
-        List<CDAModel> cdaModels = (List<CDAModel>)convertToModels(responseEntity.getBody(),new ArrayList<CDAModel>(responseEntity.getBody().size()),CDAModel.class,null);
-        Envelop envelop = getResult(cdaModels,getTotalCount(responseEntity),page,rows);
-
-        return envelop;
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "version", value = "版本", defaultValue = "")
+            @RequestParam(value = "version") String version) {
+        List<MCDADocument> cdaDocumentList = new ArrayList<>();
+        ResponseEntity<List<MCDADocument>> responseEntity = cdaClient.GetCDADocuments(fields, filters, sorts, size, page,version);
+        List<MCDADocument> cdaDocuments = responseEntity.getBody();
+        for (MCDADocument cdaDocument : cdaDocuments) {
+            cdaDocumentList.add(cdaDocument);
+        }
+        int totalCount = getTotalCount(responseEntity);
+        return getResult(cdaDocumentList, totalCount, page, size);
     }
 
     @RequestMapping(value = "/cda", method = RequestMethod.GET)
