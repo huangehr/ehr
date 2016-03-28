@@ -1,5 +1,5 @@
 server:
-  port: ${app-admin.server.port}
+  port: ${ag-admin.server.port}
 
 management:
   port: ${server.port}
