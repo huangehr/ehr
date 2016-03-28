@@ -1,6 +1,8 @@
 package com.yihu.ehr.agModel.geogrephy;
 
 
+import org.springframework.util.StringUtils;
+
 import java.io.Serializable;
 
 /**
@@ -98,5 +100,39 @@ public class GeographyModel implements Serializable {
 
     public void setPostalCode(String postalCode) {
         this.postalCode = postalCode;
+    }
+    public String getCanonicalAddress() {
+        String addressStr="";
+        if (!StringUtils.isEmpty(province)){
+            addressStr += province;
+            if (!"".equals(city)) {
+                if (!province.equals(city)){
+                    addressStr += city;
+                }
+            }
+        }
+        if (!StringUtils.isEmpty(district)){
+            addressStr += district;
+        }
+        if (!StringUtils.isEmpty(town)){
+            addressStr += town;
+        }
+        if (!StringUtils.isEmpty(street)){
+            addressStr += street;
+        }
+        if (!StringUtils.isEmpty(extra)){
+            addressStr += extra;
+        }
+        return addressStr;
+    }
+
+    public boolean isNullAddress() {
+        return
+                StringUtils.isEmpty(province)
+                        && StringUtils.isEmpty(city)
+                        && StringUtils.isEmpty(district)
+                        && StringUtils.isEmpty(town)
+                        && StringUtils.isEmpty(street)
+                        && StringUtils.isEmpty(extra);
     }
 }
