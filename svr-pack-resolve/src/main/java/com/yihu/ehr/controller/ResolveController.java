@@ -5,9 +5,13 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.fastdfs.FastDFSUtil;
+import com.yihu.ehr.feign.XPackageMgrClient;
 import com.yihu.ehr.model.packs.MPackage;
+import com.yihu.ehr.persist.ProfileService;
 import com.yihu.ehr.profile.Profile;
 import com.yihu.ehr.task.PackageResolver;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,39 +23,60 @@ import java.io.*;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
+@Api(value = "档案包解析", description = "档案包解析服务")
 public class ResolveController {
-
     @Autowired
     PackageResolver resolver;
+
+    @Autowired
+    ProfileService profileService;
+
+    @Autowired
+    FastDFSUtil fastDFSUtil;
+
+    @Autowired
+    XPackageMgrClient packageMgrClient;
 
     @ApiOperation("档案包入库")
     @RequestMapping(value = RestApi.Packages.Package, method = RequestMethod.PUT)
     public ResponseEntity<String> resolve(@ApiParam("id")
-                        @PathVariable("id") String packageId) {
+                                          @PathVariable("id") String packageId) throws Exception {
+
+        MPackage pack = packageMgrClient.acquirePackage();
+        if (pack != null) {
+            String zipFile = downloadTo(pack.getRemotePath());
+
+            Profile profile = resolver.doResolve(pack, zipFile);
+            profileService.saveProfile(profile);
+
+            packageMgrClient.reportStatus(packageId, ArchiveStatus.Finished,
+                    "身份证号: " + profile.getDemographicId() + ", 档案: " + profile.getId());
+        }
 
         return new ResponseEntity<>("", HttpStatus.OK);
     }
 
-    @ApiOperation("本地档案包入库")
+    @ApiOperation("本地档案包解析，仅供测试用")
     @RequestMapping(value = RestApi.Packages.Package, method = RequestMethod.POST)
-    public ResponseEntity<String> resolve(@ApiParam(value = "id", defaultValue = "NotNecessary")
-                                        @PathVariable("id") String packageId,
-                                        @ApiParam("file")
-                                        @RequestParam("file") InputStream file,
-                                        @ApiParam("password")
-                                        @RequestParam("password") String password,
-                                        @ApiParam("echo")
-                                        @RequestParam("echo") boolean echo) throws FileNotFoundException {
-        try{
+    public ResponseEntity<String> resolve(@ApiParam(value = "档案包ID，忽略此值", defaultValue = "NotNecessary")
+                                          @PathVariable("id") String packageId,
+                                          @ApiParam("档案包文件")
+                                          @RequestParam("file") InputStream file,
+                                          @ApiParam("档案包密码")
+                                          @RequestParam("password") String password,
+                                          @ApiParam(value = "仅解析并返回，不入库", defaultValue = "true")
+                                          @RequestParam("onlyEcho") boolean onlyEcho) throws FileNotFoundException {
+        try {
             String zipFile = System.getProperty("system.io.temp") + File.pathSeparator + packageId + ".zip";
             OutputStream outputStream = new FileOutputStream(zipFile);
 
             int read = 0;
             byte[] bytes = new byte[1024];
-
             while ((read = file.read(bytes)) != -1) {
                 outputStream.write(bytes, 0, read);
             }
+
+            outputStream.close();
 
             MPackage pack = new MPackage();
             pack.setPwd(password);
@@ -59,10 +84,20 @@ public class ResolveController {
             pack.setArchiveStatus(ArchiveStatus.Received);
 
             Profile profile = resolver.doResolve(pack, zipFile);
+            if (!onlyEcho){
+                profileService.saveProfile(profile);
+            }
 
             return new ResponseEntity<>(profile.toJson(), HttpStatus.OK);
         } catch (Exception e) {
             throw new ApiException(HttpStatus.EXPECTATION_FAILED, ErrorCode.SystemError, e.getMessage());
         }
+    }
+
+    private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
+
+    private String downloadTo(String filePath) throws Exception {
+        String[] tokens = filePath.split(";");
+        return fastDFSUtil.download(tokens[0], tokens[1], LocalTempPath);
     }
 }

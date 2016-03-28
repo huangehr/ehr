@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "source", description = "标准来源", tags = {"标准来源"})
+@Api(value = "source", description = "标准来源", tags = {"标准来源"})
 public class StandardSourceController extends ExtendController<MStdSource> {
 
     @Autowired

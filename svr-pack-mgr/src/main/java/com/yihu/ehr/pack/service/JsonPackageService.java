@@ -31,7 +31,7 @@ import java.util.*;
 @Transactional
 public class JsonPackageService {
     @Value("${deploy.region}")
-    Short adminRegion = 3502;
+    Short adminRegion;
 
     @Autowired
     XJsonPackageRepository jsonPackageRepo;

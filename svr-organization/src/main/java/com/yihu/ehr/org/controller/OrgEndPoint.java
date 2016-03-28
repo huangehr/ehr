@@ -26,7 +26,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "org", description = "组织机构管理服务", tags = {"机构管理"})
+@Api(value = "org", description = "组织机构管理服务", tags = {"机构管理"})
 public class OrgEndPoint extends BaseRestController {
 
     @Autowired

@@ -36,21 +36,21 @@ public class DataSetResolverWithChecker extends SimpleDataSetResolver {
      * @param actualData
      * @return
      */
-    protected String[] standardizeMetaData(String innerVersion,
-                                           String dataSetCode,
-                                           String metaDataInnerCode,
-                                           String actualData,
-                                           boolean isOriginDataSet) {
+    protected String[] translateMetaData(String innerVersion,
+                                         String dataSetCode,
+                                         String metaDataInnerCode,
+                                         String actualData,
+                                         boolean isOriginDataSet) {
         if (StringUtils.isEmpty(actualData)) return null;
 
         String typeKey = cacheReader.read(keySchema.metaDataType(innerVersion, dataSetCode, metaDataInnerCode));
         if (StringUtils.isEmpty(typeKey)) {
-            String msg = "Meta data %1 of data set %2 is NOT found in version %3. Please check the meta data."
+            String msg = "Meta data %1 of data set %2 is NOT found in version %3. Maybe you need cache standards?"
                     .replace("%1", metaDataInnerCode)
                     .replace("%2", dataSetCode)
                     .replace("%3", innerVersion);
 
-            LogService.getLogger().warn(msg);
+            LogService.getLogger().error(msg);
             return null;
         }
 
@@ -68,17 +68,8 @@ public class DataSetResolverWithChecker extends SimpleDataSetResolver {
 
             return new String[]{codeQualifier, actualData, valueQualifier, value == null ? "" : value};
         } else {
-            if (typeKey.equals("D")) {
-                actualData = actualData.length() <= 10 ? actualData : actualData.substring(0, actualData.lastIndexOf(' ')) + " 00:00:00";
-            } else if (typeKey.equals("DT")) {
-                actualData = actualData.contains(".") ? actualData.substring(0, actualData.lastIndexOf('.')) : actualData;
-            } else if (typeKey.equals("N")) {
-                Matcher matcher = NumberPattern.matcher(actualData);
-                if (matcher.find()) {
-                    actualData = matcher.group();
-                } else {
-                    actualData = "";
-                }
+            if (typeKey.startsWith("D")) {
+                actualData = actualData.replace(".0", "");
             }
 
             return new String[]{StdObjectQualifierTranslator.toHBaseQualifier(metaDataInnerCode, typeKey), actualData};

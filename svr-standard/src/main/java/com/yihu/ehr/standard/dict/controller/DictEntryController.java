@@ -25,7 +25,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "entry", description = "标准字典项", tags = {"标准字典项"})
+@Api(value = "entry", description = "标准字典项", tags = {"标准字典项"})
 public class DictEntryController extends ExtendController<MStdDictEntry> {
 
     @Autowired

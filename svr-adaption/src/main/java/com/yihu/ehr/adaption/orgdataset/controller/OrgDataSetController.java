@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/adapter/org")
-@Api(protocols = "https", value = "orgdataset", description = "机构数据集管理接口", tags = {"机构数据集"})
+@Api(value = "orgdataset", description = "机构数据集管理接口", tags = {"机构数据集"})
 
 public class OrgDataSetController extends ExtendController<MOrgDataSet> {
 

@@ -23,7 +23,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "cards", description = "卡管理", tags = {"卡管理"})
+@Api(value = "cards", description = "卡管理", tags = {"卡管理"})
 public class CardController extends BaseRestController {
     @Autowired
     private CardManager cardManager;

@@ -25,7 +25,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "indicatorsdict", description = "指标字典管理接口", tags = {"Indicators"})
+@Api(value = "indicatorsdict", description = "指标字典管理接口", tags = {"Indicators"})
 public class IndicatorsDictController extends BaseRestController {
 
     @Autowired

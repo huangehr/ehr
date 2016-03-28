@@ -45,7 +45,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "package_service", description = "档案包服务")
+@Api(value = "package_service", description = "档案包服务")
 public class PackageEndPoint extends BaseRestController {
     @Autowired
     private SecurityClient securityClient;

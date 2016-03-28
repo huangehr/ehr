@@ -28,7 +28,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "Standard-Dispatch", description = "标准分发接口", tags = {"标准化分发"})
+@Api(value = "Standard-Dispatch", description = "标准分发接口", tags = {"标准化分发"})
 public class StandardDispatchRestController extends ExtendController {
 
     @Autowired

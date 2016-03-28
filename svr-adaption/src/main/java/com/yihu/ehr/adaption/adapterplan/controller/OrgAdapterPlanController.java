@@ -32,7 +32,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/adapter")
-@Api(protocols = "https", value = "plan", description = "适配器管理接口", tags = {"适配器管理"})
+@Api(value = "plan", description = "适配器管理接口", tags = {"适配器管理"})
 public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
     @Autowired
     private OrgAdapterPlanService orgAdapterPlanService;

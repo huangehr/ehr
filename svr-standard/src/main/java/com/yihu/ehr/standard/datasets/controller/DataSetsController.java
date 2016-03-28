@@ -26,7 +26,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "dataset", description = "标准数据集", tags = {"标准数据集"})
+@Api(value = "dataset", description = "标准数据集", tags = {"标准数据集"})
 public class DataSetsController extends ExtendController<MStdDataSet> {
 
     @Autowired

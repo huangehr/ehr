@@ -1,14 +1,12 @@
 package com.yihu.ehr.redis;
 
-import com.yihu.ehr.util.log.LogService;
+import org.apache.commons.lang.SerializationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -25,129 +23,82 @@ public class RedisClient {
     @Autowired
     private RedisTemplate<String, Serializable> redisTemplate;
 
+    /**
+     * 添加数据。
+     *
+     * @param key
+     * @param value
+     */
     public void set(final String key, final Serializable value) {
-        redisTemplate.execute(new RedisCallback<Object>() {
-            
-            public Object doInRedis(RedisConnection connection) throws DataAccessException {
-                byte[] key_ = key.getBytes();
-                byte[] value_ = toByteArray(value);
-                connection.set(key_, value_);
+        redisTemplate.execute((RedisCallback<Object>) connection -> {
+            byte[] key_ = key.getBytes();
+            byte[] value_ = SerializationUtils.serialize(value);
+            connection.set(key_, value_);
 
-                return true;
-            }
+            return true;
         });
     }
 
+    /**
+     * 获取数据。
+     *
+     * @param key
+     * @param <T>
+     * @return
+     */
     public <T> T get(final String key) {
-        return (T)redisTemplate.execute(new RedisCallback<Serializable>() {
-            
-            public Serializable doInRedis(RedisConnection connection) throws DataAccessException {
-                byte[] keyBytes = key.getBytes();
-                byte[] bytes = connection.get(keyBytes);
-                return (Serializable) toObject(bytes);
-            }
+        return (T)redisTemplate.execute((RedisCallback<Serializable>) connection -> {
+            byte[] keyBytes = key.getBytes();
+            byte[] bytes = connection.get(keyBytes);
+            return (Serializable) SerializationUtils.deserialize(bytes);
         });
     }
 
+    /**
+     * 删除。支持Key模式匹配删除。
+     *
+     * @param key
+     */
     public void delete(String key) {
-        redisTemplate.execute(new RedisCallback<Serializable>() {
-            
-            public Serializable doInRedis(RedisConnection connection) throws DataAccessException {
-                return connection.del(key.getBytes());
-            }
-        });
+        redisTemplate.execute((RedisCallback<Serializable>) connection -> connection.del(key.getBytes()));
     }
 
+    /**
+     * 删除多条记录。如果Key集合过大，建议使用Key模式匹配删除。
+     *
+     * @param keys
+     */
     public void delete(Collection<String> keys) {
         redisTemplate.delete(keys);
-
-        redisTemplate.execute(new RedisCallback<Serializable>() {
-            
-            public Serializable doInRedis(RedisConnection connection) throws DataAccessException {
-                for (String key : keys){
-                    connection.del(key.getBytes());
-                }
-
-                return null;
-            }
-        });
     }
-    
+
+    /**
+     * 匹配特定模式的Key列表。
+     *
+     * @param pattern
+     * @param <T>
+     * @return
+     */
     public <T> Set<String> keys(String pattern) {
-        return redisTemplate.execute(new RedisCallback<Set<String>>() {
-            
-            public Set<String> doInRedis(RedisConnection connection) throws DataAccessException {
-                Set<byte[]> keys = connection.keys(pattern.getBytes());
+        return redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+            Set<byte[]> keys = connection.keys(pattern.getBytes());
 
-                Set<String> returnKeys = new HashSet<String>();
-                for (byte[] key : keys) {
-                    returnKeys.add(new String(key));
-                }
-
-                return returnKeys;
+            Set<String> returnKeys = new HashSet<>();
+            for (byte[] key : keys) {
+                returnKeys.add(new String(key));
             }
+
+            return returnKeys;
         });
     }
 
+    /**
+     * 是否包含指定Key。
+     *
+     * @param key
+     * @return
+     */
     public boolean hasKey(String key) {
-        return redisTemplate.execute(new RedisCallback<Boolean>() {
-            public Boolean doInRedis(RedisConnection connection)
-                    throws DataAccessException {
-                return connection.exists(key.getBytes());
-            }
-        });
-    }
-
-    /**
-     * 对象转字节数组。
-     * @param obj
-     * @return
-     */
-    static byte[] toByteArray (Object obj) {
-        if(obj == null) return null;
-
-        byte[] bytes = null;
-        try {
-            ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteOutputStream);
-
-            objectOutputStream.writeObject(obj);
-            objectOutputStream.flush();
-
-            bytes = byteOutputStream.toByteArray();
-
-            objectOutputStream.close();
-            byteOutputStream.close();
-        } catch (IOException ex) {
-            LogService.getLogger(RedisClient.class).error(ex.getMessage());
-        }
-
-        return bytes;
-    }
-
-    /**
-     * 数组转对象。
-     * @param bytes
-     * @return
-     */
-    static Object toObject(byte[] bytes) {
-        Object obj = null;
-        try {
-            if(bytes == null) return null;
-
-            ByteArrayInputStream byteInputStream = new ByteArrayInputStream (bytes);
-            ObjectInputStream objectInputStream = new ObjectInputStream (byteInputStream);
-
-            obj = objectInputStream.readObject();
-
-            objectInputStream.close();
-            byteInputStream.close();
-        } catch (IOException ex) {
-            LogService.getLogger(RedisClient.class).error(ex.getMessage());
-        } catch (ClassNotFoundException ex) {
-            LogService.getLogger(RedisClient.class).error(ex.getMessage());
-        }
-
-        return obj;
+        return redisTemplate.execute((RedisCallback<Boolean>) connection -> connection.exists(key.getBytes()));
     }
 }

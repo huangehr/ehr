@@ -55,11 +55,11 @@ public class SimpleDataSetResolver {
                         System.out.println(item.getValue().asText());
                     }
 
-                    String[] standardizedMetaData = standardizeMetaData(
+                    String[] standardizedMetaData = translateMetaData(
                             cdaVersion,
                             code,
                             key,
-                            item.getValue().isNull() ? "" : item.getValue().asText(),
+                            item.getValue().asText().equals("null") ? "" : item.getValue().asText(),
                             isOrigin);
                     if (standardizedMetaData != null) {
                         record.put(standardizedMetaData[0], standardizedMetaData[1]);
@@ -90,11 +90,11 @@ public class SimpleDataSetResolver {
      * @param actualData
      * @return
      */
-    protected String[] standardizeMetaData(String innerVersion,
-                                                String dataSetCode,
-                                                String metaDataInnerCode,
-                                                String actualData,
-                                                boolean isOriginDataSet) {
+    protected String[] translateMetaData(String innerVersion,
+                                         String dataSetCode,
+                                         String metaDataInnerCode,
+                                         String actualData,
+                                         boolean isOriginDataSet) {
         return new String[]{metaDataInnerCode, actualData};
     }
 }

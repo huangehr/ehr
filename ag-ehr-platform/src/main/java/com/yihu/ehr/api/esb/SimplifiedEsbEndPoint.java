@@ -27,7 +27,7 @@ import java.io.InputStream;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/simplified-esb")
-@Api(protocols = "https", value = "simplified-esb", description = "简易ESB服务临时接口")
+@Api(value = "simplified-esb", description = "简易ESB服务临时接口")
 public class SimplifiedEsbEndPoint {
     @Autowired
     private SimplifiedESBClient simplifiedESBClient;

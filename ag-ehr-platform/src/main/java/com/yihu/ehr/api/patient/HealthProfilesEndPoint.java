@@ -23,7 +23,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "health_profiles", description = "健康档案服务")
+@Api(value = "health_profiles", description = "健康档案服务")
 public class HealthProfilesEndPoint {
     @Autowired
     ObjectMapper objectMapper;

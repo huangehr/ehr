@@ -26,7 +26,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "version", description = "标准版本", tags = {"标准版本"})
+@Api(value = "version", description = "标准版本", tags = {"标准版本"})
 public class VersionController extends ExtendController<MCDAVersion> {
 
     @Autowired

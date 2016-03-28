@@ -74,10 +74,8 @@ public class PackageResolver {
             parseJsonDataSet(pack.getId(), profile, originFiles.listFiles(), true);
         }
 
-        // make health event
         makeEventSummary(profile);
 
-        // house keep
         houseKeep(zipFile, root);
 
         return profile;
@@ -127,7 +125,7 @@ public class PackageResolver {
     public ProfileDataSet generateDataSet(File jsonFile, boolean isOrigin) throws IOException {
         JsonNode jsonNode = objectMapper.readTree(jsonFile);
         if (jsonNode.isNull()) {
-            throw new IOException("无效JSON文件，文件已损坏或数据格式不对");
+            throw new IOException("Invalid json file when generate data set");
         }
 
         ProfileDataSet dataSet = dataSetResolverWithChecker.parseJsonDataSet(jsonNode, isOrigin);

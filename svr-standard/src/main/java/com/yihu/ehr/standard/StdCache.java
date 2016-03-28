@@ -1,17 +1,21 @@
 package com.yihu.ehr.standard;
 
 import com.yihu.ehr.config.StdSessionFactoryBean;
+import com.yihu.ehr.model.standard.MCDAVersion;
 import com.yihu.ehr.redis.RedisClient;
 import com.yihu.ehr.schema.StdKeySchema;
 import com.yihu.ehr.standard.version.service.CDAVersion;
 import com.yihu.ehr.standard.version.service.CDAVersionService;
 import com.yihu.ehr.util.CDAVersionUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 标准化数据数据缓存工具. 向Redis数据库初始化标准字典及数据元信息, 在档案入库的时候可用于翻译字典, 按版本缓存.
@@ -42,15 +46,42 @@ public class StdCache {
     @Autowired
     CDAVersionService versionService;
 
+    public List<MCDAVersion> versions(){
+        Set<String> keys = redisClient.keys(keySchema.versionName("*"));
+        List<MCDAVersion> versions = new ArrayList<>(keys.size());
+
+        for (String key : keys){
+            MCDAVersion version = new MCDAVersion();
+            version.setVersion(key.split(":")[1]);
+            version.setVersionName(redisClient.get(key));
+
+            versions.add(version);
+        }
+
+        return versions;
+    }
+
+    public MCDAVersion version(String version){
+        String name = redisClient.get(keySchema.versionName(version));
+        if (StringUtils.isEmpty(name)) return null;
+
+        MCDAVersion mcdaVersion = new MCDAVersion();
+        mcdaVersion.setVersion(version);
+        mcdaVersion.setVersionName(name);
+
+        return mcdaVersion;
+    }
+
     /**
      * 缓存指定版本的数据元. 此处获取数据绕过了标准化的数据模型, 直接使用原始SQL提高效率.
      *
      * @param version 内部版本号
      */
-    public void cacheData(String version) {
+    public void cacheData(String version, boolean force) {
+        if(force) clearStdData(version);
+
         Session session = openSession();
         try {
-            CDAVersion cdaVersion = versionService.getVersion(version);
             String versionName = keySchema.versionName(version);
 
             String dataSetTable = CDAVersionUtil.getDataSetTableName(version);
@@ -90,6 +121,7 @@ public class StdCache {
                 }
             }
 
+            // 缓存版本
             redisClient.set(versionName, version);
         } finally {
             if(null != session) session.close();
@@ -108,16 +140,6 @@ public class StdCache {
         redisClient.delete(keySchema.metaDataDict(version, "*", "*"));
         redisClient.delete(keySchema.metaDataType(version, "*", "*"));
         redisClient.delete(keySchema.dictEntryValue(version, "*", "*"));
-    }
-
-    /**
-     * 重新加载标准数据缓存.
-     *
-     * @param version
-     */
-    public void reloadStdCache(String version) {
-        clearStdData(version);
-        cacheData(version);
     }
 
     public boolean isCached(String version) {

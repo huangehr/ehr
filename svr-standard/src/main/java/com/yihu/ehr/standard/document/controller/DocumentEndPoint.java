@@ -26,7 +26,7 @@ import java.util.List;
 
 @RequestMapping(ApiVersion.Version1_0)
 @RestController
-@Api(protocols = "https", value = "cda document", description = "cda文档管理", tags = {"cda文档管理"})
+@Api(value = "cda document", description = "cda文档管理", tags = {"cda文档管理"})
 public class DocumentEndPoint extends BaseRestController {
 
     @Autowired

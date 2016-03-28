@@ -30,7 +30,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "patient", description = "人口管理", tags = {"人口管理"})
+@Api(value = "patient", description = "人口管理", tags = {"人口管理"})
 public class PatientController extends BaseRestController {
 
     @Autowired

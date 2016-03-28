@@ -14,7 +14,8 @@ public class RestApi {
     public static class Caches{
         public static final String Organizations                   = "/caches/organizations";
         public static final String Organization                    = "/caches/organizations/{org_code}";
-        public static final String Standards                       = "/caches/standards";
+        public static final String Versions                        = "/caches/standards/versions";
+        public static final String Version                         = "/caches/standards/versions/{version}";
     }
 
     public static class Adaptions{

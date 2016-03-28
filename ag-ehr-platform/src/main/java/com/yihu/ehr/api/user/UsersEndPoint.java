@@ -29,7 +29,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(protocols = "https", value = "users", description = "用户服务")
+@Api(value = "users", description = "用户服务")
 public class UsersEndPoint extends BaseController {
     @Autowired
     ObjectMapper objectMapper;

@@ -47,7 +47,9 @@ public class PackageResolveTask {
             Profile profile = resolver.doResolve(pack, zipFile);
             profileService.saveProfile(profile);
 
-            packageMgrClient.reportStatus(packageId, ArchiveStatus.Finished, "身份证号: " + profile.getDemographicId() + ", 档案: " + profile.getId());
+            packageMgrClient.reportStatus(packageId,
+                    ArchiveStatus.Finished,
+                    "身份证号: " + profile.getDemographicId() + ", 档案: " + profile.getId());
         } catch (Exception e) {
             packageMgrClient.reportStatus(packageId, ArchiveStatus.Failed, e.getMessage());
 

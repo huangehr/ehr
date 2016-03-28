@@ -26,7 +26,7 @@ import java.util.Date;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/applications")
-@Api(protocols = "https", value = "applications", description = "应用管理服务")
+@Api(value = "applications", description = "应用管理服务")
 public class AppsEndPoint {
     @Autowired
     EhrTokenStoreService tokenStoreService;
