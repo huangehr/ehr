@@ -1,12 +1,13 @@
 package com.yihu.ehr.std.controller;
 
+import com.yihu.ehr.agModel.standard.dict.DictEntryModel;
+import com.yihu.ehr.agModel.standard.dict.DictModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.RestAPI;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
-import com.yihu.ehr.util.ResourceProperties;
-import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.util.controller.BaseUIController;
 import com.yihu.ehr.util.log.LogService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -25,13 +26,15 @@ import java.util.Map;
 @RequestMapping("/cdadict")
 @Controller(RestAPI.DictManagerController)
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
-public class DictController {
+public class DictController  extends BaseUIController {
     @Value("${service-gateway.username}")
     private String username;
     @Value("${service-gateway.password}")
     private String password;
-    @Value("${service-gateway.url}")
+    @Value("${service-gateway.stdurl}")
     private String comUrl;
+    @Value("${service-gateway.stdsourceurl}")
+    private String stdsourceurl;
 
     @RequestMapping("initial")
     public String dictInitial(Model model) {
@@ -41,148 +44,84 @@ public class DictController {
 
     @RequestMapping("template/stdDictInfo")
     public String stdDictInfoTemplate(Model model, String dictId, String strVersionCode, String mode) {
-        String _rus = "";
+        Map<String, Object> params = new HashMap<>();
+        DictModel dictModel = new DictModel();
+        Envelop result = new Envelop();
+        String resultStr = "";
+
         //mode定义：new modify view三种模式，新增，修改，查看
         if(mode.equals("view") || mode.equals("modify")){
             model.addAttribute("rs", "suc");
             if (strVersionCode == null) {
                 model.addAttribute("rs", ("找不到version_code"));
             }else{
-                String url = "/dict/dict";
+                String url = "/dict";
                 try {
-                    Map<String,Object> params = new HashMap<>();
                     params.put("dictId",dictId);
-                    params.put("versionCode",strVersionCode);
-                    _rus = HttpClientUtil.doGet(comUrl + url, params, username, password);
-                    //todo: 还要包含baseDictId、baseDictName
-//                    ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-//                    DictForInterface dict = objectMapper.readValue(_rus, DictForInterface.class);
-//                    if (dict != null) {
-//                        params.replace("dictId",dict.getBaseDictId());
-//                        DictForInterface tmp = StringUtil.isEmpty(dict.getId()) ? null : objectMapper.readValue(HttpClientUtil.doGet(host+url,params,username,password), DictForInterface.class);
-//                        if(tmp!=null){
-//                            model.addAttribute("baseDictId", tmp.getId());
-//                            model.addAttribute("baseDictName", tmp.getName());
-//                        }
-//                    }
-//                    else{
-//                        model.addAttribute("baseDictId", "");
-//                        model.addAttribute("baseDictName", "");
-//                    }
+                    params.put("version_code",strVersionCode);
+                    resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+                    result = getEnvelop(resultStr);
+                    dictModel = getEnvelopModel(result.getObj(), DictModel.class);
+                    if(dictModel.getBaseDict()!=null){
+                        Long baseDictId = dictModel.getBaseDict();
+                        params.replace("dictId", baseDictId);
+                        params.put("version_code",strVersionCode);
+
+                        String baseResultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+                        result = objectMapper.readValue(baseResultStr, Envelop.class);
+                        if(result.isSuccessFlg()){
+                            DictModel baseDictModel = (DictModel)result.getObj();
+                            String baseDictName = baseDictModel.getName();
+                            model.addAttribute("baseDictId",baseDictId);
+                            model.addAttribute("baseDictName",baseDictName);
+                        }
+                    }
+                    else{
+                        model.addAttribute("baseDictId","");
+                        model.addAttribute("baseDictName","");
+                    }
                 } catch (Exception ex) {
                     LogService.getLogger(DictController.class).error(ex.getMessage());
                     model.addAttribute("rs", "error");
                 }
             }
         }
-        model.addAttribute("info", _rus);   // jsp页面已修改
+        model.addAttribute("info",toJson(dictModel));
         model.addAttribute("mode",mode);
         model.addAttribute("contentPage","/std/dict/stdDictInfoDialog");
         return "simpleView";
-
-       /* XDictForInterface info = new DictForInterface();
-        //mode定义：new modify view三种模式，新增，修改，查看
-        if(mode.equals("view") || mode.equals("modify")){
-            Result result = new Result();
-            model.addAttribute("rs", "suc");
-            Long id = dictId == null ? 0 : Long.parseLong(dictId);
-            if (strVersionCode == null) {
-                model.addAttribute("rs", missParameter("version_code"));
-            }else{
-                try {
-                    XCDAVersion xcdaVersion = cdaVersionManager.getVersion(strVersionCode);
-                    XDict xDict = dictManager.getDict(id, xcdaVersion);
-                    if (xDict != null) {
-                        XDict tmp = xDict.getBaseDictId()==0 ? null : dictManager.getDict(xDict.getBaseDictId() , xcdaVersion);
-                        if(tmp!=null){
-                            model.addAttribute("baseDictId", tmp.getId());
-                            model.addAttribute("baseDictName", tmp.getName());
-                        }
-                        info.setId(String.valueOf(xDict.getId()));
-                        info.setCode( StringUtil.latinString(xDict.getCode()) );
-                        info.setName( StringUtil.latinString(xDict.getName()) );
-                        info.setAuthor(xDict.getAuthor());
-//                      info.setBaseDictId(String.valueOf(xDict.getBaseDictId()));
-                        info.setCreateDate(String.valueOf(xDict.getCreateDate()));
-                        info.setDescription(StringUtil.latinString(xDict.getDescription()));
-                        info.setStdVersion(xDict.getStdVersion());
-                        if (xDict.getSource() == null) {
-                            info.setStdSource(null);
-                        } else {
-                            info.setStdSource(xDict.getSource().getId());
-                        }
-                        info.setHashCode(String.valueOf(xDict.getHashCode()));
-                        info.setInnerVersionId(xDict.getInnerVersionId());
-                        result.setSuccessFlg(true);
-                        result.setObj(info);
-                    }
-                    else{
-                        model.addAttribute("baseDictId", "");
-                        model.addAttribute("baseDictName", "");
-                    }
-                } catch (Exception ex) {
-                    LogService.getLogger(StdManagerRestController.class).error(ex.getMessage());
-                    model.addAttribute("rs", "error");
-                }
-            }
-        }
-        model.addAttribute("info", info);
-        model.addAttribute("mode",mode);
-        model.addAttribute("contentPage","/std/dict/stdDictInfoDialog");
-        return "simpleView";*/
     }
 
     @RequestMapping("template/dictEntryInfo")
     public String dictEntryInfoTemplate(Model model, String id, String dictId, String strVersionCode, String mode) {
-        String _rus = "";
+        String resultStr = "";
+        DictEntryModel dictEntryModel = new DictEntryModel();
+        dictEntryModel.setDictId(Long.parseLong(dictId));
+
+        Envelop result = new Envelop();
         model.addAttribute("rs", "suc");
         //mode定义：new modify view三种模式，新增，修改，查看
-        String url = "/dict/dictEntry*****";
+        String url = "/dict_entry";
         try {
-            Map<String,Object> params = new HashMap<>();
-            params.put("versionCode",strVersionCode);
-            params.put("dictId",dictId);
-            params.put("entryId",id);
-            _rus = HttpClientUtil.doPost(comUrl+url,params,username,password);
+            if(!mode.equals("new")){
+                Map<String,Object> params = new HashMap<>();
+                Long dictEntryId = id.equals("") ? 0 : Long.parseLong(id);
+                //Long dictIdForEntry = dictId.equals("") ? 0 : Long.parseLong(dictId);
+
+                params.put("versionCode",strVersionCode);
+                params.put("entryId",dictEntryId);
+                resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+                result = getEnvelop(resultStr);
+                dictEntryModel = getEnvelopModel(result.getObj(),DictEntryModel.class);
+            }
         } catch (Exception ex) {
             LogService.getLogger(DictController.class).error(ex.getMessage());
             model.addAttribute("rs", "error");
         }
-        model.addAttribute("info", _rus); // 已修改jsp页面
-        //model.addAttribute("dictId",dictId);
+        model.addAttribute("info", toJson(dictEntryModel));
         model.addAttribute("mode",mode);
         model.addAttribute("contentPage","/std/dict/dictEntryInfoDialog");
         return "simpleView";
-
-       /* XDictEntryForInterface info = new DictEntryForInterface();
-        model.addAttribute("rs", "suc");
-        //mode定义：new modify view三种模式，新增，修改，查看
-        if(mode.equals("view") || mode.equals("modify")){
-            Result result = new Result();
-            Long dictEntryId = id.equals("") ? 0 : Long.parseLong(id);
-            Long dictIdForEntry = dictId.equals("") ? 0 : Long.parseLong(dictId);
-            XCDAVersion xcdaVersion = cdaVersionManager.getVersion(strVersionCode);
-            XDict xDict = dictManager.getDict(dictIdForEntry, xcdaVersion);
-            try {
-                XDictEntry xDictEntry = dictEntryManager.getEntries(dictEntryId, xDict);
-                if (xDictEntry != null) {
-                    info.setId(String.valueOf(xDictEntry.getId()));
-                    info.setCode(xDictEntry.getCode());
-                    info.setValue(xDictEntry.getValue());
-                    info.setDictId(String.valueOf(xDictEntry.getDict().getId()));
-                    info.setDesc(xDictEntry.getDesc());
-                }
-            } catch (Exception ex) {
-                LogService.getLogger(StdManagerRestController.class).error(ex.getMessage());
-                model.addAttribute("rs", "error");
-            }
-        }else{
-            info.setDictId(dictId);
-        }
-        model.addAttribute("info", info);
-        model.addAttribute("mode",mode);
-        model.addAttribute("contentPage","/std/dict/dictEntryInfoDialog");
-        return "simpleView";*/
     }
 
     /**
@@ -194,6 +133,8 @@ public class DictController {
     @ResponseBody
     public Object saveDict(String cdaVersion, String dictId, String code, String name, String baseDict, String stdSource, String stdVersion, String description,String userId) {
         Envelop result = new Envelop();
+        String resultStr = "";
+
         if (StringUtils.isEmpty(cdaVersion)) {
             result.setSuccessFlg(false);
             result.setErrorMsg("版本号不能为空！");
@@ -209,39 +150,32 @@ public class DictController {
             result.setErrorMsg("名称不能为空！");
             return result;
         }
+
+        Map<String, Object> params = new HashMap<>();
+        DictModel dictModel = new DictModel();
+        dictModel.setId(Long.parseLong(dictId));
+        dictModel.setCode(code);
+        dictModel.setName(name);
+        dictModel.setBaseDict(StringUtils.isEmpty(baseDict) ? null : Long.parseLong(baseDict));
+        dictModel.setSourceId(stdSource);
+        dictModel.setDescription(description);
+        dictModel.setAuthor(userId);
+
+        params.put("version_code",cdaVersion);
+        params.put("json_data",toJson(dictModel));
+
         try{
-            String url = "/dict/updateDict";
-            Map<String,Object> params = new HashMap<>();
-            params.put("versionCode",cdaVersion);
-            params.put("dictId",dictId);
-            params.put("code",code);
-            // 检查字典编码是否重复
-            String urlCheckCode = "/dict/isExistCode******";
-            String _msg = HttpClientUtil.doGet(comUrl+urlCheckCode,params,username,password);
-            if (Boolean.parseBoolean(_msg)){
-                result.setErrorMsg("codeNotUnique");
-                return result;
-            }
-            params.put("name",name);
-            params.put("baseDict",baseDict);
-            params.put("stdSource",stdSource);
-            params.put("stdVersion",stdVersion);
-            params.put("description",description);
-            params.put("userId",userId);
-            String _rus = HttpClientUtil.doPost(comUrl+url,params,username,password);
-            if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.SaveDictFailed.toString());
-            }else{
-                result.setSuccessFlg(true);
-            }
+            String url = "/save_dict";
+            resultStr = HttpClientUtil.doPost(comUrl+url,params,username,password);
+            return resultStr;
+
         }catch(Exception ex){
             LogService.getLogger(DictController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
-        }
-        return result;
 
+            return result;
+        }
        /* Result result = new Result();
         Long id = dictId.equals("") ? 0 : Long.parseLong(dictId);
         Long baseDictL = baseDict.equals("") ? 0 : Long.parseLong(baseDict);
@@ -308,26 +242,23 @@ public class DictController {
     @ResponseBody
     public Object deleteDict(String cdaVersion, String dictId) {
         Envelop result = new Envelop();
-        String url = "/dict/deleteDict";
+        String resultStr = "";
+
+        String url = "/dict";
         try{
             Map<String,Object> params = new HashMap<>();
             params.put("versionCode",cdaVersion);
             params.put("dictId",dictId);
-            String _msg = HttpClientUtil.doDelete(comUrl+url,params,username,password);
-            if(Boolean.parseBoolean(_msg)){
-                result.setSuccessFlg(true);
-            }else{
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.DeleteDictFailed.toString());
-            }
+
+            resultStr = HttpClientUtil.doDelete(comUrl+url,params,username,password);
+            return resultStr;
+
         }catch(Exception ex){
             LogService.getLogger(DictController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
+            return result;
         }
-        return result;
-
-
 /*        Result result = new Result();
         Long id = Long.parseLong(dictId);
         XCDAVersion xcdaVersion = cdaVersionManager.getVersion(cdaVersion);
@@ -360,67 +291,73 @@ public class DictController {
     @ResponseBody
     public Object getCdaDictList(String searchNm, String strVersionCode, Integer page, Integer rows) {
         Envelop result = new Envelop();
+        String resultStr = "";
+        Map<String, Object> params = new HashMap<>();
+
+        StringBuffer stringBuffer = new StringBuffer();
+        if (!StringUtils.isEmpty(searchNm)) {
+            stringBuffer.append("name?" + searchNm + " g1;code?" + searchNm + " g1");
+        }
+        String filters = stringBuffer.toString();
+        params.put("filters", "");
+        if (!StringUtils.isEmpty(filters)) {
+            params.put("filters", filters);
+        }
+        params.put("page", page);
+        params.put("size", rows);
+        params.put("fields", "");
+        params.put("sorts", "");
         if (strVersionCode == null) {
             result.setSuccessFlg(false);
             result.setErrorMsg("版本号不能为空！");
             return result;
         }
-        String url = "/dict/getCdaDictList";
+        params.put("version",strVersionCode);
+
         try{
-            Map<String,Object> params = new HashMap<>();
-            params.put("versionCode",strVersionCode);
-            params.put("dictId",searchNm);
-            params.put("code",searchNm);
-            params.put("page",page);
-            params.put("rows",rows);
-            String _rus = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.GetDictListFaild.toString());
-            }else{
-                return _rus;
-            }
+            String url = "/dicts";
+            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+            return resultStr;
+
         }catch(Exception ex){
             LogService.getLogger(DictController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
+            return result;
         }
-        return result;
+    }
 
-        /*Result result = new Result();
-        if (strVersionCode == null) {
-            return missParameter("version_code");
-        }
+    /**
+     * 查询StdSource用于下拉框赋值。
+     *
+     * @return
+     */
+    @RequestMapping("getStdSourceList")
+    @ResponseBody
+    public Object getStdSourceList() {
+        Envelop result = new Envelop();
+        String resultStr = "";
+        DictModel dictModel = new DictModel();
+        Map<String,Object> params = new HashMap<>();
+
+        params.put("filters", "");
+        params.put("page", 1);
+        params.put("size", 500);
+        params.put("fields", "");
+        params.put("sorts", "");
+
         try {
-            XCDAVersion xcdaVersion = cdaVersionManager.getVersion(strVersionCode);
-            XDict[] xDicts = dictManager.getDictListForInter(page, rows, xcdaVersion, searchNm);
-            if (xDicts != null) {
-                XDictForInterface[] infos = new DictForInterface[xDicts.length];
-                int i = 0;
-                for (XDict xDict : xDicts) {
-                    XDictForInterface info = new DictForInterface();
-                    info.setId(String.valueOf(xDict.getId()));
-                    info.setCode(xDict.getCode());
-                    info.setName(xDict.getName());
-                    info.setAuthor(xDict.getAuthor());
-                    info.setBaseDictId(String.valueOf(xDict.getBaseDictId()));
-                    info.setCreateDate(String.valueOf(xDict.getCreateDate()));
-                    info.setDescription(xDict.getDescription());
-                    info.setStdVersion(xDict.getStdVersion());
-                    info.setHashCode(String.valueOf(xDict.getHashCode()));
-                    info.setInnerVersionId(xDict.getInnerVersionId());
-                    infos[i] = info;
-                    i++;
-                }
-                Integer totalCount = dictManager.getDictListInt(xcdaVersion, searchNm);
-                result = getResult(Arrays.asList(infos), totalCount, page, rows);
-            }
+            String url = "/sources";
+            resultStr = HttpClientUtil.doGet(stdsourceurl+url,params,username,password);
+
+            return resultStr;
+
         } catch (Exception ex) {
-            LogService.getLogger(StdManagerRestController.class).error(ex.getMessage());
+            LogService.getLogger(DictController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.GetDictListFaild.toString());
+            result.setErrorMsg(ErrorCode.GetCDAVersionListFailed.toString());
+            return result;
         }
-        return result.toJson();*/
     }
 
     /**
@@ -432,34 +369,30 @@ public class DictController {
     @ResponseBody
     public Object getCdaDictInfo(String dictId, String strVersionCode) {
         Envelop result = new Envelop();
+        String resultStr = "";
+        Map<String,Object> params = new HashMap<>();
         if (strVersionCode == null) {
             result.setSuccessFlg(false);
             result.setErrorMsg("版本号不能为空！");
             return result;
         }
+        params.put("versionCode",strVersionCode);
+        params.put("dictId",dictId);
+
         try{
-            String url = "/dict/dict";
-            Map<String,Object> params = new HashMap<>();
-            params.put("versionCode",strVersionCode);
-            params.put("dictId",dictId);
-            String _rus = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.GetDictFaild.toString());
-            }else{
-                result.setSuccessFlg(true);
-                //TODO 或修改前端页面
-//                ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-//                XDictForInterface info = objectMapper.readValue(_rus,XDictForInterface.class);
-                result.setObj(_rus);
-            }
+            String url = "/dict";
+            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+            //result = getEnvelop(resultStr);
+            //DictModel dictModel = getEnvelopModel(result.getObj(),DictModel.class);
+
+            return resultStr;
+
         }catch(Exception ex){
             LogService.getLogger(DictController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
+            return result;
         }
-        return result;
-
 
         /*Result result = new Result();
         Long id = dictId == null ? 0 : Long.parseLong(dictId);
@@ -506,116 +439,24 @@ public class DictController {
     @ResponseBody
     public Object getCdaVersionList() {
         Envelop result = new Envelop();
+        String resultStr = "";
+        Map<String,Object> params = new HashMap<>();
+
+        params.put("filters", "");
+        params.put("page", "");
+        params.put("size", "");
+
         try {
-            String url = "/version**/**********";
-            String _rus = HttpClientUtil.doGet(comUrl+url,username,password);
-            /*ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-            CDAVersionModel[] cdaVersions = objectMapper.readValue(_rus,CDAVersionModel[].class);
-            if(StringUtil.isEmpty(cdaVersions)){
-                CDAVersionForInterface[] infos = new CDAVersionForInterface[cdaVersions.length];
-                int i = 0;
-                for (CDAVersionModel cdaVersion : cdaVersions) {
-                    CDAVersionForInterface info = new CDAVersionForInterface();
-                    info.setVersion(cdaVersion.getVersion() + ',' + cdaVersion.getVersionName());
-                    info.setAuthor(cdaVersion.getAuthor());
-                    info.setBaseVersion(cdaVersion.getBaseVersion());
-                    //info.setCommitTime(cdaVersion.getCommitTime());
-                    SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
-                    info.setCommitTime(sdf.parse(cdaVersion.getCommitTime()));
-                    infos[i] = info;
-                    i++;
-                }
-                strJson = objectMapper.writeValueAsString(infos);
-            }*/
-            result.setSuccessFlg(true);
-            result.setObj(_rus);
-            return result;
+            String url = "/versions";
+            resultStr = HttpClientUtil.doGet(comUrl+url,username,password);
+
+            return resultStr;
         } catch (Exception ex) {
             LogService.getLogger(DictController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.GetCDAVersionListFailed.toString());
             return result;
         }
-
-        /*try {
-            String strJson = "";
-            XCDAVersion[] cdaVersions = cdaVersionManager.getVersionList();
-            if (cdaVersions != null) {
-                CDAVersionForInterface[] infos = new CDAVersionForInterface[cdaVersions.length];
-                int i = 0;
-                for (XCDAVersion xcdaVersion : cdaVersions) {
-                    CDAVersionForInterface info = new CDAVersionForInterface();
-                    info.setVersion(xcdaVersion.getVersion() + ',' + xcdaVersion.getVersionName());
-                    info.setAuthor(xcdaVersion.getAuthor());
-                    info.setBaseVersion(xcdaVersion.getBaseVersion());
-                    info.setCommitTime(xcdaVersion.getCommitTime());
-                    infos[i] = info;
-                    i++;
-                }
-                ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-                strJson = objectMapper.writeValueAsString(infos);
-            }
-            RestEcho echo = new RestEcho().success();
-            echo.putResultToList(strJson);
-            return echo;
-        } catch (Exception ex) {
-            LogService.getLogger(StdManagerRestController.class).error(ex.getMessage());
-            return failed(ErrorCode.GetCDAVersionListFailed);
-        }*/
-    }
-
-    /**
-     * 查询StdSource用于下拉框赋值。
-     *
-     * @return
-     */
-    @RequestMapping("getStdSourceList")
-    @ResponseBody
-    public Object getStdSourceList(String strVersionCode) {
-        Envelop result = new Envelop();
-        String strJson = "";
-        try {
-            if (StringUtils.isEmpty(strVersionCode)) {
-                result.setSuccessFlg(false);
-                result.setErrorMsg("版本号不能为空！");
-                return result;
-            }
-            String url = "/stdSource/standardSources";
-            strJson = HttpClientUtil.doGet(comUrl+url,username,password);
-//            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-//            StandardSourceForInterface[] stdSource = objectMapper.readValue(strJson,StandardSourceForInterface[].class);
-//            if (stdSource == null) {
-//                return failed(ErrorCode.GetStandardSourceFailed);
-//            }
-            result.setSuccessFlg(true);
-            result.setObj(strJson);
-            return result;
-        } catch (Exception ex) {
-            LogService.getLogger(DictController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.GetStandardSourceFailed.toString());
-            return result;
-        }
-
-        /*String strJson = "";
-        try {
-            if (strVersionCode == null || strVersionCode.equals("")) {
-                return missParameter("version_code");
-            }
-            XStandardSource[] xStandardSources = xStandardSourceManager.getSourceList();
-            if (xStandardSources == null) {
-                return failed(ErrorCode.GetStandardSourceFailed);
-            }
-            List<StandardSourceForInterface> resultInfos = GetStandardSourceForInterface(xStandardSources);
-            ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-            strJson = objectMapper.writeValueAsString(resultInfos);
-        } catch (Exception ex) {
-            LogService.getLogger(StdManagerRestController.class).error(ex.getMessage());
-            return failed(ErrorCode.GetStandardSourceFailed);
-        }
-        RestEcho echo = new RestEcho().success();
-        echo.putResultToList(strJson);
-        return echo;*/
     }
 
     /**
@@ -627,65 +468,40 @@ public class DictController {
     @ResponseBody
     public Object getCdaBaseDictList(String strVersionCode, String dictId) {
         Envelop result = new Envelop();
-        String url = "/dict/*************";
+        String resultStr = "";
+        Map<String,Object> params = new HashMap<>();
+
+        StringBuffer stringBuffer = new StringBuffer();
+        if (!StringUtils.isEmpty(dictId)) {
+            stringBuffer.append("dictId <> " + dictId);
+        }
+        String filters = stringBuffer.toString();
+        params.put("filters", "");
+        if (!StringUtils.isEmpty(filters)) {
+            params.put("filters", filters);
+        }
+        params.put("page", "");
+        params.put("size", "");
+
+        if (strVersionCode == null) {
+            result.setSuccessFlg(false);
+            result.setErrorMsg("版本号不能为空！");
+            return result;
+        }
+        params.put("version",strVersionCode);
+
         try{
-            Map<String,Object> params = new HashMap<>();
-            params.put("versionCode",strVersionCode);
-            params.put("dictId",dictId);
-            String _rus = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.GetDictListFaild.toString());
-            }else{
-//                ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-//                List<DictForInterface> infos = Arrays.asList(objectMapper.readValue(_rus, DictForInterface[].class));
-//                result.setDetailModelList(infos);
-                result.setSuccessFlg(true);
-                result.setObj(_rus);
-            }
+            String url = "/dict";
+            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+
+            return resultStr;
+
         }catch(Exception ex){
             LogService.getLogger(DictController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
+            return result;
         }
-        return result;
-
-
-        /*Result result = new Result();
-        if (strVersionCode == null) {
-            return missParameter("version_code");
-        }
-        try {
-            XCDAVersion xcdaVersion = cdaVersionManager.getVersion(strVersionCode);
-            XDict[] xDicts = dictManager.getBaseDictList(xcdaVersion, dictId);
-            if (xDicts != null) {
-                XDictForInterface[] infos = new DictForInterface[xDicts.length];
-                int i = 0;
-                for (XDict xDict : xDicts) {
-                    XDictForInterface info = new DictForInterface();
-                    info.setId(String.valueOf(xDict.getId()));
-                    info.setCode(xDict.getCode());
-                    info.setName(xDict.getName());
-                    info.setAuthor(xDict.getAuthor());
-                    //info.setBaseDictId(String.valueOf(xDict.getBaseDictId()));
-                    info.setCreateDate(String.valueOf(xDict.getCreateDate()));
-                    info.setDescription(xDict.getDescription());
-                    info.setStdVersion(xDict.getStdVersion());
-                    info.setHashCode(String.valueOf(xDict.getHashCode()));
-                    info.setInnerVersionId(xDict.getInnerVersionId());
-                    infos[i] = info;
-                    i++;
-                }
-                List<XDictForInterface> xDictForInterfaces = Arrays.asList(infos);
-                result.setSuccessFlg(true);
-                result.setDetailModelList(xDictForInterfaces);
-            }
-        } catch (Exception ex) {
-            LogService.getLogger(StdManagerRestController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.GetDictListFaild.toString());
-        }
-        return result.toJson();*/
     }
 
     /**
@@ -697,57 +513,40 @@ public class DictController {
     @ResponseBody
     public Object searchCdaBaseDictList(String strVersionCode, String param ,Integer page, Integer rows) {
         Envelop result = new Envelop();
-        String url = "/dict/getCdaBaseDictList";
+        String resultStr = "";
+        Map<String,Object> params = new HashMap<>();
+
+        StringBuffer stringBuffer = new StringBuffer();
+        if (!StringUtils.isEmpty(param)) {
+            stringBuffer.append("code?" + param + " g1;name?" + param + " g1;");
+        }
+        String filters = stringBuffer.toString();
+        params.put("filters", "");
+        if (!StringUtils.isEmpty(filters)) {
+            params.put("filters", filters);
+        }
+        params.put("page", page);
+        params.put("size", rows);
+
+        if (strVersionCode == null) {
+            result.setSuccessFlg(false);
+            result.setErrorMsg("版本号不能为空！");
+            return result;
+        }
+        params.put("version",strVersionCode);
+
         try{
-            Map<String,Object> params = new HashMap<>();
-            params.put("versionCode",strVersionCode);
-            params.put("dictId",param);
-            params.put("page",page);
-            params.put("rows",rows);
-            String _rus = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.GetDictListFaild.toString());
-            }else{
-                return _rus;
-            }
+            String url = "/dict";
+            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+
+            return resultStr;
+
         }catch(Exception ex){
             LogService.getLogger(DictController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
+            return result;
         }
-        return result;
-
-
-        /*Result result = new Result();
-        try {
-            XCDAVersion xcdaVersion = cdaVersionManager.getVersion(strVersionCode);
-            XDict[] xDicts = dictManager.getDictListForInter(page, rows,xcdaVersion, param);
-            if (xDicts != null) {
-                XDictForInterface[] infos = new DictForInterface[xDicts.length];
-                int i = 0;
-                for (XDict xDict : xDicts) {
-                    XDictForInterface info = new DictForInterface();
-                    info.setId(String.valueOf(xDict.getId()));
-                    info.setCode(xDict.getCode());
-                    info.setName(xDict.getName());
-                    info.setAuthor(xDict.getAuthor());
-                    //info.setBaseDictId(String.valueOf(xDict.getBaseDictId()));
-                    info.setCreateDate(String.valueOf(xDict.getCreateDate()));
-                    info.setDescription(xDict.getDescription());
-                    info.setStdVersion(xDict.getStdVersion());
-                    info.setHashCode(String.valueOf(xDict.getHashCode()));
-                    info.setInnerVersionId(xDict.getInnerVersionId());
-                    infos[i] = info;
-                    i++;
-                }
-                Integer totalCount = dictManager.getDictListInt(xcdaVersion, param);
-                result = getResult(Arrays.asList(infos), totalCount, page, rows);
-            }
-        } catch (Exception ex) {
-            LogService.getLogger(StdManagerRestController.class).error(ex.getMessage());
-        }
-        return result.toJson();*/
     }
     /**
      * 查询最新版本的CdaVersion，用于初始化查询字典数据。
@@ -757,7 +556,9 @@ public class DictController {
     @RequestMapping("getLastCdaVersion")
     @ResponseBody
     public Object getLastCdaVersion() {
-        String url = "/version/latestVersion";
+
+        //TODO 获取最新的版本信息API方法缺失
+        /*String url = "/version/latestVersion";
         String strJson = "";
         try {
             strJson = HttpClientUtil.doGet(comUrl+url,username,password);
@@ -765,7 +566,7 @@ public class DictController {
         } catch (Exception ex) {
             LogService.getLogger(DictController.class).error(ex.getMessage());
             return (ErrorCode.GetCDAVersionListFailed);
-        }
+        }*/
 
        /* try {
             String strJson = "";
@@ -786,11 +587,14 @@ public class DictController {
             LogService.getLogger(StdManagerRestController.class).error(ex.getMessage());
             return failed(ErrorCode.GetCDAVersionListFailed);
         }*/
+        return  null;
     }
 
     @RequestMapping("saveDictEntry")
     @ResponseBody
     public Object saveDictEntry(String cdaVersion, String dictId, String id, String code, String value, String desc) {
+        String resultStr = "";
+
         Envelop result = new Envelop();
         if (StringUtils.isEmpty(cdaVersion)) {
             result.setSuccessFlg(false);
@@ -818,29 +622,28 @@ public class DictController {
             return result;
         }
 
-        String url = "/dict/updateDictEntry";
+        Map<String, Object> params = new HashMap<>();
+        DictEntryModel dictEntryModel = new DictEntryModel();
+        dictEntryModel.setId(Long.parseLong(id));
+        dictEntryModel.setDictId(Long.parseLong(dictId));
+        dictEntryModel.setCode(code);
+        dictEntryModel.setValue(value);
+        dictEntryModel.setDesc(desc);
+
+        params.put("version_code",cdaVersion);
+        params.put("json_data",toJson(dictEntryModel));
+
         try{
-            Map<String,Object> params = new HashMap<>();
-            params.put("cdaVersion",cdaVersion);
-            params.put("dictId",dictId);
-            params.put("entryId",id);
-            params.put("entryCode",code);
-            params.put("entryValue",value);
-            params.put("description",desc);
-            String _rus = HttpClientUtil.doPost(comUrl+url,params,username,password);
-            if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.saveDictEntryFailed.toString());
-            }else{
-                result.setSuccessFlg(true);
-            }
+            String url = "/dict_entry";
+            resultStr = HttpClientUtil.doPost(comUrl+url,params,username,password);
+            return resultStr;
+
         }catch(Exception ex){
             LogService.getLogger(DictController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
+            return result;
         }
-        return result;
-
 
        /* Result result = new Result();
         try {
@@ -904,83 +707,49 @@ public class DictController {
     @ResponseBody
     public Object deleteDictEntry(String cdaVersion, String dictId, String entryId) {
         Envelop result = new Envelop();
-        if (StringUtils.isEmpty(cdaVersion)) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg("版本号不能为空！");
-            return result;
-        }
+        String resultStr = "";
+
+        Map<String,Object> params = new HashMap<>();
+        params.put("versionCode",cdaVersion);
+        //params.put("dictId",dictId); 字典ID项不需要
+
+        String[] entryIds = new String[1];
+        entryIds[0] = entryId;
+        params.put("entryIds",entryIds);
+
         try{
-            String url = "/dict/updateDict";
-            Map<String,Object> params = new HashMap<>();
-            params.put("versionCode",cdaVersion);
-            params.put("dictId",dictId);
-            params.put("entryIds",entryId);
-            String _msg = HttpClientUtil.doDelete(comUrl+url,params,username,password);
-            if(Boolean.parseBoolean(_msg)){
-                result.setSuccessFlg(true);
-            }else{
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.DeleteDictEntryFailed.toString());
-            }
+            String url = "/dict_entry";
+            resultStr = HttpClientUtil.doDelete(comUrl+url,params,username,password);
+            return resultStr;
+
         }catch(Exception ex){
             LogService.getLogger(DictController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
+            return result;
         }
-        return result;
-
-
-        /*Result result = new Result();
-        try {
-            if (cdaVersion == null || cdaVersion.equals("")) {
-                return missParameter("VersionCode");
-            }
-            if (dictId == null || dictId.equals("")) {
-                return missParameter("DictId");
-            }
-            if (entryId == null || entryId.equals("")) {
-                return missParameter("DictEntryId");
-            }
-            XCDAVersion xcdaVersion = cdaVersionManager.getVersion(cdaVersion);
-            if (xcdaVersion == null)
-                return failed(ErrorCode.GetCDAVersionFailed);
-            XDict xDict = dictManager.getDict(Long.parseLong(dictId), xcdaVersion);
-            XDictEntry xDictEntry = dictEntryManager.getEntries(Long.parseLong(entryId), xDict);
-            int resultFlag = dictEntryManager.deleteEntry(xDictEntry);
-            if (resultFlag >= 1) {
-                result.setSuccessFlg(true);
-                return result.toJson();
-            } else {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.DeleteDictEntryFailed.toString());
-                return result.toJson();
-            }
-        } catch (Exception ex) {
-            LogService.getLogger(StdManagerRestController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.DeleteDictEntryFailed.toString());
-            return result.toJson();
-        }*/
     }
 
     @RequestMapping("deleteDictEntryList")
     @ResponseBody
-    public Object deleteDictEntryList(String cdaVersion, String id) {
-        //TODO API要求 dictId 参数
+    public Object deleteDictEntryList(String cdaVersion,String dictId, String id) {
         Envelop result = new Envelop();
+        String resultStr = "";
         if (StringUtils.isEmpty(cdaVersion)) {
             result.setSuccessFlg(false);
             result.setErrorMsg("版本号不能为空！");
             return result;
         }
         try{
-            String url = "/dict/dictEntry";
+            String url = "/dict_entry";
             Map<String,Object> params = new HashMap<>();
             params.put("versionCode",cdaVersion);
             //params.put("dictId",dictId);
             params.put("entryIds",id);
-            String _msg = HttpClientUtil.doDelete(comUrl+url,params,username,password);
-            if(Boolean.parseBoolean(_msg)){
+            resultStr = HttpClientUtil.doDelete(comUrl+url,params,username,password);
+            result = getEnvelop(resultStr);
+
+            if(result.isSuccessFlg()){
                 result.setSuccessFlg(true);
             }else{
                 result.setSuccessFlg(false);
@@ -992,63 +761,49 @@ public class DictController {
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
         return result;
-
-
-/*        Result result = new Result();
-        List<String> ids = new ArrayList<>();
-        ids.add(id);
-        XCDAVersion xcdaVersion = cdaVersionManager.getVersion(cdaVersion);
-        if (xcdaVersion == null)
-            return failed(ErrorCode.GetCDAVersionFailed);
-        try {
-            if (cdaVersion == null || cdaVersion.equals("")) {
-                return missParameter("VersionCode");
-            }
-            int resultFlag = dictManager.delDictEntryList(xcdaVersion, ids);
-            if (resultFlag >= 1) {
-                result.setSuccessFlg(true);
-                return result.toJson();
-            } else {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.DeleteDictEntryFailed.toString());
-                return result.toJson();
-            }
-        } catch (Exception ex) {
-            LogService.getLogger(StdManagerRestController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.DeleteDictEntryFailed.toString());
-            return result.toJson();
-        }*/
     }
 
     @RequestMapping("searchDictEntryList")
     @ResponseBody
     public Object searchDictEntryList(Long dictId, String searchNmEntry, String strVersionCode, Integer page, Integer rows) {
         Envelop result = new Envelop();
-        String url = "/dict/dictEntrys";
+        String resultStr = "";
+        Map<String, Object> params = new HashMap<>();
+
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append("dictId=" + dictId);
+        if (!StringUtils.isEmpty(searchNmEntry)) {
+            stringBuffer.append(";value?" + searchNmEntry + " g1;code?" + searchNmEntry + " g1");
+        }
+
+        String filters = stringBuffer.toString();
+        params.put("filters", "");
+        if (!StringUtils.isEmpty(filters)) {
+            params.put("filters", filters);
+        }
+        params.put("page", page);
+        params.put("size", rows);
+        params.put("fields", "");
+        params.put("sorts", "");
+
+        if (strVersionCode == null) {
+            result.setSuccessFlg(false);
+            result.setErrorMsg("版本号不能为空！");
+            return result;
+        }
+        params.put("version",strVersionCode);
+
         try{
-            Map<String,Object> params = new HashMap<>();
-            params.put("versionCode",strVersionCode);
-            params.put("dictId",dictId);
-            params.put("entryCode",searchNmEntry);
-            params.put("entryValue",searchNmEntry);
-            params.put("page",page);
-            params.put("rows",rows);
-            String _rus = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.GetDictEntryListFailed.toString());
-            }else{
-                result.setSuccessFlg(true);
-                return _rus;
-            }
+            String url = "/dict_entrys";
+            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+            return resultStr;
+
         }catch(Exception ex){
             LogService.getLogger(DictController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
+            return result;
         }
-        return result;
-
 
  /*       Result result = new Result();
         if (strVersionCode == null) {
@@ -1087,28 +842,25 @@ public class DictController {
     @ResponseBody
     public Object getDictEntry(String id, String dictId, String strVersionCode) {
         Envelop result = new Envelop();
-        String url = "/dict/dictEntry";
+        String resultStr = "";
+        String url = "/dict_entry";
         try{
             Map<String,Object> params = new HashMap<>();
             params.put("versionCode",strVersionCode);
             params.put("dictId",dictId);
             params.put("entryId",id);
-            String _rus = HttpClientUtil.doGet(comUrl+url,params,username,password);
-            if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.GetDictEntryFailed.toString());
-            }else{
-                result.setSuccessFlg(true);
-//                ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-//                XDictEntryForInterface info = objectMapper.readValue(_rus, XDictEntryForInterface.class);
-                result.setObj(_rus);
-            }
+            resultStr = HttpClientUtil.doGet(comUrl+url,params,username,password);
+
+            return resultStr;
+
         }catch(Exception ex){
             LogService.getLogger(DictController.class).error(ex.getMessage());
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
+
+            return result;
         }
-        return result;
+
 
         /*Result result = new Result();
         Long dictEntryId = id.equals("") ? 0 : Long.parseLong(id);
@@ -1134,20 +886,6 @@ public class DictController {
         }
         return result.toJson();*/
     }
-
-    /*public List<StandardSourceForInterface> GetStandardSourceForInterface(XStandardSource[] xStandardSources) {
-        List<StandardSourceForInterface> results = new ArrayList<>();
-        for (XStandardSource xStandardSource : xStandardSources) {
-            StandardSourceForInterface info = new StandardSourceForInterface();
-            info.setId(xStandardSource.getId());
-            info.setCode(xStandardSource.getCode());
-            info.setName(xStandardSource.getName());
-            info.setSourceType(xStandardSource.getSourceType().getCode());
-            info.setDescription(xStandardSource.getDescription());
-            results.add(info);
-        }
-        return results;
-    }*/
 
 //    public void exportToExcel(){
 //        //todo：test 导出测试

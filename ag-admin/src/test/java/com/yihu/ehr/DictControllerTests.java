@@ -89,7 +89,8 @@ public class DictControllerTests {
             String id = String.valueOf(((DictEntryModel) envelop.getDetailModelList().get(i)).getId());
             ids.append(id+",");
         }
-        Envelop envelop1 = dictController.deleteDictEntry(version,Long.valueOf(dictId),ids.toString());
+        //Envelop envelop1 = dictController.deleteDictEntry(version,Long.valueOf(dictId),ids.toString());
+        Envelop envelop1 = dictController.deleteDictEntry(version,ids.toString());
         assertNotEquals("批量删除字典项失败",envelop1,null);
 
 //        envelop = dictController.saveDictEntry(version,dictId,String.valueOf(((DictEntryModel) envelop.getDetailModelList().get(0)).getId()),"entry_code_test_copy","value_test_copy","test_copy");
@@ -98,7 +99,9 @@ public class DictControllerTests {
         envelop = dictController.getDictEntryById(version,((DictEntryModel)envelop.getObj()).getId());
         assertNotEquals("获取字典项失败",envelop,null);
 
-        envelop = dictController.deleteDictEntry(version,Long.valueOf(dictId),String.valueOf(((DictEntryModel) envelop.getObj()).getId()));
+        //envelop = dictController.deleteDictEntry(version,Long.valueOf(dictId),String.valueOf(((DictEntryModel) envelop.getObj()).getId()));
+        envelop = dictController.deleteDictEntry(version,String.valueOf(((DictEntryModel) envelop.getObj()).getId()));
+
         assertNotEquals("删除字典项失败",envelop,null);
 
     }

@@ -145,7 +145,7 @@ public class AppController extends BaseUIController {
         String resultStr="";
         String url="/apps";
         MultiValueMap<String,String> conditionMap = new LinkedMultiValueMap<String, String>();
-        appDetailModel.setCreator("system");//todo:用户不能为空
+        appDetailModel.setCreator(SessionAttributeKeys.CurrentUser);
         conditionMap.add("app", toJson(appDetailModel));
         try {
             RestTemplates template = new RestTemplates();
