@@ -85,8 +85,11 @@ public class RestApi {
         public static final String Types                            = "/std/types";
         public static final String Type                             = "/std/types/{id}";
         public static final String TypesCodeExistence               = "/std/type/code/existence";
-        public static final String TypeChildren                     = "/std/types/{id}/childrens";
+        public static final String TypeChildren                     = "/std/types/parent_id/childrens";
         public static final String TypesChildren                    = "/std/types/childrens";
+        public static final String TypeOther                        = "/std/types/{id}/other";
+        public static final String TypeList                         = "/cda_types/code_name";
+        public static final String TypeParent                       = "/std/types/{id}/parent";
 
         public static final String Versions                         = "/std/versions";
         public static final String Version                          = "/std/versions/{version}";
@@ -111,6 +114,8 @@ public class RestApi {
         public static final String Dictionary                       = "/std/dictionaries/{id}";
         public static final String MetaDataWithDict                 = "/std/data_set/{data_set_id}/meta_datas/{meta_data_id}/dictionaries";
         public static final String DictCodeIsExist                  = "/std/dictionaries/is_exist/code";
+        public static final String DictOther                        = "/std/dictionaries/{id}/other";
+        public static final String DictParent                        = "/std/dictionaries/{id}/parent";
 
         public static final String Entry                            = "/std/dictionaries/entries/{id}";
         public static final String Entries                          = "/std/dictionaries/entries";

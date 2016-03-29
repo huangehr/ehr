@@ -19,7 +19,11 @@ public class CDAModel {
 
     private String sourceId;
 
-    private String typeId;
+    private String operationType;
+
+    private String user;
+
+    private String schema;
 
     public String getCode() {
         return code;
@@ -77,11 +81,27 @@ public class CDAModel {
         this.sourceId = sourceId;
     }
 
-    public String getTypeId() {
-        return typeId;
+    public String getOperationType() {
+        return operationType;
     }
 
-    public void setTypeId(String typeId) {
-        this.typeId = typeId;
+    public void setOperationType(String operationType) {
+        this.operationType = operationType;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public String getSchema() {
+        return schema;
+    }
+
+    public void setSchema(String schema) {
+        this.schema = schema;
     }
 }

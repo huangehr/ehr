@@ -23,7 +23,7 @@
         }
         function cardInfoRefresh(){
             var searchNm = patientInfo.$cardSearch.val();
-            var cardType = patientInfo.$selectCardType.ligerComboBox().getValue();
+            var cardType = cardFormInit.$selectCardType.ligerComboBox().getValue();
             cardFormInit.searchCard(searchNm,cardType);
         }
 
@@ -53,7 +53,6 @@
             $cardManagerDialog: $("#div_cardManagerDialog"),
             $recordManagerDialog: $("#div_recordManagerDialog"),
             $cardSearch: $("#inp_card_search"),
-            $selectCardType:$('#inp_select_cardType'),
             $cardBasicMsg: $("#div_card_basicMsg"),
             $addCard: $("#div_addCard"),
 
@@ -115,23 +114,6 @@
 //                        cardFormInit.searchCard(searchNm,cardType);
                     }
                 });
-
-                this.$selectCardType.ligerComboBox(
-                        {
-                            url: '${contextRoot}/dict/searchDictEntryList',
-                            valueField: 'code',
-                            textField: 'value',
-                            dataParmName: 'detailModelList',
-                            urlParms: {
-                                dictId: 10
-                            },
-                            width:120,
-                            autocomplete: true,
-                            onSelected: function (v, t) {
-                                cardFormInit.searchCard(patientInfo.$cardSearch.val(), v);
-                            }
-                        });
-
                 this.$cardType.ligerTextBox({width: 240});
                 this.$cardNo.ligerTextBox({width: 240});
                 this.$holderName.ligerTextBox({width: 240});
@@ -165,7 +147,24 @@
             }
         };
         cardFormInit = {
+            $selectCardType:$('#inp_select_cardType'),
             init: function () {
+                this.$selectCardType.ligerComboBox(
+                        {
+                            url: '${contextRoot}/dict/searchDictEntryList',
+                            valueField: 'code',
+                            textField: 'value',
+                            dataParmName: 'detailModelList',
+                            urlParms: {
+                                dictId: 10
+                            },
+                            width:120,
+                            autocomplete: true,
+                            onSelected: function (v, t) {
+                                cardFormInit.searchCard(patientInfo.$cardSearch.val(), v);
+                            }
+                        });
+
                 cardInfoGrid = $("#div_card_info_form").ligerGrid($.LigerGridEx.config({
                     url: '${contextRoot}/card/searchCard',
                     parms: {
@@ -174,16 +173,16 @@
                         cardType: ''
                     },
                     columns: [
-                        { name: 'objectId',hide: true},
-                        { name: 'type',hide: true},
-                        {display: '类型', name: 'typeValue', width: '10%'},
+                        { name: 'id',hide: true},
+                        { name: 'cardType',hide: true},
+                        {display: '类型', name: 'typeName', width: '10%'},
                         {display: '卡号', name: 'number', width: '30%'},
-                        {display: '发行机构', name: 'releaseOrg', width: '20%'},
+                        {display: '发行机构', name: 'releaseOrgName', width: '20%'},
                         {display: '创建时间', name: 'createDate', width: '18%'},
-                        {display: '状态', name: 'statusValue', width: '8%'},
+                        {display: '状态', name: 'statusName', width: '8%'},
                         {
                             display: '操作', name: 'operator', width: '14%', render: function (row) {
-                            var html = '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "patient:cardInfoModifyDialog:open", row.objectId,row.type) + '">解除关联</a>  ';
+                            var html = '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "patient:cardInfoModifyDialog:open", row.id,row.cardType) + '">解除关联</a>  ';
                             return html;
                         }
                         }
@@ -196,17 +195,17 @@
                         var self = this;
                         var dataModel = $.DataModel.init();
                         dataModel.createRemote('${contextRoot}/card/getCard', {
-                            data: {objectId: row.objectId,type:row.type},
+                            data: {id: row.id,cardType:row.cardType},
                             success: function (data) {
                                 patientInfo.$cardForm.Fields.fillValues({
-                                    type:data.obj.cardModel.typeValue,
-                                    number:data.obj.cardModel.number,
-                                    ownerName:data.obj.cardModel.ownerName,
-                                    local:data.obj.cardModel.local,
-                                    releaseOrg:data.obj.cardModel.releaseOrg,
-                                    createDate:data.obj.cardModel.createDate,
-                                    statusValue:data.obj.cardModel.statusValue,
-                                    description:data.obj.cardModel.description
+                                    cardType:data.obj.typeName,
+                                    number:data.obj.number,
+                                    ownerName:data.obj.ownerName,
+                                    local:data.obj.local,
+                                    releaseOrgName:data.obj.releaseOrgName,
+                                    createDate:data.obj.createDate,
+                                    statusName:data.obj.statusName,
+                                    description:data.obj.description
                                 })
                             }
                         });
@@ -241,12 +240,12 @@
                 });
 
                 //解绑卡信息
-                $.subscribe('patient:cardInfoModifyDialog:open',function(event,objectId,type){
+                $.subscribe('patient:cardInfoModifyDialog:open',function(event,id,cardType){
                     $.ligerDialog.confirm('确认解除关联该卡信息？<br>如果是请点击确认按钮，否则请点击取消。', function (yes) {
                         if (yes) {
                             var dataModel = $.DataModel.init();
                             dataModel.updateRemote('${contextRoot}/card/detachCard', {
-                                data: {objectId: objectId,type:type},
+                                data: {id: id,cardType:cardType},
                                 success: function (data) {
                                     if (data.successFlg) {
                                         $.ligerDialog.alert('解除关联成功');
@@ -261,7 +260,6 @@
                 });
                 //添加卡
                 patientInfo.$addCard.click(function(){
-                    debugger;
                     var idCardNo = patientInfo.$form.Fields.idCardNo.getValue();
                     $.ligerDialog.open({
                         height: 640,

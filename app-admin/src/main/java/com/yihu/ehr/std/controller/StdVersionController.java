@@ -54,7 +54,7 @@ public class StdVersionController extends BaseUIController {
             params.put("filters", filters);
             params.put("sorts", "");
             params.put("page", 1);
-            params.put("size", 30);
+            params.put("size", 999);
             String envelopStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             return envelopStr;
         } catch (Exception ex) {
@@ -65,13 +65,14 @@ public class StdVersionController extends BaseUIController {
         }
     }
 
+    /**
+     * 通用的用于下拉列表框（所有的版本，发布/未发布）
+     * @return
+     */
     @RequestMapping("getVersionList")
     @ResponseBody
-    //获取版本列表用于下拉框
     public Object getVersionList() {
-        //使用 标准数据集页面、++
-        //暂时使用的方法，原来流程是通过标准字典controller得到
-        //原方法将编码、名字组成（"version,name")形式，到前端页面在拆分，，现在返回对象、不再去封装，页面直接取对应的值（标准数据集页面）
+        //原来流程是通过标准字典controller得到
         Envelop envelop = new Envelop();
         String url = "/versions";
         try {
@@ -80,12 +81,8 @@ public class StdVersionController extends BaseUIController {
             params.put("filters", "");
             params.put("sorts", "");
             params.put("page", 1);
-            params.put("size", 100);
+            params.put("size", 999);
             String envelopStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            Envelop en = objectMapper.readValue(envelopStr,Envelop.class);
-            if (en.isSuccessFlg()){
-                List<StdVersionModel> list = (List<StdVersionModel>)getEnvelopList(en.getDetailModelList(),new ArrayList<StdVersionModel>(),StdVersionModel.class);
-            }
             return envelopStr;
         } catch (Exception ex) {
             LogService.getLogger(StdVersionController.class).error(ex.getMessage());
@@ -95,11 +92,25 @@ public class StdVersionController extends BaseUIController {
         }
     }
 
-    @RequestMapping("getVersionById")
-    //@ResponseBody
-    public String getVersionById(Model model,String strVersion,String mode){
-        //TODO 未使用
-        return "simpleView";
+    @RequestMapping("getVersion")
+    @ResponseBody
+    public Object getVersion(String strVersion){
+        Envelop envelop = new Envelop();
+        if(StringUtils.isEmpty(strVersion)){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("标准版本号不能为空！");
+            return envelop;
+        }
+        try {
+            String url = "/version/"+strVersion;
+            String envelopStr = HttpClientUtil.doGet(comUrl+url,username,password);
+            return envelop;
+        }catch (Exception ex){
+            LogService.getLogger(StdVersionController.class).error(ex.getMessage());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            return envelop;
+        }
     }
 
     // 检查是否存在处于编辑状态的版本
@@ -124,23 +135,20 @@ public class StdVersionController extends BaseUIController {
         return envelop;
     }
 
-    //获取最新已发布版本
-
-
-
     @RequestMapping("addVersion")
     @ResponseBody
     public Object addVersion(){
+        //TODO 获取登入用户信息
         //@ModelAttribute(SessionAttributeKeys.CurrentUser) Xuser user
         Envelop envelop = new Envelop();
         String url = "/version";
         Map<String,Object> params = new HashMap<>();
-        //TODO 临时测试数据--需要用户账号
+        //临时测试数据
         String userLoginCode = "wwcs";
         params.put("userLoginCode",userLoginCode);
         try{
             String envelopStr = HttpClientUtil.doPost(comUrl+url,params,username,password);
-            //TODO 新增成功单无法返回数据（会报超时异常，微服务操作过程中的重启）
+            // 新增成功单无法返回数据（会报超时异常，微服务操作过程中的重启）
             return envelopStr;
         }catch (Exception ex){
             LogService.getLogger(StdVersionController.class).error(ex.getMessage());
@@ -151,18 +159,10 @@ public class StdVersionController extends BaseUIController {
     }
 
 
-    @RequestMapping("updateVersion")
-    @ResponseBody
-    public Object updateVersion(String versionName){
-        //TODO 未使用
-        //TODO 标准版本信息能否修改，可修改那些内容？
-        return false;
-    }
-
     @RequestMapping("dropCDAVersion")
     //该方法可删除已发布版本，然后将子版本的baseversion设置为该版本的父级版本
     public Object dropCDAVersion(String strVersion){
-        //TODO 未使用
+        //未使用
         Envelop envelop = new Envelop();
         String url = "/version/version/"+strVersion+"/drop";
         Map<String,Object> params = new HashMap<>();
@@ -212,7 +212,7 @@ public class StdVersionController extends BaseUIController {
     @RequestMapping("isLatestVersion")
     @ResponseBody
     public Object isLatestVersion(String strVersion){
-        //TODO 未使用
+        //未使用
         Envelop envelop = new Envelop();
         String url = "/version/"+strVersion+"/isLatest";
         try{
@@ -230,19 +230,6 @@ public class StdVersionController extends BaseUIController {
             envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
         return envelop;
-    }
-
-    @RequestMapping("addVersionDialog")
-    public Object createStageVersion(Model model) {
-        //TODO 未使用
-        try{
-//            String latestVersion = cdaVersionManager.getLatestVersion().getVersion();
-//            model.addAttribute("latesVersion",latestVersion);
-        }catch (Exception ex){
-           // LogService.getLogger(CdaVersionController.class).error(ex.getMessage());
-        }
-        model.addAttribute("contentPage","std/cdaVersion/cdaVersionEdit");
-        return "generalView";
     }
 
     //发布新版本
@@ -273,7 +260,7 @@ public class StdVersionController extends BaseUIController {
     @RequestMapping("rollbackToStage")
     @ResponseBody
     public Object rollbackToStage(String strVersion){
-        //TODO 未使用
+        //未使用
         Envelop envelop = new Envelop();
         String url = "/version/"+strVersion+"/rollback_stage";
         Map<String,Object> params = new HashMap<>();
@@ -297,7 +284,7 @@ public class StdVersionController extends BaseUIController {
     @RequestMapping("checkVersionName")
     @ResponseBody
     public Object checkVersionName(String versionName){
-        //TODO 未使用
+        //现未使用,原为修改版本时使用
         Envelop envelop = new Envelop();
         String url = "/version/check_name";
         Map<String,Object> params = new HashMap<>();
@@ -305,7 +292,6 @@ public class StdVersionController extends BaseUIController {
         try{
             String _msg = HttpClientUtil.doGet(comUrl+url,params,username,password);
             if("true".equals(_msg)){
-                //名字已存在
                 envelop.setSuccessFlg(true);
             }else{
                 envelop.setSuccessFlg(false);

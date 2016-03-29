@@ -151,10 +151,10 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
 
     @RequestMapping(value = RestApi.Standards.EntryCodeIsExist,method = RequestMethod.GET)
     public boolean isExistEntryCode(
+            @RequestParam(value = "dict_id")long dictId,
             @RequestParam(value = "code")String code,
-            @RequestParam(value = "version_code")String versionCode)
-    {
+            @RequestParam(value = "version_code")String versionCode) {
         Class entityClass = getServiceEntity(versionCode);
-        return dictEntryService.isExistByField("code", code, entityClass);
+        return dictEntryService.isExistByFields(new String[]{"dictId","code"}, new Object[]{dictId,code}, entityClass);
     }
 }

@@ -125,6 +125,7 @@ public class URLQueryParser<T> {
     /**
      * like：使用"?"来表示，如：name?'%医'
      * in：使用"="来表示并用","逗号对值进行分隔，如：status=2,3,4,5
+     * not in：使用"<>"来表示并用","逗号对值进行分隔，如：status=2,3,4,5
      * =：使用"="来表示，如：status=2
      * >=：使用大于号和大于等于语法，如：createDate>2012
      * <=：使用小于号和小于等于语法，如：createDate<=2015
@@ -183,16 +184,16 @@ public class URLQueryParser<T> {
             }
         } else if (filter.contains(">=")) {
             Pair<Path, String> pair = getPair(filter, ">=", root);
-            predicate = cb.gt(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
+            predicate = cb.ge(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
         } else if (filter.contains(">")) {
             Pair<Path, String> pair = getPair(filter, ">", root);
-            predicate = cb.ge(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
+            predicate = cb.gt(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
         } else if (filter.contains("<=")) {
             Pair<Path, String> pair = getPair(filter, "<=", root);
-            predicate = cb.lt(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
+            predicate = cb.le(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
         } else if (filter.contains("<")) {
             Pair<Path, String> pair = getPair(filter, "<", root);
-            predicate = cb.le(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
+            predicate = cb.lt(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
         } else if (filter.contains("=")) {
             Pair<Path, String> pair = getPair(filter, "=", root);
 

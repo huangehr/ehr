@@ -75,6 +75,9 @@ public class OrgDataSetController extends ExtendController<MOrgDataSet> {
             @RequestParam(value = "model") String model) throws Exception{
 
         OrgDataSet dataModel = objectMapper.readValue(model, OrgDataSet.class);
+        if(orgDataSetService.retrieve(dataModel.getId())==null)
+            throw errNotFound();
+
         dataModel.setUpdateDate(new Date());
         return getModel(orgDataSetService.save(dataModel));
 

@@ -64,6 +64,11 @@ public class DispatchService {
     CDADocumentManager cdaDocumentManager;
     @Autowired
     CDADataSetRelationshipManager cdaDataSetRelationshipManager;
+
+    private Class getServiceEntity(String version){
+        return cdaDocumentManager.getServiceEntity(version);
+    }
+
     @Autowired
     FastDFSUtil fastDFSUtil;
     public static  Map<String, String> typeMapping = new HashMap<>();
@@ -642,7 +647,9 @@ public class DispatchService {
 
         //创建CDA文档
         String strCDAFileName = "std_cda.xml";
-        List<CDADocument> listCDA = cdaDocumentManager.getDocumentList(sourceVersionId, "", "", "", 0, 0);
+
+        Class entityClass = getServiceEntity(sourceVersionId);
+        List<CDADocument> listCDA = cdaDocumentManager.search(entityClass, "id="+ sourceVersionId);
         createCDAFile(strXMLFilePath, strCDAFileName, listCDA);
 
         //创建关系文档

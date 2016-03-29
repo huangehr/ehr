@@ -2,8 +2,11 @@ package com.yihu.ehr.standard.dict.controller;
 
 import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.standard.MCDAType;
 import com.yihu.ehr.model.standard.MStdDict;
+import com.yihu.ehr.standard.cdatype.service.CDAType;
 import com.yihu.ehr.standard.commons.ExtendController;
+import com.yihu.ehr.standard.dict.service.Dict;
 import com.yihu.ehr.standard.dict.service.DictService;
 import com.yihu.ehr.standard.dict.service.IDict;
 import io.swagger.annotations.Api;
@@ -158,4 +161,53 @@ public class DictController extends ExtendController<MStdDict> {
         Class entityClass = getServiceEntity(versionCode);
         return dictService.isExistByField("code",dictCode , entityClass);
     }
+
+
+    @RequestMapping(value = RestApi.Standards.DictOther, method = RequestMethod.GET)
+    @ApiOperation(value = "获取cdaDict列表（不包含本身）")
+    public List<MStdDict> getOtherCdaDict(
+            @ApiParam(name = "id", value = "字典编号", defaultValue = "")
+            @PathVariable(value = "id") String id,
+            @ApiParam(name = "version", value = "版本编号", defaultValue = "")
+            @RequestParam(value = "version") String version) throws Exception {
+        List list = dictService.getOtherCdaDict(id,version);
+        return (List<MStdDict>)convertToModels(list,new ArrayList<MStdDict>(list.size()),MStdDict.class,"");
+    }
+
+
+    @RequestMapping(value = RestApi.Standards.DictParent, method = RequestMethod.GET)
+    @ApiOperation(value = "根据当前类别获取自己的父级以及同级以及同级所在父级类别列表")
+    public List<MStdDict> getCdaTypeExcludeSelfAndChildren(
+            @ApiParam(name = "id", value = "id")
+            @RequestParam(value = "id") long id,
+            @ApiParam(name = "version", value = "版本编号", defaultValue = "")
+            @RequestParam(value = "version") String version) throws Exception {
+        List<IDict> dicts = new ArrayList<>();
+
+        IDict dict = dictService.retrieve(id, getServiceEntity(version));
+        dicts.add(dict);
+        String childrenIds = getChildIncludeSelfByParentsAndChildrenIds(dicts,"",version);   //递归获取
+        List<IDict> returnDicts = dictService.getCdaTypeExcludeSelfAndChildren(childrenIds,version);
+
+        return  (List<MStdDict>)convertToModels(returnDicts,new ArrayList<MStdDict>(returnDicts.size()),MStdDict.class,"");
+    }
+
+
+    /**
+     * 根据父级类别获取父级类别所在以下所有子集类别（包括当前父级列表）
+     * @param parents 父级信息
+     * @param childrenIds   子级ID
+     */
+    public String getChildIncludeSelfByParentsAndChildrenIds(List<IDict> parents,String childrenIds,String version) {
+        for (int i = 0; i < parents.size(); i++) {
+            IDict dict = parents.get(i);
+            childrenIds+=dict.getId()+",";
+            List<IDict> listChild = dictService.getChildrensByParentId(dict.getId(),version);
+            if(listChild.size()>0){
+                childrenIds = getChildIncludeSelfByParentsAndChildrenIds(listChild,childrenIds,version);
+            }
+        }
+        return childrenIds;
+    }
+
 }

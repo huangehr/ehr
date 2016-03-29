@@ -437,11 +437,11 @@ set.attr = {
         debugger
         $.ajax({
             //url: u._url + "/cdadict/getStdSourceList",
-            url: u._url + "/std/dataset/getStdSourceList",
+            url: u._url + "/standardsource/getStdSourceList",
             type: "post",
             dataType: "json",
            // data: {strVersionCode: cdaVersion},
-            data: {version: cdaVersion},
+            //data: {version: cdaVersion},
             success: function (data) {
                 //var result = eval(data.result);
                 var envelop = eval(data);
@@ -570,7 +570,7 @@ set.elementAttr = {
         $("#hdId").val(elementId);
         var setid = $.Util.getUrlQueryString('setid');
         $("#hdsetid").val(setid);
-        //this.getDictList();
+        this.getDictList();
         this.getElementInfo();
     },
     getDictList: function (initValue, initText) {
@@ -620,20 +620,20 @@ set.elementAttr = {
             async: true,
             success: function (data) {
                 if (data != null) {
-                    var info = eval(data).detailModelList;
+                    var info = eval(data).obj;
                     set.elementAttr.element_form.attrScan();
-                    set.elementAttr.element_form.Fields.fillValues(info[0]);
-                    $("#metaDataCodeCopy").val(info[0].innerCode);
-                    $("#fieldNameCopy").val(info[0].columnName);
-                    $("#datatype").val(info[0].columnType);
-                    //set.elementAttr.dict_select.setValue(info[0].dictId);
-                    set.elementAttr.getDictList(info[0].dictId, info[0].dictName);
+                    set.elementAttr.element_form.Fields.fillValues(info);
+                    $("#metaDataCodeCopy").val(info.innerCode);
+                    $("#fieldNameCopy").val(info.columnName);
+                    $("#datatype").val(info.columnType);
+                    set.elementAttr.dict_select.setValue(info.dictId);
+                    set.elementAttr.getDictList(info.dictId, info.dictName);
                     $("#primaryKey").attr('checked', false);
-                    if (info[0].primaryKey == "1") {
+                    if (info.primaryKey == "1") {
                         $("#primaryKey").attr('checked', true);
                     }
                     $("#whetherNull").attr('checked', false);
-                    if (info[0].nullable == "1") {
+                    if (info.nullable == "1") {
                         $("#whetherNull").attr('checked', true);
                     }
                 }
@@ -722,6 +722,7 @@ set.elementAttr = {
                         ErrorMsg = '内部代码不能重复';
                         return set.elementAttr.validatorSearchNm(hdversion, datasetId, metaDataCode, ErrorMsg, 'metaDataCodeMsg');
                     }
+                    //没有做验证
                     if (Util.isStrEquals($(elm).attr("id"), 'fieldName')) {
                         var fieldName = $("#fieldName").val();
                         var fieldNameCopy = $("#fieldNameCopy").val();
@@ -763,7 +764,7 @@ set.elementAttr = {
             data: {version: hdversion, datasetId: datasetId, searchNm: searchNm, metaDataCodeMsg: metaDataCodeMsg},
             async: false,
             success: function (data) {
-                if (data.successFlg) {
+                if (!data.successFlg) {
                     result.setResult(true);
                 } else {
                     result.setResult(false);

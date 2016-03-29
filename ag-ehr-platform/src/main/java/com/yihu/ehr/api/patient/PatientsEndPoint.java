@@ -68,7 +68,7 @@ public class PatientsEndPoint {
             }
 
             if (isPatientRegistered(demographicId)) {
-                return;
+                throw new ApiException(HttpStatus.NOT_ACCEPTABLE, ErrorCode.RepeatedIdentityNo, error);
             }
 
             MDemographicInfo demoInfo = new MDemographicInfo();

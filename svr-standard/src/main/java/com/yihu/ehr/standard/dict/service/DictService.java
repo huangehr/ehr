@@ -3,7 +3,9 @@ package com.yihu.ehr.standard.dict.service;
 
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.model.standard.MStdDict;
 import com.yihu.ehr.query.BaseHbmService;
+import com.yihu.ehr.standard.cdatype.service.CDAType;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -11,8 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -95,6 +99,49 @@ public class DictService extends BaseHbmService<IDict> {
         }
         return map;
     }
+
+    public List getOtherCdaDict(String id,String version) {
+        Session session = currentSession();
+        Class clz = getServiceEntity(version);
+        String hql = " from " +clz.getSimpleName()+" dict where 1 = 1 and dict.id !="+id;
+        Query query = session.createQuery(hql);
+        List o = query.list();
+        return o;
+    }
+
+    public List<IDict> getChildrensByParentId(long baseDictId,String version) {
+        Session session = currentSession();
+        Class clz = getServiceEntity(version);
+        String hql="";
+        if(StringUtils.isEmpty(baseDictId)){
+            hql += "from "+clz.getSimpleName()+" a where 1=1 and (a.baseDict is null or a.baseDict='')";
+        }else{
+            hql += "from "+clz.getSimpleName()+" a where 1=1 and a.baseDict =:baseDict";
+        }
+        Query query = session.createQuery(hql);
+        if(!StringUtils.isEmpty(baseDictId)){
+            query.setLong("baseDict", baseDictId);
+        }
+        return query.list();
+    }
+
+    public List<IDict> getCdaTypeExcludeSelfAndChildren(String childrenIds,String version) {
+        Session session = currentSession();
+        Class clz = getServiceEntity(version);
+
+        String[] ids = childrenIds.split(",");
+
+        Long[] idsL = new Long[ids.length];
+        for (int i = 0; i < ids.length; i++) {
+            idsL[i] = Long.parseLong(ids[i]);
+        }
+
+        String  hql = "from "+clz.getSimpleName()+" a where 1=1 and a.id not in (:ids)";
+        Query query = session.createQuery(hql);
+        query.setParameterList("ids",idsL);
+        return query.list();
+    }
+
 
     //TODO: 从excel导入字典、字典项
 }

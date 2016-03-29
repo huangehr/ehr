@@ -18,9 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Created by Administrator on 2015/8/12.
  */
@@ -49,10 +46,8 @@ public class AppController extends BaseUIController {
                 ((AppDetailModel)app).setStatus("WaitingForApprove");
             }else{
                 String url = "/apps/"+appId;
-                Map<String, Object> conditionMap = new HashMap<>();
-                conditionMap.put("app_id", appId);
                 RestTemplates template = new RestTemplates();
-                result = template.doGet(comUrl+url,conditionMap);
+                result = template.doGet(comUrl+url);
                 Envelop envelop = getEnvelop(result);
                 if(envelop.isSuccessFlg()){
                     app = result;
@@ -130,8 +125,6 @@ public class AppController extends BaseUIController {
         String resultStr="";
         try {
             String url = "/apps/"+appId;
-            MultiValueMap<String, String> conditionMap = new LinkedMultiValueMap<>();
-            conditionMap.add("app_id", appId);
             RestTemplates template = new RestTemplates();
             resultStr = template.doDelete(comUrl+url);
             result.setSuccessFlg(getEnvelop(resultStr).isSuccessFlg());
@@ -150,7 +143,7 @@ public class AppController extends BaseUIController {
         String resultStr="";
         String url="/apps";
         MultiValueMap<String,String> conditionMap = new LinkedMultiValueMap<String, String>();
-        appDetailModel.setCreator("system");//todo:用户不能为空
+        appDetailModel.setCreator(SessionAttributeKeys.CurrentUser);
         conditionMap.add("app", toJson(appDetailModel));
         try {
             RestTemplates template = new RestTemplates();

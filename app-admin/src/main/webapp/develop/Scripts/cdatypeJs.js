@@ -51,9 +51,9 @@ cdaType.list = {
                 if (result != null) {
                     cdaType.list.setUserList(result);
                 }
-                else {
-                    $.Notice.error("数据获取失败！");
-                }
+                //else {
+                //    $.Notice.error("数据获取失败！");
+                //}
             }
         })
     },
@@ -142,7 +142,6 @@ cdaType.list = {
                 var envelop = eval(data);
                 var _res = envelop.detailModelList;
                 if (_res != null && _res.length > 0) {
-                    debugger;
 
                     var _text = "当前类别存在子类别,删除将会同时删除子类别,并引起相关联的CDA无法显示！\n请确认是否删除？";
                     for (var i = 0; i < _res.length; i++) {
@@ -230,7 +229,6 @@ cdaType.attr = {
     validator: null,
     parent_select: null,
     init: function () {
-        debugger;
 
         var typeId = $.Util.getUrlQueryString('id');
         $("#hdId").val(typeId);
@@ -244,9 +242,8 @@ cdaType.attr = {
         });
     },
     getParentType: function (initValue, initText) {
-        debugger;
         cdaType.attr.parent_select = $("#ipt_select").ligerComboBox({
-            url: cdaType.list._url + "/cdatype/getParentType?strId=" + $("#hdId").val(),
+            url: cdaType.list._url + "/cdatype/getOtherCDAType?strId=" + $("#hdId").val(),
             valueField: 'id',
             textField: 'name',
             selectBoxWidth: 240,
@@ -309,7 +306,7 @@ cdaType.attr = {
         dataJson[0]["id"] = id;
 
         var user_id = $("#hd_user").val();
-        dataJson[0]["userId"] = user_id;
+        dataJson[0]["createUser"] = user_id;
 
         var parent_id = cdaType.attr.parent_select.getValue();
         dataJson[0]["parentId"] = parent_id;

@@ -10,14 +10,14 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.net.URLDecoder;
+import java.util.*;
 
 /**
  * @author lincl
@@ -183,15 +183,15 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.MetaDatasName, method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Standards.MetaDatasName, method = RequestMethod.POST)
     @ApiOperation(value = "获取数据元 id-name : map集")
     public Map getMetaDataMapByIds(
-            @ApiParam(name = "version", value = "版本号", defaultValue = "")
-            @RequestParam(value = "version") String version,
-            @ApiParam(name = "medaIds", value = "数据元编号", defaultValue = "")
-            @RequestParam(value = "medaIds") String metaIds) {
+            @ApiParam(name = "parmModel", value = "参数模型", defaultValue = "")
+            @RequestBody String parmModel) throws IOException {
 
-        return metaDataService.getMetaDataMapByIds(strToLongArr(metaIds), version);
+        parmModel = URLDecoder.decode(parmModel, "UTF-8");
+        Map<String, String> parms = jsonToObj(parmModel, Map.class);
+        return metaDataService.getMetaDataMapByIds(strToLongArr(parms.get("metaIds")), parms.get("version"));
     }
 
 }
