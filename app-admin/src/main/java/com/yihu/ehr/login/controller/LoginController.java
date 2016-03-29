@@ -82,8 +82,7 @@ public class LoginController {
                 }
 
                 if(userDetailModel.getLastLoginTime()!= null){
-                    //lastLoginTime = DateFormatter.simpleDateTimeShortFormat(userDetailModel.getLastLoginTime());
-                    lastLoginTime = dateFormat.format(userDetailModel.getLastLoginTime());
+                   lastLoginTime = userDetailModel.getLastLoginTime();
                 }
 
 
