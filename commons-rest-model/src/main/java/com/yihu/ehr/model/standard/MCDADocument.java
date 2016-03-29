@@ -29,7 +29,7 @@ public class MCDADocument {
     private String sourceId;
     private int hashCode;
     private String fileGroup;
-    private String typeId;
+    private String operationType;
     public MCDADocument() {
 
     }
@@ -146,11 +146,11 @@ public class MCDADocument {
         this.fileGroup = fileGroup;
     }
 
-    public String getTypeId() {
-        return typeId;
+    public String getOperationType() {
+        return operationType;
     }
 
-    public void setTypeId(String typeId) {
-        this.typeId = typeId;
+    public void setOperationType(String operationType) {
+        this.operationType = operationType;
     }
 }

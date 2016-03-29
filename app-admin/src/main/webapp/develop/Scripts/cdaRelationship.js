@@ -102,7 +102,7 @@
             base.grid.reload({ Rows: newData });
         },
         isChecked: function (rowdata) {
-
+debugger
             var uniqueField = base.p.uniqueField,
                 storage = base.p.storage;
             for (var i = 0; i < storage.length; i++) {
@@ -114,7 +114,7 @@
             return false;
         },
         onChecked: function (checked, data, rowid, rowdata) {
-
+debugger
             $("#pane-list-selected").addClass("changed");//取消是否提示
             // 非多选内容
             if (!base.p.multiple) {
@@ -129,6 +129,7 @@
             }
             // 判断
             if (checked) {
+                debugger
                 base.addItem(data);
                 base.pushData(data);
             }
@@ -147,11 +148,13 @@
             }
         },
         onCheckAllRows: function (checked) {
+            debugger
             $("#pane-list-selected").empty();
             $("#pane-list-selected").addClass("changed");//取消是否提示
             base.p.storage.splice(0);
             //如果是全选
             if (checked) {
+                debugger
                 var rows = base.grid.getSelectedRows();
                 for (var i = 0; i < rows.length; i++) {
                     var curObj = rows[i];
@@ -201,6 +204,7 @@
                 .click(function () { $("#pane-list-selected").addClass("changed"); base.deleteItem($(this).data("data")); });
         },
         deleteItem: function (data) {
+            debugger
             var uniqueField = base.p.uniqueField,
                 storage = base.p.storage;
             // 移除grid中的勾选

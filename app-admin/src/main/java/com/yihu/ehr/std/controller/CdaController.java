@@ -63,21 +63,31 @@ public class CdaController {
     @RequestMapping("GetCdaListByKey")
     @ResponseBody
     public Object GetCdaListByKey(String strKey, String strVersion, String strType, Integer page, Integer rows) {
+
+        String url = "/cda/cdas";
+        String filters = "operationType="+strType;
+
         Envelop result = new Envelop();
+        Map<String,Object> params = new HashMap<>();
+
+        if (!StringUtils.isEmpty(strKey)){
+            filters += " g1;code?"+strKey+" g2;name?"+strKey+" g2";
+        }
+        params.put("fields","");
+        params.put("sorts","");
+        params.put("versionCode",strVersion);
+        params.put("filters",filters);
+        params.put("page",page);
+        params.put("size",rows);
+
         if (StringUtils.isEmpty(strVersion)) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.VersionCodeIsNull.toString());
             return result;
         }
+
         try {
-            String url = "/cda/cdas";
-            Map<String,Object> params = new HashMap<>();
-            params.put("code",strKey);
-            params.put("name",strKey);
-            params.put("versionCode",strVersion);
-            params.put("cdaType",strType);
-            params.put("page",page);
-            params.put("rows",rows);
+
             String _rus = HttpClientUtil.doGet(comUrl+url, params, username, password);
             if (StringUtils.isEmpty(_rus)) {
                 result.setSuccessFlg(false);
@@ -285,7 +295,7 @@ public class CdaController {
 
     @RequestMapping("SaveCdaInfo")
     @ResponseBody
-    public Object SaveCdaInfo(String cdaJson) throws IOException {
+    public Object SaveCdaInfo(String cdaJson,String version) throws IOException {
 
         String url = "/cda/cda";
         String resultStr = "";
@@ -294,6 +304,7 @@ public class CdaController {
         ObjectMapper mapper = new ObjectMapper();
 
         params.put("cdaInfoJson",cdaJson);
+        params.put("version",version);
 
         try {
             CDAModel cdaModel = mapper.readValue(cdaJson,CDAModel.class);
@@ -783,7 +794,8 @@ public class CdaController {
     @RequestMapping("/getCdaXmlFileInfo")
     @ResponseBody
     public Object getCdaXmlFileInfo(String cdaId, String versionCode) {
-        Envelop result = new Envelop();
+        Envelop envelop = new Envelop();
+
         String strXmlInfo = "";
         try {
             String url = "/cda/getCdaXmlFileInfo";
@@ -791,56 +803,14 @@ public class CdaController {
             params.put("cdaId",cdaId);
             params.put("versionCode",versionCode);
             strXmlInfo = HttpClientUtil.doGet(comUrl+url,params,username,password);
-            result.setSuccessFlg(true);
+            return strXmlInfo;
+
         } catch (Exception ex) {
             LogService.getLogger(CdaController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
+            envelop.setSuccessFlg(false);
         }
-        result.setObj(strXmlInfo);
-        return result;
+        return envelop;
 
-        /*Result result = new Result();
-        String strXmlInfo = "";
-        try {
-            String strPath = System.getProperty("java.io.tmpdir");
-            strPath += "StandardFiles";
-            String splitMark = System.getProperty("file.separator");
-            String strXMLFilePath = strPath + splitMark + "xml" + splitMark + versionCode + splitMark + "downfile" + splitMark;
-            List<String> listIds = new ArrayList<>();
-            listIds.add(cdaId);
-            XCDADocument[] xcdaDocuments = xcdaDocumentManager.getDocumentList(versionCode, listIds);
-            String strFileGroup = "";
-            String strSchemePath = "";
-            if (xcdaDocuments.length > 0) {
-                strFileGroup = xcdaDocuments[0].getFileGroup();
-                strSchemePath = xcdaDocuments[0].getSchema();
-            } else {
-                return "";
-            }
-            File files = new File(strXMLFilePath);
-            if (!files.exists()) {
-                files.mkdirs();
-            }
-            String strLocalFileName = strXMLFilePath + "\\" + strSchemePath.replaceAll("/", "_");
-            File localFile = new File(strLocalFileName);
-            if (localFile.exists() && localFile.isFile()) {
-                localFile.delete();
-            }
-            if (!strFileGroup.equals("") && !strSchemePath.equals("")) {
-                strLocalFileName = FastDFSUtil.download(strFileGroup, strSchemePath, strXMLFilePath);
-                File file = new File(strLocalFileName);
-                FileReader fr = new FileReader(file);
-                BufferedReader bReader = new BufferedReader(fr);
-                strXmlInfo = bReader.readLine();
-            } else {
-                strXmlInfo = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><root></root>";
-            }
-        } catch (Exception ex) {
-            LogService.getLogger(CdaController_w.class).error(ex.getMessage());
-        }
-        result.setSuccessFlg(true);
-        result.setObj(strXmlInfo);
-        return result;*/
     }
 
     @RequestMapping("/getOrgType")
