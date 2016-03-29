@@ -107,6 +107,7 @@ public class RestApi {
         public static final String MetaDataWithDict                 = "/std/data_set/{data_set_id}/meta_datas/{meta_data_id}/dictionaries";
         public static final String DictCodeIsExist                  = "/std/dictionaries/is_exist/code";
         public static final String DictOther                        = "/std/dictionaries/{id}/other";
+        public static final String DictParent                        = "/std/dictionaries/{id}/parent";
 
         public static final String Entry                            = "/std/dictionaries/entries/{id}";
         public static final String Entries                          = "/std/dictionaries/entries";

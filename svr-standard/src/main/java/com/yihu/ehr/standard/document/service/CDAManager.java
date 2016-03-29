@@ -29,8 +29,6 @@ import java.util.List;
 @Transactional
 public class CDAManager extends BaseHbmService<ICDADataSetRelationship> {
 
-
-
     @Autowired
     private CDADataSetRelationshipManager cdaDataSetRelationshipManager;
 
@@ -157,8 +155,7 @@ public class CDAManager extends BaseHbmService<ICDADataSetRelationship> {
         cdaDocument.setFileGroup(fileGroup);
         cdaDocument.setSchema(filePath);
         cdaDocument.setVersionCode(versionCode);
-
-        cdaDocumentManager.save(cdaDocument);
+        cdaDocumentManager.saveCdaDocument(cdaDocument);
         return true;
     }
 

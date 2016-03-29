@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeDetailModel;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeModel;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeTreeModel;
+import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.std.service.CDATypeClient;
@@ -329,13 +330,23 @@ public class CDATypeController extends BaseController {
         return detailModel;
     }
 
-    @RequestMapping(value = "/types/parent_id/other", method = RequestMethod.GET)
-    @ApiOperation(value = "获取cdaType列表（不包含本身及其子类）")
-    public List<MCDAType> getOtherCDAType(
-            @ApiParam(name = "id", value = "cdaType编号")
+//    @RequestMapping(value = "/types/parent_id/other", method = RequestMethod.GET)
+//    @ApiOperation(value = "获取cdaType列表（不包含本身及其子类）")
+//    public List<MCDAType> getOtherCDAType(
+//            @ApiParam(name = "id", value = "cdaType编号")
+//            @RequestParam(value = "id") String id) throws Exception {
+//        List<MCDAType> listType = cdaTypeClient.getOtherCDAType(id);
+//        return listType;
+//    }
+
+    @RequestMapping(value = RestApi.Standards.TypeParent, method = RequestMethod.GET)
+    @ApiOperation(value = "根据当前类别获取自己的父级以及同级以及同级所在父级类别列表")
+    public List<MCDAType> getCdaTypeExcludeSelfAndChildren(
+            @ApiParam(name = "id", value = "id")
             @RequestParam(value = "id") String id) throws Exception {
-        List<MCDAType> listType = cdaTypeClient.getOtherCDAType(id);
-        return listType;
+        List<MCDAType> parentTypes = cdaTypeClient.getCDATypeByIds(id);
+
+        return parentTypes;
     }
 
     /**
