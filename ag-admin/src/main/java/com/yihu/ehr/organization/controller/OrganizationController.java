@@ -175,7 +175,7 @@ public class OrganizationController extends BaseController {
         try {
             String errorMsg = "";
 
-            GeographyModel geographyModel = convertToModel(geographyModelJsonData,GeographyModel.class);
+            GeographyModel geographyModel = objectMapper.readValue(geographyModelJsonData,GeographyModel.class);
 
             if (!isNullAddress(geographyModel)) {
                 errorMsg+="机构地址不能为空！";
@@ -228,7 +228,7 @@ public class OrganizationController extends BaseController {
             @RequestParam(value = "geography_model_json_data", required = false) String geographyModelJsonData  ) {
       try {
           String errorMsg ="";
-          GeographyModel geographyModel = convertToModel(geographyModelJsonData,GeographyModel.class);
+          GeographyModel geographyModel = objectMapper.readValue(geographyModelJsonData, GeographyModel.class);
 
           if (!isNullAddress(geographyModel)) {
               errorMsg+="机构地址不能为空！";
