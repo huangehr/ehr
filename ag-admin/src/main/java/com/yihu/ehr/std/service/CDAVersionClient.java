@@ -39,7 +39,7 @@ public interface CDAVersionClient {
             @RequestParam(value = "page", required = false) int page);
 
 
-    @RequestMapping(value = RestApi.Standards.VersionNewest, method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Standards.VersionLatestExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断是否是最新已发布版本")
     boolean isLatestVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
@@ -111,4 +111,7 @@ public interface CDAVersionClient {
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @PathVariable(value = "version") String version);
 
+    @RequestMapping(value = RestApi.Standards.VersionLatest, method = RequestMethod.GET)
+    @ApiOperation(value = "获取最新版本")
+    MCDAVersion getLatestVersion();
 }
