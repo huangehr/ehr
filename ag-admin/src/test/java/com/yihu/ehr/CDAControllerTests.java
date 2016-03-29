@@ -57,7 +57,7 @@ public class CDAControllerTests {
 
         String CDAJsonDataModel = mapper.writeValueAsString(map);
 
-        envelop = cdaController.SaveCdaInfo(CDAJsonDataModel);
+        envelop = cdaController.SaveCdaInfo("",CDAJsonDataModel);
         assertNotEquals("新增cda文档失败",envelop,null);
 
         map.put("name","name_copy");
@@ -68,7 +68,7 @@ public class CDAControllerTests {
         envelop = cdaController.getCDAInfoById(((CDAModel)envelop.getObj()).getId(),version);
         assertNotEquals("获取cda文档失败",envelop,null);
 
-        envelop = cdaController.GetCdaListByKey("code_test", "", version,typeId,1,15);
+        //envelop = cdaController.GetCdaListByKey("code_test", "", version,typeId,1,15);
         assertNotEquals("获取cda文档列表失败",envelop,null);
 
         StringBuffer sb = new StringBuffer();

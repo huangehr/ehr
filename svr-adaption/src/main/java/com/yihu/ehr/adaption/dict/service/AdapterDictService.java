@@ -52,10 +52,16 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
         sb.append("   from adapter_dict ad          ");
         sb.append("        left join " + dictTableName + " ds on ad.std_dict = ds.id  ");
         sb.append("  where ad.plan_id = " + planId + " and ds.id is not null ");
-        if (!StringUtils.isEmpty(code))
-            sb.append("     and ds.code like :code");
-        if (!StringUtils.isEmpty(name))
-            sb.append("     and ds.name like :name");
+
+        if (!StringUtils.isEmpty(code)){
+            if (!StringUtils.isEmpty(name))
+                sb.append(" and (ds.code like :code or ds.name like :name) ");
+            else
+                sb.append(" and ds.code like :code ");
+        }
+        else if (!StringUtils.isEmpty(name))
+            sb.append(" and ds.name like :name ");
+
         sb.append(makeOrder(orders));
         SQLQuery sqlQuery = session.createSQLQuery(sb.toString());
         if (!StringUtils.isEmpty(code))
@@ -99,16 +105,21 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
 
         StringBuilder sb = new StringBuilder();
         sb.append(" select count(*) from (");
-        sb.append(" select distinct  " + dictTableName + ".id    ");
-        sb.append("       ," + dictTableName + ".code  ");
-        sb.append("       ," + dictTableName + ".name  ");
+        sb.append(" select distinct  ds.id    ");
+        sb.append("       ,ds.code  ");
+        sb.append("       ,ds.name  ");
         sb.append("   from adapter_dict ad          ");
-        sb.append("        left join " + dictTableName + " on ad.std_dict = " + dictTableName + ".id  ");
+        sb.append("        left join " + dictTableName + " ds on ad.std_dict = ds.id  ");
         sb.append("  where ad.plan_id = " + planId);
-        if (!StringUtils.isEmpty(code))
-            sb.append("     and ds.code like :code");
-        if (!StringUtils.isEmpty(name))
-            sb.append("     and ds.name like :name");
+
+        if (!StringUtils.isEmpty(code)){
+            if (!StringUtils.isEmpty(name))
+                sb.append(" and (ds.code like :code or ds.name like :name) ");
+            else
+                sb.append(" and ds.code like :code ");
+        }
+        else if (!StringUtils.isEmpty(name))
+            sb.append(" and ds.name like :name ");
         sb.append(" ) t");
 
         SQLQuery sqlQuery = session.createSQLQuery(sb.toString());

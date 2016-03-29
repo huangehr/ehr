@@ -19,4 +19,7 @@ public interface XcdaTypeRepository extends PagingAndSortingRepository<CDAType, 
 
     @Query("select cdaType from CDAType cdaType  where cdaType.id Not in :id")
     List<CDAType> getOtherCDAType(@Param("id") String id);
+
+    @Query("select cdaType from CDAType cdaType  where cdaType.id Not in (:ids)")
+    List<CDAType> getCdaTypeExcludeSelfAndChildren(@Param("ids") String[] ids);
 }
