@@ -35,7 +35,7 @@ public class CdaTypeController extends BaseUIController{
     private String username;
     @Value("${service-gateway.password}")
     private String password;
-    @Value("${service-gateway.cdatypeurl}")
+    @Value("${service-gateway.url}")
     private String comUrl;
 
     @Autowired
@@ -78,7 +78,7 @@ public class CdaTypeController extends BaseUIController{
     @ResponseBody
     public Object GetCdaTypeList(String strKey, Integer page, Integer rows) {
         Envelop envelop = new Envelop();
-        String url = "/cda_types";
+        String url = "/cda_type/cda_types";
         try{
             Map<String,Object> params = new HashMap<>();
             params.put("code","");
@@ -245,14 +245,12 @@ public class CdaTypeController extends BaseUIController{
     public Object getCDATypeListByParentId(String ids) {
         Envelop envelop = new Envelop();
         ObjectMapper mapper = new ObjectMapper();
-        String url = "/children_cda_types/"+ids;
-        if (StringUtils.isEmpty(ids)){
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("id号不能为空！");
-            return envelop;
-        }
+        Map<String,Object> params = new HashMap<>();
+        params.put("parent_id",ids);
+        String url = "/cda_type/children_cda_types";
+
         try {
-            String envelopStr = HttpClientUtil.doGet(comUrl + url, username, password);
+            String envelopStr = HttpClientUtil.doGet(comUrl + url,params,username, password);
             envelop = mapper.readValue(envelopStr,Envelop.class);
 
             return envelop.getDetailModelList();

@@ -7,6 +7,7 @@ import com.yihu.ehr.util.DateFormatter;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +20,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -37,6 +40,8 @@ public class LoginController {
     @Value("${service-gateway.url}")
     private String comUrl;
 
+    @Autowired
+    ObjectMapper mapper;
 
     @RequestMapping(value = "")
     public String login(Model model) {
@@ -52,10 +57,12 @@ public class LoginController {
         String url = "/users/verification/" + userName;
         String resultStr = "";
         Map<String, Object> params = new HashMap<>();
-        ObjectMapper mapper = new ObjectMapper();
 
         params.put("psw", password);
         try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat();
+            dateFormat.applyPattern("yyyy-MM-dd hh:mm:ss");
+            mapper.setDateFormat(dateFormat);
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, this.password);
             Envelop envelop = mapper.readValue(resultStr, Envelop.class);
             String userJson = mapper.writeValueAsString(envelop.getObj());
@@ -75,8 +82,7 @@ public class LoginController {
                 }
 
                 if(userDetailModel.getLastLoginTime()!= null){
-                    //lastLoginTime = DateFormatter.simpleDateTimeShortFormat(userDetailModel.getLastLoginTime());
-                    lastLoginTime = userDetailModel.getLastLoginTime();
+                   lastLoginTime = userDetailModel.getLastLoginTime();
                 }
 
 

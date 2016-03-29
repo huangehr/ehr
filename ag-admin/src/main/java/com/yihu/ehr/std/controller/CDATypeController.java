@@ -37,11 +37,11 @@ public class CDATypeController extends BaseController {
     /**
      * 根据父级ID获取下级
      */
-    @RequestMapping(value = "/children_cda_types/{parent_id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/children_cda_types", method = RequestMethod.GET)
     @ApiOperation(value = "根据父级ID获取下级")
     public Envelop getChildrenByPatientId(
             @ApiParam(name = "parent_id", value = "父级id")
-            @PathVariable(value = "parent_id") String parentId) throws Exception {
+            @RequestParam(value = "parent_id") String parentId) throws Exception {
         Envelop envelop = new Envelop();
         List<MCDAType> mCdaTypeList = cdaTypeClient.getChildrenByPatientId(parentId);
         envelop.setSuccessFlg(true);
