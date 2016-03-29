@@ -244,17 +244,16 @@ public class DocumentEndPoint  extends ExtendController<MCDADocument> {
     }
 
 
-//    @Deprecated
-//    @RequestMapping(value = RestApi.Standards.DocumentCreateFile, method = RequestMethod.POST)
-//    @ApiOperation(value = "生成CDA文件")
-//    public boolean createCDASchemaFile(
-//            @ApiParam(name = "version", value = "版本号")
-//            @RequestParam(value = "version") String versionCode,
-//            @ApiParam(name = "cda_id", value = "文档编号")
-//            @PathVariable(value = "cda_id") String cdaId) throws Exception {
-//
-//        return cdaDocumentManager.createCDASchemaFile(cdaId, versionCode);
-//    }
+    @RequestMapping(value = RestApi.Standards.DocumentCreateFile, method = RequestMethod.POST)
+    @ApiOperation(value = "生成CDA文件")
+    public boolean createCDASchemaFile(
+            @ApiParam(name = "version", value = "版本号")
+            @RequestParam(value = "version") String versionCode,
+            @ApiParam(name = "id", value = "文档编号")
+            @PathVariable(value = "id") String cdaId) throws Exception {
+
+        return cdaDocumentManager.createCDASchemaFile(cdaId, versionCode);
+    }
 
     /**
      * 获取cda文档的XML文件信息。
