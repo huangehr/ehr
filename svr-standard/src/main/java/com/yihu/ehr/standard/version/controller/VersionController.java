@@ -87,6 +87,8 @@ public class VersionController extends ExtendController<MCDAVersion> {
         return latestVersion != null && latestVersion.equals(version);
     }
 
+    //新增标准版本的最新版本信息
+
     @RequestMapping(value = RestApi.Standards.Versions, method = RequestMethod.POST)
     @ApiOperation(value = "新增cda版本")
     public MCDAVersion addVersion(
