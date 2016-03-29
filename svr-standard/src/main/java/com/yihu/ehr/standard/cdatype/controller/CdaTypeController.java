@@ -162,7 +162,7 @@ public class CdaTypeController extends BaseRestController {
      * 删除CDA类别，若该类别存在子类别，将一并删除子类别
      * 先根据当前的类别ID获取全部子类别ID，再进行删除
      */
-    @RequestMapping(value = "/test", method = RequestMethod.DELETE)
+    @RequestMapping(value = RestApi.Standards.Types, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除CDA类别，若该类别存在子类别，将一并删除子类别")
     public boolean deleteCDATypeByPatientIds(
             @ApiParam(name = "ids", value = "ids")
@@ -186,15 +186,12 @@ public class CdaTypeController extends BaseRestController {
     }
 
 
-    @RequestMapping(value = "/test", method = RequestMethod.GET)
-    @ApiOperation(value = "根据父级类别获取父级类别所在以下所有子集类别（包括当前父级列表）")
+    @RequestMapping(value = RestApi.Standards.TypeParent, method = RequestMethod.GET)
+    @ApiOperation(value = "根据当前类别获取自己的父级以及同级以及同级所在父级类别列表")
     public List<MCDAType> getCdaTypeExcludeSelfAndChildren(
             @ApiParam(name = "id", value = "id")
-            @RequestParam(value = "id") String id,
-            @ApiParam(name = "key", value = "查询条件")
-            @RequestParam(value = "key") String key) throws Exception {
-
-        List<CDAType> parentTypes = cdaTypeManager.getCDATypeByIds(new String[]{"id"});
+            @RequestParam(value = "id") String id) throws Exception {
+        List<CDAType> parentTypes = cdaTypeManager.getCDATypeByIds(new String[]{id});
         String childrenIds = getChildIncludeSelfByParentsAndChildrenIds(parentTypes,"");   //递归获取
         List<CDAType> cdaTypes = cdaTypeManager.getCdaTypeExcludeSelfAndChildren(childrenIds);
 

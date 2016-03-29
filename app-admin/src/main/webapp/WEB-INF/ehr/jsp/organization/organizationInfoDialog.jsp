@@ -33,8 +33,8 @@
 
     <div class="m-form-group">
         <label><spring:message code="lbl.join.mode"/><spring:message code="spe.colon"/></label>
-        <div class="l-text-wrapper m-form-control ">
-            <input type="text" id="settled_way" data-type="select"  data-attr-scan="settledWay">
+        <div class="l-text-wrapper m-form-control essential">
+            <input type="text" id="settled_way"  class="required" data-type="select"  data-attr-scan="settledWay">
         </div>
     </div>
     <div class="m-form-group">
@@ -52,8 +52,8 @@
 
     <div class="m-form-group">
         <label><spring:message code="lbl.org.type"/><spring:message code="spe.colon"/></label>
-        <div class="l-text-wrapper m-form-control">
-            <input type="text" id="org_type" class=" f-w240" data-type="select" required-title=<spring:message code="lbl.must.input"/> data-attr-scan="orgType"/>
+        <div class="l-text-wrapper m-form-control essential">
+            <input type="text" id="org_type" class="required f-w240" data-type="select" required-title=<spring:message code="lbl.must.input"/> data-attr-scan="orgType"/>
         </div>
     </div>
 

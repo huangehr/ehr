@@ -3,10 +3,7 @@ package com.yihu.ehr.standard.document.service;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.query.BaseHbmService;
-import com.yihu.ehr.standard.datasets.service.DataSet;
-import com.yihu.ehr.standard.datasets.service.IMetaData;
-import com.yihu.ehr.standard.datasets.service.MetaData;
-import com.yihu.ehr.standard.datasets.service.MetaDataService;
+import com.yihu.ehr.standard.datasets.service.*;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -44,6 +41,9 @@ public class CDADocumentManager extends BaseHbmService<ICDADocument> {
     @Autowired
     private MetaDataService metaDataService;
 
+    @Autowired
+    private DataSetService dataSetService;
+
 //    @Autowired
 //    private XCDADocumentRepository cdaDocumentRepository;
 
@@ -68,6 +68,14 @@ public class CDADocumentManager extends BaseHbmService<ICDADocument> {
     public Class getMeteDataServiceEntity(String version){
         try {
             return Class.forName("com.yihu.ehr.standard.datasets.service.MetaData" + version);
+        } catch (ClassNotFoundException e) {
+            throw new ApiException(ErrorCode.NotFoundEntity, "数据元版本", version);
+        }
+    }
+
+    public Class getDataSetServiceEntity(String version){
+        try {
+            return Class.forName("com.yihu.ehr.standard.datasets.service.DataSet" + version);
         } catch (ClassNotFoundException e) {
             throw new ApiException(ErrorCode.NotFoundEntity, "数据元版本", version);
         }
@@ -122,7 +130,7 @@ public class CDADocumentManager extends BaseHbmService<ICDADocument> {
         //路径分割符
         String splitMark = System.getProperty("file.separator");
         //文件路径
-        String strXMLFilePath = strPath + splitMark + "xml" + splitMark + strVersionCode + splitMark;
+        String strXMLFilePath = strPath + splitMark + "xml" + splitMark + strVersionCode + splitMark +"downfile"+ splitMark;
         return strXMLFilePath;
     }
 
@@ -161,8 +169,9 @@ public class CDADocumentManager extends BaseHbmService<ICDADocument> {
         doc.appendChild(root);
         for (int i = 0; i < relationshipsList.size(); i++) {
             //获取数据集
-//            DataSet dataSet = relationshipsList.get(i).getDataset();
-            DataSet dataSet = new DataSet();
+            ICDADataSetRelationship dataSetRelationship = relationshipsList.get(i);
+            Class dataSetClass = getDataSetServiceEntity(versionCode);
+            IDataSet dataSet = dataSetService.retrieve(Long.parseLong(dataSetRelationship.getDataSetId()),dataSetClass);
             Element rowSet = doc.createElement("xs:table");
             rowSet.setAttribute("code", dataSet.getCode());
             root.appendChild(rowSet);

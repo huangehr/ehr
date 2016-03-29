@@ -188,7 +188,7 @@ cda.list = {
         var u = cda.list;
         var typeTree = $("#div_typeTree").ligerTree({
             nodeWidth: 260,
-            url: u._url + '/cdatype/getCDATypeListByParentId?ids=000',//参数ids值为测试值
+            url: u._url + '/cdatype/getCDATypeListByParentId?ids=',//参数ids值为测试值
             isLeaf: function (data) {
                 if (!data) return false;
                 return data.type == "employee";
@@ -448,7 +448,7 @@ cda.attr = {
         var cdaVersion = $("#hdversion").val();
         $.ajax({
             //url: u._url + "/cdadict/getStdSourceList",
-            url: u._url + "/standardsource/searchStdSource",
+            url: u._url + "/standardsource/getStdSourceList",
             type: "post",
             dataType: "json",
             data: {strVersionCode: cdaVersion},
@@ -526,7 +526,7 @@ cda.attr = {
             url: cda.list._url + "/cda/SaveCdaInfo",
             type: "post",
             dataType: "json",
-            data: {cdaJson: JSON.stringify(dataJson[0])},
+            data: {cdaJson: JSON.stringify(dataJson[0]),version:versionCode},
             success: function (data) {
                 if (data != null) {
 
@@ -625,24 +625,28 @@ cda.attr = {
 
     },
     getXMLInfoByDataSetId: function (setId, VersionCode) {
+        debugger
         $.ajax({
             url: cda.list._url + "/std/dataset/getXMLInfoByDataSetId",
             type: "get",
             dataType: "json",
             data: {setId: setId, versionCode: VersionCode},
             success: function (data) {
+                debugger
                 if (data.successFlg) {
                     kindEditor.editor.text(data.obj);
                 }
 
             },
             error: function (request) {
+                debugger
                 alert(request);
             }
 
         })
     },
     getXMLFileByCdaId: function () {
+        debugger
         var cdaid = $("#hdId").val();
         var versionCode = $("#hdversion").val();
         $.ajax({
@@ -704,6 +708,7 @@ var kindEditor = {
         'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'fontname',
         'fontsize'],
     bulidKindEditor: function (targe) {
+        debugger;
         this.editor = KindEditor.create(targe, {
             items: kindEditor.editorItems,
             resizeType: 0,
@@ -719,6 +724,7 @@ var formKindEditor = {
 
     init: function () {
         var editor = kindEditor.bulidKindEditor("textarea[name='txb_Immed_Temp']")
+        debugger
         editor.html(formKindEditor.content);
         //formKindEditor.event(editor);
     }
