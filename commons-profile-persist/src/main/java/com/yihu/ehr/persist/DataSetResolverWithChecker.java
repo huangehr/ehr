@@ -45,7 +45,7 @@ public class DataSetResolverWithChecker extends SimpleDataSetResolver {
 
         String typeKey = cacheReader.read(keySchema.metaDataType(innerVersion, dataSetCode, metaDataInnerCode));
         if (StringUtils.isEmpty(typeKey)) {
-            String msg = "Meta data %1 of data set %2 is NOT found in version %3. Maybe you need cache standards?"
+            String msg = "Meta data %1 in data set %2 is not found in version %3. FORGET cache standards?"
                     .replace("%1", metaDataInnerCode)
                     .replace("%2", dataSetCode)
                     .replace("%3", innerVersion);

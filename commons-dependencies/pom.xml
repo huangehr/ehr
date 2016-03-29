@@ -209,9 +209,9 @@
         <module>../commons-redis-cache</module>
         <module>../commons-profile-core</module>
         <module>../commons-profile-persist</module>
-        <module>../commons-thrift-services</module>
+        <!--<module>../commons-thrift-services</module>
         <module>../commons-thrift-client</module>
-        <module>../commons-thrift-server</module>
+        <module>../commons-thrift-server</module>-->
         <module>../commons-rest-model</module>
         <module>../commons-admin-gateway-model</module>
     </modules>

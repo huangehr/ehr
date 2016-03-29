@@ -50,6 +50,8 @@ public class RedisClient {
         return (T)redisTemplate.execute((RedisCallback<Serializable>) connection -> {
             byte[] keyBytes = key.getBytes();
             byte[] bytes = connection.get(keyBytes);
+            if(bytes == null) return null;
+
             return (Serializable) SerializationUtils.deserialize(bytes);
         });
     }

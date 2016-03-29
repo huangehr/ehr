@@ -7,6 +7,7 @@ import com.yihu.ehr.schema.StdKeySchema;
 import com.yihu.ehr.standard.version.service.CDAVersion;
 import com.yihu.ehr.standard.version.service.CDAVersionService;
 import com.yihu.ehr.util.CDAVersionUtil;
+import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -82,7 +83,7 @@ public class StdCache {
 
         Session session = openSession();
         try {
-            String versionName = keySchema.versionName(version);
+            String versionKey = keySchema.versionName(version);
 
             String dataSetTable = CDAVersionUtil.getDataSetTableName(version);
             String metaDataTable = CDAVersionUtil.getMetaDataTableName(version);
@@ -101,6 +102,10 @@ public class StdCache {
 
                     String metaDataTypeKey = keySchema.metaDataType(version, dataSetCode, innerCode);
                     String metaDataDictKey = keySchema.metaDataDict(version, dataSetCode, innerCode);
+
+                    if (redisClient.hasKey(metaDataTypeKey)){
+                        LogService.getLogger().warn("Meta data duplicated: " + metaDataTypeKey);
+                    }
 
                     redisClient.set(metaDataTypeKey, type);
                     redisClient.set(metaDataDictKey, dictId);
@@ -122,7 +127,7 @@ public class StdCache {
             }
 
             // 缓存版本
-            redisClient.set(versionName, version);
+            redisClient.set(versionKey, versionService.getVersion(version).getVersionName());
         } finally {
             if(null != session) session.close();
         }

@@ -51,10 +51,6 @@ public class SimpleDataSetResolver {
                     String key = item.getKey();
                     if (key.equals("PATIENT_ID") || key.equals("EVENT_NO")) continue;
 
-                    if (key.contains("HDSA00_01_017") && !item.getValue().asText().contains("null")) {
-                        System.out.println(item.getValue().asText());
-                    }
-
                     String[] standardizedMetaData = translateMetaData(
                             cdaVersion,
                             code,
@@ -68,10 +64,10 @@ public class SimpleDataSetResolver {
                     }
                 }
 
-                dataSet.addRecord(new ObjectId((short) 0, BizObject.StdProfile).toString(), record);
+                dataSet.addRecord(Integer.toString(i), record);
             }
         } catch (NullPointerException ex) {
-            throw new RuntimeException("Null pointer occurs in JsonFileParser.generateDataSet");
+            throw new RuntimeException("Null pointer occurs while generate data set");
         } catch (Exception ex) {
             throw new RuntimeException(ex.getMessage());
         } finally {

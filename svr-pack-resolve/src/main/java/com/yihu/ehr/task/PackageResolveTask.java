@@ -6,6 +6,7 @@ import com.yihu.ehr.feign.XPackageMgrClient;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.persist.ProfileService;
 import com.yihu.ehr.profile.Profile;
+import com.yihu.ehr.service.PackageResolver;
 import com.yihu.ehr.util.log.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -32,11 +33,11 @@ public class PackageResolveTask {
 
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
 
-    @Scheduled(cron = "0/2 * * * * ?")
+    //@Scheduled(cron = "0/2 * * * * ?")
     public void execute(){
         String packageId = "";
         try{
-            MPackage pack = packageMgrClient.acquirePackage();
+            MPackage pack = packageMgrClient.acquirePackage("RANDOM");
             if (pack == null) return;
 
             String zipFile = downloadTo(pack.getRemotePath());

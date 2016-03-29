@@ -1,8 +1,10 @@
-package com.yihu.ehr.task;
+package com.yihu.ehr.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.yihu.ehr.extractor.EventExtractor;
+import com.yihu.ehr.extractor.ExtractorChain;
 import com.yihu.ehr.extractor.KeyDataExtractor;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.persist.DataSetResolverWithChecker;
@@ -12,7 +14,9 @@ import com.yihu.ehr.profile.StdObjectQualifierTranslator;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
 import net.lingala.zip4j.exception.ZipException;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -31,14 +35,16 @@ import java.util.Properties;
 @Component
 public class PackageResolver {
     @Autowired
+    ApplicationContext context;
+
+    @Autowired
     DataSetResolverWithChecker dataSetResolverWithChecker;
 
     @Autowired
     ObjectMapper objectMapper;
 
-    private final static KeyDataExtractor dataFilter = null;
-
-    private static ObjectNode EhrSummaryDataSet = null;
+    @Autowired
+    ExtractorChain extractorChain;
 
     private final static char PathSep = File.separatorChar;
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
@@ -97,12 +103,17 @@ public class PackageResolver {
             // 原始数据存储在单独的表中, 表名为"数据集代码_ORIGIN"
             String dataSetTable = isOriginDataSet ? StdObjectQualifierTranslator.originDataTable(dataSet.getCode()) : dataSet.getCode();
             profile.addDataSet(dataSetTable, dataSet);
+            profile.setPatientId(dataSet.getPatientId());
+            profile.setEventNo(dataSet.getEventNo());
+            profile.setOrgCode(dataSet.getOrgCode());
+            profile.setCdaVersion(dataSet.getCdaVersion());
+
             dataSet.setCode(dataSetTable);
 
             // 在标准数据集中查找病人的就诊卡，身份证号与事件时间（门诊，住院，体检等时间）如果存在.
             if (!isOriginDataSet) {
                 if (profile.getCardId().length() == 0) {
-                    Object object = dataFilter.extract(dataSet, KeyDataExtractor.Filter.CardInfo);
+                    Object object = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.CardInfo);
                     if (null != object) {
                         Properties properties = (Properties) object;
                         profile.setCardId(properties.getProperty("CardNo"));
@@ -110,11 +121,11 @@ public class PackageResolver {
                 }
 
                 if (profile.getDemographicId() == null || profile.getDemographicId().length() == 0) {
-                    profile.setDemographicId((String) dataFilter.extract(dataSet, KeyDataExtractor.Filter.DemographicInfo));
+                    profile.setDemographicId((String) extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.DemographicInfo));
                 }
 
                 if (profile.getEventDate() == null) {
-                    profile.setEventDate((Date) dataFilter.extract(dataSet, KeyDataExtractor.Filter.EventDate));
+                    profile.setEventDate((Date) extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.EventDate));
                 }
             }
 
@@ -138,12 +149,11 @@ public class PackageResolver {
      * @param profile
      */
     public void makeEventSummary(Profile profile) {
-        boolean summaryGenerated = false;
-        for (String dataSetTable : profile.getDataSetTables()) {
-            if (!summaryGenerated && EhrSummaryDataSet.has(dataSetTable)) {
-                profile.setSummary(EhrSummaryDataSet.get(dataSetTable).textValue());
+        EventExtractor eventExtractor = context.getBean(EventExtractor.class);
 
-                summaryGenerated = true;
+        for (String dataSetTable : profile.getDataSetTables()) {
+            if (StringUtils.isEmpty(profile.getSummary()) && eventExtractor.getDataSets().containsKey(dataSetTable)) {
+                profile.setSummary(eventExtractor.getDataSets().get(dataSetTable));
             }
 
             int rowIndex = 0;

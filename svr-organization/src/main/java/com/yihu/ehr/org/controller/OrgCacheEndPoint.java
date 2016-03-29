@@ -1,6 +1,7 @@
 package com.yihu.ehr.org.controller;
 
 import com.netflix.discovery.converters.Auto;
+import com.netflix.ribbon.proxy.annotation.Http;
 import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.cache.CacheReader;
 import com.yihu.ehr.constants.ApiVersion;
@@ -44,13 +45,14 @@ public class OrgCacheEndPoint {
     @ApiOperation("获取缓存机构列表")
     @RequestMapping(value = RestApi.Caches.Organizations, method = RequestMethod.GET)
     public ResponseEntity<List<MOrganization>> organizations() {
-        return new ResponseEntity<>(orgCache.organizations(), HttpStatus.OK);
+        return new ResponseEntity<>(orgCache.organizations(), orgCache.organizations().size() == 0 ? HttpStatus.NOT_FOUND : HttpStatus.OK);
     }
 
     @ApiOperation("获取缓存机构")
     @RequestMapping(value = RestApi.Caches.Organization, method = RequestMethod.GET)
     public ResponseEntity<MOrganization> organization(@ApiParam(value = "org_code", defaultValue = "")
                                                       @RequestParam("org_code") String orgCode) {
-        return new ResponseEntity<>(orgCache.organization(orgCode), HttpStatus.OK);
+        MOrganization organization = orgCache.organization(orgCode);
+        return new ResponseEntity<>(organization, organization == null ? HttpStatus.NOT_FOUND : HttpStatus.OK);
     }
 }
