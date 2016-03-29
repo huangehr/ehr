@@ -48,6 +48,7 @@
                 this.initDDL(orgTypeDictId,this.$orgType);
                 this.initDDL(settledWayDictId,this.$settledWay);
 
+                this.$form.attrScan();
                 this.$location.addressDropdown({tabsData:[
                     {name: '省份',code:'id',value:'name',url: '${contextRoot}/address/getParent', params: {level:'1'}},
                     {name: '城市',code:'id',value:'name', url: '${contextRoot}/address/getChildByParent'},
@@ -60,12 +61,17 @@
                 this.$tel.removeClass('l-text-field-number');
             },
             initDDL: function (dictId, target) {
+                var self = this;
                 target.ligerComboBox({
                     url: "${contextRoot}/dict/searchDictEntryList",
                     dataParmName: 'detailModelList',
                     urlParms: {dictId: dictId},
                     valueField: 'code',
-                    textField: 'value'
+                    textField:'value',
+                    onSuccess: function () {
+                        self.$form.Fields.fillValues({orgType: "Hospital"});
+                        self.$form.Fields.fillValues({settledWay: "Direct"});
+                    }
                 });
             },
             bindEvents: function () {
@@ -110,35 +116,6 @@
 							street: orgAddress.names[3]
 						};
 
-						/*var orgModel = $.extend({},self.$form.Fields.getValues(),
-						 {location: "" },
-						 {province:  orgAddress.names[0]},
-						 {city: orgAddress.names[1]},
-						 {district: orgAddress.names[2]},
-						 {town: ""},
-						 {street: orgAddress.names[3]}
-						 );*/
-						/*                if(Util.isStrEquals($.trim(orgModel.orgCode),'')){
-						 $.Notice.warn('组织机构代码不能为空');
-						 return;
-						 }
-						 if(Util.isStrEquals(orgModel.fullName,'')){
-						 $.Notice.warn('机构全名不能为空');
-						 return;
-						 }
-						 if(Util.isStrEquals(orgModel.shortName,'')){
-						 $.Notice.warn('组织简称不能为空');
-						 return;
-						 }
-						 if(Util.isStrEquals(orgModel.province,'')){
-						 $.Notice.warn('位置不能为空');
-						 return;
-						 }
-						 if(Util.isStrEquals(orgModel.tel,'')){
-						 $.Notice.warn('联系电话不能为空');
-						 return;
-						 }*/
-						debugger
 						dataModel.createRemote("${contextRoot}/organization/updateOrg", {
 							data: {orgModel:JSON.stringify(orgModel),addressModel:JSON.stringify(addressModel),mode:"new"},
 							success: function (data) {
@@ -146,12 +123,8 @@
 									win.parent.closeAddOrgInfoDialog(function (){
 										win.parent.$.Notice.success('机构新增成功');
 									});
-									/*$.Notice.open({type: 'success', msg: '操作成功！'});
-									 parent.reloadMasterGrid();
-									 dialog.close();*/
 								}else{
 									window.top.$.Notice.error(data.errorMsg);
-									//$.Notice.open({type: 'error', msg: data.errorMsg});
 								}
 							}
 						})
