@@ -4,16 +4,6 @@ spring:
 
 ---
 spring:
-  profiles: zqb
-  cloud:
-    config:
-      username: user
-      password: configuration
-      uri: http://localhost:1221
-      label: zqb
-
----
-spring:
   profiles: dev
   cloud:
     config:

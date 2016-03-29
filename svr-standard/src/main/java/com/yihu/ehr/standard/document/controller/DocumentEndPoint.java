@@ -267,7 +267,7 @@ public class DocumentEndPoint  extends ExtendController<MCDADocument> {
      */
     @RequestMapping(value = RestApi.Standards.DocumentGetFile, method = RequestMethod.GET)
     @ApiOperation(value = "获取cda文档的XML文件信息。")
-    public Object getCdaXmlFileInfo(
+    public String getCdaXmlFileInfo(
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version") String versionCode,
             @ApiParam(name = "id", value = "文档编号")
