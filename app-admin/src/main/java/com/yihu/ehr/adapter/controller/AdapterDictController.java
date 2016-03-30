@@ -84,15 +84,17 @@ public class AdapterDictController extends ExtendController<AdapterDictService> 
      */
     @RequestMapping("/getStdDictEntry")
     @ResponseBody
-    public Object getStdDictEntry(Long adapterPlanId, Long dictId, String mode){
+    public Object getStdDictEntry(Long adapterPlanId, Long dictId, String mode, String searchParm, int page, int rows){
 
         try {
-            String stdDictEntryComboUrl = "/adapter/std_dict_entries/combo";
-            Map<String, Object> params = new HashMap<>();
-            params.put("plan_id",adapterPlanId);
-            params.put("dict_id",dictId);
-            params.put("mode",mode);
-            String resultStr = service.search(stdDictEntryComboUrl, params);
+            PageParms pageParms =
+                    new PageParms(rows, page)
+                    .addExt("plan_id", adapterPlanId)
+                    .addExt("dict_id", dictId)
+                    .addExt("mode", mode)
+                    .addExt("search_name", nullToSpace(searchParm));
+
+            String resultStr = service.search("/adapter/std_dict_entries/combo", pageParms);
             return resultStr;
         } catch (Exception e) {
             return systemError();
@@ -105,7 +107,7 @@ public class AdapterDictController extends ExtendController<AdapterDictService> 
      */
     @RequestMapping("/getOrgDict")
     @ResponseBody
-    public Object getOrgDict(Long adapterPlanId){
+    public Object getOrgDict(Long adapterPlanId, String searchParm, int page, int rows){
 
         try {
             Envelop result = new Envelop();
@@ -119,19 +121,13 @@ public class AdapterDictController extends ExtendController<AdapterDictService> 
             if(rs.getObj()==null)
                 return result;
 
-            String url = "/adapter/org/dicts";
-            PageParms pageParms = new PageParms("organization=" + ((Map) rs.getObj()).get("org"));
-            String resultStr = service.search(url, pageParms);
-            rs = getEnvelop(resultStr);
-            List<Map> orgDictList = rs.getDetailModelList()!=null ? rs.getDetailModelList() : new ArrayList<>();
+            PageParms pageParms = new PageParms(rows, page)
+                    .addEqual("organization", ((Map) rs.getObj()).get("org"))
+                    .addGroupNotNull("name", PageParms.LIKE, searchParm, "g1")
+                    .addGroupNotNull("code", PageParms.LIKE, searchParm, "g1");
 
-            List<String> orgDicts = new ArrayList<>();
-            for (Map orgDict : orgDictList) {
-                orgDicts.add(String.valueOf(orgDict.get("sequence")) + ',' + orgDict.get("name"));
-            }
-
-            result.setObj(orgDicts);
-            return result;
+            String resultStr = service.search("/adapter/org/dicts", pageParms);
+            return formatComboData(resultStr, "sequence", "name");
         } catch (Exception e) {
             return systemError();
         }
@@ -144,7 +140,7 @@ public class AdapterDictController extends ExtendController<AdapterDictService> 
      */
     @RequestMapping("/getOrgDictEntry")
     @ResponseBody
-    public Object getOrgDictEntry(Integer orgDictSeq, Long adapterPlanId){
+    public Object getOrgDictEntry(Integer parentId, Long adapterPlanId, String searchParm, int page, int rows){
 
         try {
             Envelop result = new Envelop();
@@ -155,24 +151,17 @@ public class AdapterDictController extends ExtendController<AdapterDictService> 
             String modelJson = orgAdapterPlanService.getModel(params);
             Envelop rs = getEnvelop(modelJson);
 
-            if(rs.getObj()==null)
+            if(rs.getObj()==null || parentId==null || parentId==0)
                 return result;
-            String url = "/adapter/org/items";
-            PageParms pageParms = new PageParms(
-                    "organization=" + ((Map) rs.getObj()).get("org")
-                            + (orgDictSeq==null ? "" : ";orgDict=" + orgDictSeq)
-            );
-            String resultStr = service.search(url, pageParms);
-            rs = getEnvelop(resultStr);
-            List<Map> orgDictList = rs.getDetailModelList()!=null ? rs.getDetailModelList() : new ArrayList<>();
 
-            List<String> orgDicts = new ArrayList<>();
-            for (Map orgDict : orgDictList) {
-                orgDicts.add(String.valueOf(orgDict.get("sequence")) + ',' + orgDict.get("name"));
-            }
+            PageParms pageParms = new PageParms(rows, page)
+                    .addEqual("organization", ((Map) rs.getObj()).get("org"))
+                    .addEqual("orgDict", parentId)
+                    .addGroupNotNull("name", PageParms.LIKE, searchParm, "g1")
+                    .addGroupNotNull("code", PageParms.LIKE, searchParm, "g1");
 
-            result.setObj(orgDicts);
-            return result;
+            String resultStr = service.search("/adapter/org/items", pageParms);
+            return formatComboData(resultStr, "sequence", "name");
         } catch (Exception e) {
             return systemError();
         }

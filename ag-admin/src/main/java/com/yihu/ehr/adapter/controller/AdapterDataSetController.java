@@ -62,7 +62,7 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
             if (dataSet == null) {
                 return failed("数据获取失败!");
             }
-            return success(convertToModel(dataSet, AdapterDataSetModel.class));
+            return success(convertAdapterDataSetModel(dataSet));
         } catch (Exception ex) {
             ex.printStackTrace();
             return failedSystem();
@@ -214,50 +214,22 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
             @ApiParam(name = "data_set_id", value = "字典编号")
             @RequestParam(value = "data_set_id") Long dataSetId,
             @ApiParam(name = "mode", value = "编辑模式： modify、new")
-            @RequestParam(value = "mode") String mode){
+            @RequestParam(value = "mode") String mode,
+            @ApiParam(name = "search_name", value = "查询字符串")
+            @RequestParam(value = "search_name") String searchName,
+            @ApiParam(name = "page", value = "当前页")
+            @RequestParam(value = "page") int page,
+            @ApiParam(name = "size", value = "大小")
+            @RequestParam(value = "size") int size){
 
-        Envelop result = new Envelop();
         try {
-
-            MAdapterPlan orgAdapterPlan = planClient.getAdapterPlanById(planId);
-            String version = orgAdapterPlan.getVersion();
-            ResponseEntity<Collection<MStdMetaData>> metaDataRs = dataSetClient.searchMetaDatas("", "dataSetId=" + dataSetId, "", 10000, 1, version);
-
-            List<String> dictEntries = new ArrayList<>();
-            Collection<MStdMetaData> metaDataList = metaDataRs.getBody();
-            if (!metaDataList.isEmpty()){
-                if("modify".equals(mode) || "view".equals(mode)){
-                    for (MStdMetaData metaData : metaDataList) {
-                        dictEntries.add(String.valueOf(metaData.getId())+','+metaData.getName());
-                    }
-                }
-                else{
-                    ResponseEntity<Collection<MAdapterDataVo>> adapterDataSetModelRs = adapterDataSetClient.searchAdapterMetaData(planId, dataSetId, "", "", "", 10000, 1);
-                    Collection<MAdapterDataVo> adapterDataSetModels = adapterDataSetModelRs.getBody();
-                    boolean exist = false;
-                    for (MStdMetaData metaData : metaDataList) {
-                        exist = false;
-                        for(MAdapterDataVo model : adapterDataSetModels){
-                            if(metaData.getId()==model.getMetaDataId()){
-                                exist = true;
-                                break;
-                            }
-                        }
-                        if(!exist)
-                            dictEntries.add(String.valueOf(metaData.getId())+','+metaData.getName());
-                    }
-                }
-
-                result.setSuccessFlg(true);
-            } else {
-                result.setSuccessFlg(false);
-            }
-            result.setObj(dictEntries);
-            return result;
-        } catch (Exception e) {
-            e.printStackTrace();
-            result.setErrorMsg(e.getMessage());
-            return result;
+            ResponseEntity<Collection<MAdapterRelationship>> responseEntity = adapterDataSetClient.searchStdMeta(planId, dataSetId, searchName, mode, "", size, page);
+            List<MAdapterRelationship> stdMeta = (List<MAdapterRelationship>) responseEntity.getBody();
+            return getResult(stdMeta, getTotalCount(responseEntity), page, size);
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
         }
     }
 

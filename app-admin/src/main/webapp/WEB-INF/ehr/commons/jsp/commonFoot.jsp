@@ -56,7 +56,7 @@
 <script src="${staticRoot}/lib/plugin/upload/upload.js"></script>
 
 <script src="${staticRoot}/lib/ligerui/custom/ligerGridEx.js"></script>
-
+<script src="${staticRoot}/lib/ligerui/custom/customCombo.js"></script>
 <script>
     (function ($, win) {
         $(function () {
