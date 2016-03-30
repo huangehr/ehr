@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * 健康档案管理器。实现档案、健康事件及数据集的获取接口。也可以搜索某段时间内病人的数据。
@@ -27,32 +28,39 @@ public class ProfileService {
     ObjectMapper objectMapper;
 
     @Autowired
+    ProfileWriter profileWriter;
+
+    @Autowired
+    ProfileLoader profileLoader;
+
+    @Autowired
     private HBaseClient hbaseClient;
+
+    public List<Profile> searchProfile(){
+        return null;
+    }
     
-    public Profile getArchive(String archiveId, boolean loadStdDataSet, boolean loadOriginDataSet) throws IOException, ParseException {
-        ProfileLoader loader = new ProfileLoader();
-        Profile healthArchive = loader.load(archiveId, loadStdDataSet, loadOriginDataSet);
+    public Profile getProfile(String archiveId, boolean loadStdDataSet, boolean loadOriginDataSet) throws IOException, ParseException {
+        Profile healthArchive = profileLoader.load(archiveId, loadStdDataSet, loadOriginDataSet);
 
         return healthArchive;
     }
 
     public ProfileDataSet getDataSet(final String cdaVersion, final String dataSetCode, final String[] rowKeys) throws IOException {
-        ProfileLoader profileLoader = new ProfileLoader();
         ProfileDataSet dataSet = profileLoader.loadFullDataSet(cdaVersion, dataSetCode, rowKeys).getRight();
 
         return dataSet;
     }
 
     public void saveProfile(Profile profile) throws IOException {
-        ProfileWriter writer = new ProfileWriter();
-        writer.writeArchive(profile);
+        profileWriter.writeArchive(profile);
     }
     
-    public void deleteArchive(String archiveId) throws IOException {
+    public void deleteProfile(String archiveId) throws IOException {
         ResultWrapper archive = hbaseClient.getResultAsWrapper(ProfileTableOptions.ArchiveTable, archiveId);
         if (archive == null) throw new RuntimeException("Profile not found");
 
-        // 先删除数据集
+        // delete data set first
         String dataSets = archive.getValueAsString(ProfileTableOptions.FamilyBasic, ProfileTableOptions.AcDataSets);
         if (null != dataSets){
             JsonNode root = objectMapper.readTree(dataSets);
@@ -67,7 +75,7 @@ public class ProfileService {
             }
         }
 
-        // 删除档案
+        // delete profile now
         hbaseClient.deleteRecord(ProfileTableOptions.ArchiveTable, archiveId);
     }
 }

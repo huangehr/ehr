@@ -7,8 +7,6 @@ import com.yihu.ehr.profile.ProfileTableOptions;
 import com.yihu.ehr.util.DateFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -24,10 +22,9 @@ import java.util.Set;
  * @created 2015.08.27 11:56
  */
 @Service
-@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ProfileWriter {
-    @Value("${profile.data-buffer-size}")
-    private int DataBufferSize;
+    @Value("${profile-persist.record-buffer-size}")
+    private int RecordBufferSize;
 
     @Autowired
     private XHBaseClient hbaseClient;
@@ -62,7 +59,7 @@ public class ProfileWriter {
             int rowIndex = 1;
             int totalRowCount = dataSet.getRecordKeys().size();
             for (String key : dataSet.getRecordKeys()) {
-                if (rowIndex == 1 || rowIndex > DataBufferSize) {
+                if (rowIndex == 1 || rowIndex > RecordBufferSize) {
                     hbaseClient.beginBatchInsert(tableName, false);
                 }
 
@@ -88,7 +85,7 @@ public class ProfileWriter {
                         hbDataArray[0],
                         hbDataArray[1]);
 
-                if (rowIndex == DataBufferSize || rowIndex == totalRowCount) {
+                if (rowIndex == RecordBufferSize || rowIndex == totalRowCount) {
                     hbaseClient.endBatchInsert();
 
                     totalRowCount -= rowIndex;

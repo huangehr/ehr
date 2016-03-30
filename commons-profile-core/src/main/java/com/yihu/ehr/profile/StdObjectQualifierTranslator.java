@@ -38,11 +38,11 @@ public class StdObjectQualifierTranslator {
      * @param innerCode
      * @return
      */
-    public static String toHBaseQualifier(String innerCode, String type){
+    public static String hBaseQualifier(String innerCode, String type){
         return new StringBuilderUtil("%1_%2").arg(innerCode).arg(type.substring(0, 1).toUpperCase()).toString();
     }
 
-    public static String[] splitInnerCodeAsCodeValue(String innerCode){
+    public static String[] splitMetaData(String innerCode){
         return new String[]{
                 innerCode + MetaDataCodeSuffix,
                 innerCode + MetaDataValueSuffix

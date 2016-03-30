@@ -1,4 +1,4 @@
-package com.yihu.ehr.browser.controller;
+package com.yihu.ehr.controller;
 
 /**
  * @author Sand

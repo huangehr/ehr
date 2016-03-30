@@ -10,10 +10,16 @@
         <relativePath>../commons-dependencies/pom.xml</relativePath>
     </parent>
 
-    <artifactId>commons-redis-cache</artifactId>
+    <artifactId>commons-redis-keyschema</artifactId>
     <packaging>jar</packaging>
+    <description>Redis key schema of platform</description>
 
     <dependencies>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-util</artifactId>
+            <version>1.1.0</version>
+        </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-data-redis</artifactId>

@@ -37,7 +37,7 @@ import java.text.ParseException;
 import java.util.*;
 
 /**
- * JSON 档案Rest控制器。
+ * 档案包控制器。
  *
  * @author Sand
  * @version 1.0

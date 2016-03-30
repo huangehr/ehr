@@ -10,16 +10,8 @@
         <relativePath>../commons-dependencies/pom.xml</relativePath>
     </parent>
 
-    <artifactId>commons-amqp</artifactId>
-    <name>commons-amqp</name>
+    <artifactId>commons-redis-mq</artifactId>
     <packaging>jar</packaging>
-    <description>AMQP</description>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-amqp</artifactId>
-        </dependency>
-    </dependencies>
+    <description>EHR platform redis message queue</description>
 
 </project>
