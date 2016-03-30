@@ -4,8 +4,8 @@ import com.yihu.ehr.agModel.standard.standardversion.StdVersionDetailModel;
 import com.yihu.ehr.agModel.standard.standardversion.StdVersionModel;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.std.service.CDAVersionClient;
 import com.yihu.ehr.model.standard.MCDAVersion;
+import com.yihu.ehr.std.service.CDAVersionClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import com.yihu.ehr.util.operator.DateUtil;
@@ -198,6 +198,22 @@ public class CDAVersionController extends BaseController {
             return envelop;
         }
         StdVersionModel versionModel = convertToModel(mCdaVersion, StdVersionModel.class);
+        envelop.setSuccessFlg(true);
+        envelop.setObj(versionModel);
+        return envelop;
+    }
+
+    @RequestMapping(value = "version/latest", method = RequestMethod.GET)
+    @ApiOperation(value = "获取最新版本")
+    public Envelop getLatestVersion()throws Exception {
+        Envelop envelop = new Envelop();
+        MCDAVersion cdaVersion = cdaVersionClient.getLatestVersion();
+        if (cdaVersion == null) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("没有版本信息！");
+            return envelop;
+        }
+        StdVersionModel versionModel = convertToModel(cdaVersion, StdVersionModel.class);
         envelop.setSuccessFlg(true);
         envelop.setObj(versionModel);
         return envelop;
