@@ -1,17 +1,13 @@
 package com.yihu.ehr.standard.document.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
-import com.yihu.ehr.model.standard.MStdDataSet;
 import com.yihu.ehr.standard.commons.ExtendController;
-import com.yihu.ehr.standard.datasets.service.IDataSet;
 import com.yihu.ehr.standard.document.service.*;
-import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -23,7 +19,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 @RequestMapping(ApiVersion.Version1_0)
 @RestController
@@ -33,8 +32,8 @@ public class DocumentEndPoint  extends ExtendController<MCDADocument> {
     @Autowired
     private CDADocumentManager cdaDocumentManager;
 
-    @Autowired
-    private CDAManager cdaManager;
+//    @Autowired
+//    private CDAManager cdaManager;
 
     @Autowired
     private CDADataSetRelationshipManager cdaDatasetRelationshipManager;
@@ -104,9 +103,10 @@ public class DocumentEndPoint  extends ExtendController<MCDADocument> {
 
         Class entityClass = getServiceEntity(version);
         ICDADocument cdaDocument = (ICDADocument) toEntity(model, entityClass);
-        //cdaDocument.setId(getObjectId(BizObject.STANDARD));
+        cdaDocument.setId(getObjectId(BizObject.STANDARD));
+        cdaDocument.setCreateUser("Sys");
         cdaDocument.setCreateDate(new Date());
-        cdaDocumentManager.save(cdaDocument);
+        cdaDocumentManager.saveCdaDocument(cdaDocument);
         return getModel(cdaDocument);
     }
 
@@ -148,14 +148,6 @@ public class DocumentEndPoint  extends ExtendController<MCDADocument> {
     @RequestMapping(value = RestApi.Standards.DataSetRelationships, method = RequestMethod.GET)
     @ApiOperation(value = "根据条件获取getCDADataSetRelationship列表")
     public Collection<MCdaDataSetRelationship> getCDADataSetRelationships(
-//            @ApiParam(name = "document_Id", value = "文档编号")
-//            @RequestParam(value = "document_Id") String cdaId,
-//            @ApiParam(name = "version", value = "版本号")
-//            @RequestParam(value = "version") String versionCode,
-//            @ApiParam(name = "page", value = "当前页", defaultValue = "")
-//            @RequestParam(value = "page") Integer page,
-//            @ApiParam(name = "rows", value = "行数", defaultValue = "")
-//            @RequestParam(value = "rows") Integer rows,
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -211,7 +203,7 @@ public class DocumentEndPoint  extends ExtendController<MCDADocument> {
             @RequestParam(value = "version") String versionCode,
             @ApiParam(name = "xml_info", value = "xml_info")
             @RequestParam(value = "xml_info") String xmlInfo) throws Exception {
-        return cdaManager.SaveDataSetRelationship(dataSetIds, cdaId, versionCode, xmlInfo);
+        return cdaDatasetRelationshipManager.SaveDataSetRelationship(dataSetIds, cdaId, versionCode, xmlInfo);
     }
 
 
@@ -244,17 +236,16 @@ public class DocumentEndPoint  extends ExtendController<MCDADocument> {
     }
 
 
-//    @Deprecated
-//    @RequestMapping(value = RestApi.Standards.DocumentCreateFile, method = RequestMethod.POST)
-//    @ApiOperation(value = "生成CDA文件")
-//    public boolean createCDASchemaFile(
-//            @ApiParam(name = "version", value = "版本号")
-//            @RequestParam(value = "version") String versionCode,
-//            @ApiParam(name = "cda_id", value = "文档编号")
-//            @PathVariable(value = "cda_id") String cdaId) throws Exception {
-//
-//        return cdaDocumentManager.createCDASchemaFile(cdaId, versionCode);
-//    }
+    @RequestMapping(value = RestApi.Standards.DocumentCreateFile, method = RequestMethod.POST)
+    @ApiOperation(value = "生成CDA文件")
+    public boolean createCDASchemaFile(
+            @ApiParam(name = "version", value = "版本号")
+            @RequestParam(value = "version") String versionCode,
+            @ApiParam(name = "id", value = "文档编号")
+            @PathVariable(value = "id") String cdaId) throws Exception {
+
+        return cdaDocumentManager.createCDASchemaFile(cdaId, versionCode);
+    }
 
     /**
      * 获取cda文档的XML文件信息。

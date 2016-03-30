@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "source", description = "标准来源", tags = {"标准来源"})
+@Api(value = "source", description = "标准来源", tags = {"标准来源"})
 public class StandardSourceController extends ExtendController<MStdSource> {
 
     @Autowired
@@ -52,6 +52,17 @@ public class StandardSourceController extends ExtendController<MStdSource> {
         pagedResponse(request, response, stdSourceService.getCount(filters), page, size);
         return convertToModels(appList, new ArrayList<>(appList.size()), MStdSource.class, fields);
     }
+
+    @RequestMapping(value = RestApi.Standards.NoPageSources, method = RequestMethod.GET)
+    @ApiOperation(value = "标准来源分页搜索(不分页)")
+    public Collection<MStdSource> searchSourcesWithoutPaging(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+        List appList = stdSourceService.search(filters);
+        return convertToModels(appList, new ArrayList<>(appList.size()), MStdSource.class, "");
+    }
+
+
 
 
     @RequestMapping(value = RestApi.Standards.Source, method = RequestMethod.GET)

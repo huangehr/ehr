@@ -9,11 +9,12 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import javax.transaction.Transactional;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -100,6 +101,10 @@ public class CDADocumentManager extends BaseHbmService<ICDADocument> {
         return true;
     }
 
+    public void saveCdaDocument(ICDADocument cdaDocument) {
+        save(cdaDocument);
+    }
+
 
     public boolean isDocumentExist(String version, String documentCode,String documentId) {
         Class entityClass = getServiceEntity(version);
@@ -130,7 +135,7 @@ public class CDADocumentManager extends BaseHbmService<ICDADocument> {
         //路径分割符
         String splitMark = System.getProperty("file.separator");
         //文件路径
-        String strXMLFilePath = strPath + splitMark + "xml" + splitMark + strVersionCode + splitMark +"downfile"+ splitMark;
+        String strXMLFilePath = strPath + splitMark + "xml" + splitMark + strVersionCode + splitMark;
         return strXMLFilePath;
     }
 
@@ -157,7 +162,7 @@ public class CDADocumentManager extends BaseHbmService<ICDADocument> {
         if (!file.exists()) {
             file.mkdirs();
         }
-        String strFilepath = strXMLFilePath + cdaId + ".xsd";
+        String strFilepath = strXMLFilePath + cdaId + ".xml";
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document doc = builder.newDocument();

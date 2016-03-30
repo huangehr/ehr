@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * HBaseClient。目前使用原型模式，但对在多线程中插入数据与查询表是否存在同时进行产生的等待问题，依然不是解决方案。
+ * Bean使用原型模式。
  */
 @Service
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)

@@ -1,7 +1,5 @@
 package com.yihu.ehr.api;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-
 /**
  * REST API URL. 此处定义的URL可用于服务对外提供的地址及HTTP客户端请求地址.
  * URL定义遵循健康档案平台REST规范.
@@ -11,6 +9,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @created 2015.09.09 15:04
  */
 public class RestApi {
+    public static class Caches{
+        public static final String Organizations                   = "/caches/organizations";
+        public static final String Organization                    = "/caches/organizations/{org_code}";
+        public static final String Versions                        = "/caches/standards/versions";
+        public static final String Version                         = "/caches/standards/versions/{version}";
+    }
+
     public static class Adaptions{
     }
 
@@ -40,9 +45,10 @@ public class RestApi {
 
     public static class Packages{
         public static final String Packages                         = "/packages";
-        public static final String LegacyPackages                   = "/json_package";
         public static final String Package                          = "/packages/{id}";
         public static final String PackageDownloads                 = "/packages/{id}/downloads";
+
+        public static final String LegacyPackages                   = "/json_package";
     }
 
     public static class Patients{
@@ -71,6 +77,7 @@ public class RestApi {
 
     public static class Standards{
         public static final String Sources                          = "/std/sources";
+        public static final String NoPageSources                    = "/std/sources/no_paging";
         public static final String Source                           = "/std/sources/{id}";
         public static final String IsSourceCodeExist                ="/std/sources/code_is_exist";
 
@@ -79,9 +86,9 @@ public class RestApi {
         public static final String TypesCodeExistence               = "/std/type/code/existence";
         public static final String TypeChildren                     = "/std/types/parent_id/childrens";
         public static final String TypesChildren                    = "/std/types/childrens";
-        public static final String TypeOther                        = "/std/types/{id}/other";
         public static final String TypeList                         = "/cda_types/code_name";
-        public static final String TypeParent                       = "/std/types/{id}/parent";
+        public static final String TypeParent                       = "/std/types/parent";
+        public static final String TypeOther                        = "/std/types/{id}/other";
 
         public static final String Versions                         = "/std/versions";
         public static final String Version                          = "/std/versions/{version}";
@@ -91,7 +98,8 @@ public class RestApi {
         public static final String VersionBackStage                 = "/std/versions/{version}/back";
         public static final String VersionCommit                    = "/std/versions/{version}/commit";
         public static final String VersionRevert                    = "/std/versions/{version}/revert";
-        public static final String VersionNewest                    = "/std/versions/{version}/newest";
+        public static final String VersionLatest                    = "/std/versions/latest";
+        public static final String VersionLatestExistence           = "/std/versions/{version}/latest/existence";
 
         public static final String Documents                        = "/std/documents";
         public static final String Document                         = "/std/documents/{id}";
@@ -107,6 +115,7 @@ public class RestApi {
         public static final String MetaDataWithDict                 = "/std/data_set/{data_set_id}/meta_datas/{meta_data_id}/dictionaries";
         public static final String DictCodeIsExist                  = "/std/dictionaries/is_exist/code";
         public static final String DictOther                        = "/std/dictionaries/{id}/other";
+        public static final String DictParent                        = "/std/dictionaries/{id}/parent";
 
         public static final String Entry                            = "/std/dictionaries/entries/{id}";
         public static final String Entries                          = "/std/dictionaries/entries";
@@ -117,6 +126,7 @@ public class RestApi {
         public static final String DataSet                          = "/std/data_sets/{id}";
         public static final String DataSetsName                     = "/std/data_sets/name";
         public static final String DataSetCodeIsExist               = "/std/data_set/is_exist/code";
+        public static final String DataSetsIds                      = "/std/{ids}data_sets";
 
         public static final String MetaDatas                        = "/std/data_sets/meta_datas";
         public static final String MetaData                         = "/std/data_sets/meta_datas/{id}";
@@ -138,6 +148,7 @@ public class RestApi {
         public static final String UserVerification                 = "/users/verification";
         public static final String UserAdmin                        = "/users/admin/{user_id}";
         public static final String UserAdminPassword                = "/users/admin/{user_id}/password";
+        public static final String UserAdminPasswordReset          = "/users/admin/{user_id}/password_reset";
         public static final String UserAdminKey                     = "/users/admin/{user_id}/key";
         public static final String UserAdminContact                 = "/users/admin/{user_id}/contact";
         public static final String UserIdCardNoExistence            = "/user/id_card_no/existence";

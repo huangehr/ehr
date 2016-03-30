@@ -25,7 +25,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "icd10dict", description = "疾病字典管理接口", tags = {"ICD10"})
+@Api(value = "icd10dict", description = "疾病字典管理接口", tags = {"ICD10"})
 public class Icd10DictController extends BaseRestController {
 
     @Autowired

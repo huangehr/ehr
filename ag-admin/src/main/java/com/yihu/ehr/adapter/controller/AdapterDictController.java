@@ -233,50 +233,22 @@ public class AdapterDictController extends ExtendController<AdapterDictModel> {
             @ApiParam(name = "dict_id", value = "字典编号")
             @RequestParam(value = "dict_id") Long dictId,
             @ApiParam(name = "mode", value = "编辑模式： modify、new")
-            @RequestParam(value = "mode") String mode){
+            @RequestParam(value = "mode") String mode,
+            @ApiParam(name = "search_name", value = "查询字符串")
+            @RequestParam(value = "search_name") String searchName,
+            @ApiParam(name = "page", value = "当前页")
+            @RequestParam(value = "page") int page,
+            @ApiParam(name = "size", value = "大小")
+            @RequestParam(value = "size") int size){
 
-        Envelop result = new Envelop();
         try {
-
-            MAdapterPlan orgAdapterPlan = planClient.getAdapterPlanById(planId);
-            String version = orgAdapterPlan.getVersion();
-            ResponseEntity<Collection<MStdDictEntry>> dictEntryRs = dictClient.searchDictEntry("", "dictId=" + dictId, "", 10000, 1, version);
-
-            List<String> dictEntries = new ArrayList<>();
-            Collection<MStdDictEntry> dictEntryList = dictEntryRs.getBody();
-            if (!dictEntryList.isEmpty()){
-                if("modify".equals(mode) || "view".equals(mode)){
-                    for (MStdDictEntry dictEntry : dictEntryList) {
-                        dictEntries.add(String.valueOf(dictEntry.getId())+','+dictEntry.getValue());
-                    }
-                }
-                else{
-                    ResponseEntity<Collection<MAdapterDictVo>> adapterDictModelRs = adapterDictClient.searchAdapterDictEntry(planId, dictId, "", "", "", 10000, 1);
-                    Collection<MAdapterDictVo> adapterDictModels = adapterDictModelRs.getBody();
-                    boolean exist = false;
-                    for (MStdDictEntry dictEntry : dictEntryList) {
-                        exist = false;
-                        for(MAdapterDictVo model : adapterDictModels){
-                            if(dictEntry.getId()==model.getDictEntryId()){
-                                exist = true;
-                                break;
-                            }
-                        }
-                        if(!exist)
-                            dictEntries.add(String.valueOf(dictEntry.getId())+','+dictEntry.getValue());
-                    }
-                }
-
-                result.setSuccessFlg(true);
-            } else {
-                result.setSuccessFlg(false);
-            }
-            result.setObj(dictEntries);
-            return result;
-        } catch (Exception e) {
-            e.printStackTrace();
-            result.setErrorMsg(e.getMessage());
-            return result;
+            ResponseEntity<Collection<MAdapterRelationship>> responseEntity = adapterDictClient.searchStdDictEntry(planId, dictId, searchName, mode, "", size, page);
+            List<MAdapterRelationship> stdDictEntries = (List<MAdapterRelationship>) responseEntity.getBody();
+            return getResult(stdDictEntries, getTotalCount(responseEntity), page, size);
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
         }
     }
 

@@ -67,35 +67,25 @@
 			<artifactId>commons-data-fastdfs</artifactId>
 			<version>1.1.0</version>
 		</dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-data-redis</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-profile-core</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-redis-keyschema</artifactId>
+            <version>1.1.0</version>
+        </dependency>
 		<dependency>
 			<groupId>happy.fish</groupId>
 			<artifactId>fastDFS</artifactId>
 			<version>1.1.0</version>
 		</dependency>
 	</dependencies>
-
-	<repositories>
-		<repository>
-			<id>Releases</id>
-			<name>local private nexus</name>
-			<url>http://172.19.103.47:8081/nexus/content/repositories/releases/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>snapshots</id>
-			<name>local private nexus</name>
-			<url>http://172.19.103.47:8081/nexus/content/repositories/snapshots/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
 </project>

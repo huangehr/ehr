@@ -41,6 +41,7 @@ public class ApiException extends RuntimeException {
     ErrorCode errorCode;        // 用于从配置环境中提取错误信息
     String[] errorArgs;         // 格式化配置环境中的错误信息
     String documentURL;
+    String message;             // 错误消息
 
     List<ResourceError> resourceErrors;         // 资源具体错误描述
 
@@ -61,14 +62,22 @@ public class ApiException extends RuntimeException {
         this(httpStatus, errorCode, null, null, null);
     }
 
-    // legacy support
-    public ApiException(ErrorCode errorCode) {
-        this(HttpStatus.FORBIDDEN, errorCode, null, null, null);
+    public ApiException(HttpStatus httpStatus, String message){
+        this(httpStatus, null, null, null, null);
+
+        this.message = message;
     }
 
     public ApiException(ErrorCode errorCode, String... errorArgs) {
         this(HttpStatus.FORBIDDEN, errorCode, null, null, errorArgs);
     }
+
+    // legacy support
+    public ApiException(ErrorCode errorCode) {
+        this(HttpStatus.FORBIDDEN, errorCode, null, null, null);
+    }
+
+
 
     @Override
     public String toString(){
@@ -83,7 +92,7 @@ public class ApiException extends RuntimeException {
 
     private String toJson() throws JsonProcessingException {
         Environment environment = SpringContext.getService(Environment.class);
-        String message = environment.getProperty(errorCode.getErrorCode());
+        message = errorCode == null ? message : environment.getProperty(errorCode.getErrorCode());
 
         if (null != message && null != errorArgs && errorArgs.length > 0){
             StringBuilderUtil util = new StringBuilderUtil(message);

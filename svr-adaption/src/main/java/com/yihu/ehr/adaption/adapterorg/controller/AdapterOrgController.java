@@ -27,7 +27,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/adapter")
-@Api(protocols = "https", value = "adapterorg", description = "第三方标准管理接口", tags = {"第三方标准"})
+@Api(value = "adapterorg", description = "第三方标准管理接口", tags = {"第三方标准"})
 public class AdapterOrgController extends ExtendController<MAdapterOrg> {
     @Autowired
     private AdapterOrgService adapterOrgService;

@@ -30,7 +30,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "Application", description = "EHR应用管理", tags = {"应用管理"})
+@Api(value = "Application", description = "EHR应用管理", tags = {"应用管理"})
 public class AppEndPoint extends BaseRestController {
     @Autowired
     private AppService appService;

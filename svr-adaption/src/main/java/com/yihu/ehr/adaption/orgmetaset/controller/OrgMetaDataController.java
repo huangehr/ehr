@@ -24,7 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/adapter/org")
-@Api(protocols = "https", value = "orgmetadata", description = "机构数据元", tags = {"机构数据元"})
+@Api(value = "orgmetadata", description = "机构数据元", tags = {"机构数据元"})
 public class OrgMetaDataController extends ExtendController<MOrgMetaData> {
 
     @Autowired

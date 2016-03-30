@@ -28,7 +28,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/adaptions")
-@Api(protocols = "https", value = "adaptions", description = "标准适配服务")
+@Api(value = "adaptions", description = "标准适配服务")
 public class AdaptionsEndPoint {
     @Autowired
     private SecurityClient securityClient;

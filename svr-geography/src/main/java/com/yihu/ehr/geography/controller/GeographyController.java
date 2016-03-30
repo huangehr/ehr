@@ -24,7 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "Geography", description = "获取常用地址，根据选择地址判断数据库中是否存在，否则保存为新地址", tags = {"地址"})
+@Api(value = "Geography", description = "获取常用地址，根据选择地址判断数据库中是否存在，否则保存为新地址", tags = {"地址"})
 public class GeographyController extends BaseRestController{
 
     @Autowired

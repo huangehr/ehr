@@ -26,7 +26,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "dictionary", description = "标准字典", tags = {"标准字典"})
+@Api(value = "dictionary", description = "标准字典", tags = {"标准字典"})
 public class DictController extends ExtendController<MStdDict> {
 
     @Autowired
@@ -75,7 +75,7 @@ public class DictController extends ExtendController<MStdDict> {
 //        if(dictService.isExistByField("code", dict.getCode(), entityClass))
 //            throw errRepeatCode();
 
-        dict.setCreatedate(new Date());
+        dict.setCreateDate(new Date());
         if(dictService.add(dict, version))
             return getModel(dict);
          return null;
@@ -172,6 +172,42 @@ public class DictController extends ExtendController<MStdDict> {
             @RequestParam(value = "version") String version) throws Exception {
         List list = dictService.getOtherCdaDict(id,version);
         return (List<MStdDict>)convertToModels(list,new ArrayList<MStdDict>(list.size()),MStdDict.class,"");
+    }
+
+
+    @RequestMapping(value = RestApi.Standards.DictParent, method = RequestMethod.GET)
+    @ApiOperation(value = "根据当前类别获取自己的父级以及同级以及同级所在父级类别列表")
+    public List<MStdDict> getCdaTypeExcludeSelfAndChildren(
+            @ApiParam(name = "id", value = "id")
+            @RequestParam(value = "id") long id,
+            @ApiParam(name = "version", value = "版本编号", defaultValue = "")
+            @RequestParam(value = "version") String version) throws Exception {
+        List<IDict> dicts = new ArrayList<>();
+
+        IDict dict = dictService.retrieve(id, getServiceEntity(version));
+        dicts.add(dict);
+        String childrenIds = getChildIncludeSelfByParentsAndChildrenIds(dicts,"",version);   //递归获取
+        List<IDict> returnDicts = dictService.getCdaTypeExcludeSelfAndChildren(childrenIds,version);
+
+        return  (List<MStdDict>)convertToModels(returnDicts,new ArrayList<MStdDict>(returnDicts.size()),MStdDict.class,"");
+    }
+
+
+    /**
+     * 根据父级类别获取父级类别所在以下所有子集类别（包括当前父级列表）
+     * @param parents 父级信息
+     * @param childrenIds   子级ID
+     */
+    public String getChildIncludeSelfByParentsAndChildrenIds(List<IDict> parents,String childrenIds,String version) {
+        for (int i = 0; i < parents.size(); i++) {
+            IDict dict = parents.get(i);
+            childrenIds+=dict.getId()+",";
+            List<IDict> listChild = dictService.getChildrensByParentId(dict.getId(),version);
+            if(listChild.size()>0){
+                childrenIds = getChildIncludeSelfByParentsAndChildrenIds(listChild,childrenIds,version);
+            }
+        }
+        return childrenIds;
     }
 
 }

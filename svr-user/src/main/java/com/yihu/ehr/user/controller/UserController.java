@@ -33,7 +33,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "users", description = "用户管理接口", tags = {"用户,登录帐号,密码"})
+@Api(value = "users", description = "用户管理接口", tags = {"用户,登录帐号,密码"})
 public class UserController extends BaseRestController {
 
     @Value("${default.password}")
@@ -152,6 +152,18 @@ public class UserController extends BaseRestController {
             @ApiParam(name = "user_id", value = "id", defaultValue = "")
             @PathVariable(value = "user_id") String userId) throws Exception {
         userManager.resetPass(userId);
+        return true;
+    }
+
+    @RequestMapping(value = RestApi.Users.UserAdminPasswordReset, method = RequestMethod.PUT)
+    @ApiOperation(value = "修改密码", notes = "根基传入的用户id和新的密码修改用户的密码")
+    public boolean changePassWord(
+            @ApiParam(name = "user_id", value = "user_id", defaultValue = "")
+            @PathVariable(value = "user_id") String userId,
+            @ApiParam(name = "password", value = "密码", defaultValue = "")
+            @RequestParam(value = "password") String password) throws Exception {
+        String hashPassWord = HashUtil.hashStr(password);
+        userManager.changePassWord(userId,hashPassWord);
         return true;
     }
 

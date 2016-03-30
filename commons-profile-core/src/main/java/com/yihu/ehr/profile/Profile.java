@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.util.DateFormatter;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
@@ -44,11 +45,17 @@ public class Profile {
     
     public String getId() {
         if (archiveID == null){
-            if(orgCode.length() == 0 || patientId.length() == 0 || eventNo.length() == 0){
-                throw new IllegalArgumentException("构建档案ID失败, 机构代码或病人索引为空.");
+            if(StringUtils.isEmpty(orgCode)){
+                throw new IllegalArgumentException("Build profile id failed, organization code is empty.");
             }
 
-            if(eventDate == null) throw new IllegalArgumentException("构建档案ID失败, 事件时间为空.");
+            if (StringUtils.isEmpty(patientId) || StringUtils.isEmpty(eventNo)){
+                throw new IllegalArgumentException("Build profile id failed, patient index is empty.");
+            }
+
+            if(eventDate == null){
+                throw new IllegalArgumentException("Build profile id failed, unable to get event time.");
+            }
 
             this.archiveID = ProfileId.get(orgCode, patientId, eventNo, eventDate);
         }
@@ -162,6 +169,8 @@ public class Profile {
     }
 
     public Date getCreateDate() {
+        if (createDate == null) createDate = new Date();
+
         return createDate;
     }
 

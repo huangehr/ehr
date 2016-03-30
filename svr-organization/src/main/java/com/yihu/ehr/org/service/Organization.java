@@ -52,7 +52,7 @@ public class Organization  {
 
 
 
-//    @Column(name = "tags",  nullable = true)
+//    @Mapping(name = "tags",  nullable = true)
 //    public String getTags() {
 //        return String.join(",", tags);
 //    }

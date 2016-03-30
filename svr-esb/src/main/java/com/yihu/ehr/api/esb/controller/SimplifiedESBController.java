@@ -30,7 +30,7 @@ import java.util.Date;
 
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/esb")
-@Api(protocols = "https", value = "simplified-esb", description = "简易ESB服务临时接口")
+@Api(value = "simplified-esb", description = "简易ESB服务临时接口")
 public class SimplifiedESBController {
     @Resource(name = "simplifiedESBService")
     private SimplifiedESBService simplifiedESBService;

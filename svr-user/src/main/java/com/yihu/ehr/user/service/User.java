@@ -48,7 +48,7 @@ public class User {
 
 
     public User() {
-        id  = UUID.randomUUID().toString().replace("_","");
+//        id  = UUID.randomUUID().toString().replace("_","");
     }
 
     @Id

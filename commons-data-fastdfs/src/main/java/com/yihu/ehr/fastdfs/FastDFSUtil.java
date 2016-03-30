@@ -226,7 +226,7 @@ public class FastDFSUtil {
     public String download(String groupName, String remoteFileName, String localPath) throws Exception {
         StorageClient client = clientPool.getStorageClient();
         try {
-            String localFileName = localPath + "\\" + remoteFileName.replaceAll("/", "_");
+            String localFileName = localPath + remoteFileName.replaceAll("/", "_");
             client.download_file(groupName, remoteFileName, 0, 0, localFileName);
 
             return localFileName;

@@ -25,7 +25,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "drugdict", description = "药品字典管理接口", tags = {"Drug"})
+@Api(value = "drugdict", description = "药品字典管理接口", tags = {"Drug"})
 public class DrugDictController extends BaseRestController {
 
     @Autowired

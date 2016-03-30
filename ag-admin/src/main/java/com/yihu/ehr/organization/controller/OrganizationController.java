@@ -98,14 +98,25 @@ public class OrganizationController extends BaseController {
 
         OrgModel orgModel = convertToModel(mOrg, OrgModel.class);
         // 获取机构类别字典
-        MConventionalDict orgTypeDict = conDictEntryClient.getOrgType(mOrg.getOrgType());
-        orgModel.setOrgTypeName(orgTypeDict == null ? "" : orgTypeDict.getValue());
+        if(!StringUtils.isEmpty(mOrg.getOrgType())){
+            MConventionalDict orgTypeDict = conDictEntryClient.getOrgType(mOrg.getOrgType());
+            orgModel.setOrgTypeName(orgTypeDict == null ? "" : orgTypeDict.getValue());
+        }
+        else{
+            orgModel.setOrgTypeName("");
+        }
         // 获取机构地址信息
         String locationStrName = addressClient.getCanonicalAddress(mOrg.getLocation());
         orgModel.setLocationStrName(locationStrName);
         //获取机构接入方式
-        MConventionalDict settledWayDict = conDictEntryClient.getSettledWay(mOrg.getSettledWay());
-        orgModel.setSettledWayName(settledWayDict == null? "" : settledWayDict.getValue());
+        if(!StringUtils.isEmpty(mOrg.getSettledWay())){
+            MConventionalDict settledWayDict = conDictEntryClient.getSettledWay(mOrg.getSettledWay());
+            orgModel.setSettledWayName(settledWayDict == null ? "" : settledWayDict.getValue());
+        }
+        else{
+            orgModel.setSettledWayName("");
+        }
+
         // 判断机构状态（是否已激活）
         orgModel.setActivityFlagName(mOrg.getActivityFlag() == 1 ? "是" : "否");
         //创建时间转化
@@ -164,9 +175,9 @@ public class OrganizationController extends BaseController {
         try {
             String errorMsg = "";
 
-            GeographyModel geographyModel = convertToModel(geographyModelJsonData,GeographyModel.class);
+            GeographyModel geographyModel = objectMapper.readValue(geographyModelJsonData,GeographyModel.class);
 
-            if (!isNullAddress(geographyModel)) {
+            if (geographyModel.nullAddress()) {
                 errorMsg+="机构地址不能为空！";
             }
 
@@ -217,9 +228,9 @@ public class OrganizationController extends BaseController {
             @RequestParam(value = "geography_model_json_data", required = false) String geographyModelJsonData  ) {
       try {
           String errorMsg ="";
-          GeographyModel geographyModel = convertToModel(geographyModelJsonData,GeographyModel.class);
+          GeographyModel geographyModel = objectMapper.readValue(geographyModelJsonData, GeographyModel.class);
 
-          if (!isNullAddress(geographyModel)) {
+          if (geographyModel.nullAddress()) {
               errorMsg+="机构地址不能为空！";
           }
 
@@ -240,6 +251,10 @@ public class OrganizationController extends BaseController {
           String locationId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
           if (StringUtils.isEmpty(locationId)) {
               return failed("保存地址失败！");
+          }
+          if(StringUtils.isNotEmpty(errorMsg))
+          {
+              return failed(errorMsg);
           }
 
           mOrganization.setLocation(locationId);
@@ -447,22 +462,5 @@ public class OrganizationController extends BaseController {
         MOrganization mOrganization = convertToModel(detailModel, MOrganization.class);
         mOrganization.setCreateDate(StringToDate(detailModel.getCreateDate(),AgAdminConstants.DateTimeFormat));
         return mOrganization;
-    }
-
-    public boolean isNullAddress (GeographyModel geographyModel)
-    {
-        if(geographyModel==null)
-            return true;
-        if(StringUtils.isEmpty(geographyModel.getProvince())
-                && StringUtils.isEmpty(geographyModel.getCity())
-                && StringUtils.isEmpty(geographyModel.getDistrict())
-                && StringUtils.isEmpty(geographyModel.getTown())
-                && StringUtils.isEmpty(geographyModel.getStreet())
-                && StringUtils.isEmpty(geographyModel.getExtra()))
-        {
-            return true;
-        }
-
-        return false;
     }
 }

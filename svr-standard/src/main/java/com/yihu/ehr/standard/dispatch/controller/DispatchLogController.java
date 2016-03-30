@@ -24,7 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "dispatch-log", description = "标准分发日志接口", tags = {"标准分发日志接口"})
+@Api(value = "dispatch-log", description = "标准分发日志接口", tags = {"标准分发日志接口"})
 public class DispatchLogController extends ExtendController<MDispatchLog> {
 
     @Autowired

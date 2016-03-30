@@ -7,8 +7,6 @@ import com.yihu.ehr.profile.ProfileTableOptions;
 import com.yihu.ehr.util.DateFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -24,11 +22,7 @@ import java.util.Set;
  * @created 2015.08.27 11:56
  */
 @Service
-@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ProfileWriter {
-    @Value("${profile.data-buffer-size}")
-    private int DataBufferSize;
-
     @Autowired
     private XHBaseClient hbaseClient;
 
@@ -59,13 +53,8 @@ public class ProfileWriter {
         for (String tableName : tableSet) {
             ProfileDataSet dataSet = healthArchive.getDataSet(tableName);
 
-            int rowIndex = 1;
-            int totalRowCount = dataSet.getRecordKeys().size();
+            hbaseClient.beginBatchInsert(tableName, false);
             for (String key : dataSet.getRecordKeys()) {
-                if (rowIndex == 1 || rowIndex > DataBufferSize) {
-                    hbaseClient.beginBatchInsert(tableName, false);
-                }
-
                 Map<String, String> record = dataSet.getRecord(key);
                 String[][] hbDataArray = ProfileTableOptions.dataSetRecordToHBaseColumn(record);
 
@@ -87,16 +76,9 @@ public class ProfileWriter {
                         ProfileTableOptions.FamilyMetaData,
                         hbDataArray[0],
                         hbDataArray[1]);
-
-                if (rowIndex == DataBufferSize || rowIndex == totalRowCount) {
-                    hbaseClient.endBatchInsert();
-
-                    totalRowCount -= rowIndex;
-                    rowIndex = 1;
-                } else {
-                    rowIndex++;
-                }
             }
+
+            hbaseClient.endBatchInsert();
         }
     }
 }

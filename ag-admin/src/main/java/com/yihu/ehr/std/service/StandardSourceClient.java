@@ -77,4 +77,8 @@ public interface StandardSourceClient {
 
     @RequestMapping(value = RestApi.Standards.IsSourceCodeExist,method = RequestMethod.GET)
     boolean isCodeExist(@RequestParam(value="code")String code);
+
+    @RequestMapping(value = RestApi.Standards.NoPageSources, method = RequestMethod.GET)
+    ResponseEntity<Collection<MStdSource>> search(
+            @RequestParam(value = "filters", required = false) String filters);
 }

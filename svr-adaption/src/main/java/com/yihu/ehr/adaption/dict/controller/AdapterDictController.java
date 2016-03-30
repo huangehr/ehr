@@ -29,7 +29,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/adapter")
-@Api(protocols = "https", value = "adapterDict", description = "适配字典管理接口", tags = {"适配字典管理"})
+@Api(value = "adapterDict", description = "适配字典管理接口", tags = {"适配字典管理"})
 public class AdapterDictController extends ExtendController<MAdapterDict> {
 
     @Autowired
@@ -139,6 +139,34 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
             throw errMissId();
         adapterDictService.delete(strToLongArr(ids));
         return true;
+    }
+
+    @RequestMapping(value = "/plan/{planId}/dict/{dictId}/std_entrys", method = RequestMethod.GET)
+    @ApiOperation(value = "过滤后的标准字典项分页查询")
+    public Collection<MAdapterRelationship> searchStdDictEntry(
+            @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
+            @PathVariable(value = "planId") Long planId,
+            @ApiParam(name = "dictId", value = "字典编号", defaultValue = "")
+            @PathVariable(value = "dictId") Long dictId,
+            @ApiParam(name = "seach_name", value = "代码查询值", defaultValue = "")
+            @RequestParam(value = "seach_name", required = false) String searchName,
+            @ApiParam(name = "mode", value = "编辑模式（new/modify）", defaultValue = "")
+            @RequestParam(value = "mode", required = false) String mode,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+
+        OrgAdapterPlan orgAdapterPlan = orgAdapterPlanService.retrieve(planId);
+        if (orgAdapterPlan == null)
+            throw errNotFound();
+        List ls = adapterDictService.searchStdDictEntry(orgAdapterPlan, dictId, searchName, mode, sorts, page, size);
+        pagedResponse(request, response, (long) adapterDictService.countStdDictEntry(orgAdapterPlan, dictId, searchName, mode), page, size);
+        return ls;
     }
 
     private MAdapterDict getAdapterDict(long id) {

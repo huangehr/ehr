@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "Dictionary", description = "系统全局字典管理", tags = {"系统字典"})
+@Api(value = "Dictionary", description = "系统全局字典管理", tags = {"系统字典"})
 public class SystemDictController extends BaseRestController {
     @Autowired
     SystemDictService dictService;
@@ -65,8 +65,6 @@ public class SystemDictController extends BaseRestController {
             @ApiParam(name = "dictionary", value = "字典JSON结构")
             @RequestParam(value = "dictionary") String dictJson) {
         SystemDict dict = toEntity(dictJson, SystemDict.class);
-        Long id = dictService.getNextId();
-        dict.setId(id);
         SystemDict systemDict = dictService.createDict(dict);
         return convertToModel(systemDict, MSystemDict.class, null);
     }

@@ -3,8 +3,6 @@ package com.yihu.ehr.adaption.dict.service;
 
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlan;
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanService;
-import com.yihu.ehr.model.adaption.MAdapterDataVo;
-import com.yihu.ehr.model.adaption.MAdapterDict;
 import com.yihu.ehr.model.adaption.MAdapterDictVo;
 import com.yihu.ehr.model.adaption.MAdapterRelationship;
 import com.yihu.ehr.query.BaseJpaService;
@@ -52,10 +50,16 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
         sb.append("   from adapter_dict ad          ");
         sb.append("        left join " + dictTableName + " ds on ad.std_dict = ds.id  ");
         sb.append("  where ad.plan_id = " + planId + " and ds.id is not null ");
-        if (!StringUtils.isEmpty(code))
-            sb.append("     and ds.code like :code");
-        if (!StringUtils.isEmpty(name))
-            sb.append("     and ds.name like :name");
+
+        if (!StringUtils.isEmpty(code)){
+            if (!StringUtils.isEmpty(name))
+                sb.append(" and (ds.code like :code or ds.name like :name) ");
+            else
+                sb.append(" and ds.code like :code ");
+        }
+        else if (!StringUtils.isEmpty(name))
+            sb.append(" and ds.name like :name ");
+
         sb.append(makeOrder(orders));
         SQLQuery sqlQuery = session.createSQLQuery(sb.toString());
         if (!StringUtils.isEmpty(code))
@@ -99,16 +103,21 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
 
         StringBuilder sb = new StringBuilder();
         sb.append(" select count(*) from (");
-        sb.append(" select distinct  " + dictTableName + ".id    ");
-        sb.append("       ," + dictTableName + ".code  ");
-        sb.append("       ," + dictTableName + ".name  ");
+        sb.append(" select distinct  ds.id    ");
+        sb.append("       ,ds.code  ");
+        sb.append("       ,ds.name  ");
         sb.append("   from adapter_dict ad          ");
-        sb.append("        left join " + dictTableName + " on ad.std_dict = " + dictTableName + ".id  ");
+        sb.append("        left join " + dictTableName + " ds on ad.std_dict = ds.id  ");
         sb.append("  where ad.plan_id = " + planId);
-        if (!StringUtils.isEmpty(code))
-            sb.append("     and ds.code like :code");
-        if (!StringUtils.isEmpty(name))
-            sb.append("     and ds.name like :name");
+
+        if (!StringUtils.isEmpty(code)){
+            if (!StringUtils.isEmpty(name))
+                sb.append(" and (ds.code like :code or ds.name like :name) ");
+            else
+                sb.append(" and ds.code like :code ");
+        }
+        else if (!StringUtils.isEmpty(name))
+            sb.append(" and ds.name like :name ");
         sb.append(" ) t");
 
         SQLQuery sqlQuery = session.createSQLQuery(sb.toString());
@@ -188,6 +197,84 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
                 .addScalar("orgDictEntryName", StandardBasicTypes.STRING)
                 .setResultTransformer(Transformers.aliasToBean(MAdapterDictVo.class))
                 .list();
+    }
+
+
+    /**
+     * 根据条件搜索标准字典项适配关系
+     *
+     */
+    public List<MAdapterRelationship> searchStdDictEntry(
+            OrgAdapterPlan orgAdapterPlan, long dictId, String seachName, String mode, String orders, int page, int rows) {
+
+        String deTableName = CDAVersionUtil.getDictEntryTableName(orgAdapterPlan.getVersion());
+        Session session = currentSession();
+        String sql =
+                "SELECT entry.id, entry.code, entry.value as name " +
+                "FROM" +
+                "   "+ deTableName +" entry " +
+                "LEFT JOIN" +
+                "   (SELECT * FROM adapter_dict ad where ad.plan_id = :planId) adapterDict " +
+                "ON" +
+                "   entry.id = adapterDict.std_dictentry " +
+                "WHERE" +
+                "   entry.dict_id = :dictId ";
+        if("new".equals(mode))
+            sql += " AND adapterDict.id is null ";
+        if(!StringUtils.isEmpty(seachName))
+            sql += " AND (entry.code like :seachName or entry.value like :seachName) ";
+
+        sql += makeOrder(orders);
+
+        SQLQuery sqlQuery = session.createSQLQuery(sql);
+        if (!StringUtils.isEmpty(seachName))
+            sqlQuery.setParameter("seachName", "%" + seachName + "%");
+        sqlQuery.setParameter("dictId", dictId);
+        sqlQuery.setParameter("planId", orgAdapterPlan.getId());
+        page = page == 0 ? 1 : page;
+        sqlQuery.setMaxResults(rows);
+        sqlQuery.setFirstResult((page - 1) * rows);
+
+        return sqlQuery
+                .addScalar("id", StandardBasicTypes.LONG)
+                .addScalar("code", StandardBasicTypes.STRING)
+                .addScalar("name", StandardBasicTypes.STRING)
+                .setResultTransformer(Transformers.aliasToBean(MAdapterRelationship.class))
+                .list();
+    }
+
+
+    /**
+     * 根据条件搜索标准字典项总数
+     *
+     */
+    public int countStdDictEntry(
+            OrgAdapterPlan orgAdapterPlan, long dictId, String seachName, String mode) {
+
+        String deTableName = CDAVersionUtil.getDictEntryTableName(orgAdapterPlan.getVersion());
+        Session session = currentSession();
+        String sql =
+                "SELECT count(*) " +
+                "FROM" +
+                "   "+ deTableName +" entry " +
+                "LEFT JOIN" +
+                "   (SELECT * FROM adapter_dict ad where ad.plan_id = :planId) adapterDict " +
+                "ON" +
+                "   entry.id = adapterDict.std_dictentry " +
+                "WHERE" +
+                "   entry.dict_id = :dictId ";
+        if("new".equals(mode))
+            sql += " AND adapterDict.id is null ";
+        if(!StringUtils.isEmpty(seachName))
+            sql += " AND (entry.code like :seachName or entry.value like :seachName) ";
+
+        SQLQuery sqlQuery = session.createSQLQuery(sql);
+        if (!StringUtils.isEmpty(seachName))
+            sqlQuery.setParameter("seachName", "%" + seachName + "%");
+        sqlQuery.setParameter("dictId", dictId);
+        sqlQuery.setParameter("planId", orgAdapterPlan.getId());
+
+        return ((BigInteger)sqlQuery.list().get(0)).intValue();
     }
 
     /**

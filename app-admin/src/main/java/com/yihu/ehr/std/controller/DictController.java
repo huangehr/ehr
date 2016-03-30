@@ -3,7 +3,6 @@ package com.yihu.ehr.std.controller;
 import com.yihu.ehr.agModel.standard.dict.DictEntryModel;
 import com.yihu.ehr.agModel.standard.dict.DictModel;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.constants.RestAPI;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
@@ -24,7 +23,7 @@ import java.util.Map;
  * Created by Administrator on 2015/8/12.
  */
 @RequestMapping("/cdadict")
-@Controller(RestAPI.DictManagerController)
+@Controller
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
 public class DictController  extends BaseUIController {
     @Value("${service-gateway.username}")
@@ -68,9 +67,9 @@ public class DictController  extends BaseUIController {
                         params.put("version_code",strVersionCode);
 
                         String baseResultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-                        result = objectMapper.readValue(baseResultStr, Envelop.class);
+                        result = getEnvelop(baseResultStr);
                         if(result.isSuccessFlg()){
-                            DictModel baseDictModel = (DictModel)result.getObj();
+                            DictModel baseDictModel = getEnvelopModel(result.getObj(),DictModel.class);
                             String baseDictName = baseDictModel.getName();
                             model.addAttribute("baseDictId",baseDictId);
                             model.addAttribute("baseDictName",baseDictName);
@@ -473,7 +472,7 @@ public class DictController  extends BaseUIController {
 
         StringBuffer stringBuffer = new StringBuffer();
         if (!StringUtils.isEmpty(dictId)) {
-            stringBuffer.append("dictId <> " + dictId);
+            stringBuffer.append("dictId<>" + dictId);
         }
         String filters = stringBuffer.toString();
         params.put("filters", "");
@@ -536,7 +535,7 @@ public class DictController  extends BaseUIController {
         params.put("version",strVersionCode);
 
         try{
-            String url = "/dict";
+            String url = "/dicts";
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
 
             return resultStr;

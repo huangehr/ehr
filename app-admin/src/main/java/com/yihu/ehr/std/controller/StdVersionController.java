@@ -3,7 +3,6 @@ package com.yihu.ehr.std.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.standardversion.StdVersionModel;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.constants.RestAPI;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
@@ -14,15 +13,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by yww on 2016/3/17.
  */
 @RequestMapping("/cdaVersion")
-@Controller(RestAPI.CdaVersionController)
+@Controller
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
 public class StdVersionController extends BaseUIController {
     @Value("${service-gateway.username}")
@@ -119,22 +121,40 @@ public class StdVersionController extends BaseUIController {
     @RequestMapping("existInStage")
     @ResponseBody
     public Object existInStage(){
-        Envelop envelop = new Envelop();
+        Envelop result = new Envelop();
         String url = "/version/exist_instage";
+        String resultStr="";
         try{
-            String _msg = HttpClientUtil.doGet(comUrl+url,username,password);
-            if("true".equals(_msg)){
-                envelop.setSuccessFlg(true);
+            resultStr = HttpClientUtil.doGet(comUrl+url,username,password);
+            if("true".equals(resultStr)){
+                result.setSuccessFlg(true);
             }else{
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("不存在处于编辑状态的标准版本！");
+                result.setSuccessFlg(false);
+                //获取最新版本
+                url = "/version/latest";
+                resultStr = HttpClientUtil.doGet(comUrl+url,username,password);
+                Envelop envelop = getEnvelop(resultStr);
+                if (envelop.isSuccessFlg()){
+                    StdVersionModel stdVersionModel = getEnvelopModel(envelop.getObj(), StdVersionModel.class);
+                    if (stdVersionModel!=null){
+                        result.setObj(stdVersionModel.getVersionName());
+                    }else{
+                        result.setErrorMsg("获取最新版本错误!");
+                    }
+                }else{
+                    if (envelop.getErrorMsg().equals("没有版本信息")){
+                        result.setObj("000000000000");
+                    }else{
+                        result.setErrorMsg("获取最新版本错误!");
+                    }
+                }
             }
         }catch (Exception ex){
             LogService.getLogger(StdVersionController.class).error(ex.getMessage());
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            result.setSuccessFlg(false);
+            result.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return envelop;
+        return result;
     }
 
     @RequestMapping("addVersion")

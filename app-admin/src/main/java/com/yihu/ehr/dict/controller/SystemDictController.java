@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.dict.SystemDictEntryModel;
 import com.yihu.ehr.agModel.dict.SystemDictModel;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.constants.RestAPI;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
@@ -26,7 +25,7 @@ import java.util.Map;
  * Created by Administrator on 2015/8/12.
  */
 @RequestMapping("/dict")
-@Controller(RestAPI.SystemDictManagerController)
+@Controller
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
 public class SystemDictController extends BaseUIController {
     @Value("${service-gateway.username}")

@@ -130,5 +130,7 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
     }
 
 
-
+    public void changePassWord(String userId, String password) {
+        userRepository.changePassWord(userId,password);
+    }
 }

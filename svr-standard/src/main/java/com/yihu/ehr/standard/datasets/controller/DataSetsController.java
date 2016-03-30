@@ -26,7 +26,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "dataset", description = "标准数据集", tags = {"标准数据集"})
+@Api(value = "dataset", description = "标准数据集", tags = {"标准数据集"})
 public class DataSetsController extends ExtendController<MStdDataSet> {
 
     @Autowired
@@ -35,7 +35,6 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
     private Class getServiceEntity(String version){
         return dataSetService.getServiceEntity(version);
     }
-
 
     @RequestMapping(value = RestApi.Standards.DataSets, method = RequestMethod.GET)
     @ApiOperation(value = "查询数据集的方法")
@@ -95,6 +94,19 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
             @RequestParam(value = "version") String version) {
 
         return getModel(dataSetService.retrieve(id, getServiceEntity(version)));
+    }
+
+
+    @RequestMapping(value = RestApi.Standards.DataSetsIds, method = RequestMethod.GET)
+    @ApiOperation(value = "根据数据集ids(用逗号隔开)获取数据集信息")
+    public Collection<MStdDataSet> getDataSets(
+            @ApiParam(name = "ids", value = "数据集编号", defaultValue = "")
+            @PathVariable(value = "ids") String ids,
+            @ApiParam(name = "version", value = "版本", defaultValue = "")
+            @RequestParam(value = "version") String version) {
+        Class entityClass = getServiceEntity(version);
+        List<IDataSet> list = dataSetService.search(entityClass,"id="+ids);
+        return convertToModels(list, new ArrayList<>(list.size()), MStdDataSet.class, "");
     }
 
 

@@ -31,7 +31,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "securities", description = "Token接口")
+@Api(value = "securities", description = "Token接口")
 public class TokenEndPoint extends BaseRestController {
     @Autowired
     private KeyManager keyManager;

@@ -58,6 +58,53 @@ public class UserController extends BaseController {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private String resetFilter(String filters) {
+
+        if(!StringUtils.isEmpty(filters)){
+            String orgName, orgCodes = "";
+            boolean searchOrg = false;
+            String[] values;
+            String[] filterArr = filters.split(";");
+            for(int i=0; i< filterArr.length; i++){
+                String filter = filterArr[i];
+                if(filter.startsWith("organization")){
+                    if(filter.contains("<>") || filter.contains(">=") || filter.contains("<="))
+                        values = filter.substring(14).split(" ");
+                    else
+                        values = filter.substring(13).split(" ");
+
+                    orgName =  values[0];
+                    ResponseEntity<List<MOrganization>> rs = orgClient.searchOrgs("", "fullName?" + orgName, "", 1000, 1);
+                    if(rs.getStatusCode().value() <=200){
+                        List<MOrganization> orgList = rs.getBody();
+                        if(orgList.size()>0){
+                            for(MOrganization org : orgList){
+                                orgCodes += "," + org.getOrgCode();
+                            }
+                            filterArr[i] = "organization=" + orgCodes.substring(1);
+                        }else
+                            filterArr[i] = "organization=-1";
+
+                        if(values.length>1)
+                            filterArr[i] = filterArr[i] + " " + values[1];
+                        searchOrg = true;
+                        break;
+                    }
+                    else
+                        throw new IllegalAccessError("解析错误");
+                }
+            }
+
+            if(searchOrg){
+                filters = "";
+                for(String filter : filterArr){
+                    filters += filter + ";";
+                }
+            }
+        }
+        return filters;
+    }
+
     @RequestMapping(value = "/users", method = RequestMethod.GET)
     @ApiOperation(value = "获取用户列表", notes = "根据查询条件获取用户列表在前端表格展示")
     public Envelop searchUsers(
@@ -72,6 +119,7 @@ public class UserController extends BaseController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) {
 
+        filters = resetFilter(filters);
         ResponseEntity<List<MUser>> responseEntity = userClient.searchUsers(fields, filters, sorts, size, page);
         List<MUser> mUsers = responseEntity.getBody();
         List<UsersModel> usersModels = new ArrayList<>();

@@ -29,7 +29,7 @@
 // */
 //@RestController
 //@RequestMapping(ApiVersion.Version1_0)
-//@Api(protocols = "https", value = "packages", description = "数据包服务")
+//@Api(value = "packages", description = "数据包服务")
 //public class PackagesEndPoint {
 //
 //    @Autowired

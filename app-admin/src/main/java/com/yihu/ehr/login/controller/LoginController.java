@@ -8,12 +8,12 @@ import com.yihu.ehr.util.DateFormatter;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -39,10 +41,12 @@ public class LoginController {
     @Value("${service-gateway.url}")
     private String comUrl;
 
+    @Autowired
+    ObjectMapper mapper;
 
     @RequestMapping(value = "")
     public String login(Model model) {
-        model.addAttribute("contentPage", "login/login");
+        model.addAttribute("contentPage","login/login");
         return "generalView";
         //return "login/login";
         //return "test";
@@ -58,27 +62,29 @@ public class LoginController {
 
         params.put("psw", password);
         try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat();
+            dateFormat.applyPattern("yyyy-MM-dd hh:mm:ss");
+            mapper.setDateFormat(dateFormat);
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, this.password);
             Envelop envelop = mapper.readValue(resultStr, Envelop.class);
             String userJson = mapper.writeValueAsString(envelop.getObj());
-            UserDetailModel userDetailModel = mapper.readValue(userJson, UserDetailModel.class);
+            UserDetailModel userDetailModel = mapper.readValue(userJson,UserDetailModel.class);
 
-            if (envelop.isSuccessFlg()) {
+            if (envelop.isSuccessFlg()){
                 String lastLoginTime = null;
 
-                if (!userDetailModel.getActivated()) {
+                if(!userDetailModel.getActivated()){
 
                     model.addAttribute("userName", userName);
                     model.addAttribute("successFlg", false);
                     model.addAttribute("failMsg", "该用户已失效，请联系系统管理员重新生效。");
-                    model.addAttribute("contentPage", "login/login");
+                    model.addAttribute("contentPage","login/login");
 
                     return "generalView";
                 }
 
-                if (userDetailModel.getLastLoginTime() != null) {
-                    //lastLoginTime = DateFormatter.simpleDateTimeShortFormat(userDetailModel.getLastLoginTime());
-                    lastLoginTime = userDetailModel.getLastLoginTime();
+                if(userDetailModel.getLastLoginTime()!= null){
+                   lastLoginTime = userDetailModel.getLastLoginTime();
                 }
 
 
@@ -88,19 +94,19 @@ public class LoginController {
 //              userManager.lastLoginTime(user.getId(),new Date());
 
                 return "redirect:/index";
-            } else {
+            }else{
 
                 model.addAttribute("userName", userName);
                 model.addAttribute("successFlg", false);
                 model.addAttribute("failMsg", "用户名或密码错误，请重新输入。");
-                model.addAttribute("contentPage", "login/login");
+                model.addAttribute("contentPage","login/login");
                 return "generalView";
             }
         } catch (Exception e) {
             model.addAttribute("userName", userName);
             model.addAttribute("successFlg", false);
             model.addAttribute("failMsg", e.getMessage());
-            model.addAttribute("contentPage", "login/login");
+            model.addAttribute("contentPage","login/login");
             return "generalView";
         }
 
@@ -251,6 +257,7 @@ public class LoginController {
 //        }
 //        return address;
 //    }
+
     public String getAddress(String citys) {
 
         String[] st = citys.split(",");

@@ -26,7 +26,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "version", description = "标准版本", tags = {"标准版本"})
+@Api(value = "version", description = "标准版本", tags = {"标准版本"})
 public class VersionController extends ExtendController<MCDAVersion> {
 
     @Autowired
@@ -57,11 +57,11 @@ public class VersionController extends ExtendController<MCDAVersion> {
     @RequestMapping(value = RestApi.Standards.Versions, method = RequestMethod.GET)
     @ApiOperation(value = "适配采集标准")
     public Collection<MCDAVersion> searchCDAVersions(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "version,versionName,commitTime,baseVersion,inStage")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+version")
             @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
@@ -76,7 +76,7 @@ public class VersionController extends ExtendController<MCDAVersion> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.VersionNewest, method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Standards.VersionLatestExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断是否最新版本")
     public boolean isLatestVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
@@ -86,6 +86,8 @@ public class VersionController extends ExtendController<MCDAVersion> {
         String latestVersion = cdaVersion.getVersion();
         return latestVersion != null && latestVersion.equals(version);
     }
+
+    //新增标准版本的最新版本信息
 
     @RequestMapping(value = RestApi.Standards.Versions, method = RequestMethod.POST)
     @ApiOperation(value = "新增cda版本")
@@ -212,4 +214,12 @@ public class VersionController extends ExtendController<MCDAVersion> {
             @PathVariable(value = "version") String version) {
 
     }
+
+    @RequestMapping(value = RestApi.Standards.VersionLatest, method = RequestMethod.GET)
+    @ApiOperation(value = "获取最新版本")
+    public MCDAVersion getLatestVersion()throws Exception {
+        CDAVersion cdaVersion = versionService.getLatestVersion();
+        return getModel(cdaVersion);
+    }
+
 }
