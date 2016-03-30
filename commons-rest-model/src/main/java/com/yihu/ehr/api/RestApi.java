@@ -1,7 +1,5 @@
 package com.yihu.ehr.api;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-
 /**
  * REST API URL. 此处定义的URL可用于服务对外提供的地址及HTTP客户端请求地址.
  * URL定义遵循健康档案平台REST规范.
@@ -98,7 +96,8 @@ public class RestApi {
         public static final String VersionBackStage                 = "/std/versions/{version}/back";
         public static final String VersionCommit                    = "/std/versions/{version}/commit";
         public static final String VersionRevert                    = "/std/versions/{version}/revert";
-        public static final String VersionNewest                    = "/std/versions/{version}/newest";
+        public static final String VersionLatest                    = "/std/versions/latest";
+        public static final String VersionLatestExistence          = "/std/versions/{version}/latest/existence";
 
         public static final String Documents                        = "/std/documents";
         public static final String Document                         = "/std/documents/{id}";
