@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.agModel.standard.standardsource.StdSourceDetailModel;
 import com.yihu.ehr.agModel.standard.standardsource.StdSourceModel;
+import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.std.service.StandardSourceClient;
@@ -40,6 +41,20 @@ public class StandardSourceController extends BaseController {
     @Autowired
     private ObjectMapper objectMapper;
 
+
+    List<StdSourceModel> getStdSourceModel(Collection<MStdSource> stdSources){
+        List<StdSourceModel> sourcrModelList = new ArrayList<>();
+        for (MStdSource stdSource : stdSources) {
+            StdSourceModel sourceModel = convertToModel(stdSource, StdSourceModel.class);
+            //标准来源类型字典
+            MConventionalDict sourcerTypeDict = conDictEntryClient.getStdSourceType(stdSource.getSourceType());
+            sourceModel.setSourceValue(sourcerTypeDict == null ? "" : sourcerTypeDict.getValue());
+            sourceModel.setCreateDate(DateUtil.formatDate(stdSource.getCreateDate(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT));
+            sourcrModelList.add(sourceModel);
+        }
+        return sourcrModelList;
+    }
+
     @RequestMapping(value = "/sources", method = RequestMethod.GET)
     @ApiOperation(value = "标准来源分页搜索")
     public Envelop searchSources(
@@ -55,19 +70,24 @@ public class StandardSourceController extends BaseController {
             @RequestParam(value = "page", required = false) int page) throws Exception {
         ResponseEntity<Collection<MStdSource>> responseEntity = stdSourcrClient.searchSources(fields, filters, sorts, size, page);
         Collection<MStdSource> stdSources = responseEntity.getBody();
-        List<StdSourceModel> sourcrModelList = new ArrayList<>();
-        for (MStdSource stdSource : stdSources) {
-            StdSourceModel sourceModel = convertToModel(stdSource, StdSourceModel.class);
-            //标准来源类型字典
-            MConventionalDict sourcerTypeDict = conDictEntryClient.getStdSourceType(stdSource.getSourceType());
-            sourceModel.setSourceValue(sourcerTypeDict == null ? "" : sourcerTypeDict.getValue());
-            sourceModel.setCreateDate(DateUtil.formatDate(stdSource.getCreateDate(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT));
-            sourcrModelList.add(sourceModel);
-        }
+        List<StdSourceModel> sourcrModelList  = getStdSourceModel(stdSources);
         int totalCount = getTotalCount(responseEntity);
         return getResult(sourcrModelList, totalCount, page, size);
     }
 
+
+    @RequestMapping(value = RestApi.Standards.NoPageSources, method = RequestMethod.GET)
+    @ApiOperation(value = "标准来源分页搜索(不分页)")
+    public Envelop searchSourcesWithoutPaging(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+        Envelop envelop = new Envelop();
+        ResponseEntity<Collection<MStdSource>> responseEntity = stdSourcrClient.search(filters);
+        Collection<MStdSource> stdSources = responseEntity.getBody();
+        List<StdSourceModel> sourcrModelList = getStdSourceModel(stdSources);
+        envelop.setDetailModelList(sourcrModelList);
+        return envelop;
+    }
 
     @RequestMapping(value = "/source/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取标准来源信息")

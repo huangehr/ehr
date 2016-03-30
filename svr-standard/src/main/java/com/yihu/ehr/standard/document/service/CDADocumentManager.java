@@ -101,7 +101,6 @@ public class CDADocumentManager extends BaseHbmService<ICDADocument> {
         return true;
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
     public void saveCdaDocument(ICDADocument cdaDocument) {
         save(cdaDocument);
     }

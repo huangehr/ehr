@@ -20,6 +20,7 @@ import java.util.Map;
  * Created by Administrator on 2015/8/12.
  */
 @RequestMapping("/orgdict")
+@Controller
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
 public class OrgDictController {
 

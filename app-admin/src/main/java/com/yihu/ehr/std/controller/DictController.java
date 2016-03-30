@@ -23,6 +23,7 @@ import java.util.Map;
  * Created by Administrator on 2015/8/12.
  */
 @RequestMapping("/cdadict")
+@Controller
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
 public class DictController  extends BaseUIController {
     @Value("${service-gateway.username}")

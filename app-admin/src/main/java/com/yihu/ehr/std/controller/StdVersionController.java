@@ -24,6 +24,7 @@ import java.util.Map;
  * Created by yww on 2016/3/17.
  */
 @RequestMapping("/cdaVersion")
+@Controller
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
 public class StdVersionController extends BaseUIController {
     @Value("${service-gateway.username}")
