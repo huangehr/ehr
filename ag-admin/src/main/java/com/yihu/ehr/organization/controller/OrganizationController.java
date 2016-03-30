@@ -177,7 +177,7 @@ public class OrganizationController extends BaseController {
 
             GeographyModel geographyModel = objectMapper.readValue(geographyModelJsonData,GeographyModel.class);
 
-            if (!isNullAddress(geographyModel)) {
+            if (geographyModel.nullAddress()) {
                 errorMsg+="机构地址不能为空！";
             }
 
@@ -230,7 +230,7 @@ public class OrganizationController extends BaseController {
           String errorMsg ="";
           GeographyModel geographyModel = objectMapper.readValue(geographyModelJsonData, GeographyModel.class);
 
-          if (!isNullAddress(geographyModel)) {
+          if (geographyModel.nullAddress()) {
               errorMsg+="机构地址不能为空！";
           }
 
@@ -251,6 +251,10 @@ public class OrganizationController extends BaseController {
           String locationId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
           if (StringUtils.isEmpty(locationId)) {
               return failed("保存地址失败！");
+          }
+          if(StringUtils.isNotEmpty(errorMsg))
+          {
+              return failed(errorMsg);
           }
 
           mOrganization.setLocation(locationId);
@@ -458,22 +462,5 @@ public class OrganizationController extends BaseController {
         MOrganization mOrganization = convertToModel(detailModel, MOrganization.class);
         mOrganization.setCreateDate(StringToDate(detailModel.getCreateDate(),AgAdminConstants.DateTimeFormat));
         return mOrganization;
-    }
-
-    public boolean isNullAddress (GeographyModel geographyModel)
-    {
-        if(geographyModel==null)
-            return true;
-        if(StringUtils.isEmpty(geographyModel.getProvince())
-                && StringUtils.isEmpty(geographyModel.getCity())
-                && StringUtils.isEmpty(geographyModel.getDistrict())
-                && StringUtils.isEmpty(geographyModel.getTown())
-                && StringUtils.isEmpty(geographyModel.getStreet())
-                && StringUtils.isEmpty(geographyModel.getExtra()))
-        {
-            return true;
-        }
-
-        return false;
     }
 }
