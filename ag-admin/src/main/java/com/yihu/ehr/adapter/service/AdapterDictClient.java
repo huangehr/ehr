@@ -88,4 +88,14 @@ public interface AdapterDictClient {
     public boolean delDictEntry(
             @RequestParam("ids") String ids) throws Exception ;
 
+    @RequestMapping(value = "/plan/{planId}/dict/{dictId}/std_entrys", method = RequestMethod.GET)
+    @ApiOperation(value = "过滤后的标准字典项分页查询")
+    ResponseEntity<Collection<MAdapterRelationship>> searchStdDictEntry(
+            @PathVariable(value = "planId") Long planId,
+            @PathVariable(value = "dictId") Long dictId,
+            @RequestParam(value = "seach_name", required = false) String searchName,
+            @RequestParam(value = "mode", required = false) String mode,
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @RequestParam(value = "size", required = false) int size,
+            @RequestParam(value = "page", required = false) int page);
 }

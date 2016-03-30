@@ -38,9 +38,10 @@
                     textField: 'name',
                     data:[{id:'',name:'请选择'},{id:'0',name:'值'},{id:'1',name:'编码'}]
                 });
-                $('#inp_info_metaDataId').ligerComboBox({readonly:mode=='modify'||mode=='view'});
-                this.initDDL(0,$('#inp_info_metaDataId'),info.metaDataId);
-                this.initDDL(1,$('#inp_info_orgDataSetSeq'),info.orgDataSetSeq);
+//                $('#inp_info_metaDataId').ligerComboBox({readonly:mode=='modify'||mode=='view'});
+                this.initCombo(0, $('#inp_info_metaDataId'), info.metaDataId, info.metaDataName);
+                this.initCombo(1, $('#inp_info_orgDataSetSeq'), info.orgDataSetSeq, info.orgDataSetName, info.orgMetaDataSeq);
+                this.initCombo(2, $('#inp_info_orgMetaDataSeq'), info.orgMetaDataSeq, info.orgMetaDataName);
                 this.$dataMataForm.attrScan();
                 this.$dataMataForm.Fields.fillValues({
                     description:info.description,
@@ -57,6 +58,22 @@
 
                 this.$dataMataForm.show();
                 this.$dataMataForm.css('display','block');
+            },
+            initCombo : function (dictId, target, value, text, childValue){
+                var url = "${contextRoot}" + dictUrl[dictId];
+                var child = dictId == 1 ? $('#inp_info_orgMetaDataSeq') : undefined;
+                var combo = target.customCombo(
+                        url, {
+                            adapterPlanId: adapterPlanId,
+                            dataSetId: parentId,
+                            mode: mode,
+                            parentId: childValue},
+                        undefined, child, dictId==0 ? mode=='modify'|| mode=='view' : false
+                )
+                if(!Util.isStrEmpty(value)){
+                    combo.setValue(value);
+                    combo.setText(text);
+                }
             },
             initDDL: function (dictId, target, value, childValue, text) {
                 var self = this;

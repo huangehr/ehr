@@ -140,6 +140,34 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
         return true;
     }
 
+    @RequestMapping(value = "/plan/{planId}/data_set/{data_set_id}/std_meta", method = RequestMethod.GET)
+    @ApiOperation(value = "过滤后的标准数据元分页查询")
+    public Collection<MAdapterRelationship> searchStdMeta(
+            @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
+            @PathVariable(value = "planId") Long planId,
+            @ApiParam(name = "data_set_id", value = "字典编号", defaultValue = "")
+            @PathVariable(value = "data_set_id") Long dataSetId,
+            @ApiParam(name = "seach_name", value = "代码查询值", defaultValue = "")
+            @RequestParam(value = "seach_name", required = false) String searchName,
+            @ApiParam(name = "mode", value = "编辑模式（new/modify）", defaultValue = "")
+            @RequestParam(value = "mode", required = false) String mode,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+
+        OrgAdapterPlan orgAdapterPlan = orgAdapterPlanService.retrieve(planId);
+        if (orgAdapterPlan == null)
+            throw errNotFound();
+
+        List ls = adapterDataSetService.searchStdMeta(orgAdapterPlan, dataSetId, searchName, mode, sorts, page, size);
+        pagedResponse(request, response, (long) adapterDataSetService.countStdMeta(orgAdapterPlan, dataSetId, searchName, mode), page, size);
+        return ls;
+    }
 
     private AdapterDataSet saveAdapterMetaData(AdapterDataSet adapterDataSet, String jsonModel)  {
         AdapterDataSet adapterDataSetModel = null;

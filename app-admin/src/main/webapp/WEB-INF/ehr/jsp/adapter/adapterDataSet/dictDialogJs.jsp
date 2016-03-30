@@ -32,15 +32,16 @@
             orgDictEntrySeq : info.orgDictEntrySeq,
             $dictForm: $("#div_dict_form"),
             $btnSave:$("#btn_save_dict"),
+            isInit: false,
             init: function () {
                 this.initForm();
                 this.bindEvents();
             },
             initForm: function () {
                 $('#dict_info_description').ligerTextBox({width:240,height:140 });
-                $('#dict_info_dictEntryId').ligerComboBox({readonly:mode=='modify'||mode=='view'});
-                this.initDDL(0,$('#dict_info_dictEntryId'),info.dictEntryId);
-                this.initDDL(1,$('#dict_info_orgDictSeq'),info.orgDictSeq);
+                this.initCombo(0, $('#dict_info_dictEntryId'), info.dictEntryId, info.dictEntryName);
+                this.initCombo(1, $('#dict_info_orgDictSeq'), info.orgDictSeq, info.orgDictName);
+                this.initCombo(2, $('#dict_info_orgDictEntrySeq'), info.orgDictEntrySeq, info.orgDictEntryName, info.orgDictSeq);
                 this.$dictForm.attrScan();
                 this.$dictForm.Fields.fillValues({
                     description:info.description,
@@ -49,53 +50,21 @@
                 this.$dictForm.show();
                 this.$dictForm.css('display','block');
             },
-            initDDL: function (dictId, target, value, childValue, text) {
-                var self = this;
-                var dataModel = $.DataModel.init();
-                var url = "${contextRoot}"+dictUrl[dictId];
-                var data = this.getDictParms(dictId);
-                dataModel.fetchRemote(url,{
-                    data:data,
-                    success: function(data) {
-                        data = self.toJson(data.obj);
-                        target.ligerComboBox({
-                            selectBoxHeight:220,
-                            valueField: 'id',
-                            textField: 'name',
-                            allowBlank: false,
-                            data: data,
-                            onSelected : self.getSelectFunc(dictId),
-                            cancelable:false
-                        });
-                        var manager = target.ligerGetComboBoxManager();
-                        manager.selectValue(value);
-                    }
-                });
-            },
-            getDictParms: function (dictId) {
-                switch (dictId){
-                    case 0:return {adapterPlanId:adapterPlanId,dictId:parentId,mode:mode};
-                    case 1:return {adapterPlanId:adapterPlanId};
-                    case 2:
-                            var orgDictSeq = $('#dict_info_orgDictSeq').ligerGetComboBoxManager().getValue();
-                            return {orgDictSeq:orgDictSeq,adapterPlanId:adapterPlanId};
+            initCombo : function (dictId, target, value, text, childValue){
+                var url = "${contextRoot}" + dictUrl[dictId];
+                var child = dictId == 1 ? $('#dict_info_orgDictEntrySeq') : undefined;
+                var combo = target.customCombo(
+                        url, {
+                            adapterPlanId: adapterPlanId,
+                            dictId: parentId,
+                            mode: mode,
+                            parentId: childValue},
+                        undefined, child, dictId==0 ? mode=='modify'|| mode=='view' : false
+                )
+                if(!Util.isStrEmpty(value)){
+                    combo.setValue(value);
+                    combo.setText(text);
                 }
-            },
-            getSelectFunc: function (dictId,childValue) {
-                var self = this;
-                if(dictId==1){
-                    return function (value, text) {
-                        if(self.orgDictEntrySeq){
-                            self.initDDL(2, $('#dict_info_orgDictEntrySeq'),self.orgDictEntrySeq);
-                            self.orgDictEntrySeq = '';
-                        }
-                        else
-                            self.initDDL(2, $('#dict_info_orgDictEntrySeq'));
-                    }
-                }
-                return function (value, text) {
-                    
-                };
             },
             bindEvents: function () {
                 var self = this;
