@@ -65,8 +65,6 @@ public class SystemDictController extends BaseRestController {
             @ApiParam(name = "dictionary", value = "字典JSON结构")
             @RequestParam(value = "dictionary") String dictJson) {
         SystemDict dict = toEntity(dictJson, SystemDict.class);
-        Long id = dictService.getNextId();
-        dict.setId(id);
         SystemDict systemDict = dictService.createDict(dict);
         return convertToModel(systemDict, MSystemDict.class, null);
     }

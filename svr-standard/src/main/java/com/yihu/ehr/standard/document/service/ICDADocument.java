@@ -51,8 +51,6 @@ public class ICDADocument {
         this.createUser = "Sys";
         ObjectId objectId = new ObjectId(adminRegion, BizObject.STANDARD);
         id = objectId.toString();
-        this.operationType="";
-
     }
 
 

@@ -4,6 +4,7 @@ import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.MStdMetaData;
 import com.yihu.ehr.standard.commons.ExtendController;
+import com.yihu.ehr.standard.datasets.service.IDataSet;
 import com.yihu.ehr.standard.datasets.service.IMetaData;
 import com.yihu.ehr.standard.datasets.service.MetaDataService;
 import io.swagger.annotations.Api;
@@ -109,6 +110,18 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
             @RequestParam(value = "version") String version) throws Exception{
 
         return getModel(metaDataService.retrieve(id, getServiceEntity(version)));
+    }
+
+    @RequestMapping(value = RestApi.Standards.MetaDatasWithDataSet, method = RequestMethod.GET)
+    @ApiOperation(value = "根据数据集id获取数据元")
+    public Collection<MStdMetaData> getMetaDataByDataSetId(
+            @ApiParam(name = "data_set_id", value = "数据元编号", defaultValue = "")
+            @PathVariable(value = "data_set_id") long dataSetIs,
+            @ApiParam(name = "version", value = "版本", defaultValue = "")
+            @RequestParam(value = "version") String version) throws Exception{
+        Class entityClass = getServiceEntity(version);
+        List<IMetaData> list = metaDataService.search(entityClass,"dataSetId="+dataSetIs);
+        return convertToModels(list, new ArrayList<>(list.size()), MStdMetaData.class, "");
     }
 
 
