@@ -23,6 +23,7 @@ import java.util.Map;
 
 
 @RequestMapping("/cda")
+@Controller
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
 public class CdaController {
     @Value("${service-gateway.username}")

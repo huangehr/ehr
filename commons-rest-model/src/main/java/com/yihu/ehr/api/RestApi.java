@@ -77,6 +77,7 @@ public class RestApi {
 
     public static class Standards{
         public static final String Sources                          = "/std/sources";
+        public static final String NoPageSources                    = "/std/sources/no_paging";
         public static final String Source                           = "/std/sources/{id}";
         public static final String IsSourceCodeExist                ="/std/sources/code_is_exist";
 

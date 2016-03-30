@@ -25,6 +25,7 @@ import java.util.Map;
  * Created by Administrator on 2015/8/12.
  */
 @RequestMapping("/dict")
+@Controller
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
 public class SystemDictController extends BaseUIController {
     @Value("${service-gateway.username}")

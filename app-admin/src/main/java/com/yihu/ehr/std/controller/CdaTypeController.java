@@ -27,6 +27,7 @@ import java.util.Map;
  * Created by AndyCai on 2015/12/14.
  */
 @RequestMapping("/cdatype")
+@Controller
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
 public class CdaTypeController extends BaseUIController{
     @Value("${service-gateway.username}")

@@ -23,8 +23,6 @@ public class ICDADataSetRelationship {
 	private String OperationType;
 
 	@Id
-	@GeneratedValue(generator = "Generator")
-	@GenericGenerator(name = "Generator", strategy = "increment")
 	@Column(name = "id", unique = true, nullable = false)
 	public String getId() {
 		return id;

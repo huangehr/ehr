@@ -53,22 +53,16 @@ public class StandardSourceController extends ExtendController<MStdSource> {
         return convertToModels(appList, new ArrayList<>(appList.size()), MStdSource.class, fields);
     }
 
-    //标准 // TODO: 2016/3/29 bu fenye  
-//    @RequestMapping(value = "", method = RequestMethod.GET)
-//    @ApiOperation(value = "标准来源分页搜索不分页")
-//    public Collection<MStdSource> ss(
-//            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
-//            @RequestParam(value = "fields", required = false) String fields,
-//            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
-//            @RequestParam(value = "filters", required = false) String filters,
-//            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
-//            @RequestParam(value = "sorts", required = false) String sorts) throws Exception {
-//
-//        List appList = stdSourceService.search(fields, filters, sorts, "", "");
-//        return convertToModels(appList, new ArrayList<>(appList.size()), MStdSource.class, fields);
-//    }
+    @RequestMapping(value = RestApi.Standards.NoPageSources, method = RequestMethod.GET)
+    @ApiOperation(value = "标准来源分页搜索(不分页)")
+    public Collection<MStdSource> searchSourcesWithoutPaging(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+        List appList = stdSourceService.search(filters);
+        return convertToModels(appList, new ArrayList<>(appList.size()), MStdSource.class, "");
+    }
 
-    
+
 
 
     @RequestMapping(value = RestApi.Standards.Source, method = RequestMethod.GET)
