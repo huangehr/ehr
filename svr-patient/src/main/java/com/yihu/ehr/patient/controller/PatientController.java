@@ -14,6 +14,7 @@ import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.csource.common.MyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -203,84 +204,131 @@ public class PatientController extends BaseRestController {
 
     /**
      * 人口信息头像图片上传
-     * @param request
+     * @param inputStearmStr
+     * @param pictureName
      * @return
      * @throws IOException
      */
-    public String webupload(HttpServletRequest request) throws IOException {
-        if(request==null){
-            return "";
-        }else {
-            InputStream inputStearm = request.getInputStream();
-            String fileName = (String) request.getParameter("name");
-            if(fileName == null){
-                return null;
-            }
-            String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-            String description = null;
-            if ((fileName != null) && (fileName.length() > 0)) {
-                int dot = fileName.lastIndexOf('.');
-                if ((dot > -1) && (dot < (fileName.length()))) {
-                    description = fileName.substring(0, dot);
-                }
-            }
-            ObjectNode objectNode = null;
-            String path = null;
-            try {
-                objectNode = fastDFSUtil.upload(inputStearm, fileExtension, description);
-                String groupName = objectNode.get("groupName").toString();
-                String remoteFileName = objectNode.get("remoteFileName").toString();
-                path = "{groupName:" + groupName + ",remoteFileName:" + remoteFileName + "}";
-            } catch (Exception e) {
-                LogService.getLogger(DemographicInfo.class).error("人口头像图片上传失败；错误代码："+e);
-            }
-            //返回文件路径
-            return path;
+    @RequestMapping(value = "/populations/picture",method = RequestMethod.POST)
+    @ApiOperation(value = "上传头像,把图片转成流的方式发送")
+    public String uploadPicture(
+            @ApiParam(name = "input_stearm_str", value = "头像转化后的输入流")
+            @RequestParam(value = "input_stearm_str") String inputStearmStr ,
+            @ApiParam(name = "picture_name", value = "头像名称", defaultValue = "")
+            @RequestParam(value = "picture_name") String pictureName) throws IOException {
+        if(pictureName == null){
+            return null;
         }
+        String fileExtension = pictureName.substring(pictureName.lastIndexOf(".") + 1).toLowerCase();
+        String description = null;
+        if ((pictureName != null) && (pictureName.length() > 0)) {
+            int dot = pictureName.lastIndexOf('.');
+            if ((dot > -1) && (dot < (pictureName.length()))) {
+                description = pictureName.substring(0, dot);
+            }
+        }
+        String path = null;
+        try {
+            InputStream inputStream = new ByteArrayInputStream(inputStearmStr.getBytes());
+            ObjectNode objectNode = fastDFSUtil.upload(inputStream, fileExtension, description);
+            String groupName = objectNode.get("groupName").toString();
+            String remoteFileName = objectNode.get("remoteFileName").toString();
+            path = "{groupName:" + groupName + ",remoteFileName:" + remoteFileName + "}";
+        } catch (Exception e) {
+            LogService.getLogger(DemographicInfo.class).error("人口头像图片上传失败；错误代码："+e);
+        }
+        //返回文件路径
+        return path;
     }
 
 
     /**
-     * 注：因直接访问文件路径，无法显示文件信息
-     * 将文件路径解析成字节流，通过字节流的方式读取文件
-     * @param request
-     * @param response
-     * @param localImgPath       文件路径
-     * @throws Exception
+     * 人口信息头像图片下载
+     * @return
+     * @throws IOException
+     * @throws MyException
      */
-    @RequestMapping(value = "/populations/images/{local_img_path}",method = RequestMethod.PUT)
-    @ApiOperation(value = "显示头像")
-    public void showImage(
-            @ApiParam(name = "local_img_path", value = "身份证号", defaultValue = "")
-            @PathVariable(value = "local_img_path") String localImgPath,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception{
-        response.setContentType("text/html; charset=UTF-8");
-        response.setContentType("image/jpeg");
-        FileInputStream fis = null;
-        OutputStream os = null;
-        try {
-            File file = new File(localImgPath);
-            if (!file.exists()) {
-                LogService.getLogger(PatientController.class).error("人口头像不存在：" + localImgPath);
-                return;
-            }
-            fis = new FileInputStream(localImgPath);
-            os = response.getOutputStream();
-            int count = 0;
-            byte[] buffer = new byte[1024 * 1024];
-            while ((count = fis.read(buffer)) != -1)
-                os.write(buffer, 0, count);
-            os.flush();
-        } catch (IOException e) {
-            LogService.getLogger(PatientController.class).error(e.getMessage());
-        } finally {
-            if (os != null)
-                os.close();
-            if (fis != null)
-                fis.close();
+    @RequestMapping(value = "/populations/picture",method = RequestMethod.GET)
+    @ApiOperation(value = "下载头像")
+    public String downloadPicture(
+            @ApiParam(name = "demographic_id", value = "病人主键，和身份证号一致")
+            @RequestParam(value = "demographic_id") String demographicId ,
+            @ApiParam(name = "group_name", value = "分组", defaultValue = "")
+            @RequestParam(value = "group_name") String groupName,
+            @ApiParam(name = "remote_file_name", value = "服务器头像名称", defaultValue = "")
+            @RequestParam(value = "remote_file_name") String remoteFileName) throws Exception {
+        String splitMark = System.getProperty("file.separator");
+        String strPath = System.getProperty("java.io.tmpdir");
+        strPath += splitMark + "patientImages" + splitMark + remoteFileName;
+        File file = new File(strPath);
+        String path = String.valueOf(file.getParentFile());
+        if (!file.getParentFile().exists()) {
+            file.getParentFile().mkdirs();
         }
+        DemographicInfo demographicInfo = demographicService.getDemographicInfo(new DemographicId(demographicId));
+        if (demographicInfo.getLocalPath() != null) {
+            File fileName = new File(demographicInfo.getLocalPath());
+            if (fileName.exists()) {
+                return demographicInfo.getLocalPath();
+            }
+        }
+        //调用图片下载方法，返回文件的储存位置localPath，将localPath保存至人口信息表
+        String localPath = null;
+        try {
+            localPath = fastDFSUtil.download(groupName, remoteFileName, path);
+            demographicInfo.setLocalPath(localPath);
+            demographicService.savePatient(demographicInfo);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (MyException e) {
+            LogService.getLogger(DemographicInfo.class).error("人口头像图片下载失败；错误代码：" + e);
+        }
+        return localPath;
     }
+
+
+    //显示头像在前端做
+//    /**
+//     * 注：因直接访问文件路径，无法显示文件信息
+//     * 将文件路径解析成字节流，通过字节流的方式读取文件
+//     * @param request
+//     * @param response
+//     * @param localImgPath       文件路径
+//     * @throws Exception
+//     */
+//    @RequestMapping(value = "/populations/picture/show",method = RequestMethod.PUT)
+//    @ApiOperation(value = "显示头像")
+//    public void showImage(
+//            @ApiParam(name = "local_img_path", value = "身份证号", defaultValue = "")
+//            @PathVariable(value = "local_img_path") String localImgPath,
+//            HttpServletRequest request,
+//            HttpServletResponse response) throws Exception{
+//        response.setContentType("text/html; charset=UTF-8");
+//        response.setContentType("image/jpeg");
+//        FileInputStream fis = null;
+//        OutputStream os = null;
+//        try {
+//            File file = new File(localImgPath);
+//            if (!file.exists()) {
+//                LogService.getLogger(PatientController.class).error("人口头像不存在：" + localImgPath);
+//                return;
+//            }
+//            fis = new FileInputStream(localImgPath);
+//            os = response.getOutputStream();
+//            int count = 0;
+//            byte[] buffer = new byte[1024 * 1024];
+//            while ((count = fis.read(buffer)) != -1)
+//                os.write(buffer, 0, count);
+//            os.flush();
+//        } catch (IOException e) {
+//            LogService.getLogger(PatientController.class).error(e.getMessage());
+//        } finally {
+//            if (os != null)
+//                os.close();
+//            if (fis != null)
+//                fis.close();
+//        }
+//    }
 
     @RequestMapping(value = "/populations/is_exist/{id_card_no}",method = RequestMethod.GET)
     @ApiOperation(value = "判断身份证是否存在")
@@ -292,38 +340,7 @@ public class PatientController extends BaseRestController {
     }
 
 
-    /**
-     * 人口信息头像图片上传
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     */
-    @RequestMapping(value = "/populations/picture",method = RequestMethod.POST)
-    @ApiOperation(value = "人口信息头像图片上传")
-    public String webupload(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        request.setCharacterEncoding("UTF-8");
-        InputStream inputStearm = request.getInputStream();
-        String fileName = (String) request.getParameter("name");
-        if(fileName == null){
-            return null;
-        }
-        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-        String description = null;
-        if ((fileName != null) && (fileName.length() > 0)) {
-            int dot = fileName.lastIndexOf('.');
-            if ((dot > -1) && (dot < (fileName.length()))) {
-                description = fileName.substring(0, dot);
-            }
-        }
-        ObjectNode objectNode;
-        objectNode = fastDFSUtil.upload(inputStearm, fileExtension, description);
-        String groupName = objectNode.get("groupName").toString();
-        String remoteFileName = objectNode.get("remoteFileName").toString();
-        String path  = "{groupName:" + groupName + ",remoteFileName:" + remoteFileName + "}";
-        //返回文件路径
-        return path;
-    }
+
 
 
 }
