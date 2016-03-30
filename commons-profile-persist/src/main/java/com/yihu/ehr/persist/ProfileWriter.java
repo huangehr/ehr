@@ -23,9 +23,6 @@ import java.util.Set;
  */
 @Service
 public class ProfileWriter {
-    @Value("${profile-persist.record-buffer-size}")
-    private int RecordBufferSize;
-
     @Autowired
     private XHBaseClient hbaseClient;
 
@@ -56,13 +53,8 @@ public class ProfileWriter {
         for (String tableName : tableSet) {
             ProfileDataSet dataSet = healthArchive.getDataSet(tableName);
 
-            int rowIndex = 1;
-            int totalRowCount = dataSet.getRecordKeys().size();
+            hbaseClient.beginBatchInsert(tableName, false);
             for (String key : dataSet.getRecordKeys()) {
-                if (rowIndex == 1 || rowIndex > RecordBufferSize) {
-                    hbaseClient.beginBatchInsert(tableName, false);
-                }
-
                 Map<String, String> record = dataSet.getRecord(key);
                 String[][] hbDataArray = ProfileTableOptions.dataSetRecordToHBaseColumn(record);
 
@@ -84,16 +76,9 @@ public class ProfileWriter {
                         ProfileTableOptions.FamilyMetaData,
                         hbDataArray[0],
                         hbDataArray[1]);
-
-                if (rowIndex == RecordBufferSize || rowIndex == totalRowCount) {
-                    hbaseClient.endBatchInsert();
-
-                    totalRowCount -= rowIndex;
-                    rowIndex = 1;
-                } else {
-                    rowIndex++;
-                }
             }
+
+            hbaseClient.endBatchInsert();
         }
     }
 }

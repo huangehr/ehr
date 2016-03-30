@@ -10,8 +10,8 @@ import com.yihu.ehr.feign.UserClient;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MUser;
-import com.yihu.ehr.pack.service.JsonPackage;
-import com.yihu.ehr.pack.service.JsonPackageService;
+import com.yihu.ehr.pack.service.Package;
+import com.yihu.ehr.pack.service.PackageService;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.encrypt.RSA;
 import io.swagger.annotations.Api;
@@ -50,7 +50,7 @@ public class PackageEndPoint extends BaseRestController {
     private SecurityClient securityClient;
 
     @Autowired
-    private JsonPackageService packService;
+    private PackageService packService;
 
     @Autowired
     private UserClient userClient;
@@ -61,25 +61,25 @@ public class PackageEndPoint extends BaseRestController {
             @ApiParam(name = "archive_status", value = "档案包状态", defaultValue = "Received")
             @RequestParam(value = "archive_status")
                     ArchiveStatus archiveStatus,
-            @ApiParam(name = "since", value = "起始日期", defaultValue = "2015-12-01")
+            @ApiParam(name = "since", value = "起始日期", defaultValue = "2016-03-01")
             @DateTimeFormat(pattern = "yyyy-MM-dd")
             @RequestParam(value = "since") Date since,
-            @ApiParam(name = "to", value = "截止日期", defaultValue = "2015-12-31")
+            @ApiParam(name = "to", value = "截止日期", defaultValue = "2016-03-31")
             @DateTimeFormat(pattern = "yyyy-MM-dd")
             @RequestParam(value = "to") Date to,
-            @ApiParam(name = "page", value = "页面号，从1开始", defaultValue = "1")
+            @ApiParam(name = "page", value = "页号，从1开始", defaultValue = "1")
             @RequestParam(value = "page") int page,
             @ApiParam(name = "page_size", value = "页面记录数", defaultValue = "15")
             @RequestParam(value = "page_size") int pageSize) throws ParseException {
 
         Pageable pageable = new PageRequest(page, pageSize);
         Map<String, Object> map = new HashMap<>();
-        map.put("fromTime", since);
-        map.put("toTime", to);
+        map.put("since", since);
+        map.put("to", to);
         map.put("archiveStatus", archiveStatus);
-        List<JsonPackage> jsonPackageList = packService.searchArchives(map, pageable);
+        List<Package> packageList = packService.searchArchives(map, pageable);
 
-        return convertToModels(jsonPackageList, new ArrayList<>(jsonPackageList.size()), MPackage.class, null);
+        return convertToModels(packageList, new ArrayList<>(packageList.size()), MPackage.class, null);
     }
 
     /**
@@ -122,14 +122,14 @@ public class PackageEndPoint extends BaseRestController {
                                                     @PathVariable(value = "id") String id) {
         MPackage pack;
         if (id.equals("RANDOM")){
-            JsonPackage jsonPackage = packService.getJsonPackage(id);
+            Package aPackage = packService.getJsonPackage(id);
 
-            pack = convertToModel(jsonPackage, MPackage.class, null);
+            pack = convertToModel(aPackage, MPackage.class, null);
         } else {
-            JsonPackage jsonPackage = packService.getJsonPackage(id);
-            if (jsonPackage == null) return new ResponseEntity<>((MPackage) null, HttpStatus.NOT_FOUND);
+            Package aPackage = packService.getJsonPackage(id);
+            if (aPackage == null) return new ResponseEntity<>((MPackage) null, HttpStatus.NOT_FOUND);
 
-            pack = convertToModel(jsonPackage, MPackage.class, null);
+            pack = convertToModel(aPackage, MPackage.class, null);
         }
 
         return new ResponseEntity<>(pack, HttpStatus.OK);
@@ -149,8 +149,8 @@ public class PackageEndPoint extends BaseRestController {
                                                  @RequestParam(value = "status") ArchiveStatus status,
                                                  @ApiParam(value = "消息")
                                                  @RequestParam(value = "message") String message) {
-        JsonPackage jsonPackage = packService.getJsonPackage(id);
-        if (jsonPackage == null) return new ResponseEntity<>((MPackage) null, HttpStatus.NOT_FOUND);
+        Package aPackage = packService.getJsonPackage(id);
+        if (aPackage == null) return new ResponseEntity<>((MPackage) null, HttpStatus.NOT_FOUND);
 
         if (status == ArchiveStatus.Failed) {
             packService.reportArchiveFailed(id, message);
