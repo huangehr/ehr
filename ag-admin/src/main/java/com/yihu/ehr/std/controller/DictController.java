@@ -419,7 +419,7 @@ public class DictController extends BaseController {
         return dictClient.isExistEntryCode(dictId,code,versionCode);
     }
 
-    @RequestMapping(value = RestApi.Standards.DictOther, method = RequestMethod.GET)
+    @RequestMapping(value = "/dicts/other", method = RequestMethod.GET)
     @ApiOperation(value = "获取cdaDict列表（不包含本身）")
     public List<MStdDict> getOtherCdaDict(
             @ApiParam(name = "id", value = "字典编号", defaultValue = "")

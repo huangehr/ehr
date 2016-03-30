@@ -292,4 +292,21 @@ public class ExtendController<T extends ExtendService> extends BaseUIController 
         }
         return target;
     }
+
+    public Envelop formatComboData(String resultStr, String idField, String nameField){
+        Envelop rs = getEnvelop(resultStr);
+        List ls = new ArrayList<>();
+        if(rs.getDetailModelList()!=null && rs.getDetailModelList().size()>0){
+            Map<String, String> tem, map;
+            for(Object obj: rs.getDetailModelList()){
+                map = ((Map) obj);
+                tem = new HashMap<>();
+                tem.put("id", map.get(idField));
+                tem.put("name", map.get(nameField));
+                ls.add(tem);
+            }
+        }
+        rs.setDetailModelList(ls);
+        return rs;
+    }
 }

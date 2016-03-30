@@ -169,6 +169,8 @@ public class Profile {
     }
 
     public Date getCreateDate() {
+        if (createDate == null) createDate = new Date();
+
         return createDate;
     }
 

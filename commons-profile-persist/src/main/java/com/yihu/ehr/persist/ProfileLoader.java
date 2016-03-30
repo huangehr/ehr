@@ -18,6 +18,7 @@ import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -32,6 +33,7 @@ import static com.yihu.ehr.profile.ProfileTableOptions.*;
  * @version 1.0
  * @created 2015.08.27 10:20
  */
+@Service
 public class ProfileLoader {
     @Autowired
     HBaseClient hbaseClient;
@@ -51,25 +53,25 @@ public class ProfileLoader {
     /**
      * 根据档案ID加载档案数据.
      *
-     * @param archiveId
+     * @param profileId
      * @param loadStdDataSet
      * @param loadOriginDataSet
      * @return
      * @throws IOException
      * @throws ParseException
      */
-    public Profile load(String archiveId, boolean loadStdDataSet, boolean loadOriginDataSet) throws IOException, ParseException {
-        return loadArchive(archiveId, loadStdDataSet, loadOriginDataSet);
+    public Profile load(String profileId, boolean loadStdDataSet, boolean loadOriginDataSet) throws IOException, ParseException {
+        return loadProfile(profileId, loadStdDataSet, loadOriginDataSet);
     }
 
     /**
      * 加载档案. 返回的map中key为健康事件id.
      *
-     * @param archiveId
+     * @param profileId
      * @return
      */
-    public Profile loadArchive(String archiveId, boolean loadStdDataSet, boolean loadOriginDataSet) throws IOException, ParseException {
-        ResultWrapper record = hbaseClient.getResultAsWrapper(ProfileTableOptions.ArchiveTable, archiveId);
+    public Profile loadProfile(String profileId, boolean loadStdDataSet, boolean loadOriginDataSet) throws IOException, ParseException {
+        ResultWrapper record = hbaseClient.getResultAsWrapper(ProfileTableOptions.ArchiveTable, profileId);
         if (record.getResult().toString().equals("keyvalues=NONE")) throw new RuntimeException("Profile not found.");
 
         String cardId = record.getValueAsString(FamilyBasic, AcCardId);
@@ -84,7 +86,7 @@ public class ProfileLoader {
         String dataSets = record.getValueAsString(FamilyBasic, AcDataSets);
 
         Profile profile = new Profile();
-        profile.setId(archiveId);
+        profile.setId(profileId);
         profile.setCardId(cardId);
         profile.setOrgCode(orgCode);
         profile.setPatientId(patientId);
@@ -217,11 +219,11 @@ public class ProfileLoader {
             if (dictId == null) {
                 continue;
             } else if (dictId == 0) {
-                metaDataInnerCode.add(StdObjectQualifierTranslator.toHBaseQualifier(innerCodes[i], type));
+                metaDataInnerCode.add(StdObjectQualifierTranslator.hBaseQualifier(innerCodes[i], type));
             } else if (dictId > 0) {
-                String[] temp = StdObjectQualifierTranslator.splitInnerCodeAsCodeValue(innerCodes[i]);
-                metaDataInnerCode.add(StdObjectQualifierTranslator.toHBaseQualifier(temp[0], type));
-                metaDataInnerCode.add(StdObjectQualifierTranslator.toHBaseQualifier(temp[1], type));
+                String[] temp = StdObjectQualifierTranslator.splitMetaData(innerCodes[i]);
+                metaDataInnerCode.add(StdObjectQualifierTranslator.hBaseQualifier(temp[0], type));
+                metaDataInnerCode.add(StdObjectQualifierTranslator.hBaseQualifier(temp[1], type));
             }
         }
 

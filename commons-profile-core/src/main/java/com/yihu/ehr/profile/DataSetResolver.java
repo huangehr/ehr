@@ -1,14 +1,11 @@
 package com.yihu.ehr.profile;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.yihu.ehr.constants.BizObject;
-import com.yihu.ehr.util.ObjectId;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * 简易数据集解析器。
@@ -18,8 +15,7 @@ import java.util.regex.Pattern;
  * @created 2015.08.16 10:44
  */
 @Component
-public class SimpleDataSetResolver {
-    protected final static Pattern NumberPattern = Pattern.compile("([1-9]\\d*\\.?\\d*)|(0\\.\\d*[1-9])");
+public class DataSetResolver {
 
     public ProfileDataSet parseJsonDataSet(JsonNode jsonNode, boolean isOrigin) {
         ProfileDataSet dataSet = new ProfileDataSet();
@@ -27,8 +23,8 @@ public class SimpleDataSetResolver {
         try {
             assert jsonNode != null;
 
-            String cdaVersion = jsonNode.get("inner_version").asText();
-            String code = jsonNode.get("code").asText();
+            String version = jsonNode.get("inner_version").asText();
+            String dataSetCode = jsonNode.get("code").asText();
             String eventNo = jsonNode.get("event_no").asText();
             String patientId = jsonNode.get("patient_id").asText();
             String orgCode = jsonNode.get("org_code").asText();
@@ -36,8 +32,8 @@ public class SimpleDataSetResolver {
 
             dataSet.setPatientId(patientId);
             dataSet.setEventNo(eventNo);
-            dataSet.setCdaVersion(cdaVersion);
-            dataSet.setCode(code);
+            dataSet.setCdaVersion(version);
+            dataSet.setCode(dataSetCode);
             dataSet.setOrgCode(orgCode);
 
             JsonNode jsonRecords = jsonNode.get("data");
@@ -48,19 +44,18 @@ public class SimpleDataSetResolver {
                 Iterator<Map.Entry<String, JsonNode>> iterator = jsonRecord.fields();
                 while (iterator.hasNext()) {
                     Map.Entry<String, JsonNode> item = iterator.next();
-                    String key = item.getKey();
-                    if (key.equals("PATIENT_ID") || key.equals("EVENT_NO")) continue;
+                    String metaData = item.getKey();
+                    if (metaData.equals("PATIENT_ID") || metaData.equals("EVENT_NO")) continue;
 
-                    String[] standardizedMetaData = translateMetaData(
-                            cdaVersion,
-                            code,
-                            key,
+                    String[] qualifiedMetaData = translateMetaData(
+                            version, dataSetCode, metaData,
                             item.getValue().asText().equals("null") ? "" : item.getValue().asText(),
                             isOrigin);
-                    if (standardizedMetaData != null) {
-                        record.put(standardizedMetaData[0], standardizedMetaData[1]);
-                        if (standardizedMetaData.length > 2)
-                            record.put(standardizedMetaData[2], standardizedMetaData[3]);
+
+                    if(qualifiedMetaData != null){
+                        record.put(qualifiedMetaData[0], qualifiedMetaData[1]);
+                        if (qualifiedMetaData.length > 2)
+                            record.put(qualifiedMetaData[2], qualifiedMetaData[3]);
                     }
                 }
 
@@ -82,15 +77,15 @@ public class SimpleDataSetResolver {
      * @param innerVersion
      * @param dataSetCode
      * @param isOriginDataSet
-     * @param metaDataInnerCode
+     * @param metaData
      * @param actualData
      * @return
      */
     protected String[] translateMetaData(String innerVersion,
                                          String dataSetCode,
-                                         String metaDataInnerCode,
+                                         String metaData,
                                          String actualData,
                                          boolean isOriginDataSet) {
-        return new String[]{metaDataInnerCode, actualData};
+        return new String[]{metaData, actualData};
     }
 }

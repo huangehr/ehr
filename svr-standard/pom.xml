@@ -79,7 +79,7 @@
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-redis-cache</artifactId>
+            <artifactId>commons-redis-keyschema</artifactId>
             <version>1.1.0</version>
         </dependency>
 		<dependency>
@@ -88,29 +88,4 @@
 			<version>1.1.0</version>
 		</dependency>
 	</dependencies>
-
-	<repositories>
-		<repository>
-			<id>Releases</id>
-			<name>local private nexus</name>
-			<url>http://172.19.103.47:8081/nexus/content/repositories/releases/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>snapshots</id>
-			<name>local private nexus</name>
-			<url>http://172.19.103.47:8081/nexus/content/repositories/snapshots/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
 </project>

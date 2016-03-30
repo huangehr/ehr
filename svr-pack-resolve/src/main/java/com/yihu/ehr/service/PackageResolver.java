@@ -2,18 +2,18 @@ package com.yihu.ehr.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.extractor.EventExtractor;
 import com.yihu.ehr.extractor.ExtractorChain;
 import com.yihu.ehr.extractor.KeyDataExtractor;
 import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.persist.DataSetResolverWithChecker;
+import com.yihu.ehr.persist.DataSetResolverWithTranslator;
 import com.yihu.ehr.profile.Profile;
 import com.yihu.ehr.profile.ProfileDataSet;
 import com.yihu.ehr.profile.StdObjectQualifierTranslator;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
 import net.lingala.zip4j.exception.ZipException;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -38,7 +38,7 @@ public class PackageResolver {
     ApplicationContext context;
 
     @Autowired
-    DataSetResolverWithChecker dataSetResolverWithChecker;
+    DataSetResolverWithTranslator dataSetResolverWithTranslator;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -69,15 +69,14 @@ public class PackageResolver {
             throw new RuntimeException("Invalid package file, package id: " + pack.getId());
         }
 
-        // build profile model
         Profile profile = new Profile();
 
         String basePackagePath = root.getAbsolutePath();
-        parseJsonDataSet(pack.getId(), profile, new File(basePackagePath + PathSep + StdFolder).listFiles(), false);
+        parseDataSet(profile, new File(basePackagePath + PathSep + StdFolder).listFiles(), false);
 
         File originFiles = new File(basePackagePath + PathSep + OriFolder);
         if (originFiles.exists()) {
-            parseJsonDataSet(pack.getId(), profile, originFiles.listFiles(), true);
+            parseDataSet(profile, originFiles.listFiles(), true);
         }
 
         makeEventSummary(profile);
@@ -94,13 +93,13 @@ public class PackageResolver {
      * @param files
      * @throws IOException
      */
-    void parseJsonDataSet(String packageId, Profile profile, File[] files, boolean isOriginDataSet) throws ParseException, IOException {
+    void parseDataSet(Profile profile, File[] files, boolean isOriginDataSet) throws ParseException, IOException {
         for (File file : files) {
             if (!file.getAbsolutePath().endsWith(JsonExt)) continue;
 
             ProfileDataSet dataSet = generateDataSet(file, isOriginDataSet);
 
-            // 原始数据存储在单独的表中, 表名为"数据集代码_ORIGIN"
+            // 原始数据存储在表"数据集代码_ORIGIN"
             String dataSetTable = isOriginDataSet ? StdObjectQualifierTranslator.originDataTable(dataSet.getCode()) : dataSet.getCode();
             profile.addDataSet(dataSetTable, dataSet);
             profile.setPatientId(dataSet.getPatientId());
@@ -110,7 +109,7 @@ public class PackageResolver {
 
             dataSet.setCode(dataSetTable);
 
-            // 在标准数据集中查找病人的就诊卡，身份证号与事件时间（门诊，住院，体检等时间）如果存在.
+            // Extract key data from data set if exists
             if (!isOriginDataSet) {
                 if (profile.getCardId().length() == 0) {
                     Object object = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.CardInfo);
@@ -120,7 +119,7 @@ public class PackageResolver {
                     }
                 }
 
-                if (profile.getDemographicId() == null || profile.getDemographicId().length() == 0) {
+                if (StringUtils.isEmpty(profile.getDemographicId())) {
                     profile.setDemographicId((String) extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.DemographicInfo));
                 }
 
@@ -139,7 +138,7 @@ public class PackageResolver {
             throw new IOException("Invalid json file when generate data set");
         }
 
-        ProfileDataSet dataSet = dataSetResolverWithChecker.parseJsonDataSet(jsonNode, isOrigin);
+        ProfileDataSet dataSet = dataSetResolverWithTranslator.parseJsonDataSet(jsonNode, isOrigin);
         return dataSet;
     }
 
@@ -166,31 +165,12 @@ public class PackageResolver {
         }
     }
 
-    /**
-     * 清理临时文件
-     *
-     * @param zipFile
-     * @param unZippedPath
-     */
-    private void houseKeep(String zipFile, File unZippedPath) {
+    private void houseKeep(String zipFile, File root) {
         try {
-            new File(zipFile).delete();
-
-            recursiveDelete(unZippedPath);
+            FileUtils.deleteQuietly(new File(zipFile));
+            FileUtils.deleteQuietly(root);
         } catch (Exception e) {
-            LogService.getLogger(PackageResolver.class).error("House keep failed when package resolve finished:" + e.getMessage());
+            LogService.getLogger(PackageResolver.class).warn("House keep failed after package resolve: " + e.getMessage());
         }
-    }
-
-    void recursiveDelete(File file) {
-        if (!file.exists()) return;
-
-        if (file.isDirectory()) {
-            for (File f : file.listFiles()) {
-                recursiveDelete(f);
-            }
-        }
-
-        file.delete();
     }
 }

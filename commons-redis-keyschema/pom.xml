@@ -10,23 +10,19 @@
         <relativePath>../commons-dependencies/pom.xml</relativePath>
     </parent>
 
-    <artifactId>commons-profile-persist</artifactId>
+    <artifactId>commons-redis-keyschema</artifactId>
     <packaging>jar</packaging>
+    <description>Redis key schema of platform</description>
 
     <dependencies>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-data-hbase</artifactId>
+            <artifactId>commons-util</artifactId>
             <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-profile-core</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-redis-keyschema</artifactId>
+            <artifactId>commons-data-redis</artifactId>
             <version>1.1.0</version>
         </dependency>
     </dependencies>

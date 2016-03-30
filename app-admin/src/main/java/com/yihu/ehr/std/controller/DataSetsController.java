@@ -72,7 +72,6 @@ public class DataSetsController extends BaseUIController {
     @RequestMapping("/searchDataSets")
     @ResponseBody
     public Object searchDataSets(String codename, String version, int page, int rows) {
-        //TODO 过滤问题
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         if (StringUtils.isEmpty(version)) {
@@ -81,8 +80,7 @@ public class DataSetsController extends BaseUIController {
         }
         String filters = "";
         if (!StringUtils.isEmpty(codename)){
-            //filters += "code?"+codename+" g1;name?"+codename+" g1;";
-            filters += "name?%"+codename+"%";
+            filters += "name?"+codename+" g1;code?"+codename+" g1;";
 
         }
         String url = "/data_sets";
@@ -235,9 +233,7 @@ public class DataSetsController extends BaseUIController {
         String url = "/meta_datas";
         String filters = "dataSetId="+id+";";
         if(!StringUtils.isEmpty(metaDataCode)){
-            //TODO 过滤问题
-//            filters += "code?"+metaDataCode+" g1;name?"+metaDataCode+" g1;"
-            filters += "name?"+metaDataCode;
+            filters += "innerCode?"+metaDataCode+" g1;name?"+metaDataCode+" g1;";
         }
         try{
             Map<String,Object> params = new HashMap<>();

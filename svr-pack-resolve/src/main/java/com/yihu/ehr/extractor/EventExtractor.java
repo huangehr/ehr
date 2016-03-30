@@ -45,7 +45,7 @@ public class EventExtractor extends KeyDataExtractor {
         for (String key : keys) {
             String value = this.dataSets.remove(key);
 
-            key = key.substring(key.indexOf('.') + 1);
+            key = key.replaceAll("^\\d{1,2}\\.", "");
             this.dataSets.put(key, value);
         }
     }

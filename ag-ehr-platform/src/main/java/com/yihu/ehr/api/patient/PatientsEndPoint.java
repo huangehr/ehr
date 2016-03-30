@@ -8,7 +8,7 @@ import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.feign.PatientClient;
 import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.profile.ProfileDataSet;
-import com.yihu.ehr.profile.SimpleDataSetResolver;
+import com.yihu.ehr.profile.DataSetResolver;
 import com.yihu.ehr.util.DateFormatter;
 import com.yihu.ehr.util.IdValidator;
 import io.swagger.annotations.Api;
@@ -17,7 +17,6 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,7 +36,7 @@ import java.util.Map;
 @Api(value = "patients", description = "患者服务")
 public class PatientsEndPoint {
     @Autowired
-    SimpleDataSetResolver dataSetResolver;
+    DataSetResolver dataSetResolver;
 
     @Autowired
     ObjectMapper objectMapper;
