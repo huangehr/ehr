@@ -12,11 +12,9 @@ import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-import org.hibernate.metamodel.binding.HibernateTypeDescriptor;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.StandardBasicTypes;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -526,5 +524,83 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
             listInfo.add(info);
         }
         return listInfo;
+    }
+
+
+    /**
+     * 根据条件搜索标准字典项适配关系
+     *
+     */
+    public List<MAdapterRelationship> searchStdMeta(
+            OrgAdapterPlan orgAdapterPlan, long dataSetId, String seachName, String mode, String orders, int page, int rows) {
+
+        String metaTable = CDAVersionUtil.getMetaDataTableName(orgAdapterPlan.getVersion());
+        Session session = currentSession();
+        String sql =
+                "SELECT meta.id, meta.code, meta.name " +
+                "FROM" +
+                "   "+ metaTable +" meta " +
+                "LEFT JOIN" +
+                "   (SELECT * FROM adapter_dataset ad where ad.plan_id = :planId) adapterDataSet " +
+                "ON" +
+                "   meta.id = adapterDataSet.std_metadata " +
+                "WHERE" +
+                "   meta.dataset_id = :dataSetId ";
+        if("new".equals(mode))
+            sql += " AND adapterDataSet.id is null ";
+        if(!StringUtils.isEmpty(seachName))
+            sql += " AND (meta.code like :seachName or meta.name like :seachName) ";
+
+        sql += makeOrder(orders);
+
+        SQLQuery sqlQuery = session.createSQLQuery(sql);
+        if (!StringUtils.isEmpty(seachName))
+            sqlQuery.setParameter("seachName", "%" + seachName + "%");
+        sqlQuery.setParameter("dataSetId", dataSetId);
+        sqlQuery.setParameter("planId", orgAdapterPlan.getId());
+        page = page == 0 ? 1 : page;
+        sqlQuery.setMaxResults(rows);
+        sqlQuery.setFirstResult((page - 1) * rows);
+
+        return sqlQuery
+                .addScalar("id", StandardBasicTypes.LONG)
+                .addScalar("code", StandardBasicTypes.STRING)
+                .addScalar("name", StandardBasicTypes.STRING)
+                .setResultTransformer(Transformers.aliasToBean(MAdapterRelationship.class))
+                .list();
+    }
+
+
+    /**
+     * 根据条件搜索标准字典项总数
+     *
+     */
+    public int countStdMeta(
+            OrgAdapterPlan orgAdapterPlan, long dataSetId, String seachName, String mode) {
+
+        String metaTable = CDAVersionUtil.getMetaDataTableName(orgAdapterPlan.getVersion());
+        Session session = currentSession();
+        String sql =
+                "SELECT count(*) " +
+                "FROM" +
+                "   "+ metaTable +" meta " +
+                "LEFT JOIN" +
+                "   (SELECT * FROM adapter_dataset ad where ad.plan_id = :planId) adapterDataSet " +
+                "ON" +
+                "   meta.id = adapterDataSet.std_metadata " +
+                "WHERE" +
+                "   meta.dataset_id = :dataSetId ";
+        if("new".equals(mode))
+            sql += " AND adapterDataSet.id is null ";
+        if(!StringUtils.isEmpty(seachName))
+            sql += " AND (meta.code like :seachName or meta.name like :seachName) ";
+
+        SQLQuery sqlQuery = session.createSQLQuery(sql);
+        if (!StringUtils.isEmpty(seachName))
+            sqlQuery.setParameter("seachName", "%" + seachName + "%");
+        sqlQuery.setParameter("dataSetId", dataSetId);
+        sqlQuery.setParameter("planId", orgAdapterPlan.getId());
+
+        return ((BigInteger)sqlQuery.list().get(0)).intValue();
     }
 }

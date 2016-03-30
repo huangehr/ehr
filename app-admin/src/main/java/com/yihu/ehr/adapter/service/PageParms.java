@@ -19,7 +19,7 @@ public class PageParms extends HashMap<String, Object> {
     public static String LESS_THAN = "<";
     public static String LESS_EQUAL = "<=";
 
-    private int rows = 10000;
+    private int rows = 999;
     private int page = 1;
     private String fields = "";
     private String filters = "";

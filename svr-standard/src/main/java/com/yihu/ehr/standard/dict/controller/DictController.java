@@ -75,7 +75,7 @@ public class DictController extends ExtendController<MStdDict> {
 //        if(dictService.isExistByField("code", dict.getCode(), entityClass))
 //            throw errRepeatCode();
 
-        dict.setCreatedate(new Date());
+        dict.setCreateDate(new Date());
         if(dictService.add(dict, version))
             return getModel(dict);
          return null;

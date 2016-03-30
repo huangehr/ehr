@@ -3,8 +3,6 @@ package com.yihu.ehr.adaption.dict.service;
 
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlan;
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanService;
-import com.yihu.ehr.model.adaption.MAdapterDataVo;
-import com.yihu.ehr.model.adaption.MAdapterDict;
 import com.yihu.ehr.model.adaption.MAdapterDictVo;
 import com.yihu.ehr.model.adaption.MAdapterRelationship;
 import com.yihu.ehr.query.BaseJpaService;
@@ -199,6 +197,84 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
                 .addScalar("orgDictEntryName", StandardBasicTypes.STRING)
                 .setResultTransformer(Transformers.aliasToBean(MAdapterDictVo.class))
                 .list();
+    }
+
+
+    /**
+     * 根据条件搜索标准字典项适配关系
+     *
+     */
+    public List<MAdapterRelationship> searchStdDictEntry(
+            OrgAdapterPlan orgAdapterPlan, long dictId, String seachName, String mode, String orders, int page, int rows) {
+
+        String deTableName = CDAVersionUtil.getDictEntryTableName(orgAdapterPlan.getVersion());
+        Session session = currentSession();
+        String sql =
+                "SELECT entry.id, entry.code, entry.value as name " +
+                "FROM" +
+                "   "+ deTableName +" entry " +
+                "LEFT JOIN" +
+                "   (SELECT * FROM adapter_dict ad where ad.plan_id = :planId) adapterDict " +
+                "ON" +
+                "   entry.id = adapterDict.std_dictentry " +
+                "WHERE" +
+                "   entry.dict_id = :dictId ";
+        if("new".equals(mode))
+            sql += " AND adapterDict.id is null ";
+        if(!StringUtils.isEmpty(seachName))
+            sql += " AND (entry.code like :seachName or entry.value like :seachName) ";
+
+        sql += makeOrder(orders);
+
+        SQLQuery sqlQuery = session.createSQLQuery(sql);
+        if (!StringUtils.isEmpty(seachName))
+            sqlQuery.setParameter("seachName", "%" + seachName + "%");
+        sqlQuery.setParameter("dictId", dictId);
+        sqlQuery.setParameter("planId", orgAdapterPlan.getId());
+        page = page == 0 ? 1 : page;
+        sqlQuery.setMaxResults(rows);
+        sqlQuery.setFirstResult((page - 1) * rows);
+
+        return sqlQuery
+                .addScalar("id", StandardBasicTypes.LONG)
+                .addScalar("code", StandardBasicTypes.STRING)
+                .addScalar("name", StandardBasicTypes.STRING)
+                .setResultTransformer(Transformers.aliasToBean(MAdapterRelationship.class))
+                .list();
+    }
+
+
+    /**
+     * 根据条件搜索标准字典项总数
+     *
+     */
+    public int countStdDictEntry(
+            OrgAdapterPlan orgAdapterPlan, long dictId, String seachName, String mode) {
+
+        String deTableName = CDAVersionUtil.getDictEntryTableName(orgAdapterPlan.getVersion());
+        Session session = currentSession();
+        String sql =
+                "SELECT count(*) " +
+                "FROM" +
+                "   "+ deTableName +" entry " +
+                "LEFT JOIN" +
+                "   (SELECT * FROM adapter_dict ad where ad.plan_id = :planId) adapterDict " +
+                "ON" +
+                "   entry.id = adapterDict.std_dictentry " +
+                "WHERE" +
+                "   entry.dict_id = :dictId ";
+        if("new".equals(mode))
+            sql += " AND adapterDict.id is null ";
+        if(!StringUtils.isEmpty(seachName))
+            sql += " AND (entry.code like :seachName or entry.value like :seachName) ";
+
+        SQLQuery sqlQuery = session.createSQLQuery(sql);
+        if (!StringUtils.isEmpty(seachName))
+            sqlQuery.setParameter("seachName", "%" + seachName + "%");
+        sqlQuery.setParameter("dictId", dictId);
+        sqlQuery.setParameter("planId", orgAdapterPlan.getId());
+
+        return ((BigInteger)sqlQuery.list().get(0)).intValue();
     }
 
     /**

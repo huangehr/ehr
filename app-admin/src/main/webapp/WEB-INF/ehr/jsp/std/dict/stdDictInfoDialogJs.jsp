@@ -49,7 +49,7 @@
                 this.$form.Fields.fillValues({
                     name: info.name,
                     code: info.code,
-                    baseDictId: info.baseDictId,
+                    //baseDictId: info.baseDictId,
                     stdSource : info.sourceId,
                     stdVersion : info.stdVersion,
                     id: info.id ,
@@ -58,11 +58,11 @@
 
                 this.$form.show();
             },
-            initDDL: function (dictId, target) {
+            initDDL: function (mode, target) {
                 var dataModel = $.DataModel.init();
                 var strVersionCode = parent.getStrVersion();
                 var url = '';
-                if(dictId==1){
+                if(mode==1){
                     url = "${contextRoot}/cdadict/getStdSourceList";
                     dataModel.fetchRemote(url,{
                         success: function(data) {

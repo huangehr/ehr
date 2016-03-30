@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeDetailModel;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeModel;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeTreeModel;
-import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.std.service.CDATypeClient;
@@ -59,47 +58,6 @@ public class CDATypeController extends BaseController {
     private List<CdaTypeModel> convertToCdaTypeModels(List<MCDAType> mCdaTypeList) {
         List<CdaTypeModel> cdaTypeModelList = (List<CdaTypeModel>) convertToModels(mCdaTypeList, new ArrayList<CdaTypeModel>(mCdaTypeList.size()), CdaTypeModel.class, null);
         return cdaTypeModelList;
-    }
-
-    /**
-     * 获取可以作为父类别的cda类别列表
-     * （不含该类别及子类别、子类别的子类类别。。所剩下的类别）
-     * @param id
-     * @param key
-     * @return
-     */
-    @RequestMapping(value = "/cda_types/as_parent_type", method = RequestMethod.GET)
-    @ApiOperation(value = "根据cda类别Id获取可作为该cda类别父级的cda类别（不含自身及其以下子集）")
-    public Envelop getAsParentType(
-            @ApiParam(name = "id", value = "父级id")
-            @RequestParam(value = "id") String id,
-            @ApiParam(name = "key", value = "查询条件")
-            @RequestParam(value = "key") String key) throws Exception {
-        //TODO 待微服务提供not in
-        Envelop envelop = new Envelop();
-        List<String> ids = new ArrayList<>();
-        if(!StringUtils.isEmpty(id)){
-            List<MCDAType> mCdaTypeSomeList = cdaTypeClient.getChildIncludeSelfByParentIdsAndKey(id, "");
-            for(MCDAType m : mCdaTypeSomeList){
-                ids.add(m.getId());
-            }
-        }
-        List<MCDAType> mCdaTypeAllList = (List) cdaTypeClient.searchType("","","", 999, 1);
-        if(ids.size()==0){
-            envelop.setSuccessFlg(true);
-            envelop.setDetailModelList(convertToCdaTypeModels(mCdaTypeAllList));
-            return envelop;
-
-        }
-        List<MCDAType> mCdaTypeList = new ArrayList<>();
-        for (MCDAType m : mCdaTypeAllList){
-            if (!ids.contains(m.getId())){
-                mCdaTypeList.add(m);
-            }
-        }
-        envelop.setSuccessFlg(true);
-        envelop.setDetailModelList(convertToCdaTypeModels(mCdaTypeList));
-        return envelop;
     }
 
 
@@ -330,23 +288,20 @@ public class CDATypeController extends BaseController {
         return detailModel;
     }
 
-//    @RequestMapping(value = "/types/parent_id/other", method = RequestMethod.GET)
-//    @ApiOperation(value = "获取cdaType列表（不包含本身及其子类）")
-//    public List<MCDAType> getOtherCDAType(
-//            @ApiParam(name = "id", value = "cdaType编号")
-//            @RequestParam(value = "id") String id) throws Exception {
-//        List<MCDAType> listType = cdaTypeClient.getOtherCDAType(id);
-//        return listType;
-//    }
 
-    @RequestMapping(value = RestApi.Standards.TypeParent, method = RequestMethod.GET)
+    @RequestMapping(value = "/types/parent", method = RequestMethod.GET)
     @ApiOperation(value = "根据当前类别获取自己的父级以及同级以及同级所在父级类别列表")
-    public List<MCDAType> getCdaTypeExcludeSelfAndChildren(
+    public Envelop getCdaTypeExcludeSelfAndChildren(
             @ApiParam(name = "id", value = "id")
             @RequestParam(value = "id") String id) throws Exception {
-        List<MCDAType> parentTypes = cdaTypeClient.getCDATypeByIds(id);
-
-        return parentTypes;
+        Envelop envelop = new Envelop();
+        List<MCDAType> mcdaTypeList = cdaTypeClient.getCdaTypeExcludeSelfAndChildren(id);
+        if(mcdaTypeList.size() == 0){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("没有匹配的cda类别列表！");
+        }
+        envelop.setDetailModelList(convertToCdaTypeModels(mcdaTypeList));
+        return  envelop;
     }
 
     /**

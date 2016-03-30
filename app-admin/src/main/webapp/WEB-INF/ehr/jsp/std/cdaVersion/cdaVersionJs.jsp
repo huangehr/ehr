@@ -109,7 +109,7 @@
 								if (data.successFlg) {
 									window.top.$.Notice.error('已经有一个编辑状态的版本，不能再新增！');
 								} else {
-									createNewVersion("《上个版本》");
+									createNewVersion(data.obj);
 								}
 							}
 						});

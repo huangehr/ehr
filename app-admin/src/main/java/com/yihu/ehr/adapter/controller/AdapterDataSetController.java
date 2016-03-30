@@ -89,16 +89,17 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetSer
      */
     @RequestMapping("/getStdMetaData")
     @ResponseBody
-    public Object getStdMetaData(Long adapterPlanId, Long dataSetId, String mode) {
+    public Object getStdMetaData(Long adapterPlanId, Long dataSetId, String mode, String searchParm, int page, int rows) {
 
         try {
 
             return service.search(
                     "/adapter/std_meta_data/combo",
-                    new PageParms()
+                    new PageParms(rows, page)
                             .addExt("plan_id", adapterPlanId)
                             .addExt("data_set_id", dataSetId)
-                            .addExt("mode", mode));
+                            .addExt("mode", mode)
+                            .addExt("search_name", nullToSpace(searchParm)));
         } catch (Exception e) {
             return systemError();
         }
@@ -110,7 +111,7 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetSer
      */
     @RequestMapping("/getOrgDataSet")
     @ResponseBody
-    public Object getOrgDataSet(Long adapterPlanId) {
+    public Object getOrgDataSet(Long adapterPlanId, String searchParm, int page, int rows) {
 
         try {
             Envelop result = new Envelop();
@@ -125,17 +126,12 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetSer
 
             String resultStr = service.search(
                     "/adapter/org/data_sets",
-                    new PageParms().addEqual("organization", ((Map) rs.getObj()).get("org")));
-            rs = getEnvelop(resultStr);
-            List<Map> orgDataList = rs.getDetailModelList() != null ? rs.getDetailModelList() : new ArrayList<>();
+                    new PageParms(rows, page)
+                            .addEqual("organization", ((Map) rs.getObj()).get("org"))
+                            .addGroupNotNull("name", PageParms.LIKE, searchParm, "g1")
+                            .addGroupNotNull("code", PageParms.LIKE, searchParm, "g1"));
 
-            List<String> orgDicts = new ArrayList<>();
-            for (Map orgDict : orgDataList) {
-                orgDicts.add(String.valueOf(orgDict.get("sequence")) + ',' + orgDict.get("name"));
-            }
-
-            result.setObj(orgDicts);
-            return result;
+            return formatComboData(resultStr, "sequence", "name");
         } catch (Exception e) {
             return systemError();
         }
@@ -147,7 +143,7 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetSer
      */
     @RequestMapping("/getOrgMetaData")
     @ResponseBody
-    public Object getOrgMetaData(Integer orgDataSetSeq, Long adapterPlanId) {
+    public Object getOrgMetaData(Integer parentId, Long adapterPlanId, String searchParm, int page, int rows) {
 
         try {
             Envelop result = new Envelop();
@@ -160,21 +156,16 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetSer
             if (rs.getObj() == null)
                 return result;
 
-            rs = getEnvelop(
+            String resultStr =
                     service.search(
-                        "/adapter/org/meta_datas",
-                        new PageParms()
-                                .addEqual("organization", ((Map) rs.getObj()).get("org"))
-                                .addEqualNotNull("orgDataSet", orgDataSetSeq)));
-            List<Map> orgDictList = rs.getDetailModelList() != null ? rs.getDetailModelList() : new ArrayList<>();
+                            "/adapter/org/meta_datas",
+                            new PageParms(rows, page)
+                                    .addEqual("organization", ((Map) rs.getObj()).get("org"))
+                                    .addEqualNotNull("orgDataSet", parentId)
+                                    .addGroupNotNull("name", PageParms.LIKE, searchParm, "g1")
+                                    .addGroupNotNull("code", PageParms.LIKE, searchParm, "g1"));
 
-            List<String> orgDicts = new ArrayList<>();
-            for (Map orgDict : orgDictList) {
-                orgDicts.add(String.valueOf(orgDict.get("sequence")) + ',' + orgDict.get("name"));
-            }
-
-            result.setObj(orgDicts);
-            return result;
+            return formatComboData(resultStr, "sequence", "name");
         } catch (Exception e) {
             return systemError();
         }

@@ -63,26 +63,27 @@ public class OrganizationController extends BaseUIController{
     @RequestMapping(value = "searchOrgs",produces = "text/html;charset=UTF-8")
     @ResponseBody
     public Object searchOrgs(String searchNm, String searchWay,String orgType, String province, String city, String district, int page, int rows) {
-        //TODO 能访问，地址检索问题
         Envelop envelop = new Envelop();
         try {
             //获取地址的 ids
-//            String addrIds = "";
-//            if(!"".equals(province)){
-//                String urlAddr = "/geographies";
-//                Map<String,Object> args = new HashMap<>();
-//                args.put("province",province);
-//                args.put("city",city);
-//                args.put("district",district);
-//                String envelopStrAddr = HttpClientUtil.doGet(comUrl+urlAddr,args,username,password);
-//                Envelop envelopAddr = getEnvelop(envelopStrAddr);
-//                if (envelopAddr.isSuccessFlg()){
-//                    List<String> addrList = (List<String>)getEnvelopList(envelopAddr.getDetailModelList(),new ArrayList<String>(),String.class);
-//                    for(String id : addrList){
-//                        addrIds += id + ",";
-//                    }
-//                }
-//            }
+            String addrIds = "";
+            if(!"".equals(province)){
+                String urlAddr = "/geographies";
+                Map<String,Object> args = new HashMap<>();
+                args.put("province",province);
+                args.put("city",city);
+                args.put("district",district);
+                String envelopStrAddr = HttpClientUtil.doGet(comUrl+urlAddr,args,username,password);
+                Envelop envelopAddr = getEnvelop(envelopStrAddr);
+                if (envelopAddr.isSuccessFlg()){
+                    List<String> addrList = (List<String>)getEnvelopList(envelopAddr.getDetailModelList(),new ArrayList<String>(),String.class);
+                    for(String id : addrList){
+                        addrIds += id + ",";
+                    }
+                    String[] addrIdsArrays = addrList.toArray(new String[addrList.size()]);
+                    addrIds = String.join(",",addrIdsArrays);
+                }
+            }
 
             //分页查询机构列表
             String url = "/organizations";
@@ -98,10 +99,9 @@ public class OrganizationController extends BaseUIController{
                 filters += "orgType="+orgType+";";
             }
             //添加地址过滤条件
-//            if(!"".equals(addrIds)){
-//                addrIds = addrIds.substring(0,addrIds.length()-1);
-//                filters += "loaction="+addrIds+";";
-//            }
+            if(!"".equals(addrIds)){
+                filters += "location="+addrIds+";";
+            }
             params.put("fields","");
             params.put("filters",filters);
             params.put("sorts","");
@@ -251,7 +251,6 @@ public class OrganizationController extends BaseUIController{
     @RequestMapping("validationOrg")
     @ResponseBody
     public Object validationOrg(String orgCode){
-        //通过
         String getOrgUrl = "/organizations/existence/"+orgCode;
         String resultStr = "";
         Envelop envelop = new Envelop();

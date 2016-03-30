@@ -7,8 +7,8 @@ import org.hibernate.annotations.GenericGenerator;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
-import java.util.Objects;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author AndyCai
@@ -16,7 +16,6 @@ import java.util.Date;
  * @created 01-9月-2015 16:54:17
  */
 @MappedSuperclass
-@Access(value = AccessType.PROPERTY)
 public class ICDADocument {
 
     @Value("${admin-region}")
@@ -47,18 +46,12 @@ public class ICDADocument {
 
 
     public ICDADocument() {
-        this.createDate = new Date();
-        this.createUser = "Sys";
-        ObjectId objectId = new ObjectId(adminRegion, BizObject.STANDARD);
-        id = objectId.toString();
-        this.operationType="";
-
+//        ObjectId objectId = new ObjectId(adminRegion, BizObject.STANDARD);
+//        id = objectId.toString();
     }
 
 
     @Id
-    @GeneratedValue(generator = "Generator")
-    @GenericGenerator(name = "Generator", strategy = "increment")
     @Column(name = "id", unique = true, nullable = false)
     public String getId() {
         return id;

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
  * Created by Administrator on 2015/8/12.
  */
 @RequestMapping("/app")
+@Controller
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
 public class AppController extends BaseUIController {
     @Value("${service-gateway.username}")

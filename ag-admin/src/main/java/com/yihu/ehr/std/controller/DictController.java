@@ -124,14 +124,14 @@ public class DictController extends BaseController {
                     return failed("代码已存在!");
                 }
 
-                mStdDict.setCreatedate(StringToDate(dictModel.getCreateDate(), AgAdminConstants.DateTimeFormat));
+                mStdDict.setCreateDate(StringToDate(dictModel.getCreateDate(), AgAdminConstants.DateTimeFormat));
                 mStdDict = dictClient.updateDict(versionCode, mStdDict.getId(), objectMapper.writeValueAsString(mStdDict));
             }
             dictModel = convertToModel(mStdDict, DictModel.class);
             if (dictModel == null) {
                 return failed("保存失败!");
             }
-            dictModel.setCreateDate(DateToString(mStdDict.getCreatedate(),AgAdminConstants.DateTimeFormat));
+            dictModel.setCreateDate(DateToString(mStdDict.getCreateDate(),AgAdminConstants.DateTimeFormat));
             return success(dictModel);
         } catch (Exception ex) {
             return failedSystem();
@@ -419,7 +419,7 @@ public class DictController extends BaseController {
         return dictClient.isExistEntryCode(dictId,code,versionCode);
     }
 
-    @RequestMapping(value = RestApi.Standards.DictOther, method = RequestMethod.GET)
+    @RequestMapping(value = "/dicts/other", method = RequestMethod.GET)
     @ApiOperation(value = "获取cdaDict列表（不包含本身）")
     public List<MStdDict> getOtherCdaDict(
             @ApiParam(name = "id", value = "字典编号", defaultValue = "")
