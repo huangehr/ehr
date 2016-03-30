@@ -162,7 +162,8 @@ public class UserController extends BaseRestController {
             @PathVariable(value = "user_id") String userId,
             @ApiParam(name = "password", value = "密码", defaultValue = "")
             @RequestParam(value = "password") String password) throws Exception {
-        userManager.changePassWord(userId,password);
+        String hashPassWord = HashUtil.hashStr(password);
+        userManager.changePassWord(userId,hashPassWord);
         return true;
     }
 
