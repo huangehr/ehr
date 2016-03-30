@@ -87,6 +87,7 @@ public class RestApi {
         public static final String TypesChildren                    = "/std/types/childrens";
         public static final String TypeList                         = "/cda_types/code_name";
         public static final String TypeParent                       = "/std/types/parent";
+        public static final String TypeOther                        = "/std/types/{id}/other";
 
         public static final String Versions                         = "/std/versions";
         public static final String Version                          = "/std/versions/{version}";
@@ -97,7 +98,7 @@ public class RestApi {
         public static final String VersionCommit                    = "/std/versions/{version}/commit";
         public static final String VersionRevert                    = "/std/versions/{version}/revert";
         public static final String VersionLatest                    = "/std/versions/latest";
-        public static final String VersionLatestExistence          = "/std/versions/{version}/latest/existence";
+        public static final String VersionLatestExistence           = "/std/versions/{version}/latest/existence";
 
         public static final String Documents                        = "/std/documents";
         public static final String Document                         = "/std/documents/{id}";
