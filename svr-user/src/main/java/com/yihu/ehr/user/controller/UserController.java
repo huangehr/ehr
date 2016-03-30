@@ -155,9 +155,9 @@ public class UserController extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(value = RestApi.Users.UserAdminPassword, method = RequestMethod.PUT)
+    @RequestMapping(value = RestApi.Users.UserAdminPasswordReset, method = RequestMethod.PUT)
     @ApiOperation(value = "修改密码", notes = "根基传入的用户id和新的密码修改用户的密码")
-    public boolean resetPass(
+    public boolean changePassWord(
             @ApiParam(name = "user_id", value = "user_id", defaultValue = "")
             @PathVariable(value = "user_id") String userId,
             @ApiParam(name = "password", value = "密码", defaultValue = "")
