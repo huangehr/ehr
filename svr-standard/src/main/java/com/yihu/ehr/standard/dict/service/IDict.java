@@ -23,7 +23,7 @@ public class IDict {
     String name;//字典名称
     String author;// 作者
     Long baseDict;//参考/继承的字典
-    Date createdate;//创建日期
+    Date createDate;//创建日期
     String description;//字典描述
     String sourceId;
     String stdVersion;// 标准化版本
@@ -81,12 +81,12 @@ public class IDict {
     }
 
     @Column(name = "create_date", unique = false, nullable = true)
-    public Date getCreatedate() {
-        return createdate;
+    public Date getCreateDate() {
+        return createDate;
     }
 
-    public void setCreatedate(Date createdate) {
-        this.createdate = createdate;
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
     }
 
     @Column(name = "description", unique = false, nullable = true)
@@ -118,7 +118,7 @@ public class IDict {
 
     @Column(name = "hash", unique = false, nullable = true)
     public int getHashCode() {
-        hashCode = Objects.hash(stdVersion, code, name, inStage, description, baseDict, author, createdate);
+        hashCode = Objects.hash(stdVersion, code, name, inStage, description, baseDict, author, createDate);
         return hashCode;
     }
 

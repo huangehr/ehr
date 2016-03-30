@@ -82,15 +82,15 @@ public class KeyManager {
     }
 
     public Key getKeyByUserId(String userId) throws Exception {
-        KeyMap keyMap = getKeyMap(userId);
-        if (keyMap == null) {
+        List<KeyMap> keyMapList = keyMapRepository.findByUserId(userId);
+        if (keyMapList!=null && keyMapList.size()>0){
+            //1-2-2当UserKey存在的情况下，查询用户关联的用户密钥信息。
+            String userSecurityId = keyMapList.get(0).getKey();
+            return keyRepository.findOne(userSecurityId);
+        }else {
             Key key = createKey();
             createUserKey(key.getId(), userId, PersonalKeyType);
             return key;
-        } else {
-            //1-2-2当UserKey存在的情况下，查询用户关联的用户密钥信息。
-            String userSecurityId = keyMap.getKey();
-            return keyRepository.findOne(userSecurityId);
         }
     }
 

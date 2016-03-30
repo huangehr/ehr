@@ -98,6 +98,19 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
     }
 
 
+    @RequestMapping(value = RestApi.Standards.DataSetsIds, method = RequestMethod.GET)
+    @ApiOperation(value = "根据数据集ids(用逗号隔开)获取数据集信息")
+    public Collection<MStdDataSet> getDataSets(
+            @ApiParam(name = "ids", value = "数据集编号", defaultValue = "")
+            @PathVariable(value = "ids") String ids,
+            @ApiParam(name = "version", value = "版本", defaultValue = "")
+            @RequestParam(value = "version") String version) {
+        Class entityClass = getServiceEntity(version);
+        List<IDataSet> list = dataSetService.search(entityClass,"id="+ids);
+        return convertToModels(list, new ArrayList<>(list.size()), MStdDataSet.class, "");
+    }
+
+
     @RequestMapping(value = RestApi.Standards.DataSets, method = RequestMethod.POST)
     @ApiOperation(value = "新增数据集信息")
     public MStdDataSet saveDataSet(

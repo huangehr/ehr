@@ -104,7 +104,7 @@ public class DocumentEndPoint  extends ExtendController<MCDADocument> {
 
         Class entityClass = getServiceEntity(version);
         ICDADocument cdaDocument = (ICDADocument) toEntity(model, entityClass);
-        //cdaDocument.setId(getObjectId(BizObject.STANDARD));
+//        cdaDocument.setId(getObjectId(BizObject.STANDARD));
         cdaDocument.setCreateDate(new Date());
         cdaDocumentManager.save(cdaDocument);
         return getModel(cdaDocument);

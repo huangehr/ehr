@@ -118,6 +118,7 @@ public class RestApi {
         public static final String DataSet                          = "/std/data_sets/{id}";
         public static final String DataSetsName                     = "/std/data_sets/name";
         public static final String DataSetCodeIsExist               = "/std/data_set/is_exist/code";
+        public static final String DataSetsIds                      = "/std/{ids}data_sets";
 
         public static final String MetaDatas                        = "/std/data_sets/meta_datas";
         public static final String MetaData                         = "/std/data_sets/meta_datas/{id}";

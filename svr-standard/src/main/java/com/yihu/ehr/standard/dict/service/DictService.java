@@ -56,7 +56,7 @@ public class DictService extends BaseHbmService<IDict> {
         query.setParameter("name", dict.getName());
         query.setParameter("author", dict.getAuthor());
         query.setParameter("base_dict", dict.getBaseDict());
-        query.setParameter("create_date", dict.getCreatedate());
+        query.setParameter("create_date", dict.getCreateDate());
         query.setParameter("description", dict.getDescription());
         query.setParameter("source", dict.getSourceId());
         query.setParameter("std_version", dict.getStdVersion());
