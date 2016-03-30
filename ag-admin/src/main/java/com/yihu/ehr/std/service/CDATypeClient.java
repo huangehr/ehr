@@ -73,7 +73,7 @@ public interface CDATypeClient {
 
     @RequestMapping(value = RestApi.Standards.Types, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除CDA类别，若该类别存在子类别，将一并删除子类别")
-    public boolean deleteCDATypeByPatientIds(
+    boolean deleteCDATypeByPatientIds(
             @ApiParam(name = "ids", value = "ids")
             @RequestParam(value = "ids") String ids);
 
@@ -92,8 +92,12 @@ public interface CDATypeClient {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page);
 
-//    @RequestMapping(value = RestApi.Standards.TypeOther, method = RequestMethod.GET)
-//    List<MCDAType> getOtherCDAType(@RequestParam(value = "id") String id);
+
+    @RequestMapping(value = RestApi.Standards.TypeParent, method = RequestMethod.GET)
+    @ApiOperation(value = "根据当前类别获取自己的父级以及同级以及同级所在父级类别列表")
+    List<MCDAType> getCdaTypeExcludeSelfAndChildren(
+            @ApiParam(name = "id", value = "id")
+            @RequestParam(value = "id") String id);
 
     @RequestMapping(value = RestApi.Standards.TypeList, method = RequestMethod.GET)
     @ApiOperation(value = "标准类别分页搜索")
@@ -102,8 +106,4 @@ public interface CDATypeClient {
                                   @ApiParam(name = "name", value = "name")
                                   @RequestParam(value = "name") String name);
 
-    @RequestMapping(value = RestApi.Standards.TypeParent, method = RequestMethod.GET)
-    @ApiOperation(value = "根据当前类别获取自己的父级以及同级以及同级所在父级类别列表")
-    List<MCDAType> getCDATypeByIds(
-            @RequestParam(value = "id") String id);
 }

@@ -82,26 +82,18 @@ public class CdaTypeController extends BaseUIController{
             params.put("code","");
             params.put("name","");
             String _rus = HttpClientUtil.doGet(comUrl+url,params,username,password);
-            if(StringUtils.isEmpty(_rus)){
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("cda类别获取失败");
-            }else
-                return _rus;
-
+            return _rus;
         }catch (Exception ex){
             LogService.getLogger(CdaTypeController.class).error(ex.getMessage());
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
         return envelop;
-
     }
 
     @RequestMapping("getCdaTypeById")
     @ResponseBody
     public Object getCdaTypeById(String strIds) {
-        //TODO　需要修改接口（ids可以为空，解除url的id绑定）
-        //cda文档功能中使用到
         Envelop envelop = new Envelop();
         String url = "/cda_types/id/"+strIds;
         try{
@@ -208,32 +200,41 @@ public class CdaTypeController extends BaseUIController{
 
     /**
      * 获取可以作为父类别的cda类别列表
-     * （不含该类别及子类别、子类别的子类类别。。所剩下的类别）
      * @param strId
-     * @param key
+     * @param codeName
      * @return
      */
-    @RequestMapping("getOtherCDAType")
+    @RequestMapping("getCdaTypeExcludeSelfAndChildren")
     @ResponseBody
-    public String getOtherCDAType(String strId, String key) {
-        //TODO 待网关提供接口
-        // ***临时使用***
-        String url = "/cda_types/as_parent_type";
-        String strResult = "";
+    public Object getCdaTypeExcludeSelfAndChildren(String strId, String codeName) {
+        //页面新增修改访问的是同个接口
+        Envelop envelop = new Envelop();
         try{
-            Map<String,Object> params = new HashMap<>();
-            params.put("id",strId);
-            params.put("key",key);
-            String envelopStr = HttpClientUtil.doGet(comUrl+url,params,username,password);
-            Envelop envelop = objectMapper.readValue(envelopStr,Envelop.class);
-            if (envelop.isSuccessFlg()) {
-                List<CdaTypeModel> cdaModelList = (List<CdaTypeModel>) getEnvelopList(envelop.getDetailModelList(), new ArrayList<CdaTypeModel>(), CdaTypeModel.class);
-                strResult = objectMapper.writeValueAsString(cdaModelList);
+            //新增cda类别是获取的是所有类别
+            if(StringUtils.isEmpty(strId)){
+                String urlGetAll = "/cda_types";
+                if(StringUtils.isEmpty(codeName)){
+                    codeName = "";
+                }
+                Map<String,Object> params = new HashMap<>();
+                params.put("code",codeName);
+                params.put("name",codeName);
+                String envelopStr = HttpClientUtil.doGet(comUrl+urlGetAll,params,username,password);
+                return envelopStr;
             }
-        }catch(Exception ex){
+            //修改时获取自身及其子类。。以外的cda类别
+            String urlGetOthers = "/types/parent";
+            Map<String,Object> args = new HashMap<>();
+            args.put("id",strId);
+            String envelopStrOthers = HttpClientUtil.doGet(comUrl+urlGetOthers,args,username,password);
+            return envelopStrOthers;
+        }catch (Exception ex){
             LogService.getLogger(CdaTypeController.class).error(ex.getMessage());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            return envelop;
         }
-        return strResult;
+
     }
 
     @RequestMapping("getCDATypeListByParentId")
