@@ -535,7 +535,7 @@ public class DictController  extends BaseUIController {
         params.put("version",strVersionCode);
 
         try{
-            String url = "/dict";
+            String url = "/dicts";
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
 
             return resultStr;

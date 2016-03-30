@@ -157,7 +157,7 @@ public class StdSourceManagerController extends BaseUIController {
             if (!envelopGet.isSuccessFlg()){
                 return envelopStrGet;
             }
-            StdSourceDetailModel modelForUpdate = getEnvelopModel(envelop.getObj(),StdSourceDetailModel.class);
+            StdSourceDetailModel modelForUpdate = getEnvelopModel(envelopGet.getObj(),StdSourceDetailModel.class);
 
             //update
             modelForUpdate.setCode(code);

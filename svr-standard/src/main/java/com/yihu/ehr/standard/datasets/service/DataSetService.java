@@ -50,8 +50,8 @@ public class DataSetService extends BaseHbmService<IDataSet>{
     public boolean add(IDataSet dataSet, String version){
         String sql =
                 "INSERT INTO " + getTaleName(version) +
-                "(code, name, ref_standard, std_version, summary, hash, document_id, lang) " +
-                "VALUES (:code, :name, :refStandard, :version, :summary, :hashCode, :documentId, :lang)";
+                "(code, name, ref_standard, std_version, summary, hash, document_id, lang, catalog, publisher) " +
+                "VALUES (:code, :name, :refStandard, :version, :summary, :hashCode, :documentId, :lang, :catalog, :publisher)";
         Query query = currentSession().createSQLQuery(sql);
         query.setParameter("code", dataSet.getCode());
         query.setParameter("name", dataSet.getName());
@@ -61,6 +61,8 @@ public class DataSetService extends BaseHbmService<IDataSet>{
         query.setParameter("hashCode", dataSet.getHashCode());
         query.setParameter("documentId", dataSet.getDocumentId());
         query.setParameter("lang", dataSet.getLang());
+        query.setParameter("catalog", dataSet.getCatalog());
+        query.setParameter("publisher", dataSet.getPublisher());
         return query.executeUpdate()>0;
     }
 

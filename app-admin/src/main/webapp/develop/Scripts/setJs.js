@@ -496,7 +496,7 @@ set.attr = {
                 var info = result.obj;
                 if (info != null) {
                     set.attr.set_form.attrScan();
-
+                    info.refStandard = info.reference;
                     set.attr.set_form.Fields.fillValues(info);
                     // cda.attr.cda_form.Fields.source_id.setValue("0dae0006561b759649f63220dcacfd00");
                 }
@@ -570,7 +570,7 @@ set.elementAttr = {
         $("#hdId").val(elementId);
         var setid = $.Util.getUrlQueryString('setid');
         $("#hdsetid").val(setid);
-        this.getDictList();
+        //this.getDictList();
         this.getElementInfo();
     },
     getDictList: function (initValue, initText) {
@@ -584,9 +584,8 @@ set.elementAttr = {
             autocomplete: true,
             keySupport: true,
             width: 400,
-            initValue: initValue,
-            initText: initText,
             onSuccess: function () {
+                set.elementAttr.dict_select.setValue(initValue);
                 $("#criterionDict").css({"width": 213, "height": 28});
                 $(".l-text-combobox").css({"width": 227});
                 $(".l-box-select-absolute").css({"width": 227});
@@ -599,8 +598,7 @@ set.elementAttr = {
             height: 28,
             width: 220
         })
-        set.elementAttr.dict_select.setValue(initValue);
-        set.elementAttr.dict_select.setText(initText);
+
     },
     getElementInfo: function () {
 
@@ -619,14 +617,15 @@ set.elementAttr = {
             data: {dataSetId: dataSetId, metaDataId: metaDataId, version: version},
             async: true,
             success: function (data) {
+                debugger
                 if (data != null) {
                     var info = eval(data).obj;
                     set.elementAttr.element_form.attrScan();
                     set.elementAttr.element_form.Fields.fillValues(info);
+
                     $("#metaDataCodeCopy").val(info.innerCode);
                     $("#fieldNameCopy").val(info.columnName);
                     $("#datatype").val(info.columnType);
-                    set.elementAttr.dict_select.setValue(info.dictId);
                     set.elementAttr.getDictList(info.dictId, info.dictName);
                     $("#primaryKey").attr('checked', false);
                     if (info.primaryKey == "1") {
