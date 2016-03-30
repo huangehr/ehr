@@ -76,7 +76,7 @@ public class StandardSourceController extends BaseController {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.NoPageSources, method = RequestMethod.GET)
+    @RequestMapping(value = "/sources/no_paging", method = RequestMethod.GET)
     @ApiOperation(value = "标准来源分页搜索(不分页)")
     public Envelop searchSourcesWithoutPaging(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")

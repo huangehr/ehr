@@ -34,7 +34,7 @@ public class CdaTypeController extends BaseUIController{
     private String username;
     @Value("${service-gateway.password}")
     private String password;
-    @Value("${service-gateway.url}")
+    @Value("${service-gateway.cdatypeurl}")
     private String comUrl;
 
     @Autowired
@@ -77,7 +77,7 @@ public class CdaTypeController extends BaseUIController{
     @ResponseBody
     public Object GetCdaTypeList(String strKey, Integer page, Integer rows) {
         Envelop envelop = new Envelop();
-        String url = "/cda_type/cda_types";
+        String url = "/cda_types";
         try{
             Map<String,Object> params = new HashMap<>();
             params.put("code","");
@@ -246,7 +246,7 @@ public class CdaTypeController extends BaseUIController{
         ObjectMapper mapper = new ObjectMapper();
         Map<String,Object> params = new HashMap<>();
         params.put("parent_id",ids);
-        String url = "/cda_type/children_cda_types";
+        String url = "/children_cda_types";
 
         try {
             String envelopStr = HttpClientUtil.doGet(comUrl + url,params,username, password);

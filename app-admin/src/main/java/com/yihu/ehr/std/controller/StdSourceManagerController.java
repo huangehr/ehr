@@ -230,14 +230,12 @@ public class StdSourceManagerController extends BaseUIController {
     @ResponseBody
     public Object getStdSourceList() {
         Envelop envelop = new Envelop();
-        String url = "/sources";
+        String url = "/sources/no_paging";
         try{
+            String filters = "";
+            //后期根据需要添加过滤参数
             Map<String,Object> params = new HashMap<>();
-            params.put("fields","");
-            params.put("filters","");
-            params.put("sorts","");
-            params.put("page",1);
-            params.put("size",999);
+            params.put("filters",filters);
             String envelopStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             if(StringUtils.isEmpty(envelopStr)){
                 envelop.setSuccessFlg(false);
