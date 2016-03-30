@@ -11,6 +11,7 @@ public class UserDetailModel {
     private String loginCode;
     private String realName;
     private String password;
+    private String newPassWord;
     private Boolean activated;
     private String validateCode;
     private String userType;
@@ -298,5 +299,13 @@ public class UserDetailModel {
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public String getNewPassWord() {
+        return newPassWord;
+    }
+
+    public void setNewPassWord(String newPassWord) {
+        this.newPassWord = newPassWord;
     }
 }

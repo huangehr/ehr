@@ -2,6 +2,7 @@ package com.yihu.ehr.login.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.user.UserDetailModel;
+import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.DateFormatter;
 import com.yihu.ehr.util.Envelop;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +42,7 @@ public class LoginController {
 
     @RequestMapping(value = "")
     public String login(Model model) {
-        model.addAttribute("contentPage","login/login");
+        model.addAttribute("contentPage", "login/login");
         return "generalView";
         //return "login/login";
         //return "test";
@@ -59,22 +61,22 @@ public class LoginController {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, this.password);
             Envelop envelop = mapper.readValue(resultStr, Envelop.class);
             String userJson = mapper.writeValueAsString(envelop.getObj());
-            UserDetailModel userDetailModel = mapper.readValue(userJson,UserDetailModel.class);
+            UserDetailModel userDetailModel = mapper.readValue(userJson, UserDetailModel.class);
 
-            if (envelop.isSuccessFlg()){
+            if (envelop.isSuccessFlg()) {
                 String lastLoginTime = null;
 
-                if(!userDetailModel.getActivated()){
+                if (!userDetailModel.getActivated()) {
 
                     model.addAttribute("userName", userName);
                     model.addAttribute("successFlg", false);
                     model.addAttribute("failMsg", "该用户已失效，请联系系统管理员重新生效。");
-                    model.addAttribute("contentPage","login/login");
+                    model.addAttribute("contentPage", "login/login");
 
                     return "generalView";
                 }
 
-                if(userDetailModel.getLastLoginTime()!= null){
+                if (userDetailModel.getLastLoginTime() != null) {
                     //lastLoginTime = DateFormatter.simpleDateTimeShortFormat(userDetailModel.getLastLoginTime());
                     lastLoginTime = userDetailModel.getLastLoginTime();
                 }
@@ -86,19 +88,19 @@ public class LoginController {
 //              userManager.lastLoginTime(user.getId(),new Date());
 
                 return "redirect:/index";
-            }else{
+            } else {
 
                 model.addAttribute("userName", userName);
                 model.addAttribute("successFlg", false);
                 model.addAttribute("failMsg", "用户名或密码错误，请重新输入。");
-                model.addAttribute("contentPage","login/login");
+                model.addAttribute("contentPage", "login/login");
                 return "generalView";
             }
         } catch (Exception e) {
             model.addAttribute("userName", userName);
             model.addAttribute("successFlg", false);
             model.addAttribute("failMsg", e.getMessage());
-            model.addAttribute("contentPage","login/login");
+            model.addAttribute("contentPage", "login/login");
             return "generalView";
         }
 
@@ -249,7 +251,6 @@ public class LoginController {
 //        }
 //        return address;
 //    }
-
     public String getAddress(String citys) {
 
         String[] st = citys.split(",");
@@ -317,4 +318,36 @@ public class LoginController {
             return localIP;
         }
     }
+
+    @RequestMapping(value = "/userVerification")
+    @ResponseBody
+    public Object dataValidation(String userName, String password) {
+
+        Map<String, Object> params = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+        Envelop envelop = new Envelop();
+
+        String url = "/users/verification/" + userName;
+        String resultStr = "";
+
+        params.put("psw", password);
+        try {
+
+            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, this.password);
+            envelop = mapper.readValue(resultStr,Envelop.class);
+            if(!envelop.isSuccessFlg()){
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("密码错误，请重新输入");
+            }else {
+                envelop.setSuccessFlg(true);
+                envelop.setObj("");
+            }
+        } catch (Exception e) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("密码错误，请重新输入");
+            return envelop;
+        }
+        return envelop;
+    }
+
 }

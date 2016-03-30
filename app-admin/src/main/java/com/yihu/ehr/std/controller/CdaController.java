@@ -75,7 +75,7 @@ public class CdaController {
         }
         params.put("fields","");
         params.put("sorts","");
-        params.put("versionCode",strVersion);
+        params.put("version",strVersion);
         params.put("filters",filters);
         params.put("page",page);
         params.put("size",rows);
@@ -337,7 +337,6 @@ public class CdaController {
 
         Envelop envelop = new Envelop();
         Map<String,Object> params = new HashMap<>();
-        ObjectMapper mapper = new ObjectMapper();
 
         params.put("cdaId",ids);
         params.put("versionCode",strVersionCode);
@@ -413,85 +412,6 @@ public class CdaController {
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
         return result;
-
-
-       /*Result result = new Result();
-        try {
-            String strErrorMsg = "";
-            if (strVersionCode == null || strVersionCode == "") {
-                strErrorMsg += "标准版本不能为空!";
-            }
-            if (strCdaId == null || strCdaId == "") {
-                strErrorMsg += "请先选择CDA!";
-            }
-            if (strErrorMsg != "") {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(strErrorMsg);
-                return result;
-            }
-            List<String> listCdaId = Arrays.asList(strCdaId.split(","));
-            int iDelRes = xCdaDatasetRelationshipManager.deleteRelationshipByCdaId(strVersionCode, listCdaId);
-            if (iDelRes < 0) {
-                result.setSuccessFlg(false);
-                result.setErrorMsg("关系保存失败!");
-                return result;
-            }
-            List<String> listIds = new ArrayList<>();
-            listIds.add(strCdaId);
-            XCDADocument[] xcdaDocuments = xcdaDocumentManager.getDocumentList(strVersionCode, listIds);
-            if (xcdaDocuments.length <= 0) {
-                result.setSuccessFlg(false);
-                result.setErrorMsg("请先选择CDA！");
-                return result;
-            }
-            if (xcdaDocuments[0].getFileGroup() != null && !xcdaDocuments[0].getFileGroup().equals("") && xcdaDocuments[0].getSchema() != null && !xcdaDocuments[0].getSchema().equals("")) {
-                FastDFSUtil.delete(xcdaDocuments[0].getFileGroup(), xcdaDocuments[0].getSchema());
-            }
-            if (strDatasetIds == null || strDatasetIds == "") {
-                result.setSuccessFlg(true);
-                result.setErrorMsg("关系保存成功!");
-                return result;
-            }
-            strDatasetIds = strDatasetIds.substring(0, strDatasetIds.length() - 1);
-            List<String> datasetIds = Arrays.asList(strDatasetIds.split(","));
-            XCdaDatasetRelationship[] infos = new CdaDatasetRelationship[datasetIds.size()];
-            for (int i = 0; i < infos.length; i++) {
-                String datasetId = datasetIds.get(i);
-                XCdaDatasetRelationship info = new CdaDatasetRelationship();
-                info.setCdaId(strCdaId);
-                info.setDatasetId(datasetId);
-                info.setVersionCode(strVersionCode);
-                infos[i] = info;
-            }
-            int iResult = xCdaDatasetRelationshipManager.addRelationship(infos);
-            if (iResult < 0) {
-                result.setSuccessFlg(false);
-                result.setErrorMsg("关系保存失败!");
-            }
-            String strFilePath = SaveCdaFile(xmlInfo, strVersionCode, strCdaId);
-            //将文件上传到服务器中
-            ObjectNode msg = FastDFSUtil.upload(strFilePath, "");
-            String strFileGroup = msg.get(FastDFSUtil.GroupField).asText();//setFilePath
-            String strSchemePath = msg.get(FastDFSUtil.RemoteFileField).asText();//setFileName
-            File file = new File(strFilePath);
-            // 路径为文件且不为空则进行删除
-            if (file.isFile() && file.exists()) {
-                file.delete();
-            }
-            boolean bRes = SaveXmlFilePath(strCdaId, strVersionCode, strFileGroup, strSchemePath);
-            if (bRes) {
-                result.setSuccessFlg(true);
-                result.setErrorMsg("关系保存成功!");
-            } else {
-                result.setSuccessFlg(false);
-                result.setErrorMsg("关系保存失败!");
-            }
-        } catch (Exception ex) {
-            LogService.getLogger(CdaController_w.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg("关系保存失败!");
-        }
-        return result;*/
     }
 
     @RequestMapping("DeleteRelationship")
@@ -565,68 +485,6 @@ public class CdaController {
         }*/
     }
 
-    /**
-     * 生成CDA文件
-     *
-     * @param strCdaId
-     * @param strVersionCode
-     * @return
-     */
-    @RequestMapping("/createCDASchemaFile")
-    @ResponseBody
-    public Object createCDASchemaFile(String strCdaId, String strVersionCode) {
-        // TODO 无对应
-        Envelop result = new Envelop();
-        try {
-            String url = "/cda/***********";
-            Map<String,Object> params = new HashMap<>();
-            params.put("strCdaId",strCdaId);
-            params.put("strVersionCode",strVersionCode);
-            String _rus = HttpClientUtil.doPost(comUrl+url,params,username,password);
-            if (StringUtils.isEmpty(_rus)) {
-                result.setSuccessFlg(false);
-                result.setErrorMsg("cda�ĵ�����ʧ�ܣ�");
-            } else {
-                result.setSuccessFlg(true);
-            }
-        } catch (Exception ex) {
-            LogService.getLogger(CdaController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg("CDA�ĵ�����ʧ��!");
-        }
-        return result;
-
-       /*Result result = new Result();
-        try {
-            int iResult = xcdaDocumentManager.createCDASchemaFile(strCdaId, strVersionCode);
-            if (iResult >= 0) {
-                result.setSuccessFlg(true);
-            } else {
-                result.setSuccessFlg(false);
-                result.setErrorMsg("CDA文档创建失败!");
-            }
-        } catch (Exception ex) {
-            LogService.getLogger(CdaController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg("CDA文档创建失败!");
-        }
-        return result.toJson();*/
-    }
-
-//    @RequestMapping("/TestFileSend")
-//    @ResponseBody
-//    public void TestFileSend(String strVersion)
-//    {
-//        try {
-//            XStdDispatchManager sendManager = ServiceFactory.getService(Services.StdDispatchManager);
-//
-//            sendManager.SendStandard(strVersion);
-//        }
-//        catch (Exception ex)
-//        {
-//            int t=0;
-//        }
-//    }
 
     /*
      * 根据CDA ID 获取数据集信息
