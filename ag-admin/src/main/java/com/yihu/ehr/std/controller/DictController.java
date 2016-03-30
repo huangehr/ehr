@@ -124,14 +124,14 @@ public class DictController extends BaseController {
                     return failed("代码已存在!");
                 }
 
-                mStdDict.setCreatedate(StringToDate(dictModel.getCreateDate(), AgAdminConstants.DateTimeFormat));
+                mStdDict.setCreateDate(StringToDate(dictModel.getCreateDate(), AgAdminConstants.DateTimeFormat));
                 mStdDict = dictClient.updateDict(versionCode, mStdDict.getId(), objectMapper.writeValueAsString(mStdDict));
             }
             dictModel = convertToModel(mStdDict, DictModel.class);
             if (dictModel == null) {
                 return failed("保存失败!");
             }
-            dictModel.setCreateDate(DateToString(mStdDict.getCreatedate(),AgAdminConstants.DateTimeFormat));
+            dictModel.setCreateDate(DateToString(mStdDict.getCreateDate(),AgAdminConstants.DateTimeFormat));
             return success(dictModel);
         } catch (Exception ex) {
             return failedSystem();
