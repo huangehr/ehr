@@ -24,7 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "DictionaryEntry", description = "系统全局字典项管理", tags = {"系统字典项"})
+@Api(value = "DictionaryEntry", description = "系统全局字典项管理", tags = {"系统字典项"})
 public class SystemDictEntryController extends BaseRestController {
     @Autowired
     SystemDictService dictService;

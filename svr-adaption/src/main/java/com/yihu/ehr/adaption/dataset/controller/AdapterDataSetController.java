@@ -32,7 +32,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/adapter")
-@Api(protocols = "https", value = "adapterDataSet", description = "适配数据集接口", tags = {"适配数据集"})
+@Api(value = "adapterDataSet", description = "适配数据集接口", tags = {"适配数据集"})
 public class AdapterDataSetController extends ExtendController<MAdapterDataSet> {
 
     @Autowired

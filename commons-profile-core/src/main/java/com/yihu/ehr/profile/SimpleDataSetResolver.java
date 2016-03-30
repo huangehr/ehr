@@ -32,7 +32,7 @@ public class SimpleDataSetResolver {
             String eventNo = jsonNode.get("event_no").asText();
             String patientId = jsonNode.get("patient_id").asText();
             String orgCode = jsonNode.get("org_code").asText();
-            String eventDate = jsonNode.path("event_time").asText();        // 旧数据包可能不存在这个属性
+            String eventDate = jsonNode.path("event_time").asText();        // 旧数据集结构可能不存在这个属性
 
             dataSet.setPatientId(patientId);
             dataSet.setEventNo(eventNo);
@@ -51,15 +51,11 @@ public class SimpleDataSetResolver {
                     String key = item.getKey();
                     if (key.equals("PATIENT_ID") || key.equals("EVENT_NO")) continue;
 
-                    if (key.contains("HDSA00_01_017") && !item.getValue().asText().contains("null")) {
-                        System.out.println(item.getValue().asText());
-                    }
-
-                    String[] standardizedMetaData = standardizeMetaData(
+                    String[] standardizedMetaData = translateMetaData(
                             cdaVersion,
                             code,
                             key,
-                            item.getValue().isNull() ? "" : item.getValue().asText(),
+                            item.getValue().asText().equals("null") ? "" : item.getValue().asText(),
                             isOrigin);
                     if (standardizedMetaData != null) {
                         record.put(standardizedMetaData[0], standardizedMetaData[1]);
@@ -68,10 +64,10 @@ public class SimpleDataSetResolver {
                     }
                 }
 
-                dataSet.addRecord(new ObjectId((short) 0, BizObject.StdProfile).toString(), record);
+                dataSet.addRecord(Integer.toString(i), record);
             }
         } catch (NullPointerException ex) {
-            throw new RuntimeException("Null pointer occurs in JsonFileParser.generateDataSet");
+            throw new RuntimeException("Null pointer occurs while generate data set");
         } catch (Exception ex) {
             throw new RuntimeException(ex.getMessage());
         } finally {
@@ -90,11 +86,11 @@ public class SimpleDataSetResolver {
      * @param actualData
      * @return
      */
-    protected String[] standardizeMetaData(String innerVersion,
-                                                String dataSetCode,
-                                                String metaDataInnerCode,
-                                                String actualData,
-                                                boolean isOriginDataSet) {
+    protected String[] translateMetaData(String innerVersion,
+                                         String dataSetCode,
+                                         String metaDataInnerCode,
+                                         String actualData,
+                                         boolean isOriginDataSet) {
         return new String[]{metaDataInnerCode, actualData};
     }
 }

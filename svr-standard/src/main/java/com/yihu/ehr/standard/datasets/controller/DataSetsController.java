@@ -26,7 +26,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "dataset", description = "标准数据集", tags = {"标准数据集"})
+@Api(value = "dataset", description = "标准数据集", tags = {"标准数据集"})
 public class DataSetsController extends ExtendController<MStdDataSet> {
 
     @Autowired
@@ -35,7 +35,6 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
     private Class getServiceEntity(String version){
         return dataSetService.getServiceEntity(version);
     }
-
 
     @RequestMapping(value = RestApi.Standards.DataSets, method = RequestMethod.GET)
     @ApiOperation(value = "查询数据集的方法")

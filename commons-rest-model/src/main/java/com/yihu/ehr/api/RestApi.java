@@ -11,6 +11,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @created 2015.09.09 15:04
  */
 public class RestApi {
+    public static class Caches{
+        public static final String Organizations                   = "/caches/organizations";
+        public static final String Organization                    = "/caches/organizations/{org_code}";
+        public static final String Versions                        = "/caches/standards/versions";
+        public static final String Version                         = "/caches/standards/versions/{version}";
+    }
+
     public static class Adaptions{
     }
 
@@ -40,9 +47,10 @@ public class RestApi {
 
     public static class Packages{
         public static final String Packages                         = "/packages";
-        public static final String LegacyPackages                   = "/json_package";
         public static final String Package                          = "/packages/{id}";
         public static final String PackageDownloads                 = "/packages/{id}/downloads";
+
+        public static final String LegacyPackages                   = "/json_package";
     }
 
     public static class Patients{
@@ -79,9 +87,8 @@ public class RestApi {
         public static final String TypesCodeExistence               = "/std/type/code/existence";
         public static final String TypeChildren                     = "/std/types/parent_id/childrens";
         public static final String TypesChildren                    = "/std/types/childrens";
-        public static final String TypeOther                        = "/std/types/{id}/other";
         public static final String TypeList                         = "/cda_types/code_name";
-        public static final String TypeParent                       = "/std/types/{id}/parent";
+        public static final String TypeParent                       = "/std/types/parent";
 
         public static final String Versions                         = "/std/versions";
         public static final String Version                          = "/std/versions/{version}";

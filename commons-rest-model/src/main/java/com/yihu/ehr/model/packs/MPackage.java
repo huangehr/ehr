@@ -11,14 +11,16 @@ import java.util.Date;
  * @created 2016.02.01 16:11
  */
 public class MPackage implements Serializable {
-    public String id;
-    public String pwd;
-    public String remotePath;
-    public String message;
-    public Date receiveDate;
-    public Date parseDate;
-    public Date finishDate;
-    public ArchiveStatus archiveStatus;
+    String id;
+    String pwd;
+    String remotePath;
+    String message;
+    String md5;
+    String orgCode;
+    Date receiveDate;
+    Date parseDate;
+    Date finishDate;
+    ArchiveStatus archiveStatus;
 
     public ArchiveStatus getArchiveStatus() {
         return archiveStatus;
@@ -82,5 +84,21 @@ public class MPackage implements Serializable {
 
     public void setFinishDate(Date finishDate) {
         this.finishDate = finishDate;
+    }
+
+    public String getOrgCode() {
+        return orgCode;
+    }
+
+    public void setOrgCode(String orgCode) {
+        this.orgCode = orgCode;
+    }
+
+    public String getMd5() {
+        return md5;
+    }
+
+    public void setMd5(String md5) {
+        this.md5 = md5;
     }
 }

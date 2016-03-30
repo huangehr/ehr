@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.cache.*;
 import com.yihu.ehr.lang.SpringContext;
 
 import java.util.*;
@@ -127,11 +126,9 @@ public class ProfileDataSet {
         } else {
             ObjectNode root = objectMapper.createObjectNode();
             root.put("code", code);
-            root.put("name", name);
             root.put("patient_id", patientId);
             root.put("event_no", eventNo);
             root.put("org_code", orgCode);
-            root.put("org_name", orgName);
             root.put("origin_doc_url", String.join(";", originDocUrls));
 
             ArrayNode arrayNode = root.putArray("records");

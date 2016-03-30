@@ -31,7 +31,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/adapter_dispatcher")
-@Api(protocols = "https", value = "Adapter-Dispatch", description = "适配分发接口", tags = {"适配分发接口"})
+@Api(value = "Adapter-Dispatch", description = "适配分发接口", tags = {"标准化", "适配方案", "分发"})
 public class AdapterDispatchController {
     @Autowired
     AdapterInfoSendService adapterInfoSendService;

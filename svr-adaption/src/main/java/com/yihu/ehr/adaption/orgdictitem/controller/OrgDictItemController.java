@@ -24,7 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/adapter/org")
-@Api(protocols = "https", value = "orgdictitem", description = "机构字典项", tags = {"机构字典项"})
+@Api(value = "orgdictitem", description = "机构字典项", tags = {"机构字典项"})
 public class OrgDictItemController extends ExtendController<MOrgDictItem> {
 
     @Autowired

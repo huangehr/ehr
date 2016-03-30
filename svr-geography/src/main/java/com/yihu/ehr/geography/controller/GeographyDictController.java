@@ -23,7 +23,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "Geography-Dict", description = "行政区划地址", tags = {"行政区划地址"})
+@Api(value = "Geography-Dict", description = "行政区划地址", tags = {"行政区划地址"})
 public class GeographyDictController extends BaseRestController{
 
     @Autowired

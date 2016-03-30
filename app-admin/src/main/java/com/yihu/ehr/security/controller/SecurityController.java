@@ -1,29 +1,14 @@
 package com.yihu.ehr.security.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adapter.controller.ExtendController;
-import com.yihu.ehr.agModel.dict.SystemDictEntryModel;
-import com.yihu.ehr.agModel.dict.SystemDictModel;
-import com.yihu.ehr.agModel.security.UserSecurityModel;
-import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.constants.RestAPI;
-import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.security.service.SecurityService;
 import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.HttpClientUtil;
-import com.yihu.ehr.util.RestEcho;
 import com.yihu.ehr.util.log.LogService;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.net.URLDecoder;
-import java.security.Key;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 

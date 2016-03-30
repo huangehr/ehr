@@ -27,7 +27,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "metadata", description = "标准数据元", tags = {"标准数据元"})
+@Api(value = "metadata", description = "标准数据元", tags = {"标准数据元"})
 public class MetaDataController extends ExtendController<MStdMetaData> {
 
     @Autowired

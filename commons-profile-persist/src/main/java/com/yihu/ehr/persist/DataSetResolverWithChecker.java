@@ -1,10 +1,13 @@
 package com.yihu.ehr.persist;
 
-import com.yihu.ehr.cache.CachedMetaData;
-import com.yihu.ehr.cache.StdDataRedisCache;
-import com.yihu.ehr.cache.StdObjectQualifierTranslator;
+import com.yihu.ehr.cache.CacheReader;
 import com.yihu.ehr.profile.SimpleDataSetResolver;
+import com.yihu.ehr.profile.StdObjectQualifierTranslator;
+import com.yihu.ehr.schema.StdKeySchema;
 import com.yihu.ehr.util.log.LogService;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.regex.Matcher;
 
@@ -15,7 +18,14 @@ import java.util.regex.Matcher;
  * @version 1.0
  * @created 2015.08.16 10:44
  */
+@Component
 public class DataSetResolverWithChecker extends SimpleDataSetResolver {
+    @Autowired
+    CacheReader cacheReader;
+
+    @Autowired
+    StdKeySchema keySchema;
+
     /**
      * 翻译数据元。
      *
@@ -26,49 +36,43 @@ public class DataSetResolverWithChecker extends SimpleDataSetResolver {
      * @param actualData
      * @return
      */
-    protected String[] standardizeMetaData(String innerVersion,
-                                           String dataSetCode,
-                                           String metaDataInnerCode,
-                                           String actualData,
-                                           boolean isOriginDataSet) {
-        actualData = (actualData == null) ? "" : actualData.trim();
+    protected String[] translateMetaData(String innerVersion,
+                                         String dataSetCode,
+                                         String metaDataInnerCode,
+                                         String actualData,
+                                         boolean isOriginDataSet) {
+        if (StringUtils.isEmpty(actualData)) return null;
 
-        CachedMetaData metaData = StdDataRedisCache.getMetaData(innerVersion, dataSetCode, metaDataInnerCode);
-        if (null == metaData) {
-            String msg = "Meta data %1 of data set %2 is NOT found in version %3. Please check the meta data."
+        String typeKey = cacheReader.read(keySchema.metaDataType(innerVersion, dataSetCode, metaDataInnerCode));
+        if (StringUtils.isEmpty(typeKey)) {
+            String msg = "Meta data %1 in data set %2 is not found in version %3. FORGET cache standards?"
                     .replace("%1", metaDataInnerCode)
                     .replace("%2", dataSetCode)
                     .replace("%3", innerVersion);
 
-            LogService.getLogger().warn(msg);
+            LogService.getLogger().error(msg);
             return null;
         }
 
+        actualData = actualData.trim();
+
         // 仅对标准化数据集及有关联字典的数据元进行翻译
-        if (!isOriginDataSet && actualData != null && actualData.length() > 0 && metaData.dictId > 0) {
+        long dictId = cacheReader.read(keySchema.metaDataDict(innerVersion, dataSetCode, metaDataInnerCode));
+        if (!isOriginDataSet && StringUtils.isNotEmpty(actualData) && dictId > 0) {
             String[] tempQualifiers = StdObjectQualifierTranslator.splitInnerCodeAsCodeValue(metaDataInnerCode);
 
-            String codeQualifier = StdObjectQualifierTranslator.toHBaseQualifier(tempQualifiers[0], metaData.type);
-            String valueQualifier = StdObjectQualifierTranslator.toHBaseQualifier(tempQualifiers[1], metaData.type);
+            String codeQualifier = StdObjectQualifierTranslator.toHBaseQualifier(tempQualifiers[0], typeKey);
+            String valueQualifier = StdObjectQualifierTranslator.toHBaseQualifier(tempQualifiers[1], typeKey);
 
-            String value = StdDataRedisCache.getDictEntryValue(innerVersion, metaData.dictId, actualData);
+            String value = cacheReader.read(keySchema.dictEntryValue(innerVersion, Long.toString(dictId), actualData));
 
             return new String[]{codeQualifier, actualData, valueQualifier, value == null ? "" : value};
         } else {
-            if (metaData.type.equals("D")) {
-                actualData = actualData.length() <= 10 ? actualData : actualData.substring(0, actualData.lastIndexOf(' ')) + " 00:00:00";
-            } else if (metaData.type.equals("DT")) {
-                actualData = actualData.contains(".") ? actualData.substring(0, actualData.lastIndexOf('.')) : actualData;
-            } else if (metaData.type.equals("N")) {
-                Matcher matcher = NumberPattern.matcher(actualData);
-                if (matcher.find()) {
-                    actualData = matcher.group();
-                } else {
-                    actualData = "";
-                }
+            if (typeKey.startsWith("D")) {
+                actualData = actualData.replace(".0", "");
             }
 
-            return new String[]{StdObjectQualifierTranslator.toHBaseQualifier(metaDataInnerCode, metaData.type), actualData};
+            return new String[]{StdObjectQualifierTranslator.toHBaseQualifier(metaDataInnerCode, typeKey), actualData};
         }
     }
 }

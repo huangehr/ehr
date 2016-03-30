@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/organizations")
-@Api(protocols = "https", value = "organizations", description = "组织机构服务")
+@Api(value = "organizations", description = "组织机构服务")
 public class OrganizationsEndPoint extends BaseController {
 
     @Autowired

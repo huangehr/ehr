@@ -2,14 +2,14 @@ package com.yihu.ehr.persist;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.cache.CachedMetaData;
-import com.yihu.ehr.cache.StdDataRedisCache;
-import com.yihu.ehr.cache.StdObjectQualifierTranslator;
+import com.yihu.ehr.cache.CacheReader;
 import com.yihu.ehr.data.HBaseClient;
 import com.yihu.ehr.data.ResultWrapper;
 import com.yihu.ehr.profile.Profile;
 import com.yihu.ehr.profile.ProfileDataSet;
 import com.yihu.ehr.profile.ProfileTableOptions;
+import com.yihu.ehr.profile.StdObjectQualifierTranslator;
+import com.yihu.ehr.schema.StdKeySchema;
 import com.yihu.ehr.util.DateFormatter;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -38,6 +38,12 @@ public class ProfileLoader {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @Autowired
+    CacheReader cacheReader;
+
+    @Autowired
+    StdKeySchema keySchema;
 
     public ProfileLoader() {
     }
@@ -110,7 +116,7 @@ public class ProfileLoader {
                     }
                 }
             } else {
-                Pair<String, ProfileDataSet> pair = loadOnlyIndexedDataSet(cdaVersion, dataSetCode, rowKeys);
+                Pair<String, ProfileDataSet> pair = loadDataSetIndexOnly(cdaVersion, dataSetCode, rowKeys);
                 profile.addDataSet(pair.getLeft(), pair.getRight());
             }
         }
@@ -176,9 +182,9 @@ public class ProfileLoader {
      * @param rowKeys
      * @return
      */
-    public Pair<String, ProfileDataSet> loadOnlyIndexedDataSet(String cdaVersion,
-                                                               String dataSetCode,
-                                                               String[] rowKeys){
+    public Pair<String, ProfileDataSet> loadDataSetIndexOnly(String cdaVersion,
+                                                             String dataSetCode,
+                                                             String[] rowKeys){
         ProfileDataSet dataSet = new ProfileDataSet();
         dataSet.setCdaVersion(cdaVersion);
         dataSet.setCode(dataSetCode);
@@ -193,28 +199,29 @@ public class ProfileLoader {
     /**
      * 加载部分数据集。
      *
-     * @param cdaVersion
+     * @param version
      * @param dataSetCode
      * @param rowKeys
      * @param innerCodes
      * @return
      * @throws IOException
      */
-    public Pair<String, ProfileDataSet> loadPartialDataSet(String cdaVersion,
+    public Pair<String, ProfileDataSet> loadPartialDataSet(String version,
                                                            String dataSetCode,
                                                            Set<String> rowKeys,
                                                            String[] innerCodes) throws IOException {
         List<String> metaDataInnerCode = new ArrayList<>(innerCodes.length);
         for (int i = 0; i < innerCodes.length; ++i) {
-            CachedMetaData metaData = StdDataRedisCache.getMetaData(cdaVersion, dataSetCode, innerCodes[i]);
-            if (metaData == null) {
+            Long dictId = Long.getLong(cacheReader.read(keySchema.metaDataDict(version, dataSetCode, innerCodes[i])));
+            String type = cacheReader.read(keySchema.metaDataType(version, dataSetCode, innerCodes[i]));
+            if (dictId == null) {
                 continue;
-            } else if (metaData.dictId == 0) {
-                metaDataInnerCode.add(StdObjectQualifierTranslator.toHBaseQualifier(innerCodes[i], metaData.type));
-            } else if (metaData.dictId > 0) {
+            } else if (dictId == 0) {
+                metaDataInnerCode.add(StdObjectQualifierTranslator.toHBaseQualifier(innerCodes[i], type));
+            } else if (dictId > 0) {
                 String[] temp = StdObjectQualifierTranslator.splitInnerCodeAsCodeValue(innerCodes[i]);
-                metaDataInnerCode.add(StdObjectQualifierTranslator.toHBaseQualifier(temp[0], metaData.type));
-                metaDataInnerCode.add(StdObjectQualifierTranslator.toHBaseQualifier(temp[1], metaData.type));
+                metaDataInnerCode.add(StdObjectQualifierTranslator.toHBaseQualifier(temp[0], type));
+                metaDataInnerCode.add(StdObjectQualifierTranslator.toHBaseQualifier(temp[1], type));
             }
         }
 
@@ -254,7 +261,7 @@ public class ProfileLoader {
             dataSet.addRecord(Bytes.toString(result.getRow()), record);
         }
 
-        dataSet.setCdaVersion(cdaVersion);
+        dataSet.setCdaVersion(version);
         dataSet.setCode(dataSetCode);
 
         return new ImmutablePair<>(dataSetCode, dataSet);

@@ -22,6 +22,8 @@ public class JsonPackage  {
     private String pwd;
     private String remotePath;
     private String message;
+    private String md5;
+    private String orgCode;
     private Date receiveDate;
     private Date parseDate;
     private Date finishDate;
@@ -98,6 +100,24 @@ public class JsonPackage  {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    //@Column(name = "md5")
+    public String getMd5() {
+        return md5;
+    }
+
+    public void setMd5(String md5) {
+        this.md5 = md5;
+    }
+
+    //@Column(name = "org_code")
+    public String getOrgCode() {
+        return orgCode;
+    }
+
+    public void setOrgCode(String orgCode) {
+        this.orgCode = orgCode;
     }
 
     public boolean equals(Object o) {

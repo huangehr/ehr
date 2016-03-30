@@ -20,7 +20,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/standards")
-@Api(protocols = "https", value = "standards", description = "健康档案标准服务")
+@Api(value = "standards", description = "健康档案标准服务")
 public class StandardsEndPoint {
 
     @ApiOperation(value = "获取健康档案数据标准版本", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)

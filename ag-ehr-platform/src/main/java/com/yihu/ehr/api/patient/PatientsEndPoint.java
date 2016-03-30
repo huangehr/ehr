@@ -34,7 +34,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(protocols = "https", value = "patients", description = "患者服务")
+@Api(value = "patients", description = "患者服务")
 public class PatientsEndPoint {
     @Autowired
     SimpleDataSetResolver dataSetResolver;

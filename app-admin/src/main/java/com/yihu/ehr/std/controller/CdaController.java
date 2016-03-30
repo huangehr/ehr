@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.cdadocument.CDAModel;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.constants.RestAPI;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
@@ -24,7 +23,6 @@ import java.util.Map;
 
 
 @RequestMapping("/cda")
-@Controller(RestAPI.StandardCDAManagerController)
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
 public class CdaController {
     @Value("${service-gateway.username}")
