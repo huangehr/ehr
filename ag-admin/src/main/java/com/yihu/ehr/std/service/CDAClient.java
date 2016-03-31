@@ -51,6 +51,8 @@ public interface CDAClient {
     @RequestMapping(value = ApiVersion.Version1_0+RestApi.Standards.Documents,method = RequestMethod.POST)
     @ApiOperation(value = "保存CDADocuments")
     MCDADocument saveCDADocuments(
+            @ApiParam(name = "version", value = "标准版本", defaultValue = "")
+            @RequestParam(value = "version") String version,
             @ApiParam(name = "model", value = "文档json数据模型")
             @RequestParam(value = "model") String cdaDocumentJsonData);
 
@@ -117,7 +119,7 @@ public interface CDAClient {
 
     @RequestMapping(value = ApiVersion.Version1_0+RestApi.Standards.DocumentGetFile, method = RequestMethod.GET)
     @ResponseBody
-    Object getCdaXmlFileInfo(
+    String getCdaXmlFileInfo(
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version") String versionCode,
             @ApiParam(name = "id", value = "文档编号")

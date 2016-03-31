@@ -2,6 +2,7 @@ package com.yihu.ehr.login.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.user.UserDetailModel;
+import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.DateFormatter;
 import com.yihu.ehr.util.Envelop;
@@ -57,6 +58,7 @@ public class LoginController {
         String url = "/users/verification/" + userName;
         String resultStr = "";
         Map<String, Object> params = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
 
         params.put("psw", password);
         try {
@@ -323,4 +325,36 @@ public class LoginController {
             return localIP;
         }
     }
+
+    @RequestMapping(value = "/userVerification")
+    @ResponseBody
+    public Object dataValidation(String userName, String password) {
+
+        Map<String, Object> params = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+        Envelop envelop = new Envelop();
+
+        String url = "/users/verification/" + userName;
+        String resultStr = "";
+
+        params.put("psw", password);
+        try {
+
+            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, this.password);
+            envelop = mapper.readValue(resultStr,Envelop.class);
+            if(!envelop.isSuccessFlg()){
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("密码错误，请重新输入");
+            }else {
+                envelop.setSuccessFlg(true);
+                envelop.setObj("");
+            }
+        } catch (Exception e) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("密码错误，请重新输入");
+            return envelop;
+        }
+        return envelop;
+    }
+
 }

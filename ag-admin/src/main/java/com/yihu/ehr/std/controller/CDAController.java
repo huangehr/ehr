@@ -93,12 +93,14 @@ public class CDAController extends BaseController{
     @RequestMapping(value = "/cda",method = RequestMethod.POST)
     @ApiOperation(value = "保存CDADocuments")
     public Envelop SaveCdaInfo(
+            @ApiParam(name = "version", value = "标准版本", defaultValue = "")
+            @RequestParam(value = "version") String version,
             @ApiParam(name = "cdaInfoJson", value = "CDAJson")
             @RequestParam(value = "cdaInfoJson") String cdaInfoJson) {
 
         Envelop envelop = new Envelop();
 
-        MCDADocument mcdaDocument = cdaClient.saveCDADocuments(cdaInfoJson);
+        MCDADocument mcdaDocument = cdaClient.saveCDADocuments(version,cdaInfoJson);
         CDAModel cdaModel = convertToModel(mcdaDocument,CDAModel.class);
 
         if (cdaModel != null){
@@ -177,15 +179,15 @@ public class CDAController extends BaseController{
         return envelop;
     }
 
-    @RequestMapping("SaveRelationship")
+    @RequestMapping(value = "SaveRelationship",method = RequestMethod.POST)
     @ApiOperation(value = "保存CDADataSetRelationship")
     public Envelop SaveRelationship(
             @ApiParam(name = "dataSetIds", value = "数据集ID(多ID以逗号隔开)")
             @RequestParam(value = "dataSetIds") String dataSetIds,
             @ApiParam(name = "cdaId", value = "cdaID")
-            @PathVariable(value = "cdaId") String cdaId,
+            @RequestParam(value = "cdaId") String cdaId,
             @ApiParam(name = "versionCode", value = "标准版本代码")
-            @PathVariable(value = "versionCode") String versionCode,
+            @RequestParam(value = "versionCode") String versionCode,
             @ApiParam(name = "xmlInfo", value = "XML文件信息")
             @RequestParam(value = "xmlInfo") String xmlInfo) {
 
@@ -257,26 +259,26 @@ public class CDAController extends BaseController{
         return null;
     }
 
-//    @RequestMapping(value = "/getCdaXmlFileInfo",method = RequestMethod.GET)
-//    public Envelop getCdaXmlFileInfo(
-//                                    @ApiParam(name = "cdaId", value = "cdaID")
-//                                    @PathVariable(value = "cdaId") String cdaId,
-//                                    @ApiParam(name = "versionCode", value = "标准版本代码")
-//                                    @PathVariable(value = "versionCode") String versionCode) {
-//
-//        Envelop envelop = new Envelop();
-//
-//        CDAModel cdaModel = (CDAModel) cdaClient.getCdaXmlFileInfo(cdaId, versionCode);
-//
-//        if (cdaModel != null){
-//            envelop.setObj(cdaModel);
-//            envelop.setSuccessFlg(true);
-//        }else {
-//            envelop.setSuccessFlg(false);
-//            envelop.setErrorMsg("获取cda文档XML文件信息失败");
-//        }
-//      return envelop;
-//    }
+    @RequestMapping(value = "/getCdaXmlFileInfo",method = RequestMethod.GET)
+    public Envelop getCdaXmlFileInfo(
+                                    @ApiParam(name = "cdaId", value = "cdaID")
+                                    @RequestParam(value = "cdaId") String cdaId,
+                                    @ApiParam(name = "versionCode", value = "标准版本代码")
+                                    @RequestParam(value = "versionCode") String versionCode)     {
+
+        Envelop envelop = new Envelop();
+
+        String cdaXMLInfo = cdaClient.getCdaXmlFileInfo(versionCode,cdaId);
+
+        if (cdaXMLInfo != null){
+            envelop.setObj(cdaXMLInfo);
+            envelop.setSuccessFlg(true);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("获取cda文档XML文件信息失败");
+        }
+        return envelop;
+    }
 
     @RequestMapping(value = "createCDASchemaFile",method = RequestMethod.POST)
     @ApiOperation(value = "生成CDA文件")
