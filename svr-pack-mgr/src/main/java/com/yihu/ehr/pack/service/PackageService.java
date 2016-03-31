@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.*;
@@ -29,17 +28,15 @@ import java.util.*;
  */
 @Service
 @Transactional
-public class JsonPackageService {
+public class PackageService {
     @Value("${deploy.region}")
     Short adminRegion;
 
     @Autowired
-    XJsonPackageRepository jsonPackageRepo;
+    XPackageRepository jsonPackageRepo;
 
     @Autowired
     FastDFSUtil fastDFSUtil;
-
-    private List<JsonPackage> packageQueue = new ArrayList<JsonPackage>();
 
     public String receive(InputStream is, String pwd) {
         Map<String, String> metaData = storeJsonPackage(is);
@@ -48,30 +45,30 @@ public class JsonPackageService {
         return metaData.get("id");
     }
 
-    public List<JsonPackage> getArchiveList(Date from, Date to) {
+    public List<Package> getArchiveList(Date from, Date to) {
         return jsonPackageRepo.findAll(from, to);
     }
 
-    public JsonPackage getJsonPackage(String id) {
+    public Package getJsonPackage(String id) {
         return jsonPackageRepo.findOne(id);
     }
 
     public InputStream downloadFile(String id) throws Exception {
-        JsonPackage jsonPackage = jsonPackageRepo.findOne(id);
-        if (jsonPackage == null) return null;
+        Package aPackage = jsonPackageRepo.findOne(id);
+        if (aPackage == null) return null;
 
-        String file[] = jsonPackage.getRemotePath().split(":");
+        String file[] = aPackage.getRemotePath().split(":");
         byte[] data = fastDFSUtil.download(file[0], file[1]);
 
         return new ByteArrayInputStream(data);
     }
 
-    public List<JsonPackage> searchArchives(Map<String, Object> args, Pageable pageable) throws ParseException {
-        Date from = (Date)args.get("fromTime");
-        Date to = (Date)args.get("toTime");
+    public List<Package> searchArchives(Map<String, Object> args, Pageable pageable) throws ParseException {
+        Date since = (Date)args.get("since");
+        Date to = (Date)args.get("to");
         ArchiveStatus archiveStatus = (ArchiveStatus) args.get("archiveStatus");
 
-        return jsonPackageRepo.findAll(archiveStatus, from, to, pageable);
+        return jsonPackageRepo.findAll(archiveStatus, since, to, pageable);
     }
 
     public int getArchiveCount(Date from, Date to) {
@@ -79,31 +76,31 @@ public class JsonPackageService {
     }
 
     public void acquireArchive(String id) {
-        JsonPackage jsonPackage = jsonPackageRepo.findOne(id);
+        Package aPackage = jsonPackageRepo.findOne(id);
 
         // 设置为'解析'状态
-        jsonPackage.setArchiveStatus(ArchiveStatus.Acquired);
-        jsonPackage.setParseDate(new Date());
+        aPackage.setArchiveStatus(ArchiveStatus.Acquired);
+        aPackage.setParseDate(new Date());
 
-        jsonPackageRepo.save(jsonPackage);
+        jsonPackageRepo.save(aPackage);
     }
 
     public void reportArchiveFinished(String id, String message) {
-        JsonPackage jsonPackage = jsonPackageRepo.findOne(id);
-        jsonPackage.setArchiveStatus(ArchiveStatus.Finished);
-        jsonPackage.setMessage(message);
-        jsonPackage.setFinishDate(new Date());
+        Package aPackage = jsonPackageRepo.findOne(id);
+        aPackage.setArchiveStatus(ArchiveStatus.Finished);
+        aPackage.setMessage(message);
+        aPackage.setFinishDate(new Date());
 
-        jsonPackageRepo.save(jsonPackage);
+        jsonPackageRepo.save(aPackage);
     }
 
     public void reportArchiveFailed(String id, String message) {
-        JsonPackage jsonPackage = jsonPackageRepo.findOne(id);
-        jsonPackage.setArchiveStatus(ArchiveStatus.Failed);
-        jsonPackage.setMessage(message);
-        jsonPackage.setFinishDate(null);
+        Package aPackage = jsonPackageRepo.findOne(id);
+        aPackage.setArchiveStatus(ArchiveStatus.Failed);
+        aPackage.setMessage(message);
+        aPackage.setFinishDate(null);
 
-        jsonPackageRepo.save(jsonPackage);
+        jsonPackageRepo.save(aPackage);
     }
 
     /**
@@ -121,7 +118,7 @@ public class JsonPackageService {
             String remoteFile = msg.get(FastDFSUtil.RemoteFileField).asText();
 
             // 将组与文件ID使用英文分号隔开, 提取的时候, 只需要将它们这个串拆开, 就可以得到组与文件ID
-            String remoteFilePath = String.join(JsonPackage.pathSeparator, new String[]{group, remoteFile});
+            String remoteFilePath = String.join(Package.pathSeparator, new String[]{group, remoteFile});
 
             Map<String, String> metaData = new HashMap<>();
             metaData.put("id", objectId.toString());
@@ -129,7 +126,7 @@ public class JsonPackageService {
 
             return metaData;
         } catch (Exception e) {
-            LogService.getLogger(JsonPackageService.class)
+            LogService.getLogger(PackageService.class)
                     .error("存病人档案文件失败, 错误原因: " + ExceptionUtils.getStackTrace(e));
 
             return null;
@@ -145,17 +142,17 @@ public class JsonPackageService {
      */
     boolean checkIn(String id, String path, String pwd) {
         try {
-            JsonPackage jsonPackage = new JsonPackage();
-            jsonPackage.setId(id);
-            jsonPackage.setRemotePath(path);
-            jsonPackage.setPwd(pwd);
-            jsonPackage.setReceiveDate(new Date());
-            jsonPackage.setArchiveStatus(ArchiveStatus.Received);
+            Package aPackage = new Package();
+            aPackage.setId(id);
+            aPackage.setRemotePath(path);
+            aPackage.setPwd(pwd);
+            aPackage.setReceiveDate(new Date());
+            aPackage.setArchiveStatus(ArchiveStatus.Received);
 
-            jsonPackageRepo.save(jsonPackage);
+            jsonPackageRepo.save(aPackage);
             return true;
         } catch (HibernateException ex) {
-            LogService.getLogger(JsonPackageService.class).error(ex.getMessage());
+            LogService.getLogger(PackageService.class).error(ex.getMessage());
 
             return false;
         }
@@ -163,7 +160,7 @@ public class JsonPackageService {
 
     public String downloadTo(String remotePath, String localPath) {
         try {
-            String[] meta = remotePath.split(JsonPackage.pathSeparator);
+            String[] meta = remotePath.split(Package.pathSeparator);
             return fastDFSUtil.download(meta[0], meta[1], localPath);
         } catch (Exception ex) {
             throw new RuntimeException("fastDFS - " + ex.getMessage());

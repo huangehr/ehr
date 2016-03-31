@@ -48,18 +48,17 @@ public class PackageResolveTask {
             Profile profile = resolver.doResolve(pack, zipFile);
             profileService.saveProfile(profile);
 
-            packageMgrClient.reportStatus(packageId,
-                    ArchiveStatus.Finished,
+            packageMgrClient.reportStatus(packageId, ArchiveStatus.Finished.ordinal(),
                     "身份证号: " + profile.getDemographicId() + ", 档案: " + profile.getId());
         } catch (Exception e) {
-            packageMgrClient.reportStatus(packageId, ArchiveStatus.Failed, e.getMessage());
+            packageMgrClient.reportStatus(packageId, ArchiveStatus.Failed.ordinal(), e.getMessage());
 
             LogService.getLogger().error(e.getMessage());
         }
     }
 
     private String downloadTo(String filePath) throws Exception {
-        String[] tokens = filePath.split(";");
+        String[] tokens = filePath.split(":");
         return fastDFSUtil.download(tokens[0], tokens[1], LocalTempPath);
     }
 }

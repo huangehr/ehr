@@ -47,18 +47,18 @@ public class ResolveController {
     public ResponseEntity<String> resolve(@ApiParam("id")
                                           @PathVariable("id") String packageId) throws Exception {
 
-        MPackage pack = packageMgrClient.acquirePackage("RANDOM");
-        if (pack != null) {
-            String zipFile = downloadTo(pack.getRemotePath());
+        MPackage pack = packageMgrClient.acquirePackage(packageId);
+        if (pack == null) throw new ApiException(HttpStatus.NOT_FOUND, "Package not found.");
 
-            Profile profile = resolver.doResolve(pack, zipFile);
-            profileService.saveProfile(profile);
+        String zipFile = downloadTo(pack.getRemotePath());
 
-            packageMgrClient.reportStatus(packageId, ArchiveStatus.Finished,
-                    "身份证号: " + profile.getDemographicId() + ", 档案: " + profile.getId());
-        }
+        Profile profile = resolver.doResolve(pack, zipFile);
+        profileService.saveProfile(profile);
 
-        return new ResponseEntity<>("", HttpStatus.OK);
+        packageMgrClient.reportStatus(packageId, ArchiveStatus.Finished.ordinal(),
+                "身份证号: " + profile.getDemographicId() + ", 档案: " + profile.getId());
+
+        return new ResponseEntity<>(profile.toJson(), HttpStatus.OK);
     }
 
     @ApiOperation(value = "本地档案包解析，仅供测试用", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -69,8 +69,8 @@ public class ResolveController {
                                           @RequestPart(required = true) MultipartFile file,
                                           @ApiParam("档案包密码")
                                           @RequestParam("password") String password,
-                                          @ApiParam(value = "仅解析并返回，不入库", defaultValue = "true")
-                                          @RequestParam("onlyEcho") boolean onlyEcho) throws FileNotFoundException {
+                                          @ApiParam(value = "是否入库", defaultValue = "false")
+                                          @RequestParam("persist") boolean persist) throws FileNotFoundException {
 
         String zipFile = System.getProperty("java.io.tmpdir") + packageId + ".zip";
 
@@ -85,7 +85,7 @@ public class ResolveController {
             pack.setArchiveStatus(ArchiveStatus.Received);
 
             Profile profile = resolver.doResolve(pack, zipFile);
-            if (!onlyEcho) {
+            if (!persist) {
                 profileService.saveProfile(profile);
             }
 
@@ -98,7 +98,7 @@ public class ResolveController {
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
 
     private String downloadTo(String filePath) throws Exception {
-        String[] tokens = filePath.split(";");
+        String[] tokens = filePath.split(":");
         return fastDFSUtil.download(tokens[0], tokens[1], LocalTempPath);
     }
 }

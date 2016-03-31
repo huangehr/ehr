@@ -15,15 +15,15 @@ import java.util.Date;
 @Entity
 @Table(name = "json_archives")
 @Access(value = AccessType.PROPERTY)
-public class JsonPackage  {
+public class Package {
     public final static String pathSeparator = ":";     // 统一使用冒号作为路径分隔符
 
     private String id;
     private String pwd;
     private String remotePath;
     private String message;
-    private String md5;
-    private String orgCode;
+    //private String md5;
+    //private String orgCode;
     private Date receiveDate;
     private Date parseDate;
     private Date finishDate;
@@ -102,7 +102,7 @@ public class JsonPackage  {
         this.message = message;
     }
 
-    //@Column(name = "md5")
+    /*@Column(name = "md5")
     public String getMd5() {
         return md5;
     }
@@ -111,7 +111,7 @@ public class JsonPackage  {
         this.md5 = md5;
     }
 
-    //@Column(name = "org_code")
+    @Column(name = "org_code")
     public String getOrgCode() {
         return orgCode;
     }
@@ -119,12 +119,12 @@ public class JsonPackage  {
     public void setOrgCode(String orgCode) {
         this.orgCode = orgCode;
     }
-
+*/
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        JsonPackage that = (JsonPackage) o;
+        Package that = (Package) o;
 
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (pwd != null ? !pwd.equals(that.pwd) : that.pwd != null) return false;
