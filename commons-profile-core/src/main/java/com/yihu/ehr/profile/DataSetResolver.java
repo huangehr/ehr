@@ -1,8 +1,11 @@
 package com.yihu.ehr.profile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.stereotype.Component;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -17,6 +20,46 @@ import java.util.Map;
 @Component
 public class DataSetResolver {
 
+
+    //轻量级档案 获取数据集列表并保存到健康档案中
+    public void  parseJsonDataSetlight(Profile profile,JsonNode jsonNode) throws JsonProcessingException, ParseException {
+
+        ProfileDataSet profileDataSet = new ProfileDataSet();
+        String version = jsonNode.get("inner_version").asText();
+        String eventNo = jsonNode.get("event_no").asText();
+        String patientId = jsonNode.get("patient_id").asText();
+        String orgCode = jsonNode.get("org_code").asText();
+        String eventDate = jsonNode.path("event_time").asText();        // 旧数据集结构可能不存在这个属性\
+
+//            profileDataSet.setPatientId(patientId);
+//            profileDataSet.setEventNo(eventNo);
+//            profileDataSet.setCdaVersion(version);
+//            profileDataSet.setOrgCode(orgCode);
+
+        JsonNode dataSets = jsonNode.get("dataset");
+        Iterator<Map.Entry<String, JsonNode>> iterator = dataSets.fields();
+        while (iterator.hasNext()) {
+            profile.setPatientId(patientId);
+            profile.setEventNo(eventNo);
+            profile.setOrgCode(orgCode);
+            profile.setCdaVersion(version);
+
+            //"event_time": "2015-05-23 08:01:42.0"
+
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            profile.setEventDate(format.parse(eventDate));
+
+            Map.Entry<String, JsonNode> map = iterator.next();
+            String code = map.getKey();
+            String path = map.getValue().asText();
+            profileDataSet.setCode(code);
+            profileDataSet.setRemotePath(path);
+            profile.addDataSet(code,profileDataSet);
+        }
+    }
+
+    //全量级档案 解析数据集
     public ProfileDataSet parseJsonDataSet(JsonNode jsonNode, boolean isOrigin) {
         ProfileDataSet dataSet = new ProfileDataSet();
 

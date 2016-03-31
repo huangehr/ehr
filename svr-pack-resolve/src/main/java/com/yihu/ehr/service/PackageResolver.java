@@ -50,6 +50,7 @@ public class PackageResolver {
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
     private final static String StdFolder = "standard";
     private final static String OriFolder = "origin";
+    private final static String IndexFolder = "index";
     private final static String JsonExt = ".json";
 
     /**
@@ -72,12 +73,28 @@ public class PackageResolver {
         Profile profile = new Profile();
 
         String basePackagePath = root.getAbsolutePath();
-        parseDataSet(profile, new File(basePackagePath + PathSep + StdFolder).listFiles(), false);
+        //全量级 原始数据列表
+        File standardFiles = new File(basePackagePath + PathSep + StdFolder);
+        if (standardFiles.exists()) {
+            parseDataSet(profile, standardFiles.listFiles(), false);
+            standardFiles.delete();
+        }
+        //parseDataSet(profile, new File(basePackagePath + PathSep + StdFolder).listFiles(), false);
 
+        //全量级 标准数据列表
         File originFiles = new File(basePackagePath + PathSep + OriFolder);
         if (originFiles.exists()) {
             parseDataSet(profile, originFiles.listFiles(), true);
+            originFiles.delete();
         }
+
+        //轻量级 原始数据列表
+        File indexFiles = new File(basePackagePath + PathSep + IndexFolder);
+        if (indexFiles.exists()) {
+            parseDataSetLight(profile, indexFiles.listFiles()[0]);
+            indexFiles.delete();
+        }
+
 
         makeEventSummary(profile);
 
@@ -86,9 +103,10 @@ public class PackageResolver {
         return profile;
     }
 
+
+
     /**
-     * 解析JSON文件中的数据。
-     *
+     * 全量级档案包解析JSON文件中的数据。
      * @param profile
      * @param files
      * @throws IOException
@@ -131,6 +149,23 @@ public class PackageResolver {
             profile.addDataSet(dataSet.getCode(), dataSet);
         }
     }
+
+    /**
+     * 轻量级档案包解析JSON文件中的数据。
+     * @param profile
+     * @param
+     * @throws IOException
+     */
+    void parseDataSetLight(Profile profile,File file) throws IOException, ParseException {
+        //// TODO: 2016/3/31 file不能空
+        JsonNode jsonNode = objectMapper.readTree(file);
+        if (jsonNode.isNull()) {
+            throw new IOException("Invalid json file when generate data set");
+        }
+        //设置数据集
+        dataSetResolverWithTranslator.parseJsonDataSetlight(profile,jsonNode);
+    }
+
 
     public ProfileDataSet generateDataSet(File jsonFile, boolean isOrigin) throws IOException {
         JsonNode jsonNode = objectMapper.readTree(jsonFile);
