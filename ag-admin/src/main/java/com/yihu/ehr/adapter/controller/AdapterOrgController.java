@@ -74,7 +74,7 @@ public class AdapterOrgController extends BaseController {
                 String orgCode = adapterOrgModel.getOrg();
                 if (StringUtils.isNotEmpty(orgCode)) {
                     MOrganization mOrganization = organizationClient.getOrg(orgCode);
-                    adapterOrgModel.setOrgValue(mAdapterOrg == null ? "" : mOrganization.getFullName());
+                    adapterOrgModel.setOrgValue(mOrganization == null ? "" : mOrganization.getFullName());
                 }
                 String parentId = adapterOrgModel.getParent();
                 if (StringUtils.isNotEmpty(parentId)) {

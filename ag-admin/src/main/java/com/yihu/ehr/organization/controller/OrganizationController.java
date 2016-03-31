@@ -125,8 +125,6 @@ public class OrganizationController extends BaseController {
         return orgModel;
     }
 
-
-
     /**
      * 删除机构
      * @param orgCode

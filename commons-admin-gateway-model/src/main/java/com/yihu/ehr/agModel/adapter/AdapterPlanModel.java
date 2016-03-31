@@ -18,6 +18,7 @@ public class AdapterPlanModel {
     public String type;
     public String typeValue;
     public String version;
+    public String versionName;
     public String org;
     public String orgValue;
     public String description;
@@ -122,5 +123,13 @@ public class AdapterPlanModel {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public String getVersionName() {
+        return versionName;
+    }
+
+    public void setVersionName(String versionName) {
+        this.versionName = versionName;
     }
 }

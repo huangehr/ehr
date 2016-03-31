@@ -198,9 +198,7 @@ public class CDATypeController extends BaseController {
             envelop.setErrorMsg("该cda类别代码已经存在！");
             return envelop;
         }
-        mCdaTypeOld.setCreateDate(new Date());
         String jsonDataNew = objectMapper.writeValueAsString(mCdaTypeOld);
-
         MCDAType mCdaTypeNew = cdaTypeClient.saveCDAType(jsonDataNew);
         if (mCdaTypeNew == null) {
             envelop.setSuccessFlg(false);
