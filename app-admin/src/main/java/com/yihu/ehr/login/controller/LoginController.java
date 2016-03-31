@@ -2,9 +2,7 @@ package com.yihu.ehr.login.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.user.UserDetailModel;
-import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.SessionAttributeKeys;
-import com.yihu.ehr.util.DateFormatter;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -22,7 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 

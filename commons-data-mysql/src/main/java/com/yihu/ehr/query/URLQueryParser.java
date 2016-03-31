@@ -1,11 +1,14 @@
 package com.yihu.ehr.query;
 
+import com.yihu.ehr.util.DateFormatter;
 import javafx.util.Pair;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.springframework.util.NumberUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.*;
+import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -54,7 +57,7 @@ public class URLQueryParser<T> {
      *
      * @return
      */
-    public CriteriaQuery makeCriteriaQuery() {
+    public CriteriaQuery makeCriteriaQuery() throws ParseException {
         CriteriaQuery query = builder.createQuery();
         Root<T> root = query.from(entityCls);
 
@@ -70,7 +73,7 @@ public class URLQueryParser<T> {
      *
      * @return
      */
-    public CriteriaQuery makeCriteriaCountQuery() {
+    public CriteriaQuery makeCriteriaCountQuery() throws ParseException {
         CriteriaQuery<Long> query = builder.createQuery(Long.class);
         Root<T> root = query.from(entityCls);
 
@@ -138,7 +141,7 @@ public class URLQueryParser<T> {
      * @param query
      * @param root
      */
-    private void makeWhere(CriteriaBuilder criteriaBuilder, CriteriaQuery query, Root<T> root) {
+    private void makeWhere(CriteriaBuilder criteriaBuilder, CriteriaQuery query, Root<T> root) throws ParseException {
         if (StringUtils.isEmpty(filters)) return;
 
         Map<String, Predicate> predicateMap = new HashMap<>();
@@ -155,21 +158,19 @@ public class URLQueryParser<T> {
 
             Predicate predicate = splitFilter(tokens[0], criteriaBuilder, root);
 
-            if (group != null){
-                if(predicateMap.get(group)==null)
+            if (group != null) {
+                if (predicateMap.get(group) == null)
                     predicateMap.put(group, predicate);
                 else
                     predicateMap.put(group, criteriaBuilder.or(predicateMap.get(group), predicate));
-            }
-
-            else
+            } else
                 predicateMap.put(Integer.toString(i), predicate);
         }
 
         query.where(predicateMap.values().toArray(new Predicate[predicateMap.size()]));
     }
 
-    protected Predicate splitFilter(String filter, CriteriaBuilder cb, Root<T> root) {
+    protected Predicate splitFilter(String filter, CriteriaBuilder cb, Root<T> root) throws ParseException {
         Predicate predicate = null;
         if (filter.contains("?")) {
             Pair<Path, String> pair = getPair(filter, "[?]", root);
@@ -184,16 +185,21 @@ public class URLQueryParser<T> {
             }
         } else if (filter.contains(">=")) {
             Pair<Path, String> pair = getPair(filter, ">=", root);
-            predicate = cb.ge(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
+            predicate = cb.ge(pair.getKey(), NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
         } else if (filter.contains(">")) {
             Pair<Path, String> pair = getPair(filter, ">", root);
-            predicate = cb.gt(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
+            if (pair.getKey().getJavaType() == Date.class) {
+                Date date = DateFormatter.simpleDateParse(pair.getValue());
+                predicate = cb.greaterThan(pair.getKey(), date);
+            } else {
+                predicate = cb.gt(pair.getKey(), NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
+            }
         } else if (filter.contains("<=")) {
             Pair<Path, String> pair = getPair(filter, "<=", root);
-            predicate = cb.le(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
+            predicate = cb.le(pair.getKey(), NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
         } else if (filter.contains("<")) {
             Pair<Path, String> pair = getPair(filter, "<", root);
-            predicate = cb.lt(pair.getKey(), (Number) NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
+            predicate = cb.lt(pair.getKey(), NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
         } else if (filter.contains("=")) {
             Pair<Path, String> pair = getPair(filter, "=", root);
 

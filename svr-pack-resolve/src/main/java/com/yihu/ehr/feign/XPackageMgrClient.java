@@ -21,10 +21,10 @@ import springfox.documentation.annotations.ApiIgnore;
 @FeignClient(name = MicroServices.Package)
 public interface XPackageMgrClient {
     @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Packages.Package, method = RequestMethod.GET)
-    MPackage acquirePackage(@PathVariable(value = "id") String id);
+    MPackage getPackage(@PathVariable(value = "id") String id);
 
     @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Packages.Package, method = RequestMethod.PUT)
     void reportStatus(@PathVariable(value = "id") String id,
-                      @RequestParam(value = "status") int status,
+                      @RequestParam(value = "status") ArchiveStatus status,
                       @RequestParam(value = "message") String message);
 }
