@@ -1,10 +1,13 @@
 package com.yihu.ehr.adapter.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.standard.dict.DictModel;
 import com.yihu.ehr.agModel.thirdpartystandard.AdapterOrgDetailModel;
+import com.yihu.ehr.agModel.thirdpartystandard.AdapterOrgModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
+import com.yihu.ehr.util.controller.BaseUIController;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,7 +15,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,7 +26,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/adapterorg")
-public class AdapterOrgController {
+public class AdapterOrgController extends BaseUIController {
     @Value("${service-gateway.username}")
     private String username;
     @Value("${service-gateway.password}")
@@ -39,7 +44,6 @@ public class AdapterOrgController {
         model.addAttribute("contentPage", "/adapter/adapterOrg/adapterOrg");
         return "pageView";
     }
-
 
     /**
      * 第三方标准：新增、修改窗口
@@ -307,38 +311,73 @@ public class AdapterOrgController {
     @ResponseBody
     //查询机构列表
     public Object searchOrgList(String type, String param, int page, int rows) {
-        String url = "/organizations";
+
         String resultStr = "";
         String filters = "";
         Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
         String orgType = "";
 
-        if(!StringUtils.isEmpty(type)){
-            switch (type){
-                case "1":
-                    orgType = "ThirdPartyPlatform";
-                    break;
-                case "2":
-                    orgType = "Hospital";
-                    break;
-                default:
-                    orgType = "Govement";
-                    break;
-            }
-            filters += "orgType="+orgType;
-        }
-        if(!StringUtils.isEmpty(param)){
-            filters += "orgCode?"+param+" g1;fullName?"+param+" g1;";
-        }
-
-        params.put("fields","");
-        params.put("filters",filters);
-        params.put("sorts","");
-        params.put("address","");
-        params.put("size",rows);
-        params.put("page",page);
         try {
+            String adapterOrgListUrl = "/adapterOrg/orgs";
+            Envelop adapterOrgEnvelop = new Envelop();
+            Map<String, Object> adapterOrgParams = new HashMap<>();
+            adapterOrgParams.put("sorts","");
+            adapterOrgParams.put("filters","");
+            adapterOrgParams.put("fields","");
+            adapterOrgParams.put("page",1);
+            adapterOrgParams.put("size",10000);
+            String  adapterOrgResultStr = HttpClientUtil.doGet(comUrl + adapterOrgListUrl, adapterOrgParams, username, password);
+            adapterOrgEnvelop = getEnvelop(adapterOrgResultStr);
+            List<AdapterOrgModel> adapterOrgModelList = (List<AdapterOrgModel>)getEnvelopList(adapterOrgEnvelop.getDetailModelList(),new ArrayList<AdapterOrgModel>(),AdapterOrgModel.class);
+
+            String orgCodeList = "";
+            for(AdapterOrgModel adapterOrgModel : adapterOrgModelList){
+                orgCodeList += "," + adapterOrgModel.getCode().toString();
+            }
+
+            if(!StringUtils.isEmpty(type)){
+                switch (type){
+                    case "1":
+                        orgType = "ThirdPartyPlatform";
+                        break;
+                    case "2":
+                        orgType = "Hospital";
+                        break;
+                    default:
+                        orgType = "Govement";
+                        break;
+                }
+                filters += "orgType="+orgType;
+            }
+
+            if(!StringUtils.isEmpty(param)){
+                if(!StringUtils.isEmpty(filters)){
+                    filters += ";orgCode?"+param+" g1;fullName?"+param+" g1";
+                }
+                else{
+                    filters += "orgCode?"+param+" g1;fullName?"+param+" g1";
+                }
+            }
+
+            if(!StringUtils.isEmpty(orgCodeList)){
+                orgCodeList = orgCodeList.substring(1);
+                if(!StringUtils.isEmpty(filters)){
+                    filters += ";orgCode<>"+ orgCodeList;
+                }
+                else{
+                    filters += "orgCode<>"+ orgCodeList;
+                }
+            }
+
+            params.put("fields","");
+            params.put("filters",filters);
+            params.put("sorts","");
+            params.put("address","");
+            params.put("size",rows);
+            params.put("page",page);
+            String url = "/organizations";
+
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             return resultStr;
         } catch (Exception e) {
