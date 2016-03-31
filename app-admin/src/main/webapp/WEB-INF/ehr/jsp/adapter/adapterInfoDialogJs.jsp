@@ -285,7 +285,7 @@
                         textField: 'value',
                         dataParmName: 'detailModelList',
                         urlParms: {
-                            type: "",
+                            type: adapterModel.type,
                             version: versions.getValue()
                         }
                     });

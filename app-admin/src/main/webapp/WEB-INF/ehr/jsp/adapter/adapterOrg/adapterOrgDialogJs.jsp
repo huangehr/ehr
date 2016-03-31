@@ -306,7 +306,7 @@
                                         parent.closeAdapterOrgDialog();
                                     }, null);
                                 }
-                                win.adapterModel(self.$form.Fields.getValues());
+                                parent.adapterModel(self.$form.Fields.getValues());
                             }else{
                                 if(data.errorMsg)
                                     $.Notice.error(data.errorMsg);

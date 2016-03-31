@@ -1,14 +1,18 @@
 package com.yihu.ehr.adapter.controller;
 
 import com.yihu.ehr.SystemDict.service.ConventionalDictEntryClient;
+import com.yihu.ehr.adapter.service.AdapterOrgClient;
 import com.yihu.ehr.adapter.service.PlanClient;
 import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.agModel.adapter.AdapterPlanDetailModel;
 import com.yihu.ehr.agModel.adapter.AdapterPlanModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.model.adaption.MAdapterOrg;
 import com.yihu.ehr.model.adaption.MAdapterPlan;
 import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.model.standard.MCDAVersion;
+import com.yihu.ehr.std.service.CDAVersionClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.validate.ValidateResult;
 import io.swagger.annotations.Api;
@@ -39,6 +43,12 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
 
     @Autowired
     ConventionalDictEntryClient dictEntryClient;
+
+    @Autowired
+    AdapterOrgClient adapterOrgClient;
+
+    @Autowired
+    CDAVersionClient cdaVersionClient;
 
     @RequestMapping(value = "/plan", method = RequestMethod.POST)
     @ApiOperation(value = "新增适配方案信息")
@@ -121,22 +131,7 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
                     new ArrayList<AdapterPlanModel>(mAdapterPlans.size()), AdapterPlanModel.class, null);
             if (adapterPlanModels != null) {
                 for (int i = 0; i < adapterPlanModels.size(); i++) {
-                    long planId = adapterPlanModels.get(i).getId();
-
-                    AdapterPlanModel adapterPlanModel = getModel(planClient.getAdapterPlanById(planId));
-                    if (adapterPlanModel != null) {
-                        adapterPlanModels.get(i).setParentName(adapterPlanModel.getName());
-                    }
-
-                    String type = adapterPlanModels.get(i).getType();
-                    if(StringUtils.isNotEmpty(type))
-                    {
-                        MConventionalDict dict =dictEntryClient.getAdapterType(type);
-                        if(dict!=null)
-                        {
-                            adapterPlanModels.get(i).setTypeValue(dict.getValue());
-                        }
-                    }
+                    ConvertAdapterPlanModel(adapterPlanModels.get(i));
                 }
             }
             return getResult(adapterPlanModels, getTotalCount(responseEntity), page, size);
@@ -231,11 +226,15 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
 
     public AdapterPlanModel ConvertAdapterPlanModel(AdapterPlanModel adapterPlanModel)
     {
-        long planId = adapterPlanModel.getId();
+        if (adapterPlanModel == null) {
+            return null;
+        }
 
-        AdapterPlanModel planModel = getModel(planClient.getAdapterPlanById(planId));
-        if (adapterPlanModel != null) {
-            adapterPlanModel.setParentName(adapterPlanModel.getName());
+        Long parentId = adapterPlanModel.getParentId();
+        if(parentId!=null && parentId!=0) {
+            AdapterPlanModel parent = getModel(planClient.getAdapterPlanById(parentId));
+            if(parent!=null)
+                adapterPlanModel.setParentName(parent.getName());
         }
 
         String type = adapterPlanModel.getType();
@@ -248,6 +247,26 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
             }
         }
 
+        String orgCode = adapterPlanModel.getOrg();
+        if(StringUtils.isNotEmpty(orgCode))
+        {
+            MAdapterOrg org = adapterOrgClient.getAdapterOrg(orgCode);
+            if(org!=null)
+            {
+                adapterPlanModel.setOrgValue(org.getName());
+            }
+        }
+
+        String versionId = adapterPlanModel.getVersion();
+        if(StringUtils.isNotEmpty(versionId))
+        {
+            MCDAVersion version = cdaVersionClient.getVersion(versionId);
+            if(version!=null)
+            {
+                adapterPlanModel.setVersionName(version.getVersionName());
+            }
+        }
         return adapterPlanModel;
     }
+
 }
