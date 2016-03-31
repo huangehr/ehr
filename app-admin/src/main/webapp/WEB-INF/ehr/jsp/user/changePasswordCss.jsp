@@ -10,4 +10,6 @@
     .div-img{ background:url(${staticRoot}/images/icon_Prompt.png); }
     .tab-td-b1{ border: 1px solid #c8c8c8; }
     .tab-txt-cen{ text-align: center }
+    .save-toolbar{ margin-left: 470px; }
+    .pane-attribute-toolbar{ margin-bottom: -10px; }
 </style>

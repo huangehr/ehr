@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.servlet.http.HttpServletRequest;
@@ -347,7 +348,6 @@ public class LoginController {
                 envelop.setErrorMsg("密码错误，请重新输入");
             }else {
                 envelop.setSuccessFlg(true);
-                envelop.setObj("");
             }
         } catch (Exception e) {
             envelop.setSuccessFlg(false);

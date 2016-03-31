@@ -485,6 +485,30 @@ public class UserController extends BaseController {
     }
 
 
+    @RequestMapping(value = "/users/changePassWord", method = RequestMethod.PUT)
+    @ApiOperation(value = "根据登录账号获取当前用户", notes = "根据登陆用户名及密码验证用户")
+    public Envelop changePassWord(
+            @ApiParam(name = "user_id",value = "password", defaultValue = "")
+            @RequestParam(value = "user_id") String userId,
+            @ApiParam(name = "password",value = "密码", defaultValue = "")
+            @RequestParam(value = "password") String password) {
+
+        Envelop envelop = new Envelop();
+        try {
+            boolean bo = userClient.changePassWord(userId,password);
+            if (bo){
+                envelop.setSuccessFlg(true);
+            }else {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("密码修改失败");
+            }
+        } catch (Exception e) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("密码修改失败");
+        }
+        return envelop;
+    }
+
     /**
      * 将 MUser 转为 UserDetailModel
      *
