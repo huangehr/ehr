@@ -22,6 +22,7 @@ import javax.persistence.metamodel.EntityType;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -70,7 +71,7 @@ public class BaseJpaService<T, R> {
         return (Class) parameters[0];
     }
 
-    public List search(String fields, String filters, String sorts, Integer page, Integer size) {
+    public List search(String fields, String filters, String sorts, Integer page, Integer size) throws ParseException {
         URLQueryParser queryParser = createQueryParser(fields, filters, sorts);
         CriteriaQuery query = queryParser.makeCriteriaQuery();
 
@@ -84,7 +85,7 @@ public class BaseJpaService<T, R> {
                 .getResultList();
     }
 
-    public List search(String filters) {
+    public List search(String filters) throws ParseException {
         URLQueryParser queryParser = createQueryParser("", filters, "");
         CriteriaQuery query = queryParser.makeCriteriaQuery();
 
@@ -93,7 +94,7 @@ public class BaseJpaService<T, R> {
                 .getResultList();
     }
 
-    public long getCount(String filters) {
+    public long getCount(String filters) throws ParseException {
         URLQueryParser queryParser = createQueryParser(filters);
         CriteriaQuery query = queryParser.makeCriteriaCountQuery();
 

@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -62,9 +63,10 @@ public class UserController extends BaseRestController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
-            HttpServletResponse response) {
+            HttpServletResponse response) throws ParseException {
         List<User> userList = userManager.search(fields, filters, sorts, page, size);
         pagedResponse(request, response, userManager.getCount(filters), page, size);
+
         return (List<MUser>) convertToModels(userList, new ArrayList<MUser>(userList.size()), MUser.class, fields);
     }
 

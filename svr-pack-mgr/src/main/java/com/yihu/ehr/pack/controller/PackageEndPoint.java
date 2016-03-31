@@ -18,6 +18,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.client.RedirectStrategy;
+import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -55,31 +58,27 @@ public class PackageEndPoint extends BaseRestController {
     @Autowired
     private UserClient userClient;
 
-    @RequestMapping(value = RestApi.Packages.Packages, method = RequestMethod.GET)
-    @ApiOperation(value = "获取档案列表", response = MPackage.class, responseContainer = "List", notes = "获取当前平台上的档案列表")
+    @RequestMapping(value = RestApi.Packages.PackageSearch, method = RequestMethod.GET)
+    @ApiOperation(value = "搜索档案包", response = MPackage.class, responseContainer = "List", notes = "搜索档案包")
     public Collection<MPackage> packageList(
-            @ApiParam(name = "archive_status", value = "档案包状态", defaultValue = "Received")
-            @RequestParam(value = "archive_status")
-                    ArchiveStatus archiveStatus,
-            @ApiParam(name = "since", value = "起始日期", defaultValue = "2016-03-01")
-            @DateTimeFormat(pattern = "yyyy-MM-dd")
-            @RequestParam(value = "since") Date since,
-            @ApiParam(name = "to", value = "截止日期", defaultValue = "2016-03-31")
-            @DateTimeFormat(pattern = "yyyy-MM-dd")
-            @RequestParam(value = "to") Date to,
-            @ApiParam(name = "page", value = "页号，从1开始", defaultValue = "1")
-            @RequestParam(value = "page") int page,
-            @ApiParam(name = "page_size", value = "页面记录数", defaultValue = "15")
-            @RequestParam(value = "page_size") int pageSize) throws ParseException {
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "receiveDate>2016-03-01")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+receiveDate")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            HttpServletRequest request,
+            HttpServletResponse response) throws ParseException {
 
-        Pageable pageable = new PageRequest(page, pageSize);
-        Map<String, Object> map = new HashMap<>();
-        map.put("since", since);
-        map.put("to", to);
-        map.put("archiveStatus", archiveStatus);
-        List<Package> packageList = packService.searchArchives(map, pageable);
+        List<Package> packageList = packService.search(fields, filters, sorts, page, size);
 
-        return convertToModels(packageList, new ArrayList<>(packageList.size()), MPackage.class, null);
+        pagedResponse(request, response, packService.getCount(filters), page, size);
+
+        return convertToModels(packageList, new ArrayList<MPackage>(packageList.size()), MPackage.class, fields);
     }
 
     /**
@@ -118,7 +117,7 @@ public class PackageEndPoint extends BaseRestController {
     @RequestMapping(value = RestApi.Packages.Package, method = {RequestMethod.GET})
     @ApiOperation(value = "获取档案包", notes = "获取档案包的信息")
     public ResponseEntity<MPackage> getPackage(@ApiParam(name = "id", value = "档案包编号")
-                                               @PathVariable(value = "id") String id) {
+                                               @PathVariable(value = "id") String id) throws IOException {
         Package aPackage;
         if (id.equals("OLDEST")) {
             // only use for svr-pack-resolve, it will change pack status internal
@@ -179,7 +178,7 @@ public class PackageEndPoint extends BaseRestController {
      * @return
      */
     @RequestMapping(value = RestApi.Packages.PackageDownloads, method = {RequestMethod.GET})
-    @ApiOperation(value = "获取档案包", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE, notes = "获取档案包的信息")
+    @ApiOperation(value = "获取档案包", notes = "获取档案包的信息")
     public ResponseEntity<MPackage> downloadPackage(@ApiParam(name = "id", value = "档案包编号")
                                                     @PathVariable(value = "id")
                                                             String id,
@@ -193,13 +192,11 @@ public class PackageEndPoint extends BaseRestController {
 
             IOUtils.copy(is, response.getOutputStream());
             response.flushBuffer();
-        } catch (IOException ex) {
-            throw new RuntimeException("Cannot download package from server. " + ex.getMessage());
-        } catch (Exception e) {
-            throw e;
-        }
 
-        return null;
+            return null;
+        } catch (Exception ex) {
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Cannot download package from server. " + ex.getMessage());
+        }
     }
 
     /**

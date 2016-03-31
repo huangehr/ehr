@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
+import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.ObjectId;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -29,12 +30,9 @@ import java.util.*;
  */
 @Service
 @Transactional
-public class PackageService {
+public class PackageService extends BaseJpaService<Package, XPackageRepository> {
     @Value("${deploy.region}")
     Short adminRegion;
-
-    @Autowired
-    XPackageRepository packageRepo;
 
     @Autowired
     FastDFSUtil fastDFSUtil;
@@ -46,16 +44,12 @@ public class PackageService {
         return metaData.get("id");
     }
 
-    public List<Package> getArchiveList(Date from, Date to) {
-        return packageRepo.findAll(from, to);
-    }
-
     public Package getPackage(String id) {
-        return packageRepo.findOne(id);
+        return getRepo().findOne(id);
     }
 
     public InputStream downloadFile(String id) throws Exception {
-        Package aPackage = packageRepo.findOne(id);
+        Package aPackage = getRepo().findOne(id);
         if (aPackage == null) return null;
 
         String file[] = aPackage.getRemotePath().split(":");
@@ -69,22 +63,18 @@ public class PackageService {
         Date to = (Date)args.get("to");
         ArchiveStatus archiveStatus = (ArchiveStatus) args.get("archiveStatus");
 
-        return packageRepo.findAll(archiveStatus, since, to, pageable);
-    }
-
-    public int getArchiveCount(Date from, Date to) {
-        return getArchiveList(from, to).size();
+        return getRepo().findAll(archiveStatus, since, to, pageable);
     }
 
     public Package acquirePackage(String id) {
         Package aPackage = null;
         if (id.equals("OLDEST")){
             Pageable pageable = new PageRequest(1, 1);
-            List<Package> packages = packageRepo.findEarliestOne(pageable);
+            List<Package> packages = getRepo().findEarliestOne(pageable);
 
             if(packages.size() > 0) aPackage = packages.get(0);
         } else {
-            aPackage = packageRepo.findOne(id);
+            aPackage = getRepo().findOne(id);
         }
 
         if(aPackage == null) return null;
@@ -93,27 +83,27 @@ public class PackageService {
         aPackage.setArchiveStatus(ArchiveStatus.Acquired);
         aPackage.setParseDate(new Date());
 
-        packageRepo.save(aPackage);
+        getRepo().save(aPackage);
 
         return aPackage;
     }
 
     public void reportArchiveFinished(String id, String message) {
-        Package aPackage = packageRepo.findOne(id);
+        Package aPackage = getRepo().findOne(id);
         aPackage.setArchiveStatus(ArchiveStatus.Finished);
         aPackage.setMessage(message);
         aPackage.setFinishDate(new Date());
 
-        packageRepo.save(aPackage);
+        getRepo().save(aPackage);
     }
 
     public void reportArchiveFailed(String id, String message) {
-        Package aPackage = packageRepo.findOne(id);
+        Package aPackage = getRepo().findOne(id);
         aPackage.setArchiveStatus(ArchiveStatus.Failed);
         aPackage.setMessage(message);
         aPackage.setFinishDate(null);
 
-        packageRepo.save(aPackage);
+        getRepo().save(aPackage);
     }
 
     /**
@@ -162,7 +152,7 @@ public class PackageService {
             aPackage.setReceiveDate(new Date());
             aPackage.setArchiveStatus(ArchiveStatus.Received);
 
-            packageRepo.save(aPackage);
+            getRepo().save(aPackage);
             return true;
         } catch (HibernateException ex) {
             LogService.getLogger(PackageService.class).error(ex.getMessage());
@@ -181,6 +171,10 @@ public class PackageService {
     }
 
     public void deletePackage(String id) {
-        packageRepo.delete(id);
+        getRepo().delete(id);
+    }
+    
+    private XPackageRepository getRepo(){
+        return (XPackageRepository)getRepository();
     }
 }

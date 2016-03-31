@@ -16,27 +16,16 @@ import org.quartz.UnableToInterruptJobException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Sand
  * @version 1.0
  * @created 2016.03.28 11:30
  */
+@Service
 public class PackageResolveJob implements InterruptableJob {
-    FastDFSUtil fastDFSUtil = SpringContext.getService(FastDFSUtil.class);
-
-    XPackageMgrClient packageMgrClient = SpringContext.getService(XPackageMgrClient.class);
-
-    PackageResolver resolver = SpringContext.getService(PackageResolver.class);
-
-    ProfileService profileService = SpringContext.getService(ProfileService.class);
-
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
-
-    private String downloadTo(String filePath) throws Exception {
-        String[] tokens = filePath.split(":");
-        return fastDFSUtil.download(tokens[0], tokens[1], LocalTempPath);
-    }
 
     @Override
     public void interrupt() throws UnableToInterruptJobException {
@@ -44,9 +33,20 @@ public class PackageResolveJob implements InterruptableJob {
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-        String packageId = "";
+        doResolve("OLDEST");
+    }
+
+    public void execute(String packageId){
+        doResolve(packageId);
+    }
+
+    private void doResolve(String packageId){
         try{
-            MPackage pack = packageMgrClient.getPackage("OLDEST");
+            XPackageMgrClient packageMgrClient = SpringContext.getService(XPackageMgrClient.class);
+            PackageResolver resolver = SpringContext.getService(PackageResolver.class);
+            ProfileService profileService = SpringContext.getService(ProfileService.class);
+
+            MPackage pack = packageMgrClient.getPackage(packageId);
             if (pack == null) return;
 
             String zipFile = downloadTo(pack.getRemotePath());
@@ -59,5 +59,12 @@ public class PackageResolveJob implements InterruptableJob {
         } catch (Exception e) {
             LogService.getLogger().error(e.getMessage());
         }
+    }
+
+    private String downloadTo(String filePath) throws Exception {
+        FastDFSUtil fastDFSUtil = SpringContext.getService(FastDFSUtil.class);
+
+        String[] tokens = filePath.split(":");
+        return fastDFSUtil.download(tokens[0], tokens[1], LocalTempPath);
     }
 }

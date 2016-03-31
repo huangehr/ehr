@@ -46,7 +46,10 @@ public class RestApi {
     public static class Packages{
         public static final String Packages                         = "/packages";
         public static final String Package                          = "/packages/{id}";
+        public static final String PackageSearch                    = "/packages/search";
         public static final String PackageDownloads                 = "/packages/{id}/downloads";
+
+        public static final String ResolveMessage                   = "/message/resolve";
 
         public static final String LegacyPackages                   = "/json_package";
     }
