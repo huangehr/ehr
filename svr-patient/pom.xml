@@ -103,6 +103,11 @@
 			<artifactId>commons-ehr-constants</artifactId>
             <version>1.1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>happy.fish</groupId>
+			<artifactId>fastDFS</artifactId>
+			<version>1.1.0</version>
+		</dependency>
 	</dependencies>
 
 </project>
