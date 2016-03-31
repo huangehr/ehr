@@ -27,6 +27,6 @@ public interface XPackageRepository extends PagingAndSortingRepository<Package, 
     @Query("select pack from Package pack where archiveStatus in (:archiveStatus) and receiveDate between :from and :to")
     List<Package> findAll(@Param("archiveStatus") ArchiveStatus archiveStatus, @Param("from") Date from, @Param("to") Date to, Pageable pageable);
 
-    @Query("select pack from Package pack where archiveStatus = :archiveStatus order by receiveDate asc")
-    Package findEarliestOne();
+    @Query("select pack from Package pack where archiveStatus = 0 order by receiveDate asc")
+    List<Package> findEarliestOne(Pageable pageable);
 }

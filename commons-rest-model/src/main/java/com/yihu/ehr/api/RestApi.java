@@ -51,6 +51,10 @@ public class RestApi {
         public static final String LegacyPackages                   = "/json_package";
     }
 
+    public static class PackageResolve{
+        public static final String Scheduler                        = "/scheduler";
+    }
+
     public static class Patients{
 
     }
