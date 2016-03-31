@@ -49,10 +49,10 @@ public class UserController {
         return "pageView";
     }
 
-    @RequestMapping("inChangePassword")
+    @RequestMapping("initialChangePassword")
     public String inChangePassword(Model model) {
         model.addAttribute("contentPage", "user/changePassword");
-        return "pageView";
+        return "generalView";
     }
 
     @RequestMapping("addUserInfoDialog")
@@ -348,4 +348,25 @@ public class UserController {
             if (fis != null) fis.close();
         }
     }
+
+    @RequestMapping("/changePassWord")
+    @ResponseBody
+    public Object chAangePassWord(UserDetailModel userDetailModel){
+        String getUserUrl = "/users/changePassWord";
+        String resultStr = "";
+        Envelop envelop = new Envelop();
+        Map<String, Object> params = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+
+        params.put("userDetailModel", userDetailModel);
+        try {
+            resultStr = HttpClientUtil.doPost(comUrl + getUserUrl, params, username, password);
+        } catch (Exception e) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("密码修改失败");
+        }
+
+        return envelop;
+    }
+
 }
