@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.datasset.DataSetModel;
 import com.yihu.ehr.agModel.standard.datasset.MetaDataModel;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.standard.MStdDict;
 import com.yihu.ehr.std.service.DataSetClient;
 import com.yihu.ehr.model.standard.MStdDataSet;
 import com.yihu.ehr.model.standard.MStdMetaData;
+import com.yihu.ehr.std.service.DictClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.ApiOperation;
@@ -29,6 +31,9 @@ public class DataSetController extends BaseController {
 
     @Autowired
     private DataSetClient dataSetClient;
+
+    @Autowired
+    private DictClient dictClient;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -169,12 +174,24 @@ public class DataSetController extends BaseController {
             @RequestParam(value = "page", required = false) int page,
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version) {
-
-        ResponseEntity<Collection<MStdMetaData>> responseEntity = dataSetClient.searchMetaDatas(fields, filters, sorts, size, page, version);
-        List<MetaDataModel> metaDataModels = (List<MetaDataModel>) convertToModels(responseEntity.getBody(), new ArrayList<MetaDataModel>(responseEntity.getBody().size()), MetaDataModel.class, null);
-
-        Envelop envelop = getResult(metaDataModels, getTotalCount(responseEntity), page, size);
-        return envelop;
+        try{
+            ResponseEntity<Collection<MStdMetaData>> responseEntity = dataSetClient.searchMetaDatas(fields, filters, sorts, size, page, version);
+            List<MStdMetaData> mStdMetaDatas = (List<MStdMetaData>) responseEntity.getBody();
+            List<MetaDataModel> metaDataModels = new ArrayList<>();
+            for (MStdMetaData m : mStdMetaDatas){
+                MetaDataModel model = convertToModel(m,MetaDataModel.class);
+                long dictId = m.getDictId();
+                if(!(dictId == 0)){
+                    MStdDict dict = dictClient.getCdaDictInfo(dictId, version);
+                    model.setDictName(dict == null?"":dict.getName());
+                }
+                metaDataModels.add(model);
+            }
+            return getResult(metaDataModels, getTotalCount(responseEntity), page, size);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return failedSystem();
+        }
     }
 
     @RequestMapping(value = "/meta_data", method = RequestMethod.DELETE)
