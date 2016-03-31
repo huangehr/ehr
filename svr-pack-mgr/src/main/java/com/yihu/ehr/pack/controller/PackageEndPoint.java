@@ -90,13 +90,12 @@ public class PackageEndPoint extends BaseRestController {
     @RequestMapping(value = RestApi.Packages.Packages, method = RequestMethod.POST)
     @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
     public void savePackageWithOrg(
-            @ApiParam(required = true, name = "package", value = "档案包", allowMultiple = true)
-                    MultipartHttpServletRequest jsonPackage,
-            @ApiParam(required = true, name = "org_code", value = "机构代码")
+            @ApiParam(name = "package", value = "档案包", allowMultiple = true) MultipartHttpServletRequest jsonPackage,
+            @ApiParam(name = "org_code", value = "机构代码")
             @RequestParam(value = "org_code") String orgCode,
-            @ApiParam(required = true, name = "package_crypto", value = "档案包解压密码,二次加密")
+            @ApiParam(name = "package_crypto", value = "档案包解压密码,二次加密")
             @RequestParam(value = "package_crypto") String packageCrypto,
-            @ApiParam(required = true, name = "md5", value = "档案包MD5")
+            @ApiParam(name = "md5", value = "档案包MD5")
             @RequestParam(value = "md5", required = false) String md5) throws Exception {
 
         if (jsonPackage.getFile("file") == null) throw new ApiException(ErrorCode.MissParameter, "file");
@@ -119,9 +118,9 @@ public class PackageEndPoint extends BaseRestController {
     @RequestMapping(value = RestApi.Packages.Package, method = {RequestMethod.GET})
     @ApiOperation(value = "获取档案包", notes = "获取档案包的信息")
     public ResponseEntity<MPackage> getPackage(@ApiParam(name = "id", value = "档案包编号")
-                                                    @PathVariable(value = "id") String id) {
+                                               @PathVariable(value = "id") String id) {
         Package aPackage;
-        if (id.equals("OLDEST")){
+        if (id.equals("OLDEST")) {
             // only use for svr-pack-resolve, it will change pack status internal
             aPackage = packService.acquirePackage(id);
         } else {
@@ -212,13 +211,13 @@ public class PackageEndPoint extends BaseRestController {
     @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
     @Deprecated
     public void savePackageWithUser(
-            @ApiParam(required = true, name = "package", value = "档案包", allowMultiple = true)
+            @ApiParam(name = "package", value = "档案包", allowMultiple = true)
                     MultipartHttpServletRequest jsonPackage,
-            @ApiParam(required = true, name = "user_name", value = "用户名")
+            @ApiParam(name = "user_name", value = "用户名")
             @RequestParam(value = "user_name") String userName,
-            @ApiParam(required = true, name = "package_crypto", value = "档案包解压密码,二次加密")
+            @ApiParam(name = "package_crypto", value = "档案包解压密码,二次加密")
             @RequestParam(value = "package_crypto") String packageCrypto,
-            @ApiParam(required = true, name = "md5", value = "档案包MD5")
+            @ApiParam(name = "md5", value = "档案包MD5")
             @RequestParam(value = "md5") String md5) throws Exception {
 
         if (jsonPackage.getFile("file") == null) throw new ApiException(ErrorCode.MissParameter, "file");
