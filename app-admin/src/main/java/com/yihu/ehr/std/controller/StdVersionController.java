@@ -2,6 +2,7 @@ package com.yihu.ehr.std.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.standardversion.StdVersionModel;
+import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -108,7 +110,7 @@ public class StdVersionController extends BaseUIController {
         try {
             String url = "/version/"+strVersion;
             String envelopStr = HttpClientUtil.doGet(comUrl+url,username,password);
-            return envelop;
+            return envelopStr;
         }catch (Exception ex){
             LogService.getLogger(StdVersionController.class).error(ex.getMessage());
             envelop.setSuccessFlg(false);
@@ -159,18 +161,13 @@ public class StdVersionController extends BaseUIController {
 
     @RequestMapping("addVersion")
     @ResponseBody
-    public Object addVersion(){
-        //TODO 获取登入用户信息
-        //@ModelAttribute(SessionAttributeKeys.CurrentUser) Xuser user
+    public Object addVersion(@ModelAttribute(SessionAttributeKeys.CurrentUser) UserDetailModel user){
         Envelop envelop = new Envelop();
         String url = "/version";
         Map<String,Object> params = new HashMap<>();
-        //临时测试数据
-        String userLoginCode = "wwcs";
-        params.put("userLoginCode",userLoginCode);
+        params.put("userLoginCode",user.getLoginCode());
         try{
             String envelopStr = HttpClientUtil.doPost(comUrl+url,params,username,password);
-            // 新增成功单无法返回数据（会报超时异常，微服务操作过程中的重启）
             return envelopStr;
         }catch (Exception ex){
             LogService.getLogger(StdVersionController.class).error(ex.getMessage());
@@ -263,13 +260,8 @@ public class StdVersionController extends BaseUIController {
         Map<String,Object> params = new HashMap<>();
         params.put("version",strVersion);
         try{
-            String _msg = HttpClientUtil.doPut(comUrl+url,params,username,password);
-            if("true".equals(_msg)){
-                envelop.setSuccessFlg(true);
-            }else{
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("标准版本发布失败！");
-            }
+            String envelopStr = HttpClientUtil.doPut(comUrl+url,params,username,password);
+            return envelopStr;
         }catch (Exception ex){
             LogService.getLogger(StdVersionController.class).error(ex.getMessage());
             envelop.setSuccessFlg(false);
