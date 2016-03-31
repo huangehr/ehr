@@ -9,7 +9,6 @@ import com.yihu.ehr.profile.Profile;
 import com.yihu.ehr.service.PackageResolver;
 import com.yihu.ehr.util.log.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,21 +36,18 @@ public class PackageResolveTask {
     public void execute(){
         String packageId = "";
         try{
-            MPackage pack = packageMgrClient.acquirePackage("RANDOM");
+            MPackage pack = packageMgrClient.getPackage("OLDEST");
             if (pack == null) return;
 
             String zipFile = downloadTo(pack.getRemotePath());
 
-            pack.setId("0dae0005565d0350b5956e31b69f7959");
-            pack.setPwd("f354fe25-e439-40fa-98dd-070779106a7a");
-
             Profile profile = resolver.doResolve(pack, zipFile);
             profileService.saveProfile(profile);
 
-            packageMgrClient.reportStatus(packageId, ArchiveStatus.Finished.ordinal(),
-                    "身份证号: " + profile.getDemographicId() + ", 档案: " + profile.getId());
+            packageMgrClient.reportStatus(packageId, ArchiveStatus.Finished,
+                    "Identity: " + profile.getDemographicId() + ", profile: " + profile.getId());
         } catch (Exception e) {
-            packageMgrClient.reportStatus(packageId, ArchiveStatus.Failed.ordinal(), e.getMessage());
+            packageMgrClient.reportStatus(packageId, ArchiveStatus.Failed, e.getMessage());
 
             LogService.getLogger().error(e.getMessage());
         }

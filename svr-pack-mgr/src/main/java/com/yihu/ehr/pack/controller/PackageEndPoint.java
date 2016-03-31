@@ -118,21 +118,19 @@ public class PackageEndPoint extends BaseRestController {
      */
     @RequestMapping(value = RestApi.Packages.Package, method = {RequestMethod.GET})
     @ApiOperation(value = "获取档案包", notes = "获取档案包的信息")
-    public ResponseEntity<MPackage> retrievePackage(@ApiParam(name = "id", value = "档案包编号")
+    public ResponseEntity<MPackage> getPackage(@ApiParam(name = "id", value = "档案包编号")
                                                     @PathVariable(value = "id") String id) {
-        MPackage pack;
-        if (id.equals("RANDOM")){
-            Package aPackage = packService.getJsonPackage(id);
-
-            pack = convertToModel(aPackage, MPackage.class, null);
+        Package aPackage;
+        if (id.equals("OLDEST")){
+            // only use for svr-pack-resolve, it will change pack status internal
+            aPackage = packService.acquirePackage(id);
         } else {
-            Package aPackage = packService.getJsonPackage(id);
-            if (aPackage == null) return new ResponseEntity<>((MPackage) null, HttpStatus.NOT_FOUND);
-
-            pack = convertToModel(aPackage, MPackage.class, null);
+            aPackage = packService.getPackage(id);
         }
 
-        return new ResponseEntity<>(pack, HttpStatus.OK);
+        if (aPackage == null) return new ResponseEntity<>((MPackage) null, HttpStatus.NOT_FOUND);
+
+        return new ResponseEntity<>(convertToModel(aPackage, MPackage.class), HttpStatus.OK);
     }
 
     /**
@@ -144,12 +142,12 @@ public class PackageEndPoint extends BaseRestController {
     @RequestMapping(value = RestApi.Packages.Package, method = {RequestMethod.PUT})
     @ApiOperation(value = "获取档案包", notes = "获取档案包的信息")
     public ResponseEntity<MPackage> reportStatus(@ApiParam(value = "档案包编号")
-                                                 @RequestParam(value = "id") String id,
+                                                 @PathVariable(value = "id") String id,
                                                  @ApiParam(value = "状态")
                                                  @RequestParam(value = "status") ArchiveStatus status,
                                                  @ApiParam(value = "消息")
                                                  @RequestParam(value = "message") String message) {
-        Package aPackage = packService.getJsonPackage(id);
+        Package aPackage = packService.getPackage(id);
         if (aPackage == null) return new ResponseEntity<>((MPackage) null, HttpStatus.NOT_FOUND);
 
         if (status == ArchiveStatus.Failed) {

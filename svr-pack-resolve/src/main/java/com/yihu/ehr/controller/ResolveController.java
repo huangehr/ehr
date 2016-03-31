@@ -45,9 +45,11 @@ public class ResolveController {
     @ApiOperation(value = "档案包入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @RequestMapping(value = RestApi.Packages.Package, method = RequestMethod.PUT)
     public ResponseEntity<String> resolve(@ApiParam("id")
-                                          @PathVariable("id") String packageId) throws Exception {
+                                          @PathVariable("id") String packageId,
+                                          @ApiParam(value = "返回档案数据", defaultValue = "false")
+                                          @RequestParam("echo") boolean echo) throws Exception {
 
-        MPackage pack = packageMgrClient.acquirePackage(packageId);
+        MPackage pack = packageMgrClient.getPackage(packageId);
         if (pack == null) throw new ApiException(HttpStatus.NOT_FOUND, "Package not found.");
 
         String zipFile = downloadTo(pack.getRemotePath());
@@ -55,10 +57,10 @@ public class ResolveController {
         Profile profile = resolver.doResolve(pack, zipFile);
         profileService.saveProfile(profile);
 
-        packageMgrClient.reportStatus(packageId, ArchiveStatus.Finished.ordinal(),
-                "身份证号: " + profile.getDemographicId() + ", 档案: " + profile.getId());
+        packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
+                "Identity: " + profile.getDemographicId() + ", profile: " + profile.getId());
 
-        return new ResponseEntity<>(profile.toJson(), HttpStatus.OK);
+        return new ResponseEntity<>(echo ? profile.toJson() : "", HttpStatus.OK);
     }
 
     @ApiOperation(value = "本地档案包解析，仅供测试用", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
