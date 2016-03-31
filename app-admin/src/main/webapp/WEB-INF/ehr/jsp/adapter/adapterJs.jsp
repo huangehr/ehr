@@ -240,11 +240,11 @@
                         if (rows.length > 0) {
                             $.ligerDialog.confirm('确定删除这些方案信息?', function (yes) {
                                 if (yes) {
-                                    var id = [];
+                                    var id = "";
                                     for (var i = 0; i < rows.length; i++) {
-                                        id[i] = rows[i].id;
+                                        id += "," + rows[i].id;
                                     }
-                                    delAdapterPlan(id);
+                                    delAdapterPlan(id.substring(1));
                                 }
                             });
                         }

@@ -3,6 +3,7 @@ package com.yihu.ehr.std.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeDetailModel;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeModel;
+import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -47,10 +49,8 @@ public class CdaTypeController extends BaseUIController{
     }
 
     @RequestMapping("typeupdate")
-    public String typeupdate(Model model,String userId) {
-        //TODO 临时测试数据 需要获取当前登入用户信息
-        userId = "wwcs";
-        model.addAttribute("UserId", userId);
+    public String typeupdate(Model model,@ModelAttribute(SessionAttributeKeys.CurrentUser) UserDetailModel user) {
+        model.addAttribute("UserId", user.getLoginCode());
         model.addAttribute("contentPage", "std/cdaType/CdaTypeDetail");
         return "generalView";
     }
@@ -145,13 +145,11 @@ public class CdaTypeController extends BaseUIController{
     @RequestMapping("SaveCdaType")
     @ResponseBody
     //新增、修改的保存合二为一
-    public Object SaveCdaType(String dataJson) {
-        //TODO 用户code
+    public Object SaveCdaType(String dataJson,@ModelAttribute(SessionAttributeKeys.CurrentUser) UserDetailModel user) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         String url = "/cda_types";
-        //临时测试数据（用户code）
-        String createUser = "wwcs";
+        String createUser = user.getLoginCode();
         try {
             CdaTypeDetailModel detailModel = objectMapper.readValue(dataJson,CdaTypeDetailModel.class);
             if(StringUtils.isEmpty(detailModel.getCode())){

@@ -2,7 +2,9 @@ package com.yihu.ehr.std.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.standardsource.StdSourceDetailModel;
+import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.controller.BaseUIController;
@@ -12,8 +14,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +27,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/standardsource")
+@SessionAttributes(SessionAttributeKeys.CurrentUser)
 public class StdSourceManagerController extends BaseUIController {
     @Value("${service-gateway.username}")
     private String username;
@@ -112,7 +117,7 @@ public class StdSourceManagerController extends BaseUIController {
 
     @RequestMapping("updateStdSource")
     @ResponseBody
-    public Object updateStdSource(String id,String code, String name, String type, String description) {
+    public Object updateStdSource(String id,String code, String name, String type, String description,@ModelAttribute(SessionAttributeKeys.CurrentUser) UserDetailModel user) {
         //新增、修改标准来源
         Envelop envelop = new Envelop();
         String envelopStr = "";
@@ -139,6 +144,7 @@ public class StdSourceManagerController extends BaseUIController {
             if (StringUtils.isEmpty(id)){
                 String urlNew = "/source";
                 StdSourceDetailModel detailModel = new StdSourceDetailModel();
+                detailModel.setCreateUser(user.getLoginCode());
                 detailModel.setId(id);
                 detailModel.setCode(code);
                 detailModel.setName(name);
@@ -160,6 +166,7 @@ public class StdSourceManagerController extends BaseUIController {
             StdSourceDetailModel modelForUpdate = getEnvelopModel(envelopGet.getObj(),StdSourceDetailModel.class);
 
             //update
+            modelForUpdate.setUpdateUser(user.getLoginCode());
             modelForUpdate.setCode(code);
             modelForUpdate.setName(name);
             modelForUpdate.setSourceType(type);

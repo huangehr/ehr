@@ -18,12 +18,6 @@ import java.util.List;
 @Repository
 public interface XPackageRepository extends PagingAndSortingRepository<Package, String> {
 
-    @Query("select count(*) from Package pack where pack.receiveDate between :from and :to")
-    long count(@Param("from") Date from, @Param("to") Date to);
-
-    @Query("select pack from Package pack where pack.receiveDate between :from and :to")
-    List<Package> findAll(@Param("from") Date from, @Param("to") Date to);
-
     @Query("select pack from Package pack where archiveStatus in (:archiveStatus) and receiveDate between :from and :to")
     List<Package> findAll(@Param("archiveStatus") ArchiveStatus archiveStatus, @Param("from") Date from, @Param("to") Date to, Pageable pageable);
 

@@ -29,7 +29,7 @@ import java.io.FileOutputStream;
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "档案包解析", description = "档案包解析服务")
-public class ResolveController {
+public class ResolveEndPoint {
     @Autowired
     PackageResolver resolver;
 
