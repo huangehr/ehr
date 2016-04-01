@@ -25,6 +25,9 @@ public class CDAModel {
 
     private String schema;
 
+    private String fileGroup;
+
+
     public String getCode() {
         return code;
     }
@@ -103,5 +106,13 @@ public class CDAModel {
 
     public void setSchema(String schema) {
         this.schema = schema;
+    }
+
+    public String getFileGroup() {
+        return fileGroup;
+    }
+
+    public void setFileGroup(String fileGroup) {
+        this.fileGroup = fileGroup;
     }
 }

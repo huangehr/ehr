@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -186,4 +187,20 @@ public interface DataSetClient {
             @RequestParam(value = "data_set_id") long dataSetId,
             @ApiParam(name = "name", value = "查询名称", defaultValue = "")
             @RequestParam(value = "name") String name);
+
+    @RequestMapping(value = RestApi.Standards.DataSetsIds, method = RequestMethod.GET)
+    @ApiOperation(value = "根据数据集ids(用逗号隔开)获取数据集信息")
+    List<MStdDataSet> getDataSets(
+            @ApiParam(name = "ids", value = "数据集编号", defaultValue = "")
+            @PathVariable(value = "ids") String ids,
+            @ApiParam(name = "version", value = "版本", defaultValue = "")
+            @RequestParam(value = "version") String version);
+
+    @RequestMapping(value = RestApi.Standards.MetaDatasWithDataSet, method = RequestMethod.GET)
+    @ApiOperation(value = "根据数据集id获取数据元")
+    List<MStdMetaData> getMetaDataByDataSetId(
+            @ApiParam(name = "data_set_id", value = "数据元编号", defaultValue = "")
+            @PathVariable(value = "data_set_id") long dataSetIs,
+            @ApiParam(name = "version", value = "版本", defaultValue = "")
+            @RequestParam(value = "version") String version);
 }

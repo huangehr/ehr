@@ -86,7 +86,6 @@
             base.p.get(jq_search.val().trim(), base.loadData);
         },
         loadData: function (data) {
-            debugger;
             var selectedData = [], newData = [];
             var uniqueField = base.p.uniqueField,
                 storage = base.p.storage;
@@ -102,11 +101,10 @@
             base.grid.reload({ Rows: newData });
         },
         isChecked: function (rowdata) {
-debugger
             var uniqueField = base.p.uniqueField,
                 storage = base.p.storage;
             for (var i = 0; i < storage.length; i++) {
-                if (storage[i][uniqueField] == rowdata[uniqueField]) {
+                if (storage[i].dataSetId == rowdata[uniqueField]) {
                     base.addItem(storage[i]);
                     return true;
                 }
@@ -114,7 +112,6 @@ debugger
             return false;
         },
         onChecked: function (checked, data, rowid, rowdata) {
-debugger
             $("#pane-list-selected").addClass("changed");//取消是否提示
             // 非多选内容
             if (!base.p.multiple) {
