@@ -23,6 +23,7 @@ public class ProfileDataSet {
     private String orgCode;
     private String orgName;
     private String cdaVersion;
+    private String remotePath;
     private List<String> originDocUrls = new ArrayList<>();
 
     private Map<String, Map<String, String>> records;
@@ -83,6 +84,14 @@ public class ProfileDataSet {
 
     public void setEventNo(String eventNo) {
         this.eventNo = eventNo;
+    }
+
+    public String getRemotePath() {
+        return remotePath;
+    }
+
+    public void setRemotePath(String remotePath) {
+        this.remotePath = remotePath;
     }
 
     public void addRecord(String recordKey, Map<String, String> record) {

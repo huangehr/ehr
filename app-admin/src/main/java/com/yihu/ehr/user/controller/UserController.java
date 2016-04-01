@@ -169,7 +169,7 @@ public class UserController {
         try {
             if (!StringUtils.isEmpty(userDetailModel.getId())) {
                 //修改
-                String getUser = HttpClientUtil.doGet(comUrl + "/users/"+userDetailModel.getId(), params, username, password);
+                String getUser = HttpClientUtil.doGet(comUrl + "/users/admin/"+userDetailModel.getId(), params, username, password);
                 envelop = mapper.readValue(getUser,Envelop.class);
                 String userJsonModel = mapper.writeValueAsString(envelop.getObj());
                 UserDetailModel userModel = mapper.readValue(userJsonModel,UserDetailModel.class);
