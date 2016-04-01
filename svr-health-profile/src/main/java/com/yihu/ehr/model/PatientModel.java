@@ -1,9 +1,11 @@
-package com.yihu.ehr.browser.service;
+package com.yihu.ehr.model;
 
 /**
- * Created by cws on 2015/8/16.
+ * @author cws
+ * @version 1.0
+ * @created 2015.12.26 16:08
  */
-public class PatiendInfoModel {
+public class PatientModel {
 
     String patiendId;
     String name;

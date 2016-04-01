@@ -1,4 +1,4 @@
-package com.yihu.ehr.browser.feign;
+package com.yihu.ehr.feign;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;

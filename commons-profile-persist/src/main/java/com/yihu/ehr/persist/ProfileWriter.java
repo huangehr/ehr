@@ -6,7 +6,6 @@ import com.yihu.ehr.profile.ProfileDataSet;
 import com.yihu.ehr.profile.ProfileTableOptions;
 import com.yihu.ehr.util.DateFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -31,7 +30,7 @@ public class ProfileWriter {
 
     public void writeArchive(Profile healthArchive) throws IOException {
         // 先存档案
-        hbaseClient.insertRecord(ProfileTableOptions.ArchiveTable,
+        hbaseClient.insertRecord(ProfileTableOptions.ProfileTable,
                 healthArchive.getId(),
                 ProfileTableOptions.FamilyBasic,
                 ProfileTableOptions.getColumns(ProfileTableOptions.Table.ArchiveTable, ProfileTableOptions.TableFamily.Basic),

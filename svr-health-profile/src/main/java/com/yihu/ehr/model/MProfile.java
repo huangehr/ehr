@@ -1,4 +1,4 @@
-package com.yihu.ehr.browser.service;
+package com.yihu.ehr.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
@@ -11,7 +11,7 @@ import java.util.List;
  * @created 2015.12.26 16:08
  */
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-public class Event{
+public class MProfile {
     public String date;
     public String summary;
     public String orgName;

@@ -1,4 +1,4 @@
-package com.yihu.ehr.browser.service;
+package com.yihu.ehr.service;
 
 /**
  * Created by cws on 2015/8/16.

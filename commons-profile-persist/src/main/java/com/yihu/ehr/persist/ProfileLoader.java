@@ -71,7 +71,7 @@ public class ProfileLoader {
      * @return
      */
     public Profile loadProfile(String profileId, boolean loadStdDataSet, boolean loadOriginDataSet) throws IOException, ParseException {
-        ResultWrapper record = hbaseClient.getResultAsWrapper(ProfileTableOptions.ArchiveTable, profileId);
+        ResultWrapper record = hbaseClient.getResultAsWrapper(ProfileTableOptions.ProfileTable, profileId);
         if (record.getResult().toString().equals("keyvalues=NONE")) throw new RuntimeException("Profile not found.");
 
         String cardId = record.getValueAsString(FamilyBasic, AcCardId);

@@ -24,7 +24,7 @@ public class ProfileTableOptions {
         MetaData
     }
 
-    public static final String ArchiveTable = "HealthArchives";           // 健康档案表
+    public static final String ProfileTable = "HealthArchives";           // 健康档案表
 
     /*通用列族 */
     public static final String FamilyBasic = "basic";

@@ -172,4 +172,13 @@ public class RestApi {
         public static final String Organizations                    = "/organizations";
         public static final String Organization                     = "/organizations/{id}";
     }
+
+    public static class HealthProfile{
+        public static final String Profiles                         = "/patients/{demographic_id}/health_profiles";
+        public static final String Profile                          = "/patient/health_profiles/{id}";
+        public static final String ProfileDateSets                  = "/patient/health_profiles/{id}/data_sets";
+
+        public static final String ProfileSearch                    = "/patient/health_profiles/search";
+        public static final String SanofiSupport                    = "/patient/health_profiles/{id}/physic_signs";
+    }
 }
