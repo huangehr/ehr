@@ -63,27 +63,31 @@ public class PackageResolver {
      * <p>
      * ObjectMapper Stream API使用，参见：http://wiki.fasterxml.com/JacksonStreamingApi
      */
-    public Profile doResolve(MPackage pack, String zipFile) throws ZipException, IOException, ParseException {
-        File root = new Zipper().unzipFile(new File(zipFile), LocalTempPath + PathSep + pack.getId(), pack.getPwd());
-        if (root == null || !root.isDirectory() || root.list().length == 0) {
-            throw new RuntimeException("Invalid package file, package id: " + pack.getId());
+    public Profile doResolve(MPackage pack, String zipFile) throws IOException, ParseException {
+        try{
+            File root = new Zipper().unzipFile(new File(zipFile), LocalTempPath + PathSep + pack.getId(), pack.getPwd());
+            if (root == null || !root.isDirectory() || root.list().length == 0) {
+                throw new RuntimeException("Invalid package file, package id: " + pack.getId());
+            }
+
+            Profile profile = new Profile();
+
+            String basePackagePath = root.getAbsolutePath();
+            parseDataSet(profile, new File(basePackagePath + PathSep + StdFolder).listFiles(), false);
+
+            File originFiles = new File(basePackagePath + PathSep + OriFolder);
+            if (originFiles.exists()) {
+                parseDataSet(profile, originFiles.listFiles(), true);
+            }
+
+            makeEventSummary(profile);
+
+            return profile;
+        } catch (ZipException e){
+            houseKeep(zipFile, null);
+
+            throw new RuntimeException(e.getMessage());
         }
-
-        Profile profile = new Profile();
-
-        String basePackagePath = root.getAbsolutePath();
-        parseDataSet(profile, new File(basePackagePath + PathSep + StdFolder).listFiles(), false);
-
-        File originFiles = new File(basePackagePath + PathSep + OriFolder);
-        if (originFiles.exists()) {
-            parseDataSet(profile, originFiles.listFiles(), true);
-        }
-
-        makeEventSummary(profile);
-
-        houseKeep(zipFile, root);
-
-        return profile;
     }
 
     /**
