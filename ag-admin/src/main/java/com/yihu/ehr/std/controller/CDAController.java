@@ -118,12 +118,14 @@ public class CDAController extends BaseController{
     @RequestMapping(value = "/cda",method = RequestMethod.PUT)
     @ApiOperation(value = "修改CDADocuments")
     public Envelop updateCDADocuments(
+            @ApiParam(name = "version", value = "标准版本", defaultValue = "")
+            @RequestParam(value = "version") String version,
             @ApiParam(name = "cdaInfoJson", value = "CDAJson")
             @RequestParam(value = "cdaInfoJson") String cdaInfoJson) {
 
         Envelop envelop = new Envelop();
-        MCDADocument model = toEntity(cdaInfoJson, MCDADocument.class);
-        MCDADocument mcdaDocument = cdaClient.updateCDADocuments(model.getId(), cdaInfoJson);
+        //todo:访问微服务的路径不对  路径带有参数id
+        MCDADocument mcdaDocument = cdaClient.updateCDADocuments(version, cdaInfoJson);
         CDAModel cdaModel = convertToModel(mcdaDocument,CDAModel.class);
 
         if (cdaModel != null){
@@ -159,9 +161,9 @@ public class CDAController extends BaseController{
     @ApiOperation(value = "根据条件获取getCDADataSetRelationship")
     public Envelop getRelationByCdaId(
             @ApiParam(name = "cdaId", value = "cdaID")
-            @PathVariable(value = "cdaId") String cdaId,
+            @RequestParam(value = "cdaId") String cdaId,
             @ApiParam(name = "versionCode", value = "标准版本代码")
-            @PathVariable(value = "versionCode") String versionCode) {
+            @RequestParam(value = "versionCode") String versionCode) {
 
         Envelop envelop = new Envelop();
 

@@ -13,10 +13,11 @@
             // 页面主模块
             var changePassWordInfo = null;
 
+            var errorPassWords = sessionStorage.getItem("errorPassWord");
+
+            var userId = '${current_user.id}';
             /* *************************** 函数定义 ******************************* */
-            /**
-             * 页面初始化。
-             */
+
             function pageInit() {
                 changePassWordInfo.init();
             }
@@ -30,13 +31,13 @@
                 $oldPassWord: $("#inp_old_passWord"),
                 $newPassWord: $("#inp_new_passWord"),
                 $againNewPassWord: $("#inp_again_passWord"),
+
                 $changePassWordBtn: $("#div_changePassWord_btn"),
                 $cancelBtn: $("#div_cancel_btn"),
 
                 $intensionWeak: $("#td-intension-weak"),
                 $intensionMiddle: $("#td-intension-middle"),
                 $intensionPowerful: $("#td-intension-powerful"),
-
 
                 init: function () {
                     var self = this;
@@ -55,16 +56,10 @@
                     self.$form.attrScan();
                 },
 
-
-                //重新加载
-                reloadGrid: function () {
-                    <%--var values = retrieve.$element.Fields.getValues();--%>
-                    <%--reloadGrid.call(this, '${contextRoot}/user/searchUsers', values);--%>
-                },
-
                 bindEvents: function () {
                     var self = this;
                     var result = new jValidation.ajax.Result();
+                    errorPassWord();
 
                     var validator = new jValidation.Validation(self.$form, {
                         immediate: true, onSubmit: false,
@@ -73,17 +68,56 @@
                         }
                     });
                     self.$changePassWordBtn.click(function () {
-                        var UserDetailModel = self.$form.Fields.getValues();
                         if (validator.validate()) {
                             var dataModel = $.DataModel.init();
                             dataModel.updateRemote("${contextRoot}/user/changePassWord", {
-                                data: UserDetailModel,
+                                data: {userId: userId, passWord: self.$newPassWord.val()},
                                 success: function (data) {
-
+                                    $.ligerDialog.waitting('密码修改成功，请重新登录');
+                                    setTimeout(function () {
+                                        window.location.href = "${contextRoot}/login";
+                                    }, 3000);
                                 }
                             })
                         } else
                             return;
+                    });
+
+                    //取消修改密码
+                    self.$cancelBtn.click(function () {
+                        history.back();
+                    });
+
+                    //密码强度的实时监测
+                    self.$newPassWord.bind('input propertychange', function () {
+
+                        var value = self.$newPassWord.val();
+                        var strongRegex = new RegExp("^(?=.{8,})(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*\\W).*$", "g");
+                        var mediumRegex = new RegExp("^(?=.{8,})(((?=.*[A-Z])(?=.*[a-z]))|((?=.*[A-Z])(?=.*[0-9]))|((?=.*[a-z])(?=.*[0-9]))).*$", "g");
+                        var enoughRegex = new RegExp("(?=.{8,}).*", "g");
+
+                        if (false == enoughRegex.test(value)) {
+                            self.$intensionMiddle.removeClass('s-bc4');
+                            self.$intensionPowerful.removeClass('s-bc12');
+                            self.$intensionWeak.addClass('s-bc13');
+                            //密码小于8位，密码强度：弱
+                        }
+                        else if (strongRegex.test(value)) {
+                            self.$intensionMiddle.addClass('s-bc4');
+                            self.$intensionPowerful.addClass('s-bc12');
+                            //密码为8位及以上并且(大小写)字母数字特殊字符三项都包括,强度：强
+                        }
+                        else if (mediumRegex.test(value)) {
+                            self.$intensionPowerful.removeClass('s-bc12');
+                            self.$intensionMiddle.addClass('s-bc4');
+                            //密码为8位及以上并且字母、数字、特殊字符三项中有两项，强度：中
+                        }
+                        else {
+                            self.$intensionMiddle.removeClass('s-bc4');
+                            self.$intensionPowerful.removeClass('s-bc12');
+                            self.$intensionWeak.addClass('s-bc13');
+                            //如果密码为8位以下，就算字母、数字、特殊字符三项都包括，强度：弱
+                        }
 
                     });
 
@@ -93,7 +127,7 @@
                         var userName = self.$userName.val();
                         var passWord = self.$oldPassWord.val();
                         var newPassWord = self.$newPassWord.val();
-                        var againNewPassWord = self.$againNewPassWord.val();
+//                        var againNewPassWord = self.$againNewPassWord.val();
 
                         if (Util.isStrEquals($(idCode).attr("id"), "inp_old_passWord")) {
 
@@ -103,7 +137,12 @@
                                 success: function (data) {
                                     if (data.successFlg) {
                                         result.setResult(true);
+                                        sessionStorage.removeItem("errorPassWord")
+                                        errorPassWords = 0;
                                     } else {
+                                        sessionStorage.setItem("errorPassWord", parseInt(errorPassWords) + 1);
+                                        errorPassWords = sessionStorage.getItem("errorPassWord");
+                                        errorPassWord(errorPassWords);
                                         result.setResult(false);
                                         result.setErrorMsg(data.errorMsg);
                                     }
@@ -112,32 +151,48 @@
                             return result;
                         }
                         if (Util.isStrEquals($(idCode).attr("id"), "inp_new_passWord")) {
+                            var reg = /^[a-zA-Z]{8,16}$/;
                             if (Util.isStrEquals(passWord, newPassWord)) {
-                                return ValidationMsg(false,"密码与原始密码相近，请重新输入");
+                                return ValidationErrorMsg(false, "密码与原始密码相近，请重新输入");
                             }
-                            if(Util.isStrEquals(userName, newPassWord)){
-                                return ValidationMsg(false,"新密码与用户名不能一样");
+                            if (Util.isStrEquals(userName, newPassWord)) {
+                                return ValidationErrorMsg(false, "新密码与用户名不能一样");
                             }
-                            if(Util.isNum){
-                                debugger
-                                self.$intensionWeak.addClass("s-bc13");
-                                return ValidationMsg(false,"新密码不能纯数字");
-
+                            if (Util.isNum(newPassWord)) {
+                                return ValidationErrorMsg(false, "新密码不能纯数字");
                             }
-                        }
-                        if (Util.isStrEquals($(idCode).attr("id"), "inp_again_passWord")) {
-                            if (!Util.isStrEquals(newPassWord, againNewPassWord)) {
-                                return ValidationMsg(false,"新密码不一致");
+                            if(reg.test(newPassWord)){
+                                return ValidationErrorMsg(false, "新密码不能纯字母");
                             }
                         }
                     }
-                    function ValidationMsg(bo,errorMsg){
+
+                    function ValidationErrorMsg(bo, errorMsg) {
                         result.setResult(bo);
                         result.setErrorMsg(errorMsg);
                         return result;
                     }
-                },
 
+                    function errorPassWord(inpNum) {
+                        if (Util.isStrEmpty(errorPassWords)) {
+                            errorPassWords = 0;
+                        }
+                        if (errorPassWords >= 5 || inpNum >= 5) {
+                            var dataModel = $.DataModel.init();
+                            dataModel.updateRemote("${contextRoot}/user/activityUser", {
+                                data: {userId: userId, activated: 0},
+                                success: function (data) {
+                                    $.ligerDialog.waitting('错误密码输入次数过多，该账户已被锁定，请通过OA至管理员重置密码');
+                                    setTimeout(function () {
+                                        window.location.href = "${contextRoot}/login";
+                                    }, 3000);
+                                }
+                            })
+
+                        }
+
+                    }
+                },
 
             };
 

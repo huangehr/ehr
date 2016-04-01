@@ -111,7 +111,7 @@ API列表
 
 以下为当前开放的档案接收接口，后续将会开放更多的接口。
 
-### 健康事件列表（时间轴）与事件文档列表
+### 健康事件列表（时间轴）与文档列表
 
 	GET /patient/health-profiles/timeline
 	
@@ -195,6 +195,25 @@ API列表
 
 ### 获取文档
 
+	GET /patient/health-profiles/{id}
+	
+**参数**
+
+<table>
+	<tr>
+		<td>名称</td>
+		<td>类型</td>
+		<td>描述</td>
+	</tr>
+	<tr>
+		<td>id</td>
+		<td>string</td>
+		<td>档案ID</td>
+	</tr>
+</table>
+
+### 获取数据集
+
 	GET /patient/health-profiles/document/datasets
 
 **参数**
@@ -245,3 +264,68 @@ API列表
         ]
     }
 
+### 档案搜索
+
+	GET /patient/health-profiles/search
+	
+**参数**
+
+<table>
+	<tr>
+		<td>名称</td>
+		<td>类型</td>
+		<td>描述</td>
+	</tr>
+	<tr>
+		<td>demographic_id</td>
+		<td>string</td>
+		<td>身份证号</td>
+	</tr>
+	<tr>
+		<td>name</td>
+		<td>string</td>
+		<td>患者就诊时填写的姓名</td>
+	</tr>
+	<tr>
+		<td>birthday</td>
+		<td>string</td>
+		<td>患者就诊时填写的生日，yyyy-MM-dd格式</td>
+	</tr>
+	<tr>
+		<td>gender</td>
+		<td>string</td>
+        <td>患者性别，1表示女性，2表示男性</td>
+	</tr>
+	<tr>
+		<td>mobile</td>
+		<td>string</td>
+		<td>患者就诊时填写的手机号</td>
+	</tr>
+</table>
+
+参数使用以下几种模式，按顺序搜索：
+
+1. 使用身份证号搜索
+2. 使用姓名与手机号搜索档案
+3. 使用姓名，性别，生日搜索档案
+
+
+	// 身份证号搜索参数
+	{
+		"demographic_id": 123456789013245678
+	}
+	
+	// 姓名+手机号搜索参数
+	{
+		"name": "朱蕊",
+		"mobile": "13545678901"
+	}
+
+	// 姓名+性别+生日搜索参数 
+	{
+		"name": "朱蕊",
+		"gender": "1",
+		"birthday": "1975-01-02"
+	}
+
+若找到符合条件的档案，将返回这些档案ID（注意，若后面两种搜索模式匹配多份档案，将返回404 NOT FOUND）。应用根据需要再使用相应的接口获取数据。

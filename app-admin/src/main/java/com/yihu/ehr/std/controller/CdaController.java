@@ -496,7 +496,8 @@ public class CdaController {
     public Object getDatasetByCdaId(String strVersionCode, String strCdaId) {
         Envelop result = new Envelop();
         try {
-            String url = "/cda/getDatasetByCdaId";
+//            String url = "/cda/getDatasetByCdaId";
+            String url = "/cda/relationships";
             Map<String,Object> params = new HashMap<>();
             params.put("versionCode",strVersionCode);
             params.put("cdaId",strCdaId);
@@ -515,34 +516,6 @@ public class CdaController {
         }
         return result;
 
-
-        /*Result result = new Result();
-        try {
-            XCdaDatasetRelationship[] relations = xCdaDatasetRelationshipManager.getRelationshipByCdaId(strCdaId, strVersionCode);
-            List<XDataSet> datasetList = new ArrayList<>();
-            for (XCdaDatasetRelationship info : relations) {
-                datasetList.add(info.getDataset());
-            }
-            List<DataSetForInterface> dataSetModels = new ArrayList<>();
-            for (XDataSet dataSet : datasetList) {
-                DataSetForInterface info = new DataSetForInterface();
-                info.setId(String.valueOf(dataSet.getId()));
-                info.setCode(dataSet.getCode());
-                info.setName(dataSet.getName());
-                dataSetModels.add(info);
-            }
-            if (dataSetModels == null) {
-                result.setSuccessFlg(false);
-                return result.toJson();
-            } else {
-                result = getResult(dataSetModels, 1, 1, 1);
-                result.setSuccessFlg(true);
-                return result.toJson();
-            }
-        } catch (Exception ex) {
-            result.setSuccessFlg(false);
-            return result.toJson();
-        }*/
     }
 
     @RequestMapping("/validatorCda")

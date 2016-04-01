@@ -151,7 +151,7 @@
                     gender: user.gender,
                     email: user.email,
                     telephone: user.telephone,
-//                    organization: ["安徽省",,""],
+                    organization: [user.province, user.city, user.organization],
                     major: user.major,
                     publicKey: user.publicKey,
                     validTime: user.validTime,
