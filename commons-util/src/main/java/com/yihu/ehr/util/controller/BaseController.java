@@ -205,7 +205,7 @@ public class BaseController extends AbstractController {
     {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat(formatRule);
-            return sdf.parse(dateTime);
+            return dateTime==null?null:sdf.parse(dateTime);
         }
         catch (Exception ex)
         {
@@ -224,7 +224,7 @@ public class BaseController extends AbstractController {
     {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat(formatRule);
-            return sdf.format(dateTime);
+            return dateTime==null?null:sdf.format(dateTime);
         }
         catch (Exception ex)
         {

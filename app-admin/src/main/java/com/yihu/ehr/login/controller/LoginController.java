@@ -2,6 +2,7 @@ package com.yihu.ehr.login.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.user.UserDetailModel;
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
@@ -83,6 +84,9 @@ public class LoginController {
 
                 if(userDetailModel.getLastLoginTime()!= null){
                    lastLoginTime = userDetailModel.getLastLoginTime();
+                }else{
+                    SimpleDateFormat sdf = new SimpleDateFormat(AgAdminConstants.DateTimeFormat);
+                    lastLoginTime = sdf.format(new Date());
                 }
 
 
