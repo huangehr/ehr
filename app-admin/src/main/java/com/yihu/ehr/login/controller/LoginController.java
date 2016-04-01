@@ -345,7 +345,6 @@ public class LoginController {
                 envelop.setErrorMsg("密码错误，请重新输入");
             }else {
                 envelop.setSuccessFlg(true);
-                envelop.setObj("");
             }
         } catch (Exception e) {
             envelop.setSuccessFlg(false);

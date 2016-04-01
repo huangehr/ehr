@@ -351,16 +351,17 @@ public class UserController {
 
     @RequestMapping("/changePassWord")
     @ResponseBody
-    public Object chAangePassWord(UserDetailModel userDetailModel){
+    public Object chAangePassWord(String userId,String passWord){
         String getUserUrl = "/users/changePassWord";
         String resultStr = "";
         Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        ObjectMapper mapper = new ObjectMapper();
+        params.put("user_id",userId);
+        params.put("password",passWord);
 
-        params.put("userDetailModel", userDetailModel);
         try {
-            resultStr = HttpClientUtil.doPost(comUrl + getUserUrl, params, username, password);
+            resultStr = HttpClientUtil.doPut(comUrl + getUserUrl, params, username, password);
+            envelop.setObj(resultStr);
         } catch (Exception e) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("密码修改失败");

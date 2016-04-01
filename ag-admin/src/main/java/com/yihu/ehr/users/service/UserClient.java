@@ -99,4 +99,12 @@ public interface UserClient {
     @RequestMapping(value = RestApi.Users.UserEmailNoExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断用户邮件是否存在")
     boolean isEmailExists(@RequestParam(value = "email") String email);
+
+    @RequestMapping(value = RestApi.Users.UserAdminPasswordReset, method = RequestMethod.PUT)
+    @ApiOperation(value = "修改密码")
+    boolean changePassWord(
+            @ApiParam(name = "user_id", value = "user_id", defaultValue = "")
+            @PathVariable(value = "user_id") String userId,
+            @ApiParam(name = "password", value = "密码", defaultValue = "")
+            @RequestParam(value = "password") String password);
 }

@@ -20,9 +20,11 @@
         // 消息通知栏模块
         var notice = null;
 
+        //登入成功后，将输入次数过多的错误密码清除
+        sessionStorage.removeItem("errorPassWord");
+
         //Pid 和Id 用于浏览器刷新之后，菜单导航不改变
-       // var treePid = Util.getUrlQueryString("treePid");
-       var treePid = sessionStorage.getItem("treePid");
+        var treePid = sessionStorage.getItem("treePid");
 
         var treeId = sessionStorage.getItem("treeId");
 
@@ -160,11 +162,11 @@
                     url: '${contextRoot}/dict/initial'
                 },
                 /*{
-                    id: 42,
-                    pid: 4,
-                    text: '<spring:message code="title.monitor.manage"/>',
-                    url: '${contextRoot}/monitor/initial'
-                },*/
+                 id: 42,
+                 pid: 4,
+                 text: '<spring:message code="title.monitor.manage"/>',
+                 url: '${contextRoot}/monitor/initial'
+                 },*/
 
                 //健康档案浏览器
                 {id: 5, text: '<spring:message code="title.health.archive.browser"/>'},
@@ -215,8 +217,8 @@
                         var url = dt.url;
                         var treedataindex = $(this.getParentTreeItem(obj.data.treedataindex)).attr("treedataindex") || "";
                         //debugger;
-                        sessionStorage.setItem("treePid",treedataindex);
-                        sessionStorage.setItem("treeId",dt.id);
+                        sessionStorage.setItem("treePid", treedataindex);
+                        sessionStorage.setItem("treeId", dt.id);
                         if (url) {
                             $("#contentPage").empty();
                             $("#contentPage").load(url);
@@ -232,7 +234,7 @@
                     mainLayout.$breadcrumbContent.html(content);
                     $('.l-body', "#" + treeId).addClass("l-selected");
                     $("#contentPage").empty();
-                    if(treeData.url)
+                    if (treeData.url)
                         $("#contentPage").load(treeData.url);
                 }
                 // 初始化树形菜单后，缓存一级节点
