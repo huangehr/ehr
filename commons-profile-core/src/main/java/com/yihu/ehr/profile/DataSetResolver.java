@@ -31,11 +31,6 @@ public class DataSetResolver {
         String orgCode = jsonNode.get("org_code").asText();
         String eventDate = jsonNode.path("event_time").asText();        // 旧数据集结构可能不存在这个属性\
 
-//            profileDataSet.setPatientId(patientId);
-//            profileDataSet.setEventNo(eventNo);
-//            profileDataSet.setCdaVersion(version);
-//            profileDataSet.setOrgCode(orgCode);
-
         JsonNode dataSets = jsonNode.get("dataset");
         Iterator<Map.Entry<String, JsonNode>> iterator = dataSets.fields();
         while (iterator.hasNext()) {
@@ -43,8 +38,6 @@ public class DataSetResolver {
             profile.setEventNo(eventNo);
             profile.setOrgCode(orgCode);
             profile.setCdaVersion(version);
-
-            //"event_time": "2015-05-23 08:01:42.0"
 
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -119,7 +112,7 @@ public class DataSetResolver {
      *
      * @param innerVersion
      * @param dataSetCode
-     * @param isOriginDataSet
+     * @param isOrigin
      * @param metaData
      * @param actualData
      * @return
@@ -128,7 +121,7 @@ public class DataSetResolver {
                                          String dataSetCode,
                                          String metaData,
                                          String actualData,
-                                         boolean isOriginDataSet) {
+                                         boolean isOrigin) {
         return new String[]{metaData, actualData};
     }
 }

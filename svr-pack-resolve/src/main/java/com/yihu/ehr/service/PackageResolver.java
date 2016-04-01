@@ -70,31 +70,16 @@ public class PackageResolver {
             throw new RuntimeException("Invalid package file, package id: " + pack.getId());
         }
 
+
         Profile profile = new Profile();
 
-        String basePackagePath = root.getAbsolutePath();
-        //全量级 原始数据列表
-        File standardFiles = new File(basePackagePath + PathSep + StdFolder);
-        if (standardFiles.exists()) {
-            parseDataSet(profile, standardFiles.listFiles(), false);
-            standardFiles.delete();
+        File[] files = root.listFiles();
+        for(File file:files){
+            String path = file.getPath();
+            String folderName = path.substring(path.lastIndexOf("\\")+1);
+            parseDataSet(profile, file.listFiles(), folderName);
+            file.delete();
         }
-        //parseDataSet(profile, new File(basePackagePath + PathSep + StdFolder).listFiles(), false);
-
-        //全量级 标准数据列表
-        File originFiles = new File(basePackagePath + PathSep + OriFolder);
-        if (originFiles.exists()) {
-            parseDataSet(profile, originFiles.listFiles(), true);
-            originFiles.delete();
-        }
-
-        //轻量级 原始数据列表
-        File indexFiles = new File(basePackagePath + PathSep + IndexFolder);
-        if (indexFiles.exists()) {
-            parseDataSetLight(profile, indexFiles.listFiles()[0]);
-            indexFiles.delete();
-        }
-
 
         makeEventSummary(profile);
 
@@ -111,43 +96,49 @@ public class PackageResolver {
      * @param files
      * @throws IOException
      */
-    void parseDataSet(Profile profile, File[] files, boolean isOriginDataSet) throws ParseException, IOException {
-        for (File file : files) {
-            if (!file.getAbsolutePath().endsWith(JsonExt)) continue;
+    void parseDataSet(Profile profile, File[] files, String folderName) throws ParseException, IOException {
+        if(folderName.equals(IndexFolder)){
+            //就诊事件摘要信息解析 其中index目录保存病人的档案数据，档案包仅有此目录。此目录下的patient_index.json文件包含患者档案在机构的访问路径和部分平台所需要的摘要数据
+            parseDataSetLight(profile,files[0]);
+        }else {
+            for (File file : files) {
+                //原始数据与标准数据解析
+                //if (!file.getAbsolutePath().endsWith(JsonExt)) continue;
+                ProfileDataSet dataSet = generateDataSet(file, folderName.equals(OriFolder) ? true :false);
 
-            ProfileDataSet dataSet = generateDataSet(file, isOriginDataSet);
+                // 原始数据存储在表"数据集代码_ORIGIN"
+                String dataSetTable = folderName==OriFolder ? StdObjectQualifierTranslator.originDataTable(dataSet.getCode()) : dataSet.getCode();
+                profile.addDataSet(dataSetTable, dataSet);
+                profile.setPatientId(dataSet.getPatientId());
+                profile.setEventNo(dataSet.getEventNo());
+                profile.setOrgCode(dataSet.getOrgCode());
+                profile.setCdaVersion(dataSet.getCdaVersion());
 
-            // 原始数据存储在表"数据集代码_ORIGIN"
-            String dataSetTable = isOriginDataSet ? StdObjectQualifierTranslator.originDataTable(dataSet.getCode()) : dataSet.getCode();
-            profile.addDataSet(dataSetTable, dataSet);
-            profile.setPatientId(dataSet.getPatientId());
-            profile.setEventNo(dataSet.getEventNo());
-            profile.setOrgCode(dataSet.getOrgCode());
-            profile.setCdaVersion(dataSet.getCdaVersion());
+                dataSet.setCode(dataSetTable);
 
-            dataSet.setCode(dataSetTable);
+                // Extract key data from data set if exists
+                if (folderName!=OriFolder) {
+                    if (profile.getCardId().length() == 0) {
+                        Object object = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.CardInfo);
+                        if (null != object) {
+                            Properties properties = (Properties) object;
+                            profile.setCardId(properties.getProperty("CardNo"));
+                        }
+                    }
 
-            // Extract key data from data set if exists
-            if (!isOriginDataSet) {
-                if (profile.getCardId().length() == 0) {
-                    Object object = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.CardInfo);
-                    if (null != object) {
-                        Properties properties = (Properties) object;
-                        profile.setCardId(properties.getProperty("CardNo"));
+                    if (StringUtils.isEmpty(profile.getDemographicId())) {
+                        profile.setDemographicId((String) extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.DemographicInfo));
+                    }
+
+                    if (profile.getEventDate() == null) {
+                        profile.setEventDate((Date) extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.EventDate));
                     }
                 }
 
-                if (StringUtils.isEmpty(profile.getDemographicId())) {
-                    profile.setDemographicId((String) extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.DemographicInfo));
-                }
-
-                if (profile.getEventDate() == null) {
-                    profile.setEventDate((Date) extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.EventDate));
-                }
+                profile.addDataSet(dataSet.getCode(), dataSet);
             }
-
-            profile.addDataSet(dataSet.getCode(), dataSet);
         }
+
     }
 
     /**
@@ -157,7 +148,6 @@ public class PackageResolver {
      * @throws IOException
      */
     void parseDataSetLight(Profile profile,File file) throws IOException, ParseException {
-        //// TODO: 2016/3/31 file不能空
         JsonNode jsonNode = objectMapper.readTree(file);
         if (jsonNode.isNull()) {
             throw new IOException("Invalid json file when generate data set");
