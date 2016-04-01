@@ -91,6 +91,7 @@ public class ResolveEndPoint {
                 profileService.saveProfile(profile);
             }
 
+
             return new ResponseEntity<>(profile.toJson(), HttpStatus.OK);
         } catch (Exception e) {
             throw new ApiException(HttpStatus.NOT_ACCEPTABLE, e.getMessage());
