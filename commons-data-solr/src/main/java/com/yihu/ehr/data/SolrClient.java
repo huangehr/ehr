@@ -2,6 +2,7 @@ package com.yihu.ehr.data;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.solr.core.SolrTemplate;
+import org.springframework.data.solr.repository.support.SimpleSolrRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
