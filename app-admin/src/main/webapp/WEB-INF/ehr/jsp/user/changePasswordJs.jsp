@@ -31,6 +31,7 @@
                 $oldPassWord: $("#inp_old_passWord"),
                 $newPassWord: $("#inp_new_passWord"),
                 $againNewPassWord: $("#inp_again_passWord"),
+
                 $changePassWordBtn: $("#div_changePassWord_btn"),
                 $cancelBtn: $("#div_cancel_btn"),
 
@@ -181,7 +182,7 @@
                             dataModel.updateRemote("${contextRoot}/user/activityUser", {
                                 data: {userId: userId, activated: 0},
                                 success: function (data) {
-                                    $.ligerDialog.waitting('错误密码输入次数过多，改账户已被锁定，请通过OA至管理员重置密码');
+                                    $.ligerDialog.waitting('错误密码输入次数过多，该账户已被锁定，请通过OA至管理员重置密码');
                                     setTimeout(function () {
                                         window.location.href = "${contextRoot}/login";
                                     }, 3000);

@@ -50,6 +50,7 @@ public class PackageResolver {
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
     private final static String StdFolder = "standard";
     private final static String OriFolder = "origin";
+    private final static String IndexFolder = "index";
     private final static String JsonExt = ".json";
 
     /**
@@ -69,14 +70,15 @@ public class PackageResolver {
             throw new RuntimeException("Invalid package file, package id: " + pack.getId());
         }
 
+
         Profile profile = new Profile();
 
-        String basePackagePath = root.getAbsolutePath();
-        parseDataSet(profile, new File(basePackagePath + PathSep + StdFolder).listFiles(), false);
-
-        File originFiles = new File(basePackagePath + PathSep + OriFolder);
-        if (originFiles.exists()) {
-            parseDataSet(profile, originFiles.listFiles(), true);
+        File[] files = root.listFiles();
+        for(File file:files){
+            String path = file.getPath();
+            String folderName = path.substring(path.lastIndexOf("\\")+1);
+            parseDataSet(profile, file.listFiles(), folderName);
+            file.delete();
         }
 
         makeEventSummary(profile);
@@ -86,51 +88,74 @@ public class PackageResolver {
         return profile;
     }
 
+
+
     /**
-     * 解析JSON文件中的数据。
-     *
+     * 全量级档案包解析JSON文件中的数据。
      * @param profile
      * @param files
      * @throws IOException
      */
-    void parseDataSet(Profile profile, File[] files, boolean isOriginDataSet) throws ParseException, IOException {
-        for (File file : files) {
-            if (!file.getAbsolutePath().endsWith(JsonExt)) continue;
+    void parseDataSet(Profile profile, File[] files, String folderName) throws ParseException, IOException {
+        if(folderName.equals(IndexFolder)){
+            //就诊事件摘要信息解析 其中index目录保存病人的档案数据，档案包仅有此目录。此目录下的patient_index.json文件包含患者档案在机构的访问路径和部分平台所需要的摘要数据
+            parseDataSetLight(profile,files[0]);
+        }else {
+            for (File file : files) {
+                //原始数据与标准数据解析
+                //if (!file.getAbsolutePath().endsWith(JsonExt)) continue;
+                ProfileDataSet dataSet = generateDataSet(file, folderName.equals(OriFolder) ? true :false);
 
-            ProfileDataSet dataSet = generateDataSet(file, isOriginDataSet);
+                // 原始数据存储在表"数据集代码_ORIGIN"
+                String dataSetTable = folderName==OriFolder ? StdObjectQualifierTranslator.originDataTable(dataSet.getCode()) : dataSet.getCode();
+                profile.addDataSet(dataSetTable, dataSet);
+                profile.setPatientId(dataSet.getPatientId());
+                profile.setEventNo(dataSet.getEventNo());
+                profile.setOrgCode(dataSet.getOrgCode());
+                profile.setCdaVersion(dataSet.getCdaVersion());
 
-            // 原始数据存储在表"数据集代码_ORIGIN"
-            String dataSetTable = isOriginDataSet ? StdObjectQualifierTranslator.originDataTable(dataSet.getCode()) : dataSet.getCode();
-            profile.addDataSet(dataSetTable, dataSet);
-            profile.setPatientId(dataSet.getPatientId());
-            profile.setEventNo(dataSet.getEventNo());
-            profile.setOrgCode(dataSet.getOrgCode());
-            profile.setCdaVersion(dataSet.getCdaVersion());
+                dataSet.setCode(dataSetTable);
 
-            dataSet.setCode(dataSetTable);
+                // Extract key data from data set if exists
+                if (folderName!=OriFolder) {
+                    if (profile.getCardId().length() == 0) {
+                        Object object = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.CardInfo);
+                        if (null != object) {
+                            Properties properties = (Properties) object;
+                            profile.setCardId(properties.getProperty("CardNo"));
+                        }
+                    }
 
-            // Extract key data from data set if exists
-            if (!isOriginDataSet) {
-                if (profile.getCardId().length() == 0) {
-                    Object object = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.CardInfo);
-                    if (null != object) {
-                        Properties properties = (Properties) object;
-                        profile.setCardId(properties.getProperty("CardNo"));
+                    if (StringUtils.isEmpty(profile.getDemographicId())) {
+                        profile.setDemographicId((String) extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.DemographicInfo));
+                    }
+
+                    if (profile.getEventDate() == null) {
+                        profile.setEventDate((Date) extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.EventDate));
                     }
                 }
 
-                if (StringUtils.isEmpty(profile.getDemographicId())) {
-                    profile.setDemographicId((String) extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.DemographicInfo));
-                }
-
-                if (profile.getEventDate() == null) {
-                    profile.setEventDate((Date) extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.EventDate));
-                }
+                profile.addDataSet(dataSet.getCode(), dataSet);
             }
-
-            profile.addDataSet(dataSet.getCode(), dataSet);
         }
+
     }
+
+    /**
+     * 轻量级档案包解析JSON文件中的数据。
+     * @param profile
+     * @param
+     * @throws IOException
+     */
+    void parseDataSetLight(Profile profile,File file) throws IOException, ParseException {
+        JsonNode jsonNode = objectMapper.readTree(file);
+        if (jsonNode.isNull()) {
+            throw new IOException("Invalid json file when generate data set");
+        }
+        //设置数据集
+        dataSetResolverWithTranslator.parseJsonDataSetlight(profile,jsonNode);
+    }
+
 
     public ProfileDataSet generateDataSet(File jsonFile, boolean isOrigin) throws IOException {
         JsonNode jsonNode = objectMapper.readTree(jsonFile);

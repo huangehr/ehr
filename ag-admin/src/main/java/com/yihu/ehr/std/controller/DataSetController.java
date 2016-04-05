@@ -3,6 +3,7 @@ package com.yihu.ehr.std.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.datasset.DataSetModel;
 import com.yihu.ehr.agModel.standard.datasset.MetaDataModel;
+import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.MStdDict;
 import com.yihu.ehr.std.service.DataSetClient;
@@ -322,6 +323,36 @@ public class DataSetController extends BaseController {
             @RequestParam(value = "code")String code,
             @RequestParam(value = "version_code")String versionCode){
         return dataSetClient.isExistCode(code,versionCode);
+    }
+
+
+    @RequestMapping(value = "/getData_sets", method = RequestMethod.GET)
+    @ApiOperation(value = "根据数据集ids(用逗号隔开)获取数据集信息")
+    public Envelop getDataSets(
+            @ApiParam(name = "ids", value = "数据集编号", defaultValue = "")
+            @RequestParam(value = "ids") String ids,
+            @ApiParam(name = "version", value = "版本", defaultValue = "")
+            @RequestParam(value = "version") String version) {
+        Envelop envelop = new Envelop();
+        List<MStdDataSet> list = dataSetClient.getDataSets(ids, version);
+        Collection<DataSetModel> lists = convertToModels(list, new ArrayList<DataSetModel>(list.size()), DataSetModel.class, null);
+        envelop.setDetailModelList((List) lists);
+        return envelop;
+    }
+
+    @RequestMapping(value = "/getMetaDataByDataSetId", method = RequestMethod.GET)
+    @ApiOperation(value = "根据数据集id获取数据元")
+    public Envelop getMetaDataByDataSetId(
+            @ApiParam(name = "data_set_id", value = "数据元编号", defaultValue = "")
+            @RequestParam(value = "data_set_id") long dataSetIs,
+            @ApiParam(name = "version", value = "版本", defaultValue = "")
+            @RequestParam(value = "version") String version) throws Exception{
+        Envelop envelop = new Envelop();
+
+        List<MStdMetaData> list = dataSetClient.getMetaDataByDataSetId(dataSetIs, version);
+        Collection<MetaDataModel> metaDataList = convertToModels(list, new ArrayList<>(list.size()), MetaDataModel.class, null);
+        envelop.setDetailModelList((List) metaDataList);
+        return envelop;
     }
 
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.datasset.DataSetModel;
 import com.yihu.ehr.agModel.standard.datasset.MetaDataModel;
 import com.yihu.ehr.agModel.standard.dict.DictModel;
+import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
@@ -472,61 +473,84 @@ public class DataSetsController extends BaseUIController {
 
     /**
      * 将CDA归属的数据集信息转换的XML信息
-     * @param setId 数据集ID
+     *
+     * @param setId       数据集ID
      * @param versionCode 版本号
-     * @return xml信息*/
+     * @return xml信息
+     */
     @RequestMapping("/getXMLInfoByDataSetId")
     @ResponseBody
     public Object getXMLInfoByDataSetId(String setId, String versionCode) {
-        //TODO 无对应
-        Envelop result = new Envelop();
-        try {
-            String url = "/dataSet/*******";
-            Map<String,Object> params = new  HashMap<>();
-            params.put("setId",setId);
-            params.put("versionCode",versionCode);
-            String _rus = HttpClientUtil.doGet(comUrl+url,params,username,password);
-            if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg("数据获取失败!");
-            }else{
-                result.setSuccessFlg(true);
-                result.setObj(_rus);
-            }
-        } catch (Exception ex) {
-            LogService.getLogger(DataSetsController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
-        }
-        return result;
 
-        /*Result result = new Result();
+        Envelop envelop = new Envelop();
+        List<DataSetModel> dataSetModelList = new ArrayList<>();
+        List<MetaDataModel> metaDataModelList = new ArrayList<>();
+
+        String dataSetRus = "";
+        String metaDataRus = "";
         String strResult = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><root>";
+        Map<String, Object> params = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+
+        params.put("ids", setId);
+        params.put("version", versionCode);
+
         try {
-            List<String> listIds = Arrays.asList(setId.split(","));
-            XDataSet[] xDataSets = dataSetManager.getDataSetByIds(listIds, versionCode);
-            if (xDataSets.length > 0) {
-                for (int i = 0; i < xDataSets.length; i++) {
-                    String strCode = xDataSets[i].getCode();
+
+            if (StringUtils.isEmpty(setId)) {
+                envelop.setSuccessFlg(true);
+                envelop.setObj(strResult += "</root>");
+                return envelop;
+            }
+
+            //根据 dataSetIds 查询数据集信息
+            dataSetRus = HttpClientUtil.doGet(comUrl + "/getData_sets", params, username, password);
+            envelop = mapper.readValue(dataSetRus, Envelop.class);
+
+            if (envelop.getDetailModelList().size() > 0) {
+
+                for (int i = 0; i < envelop.getDetailModelList().size(); i++) {
+                    String dataSetJson = mapper.writeValueAsString(envelop.getDetailModelList().get(i));
+                    DataSetModel dataSetModel = mapper.readValue(dataSetJson, DataSetModel.class);
+                    dataSetModelList.add(dataSetModel);
+                }
+
+
+
+                for (DataSetModel dataSetModel : dataSetModelList) {
+                    String strCode = dataSetModel.getCode();
                     strResult += "<" + strCode + ">";
-                    List<XMetaData> xMetaDatas = xDataSets[i].getMetaDataList();
-                    if (xMetaDatas.size() > 0) {
-                        for (int j = 0; j < xMetaDatas.size(); j++) {
-                            String strColumnName = xMetaDatas.get(j).getColumnName();
+                    params.put("data_set_id", dataSetModel.getId());
+
+                    metaDataRus = HttpClientUtil.doGet(comUrl + "/getMetaDataByDataSetId", params, username, password);
+                    envelop = mapper.readValue(metaDataRus, Envelop.class);
+
+                    for (int i = 0; i < envelop.getDetailModelList().size(); i++) {
+                        String metaDataJson = mapper.writeValueAsString(envelop.getDetailModelList().get(i));
+                        MetaDataModel metaDataModel = mapper.readValue(metaDataJson, MetaDataModel.class);
+                        metaDataModelList.add(metaDataModel);
+                    }
+
+                    if (envelop.getDetailModelList().size() > 0) {
+                        for (MetaDataModel metaDataModel : metaDataModelList) {
+                            String strColumnName = metaDataModel.getColumnName();
                             strResult += "<" + strColumnName + "></" + strColumnName + ">";
                         }
                     }
                     strResult += "</" + strCode + ">";
                 }
             }
+
+            strResult += "</root>";
+            envelop.setSuccessFlg(true);
+            envelop.setObj(strResult);
         } catch (Exception ex) {
-            LogService.getLogger(StdManagerRestController.class).error(ex.getMessage());
+            LogService.getLogger(DataSetsController.class).error(ex.getMessage());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        strResult += "</root>";
-        //  result=result.replaceAll("<","&lt;").replaceAll(">","&gt;");
-        result.setSuccessFlg(true);
-        result.setObj(strResult);
-        return result;*/
+
+        return envelop;
     }
 
 //    public void exportToExcel(){

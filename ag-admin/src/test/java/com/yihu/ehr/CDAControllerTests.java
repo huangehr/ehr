@@ -62,7 +62,7 @@ public class CDAControllerTests {
 
         map.put("name","name_copy");
         CDAJsonDataModel = mapper.writeValueAsString(map);
-        envelop = cdaController.updateCDADocuments(CDAJsonDataModel);
+        envelop = cdaController.updateCDADocuments("",CDAJsonDataModel);
         assertNotEquals("修改cda文档失败",envelop,null);
 
         envelop = cdaController.getCDAInfoById(((CDAModel)envelop.getObj()).getId(),version);

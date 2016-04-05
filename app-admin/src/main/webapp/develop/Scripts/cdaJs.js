@@ -129,7 +129,7 @@ cda.list = {
                         cda.list.getTypeTree();
                     }
                 });
-                cda.list.getTypeTree();
+                //cda.list.getTypeTree();
                 var manager = $("#cdaVersion").ligerGetComboBoxManager();
                 manager.selectItemByIndex(0);
             },
@@ -214,7 +214,6 @@ cda.list = {
                     $("#div_typeTree").css({});
                     var id = data[0].id;
                     $("#hdType").val(id);
-                    debugger//2、3
                     cda.list.getCDAList();
                     //$(".l-body").removeClass("l-selected");
                     $("#" + id + " div:first").addClass("l-selected");
@@ -278,7 +277,6 @@ cda.list = {
         cda.list.showDialog(_tital, _url, 450, 500, callback);
     },
     updateCdaInfo: function (cdaid, click_name) {
-        debugger
         var _height = 600;
         var _width = 955;
         var _tital = "数据集关联";
@@ -447,7 +445,6 @@ cda.attr = {
         }
         var cdaVersion = $("#hdversion").val();
         $.ajax({
-            //url: u._url + "/cdadict/getStdSourceList",
             url: u._url + "/standardsource/getStdSourceList",
             type: "post",
             dataType: "json",
@@ -521,6 +518,8 @@ cda.attr = {
         dataJson[0]["versionCode"] = versionCode;
         dataJson[0]["id"] = id;
         dataJson[0]["user"] = user_id;
+        //todo ：fileGroup为测试参数，数据库的该字段设置成非空，需要修改允许为空
+        dataJson[0]["fileGroup"] = "group1";
 
         $.ajax({
             url: cda.list._url + "/cda/SaveCdaInfo",
@@ -529,7 +528,6 @@ cda.attr = {
             data: {cdaJson: JSON.stringify(dataJson[0]),version:versionCode},
             success: function (data) {
                 if (data != null) {
-
                     var _res = eval(data);
                     if (_res.successFlg) {
                         $.ligerDialog.alert("保存成功!", "提示", "success", function () {
@@ -576,7 +574,6 @@ cda.attr = {
         });
     },
     getALLRelationByCdaId: function (cdaid) {
-        debugger
         var strVersionCode = $("#hdversion").val();
         $.ajax({
             url: cda.list._url + "/cda/getDatasetByCdaId",
@@ -625,28 +622,24 @@ cda.attr = {
 
     },
     getXMLInfoByDataSetId: function (setId, VersionCode) {
-        debugger
         $.ajax({
             url: cda.list._url + "/std/dataset/getXMLInfoByDataSetId",
             type: "get",
             dataType: "json",
             data: {setId: setId, versionCode: VersionCode},
             success: function (data) {
-                debugger
                 if (data.successFlg) {
                     kindEditor.editor.text(data.obj);
                 }
 
             },
             error: function (request) {
-                debugger
                 alert(request);
             }
 
         })
     },
     getXMLFileByCdaId: function () {
-        debugger
         var cdaid = $("#hdId").val();
         var versionCode = $("#hdversion").val();
         $.ajax({
@@ -708,7 +701,6 @@ var kindEditor = {
         'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'fontname',
         'fontsize'],
     bulidKindEditor: function (targe) {
-        debugger;
         this.editor = KindEditor.create(targe, {
             items: kindEditor.editorItems,
             resizeType: 0,
@@ -724,7 +716,6 @@ var formKindEditor = {
 
     init: function () {
         var editor = kindEditor.bulidKindEditor("textarea[name='txb_Immed_Temp']")
-        debugger
         editor.html(formKindEditor.content);
         //formKindEditor.event(editor);
     }
