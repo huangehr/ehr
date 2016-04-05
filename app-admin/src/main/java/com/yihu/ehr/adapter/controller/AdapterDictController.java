@@ -146,6 +146,9 @@ public class AdapterDictController extends ExtendController<AdapterDictService> 
             Envelop result = new Envelop();
             result.setSuccessFlg(true);
 
+            if(parentId == null || parentId == 0)
+                return result;
+
             Map<String, Object> params = new HashMap<>();
             params.put("id",adapterPlanId);
             String modelJson = orgAdapterPlanService.getModel(params);
