@@ -120,8 +120,11 @@ public class OrganizationController extends BaseController {
         // 判断机构状态（是否已激活）
         orgModel.setActivityFlagName(mOrg.getActivityFlag() == 1 ? "是" : "否");
         //创建时间转化
-        orgModel.setCreateDate(DateUtil.formatDate(mOrg.getCreateDate(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT));
-
+        try {
+            orgModel.setCreateDate(DateUtil.formatDate(mOrg.getCreateDate(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT));
+        }catch (Exception e){
+            orgModel.setCreateDate("");
+        }
         return orgModel;
     }
 

@@ -149,6 +149,9 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetSer
             Envelop result = new Envelop();
             result.setSuccessFlg(true);
 
+            if(parentId == null || parentId == 0)
+                return result;
+
             Envelop rs = getEnvelop(
                     orgAdapterPlanService.getModel(
                         new PageParms().addExt("id", adapterPlanId)));

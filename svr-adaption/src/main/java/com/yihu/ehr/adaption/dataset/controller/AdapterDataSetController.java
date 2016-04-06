@@ -41,7 +41,7 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
     OrgAdapterPlanService orgAdapterPlanService;
 
     @RequestMapping(value = "/plan/{planId}/datasets", method = RequestMethod.GET)
-    @ApiOperation(value = "根据方案ID及查询条件查询数据集适配关系")
+    @ApiOperation(value = "查询定制数据集")
     public Collection<MAdapterRelationship> searchAdapterDataSet(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
@@ -67,7 +67,7 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
     }
 
     @RequestMapping("/plan/{planId}/datasets/{dataSetId}/datametas")
-    @ApiOperation(value = "根据dataSetId搜索数据元适配关系")
+    @ApiOperation(value = "搜索定制数据元")
     public Collection<MAdapterDataVo> searchAdapterMetaData(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,

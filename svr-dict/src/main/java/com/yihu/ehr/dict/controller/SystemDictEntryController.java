@@ -46,7 +46,7 @@ public class SystemDictEntryController extends BaseRestController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) Integer page,
             HttpServletRequest request,
-            HttpServletResponse response) {
+            HttpServletResponse response) throws Exception {
 //        page = reducePage(page);
 
 //        Page<SystemDictEntry> p = null;

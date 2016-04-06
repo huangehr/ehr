@@ -550,8 +550,16 @@ cda.attr = {
 
         u.relationIds = "";
         for (var i = 0; i < u.top.list_dataset_storage.length; i++) {
-            u.relationIds += u.top.list_dataset_storage[i].id + ",";
+            var datasets = u.top.list_dataset_storage[i];
+            debugger
+            if(i == 0){
+                u.relationIds += datasets.id;
+            }else{
+                u.relationIds += ","+ datasets.id;
+            }
+            //u.relationIds += u.top.list_dataset_storage[i].id + ",";
         }
+        //u.relationIds=u.relationIds.substring(0,strSetId.length-1);
 
         var cdaId = $("#hdId").val();
         var strVersionCode = $("#hdversion").val();
@@ -568,7 +576,7 @@ cda.attr = {
                     }, null);
                 }
                 else {
-                    $.Notice.error(result.errorMsg);
+                    $.Notice.error("保存失败");
                 }
             }
         });
