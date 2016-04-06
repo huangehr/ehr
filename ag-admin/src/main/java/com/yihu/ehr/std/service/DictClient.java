@@ -1,10 +1,12 @@
 package com.yihu.ehr.std.service;
 
+import com.yihu.ehr.agModel.standard.dict.DictModel;
 import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.standard.MStdDict;
 import com.yihu.ehr.model.standard.MStdDictEntry;
+import com.yihu.ehr.model.standard.MStdSource;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -173,4 +175,8 @@ public interface DictClient {
     List<MStdDict> getOtherCdaDict(
             @PathVariable(value = "id") String id,
             @RequestParam(value = "version") String version);
+
+    @RequestMapping(value = RestApi.Standards.NoPageDictionaries, method = RequestMethod.GET)
+    ResponseEntity<Collection<DictModel>> search(
+            @RequestParam(value = "filters", required = false) String filters);
 }

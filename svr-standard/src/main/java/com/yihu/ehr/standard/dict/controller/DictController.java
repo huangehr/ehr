@@ -4,6 +4,7 @@ import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.MCDAType;
 import com.yihu.ehr.model.standard.MStdDict;
+import com.yihu.ehr.model.standard.MStdSource;
 import com.yihu.ehr.standard.cdatype.service.CDAType;
 import com.yihu.ehr.standard.commons.ExtendController;
 import com.yihu.ehr.standard.dict.service.Dict;
@@ -59,6 +60,16 @@ public class DictController extends ExtendController<MStdDict> {
         List ls = dictService.search(entityClass, fields, filters, sorts, page, size);
         pagedResponse(request, response, dictService.getCount(entityClass, filters), page, size);
         return convertToModels(ls, new ArrayList<>(ls.size()), MStdDict.class, fields);
+    }
+
+
+    @RequestMapping(value = RestApi.Standards.NoPageDictionaries, method = RequestMethod.GET)
+    @ApiOperation(value = "标准字典不分页搜索")
+    public Collection<MStdDict> searchSourcesWithoutPaging(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+        List dictList = dictService.search(filters);
+        return convertToModels(dictList, new ArrayList<>(dictList.size()), MStdDict.class, "");
     }
 
 

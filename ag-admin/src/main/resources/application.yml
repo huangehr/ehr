@@ -24,11 +24,6 @@ ribbon:
   ReadTimeout: 30000
   ConnectTimeout: 6000
 
-zuul:
-  ignored-services: "*"
-  routes:
-    svr-adaption: /api/v1.0/adapter/plan/adapterDataSet
-
 ---
 spring:
   profiles: dev
