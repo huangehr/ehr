@@ -124,8 +124,8 @@ public class CDAController extends BaseController{
             @RequestParam(value = "cdaInfoJson") String cdaInfoJson) {
 
         Envelop envelop = new Envelop();
-        //todo:访问微服务的路径不对  路径带有参数id
-        MCDADocument mcdaDocument = cdaClient.updateCDADocuments(version, cdaInfoJson);
+        MCDADocument model = toEntity(cdaInfoJson, MCDADocument.class);
+        MCDADocument mcdaDocument = cdaClient.updateCDADocuments(version, model.getId(), cdaInfoJson);
         CDAModel cdaModel = convertToModel(mcdaDocument,CDAModel.class);
 
         if (cdaModel != null){
