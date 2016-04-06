@@ -26,9 +26,9 @@ cda.list = {
             {
                 display: '操作', isSort: false, width: 180, render: function (rowdata, rowindex, value) {
 
-                var html = "<div class='grid_edit' onclick='cda.list.updateCdaInfo(\"" + rowdata.id + "\",\"btn_relationship\")'></div> " +
-                    "<div class='grid_edit' style='margin-left: 55px; margin-top: -22px;' onclick='cda.list.updateCdaInfo(\"" + rowdata.id + "\",\"btn_basic\")'></div> " +
-                    "<div class='grid_delete'style='margin-left: 90px;' onclick='cda.list.deleteCda(\"" + rowdata.id + "\")'></div>";
+                var html = "<div class='grid_edit' style='margin-left: 40px;cursor:pointer;' title='数据集关联' onclick='cda.list.updateCdaInfo(\"" + rowdata.id + "\",\"btn_relationship\")'></div> " +
+                    "<div class='grid_edit' style='margin-left: 80px; margin-top: -22px;cursor:pointer;' title='编辑' onclick='cda.list.updateCdaInfo(\"" + rowdata.id + "\",\"btn_basic\")'></div> " +
+                    "<div class='grid_delete'style='margin-left: 120px;cursor:pointer;' title='删除' onclick='cda.list.deleteCda(\"" + rowdata.id + "\")'></div>";
                 return html;
             }
             }
