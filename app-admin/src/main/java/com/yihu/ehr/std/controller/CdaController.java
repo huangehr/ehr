@@ -378,6 +378,7 @@ public class CdaController {
     @RequestMapping("SaveRelationship")
     @ResponseBody
     public Object SaveRelationship(String strDatasetIds, String strCdaId, String strVersionCode, String xmlInfo) {
+
         Envelop result = new Envelop();
         String strErrorMsg = "";
         if (StringUtils.isEmpty(strVersionCode)) {
@@ -496,7 +497,6 @@ public class CdaController {
     public Object getDatasetByCdaId(String strVersionCode, String strCdaId) {
         Envelop result = new Envelop();
         try {
-//            String url = "/cda/getDatasetByCdaId";
             String url = "/cda/relationships";
             Map<String,Object> params = new HashMap<>();
             params.put("versionCode",strVersionCode);

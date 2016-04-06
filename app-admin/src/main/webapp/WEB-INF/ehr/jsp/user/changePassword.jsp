@@ -24,8 +24,7 @@
         <label>输入新密码<spring:message code="spe.colon"/></label>
         <div class="l-text-wrapper m-form-control essential">
             <input type="password" id="inp_new_passWord"
-                   class="required useTitle ajax length-range-8-16 validate-space validate-special-char" required-title=
-                   <spring:message code="lbl.must.input"/> data-attr-scan="newPassWord"/>
+                   class="required useTitle ajax length-range-8-16 validate-space validate-special-char" data-attr-scan="newPassWord"/>
         </div>
     </div>
     <div class="m-form-group f-ml100 f-w500">

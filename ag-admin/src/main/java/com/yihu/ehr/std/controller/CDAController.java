@@ -124,8 +124,8 @@ public class CDAController extends BaseController{
             @RequestParam(value = "cdaInfoJson") String cdaInfoJson) {
 
         Envelop envelop = new Envelop();
-        //todo:访问微服务的路径不对  路径带有参数id
-        MCDADocument mcdaDocument = cdaClient.updateCDADocuments(version, cdaInfoJson);
+        MCDADocument model = toEntity(cdaInfoJson, MCDADocument.class);
+        MCDADocument mcdaDocument = cdaClient.updateCDADocuments(version, model.getId(), cdaInfoJson);
         CDAModel cdaModel = convertToModel(mcdaDocument,CDAModel.class);
 
         if (cdaModel != null){
@@ -168,7 +168,17 @@ public class CDAController extends BaseController{
         Envelop envelop = new Envelop();
 
         List<MCdaDataSetRelationship> mcdaDocumentList = cdaClient.getCDADataSetRelationshipByCDAId(versionCode, cdaId);
-        List<CdaDataSetRelationshipModel> cdaDataSetRelationshipModels = (List<CdaDataSetRelationshipModel>)convertToModels(mcdaDocumentList,new ArrayList<CdaDataSetRelationshipModel>(mcdaDocumentList.size()),CdaDataSetRelationshipModel.class,null);
+
+//        List<CdaDataSetRelationshipModel> cdaDataSetRelationshipModels = (List<CdaDataSetRelationshipModel>)convertToModels(mcdaDocumentList,new ArrayList<CdaDataSetRelationshipModel>(mcdaDocumentList.size()),CdaDataSetRelationshipModel.class,null);
+        List<CdaDataSetRelationshipModel> cdaDataSetRelationshipModels = new ArrayList<>();
+
+        for(MCdaDataSetRelationship mCdaDataSetRelationship:mcdaDocumentList){
+            CdaDataSetRelationshipModel cdaDataSetRelationshipModel = new CdaDataSetRelationshipModel();
+            cdaDataSetRelationshipModel.setId(mCdaDataSetRelationship.getDataSetId());
+            cdaDataSetRelationshipModel.setCdaId(mCdaDataSetRelationship.getCdaId());
+            cdaDataSetRelationshipModel.setDataSetId(mCdaDataSetRelationship.getId());
+            cdaDataSetRelationshipModels.add(cdaDataSetRelationshipModel);
+        }
 
         if (cdaDataSetRelationshipModels != null){
             envelop.setSuccessFlg(true);

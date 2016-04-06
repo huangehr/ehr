@@ -61,6 +61,8 @@ public interface CDAClient {
     MCDADocument updateCDADocuments(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
             @RequestParam(value = "version") String version,
+            @ApiParam(name = "id", value = "编号")
+            @PathVariable(value = "id") String id,
             @ApiParam(name = "model", value = "文档json数据模型")
             @RequestParam(value = "model") String cdaDocumentJsonData);
 

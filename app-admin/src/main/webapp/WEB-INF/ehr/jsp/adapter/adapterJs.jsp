@@ -247,6 +247,8 @@
                                     delAdapterPlan(id.substring(1));
                                 }
                             });
+                        }else{
+                            $.ligerDialog.warn("请选择要删除的数据适配方案");
                         }
                     });
                     //修改适配方案

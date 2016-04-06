@@ -93,19 +93,19 @@
 
                         var value = self.$newPassWord.val();
                         var strongRegex = new RegExp("^(?=.{8,})(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*\\W).*$", "g");
-                        var mediumRegex = new RegExp("^(?=.{8,})(((?=.*[A-Z])(?=.*[a-z]))|((?=.*[A-Z])(?=.*[0-9]))|((?=.*[a-z])(?=.*[0-9]))).*$", "g");
-                        var enoughRegex = new RegExp("(?=.{8,}).*", "g");
-
+                        var mediumRegex = new RegExp("^(?=.{9,})(((?=.*[A-Z])(?=.*[a-z]))|((?=.*[A-Z])(?=.*[0-9]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[a-z])(?=.*\\W))|((?=.*[0-9])(?=.*\\W))).*$");
+//                        var mediumRegex = new RegExp("^(?=.{9,})(((?=.*[A-Z])(?=.*[a-z]))|((?=.*[A-Z])(?=.*[0-9]))|((?=.*[a-z])(?=.*[0-9]))).*$");
+                        var enoughRegex = new RegExp("(?=.{8,}).*");
                         if (false == enoughRegex.test(value)) {
                             self.$intensionMiddle.removeClass('s-bc4');
                             self.$intensionPowerful.removeClass('s-bc12');
                             self.$intensionWeak.addClass('s-bc13');
-                            //密码小于8位，密码强度：弱
+                            //密码小于8位，强度：弱
                         }
                         else if (strongRegex.test(value)) {
                             self.$intensionMiddle.addClass('s-bc4');
                             self.$intensionPowerful.addClass('s-bc12');
-                            //密码为8位及以上并且(大小写)字母数字特殊字符三项都包括,强度：强
+                            //密码为8位及以上并且大、小字母、数字、特殊字符三项都包括,强度：强
                         }
                         else if (mediumRegex.test(value)) {
                             self.$intensionPowerful.removeClass('s-bc12');
@@ -127,7 +127,6 @@
                         var userName = self.$userName.val();
                         var passWord = self.$oldPassWord.val();
                         var newPassWord = self.$newPassWord.val();
-//                        var againNewPassWord = self.$againNewPassWord.val();
 
                         if (Util.isStrEquals($(idCode).attr("id"), "inp_old_passWord")) {
 
@@ -159,6 +158,9 @@
                                 return ValidationErrorMsg(false, "新密码与用户名不能一样");
                             }
                             if (Util.isNum(newPassWord)) {
+                                if(newPassWord.length<=8||newPassWord.length>=16){
+                                    return ValidationErrorMsg(false, "输入值的长度应该在8 至 16之间，当前长度"+newPassWord.length);
+                                }
                                 return ValidationErrorMsg(false, "新密码不能纯数字");
                             }
                             if(reg.test(newPassWord)){
