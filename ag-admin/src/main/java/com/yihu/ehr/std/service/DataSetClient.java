@@ -1,5 +1,7 @@
 package com.yihu.ehr.std.service;
 
+import com.yihu.ehr.agModel.standard.datasset.DataSetModel;
+import com.yihu.ehr.agModel.standard.dict.DictModel;
 import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
@@ -203,4 +205,8 @@ public interface DataSetClient {
             @PathVariable(value = "data_set_id") long dataSetIs,
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version);
+
+    @RequestMapping(value = RestApi.Standards.NoPageDataSets, method = RequestMethod.GET)
+    ResponseEntity<Collection<DataSetModel>> search(
+            @RequestParam(value = "filters", required = false) String filters);
 }

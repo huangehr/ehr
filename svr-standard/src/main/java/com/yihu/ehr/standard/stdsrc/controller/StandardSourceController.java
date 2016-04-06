@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -129,7 +130,7 @@ public class StandardSourceController extends ExtendController<MStdSource> {
     }
 
     @RequestMapping(value = RestApi.Standards.IsSourceCodeExist,method = RequestMethod.GET)
-    public boolean isCodeExist(@RequestParam(value="code")String code){
+    public boolean isCodeExist(@RequestParam(value="code")String code) throws Exception {
 
         return stdSourceService.isSourceCodeExist(code);
     }
