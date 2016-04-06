@@ -118,6 +118,7 @@ public class RestApi {
         public static final String DataSetRelationship              = "/std/documents/data_set_relationships/{id}";
 
         public static final String Dictionaries                     = "/std/dictionaries";
+        public static final String NoPageDictionaries               = "/std/dictionaries/no_paging";
         public static final String Dictionary                       = "/std/dictionaries/{id}";
         public static final String MetaDataWithDict                 = "/std/data_set/{data_set_id}/meta_datas/{meta_data_id}/dictionaries";
         public static final String DictCodeIsExist                  = "/std/dictionaries/is_exist/code";
@@ -130,6 +131,7 @@ public class RestApi {
         public static final String EntryCodeIsExist                 = "/std/dictionaries/entries/is_exist/code";
 
         public static final String DataSets                         = "/std/data_sets";
+        public static final String NoPageDataSets                   = "/std/data_sets/no_paging";
         public static final String DataSet                          = "/std/data_sets/{id}";
         public static final String DataSetsName                     = "/std/data_sets/name";
         public static final String DataSetCodeIsExist               = "/std/data_set/is_exist/code";

@@ -3,11 +3,13 @@ package com.yihu.ehr.std.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.dict.DictEntryModel;
 import com.yihu.ehr.agModel.standard.dict.DictModel;
+import com.yihu.ehr.agModel.standard.standardsource.StdSourceModel;
 import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.MStdDict;
 import com.yihu.ehr.model.standard.MStdDictEntry;
+import com.yihu.ehr.model.standard.MStdSource;
 import com.yihu.ehr.std.service.DictClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
@@ -18,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -59,6 +63,22 @@ public class DictController extends BaseController {
 
         return envelop;
     }
+
+
+
+    @RequestMapping(value = "/dicts/no_paging", method = RequestMethod.GET)
+    @ApiOperation(value = "标准字典分页搜索(不分页)")
+    public Envelop searchDictsWithoutPaging(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+        Envelop envelop = new Envelop();
+        ResponseEntity<Collection<DictModel>> responseEntity = dictClient.search(filters);
+        List<DictModel> stdSources = (List<DictModel>) responseEntity.getBody();
+        envelop.setDetailModelList(stdSources);
+        return envelop;
+    }
+
+
 
     @RequestMapping(value = "/dict", method = RequestMethod.GET)
     @ApiOperation(value = "根据dictid，version获取字典信息")
