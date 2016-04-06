@@ -141,7 +141,6 @@
                             $('#inp_major_div').hide();
                     }
                 });
-                debugger
                 this.$form.attrScan();
                 this.$form.Fields.fillValues({
                     id: user.id,
@@ -282,7 +281,14 @@
                                 data: {userId: userModelres.id},
                                 success: function (data) {
                                     if (data.successFlg)
-                                        $.Notice.success('重置成功!');
+                                        //重置当前用户密码，需重登
+                                        if ((userModelres.id)==(data.obj)){
+                                            $.Notice.warn('重置成功，请重新登录!',function(){
+                                                location.href='${contextRoot}/logout';
+                                            });
+                                        }else{
+                                            $.Notice.success('重置成功!');
+                                        }
                                     else
                                         $.Notice.error('重置失败!');
                                 },

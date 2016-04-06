@@ -1,7 +1,9 @@
 package com.yihu.ehr.security.service;
 
-import com.yihu.ehr.util.ObjectVersion;
+import com.yihu.ehr.constants.BizObject;
+import com.yihu.ehr.util.ObjectId;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -18,9 +20,11 @@ import java.util.Date;
 @Table(name = "user_security")
 @Access(value = AccessType.PROPERTY)
 public class Key implements Serializable {
+	@Value("${admin-region}")
+	short adminRegion;
 
 	public Key() {
-		id  = new ObjectVersion().toString();
+		id = new ObjectId(adminRegion, BizObject.User).toString();
 	}
 
 	private String id;
