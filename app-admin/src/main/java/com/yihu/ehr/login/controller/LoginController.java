@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -346,13 +346,13 @@ public class LoginController {
             envelop = mapper.readValue(resultStr,Envelop.class);
             if(!envelop.isSuccessFlg()){
                 envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("密码错误，请重新输入");
+                envelop.setErrorMsg("密码错误，请重新输入！");
             }else {
                 envelop.setSuccessFlg(true);
             }
         } catch (Exception e) {
             envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("密码错误，请重新输入");
+            envelop.setErrorMsg("密码错误，请重新输入！");
             return envelop;
         }
         return envelop;
