@@ -112,7 +112,7 @@ public class DocumentEndPoint  extends ExtendController<MCDADocument> {
 
 
     @ApiOperation(value = "修改CDADocuments")
-    @RequestMapping(value = RestApi.Standards.Document, method = RequestMethod.PUT)
+    @RequestMapping(value = RestApi.Standards.Documents, method = RequestMethod.PUT)
     public MCDADocument updateCDADocuments(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
             @RequestParam(value = "version") String version,

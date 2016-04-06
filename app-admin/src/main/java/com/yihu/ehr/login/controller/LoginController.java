@@ -6,11 +6,14 @@ import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
+import com.yihu.ehr.util.RestTemplates;
+import com.yihu.ehr.util.controller.BaseUIController;
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -31,7 +34,7 @@ import java.util.*;
 @Controller
 @RequestMapping("/login")
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
-public class LoginController {
+public class LoginController extends BaseUIController {
 
     @Value("${service-gateway.username}")
     private String username;
@@ -40,15 +43,10 @@ public class LoginController {
     @Value("${service-gateway.url}")
     private String comUrl;
 
-    @Autowired
-    ObjectMapper mapper;
-
     @RequestMapping(value = "")
     public String login(Model model) {
         model.addAttribute("contentPage","login/login");
         return "generalView";
-        //return "login/login";
-        //return "test";
     }
 
     @RequestMapping(value = "validate", method = RequestMethod.POST)
@@ -57,17 +55,12 @@ public class LoginController {
         String url = "/users/verification/" + userName;
         String resultStr = "";
         Map<String, Object> params = new HashMap<>();
-        ObjectMapper mapper = new ObjectMapper();
 
         params.put("psw", password);
         try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat();
-            dateFormat.applyPattern("yyyy-MM-dd hh:mm:ss");
-            mapper.setDateFormat(dateFormat);
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, this.password);
-            Envelop envelop = mapper.readValue(resultStr, Envelop.class);
-            String userJson = mapper.writeValueAsString(envelop.getObj());
-            UserDetailModel userDetailModel = mapper.readValue(userJson,UserDetailModel.class);
+            Envelop envelop = getEnvelop(resultStr);
+            UserDetailModel userDetailModel =getEnvelopModel(envelop.getObj(),UserDetailModel.class);
 
             if (envelop.isSuccessFlg()){
                 String lastLoginTime = null;
@@ -82,19 +75,24 @@ public class LoginController {
                     return "generalView";
                 }
 
+                SimpleDateFormat sdf = new SimpleDateFormat(AgAdminConstants.DateTimeFormat);
+                String now = sdf.format(new Date());
                 if(userDetailModel.getLastLoginTime()!= null){
                    lastLoginTime = userDetailModel.getLastLoginTime();
                 }else{
-                    SimpleDateFormat sdf = new SimpleDateFormat(AgAdminConstants.DateTimeFormat);
-                    lastLoginTime = sdf.format(new Date());
+                    lastLoginTime = now;
                 }
 
 
                 model.addAttribute(SessionAttributeKeys.CurrentUser, userDetailModel);
                 request.getSession().setAttribute("last_login_time", lastLoginTime);
-                //todo 记录最近登入时间，目前没有提供接口
-//              userManager.lastLoginTime(user.getId(),new Date());
-
+                //update lastLoginTime
+                userDetailModel.setLastLoginTime(now);
+                url="/users/";
+                MultiValueMap<String, String> conditionMap = new LinkedMultiValueMap<>();
+                conditionMap.add("user_json_data", toJson(userDetailModel));
+                RestTemplates templates = new RestTemplates();
+                resultStr = templates.doPut(comUrl + url,conditionMap);
                 return "redirect:/index";
             }else{
 
@@ -111,52 +109,6 @@ public class LoginController {
             model.addAttribute("contentPage","login/login");
             return "generalView";
         }
-
-//        try {
-//            XUser user = userManager.loginIndetification(userName, password);
-//            if (user != null) {
-//                if(user.getActivated()){
-//
-////                    model.addAttribute("successFlg", true);
-//
-//                        String lastLoginTime = null;
-///*                    String checkDay = DateUtil.checkTodayOrYes(user.getLastLoginTime());
-//                    if(!checkDay.equals("-1")){
-//                        lastLoginTime   = DateFormatter.simpleDateTimeShortFormat(user.getLastLoginTime());
-//                        String[] tmp = lastLoginTime!=null? lastLoginTime.split(" ") : new String[]{};
-//                        lastLoginTime = checkDay + (tmp.length>1?tmp[1]:"");
-//                    }*/
-//                    if(user.getLastLoginTime() != null){
-//                        lastLoginTime   = DateFormatter.simpleDateTimeShortFormat(user.getLastLoginTime());
-//                    }
-//                    //将需要的信息置于session中，用于全局调用。
-//                    model.addAttribute(SessionAttributeKeys.CurrentUser, user);
-//                    request.getSession().setAttribute("last_login_time", lastLoginTime);
-//                    userManager.lastLoginTime(user.getId(),new Date());
-////                    response.sendRedirect(request.getContextPath()+"/index");
-//                    return "redirect:/index";
-//                }
-//                else{
-//                    model.addAttribute("userName", userName);
-//                    model.addAttribute("successFlg", false);
-//                    model.addAttribute("failMsg", "该用户已失效，请联系系统管理员重新生效。");
-//                    model.addAttribute("contentPage","login/login");
-//                    return "generalView";
-//                }
-//            } else {
-//                model.addAttribute("userName", userName);
-//                model.addAttribute("successFlg", false);
-//                model.addAttribute("failMsg", "用户名或密码错误，请重新输入。");
-//                model.addAttribute("contentPage","login/login");
-//                return "generalView";
-//            }
-//        } catch (Exception e) {
-//            model.addAttribute("userName", userName);
-//            model.addAttribute("successFlg", false);
-//            model.addAttribute("failMsg", e.getMessage());
-//            model.addAttribute("contentPage","login/login");
-//            return "generalView";
-//        }
     }
 
     //todo:暂时没用到

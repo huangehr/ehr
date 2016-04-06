@@ -1,6 +1,7 @@
 package com.yihu.ehr.apps.controller;
 
 import com.yihu.ehr.agModel.app.AppDetailModel;
+import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
@@ -17,6 +18,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Created by Administrator on 2015/8/12.
@@ -138,13 +141,15 @@ public class AppController extends BaseUIController {
 
     @RequestMapping("createApp")
     @ResponseBody
-    public Object createApp(AppDetailModel appDetailModel) {
+    public Object createApp(AppDetailModel appDetailModel,HttpServletRequest request) {
 
         Envelop result = new Envelop();
         String resultStr="";
         String url="/apps";
         MultiValueMap<String,String> conditionMap = new LinkedMultiValueMap<String, String>();
-        appDetailModel.setCreator(SessionAttributeKeys.CurrentUser);
+        //不能用 @ModelAttribute(SessionAttributeKeys.CurrentUser)获取，会与AppDetailModel中的id属性有冲突
+        UserDetailModel userDetailModel = (UserDetailModel)request.getSession().getAttribute(SessionAttributeKeys.CurrentUser);
+        appDetailModel.setCreator(userDetailModel.getId());
         conditionMap.add("app", toJson(appDetailModel));
         try {
             RestTemplates template = new RestTemplates();

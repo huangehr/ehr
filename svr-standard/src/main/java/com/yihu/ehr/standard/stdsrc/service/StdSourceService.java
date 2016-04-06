@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
+
 /**
  * @author lincl
  * @version 1.0
@@ -37,7 +39,7 @@ public class StdSourceService extends BaseJpaService<StandardSource, XStdSourceR
      * @param code
      * @return
      */
-    public boolean isSourceCodeExist(String code) {
+    public boolean isSourceCodeExist(String code) throws ParseException {
 
         return getCount("code=" + code) > 0;
     }
