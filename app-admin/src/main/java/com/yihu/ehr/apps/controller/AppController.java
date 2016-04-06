@@ -1,6 +1,7 @@
 package com.yihu.ehr.apps.controller;
 
 import com.yihu.ehr.agModel.app.AppDetailModel;
+import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
@@ -14,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -138,13 +140,13 @@ public class AppController extends BaseUIController {
 
     @RequestMapping("createApp")
     @ResponseBody
-    public Object createApp(AppDetailModel appDetailModel) {
+    public Object createApp(AppDetailModel appDetailModel,@ModelAttribute(SessionAttributeKeys.CurrentUser) UserDetailModel userDetailModel) {
 
         Envelop result = new Envelop();
         String resultStr="";
         String url="/apps";
         MultiValueMap<String,String> conditionMap = new LinkedMultiValueMap<String, String>();
-        appDetailModel.setCreator(SessionAttributeKeys.CurrentUser);
+        appDetailModel.setCreator(userDetailModel.getId());//todo:获取时id丢失，LoginController中插入前id存在
         conditionMap.add("app", toJson(appDetailModel));
         try {
             RestTemplates template = new RestTemplates();

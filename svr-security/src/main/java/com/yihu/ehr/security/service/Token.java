@@ -1,12 +1,13 @@
 package com.yihu.ehr.security.service;
 
-import com.yihu.ehr.util.ObjectVersion;
+import com.yihu.ehr.constants.BizObject;
+import com.yihu.ehr.util.ObjectId;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * Token。
@@ -19,6 +20,8 @@ import java.util.UUID;
 @Table(name = "user_token")
 @Access(value = AccessType.PROPERTY)
 public class Token implements Serializable {
+    @Value("${admin-region}")
+    short adminRegion;
 
     private String tokenId;
     private String accessToken;
@@ -30,7 +33,7 @@ public class Token implements Serializable {
     private String appId;
 
     public Token() {
-        tokenId = new ObjectVersion().toString();
+        tokenId = new ObjectId(adminRegion, BizObject.User).toString();
     }
 
     @Id
