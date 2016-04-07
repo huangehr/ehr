@@ -323,7 +323,6 @@ public class AdapterOrgController extends BaseUIController {
 
         try {
             String adapterOrgListUrl = "/adapterOrg/orgs";
-            Envelop adapterOrgEnvelop = new Envelop();
             Map<String, Object> adapterOrgParams = new HashMap<>();
             adapterOrgParams.put("sorts","");
             adapterOrgParams.put("filters","");
@@ -331,7 +330,7 @@ public class AdapterOrgController extends BaseUIController {
             adapterOrgParams.put("page",1);
             adapterOrgParams.put("size",10000);
             String  adapterOrgResultStr = HttpClientUtil.doGet(comUrl + adapterOrgListUrl, adapterOrgParams, username, password);
-            adapterOrgEnvelop = getEnvelop(adapterOrgResultStr);
+            Envelop adapterOrgEnvelop = getEnvelop(adapterOrgResultStr);
             List<AdapterOrgModel> adapterOrgModelList = (List<AdapterOrgModel>)getEnvelopList(adapterOrgEnvelop.getDetailModelList(),new ArrayList<AdapterOrgModel>(),AdapterOrgModel.class);
 
             String orgCodeList = "";
@@ -356,10 +355,10 @@ public class AdapterOrgController extends BaseUIController {
 
             if(!StringUtils.isEmpty(param)){
                 if(!StringUtils.isEmpty(filters)){
-                    filters += ";orgCode?"+param+" g1;fullName?"+param+" g1";
+                    filters += ";orgCode?"+param+" g1;fullName?"+param+" g1;pyCode?"+ param +" g1";
                 }
                 else{
-                    filters += "orgCode?"+param+" g1;fullName?"+param+" g1";
+                    filters += "orgCode?"+param+" g1;fullName?"+param+" g1;pyCode?"+ param +" g1";
                 }
             }
 
