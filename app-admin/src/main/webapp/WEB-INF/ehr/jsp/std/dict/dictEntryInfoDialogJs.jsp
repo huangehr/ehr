@@ -80,18 +80,18 @@
                                 parent.reloadEntryMasterGrid();
                                 parent.closeDialog('right','保存成功！');
                             }else{
-                                if(data.errorMsg=='codeNotUnique'){
-                                    $.Notice.error('该代码已存在，请重新填写代码！');
+                                if(data.errorMsg){
+                                     $.Notice.error(data.errorMsg);
                                 }
                                 else if(data.message)
                                     $.Notice.error( data.message);
                                 else
-                                    $.Notice.error( '出错了！');
+                                    $.Notice.error( '系统出错了，请联系管理员！');
                             }
                             self.$btnSave.removeAttr('disabled');
                         },
                         error: function () {
-                            $.Notice.error( '出错了！');
+                            $.Notice.error( '系统出错了，请联系管理员！');
                             self.$btnSave.removeAttr('disabled');
                         }
                     });
