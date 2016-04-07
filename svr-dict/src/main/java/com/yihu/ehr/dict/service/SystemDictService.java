@@ -34,7 +34,7 @@ public class SystemDictService extends BaseJpaService<SystemDict, XSystemDictRep
 
     public SystemDict createDict(SystemDict dict) {
         dict.setCreateDate(new Date());
-        dict.setName(dict.getName());
+//        dict.setName(dict.getName());
         dictRepo.save(dict);
 
         return dict;

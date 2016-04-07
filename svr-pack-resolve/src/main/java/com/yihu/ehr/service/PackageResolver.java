@@ -19,6 +19,8 @@ import com.yihu.ehr.util.log.LogService;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -100,8 +102,10 @@ public class PackageResolver {
                     //非结构化档案包处理
                     if(folderName.equals("meta.json")){
                         unstructuredDataSetParse(unStructuredProfile,file);
+                    }else if(folderName.equals(DocumentFolder)){
+                        unstructuredDocumentParse(unStructuredProfile, file.listFiles());
                     }
-                    unstructuredDocumentParse(unStructuredProfile, file.listFiles());
+
                     break;
                 default: break;
             }
@@ -222,13 +226,43 @@ public class PackageResolver {
      */
     void unstructuredDataSetParse(UnStructuredProfile profile, File file) throws Exception {
         JsonNode jsonNode = objectMapper.readTree(file);
+
+        //公共部分
         String version = jsonNode.get("inner_version").asText();
         //String dataSetCode = jsonNode.get("code").asText();
         String eventNo = jsonNode.get("event_no").asText();
         String patientId = jsonNode.get("patient_id").asText();
         String orgCode = jsonNode.get("org_code").asText();
         String eventDate = jsonNode.path("event_time").asText();
-        JsonNode data = jsonNode.get("data"); //保存
+
+        //data部分
+        JsonNode datas = jsonNode.get("data"); //保存
+        for(int i=0;i<datas.size();i++){
+            JsonNode data = datas.get(i);
+            String dataStr = data.toString();
+            dataStr = dataStr.substring(1,dataStr.length()-1);
+            JSONObject dataObj = new JSONObject(dataStr);
+
+            String cdaDocId = dataObj.getString("cda_doc_id");
+            String url = dataObj.getString("url");
+            String expiryDate = dataObj.getString("expiry_date");
+
+            JSONObject keyWords = (JSONObject)dataObj.get("key_words");
+            Iterator keys = keyWords.keys();
+            while (keys.hasNext()) {
+                String key = (String) keys.next();
+                String value = keyWords.getString(key);
+            }
+            String content = dataObj.get("content").toString();
+            content = content.substring(1,content.length()-1);
+
+        }
+
+
+
+
+
+
     }
 
     /**
