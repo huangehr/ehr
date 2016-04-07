@@ -3,24 +3,20 @@ package com.yihu.ehr.security.controller;
 import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.security.MKey;
-import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.security.feign.AppClient;
 import com.yihu.ehr.security.feign.UserClient;
-import com.yihu.ehr.security.service.*;
-import com.yihu.ehr.util.DateUtil;
+import com.yihu.ehr.security.service.Key;
+import com.yihu.ehr.security.service.KeyManager;
+import com.yihu.ehr.security.service.KeyMap;
+import com.yihu.ehr.security.service.TokenManager;
 import com.yihu.ehr.util.controller.BaseRestController;
-import com.yihu.ehr.util.encrypt.RSA;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URLDecoder;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
@@ -43,9 +39,10 @@ public class KeyRestEndPoint extends BaseRestController {
     @ApiOperation(value = "获取用户Key", notes = "公-私钥用于与健康档案平台加密传输数据使用")
     public MKey getUserKey(
             @ApiParam(name = "user_id", value = "用户名")
-            @PathVariable(value = "user_id") String userId) throws Exception {
-        Key key = keyManager.getKeyByUserId(userId);
-
+            @PathVariable(value = "user_id") String userId,
+            @ApiParam(name = "is_null", value = "key为空时不自动创建")
+            @RequestParam(value = "is_null", required = false) boolean isNull) throws Exception {
+        Key key = keyManager.getKeyByUserId(userId,isNull);
         return convertToModel(key, MKey.class);
     }
 
@@ -62,8 +59,10 @@ public class KeyRestEndPoint extends BaseRestController {
     @ApiOperation(value = "获取用户key的id")
     public String getKeyIdByUserId(
             @ApiParam(name = "user_id", value = "用户id")
-            @PathVariable(value = "user_id") String userId) throws Exception {
-        return keyManager.getKeyByUserId(userId).getId();
+            @PathVariable(value = "user_id") String userId,
+            @ApiParam(name = "create_flg", value = "key为空时自动创建")
+            @RequestParam(value = "create_flg", required = false) String createFlg) throws Exception {
+        return keyManager.getKeyByUserId(userId,(createFlg == null || createFlg.equals("true"))).getId();
     }
 
     /**

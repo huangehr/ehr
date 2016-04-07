@@ -3,6 +3,7 @@ package com.yihu.ehr.user.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.log.LogService;
@@ -10,8 +11,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,6 +33,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/user")
+@SessionAttributes(SessionAttributeKeys.CurrentUser)
 public class UserController {
     public static final String GroupField = "groupName";
     public static final String RemoteFileField = "remoteFileName";
@@ -203,7 +207,7 @@ public class UserController {
 
     @RequestMapping("resetPass")
     @ResponseBody
-    public Object resetPass(String userId) {
+    public Object resetPass(String userId,@ModelAttribute(SessionAttributeKeys.CurrentUser) UserDetailModel userDetailModel) {
         String url = "/users/password/"+userId;
         String resultStr = "";
         Envelop result = new Envelop();
@@ -213,6 +217,7 @@ public class UserController {
             resultStr = HttpClientUtil.doPut(comUrl + url, params, username, password);
             if (Boolean.parseBoolean(resultStr)) {
                 result.setSuccessFlg(true);
+                result.setObj(userDetailModel.getId()); //重置到当前用户时需重登
             } else {
                 result.setSuccessFlg(false);
                 result.setErrorMsg(ErrorCode.InvalidUpdate.toString());

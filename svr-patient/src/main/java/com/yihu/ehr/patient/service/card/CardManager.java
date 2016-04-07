@@ -115,7 +115,7 @@ public class CardManager {
         String number = (String)args.get("number");
         String type = (String) args.get("type");
         String cardType = (String)args.get("cardType");   //","otherCard
-        String sql="from AbstractPhysicalCard card where (card.number like :number)";
+        String sql="select 1 from AbstractPhysicalCard card where (card.number like :number)";
         if ("bind_card".equals(type) && !StringUtils.isEmpty(idCardNo)){
             sql += " and (card.idCardNo=:idCardNo)";
         }else{

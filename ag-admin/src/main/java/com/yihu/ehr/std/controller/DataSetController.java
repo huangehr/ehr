@@ -3,6 +3,7 @@ package com.yihu.ehr.std.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.datasset.DataSetModel;
 import com.yihu.ehr.agModel.standard.datasset.MetaDataModel;
+import com.yihu.ehr.agModel.standard.dict.DictModel;
 import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.MStdDict;
@@ -41,7 +42,7 @@ public class DataSetController extends BaseController {
 
     @RequestMapping(value = "/data_sets", method = RequestMethod.GET)
     @ApiOperation(value = "查询数据集的方法")
-    public Envelop getDataSetByCodeName(
+    public Envelop getDataSets(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -62,6 +63,23 @@ public class DataSetController extends BaseController {
 
         return envelop;
     }
+
+
+    @RequestMapping(value = "/data_sets/no_paging", method = RequestMethod.GET)
+    @ApiOperation(value = "标准字典条件搜索(不分页)")
+    public Envelop searchDataSetsWithoutPaging(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "version", value = "版本", defaultValue = "")
+            @RequestParam(value = "version") String version) throws Exception {
+        Envelop envelop = new Envelop();
+        ResponseEntity<Collection<DataSetModel>> responseEntity = dataSetClient.search(filters,version);
+        List<DataSetModel> stdSources = (List<DataSetModel>) responseEntity.getBody();
+        envelop.setDetailModelList(stdSources);
+        return envelop;
+    }
+
+
 
     @RequestMapping(value = "/data_set/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据集信息")

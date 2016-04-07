@@ -170,6 +170,14 @@
                             },
                             {
                                 display: '操作', name: 'operator', width: '15%', render: function (row) {
+//								var html ='<div class="grid_edit"  style="margin-left: 10px;cursor:pointer;"  title="定制" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:open", row.id,'modify') + '"></div>'
+//										+'<div class="grid_delete"  style="margin-left: 40px;cursor:pointer;" title="适配"' +
+//										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoDialog:del", row.id,'delete') + '"></div>'
+//										+'<div class="grid_edit"  style="margin-left: 70px;margin-top:-22px;cursor:pointer;" title="修改"' +
+//										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoDialog:del", row.id,'delete') + '"></div>'
+//										+'<div class="grid_delete"  style="margin-left: 100px;cursor:pointer;" title="删除"' +
+//										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoDialog:del", row.id,'delete') + '"></div>';
+
                                 var html = '<a href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:customize", row.id, row.version) + '">定制</a>' +
                                         '/<a href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:adapter", row.id, 'modify') + '">适配</a>' +
                                         '/<a href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}',])", "adapter:adapterInfo:open", row.id, 'modify') + '">修改</a>' +
@@ -178,6 +186,8 @@
                                 if (row.status == 1) {
                                     text = "重新发布";
                                 }
+//								html+='<div class="grid_delete"  style="margin-left: 130px;cursor:pointer;" title="'+text+'"' +
+//										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3},'{4}','{5}'])", "adapter:adapterInfo:release", row.org,row.version,text,row.id) + '"></div>';
                                 html += '/<a href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}','{4}','{5}'])", "adapter:adapterInfo:release", row.org, row.version,text,row.id) + '">' + text + '</a>';
                                 return html;
                             }

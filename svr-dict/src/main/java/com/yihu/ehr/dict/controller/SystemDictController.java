@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -45,7 +46,7 @@ public class SystemDictController extends BaseRestController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) Integer page,
             HttpServletRequest request,
-            HttpServletResponse response) {
+            HttpServletResponse response) throws Exception {
         page = reducePage(page);
 
         if (StringUtils.isEmpty(filters)) {
@@ -99,11 +100,11 @@ public class SystemDictController extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(value = "/dictionaries/existence/{dict_name}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dictionaries/existence" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典名称是否已经存在")
     public boolean isDictNameExists(
             @ApiParam(name = "dict_name", value = "dict_name", defaultValue = "")
-            @PathVariable(value = "dict_name") String dictName){
+            @RequestParam(value = "dict_name") String dictName){
         return dictService.isDictNameExists(dictName);
     }
 }

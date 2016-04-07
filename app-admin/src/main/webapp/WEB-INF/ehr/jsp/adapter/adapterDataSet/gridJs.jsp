@@ -359,8 +359,11 @@
               { display: '机构数据元代码', name: 'orgMetaDataCode',width: '14%', isAllowHide: false  ,align:'left'},
               { display: '机构数据元名称',name: 'orgMetaDataName', width: '14%',isAllowHide: false  ,align:'left'},
               { display: '操作', name: 'operator', width: '16%', render: function (row) {
-                var html = '<a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}','{3}'])","grid:right:open", row.id,'modify')+'">修改</a>' +
-                        ' / <a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","grid:right:delete", row.id)+'">删除</a>';
+				  var html ='<div class="grid_edit"  style="margin-left: 20px;cursor:pointer;"  title="修改" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}'])", "grid:right:open", row.id,'modify') + '"></div>'
+						  +'<div class="grid_delete"  style="margin-left: 60px;cursor:pointer;" title="删除"' +
+						  ' onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "grid:right:delete", row.id) + '"></div>';
+//                var html = '<a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}','{3}'])","grid:right:open", row.id,'modify')+'">修改</a>' +
+//                        ' / <a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","grid:right:delete", row.id)+'">删除</a>';
                 return html;
               }}
             ]
@@ -376,8 +379,11 @@
               { display: '机构字典项代码', name: 'orgDictEntryCode',width: '14%', isAllowHide: false  ,align:'left'},
               { display: '机构字典项值',name: 'orgDictEntryName', width: '14%',isAllowHide: false  ,align:'left'},
               { display: '操作', name: 'operator', width: '16%', render: function (row) {
-                var html = '<a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}','{3}'])","grid:right:open", row.id,'modify')+'">修改</a>' +
-                        ' / <a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","grid:right:delete", row.id)+'">删除</a>';
+				  var html ='<div class="grid_edit"  style="margin-left: 20px;cursor:pointer;"  title="修改" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}'])", "grid:right:open", row.id,'modify') + '"></div>'
+						  +'<div class="grid_delete"  style="margin-left: 60px;cursor:pointer;" title="删除"' +
+						  ' onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "grid:right:delete", row.id) + '"></div>';
+//                var html = '<a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}','{3}'])","grid:right:open", row.id,'modify')+'">修改</a>' +
+//                        ' / <a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","grid:right:delete", row.id)+'">删除</a>';
                 return html;
               }}
             ]
