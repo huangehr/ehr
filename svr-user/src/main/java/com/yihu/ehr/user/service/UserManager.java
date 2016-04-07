@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,14 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
     @Autowired
     private XUserRepository userRepository;
     @Value("${default.password}")
-    private String default_password = "123456";
+    private String default_password;
+
+    @PostConstruct
+    void init() {
+        if (default_password.startsWith("$")) {
+            default_password="123456";
+        }
+    }
 
     /**
      * 根据ID获取用户接口.

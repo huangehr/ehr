@@ -79,11 +79,13 @@
                             {display: '家庭地址', name: 'homeAddress', width: '30%', minColumnWidth: 20,align: 'left'},
                             {
                                 display: '操作', name: 'operator', width: '10%', render: function (row) {
-                                var html = '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "patient:patientInfoModifyDialog:open", row.idCardNo) + '">修改</a> /';
-                                html += '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "patient:patientInfoModifyDialog:delete", row.idCardNo) + '"> 删除</a>';
-
-                                return html;
-                            }
+									var html ='<div class="grid_edit"  style="margin-left: 20px;cursor:pointer;" title="修改" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "patient:patientInfoModifyDialog:open", row.idCardNo) + '"></div>'
+										+'<div class="grid_delete"  style="margin-left: 60px;cursor:pointer;" title="删除"' +
+										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "patient:patientInfoModifyDialog:delete", row.idCardNo) + '"></div>';
+//                                var html = '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "patient:patientInfoModifyDialog:open", row.idCardNo) + '">修改</a> /';
+//                                html += '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "patient:patientInfoModifyDialog:delete", row.idCardNo) + '"> 删除</a>';
+									return html;
+								}
                             }
                         ],
                         onDblClickRow: function (row) {
