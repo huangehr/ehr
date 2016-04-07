@@ -20,9 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import java.util.ArrayList;
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -145,11 +144,12 @@ public class CdaTypeController extends BaseUIController{
     @RequestMapping("SaveCdaType")
     @ResponseBody
     //新增、修改的保存合二为一
-    public Object SaveCdaType(String dataJson,@ModelAttribute(SessionAttributeKeys.CurrentUser) UserDetailModel user) {
+    public Object SaveCdaType(String dataJson,HttpServletRequest request) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         String url = "/cda_types";
-        String createUser = user.getLoginCode();
+        UserDetailModel userDetailModel = (UserDetailModel)request.getSession().getAttribute(SessionAttributeKeys.CurrentUser);
+        String createUserId = userDetailModel.getId();
         try {
             CdaTypeDetailModel detailModel = objectMapper.readValue(dataJson,CdaTypeDetailModel.class);
             if(StringUtils.isEmpty(detailModel.getCode())){
@@ -165,7 +165,7 @@ public class CdaTypeController extends BaseUIController{
             // 新增cda类别
             String envelopStr = "";
             if(StringUtils.isEmpty(cdaTypeId)){
-                detailModel.setCreateUser(createUser);
+                detailModel.setCreateUser(createUserId);
                 String jsonData = objectMapper.writeValueAsString(detailModel);
                 params.put("jsonData",jsonData);
                 envelopStr = HttpClientUtil.doPost(comUrl+url,params,username,password);
@@ -183,7 +183,7 @@ public class CdaTypeController extends BaseUIController{
             modelForUpdate.setDescription(detailModel.getDescription());
             modelForUpdate.setName(detailModel.getName());
             modelForUpdate.setParentId(detailModel.getParentId());
-            modelForUpdate.setUpdateUser(createUser);
+            modelForUpdate.setUpdateUser(createUserId);
             String typeJson = objectMapper.writeValueAsString(modelForUpdate);
             params.put("jsonData", typeJson);
 
