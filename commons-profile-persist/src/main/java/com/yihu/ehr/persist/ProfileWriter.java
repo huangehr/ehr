@@ -31,7 +31,8 @@ public class ProfileWriter {
 
     public void writeArchive(Profile healthArchive) throws IOException {
         // 先存档案
-        hbaseClient.insertRecord(ProfileTableOptions.ArchiveTable,
+        hbaseClient.insertRecord(
+                ProfileTableOptions.ArchiveTable,
                 healthArchive.getId(),
                 ProfileTableOptions.FamilyBasic,
                 ProfileTableOptions.getColumns(ProfileTableOptions.Table.ArchiveTable, ProfileTableOptions.TableFamily.Basic),

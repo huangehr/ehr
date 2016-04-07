@@ -100,14 +100,6 @@ public class DictService extends BaseHbmService<IDict> {
         return map;
     }
 
-    public List getOtherCdaDict(String id,String version) {
-        Session session = currentSession();
-        Class clz = getServiceEntity(version);
-        String hql = " from " +clz.getSimpleName()+" dict where 1 = 1 and dict.id !="+id;
-        Query query = session.createQuery(hql);
-        List o = query.list();
-        return o;
-    }
 
     public List<IDict> getChildrensByParentId(long baseDictId,String version) {
         Session session = currentSession();
