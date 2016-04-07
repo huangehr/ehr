@@ -80,13 +80,7 @@
                                 parent.reloadEntryMasterGrid();
                                 parent.closeDialog('right','保存成功！');
                             }else{
-                                if(data.errorMsg=='codeNotUnique'){
-                                    $.Notice.error('该代码已存在，请重新填写代码！');
-                                }
-                                else if(data.message)
-                                    $.Notice.error( data.message);
-                                else
-                                    $.Notice.error( '出错了！');
+                                $.Notice.error(data.errorMsg);
                             }
                             self.$btnSave.removeAttr('disabled');
                         },
