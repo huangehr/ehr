@@ -21,8 +21,8 @@ cdaType.list = {
             {
                 display: '操作', isSort: false, width: 200, align: 'center', render: function (rowdata, rowindex, value) {
 
-                var html = "<div class='grid_edit' name='edit_click' style='margin-left: 60px;' onclick='cdaType.list.add(\"" + rowdata.id + "\", \"modify\")'></div> " +
-                    "<div class='grid_delete' name='delete_click' style='margin-left: 110px;' onclick='cdaType.list.deleted(\"" + rowdata.id + "\")'></div>";
+                var html = "<div class='grid_edit' name='edit_click' style='margin-left: 60px;cursor:pointer;' onclick='cdaType.list.add(\"" + rowdata.id + "\", \"modify\")'></div> " +
+                    "<div class='grid_delete' name='delete_click' style='margin-left: 110px;cursor:pointer;' onclick='cdaType.list.deleted(\"" + rowdata.id + "\")'></div>";
                 return html;
             }
             }
