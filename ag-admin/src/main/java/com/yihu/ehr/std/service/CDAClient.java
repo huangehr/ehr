@@ -57,7 +57,7 @@ public interface CDAClient {
             @RequestParam(value = "model") String cdaDocumentJsonData);
 
     @ApiOperation(value = "修改CDADocuments")
-    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Standards.Documents,method = RequestMethod.PUT)
+    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Standards.Document,method = RequestMethod.PUT)
     MCDADocument updateCDADocuments(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
             @RequestParam(value = "version") String version,

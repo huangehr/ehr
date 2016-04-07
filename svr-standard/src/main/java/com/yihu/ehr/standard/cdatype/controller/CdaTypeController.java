@@ -5,6 +5,7 @@ import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.standard.MCDAType;
+import com.yihu.ehr.model.standard.MStdDict;
 import com.yihu.ehr.standard.cdatype.service.CDAType;
 import com.yihu.ehr.standard.cdatype.service.CDATypeManager;
 import com.yihu.ehr.util.controller.BaseRestController;
@@ -62,18 +63,16 @@ public class CdaTypeController extends BaseRestController {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.TypeList,method = RequestMethod.GET)
-    @ApiOperation(value = "根据code或者name获取CDAType列表")
-    public List<MCDAType> getCdaTypeByCodeOrName(
-            @ApiParam(name = "code", value = "代码")
-            @RequestParam(value = "code") String code,
-            @ApiParam(name = "name", value = "名称")
-            @RequestParam(value = "name") String name) {
-
-        List<CDAType> cdaTypeList = cdaTypeManager.GetCdaTypeByCodeOrName(code,name);
-        return  (List<MCDAType>)convertToModels(cdaTypeList,new ArrayList<MCDAType>(cdaTypeList.size()),MCDAType.class,"");
-    }
-
+//    @RequestMapping(value = RestApi.Standards.TypeList,method = RequestMethod.GET)
+//    @ApiOperation(value = "根据code或者name获取CDAType列表")
+//    public List<MCDAType> getCdaTypeByCodeOrName(
+//            @ApiParam(name = "code", value = "代码")
+//            @RequestParam(value = "code") String code,
+//            @ApiParam(name = "name", value = "名称")
+//            @RequestParam(value = "name") String name) {
+//
+//        List<CDAType> cdaTypeList = cdaTypeManager.GetCdaTypeByCodeOrName(code,name);
+//        return  (List<MCDAType>)convertToModels(cdaTypeList,new ArrayList<MCDAType>(cdaTypeList.size()),MCDAType.class,"");
 
 //    @RequestMapping(value = "/cda_types/ids/{ids}",method = RequestMethod.GET)
 //    @ApiOperation(value = "根据ids获取CDAType列表")
@@ -105,6 +104,17 @@ public class CdaTypeController extends BaseRestController {
         pagedResponse(request, response, cdaTypeManager.getCount(filters), page, size);
         return convertToModels(appList, new ArrayList<>(appList.size()), MCDAType.class, fields);
     }
+
+    @RequestMapping(value = RestApi.Standards.NoPageTypes, method = RequestMethod.GET)
+    @ApiOperation(value = "标准字典不分页搜索")
+    public List<MCDAType> searchSourcesWithoutPaging(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+        List<CDAType> cdaTypes = cdaTypeManager.search(filters);
+        return (List<MCDAType>) convertToModels(cdaTypes, new ArrayList<MCDAType>(cdaTypes.size()), MCDAType.class, "");
+    }
+
+
 
     @RequestMapping(value = RestApi.Standards.Type, method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取CDAType")

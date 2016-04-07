@@ -106,11 +106,11 @@ public interface SystemDictClient {
             @ApiParam(name = "entry", value = "字典JSON结构")
             @RequestParam(value = "entry") String entryJson);
 
-    @RequestMapping(value = "/dictionaries/existence/{dict_name}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dictionaries/existence" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典名称是否已经存在")
     boolean isDictNameExists(
             @ApiParam(name = "dict_name", value = "dict_name", defaultValue = "")
-            @PathVariable(value = "dict_name") String dictName);
+            @RequestParam(value = "dict_name") String dictName);
 
     @RequestMapping(value = "/dictionaries/existence/{dict_id}/{code}" , method = RequestMethod.GET)
     @ApiOperation(value = "根基dictId和code判断提交的字典项名称是否已经存在")
