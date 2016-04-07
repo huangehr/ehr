@@ -207,6 +207,9 @@ public interface DataSetClient {
             @RequestParam(value = "version") String version);
 
     @RequestMapping(value = RestApi.Standards.NoPageDataSets, method = RequestMethod.GET)
-    ResponseEntity<Collection<DataSetModel>> search(
-            @RequestParam(value = "filters", required = false) String filters);
+    List<MStdDataSet> search(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "version", value = "版本", defaultValue = "")
+            @RequestParam(value = "version") String version);
 }

@@ -66,14 +66,16 @@ public class DataSetController extends BaseController {
 
 
     @RequestMapping(value = "/data_sets/no_paging", method = RequestMethod.GET)
-    @ApiOperation(value = "标准字典分页搜索(不分页)")
+    @ApiOperation(value = "标准数据集搜索(不分页)")
     public Envelop searchDataSetsWithoutPaging(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "version", value = "版本", defaultValue = "")
+            @RequestParam(value = "version") String version) throws Exception {
         Envelop envelop = new Envelop();
-        ResponseEntity<Collection<DataSetModel>> responseEntity = dataSetClient.search(filters);
-        List<DataSetModel> stdSources = (List<DataSetModel>) responseEntity.getBody();
-        envelop.setDetailModelList(stdSources);
+        List<MStdDataSet> mStdDataSetList = dataSetClient.search(filters,version);
+        List<DataSetModel> dataSetModelList = (List<DataSetModel>)convertToModels(mStdDataSetList,new ArrayList<DataSetModel>(mStdDataSetList.size()),DataSetModel.class,null);
+        envelop.setDetailModelList(dataSetModelList);
         return envelop;
     }
 
