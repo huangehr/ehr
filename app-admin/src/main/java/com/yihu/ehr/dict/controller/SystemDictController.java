@@ -423,7 +423,7 @@ public class SystemDictController extends BaseUIController {
         params.put("dict_name",systemName);
 
         try {
-            String url ="/dictionaries/existence/" + systemName;
+            String url ="/dictionaries/existence";
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
 
             if(Boolean.parseBoolean(resultStr)){
