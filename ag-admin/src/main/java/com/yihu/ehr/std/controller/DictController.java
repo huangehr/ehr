@@ -67,14 +67,17 @@ public class DictController extends BaseController {
 
 
     @RequestMapping(value = "/dicts/no_paging", method = RequestMethod.GET)
-    @ApiOperation(value = "标准字典分页搜索(不分页)")
+    @ApiOperation(value = "标准字典条件搜索(不分页)")
     public Envelop searchDictsWithoutPaging(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "version", value = "版本", defaultValue = "")
+            @RequestParam(value = "version") String version) throws Exception {
         Envelop envelop = new Envelop();
-        ResponseEntity<Collection<DictModel>> responseEntity = dictClient.search(filters);
+        ResponseEntity<Collection<DictModel>> responseEntity = dictClient.search(filters,version);
         List<DictModel> stdSources = (List<DictModel>) responseEntity.getBody();
         envelop.setDetailModelList(stdSources);
+        envelop.setSuccessFlg(true);
         return envelop;
     }
 
@@ -437,17 +440,6 @@ public class DictController extends BaseController {
             @RequestParam(value = "code")String code,
             @RequestParam(value = "version_code")String versionCode){
         return dictClient.isExistEntryCode(dictId,code,versionCode);
-    }
-
-    @RequestMapping(value = "/dicts/other", method = RequestMethod.GET)
-    @ApiOperation(value = "获取cdaDict列表（不包含本身）")
-    public List<MStdDict> getOtherCdaDict(
-            @ApiParam(name = "id", value = "字典编号", defaultValue = "")
-            @PathVariable(value = "id") String id,
-            @ApiParam(name = "version", value = "版本编号", defaultValue = "")
-            @RequestParam(value = "version") String version) throws Exception {
-        List<MStdDict> list = dictClient.getOtherCdaDict(id,version);
-        return list;
     }
 
 }

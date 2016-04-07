@@ -171,12 +171,9 @@ public interface DictClient {
             @RequestParam(value = "code")String code,
             @RequestParam(value = "version_code")String versionCode);
 
-    @RequestMapping(value = RestApi.Standards.DictOther, method = RequestMethod.GET)
-    List<MStdDict> getOtherCdaDict(
-            @PathVariable(value = "id") String id,
-            @RequestParam(value = "version") String version);
 
     @RequestMapping(value = RestApi.Standards.NoPageDictionaries, method = RequestMethod.GET)
     ResponseEntity<Collection<DictModel>> search(
-            @RequestParam(value = "filters", required = false) String filters);
+            @RequestParam(value = "filters", required = false) String filters,
+            @RequestParam(value = "version") String version);
 }
