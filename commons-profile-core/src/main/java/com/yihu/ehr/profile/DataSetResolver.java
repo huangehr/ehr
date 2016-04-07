@@ -2,14 +2,14 @@ package com.yihu.ehr.profile;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 简易数据集解析器。
@@ -20,9 +20,6 @@ import java.util.Map;
  */
 @Component
 public class DataSetResolver {
-
-
-
 
     /**
      * 结构化档案包数据集处理
@@ -95,6 +92,15 @@ public class DataSetResolver {
      */
     public void  parseUnStructuredJsonDataSet(Profile profile, File[] files) throws JsonProcessingException, ParseException {
 
+        for (File file : files) {
+            String filePath = file.getPath();
+            String lastName = filePath.substring(filePath.lastIndexOf("\\")+1);
+            if (lastName.equals("document")) {
+                //这里把图片保存的fastdfs
+
+            }
+
+        }
     }
 
 

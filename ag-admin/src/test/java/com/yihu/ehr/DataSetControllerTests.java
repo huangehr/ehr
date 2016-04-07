@@ -63,7 +63,7 @@ public class DataSetControllerTests {
 //        envelop = dataSetController.saveDataSet(id,"code_test5","name_test","refStandard_test","summary_test",version);
 //        assertTrue("新增数据集信息失败", envelop.isSuccessFlg());
 
-        envelop = dataSetController.getDataSetByCodeName(fields, filters, sorts, 15, 1, version);
+        //envelop = dataSetController.getDataSetByCodeName(fields, filters, sorts, 15, 1, version);
         assertNotEquals("查询数据集列表失败", envelop,null);
 
         StringBuffer ids = new StringBuffer();

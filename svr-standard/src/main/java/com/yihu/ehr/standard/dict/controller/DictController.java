@@ -67,8 +67,11 @@ public class DictController extends ExtendController<MStdDict> {
     @ApiOperation(value = "标准字典不分页搜索")
     public Collection<MStdDict> searchSourcesWithoutPaging(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters) throws Exception {
-        List dictList = dictService.search(filters);
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "version", value = "版本", defaultValue = "")
+            @RequestParam(value = "version") String version) throws Exception {
+        Class entityClass = getServiceEntity(version);
+        List dictList = dictService.search(entityClass,filters);
         return convertToModels(dictList, new ArrayList<>(dictList.size()), MStdDict.class, "");
     }
 
@@ -171,18 +174,6 @@ public class DictController extends ExtendController<MStdDict> {
     {
         Class entityClass = getServiceEntity(versionCode);
         return dictService.isExistByField("code",dictCode , entityClass);
-    }
-
-
-    @RequestMapping(value = RestApi.Standards.DictOther, method = RequestMethod.GET)
-    @ApiOperation(value = "获取cdaDict列表（不包含本身）")
-    public List<MStdDict> getOtherCdaDict(
-            @ApiParam(name = "id", value = "字典编号", defaultValue = "")
-            @PathVariable(value = "id") String id,
-            @ApiParam(name = "version", value = "版本编号", defaultValue = "")
-            @RequestParam(value = "version") String version) throws Exception {
-        List list = dictService.getOtherCdaDict(id,version);
-        return (List<MStdDict>)convertToModels(list,new ArrayList<MStdDict>(list.size()),MStdDict.class,"");
     }
 
 

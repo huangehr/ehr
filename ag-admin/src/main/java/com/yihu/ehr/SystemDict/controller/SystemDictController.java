@@ -300,11 +300,11 @@ public class SystemDictController extends BaseController {
         }
     }
 
-    @RequestMapping(value = "/dictionaries/existence/{dict_name}", method = RequestMethod.GET)
+    @RequestMapping(value = "/dictionaries/existence", method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典名称是否已经存在")
     public boolean isDictNameExists(
             @ApiParam(name = "dict_name", value = "dict_name", defaultValue = "")
-            @PathVariable(value = "dict_name") String dictName) {
+            @RequestParam(value = "dict_name") String dictName) {
 
         return systemDictClient.isDictNameExists(dictName);
     }
