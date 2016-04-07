@@ -208,5 +208,6 @@ public interface DataSetClient {
 
     @RequestMapping(value = RestApi.Standards.NoPageDataSets, method = RequestMethod.GET)
     ResponseEntity<Collection<DataSetModel>> search(
-            @RequestParam(value = "filters", required = false) String filters);
+            @RequestParam(value = "filters", required = false) String filters,
+            @RequestParam(value = "version") String version);
 }

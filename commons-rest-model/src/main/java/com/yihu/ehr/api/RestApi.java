@@ -88,7 +88,9 @@ public class RestApi {
         public static final String Source                           = "/std/sources/{id}";
         public static final String IsSourceCodeExist                ="/std/sources/code_is_exist";
 
+        public static final String NoPageTypes                      = "/std/types/no_paging";
         public static final String Types                            = "/std/types";
+
         public static final String Type                             = "/std/types/{id}";
         public static final String TypesCodeExistence               = "/std/type/code/existence";
         public static final String TypeChildren                     = "/std/types/parent_id/childrens";

@@ -1,5 +1,6 @@
 package com.yihu.ehr.std.service;
 
+import com.yihu.ehr.agModel.standard.dict.DictModel;
 import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
@@ -7,6 +8,7 @@ import com.yihu.ehr.model.standard.MCDAType;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -80,17 +82,17 @@ public interface CDATypeClient {
 
     @RequestMapping(value = RestApi.Standards.Types, method = RequestMethod.GET)
     @ApiOperation(value = "标准类别分页搜索")
-    Collection<MCDAType> searchType(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
+    ResponseEntity<Collection<MCDAType>> searchType(
             @RequestParam(value = "fields", required = false) String fields,
-            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
             @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
-            @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page);
+
+
+    @RequestMapping(value = RestApi.Standards.NoPageTypes, method = RequestMethod.GET)
+    ResponseEntity<Collection<MCDAType>> search(
+            @RequestParam(value = "filters", required = false) String filters);
 
 
     @RequestMapping(value = RestApi.Standards.TypeParent, method = RequestMethod.GET)
@@ -99,11 +101,5 @@ public interface CDATypeClient {
             @ApiParam(name = "id", value = "id")
             @RequestParam(value = "id") String id);
 
-    @RequestMapping(value = RestApi.Standards.TypeList, method = RequestMethod.GET)
-    @ApiOperation(value = "标准类别分页搜索")
-    List<MCDAType> getCdaTypeList(@ApiParam(name = "code", value = "code")
-                                  @RequestParam(value = "code") String code,
-                                  @ApiParam(name = "name", value = "name")
-                                  @RequestParam(value = "name") String name);
 
 }
