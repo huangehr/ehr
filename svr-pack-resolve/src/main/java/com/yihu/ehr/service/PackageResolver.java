@@ -3,14 +3,17 @@ package com.yihu.ehr.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.extractor.EventExtractor;
 import com.yihu.ehr.extractor.ExtractorChain;
 import com.yihu.ehr.extractor.KeyDataExtractor;
+import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.persist.DataSetResolverWithTranslator;
 import com.yihu.ehr.profile.Profile;
 import com.yihu.ehr.profile.ProfileDataSet;
 import com.yihu.ehr.profile.StdObjectQualifierTranslator;
+import com.yihu.ehr.profile.UnStructuredProfile;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
 import net.lingala.zip4j.exception.ZipException;
@@ -21,10 +24,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
-import java.util.Date;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * 档案归档任务.
@@ -46,6 +50,9 @@ public class PackageResolver {
 
     @Autowired
     ExtractorChain extractorChain;
+
+    @Autowired
+    private FastDFSUtil fastDFSUtil;
 
     private final static char PathSep = File.separatorChar;
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
@@ -74,45 +81,31 @@ public class PackageResolver {
 
 
         Profile profile = new Profile();
+        UnStructuredProfile unStructuredProfile = new UnStructuredProfile();
 
         File[] files = root.listFiles();
         String firstFilepath = files[0].getPath();
-        String lastFolderName =  firstFilepath.substring(firstFilepath.lastIndexOf("\\")+1);
+        String firstFolderName =  firstFilepath.substring(firstFilepath.lastIndexOf("\\")+1);
         for(File file:files){
-            switch (lastFolderName){
+            String folderName = file.getPath().substring(file.getPath().lastIndexOf("\\")+1);
+            switch (firstFolderName){
                 case OriFolder:
                     //结构化档案报处理
-                    structuredDataSetParse(profile, file.listFiles());
+                    structuredDataSetParse(profile, file.listFiles(),folderName);
                     break;
                 case IndexFolder:
                     //轻量级档案包处理
                     parseDataSetLight(profile,file.listFiles());
                 case DocumentFolder:
                     //非结构化档案包处理
-                    unstructuredDataSetParse(profile, file.listFiles());
+                    if(folderName.equals("meta.json")){
+                        unstructuredDataSetParse(unStructuredProfile,file);
+                    }
+                    unstructuredDocumentParse(unStructuredProfile, file.listFiles());
                     break;
                 default: break;
             }
         }
-
-//        for(File file:files){
-//            //// TODO: 2016/4/5 在这边做档案类型管理
-//            //文件的路径： 1.结构化--origin standard  2.轻量级--index  3.非结构化--document index
-//            String filePath = file.getPath();
-//            String lastName = filePath.substring(filePath.lastIndexOf("\\")+1);
-//            if(lastName.equals(OriFolder)){
-//                //结构化数据结构
-//                structuredDataSetParse(profile, file.listFiles());
-//            }else if(lastName.equals(IndexFolder)){
-//                //轻量级数据结构
-//                parseDataSetLight(profile,files[0]);
-//            }else if(lastName.equals(DocumentFolder)){
-//                //非机构化文档结构
-//                unstructuredDataSetParse(profile, file.listFiles());
-//            }
-//            file.delete();
-//            return null;
-//        }
 
         makeEventSummary(profile);
 
@@ -130,10 +123,9 @@ public class PackageResolver {
      * @param files
      * @throws IOException
      */
-    void structuredDataSetParse(Profile profile, File[] files) throws ParseException, IOException {
+    void structuredDataSetParse(Profile profile, File[] files,String folderName) throws ParseException, IOException {
         for (File file : files) {
-            String filePath = file.getPath();
-            String lastName = filePath.substring(filePath.lastIndexOf("\\")+1);
+            String lastName = folderName.substring(folderName.lastIndexOf("\\")+1);
             //if (!file.getAbsolutePath().endsWith(JsonExt)) continue;
             ProfileDataSet dataSet = generateDataSet(file, lastName.equals(OriFolder) ? true :false);
 
@@ -197,17 +189,46 @@ public class PackageResolver {
 
 
     /**
-     * 非标准化档案包解析JSON文件中的数据。
+     * 非标准化档案包解析document的文件。
      * @param profile
      * @param
      * @throws IOException
      */
-    void unstructuredDataSetParse(Profile profile, File[] files) throws Exception {
+    void unstructuredDocumentParse(UnStructuredProfile profile, File[] files) throws Exception {
+        List<String> documentPictures = new LinkedList<>();
         for (File file : files) {
-            if (!file.getAbsolutePath().endsWith(JsonExt)) continue;
-            dataSetResolverWithTranslator.parseUnStructuredJsonDataSet(profile,files);
-        }
+            if (file.getAbsolutePath().endsWith(JsonExt)) continue;
+            //这里把图片保存的fastdfs
+            String filePath = file.getPath();
+            String extensionName = filePath.substring(file.getPath().lastIndexOf('.') + 1);
 
+            InputStream is = new FileInputStream(file);
+            ObjectNode objectNode = fastDFSUtil.upload(is,extensionName,"");
+            String groupName = objectNode.get("groupName").toString();
+            String remoteFileName = objectNode.get("remoteFileName").toString();
+            String remotePath = "groupName:" + groupName + ",remoteFileName:" + remoteFileName;
+            documentPictures.add(remotePath);
+        }
+        profile.setDocumentPictures(documentPictures);
+        dataSetResolverWithTranslator.parseUnStructuredJsonDataSet(profile,files);
+    }
+
+
+    /**
+     * 非标准化档案包解析document的文件。
+     * @param profile
+     * @param
+     * @throws IOException
+     */
+    void unstructuredDataSetParse(UnStructuredProfile profile, File file) throws Exception {
+        JsonNode jsonNode = objectMapper.readTree(file);
+        String version = jsonNode.get("inner_version").asText();
+        //String dataSetCode = jsonNode.get("code").asText();
+        String eventNo = jsonNode.get("event_no").asText();
+        String patientId = jsonNode.get("patient_id").asText();
+        String orgCode = jsonNode.get("org_code").asText();
+        String eventDate = jsonNode.path("event_time").asText();
+        JsonNode data = jsonNode.get("data"); //保存
     }
 
     /**
