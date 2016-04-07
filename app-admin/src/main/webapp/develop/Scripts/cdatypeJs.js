@@ -248,7 +248,6 @@ cdaType.attr = {
             textField: 'name',
             dataParmName: 'detailModelList',
             selectBoxWidth: 240,
-            autocomplete: true,
             keySupport: true,
             width: 240,
             initValue: initValue,
