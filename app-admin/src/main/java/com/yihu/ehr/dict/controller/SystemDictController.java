@@ -220,7 +220,7 @@ public class SystemDictController extends BaseUIController {
 
             if(Boolean.parseBoolean(resultCheckStr)){
                 result.setSuccessFlg(false);
-                result.setErrorMsg("代码在该字典中已存在。");
+                result.setErrorMsg("代码在该字典中已存在，请确认。");
                 return result;
             }
 
