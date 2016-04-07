@@ -67,6 +67,9 @@ public class AdapterOrgController extends BaseUIController {
                 resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
                 model.addAttribute("rs", "success");
             }
+            else {
+                model.addAttribute("initType",type);
+            }
             model.addAttribute("info", resultStr);
             model.addAttribute("mode",mode);
 

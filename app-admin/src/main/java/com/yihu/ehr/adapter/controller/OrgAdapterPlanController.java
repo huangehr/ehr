@@ -111,12 +111,15 @@ public class OrgAdapterPlanController extends ExtendController<OrgAdapterPlanSer
 
     @RequestMapping("/getOrgList")
     @ResponseBody
-    public Object getOrgList(String type, String version, String mode) {
+    public Object getOrgList(String type, String version, String mode, String searchParm, int page, int rows) {
 
         try {
+            if(!"notVersion".equals(version) && (StringUtils.isEmpty(type) || StringUtils.isEmpty(version)))
+                return new Envelop();
+
             String adapterOrgs = "";
             if(!"modify".equals(mode)){
-                String rs =service.search(new PageParms("version=" + version));
+                String rs =service.search(new PageParms().addEqual("version", version));
                 Envelop envelop = getEnvelop(rs);
                 if(!envelop.isSuccessFlg())
                     return systemError();
@@ -129,11 +132,12 @@ public class OrgAdapterPlanController extends ExtendController<OrgAdapterPlanSer
             }
 
             String url = "/adapterOrg/orgs";
-            PageParms pageParms = new PageParms(
-                    StringUtils.isEmpty(type) ? "" : "type=" + type
-                    + (adapterOrgs.length()>0 ? ";org<>" + adapterOrgs.substring(1) :"") );
+            PageParms pageParms = new PageParms(rows, page)
+                    .addEqualNotNull("type", type)
+                    .addNotEqualNotNull("org", adapterOrgs.length()>0 ? adapterOrgs.substring(1) : "")
+                    .addLikeNotNull("name", searchParm);
             String resultStr = service.search(url, pageParms);
-            return resultStr;
+            return formatComboData(resultStr, "code", "name");
         } catch (Exception e) {
             return systemError();
         }

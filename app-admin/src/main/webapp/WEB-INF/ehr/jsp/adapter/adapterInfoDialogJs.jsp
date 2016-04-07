@@ -75,19 +75,6 @@
                                 }
                                 searchParent();
                                 searchOrg();
-                                /*                    self.$org.ligerComboBox(
-                                 {
-                                 url: '
-                                ${contextRoot}/adapter/getOrgList',
-                                 valueField: 'code',
-                                 textField: 'value',
-                                 dataParmName: 'detailModelList',
-                                 urlParms: {
-                                 type: value,
-                                 version:versionValue
-                                 }
-                                 });*/
-
                             }
                         });
 
@@ -114,10 +101,7 @@
                                 searchOrg();
                             }
                         });
-                orgData = self.$org.ligerComboBox(
-                        {
-                            data: null
-                        });
+                searchOrg();
                 self.$parent.ligerComboBox(
                         {
                             data: null
@@ -144,19 +128,17 @@
                     self.$addOrg.hide();
                     self.$readonly.addClass("u-ui-readonly");
                 }
-                function searchOrg(msg) {
-                    self.$org.ligerComboBox(
-                        {
-                            url: '${contextRoot}/adapter/getOrgList',
-                            valueField: 'code',
-                            textField: 'name',
-                            dataParmName: 'detailModelList',
-                            urlParms: {
-                                type: types.getValue(),
-                                version: versions.getValue(),
-                                mode: mode
-                            }
-                        });
+
+                function searchOrg() {
+                    var p = {
+                            type: types.getValue(),
+                            version: versions.getValue(),
+                            mode: mode};
+                    if(orgData)
+                        orgData.reload(p);
+                    else
+                        orgData = self.$org.customCombo(
+                            '${contextRoot}/adapter/getOrgList', p, undefined, undefined, false);
                 }
 
                 function searchParent() {
@@ -277,20 +259,13 @@
                 $.Notice.success(msg);
         };
         win.adapterModel = function (adapterModel) {
-            debugger;
-            adapterInfo.$org.ligerComboBox(
-                    {
-                        url: '${contextRoot}/adapter/getOrgList',
-                        valueField: 'code',
-                        textField: 'value',
-                        dataParmName: 'detailModelList',
-                        urlParms: {
-                            type: adapterModel.type,
-                            version: versions.getValue()
-                        }
-                    });
+            orgData.reload({
+                type: adapterModel.type,
+                version: versions.getValue()
+            });
             types.setValue(adapterModel.type);
-            orgData.setValue(adapterModel.org);
+            orgData.setValue(adapterModel.code);
+            orgData.setText(adapterModel.name);
         }
         /* *************************** 页面初始化 **************************** */
 

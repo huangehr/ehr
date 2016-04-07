@@ -38,7 +38,7 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
     OrgAdapterPlanService orgAdapterPlanService;
 
     @RequestMapping(value = "/plan/{planId}/dicts", method = RequestMethod.GET)
-    @ApiOperation(value = "字典适配关系分页查询")
+    @ApiOperation(value = "适配字典分页查询")
     public Collection<MAdapterRelationship> searchAdapterDict(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,

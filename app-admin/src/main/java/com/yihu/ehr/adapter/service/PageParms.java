@@ -263,6 +263,13 @@ public class PageParms extends HashMap<String, Object> {
         return putFilters(this.filters);
     }
 
+    public PageParms setSorts(String sorts) {
+
+        this.sorts = sorts;
+        put("sorts", this.sorts);
+        return this;
+    }
+
     private PageParms putFilters(String filters) {
 
         put("filters", filters);

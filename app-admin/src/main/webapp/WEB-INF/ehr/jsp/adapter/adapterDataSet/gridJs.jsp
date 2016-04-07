@@ -323,9 +323,16 @@
 
             $.Notice.confirm('确认删除所选数据？', function (r) {
               if(r){
+                var extParms = {
+                  plan_id: adapterPlanId
+                };
+                var parent = master.grid.getSelectedRow();
+                if(parent){
+                  extParms.data_set_id = parent.id;
+                }
                 var dataModel = $.DataModel.init();
                 dataModel.updateRemote('${contextRoot}'+cfg[cfgModel].right.delLs,{
-                  data:{ids:ids},
+                  data:{ids: ids, extParms: JSON.stringify(extParms)},
                   success:function(data){
                     if (data.successFlg) {
                       $.Notice.success('操作成功！');
