@@ -5,18 +5,18 @@ import com.yihu.ehr.agModel.org.OrgModel;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeDetailModel;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeModel;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeTreeModel;
-import com.yihu.ehr.agModel.standard.dict.DictModel;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.model.org.MOrganization;
-import com.yihu.ehr.model.standard.MStdDict;
+import com.yihu.ehr.model.standard.MCDADocument;
+import com.yihu.ehr.model.standard.MCDAVersion;
+import com.yihu.ehr.std.service.CDAClient;
 import com.yihu.ehr.std.service.CDATypeClient;
 import com.yihu.ehr.model.standard.MCDAType;
+import com.yihu.ehr.std.service.CDAVersionClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +35,12 @@ public class CDATypeController extends BaseController {
 
     @Autowired
     CDATypeClient cdaTypeClient;
+
+    @Autowired
+    CDAVersionClient cdaVersionClient;
+
+    @Autowired
+    CDAClient cdaClient;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -343,6 +349,43 @@ public class CDATypeController extends BaseController {
         }
         envelop.setDetailModelList(convertToCdaTypeModels(mcdaTypeList));
         return  envelop;
+    }
+
+    /**
+     * 删除cda类别前先判断是否有关联的cda文档
+     * @param ids
+     * @return
+     */
+    @RequestMapping("isExitRelativeCDA")
+    @ResponseBody
+    public Object isExitRelativeCDA(
+            @ApiParam(name = "ids", value = "ids")
+            @RequestParam(value = "ids") String ids) throws Exception {
+        //获取所有子集（含自身）
+        Envelop envelop = new Envelop();
+        List<MCDAType> mcdaTypes = cdaTypeClient.getChildIncludeSelfByParentIdsAndKey(ids, "");
+        if (mcdaTypes == null){
+            return failed("获取cda类别失败！");
+        }
+        String cdaTypeIds ="";
+        for(MCDAType cdaTypeModel: mcdaTypes){
+            cdaTypeIds += cdaTypeIds+cdaTypeModel.getId()+",";
+        }
+        cdaTypeIds = cdaTypeIds.substring(0, cdaTypeIds.length() - 1);
+        String filters = "operationType="+cdaTypeIds;
+        //获取当前所有版本
+        ResponseEntity<Collection<MCDAVersion>> entity = cdaVersionClient.searchCDAVersions("", "", "", 1000, 1);
+        Collection<MCDAVersion> mCdaVersions = entity.getBody();
+        envelop.setSuccessFlg(false);
+        for (MCDAVersion mcdaVersion : mCdaVersions){
+            //对应每个版本的cda文档是否有关联指定的cda类别
+            ResponseEntity<List<MCDADocument>> responseEntity  = cdaClient.GetCDADocuments("", filters,"", 1000, 1, mcdaVersion.getVersion());
+            List<MCDADocument> mcdaDocuments = responseEntity.getBody();
+            if (mcdaDocuments.size()!=0){
+                envelop.setSuccessFlg(true);
+            }
+        }
+        return envelop;
     }
 
 }
