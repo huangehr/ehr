@@ -53,6 +53,7 @@
                 var mode = '${mode}';
                 if(mode == 'view'){
                     $("input,select", this.$form).prop('disabled', false);
+                    $(".my-footer").hide();
                 }
                 this.$form.attrScan();
                 if(mode !='new'){

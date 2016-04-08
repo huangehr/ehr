@@ -90,12 +90,12 @@
                         ],
                         onDblClickRow: function (row) {
                             $.ligerDialog.open({
-                                title:'<div class="f-ib" style="border-style: solid; border-radius: 2px; width: 120px;height: 36px;cursor: pointer;line-height: 36px;text-align: center;border: 2px solid" id="div_patientBasicMsgDialog">病人基本信息</div><div class="f-ib f-ml10"  id="div_cardManagerDialog"  style="border-style: solid; border-radius: 2px; width: 120px;height: 36px;cursor: pointer;line-height: 36px;text-align: center;border: 2px solid">卡管理</div>',
+                                title:'<div class="f-ib f-tac f-w100 f-click-down" id="div_patientBasicMsgDialog">病人基本信息</div><div class="f-ib f-ml10 f-tac f-w100"  id="div_cardManagerDialog">卡管理</div>',
                                 height: 600,
                                 width: 570,
                                 url: '${contextRoot}/patient/patientDialogType',
                                 load: true,
-                                isDrag:false,
+                                isDrag:true,
                                 urlParms: {
                                     idCardNo: row.idCardNo,
                                     patientDialogType: 'patientInfoMessage'

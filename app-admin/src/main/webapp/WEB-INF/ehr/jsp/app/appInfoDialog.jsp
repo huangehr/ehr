@@ -53,7 +53,7 @@
         </div>
     </div>
 
-    <div class="m-form-group f-pr" align="right">
+    <div class="m-form-group f-pr my-footer" align="right">
         <div class="m-form-control f-pa" style="right: 10px">
             <div id="btn_save" class="l-button u-btn u-btn-primary u-btn-large f-ib f-vam" >
                 <span>保存</span>

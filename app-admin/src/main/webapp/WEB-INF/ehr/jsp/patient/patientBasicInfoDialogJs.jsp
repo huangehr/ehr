@@ -223,11 +223,15 @@
                 self.$recordForm.hide();
 
                 self.$patientBasicMsgDialog.click(function () {
+                    self.$patientBasicMsgDialog.addClass("f-click-down").removeClass("f-click-up");
+                    self.$cardManagerDialog.removeClass("f-click-down").addClass("f-click-up");
                     self.$form.show();
                     self.$cardInfo.css('visibility','hidden');
                     self.$recordForm.hide();
                 });
                 self.$cardManagerDialog.click(function () {
+                    self.$cardManagerDialog.addClass("f-click-down").removeClass("f-click-up");
+                    self.$patientBasicMsgDialog.removeClass("f-click-down").addClass("f-click-up");
                     self.$cardInfo.css('visibility','visible');
                     self.$recordForm.hide();
                     self.$form.hide();

@@ -283,7 +283,7 @@
                                     if (data.successFlg)
                                         //重置当前用户密码，需重登
                                         if ((userModelres.id)==(data.obj)){
-                                            $.Notice.warn('重置成功，请重新登录!',function(){
+                                            $.Notice.success('重置成功，请重新登录!',function(){
                                                 location.href='${contextRoot}/logout';
                                             });
                                         }else{
