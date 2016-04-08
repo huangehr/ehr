@@ -40,11 +40,12 @@ cdaType.list = {
 
     getTypeList: function () {
         var u = cdaType.list;
+        var codeName = $('#inp_search').val();
         $.ajax({
             url: u._url + "/cdatype/getTreeGridData",
             type: "get",
             dataType: "json",
-            data: null,
+            data:{codeName:codeName},
             success: function (data) {
                 var envelop = eval(data);
                 var result = envelop.detailModelList;

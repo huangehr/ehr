@@ -58,12 +58,17 @@ public class CdaTypeController extends BaseUIController{
     @RequestMapping("getTreeGridData")
     @ResponseBody
     //获取TreeData 用于初始页面显示嵌套model
-    public Object getTreeGridData() {
+    public Object getTreeGridData(String codeName) {
         Envelop envelop = new Envelop();
         String url = "/cda_types/cda_types_tree";
         String strResult = "";
+        if (StringUtils.isEmpty(codeName)){
+            codeName = "";
+        }
         try{
-            strResult = HttpClientUtil.doGet(comUrl+url,username,password);
+            Map<String,Object> params = new HashMap<>();
+            params.put("code_name",codeName);
+            strResult = HttpClientUtil.doGet(comUrl+url,params,username,password);
             return strResult;
         }catch(Exception ex){
             LogService.getLogger(CdaTypeController.class).error(ex.getMessage());
