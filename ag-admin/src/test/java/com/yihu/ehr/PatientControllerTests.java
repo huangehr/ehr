@@ -67,7 +67,7 @@ public class PatientControllerTests {
         detailModel.setHomeAddressInfo(geographyModel);
 
         String dataJson = objectMapper.writeValueAsString(detailModel);
-        Envelop envelop = patientController.createPatient(dataJson);
+        Envelop envelop = patientController.createPatient(dataJson,"","");
         assertTrue("非空校验失败!", !envelop.isSuccessFlg());
 
         detailModel.setName("test_cms");
@@ -76,12 +76,12 @@ public class PatientControllerTests {
         detailModel.setNativePlace("福建漳州");
         detailModel.setNation("1");
         dataJson = objectMapper.writeValueAsString(detailModel);
-        envelop = patientController.createPatient(dataJson);
+        envelop = patientController.createPatient(dataJson,"","");
         assertTrue("新增失败", envelop.isSuccessFlg());
 
         detailModel = (PatientDetailModel)envelop.getObj();
 
-        envelop = patientController.createPatient(dataJson);
+        envelop = patientController.createPatient(dataJson,"","");
         assertTrue("身份证重复校验失败!", !envelop.isSuccessFlg());
 
 
@@ -95,7 +95,7 @@ public class PatientControllerTests {
         detailModel.setName("test_cms_1");
         geographyModel.setExtra("上蔡村大学35号");
         detailModel.setHomeAddressInfo(geographyModel);
-        envelop = patientController.updatePatient(objectMapper.writeValueAsString(detailModel));
+        envelop = patientController.updatePatient(objectMapper.writeValueAsString(detailModel),"","");
         assertTrue("修改失败",envelop.isSuccessFlg() && envelop.getObj()!=null && ((PatientDetailModel) envelop.getObj()).getName().equals("test_cms_1"));
 
         envelop = cardController.searchCardUnBinding("","MediCard",1,15);

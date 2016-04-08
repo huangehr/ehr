@@ -1,11 +1,13 @@
 package com.yihu.ehr.patient.controller;
 
+import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import com.yihu.ehr.agModel.patient.PatientDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.RestTemplates;
 import com.yihu.ehr.util.controller.BaseUIController;
+import com.yihu.ehr.util.encode.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,10 +18,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -161,12 +162,41 @@ public class PatientController extends BaseUIController {
     public Object updatePatient(String patientJsonData,String patientDialogType,HttpServletRequest request, HttpServletResponse response) throws IOException {
         //将文件保存至服务器，返回文件的path，
         //String picPath = webupload(request, response);//网关中处理webupload
+
         String url = "/populations";
         String resultStr = "";
         Envelop result = new Envelop();
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        PatientDetailModel patientDetailModel = toModel(patientJsonData, PatientDetailModel.class);
+        PatientDetailModel patientDetailModel = toModel(URLDecoder.decode(patientJsonData,"UTF-8"), PatientDetailModel.class);
         RestTemplates templates = new RestTemplates();
+
+
+
+        //图片上传测试开始
+        request.setCharacterEncoding("UTF-8");
+        patientDialogType = "";
+        InputStream inputStream = request.getInputStream();
+        String imageName = request.getParameter("name");
+
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        int i = -1;
+        while ((i = inputStream.read()) != -1){
+            byteArrayOutputStream.write(i);
+        }
+        byte[] b = byteArrayOutputStream.toByteArray();
+        String s = Base64.encode(b);
+        params.add("inputStream", s);
+        params.add("imageName",imageName);
+        //图片上传测试结束
+
+
+
+
+
+
+
+
         if (patientDialogType.equals("addPatient")) {
             //联系电话
             Map<String, String> telphoneNo = new HashMap<String, String>();
