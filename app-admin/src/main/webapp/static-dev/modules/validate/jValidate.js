@@ -273,7 +273,7 @@ define(function (require, exports, module) {
             ['int-range' , '输入值应该为 %s 至 %s 的整数'],
             ['float-range' , '输入值应该为 %s 至 %s 的数字'],
             ['length-range' , '输入值的长度应该在 %s 至 %s 之间,当前长度为%s'],
-            ['equals','两次输入不一致,请重新输入'],
+            ['equals','两次输入不一致,请重新输入！'],
             ['less-than','请输入小于前面的值'],
             ['less-than-equal','请输入小于或等于前面的值'],
             ['great-than','请输入大于前面的值'],
@@ -290,7 +290,7 @@ define(function (require, exports, module) {
             ['validate-zip','请输入有效的邮政编码'],
             ['validate-qq','请输入有效的QQ号码.'],
             ['validate-devid','设备输入ID有误'],
-            ['validate-space','不能输入空格'],
+            ['validate-space','不能输入空格！'],
             ['checkbox-required','该复选框必须选中'],
             ['validate-money','请输入正确的数值,最高保留2位小数'],
             ['validate-contact-way','请输入有效的电话号码或手机号码']

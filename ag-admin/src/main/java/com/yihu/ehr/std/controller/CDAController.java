@@ -212,16 +212,6 @@ public class CDAController extends BaseController{
         return envelop;
     }
 
-//    @RequestMapping(value = "/getDatasetByCdaId",method = RequestMethod.GET)
-//    public Object getDatasetByCdaId(
-//                                    @ApiParam(name = "cdaId", value = "cdaID")
-//                                    @PathVariable(value = "cdaId") String cdaId,
-//                                    @ApiParam(name = "versionCode", value = "标准版本代码")
-//                                    @PathVariable(value = "versionCode") String versionCode) {
-//        return null;
-//    }
-
-
     @ApiOperation(value = "根基id删除CDADataSetRelationship")
     @RequestMapping(value = "/cda_data_set_relationships",method = RequestMethod.DELETE)
     public Envelop deleteCDADataSetRelationship(
