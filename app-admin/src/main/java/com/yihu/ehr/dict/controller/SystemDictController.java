@@ -220,7 +220,7 @@ public class SystemDictController extends BaseUIController {
 
             if(Boolean.parseBoolean(resultCheckStr)){
                 result.setSuccessFlg(false);
-                result.setErrorMsg("代码在该字典中已存在。");
+                result.setErrorMsg("代码在该字典中已存在，请确认。");
                 return result;
             }
 
@@ -423,7 +423,7 @@ public class SystemDictController extends BaseUIController {
         params.put("dict_name",systemName);
 
         try {
-            String url ="/dictionaries/existence/" + systemName;
+            String url ="/dictionaries/existence";
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
 
             if(Boolean.parseBoolean(resultStr)){

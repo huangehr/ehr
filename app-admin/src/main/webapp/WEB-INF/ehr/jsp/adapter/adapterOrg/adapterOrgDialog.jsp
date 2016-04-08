@@ -20,7 +20,7 @@
         </div>
     </div>
 
-    <div id="areaDiv" class="m-form-group">
+    <div id="areaDiv" class="m-form-group" style="display: none">
         <label class="label_title">地区<spring:message code="spe.colon"/></label>
         <input id="province" name="address.province" type="hidden" data-attr-scan="province">
         <input id="city" name="address.city" type="hidden" data-attr-scan="city">

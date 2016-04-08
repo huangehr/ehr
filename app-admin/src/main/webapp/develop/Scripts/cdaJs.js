@@ -518,8 +518,6 @@ cda.attr = {
         dataJson[0]["versionCode"] = versionCode;
         dataJson[0]["id"] = id;
         dataJson[0]["user"] = user_id;
-        //todo ：fileGroup为测试参数，数据库的该字段设置成非空，需要修改允许为空
-        dataJson[0]["fileGroup"] = "group1";
 
         $.ajax({
             url: cda.list._url + "/cda/SaveCdaInfo",

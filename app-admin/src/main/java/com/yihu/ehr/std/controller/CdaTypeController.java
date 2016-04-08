@@ -48,8 +48,9 @@ public class CdaTypeController extends BaseUIController{
     }
 
     @RequestMapping("typeupdate")
-    public String typeupdate(Model model,@ModelAttribute(SessionAttributeKeys.CurrentUser) UserDetailModel user) {
-        model.addAttribute("UserId", user.getLoginCode());
+    public String typeupdate(Model model,HttpServletRequest request) {
+        UserDetailModel user = (UserDetailModel)request.getSession().getAttribute(SessionAttributeKeys.CurrentUser);
+        model.addAttribute("UserId", user.getId());
         model.addAttribute("contentPage", "std/cdaType/CdaTypeDetail");
         return "generalView";
     }

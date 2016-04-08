@@ -67,7 +67,7 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
         else if (!StringUtils.isEmpty(name))
             sb.append(" and ds.name like :name ");
 
-        sb.append(makeOrder(orders));
+        sb.append(makeOrder(orders, "ds"));
         SQLQuery sqlQuery = session.createSQLQuery(sb.toString());
         if (!StringUtils.isEmpty(code))
             sqlQuery.setParameter("code", "%" + code + "%");
@@ -85,15 +85,15 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
                 .list();
     }
 
-    private String makeOrder(String orders) {
+    private String makeOrder(String orders, String tablePre) {
         if(StringUtils.isEmpty(orders))
             return "";
         String sql = "";
         for (String order : orders.split(",")) {
             if (order.startsWith("+"))
-                sql += "," + order.substring(1);
+                sql += "," + tablePre + "." + order.substring(1);
             else if (order.startsWith("-"))
-                sql += "," + order.substring(1) + " desc";
+                sql += "," + tablePre + "." + order.substring(1) + " desc";
         }
         return StringUtils.isEmpty(sql) ?
                 "" :
@@ -183,7 +183,7 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
             sb.append("   and md.name like :name)");
         }
 
-        sb.append(makeOrder(orders));
+        sb.append(makeOrder(orders, "md"));
         SQLQuery sqlQuery = session.createSQLQuery(sb.toString());
         if (!StringUtils.isEmpty(code))
             sqlQuery.setParameter("code", "%" + code + "%");
@@ -551,7 +551,7 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
         if(!StringUtils.isEmpty(seachName))
             sql += " AND (meta.code like :seachName or meta.name like :seachName) ";
 
-        sql += makeOrder(orders);
+        sql += makeOrder(orders, "meta");
 
         SQLQuery sqlQuery = session.createSQLQuery(sql);
         if (!StringUtils.isEmpty(seachName))
@@ -602,5 +602,22 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
         sqlQuery.setParameter("planId", orgAdapterPlan.getId());
 
         return ((BigInteger)sqlQuery.list().get(0)).intValue();
+    }
+
+    public boolean isLeftMeta(Long planId, Long dataSetId, Long[] metaIds){
+        String hql =
+                "SELECT " +
+                "   COUNT(*) " +
+                "FROM " +
+                "   AdapterDataSet " +
+                "where " +
+                "   dataSetId = :dataSetId AND adapterPlanId = :planId and id NOT IN(:ids)";
+
+        Session session = currentSession();
+        Query query = session.createQuery(hql);
+        query.setParameter("planId", planId);
+        query.setParameter("dataSetId", dataSetId);
+        query.setParameterList("ids", metaIds);
+        return ((Long) query.list().get(0)) > 0;
     }
 }

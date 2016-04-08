@@ -71,6 +71,7 @@ public class AdapterDictController extends ExtendController<AdapterDictService> 
             params.put("name", searchNmEntry);
             params.put("page", page);
             params.put("size", rows);
+            params.put("sorts", "+code");
             String resultStr = service.search(url, params);
             return resultStr;
         } catch (Exception e) {

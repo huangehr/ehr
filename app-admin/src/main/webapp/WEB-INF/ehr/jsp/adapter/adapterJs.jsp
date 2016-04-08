@@ -12,7 +12,7 @@
             var adapterGrid = null;
             var adapterDataSet = null;
             var adapterType = 21;
-
+            var searchOrg;
             /* *************************** 函数定义 ******************************* */
             function pageInit() {
                 retrieve.init();
@@ -64,17 +64,15 @@
             }
 
             function initSearchType(target, type) {
-                target.ligerComboBox(
-                        {
-                            url: '${contextRoot}/adapter/getOrgList',
-                            valueField: 'code',
-                            textField: 'name',
-                            dataParmName: 'detailModelList',
-                            urlParms: {
-                                type: type,
-                                mode: "modify"
-                            }
-                        });
+                var p = {
+                    type: type,
+                    mode: "modify",
+                    version: "notVersion"};
+                if(searchOrg)
+                    searchOrg.reload(p);
+                else
+                    searchOrg = target.customCombo(
+                            '${contextRoot}/adapter/getOrgList', p, undefined, undefined, false);
             }
 
             function release(id,orgCode,versionCode) {

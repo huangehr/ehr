@@ -74,7 +74,8 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetSer
                     url,
                     new PageParms(rows, page)
                             .addExt("code", searchNmEntry)
-                            .addExt("name", searchNmEntry));
+                            .addExt("name", searchNmEntry)
+                            .setSorts("+inner_code"));
         } catch (Exception e) {
             e.printStackTrace();
             return systemError();
