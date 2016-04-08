@@ -1,6 +1,5 @@
 package com.yihu.ehr.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -10,16 +9,11 @@ import com.yihu.ehr.extractor.KeyDataExtractor;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.persist.DataSetResolverWithTranslator;
-import com.yihu.ehr.profile.Profile;
-import com.yihu.ehr.profile.ProfileDataSet;
-import com.yihu.ehr.profile.StdObjectQualifierTranslator;
-import com.yihu.ehr.profile.UnStructuredProfile;
+import com.yihu.ehr.profile.*;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
-import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -30,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -88,6 +83,8 @@ public class PackageResolver {
         File[] files = root.listFiles();
         String firstFilepath = files[0].getPath();
         String firstFolderName =  firstFilepath.substring(firstFilepath.lastIndexOf("\\")+1);
+
+        List<UnStructuredContent> contentList = new ArrayList<>();  //document底下的文件
         for(File file:files){
             String folderName = file.getPath().substring(file.getPath().lastIndexOf("\\")+1);
             switch (firstFolderName){
@@ -100,12 +97,12 @@ public class PackageResolver {
                     parseDataSetLight(profile,file.listFiles());
                 case DocumentFolder:
                     //非结构化档案包处理
-                    if(folderName.equals("meta.json")){
-                        unstructuredDataSetParse(unStructuredProfile,file);
-                    }else if(folderName.equals(DocumentFolder)){
-                        unstructuredDocumentParse(unStructuredProfile, file.listFiles());
-                    }
 
+                    if(folderName.equals(DocumentFolder)){
+                        contentList = unstructuredDocumentParse(unStructuredProfile, file.listFiles());
+                    }else if(folderName.equals("meta.json")){
+                        unstructuredDataSetParse(unStructuredProfile,file,contentList);
+                    }
                     break;
                 default: break;
             }
@@ -192,30 +189,7 @@ public class PackageResolver {
     }
 
 
-    /**
-     * 非标准化档案包解析document的文件。
-     * @param profile
-     * @param
-     * @throws IOException
-     */
-    void unstructuredDocumentParse(UnStructuredProfile profile, File[] files) throws Exception {
-        List<String> documentPictures = new LinkedList<>();
-        for (File file : files) {
-            if (file.getAbsolutePath().endsWith(JsonExt)) continue;
-            //这里把图片保存的fastdfs
-            String filePath = file.getPath();
-            String extensionName = filePath.substring(file.getPath().lastIndexOf('.') + 1);
 
-            InputStream is = new FileInputStream(file);
-            ObjectNode objectNode = fastDFSUtil.upload(is,extensionName,"");
-            String groupName = objectNode.get("groupName").toString();
-            String remoteFileName = objectNode.get("remoteFileName").toString();
-            String remotePath = "groupName:" + groupName + ",remoteFileName:" + remoteFileName;
-            documentPictures.add(remotePath);
-        }
-        profile.setDocumentPictures(documentPictures);
-        dataSetResolverWithTranslator.parseUnStructuredJsonDataSet(profile,files);
-    }
 
 
     /**
@@ -224,8 +198,9 @@ public class PackageResolver {
      * @param
      * @throws IOException
      */
-    void unstructuredDataSetParse(UnStructuredProfile profile, File file) throws Exception {
+    void unstructuredDataSetParse(UnStructuredProfile profile, File file,List<UnStructuredContent> contentList) throws Exception {
         JsonNode jsonNode = objectMapper.readTree(file);
+
 
         //公共部分
         String version = jsonNode.get("inner_version").asText();
@@ -235,34 +210,120 @@ public class PackageResolver {
         String orgCode = jsonNode.get("org_code").asText();
         String eventDate = jsonNode.path("event_time").asText();
 
-        //data部分
+        profile.setCdaVersion(version);
+        profile.setEventNo(eventNo);
+        profile.setDemographicId(patientId);
+        profile.setOrgCode(orgCode);
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        profile.setEventDate(format.parse(eventDate));
+
+        //data解析
         JsonNode datas = jsonNode.get("data"); //保存
+
+        List<UnStructuredDocument> unStructuredDocumentList = new ArrayList<>();
         for(int i=0;i<datas.size();i++){
+            UnStructuredDocument unStructuredDocument = new UnStructuredDocument();
             JsonNode data = datas.get(i);
-            String dataStr = data.toString();
-            dataStr = dataStr.substring(1,dataStr.length()-1);
-            JSONObject dataObj = new JSONObject(dataStr);
 
-            String cdaDocId = dataObj.getString("cda_doc_id");
-            String url = dataObj.getString("url");
-            String expiryDate = dataObj.getString("expiry_date");
+            String cdaDocId = data.get("cda_doc_id").asText();
+            String url = data.get("url").asText();
+            String expiryDate = data.get("expiry_date").asText();
 
-            JSONObject keyWords = (JSONObject)dataObj.get("key_words");
-            Iterator keys = keyWords.keys();
-            while (keys.hasNext()) {
-                String key = (String) keys.next();
-                String value = keyWords.getString(key);
+            unStructuredDocument.setCdaDocId(cdaDocId);
+            unStructuredDocument.setUrl(url);
+            unStructuredDocument.setExpiryDate(format.parse(expiryDate));
+
+
+            String keyWordsStr = data.get("key_words").toString();
+            JSONObject keyWordsObj = new JSONObject(keyWordsStr);
+            Iterator keys = keyWordsObj.keys();
+
+            List<Map<String,Object>> keyWordsList = new ArrayList<>();  //存放keyMap的数组
+            keyWordsList = JSONObject2List(keys,keyWordsList,keyWordsObj);
+            unStructuredDocument.setKeyWordsList(keyWordsList);
+
+
+            //document底下文件处理
+            JsonNode contents = data.get("content");   //文件信息
+            List<UnStructuredContent> newContentList = new ArrayList<>();
+            for(int j=0;j<contents.size();j++){
+                //documentFiles;
+                UnStructuredContent unStructuredContent = new UnStructuredContent();
+                JsonNode object = contents.get(j);
+                String mimeType = object.get("mime_type").asText();
+                String name = object.get("name").asText().replace("/","");
+
+                String[] names = name.split(",");
+                for(String filename:names){
+                    for(UnStructuredContent ucontent:contentList){
+                        String localFileName = ucontent.getLocalFileName();
+                        if(filename.equals(localFileName)){
+                            unStructuredContent.setMimeType(mimeType);
+                            unStructuredContent.setName(name);
+                            unStructuredContent.setLocalFileName(ucontent.getLocalFileName());
+                            unStructuredContent.setRemotePath(ucontent.getRemotePath());
+                            newContentList.add(unStructuredContent);
+                        }
+                    }
+                }
             }
-            String content = dataObj.get("content").toString();
-            content = content.substring(1,content.length()-1);
+            unStructuredDocument.setUnStructuredContentList(newContentList);
+            unStructuredDocumentList.add(unStructuredDocument);
 
         }
+        profile.setUnStructuredDocument(unStructuredDocumentList);
+
+
+    }
+
+    /**
+     * 非标准化档案包解析document的文件。
+     * @param profile
+     * @param
+     * @throws IOException
+     */
+    List<UnStructuredContent> unstructuredDocumentParse(UnStructuredProfile profile, File[] files) throws Exception {
+        List<UnStructuredContent> contentList = new ArrayList<>();
+        for (File file : files) {
+            UnStructuredContent unStructuredContent = new UnStructuredContent();
+            if (file.getAbsolutePath().endsWith(JsonExt)) continue;
+            //这里把图片保存的fastdfs
+            String filePath = file.getPath();
+            String extensionName = filePath.substring(file.getPath().lastIndexOf('.') + 1);
+            String localFileName = filePath.substring(file.getPath().lastIndexOf('\\') + 1);
+            InputStream is = new FileInputStream(file);
+            ObjectNode objectNode = fastDFSUtil.upload(is,extensionName,"");
+            String groupName = objectNode.get("groupName").toString();
+            String remoteFileName = objectNode.get("remoteFileName").toString();
+            String remotePath = "groupName:" + groupName + ",remoteFileName:" + remoteFileName;
+
+            unStructuredContent.setLocalFileName(localFileName);
+            unStructuredContent.setRemotePath(remotePath);
+            contentList.add(unStructuredContent);
+        }
+        return contentList;
+    }
 
 
 
 
-
-
+    /**
+     *
+     * @param iterator data的Iterator格式
+     * @param list   返回的数组
+     * @param jsonObject    data的JSONObject格式
+     * @return
+     */
+    public List<Map<String,Object>> JSONObject2List(Iterator iterator,List<Map<String,Object>> list,JSONObject jsonObject){
+        while (iterator.hasNext()) {
+            Map<String,Object> contentMap = new HashMap<>(); //解析单个content
+            String key = (String) iterator.next();
+            String value = jsonObject.getString(key);
+            contentMap.put(key,value);
+            list.add(contentMap);
+        }
+        return list;
     }
 
     /**

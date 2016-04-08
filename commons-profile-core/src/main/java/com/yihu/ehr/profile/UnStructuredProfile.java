@@ -17,6 +17,7 @@ import java.util.*;
  * @created 2015.08.16 10:44
  */
 public class UnStructuredProfile extends Profile{
+
     private ObjectMapper objectMapper = SpringContext.getService("objectMapper");
 
     private ProfileId archiveID;                        // 健康档案ID
@@ -29,11 +30,8 @@ public class UnStructuredProfile extends Profile{
     private String summary;                             // 档案摘要
 
 
-    //保存document文件夹底下的图片在fastdfs上保存的地址
-    private List<String> documentPictures;
-
-    //非结构化content内容 类表包含两个字典 mime_type 和 name
-    private Map<String, Map<String, String>> contents;
+    //非结构化data数组内容
+    private List<UnStructuredDocument> unStructuredDocument;
 
 
     private Date createDate;                            // EhrArchive创建时间，由JSON包中提取
@@ -181,19 +179,12 @@ public class UnStructuredProfile extends Profile{
     }
 
 
-    public Map<String, Map<String, String>> getContents() {
-        return contents;
+    public List<UnStructuredDocument> getUnStructuredDocument() {
+        return unStructuredDocument;
     }
 
-    public void setContents(Map<String, Map<String, String>> contents) {
-        this.contents = contents;
+    public void setUnStructuredDocument(List<UnStructuredDocument> unStructuredDocument) {
+        this.unStructuredDocument = unStructuredDocument;
     }
 
-    public List<String> getDocumentPictures() {
-        return documentPictures;
-    }
-
-    public void setDocumentPictures(List<String> documentPictures) {
-        this.documentPictures = documentPictures;
-    }
 }
