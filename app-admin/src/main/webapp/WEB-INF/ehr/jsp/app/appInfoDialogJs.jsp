@@ -52,6 +52,7 @@
 
                 var mode = '${mode}';
                 if(mode == 'view'){
+					appInfoForm.$form.addClass('m-form-readonly')
                     $("input,select", this.$form).prop('disabled', false);
                     $(".my-footer").hide();
                 }
