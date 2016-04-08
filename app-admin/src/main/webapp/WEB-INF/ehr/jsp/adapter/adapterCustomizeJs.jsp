@@ -76,7 +76,7 @@
         var adapterDataSet = allData.adapterDataSet;
         //var stdDataSet = JSON.parse('${stdDataSet}');
         //var adapterDataSet = JSON.parse('${adapterDataSet}');
-        debugger;
+//        debugger;
         //来源树对象（ligerTree对象）
         fromTree = self.$treeFrom.ligerTree($.extend({},defaults,{
           data:stdDataSet,

@@ -215,7 +215,7 @@ public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel>
 //    }
 
     @RequestMapping(value = "/plan/{plan_id}/public", method = RequestMethod.PUT)
-    @ApiOperation(value = "获取定制信息")
+    @ApiOperation(value = "发布方案")
     public boolean adapterDispatch(
             @ApiParam(name = "plan_id", value = "方案ID")
             @PathVariable(value = "plan_id") long planId) throws Exception {

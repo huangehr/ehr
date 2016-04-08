@@ -6,8 +6,8 @@ import com.yihu.ehr.adaption.commons.ExtendController;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSet;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSetService;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.model.adaption.MAdapterDataVo;
 import com.yihu.ehr.model.adaption.MAdapterDataSet;
+import com.yihu.ehr.model.adaption.MAdapterDataVo;
 import com.yihu.ehr.model.adaption.MAdapterRelationship;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.List;
 
@@ -132,12 +131,26 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
     @RequestMapping(value = "/datametas", method = RequestMethod.DELETE)
     @ApiOperation(value = "批量删除数据元映射关系")
     public boolean delMetaData(
+            @ApiParam(name = "ids", value = "数据元编号集")
             @RequestParam("ids") String ids) throws Exception{
 
         if (StringUtils.isEmpty(ids))
             throw errMissId();
         adapterDataSetService.deleteAdapterDataSet(strToLongArr(ids));
         return true;
+    }
+
+    @RequestMapping(value = "/data_set/{data_set_id}/is_left/meta", method = RequestMethod.GET)
+    @ApiOperation(value = "判断除了metaIds之外是否还存在其他的数据元")
+    public boolean isLeftMeta(
+            @ApiParam(name = "plan_id", value = "数据集编号")
+            @RequestParam("plan_id") long planId,
+            @ApiParam(name = "data_set_id", value = "数据集编号")
+            @PathVariable("data_set_id") long dataSetId,
+            @ApiParam(name = "meta_ids", value = "数据元编号集")
+            @RequestParam("meta_ids") String metaIds) {
+
+        return adapterDataSetService.isLeftMeta(planId, dataSetId, strToLongArr(metaIds));
     }
 
     @RequestMapping(value = "/plan/{planId}/data_set/{data_set_id}/std_meta", method = RequestMethod.GET)

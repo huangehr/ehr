@@ -9,7 +9,7 @@
         var selForm = null;
         var jValidation = $.jValidation;
         var mode = '${mode}';
-
+        var initType = '${initType}';
         if(!Util.isStrEquals(mode,'new')){
             var info = JSON.parse('${info}');
         }
@@ -46,6 +46,9 @@
                 this.bindEvents();
             },
             initForm: function () {
+                if(initType == 3){
+                    $("#areaDiv").css('display','block');
+                }
                 this.$area.ligerComboBox({valueField: 'id',textField: 'name',readonly:mode=='modify',
                     onBeforeOpen: function () {
                         selForm.show(true);
@@ -107,31 +110,32 @@
                                 var type = value;
                                 if(type==1){
                                     //厂商，初始标准只能是厂商
-                                    infoForm.initOrg(infoForm.$org, type);
+                                    infoForm.initAdapterOrg(infoForm.$parent, type);
                                     $("#areaDiv").css('display','none');
                                 }
                                 else if(type==2){
                                     //医院，初始标准没有限制
-                                    infoForm.initOrg(infoForm.$org, type);
+                                    infoForm.initAdapterOrg(infoForm.$parent, type);
                                     $("#areaDiv").css('display','none');
                                 }
                                 else if(type==3){
                                     //区域,初始标准只能选择厂商或区域
-                                    infoForm.initOrg(infoForm.$org, '1');
+                                    infoForm.initAdapterOrg(infoForm.$org, '1');
                                     $("#areaDiv").css('display','block');
                                 }
-                                infoForm.initAdapterOrg(infoForm.$parent, type);
+                                infoForm.initOrg(infoForm.$org, type);
                             }
                         });
+                        var manager = target.ligerGetComboBoxManager();
                         if(!Util.isStrEmpty(info)){
                             var type = info.obj.type;
-                            var manager = target.ligerGetComboBoxManager();
                             if(type)
                                 manager.selectValue(type);
                             else
                                 manager.selectItemByIndex(0);
+                        }else if(initType){
+                            manager.selectValue(initType);
                         }
-
                     }});
 
 
@@ -302,11 +306,11 @@
                                     parent.closeDialog('保存成功！');
                                 }
                                 else{
+                                    parent.adapterModel(self.$form.Fields.getValues());
                                     $.ligerDialog.alert("保存成功", "提示", "success", function(){
-                                        parent.closeAdapterOrgDialog();
+                                        parent.closeDialog();
                                     }, null);
                                 }
-                                parent.adapterModel(self.$form.Fields.getValues());
                             }else{
                                 if(data.errorMsg)
                                     $.Notice.error(data.errorMsg);
@@ -329,7 +333,6 @@
                 });
             },
             setAreaInfo: function (province, city, district, town, areaCode) {
-                debugger
                 this.$province.val(province);
                 this.$city.val(city);
                 this.$district.val(district);

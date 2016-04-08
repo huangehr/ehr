@@ -164,7 +164,9 @@ public class AdapterDataSetControllerTests {
             envelop = dataSetController.updateAdapterMetaData(objectMapper.writeValueAsString(adapterDataSetModel));
             assertTrue("适配信息修改失败!", envelop.isSuccessFlg());
 
-            envelop = dataSetController.deleteAdapterMetaData(String.valueOf(adapterDataSetModel.getId()));
+            Long planId = 107l;
+            Long dataSetId = 2l;
+            envelop = dataSetController.deleteAdapterMetaData(planId, dataSetId, String.valueOf(adapterDataSetModel.getId()));
             assertTrue("适配信息删除失败!", envelop.isSuccessFlg());
 
         }
