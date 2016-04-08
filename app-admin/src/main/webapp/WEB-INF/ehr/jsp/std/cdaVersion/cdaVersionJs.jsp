@@ -65,11 +65,11 @@
 								var _title = "";
 								if(row.inStage == false){
 									_title="重新发布";
-									html ='<div class="grid_edit" name="delete_click"  style="margin: 10px auto;" cursor:pointer;" title="'+_title+'" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "cdaVersion:commitVersion", row.version,row.inStage,0) + '"></div>';
+									html ='<div class="grid_edit" name="delete_click"  style="margin: 10px auto;cursor:pointer;" title="'+_title+'" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "cdaVersion:commitVersion", row.version,row.inStage,0) + '"></div>';
 								} else{
 									_title = "发布";
-									html ='<div class="grid_edit" name="delete_click" style="margin-left: 60px;" cursor:pointer;" title="'+_title+'" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "cdaVersion:commitVersion", row.version,row.inStage,0) + '"></div>'
-											+'<div class="grid_delete" name="delete_click" style="margin-left: 90px;"  cursor:pointer; title="删除"' +
+									html ='<div class="grid_edit" name="delete_click" style="margin-left: 60px;cursor:pointer;" title="'+_title+'" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "cdaVersion:commitVersion", row.version,row.inStage,0) + '"></div>'
+											+'<div class="grid_delete" name="delete_click" style="margin-left: 90px;cursor:pointer; title="删除"' +
 											' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "cdaVersion:del", row.version,row.inStage,0) + '"></div>';
 								}
 								return html;

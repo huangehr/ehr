@@ -14,9 +14,9 @@
          style="display:block;border: 1px solid #D6D6D6;border-bottom: 0px;">
         <ul>
             <li class="f-mt15 li_seach">
-                <div style="float: left; width: 250px; margin-left: 12px; margin-top: -5px;display: none;">
+                <div style="float: left; width: 250px; margin-left: 12px; margin-top: -5px;">
                     <input type="text" id="inp_search" name="inp_search" placeholder="<spring:message code="lbl.input.placehold"/>"
-                           class="f-ml10" style="display: none">
+                           class="f-ml10" >
                 </div>
                 <div style="float: right; width: 250px; margin-top: -5px;">
                     <%--<a id="btn_Delete_relation" class="btn btn-primary J_add-btn f-fr f-mr10">--%>
