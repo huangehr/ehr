@@ -90,7 +90,7 @@
                         ],
                         onDblClickRow: function (row) {
                             $.ligerDialog.open({
-                                title:'<div class="f-ib f-tac f-w100 f-click-down" id="div_patientBasicMsgDialog">病人基本信息</div><div class="f-ib f-ml10 f-tac f-w100"  id="div_cardManagerDialog">卡管理</div>',
+                                title:'<button class="f-ib f-tac f-w100 f-click-down" id="div_patientBasicMsgDialog">病人基本信息</button><button class="f-ib f-ml10 f-tac f-w100"  id="div_cardManagerDialog">卡管理</button>',
                                 height: 600,
                                 width: 570,
                                 url: '${contextRoot}/patient/patientDialogType',

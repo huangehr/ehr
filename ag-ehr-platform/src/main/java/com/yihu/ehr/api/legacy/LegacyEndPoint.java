@@ -1,9 +1,7 @@
 package com.yihu.ehr.api.legacy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.api.adaption.AdaptionsEndPoint;
-import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.feign.*;
@@ -13,18 +11,12 @@ import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.util.DateFormatter;
 import com.yihu.ehr.util.IdValidator;
 import com.yihu.ehr.util.RestEcho;
-import com.yihu.ehr.util.encode.Base64;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -318,7 +310,8 @@ public class LegacyEndPoint {
 
             demoInfo.setBirthday(DateFormatter.simpleDateParse(birthday));
             demoInfo.setNativePlace(nativePlace);
-            demoInfo.setTelephoneNo(telMap.get(0));
+            //demoInfo.setTelephoneNo(telMap.get(0));
+            demoInfo.setTelephoneNo(new ObjectMapper().writeValueAsString(telMap));//电话号码格式调整
 
 
             if (!StringUtils.isEmpty(birthProvince)) {
