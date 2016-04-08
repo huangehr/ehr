@@ -258,7 +258,7 @@
                                     } else {
                                         win.parent.$.Notice.error('密码修改失败');
                                     }
-                                    dialog.close();
+                                    //dialog.close();
                                 }
                             })
                         }

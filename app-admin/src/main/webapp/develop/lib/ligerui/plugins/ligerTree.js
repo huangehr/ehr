@@ -183,6 +183,15 @@
         {
             return this.data;
         },
+        // add by lincl start
+        //子节点是否全选
+        isIncomplete: function (treenodedata)
+        {
+            var str = JSON.stringify(treenodedata.children);
+            return (str.indexOf('"ischecked":null')!=-1 || str.indexOf('"ischecked":false')!=-1)
+                && str.indexOf('"ischecked":true')!=-1;
+        },
+        // add by lincl end
         //是否包含子节点
         hasChildren: function (treenodedata)
         {
@@ -994,6 +1003,8 @@
                     {
                         if (o.ischecked)
                             treehtmlarr.push('<div class="l-box l-checkbox l-checkbox-checked"></div>');
+                        else if(g.isIncomplete(o))
+                            treehtmlarr.push('<div class="l-box l-checkbox l-checkbox-incomplete"></div>');
                         else
                             treehtmlarr.push('<div class="l-box l-checkbox l-checkbox-unchecked"></div>');
                     }

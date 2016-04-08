@@ -102,6 +102,30 @@ public class DataSetsController extends BaseUIController {
         return envelop;
     }
 
+    @RequestMapping("/searchDataSetsWithoutPaging")
+    @ResponseBody
+    public Object searchDataSetsWithoutPaging(String codename, String version){
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+
+        String filters = "";
+        if (!StringUtils.isEmpty(codename)){
+            filters += "name?"+codename+" g1;code?"+codename+" g1;";
+        }
+        String url = "/data_sets/no_paging";
+        try{
+            Map<String,Object> params = new HashMap<>();
+            params.put("filters",filters);
+            params.put("version",version);
+            String envelopStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+            return envelopStr;
+        }catch(Exception ex){
+            LogService.getLogger(DataSetsController.class).error(ex.getMessage());
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+        }
+        return envelop;
+    }
+
     @RequestMapping("/deleteDataSet")
     @ResponseBody
     public Object deleteDataSet(Long dataSetId, String version) {

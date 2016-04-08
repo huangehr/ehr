@@ -34,6 +34,7 @@
 
                 $changePassWordBtn: $("#div_changePassWord_btn"),
                 $cancelBtn: $("#div_cancel_btn"),
+                $pwBtn:$("#div-pw-btn"),
 
                 $intensionWeak: $("#td-intension-weak"),
                 $intensionMiddle: $("#td-intension-middle"),
@@ -130,6 +131,15 @@
                         }
                     });
 
+                    self.$pwBtn.click(function () {
+                        var newPassWord = self.$newPassWord.val();
+                        if(Util.isStrEmpty(newPassWord)){
+                            self.$intensionMiddle.removeClass('s-bc4');
+                            self.$intensionPowerful.removeClass('s-bc12');
+                            self.$intensionWeak.removeClass('s-bc13');
+                        }
+                    })
+
                     function dataValidation(idCode) {
 
                         var dataModel = $.DataModel.init();
@@ -163,7 +173,7 @@
                             if (Util.isStrEquals(passWord, newPassWord)) {
                                 return ValidationErrorMsg(false, "密码与原始密码相近，请重新输入！");
                             }
-                            if (newPassWord.length <= 8 || newPassWord.length >= 16) {
+                            if (newPassWord.length < 8 || newPassWord.length > 16) {
                                 return ValidationErrorMsg(false, "输入值的长度应该在8 至 16之间，当前长度" + newPassWord.length + "！");
                             }
                             if (Util.isStrEquals(userName, newPassWord)) {

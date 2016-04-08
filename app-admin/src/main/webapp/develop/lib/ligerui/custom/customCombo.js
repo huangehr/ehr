@@ -60,6 +60,7 @@
         opts.grid = girdOptsCopy;
         this.options = opts;
         this.ligerComboBox = el.ligerComboBox(this.options)
+        this._el = el;
     }
 
     CustomCombo.prototype.getLigerComboBox = function () {
@@ -77,14 +78,26 @@
         return this.ligerComboBox.setText(t);
     };
 
+    CustomCombo.prototype.reload = function (parms) {
+        var manager = this.ligerComboBox;
+        var grid = manager.getGrid();
+        if(grid)
+            grid.set({
+                newPage: 1,
+                parms: parms
+            });
+        manager.set({parms: parms});
+        manager.reload();
+        manager.clear();
+    };
+
     $.fn.customCombo = function (url, parms, selectedCall, child, readOnly) {
-        debugger
         if(!selectedCall)
             selectedCall = function(id, name){
                 if(!name || !id)
                     return;
                 if(child){
-                    var childManager = child.ligerGetComboBoxManager()
+                    var childManager = child.ligerGetComboBoxManager();
                     var parms = childManager.get("parms");
                     var grid = childManager.getGrid();
                     grid.set({

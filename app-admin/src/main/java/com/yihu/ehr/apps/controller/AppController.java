@@ -172,10 +172,10 @@ public class AppController extends BaseUIController {
     @RequestMapping("updateApp")
     @ResponseBody
     public Object updateApp(AppDetailModel appDetailModel) {
-        if (appDetailModel.getDescription().equals("del")){
-            deleteApp(appDetailModel.getId());
-            return false;
-        }
+//        if (appDetailModel.getDescription().equals("del")){
+//            deleteApp(appDetailModel.getId());
+//            return false;
+//        }
         Envelop result = new Envelop();
         Envelop envelop = new Envelop();
         String resultStr="";

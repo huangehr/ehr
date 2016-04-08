@@ -15,4 +15,18 @@
   .card-dialog  div span{font-size: 12px}
   .f-w88{ width: 88px; }
   .f-h110{ height: 110px }
+  .f-click-up{
+    border-radius: 4px;
+    background-color: #2d9bd2;
+    color: #fff;
+    border: 4px solid #2d9bd2;
+    margin-top: -9px;
+  }
+  .f-click-down{
+    border-radius: 4px;
+    background-color: #fff;
+    color: #2d9bd2;
+    border: 4px solid #fff;
+    margin-top: -8px;
+  }
 </style>
