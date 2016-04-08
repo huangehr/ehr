@@ -30,8 +30,13 @@ public class EhrClientDetailsService implements ClientDetailsService {
                 "ROLE_CLIENT",
                 "http://www.yihu.com?key=value");
 
+        // 简易ESB
         baseClientDetails.setClientSecret("Bd2h8rdYhep6NKOO");
         clientDetailsStore.put("kHAbVppx44", baseClientDetails);
+
+        // 康赛应用
+        baseClientDetails.setClientSecret("ks0odkx5hqcsOIPM");
+        clientDetailsStore.put("iPOuvtrbzx", baseClientDetails);
     }
 
     public ClientDetails loadClientByClientId(String clientId) throws ClientRegistrationException {

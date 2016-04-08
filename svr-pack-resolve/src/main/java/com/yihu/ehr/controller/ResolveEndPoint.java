@@ -8,7 +8,7 @@ import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.feign.XPackageMgrClient;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.persist.ProfileService;
-import com.yihu.ehr.profile.Profile;
+import com.yihu.ehr.profile.core.Profile;
 import com.yihu.ehr.service.PackageResolver;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

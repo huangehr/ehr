@@ -7,16 +7,13 @@ import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.mq.MessageBuffer;
 import com.yihu.ehr.persist.ProfileService;
-import com.yihu.ehr.profile.Profile;
+import com.yihu.ehr.profile.core.Profile;
 import com.yihu.ehr.service.PackageResolver;
 import com.yihu.ehr.util.log.LogService;
 import org.quartz.InterruptableJob;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.UnableToInterruptJobException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;

@@ -1,8 +1,9 @@
 server:
-  port: 10086 #${svr-health-profiles.server.port}
+  port: ${svr-health-profile.server.port}
 
 management:
   port: ${server.port}
+
 
 info:
   app:

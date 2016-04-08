@@ -1,13 +1,9 @@
 package com.yihu.ehr.extractor;
 
-import com.yihu.ehr.profile.ProfileDataSet;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import com.yihu.ehr.profile.core.ProfileDataSet;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * 卡号提取。
