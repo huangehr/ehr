@@ -84,7 +84,7 @@ public class PackageResolver {
         String firstFilepath = files[0].getPath();
         String firstFolderName =  firstFilepath.substring(firstFilepath.lastIndexOf("\\")+1);
 
-        List<UnStructuredContent> contentList = new ArrayList<>();  //document底下的文件
+        List<DocumentFile> documentFileList = new ArrayList<>();  //document底下的文件
         for(File file:files){
             String folderName = file.getPath().substring(file.getPath().lastIndexOf("\\")+1);
             switch (firstFolderName){
@@ -99,9 +99,9 @@ public class PackageResolver {
                     //非结构化档案包处理
 
                     if(folderName.equals(DocumentFolder)){
-                        contentList = unstructuredDocumentParse(unStructuredProfile, file.listFiles());
+                        documentFileList = unstructuredDocumentParse(unStructuredProfile, file.listFiles());
                     }else if(folderName.equals("meta.json")){
-                        unstructuredDataSetParse(unStructuredProfile,file,contentList);
+                        unstructuredDataSetParse(unStructuredProfile,file,documentFileList);
                     }
                     break;
                 default: break;
@@ -198,7 +198,7 @@ public class PackageResolver {
      * @param
      * @throws IOException
      */
-    void unstructuredDataSetParse(UnStructuredProfile profile, File file,List<UnStructuredContent> contentList) throws Exception {
+    void unstructuredDataSetParse(UnStructuredProfile profile, File file,List<DocumentFile> documentFileList) throws Exception {
         JsonNode jsonNode = objectMapper.readTree(file);
 
 
@@ -222,10 +222,14 @@ public class PackageResolver {
         JsonNode datas = jsonNode.get("data"); //保存
 
         List<UnStructuredDocument> unStructuredDocumentList = new ArrayList<>();
+
+
         for(int i=0;i<datas.size();i++){
-            UnStructuredDocument unStructuredDocument = new UnStructuredDocument();
+
+
             JsonNode data = datas.get(i);
 
+            UnStructuredDocument unStructuredDocument = new UnStructuredDocument();
             String cdaDocId = data.get("cda_doc_id").asText();
             String url = data.get("url").asText();
             String expiryDate = data.get("expiry_date").asText();
@@ -236,39 +240,50 @@ public class PackageResolver {
 
 
             String keyWordsStr = data.get("key_words").toString();
-            JSONObject keyWordsObj = new JSONObject(keyWordsStr);
-            Iterator keys = keyWordsObj.keys();
+//            JSONObject keyWordsObj = new JSONObject(keyWordsStr);
+//            Iterator keys = keyWordsObj.keys();
+//
+//            List<Map<String,Object>> keyWordsList = new ArrayList<>();  //存放keyMap的数组
+//            keyWordsList = JSONObject2List(keys,keyWordsList,keyWordsObj);
+//            unStructuredDocument.setKeyWordsList(keyWordsList);
 
-            List<Map<String,Object>> keyWordsList = new ArrayList<>();  //存放keyMap的数组
-            keyWordsList = JSONObject2List(keys,keyWordsList,keyWordsObj);
-            unStructuredDocument.setKeyWordsList(keyWordsList);
-
+            unStructuredDocument.setKeyWordsStr(keyWordsStr);
 
             //document底下文件处理
             JsonNode contents = data.get("content");   //文件信息
-            List<UnStructuredContent> newContentList = new ArrayList<>();
+
+            List<UnStructuredContent> unStructuredContentList = new ArrayList<>();
             for(int j=0;j<contents.size();j++){
                 //documentFiles;
                 UnStructuredContent unStructuredContent = new UnStructuredContent();
+                List<DocumentFile> documentFileListNew = new ArrayList<>();
+
+
                 JsonNode object = contents.get(j);
                 String mimeType = object.get("mime_type").asText();
                 String name = object.get("name").asText().replace("/","");
 
                 String[] names = name.split(",");
+
                 for(String filename:names){
-                    for(UnStructuredContent ucontent:contentList){
-                        String localFileName = ucontent.getLocalFileName();
+                    for(DocumentFile documentFile:documentFileList){
+                        String localFileName = documentFile.getLocalFileName();
                         if(filename.equals(localFileName)){
-                            unStructuredContent.setMimeType(mimeType);
-                            unStructuredContent.setName(name);
-                            unStructuredContent.setLocalFileName(ucontent.getLocalFileName());
-                            unStructuredContent.setRemotePath(ucontent.getRemotePath());
-                            newContentList.add(unStructuredContent);
+                            documentFile.setMimeType(mimeType);
+                            documentFile.setName(filename);
+                            documentFile.setLocalFileName(documentFile.getLocalFileName());
+                            documentFile.setRemotePath(documentFile.getRemotePath());
+                            documentFileListNew.add(documentFile);
                         }
                     }
                 }
+                unStructuredContent.setDocumentFileList(documentFileListNew);
+                unStructuredContentList.add(unStructuredContent);
+
+
+                unStructuredDocument.setUnStructuredContentList(unStructuredContentList);
             }
-            unStructuredDocument.setUnStructuredContentList(newContentList);
+
             unStructuredDocumentList.add(unStructuredDocument);
 
         }
@@ -283,10 +298,10 @@ public class PackageResolver {
      * @param
      * @throws IOException
      */
-    List<UnStructuredContent> unstructuredDocumentParse(UnStructuredProfile profile, File[] files) throws Exception {
-        List<UnStructuredContent> contentList = new ArrayList<>();
+    List<DocumentFile> unstructuredDocumentParse(UnStructuredProfile profile, File[] files) throws Exception {
+        List<DocumentFile> documentFileList = new ArrayList<>();
         for (File file : files) {
-            UnStructuredContent unStructuredContent = new UnStructuredContent();
+            DocumentFile documentFile = new DocumentFile();
             if (file.getAbsolutePath().endsWith(JsonExt)) continue;
             //这里把图片保存的fastdfs
             String filePath = file.getPath();
@@ -298,11 +313,11 @@ public class PackageResolver {
             String remoteFileName = objectNode.get("remoteFileName").toString();
             String remotePath = "groupName:" + groupName + ",remoteFileName:" + remoteFileName;
 
-            unStructuredContent.setLocalFileName(localFileName);
-            unStructuredContent.setRemotePath(remotePath);
-            contentList.add(unStructuredContent);
+            documentFile.setLocalFileName(localFileName);
+            documentFile.setRemotePath(remotePath);
+            documentFileList.add(documentFile);
         }
-        return contentList;
+        return documentFileList;
     }
 
 
