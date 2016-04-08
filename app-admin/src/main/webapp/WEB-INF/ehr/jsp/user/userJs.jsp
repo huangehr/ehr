@@ -100,12 +100,18 @@
                             {display: '最近登录时间', name: 'lastLoginTime', width: '12%',align:'left'},
                             {
                                 display: '操作', name: 'operator', width: '12%', render: function (row) {
+//								var html ='<div class="grid_edit"  style="margin-left: 20px;cursor:pointer;"  title="编辑" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:open", row.id,'modify') + '"></div>'
+//										+'<div class="grid_delete"  style="margin-left: 60px;cursor:pointer;" title="删除"' +
+//										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoDialog:del", row.id,'delete') + '"></div>';
                                 var html = '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:open", row.id, 'modify') + '">编辑</a> / ';
                                     html+= '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoDialog:del", row.id, 'delete') + '">删除</a> / ';
                                     if(Util.isStrEquals(row.activated,true)){
+										//缺开启/失效图标
+//										html +='<div class="grid_activate" style="margin-left:100px;cursor:pointer;" title="失效" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:failure", row.id,0) + '"></div>';
                                            html+= '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:failure", row.id,0) + '">失效</a>';
                                        }else if(Util.isStrEquals(row.activated,false)){
-                                           html+='<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:failure", row.id,1) + '">开启</a>';
+//										html +='<div class="grid_deactivated" style="margin-left:100px;cursor:pointer;" title="开启" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:failure", row.id,1) + '"></div>';
+										html+='<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:failure", row.id,1) + '">开启</a>';
                                        }
 
                                 return html;
