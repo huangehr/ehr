@@ -7,10 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
@@ -102,4 +99,19 @@ public interface PatientClient {
     boolean isExistIdCardNo(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @PathVariable(value = "id_card_no") String idCardNo);
+
+    @RequestMapping(value = "/populations/picture",method = RequestMethod.POST)
+    @ApiOperation(value = "头像上传")
+    String uploadPicture(
+            @ApiParam(name = "jsonData", value = "头像信息", defaultValue = "")
+            @RequestBody String jsonData);
+
+    @RequestMapping(value = "/populations/picture",method = RequestMethod.GET)
+    @ApiOperation(value = "头像下载")
+    String downloadPicture(@ApiParam(name = "demographic_id", value = "病人主键，和身份证号一致")
+                           @RequestParam(value = "demographic_id") String demographicId ,
+                           @ApiParam(name = "group_name", value = "分组", defaultValue = "")
+                           @RequestParam(value = "group_name") String groupName,
+                           @ApiParam(name = "remote_file_name", value = "服务器头像名称", defaultValue = "")
+                           @RequestParam(value = "remote_file_name") String remoteFileName);
 }

@@ -9,6 +9,7 @@ import com.yihu.ehr.patient.service.demographic.DemographicId;
 import com.yihu.ehr.patient.service.demographic.DemographicInfo;
 import com.yihu.ehr.patient.service.demographic.DemographicService;
 import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.util.encode.Base64;
 import com.yihu.ehr.util.encode.HashUtil;
 import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -204,21 +206,20 @@ public class PatientController extends BaseRestController {
 
     /**
      * 人口信息头像图片上传
-     * @param inputStearmStr
-     * @param pictureName
      * @return
      * @throws IOException
      */
     @RequestMapping(value = "/populations/picture",method = RequestMethod.POST)
     @ApiOperation(value = "上传头像,把图片转成流的方式发送")
     public String uploadPicture(
-            @ApiParam(name = "input_stearm_str", value = "头像转化后的输入流")
-            @RequestParam(value = "input_stearm_str") String inputStearmStr ,
-            @ApiParam(name = "picture_name", value = "头像名称", defaultValue = "")
-            @RequestParam(value = "picture_name") String pictureName) throws IOException {
-        if(pictureName == null){
+            @ApiParam(name = "jsonData", value = "头像转化后的输入流")
+            @RequestBody String jsonData ) throws IOException {
+        if(jsonData == null){
             return null;
         }
+        Map<String, String> map = toEntity(URLDecoder.decode(jsonData, "UTF-8"), Map.class);
+        byte[] b = Base64.decode(map.get("inputStream"));
+        String pictureName = map.get("imageName");
         String fileExtension = pictureName.substring(pictureName.lastIndexOf(".") + 1).toLowerCase();
         String description = null;
         if ((pictureName != null) && (pictureName.length() > 0)) {
@@ -229,11 +230,11 @@ public class PatientController extends BaseRestController {
         }
         String path = null;
         try {
-            InputStream inputStream = new ByteArrayInputStream(inputStearmStr.getBytes());
+            InputStream inputStream = new ByteArrayInputStream(b);
             ObjectNode objectNode = fastDFSUtil.upload(inputStream, fileExtension, description);
             String groupName = objectNode.get("groupName").toString();
             String remoteFileName = objectNode.get("remoteFileName").toString();
-            path = "{groupName:" + groupName + ",remoteFileName:" + remoteFileName + "}";
+            path = "{\"groupName\":\"" + groupName + "\",\"remoteFileName\":\"" + remoteFileName + "\"}";
         } catch (Exception e) {
             LogService.getLogger(DemographicInfo.class).error("人口头像图片上传失败；错误代码："+e);
         }

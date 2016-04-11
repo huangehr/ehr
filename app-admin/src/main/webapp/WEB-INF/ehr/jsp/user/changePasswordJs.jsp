@@ -176,6 +176,9 @@
                             if (newPassWord.length < 8 || newPassWord.length > 16) {
                                 return ValidationErrorMsg(false, "输入值的长度应该在8 至 16之间，当前长度" + newPassWord.length + "！");
                             }
+//                            if(newPassWord.split(" ").length>=1){
+//                                return ValidationErrorMsg(false, "不能输入空格！");
+//                            }
                             if (Util.isStrEquals(userName, newPassWord)) {
                                 return ValidationErrorMsg(false, "新密码与用户名不能一样！");
                             }
