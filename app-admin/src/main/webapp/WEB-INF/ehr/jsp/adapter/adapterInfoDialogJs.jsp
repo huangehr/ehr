@@ -18,7 +18,7 @@
         var versions;
         var types;
         var adapterPlan = $.parseJSON('${model}');
-
+        var firstInit = true;
         /* ************************** 变量定义结束 **************************** */
 
         /* *************************** 函数定义 ******************************* */
@@ -120,7 +120,7 @@
                         code: adapterPlan.code,
                         name: adapterPlan.name,
                         version: adapterPlan.version,
-                        org: adapterPlan.org,
+//                        org: adapterPlan.org,
                         parentId: adapterPlan.parentId,
                         description: adapterPlan.description
                     });
@@ -134,11 +134,18 @@
                             type: types.getValue(),
                             version: versions.getValue(),
                             mode: mode};
-                    if(orgData)
-                        orgData.reload(p);
-                    else
+                    if(orgData){
+                        if(!firstInit)
+                            orgData.reload(p);
+                        else
+                            firstInit = false;
+                    }
+                    else{
                         orgData = self.$org.customCombo(
-                            '${contextRoot}/adapter/getOrgList', p, undefined, undefined, false);
+                                '${contextRoot}/adapter/getOrgList', p, undefined, undefined, false);
+                        orgData.setValue(adapterPlan.orgValue);
+                        orgData.setText(adapterPlan.org);
+                    }
                 }
 
                 function searchParent() {

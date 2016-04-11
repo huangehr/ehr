@@ -338,7 +338,23 @@
             }
         };
         /* ************************* 模块初始化结束 ************************** */
+        /* ************************* 左侧菜单栏滚动开始 ************************** */
+        $(window).load(function(){
+            $("#menucyc-scroll").mCustomScrollbar({
+                theme:"dark", //主题颜色
+                scrollButtons:{
+                    enable:true //是否使用上下滚动按钮
+                },
+                autoHideScrollbar: true, //是否自动隐藏滚动条
+                scrollInertia :0,//滚动延迟
+                horizontalScroll : false,//水平滚动条
+                callbacks:{
+                    //onScroll: function(){alert(1)} //滚动完成后触发事件
+                }
+            });
 
+        });
+        /* ************************* 左侧菜单栏滚动结束  ************************** */
         /* *************************** 页面初始化 **************************** */
 
         pageInit();
