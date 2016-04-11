@@ -85,7 +85,11 @@ public class PatientController extends BaseController {
             //联系电话
             Map<String, String> telephoneNo;
             String tag="联系电话";
-            telephoneNo = objectMapper.readValue(patient.getTelephoneNo(), Map.class);
+            try {
+                telephoneNo = objectMapper.readValue(patient.getTelephoneNo(), Map.class);
+            } catch (Exception e) {
+                telephoneNo=null;
+            }
             if (telephoneNo != null && telephoneNo.containsKey(tag)) {
                 patient.setTelephoneNo(telephoneNo.get(tag));
             } else {
@@ -380,7 +384,13 @@ public class PatientController extends BaseController {
 
         //联系电话
         String tag = "联系电话";
-        Map<String, String> telephoneNo = objectMapper.readValue(detailModel.getTelephoneNo(), Map.class);
+        Map<String, String> telephoneNo =null;
+        try {
+            telephoneNo = objectMapper.readValue(detailModel.getTelephoneNo(), Map.class);
+        } catch (Exception e){
+            telephoneNo=null;
+        }
+
         detailModel.setTelephoneNo(null);
         if (telephoneNo != null && telephoneNo.containsKey(tag)) {
             detailModel.setTelephoneNo(telephoneNo.get(tag));
