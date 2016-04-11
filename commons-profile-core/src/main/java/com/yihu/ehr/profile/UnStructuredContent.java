@@ -1,43 +1,18 @@
 package com.yihu.ehr.profile;
 
+import java.util.List;
+
 /**
  * Created by Administrator on 2016/4/7.
  */
 public class UnStructuredContent {
-    String mimeType;
-    String name;
-    String localFileName;
-    String remotePath;
+    List<DocumentFile> documentFileList;
 
-    public String getMimeType() {
-        return mimeType;
+    public List<DocumentFile> getDocumentFileList() {
+        return documentFileList;
     }
 
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getLocalFileName() {
-        return localFileName;
-    }
-
-    public void setLocalFileName(String localFileName) {
-        this.localFileName = localFileName;
-    }
-
-    public String getRemotePath() {
-        return remotePath;
-    }
-
-    public void setRemotePath(String remotePath) {
-        this.remotePath = remotePath;
+    public void setDocumentFileList(List<DocumentFile> documentFileList) {
+        this.documentFileList = documentFileList;
     }
 }

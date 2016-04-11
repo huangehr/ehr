@@ -2,7 +2,6 @@ package com.yihu.ehr.profile;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Administrator on 2016/4/7.
@@ -12,7 +11,8 @@ public class UnStructuredDocument {
     String url;
     Date expiryDate;
 
-    List<Map<String,Object>> keyWordsList;
+//    List<Map<String,Object>> keyWordsList;
+    String keyWordsStr;
     //非结构化content内容 类表包含两个字典 mime_type 和 name 和fastdfs保存的地址
     private List<UnStructuredContent> unStructuredContentList;
 
@@ -40,12 +40,12 @@ public class UnStructuredDocument {
         this.expiryDate = expiryDate;
     }
 
-    public List<Map<String, Object>> getKeyWordsList() {
-        return keyWordsList;
+    public String getKeyWordsStr() {
+        return keyWordsStr;
     }
 
-    public void setKeyWordsList(List<Map<String, Object>> keyWordsList) {
-        this.keyWordsList = keyWordsList;
+    public void setKeyWordsStr(String keyWordsStr) {
+        this.keyWordsStr = keyWordsStr;
     }
 
     public List<UnStructuredContent> getUnStructuredContentList() {

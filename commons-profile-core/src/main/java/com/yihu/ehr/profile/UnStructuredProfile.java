@@ -16,7 +16,7 @@ import java.util.*;
  * @version 1.0
  * @created 2015.08.16 10:44
  */
-public class UnStructuredProfile extends Profile{
+public class UnStructuredProfile {
 
     private ObjectMapper objectMapper = SpringContext.getService("objectMapper");
 
@@ -47,7 +47,7 @@ public class UnStructuredProfile extends Profile{
         this.eventNo = "";
         this.dataSets = new TreeMap<>();
     }
-    
+
     public String getId() {
         if (archiveID == null){
             if(StringUtils.isEmpty(orgCode)){
