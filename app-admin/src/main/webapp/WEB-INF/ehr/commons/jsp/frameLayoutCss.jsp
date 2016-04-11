@@ -70,5 +70,7 @@
     color: #fff;
     /*width: 260px;*/
   }
-
+  /**/
+  #menucyc-scroll #mCSB_1_container{ margin-right:0;}
+  .mCS-dark.mCSB_scrollTools .mCSB_dragger .mCSB_dragger_bar{background-color: rgba(0,0,0,0.2)}
 </style>

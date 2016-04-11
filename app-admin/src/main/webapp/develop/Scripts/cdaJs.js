@@ -517,7 +517,8 @@ cda.attr = {
         var dataJson = eval("[" + cda.attr.cda_form.Fields.toJsonString() + "]");
         dataJson[0]["versionCode"] = versionCode;
         dataJson[0]["id"] = id;
-        dataJson[0]["user"] = user_id;
+        debugger
+        //dataJson[0]["user"] = user_id;
 
         $.ajax({
             url: cda.list._url + "/cda/SaveCdaInfo",
