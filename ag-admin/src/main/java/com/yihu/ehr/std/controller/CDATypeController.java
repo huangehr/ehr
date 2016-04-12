@@ -1,7 +1,6 @@
 package com.yihu.ehr.std.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.agModel.org.OrgModel;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeDetailModel;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeModel;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeTreeModel;
@@ -22,10 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by yww on 2016/3/1.
@@ -122,38 +118,51 @@ public class CDATypeController extends BaseController {
             @ApiParam(name = "code_name", value = "cda类别的编码或名称")
             @RequestParam(value = "code_name") String codeName) throws Exception {
         Envelop envelop = new Envelop();
-        //顶级cda类别的父级id在数库是为空的
-        List<MCDAType> mcdaTypes = cdaTypeClient.getChildrenByPatientId("");
-        if (mcdaTypes.size() == 0){
+        envelop.setSuccessFlg(true);
+        //获取到的顶级cda类别集合
+        List<MCDAType> mcdaTypesAll = cdaTypeClient.getChildrenByPatientId("");
+        //顶级类别中符合条件的类别集合
+        List<MCDAType> mcdaTypesSome = new ArrayList<>();
+        //顶级类别中不符合条件的类别集合
+        List<MCDAType> mcdaTypesOthers = new ArrayList<>();
+        if (mcdaTypesAll.size() == 0){
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("没有匹配条件的cda类别！");
             return envelop;
         }
         List<CdaTypeTreeModel> treeList = new ArrayList<>();
-        if(!StringUtils.isEmpty(codeName)){
-            treeList = getCdaTypeTreeModelByCodeName(mcdaTypes,codeName);
-        }else{
-            treeList = getCdaTypeChild(mcdaTypes);
+        if(StringUtils.isEmpty(codeName)){
+            treeList = getCdaTypeTreeModelChild(mcdaTypesAll);
+            envelop.setDetailModelList(treeList);
+            return envelop;
         }
-        envelop.setSuccessFlg(true);
+        for(MCDAType mcdaType :mcdaTypesAll){
+            if(mcdaType.getCode().contains(codeName) || mcdaType.getName().contains(codeName)){
+                mcdaTypesSome.add(mcdaType);
+                continue;
+            }
+            mcdaTypesOthers.add(mcdaType);
+        }
+        if (mcdaTypesSome.size()!=0){
+            treeList.addAll(getCdaTypeTreeModelChild(mcdaTypesSome));
+        }
+        treeList .addAll(getCdaTypeTreeModelByCodeName(mcdaTypesOthers,codeName));
         envelop.setDetailModelList(treeList);
         return envelop;
     }
 
+    /**
+     * 递归不满足的父级类别集合的子集中满足条件TreeModel集合的方法
+     * @param mcdaTypes 不符合的父级类别的集合
+     * @param codeName
+     * @return
+     */
     public  List<CdaTypeTreeModel> getCdaTypeTreeModelByCodeName(List<MCDAType> mcdaTypes,String codeName){
         //结构：treeList 包含treeModel，treeModel包含listOfParent
         List<CdaTypeTreeModel> treeList = new ArrayList<>();
         for(MCDAType mcdaType:mcdaTypes){
-            List<CdaTypeTreeModel> listOfParent = new ArrayList<>();
+            List<CdaTypeTreeModel> childList = new ArrayList<>();
             CdaTypeTreeModel treeModel = convertToModel(mcdaType,CdaTypeTreeModel.class);
-            //判断顶级cda类别是否已符合要求
-            if(mcdaType.getCode().contains(codeName) || mcdaType.getName().contains(codeName)){
-                List<MCDAType> list = new ArrayList<>();
-                list.add(mcdaType);
-                listOfParent=getCdaTypeChild(list);
-                treeList.add(listOfParent.get(0));
-                continue;
-            }
             String parentId = mcdaType.getId();
             //获取所有下一级cda类别
             List<MCDAType> listAll = cdaTypeClient.getChildrenByPatientId(parentId);
@@ -165,15 +174,15 @@ public class CDATypeController extends BaseController {
             ResponseEntity<Collection<MCDAType>> responseEntity = cdaTypeClient.search(filters);
             List<MCDAType> listSome = (List<MCDAType>)responseEntity.getBody();
             if(listSome.size()!=0){
-                listOfParent.addAll(getCdaTypeChild(listSome));
+                childList.addAll(getCdaTypeTreeModelChild(listSome));
             }
             //取剩下不符合要求的进行递归
             listAll.removeAll(listSome);
             if(listAll.size() != 0){
-                listOfParent.addAll(getCdaTypeTreeModelByCodeName(listAll,codeName));
+                childList.addAll(getCdaTypeTreeModelByCodeName(listAll,codeName));
             }
-            if(listOfParent.size() != 0){
-                treeModel.setChildren(listOfParent);
+            if(childList.size() != 0){
+                treeModel.setChildren(childList);
                 treeList.add(treeModel);
             }
         }
@@ -186,14 +195,14 @@ public class CDATypeController extends BaseController {
      * @param info 父级信息
      * @return 全部子级信息
      */
-    public List<CdaTypeTreeModel> getCdaTypeChild(List<MCDAType> info) {
+    public List<CdaTypeTreeModel> getCdaTypeTreeModelChild(List<MCDAType> info) {
         List<CdaTypeTreeModel> treeInfo = new ArrayList<>();
         for (int i = 0; i < info.size(); i++) {
             MCDAType typeInfo = info.get(i);
             CdaTypeTreeModel tree = new CdaTypeTreeModel();
             tree = convertToModel(typeInfo,CdaTypeTreeModel.class);
             List<MCDAType> listChild = cdaTypeClient.getChildrenByPatientId(typeInfo.getId());
-            List<CdaTypeTreeModel> listChildTree = getCdaTypeChild(listChild);
+            List<CdaTypeTreeModel> listChildTree = getCdaTypeTreeModelChild(listChild);
             tree.setChildren(listChildTree);
             treeInfo.add(tree);
         }

@@ -1,5 +1,4 @@
 package com.yihu.ehr.patient.controller;
-
 import com.yihu.ehr.agModel.patient.PatientDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.Envelop;

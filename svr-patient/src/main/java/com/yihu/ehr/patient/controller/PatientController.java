@@ -59,13 +59,13 @@ public class PatientController extends BaseRestController {
     @ApiOperation(value = "根据条件查询人")
     public List<MDemographicInfo> searchPatient(
             @ApiParam(name = "search", value = "搜索内容", defaultValue = "")
-            @RequestParam(value = "search") String search,
-            @ApiParam(name = "province", value = "省", defaultValue = "")
-            @RequestParam(value = "province") String province,
-            @ApiParam(name = "city", value = "市", defaultValue = "")
-            @RequestParam(value = "city") String city,
-            @ApiParam(name = "district", value = "县", defaultValue = "")
-            @RequestParam(value = "district") String district,
+            @RequestParam(value = "search",required = false) String search,
+            @ApiParam(name = "home_province", value = "省", defaultValue = "")
+            @RequestParam(value = "home_province",required = false) String province,
+            @ApiParam(name = "home_city", value = "市", defaultValue = "")
+            @RequestParam(value = "home_city",required = false) String city,
+            @ApiParam(name = "home_district", value = "县", defaultValue = "")
+            @RequestParam(value = "home_district",required = false) String district,
             @ApiParam(name = "page", value = "当前页", defaultValue = "")
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
