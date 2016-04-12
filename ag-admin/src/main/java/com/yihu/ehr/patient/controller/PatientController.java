@@ -138,8 +138,12 @@ public class PatientController extends BaseController {
             @PathVariable(value = "id_card_no") String idCardNo) throws Exception {
 
         MDemographicInfo demographicInfo = patientClient.getPatient(idCardNo);
-        Map<String,String> map = toEntity(demographicInfo.getPicPath(),Map.class);
-        String localPath = patientClient.downloadPicture(demographicInfo.getIdCardNo(),map.get("groupName"),map.get("remoteFileName"));
+        if(!StringUtils.isEmpty(demographicInfo.getPicPath())){
+            Map<String,String> map = toEntity(demographicInfo.getPicPath(),Map.class);
+            String localPath = patientClient.downloadPicture(demographicInfo.getIdCardNo(),map.get("groupName"),map.get("remoteFileName"));
+        }
+//        Map<String,String> map = toEntity(demographicInfo.getPicPath(),Map.class);
+
         if (demographicInfo == null) {
             return failed("数据获取失败！");
         }
@@ -244,7 +248,8 @@ public class PatientController extends BaseController {
             @RequestParam(value = "imageName") String imageName) throws Exception {
 
         //头像上传
-        String jsonData = "{\"inputStream\":\""+inputStream+"\",\"imageName\":\""+imageName+"\"}";
+        String jsonData = inputStream+","+imageName;
+//        String path = patientClient.uploadPicture(jsonData);
         String path = patientClient.uploadPicture(jsonData);
 
         PatientDetailModel detailModel = objectMapper.readValue(patientModelJsonData, PatientDetailModel.class);

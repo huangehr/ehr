@@ -51,11 +51,13 @@
                 this.$description.ligerTextBox({width:240, height: 100 });
 
                 var mode = '${mode}';
-                if(mode == 'view'){
+				if(mode != 'view'){
+					$(".my-footer").show();
+				}
+				if(mode == 'view'){
 					appInfoForm.$form.addClass('m-form-readonly')
-                    $("input,select", this.$form).prop('disabled', false);
-                    $(".my-footer").hide();
-                }
+					$("input,select", this.$form).prop('disabled', false);
+				}
                 this.$form.attrScan();
                 if(mode !='new'){
                     var app = (JSON.parse('${app}')).obj;
