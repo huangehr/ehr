@@ -1,6 +1,5 @@
 package com.yihu.ehr.patient.controller;
 
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import com.yihu.ehr.agModel.patient.PatientDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.Envelop;
@@ -8,11 +7,15 @@ import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.RestTemplates;
 import com.yihu.ehr.util.controller.BaseUIController;
 import com.yihu.ehr.util.encode.Base64;
+import org.apache.catalina.connector.CoyoteInputStream;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.ResizableByteArrayOutputStream;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -20,8 +23,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -60,21 +64,21 @@ public class PatientController extends BaseUIController {
                 model.addAttribute("patientDialogType", "addPatient");
                 model.addAttribute("contentPage", "patient/patientInfoDialog");
                 return "generalView";
-            }else{
+            } else {
                 url = "/populations/";
                 //todo 该controller的download方法放后台处理
-                resultStr = templates.doGet(comUrl+url+idCardNo);
+                resultStr = templates.doGet(comUrl + url + idCardNo);
                 Envelop envelop = getEnvelop(resultStr);
-                if (envelop.isSuccessFlg()){
+                if (envelop.isSuccessFlg()) {
                     model.addAttribute("patientModel", resultStr);
                     if (patientDialogType.equals("updatePatient")) {
                         model.addAttribute("contentPage", "patient/patientInfoDialog");
                         return "generalView";
-                    }else if (patientDialogType.equals("patientInfoMessage")) {
+                    } else if (patientDialogType.equals("patientInfoMessage")) {
                         model.addAttribute("contentPage", "patient/patientBasicInfoDialog");
                         return "simpleView";
                     }
-                }else{
+                } else {
                     return envelop.getErrorMsg();
                 }
                 return "";
@@ -116,7 +120,7 @@ public class PatientController extends BaseUIController {
     * "idCardNo":""  //身份证号
     */
     public Object deletePatient(String idCardNo) {
-        String url = "/populations/"+idCardNo;
+        String url = "/populations/" + idCardNo;
         String resultStr = "";
         Envelop result = new Envelop();
         try {
@@ -136,16 +140,16 @@ public class PatientController extends BaseUIController {
     @RequestMapping("checkIdCardNo")
     @ResponseBody
     public Object checkIdCardNo(String searchNm) {
-        String url = "/populations/is_exist/"+searchNm;
+        String url = "/populations/is_exist/" + searchNm;
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("id_card_no",searchNm);
+        params.put("id_card_no", searchNm);
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            if(Boolean.parseBoolean(resultStr)){
+            if (Boolean.parseBoolean(resultStr)) {
                 result.setSuccessFlg(true);
-            }else{
+            } else {
                 result.setSuccessFlg(false);
             }
             return result;
@@ -156,107 +160,112 @@ public class PatientController extends BaseUIController {
         }
     }
 
-    @RequestMapping(value="updatePatient")
+    @RequestMapping(value = "updatePatient")
     @ResponseBody
     //注册或更新病人信息Header("Content-type: text/html; charset=UTF-8")
-    public Object updatePatient(String patientJsonData,String patientDialogType,HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public Object updatePatient(String patientJsonData, String patientDialogType, HttpServletRequest request, HttpServletResponse response) {
         //将文件保存至服务器，返回文件的path，
         //String picPath = webupload(request, response);//网关中处理webupload
-
-        String url = "/populations";
-        String resultStr = "";
-        Envelop result = new Envelop();
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        PatientDetailModel patientDetailModel = toModel(URLDecoder.decode(patientJsonData,"UTF-8"), PatientDetailModel.class);
-        RestTemplates templates = new RestTemplates();
+        try {
 
 
-
-        //图片上传测试开始
-        request.setCharacterEncoding("UTF-8");
-        patientDialogType = "";
-        InputStream inputStream = request.getInputStream();
-        String imageName = request.getParameter("name");
-
-
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        int i = -1;
-        while ((i = inputStream.read()) != -1){
-            byteArrayOutputStream.write(i);
-        }
-        byte[] b = byteArrayOutputStream.toByteArray();
-        String s = Base64.encode(b);
-        params.add("inputStream", s);
-        params.add("imageName",imageName);
-        //图片上传测试结束
+            String url = "/populations";
+            String resultStr = "";
+            Envelop result = new Envelop();
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            PatientDetailModel patientDetailModel = toModel(URLDecoder.decode(patientJsonData, "UTF-8"), PatientDetailModel.class);
+            RestTemplates templates = new RestTemplates();
 
 
+            //图片上传测试开始
+            request.setCharacterEncoding("UTF-8");
+            InputStream inputStream = request.getInputStream();
+            String imageName = request.getParameter("name");
 
 
+            int temp = 0;  //所有读取的内容都使用temp接收
+            int bufferSize = 1024;
+            byte tempBuffer[] = new byte[bufferSize];
+            byte[] fileBuffer = new byte[0];
+            while ((temp = inputStream.read(tempBuffer)) != -1) {
+                fileBuffer = ArrayUtils.addAll(fileBuffer, ArrayUtils.subarray(tempBuffer, 0, temp));
+            }
+
+            //图片上传测试结束
+            inputStream.close();
+
+//            ByteArrayInputStream in = new ByteArrayInputStream(tempBuffer);
+//            FileOutputStream fileOutputStream = new FileOutputStream(new File("C:\\Users\\wq\\AppData\\Local\\Temp\\patientImages\\M00\\00\\"+imageName));
+//            fileOutputStream.write(fileBuffer);
+//            fileOutputStream.flush();
+//            fileOutputStream.close();
+        String restStream = Base64.encode(fileBuffer);
+
+        params.add("inputStream", restStream);
+        params.add("imageName", imageName);
 
 
-
-
-        if (patientDialogType.equals("addPatient")) {
-            //联系电话
-            Map<String, String> telphoneNo = new HashMap<String, String>();
-            String tag="联系电话";
-            telphoneNo.put(tag,patientDetailModel.getTelephoneNo());
-            patientDetailModel.setTelephoneNo(toJson(telphoneNo));
-            params.add("patientModelJsonData", toJson(patientDetailModel));
-        }else{
-            String idCardNo = patientDetailModel.getIdCardNo();
-            resultStr = templates.doGet(comUrl+url+'/'+idCardNo);
-            Envelop envelop = getEnvelop(resultStr);
-            if (envelop.isSuccessFlg()){
-                PatientDetailModel updatePatient = getEnvelopModel(envelop.getObj(),PatientDetailModel.class);
-                //todo:姓名、身份证号能否修改
-                updatePatient.setName(patientDetailModel.getName());
-                updatePatient.setIdCardNo(patientDetailModel.getIdCardNo());
-                updatePatient.setGender(patientDetailModel.getGender());
-                updatePatient.setNation(patientDetailModel.getNation());
-                updatePatient.setNativePlace(patientDetailModel.getNativePlace());
-                updatePatient.setMartialStatus(patientDetailModel.getMartialStatus());
-                updatePatient.setBirthday(patientDetailModel.getBirthday());
-                updatePatient.setBirthPlaceInfo(patientDetailModel.getBirthPlaceInfo());
-                updatePatient.setHomeAddressInfo(patientDetailModel.getHomeAddressInfo());
-                updatePatient.setWorkAddressInfo(patientDetailModel.getWorkAddressInfo());
-                updatePatient.setResidenceType(patientDetailModel.getResidenceType());
-                //联系电话
-                Map<String, String> telphoneNo = null;
-                String tag = "联系电话";
-                telphoneNo = toModel(updatePatient.getTelephoneNo(),Map.class);
-                if (telphoneNo!=null){
-                    if (telphoneNo.containsKey(tag)) {
-                        telphoneNo.remove(tag);
+            if (StringUtils.isEmpty(patientDialogType)) {
+                String idCardNo = patientDetailModel.getIdCardNo();
+                resultStr = templates.doGet(comUrl + url + '/' + idCardNo);
+                Envelop envelop = getEnvelop(resultStr);
+                if (envelop.isSuccessFlg()) {
+                    PatientDetailModel updatePatient = getEnvelopModel(envelop.getObj(), PatientDetailModel.class);
+                    //todo:姓名、身份证号能否修改
+                    updatePatient.setName(patientDetailModel.getName());
+                    updatePatient.setIdCardNo(patientDetailModel.getIdCardNo());
+                    updatePatient.setGender(patientDetailModel.getGender());
+                    updatePatient.setNation(patientDetailModel.getNation());
+                    updatePatient.setNativePlace(patientDetailModel.getNativePlace());
+                    updatePatient.setMartialStatus(patientDetailModel.getMartialStatus());
+                    updatePatient.setBirthday(patientDetailModel.getBirthday());
+                    updatePatient.setBirthPlaceInfo(patientDetailModel.getBirthPlaceInfo());
+                    updatePatient.setHomeAddressInfo(patientDetailModel.getHomeAddressInfo());
+                    updatePatient.setWorkAddressInfo(patientDetailModel.getWorkAddressInfo());
+                    updatePatient.setResidenceType(patientDetailModel.getResidenceType());
+                    //联系电话
+                    Map<String, String> telphoneNo = null;
+                    String tag = "联系电话";
+                    telphoneNo = toModel(updatePatient.getTelephoneNo(), Map.class);
+                    if (telphoneNo != null) {
+                        if (telphoneNo.containsKey(tag)) {
+                            telphoneNo.remove(tag);
+                        }
+                    } else {
+                        telphoneNo = new HashMap<String, String>();
                     }
-                }else{
-                    telphoneNo = new HashMap<String, String>();
-                }
-                telphoneNo.put(tag, patientDetailModel.getTelephoneNo());
-                updatePatient.setTelephoneNo(toJson(telphoneNo));
-                updatePatient.setEmail(patientDetailModel.getEmail());
+                    telphoneNo.put(tag, patientDetailModel.getTelephoneNo());
+                    updatePatient.setTelephoneNo(toJson(telphoneNo));
+                    updatePatient.setEmail(patientDetailModel.getEmail());
 
-                params.add("patient_model_json_data", toJson(updatePatient));
-            }else{
+                    params.add("patient_model_json_data", toJson(updatePatient));
+                } else {
+                    result.setSuccessFlg(false);
+                    result.setErrorMsg(envelop.getErrorMsg());
+                    return result;
+                }
+            } else if (patientDialogType.equals("addPatient")) {
+                //联系电话
+                Map<String, String> telphoneNo = new HashMap<String, String>();
+                String tag = "联系电话";
+                telphoneNo.put(tag, patientDetailModel.getTelephoneNo());
+                patientDetailModel.setTelephoneNo(toJson(telphoneNo));
+                params.add("patientModelJsonData", toJson(patientDetailModel));
+            }
+            try {
+
+                if (StringUtils.isEmpty(patientDialogType)) {
+                    resultStr = templates.doPut(comUrl + url, params);
+                } else if (patientDialogType.equals("addPatient")) {
+                    resultStr = templates.doPost(comUrl + url, params);
+                }
+                result.setSuccessFlg(getEnvelop(resultStr).isSuccessFlg());
+                return result;
+            } catch (Exception e) {
                 result.setSuccessFlg(false);
-                result.setErrorMsg(envelop.getErrorMsg());
+                result.setErrorMsg(ErrorCode.SystemError.toString());
                 return result;
             }
-        }
-        try {
-            if (patientDialogType.equals("addPatient")) {
-                resultStr = templates.doPost(comUrl + url, params);
-            }else {
-                resultStr = templates.doPut(comUrl + url, params);
-            }
-            result.setSuccessFlg(getEnvelop(resultStr).isSuccessFlg());
-            return result;
-        } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result;
-        }
 //        //String patientData = request.getParameter("patientJsonData");
 //        String patientData = URLDecoder.decode(patientJsonData,"UTF-8");
 //
@@ -280,6 +289,10 @@ public class PatientController extends BaseUIController {
 //        }
 //        result.setObj(data);
 //        return result.toJson();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
     @RequestMapping("resetPass")
@@ -287,13 +300,14 @@ public class PatientController extends BaseUIController {
     public Object resetPass(String idCardNo) {
         String url = "/populations/password/";
         String resultStr = "";
-        Envelop result = new Envelop();;
+        Envelop result = new Envelop();
+        ;
         try {
             RestTemplates templates = new RestTemplates();
-            resultStr = templates.doPut(comUrl+url+idCardNo,null);
-            if(Boolean.parseBoolean(resultStr)){
+            resultStr = templates.doPut(comUrl + url + idCardNo, null);
+            if (Boolean.parseBoolean(resultStr)) {
                 result.setSuccessFlg(true);
-            }else{
+            } else {
                 result.setSuccessFlg(false);
             }
             return result;
@@ -392,9 +406,10 @@ public class PatientController extends BaseUIController {
     /**
      * 注：因直接访问文件路径，无法显示文件信息
      * 将文件路径解析成字节流，通过字节流的方式读取文件
+     *
      * @param request
      * @param response
-     * @param localImgPath       文件路径
+     * @param localImgPath 文件路径
      * @throws Exception
      */
     @RequestMapping("showImage")
@@ -417,7 +432,7 @@ public class PatientController extends BaseUIController {
             byte[] buffer = new byte[1024 * 1024];
             while ((count = fis.read(buffer)) != -1)
                 os.write(buffer, 0, count);
-                os.flush();
+            os.flush();
         } catch (IOException e) {
 //            LogService.getLogger(PatientController.class).error(e.getMessage());
         } finally {
