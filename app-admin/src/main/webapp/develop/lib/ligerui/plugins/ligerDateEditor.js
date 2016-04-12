@@ -90,8 +90,7 @@
             dateeditorHTML += "            </tbody>";
             dateeditorHTML += "        </table>";
             dateeditorHTML += "        <ul class='l-box-dateeditor-monthselector'><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ul>";
-            dateeditorHTML += "        <ul class='l-box-dateeditor-yearselector'><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ul>";
-            dateeditorHTML += "        <ul class='l-box-dateeditor-hourselector'><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ul>";
+            dateeditorHTML += "        <select class='l-box-dateeditor-yearselector' size=10 style='overflow-y: auto;'></select>";
             dateeditorHTML += "        <ul class='l-box-dateeditor-minuteselector'><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ul>";
             dateeditorHTML += "    </div>";
             dateeditorHTML += "    <div class='l-box-dateeditor-toolbar'>";
@@ -299,18 +298,32 @@
             g.buttons.btnYear.click(function ()
             {
                 //build year list
+                /*if (!g.body.yearselector.is(":visible"))
+                 {
+                 $("li", g.body.yearselector).each(function (i, item)
+                 {
+                 var currentYear = g.currentDate.year + (i - 4);
+                 if (currentYear == g.currentDate.year)
+                 $(this).addClass("l-selected");
+                 else
+                 $(this).removeClass("l-selected");
+                 $(this).html(currentYear);
+                 });
+                 }*/
+                /* ******************TODO 时间空间年选则改成下拉列表开始****************************** */
                 if (!g.body.yearselector.is(":visible"))
                 {
-                    $("li", g.body.yearselector).each(function (i, item)
-                    {
-                        var currentYear = g.currentDate.year + (i - 4);
-                        if (currentYear == g.currentDate.year)
-                            $(this).addClass("l-selected");
-                        else
-                            $(this).removeClass("l-selected");
-                        $(this).html(currentYear);
-                    });
+                    var opthtml='';
+                    for(i=g.currentDate.year-50;i<=g.currentDate.year+50;i++){
+                        opthtml+="<option value="+i+">"+i+"</option>";
+                    }
+                    $(g.body.yearselector).html(opthtml);
+                    setTimeout(function(){
+                        $(g.body.yearselector).find("option[value="+g.currentDate.year+"]").attr('selected',true)
+                    },500);
+
                 }
+                /* ******************TODO 时间空间年选则改成下拉列表结束****************************** */
 
                 g.body.yearselector.slideToggle();
             });
@@ -318,12 +331,20 @@
             {
                 $(this).slideUp();
             });
-            $("li", g.body.yearselector).click(function ()
+            /* $("li", g.body.yearselector).click(function ()
+             {
+             g.currentDate.year = parseInt($(this).html());
+             g.body.yearselector.slideToggle();
+             g.bulidContent();
+             });*/
+            /* ******************TODO 时间空间年选则改成下拉列表开始****************************** */
+            $(g.body.yearselector).change(function ()
             {
-                g.currentDate.year = parseInt($(this).html());
+                g.currentDate.year = parseInt($(this).find("option:selected").html());
                 g.body.yearselector.slideToggle();
                 g.bulidContent();
             });
+            /* ******************TODO 时间空间年选则改成下拉列表结束****************************** */
             //select month
             g.buttons.btnMonth.click(function ()
             {
