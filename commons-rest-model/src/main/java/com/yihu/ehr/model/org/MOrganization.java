@@ -1,7 +1,12 @@
 package com.yihu.ehr.model.org;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 机构,由 XOrgManager 创建并维护.
@@ -24,6 +29,7 @@ public class MOrganization implements Serializable{
     private Date createDate;        // 创建日期
     private String location;        // 地址
     private int activityFlag;
+    private String tags;
 
     public MOrganization() {
     }
@@ -116,6 +122,23 @@ public class MOrganization implements Serializable{
 
     public void setActivityFlag(int activityFlag) {
         this.activityFlag = activityFlag;
+    }
+
+    public List<String> getTags() {
+        List<String> list = new ArrayList<>();
+        if(org.springframework.util.StringUtils.isEmpty(tags)){
+        }else {
+            String[] arr = tags.split(";|；");
+            list = Arrays.asList(arr);
+        }
+        return list;
+    }
+    public void setTags(List<String> tags) {
+        if(tags.size()>0){
+            this.tags = StringUtils.join(tags.toArray(),";");
+        }else {
+            this.tags = "";
+        }
     }
 
 }

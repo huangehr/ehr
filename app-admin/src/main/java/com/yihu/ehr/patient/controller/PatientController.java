@@ -1,6 +1,4 @@
 package com.yihu.ehr.patient.controller;
-
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import com.yihu.ehr.agModel.patient.PatientDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.Envelop;
