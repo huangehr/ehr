@@ -6,10 +6,13 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
+import com.yihu.ehr.util.RestTemplates;
 import com.yihu.ehr.util.log.LogService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -162,18 +165,20 @@ public class UserController {
         String url = "/users/";
         String resultStr = "";
         Envelop envelop = new Envelop();
-        Map<String, Object> params = new HashMap<>();
+//        Map<String, Object> params = new HashMap<>();
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         ObjectMapper mapper = new ObjectMapper();
+        RestTemplates templates = new RestTemplates();
 
         String userJsonDataModel = URLDecoder.decode(userModelJsonData,"UTF-8");
         UserDetailModel userDetailModel = mapper.readValue(userJsonDataModel, UserDetailModel.class);
 
-        params.put("user_json_data", userJsonDataModel);
+        params.add("user_json_data", userJsonDataModel);
 
         try {
             if (!StringUtils.isEmpty(userDetailModel.getId())) {
                 //修改
-                String getUser = HttpClientUtil.doGet(comUrl + "/users/admin/"+userDetailModel.getId(), params, username, password);
+                String getUser = templates.doGet(comUrl + "/users/admin/"+userDetailModel.getId());
                 envelop = mapper.readValue(getUser,Envelop.class);
                 String userJsonModel = mapper.writeValueAsString(envelop.getObj());
                 UserDetailModel userModel = mapper.readValue(userJsonModel,UserDetailModel.class);
@@ -191,11 +196,11 @@ public class UserController {
                 }
 
                 userJsonDataModel = mapper.writeValueAsString(userModel);
-                params.put("user_json_data", userJsonDataModel);
+                params.add("user_json_data", userJsonDataModel);
 
-                resultStr = HttpClientUtil.doPut(comUrl + url, params, username, password);
+                resultStr = templates.doPut(comUrl + url, params);
             }else{
-                resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
+                resultStr = templates.doPost(comUrl + url, params);
             }
         } catch (Exception e) {
             envelop.setSuccessFlg(false);

@@ -206,7 +206,6 @@
                         }
                     });
                      var jsonData = JSON.stringify(values)+";"+patientDialogType;
-//                     values.patientDialogType = patientDialogType;
                     if(picHtml == 0){
                         updatePatient(jsonData);
 //                        updatePatient(JSON.stringify(values));

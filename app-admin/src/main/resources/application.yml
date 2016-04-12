@@ -42,6 +42,8 @@ service-gateway:
   versionurl: http://172.19.103.75:10000/api/v1.0/admin/version
   cdatypeurl: http://172.19.103.75:10000/api/v1.0/admin/cda_type
   stdsourceurl: http://172.19.103.75:10000/api/v1.0/admin/standard_source
+  adaption: http://172.19.103.73:10150/api/v1.0/adapter
+
 
 fast-dfs:
   tracker-server: 172.19.103.13:22122
