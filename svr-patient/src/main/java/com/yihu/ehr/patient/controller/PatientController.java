@@ -220,15 +220,14 @@ public class PatientController extends BaseRestController {
         if(jsonData == null){
             return null;
         }
-        String[] file = jsonData.split("%3A");
-//        Map<String, String> map = toEntity(URLDecoder.decode(jsonData, "UTF-8"), Map.class);
+        String date = URLDecoder.decode(jsonData,"UTF-8");
 
-        byte[] b = Base64.decode(file[1].substring(0,file[1].length()-1));
-//        byte[] b = Base64.decode(map.get("inputStream"));
-        String pictureName = file[0];
+        String[] fileStreams = date.split(",");
+        String is = URLDecoder.decode(fileStreams[0],"UTF-8").replace(" ","+");
+        byte[] in = Base64.decode(is);
+
+        String pictureName = fileStreams[1].substring(0,fileStreams[1].length()-1);
         String fileExtension = pictureName.substring(pictureName.lastIndexOf(".") + 1).toLowerCase();
-//        String pictureName = map.get("imageName");
-//        String fileExtension = pictureName.substring(pictureName.lastIndexOf(".") + 1).toLowerCase();
         String description = null;
         if ((pictureName != null) && (pictureName.length() > 0)) {
             int dot = pictureName.lastIndexOf('.');
@@ -238,21 +237,18 @@ public class PatientController extends BaseRestController {
         }
         String path = null;
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream(new File("C:\\Users\\wq\\AppData\\Local\\Temp\\patientImages\\M00\\00\\"+pictureName));
-            fileOutputStream.write(b);
-            fileOutputStream.flush();
-            fileOutputStream.close();
-            InputStream inputStream = new ByteArrayInputStream(b);
+
+//            FileOutputStream fileOutputStream = new FileOutputStream(new File("F:\\m\\"+pictureName));
+//            fileOutputStream.write(in);
+//            fileOutputStream.flush();
+//            fileOutputStream.close();
+
+            InputStream inputStream = new ByteArrayInputStream(in);
             ObjectNode objectNode = fastDFSUtil.upload(inputStream, fileExtension, description);
             String groupName = objectNode.get("groupName").toString();
             String remoteFileName = objectNode.get("remoteFileName").toString();
-//            path = "{'groupName':'" + groupName + "','remoteFileName':'" + remoteFileName + "'}";
             path = "{\"groupName\":" + groupName + ",\"remoteFileName\":" + remoteFileName + "}";
-//            Map<String,String> mapPath = new HashMap<>();
-//            mapPath.put("groupName",groupName);
-//            mapPath.put("remoteFileName",remoteFileName);
-//            JSONObject jsonObject = new JSONObject(mapPath);
-//            path = jsonObject.toString();
+
         } catch (Exception e) {
             LogService.getLogger(DemographicInfo.class).error("人口头像图片上传失败；错误代码："+e);
         }

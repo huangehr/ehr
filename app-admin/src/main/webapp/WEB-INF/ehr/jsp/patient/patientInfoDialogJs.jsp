@@ -66,7 +66,7 @@
                         extensions: 'gif,jpg,jpeg,bmp,png',
                         mimeTypes: 'image/*'
                     },
-                    /*formData:{msg:"upload"},*/
+//                    formData:{msg:"upload"},
                     auto: false,
                     async:false
                 });
@@ -205,17 +205,20 @@
                             street: workAddressList.names[3] || null
                         }
                     });
+                     var jsonData = JSON.stringify(values)+";"+patientDialogType;
+//                     values.patientDialogType = patientDialogType;
                     if(picHtml == 0){
-                        updatePatient(JSON.stringify(values));
+                        updatePatient(jsonData);
+//                        updatePatient(JSON.stringify(values));
                     }else{
                         var upload = self.$patientImgUpload.instance;
                         var image = upload.getFiles().length;
                         if(image){
-                            upload.options.formData.patientJsonData =   encodeURIComponent(JSON.stringify(values));
+                            upload.options.formData.patientJsonData =   encodeURIComponent(jsonData);
                             upload.upload();
                             win.parent.patientDialogRefresh();
                         }else{
-                            updatePatient(JSON.stringify(values));
+                            updatePatient(jsonData);
                         }
                     }
                   }else{
