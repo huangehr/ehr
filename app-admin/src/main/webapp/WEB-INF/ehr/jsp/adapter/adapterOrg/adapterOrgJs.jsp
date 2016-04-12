@@ -113,7 +113,7 @@
               { display: '操作', name: 'operator', width: '12%', render: function (row) {
 				  var html ='<div class="grid_edit"  style="margin-left: 20px;cursor:pointer;"  title="维护" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:manager", row.code,'manager') + '"></div>'
 						  +'<div class="grid_edit"  style="margin-left: 60px;margin-top:-22px;cursor:pointer;" title="修改"' +
-						  ' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}])", "adapter:adapterInfo:open", row.code,'modify') + '"></div>'
+						  ' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:open", row.code,'modify') + '"></div>'
 						  +'<div class="grid_delete"  style="margin-left: 100px;cursor:pointer;" title="删除"' +
 						  ' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:del", row.code,'del') + '"></div>';
 //                var html = '<a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","adapter:adapterInfo:manager", row.code,'manager')+'">维护 /</a>' +

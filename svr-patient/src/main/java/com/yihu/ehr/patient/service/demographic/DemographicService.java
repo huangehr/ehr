@@ -99,7 +99,7 @@ public class DemographicService {
         String district = (String) args.get("district");
         boolean addressNotNull=(!StringUtils.isEmpty(province) || !StringUtils.isEmpty(city) || !StringUtils.isEmpty(district));
         List<String> homeAddressIdList = null;
-        String hql = "from DemographicInfo where 1=1";
+        String hql = "select count(*) from DemographicInfo where 1=1";
         if (!StringUtils.isEmpty(search)) {
             hql += " and ((id like :search) or (name like :search))";
         }
@@ -114,7 +114,7 @@ public class DemographicService {
         if (addressNotNull) {
             query.setParameterList("homeAddressIdList", homeAddressIdList);
         }
-        return query.list().size();
+        return ((Long)query.list().get(0)).intValue();
     }
 
     public Boolean isNullAddress(MGeography address) throws JsonProcessingException {

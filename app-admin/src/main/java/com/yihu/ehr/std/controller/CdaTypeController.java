@@ -58,12 +58,17 @@ public class CdaTypeController extends BaseUIController{
     @RequestMapping("getTreeGridData")
     @ResponseBody
     //获取TreeData 用于初始页面显示嵌套model
-    public Object getTreeGridData() {
+    public Object getTreeGridData(String codeName) {
         Envelop envelop = new Envelop();
         String url = "/cda_types/cda_types_tree";
         String strResult = "";
+        if (StringUtils.isEmpty(codeName)){
+            codeName = "";
+        }
         try{
-            strResult = HttpClientUtil.doGet(comUrl+url,username,password);
+            Map<String,Object> params = new HashMap<>();
+            params.put("code_name",codeName);
+            strResult = HttpClientUtil.doGet(comUrl+url,params,username,password);
             return strResult;
         }catch(Exception ex){
             LogService.getLogger(CdaTypeController.class).error(ex.getMessage());
@@ -77,11 +82,14 @@ public class CdaTypeController extends BaseUIController{
     @ResponseBody
     public Object GetCdaTypeList(String strKey, Integer page, Integer rows) {
         Envelop envelop = new Envelop();
-        String url = "/cda_types";
+        String url = "/cda_types/no_paging";
+        String filters = "";
+        if(!StringUtils.isEmpty(strKey)){
+            filters = "code?"+strKey+" g1;name?"+strKey+" g1;";
+        }
         try{
             Map<String,Object> params = new HashMap<>();
-            params.put("code","");
-            params.put("name","");
+            params.put("filters",filters);
             String _rus = HttpClientUtil.doGet(comUrl+url,params,username,password);
             return _rus;
         }catch (Exception ex){
@@ -212,13 +220,13 @@ public class CdaTypeController extends BaseUIController{
         try{
             //新增cda类别是获取的是所有类别
             if(StringUtils.isEmpty(strId)){
-                String urlGetAll = "/cda_types";
-                if(StringUtils.isEmpty(codeName)){
-                    codeName = "";
+                String urlGetAll = "/cda_types/no_paging";
+                String filters = "";
+                if(!StringUtils.isEmpty(codeName)){
+                    filters = "code?"+codeName+" g1;name?"+codeName+" g1;";
                 }
                 Map<String,Object> params = new HashMap<>();
-                params.put("code",codeName);
-                params.put("name",codeName);
+                params.put("filters",filters);
                 String envelopStr = HttpClientUtil.doGet(comUrl+urlGetAll,params,username,password);
                 return envelopStr;
             }
@@ -260,4 +268,27 @@ public class CdaTypeController extends BaseUIController{
         return envelop;
     }
 
+
+    /**
+     * 删除cda类别前先判断是否有关联的cda文档
+     * @param ids
+     * @return
+     */
+    @RequestMapping("isExitRelativeCDA")
+    @ResponseBody
+    public Object isExitRelativeCDA(String ids){
+        Envelop envelop = new Envelop();
+        String url = "/isExitRelativeCDA";
+        try{
+            Map<String,Object> params = new HashMap<>();
+            params.put("ids",ids);
+            String envelopStr = HttpClientUtil.doGet(comUrl+url,params,username,password);
+            return envelopStr;
+        }catch (Exception ex){
+            LogService.getLogger(CdaTypeController.class).error(ex.getMessage());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            return envelop;
+        }
+    }
 }

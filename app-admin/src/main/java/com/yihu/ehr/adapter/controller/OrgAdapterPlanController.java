@@ -6,6 +6,7 @@ import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.RestTemplates;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
@@ -23,7 +24,8 @@ import java.util.Map;
 @Controller
 @RequestMapping("/adapter")
 public class OrgAdapterPlanController extends ExtendController<OrgAdapterPlanService> {
-
+    @Value("${service-gateway.adaption}")
+    public String adaptionUrl;
 
     public OrgAdapterPlanController() {
         this.init(
@@ -69,7 +71,7 @@ public class OrgAdapterPlanController extends ExtendController<OrgAdapterPlanSer
 
         try {
             customizeData = customizeData.replace("DataSet", "").replace("MetaData", "");
-            String url = "http://localhost:10000/api/v1.0/adapter/plan/adapterDataSet" ;
+            String url = adaptionUrl + "/plan/adapterDataSet" ;
             String resultStr = "";
             Envelop result = new Envelop();
             MultiValueMap<String,String> conditionMap = new LinkedMultiValueMap<String, String>();

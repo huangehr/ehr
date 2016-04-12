@@ -52,7 +52,7 @@ public class PatientsEndPoint {
             @ApiParam(name = "json", value = "患者人口学数据集")
             @RequestParam(value = "json", required = true) String patientInfo) throws IOException, ParseException {
         ObjectNode patientNode = (ObjectNode) objectMapper.readTree(patientInfo);
-        ProfileDataSet dataSet = dataSetResolver.parseJsonDataSet(patientNode, false);
+        ProfileDataSet dataSet = dataSetResolver.parseStructuredJsonDataSet(patientNode, false);
 
         for (String key : dataSet.getRecordKeys()) {
             Map<String, String> record = dataSet.getRecord(key);
