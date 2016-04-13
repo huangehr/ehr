@@ -169,7 +169,7 @@ public class ArchiveTplMgrController {
 //            tpl.setTitle(title);
 //            tpl.setCdaVersion(version);
 //            tpl.setOrg(orgCode);
-//            tpl.setCdaDocumentId(cdaType);
+//            tpl.setId(cdaType);
 //            tplManager.saveArchiveTpl(tpl);
 //            Result result = getSuccessResult(true);
 //            return result.toJson();
@@ -242,7 +242,7 @@ public class ArchiveTplMgrController {
 //            tplNew.setTitle(title);
 //            tplNew.setCdaVersion(version);
 //            tplNew.setOrg(orgCode);
-//            tplNew.setCdaDocumentId(cdaType);
+//            tplNew.setId(cdaType);
 //            tplManager.copyTemplate(id, tplNew);
 //            Result result = getSuccessResult(true);
 //            return result.toJson();

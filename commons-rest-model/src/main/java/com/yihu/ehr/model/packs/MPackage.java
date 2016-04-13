@@ -1,6 +1,7 @@
 package com.yihu.ehr.model.packs;
 
 import com.yihu.ehr.constants.ArchiveStatus;
+import org.apache.commons.lang.ObjectUtils;
 
 import java.io.Serializable;
 import java.util.Date;

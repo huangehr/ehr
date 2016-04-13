@@ -179,8 +179,9 @@ meta.json
 				"url": "/api/patient/patient_id=10295514&event_no=000622508",
 				"expiry_date": "2016-10-10 00:00:00"
 				"key_words": {
-					//key格式: 数据集.数据元
-					"key": "word"    
+					"key1": "word1",
+					"key2": "word2",
+					"key3": "word3"
 				},
 				"content":{
 					"mime_type": "application/msword",

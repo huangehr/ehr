@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 @Service
-public class DictEntryService extends BaseHbmService<IDictEntry>{
+public class DictEntryService extends BaseHbmService<BaseDictEntry>{
 	private final static String ENTITY_PRE = "com.yihu.ehr.standard.dict.service.DictEntry";
 
 	public Class getServiceEntity(String version){
@@ -32,7 +32,7 @@ public class DictEntryService extends BaseHbmService<IDictEntry>{
 		return CDAVersionUtil.getDictEntryTableName(version);
 	}
 
-	public boolean add(IDictEntry dictEntry, String version) {
+	public boolean add(BaseDictEntry dictEntry, String version) {
 		String sql =
 				"INSERT INTO " + getTaleName(version) +
 						"(code, value, dict_id, description, hash) " +
