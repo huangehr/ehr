@@ -97,21 +97,21 @@
 //									return '<div class="grid_edit"  style="margin-left: 20px;cursor:pointer;"  title="通过" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "appInfo:appInfoGrid:approved", row.id) + '"></div>'
 //											+'<div class="grid_delete"  style="margin-left: 60px;cursor:pointer;" title="否决"' +
 //											' onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "appInfo:appInfoGrid:reject", row.id) + '"></div>';
-                                    return '<a data-toggle="model"  class="checkPass" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","appInfo:appInfoGrid:approved", row.id)+'">'+'通过'+'</a> /' +
-                                            ' <a class="veto" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","appInfo:appInfoGrid:reject", row.id)+'">'+'否决'+'</a>'
+                                    return '<a data-toggle="model"  class="checkPass label_a" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","appInfo:appInfoGrid:approved", row.id)+'">'+'通过'+'</a> /' +
+                                            ' <a class="veto label_a" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","appInfo:appInfoGrid:reject", row.id)+'">'+'否决'+'</a>'
                                 } else if(Util.isStrEquals( row.status,'Approved')){
 //									return '<div class="grid_edit"  style="margin: 10px auto;cursor:pointer;"  title="禁用" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "appInfo:appInfoGrid:forbidden", row.id) + '"></div>'
-									return '<a data-toggle="model"  class="Forbidden" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","appInfo:appInfoGrid:forbidden", row.id)+'">'+'禁用'+'</a>'
+									return '<a data-toggle="model"  class="Forbidden label_a" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","appInfo:appInfoGrid:forbidden", row.id)+'">'+'禁用'+'</a>'
                                 }else if(Util.isStrEquals( row.status,'Forbidden')){
 //									return '<div class="grid_edit"  style="margin: 10px auto;cursor:pointer;"  title="开启" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "appInfo:appInfoGrid:open", row.id) + '"></div>'
-									return '<a data-toggle="model"  class="checkPass" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","appInfo:appInfoGrid:open", row.id)+'">'+'开启'+'</a>'
+									return '<a data-toggle="model"  class="checkPass label_a" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","appInfo:appInfoGrid:open", row.id)+'">'+'开启'+'</a>'
                                 }else if(Util.isStrEquals( row.status,'Reject')){
                                     return '无'
                                 }
                             }},
                             { display: '操作', name: 'operator', width: '10%', render: function (row) {
-								var html ='<div class="grid_edit"  style="margin: 10px auto;cursor:pointer;"  title="修改" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "app:appInfo:open", row.id,'modify') + '"></div>'
-//                                var html = '<a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","app:appInfo:open", row.id,'modify')+'">修改</a>' ;
+//								var html ='<div class="grid_edit"  style=""  title="编辑" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "app:appInfo:open", row.id,'modify') + '"></div>'
+                                var html = '<a class="grid_edit" href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","app:appInfo:open", row.id,'modify')+'"></a>' ;
                                 return html;
                             }}
                         ],

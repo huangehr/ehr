@@ -61,6 +61,12 @@
                 this.$form.attrScan();
                 if(mode !='new'){
                     var app = (JSON.parse('${app}')).obj;
+					var tags = '';
+					for(var i=0;i<app.tags.length;i++){
+						tags += (app.tags)[i]+';'
+					}
+					tags = tags.substring(0,tags.length-1);
+					app.tags = tags;
                     this.$form.Fields.fillValues({
                         name:app.name,
                         catalog: app.catalog,
