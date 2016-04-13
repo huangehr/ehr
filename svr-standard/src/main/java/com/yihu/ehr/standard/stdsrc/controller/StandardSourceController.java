@@ -27,7 +27,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "source", description = "标准来源", tags = {"标准来源"})
+@Api(value = "standard source", description = "标准来源服务")
 public class StandardSourceController extends ExtendController<MStdSource> {
 
     @Autowired
@@ -130,7 +130,7 @@ public class StandardSourceController extends ExtendController<MStdSource> {
     }
 
     @RequestMapping(value = RestApi.Standards.IsSourceCodeExist,method = RequestMethod.GET)
-    public boolean isCodeExist(@RequestParam(value="code")String code) throws Exception {
+    public boolean isCodeExist(@RequestParam(value="code")String code) throws ParseException {
 
         return stdSourceService.isSourceCodeExist(code);
     }

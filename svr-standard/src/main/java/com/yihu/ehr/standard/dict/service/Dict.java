@@ -7,6 +7,6 @@ package com.yihu.ehr.standard.dict.service;
  * @version 1.0
  * @created 2016.2.22
  */
-public class Dict extends IDict {
+public class Dict extends BaseDict {
 
 }

@@ -7,7 +7,7 @@
 //import com.yihu.ehr.standard.dict.controller.DictController;
 //import com.yihu.ehr.standard.dict.controller.DictEntryController;
 //import com.yihu.ehr.standard.dict.service.IDict;
-//import com.yihu.ehr.standard.dict.service.IDictEntry;
+//import com.yihu.ehr.standard.dict.service.BaseDictEntry;
 //import org.junit.FixMethodOrder;
 //import org.junit.Test;
 //import org.junit.runner.RunWith;
@@ -37,7 +37,7 @@
 //    @Test
 //    public void test() throws Exception{
 //        String  version = "000000000000";
-//        IDictEntry dictEntry = new IDictEntry();
+//        BaseDictEntry dictEntry = new BaseDictEntry();
 //        dictEntry.setCode("TESTSOUR");
 //        dictEntry.setDictId(1l);
 //        dictEntry.setValue("TESTvaa.0");

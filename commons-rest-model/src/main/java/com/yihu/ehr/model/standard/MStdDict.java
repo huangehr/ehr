@@ -25,7 +25,6 @@ public class MStdDict {
     String sourceId;
     String stdVersion;// 标准化版本
     int hashCode;
-    String OperationType;
     String innerVersion;
     int inStage;
 
@@ -100,14 +99,6 @@ public class MStdDict {
 
     public void setHashCode(int hashCode) {
         this.hashCode = hashCode;
-    }
-
-    public String getOperationType() {
-        return OperationType;
-    }
-
-    public void setOperationType(String operationType) {
-        OperationType = operationType;
     }
 
     public String getInnerVersion() {

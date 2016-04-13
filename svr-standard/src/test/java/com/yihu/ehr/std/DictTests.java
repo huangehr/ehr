@@ -35,7 +35,7 @@
 //    @Test
 //    public void test() throws Exception{
 //        String  version = "000000000000";
-//        IDict dict = new IDict();
+//        BaseDict dict = new BaseDict();
 //        dict.setCode("TESTSOUR");
 //        dict.setName("TESTSOUR");
 //        dict.setStdVersion("v1.0");

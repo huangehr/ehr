@@ -27,7 +27,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0)
 @RestController
-@Api(value = "CDAType", description = "CDAType管理", tags = {"CDAType管理"})
+@Api(value = "CDA Type", description = "CDA类别服务")
 public class CdaTypeController extends BaseRestController {
 
     @Autowired

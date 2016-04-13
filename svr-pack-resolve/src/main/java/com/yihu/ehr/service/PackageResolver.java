@@ -8,13 +8,16 @@ import com.yihu.ehr.extractor.ExtractorChain;
 import com.yihu.ehr.extractor.KeyDataExtractor;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.persist.DataSetResolverWithTranslator;
 import com.yihu.ehr.profile.*;
+import com.yihu.ehr.profile.core.DataSetTableOption;
+import com.yihu.ehr.profile.core.Profile;
+import com.yihu.ehr.profile.core.ProfileDataSet;
+import com.yihu.ehr.profile.core.QualifierTranslator;
+import com.yihu.ehr.profile.persist.DataSetResolverWithTranslator;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -115,9 +118,6 @@ public class PackageResolver {
         return profile;
     }
 
-
-
-
     /**
      * 结构化档案包解析JSON文件中的数据。
      * @param profile
@@ -127,11 +127,10 @@ public class PackageResolver {
     void structuredDataSetParse(Profile profile, File[] files,String folderName) throws ParseException, IOException {
         for (File file : files) {
             String lastName = folderName.substring(folderName.lastIndexOf("\\")+1);
-            //if (!file.getAbsolutePath().endsWith(JsonExt)) continue;
             ProfileDataSet dataSet = generateDataSet(file, lastName.equals(OriFolder) ? true :false);
 
             // 原始数据存储在表"数据集代码_ORIGIN"
-            String dataSetTable = lastName.equals(OriFolder) ? StdObjectQualifierTranslator.originDataTable(dataSet.getCode()) : dataSet.getCode();
+            String dataSetTable = lastName.equals(OriFolder) ? DataSetTableOption.originDataSetCode(dataSet.getCode()) : dataSet.getCode();
             profile.addDataSet(dataSetTable, dataSet);
             profile.setPatientId(dataSet.getPatientId());
             profile.setEventNo(dataSet.getEventNo());
@@ -320,27 +319,6 @@ public class PackageResolver {
         return documentFileList;
     }
 
-
-
-
-    /**
-     *
-     * @param iterator data的Iterator格式
-     * @param list   返回的数组
-     * @param jsonObject    data的JSONObject格式
-     * @return
-     */
-    public List<Map<String,Object>> JSONObject2List(Iterator iterator,List<Map<String,Object>> list,JSONObject jsonObject){
-        while (iterator.hasNext()) {
-            Map<String,Object> contentMap = new HashMap<>(); //解析单个content
-            String key = (String) iterator.next();
-            String value = jsonObject.getString(key);
-            contentMap.put(key,value);
-            list.add(contentMap);
-        }
-        return list;
-    }
-
     /**
      * 生产数据集
      * @param jsonFile
@@ -356,8 +334,6 @@ public class PackageResolver {
         ProfileDataSet dataSet = dataSetResolverWithTranslator.parseStructuredJsonDataSet(jsonNode, isOrigin);
         return dataSet;
     }
-
-
 
     /**
      * 根据此次的数据产生一个健康事件，并更新数据集的行ID.
