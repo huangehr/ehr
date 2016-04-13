@@ -1,5 +1,11 @@
 package com.yihu.ehr.agModel.org;
 
+import org.apache.commons.lang.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by yww on 2016/2/22.
  */
@@ -199,12 +205,21 @@ public class OrgDetailModel{
         this.tel = tel;
     }
 
-    public String getTags() {
-        return tags;
+    public List<String> getTags() {
+        List<String> list = new ArrayList<>();
+        if(org.springframework.util.StringUtils.isEmpty(tags)){
+        }else {
+            String[] arr = tags.split(";|；");
+            list = Arrays.asList(arr);
+        }
+        return list;
     }
-
-    public void setTags(String tags) {
-        this.tags = tags;
+    public void setTags(List<String> tags) {
+        if(tags.size()>0){
+            this.tags = StringUtils.join(tags.toArray(),";");
+        }else {
+            this.tags = "";
+        }
     }
 
     public String getPublicKey() {

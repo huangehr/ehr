@@ -55,8 +55,11 @@
                         <label><spring:message code="lbl.verify.dict"/><spring:message code="spe.colon"/></label>
                     </td>
                     <td class="td-left">
-                        <input type="text" id="criterionDict" class="validate-special-char" style="width: 227px;" placeholder="请选择检验字典"/>
+                        <%--<input type="text" id="criterionDict" class="validate-special-char" style="width: 227px;" placeholder="请选择检验字典"/>--%>
                         <%--<input id="metaDataDict"/>--%>
+                        <div class="l-text-wrapper m-form-control ">
+                            <input type="text" id="criterionDict" data-type="select" class="">
+                        </div>
                         <%--<select id="criterionDict" data-type="select" data-placeholder="请选择检验字典" data-attr-scan="dictId"></select>--%>
                     </td>
                     <td>
