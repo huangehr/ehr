@@ -603,8 +603,8 @@ set.elementAttr = {
             onSuccess: function () {
                 //set.elementAttr.dict_select.setValue(initValue);
                 $("#criterionDict").css({"width": 213, "height": 28});
-                $(".l-text-combobox").css({"width": 227});
-                $(".l-box-select-absolute").css({"width": 227});
+                $(".l-text-combobox").css({"width": 229});
+                $(".l-box-select-absolute").css({"width": 229});
             },
             onAfterSetData: function () {
 
