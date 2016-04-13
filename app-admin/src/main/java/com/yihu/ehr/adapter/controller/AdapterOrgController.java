@@ -397,6 +397,11 @@ public class AdapterOrgController extends BaseUIController {
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
 
+        if("2".equals(type))
+            type = "1,2,3";
+        else if("3".equals(type))
+            type = "1,3";
+
         String filters = "";
         if(!StringUtils.isEmpty(param)){
             filters+="name?"+param+" g1;";

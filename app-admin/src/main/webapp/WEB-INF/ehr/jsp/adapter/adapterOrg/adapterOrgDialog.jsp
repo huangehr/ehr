@@ -83,7 +83,7 @@
         </div>
     </div>
 
-    <div class="m-form-group">
+    <div class="m-form-group" id="parent_div" style="display: none">
         <label class="label_title">继承标准<spring:message code="spe.colon"/></label>
         <div class="l-text-wrapper m-form-control">
             <input type="text" id="inp_adapterorg_parent" data-type="select" class="" data-attr-scan="parent">
