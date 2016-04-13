@@ -35,12 +35,7 @@ public class MStdMetaData {
     boolean isHbasePrimaryKey;              // Hbase 主键字段
     String dictName;
     String dictCode;
-    String OperationType;
 
-
-    public MStdMetaData() {
-        this.OperationType = "";
-    }
 
     public long getDictId() {
         return dictId;
@@ -195,13 +190,5 @@ public class MStdMetaData {
 
     public void setDictName(String dictName) {
         this.dictName = dictName;
-    }
-
-    public String getOperationType() {
-        return OperationType;
-    }
-
-    public void setOperationType(String operationType) {
-        OperationType = operationType;
     }
 }

@@ -1,6 +1,7 @@
 package com.yihu.ehr.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.yihu.ehr.util.compress.Zipper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +25,10 @@ public class UtilConfiguration {
      */
     @Bean
     ObjectMapper objectMapper(){
-        return new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(SerializationFeature.WRITE_DATE_KEYS_AS_TIMESTAMPS, false);
+
+        return objectMapper;
     }
 
     /**

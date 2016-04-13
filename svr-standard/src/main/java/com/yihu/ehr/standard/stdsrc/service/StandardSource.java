@@ -33,12 +33,10 @@ public class StandardSource {
 
     private String sourceValue;
     private int hashCode;
-    private String OperationType;
 
     public StandardSource() {
         this.createDate = new Date();
         this.createUser = "Sys";
-        this.OperationType = "";
 
         Object objectID = new ObjectId(adminRegion, BizObject.StdProfile);
         this.id = objectID.toString();
@@ -130,14 +128,6 @@ public class StandardSource {
     }
     public void setHashCode(int hashCode){
         this.hashCode = hashCode;
-    }
-
-    @Transient
-    public String getOperationType() {
-        return this.OperationType;
-    }
-    public void setOperationType(String operationType) {
-        this.OperationType = operationType;
     }
 
     @Transient

@@ -4,7 +4,7 @@
 //import com.yihu.ehr.StandardServiceApp;
 //import com.yihu.ehr.model.standard.MStdMetaData;
 //import com.yihu.ehr.standard.datasets.controller.MetaDataController;
-//import com.yihu.ehr.standard.datasets.service.IMetaData;
+//import com.yihu.ehr.standard.datasets.service.BaseMetaData;
 //import org.junit.FixMethodOrder;
 //import org.junit.Test;
 //import org.junit.runner.RunWith;
@@ -33,7 +33,7 @@
 //    @Test
 //    public void test() throws Exception{
 //        String  version = "000000000000";
-//        IMetaData metaData = new IMetaData();
+//        BaseMetaData metaData = new BaseMetaData();
 //        metaData.setCode("TESTSOUR");
 //        metaData.setDictId(1l);
 //        metaData.setDataSetId(1l);

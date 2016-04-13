@@ -85,7 +85,7 @@
                         {name: '省份', code:'id',value:'name',url: '${contextRoot}/address/getParent', params: {level: '1'}},
                         {name: '城市', code:'id',value:'name',url: '${contextRoot}/address/getChildByParent'},
                         {
-                            name: '医院', code:'orgCode',value:'fullName',url: '${contextRoot}/address/getOrgs', beforeAjaxSend: function (ds, $options) {
+                            name: '医院', code:'organizationCode',value:'fullName',url: '${contextRoot}/address/getOrgs', beforeAjaxSend: function (ds, $options) {
                             var province = $options.eq(0).attr('title'),
                                     city = $options.eq(1).attr('title');
                             ds.params = $.extend({}, ds.params, {
@@ -181,7 +181,7 @@
                     var addUser = self.$form.Fields.getValues();
                    if(validator.validate()){
                         var organizationKeys = addUser.organization['keys'];
-//                        addUser.orgCode = organizationKeys[2];
+//                        addUser.organizationCode = organizationKeys[2];
 //                        addUser.orgName = addUser.organization['names'][2];
                     addUser.organization = organizationKeys[2];
                     if (userImgHtml == 0) {

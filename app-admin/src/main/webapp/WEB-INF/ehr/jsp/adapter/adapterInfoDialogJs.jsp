@@ -130,7 +130,6 @@
                 }
 
                 function searchOrg() {
-                    debugger
                     var p = {
                             type: types.getValue(),
                             version: versions.getValue(),
@@ -235,7 +234,6 @@
                 });
                 //新增映射机构
                 this.$addOrg.click(function () {
-                    //
                     var title = '新增第三方标准';
                     var code = '';
                     var mode = 'new';

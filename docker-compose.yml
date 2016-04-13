@@ -104,3 +104,15 @@ svr-esb:
    - svr-security
    - svr-patient
    - svr-user
+
+svr-resource:
+  image: svr-resource:ehr
+  ports:
+     - 10140:10140
+  links:
+   - discovery
+   - config
+   - svr-dict
+   - svr-geography
+   - svr-app
+   - svr-organization

@@ -14,6 +14,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -90,8 +91,8 @@ public class OrgMetaDataController extends BaseController {
                     && isExist){
                 return failed("数据元已存在!");
             }
-           // mOrgMetaData.setUpdateDate(new Date());
-            mOrgMetaData = orgMetaDataClient.updateOrgMetaData(objectMapper.writeValueAsString(mOrgMetaData));
+            BeanUtils.copyProperties(mOrgMetaData, orgMetaData, "id", "createDate", "createUser", "columnType", "columnLength", "sequence");
+            mOrgMetaData = orgMetaDataClient.updateOrgMetaData(objectMapper.writeValueAsString(orgMetaData));
         }
         detailModel = convertToOrgMetaDataDetailModel(mOrgMetaData);
         if (detailModel == null) {

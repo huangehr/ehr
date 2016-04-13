@@ -27,9 +27,23 @@ API列表
 
 ### 提取体征数据
 
-	GET /patient/profiles/search
+	GET /patient/health-profiles/physical_signs
 	
 **参数**
 
+<table>
+	<tr>
+		<td>名称</td>
+		<td>类型</td>
+		<td>描述</td>
+	</tr>
+	<tr>
+		<td>profiles</td>
+		<td>array</td>
+		<td>档案ID列表，以逗号分开</td>
+	</tr>
+</table>
+
 **返回值**
 
+康赛体征数据。

@@ -19,7 +19,6 @@ public class MStdDataSet {
     String name;
     String summary;
     String innerVersionId;
-    String OperationType;
 
     public long getId() {
         return id;
@@ -115,13 +114,5 @@ public class MStdDataSet {
 
     public void setInnerVersionId(String innerVersionId) {
         this.innerVersionId = innerVersionId;
-    }
-
-    public String getOperationType() {
-        return OperationType;
-    }
-
-    public void setOperationType(String operationType) {
-        OperationType = operationType;
     }
 }

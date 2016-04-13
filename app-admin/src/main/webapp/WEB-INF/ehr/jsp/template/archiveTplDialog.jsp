@@ -38,7 +38,7 @@
         <div class="m-form-control essential">
             <!--输入框带查询-->
             <input type="text" id="inp_org"  class="f-ml10 required  useTitle f-w238 validate-org-length"  data-type="comboSelect"
-				   required-title=<spring:message code="lbl.must.input"/>  data-attr-scan="orgCode" validate-org-length="请选择到医院一级！"/>
+				   required-title=<spring:message code="lbl.must.input"/>  data-attr-scan="organizationCode" validate-org-length="请选择到医院一级！"/>
         </div>
     </div>
 
