@@ -28,7 +28,7 @@
             <div class="f-w290 f-mt10">
                 <a class="f-fr s-c1 f-dn">忘记密码？ </a>
             </div>
-            <div class="f-tac s-c13">${failMsg}</div>
+            <div id="div_error_msg" class="f-tac s-c13">${failMsg}</div>
             <div class="f-mt5">
                 <a id="btn_login" class="btn btn-primary f-w290 f-mt10 f-fs16 f-fwb" >登录</a>
             </div>
