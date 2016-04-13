@@ -26,7 +26,10 @@ public interface SecurityClient {
     @ApiOperation(value = "获取用户Key", notes = "公-私钥用于与健康档案平台加密传输数据使用")
     MKey getUserKey(
             @ApiParam(name = "user_id", value = "用户名")
-            @PathVariable(value = "user_id") String userId);
+            @PathVariable(value = "user_id") String userId,
+            @ApiParam(name = "is_null", value = "key为空时不自动创建")
+            @RequestParam(value = "is_null", required = false) boolean isNull
+    );
 
     @RequestMapping(value = RestApi.Securities.UserKey, method = RequestMethod.POST)
     @ApiOperation(value = "为用户创建Key")

@@ -20,8 +20,10 @@ set.list = {
             {
                 display: '操作', isSort: false, width: '33%', render: function (rowdata, rowindex, value) {
 
-                var html = "<div class='grid_edit' onclick='set.list.updateSet(\"" + rowdata.id + "\")'></div> " +
-                    "<div class='grid_delete' onclick='set.list.deleteSet(\"" + rowdata.id + "\")'></div>";
+                var html = "<div class='grid_edit' style='' title='' onclick='set.list.updateSet(\"" + rowdata.id + "\")'></div> " +
+                    "<div class='grid_delete' style=''title='' onclick='set.list.deleteSet(\"" + rowdata.id + "\")'></div>";
+                //var html = "<div class='grid_edit' style='margin-left: 30px;cursor:pointer;' title='修改' onclick='set.list.updateSet(\"" + rowdata.id + "\")'></div> " +
+                //    "<div class='grid_delete' style='margin-left: 70px;cursor:pointer;'title='删除' onclick='set.list.deleteSet(\"" + rowdata.id + "\")'></div>";
                 return html;
             }
             }
@@ -34,8 +36,10 @@ set.list = {
             {display: '检验字典', name: 'dictName', align: 'left', width: '20%'},
             {
                 display: '操作', width: '15%', isSort: false, render: function (rowdata, rowindex, value) {
-                var html = "<a href='#' onclick='set.list.updateElement(\"" + rowdata.id + "\")'>修改 / </a>" +
-                    "<a href='#' onclick='set.list.deleteElement(\"" + rowdata.id + "\")'>删除</a>";
+                //var html = "<div class='grid_edit' style='' title='' onclick='set.list.updateElement(\"" + rowdata.id + "\")'></div> " +
+                //    "<div class='grid_delete' style='' title='' onclick='set.list.deleteElement(\"" + rowdata.id + "\")'></div>";
+                var html = "<a class='grid_edit' href='#' onclick='set.list.updateElement(\"" + rowdata.id + "\")'></a>" +
+                    "<a class='grid_delete' href='#' onclick='set.list.deleteElement(\"" + rowdata.id + "\")'></a>";
                 return html;
             }
             }

@@ -183,10 +183,17 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
     @RequestMapping(value = "/meta_data", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除适配关系", notes = "根据适配关系ID删除适配关系，批量删除时ID以逗号隔开")
     public Envelop deleteAdapterMetaData(
+            @ApiParam(name = "plan_id", value = "数据集id")
+            @RequestParam(value = "plan_id") long planId,
+            @ApiParam(name = "data_set_id", value = "数据集id")
+            @RequestParam(value = "data_set_id") long dataSetId,
             @ApiParam(name = "ids", value = "适配关系ID")
             @RequestParam(value = "ids") String ids) {
 
         try {
+            if(!adapterDataSetClient.isLeftMeta(planId, dataSetId, ids)){
+                return failed("至少保留一条适配数据!");
+            }
             ids = trimEnd(ids, ",");
             if (StringUtils.isEmpty(ids)) {
                 return failed("请选择需要删除的数据!");

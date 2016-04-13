@@ -100,21 +100,34 @@
                         },
                         columns: [
                             {display:'机构类型',name:'orgTypeName', width: '8%', align:"left"},
-                            {display:'机构代码',name:'organizationCode', width: '9%', align:"left"},
+                            {display:'机构代码',name:'orgCode', width: '9%', align:"left"},
                             {display:'机构全名',name:'fullName', width: '15%', align:"left"},
-                            {display:'联系人',name:'admin', width: '10%', align:"left"},
-                            {display:'联系方式',name:'tel', width: '10%', align:"left"},
+                            {display:'联系人',name:'admin', width: '8%', align:"left"},
+                            {display:'联系方式',name:'tel', width: '8%', align:"left"},
                             {display:'机构地址',name:'locationStrName', width: '20%', align:"left"},
-                            {display:'是否激活',name:'activityFlagName',width: '8%',isAllowHide: false},
+                            {display:'是否激活',name:'activityFlagName',width: '8%',isAllowHide: false,render:function(row){
+								var html = '';
+								if(row.activityFlag == 1){
+//									html +='<div class="grid_off" title="" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:activityFlg", row.orgCode,'1') + '"></div>';
+									html +='<a class="grid_off" title="" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:activityFlg", row.orgCode,'1') + '"></a>';
+
+								}else{
+//									html +='<div class="grid_on" title="" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:activityFlg", row.orgCode,'0') + '"></div>';
+									html +='<a class="grid_on" title="" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:activityFlg", row.orgCode,'0') + '"></a>';
+
+								}
+								return html;
+							}},
                             {display:'入驻方式',name:'settledWayName',width: '10%',isAllowHide: false},
-                            {display:'操作', name: 'operator', width: '10%', render: function (row) {
-                                var html = '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:modify", row.organizationCode,'modify') + '">编辑</a> / ';
-                                html += '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:del", row.organizationCode, 'del') + '">删除</a> /';
-                                if(row.activityFlag == 1){
-                                    html += '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:activityFlg", row.organizationCode, '1') + '">失效</a>';
-                                 }else{
-                                    html += '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:activityFlg", row.organizationCode, '0') + '">开启</a>';
-                                }
+                            {display:'操作', name: 'operator', width: '14%', render: function (row) {
+								var html = '';
+
+//								html +='<div class="grid_edit"  style="" title="编辑" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:modify", row.orgCode,'modify') + '"></div>'
+//										+'<div class="grid_delete"  style="" title="删除"' +
+//										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:del", row.orgCode,'del') + '"></div>';
+								html += '<a class="label_a" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:modify", row.orgCode,'modify') + '">模板配置</a>';
+								html += '<a class="grid_edit" style="margin-left:10px;" title="编辑" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:modify", row.orgCode,'modify') + '"></a>';
+                                html += '<a class="grid_delete" style="margin-left:0px;" title="删除" href="javascript:void(0)"  onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:del", row.orgCode, 'del') + '"></a>';
                                 return html;
                             }},
                             {name:'activityFlag',hide:true, align:"center"},
@@ -132,7 +145,7 @@
                                 url: '${contextRoot}/organization/dialog/orgInfo',
                                 load: true,
                                 urlParms: {
-                                    organizationCode: encodeURIComponent(row.organizationCode),
+                                    orgCode: encodeURIComponent(row.orgCode),
                                     mode:mode
                                 }
                             });
@@ -142,10 +155,10 @@
                     this.grid.adjustToWidth();
                     this.bindEvents();
                 },
-                activity: function (organizationCode,activityFlag) {
+                activity: function (orgCode,activityFlag) {
                     var dataModel = $.DataModel.init();
                     dataModel.createRemote('${contextRoot}/organization/activity',{
-                        data: {organizationCode:organizationCode,activityFlag:activityFlag},
+                        data: {orgCode:orgCode,activityFlag:activityFlag},
                         success:function(data){
                             if (data.successFlg) {
                                 master.reloadGrid();
@@ -164,9 +177,9 @@
 
                     reloadGrid.call(this, '${contextRoot}/organization/searchOrgs', values);
                 },
-                delRecord:function(organizationCode){
+                delRecord:function(orgCode){
                     var dataModel = $.DataModel.init();
-                    dataModel.updateRemote("${contextRoot}/organization/deleteOrg",{data:{organizationCode:organizationCode},
+                    dataModel.updateRemote("${contextRoot}/organization/deleteOrg",{data:{orgCode:orgCode},
                         success: function(data) {
                             if(data.successFlg){
                                 $.Notice.success('操作成功。');
@@ -178,8 +191,7 @@
                 },
                 bindEvents: function () {
                     var self = this;
-                    $.subscribe('org:orgInfoDialog:modify', function (event, organizationCode, mode) {
-						debugger
+                    $.subscribe('org:orgInfoDialog:modify', function (event, orgCode, mode) {
                         var title = '修改机构信息';
                             self.orgInfoDialog = $.ligerDialog.open({
                             isHidden: false,
@@ -189,23 +201,23 @@
                             url: '${contextRoot}/organization/dialog/orgInfo',
                             load: true,
                             urlParms: {
-                                organizationCode: encodeURIComponent(organizationCode),
+                                orgCode: encodeURIComponent(orgCode),
                                 mode:mode
                             }
                         });
                     });
-                    $.subscribe('org:orgInfoDialog:activityFlg', function (event, organizationCode, activityFlg) {
+                    $.subscribe('org:orgInfoDialog:activityFlg', function (event, orgCode, activityFlg) {
                         $.ligerDialog.confirm('确认修改该行信息？<br>如果是请点击确认按钮，否则请点击取消。',function(yes){
                             if(yes){
-                                self.activity(organizationCode,activityFlg);
+                                self.activity(orgCode,activityFlg);
                             }
                         });
 
                     });
-                    $.subscribe('org:orgInfoDialog:del', function (event, organizationCode, activityFlg) {
+                    $.subscribe('org:orgInfoDialog:del', function (event, orgCode, activityFlg) {
                         $.ligerDialog.confirm('确认删除该行信息？<br>如果是请点击确认按钮，否则请点击取消。',function(yes){
                             if(yes){
-                                self.delRecord(organizationCode);
+                                self.delRecord(orgCode);
                             }
                         });
 

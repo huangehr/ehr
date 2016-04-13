@@ -26,9 +26,12 @@ cda.list = {
             {
                 display: '操作', isSort: false, width: 180, render: function (rowdata, rowindex, value) {
 
-                var html = "<div class='grid_edit' onclick='cda.list.updateCdaInfo(\"" + rowdata.id + "\",\"btn_relationship\")'></div> " +
-                    "<div class='grid_edit' style='margin-left: 55px; margin-top: -22px;' onclick='cda.list.updateCdaInfo(\"" + rowdata.id + "\",\"btn_basic\")'></div> " +
-                    "<div class='grid_delete'style='margin-left: 90px;' onclick='cda.list.deleteCda(\"" + rowdata.id + "\")'></div>";
+                //var html = "<div class='grid_edit' style='' title='数据集关联' onclick='cda.list.updateCdaInfo(\"" + rowdata.id + "\",\"btn_relationship\")'></div> " +
+                //    "<div class='grid_edit' style='' title='编辑' onclick='cda.list.updateCdaInfo(\"" + rowdata.id + "\",\"btn_basic\")'></div> " +
+                //    "<div class='grid_delete' style='' title='删除' onclick='cda.list.deleteCda(\"" + rowdata.id + "\")'></div>";
+                var html = "<a class='label_a' title='关联' onclick='cda.list.updateCdaInfo(\"" + rowdata.id + "\",\"btn_relationship\")'>关联</a> " +
+                    "<a class='grid_edit' style='margin-left:10px;' title='编辑' onclick='cda.list.updateCdaInfo(\"" + rowdata.id + "\",\"btn_basic\")'></a> " +
+                    "<a class='grid_delete'style='' title='删除' onclick='cda.list.deleteCda(\"" + rowdata.id + "\")'></a>";
                 return html;
             }
             }
@@ -517,9 +520,8 @@ cda.attr = {
         var dataJson = eval("[" + cda.attr.cda_form.Fields.toJsonString() + "]");
         dataJson[0]["versionCode"] = versionCode;
         dataJson[0]["id"] = id;
-        dataJson[0]["user"] = user_id;
-        //todo ：fileGroup为测试参数，数据库的该字段设置成非空，需要修改允许为空
-        dataJson[0]["fileGroup"] = "group1";
+        debugger
+        //dataJson[0]["user"] = user_id;
 
         $.ajax({
             url: cda.list._url + "/cda/SaveCdaInfo",
@@ -550,8 +552,16 @@ cda.attr = {
 
         u.relationIds = "";
         for (var i = 0; i < u.top.list_dataset_storage.length; i++) {
-            u.relationIds += u.top.list_dataset_storage[i].id + ",";
+            var datasets = u.top.list_dataset_storage[i];
+            debugger
+            if(i == 0){
+                u.relationIds += datasets.id;
+            }else{
+                u.relationIds += ","+ datasets.id;
+            }
+            //u.relationIds += u.top.list_dataset_storage[i].id + ",";
         }
+        //u.relationIds=u.relationIds.substring(0,strSetId.length-1);
 
         var cdaId = $("#hdId").val();
         var strVersionCode = $("#hdversion").val();
@@ -568,7 +578,7 @@ cda.attr = {
                     }, null);
                 }
                 else {
-                    $.Notice.error(result.errorMsg);
+                    $.Notice.error("保存失败");
                 }
             }
         });

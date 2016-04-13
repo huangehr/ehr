@@ -9,11 +9,15 @@ import com.yihu.ehr.patient.service.demographic.DemographicId;
 import com.yihu.ehr.patient.service.demographic.DemographicInfo;
 import com.yihu.ehr.patient.service.demographic.DemographicService;
 import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.util.encode.Base64;
 import com.yihu.ehr.util.encode.HashUtil;
 import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
+import org.apache.commons.collections.map.HashedMap;
 import org.csource.common.MyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,13 +59,13 @@ public class PatientController extends BaseRestController {
     @ApiOperation(value = "根据条件查询人")
     public List<MDemographicInfo> searchPatient(
             @ApiParam(name = "search", value = "搜索内容", defaultValue = "")
-            @RequestParam(value = "search") String search,
-            @ApiParam(name = "province", value = "省", defaultValue = "")
-            @RequestParam(value = "province") String province,
-            @ApiParam(name = "city", value = "市", defaultValue = "")
-            @RequestParam(value = "city") String city,
-            @ApiParam(name = "district", value = "县", defaultValue = "")
-            @RequestParam(value = "district") String district,
+            @RequestParam(value = "search",required = false) String search,
+            @ApiParam(name = "home_province", value = "省", defaultValue = "")
+            @RequestParam(value = "home_province",required = false) String province,
+            @ApiParam(name = "home_city", value = "市", defaultValue = "")
+            @RequestParam(value = "home_city",required = false) String city,
+            @ApiParam(name = "home_district", value = "县", defaultValue = "")
+            @RequestParam(value = "home_district",required = false) String district,
             @ApiParam(name = "page", value = "当前页", defaultValue = "")
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
@@ -204,21 +209,24 @@ public class PatientController extends BaseRestController {
 
     /**
      * 人口信息头像图片上传
-     * @param inputStearmStr
-     * @param pictureName
      * @return
      * @throws IOException
      */
     @RequestMapping(value = "/populations/picture",method = RequestMethod.POST)
     @ApiOperation(value = "上传头像,把图片转成流的方式发送")
     public String uploadPicture(
-            @ApiParam(name = "input_stearm_str", value = "头像转化后的输入流")
-            @RequestParam(value = "input_stearm_str") String inputStearmStr ,
-            @ApiParam(name = "picture_name", value = "头像名称", defaultValue = "")
-            @RequestParam(value = "picture_name") String pictureName) throws IOException {
-        if(pictureName == null){
+            @ApiParam(name = "jsonData", value = "头像转化后的输入流")
+            @RequestBody String jsonData ) throws IOException {
+        if(jsonData == null){
             return null;
         }
+        String date = URLDecoder.decode(jsonData,"UTF-8");
+
+        String[] fileStreams = date.split(",");
+        String is = URLDecoder.decode(fileStreams[0],"UTF-8").replace(" ","+");
+        byte[] in = Base64.decode(is);
+
+        String pictureName = fileStreams[1].substring(0,fileStreams[1].length()-1);
         String fileExtension = pictureName.substring(pictureName.lastIndexOf(".") + 1).toLowerCase();
         String description = null;
         if ((pictureName != null) && (pictureName.length() > 0)) {
@@ -229,11 +237,18 @@ public class PatientController extends BaseRestController {
         }
         String path = null;
         try {
-            InputStream inputStream = new ByteArrayInputStream(inputStearmStr.getBytes());
+
+//            FileOutputStream fileOutputStream = new FileOutputStream(new File("F:\\m\\"+pictureName));
+//            fileOutputStream.write(in);
+//            fileOutputStream.flush();
+//            fileOutputStream.close();
+
+            InputStream inputStream = new ByteArrayInputStream(in);
             ObjectNode objectNode = fastDFSUtil.upload(inputStream, fileExtension, description);
             String groupName = objectNode.get("groupName").toString();
             String remoteFileName = objectNode.get("remoteFileName").toString();
-            path = "{groupName:" + groupName + ",remoteFileName:" + remoteFileName + "}";
+            path = "{\"groupName\":" + groupName + ",\"remoteFileName\":" + remoteFileName + "}";
+
         } catch (Exception e) {
             LogService.getLogger(DemographicInfo.class).error("人口头像图片上传失败；错误代码："+e);
         }

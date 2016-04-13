@@ -104,7 +104,9 @@
             var uniqueField = base.p.uniqueField,
                 storage = base.p.storage;
             for (var i = 0; i < storage.length; i++) {
-                if (storage[i].dataSetId == rowdata[uniqueField]) {
+                if (storage[i][uniqueField] == rowdata[uniqueField]) {
+                    storage[i].name = rowdata.name;
+                    storage[i].code = rowdata.code;
                     base.addItem(storage[i]);
                     return true;
                 }
@@ -126,7 +128,6 @@
             }
             // 判断
             if (checked) {
-                debugger
                 base.addItem(data);
                 base.pushData(data);
             }
@@ -137,6 +138,7 @@
             var strSetId = "";
             for(var i=0;i<base.p.storage.length;i++)
             {
+                //添加
                 strSetId+=base.p.storage[i].id+",";
             }
             strSetId=strSetId.substring(0,strSetId.length-1);
@@ -145,13 +147,11 @@
             }
         },
         onCheckAllRows: function (checked) {
-            debugger
             $("#pane-list-selected").empty();
             $("#pane-list-selected").addClass("changed");//取消是否提示
             base.p.storage.splice(0);
             //如果是全选
             if (checked) {
-                debugger
                 var rows = base.grid.getSelectedRows();
                 for (var i = 0; i < rows.length; i++) {
                     var curObj = rows[i];
@@ -172,7 +172,6 @@
             }
         },
         addItem: function (data) {
-            debugger;
             var jq_ul = $("#pane-list-selected");
             // var itemclass = data[base.p.uniqueField].replace("(", "_").replace(")", "_");
             var itemclass = data[base.p.uniqueField].toString().replace("(", "_").replace(")", "_");
@@ -201,7 +200,6 @@
                 .click(function () { $("#pane-list-selected").addClass("changed"); base.deleteItem($(this).data("data")); });
         },
         deleteItem: function (data) {
-            debugger
             var uniqueField = base.p.uniqueField,
                 storage = base.p.storage;
             // 移除grid中的勾选
@@ -292,12 +290,12 @@
                 { display: '数据集名称', name: 'name',  align: 'left' }
             ],
             get: function (key, callback) {
-                var url = webRoot + "/std/dataset/searchDataSets";
+                var url = webRoot + "/std/dataset/searchDataSetsWithoutPaging";
                 $.ajax({
                     url: url,
                     type:"post",
                     dataType:"json",
-                    data:{codename:key,version:versionCode,page:1,rows:0},
+                    data:{codename:key,version:versionCode},
                     success:function(data) {
                         if (data != null) {
                             var result = eval(data);

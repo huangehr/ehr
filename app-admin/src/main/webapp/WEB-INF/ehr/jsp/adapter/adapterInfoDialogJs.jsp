@@ -18,7 +18,7 @@
         var versions;
         var types;
         var adapterPlan = $.parseJSON('${model}');
-
+        var firstInit = true;
         /* ************************** 变量定义结束 **************************** */
 
         /* *************************** 函数定义 ******************************* */
@@ -75,19 +75,6 @@
                                 }
                                 searchParent();
                                 searchOrg();
-                                /*                    self.$org.ligerComboBox(
-                                 {
-                                 url: '
-                                ${contextRoot}/adapter/getOrgList',
-                                 valueField: 'code',
-                                 textField: 'value',
-                                 dataParmName: 'detailModelList',
-                                 urlParms: {
-                                 type: value,
-                                 version:versionValue
-                                 }
-                                 });*/
-
                             }
                         });
 
@@ -114,10 +101,7 @@
                                 searchOrg();
                             }
                         });
-                orgData = self.$org.ligerComboBox(
-                        {
-                            data: null
-                        });
+                searchOrg();
                 self.$parent.ligerComboBox(
                         {
                             data: null
@@ -136,7 +120,7 @@
                         code: adapterPlan.code,
                         name: adapterPlan.name,
                         version: adapterPlan.version,
-                        org: adapterPlan.org,
+//                        org: adapterPlan.org,
                         parentId: adapterPlan.parentId,
                         description: adapterPlan.description
                     });
@@ -144,19 +128,29 @@
                     self.$addOrg.hide();
                     self.$readonly.addClass("u-ui-readonly");
                 }
-                function searchOrg(msg) {
-                    self.$org.ligerComboBox(
-                        {
-                            url: '${contextRoot}/adapter/getOrgList',
-                            valueField: 'code',
-                            textField: 'name',
-                            dataParmName: 'detailModelList',
-                            urlParms: {
-                                type: types.getValue(),
-                                version: versions.getValue(),
-                                mode: mode
-                            }
-                        });
+
+                function searchOrg() {
+                    debugger
+                    var p = {
+                            type: types.getValue(),
+                            version: versions.getValue(),
+                            mode: mode};
+                    if(orgData){
+                        if(firstInit){
+                            orgData.reload(p);
+                            orgData.setValue(adapterPlan.org);
+                            orgData.setText(adapterPlan.orgValue);
+                            firstInit = false;
+                        }
+                        else
+                            orgData.reload(p);
+                    }
+                    else{
+                        orgData = self.$org.customCombo(
+                                '${contextRoot}/adapter/getOrgList', p, undefined, undefined, false);
+//                        orgData.setValue(adapterPlan.org);
+//                        orgData.setText(adapterPlan.orgValue);
+                    }
                 }
 
                 function searchParent() {
@@ -199,7 +193,7 @@
                         extParms: '{"isCover": "false"}'
                     }
                     var pv = self.$parent.ligerGetComboBoxManager().getValue();
-                    if (pv) {
+                    if (pv && mode=='new') {
                         var parent = self.$parent.ligerGetComboBoxManager().getSelected();
                         $.Notice.confirm("映射机构采集标准与复方案采集标准不一致，是否覆盖映射机构采集标准？", function (r) {
                             parms.extParms = '{"isCover":"' + r + '"}';
@@ -223,9 +217,8 @@
                                 //调用主页面接口，重新刷新Grid
                                 win.closePlanDialog("保存成功")
                             } else {
-                                if (data.errorMsg == 'codeNotUnique') {
-                                    $.Notice.error('该代码已存在，请重新填写代码！');
-                                }
+                                if (data.errorMsg)
+                                    $.Notice.error(data.errorMsg);
                                 else
                                     $.Notice.error('出错了！');
                             }
@@ -256,7 +249,8 @@
                         urlParms: {
                             code: code,
                             type: initType,
-                            mode: mode
+                            mode: mode,
+                            frm: "1"
                         },
                         isHidden: false,
                         opener: true,
@@ -277,20 +271,13 @@
                 $.Notice.success(msg);
         };
         win.adapterModel = function (adapterModel) {
-            debugger;
-            adapterInfo.$org.ligerComboBox(
-                    {
-                        url: '${contextRoot}/adapter/getOrgList',
-                        valueField: 'code',
-                        textField: 'value',
-                        dataParmName: 'detailModelList',
-                        urlParms: {
-                            type: adapterModel.type,
-                            version: versions.getValue()
-                        }
-                    });
+            orgData.reload({
+                type: adapterModel.type,
+                version: versions.getValue()
+            });
             types.setValue(adapterModel.type);
-            orgData.setValue(adapterModel.org);
+            orgData.setValue(adapterModel.code);
+            orgData.setText(adapterModel.name);
         }
         /* *************************** 页面初始化 **************************** */
 

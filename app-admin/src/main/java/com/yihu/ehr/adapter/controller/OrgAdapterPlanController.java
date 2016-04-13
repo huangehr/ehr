@@ -6,6 +6,7 @@ import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.RestTemplates;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
@@ -23,7 +24,8 @@ import java.util.Map;
 @Controller
 @RequestMapping("/adapter")
 public class OrgAdapterPlanController extends ExtendController<OrgAdapterPlanService> {
-
+    @Value("${service-gateway.adaption}")
+    public String adaptionUrl;
 
     public OrgAdapterPlanController() {
         this.init(
@@ -69,7 +71,7 @@ public class OrgAdapterPlanController extends ExtendController<OrgAdapterPlanSer
 
         try {
             customizeData = customizeData.replace("DataSet", "").replace("MetaData", "");
-            String url = "http://localhost:10000/api/v1.0/adapter/plan/adapterDataSet" ;
+            String url = adaptionUrl + "/plan/adapterDataSet" ;
             String resultStr = "";
             Envelop result = new Envelop();
             MultiValueMap<String,String> conditionMap = new LinkedMultiValueMap<String, String>();
@@ -111,12 +113,15 @@ public class OrgAdapterPlanController extends ExtendController<OrgAdapterPlanSer
 
     @RequestMapping("/getOrgList")
     @ResponseBody
-    public Object getOrgList(String type, String version, String mode) {
+    public Object getOrgList(String type, String version, String mode, String searchParm, int page, int rows) {
 
         try {
+            if(!"notVersion".equals(version) && (StringUtils.isEmpty(type) || StringUtils.isEmpty(version)))
+                return new Envelop();
+
             String adapterOrgs = "";
             if(!"modify".equals(mode)){
-                String rs =service.search(new PageParms("version=" + version));
+                String rs =service.search(new PageParms().addEqual("version", version));
                 Envelop envelop = getEnvelop(rs);
                 if(!envelop.isSuccessFlg())
                     return systemError();
@@ -129,11 +134,12 @@ public class OrgAdapterPlanController extends ExtendController<OrgAdapterPlanSer
             }
 
             String url = "/adapterOrg/orgs";
-            PageParms pageParms = new PageParms(
-                    StringUtils.isEmpty(type) ? "" : "type=" + type
-                    + (adapterOrgs.length()>0 ? ";org<>" + adapterOrgs.substring(1) :"") );
+            PageParms pageParms = new PageParms(rows, page)
+                    .addEqualNotNull("type", type)
+                    .addNotEqualNotNull("org", adapterOrgs.length()>0 ? adapterOrgs.substring(1) : "")
+                    .addLikeNotNull("name", searchParm);
             String resultStr = service.search(url, pageParms);
-            return resultStr;
+            return formatComboData(resultStr, "code", "name");
         } catch (Exception e) {
             return systemError();
         }

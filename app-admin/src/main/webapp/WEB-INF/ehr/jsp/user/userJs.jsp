@@ -94,23 +94,27 @@
                             {display: '所属机构', name: 'organizationName', width: '17%',align:'left'},
                             {display: '联系方式', name: 'telephone',width: '12%',align:'left'},
                             {display: '用户邮箱', name: 'email', width: '12%', resizable: true,align:'left'},
-                            {display: '是否激活', name: 'activated', width: '5%', minColumnWidth: 20,render:function(value){
-                                return value.activated == true ? "是":"否"
+                            {display: '是否生/失效', name: 'activated', width: '8%', minColumnWidth: 20,render:function(row){
+								var html ='';
+								if(Util.isStrEquals(row.activated,true)){
+//										html +='<div class="grid_on"  onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:failure", row.id,0) + '"></div>';
+									html+= '<a class="grid_on" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:failure", row.id,0) + '"></a>';
+								}else if(Util.isStrEquals(row.activated,false)){
+//										html +='<div class="grid_off" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:failure", row.id,1) + '"></div>';
+									html+='<a class="grid_off" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:failure", row.id,1) + '"></a>';
+								}
+								return html;
                             }},
-                            {display: '最近登录时间', name: 'lastLoginTime', width: '12%',align:'left'},
+							{display: '最近登录时间', name: 'lastLoginTime', width: '12%',align:'left'},
                             {
-                                display: '操作', name: 'operator', width: '12%', render: function (row) {
-                                var html = '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:open", row.id, 'modify') + '">编辑</a> / ';
-                                    html+= '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoDialog:del", row.id, 'delete') + '">删除</a> / ';
-                                    if(Util.isStrEquals(row.activated,true)){
-                                           html+= '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:failure", row.id,0) + '">失效</a>';
-                                       }else if(Util.isStrEquals(row.activated,false)){
-                                           html+='<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:failure", row.id,1) + '">开启</a>';
-                                       }
-
+                                display: '操作', name: 'operator', width: '10%', render: function (row) {
+//								var html ='<div class="grid_edit"    title="编辑" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:open", row.id,'modify') + '"></div>'
+//										+'<div class="grid_delete"   title="删除"' +
+//										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoDialog:del", row.id,'delete') + '"></div>';
+                                var html = '<a class="grid_edit" style="" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:open", row.id, 'modify') + '"></a>';
+                                    html+= '<a class="grid_delete" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoDialog:del", row.id, 'delete') + '"></a>';
                                 return html;
-                            }
-                            }
+							}}
                         ],
                         enabledEdit: true,
                         validate: true,

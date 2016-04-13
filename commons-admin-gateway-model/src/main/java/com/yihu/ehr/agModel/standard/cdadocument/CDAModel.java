@@ -1,32 +1,41 @@
 package com.yihu.ehr.agModel.standard.cdadocument;
 
+import java.util.Date;
+
 /**
  * Created by AndyCai on 2016/2/29.
  */
 public class CDAModel {
 
-    private String id;
-
     private String code;
 
-    private String name;
+    private Date createDate;
 
     private String createUser;
 
     private String description;
 
+    private String id;
+
+    private String name;
+
+    private Date updateDate;
+
+    private String updateUser;
+
     private String versionCode;
 
-    private String sourceId;
-
-    private String type;
-
-    private String user;
+    private String printOut;
 
     private String schema;
 
+    private String sourceId;
+
+    private int hashCode;
+
     private String fileGroup;
 
+    private String operationType;
 
     public String getCode() {
         return code;
@@ -34,6 +43,14 @@ public class CDAModel {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
     }
 
     public String getCreateUser() {
@@ -68,6 +85,22 @@ public class CDAModel {
         this.name = name;
     }
 
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
+
+    public String getUpdateUser() {
+        return updateUser;
+    }
+
+    public void setUpdateUser(String updateUser) {
+        this.updateUser = updateUser;
+    }
+
     public String getVersionCode() {
         return versionCode;
     }
@@ -76,28 +109,12 @@ public class CDAModel {
         this.versionCode = versionCode;
     }
 
-    public String getSourceId() {
-        return sourceId;
+    public String getPrintOut() {
+        return printOut;
     }
 
-    public void setSourceId(String sourceId) {
-        this.sourceId = sourceId;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
+    public void setPrintOut(String printOut) {
+        this.printOut = printOut;
     }
 
     public String getSchema() {
@@ -108,11 +125,35 @@ public class CDAModel {
         this.schema = schema;
     }
 
+    public String getSourceId() {
+        return sourceId;
+    }
+
+    public void setSourceId(String sourceId) {
+        this.sourceId = sourceId;
+    }
+
+    public int getHashCode() {
+        return hashCode;
+    }
+
+    public void setHashCode(int hashCode) {
+        this.hashCode = hashCode;
+    }
+
     public String getFileGroup() {
         return fileGroup;
     }
 
     public void setFileGroup(String fileGroup) {
         this.fileGroup = fileGroup;
+    }
+
+    public String getOperationType() {
+        return operationType;
+    }
+
+    public void setOperationType(String operationType) {
+        this.operationType = operationType;
     }
 }

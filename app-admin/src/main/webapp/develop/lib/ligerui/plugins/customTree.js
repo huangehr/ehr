@@ -119,7 +119,6 @@
      * @returns {boolean}
      */
     treePrototype.f_onFromTreeCheck = function (options) {
-        debugger;
         var fromTree = options.fromTree; //来源树对象（ligerTree对象）
         var toTree = options.toTree; //目标树对象
         var fromFlag = options.fromFlag; //来源树特殊标志 如：（id="std987",fromFlag="std"）
@@ -127,6 +126,8 @@
         var from = $(options.checkNodeItem); //来源树勾选的内容
         var toTarget = options.toTarget; //目标节点id
         var checked = options.checked;
+        var fromFlagReg = new RegExp(fromFlag,"g");
+        debugger;
         //来源树到目标树节点生成
         for (var i = 0; i < from.length; i++) {
             data = from[i].data;
@@ -136,114 +137,112 @@
                 if (data.pid == "-1") {//根节点
                     if (!checked) {//全选未选中
                         if (fromTree.getData().length > 0) {//删除右树所有节点，包含根节点
-                            var firstId = fromTree.getData()[0].id.replace(new RegExp(fromFlag,"g"), toFlag);
+                            var firstId = fromTree.getData()[0].id.replace(fromFlagReg, toFlag);
                             var liArr = $("#" + firstId).find("li");
                             toTree.remove($("#" + firstId));//删除所有节点
                         }
                         return false;
                     }
-                    for (var k = 0; k < childrenNode.length; k++) {
-                        if ($('#' + childrenNode[k].id.replace(new RegExp(fromFlag,"g"), toFlag)).length == 0) {//说明元素不存在，则新增
-                            dom = $('#' + childrenNode[k].pid.replace(new RegExp(fromFlag,"g"), toFlag), toTarget)[0];//子节点的父节点dom
-                            if(dom==undefined){
-                                dom = $("#mCSB_2_container")[0];
-                                toTreeData = [{id: data.id.replace(new RegExp(fromFlag,"g"), toFlag), pid: data.pid, text:data.text,ischecked:checked}]; //添加树节点的实际data
-                                toTree.append(dom, toTreeData); //添加树节点
-                                dom = $('#' + data.id.replace(new RegExp(fromFlag,"g"), toFlag), toTarget)[0];//父节点的父节点dom
-                            }
 
-                            toTreeData = [{id: childrenNode[k].id.replace(new RegExp(fromFlag,"g"), toFlag), pid: childrenNode[k].pid.replace(new RegExp(fromFlag,"g"), toFlag), text: childrenNode[k].text,ischecked:checked}]; //添加树节点的实际data
-                            toTree.append(dom, toTreeData); //添加树节点
-                        }
-                        thirdNode = childrenNode[k].children == null ? "" : childrenNode[k].children;//获取子节点数据
-                        for (var j = 0; j < thirdNode.length; j++) {
-                            if ($('#' + thirdNode[j].id.replace(new RegExp(fromFlag,"g"), toFlag)).length == 0) {//说明元素不存在，则新增
-                                dom = $('#' + thirdNode[j].pid.replace(new RegExp(fromFlag,"g"), toFlag), toTarget)[0];//子节点的父节点dom
-                                toTreeData = [{id: thirdNode[j].id.replace(new RegExp(fromFlag,"g"), toFlag), pid: thirdNode[j].pid.replace(new RegExp(fromFlag,"g"), toFlag), text: thirdNode[j].text,ischecked:checked}]; //添加树节点的实际data
-                                toTree.append(dom, toTreeData); //添加树节点
-                            }
+                    dom = $('#' + data.id.replace(fromFlagReg, toFlag), toTarget)[0];//根节点
+                    if(dom==undefined){
+                        dom = $("#mCSB_2_container")[0];
+                        toTreeData = [{id: data.id.replace(fromFlagReg, toFlag), pid: "-1", text:  $($("#"+data.id).find(".l-body")[0]).find("span").text(),ischecked:checked}]; //添加树节点的实际data
+                        toTree.append(dom, toTreeData); //添加树节点
+                        dom = $('#' + data.id.replace(fromFlagReg, toFlag), toTarget)[0];//父节点的父节点dom
+                    }
+                    else
+                        toTree.clear(dom);
+                    var fromData = fromTree.getData()[0].children;
+                    var toData = [];
+                    function replaceFlag(data){
+                        var d;
+                        for(var o=0; o<data.length; o++){
+                            d = data[o];
+                            toData.push({
+                                id: d.id.replace(fromFlagReg, toFlag),
+                                ischecked: checked,
+                                pid: d.pid.replace(fromFlagReg, toFlag),
+                                text: d.text});
+
+                            if(d.children)
+                                replaceFlag(d.children);
                         }
                     }
+                    replaceFlag(fromData);
+                    toTree.append(dom, toData); //添加树节点
                 } else {//不是根节点，但是该节点下可能有子节点
                     if (checked) {
-                        if ($('#' + data.id.replace(new RegExp(fromFlag,"g"), toFlag)).length == 0) {//说明元素不存在，则新增
-                            dom = $('#' + data.pid.replace(new RegExp(fromFlag,"g"), toFlag), toTarget)[0];//父节点的父节点dom
+                        if ($('#' + data.id.replace(fromFlagReg, toFlag)).length == 0) {//说明元素不存在，则新增
+                            dom = $('#' + data.pid.replace(fromFlagReg, toFlag), toTarget)[0];//父节点的父节点dom
                             if(dom==undefined){
                                 dom = $("#mCSB_2_container")[0];
-                                toTreeData = [{id: data.pid.replace(new RegExp(fromFlag,"g"), toFlag), pid: "-1", text:  $($("#"+data.pid).find(".l-body")[0]).find("span").text(),ischecked:checked}]; //添加树节点的实际data
+                                toTreeData = [{id: data.pid.replace(fromFlagReg, toFlag), pid: "-1", text:  $($("#"+data.pid).find(".l-body")[0]).find("span").text(),ischecked:checked}]; //添加树节点的实际data
                                 toTree.append(dom, toTreeData); //添加树节点
-                                dom = $('#' + data.pid.replace(new RegExp(fromFlag,"g"), toFlag), toTarget)[0];//父节点的父节点dom
+                                dom = $('#' + data.pid.replace(fromFlagReg, toFlag), toTarget)[0];//父节点的父节点dom
                             }
-                            toTreeData = [{id: data.id.replace(new RegExp(fromFlag,"g"), toFlag), pid: data.pid.replace(new RegExp(fromFlag,"g"), toFlag), text: data.text,ischecked:checked}]; //添加树节点的实际data
-                            toTree.append(dom, toTreeData); //添加树节点
+                            toTreeData = [{id: data.id.replace(fromFlagReg, toFlag), pid: data.pid.replace(fromFlagReg, toFlag), text: data.text,ischecked:checked}]; //添加树节点的实际data
+
+                            for (var k = 0; k < childrenNode.length; k++) {
+                                toTreeData.push({id: childrenNode[k].id.replace(fromFlagReg, toFlag), pid: childrenNode[k].pid.replace(fromFlagReg, toFlag), text: childrenNode[k].text,ischecked:checked});
+                            }
+                            //toTree.append(dom, toTreeData); //添加树节点
+                        }else if(childrenNode && childrenNode.length>0){
+                            dom = $('#' + data.id.replace(fromFlagReg, toFlag))[0];
+                            toTreeData = [];
+                            for (var k = 0; k < childrenNode.length; k++) {
+                                if( $('#' + childrenNode[k].id.replace(fromFlagReg, toFlag)).length==0)
+                                    toTreeData.push({id: childrenNode[k].id.replace(fromFlagReg, toFlag), pid: childrenNode[k].pid.replace(fromFlagReg, toFlag), text: childrenNode[k].text,ischecked:checked});
+                            }
                         }
+                        toTree.append(dom, toTreeData); //添加树节点
                     } else {
-                        toTree.remove($('#' + data.id.replace(new RegExp(fromFlag,"g"), toFlag)));//删除节点
-                        if($($('#' + data.pid.replace(new RegExp(fromFlag,"g"), toFlag)).find(".l-children")[0]).find("li").length==0){
-                            toTree.remove($('#' + data.pid.replace(new RegExp(fromFlag,"g"), toFlag)))//删除根节点
-                        }
-                    }
-                    for (var k = 0; k < childrenNode.length; k++) {
-                        if (checked) {
-                            if ($('#' + childrenNode[k].id.replace(new RegExp(fromFlag,"g"), toFlag)).length == 0) {//说明元素不存在,且选中节点，则新增
-                                dom = $('#' + childrenNode[k].pid.replace(new RegExp(fromFlag,"g"), toFlag), toTarget)[0];//子节点的父节点dom
-                                toTreeData = [{id: childrenNode[k].id.replace(new RegExp(fromFlag,"g"), toFlag), pid: childrenNode[k].pid.replace(new RegExp(fromFlag,"g"), toFlag), text: childrenNode[k].text,ischecked:checked}]; //添加树节点的实际data
-                                toTree.append(dom, toTreeData); //添加树节点
-                            }
-                        } else {
-                            toTree.remove($('#' + childrenNode[k].id.replace(new RegExp(fromFlag,"g"), toFlag)));//删除节点
+                        toTree.remove($('#' + data.id.replace(fromFlagReg, toFlag)));//删除节点
+                        if($($('#' + data.pid.replace(fromFlagReg, toFlag)).find(".l-children")[0]).find("li").length==0){
+                            toTree.remove($('#' + data.pid.replace(fromFlagReg, toFlag)))//删除根节点
                         }
                     }
                 }
-
             } else {//单个节点
                 pid = data.pid;
                 if(pid=="-1"){
                     return false;
                 }
-                dom = $('#' + pid.replace(new RegExp(fromFlag,"g"), toFlag), toTarget)[0]; //父节点dom
+                dom = $('#' + pid.replace(fromFlagReg, toFlag), toTarget)[0]; //父节点dom
                 //父节点是否存在,不存在要创建
                 if (dom == null) {
                     var parentData = fromTree.getDataByID(pid); //父节点的data
-                    if ($('#' + parentData.id.replace(new RegExp(fromFlag,"g"), toFlag)).length == 0 && checked) {//说明元素不存在,且选中节点，则新增
-                        var parentDom = $('#' + parentData.pid.replace(new RegExp(fromFlag,"g"), toFlag), toTarget)[0]; //父节点的父节点dom
+                    if ($('#' + parentData.id.replace(fromFlagReg, toFlag)).length == 0 && checked) {//说明元素不存在,且选中节点，则新增
+                        var parentDom = $('#' + parentData.pid.replace(fromFlagReg, toFlag), toTarget)[0]; //父节点的父节点dom
                         if(parentDom==undefined){
                             parentDom = $("#mCSB_2_container")[0];
-                            toTreeData = [{id: $("#"+data.pid).parent().parent().attr("id").replace(new RegExp(fromFlag,"g"), toFlag), pid: -1, text:  $($("#"+$("#"+data.pid).parent().parent().attr("id")).find(".l-body")[0]).find("span").text(),ischecked:checked}]; //添加根节点
+                            toTreeData = [{id: $("#"+data.pid).parent().parent().attr("id").replace(fromFlagReg, toFlag), pid: -1, text:  $($("#"+$("#"+data.pid).parent().parent().attr("id")).find(".l-body")[0]).find("span").text(),ischecked:checked}]; //添加根节点
                             toTree.append(parentDom, toTreeData); //添加树节点
-                            parentDom = $('#' + $("#"+data.pid).parent().parent().attr("id").replace(new RegExp(fromFlag,"g"), toFlag), toTarget)[0];//根节点dom
+                            parentDom = $('#' + $("#"+data.pid).parent().parent().attr("id").replace(fromFlagReg, toFlag), toTarget)[0];//根节点dom
                         }
-                        toTreeData = [{id: parentData.id.replace(new RegExp(fromFlag,"g"), toFlag), pid: parentData.pid.replace(new RegExp(fromFlag,"g"), toFlag), text: parentData.text,ischecked:checked}]; //父节点要添加的实际data
+                        toTreeData = [{id: parentData.id.replace(fromFlagReg, toFlag), pid: parentData.pid.replace(fromFlagReg, toFlag), text: parentData.text,ischecked:checked}]; //父节点要添加的实际data
                         toTree.append(parentDom, toTreeData); //添加父节点
-                        dom = $('#' + pid.replace(new RegExp(fromFlag,"g"), toFlag), toTarget)[0]; //提供父节点的dom
+                        dom = $('#' + pid.replace(fromFlagReg, toFlag), toTarget)[0]; //提供父节点的dom
                     } else {//不选中，则移除节点
-                        toTree.remove($('#' + parentData.id.replace(new RegExp(fromFlag,"g"), toFlag)));//删除节点
+                        toTree.remove($('#' + parentData.id.replace(fromFlagReg, toFlag)));//删除节点
                     }
                 }
-                if ($('#' + data.id.replace(new RegExp(fromFlag,"g"), toFlag)).length == 0 && checked) {//说明元素不存在，则新增
-                    toTreeData = [{id: data.id.replace(new RegExp(fromFlag,"g"), toFlag), pid: pid.replace(new RegExp(fromFlag,"g"), toFlag), text: data.text,ischecked:checked}]; //添加树节点的实际data
+                if ($('#' + data.id.replace(fromFlagReg, toFlag)).length == 0 && checked) {//说明元素不存在，则新增
+                    toTreeData = [{id: data.id.replace(fromFlagReg, toFlag), pid: pid.replace(fromFlagReg, toFlag), text: data.text,ischecked:checked}]; //添加树节点的实际data
                     toTree.append(dom, toTreeData); //添加树节点
                 } else {//不选中，则移除节点
-                    if ($('#' + data.pid.replace(new RegExp(fromFlag,"g"), toFlag)).find(".l-children").find("li").length <= 1) {//父节点下只有一个子节点，则删除父节点和子节点
-                        toTree.remove($('#' + data.pid.replace(new RegExp(fromFlag,"g"), toFlag)));//删除父节点
-                        toTree.remove($('#' + data.id.replace(new RegExp(fromFlag,"g"), toFlag)));//删除子节点
+                    if ($('#' + data.pid.replace(fromFlagReg, toFlag)).find(".l-children").find("li").length <= 1) {//父节点下只有一个子节点，则删除父节点和子节点
+                        toTree.remove($('#' + data.pid.replace(fromFlagReg, toFlag)));//删除父节点
+                        toTree.remove($('#' + data.id.replace(fromFlagReg, toFlag)));//删除子节点
                     } else {
-                        toTree.remove($('#' + data.id.replace(new RegExp(fromFlag,"g"), toFlag)));//删除子节点
+                        toTree.remove($('#' + data.id.replace(fromFlagReg, toFlag)));//删除子节点
                     }
-                    if ($("#" + fromTree.getData()[0].id.replace(new RegExp(fromFlag,"g"), toFlag)).find(".l-children").find("li").length == 0) {
-                        $($('#' + fromTree.getData()[0].id.replace(new RegExp(fromFlag,"g"), toFlag)).find(".l-body").find("div")[1]).removeClass("l-checkbox-checked").addClass("l-checkbox-unchecked");//不选中根节点复选框
+                    if ($("#" + fromTree.getData()[0].id.replace(fromFlagReg, toFlag)).find(".l-children").find("li").length == 0) {
+                        $($('#' + fromTree.getData()[0].id.replace(fromFlagReg, toFlag)).find(".l-body").find("div")[1]).removeClass("l-checkbox-checked").addClass("l-checkbox-unchecked");//不选中根节点复选框
                     }
                 }
             }
         }
-        if (fromTree.getData().length > 0 && fromTree.getData()[0].pid == "-1" && $("#" + fromTree.getData()[0].id.replace(new RegExp(fromFlag,"g"), toFlag)).find(".l-children").find("li").length > 0) {//触发右树全选节点
-            var firstId = fromTree.getData()[0].id.replace(new RegExp(fromFlag,"g"), toFlag);
-            $($("#" + firstId).find(".l-body")[0]).find(".l-checkbox").removeClass("l-checkbox-checked").addClass("l-checkbox-unchecked");
-            $($("#" + firstId).find(".l-body")[0]).find(".l-checkbox").trigger("click");
-        }
-        //刷新树
-        fromTree.refreshTree();
-        toTree.refreshTree();
     }
 
     /**
@@ -260,6 +259,7 @@
         var toNode = $(options.checkNodeItem); //来源树勾选的内容
         var node = options.checkNodeItem;
         var checked = options.checked;
+        var fromFlagReg = new RegExp(fromFlag,"g");
 
         if (!checked) {
             if (toNode.length > 0) {
@@ -267,62 +267,59 @@
                 if (data.pid == "-1") {//根节点
                     childrenNode = data.children;//获取根节点的下一级节点
                     for (var k = 0; k < childrenNode.length; k++) {
-                        $($('#' + childrenNode[k].id.replace(new RegExp(fromFlag,"g"), toFlag)).find(".l-body").find("div")[2]).removeClass("l-checkbox-checked").addClass("l-checkbox-unchecked");//不选中根节点复选框
-                        toTree.remove($('#' + childrenNode[k].id));//删除节点
+                        $($('#' + childrenNode[k].id.replace(fromFlagReg, toFlag)).find(".l-body").find("div")[2]).removeClass("l-checkbox-checked l-checkbox-incomplete").addClass("l-checkbox-unchecked");//不选中根节点复选框
+                        //toTree.remove($('#' + childrenNode[k].id));//删除节点
                         thirdNode = childrenNode[k].children == null ? "" : childrenNode[k].children;//获取下级节点的子节点
                         for (var j = 0; j < thirdNode.length; j++) {
-                            $($('#' + thirdNode[j].id.replace(new RegExp(fromFlag,"g"), toFlag)).find(".l-body").find("div")[3]).removeClass("l-checkbox-checked").addClass("l-checkbox-unchecked");//不选中根节点复选框
-                            toTree.remove($('#' + thirdNode[j].id));//删除节点
+                            $($('#' + thirdNode[j].id.replace(fromFlagReg, toFlag)).find(".l-body").find("div")[3]).removeClass("l-checkbox-checked").addClass("l-checkbox-unchecked");//不选中根节点复选框
+                            //toTree.remove($('#' + thirdNode[j].id));//删除节点
                         }
                     }
                     toTree.remove($("#" + data.id));//删除目标树根节点
-                    $($("#" + data.id.replace(new RegExp(fromFlag,"g"), toFlag)).find(".l-body").find("div")[1]).removeClass("l-checkbox-checked").addClass("l-checkbox-unchecked");//去除来源树根节点的复选框
+                    $($("#" + data.id.replace(fromFlagReg, toFlag)).find(".l-body").find("div")[1]).removeClass("l-checkbox-checked l-checkbox-incomplete").addClass("l-checkbox-unchecked");//去除来源树根节点的复选框
                 } else {//子节点
-                    if ($(node.target).attr("outlinelevel") == "2" && $("#" + data.id.replace(new RegExp(fromFlag,"g"), toFlag)).find(".l-children").find("li").length == 0) {//根节点下的子节点，没有子节点
-                        $($('#' + data.id.replace(new RegExp(fromFlag,"g"), toFlag)).find(".l-body").find("div")[2]).removeClass("l-checkbox-checked").addClass("l-checkbox-unchecked");
+                    if ($(node.target).attr("outlinelevel") == "2" && $("#" + data.id.replace(fromFlagReg, toFlag)).find(".l-children").find("li").length == 0) {//根节点下的子节点，没有子节点
+                        $($('#' + data.id.replace(fromFlagReg, toFlag)).find(".l-body").find("div")[2]).removeClass("l-checkbox-checked l-checkbox-incomplete").addClass("l-checkbox-unchecked");
                         toTree.remove(node.target);
                     } else {//根节点下的子节点，再有子节点
+                        var toTreeRoot = toTree.getParentTreeItem(node, 1);
                         toTree.remove(node.target);
                         if (data.children == null) {//单个节点
+                            $($('#' + data.id.replace(fromFlagReg, toFlag)).find(".l-body").find("div")[3]).removeClass("l-checkbox-checked").addClass("l-checkbox-unchecked");//移除来源选择状态
                             if ($("#" + data.pid).find(".l-children").find("li").length == 0) {//目标树下只有一个节点是，父节点也要删除掉
-                                $($('#' + $("#"+data.pid).parent().parent().attr("id").replace(new RegExp(fromFlag,"g"), toFlag)).find(".l-body").find("div")[4]).removeClass("l-checkbox-incomplete");;//移除来源树该节点的半选择状态
+                                $($("#"+data.pid.replace(fromFlagReg, toFlag)).find(".l-body").find("div")[2]).removeClass("l-checkbox-incomplete").addClass("l-checkbox-unchecked");//移除来源树该节点的半选择状态
                                 if($("#"+data.pid).parent().parent().find("li").length == 1){
                                     toTree.remove($("#"+$("#"+data.pid).parent().parent().attr("id")));//删除根节点
                                 }
                                 toTree.remove($('#' + data.pid));
-                            }
-
-                            $($('#' + data.id.replace(new RegExp(fromFlag,"g"), toFlag)).find(".l-body").find("div")[3]).removeClass("l-checkbox-checked").addClass("l-checkbox-unchecked");
-                            $($('#' + data.pid.replace(new RegExp(fromFlag,"g"), toFlag)).find(".l-body").find("div")[2]).removeClass("l-checkbox-checked").addClass("l-checkbox-unchecked");
-                            if ($(".l-checkbox-checked", $($('#' + data.pid.replace(new RegExp(fromFlag,"g"), toFlag)).find(".l-body").find("div")[2])).length == 0) {
-                                $($('#' + data.pid.replace(new RegExp(fromFlag,"g"), toFlag)).find(".l-body").find("div")[2]).removeClass("l-checkbox-incomplete");//移除来源树该节点父节点的半选择状态
+                            }else{
+                                $($('#' + data.pid).find(".l-body").find("div")[2]).removeClass("l-checkbox-incomplete").addClass("l-checkbox-checked");//移除父节点半选状态
+                                $($('#' + data.pid.replace(fromFlagReg, toFlag)).find(".l-body").find("div")[2]).removeClass("l-checkbox-checked").addClass("l-checkbox-incomplete");//添加来源父节点半选状态
                             }
                         } else {
-                            $($('#' + data.id.replace(new RegExp(fromFlag,"g"), toFlag)).find(".l-body").find("div")[2]).removeClass("l-checkbox-checked").addClass("l-checkbox-unchecked");
-                            if ($(".l-checkbox-checked", $($('#' + data.id.replace(new RegExp(fromFlag,"g"), toFlag)).find(".l-body").find("div")[2])).length == 0) {
-                                $($('#' + data.id.replace(new RegExp(fromFlag,"g"), toFlag)).find(".l-body").find("div")[2]).removeClass("l-checkbox-incomplete");;//移除来源树该节点的半选择状态
+                            $($('#' + data.id.replace(fromFlagReg, toFlag)).find(".l-body").find("div")[2]).removeClass("l-checkbox-checked").addClass("l-checkbox-unchecked");
+                            if ($(".l-checkbox-checked", $($('#' + data.id.replace(fromFlagReg, toFlag)).find(".l-body").find("div")[2])).length == 0) {
+                                $($('#' + data.id.replace(fromFlagReg, toFlag)).find(".l-body").find("div")[2]).removeClass("l-checkbox-incomplete");;//移除来源树该节点的半选择状态
                             }
                             childrenNode = data.children == null ? "" : data.children;//获取子节点数据
                             for (var k = 0; k < childrenNode.length; k++) {
-                                $($('#' + childrenNode[k].id.replace(new RegExp(fromFlag,"g"), toFlag)).find(".l-body").find("div")[3]).removeClass("l-checkbox-checked").addClass("l-checkbox-unchecked");//不选中根节点复选框
+                                $($('#' + childrenNode[k].id.replace(fromFlagReg, toFlag)).find(".l-body").find("div")[3]).removeClass("l-checkbox-checked").addClass("l-checkbox-unchecked");//不选中根节点复选框
                             }
                             if($($('#' + data.pid).find(".l-children")[0]).find("li").length==0){
                                 toTree.remove($('#' + data.pid));
                             }
-                            $($('#' + data.id.replace(new RegExp(fromFlag,"g"), toFlag)).find(".l-body").find("div")[1]).removeClass("l-checkbox-incomplete");;//移除来源树该节点的半选择状态
+                            $($('#' + data.id.replace(fromFlagReg, toFlag)).find(".l-body").find("div")[1]).removeClass("l-checkbox-incomplete");;//移除来源树该节点的半选择状态
+                        }
+                        $( $(toTreeRoot).find(".l-body:eq(0)").find("div:eq(1)")).removeClass("l-checkbox-incomplete").addClass("l-checkbox-checked");//移除根节点半选状态
+                        var fromTreeToot = $("#" + toTreeRoot.id.replace(fromFlagReg, toFlag));
+                        var fromTreeRootCheckBox = $($(fromTreeToot).find(".l-body:eq(0)").find("div:eq(1)"));
+                        if($(".l-checkbox-checked", fromTreeToot).length>0){//确认半选状态
+                            fromTreeRootCheckBox.removeClass("l-checkbox-checked").addClass("l-checkbox-incomplete");
+                        }else{
+                            fromTreeRootCheckBox.removeClass("l-checkbox-incomplete l-checkbox-checked").addClass("l-checkbox-unchecked");
                         }
                     }
                 }
-
-                if (fromTree.getData().length > 0 && fromTree.getData()[0].pid == "-1") {//移除来源树根节点的半选择状态
-                    var firstId = fromTree.getData()[0].id.replace(new RegExp(fromFlag,"g"), toFlag);
-                    if ($(".l-checkbox-checked", $($("#" + firstId).find(".l-body")[0]).find(".l-checkbox")).length == 0) {
-                        $($("#" + firstId).find(".l-body")[0]).find(".l-checkbox").removeClass("l-checkbox-incomplete").addClass("l-checkbox-unchecked");
-                    }
-                }
-                //刷新树
-                fromTree.refreshTree();
-                toTree.refreshTree();
             }
         }
     }
@@ -330,6 +327,11 @@
     //判断字符串是否为空
     function isStrEmpty(str) {
         return str == null || !str || typeof str == undefined || str == '';
+    }
+
+    function isJson(obj){
+
+        return typeof(obj) == "object" && Object.prototype.toString.call(obj).toLowerCase() == "[object object]" && !obj.length;
     }
 
 })(window, jQuery);

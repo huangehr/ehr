@@ -44,7 +44,7 @@ public class SecurityController extends BaseController{
         Envelop envelop = new Envelop();
 
         MUser mUser = userClient.getUserByUserName(loginCode);
-        MKey mKey = securityClient.getUserKey(mUser.getId());
+        MKey mKey = securityClient.getUserKey(mUser.getId(),true);
         UserSecurityModel userSecurityModel = convertToUserSecurityModel(mKey);
 
         if(mKey != null){
@@ -101,7 +101,7 @@ public class SecurityController extends BaseController{
 
         Envelop envelop = new Envelop();
 
-        MKey mKey = securityClient.getUserKey(userId);
+        MKey mKey = securityClient.getUserKey(userId,true);
         UserSecurityModel userSecurityModel = convertToUserSecurityModel(mKey);
 
         if(userSecurityModel != null){

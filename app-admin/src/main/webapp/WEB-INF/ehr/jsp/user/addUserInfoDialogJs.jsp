@@ -147,7 +147,7 @@
                         }
                         if(Util.isStrEquals($(elm).attr("id"),'inp_idCard')){
                             var idCard = $("#inp_idCard").val();
-                            return checkDataSourceName('id_card_no',idCard,"该身份证已存在");
+                            return checkDataSourceName('id_card_no',idCard,"该身份证号已被注册，请确认。");
                         }
                        if(Util.isStrEquals($(elm).attr("id"),'inp_userEmail')){
                            var email = $("#inp_userEmail").val();

@@ -7,7 +7,7 @@
         var Util = $.Util;
         var infoForm = null;
         var jValidation = $.jValidation;
-        var organizationCode = parent.getOrgCode();
+        var orgCode = parent.getOrgCode();
         var seq = parent.getSeq();
         var mode = '${mode}';
         if(!Util.isStrEquals(mode,'new')){
@@ -62,9 +62,9 @@
                 }
 
                 this.$form.Fields.fillValues({
-                        orgDataSet: seq,
-                        orgDict: seq,
-                        organization: organizationCode
+                        orgDataSetSeq: seq,
+                        orgDictSeq: seq,
+                        organization: orgCode
                 });
 
                 this.setSortShow();
@@ -83,6 +83,24 @@
                     adapterModel.sequence = seq;
                     if(!validator.validate()){
                         return;
+                    }
+                    if(cfgModel==1){
+                        adapterModel.orgDataSet = adapterModel.orgDataSetSeq;
+                        adapterModel.orgDataSetSeq = undefined;
+                        adapterModel.orgDictSeq = undefined;
+                    }
+                    else if(cfgModel==2){
+                        adapterModel.orgDataSetSeq = undefined;
+                        adapterModel.orgDictSeq = undefined;
+                    }
+                    else if(cfgModel==3){
+                        adapterModel.orgDataSetSeq = undefined;
+                        adapterModel.orgDict = adapterModel.orgDictSeq;
+                        adapterModel.orgDictSeq = undefined;
+                    }
+
+                    if(cfgModel!=3){
+                        adapterModel.sort = undefined;
                     }
                     self.$btnSave.attr('disabled','disabled');
                     var dataModel = $.DataModel.init();

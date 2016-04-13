@@ -3,6 +3,7 @@ package com.yihu.ehr.standard.datasets.controller;
 import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.MStdDataSet;
+import com.yihu.ehr.model.standard.MStdDict;
 import com.yihu.ehr.standard.commons.ExtendController;
 import com.yihu.ehr.standard.datasets.service.BaseDataSet;
 import com.yihu.ehr.standard.datasets.service.DataSetService;
@@ -58,6 +59,19 @@ public class DataSetEndPoint extends ExtendController<MStdDataSet> {
         List ls = dataSetService.search(entityClass, fields, filters, sorts, page, size);
         pagedResponse(request, response, dataSetService.getCount(entityClass, filters), page, size);
         return convertToModels(ls, new ArrayList<>(ls.size()), MStdDataSet.class, fields);
+    }
+
+
+    @RequestMapping(value = RestApi.Standards.NoPageDataSets, method = RequestMethod.GET)
+    @ApiOperation(value = "标准数据集不分页搜索")
+    public Collection<MStdDataSet> searchSourcesWithoutPaging(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "version", value = "版本", defaultValue = "")
+            @RequestParam(value = "version") String version) throws Exception {
+        Class entityClass = getServiceEntity(version);
+        List dataSetList = dataSetService.search(entityClass,filters);
+        return convertToModels(dataSetList, new ArrayList<>(dataSetList.size()), MStdDataSet.class, "");
     }
 
 

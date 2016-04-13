@@ -97,8 +97,9 @@
                   data: {idCardNo:'${idCardNo}',id: id,cardType:cardType},
                   success: function (data) {
                     if (data.successFlg) {
-                      $.Notice.success('关联成功');
-                      cardInfo.searchNewCard();
+                      $.Notice.success('关联成功!',function(){
+                        cardInfo.searchNewCard();
+                      });
                     } else {
                       $.Notice.error('关联失败');
                     }

@@ -74,7 +74,8 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetSer
                     url,
                     new PageParms(rows, page)
                             .addExt("code", searchNmEntry)
-                            .addExt("name", searchNmEntry));
+                            .addExt("name", searchNmEntry)
+                            .setSorts("+inner_code"));
         } catch (Exception e) {
             e.printStackTrace();
             return systemError();
@@ -148,6 +149,9 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetSer
         try {
             Envelop result = new Envelop();
             result.setSuccessFlg(true);
+
+            if(parentId == null || parentId == 0)
+                return result;
 
             Envelop rs = getEnvelop(
                     orgAdapterPlanService.getModel(

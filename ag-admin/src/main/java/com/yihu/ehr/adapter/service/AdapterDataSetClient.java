@@ -91,6 +91,12 @@ public interface AdapterDataSetClient {
     boolean delMetaData(
             @RequestParam("ids") String ids);
 
+    @RequestMapping(value = "/data_set/{data_set_id}/is_left/meta", method = RequestMethod.GET)
+    @ApiOperation(value = "判断除了metaIds之外是否还存在其他的数据元")
+    boolean isLeftMeta(
+            @RequestParam("plan_id") long planId,
+            @PathVariable("data_set_id") long dataSetId,
+            @RequestParam("meta_ids") String metaIds);
 
     @RequestMapping(value = "/plan/{planId}/data_set/{data_set_id}/std_meta", method = RequestMethod.GET)
     @ApiOperation(value = "过滤后的标准字典项分页查询")

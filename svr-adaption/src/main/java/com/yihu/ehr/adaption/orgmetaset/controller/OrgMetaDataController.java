@@ -48,6 +48,7 @@ public class OrgMetaDataController extends ExtendController<MOrgMetaData> {
             @RequestParam(value = "model") String model) throws Exception {
 
         OrgMetaData orgMetaData = jsonToObj(model, OrgMetaData.class);
+        orgMetaData.setColumnLength(orgMetaData.getColumnLength()==null? 0 : orgMetaData.getColumnLength());
         //orgMetaData.setCreateDate(new Date());
         return getModel(orgMetaDataService.createOrgMetaData(orgMetaData));
     }

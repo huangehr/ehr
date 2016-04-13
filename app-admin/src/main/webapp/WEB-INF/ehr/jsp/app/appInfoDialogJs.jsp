@@ -51,12 +51,22 @@
                 this.$description.ligerTextBox({width:240, height: 100 });
 
                 var mode = '${mode}';
-                if(mode == 'view'){
-                    $("input,select", this.$form).prop('disabled', false);
-                }
+				if(mode != 'view'){
+					$(".my-footer").show();
+				}
+				if(mode == 'view'){
+					appInfoForm.$form.addClass('m-form-readonly')
+					$("input,select", this.$form).prop('disabled', false);
+				}
                 this.$form.attrScan();
                 if(mode !='new'){
                     var app = (JSON.parse('${app}')).obj;
+					var tags = '';
+					for(var i=0;i<app.tags.length;i++){
+						tags += (app.tags)[i]+';'
+					}
+					tags = tags.substring(0,tags.length-1);
+					app.tags = tags;
                     this.$form.Fields.fillValues({
                         name:app.name,
                         catalog: app.catalog,

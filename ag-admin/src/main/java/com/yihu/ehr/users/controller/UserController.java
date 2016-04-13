@@ -550,7 +550,7 @@ public class UserController extends BaseController {
             }
         }
         //获取秘钥信息
-        MKey userSecurity = securityClient.getUserKey(mUser.getId());
+        MKey userSecurity = securityClient.getUserKey(mUser.getId(),true);
         if (userSecurity != null) {
             detailModel.setPublicKey(userSecurity.getPublicKey());
             String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT)

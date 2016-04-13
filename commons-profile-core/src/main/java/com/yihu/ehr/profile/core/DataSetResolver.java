@@ -2,13 +2,14 @@ package com.yihu.ehr.profile.core;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 简易数据集解析器。
@@ -20,40 +21,13 @@ import java.util.Map;
 @Component
 public class DataSetResolver {
 
-
-    //轻量级档案 获取数据集列表并保存到健康档案中
-    public void  parseJsonDataSetlight(Profile profile,JsonNode jsonNode) throws JsonProcessingException, ParseException {
-
-        ProfileDataSet profileDataSet = new ProfileDataSet();
-        String version = jsonNode.get("inner_version").asText();
-        String eventNo = jsonNode.get("event_no").asText();
-        String patientId = jsonNode.get("patient_id").asText();
-        String orgCode = jsonNode.get("org_code").asText();
-        String eventDate = jsonNode.path("event_time").asText();        // 旧数据集结构可能不存在这个属性\
-
-        JsonNode dataSets = jsonNode.get("dataset");
-        Iterator<Map.Entry<String, JsonNode>> iterator = dataSets.fields();
-        while (iterator.hasNext()) {
-            profile.setPatientId(patientId);
-            profile.setEventNo(eventNo);
-            profile.setOrgCode(orgCode);
-            profile.setCdaVersion(version);
-
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-            profile.setEventDate(format.parse(eventDate));
-
-            Map.Entry<String, JsonNode> map = iterator.next();
-            String code = map.getKey();
-            String path = map.getValue().asText();
-            profileDataSet.setCode(code);
-            profileDataSet.setRemotePath(path);
-            profile.addDataSet(code,profileDataSet);
-        }
-    }
-
-    //全量级档案 解析数据集
-    public ProfileDataSet parseJsonDataSet(JsonNode jsonNode, boolean isOrigin) {
+    /**
+     * 结构化档案包数据集处理
+     * @param jsonNode
+     * @param isOrigin
+     * @return
+     */
+    public ProfileDataSet parseStructuredJsonDataSet(JsonNode jsonNode, boolean isOrigin) {
         ProfileDataSet dataSet = new ProfileDataSet();
 
         try {
@@ -105,6 +79,66 @@ public class DataSetResolver {
         }
 
         return dataSet;
+    }
+
+
+
+    /**
+     * 非结构化档案报数据集处理
+     * @param profile
+     * @param files
+     * @throws JsonProcessingException
+     * @throws ParseException
+     */
+    public void  parseUnStructuredJsonDataSet(Profile profile, File[] files) throws JsonProcessingException, ParseException {
+
+        for (File file : files) {
+            String filePath = file.getPath();
+            String lastName = filePath.substring(filePath.lastIndexOf("\\")+1);
+            if (lastName.equals("document")) {
+                //这里把图片保存的fastdfs
+
+            }
+
+        }
+    }
+
+
+    /**
+     * 轻量级档案包数据集处理
+     * @param profile
+     * @param jsonNode
+     * @throws JsonProcessingException
+     * @throws ParseException
+     */
+    public void  parseLightJsonDataSet(Profile profile,JsonNode jsonNode) throws JsonProcessingException, ParseException {
+
+        ProfileDataSet profileDataSet = new ProfileDataSet();
+        String version = jsonNode.get("inner_version").asText();
+        String eventNo = jsonNode.get("event_no").asText();
+        String patientId = jsonNode.get("patient_id").asText();
+        String orgCode = jsonNode.get("org_code").asText();
+        String eventDate = jsonNode.path("event_time").asText();        // 旧数据集结构可能不存在这个属性\
+
+        JsonNode dataSets = jsonNode.get("dataset");
+        Iterator<Map.Entry<String, JsonNode>> iterator = dataSets.fields();
+        while (iterator.hasNext()) {
+            profile.setPatientId(patientId);
+            profile.setEventNo(eventNo);
+            profile.setOrgCode(orgCode);
+            profile.setCdaVersion(version);
+
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            profile.setEventDate(format.parse(eventDate));
+
+            Map.Entry<String, JsonNode> map = iterator.next();
+            String code = map.getKey();
+            String path = map.getValue().asText();
+            profileDataSet.setCode(code);
+            profileDataSet.setRemotePath(path);
+            profile.addDataSet(code,profileDataSet);
+        }
     }
 
     /**

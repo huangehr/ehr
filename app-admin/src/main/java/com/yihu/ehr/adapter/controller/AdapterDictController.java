@@ -71,6 +71,7 @@ public class AdapterDictController extends ExtendController<AdapterDictService> 
             params.put("name", searchNmEntry);
             params.put("page", page);
             params.put("size", rows);
+            params.put("sorts", "+code");
             String resultStr = service.search(url, params);
             return resultStr;
         } catch (Exception e) {
@@ -145,6 +146,9 @@ public class AdapterDictController extends ExtendController<AdapterDictService> 
         try {
             Envelop result = new Envelop();
             result.setSuccessFlg(true);
+
+            if(parentId == null || parentId == 0)
+                return result;
 
             Map<String, Object> params = new HashMap<>();
             params.put("id",adapterPlanId);

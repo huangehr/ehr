@@ -25,7 +25,7 @@
     <div class="m-form-group">
         <label><spring:message code="lbl.tip"/><spring:message code="spe.colon"/></label>
         <div class="l-text-wrapper m-form-control">
-            <input type="text" id="inp_tags" class="max-length-100 validate-special-char" data-attr-scan="tags"/>
+            <input type="text" id="inp_tags" class="max-length-100 validate-special-char" placeholder="若输入多个标签，请用分号隔开" data-attr-scan="tags"/>
         </div>
     </div>
     <div class="m-form-group">
@@ -53,7 +53,7 @@
         </div>
     </div>
 
-    <div class="m-form-group f-pr" align="right">
+    <div class="m-form-group f-pr my-footer" align="right" hidden="hidden">
         <div class="m-form-control f-pa" style="right: 10px">
             <div id="btn_save" class="l-button u-btn u-btn-primary u-btn-large f-ib f-vam" >
                 <span>保存</span>

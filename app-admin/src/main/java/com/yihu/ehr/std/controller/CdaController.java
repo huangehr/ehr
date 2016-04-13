@@ -1,22 +1,30 @@
 package com.yihu.ehr.std.controller;
 
+import antlr.ASdebug.IASDebugStream;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.cdadocument.CDAModel;
+import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.ResourceProperties;
+import com.yihu.ehr.util.RestTemplates;
+import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.util.controller.BaseUIController;
 import com.yihu.ehr.util.log.LogService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +33,7 @@ import java.util.Map;
 @RequestMapping("/cda")
 @Controller
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
-public class CdaController {
+public class CdaController extends BaseUIController{
     @Value("${service-gateway.username}")
     private String username;
     @Value("${service-gateway.password}")
@@ -294,36 +302,57 @@ public class CdaController {
 
     @RequestMapping("SaveCdaInfo")
     @ResponseBody
-    public Object SaveCdaInfo(String cdaJson,String version) throws IOException {
+    public Object SaveCdaInfo(String cdaJson,String version,HttpServletRequest request) throws IOException {
 
         String url = "/cda/cda";
         String resultStr = "";
-        Envelop result = new Envelop();
-        Map<String,Object> params = new HashMap<>();
-        ObjectMapper mapper = new ObjectMapper();
+        CDAModel cdaModel = null;
 
-        params.put("cdaInfoJson",cdaJson);
+        Envelop envelop = new Envelop();
+        Map<String,Object> params = new HashMap<>();
+
+        cdaModel = toModel(cdaJson,CDAModel.class);
+        UserDetailModel userDetailModel = (UserDetailModel)request.getSession().getAttribute(SessionAttributeKeys.CurrentUser);
+
         params.put("version",version);
 
         try {
-            CDAModel cdaModel = mapper.readValue(cdaJson,CDAModel.class);
-            if(StringUtils.isEmpty(cdaModel.getId()))
-                resultStr = HttpClientUtil.doPost(comUrl+url,params,username,password);//新增
-            else
-                resultStr = HttpClientUtil.doPut(comUrl + url, params, username, password);//修改
 
-            if(StringUtils.isEmpty(resultStr)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg("CDA保存失败");
+            if(StringUtils.isEmpty(cdaModel.getId())) {
+                cdaModel.setCreateUser(userDetailModel.getId());
+                params.put("cdaInfoJson",toJson(cdaModel));
+                resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//新增
+            }
+            else {
+                params.put("version_code",cdaModel.getVersionCode());
+                params.put("cda_id",cdaModel.getId());
+                resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);//获取
+                envelop = toModel(resultStr,Envelop.class);
+                CDAModel updateCdaModel = getEnvelopModel(envelop.getDetailModelList().get(0),CDAModel.class);
+
+                updateCdaModel.setCode(cdaModel.getCode());
+                updateCdaModel.setName(cdaModel.getName());
+                updateCdaModel.setSourceId(cdaModel.getSourceId());
+                updateCdaModel.setOperationType(cdaModel.getOperationType());
+                updateCdaModel.setDescription(cdaModel.getDescription());
+
+                cdaModel.setUpdateUser(userDetailModel.getId());
+                params.put("cdaInfoJson",toJson(updateCdaModel));
+                resultStr = HttpClientUtil.doPut(comUrl + url, params, username, password);//修改
+            }
+            envelop = toModel(resultStr,Envelop.class);
+            if(!envelop.isSuccessFlg()){
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("CDA保存失败");
             }else {
-                result.setSuccessFlg(true);
+                envelop.setSuccessFlg(true);
             }
         } catch (Exception ex) {
             LogService.getLogger(CdaController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result;
+        return envelop;
 
     }
 
@@ -378,6 +407,10 @@ public class CdaController {
     @RequestMapping("SaveRelationship")
     @ResponseBody
     public Object SaveRelationship(String strDatasetIds, String strCdaId, String strVersionCode, String xmlInfo) {
+
+//        MultiValueMap<String,String> conditionMap = new LinkedMultiValueMap<String, String>();
+//        RestTemplates template = new RestTemplates();
+
         Envelop result = new Envelop();
         String strErrorMsg = "";
         if (StringUtils.isEmpty(strVersionCode)) {
@@ -399,6 +432,16 @@ public class CdaController {
             params.put("versionCode", strVersionCode);
             params.put("xmlInfo", xmlInfo);
             String _rus = HttpClientUtil.doPost(comUrl + url, params, username, password);
+//todo:数据集选择过存在http请求头太大问题
+            //测试
+//            conditionMap.add("dataSetIds", strDatasetIds);
+//            conditionMap.add("cdaId", strCdaId);
+//            conditionMap.add("versionCode", strVersionCode);
+//            conditionMap.add("xmlInfo", xmlInfo);
+//            String _rus = template.doPost(comUrl + url, conditionMap);
+            //结束
+
+
             if(StringUtils.isEmpty(_rus)){
                 result.setSuccessFlg(false);
                 result.setErrorMsg("关系保存失败");
@@ -496,7 +539,6 @@ public class CdaController {
     public Object getDatasetByCdaId(String strVersionCode, String strCdaId) {
         Envelop result = new Envelop();
         try {
-//            String url = "/cda/getDatasetByCdaId";
             String url = "/cda/relationships";
             Map<String,Object> params = new HashMap<>();
             params.put("versionCode",strVersionCode);

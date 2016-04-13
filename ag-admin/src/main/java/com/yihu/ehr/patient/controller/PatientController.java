@@ -22,6 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -51,12 +55,12 @@ public class PatientController extends BaseController {
     public Envelop searchPatient(
             @ApiParam(name = "search", value = "搜索内容", defaultValue = "")
             @RequestParam(value = "search") String search,
-            @ApiParam(name = "province", value = "省", defaultValue = "")
-            @RequestParam(value = "province") String province,
-            @ApiParam(name = "city", value = "市", defaultValue = "")
-            @RequestParam(value = "city") String city,
-            @ApiParam(name = "district", value = "县", defaultValue = "")
-            @RequestParam(value = "district") String district,
+            @ApiParam(name = "home_province", value = "省", defaultValue = "")
+            @RequestParam(value = "home_province") String province,
+            @ApiParam(name = "home_city", value = "市", defaultValue = "")
+            @RequestParam(value = "home_city") String city,
+            @ApiParam(name = "home_district", value = "县", defaultValue = "")
+            @RequestParam(value = "home_district") String district,
             @ApiParam(name = "page", value = "当前页", defaultValue = "")
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
@@ -83,7 +87,11 @@ public class PatientController extends BaseController {
             //联系电话
             Map<String, String> telephoneNo;
             String tag="联系电话";
-            telephoneNo = objectMapper.readValue(patient.getTelephoneNo(), Map.class);
+            try {
+                telephoneNo = objectMapper.readValue(patient.getTelephoneNo(), Map.class);
+            } catch (Exception e) {
+                telephoneNo=null;
+            }
             if (telephoneNo != null && telephoneNo.containsKey(tag)) {
                 patient.setTelephoneNo(telephoneNo.get(tag));
             } else {
@@ -132,6 +140,12 @@ public class PatientController extends BaseController {
             @PathVariable(value = "id_card_no") String idCardNo) throws Exception {
 
         MDemographicInfo demographicInfo = patientClient.getPatient(idCardNo);
+        if(!StringUtils.isEmpty(demographicInfo.getPicPath())){
+            Map<String,String> map = toEntity(demographicInfo.getPicPath(),Map.class);
+            String localPath = patientClient.downloadPicture(demographicInfo.getIdCardNo(),map.get("groupName"),map.get("remoteFileName"));
+        }
+//        Map<String,String> map = toEntity(demographicInfo.getPicPath(),Map.class);
+
         if (demographicInfo == null) {
             return failed("数据获取失败！");
         }
@@ -152,9 +166,20 @@ public class PatientController extends BaseController {
     @ApiOperation(value = "根据前端传回来的json创建一个人口信息")
     public Envelop createPatient(
             @ApiParam(name = "patientModelJsonData", value = "身份证号", defaultValue = "")
-            @RequestParam(value = "patientModelJsonData") String patientModelJsonData) throws Exception {
+            @RequestParam(value = "patientModelJsonData") String patientModelJsonData,
+            @ApiParam(name = "inputStream", value = "转换后的输入流", defaultValue = "")
+            @RequestParam(value = "inputStream") String inputStream,
+            @ApiParam(name = "imageName", value = "图片全名", defaultValue = "")
+            @RequestParam(value = "imageName") String imageName) throws Exception {
+
+        //头像上传,接收头像保存的远程路径  path
+        String jsonData = inputStream+","+imageName;
+        String path = patientClient.uploadPicture(jsonData);
 
         PatientDetailModel detailModel = objectMapper.readValue(patientModelJsonData, PatientDetailModel.class);
+        if (!StringUtils.isEmpty(path)){
+            detailModel.setPicPath(path);
+        }
         String errorMsg = "";
         if (StringUtils.isEmpty(detailModel.getName())) {
             errorMsg += "姓名不能为空!";
@@ -225,9 +250,20 @@ public class PatientController extends BaseController {
     @ApiOperation(value = "根据前端传回来的json修改人口信息")
     public Envelop updatePatient(
             @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
-            @RequestParam(value = "patient_model_json_data") String patientModelJsonData) throws Exception {
+            @RequestParam(value = "patient_model_json_data") String patientModelJsonData,
+            @ApiParam(name = "inputStream", value = "转换后的输入流", defaultValue = "")
+            @RequestParam(value = "inputStream") String inputStream,
+            @ApiParam(name = "imageName", value = "图片全名", defaultValue = "")
+            @RequestParam(value = "imageName") String imageName) throws Exception {
+
+        //头像上传,接收头像保存的远程路径  path
+        String jsonData = inputStream+","+imageName;
+        String path = patientClient.uploadPicture(jsonData);
 
         PatientDetailModel detailModel = objectMapper.readValue(patientModelJsonData, PatientDetailModel.class);
+        if (!StringUtils.isEmpty(path)){
+            detailModel.setPicPath(path);
+        }
         String errorMsg = "";
         if (StringUtils.isEmpty(detailModel.getName())) {
             errorMsg += "姓名不能为空!";
@@ -361,7 +397,13 @@ public class PatientController extends BaseController {
 
         //联系电话
         String tag = "联系电话";
-        Map<String, String> telephoneNo = objectMapper.readValue(detailModel.getTelephoneNo(), Map.class);
+        Map<String, String> telephoneNo =null;
+        try {
+            telephoneNo = objectMapper.readValue(detailModel.getTelephoneNo(), Map.class);
+        } catch (Exception e){
+            telephoneNo=null;
+        }
+
         detailModel.setTelephoneNo(null);
         if (telephoneNo != null && telephoneNo.containsKey(tag)) {
             detailModel.setTelephoneNo(telephoneNo.get(tag));

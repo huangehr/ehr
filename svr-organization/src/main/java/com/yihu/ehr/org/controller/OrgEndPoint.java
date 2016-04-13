@@ -7,6 +7,7 @@ import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.org.feign.SecurityClient;
 import com.yihu.ehr.org.service.OrgService;
 import com.yihu.ehr.org.service.Organization;
+import com.yihu.ehr.util.PinyinUtil;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -98,6 +99,7 @@ public class OrgEndPoint extends BaseRestController {
         Organization org = objectMapper.readValue(orgJsonData, Organization.class);
         org.setCreateDate(new Date());
         org.setActivityFlag(1);
+        org.setPyCode(PinyinUtil.getPinYinHeadChar(org.getFullName(), false));
         orgService.save(org);
         return convertToModel(org, MOrganization.class);
     }
@@ -109,6 +111,7 @@ public class OrgEndPoint extends BaseRestController {
             @RequestParam(value = "mOrganizationJsonData") String orgJsonData) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         Organization org = objectMapper.readValue(orgJsonData, Organization.class);
+        org.setPyCode(PinyinUtil.getPinYinHeadChar(org.getFullName(), false));
         orgService.save(org);
         return convertToModel(org, MOrganization.class);
     }

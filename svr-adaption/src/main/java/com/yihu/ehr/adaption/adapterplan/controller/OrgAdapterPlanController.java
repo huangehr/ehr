@@ -224,6 +224,7 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
         parms.put("version", version);
         parms.put("metaIds", "");
         Map<String, Map> metaDatas = (Map<String, Map>) dataSetClient.getMetaDataMapByIds(toJson(parms));
+        int rootCheckCount = 0;
         for (String dataSetId : map.keySet()) {
             AdapterCustomize parent = new AdapterCustomize();
             parent.setId("stdDataSet" + dataSetId);
@@ -232,8 +233,10 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
             std = true;
             childCheckCount = 0;
             Map<String, String> metaDataList = metaDatas.get(dataSetId);
-            if (metaDataList == null)
+            if (metaDataList == null){
+                rootCheckCount++;
                 continue;
+            }
             for (String k : metaDataList.keySet()) {
                 check = false;
                 for (AdapterCustomize adapterCustomize : adapterCustomizeList) {
@@ -256,6 +259,7 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
             }
             if (metaDataList.size() == childCheckCount && childCheckCount > 0) {
                 parent.setIschecked(true);//子节点全选
+                rootCheckCount++;
             }
             stdCustomizeList.add(parent);
         }
@@ -266,6 +270,8 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
             stdRoot.setPid("-1");
             stdRoot.setText("数据集");
             stdCustomizeList.add(stdRoot);
+            if(map.size() == rootCheckCount)
+                stdRoot.setIschecked(true);
         }
         return stdCustomizeList;
     }

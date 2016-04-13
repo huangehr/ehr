@@ -60,7 +60,7 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
         else if (!StringUtils.isEmpty(name))
             sb.append(" and ds.name like :name ");
 
-        sb.append(makeOrder(orders));
+        sb.append(makeOrder(orders, "ds"));
         SQLQuery sqlQuery = session.createSQLQuery(sb.toString());
         if (!StringUtils.isEmpty(code))
             sqlQuery.setParameter("code", "%" + code + "%");
@@ -77,15 +77,15 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
                 .list();
     }
 
-    private String makeOrder(String orders) {
+    private String makeOrder(String orders, String vo) {
         if(StringUtils.isEmpty(orders))
             return "";
         String sql = "";
         for (String order : orders.split(",")) {
             if (order.startsWith("+"))
-                sql += "," + order.substring(1);
+                sql += "," + vo + "." + order.substring(1);
             else if (order.startsWith("-"))
-                sql += "," + order.substring(1) + " desc";
+                sql += "," + vo + "." + order.substring(1) + " desc";
         }
         return StringUtils.isEmpty(sql) ?
                 "" :
@@ -170,7 +170,7 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
         }else if (!StringUtils.isEmpty(name))
             sb.append("     and de.value like :name");
 
-        sb.append(makeOrder(orders));
+        sb.append(makeOrder(orders, "de"));
         SQLQuery sqlQuery = session.createSQLQuery(sb.toString());
         if (!StringUtils.isEmpty(code))
             sqlQuery.setParameter("code", "%" + code + "%");
@@ -224,7 +224,7 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
         if(!StringUtils.isEmpty(seachName))
             sql += " AND (entry.code like :seachName or entry.value like :seachName) ";
 
-        sql += makeOrder(orders);
+        sql += makeOrder(orders, "entry");
 
         SQLQuery sqlQuery = session.createSQLQuery(sql);
         if (!StringUtils.isEmpty(seachName))

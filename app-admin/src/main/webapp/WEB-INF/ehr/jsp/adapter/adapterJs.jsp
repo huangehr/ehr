@@ -12,7 +12,7 @@
             var adapterGrid = null;
             var adapterDataSet = null;
             var adapterType = 21;
-
+            var searchOrg;
             /* *************************** 函数定义 ******************************* */
             function pageInit() {
                 retrieve.init();
@@ -64,17 +64,15 @@
             }
 
             function initSearchType(target, type) {
-                target.ligerComboBox(
-                        {
-                            url: '${contextRoot}/adapter/getOrgList',
-                            valueField: 'code',
-                            textField: 'name',
-                            dataParmName: 'detailModelList',
-                            urlParms: {
-                                type: type,
-                                mode: "modify"
-                            }
-                        });
+                var p = {
+                    type: type,
+                    mode: "modify",
+                    version: "notVersion"};
+                if(searchOrg)
+                    searchOrg.reload(p);
+                else
+                    searchOrg = target.customCombo(
+                            '${contextRoot}/adapter/getOrgList', p, undefined, undefined, false);
             }
 
             function release(id,organizationCode,versionCode) {
@@ -153,7 +151,7 @@
                             {display: '方案类别代码', name: 'type', hide: true},
                             {display: '方案代码', name: 'code', width: '10%', minColumnWidth: 60, align: 'left'},
                             {display: '方案名称', name: 'name', width: '20%', align: 'left'},
-                            {display: '标准版本', name: 'versionName', width: '10%', align: 'left'},
+                            {display: '标准版本', name: 'versionName', width: '6%', align: 'left'},
                             {display: '标准版本代码', name: 'version', hide: true},
                             {display: '采集机构代码', name: 'org', hide: true},
                             {display: '采集机构', name: 'orgValue', width: '20%', align: 'left'},
@@ -171,17 +169,31 @@
                                 }
                             },
                             {
-                                display: '操作', name: 'operator', width: '15%', render: function (row) {
-                                var html = '<a href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:customize", row.id, row.version) + '">定制</a>' +
-                                        '/<a href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:adapter", row.id, 'modify') + '">适配</a>' +
-                                        '/<a href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}',])", "adapter:adapterInfo:open", row.id, 'modify') + '">修改</a>' +
-                                        '/<a href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "adapter:adapterInfo:delete", row.id) + '">删除</a>';
+                                display: '操作', name: 'operator', width: '19%', render: function (row) {
+//								var html ='<div class="grid_edit"  style="margin-left: 10px;cursor:pointer;"  title="定制" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:open", row.id,'modify') + '"></div>'
+//										+'<div class="grid_delete"  style="margin-left: 40px;cursor:pointer;" title="适配"' +
+//										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoDialog:del", row.id,'delete') + '"></div>'
+//										+'<div class="grid_edit"  style="margin-left: 70px;margin-top:-22px;cursor:pointer;" title="修改"' +
+//										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoDialog:del", row.id,'delete') + '"></div>'
+//										+'<div class="grid_delete"  style="margin-left: 100px;cursor:pointer;" title="删除"' +
+//										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoDialog:del", row.id,'delete') + '"></div>';
+
+                                var html = '<a class="label_a" style="margin-left:0px;" href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:customize", row.id, row.version) + '">定制</a>' +
+                                        '<a class="label_a" style="margin-left:5px;" href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:adapter", row.id, 'modify') + '">适配</a>';
+//                                        '/<a href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}',])", "adapter:adapterInfo:open", row.id, 'modify') + '">修改</a>' +
+//                                        '/<a href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "adapter:adapterInfo:delete", row.id) + '">删除</a>';
                                 var text = "发布";
                                 if (row.status == 1) {
                                     text = "重新发布";
                                 }
-                                html += '/<a href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}','{4}','{5}'])", "adapter:adapterInfo:release", row.org, row.version,text,row.id) + '">' + text + '</a>';
-                                return html;
+//								html+='<div class="grid_delete"  style="margin-left: 130px;cursor:pointer;" title="'+text+'"' +
+//										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3},'{4}','{5}'])", "adapter:adapterInfo:release", row.org,row.version,text,row.id) + '"></div>';
+                                html += '<a class="label_a" style="margin-left:5px; href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}','{4}','{5}'])", "adapter:adapterInfo:release", row.org, row.version,text,row.id) + '">' + text + '</a>';
+								html += '<a class="grid_edit" href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}',])", "adapter:adapterInfo:open", row.id, 'modify') + '"></a>' +
+								'<a class="grid_delete" href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "adapter:adapterInfo:delete", row.id) + '"></a>';
+
+
+								return html;
                             }
                             }
                         ],
@@ -247,6 +259,8 @@
                                     delAdapterPlan(id.substring(1));
                                 }
                             });
+                        }else{
+                            $.ligerDialog.warn("请选择要删除的数据适配方案");
                         }
                     });
                     //修改适配方案

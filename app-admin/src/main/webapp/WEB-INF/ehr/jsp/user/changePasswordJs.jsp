@@ -34,6 +34,7 @@
 
                 $changePassWordBtn: $("#div_changePassWord_btn"),
                 $cancelBtn: $("#div_cancel_btn"),
+                $pwBtn:$("#div-pw-btn"),
 
                 $intensionWeak: $("#td-intension-weak"),
                 $intensionMiddle: $("#td-intension-middle"),
@@ -93,33 +94,51 @@
 
                         var value = self.$newPassWord.val();
                         var strongRegex = new RegExp("^(?=.{8,})(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*\\W).*$", "g");
-                        var mediumRegex = new RegExp("^(?=.{8,})(((?=.*[A-Z])(?=.*[a-z]))|((?=.*[A-Z])(?=.*[0-9]))|((?=.*[a-z])(?=.*[0-9]))).*$", "g");
-                        var enoughRegex = new RegExp("(?=.{8,}).*", "g");
+                        var mediumRegex = new RegExp("^(?=.{9,})(((?=.*[A-Z])(?=.*[a-z]))|((?=.*[A-Z])(?=.*[0-9]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[a-z])(?=.*\\W))|((?=.*[0-9])(?=.*\\W))).*$");
+                        var enoughRegex = new RegExp("(?=.{8,}).*");
 
+                        if(Util.isStrEmpty(value)){
+                            self.$intensionMiddle.removeClass('s-bc4');
+                            self.$intensionPowerful.removeClass('s-bc12');
+                            self.$intensionWeak.removeClass('s-bc13');
+                            return ;
+                        }
                         if (false == enoughRegex.test(value)) {
                             self.$intensionMiddle.removeClass('s-bc4');
                             self.$intensionPowerful.removeClass('s-bc12');
                             self.$intensionWeak.addClass('s-bc13');
-                            //密码小于8位，密码强度：弱
+                            return;
+                            //密码小于8位，强度：弱
                         }
                         else if (strongRegex.test(value)) {
                             self.$intensionMiddle.addClass('s-bc4');
                             self.$intensionPowerful.addClass('s-bc12');
-                            //密码为8位及以上并且(大小写)字母数字特殊字符三项都包括,强度：强
+                            return;
+                            //密码为8位及以上并且大、小字母、数字、特殊字符三项都包括,强度：强
                         }
                         else if (mediumRegex.test(value)) {
                             self.$intensionPowerful.removeClass('s-bc12');
                             self.$intensionMiddle.addClass('s-bc4');
+                            return;
                             //密码为8位及以上并且字母、数字、特殊字符三项中有两项，强度：中
                         }
                         else {
                             self.$intensionMiddle.removeClass('s-bc4');
                             self.$intensionPowerful.removeClass('s-bc12');
                             self.$intensionWeak.addClass('s-bc13');
+                            return;
                             //如果密码为8位以下，就算字母、数字、特殊字符三项都包括，强度：弱
                         }
-
                     });
+
+                    self.$pwBtn.click(function () {
+                        var newPassWord = self.$newPassWord.val();
+                        if(Util.isStrEmpty(newPassWord)){
+                            self.$intensionMiddle.removeClass('s-bc4');
+                            self.$intensionPowerful.removeClass('s-bc12');
+                            self.$intensionWeak.removeClass('s-bc13');
+                        }
+                    })
 
                     function dataValidation(idCode) {
 
@@ -127,7 +146,6 @@
                         var userName = self.$userName.val();
                         var passWord = self.$oldPassWord.val();
                         var newPassWord = self.$newPassWord.val();
-//                        var againNewPassWord = self.$againNewPassWord.val();
 
                         if (Util.isStrEquals($(idCode).attr("id"), "inp_old_passWord")) {
 
@@ -151,18 +169,18 @@
                             return result;
                         }
                         if (Util.isStrEquals($(idCode).attr("id"), "inp_new_passWord")) {
-                            var reg = /^[a-zA-Z]{8,16}$/;
+//                            var reg = /^[a-zA-Z]{8,16}$/;
                             if (Util.isStrEquals(passWord, newPassWord)) {
-                                return ValidationErrorMsg(false, "密码与原始密码相近，请重新输入");
+                                return ValidationErrorMsg(false, "密码与原始密码相近，请重新输入！");
                             }
+                            if (newPassWord.length < 8 || newPassWord.length > 16) {
+                                return ValidationErrorMsg(false, "输入值的长度应该在8 至 16之间，当前长度" + newPassWord.length + "！");
+                            }
+//                            if(newPassWord.split(" ").length>=1){
+//                                return ValidationErrorMsg(false, "不能输入空格！");
+//                            }
                             if (Util.isStrEquals(userName, newPassWord)) {
-                                return ValidationErrorMsg(false, "新密码与用户名不能一样");
-                            }
-                            if (Util.isNum(newPassWord)) {
-                                return ValidationErrorMsg(false, "新密码不能纯数字");
-                            }
-                            if(reg.test(newPassWord)){
-                                return ValidationErrorMsg(false, "新密码不能纯字母");
+                                return ValidationErrorMsg(false, "新密码与用户名不能一样！");
                             }
                         }
                     }
@@ -182,18 +200,15 @@
                             dataModel.updateRemote("${contextRoot}/user/activityUser", {
                                 data: {userId: userId, activated: 0},
                                 success: function (data) {
-                                    $.ligerDialog.waitting('错误密码输入次数过多，该账户已被锁定，请通过OA至管理员重置密码');
+                                    $.ligerDialog.waitting('错误密码输入次数过多，该账户已被锁定，请通过OA至管理员重置密码！');
                                     setTimeout(function () {
                                         window.location.href = "${contextRoot}/login";
                                     }, 3000);
                                 }
                             })
-
                         }
-
                     }
-                },
-
+                }
             };
 
             /* ************************* 模块初始化结束 ************************** */
