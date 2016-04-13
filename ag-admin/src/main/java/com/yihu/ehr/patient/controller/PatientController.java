@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -170,7 +172,14 @@ public class PatientController extends BaseController {
             @ApiParam(name = "imageName", value = "图片全名", defaultValue = "")
             @RequestParam(value = "imageName") String imageName) throws Exception {
 
+        //头像上传,接收头像保存的远程路径  path
+        String jsonData = inputStream+","+imageName;
+        String path = patientClient.uploadPicture(jsonData);
+
         PatientDetailModel detailModel = objectMapper.readValue(patientModelJsonData, PatientDetailModel.class);
+        if (!StringUtils.isEmpty(path)){
+            detailModel.setPicPath(path);
+        }
         String errorMsg = "";
         if (StringUtils.isEmpty(detailModel.getName())) {
             errorMsg += "姓名不能为空!";
@@ -247,9 +256,8 @@ public class PatientController extends BaseController {
             @ApiParam(name = "imageName", value = "图片全名", defaultValue = "")
             @RequestParam(value = "imageName") String imageName) throws Exception {
 
-        //头像上传
+        //头像上传,接收头像保存的远程路径  path
         String jsonData = inputStream+","+imageName;
-//        String path = patientClient.uploadPicture(jsonData);
         String path = patientClient.uploadPicture(jsonData);
 
         PatientDetailModel detailModel = objectMapper.readValue(patientModelJsonData, PatientDetailModel.class);
