@@ -90,7 +90,7 @@
                         ],
                         onDblClickRow: function (row) {
                             $.ligerDialog.open({
-                                title:'<button class="f-ib f-tac f-w100 f-click-down" id="div_patientBasicMsgDialog">病人基本信息</button><button class="f-ib f-ml10 f-tac f-w100"  id="div_cardManagerDialog">卡管理</button>',
+                                title:'',
                                 height: 600,
                                 width: 570,
                                 url: '${contextRoot}/patient/patientDialogType',
@@ -102,6 +102,10 @@
                                 },
                                 isHidden: false
                             });
+                            var buttonsWrap = '<span style="position:relative; z-index:10;"><button class="f-ib f-tac f-w100 f-click-down" id="div_patientBasicMsgDialog">病人基本信息</button><button class="f-ib f-ml10 f-tac f-w100 f-click-up"  id="div_cardManagerDialog">卡管理</button></span>';
+                            $('.l-dialog .l-dialog-tc-inner').eq(0).append( $(buttonsWrap));
+                            $('.l-dialog .l-dialog-title').eq(0).css({position:'absolute',left:-40,width:'100%',height:40,'z-index': 2});
+
                         }
                     }));
                     grid.adjustToWidth();

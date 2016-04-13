@@ -1,7 +1,5 @@
 package com.yihu.ehr.agModel.standard.cdadocument;
 
-import java.util.Date;
-
 /**
  * Created by AndyCai on 2016/2/29.
  */
@@ -9,7 +7,7 @@ public class CDAModel {
 
     private String code;
 
-    private Date createDate;
+    private String createDate;
 
     private String createUser;
 
@@ -19,7 +17,7 @@ public class CDAModel {
 
     private String name;
 
-    private Date updateDate;
+    private String updateDate;
 
     private String updateUser;
 
@@ -37,6 +35,8 @@ public class CDAModel {
 
     private String operationType;
 
+    private String staged;
+
     public String getCode() {
         return code;
     }
@@ -45,11 +45,11 @@ public class CDAModel {
         this.code = code;
     }
 
-    public Date getCreateDate() {
+    public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(String createDate) {
         this.createDate = createDate;
     }
 
@@ -85,11 +85,11 @@ public class CDAModel {
         this.name = name;
     }
 
-    public Date getUpdateDate() {
+    public String getUpdateDate() {
         return updateDate;
     }
 
-    public void setUpdateDate(Date updateDate) {
+    public void setUpdateDate(String updateDate) {
         this.updateDate = updateDate;
     }
 
@@ -155,5 +155,13 @@ public class CDAModel {
 
     public void setOperationType(String operationType) {
         this.operationType = operationType;
+    }
+
+    public String getStaged() {
+        return staged;
+    }
+
+    public void setStaged(String staged) {
+        this.staged = staged;
     }
 }

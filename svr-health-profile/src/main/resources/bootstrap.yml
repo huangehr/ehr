@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-browser
+    name: svr-health-profile
 
 ---
 spring:
@@ -21,7 +21,6 @@ spring:
       password: configuration
       uri: http://172.19.103.73:1221
       label: dev
-
 
 ---
 spring:

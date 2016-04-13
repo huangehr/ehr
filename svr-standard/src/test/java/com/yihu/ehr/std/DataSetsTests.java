@@ -3,8 +3,8 @@
 //import com.fasterxml.jackson.databind.ObjectMapper;
 //import com.yihu.ehr.StandardServiceApp;
 //import com.yihu.ehr.model.standard.MStdDataSet;
-//import com.yihu.ehr.standard.datasets.controller.DataSetsController;
-//import com.yihu.ehr.standard.datasets.service.IDataSet;
+//import com.yihu.ehr.standard.datasets.controller.BaseRestEndPoint;
+//import com.yihu.ehr.standard.datasets.service.BaseDataSet;
 //import org.junit.FixMethodOrder;
 //import org.junit.Test;
 //import org.junit.runner.RunWith;
@@ -24,13 +24,13 @@
 //public class DataSetsTests {
 //
 //    @Autowired
-//    private DataSetsController dataSetsController;
+//    private BaseRestEndPoint dataSetsController;
 //
 //
 //    @Test
 //    public void test() throws Exception{
 //        String  version = "000000000000";
-//        IDataSet dataSet = new IDataSet();
+//        BaseDataSet dataSet = new BaseDataSet();
 //        dataSet.setCode("TESTSOUR");
 //        dataSet.setName("TESTSOUR");
 //        dataSet.setStdVersion("v1.0");

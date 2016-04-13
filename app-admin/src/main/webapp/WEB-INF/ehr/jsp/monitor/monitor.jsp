@@ -22,7 +22,7 @@
                     </select>
                 </td>
                 <td>
-                    <input type="text" class="f-ml10" name="rowkey" id="rowkey" value="" style="width: 240px" class="form-control"  placeholder="请输入rowkey">
+                    <input type="text" class="f-ml10" name="id" id="id" value="" style="width: 240px" class="form-control"  placeholder="请输入rowkey">
                 </td>
                 <td>
                     <input type="button" id="btnQuery" class="btn btn-warning f-ml10" value="查询数据">

@@ -1,7 +1,7 @@
 server:
   contextPath: /ehr
   port: 8080
-  sessionTimeout:  300000
+  sessionTimeout:  300
 
 fast-dfs:
   pool:
@@ -47,4 +47,5 @@ service-gateway:
 
 fast-dfs:
   tracker-server: 172.19.103.13:22122
+
 

@@ -1,8 +1,8 @@
 package com.yihu.ehr.mq;
 
-import com.yihu.ehr.task.PackageResolveJob;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.util.log.LogService;
-import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,14 +14,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class MessageReceiver implements XReceiver {
     @Autowired
-    PackageResolveJob resolveJob;
+    MessageBuffer messageBuffer;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     @Override
     public void receive(Object message) {
         try {
-            String id = (String)message;
+            MPackage pack = objectMapper.readValue((String)message, MPackage.class);
+            LogService.getLogger().info("Receive package: " + pack.getId());
 
-            resolveJob.execute(id);
+            messageBuffer.putMessage(pack);
         } catch (Exception e) {
             LogService.getLogger().error(e.getMessage());
         }

@@ -4,14 +4,12 @@ import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.MStdMetaData;
 import com.yihu.ehr.standard.commons.ExtendController;
-import com.yihu.ehr.standard.datasets.service.IDataSet;
-import com.yihu.ehr.standard.datasets.service.IMetaData;
+import com.yihu.ehr.standard.datasets.service.BaseMetaData;
 import com.yihu.ehr.standard.datasets.service.MetaDataService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +25,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "metadata", description = "标准数据元", tags = {"标准数据元"})
+@Api(value = "Meta data", description = "数据元服务")
 public class MetaDataController extends ExtendController<MStdMetaData> {
 
     @Autowired
@@ -120,7 +118,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version) throws Exception{
         Class entityClass = getServiceEntity(version);
-        List<IMetaData> list = metaDataService.search(entityClass,"dataSetId="+dataSetIs);
+        List<BaseMetaData> list = metaDataService.search(entityClass,"dataSetId="+dataSetIs);
         return convertToModels(list, new ArrayList<>(list.size()), MStdMetaData.class, "");
     }
 
@@ -136,8 +134,8 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
             @RequestParam(value = "model", required = false) String model) throws Exception{
 
         Class entityClass = getServiceEntity(version);
-        IMetaData metaDataModel = (IMetaData) jsonToObj(model, entityClass);
-        IMetaData metaData = metaDataService.retrieve(id, entityClass);
+        BaseMetaData metaDataModel = (BaseMetaData) jsonToObj(model, entityClass);
+        BaseMetaData metaData = metaDataService.retrieve(id, entityClass);
         if(metaData.getId()==0)
             throw errNotFound("数据元", metaDataModel.getId());
 
@@ -159,7 +157,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
             @ApiParam(name = "model", value = "数据源模型", defaultValue = "")
             @RequestParam(value = "model", required = false) String model) throws Exception{
 
-        IMetaData metaData = (IMetaData) jsonToObj(model, getServiceEntity(version));
+        BaseMetaData metaData = (BaseMetaData) jsonToObj(model, getServiceEntity(version));
         if(metaDataService.isColumnValExsit(metaData.getDataSetId(), "code", metaData.getCode(), getServiceEntity(version)))
             throw errRepeatCode();
         if(metaDataService.saveMetaData(metaData, version))

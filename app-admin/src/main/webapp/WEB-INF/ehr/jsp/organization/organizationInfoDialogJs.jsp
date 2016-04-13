@@ -29,7 +29,7 @@
             //form
             $form: $("#div_organization_info_form"),
 
-            $orgCode: $("#org_code"),
+            $organizationCode: $("#org_code"),
             $fullName: $('#full_name'),
             $shortName: $('#short_name'),
             $location: $('#location'),
@@ -66,7 +66,7 @@
             },
             initForm: function () {
 
-                this.$orgCode.ligerTextBox({width: 240});
+                this.$organizationCode.ligerTextBox({width: 240});
                 this.$fullName.ligerTextBox({width: 240});
                 this.$shortName.ligerTextBox({width: 240});
                 this.$location.ligerComboBox({width: 240});
@@ -92,7 +92,7 @@
 				}
 				tags = tags.substring(0,tags.length-1);
 				this.$form.Fields.fillValues({
-					orgCode: org.orgCode,
+					organizationCode: org.organizationCode,
 					fullName: org.fullName,
 					shortName: org.shortName,
 					//location: org.location,
@@ -137,7 +137,7 @@
             bindEvents: function () {
                 var self = this;
                 $('#location,.u-dropdown-icon').click(function(){
-                    self.$orgCode.click();
+                    self.$organizationCode.click();
                 });
                 var validator =  new jValidation.Validation(self.$form, {immediate: true, onSubmit: false});
                 self.$updateOrgBtn.click(function () {
@@ -167,7 +167,7 @@
                             {town: ""},
                             {street: orgAddress.names[3]}
                     );*/
-                   /* if(Util.isStrEquals(orgModel.orgCode,'')){
+                   /* if(Util.isStrEquals(orgModel.organizationCode,'')){
                         $.Notice.warn('组织机构代码不能为空');
                         return;
                     }
@@ -215,10 +215,10 @@
                     //分配公钥点击事件
                     self.$allotpublicKey.click(function () {
 
-                        var code = self.$form.Fields.orgCode.getValue();
+                        var code = self.$form.Fields.organizationCode.getValue();
                         var dataModel = $.DataModel.init();
                         dataModel.createRemote('${contextRoot}/organization/distributeKey', {
-                            data: {orgCode:code},
+                            data: {organizationCode:code},
                             success: function (data) {
                                 if(data.successFlg){
                                     self.$publicKeyMessage.val(data.obj.publicKey);
