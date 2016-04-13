@@ -60,7 +60,7 @@
     <div class="m-form-group">
         <label><spring:message code="lbl.tip"/><spring:message code="spe.colon"/></label>
         <div class="l-text-wrapper m-form-control">
-            <input type="text" id="tags" class="f-w240 max-length-100 validate-special-char" data-attr-scan="tags"/>
+            <input type="text" id="tags" class="f-w240 max-length-100 validate-special-char" placeholder="多个标签，请用分号隔开" data-attr-scan="tags"/>
         </div>
     </div>
     <div>

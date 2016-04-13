@@ -106,6 +106,10 @@
                     	self.$form.attrScan();
                     	var orgAddress = self.$form.Fields.location.getValue();
 						var orgModel = self.$form.Fields.getValues();
+						//标签字符串转化为数组
+						var tags = orgModel.tags;
+						tags = tags.split(/[;；]/)
+						orgModel.tags = tags;
 						//原location是对象，传到controller转化成model会报错--机构、地址分开传递（json串）
 						orgModel.location = "";
 						var addressModel = {
