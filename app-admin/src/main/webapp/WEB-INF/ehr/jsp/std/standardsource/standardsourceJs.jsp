@@ -98,11 +98,11 @@
                             { display: '名称',name: 'name', width: '35%',align:'left',isAllowHide: false },
                             { display: '创建时间',name: 'createDate', width: '20%',isAllowHide: false },
                             { display: '操作', name: 'operator', width: '12%', render: function (row) {
-								var html ='<div class="grid_edit"  style="margin-left: 40px;cursor:pointer;" title="修改" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "std:stdInfo:open", row.id,'modify') + '"></div>'
-										+'<div class="grid_delete"  style="margin-left: 80px;cursor:pointer;" title="删除"' +
-										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "stdInfo:stdInfoGrid:delete", row.id) + '"></div>';
-//								var html = '<a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","std:stdInfo:open", row.id,'modify')+'">修改</a>' +
-//                                        ' / <a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","stdInfo:stdInfoGrid:delete", row.id)+'">删除</a>';
+//								var html ='<div class="grid_edit"  style="" title="修改" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "std:stdInfo:open", row.id,'modify') + '"></div>'
+//										+'<div class="grid_delete"  style="" title="删除"' +
+//										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "stdInfo:stdInfoGrid:delete", row.id) + '"></div>';
+								var html = '<a class="grid_edit" href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","std:stdInfo:open", row.id,'modify')+'"></a>' +
+                                        '<a class="grid_delete" href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","stdInfo:stdInfoGrid:delete", row.id)+'"></a>';
                                 return html;
                             }}
                         ],

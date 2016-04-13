@@ -54,7 +54,7 @@ public class AdapterOrgController extends BaseUIController {
      * @return
      */
     @RequestMapping("template/adapterOrgInfo")
-    public Object adapterOrgInfoTemplate(Model model, String code, String type, String mode) {
+    public Object adapterOrgInfoTemplate(Model model, String code, String type, String mode, String frm) {
         String url = "/adapterOrg/org/"+code;
 
         String resultStr = "";
@@ -72,7 +72,7 @@ public class AdapterOrgController extends BaseUIController {
             }
             model.addAttribute("info", resultStr);
             model.addAttribute("mode",mode);
-
+            model.addAttribute("frm",frm);
             model.addAttribute("contentPage","/adapter/adapterOrg/adapterOrgDialog");
             return "simpleView";
         } catch (Exception e) {

@@ -40,8 +40,8 @@
                 });
 //                $('#inp_info_metaDataId').ligerComboBox({readonly:mode=='modify'||mode=='view'});
                 this.initCombo(0, $('#inp_info_metaDataId'), info.metaDataId, info.metaDataName);
-                this.initCombo(1, $('#inp_info_orgDataSetSeq'), info.orgDataSetSeq, info.orgDataSetName, info.orgMetaDataSeq);
-                this.initCombo(2, $('#inp_info_orgMetaDataSeq'), info.orgMetaDataSeq, info.orgMetaDataName);
+                this.initCombo(1, $('#inp_info_orgDataSetSeq'), info.orgDataSetSeq, info.orgDataSetName);
+                this.initCombo(2, $('#inp_info_orgMetaDataSeq'), info.orgMetaDataSeq, info.orgMetaDataName, info.orgDataSetSeq);
                 this.$dataMataForm.attrScan();
                 this.$dataMataForm.Fields.fillValues({
                     description:info.description,
@@ -59,7 +59,7 @@
                 this.$dataMataForm.show();
                 this.$dataMataForm.css('display','block');
             },
-            initCombo : function (dictId, target, value, text, childValue){
+            initCombo : function (dictId, target, value, text, parentValue){
                 var url = "${contextRoot}" + dictUrl[dictId];
                 var child = dictId == 1 ? $('#inp_info_orgMetaDataSeq') : undefined;
                 var combo = target.customCombo(
@@ -67,7 +67,7 @@
                             adapterPlanId: adapterPlanId,
                             dataSetId: parentId,
                             mode: mode,
-                            parentId: childValue},
+                            parentId: parentValue},
                         undefined, child, dictId==0 ? mode=='modify'|| mode=='view' : false
                 )
                 if(!Util.isStrEmpty(value)){

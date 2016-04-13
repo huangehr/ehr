@@ -233,8 +233,10 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
             std = true;
             childCheckCount = 0;
             Map<String, String> metaDataList = metaDatas.get(dataSetId);
-            if (metaDataList == null)
+            if (metaDataList == null){
+                rootCheckCount++;
                 continue;
+            }
             for (String k : metaDataList.keySet()) {
                 check = false;
                 for (AdapterCustomize adapterCustomize : adapterCustomizeList) {

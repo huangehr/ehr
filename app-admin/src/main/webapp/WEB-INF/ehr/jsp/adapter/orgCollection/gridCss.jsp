@@ -60,22 +60,4 @@
     font-size: 12px;
     width: 150px;
   }
-  .grid_edit{
-    margin-left: 30px;
-    margin-top: 10px;
-    width: 22px;
-    height: 22px;
-    background: url("${contextRoot}/develop/images/Modify_btn.png")  no-repeat;
-    float: left;
-    cursor: pointer;
-  }
-  .grid_delete{
-    float: left;
-    margin-left: 70px;
-    margin-top: -22px;
-    width: 22px;
-    height: 22px;
-    background: url("${contextRoot}/develop/images/Delete_btn.png")  no-repeat;
-    cursor: pointer;
-  }
 </style>
