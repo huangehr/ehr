@@ -111,14 +111,14 @@
               { display: '采集机构', name: 'orgValue', width: '23%',resizable: true ,align:'left'},
               { display: '继承标准', name: 'parentValue', width: '25%',minColumnWidth: 20 ,align:'left'},
               { display: '操作', name: 'operator', width: '12%', render: function (row) {
-				  var html ='<div class="grid_edit"  style="margin-left: 20px;cursor:pointer;"  title="维护" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:manager", row.code,'manager') + '"></div>'
-						  +'<div class="grid_edit"  style="margin-left: 60px;margin-top:-22px;cursor:pointer;" title="修改"' +
-						  ' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:open", row.code,'modify') + '"></div>'
-						  +'<div class="grid_delete"  style="margin-left: 100px;cursor:pointer;" title="删除"' +
-						  ' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:del", row.code,'del') + '"></div>';
-//                var html = '<a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","adapter:adapterInfo:manager", row.code,'manager')+'">维护 /</a>' +
-//                           '<a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","adapter:adapterInfo:open", row.code,'modify')+'">修改 /</a>' +
-//                           '<a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","adapter:adapterInfo:del", row.code,'del')+'">删除</a>';
+//				  var html ='<div class="grid_edit"  style=""  title="维护" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:manager", row.code,'manager') + '"></div>'
+//						  +'<div class="grid_edit"  style="" title="修改"' +
+//						  ' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:open", row.code,'modify') + '"></div>'
+//						  +'<div class="grid_delete"  style="" title="删除"' +
+//						  ' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:del", row.code,'del') + '"></div>';
+                var html = '<a class="label_a" href="#" title="维护" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","adapter:adapterInfo:manager", row.code,'manager')+'">维护</a>' +
+                           '<a class="grid_edit" href="#" title="编辑" style="margin-left:10px;" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","adapter:adapterInfo:open", row.code,'modify')+'"></a>' +
+                           '<a class="grid_delete" href="#" title="删除" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","adapter:adapterInfo:del", row.code,'del')+'"></a>';
                 return html;
               }}
             ],

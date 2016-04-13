@@ -97,16 +97,19 @@
                 if(!name || !id)
                     return;
                 if(child){
+                    debugger
                     var childManager = child.ligerGetComboBoxManager();
                     var parms = childManager.get("parms");
                     var grid = childManager.getGrid();
                     grid.set({
+                        //parms: parms,
                         newPage: 1
                     });
                     parms.parentId = id;
                     parms.parentName = name;
                     childManager.set({
-                        parms: parms
+                        parms: parms,
+                        newPage: 1
                     });
                     childManager.reload();
                     childManager.clear();

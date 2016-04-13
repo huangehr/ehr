@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,7 +61,7 @@ public class PatientController extends BaseUIController {
                 PatientDetailModel patientDetailModel = new PatientDetailModel();
                 result.setObj(patientDetailModel);
                 model.addAttribute("patientModel", toJson(result));
-                model.addAttribute("patientDialogType", "addPatient");
+                model.addAttribute("patientDialogType", patientDialogType);
                 model.addAttribute("contentPage", "patient/patientInfoDialog");
                 return "generalView";
             } else {
@@ -68,6 +69,7 @@ public class PatientController extends BaseUIController {
                 //todo 该controller的download方法放后台处理
                 resultStr = templates.doGet(comUrl + url + idCardNo);
                 Envelop envelop = getEnvelop(resultStr);
+                model.addAttribute("patientDialogType", patientDialogType);
                 if (envelop.isSuccessFlg()) {
                     model.addAttribute("patientModel", resultStr);
                     if (patientDialogType.equals("updatePatient")) {
@@ -162,49 +164,39 @@ public class PatientController extends BaseUIController {
     @RequestMapping(value = "updatePatient")
     @ResponseBody
     //注册或更新病人信息Header("Content-type: text/html; charset=UTF-8")
-    public Object updatePatient(String patientJsonData, String patientDialogType, HttpServletRequest request, HttpServletResponse response) {
-        //将文件保存至服务器，返回文件的path，
-        //String picPath = webupload(request, response);//网关中处理webupload
-        try {
+    public Object updatePatient(String patientJsonData, String patientDialogType,HttpServletRequest request, HttpServletResponse response) {
 
+        try {
 
             String url = "/populations";
             String resultStr = "";
             Envelop result = new Envelop();
             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-            PatientDetailModel patientDetailModel = toModel(URLDecoder.decode(patientJsonData, "UTF-8"), PatientDetailModel.class);
+            String[] strings = URLDecoder.decode(patientJsonData, "UTF-8").split(";");
+            PatientDetailModel patientDetailModel = toModel(strings[0], PatientDetailModel.class);
             RestTemplates templates = new RestTemplates();
 
-
-            //图片上传测试开始
             request.setCharacterEncoding("UTF-8");
             InputStream inputStream = request.getInputStream();
             String imageName = request.getParameter("name");
 
-
-            int temp = 0;  //所有读取的内容都使用temp接收
+            //读取文件流，将文件输入流转成 byte
+            int temp = 0;
             int bufferSize = 1024;
             byte tempBuffer[] = new byte[bufferSize];
             byte[] fileBuffer = new byte[0];
             while ((temp = inputStream.read(tempBuffer)) != -1) {
                 fileBuffer = ArrayUtils.addAll(fileBuffer, ArrayUtils.subarray(tempBuffer, 0, temp));
             }
-
-            //图片上传测试结束
             inputStream.close();
 
-//            ByteArrayInputStream in = new ByteArrayInputStream(tempBuffer);
-//            FileOutputStream fileOutputStream = new FileOutputStream(new File("C:\\Users\\wq\\AppData\\Local\\Temp\\patientImages\\M00\\00\\"+imageName));
-//            fileOutputStream.write(fileBuffer);
-//            fileOutputStream.flush();
-//            fileOutputStream.close();
-        String restStream = Base64.encode(fileBuffer);
+            String restStream = Base64.encode(fileBuffer);
+            String imageStream = URLEncoder.encode(restStream, "UTF-8");
 
-        params.add("inputStream", restStream);
-        params.add("imageName", imageName);
-
-
-            if (StringUtils.isEmpty(patientDialogType)) {
+            params.add("inputStream", imageStream);
+            params.add("imageName", imageName);
+//            StringUtils.isEmpty(patientDialogType)&&!strings[1].equals("addPatient")
+            if (strings[1].equals("updatePatient")) {
                 String idCardNo = patientDetailModel.getIdCardNo();
                 resultStr = templates.doGet(comUrl + url + '/' + idCardNo);
                 Envelop envelop = getEnvelop(resultStr);
@@ -243,7 +235,7 @@ public class PatientController extends BaseUIController {
                     result.setErrorMsg(envelop.getErrorMsg());
                     return result;
                 }
-            } else if (patientDialogType.equals("addPatient")) {
+            } else if (strings[1].equals("addPatient")) {
                 //联系电话
                 Map<String, String> telphoneNo = new HashMap<String, String>();
                 String tag = "联系电话";
@@ -253,9 +245,9 @@ public class PatientController extends BaseUIController {
             }
             try {
 
-                if (StringUtils.isEmpty(patientDialogType)) {
+                if (strings[1].equals("updatePatient")) {
                     resultStr = templates.doPut(comUrl + url, params);
-                } else if (patientDialogType.equals("addPatient")) {
+                } else if (strings[1].equals("addPatient")) {
                     resultStr = templates.doPost(comUrl + url, params);
                 }
                 result.setSuccessFlg(getEnvelop(resultStr).isSuccessFlg());
@@ -265,29 +257,6 @@ public class PatientController extends BaseUIController {
                 result.setErrorMsg(ErrorCode.SystemError.toString());
                 return result;
             }
-//        //String patientData = request.getParameter("patientJsonData");
-//        String patientData = URLDecoder.decode(patientJsonData,"UTF-8");
-//
-//        //将文件保存至服务器，返回文件的path，
-//        String picPath = webupload(request, response);
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        PatientModel patientModels = objectMapper.readValue(patientData, PatientModel.class);
-///*        String patientPassword = HashUtil.hashStr(patientModels.getPassword());
-//        patientModels.setPassword(patientPassword);*/
-//        //将文件path保存至数据库
-//        patientModels.setPicPath(picPath);
-//        if(picPath != null){
-//            patientModels.setLocalPath("");
-//        }
-//        Map<String, PatientModel> data = new HashMap<>();
-//        Result result = null;
-//        if (demographicIndex.updatePatient(patientModels)) {
-//            result = getSuccessResult(true);
-//        } else {
-//            result = getSuccessResult(false);
-//        }
-//        result.setObj(data);
-//        return result.toJson();
         } catch (Exception e) {
             e.printStackTrace();
             return "";

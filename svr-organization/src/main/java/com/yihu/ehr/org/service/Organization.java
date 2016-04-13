@@ -1,6 +1,7 @@
 package com.yihu.ehr.org.service;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.*;
@@ -14,8 +15,13 @@ import java.util.*;
  */
 @Entity
 @Table(name = "organizations")
-@Access(value = AccessType.PROPERTY)
+@Access(value = AccessType.FIELD)
 public class Organization  {
+
+    @Id
+    @GeneratedValue(generator = "Generator")
+    @GenericGenerator(name = "Generator", strategy = "assigned")
+    @Column(name = "org_code", unique = true, nullable = false)
     private String orgCode;         // 机构代码,对医院编码属性需要调研
     private String admin;            // 机构管理员
     private boolean settled;        // 是否已接入,对第三方平台有效.
@@ -34,8 +40,7 @@ public class Organization  {
         //tags = new HashSet<>();
     }
 
-    @Id
-    @Column(name = "org_code", unique = true, nullable = false)
+
     public String getOrgCode() {
         return orgCode;
     }

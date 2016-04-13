@@ -99,11 +99,11 @@
                 { display: '字典编码', name: 'code',width: '33%', isAllowHide: false  ,align:'left'},
                 { display: '字典名称',name: 'name', width: '34%',isAllowHide: false  ,align:'left'},
                 { display: '操作', name: 'operator', width: '33%', render: function (row) {
-					var html ='<div class="grid_edit"  style="margin-left: 30px;cursor:pointer;" title="修改" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "stddict:dictInfo:open", row.id,'modify') + '"></div>'
-							+'<div class="grid_delete"  style="margin-left: 70px;cursor:pointer;" title="删除"' +
-							' onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "stddict:dictInfoGrid:delete", row.id) + '"></div>';
-//                  var html = '<a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","stddict:dictInfo:open", row.id,'modify')+'">修改</a>' +
-//                          ' / <a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","stddict:dictInfoGrid:delete", row.id)+'">删除</a>';
+//					var html ='<div class="grid_edit"  style="" title="" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "stddict:dictInfo:open", row.id,'modify') + '"></div>'
+//							+'<div class="grid_delete"  style="" title=""' +
+//							' onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "stddict:dictInfoGrid:delete", row.id) + '"></div>';
+                  var html = '<a class="grid_edit"  href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","stddict:dictInfo:open", row.id,'modify')+'"></a>' +
+                          '<a class="grid_delete" href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","stddict:dictInfoGrid:delete", row.id)+'"></a>';
                   return html;
                 }}
               ],
@@ -211,11 +211,11 @@
               { display: '值域名称',name: 'value', width: '34%',isAllowHide: false  ,align:'left'},
               { display: '操作', name: 'operator', width: '33%', render: function (row) {
 
-				  var html ='<div class="grid_edit"  style="margin-left: 80px;cursor:pointer;" title="修改" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}'])", "entry:dictInfo:open", row.id,row.dictId,'modify') + '"></div>'
-						  +'<div class="grid_delete"  style="margin-left: 120px;cursor:pointer;" title="删除"' +
-						  ' onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "entry:dictInfoGrid:delete", row.id) + '"></div>';
-//                var html = '<a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}','{3}'])","entry:dictInfo:open", row.id,row.dictId,'modify')+'">修改</a>' +
-//                        ' / <a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","entry:dictInfoGrid:delete", row.id)+'">删除</a>';
+//				  var html ='<div class="grid_edit"  style="" title="" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}'])", "entry:dictInfo:open", row.id,row.dictId,'modify') + '"></div>'
+//						  +'<div class="grid_delete"  style="" title=""' +
+//						  ' onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "entry:dictInfoGrid:delete", row.id) + '"></div>';
+                var html = '<a class="grid_edit" href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}','{3}'])","entry:dictInfo:open", row.id,row.dictId,'modify')+'"></a>' +
+                        '<a class="grid_delete" href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","entry:dictInfoGrid:delete", row.id)+'"></a>';
                 return html;
               }}
             ],
