@@ -60,7 +60,7 @@ public class SystemDictController extends BaseUIController {
         params.put("dictionary",toJson(systemDictModel));
 
         try{
-            String urlCheck = "/dictionaries/existence/"+ name;
+            String urlCheck = "/dictionaries/existence";
             Map<String, Object> paramsCheck = new HashMap<>();
             paramsCheck.put("dict_name",name);
             String resultCheckStr = HttpClientUtil.doGet(comUrl + urlCheck, paramsCheck, username, password);
