@@ -4,8 +4,8 @@ import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.MStdDictEntry;
 import com.yihu.ehr.standard.commons.ExtendController;
+import com.yihu.ehr.standard.dict.service.BaseDictEntry;
 import com.yihu.ehr.standard.dict.service.DictEntryService;
-import com.yihu.ehr.standard.dict.service.IDictEntry;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -25,7 +25,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "entry", description = "标准字典项", tags = {"标准字典项"})
+@Api(value = "Entry", description = "字典项服务")
 public class DictEntryController extends ExtendController<MStdDictEntry> {
 
     @Autowired
@@ -47,8 +47,8 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
             @RequestParam(value = "model") String model) throws Exception{
 
         Class entityClass = getServiceEntity(version);
-        IDictEntry dictEntryModel = (IDictEntry) jsonToObj(model, entityClass);
-//        IDictEntry dictEntry = dictEntryService.retrieve(id, entityClass);
+        BaseDictEntry dictEntryModel = (BaseDictEntry) jsonToObj(model, entityClass);
+//        BaseDictEntry dictEntry = dictEntryService.retrieve(id, entityClass);
 //        if(!dictEntry.getCode().equals(dictEntryModel.getCode())
 //                && dictEntryService.isExistByField("code", dictEntryModel.getCode(), entityClass))
 //            throw errRepeatCode();
@@ -68,7 +68,7 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
             @RequestParam(value = "model") String model) throws Exception{
 
         Class entityClass = getServiceEntity(version);
-        IDictEntry dictEntry = (IDictEntry) jsonToObj(model, entityClass);
+        BaseDictEntry dictEntry = (BaseDictEntry) jsonToObj(model, entityClass);
 //        if(dictEntryService.isExistByField("code", dictEntry.getCode(), entityClass))
 //            throw errRepeatCode();
         if (dictEntryService.add(dictEntry, version))

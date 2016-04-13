@@ -37,11 +37,9 @@ public class PackageService extends BaseJpaService<Package, XPackageRepository> 
     @Autowired
     FastDFSUtil fastDFSUtil;
 
-    public String receive(InputStream is, String pwd) {
+    public Package receive(InputStream is, String pwd) {
         Map<String, String> metaData = storeJsonPackage(is);
-        checkIn(metaData.get("id"), metaData.get("path"), pwd);
-
-        return metaData.get("id");
+        return checkIn(metaData.get("id"), metaData.get("path"), pwd);
     }
 
     public Package getPackage(String id) {
@@ -56,14 +54,6 @@ public class PackageService extends BaseJpaService<Package, XPackageRepository> 
         byte[] data = fastDFSUtil.download(file[0], file[1]);
 
         return new ByteArrayInputStream(data);
-    }
-
-    public List<Package> searchArchives(Map<String, Object> args, Pageable pageable) throws ParseException {
-        Date since = (Date)args.get("since");
-        Date to = (Date)args.get("to");
-        ArchiveStatus archiveStatus = (ArchiveStatus) args.get("archiveStatus");
-
-        return getRepo().findAll(archiveStatus, since, to, pageable);
     }
 
     public Package acquirePackage(String id) {
@@ -143,7 +133,7 @@ public class PackageService extends BaseJpaService<Package, XPackageRepository> 
      * @param pwd  zip密码
      * @return 索引存储成功
      */
-    boolean checkIn(String id, String path, String pwd) {
+    Package checkIn(String id, String path, String pwd) {
         try {
             Package aPackage = new Package();
             aPackage.setId(id);
@@ -151,13 +141,13 @@ public class PackageService extends BaseJpaService<Package, XPackageRepository> 
             aPackage.setPwd(pwd);
             aPackage.setReceiveDate(new Date());
             aPackage.setArchiveStatus(ArchiveStatus.Received);
-
             getRepo().save(aPackage);
-            return true;
+
+            return aPackage;
         } catch (HibernateException ex) {
             LogService.getLogger(PackageService.class).error(ex.getMessage());
 
-            return false;
+            return null;
         }
     }
 

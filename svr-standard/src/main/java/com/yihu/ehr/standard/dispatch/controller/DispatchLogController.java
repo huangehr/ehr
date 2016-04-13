@@ -24,12 +24,11 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "dispatch-log", description = "标准分发日志接口", tags = {"标准分发日志接口"})
+@Api(value = "dispatch-log", description = "分发与下载日志服务")
 public class DispatchLogController extends ExtendController<MDispatchLog> {
 
     @Autowired
     private DispatchLogService dispatchLogService;
-
 
     @RequestMapping(value = RestApi.Standards.DispatchLogs, method = RequestMethod.GET)
     @ApiOperation(value = "获取日志信息")
@@ -37,16 +36,15 @@ public class DispatchLogController extends ExtendController<MDispatchLog> {
             @ApiParam(required = true, name = "version", value = "版本号")
             @RequestParam(value = "version", required = true) String versionCode,
             @ApiParam(required = true, name = "org_code", value = "机构代码")
-            @RequestParam(value = "org_code", required = true) String orgCode) throws Exception{
+            @RequestParam(value = "org_code", required = true) String orgCode) throws Exception {
 
         List ls = dispatchLogService.findByFields(
-                        new String[]{"stdVersionId", "orgId"},
-                        new Object[]{versionCode, orgCode});
-        if(ls.size()>0)
+                new String[]{"stdVersionId", "orgId"},
+                new Object[]{versionCode, orgCode});
+        if (ls.size() > 0)
             return getModel(ls.get(0));
         return null;
     }
-
 
     @RequestMapping(value = RestApi.Standards.DispatchLogs, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除日志信息")
@@ -54,7 +52,7 @@ public class DispatchLogController extends ExtendController<MDispatchLog> {
             @ApiParam(required = true, name = "version", value = "版本号")
             @RequestParam(value = "version", required = true) String versionCode,
             @ApiParam(required = true, name = "org_code", value = "机构代码")
-            @RequestParam(value = "org_code", required = true) String orgCode) throws Exception{
+            @RequestParam(value = "org_code", required = true) String orgCode) throws Exception {
 
         return dispatchLogService.delete(versionCode, orgCode);
     }
@@ -63,7 +61,7 @@ public class DispatchLogController extends ExtendController<MDispatchLog> {
     @ApiOperation(value = "新增日志信息")
     public MDispatchLog saveLog(
             @ApiParam(name = "model", value = "数据模型")
-            @RequestParam(value = "model") String model) throws Exception{
+            @RequestParam(value = "model") String model) throws Exception {
 
         DispatchLog dispatchLog = toEntity(model, DispatchLog.class);
         dispatchLog.createId();

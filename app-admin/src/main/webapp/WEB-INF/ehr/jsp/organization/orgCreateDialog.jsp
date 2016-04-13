@@ -6,7 +6,7 @@
     <div class="m-form-group">
         <label><spring:message code="lbl.org.code"/><spring:message code="spe.colon"/></label>
         <div class="l-text-wrapper m-form-control essential">
-            <input type="text" id="org_code" class="required useTitle ajax validate-space validate-org-code f-w240 max-length-20"  required-title=<spring:message code="lbl.must.input"/> data-attr-scan="orgCode"/>
+            <input type="text" id="org_code" class="required useTitle ajax validate-space validate-org-code f-w240 max-length-20"  required-title=<spring:message code="lbl.must.input"/> data-attr-scan="organizationCode"/>
         </div>
     </div>
 

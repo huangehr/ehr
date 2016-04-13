@@ -1,4 +1,4 @@
-package com.yihu.ehr.org;
+package com.yihu.ehr.schema;
 
 import com.yihu.ehr.schema.StdKeySchema;
 import org.junit.Test;
@@ -23,8 +23,8 @@ public class StdKeySchemaTest {
 
     //@Test
     public void dataSetKey() throws Exception {
-        assertEquals("std_data_set_000000000000:HDSA01:code", schema.dataSetCode(Version, "HDSA01"));
-        assertNotEquals("std_data_set_000000000000:HDSA01:name", schema.dataSetCode(Version, "HDSA01"));
+        assertEquals("std_data_set_000000000000:1:code", schema.dataSetName(Version, "1"));
+        assertNotEquals("std_data_set_000000000000:1:name", schema.dataSetName(Version, "2"));
     }
 
     //@Test

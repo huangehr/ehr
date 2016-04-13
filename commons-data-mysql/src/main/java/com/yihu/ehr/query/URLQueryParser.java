@@ -3,7 +3,6 @@ package com.yihu.ehr.query;
 import com.yihu.ehr.util.DateFormatter;
 import javafx.util.Pair;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
 import org.springframework.util.NumberUtils;
 
 import javax.persistence.EntityManager;
@@ -203,11 +202,16 @@ public class URLQueryParser<T> {
         } else if (filter.contains("=")) {
             Pair<Path, String> pair = getPair(filter, "=", root);
 
-            if (pair.getValue().contains(",")) {
-                predicate = pair.getKey().in(pair.getValue().split(","));
-            } else {
-                predicate = cb.equal(pair.getKey(), pair.getValue());
+            Set<Object> values = new HashSet<>();
+            for (String data : pair.getValue().split(",")){
+                if (pair.getKey().getJavaType().isEnum()){
+                    values.add(Enum.valueOf(pair.getKey().getJavaType(), data));
+                } else{
+                    values.add(data);
+                }
             }
+
+            predicate = pair.getKey().in(values);
         }
 
         return predicate;

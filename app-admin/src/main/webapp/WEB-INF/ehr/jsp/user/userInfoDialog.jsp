@@ -3,7 +3,7 @@
 <!--######用户管理页面 > 用户信息对话框模板页######-->
 <div id="div_user_info_form" data-role-form class="m-form-inline f-mt20 f-pb30" style="overflow:auto">
     <input data-attr-scan="id" hidden="hidden"/>
-    <%--<input data-attr-scan="orgCode" hidden="hidden"/>--%>
+    <%--<input data-attr-scan="organizationCode" hidden="hidden"/>--%>
     <%--保存初始数据-------yww--%>
     <input hidden="hidden" id="idCardCopy"/>
     <input hidden="hidden" id="emailCopy"/>

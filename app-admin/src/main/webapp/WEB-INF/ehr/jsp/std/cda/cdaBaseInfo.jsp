@@ -45,7 +45,7 @@
 
             <div class="l-text-wrapper m-form-control essential">
                 <input type="text" id="ipt_type" data-type="select" class="required useTitle" required-title=<spring:message code="lbl.must.input"/>
-                       data-attr-scan="operationType">
+                       data-attr-scan="type">
             </div>
         </div>
         <div class="m-form-group">
