@@ -85,7 +85,6 @@ set.list = {
             "margin-left": 100, "margin-top": -20
         });
         this.setCss();
-        debugger;
         this.event();
         this.getVersionList();
         this.bindEvents();
@@ -119,7 +118,6 @@ set.list = {
             success: function (data) {
                 var envelop = eval(data);
                 var result = envelop.detailModelList;
-                debugger;
                 //var result = eval(data.result);
                 var option = [];
                 for (var i = 0; i < result.length; i++) {
@@ -436,7 +434,7 @@ set.attr = {
             u._url = $("#hd_url").val();
         }
         var cdaVersion = $("#hdversion").val();
-        debugger
+
         $.ajax({
             //url: u._url + "/cdadict/getStdSourceList",
             url: u._url + "/standardsource/getStdSourceList",
@@ -491,7 +489,6 @@ set.attr = {
             dataType: "json",
             data: {dataSetId: id, versionCode: versionCode},
             success: function (data) {
-                //debugger;
                 //  cda.list.clearCdaDetail();
 
                 var result = eval(data);
@@ -547,7 +544,6 @@ set.attr = {
         })
     },
     event: function () {
-        debugger;
         // 表单校验工具类
         var jValidation = $.jValidation;
         var validator = new jValidation.Validation(this.set_form, {immediate: true, onSubmit: false});
@@ -576,18 +572,34 @@ set.elementAttr = {
         this.getElementInfo();
     },
     getDictList: function (initValue, initText) {
-
         var version = $("#hdversion").val();
+        var url = set.list._url + "/std/dataset/getMetaDataDict?version=" + version;
         set.elementAttr.dict_select = $("#criterionDict").ligerComboBox({
-            url: set.list._url + "/std/dataset/getMetaDataDict?version=" + version,
+            condition: { inputWidth: 90 ,width:0,labelWidth:0,hideSpace:true,fields: [{ name: 'param', label:''}] },
+            url: url,
+            grid: getGridOptions(true),
             valueField: 'id',
             textField: 'name',
-            selectBoxWidth: 400,
+            width : 240,
+            selectBoxHeight : 260,
+            //selectBoxWidth: 400,
             autocomplete: true,
             keySupport: true,
-            width: 400,
+            //width: 400,
+            onSelected: function(id,name){
+                $("#criterionDict").val(name);
+            },
+            conditionSearchClick: function (g) {
+                var param = g.rules.length>0? g.rules[0].value : '';
+                param = {param:param }
+                g.grid.set({
+                    parms: param,
+                    newPage: 1
+                });
+                g.grid.reload();
+            },
             onSuccess: function () {
-                set.elementAttr.dict_select.setValue(initValue);
+                //set.elementAttr.dict_select.setValue(initValue);
                 $("#criterionDict").css({"width": 213, "height": 28});
                 $(".l-text-combobox").css({"width": 227});
                 $(".l-box-select-absolute").css({"width": 227});
@@ -596,6 +608,36 @@ set.elementAttr = {
 
             }
         });
+
+        if(initValue != ""){
+            $("#criterionDict").ligerGetComboBoxManager().setValue(initValue);
+            $("#criterionDict").ligerGetComboBoxManager().setText(initText);
+        }
+
+        function getGridOptions(checkbox) {
+            var options = {
+                columns: [
+                    {display : '名称', name :'name',width : 210}
+                ],
+                allowAdjustColWidth : true,
+                editorTopDiff : 41,
+                headerRowHeight : 0,
+                height : '100%',
+                heightDiff : 0,
+                pageSize: 15,
+                pagesizeParmName : 'rows',
+                record : "totalCount",
+                root : "detailModelList",
+                rowHeight : 30,
+                rownumbers :false,
+                switchPageSizeApplyComboBox: false,
+                width :"98%",
+                url : url
+            };
+            return options;
+        }
+
+
         $("#datatype").ligerComboBox({
             height: 28,
             width: 220
@@ -619,8 +661,9 @@ set.elementAttr = {
             data: {dataSetId: dataSetId, metaDataId: metaDataId, version: version},
             async: true,
             success: function (data) {
-                debugger
+
                 if (data != null) {
+
                     var info = eval(data).obj;
                     set.elementAttr.element_form.attrScan();
                     set.elementAttr.element_form.Fields.fillValues(info);
@@ -655,7 +698,7 @@ set.elementAttr = {
         if (id == "")
             id = "0";
         dataJson[0]["id"] = id;
-        debugger
+
 
         var versionCode = $("#hdversion").val();
         //dataJson[0]["version"] = versionCode;
@@ -713,7 +756,6 @@ set.elementAttr = {
                     var hdversion = $("#hdversion").val();
                     var datasetId = $("#hdsetid").val();
                     var ErrorMsg = null;
-                    debugger
                     if (Util.isStrEquals($(elm).attr("id"), 'metaDataInnerCode')) {
                         var metaDataCode = $("#metaDataInnerCode").val();
                         var metaDataCodeCopy = $("#metaDataCodeCopy").val();
