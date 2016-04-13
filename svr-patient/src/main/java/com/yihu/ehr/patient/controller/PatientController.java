@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiParam;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang.StringUtils;
 import org.csource.common.MyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -281,7 +282,7 @@ public class PatientController extends BaseRestController {
             file.getParentFile().mkdirs();
         }
         DemographicInfo demographicInfo = demographicService.getDemographicInfo(new DemographicId(demographicId));
-        if (demographicInfo.getLocalPath() != null) {
+        if (!StringUtils.isEmpty(demographicInfo.getLocalPath())) {
             File fileName = new File(demographicInfo.getLocalPath());
             if (fileName.exists()) {
                 return demographicInfo.getLocalPath();

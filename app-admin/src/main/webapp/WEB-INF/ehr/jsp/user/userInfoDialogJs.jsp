@@ -19,8 +19,7 @@
         // 表单校验工具类
         var jValidation = $.jValidation;
 
-        var allData = JSON.parse('${allData}');
-//        var orgLoc = allData[0];
+        var allData = ${allData};
         var user = allData.obj;
 
 
@@ -163,8 +162,9 @@
                 self.$idCardCopy.val(user.idCardNo);
                 self.$emailCopy.val(user.email);
 
-                var pic = user.localPath;
-                if (!(Util.isStrEquals(pic, null) || Util.isStrEquals(pic, ""))) {
+                debugger
+                var pic = user.imgLocalPath;
+                if (!Util.isStrEmpty(pic)) {
                     self.$imageShow.html('<img src="${contextRoot}/user/showImage?localImgPath=' + pic + '" class="f-w88 f-h110"></img>');
                 }
 
