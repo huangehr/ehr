@@ -13,6 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -90,8 +91,8 @@ public class OrgDictEntryController extends BaseController {
             {
                 return failed("字典项已存在!");
             }
-
-            mOrgDictItem = orgDictEntryClient.updateDictItem(objectMapper.writeValueAsString(mOrgDictItem));
+            BeanUtils.copyProperties(mOrgDictItem, dictItem, "id", "createDate", "createUser", "sequence");
+            mOrgDictItem = orgDictEntryClient.updateDictItem(objectMapper.writeValueAsString(dictItem));
         }
         if (mOrgDictItem == null) {
             return failed("保存失败!");

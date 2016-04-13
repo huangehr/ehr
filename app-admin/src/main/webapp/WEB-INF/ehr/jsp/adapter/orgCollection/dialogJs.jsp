@@ -80,7 +80,7 @@
 
                 this.$btnSave.click(function () {
                     var adapterModel = self.$form.Fields.getValues();
-                    adapterModel.sequence = seq;
+//                    adapterModel.sequence = seq;
                     if(!validator.validate()){
                         return;
                     }

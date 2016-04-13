@@ -12,6 +12,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -90,8 +91,8 @@ public class OrgDataSetController extends BaseController {
                         && isExist) {
                     return failed("数据集已存在!");
                 }
-                //mOrgDataSet.setUpdateDate(new Date());
-                mOrgDataSet = orgDataSetClient.updateOrgDataSet(objectMapper.writeValueAsString(mOrgDataSet));
+                BeanUtils.copyProperties(mOrgDataSet, orgDataSet, "id", "createDate", "createUser", "sequence");
+                mOrgDataSet = orgDataSetClient.updateOrgDataSet(objectMapper.writeValueAsString(orgDataSet));
             }
 
             detailModel = convertToOrgDataSetDetailModel(mOrgDataSet);

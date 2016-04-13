@@ -46,7 +46,8 @@ public class CDAVersionController extends BaseController {
         List<StdVersionModel> versionModelList = new ArrayList<>();
         for (MCDAVersion mCdaVersion : mCdaVersions) {
             StdVersionModel versionModel = convertToModel(mCdaVersion, StdVersionModel.class);
-            versionModel.setCommitTime(DateUtil.formatDate(mCdaVersion.getCommitTime(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT));
+            if(mCdaVersion.getCommitTime()!=null)
+                versionModel.setCommitTime(DateUtil.formatDate(mCdaVersion.getCommitTime(), DateUtil.DEFAULT_YMDHMSDATE_FORMAT));
 
             //基础版本名字
             //versionModel.setBaseVersionName();
@@ -85,7 +86,7 @@ public class CDAVersionController extends BaseController {
         }
         envelop.setSuccessFlg(true);
         StdVersionDetailModel stdVersionDetailModel = convertToModel(mcdaVersion, StdVersionDetailModel.class);
-        if(stdVersionDetailModel!=null) {
+        if(stdVersionDetailModel!=null && mcdaVersion.getCommitTime()!=null) {
             stdVersionDetailModel.setCommitTime(DateToString(mcdaVersion.getCommitTime(), AgAdminConstants.DateTimeFormat));
         }
         envelop.setObj(stdVersionDetailModel);
@@ -161,7 +162,7 @@ public class CDAVersionController extends BaseController {
             return envelop;
         }
         StdVersionDetailModel stdVersionDetailModel = convertToModel(mcdaVersion, StdVersionDetailModel.class);
-        if(stdVersionDetailModel!=null)
+        if(stdVersionDetailModel!=null && mcdaVersion.getCommitTime()!=null)
         {
             stdVersionDetailModel.setCommitTime(DateToString(mcdaVersion.getCommitTime(),AgAdminConstants.DateTimeFormat));
         }
