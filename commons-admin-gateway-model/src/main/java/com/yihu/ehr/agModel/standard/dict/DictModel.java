@@ -15,7 +15,7 @@ public class DictModel {
     String sourceId;
     String stdVersion;// 标准化版本
     int hashCode;
-    String OperationType;
+    String type;
     String innerVersion;
     int inStage;
 
@@ -99,12 +99,12 @@ public class DictModel {
         this.hashCode = hashCode;
     }
 
-    public String getOperationType() {
-        return OperationType;
+    public String getType() {
+        return type;
     }
 
-    public void setOperationType(String operationType) {
-        OperationType = operationType;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getInnerVersion() {

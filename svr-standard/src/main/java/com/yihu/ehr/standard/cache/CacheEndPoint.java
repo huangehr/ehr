@@ -2,10 +2,8 @@ package com.yihu.ehr.standard.cache;
 
 import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.standard.MCDAVersion;
-import com.yihu.ehr.standard.StdCache;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -19,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "standard cache", description = "标准缓存服务")
-public class StandardCacheEndPoint {
+public class CacheEndPoint {
     @Autowired
     StdCache stdCache;
 

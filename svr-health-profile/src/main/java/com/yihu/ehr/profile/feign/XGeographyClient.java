@@ -12,13 +12,9 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
-
-/**
- * Created by Administrator on 2016/1/4.
- */
-@FeignClient(name = MicroServices.Geography)
 @ApiIgnore
-public interface GeographyClient {
+@FeignClient(name = MicroServices.Geography)
+public interface XGeographyClient {
 
 
     @RequestMapping(value = ApiVersion.Version1_0+"/geographies/{id}", method = RequestMethod.GET)

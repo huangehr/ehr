@@ -1,25 +1,44 @@
 package com.yihu.ehr.profile.controller;
 
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.cache.CacheReader;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.model.profile.MDataSet;
+import com.yihu.ehr.model.profile.MDocument;
+import com.yihu.ehr.model.profile.MProfile;
+import com.yihu.ehr.model.profile.MRecord;
 import com.yihu.ehr.model.standard.MCDADocument;
+import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
+import com.yihu.ehr.profile.config.CdaDocumentOptions;
+import com.yihu.ehr.profile.core.DataSetTableOption;
 import com.yihu.ehr.profile.core.Profile;
-import com.yihu.ehr.profile.model.MDataSet;
-import com.yihu.ehr.profile.model.MDocument;
-import com.yihu.ehr.profile.model.MProfile;
+import com.yihu.ehr.profile.core.ProfileDataSet;
+import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.persist.ProfileIndices;
 import com.yihu.ehr.profile.persist.repo.ProfileRepository;
 import com.yihu.ehr.profile.persist.repo.XProfileIndicesRepo;
-import com.yihu.ehr.util.controller.BaseEndPoint;
+import com.yihu.ehr.profile.service.ProfileSerializer;
+import com.yihu.ehr.profile.service.TemplateService;
+import com.yihu.ehr.schema.OrgKeySchema;
+import com.yihu.ehr.schema.StdKeySchema;
+import com.yihu.ehr.util.controller.BaseRestEndPoint;
 import com.yihu.ehr.util.encode.Base64;
+import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
@@ -31,23 +50,33 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "健康档案服务", description = "健康档案获取及查询服务")
-public class ProfileEndPoint extends BaseEndPoint {
+@Api(value = "健康档案服务", description = "健康档案服务")
+@DependsOn("objectMapper")
+public class ProfileEndPoint extends BaseRestEndPoint {
     @Autowired
     private ProfileRepository profileRepo;
 
     @Autowired
     private XProfileIndicesRepo profileIndicesRepo;
 
-    // 数据集代码与CDA类别ID之间的映射
-    Map<String, String> cdaTypeMapper;
+    @Autowired
+    private TemplateService templateService;
+
+    @Autowired
+    private XCDADocumentClient cdaDocumentClient;
+
+    @Autowired
+    CdaDocumentOptions cdaDocumentOptions;
+
+    @Autowired
+    OrgKeySchema orgKeySchema;
 
     @ApiOperation(value = "按时间获取档案列表", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "获取患者的就诊档案列表")
     @RequestMapping(value = RestApi.HealthProfile.Profiles, method = RequestMethod.GET)
     public Collection<MProfile> getProfiles(
-            @ApiParam(value = "身份证号,使用Base64编码", defaultValue = "NDUxMzAwMTk5MzA4MjgxMjk0")
+            @ApiParam(value = "身份证号,使用Base64编码", defaultValue = "NDEyNzI2MTk1MTExMzA2MjY4")
             @PathVariable("demographic_id") String demographicId,
-            @ApiParam(value = "起始时间", defaultValue = "2016-01-01")
+            @ApiParam(value = "起始时间", defaultValue = "2015-01-01")
             @RequestParam("since") @DateTimeFormat(pattern = "yyyy-MM-dd") Date since,
             @ApiParam(value = "结束时间", defaultValue = "2016-12-31")
             @RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,
@@ -66,67 +95,39 @@ public class ProfileEndPoint extends BaseEndPoint {
             profiles.add(profile);
         }
 
+        List<MProfile> profileList = new ArrayList<>();
         for (Profile profile : profiles) {
-            MProfile mProfile = new MProfile();
-            mProfile.setSummary(profile.getSummary());
-            mProfile.setOrgCode(profile.getOrgCode());
-            mProfile.setOrgName(profile.getOrgName());
-            mProfile.setDate(profile.getEventDate());
+            MProfile mProfile = convertProfile(profile);
 
-            // 取得与此档案相关联的CDA类目
-            String cdaType = null;
-            for (String dataSetCode : cdaTypeMapper.keySet()) {
-                if (profile.getDataSet(dataSetCode) != null) {
-                    cdaType = cdaTypeMapper.get(dataSetCode);
-                    break;
-                }
-            }
-
-            if (cdaType == null) throw new RuntimeException("Cannot find cda document type by data set code, forget primary data set & cda document mapping?");
-
-            // 此类目下卫生机构定制的CDA文档列表
-            MCDADocument[] cdaDocuments = archiveTplManager.getAdaptedDocumentsList(profile.getOrgCode(), profile.getCdaVersion(), cdaType);
-            if (cdaDocuments == null || cdaDocuments.length == 0)
-                throw new RuntimeException("Unable to get cda document of version " + profile.getCdaVersion()
-                        + " for organization " + profile.getOrgCode() + ", template not uploaded?");
-
-            for (MCDADocument cdaDocument : cdaDocuments) {
-                MDocument document = new MDocument();
-                document.cdaVersion = profile.getCdaVersion();
-                document.orgCode = profile.getOrgCode();
-                document.cdaDocumentId = cdaDocument.getId();
-                document.cdaDocumentName = cdaDocument.getName();
-
-                // CDA文档裁剪，根据从医院中实际采集到的数据集，对CDA进行裁剪
-                boolean validDocument = false;
-                XCdaDatasetRelationship[] datasetRelationships = cdaDocument.getRelationship();
-                for (XCdaDatasetRelationship datasetRelationship : datasetRelationships) {
-                    String stdDataSetCode = datasetRelationship.getDataSetCode();
-                    String originDataSetCode = StdObjectQualifierTranslator.makeOriginDataSetTable(datasetRelationship.getDataSetCode());
-
-                    XEhrDataSet ehrStdDataSet = ehrArchive.getDataSet(stdDataSetCode);
-                    if (ehrStdDataSet != null) {
-                        DataSetModel stdDataSet = createDateSetModel(stdDataSetCode, ehrStdDataSet);
-                        document.dataSets.add(stdDataSet);
-
-                        if (!validDocument) validDocument = !ehrStdDataSet.getCode().startsWith("HDSA00_01");
-                    }
-
-                    XEhrDataSet ehrOriDataSet = ehrArchive.getDataSet(originDataSetCode);
-                    if (ehrOriDataSet != null) {
-                        DataSetModel oriDataSet = createDateSetModel(originDataSetCode, ehrOriDataSet);
-                        document.dataSets.add(oriDataSet);
-
-                        if (!validDocument) validDocument = !ehrStdDataSet.getCode().startsWith("HDSA00_01");
-                    }
-                }
-
-                // TODO 仅对有关键数据集的CDA文档展示，若只有病人基本信息数据集则不用展示
-                if (validDocument) mProfile.documents.add(document);
-            }
+            profileList.add(mProfile);
         }
 
-        return convertToModels(profiles, new ArrayList<>(profiles.size()), MProfile.class, null);
+        return profileList;
+    }
+
+    @Autowired
+    CacheReader cacheReader;
+
+    @Autowired
+    StdKeySchema stdKeySchema;
+
+    private void addDataset(String version, MDocument document, ProfileDataSet dataSet) {
+        if (dataSet != null) {
+            String dataSetCode = DataSetTableOption.standardDataSetCode(dataSet.getCode());
+
+            MDataSet mDataSet = new MDataSet();
+            mDataSet.setName(cacheReader.read(stdKeySchema.dataSetNameByCode(version, dataSetCode)));
+            mDataSet.setCode(dataSet.getCode());
+
+            Map<String, MRecord> records = new HashMap<>();
+            mDataSet.setRecords(records);
+
+            for (String key : dataSet.getRecordKeys()){
+                records.put(key, new MRecord(dataSet.getRecord(key)));
+            }
+
+            document.getDataSets().add(mDataSet);
+        }
     }
 
     @ApiOperation(value = "获取档案", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "读取一份档案")
@@ -140,7 +141,7 @@ public class ProfileEndPoint extends BaseEndPoint {
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws IOException, ParseException {
         Profile profile = profileRepo.findOne(id, loadStdDataSet, loadOriginDataSet);
 
-        return null;
+        return convertProfile(profile);
     }
 
     @ApiOperation(value = "获取档案数据集", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "获取档案数据集列表")
@@ -158,7 +159,76 @@ public class ProfileEndPoint extends BaseEndPoint {
     public List<MProfile> searchProfile(
             @ApiParam(value = "搜索条件")
             @RequestParam("q") String query) {
-
         return null;
+    }
+
+    @PostConstruct
+    private void registerJsonSerializer(){
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(MDataSet.class, new ProfileSerializer());
+        objectMapper.registerModule(module);
+    }
+
+    private MProfile convertProfile(Profile profile){
+        MProfile mProfile = new MProfile();
+        mProfile.setId(profile.getId());
+        mProfile.setCdaVersion(profile.getCdaVersion());
+        mProfile.setOrgCode(profile.getOrgCode());
+        mProfile.setOrgName(cacheReader.read(orgKeySchema.name(profile.getOrgCode())));
+        mProfile.setEventDate(profile.getEventDate());
+        mProfile.setSummary(profile.getSummary());
+        mProfile.setDemographicId(profile.getDemographicId());
+
+        // 使用CDA类别关键数据元映射，取得与此档案相关联的CDA类别ID
+        String cdaType = null;
+        for (ProfileDataSet dataSet : profile.getDataSets()){
+            if(cdaDocumentOptions.isPrimaryDataSet(dataSet.getCode())){
+                cdaType = cdaDocumentOptions.getCdaDocumentTypeId(dataSet.getCode());
+                break;
+            }
+        }
+
+        if (cdaType == null) {
+            throw new RuntimeException("Cannot find cda document type by data set code, forget primary data set & cda document mapping?");
+        }
+
+        // 此类目下卫生机构定制的CDA文档列表
+        Collection<MCDADocument> cdaDocuments = templateService.getOrganizationTemplates(profile.getOrgCode(), profile.getCdaVersion(), cdaType);
+        if (CollectionUtils.isEmpty(cdaDocuments)) {
+            LogService.getLogger().error("Unable to get cda document of version " + profile.getCdaVersion()
+                    + " for organization " + profile.getOrgCode() + ", template not uploaded?");
+
+            return null;
+        }
+
+        for (MCDADocument cdaDocument : cdaDocuments) {
+            MDocument document = new MDocument();
+            document.setId(cdaDocument.getId());
+            document.setName(cdaDocument.getName());
+
+            // CDA文档裁剪，根据从医院中实际采集到的数据集，对CDA进行裁剪
+            boolean validDocument = false;
+            List<MCdaDataSetRelationship> datasetRelationships = cdaDocumentClient.getCDADataSetRelationshipByCDAId(
+                    profile.getCdaVersion(),
+                    cdaDocument.getId());
+
+            for (MCdaDataSetRelationship datasetRelationship : datasetRelationships) {
+                String dataSetId = datasetRelationship.getDataSetId();
+                String dataSetCode = cacheReader.read(stdKeySchema.dataSetCode(profile.getCdaVersion(), dataSetId));
+                if (StringUtils.isEmpty(dataSetCode)) {
+                    throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Data set of version " + profile.getCdaVersion() + " not cached in redis.");
+                }
+
+                addDataset(profile.getCdaVersion(), document, profile.getDataSet(dataSetCode));
+
+                addDataset(profile.getCdaVersion(), document, profile.getDataSet(DataSetTableOption.originDataSetCode(dataSetCode)));
+
+                if (!validDocument) validDocument = !dataSetCode.startsWith("HDSA00_01");
+            }
+
+            if (validDocument) mProfile.getDocuments().add(document);
+        }
+
+        return mProfile;
     }
 }

@@ -86,13 +86,13 @@ public class ProfileRepository {
 
             if (loadStdDataSet || loadOriginDataSet) {
                 if (loadStdDataSet) {
-                    if (!dataSetCode.contains(QualifierTranslator.OriginDataSetFlag)) {
+                    if (!dataSetCode.contains(DataSetTableOption.OriginDataSetFlag)) {
                         Pair<String, ProfileDataSet> pair = findDataSet(cdaVersion, dataSetCode, rowKeys);
                         profile.addDataSet(pair.getLeft(), pair.getRight());
                     }
                 }
                 if (loadOriginDataSet) {
-                    if (dataSetCode.contains(QualifierTranslator.OriginDataSetFlag)) {
+                    if (dataSetCode.contains(DataSetTableOption.OriginDataSetFlag)) {
                         Pair<String, ProfileDataSet> pair = findDataSet(cdaVersion, dataSetCode, rowKeys);
                         profile.addDataSet(pair.getLeft(), pair.getRight());
                     }

@@ -64,7 +64,7 @@ public class CdaController {
     public Object GetCdaListByKey(String strKey, String strVersion, String strType, Integer page, Integer rows) {
 
         String url = "/cda/cdas";
-        String filters = "operationType="+strType;
+        String filters = "type="+strType;
 
         Envelop result = new Envelop();
         Map<String,Object> params = new HashMap<>();

@@ -14,7 +14,7 @@ import java.util.Objects;
  * @created 2016.2.22
  */
 @MappedSuperclass
-public class IMetaData {
+public class BaseMetaData {
 
     long id;                    // 数据元ID
     long dataSetId;
@@ -39,11 +39,10 @@ public class IMetaData {
     boolean isHbasePrimaryKey;              // Hbase 主键字段
     String dictName;
     String dictCode;
-    String OperationType;
 
 
-    public IMetaData() {
-        this.OperationType = "";
+    public BaseMetaData() {
+
     }
 
     @Column(name = "dict_id", unique = false, nullable = true)
@@ -227,14 +226,5 @@ public class IMetaData {
 
     public void setDictName(String dictName) {
         this.dictName = dictName;
-    }
-
-    @Transient
-    public String getOperationType() {
-        return OperationType;
-    }
-
-    public void setOperationType(String operationType) {
-        OperationType = operationType;
     }
 }

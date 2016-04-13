@@ -152,16 +152,16 @@ API列表
           "docs": [
             {
               "cdaVersion": "000000000000",
-              "cdaDocumentId": "0dae000656254674bed9a905c253de37",
-              "cdaDocumentName": "门诊病历",
-              "orgCode": "41872607-9",
+              "id": "0dae000656254674bed9a905c253de37",
+              "name": "门诊病历",
+              "organizationCode": "41872607-9",
               "archiveKey": "41872607-9_11603508_1001293827_1443489861000"
             },
             {
               "cdaVersion": "000000000000",
-              "cdaDocumentId": "0dae00065625491ebed9a905c253debc",
-              "cdaDocumentName": "门诊处方",
-              "orgCode": "41872607-9",
+              "id": "0dae00065625491ebed9a905c253debc",
+              "name": "门诊处方",
+              "organizationCode": "41872607-9",
               "archiveKey": "41872607-9_11603508_1001293827_1443489861000"
             }
           ]
@@ -174,16 +174,16 @@ API列表
           "docs": [
             {
               "cdaVersion": "000000000000",
-              "cdaDocumentId": "0dae00065618852549f6321eb42ce5e7",
-              "cdaDocumentName": "检查报告",
-              "orgCode": "41872607-9",
+              "id": "0dae00065618852549f6321eb42ce5e7",
+              "name": "检查报告",
+              "organizationCode": "41872607-9",
               "archiveKey": "41872607-9_11603508_1001291948_1443402097000"
             },
             {
               "cdaVersion": "000000000000",
-              "cdaDocumentId": "0dae0006561c7e3949f6320b6c60f07f",
-              "cdaDocumentName": "检验报告",
-              "orgCode": "41872607-9",
+              "id": "0dae0006561c7e3949f6320b6c60f07f",
+              "name": "检验报告",
+              "organizationCode": "41872607-9",
               "archiveKey": "41872607-9_11603508_1001291948_1443402097000"
             ｝
           ]

@@ -1,12 +1,11 @@
 package com.yihu.ehr.standard.document.service;
 
-
-import com.yihu.ehr.constants.BizObject;
-import com.yihu.ehr.util.ObjectId;
-import org.hibernate.annotations.GenericGenerator;
 import org.springframework.beans.factory.annotation.Value;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 import java.util.Date;
 import java.util.Objects;
 
@@ -16,10 +15,9 @@ import java.util.Objects;
  * @created 01-9月-2015 16:54:17
  */
 @MappedSuperclass
-public class ICDADocument {
-
-    @Value("${admin-region}")
+public class BaseCDADocument {
     @Transient
+    @Value("${admin-region}")
     short adminRegion;
 
     private String code;
@@ -31,31 +29,19 @@ public class ICDADocument {
     private Date updateDate;
     private String updateUser;
     private String versionCode;
-    String operationType;
-    /**
-     * 输出排版路径
-     */
+    private String type;
     private String printOut;
     private String schema;
-    /**
-     * 标准来源ID
-     */
     private String sourceId;
     private int hashCode;
     private String fileGroup;
-
-
-    public ICDADocument() {
-//        ObjectId objectId = new ObjectId(adminRegion, BizObject.STANDARD);
-//        id = objectId.toString();
-    }
-
 
     @Id
     @Column(name = "id", unique = true, nullable = false)
     public String getId() {
         return id;
     }
+
     public void setId(String id) {
         this.id = id;
     }
@@ -64,6 +50,7 @@ public class ICDADocument {
     public String getCode() {
         return code;
     }
+
     public void setCode(String code) {
         this.code = code;
     }
@@ -72,6 +59,7 @@ public class ICDADocument {
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -80,6 +68,7 @@ public class ICDADocument {
     public Date getCreateDate() {
         return createDate;
     }
+
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
@@ -88,6 +77,7 @@ public class ICDADocument {
     public String getCreateUser() {
         return createUser;
     }
+
     public void setCreateUser(String createUser) {
         this.createUser = createUser;
     }
@@ -96,6 +86,7 @@ public class ICDADocument {
     public String getDescription() {
         return description;
     }
+
     public void setDescription(String description) {
         this.description = description;
     }
@@ -104,6 +95,7 @@ public class ICDADocument {
     public Date getUpdateDate() {
         return updateDate;
     }
+
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
     }
@@ -112,15 +104,16 @@ public class ICDADocument {
     public String getUpdateUser() {
         return updateUser;
     }
+
     public void setUpdateUser(String updateUser) {
         this.updateUser = updateUser;
     }
-
 
     @Column(name = "print_out", unique = false, nullable = true)
     public String getPrintOut() {
         return printOut;
     }
+
     public void setPrintOut(String printOut) {
         this.printOut = printOut;
     }
@@ -129,6 +122,7 @@ public class ICDADocument {
     public String getSchema() {
         return schema;
     }
+
     public void setSchema(String schema) {
         this.schema = schema;
     }
@@ -137,6 +131,7 @@ public class ICDADocument {
     public String getSourceId() {
         return sourceId;
     }
+
     public void setSourceId(String sourceId) {
         this.sourceId = sourceId;
     }
@@ -145,16 +140,18 @@ public class ICDADocument {
     public String getFileGroup() {
         return fileGroup;
     }
+
     public void setFileGroup(String fileGroup) {
         this.fileGroup = fileGroup;
     }
 
     @Column(name = "type", unique = false, nullable = false)
-    public String getOperationType() {
-        return operationType;
+    public String getType() {
+        return type;
     }
-    public void setOperationType(String operationType) {
-        this.operationType = operationType;
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     @Column(name = "hash", unique = false, nullable = true)
@@ -162,15 +159,16 @@ public class ICDADocument {
         hashCode = Objects.hash(id, code, createDate, createUser, name, printOut, schema, sourceId);
         return hashCode;
     }
+
     public void setHashCode(int hashCode) {
         this.hashCode = hashCode;
     }
-
 
     @Transient
     public String getVersionCode() {
         return versionCode;
     }
+
     public void setVersionCode(String versionCode) {
         this.versionCode = versionCode;
     }

@@ -9,7 +9,7 @@
       var retrieve = null;
       var master = null;
       var conditionArea = null;
-      var orgCode = '${adapterOrg}';
+      var organizationCode = '${adapterOrg}';
       var entryRetrieve = null;
       var entryMater = null;
       var cfgModel = 0;
@@ -66,7 +66,7 @@
         initAdapterOrg: function () {
           var dataModel = $.DataModel.init();
           dataModel.fetchRemote("${contextRoot}/adapterorg/getAdapterOrg",{
-            data:{code:orgCode},
+            data:{code:organizationCode},
             success: function(data) {
               var model = data.obj;
               $("#adapterorg_name").val(model.name);
@@ -165,7 +165,7 @@
           var searchNm = $("#searchNm").val();
           var values = {
             codeOrName: searchNm,
-            orgCode: orgCode
+            organizationCode: organizationCode
           };
           if (changeFlag){
             var url = '${contextRoot}' + cfg[cfgModel].left.search;
@@ -278,7 +278,7 @@
               seq = row.sequence;
           }
           var values = {
-            orgCode :orgCode,
+            organizationCode :organizationCode,
             codeOrName: searchNmEntry,
             orgDataSetSeq:seq,
             orgDictSeq:seq
@@ -368,7 +368,7 @@
           entryMater.reloadGrid();
       };
       win.getOrgCode = function () {
-        return orgCode;
+        return organizationCode;
       };
       win.getSeq = function () {
         var row = master.grid.getSelectedRow();

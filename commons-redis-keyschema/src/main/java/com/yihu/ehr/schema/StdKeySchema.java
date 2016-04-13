@@ -30,6 +30,9 @@ public class StdKeySchema extends KeySchema {
     @Value("${redis-key-schema.std.data-set-code}")
     private String DataSetCodeColumn = "code";
 
+    @Value("${redis-key-schema.std.data-set-name}")
+    private String DataSetNameColumn = "name";
+
     @Value("${redis-key-schema.std.meta-data-table-prefix}")
     private String MetaDataTable = "std_meta_data_";
 
@@ -49,8 +52,16 @@ public class StdKeySchema extends KeySchema {
         return makeKey(VersionTable, version, VersionNameColumn);
     }
 
-    public String dataSetCode(String version, String code){
-        return makeKey(DataSetTable + version, code, DataSetCodeColumn);
+    public String dataSetCode(String version, String id){
+        return makeKey(DataSetTable + version, id, DataSetCodeColumn);
+    }
+
+    public String dataSetName(String version, String id){
+        return makeKey(DataSetTable + version, id, DataSetNameColumn);
+    }
+
+    public String dataSetNameByCode(String version, String code){
+        return makeKey(DataSetTable + version, code, DataSetNameColumn);
     }
 
     public String metaDataDict(String version, String dataSetCode, String innerCode) {

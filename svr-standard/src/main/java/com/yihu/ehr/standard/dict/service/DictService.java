@@ -3,9 +3,7 @@ package com.yihu.ehr.standard.dict.service;
 
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.model.standard.MStdDict;
 import com.yihu.ehr.query.BaseHbmService;
-import com.yihu.ehr.standard.cdatype.service.CDAType;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -26,7 +24,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class DictService extends BaseHbmService<IDict> {
+public class DictService extends BaseHbmService<BaseDict> {
     private final static String ENTITY_PRE = "com.yihu.ehr.standard.dict.service.Dict";
 
     @Autowired
@@ -46,7 +44,7 @@ public class DictService extends BaseHbmService<IDict> {
     }
 
     @Transactional(propagation= Propagation.REQUIRED)
-    public boolean add(IDict dict, String version){
+    public boolean add(BaseDict dict, String version){
         String sql =
                 "INSERT INTO " + getTaleName(version) +
                         "(code, name, author, base_dict, create_date, description, source, std_version, hash) " +
@@ -109,7 +107,7 @@ public class DictService extends BaseHbmService<IDict> {
         return o;
     }
 
-    public List<IDict> getChildrensByParentId(long baseDictId,String version) {
+    public List<BaseDict> getChildrensByParentId(long baseDictId, String version) {
         Session session = currentSession();
         Class clz = getServiceEntity(version);
         String hql="";
@@ -125,7 +123,7 @@ public class DictService extends BaseHbmService<IDict> {
         return query.list();
     }
 
-    public List<IDict> getCdaTypeExcludeSelfAndChildren(String childrenIds,String version) {
+    public List<BaseDict> getCdaTypeExcludeSelfAndChildren(String childrenIds, String version) {
         Session session = currentSession();
         Class clz = getServiceEntity(version);
 

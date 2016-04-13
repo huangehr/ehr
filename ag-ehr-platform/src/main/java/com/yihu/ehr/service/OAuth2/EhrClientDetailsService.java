@@ -42,7 +42,7 @@ public class EhrClientDetailsService implements ClientDetailsService {
     public ClientDetails loadClientByClientId(String clientId) throws ClientRegistrationException {
         ClientDetails details = clientDetailsStore.get(clientId);
         if (details == null) {
-            throw new NoSuchClientException("所请求应用不存在，id: " + clientId);
+            throw new NoSuchClientException("Client not found，id: " + clientId);
         }
 
         return details;

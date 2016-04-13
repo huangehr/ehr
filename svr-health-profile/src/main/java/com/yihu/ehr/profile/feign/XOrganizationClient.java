@@ -5,14 +5,8 @@ import com.yihu.ehr.model.org.MOrganization;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import springfox.documentation.annotations.ApiIgnore;
 
-
-/**
- * Created by Administrator on 2016/1/4.
- */
-@FeignClient(name = MicroServices.Organization)
 @ApiIgnore
-public interface OrganizationClient {
-
-
+@FeignClient(name = MicroServices.Organization)
+public interface XOrganizationClient {
     MOrganization getOrg(String orgCode);
 }

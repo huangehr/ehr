@@ -4,7 +4,6 @@ server:
 management:
   port: ${server.port}
 
-
 info:
   app:
     name: BrowserService

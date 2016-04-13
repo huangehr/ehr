@@ -14,7 +14,7 @@ import java.util.Objects;
  * @created 30-6月-2015 16:19:03
  */
 @MappedSuperclass
-public class IDataSet {
+public class BaseDataSet {
 
     public long id;
     long documentId;
@@ -29,11 +29,7 @@ public class IDataSet {
     String summary;
     String innerVersionId;
 
-    String OperationType;
-
-
-    public IDataSet() {
-        this.OperationType = "";
+    public BaseDataSet(){
     }
 
     @Id
@@ -139,15 +135,6 @@ public class IDataSet {
 
     public void setSummary(String summary) {
         this.summary = summary;
-    }
-
-    @Transient
-    public String getOperationType() {
-        return OperationType;
-    }
-
-    public void setOperationType(String operationType) {
-        OperationType = operationType;
     }
 
     @Transient

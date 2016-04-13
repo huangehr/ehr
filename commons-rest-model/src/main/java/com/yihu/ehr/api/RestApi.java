@@ -155,7 +155,7 @@ public class RestApi {
         public static final String UserVerification                 = "/users/verification";
         public static final String UserAdmin                        = "/users/admin/{user_id}";
         public static final String UserAdminPassword                = "/users/admin/{user_id}/password";
-        public static final String UserAdminPasswordReset          = "/users/admin/{user_id}/password_reset";
+        public static final String UserAdminPasswordReset           = "/users/admin/{user_id}/password_reset";
         public static final String UserAdminKey                     = "/users/admin/{user_id}/key";
         public static final String UserAdminContact                 = "/users/admin/{user_id}/contact";
         public static final String UserIdCardNoExistence            = "/user/id_card_no/existence";
@@ -180,5 +180,10 @@ public class RestApi {
 
         public static final String ProfileSearch                    = "/patient/health_profiles/search";
         public static final String SanofiSupport                    = "/patient/health_profiles/{id}/physic_signs";
+
+        public static final String Templates                        = "/templates";
+        public static final String TemplatesDownloads               = "/templates/downloads";
+        public static final String Template                         = "/templates/{id}";
+        public static final String TemplateCtn                      = "/templates/{id}/content";
     }
 }

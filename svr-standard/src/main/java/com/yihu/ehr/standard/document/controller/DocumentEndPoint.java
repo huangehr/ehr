@@ -24,16 +24,13 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-@RequestMapping(ApiVersion.Version1_0)
 @RestController
-@Api(protocols = "https", value = "cda document", description = "cda文档管理", tags = {"cda文档管理"})
-public class DocumentEndPoint  extends ExtendController<MCDADocument> {
+@RequestMapping(ApiVersion.Version1_0)
+@Api(value = "cda document", description = "CDA文档服务")
+public class DocumentEndPoint extends ExtendController<MCDADocument> {
 
     @Autowired
-    private CDADocumentManager cdaDocumentManager;
-
-//    @Autowired
-//    private CDAManager cdaManager;
+    private CDADocumentService cdaDocumentService;
 
     @Autowired
     private CDADataSetRelationshipManager cdaDatasetRelationshipManager;
@@ -41,14 +38,13 @@ public class DocumentEndPoint  extends ExtendController<MCDADocument> {
     @Autowired
     private FastDFSUtil fastDFSUtil;
 
-    private Class getServiceEntity(String version){
-        return cdaDocumentManager.getServiceEntity(version);
+    private Class getServiceEntity(String version) {
+        return cdaDocumentService.getServiceEntity(version);
     }
 
-    private Class getRelationshipServiceEntity(String version){
+    private Class getRelationshipServiceEntity(String version) {
         return cdaDatasetRelationshipManager.getRelationshipServiceEntity(version);
     }
-
 
     @RequestMapping(value = RestApi.Standards.Documents, method = RequestMethod.GET)
     @ApiOperation(value = "根据条件获取cda文档列表")
@@ -67,14 +63,12 @@ public class DocumentEndPoint  extends ExtendController<MCDADocument> {
             @RequestParam(value = "version") String version,
             HttpServletRequest request,
             HttpServletResponse response) {
-
         Class entityClass = getServiceEntity(version);
 
-        List ls = cdaDocumentManager.search(entityClass, fields, filters, sorts, page, size);
+        List ls = cdaDocumentService.search(entityClass, fields, filters, sorts, page, size);
 
-        pagedResponse(request, response, cdaDocumentManager.getCount(entityClass, filters), page, size);
+        pagedResponse(request, response, cdaDocumentService.getCount(entityClass, filters), page, size);
         return convertToModels(ls, new ArrayList<>(ls.size()), MCDADocument.class, fields);
-
     }
 
     //todo： 动态实体改版完后   归并到GetCDADocuments方法中
@@ -88,8 +82,8 @@ public class DocumentEndPoint  extends ExtendController<MCDADocument> {
             @RequestParam(value = "version") String version) {
 
         Class entityClass = getServiceEntity(version);
-        List<CDADocument> list = cdaDocumentManager.search(entityClass, "id="+ ids);
-        return convertToModels(list, new ArrayList<>(list.size()), MCDADocument.class,"");
+        List<CDADocument> list = cdaDocumentService.search(entityClass, "id=" + ids);
+        return convertToModels(list, new ArrayList<>(list.size()), MCDADocument.class, "");
     }
 
 
@@ -102,11 +96,11 @@ public class DocumentEndPoint  extends ExtendController<MCDADocument> {
             @RequestParam(value = "model") String model) throws Exception {
 
         Class entityClass = getServiceEntity(version);
-        ICDADocument cdaDocument = (ICDADocument) toEntity(model, entityClass);
+        BaseCDADocument cdaDocument = (BaseCDADocument) toEntity(model, entityClass);
         cdaDocument.setId(getObjectId(BizObject.STANDARD));
         cdaDocument.setCreateUser("Sys");
         cdaDocument.setCreateDate(new Date());
-        cdaDocumentManager.saveCdaDocument(cdaDocument);
+        cdaDocumentService.saveCdaDocument(cdaDocument);
         return getModel(cdaDocument);
     }
 
@@ -120,12 +114,11 @@ public class DocumentEndPoint  extends ExtendController<MCDADocument> {
             @RequestParam(value = "model") String model) throws Exception {
 
         Class entityClass = getServiceEntity(version);
-        ICDADocument cdaDocument = (ICDADocument) toEntity(model, entityClass);
+        BaseCDADocument cdaDocument = (BaseCDADocument) toEntity(model, entityClass);
         cdaDocument.setUpdateDate(new Date());
-        cdaDocumentManager.save(cdaDocument);
+        cdaDocumentService.save(cdaDocument);
         return getModel(cdaDocument);
     }
-
 
     @ApiOperation(value = "删除CDADocuments")
     @RequestMapping(value = RestApi.Standards.Documents, method = RequestMethod.DELETE)
@@ -135,16 +128,13 @@ public class DocumentEndPoint  extends ExtendController<MCDADocument> {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version") String versionCode) {
 
-        cdaDocumentManager.deleteDocument(ids, versionCode);
+        cdaDocumentService.deleteDocument(ids, versionCode);
         return true;
     }
-
 
     /***********************************************************************************************************/
     /************** document data set relationship   ***********************************************************/
     /***********************************************************************************************************/
-
-
     @RequestMapping(value = RestApi.Standards.DataSetRelationships, method = RequestMethod.GET)
     @ApiOperation(value = "根据条件获取getCDADataSetRelationship列表")
     public Collection<MCdaDataSetRelationship> getCDADataSetRelationships(
@@ -163,12 +153,11 @@ public class DocumentEndPoint  extends ExtendController<MCDADocument> {
             HttpServletRequest request,
             HttpServletResponse response) {
         Class entityClass = getRelationshipServiceEntity(version);
-        List relations = cdaDatasetRelationshipManager.getCDADataSetRelationships(entityClass,fields,filters,sorts,size,page);
-        pagedResponse(request, response, cdaDocumentManager.getCount(entityClass, filters), page, size);
+        List relations = cdaDatasetRelationshipManager.getCDADataSetRelationships(entityClass, fields, filters, sorts, size, page);
+        pagedResponse(request, response, cdaDocumentService.getCount(entityClass, filters), page, size);
         return convertToModels(relations, new ArrayList<>(relations.size()), MCdaDataSetRelationship.class, fields);
 
     }
-
 
     @RequestMapping(value = "/std/cda_data_set_relationships/cda_id", method = RequestMethod.GET)
     @ApiOperation(value = "根据cda_id获取getCDADataSetRelationship列表")
@@ -178,7 +167,7 @@ public class DocumentEndPoint  extends ExtendController<MCDADocument> {
             @ApiParam(name = "document_Id", value = "文档编号")
             @RequestParam(value = "document_Id") String cdaId) {
         Class entityClass = getRelationshipServiceEntity(version);
-        List relations = cdaDatasetRelationshipManager.getCDADataSetRelationshipByCDAId(entityClass,cdaId);
+        List relations = cdaDatasetRelationshipManager.getCDADataSetRelationshipByCDAId(entityClass, cdaId);
         return convertToModels(relations, new ArrayList<>(relations.size()), MCdaDataSetRelationship.class, "");
     }
 
@@ -206,7 +195,6 @@ public class DocumentEndPoint  extends ExtendController<MCDADocument> {
         return cdaDatasetRelationshipManager.SaveDataSetRelationship(dataSetIds, cdaId, versionCode, xmlInfo);
     }
 
-
     @ApiOperation(value = "根基id删除CDADataSetRelationship")
     @RequestMapping(value = RestApi.Standards.DataSetRelationships, method = RequestMethod.DELETE)
     public boolean deleteCDADataSetRelationship(
@@ -217,8 +205,6 @@ public class DocumentEndPoint  extends ExtendController<MCDADocument> {
 
         return cdaDatasetRelationshipManager.deleteRelationshipById(versionCode, ids);
     }
-
-
 
     /***********************************************************************************************************/
     /************** document file  ****************************************************************************/
@@ -232,9 +218,8 @@ public class DocumentEndPoint  extends ExtendController<MCDADocument> {
             @ApiParam(name = "id", value = "文档编号")
             @PathVariable(value = "id") String cdaId) {
 
-        return cdaDocumentManager.isFileExists(cdaId, versionCode);
+        return cdaDocumentService.isFileExists(cdaId, versionCode);
     }
-
 
     @RequestMapping(value = RestApi.Standards.DocumentCreateFile, method = RequestMethod.POST)
     @ApiOperation(value = "生成CDA文件")
@@ -244,7 +229,7 @@ public class DocumentEndPoint  extends ExtendController<MCDADocument> {
             @ApiParam(name = "id", value = "文档编号")
             @PathVariable(value = "id") String cdaId) throws Exception {
 
-        return cdaDocumentManager.createCDASchemaFile(cdaId, versionCode);
+        return cdaDocumentService.createCDASchemaFile(cdaId, versionCode);
     }
 
     /**
@@ -278,10 +263,10 @@ public class DocumentEndPoint  extends ExtendController<MCDADocument> {
         List<String> listIds = new ArrayList<>();
         listIds.add(cdaId);
         Class entityClass = getServiceEntity(versionCode);
-        ICDADocument cdaDocument = cdaDocumentManager.retrieve(cdaId,entityClass);
+        BaseCDADocument cdaDocument = cdaDocumentService.retrieve(cdaId, entityClass);
 
 
-        if (cdaDocument!=null) {
+        if (cdaDocument != null) {
             strFileGroup = cdaDocument.getFileGroup();
             strSchemePath = cdaDocument.getSchema();
         } else {

@@ -14,7 +14,7 @@ import java.util.Objects;
  * @created 2016.2.22
  */
 @MappedSuperclass
-public class IDictEntry {
+public class BaseDictEntry {
 
     long id;
     Long dictId;//字典ID
@@ -25,7 +25,7 @@ public class IDictEntry {
 
     String OperationType;
 
-    public IDictEntry() {
+    public BaseDictEntry() {
         this.OperationType = "";
     }
 

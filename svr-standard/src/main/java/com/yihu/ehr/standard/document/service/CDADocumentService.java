@@ -4,12 +4,8 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.query.BaseHbmService;
 import com.yihu.ehr.standard.datasets.service.*;
-import com.yihu.ehr.util.CDAVersionUtil;
-import org.hibernate.Query;
-import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
@@ -34,7 +30,7 @@ import java.util.List;
  */
 @Transactional
 @Service
-public class CDADocumentManager extends BaseHbmService<ICDADocument> {
+public class CDADocumentService extends BaseHbmService<BaseCDADocument> {
 
     @Autowired
     private CDADataSetRelationshipManager cdaDataSetRelationshipManager;
@@ -45,10 +41,6 @@ public class CDADocumentManager extends BaseHbmService<ICDADocument> {
     @Autowired
     private DataSetService dataSetService;
 
-//    @Autowired
-//    private XCDADocumentRepository cdaDocumentRepository;
-
-
     public Class getServiceEntity(String version){
         try {
             return Class.forName("com.yihu.ehr.standard.document.service.CDADocument" + version);
@@ -56,7 +48,6 @@ public class CDADocumentManager extends BaseHbmService<ICDADocument> {
             throw new ApiException(ErrorCode.NotFoundEntity, "CDA文档", version);
         }
     }
-
 
     public Class getRelationshipServiceEntity(String version){
         try {
@@ -82,15 +73,8 @@ public class CDADocumentManager extends BaseHbmService<ICDADocument> {
         }
     }
 
-
-//    public CDADocument create(CDADocument cDADocument){
-//        cdaDocumentRepository.save(cDADocument);
-//        return  cDADocument;
-//    }
-
-
     /**
-     * 同时删除多个时 CDAID用逗号隔开
+     * 同时删除多个时 CDA ID用逗号隔开
      *
      * @param versionCode
      * @param ids
@@ -101,10 +85,9 @@ public class CDADocumentManager extends BaseHbmService<ICDADocument> {
         return true;
     }
 
-    public void saveCdaDocument(ICDADocument cdaDocument) {
+    public void saveCdaDocument(BaseCDADocument cdaDocument) {
         save(cdaDocument);
     }
-
 
     public boolean isDocumentExist(String version, String documentCode,String documentId) {
         Class entityClass = getServiceEntity(version);
@@ -117,11 +100,6 @@ public class CDADocumentManager extends BaseHbmService<ICDADocument> {
         return list.size() > 0;
     }
 
-
-
-    /**
-     * 判断文件是否存在
-     */
     public boolean isFileExists(String cdaId, String strVersionCode) {
         String strFilePath = FilePath(strVersionCode) + cdaId + ".xml";
         File file = new File(strFilePath);
@@ -129,12 +107,10 @@ public class CDADocumentManager extends BaseHbmService<ICDADocument> {
     }
 
     public String FilePath(String strVersionCode) {
-        //文件服务器路径
         String strPath = System.getProperty("java.io.tmpdir");
         strPath += "StandardFiles";
-        //路径分割符
+
         String splitMark = System.getProperty("file.separator");
-        //文件路径
         String strXMLFilePath = strPath + splitMark + "xml" + splitMark + strVersionCode + splitMark;
         return strXMLFilePath;
     }
@@ -150,7 +126,6 @@ public class CDADocumentManager extends BaseHbmService<ICDADocument> {
      * @throws UnsupportedEncodingException
      */
     public boolean createCDASchemaFile(String cdaId, String versionCode) throws Exception {
-        //操作结果：0：现在失败 1：新增成功
         Class entityClass = getRelationshipServiceEntity(versionCode);
         List<CDADataSetRelationship> relationshipsList = cdaDataSetRelationshipManager.getCDADataSetRelationshipByCDAId(entityClass,cdaId);
 
@@ -174,16 +149,16 @@ public class CDADocumentManager extends BaseHbmService<ICDADocument> {
         doc.appendChild(root);
         for (int i = 0; i < relationshipsList.size(); i++) {
             //获取数据集
-            ICDADataSetRelationship dataSetRelationship = relationshipsList.get(i);
+            BaseCDADataSetRelationship dataSetRelationship = relationshipsList.get(i);
             Class dataSetClass = getDataSetServiceEntity(versionCode);
-            IDataSet dataSet = dataSetService.retrieve(Long.parseLong(dataSetRelationship.getDataSetId()),dataSetClass);
+            BaseDataSet dataSet = dataSetService.retrieve(Long.parseLong(dataSetRelationship.getDataSetId()),dataSetClass);
             Element rowSet = doc.createElement("xs:table");
             rowSet.setAttribute("code", dataSet.getCode());
             root.appendChild(rowSet);
 
             //获取数据元
             Class meteClass = getMeteDataServiceEntity(versionCode);
-            List<IMetaData> metaDatas = metaDataService.search(meteClass,"dataSetId="+dataSet.getId());
+            List<BaseMetaData> metaDatas = metaDataService.search(meteClass,"dataSetId="+dataSet.getId());
 
             for (int j = 0; j < metaDatas.size(); j++) {
                 Element rowEle = doc.createElement("xs:element");
@@ -212,6 +187,4 @@ public class CDADocumentManager extends BaseHbmService<ICDADocument> {
         StreamResult result = new StreamResult(pw);
         transformer.transform(source, result);
     }
-
-
-}//end CDADocumentManager
+}

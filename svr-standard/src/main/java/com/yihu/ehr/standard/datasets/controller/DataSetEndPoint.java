@@ -4,8 +4,8 @@ import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.MStdDataSet;
 import com.yihu.ehr.standard.commons.ExtendController;
+import com.yihu.ehr.standard.datasets.service.BaseDataSet;
 import com.yihu.ehr.standard.datasets.service.DataSetService;
-import com.yihu.ehr.standard.datasets.service.IDataSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -26,8 +26,8 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "dataset", description = "标准数据集", tags = {"标准数据集"})
-public class DataSetsController extends ExtendController<MStdDataSet> {
+@Api(value = "Dataset", description = "数据集服务")
+public class DataSetEndPoint extends ExtendController<MStdDataSet> {
 
     @Autowired
     private DataSetService dataSetService;
@@ -105,7 +105,7 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version) {
         Class entityClass = getServiceEntity(version);
-        List<IDataSet> list = dataSetService.search(entityClass,"id="+ids);
+        List<BaseDataSet> list = dataSetService.search(entityClass,"id="+ids);
         return convertToModels(list, new ArrayList<>(list.size()), MStdDataSet.class, "");
     }
 
@@ -119,7 +119,7 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
             @RequestParam(value = "model") String model) throws Exception{
 
         Class entityClass = getServiceEntity(version);
-        IDataSet dataSet = (IDataSet) jsonToObj(model, entityClass);
+        BaseDataSet dataSet = (BaseDataSet) jsonToObj(model, entityClass);
 //        if (dataSetService.isExistByField("code", dataSet.getCode(), entityClass))
 //            throw new ApiException(ErrorCode.RapeatDataSetCode, "代码重复！");
         if(dataSetService.add(dataSet, version))
@@ -139,8 +139,8 @@ public class DataSetsController extends ExtendController<MStdDataSet> {
             @RequestParam(value = "model") String model) throws Exception{
 
         Class entityClass = getServiceEntity(version);
-        IDataSet dataSetModel = (IDataSet) jsonToObj(model, entityClass);
-//        IDataSet dataSet = dataSetService.retrieve(id, entityClass);
+        BaseDataSet dataSetModel = (BaseDataSet) jsonToObj(model, entityClass);
+//        BaseDataSet dataSet = dataSetService.retrieve(id, entityClass);
 //        if(!dataSet.getCode().equals(dataSetModel.getCode())){
 //            if(dataSetService.isExistByField("code", dataSetModel.getCode(), entityClass))
 //                throw new ApiException(ErrorCode.RapeatDataSetCode, "代码重复！");

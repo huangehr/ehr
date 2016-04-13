@@ -20,11 +20,12 @@ import java.util.*;
 
 /**
  * 控制器基类。提供模型转换，分页规范实现。
+ *
  * @author Sand
  * @version 1.0
  * @created 2016.04.07 17:01
  */
-public class BaseEndPoint extends AbstractController {
+public class BaseRestEndPoint extends AbstractController {
     protected final static String ResourceCount = "X-Total-Count";
     protected final static String ResourceLink = "Link";
 
@@ -46,7 +47,7 @@ public class BaseEndPoint extends AbstractController {
      * @return
      */
     public <T> T convertToModel(Object source, Class<T> targetCls, String... properties) {
-        if(source==null){
+        if (source == null) {
             return null;
         }
         T target = BeanUtils.instantiate(targetCls);
@@ -59,17 +60,18 @@ public class BaseEndPoint extends AbstractController {
             T entity = objectMapper.readValue(json, entityCls);
             return entity;
         } catch (IOException ex) {
-            throw new ApiException(ErrorCode.SystemError,  "无法转换json, " + ex.getMessage());
+            throw new ApiException(ErrorCode.SystemError, "Unable to parse json, " + ex.getMessage());
         }
     }
 
-    public String toJson(Object obj){
+    public String toJson(Object obj) {
         try {
             return objectMapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
             return null;
         }
     }
+
     /**
      * 将实体集合转换为模型集合。
      *
@@ -80,7 +82,7 @@ public class BaseEndPoint extends AbstractController {
      * @return
      */
     public <T> Collection<T> convertToModels(Collection sources, Collection<T> targets, Class<T> targetCls, String properties) {
-        if(sources==null){
+        if (sources == null) {
             return null;
         }
         Iterator iterator = sources.iterator();
@@ -165,7 +167,7 @@ public class BaseEndPoint extends AbstractController {
     }
 
     protected Integer reducePage(Integer page) {
-        if (page != null) {
+        if (page != null || page > 0) {
             page = page - 1;
             return page;
         }

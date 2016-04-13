@@ -10,23 +10,8 @@ import com.yihu.ehr.util.StringBuilderUtil;
  * @created 2015.09.26 20:35
  */
 public class QualifierTranslator {
-    public final static String OriginDataSetFlag = "_ORIGIN";
-
     private final static String MetaDataCodeSuffix = "_CODE";
     private final static String MetaDataValueSuffix = "_VALUE";
-
-    /**
-     * 为原始数据的数据集产生一个别名, 将原始数据存储在这个别名中.
-     *
-     * @param dataSetCode
-     */
-    public static String originDataTable(String dataSetCode) {
-        return dataSetCode + OriginDataSetFlag;
-    }
-
-    public static boolean isOriginDataSet(String dataSetCode){
-        return dataSetCode.endsWith(OriginDataSetFlag);
-    }
 
     /**
      * 以数据内部标识为基础，数据类型为辅助，产生一个HBase列名。

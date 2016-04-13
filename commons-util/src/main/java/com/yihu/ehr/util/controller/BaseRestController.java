@@ -1,26 +1,12 @@
 package com.yihu.ehr.util.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.BizObject;
-import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.constants.PageArg;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.ObjectId;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.AbstractController;
 
 import javax.persistence.EntityManager;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.beans.PropertyDescriptor;
-import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -34,7 +20,7 @@ import java.util.*;
  * @author zhiyong
  * @author Sand
  */
-public class BaseRestController extends BaseEndPoint {
+public class BaseRestController extends BaseRestEndPoint {
     @Value("${deploy.region}")
     Short deployRegion = 3502;
 

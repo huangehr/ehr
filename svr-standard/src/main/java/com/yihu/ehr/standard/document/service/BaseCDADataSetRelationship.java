@@ -11,22 +11,18 @@ import javax.persistence.*;
  */
 @MappedSuperclass
 @Access(value = AccessType.PROPERTY)
-public class ICDADataSetRelationship {
+public class BaseCDADataSetRelationship {
 
 	private String id;
 	private String cdaId;
 	private String dataSetId;
-//	private String versionCode;
-//	private String dataSetCode;
-//	private String dataSetName;
-//	private String summary;
-	private String OperationType;
 
 	@Id
 	@Column(name = "id", unique = true, nullable = false)
 	public String getId() {
 		return id;
 	}
+
 	public void setId(String id) {
 		this.id = id;
 	}
@@ -35,6 +31,7 @@ public class ICDADataSetRelationship {
 	public String getCdaId() {
 		return cdaId;
 	}
+
 	public void setCdaId(String cdaId) {
 		this.cdaId = cdaId;
 	}
@@ -43,15 +40,8 @@ public class ICDADataSetRelationship {
 	public String getDataSetId() {
 		return dataSetId;
 	}
+
 	public void setDataSetId(String dataSetId) {
 		this.dataSetId = dataSetId;
-	}
-
-	@Transient
-	public String getOperationType() {
-		return OperationType;
-	}
-	public void setOperationType(String operationType) {
-		OperationType = operationType;
 	}
 }

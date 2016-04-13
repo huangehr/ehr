@@ -19,7 +19,7 @@ public class CDAModel {
 
     private String sourceId;
 
-    private String operationType;
+    private String type;
 
     private String user;
 
@@ -84,12 +84,12 @@ public class CDAModel {
         this.sourceId = sourceId;
     }
 
-    public String getOperationType() {
-        return operationType;
+    public String getType() {
+        return type;
     }
 
-    public void setOperationType(String operationType) {
-        this.operationType = operationType;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getUser() {

@@ -77,11 +77,11 @@
                         });
             }
 
-            function release(id,orgCode,versionCode) {
+            function release(id,organizationCode,versionCode) {
                 var dialog = $.ligerDialog.waitting('正在发布中,请稍候...');
                 var dataModel = $.DataModel.init();
                 dataModel.updateRemote('${contextRoot}/adapter/adapterDispatch', {
-                    data: {planId:id,orgCode:orgCode,versionCode:versionCode},
+                    data: {planId:id,organizationCode:organizationCode,versionCode:versionCode},
                     success: function (data) {
                         if (data.successFlg) {
                             $.ligerDialog.alert("发布成功!");
@@ -293,11 +293,11 @@
                     });
 
                     //定制适配方案
-                    $.subscribe('adapter:adapterInfo:release', function (event, orgCode, versionCode,title,id) {
+                    $.subscribe('adapter:adapterInfo:release', function (event, organizationCode, versionCode,title,id) {
 
                         $.ligerDialog.confirm('确定'+title+'该方案?', function (yes) {
                             if (yes) {
-                                release(id, orgCode, versionCode);
+                                release(id, organizationCode, versionCode);
                             }
                         });
                     });

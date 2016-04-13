@@ -225,7 +225,8 @@ public class PackageEndPoint extends BaseRestController {
         MUser user = userClient.getUserByUserName(userName);
         MKey key = securityClient.getUserKey(user.getId());
         String privateKey = key.getPrivateKey();
-        if (null == privateKey) throw new ApiException(HttpStatus.FORBIDDEN, "Invalid public key, maybe you miss the user name?");
+        if (null == privateKey)
+            throw new ApiException(HttpStatus.FORBIDDEN, "Invalid public key, maybe you miss the user name?");
 
         String unzipPwd = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
         Package aPackage = packService.receive(multipartFile.getInputStream(), unzipPwd);

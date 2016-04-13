@@ -19,7 +19,7 @@ import java.util.*;
 public class Profile {
     private ObjectMapper objectMapper = SpringContext.getService("objectMapper");
 
-    private ProfileId archiveID;                        // 健康档案ID
+    private ProfileId profileId;                        // 健康档案ID
     private String cardId;                              // 就诊时用的就诊卡ID
     private String orgCode;                             // 机构代码
     private String orgName;                             // 机构名称
@@ -44,7 +44,7 @@ public class Profile {
     }
     
     public String getId() {
-        if (archiveID == null){
+        if (profileId == null){
             if(StringUtils.isEmpty(orgCode)){
                 throw new IllegalArgumentException("Build profile id failed, organization code is empty.");
             }
@@ -57,14 +57,14 @@ public class Profile {
                 throw new IllegalArgumentException("Build profile id failed, unable to get event time.");
             }
 
-            this.archiveID = ProfileId.get(orgCode, patientId, eventNo, eventDate);
+            this.profileId = ProfileId.get(orgCode, patientId, eventNo, eventDate);
         }
 
-        return archiveID.toString();
+        return profileId.toString();
     }
 
     public void setId(String archiveId){
-        this.archiveID = new ProfileId(archiveId);
+        this.profileId = new ProfileId(archiveId);
     }
     
     public Collection<ProfileDataSet> getDataSets() {

@@ -24,14 +24,10 @@ public class ProfileDataSet {
     private String orgName;
     private String cdaVersion;
     private String remotePath;
-    private List<String> originDocUrls = new ArrayList<>();
 
-    private Map<String, Map<String, String>> records;
-
-    private ObjectMapper objectMapper = SpringContext.getService("objectMapper");
+    private Map<String, Map<String, String>> records = new HashMap<>();
 
     public ProfileDataSet() {
-        records = new HashMap<>();
     }
 
     public Set<String> getRecordKeys() {
@@ -102,6 +98,10 @@ public class ProfileDataSet {
         return this.records.get(recordKey);
     }
 
+    public Map<String, Map<String, String>> getRecords() {
+        return records;
+    }
+
     public void updateRecordKey(String origin, String newer) {
         Map<String, String> record = this.records.remove(origin);
         if (record != null) {
@@ -109,11 +109,9 @@ public class ProfileDataSet {
         }
     }
 
-    public List<String> getOriginDocumentURL() {
-        return null;
-    }
-
     public JsonNode toJson(boolean simplified) {
+        ObjectMapper objectMapper = SpringContext.getService("objectMapper");
+
         if (simplified) {
             ObjectNode root = objectMapper.createObjectNode();
             ArrayNode rows = root.putArray(code);
@@ -138,7 +136,6 @@ public class ProfileDataSet {
             root.put("patient_id", patientId);
             root.put("event_no", eventNo);
             root.put("org_code", orgCode);
-            root.put("origin_doc_url", String.join(";", originDocUrls));
 
             ArrayNode arrayNode = root.putArray("records");
             for (String rowKey : this.records.keySet()) {

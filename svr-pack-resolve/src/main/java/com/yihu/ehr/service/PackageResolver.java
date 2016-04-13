@@ -6,10 +6,10 @@ import com.yihu.ehr.extractor.EventExtractor;
 import com.yihu.ehr.extractor.ExtractorChain;
 import com.yihu.ehr.extractor.KeyDataExtractor;
 import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.profile.persist.DataSetResolverWithTranslator;
+import com.yihu.ehr.profile.core.DataSetTableOption;
 import com.yihu.ehr.profile.core.Profile;
 import com.yihu.ehr.profile.core.ProfileDataSet;
-import com.yihu.ehr.profile.core.QualifierTranslator;
+import com.yihu.ehr.profile.persist.DataSetResolverWithTranslator;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
 import net.lingala.zip4j.exception.ZipException;
@@ -104,7 +104,7 @@ public class PackageResolver {
             ProfileDataSet dataSet = generateDataSet(file, isOriginDataSet);
 
             // 原始数据存储在表"数据集代码_ORIGIN"
-            String dataSetTable = isOriginDataSet ? QualifierTranslator.originDataTable(dataSet.getCode()) : dataSet.getCode();
+            String dataSetTable = isOriginDataSet ? DataSetTableOption.originDataSetCode(dataSet.getCode()) : dataSet.getCode();
             profile.addDataSet(dataSetTable, dataSet);
             profile.setPatientId(dataSet.getPatientId());
             profile.setEventNo(dataSet.getEventNo());

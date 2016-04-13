@@ -3,6 +3,8 @@ package com.yihu.ehr.profile.service;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.lang.SpringContext;
+import com.yihu.ehr.util.log.LogService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
@@ -19,22 +21,19 @@ import java.util.Date;
 @Table(name = "archive_template")
 @Access(value = AccessType.PROPERTY)
 public class Template {
-    @Autowired
-    private FastDFSUtil fastDFSUtil;
-
-    public final static String UrlSeparator = ";";
-
     private int id;
     private String title;
     private String cdaVersion;
     private String cdaDocumentId;
     private String organizationCode;
     private String pcTplURL;
-    private String mobileTemplate;
+    private String mobileTplURL;
     private Date createTime = new Date();
 
+    final static String UrlSeparator = ";";
+
     @Id
-    @GeneratedValue(generator = "increment")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", unique = true, nullable = false)
     public int getId() {
         return id;
@@ -72,34 +71,21 @@ public class Template {
     }
 
     @Column(name = "pc_template", nullable = false)
-    public String getPcTplContent() throws Exception {
-        String[] tokens = getPcTplUrl();
-        byte[] bytes = fastDFSUtil.download(tokens[0], tokens[1]);
-
-        return new String(bytes, Charset.forName("UTF-8"));
+    public String getPcTplURL() throws Exception {
+        return pcTplURL;
     }
 
-    public void setPcTplContent(InputStream fileStream) throws Exception {
-        ObjectNode objectNode = fastDFSUtil.upload(fileStream, "html", "健康档案展示模板");
-        String group = objectNode.get(FastDFSUtil.GroupField).asText();
-        String remoteFile = objectNode.get(FastDFSUtil.RemoteFileField).asText();
-
-        pcTplURL = group + UrlSeparator + remoteFile;
-    }
-
-    public String[] getPcTplUrl() {
-        String[] tokens = pcTplURL == null ? null : pcTplURL.split(UrlSeparator);
-
-        return tokens;
+    public void setPcTplURL(String url) throws Exception {
+        pcTplURL = url;
     }
 
     @Column(name = "mobile_template", nullable = false)
-    public String getMobileTplContent() {
-        return mobileTemplate;
+    public String getMobileTplURL() {
+        return mobileTplURL;
     }
 
-    public void setMobileTemplate(String mobileTemplate) {
-        this.mobileTemplate = mobileTemplate;
+    public void setMobileTplURL(String mobileTplURL) {
+        this.mobileTplURL = mobileTplURL;
     }
 
     @Column(name = "create_time")
@@ -111,12 +97,52 @@ public class Template {
         this.createTime = createTime;
     }
 
-    @Column(name = "create_time")
+    @Column(name = "org_code")
     public String getOrganizationCode() {
         return organizationCode;
     }
 
-    public void setOrganizationCode(String orgCode) {
-        this.organizationCode = orgCode;
+    public void setOrganizationCode(String organizationCode) {
+        this.organizationCode = organizationCode;
+    }
+
+    /**
+     * 读取模板内容。
+     *
+     * @return
+     */
+    public byte[] getContent(boolean pc) throws Exception {
+        String url = pc ? pcTplURL : mobileTplURL;
+        if (StringUtils.isEmpty(url)) {
+            return null;
+        }
+
+        String[] tokens = pcTplURL.split(UrlSeparator);
+        byte[] bytes = fastDFSUtil().download(tokens[0], tokens[1]);
+
+        return bytes;
+    }
+
+    /**
+     * 设置模板内容。
+     *
+     * @param fileStream
+     * @throws Exception
+     */
+    public void setContent(boolean pc, InputStream fileStream) throws Exception {
+        ObjectNode objectNode = fastDFSUtil().upload(fileStream, "html", "健康档案展示模板");
+        String group = objectNode.get(FastDFSUtil.GroupField).asText();
+        String remoteFile = objectNode.get(FastDFSUtil.RemoteFileField).asText();
+
+        String url = group + UrlSeparator + remoteFile;
+        if (pc){
+            pcTplURL = url;
+        } else {
+            mobileTplURL = url;
+        }
+    }
+
+    private FastDFSUtil fastDFSUtil(){
+        return SpringContext.getService(FastDFSUtil.class);
     }
 }

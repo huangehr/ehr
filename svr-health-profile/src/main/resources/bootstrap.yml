@@ -22,7 +22,6 @@ spring:
       uri: http://172.19.103.73:1221
       label: dev
 
-
 ---
 spring:
   profiles: prod

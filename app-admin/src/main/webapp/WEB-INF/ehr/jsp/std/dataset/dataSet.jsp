@@ -77,7 +77,7 @@
                                     <label><spring:message code="lbl.code"/><spring:message code="spe.colon"/></label>
                                 </td>
                                 <td>
-                                    <input id="cdaDocumentId" class="required useTitle"  required-title="不能为空"/>
+                                    <input id="id" class="required useTitle"  required-title="不能为空"/>
                                 </td>
                             </tr>
                             <tr>
@@ -149,7 +149,7 @@
                                     <label><spring:message code="lbl.code"/><spring:message code="spe.colon"/></label>
                                 </td>
                                 <td>
-                                    <input id="updata-cdaDocumentId" class="required useTitle"  required-title="不能为空" />
+                                    <input id="updata-id" class="required useTitle"  required-title="不能为空" />
                                 </td>
                             </tr>
                             <tr>

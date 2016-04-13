@@ -7,12 +7,12 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.data.solr.repository.config.EnableSolrRepositories;
 
 @SpringBootApplication
-//@EnableDiscoveryClient
-//@EnableFeignClients
+@EnableDiscoveryClient
+@EnableFeignClients
 @EnableSolrRepositories(basePackages = {"com.yihu.ehr.profile.persist.repo"}, multicoreSupport = true)
 public class HealthProfileSvrApp {
 
-	public static void main(String[] args) {
-		SpringApplication.run(HealthProfileSvrApp.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(HealthProfileSvrApp.class, args);
+    }
 }

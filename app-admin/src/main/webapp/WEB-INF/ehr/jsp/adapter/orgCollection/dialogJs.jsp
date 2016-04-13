@@ -7,7 +7,7 @@
         var Util = $.Util;
         var infoForm = null;
         var jValidation = $.jValidation;
-        var orgCode = parent.getOrgCode();
+        var organizationCode = parent.getOrgCode();
         var seq = parent.getSeq();
         var mode = '${mode}';
         if(!Util.isStrEquals(mode,'new')){
@@ -64,7 +64,7 @@
                 this.$form.Fields.fillValues({
                         orgDataSet: seq,
                         orgDict: seq,
-                        organization: orgCode
+                        organization: organizationCode
                 });
 
                 this.setSortShow();

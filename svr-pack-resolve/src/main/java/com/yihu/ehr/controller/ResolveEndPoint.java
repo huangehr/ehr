@@ -7,8 +7,8 @@ import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.feign.XPackageMgrClient;
 import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.persist.ProfileService;
 import com.yihu.ehr.profile.core.Profile;
+import com.yihu.ehr.profile.persist.repo.ProfileRepository;
 import com.yihu.ehr.service.PackageResolver;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,7 +34,7 @@ public class ResolveEndPoint {
     PackageResolver resolver;
 
     @Autowired
-    ProfileService profileService;
+    ProfileRepository profileRepo;
 
     @Autowired
     FastDFSUtil fastDFSUtil;
@@ -55,7 +55,7 @@ public class ResolveEndPoint {
         String zipFile = downloadTo(pack.getRemotePath());
 
         Profile profile = resolver.doResolve(pack, zipFile);
-        profileService.saveProfile(profile);
+        profileRepo.save(profile);
 
         packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
                 "Identity: " + profile.getDemographicId() + ", profile: " + profile.getId());
@@ -63,16 +63,16 @@ public class ResolveEndPoint {
         return new ResponseEntity<>(echo ? profile.toJson() : "", HttpStatus.OK);
     }
 
-    @ApiOperation(value = "本地档案包解析，仅供测试用", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "本地档案包解析", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @RequestMapping(value = RestApi.Packages.Package, method = RequestMethod.POST)
     public ResponseEntity<String> resolve(@ApiParam(value = "档案包ID，忽略此值", defaultValue = "LocalPackage")
                                           @PathVariable("id") String packageId,
                                           @ApiParam("档案包文件")
-                                          @RequestPart(required = true) MultipartFile file,
+                                          @RequestPart() MultipartFile file,
                                           @ApiParam("档案包密码")
                                           @RequestParam("password") String password,
-                                          @ApiParam(value = "是否入库", defaultValue = "false")
-                                          @RequestParam("persist") boolean persist) throws FileNotFoundException {
+                                          @ApiParam(value = "是否入库")
+                                          @RequestParam(value = "persist", defaultValue = "false") boolean persist) throws FileNotFoundException {
 
         String zipFile = System.getProperty("java.io.tmpdir") + packageId + ".zip";
 
@@ -88,9 +88,8 @@ public class ResolveEndPoint {
 
             Profile profile = resolver.doResolve(pack, zipFile);
             if (!persist) {
-                profileService.saveProfile(profile);
+                profileRepo.save(profile);
             }
-
 
             return new ResponseEntity<>(profile.toJson(), HttpStatus.OK);
         } catch (Exception e) {

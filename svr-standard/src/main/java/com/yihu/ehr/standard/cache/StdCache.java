@@ -1,4 +1,4 @@
-package com.yihu.ehr.standard;
+package com.yihu.ehr.standard.cache;
 
 import com.yihu.ehr.config.StdSessionFactoryBean;
 import com.yihu.ehr.model.standard.MCDAVersion;
@@ -30,7 +30,7 @@ import java.util.Set;
 @Component
 public class StdCache {
 
-    static String DataSetQuery = "SELECT code, name FROM data.set.table";
+    static String DataSetQuery = "SELECT id, code, name FROM data.set.table";
     static String MetaDataQuery = "SELECT a.code AS data_set_code, b.inner_code, b.type, b.dict_id FROM data.set.table a, " +
             "meta.data.table b WHERE a.id = b.dataset_id";
     static String DictEntryQuery = "SELECT t.dict_id, t.code, t.value FROM dict.entry.table t";
@@ -47,11 +47,11 @@ public class StdCache {
     @Autowired
     CDAVersionService versionService;
 
-    public List<MCDAVersion> versions(){
+    public List<MCDAVersion> versions() {
         Set<String> keys = redisClient.keys(keySchema.versionName("*"));
         List<MCDAVersion> versions = new ArrayList<>(keys.size());
 
-        for (String key : keys){
+        for (String key : keys) {
             MCDAVersion version = new MCDAVersion();
             version.setVersion(key.split(":")[1]);
             version.setVersionName(redisClient.get(key));
@@ -62,7 +62,7 @@ public class StdCache {
         return versions;
     }
 
-    public MCDAVersion version(String version){
+    public MCDAVersion version(String version) {
         String name = redisClient.get(keySchema.versionName(version));
         if (StringUtils.isEmpty(name)) return null;
 
@@ -79,7 +79,7 @@ public class StdCache {
      * @param version 内部版本号
      */
     public void cacheData(String version, boolean force) {
-        if(force) clearStdData(version);
+        if (force) clearStdData(version);
 
         Session session = openSession();
         try {
@@ -90,7 +90,7 @@ public class StdCache {
             String dictEntryTable = CDAVersionUtil.getDictEntryTableName(version);
             Query query;
 
-            // 缓存数据元
+            // 数据元
             {
                 query = session.createSQLQuery(MetaDataQuery.replace("data.set.table", dataSetTable).replace("meta.data.table", metaDataTable));
                 List<Object[]> metaDataList = query.list();
@@ -103,7 +103,7 @@ public class StdCache {
                     String metaDataTypeKey = keySchema.metaDataType(version, dataSetCode, innerCode);
                     String metaDataDictKey = keySchema.metaDataDict(version, dataSetCode, innerCode);
 
-                    if (redisClient.hasKey(metaDataTypeKey)){
+                    if (redisClient.hasKey(metaDataTypeKey)) {
                         LogService.getLogger().warn("Meta data duplicated: " + metaDataTypeKey);
                     }
 
@@ -112,7 +112,27 @@ public class StdCache {
                 }
             }
 
-            // 缓存字典项
+            // 数据集
+            {
+                query = session.createSQLQuery(DataSetQuery.replace("data.set.table", dataSetTable));
+                List<Object[]> dataSetList = query.list();
+                for (Object[] record : dataSetList) {
+                    String id = record[0].toString();
+                    String code = (String)record[1];
+                    String name = (String)record[2];
+
+                    String codeKey = keySchema.dataSetCode(version, id);
+                    redisClient.set(codeKey, code);
+
+                    String nameKey = keySchema.dataSetName(version, id);
+                    redisClient.set(nameKey, name);
+
+                    String nameKeyByCode = keySchema.dataSetNameByCode(version, code);
+                    redisClient.set(nameKeyByCode, name);
+                }
+            }
+
+            // 字典项
             {
                 query = session.createSQLQuery(DictEntryQuery.replace("dict.entry.table", dictEntryTable));
                 List<Object[]> entryList = query.list();
@@ -126,10 +146,10 @@ public class StdCache {
                 }
             }
 
-            // 缓存版本
+            // 版本
             redisClient.set(versionKey, versionService.getVersion(version).getVersionName());
         } finally {
-            if(null != session) session.close();
+            if (null != session) session.close();
         }
     }
 
@@ -151,7 +171,7 @@ public class StdCache {
         return redisClient.hasKey(keySchema.versionName(version));
     }
 
-    private Session openSession(){
+    private Session openSession() {
         return localSessionFactoryBean.getObject().openSession();
     }
 }

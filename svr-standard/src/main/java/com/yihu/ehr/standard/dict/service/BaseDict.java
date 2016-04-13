@@ -17,7 +17,7 @@ import java.util.Objects;
  * @created 14-7月-2015 16:33:51
  */
 @MappedSuperclass
-public class IDict {
+public class BaseDict {
     long id;
     String code;//字典代码
     String name;//字典名称
@@ -28,7 +28,6 @@ public class IDict {
     String sourceId;
     String stdVersion;// 标准化版本
     int hashCode;
-    String OperationType;
     String innerVersion;
     int inStage;
 
@@ -124,15 +123,6 @@ public class IDict {
 
     public void setHashCode(int hashCode) {
         this.hashCode = hashCode;
-    }
-
-    @Transient
-    public String getOperationType() {
-        return OperationType;
-    }
-
-    public void setOperationType(String operationType) {
-        OperationType = operationType;
     }
 
     @Transient
