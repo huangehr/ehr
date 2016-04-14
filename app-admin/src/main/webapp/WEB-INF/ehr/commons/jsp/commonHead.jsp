@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="${staticRoot}/common/function.css">
 <link rel="stylesheet" href="${staticRoot}/common/unit.css">
 <link rel="stylesheet" href="${staticRoot}/common/skin.css">
+<link rel="stylesheet" href="${staticRoot}/common/cyc-menu.css">
 
 <link rel="stylesheet" href="${staticRoot}/lib/plugin/tips/tips.css">
 <link rel="stylesheet" href="${staticRoot}/lib/ligerui/skins/Aqua/css/ligerui-all.css">
