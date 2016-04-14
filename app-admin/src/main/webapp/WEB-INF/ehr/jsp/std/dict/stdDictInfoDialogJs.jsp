@@ -30,6 +30,12 @@
             $btnCancel: $("#btn_cancel"),
 
             init: function () {
+                var staged = '${staged}';
+
+                if(staged=='false')
+                {
+                    $("#btn_save").hide();
+                }
                 this.initForm();
                 this.bindEvents();
             },
