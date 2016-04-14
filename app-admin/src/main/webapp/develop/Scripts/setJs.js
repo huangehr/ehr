@@ -400,10 +400,9 @@ set.list = {
             set.list.addElement();
         });
         $("#btn_Delete_relation").click(function () {
-
             var rows = set.list.elementGrid.getSelecteds();
             if (rows.length == 0) {
-                $.Notice.tip("请选择要删除的内容！");
+                $.Notice.warn("请选择要删除的内容！");
                 return;
             }
             else {

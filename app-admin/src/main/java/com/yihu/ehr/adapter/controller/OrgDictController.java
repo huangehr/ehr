@@ -239,13 +239,13 @@ public class OrgDictController {
      */
     @RequestMapping("searchOrgDicts")
     @ResponseBody
-    public Object searchOrgDicts(String orgCode,String codeOrName,int page, int rows) {
+    public Object searchOrgDicts(String organizationCode,String codeOrName,int page, int rows) {
         String url = "/adapter/org/dicts";
         String resultStr = "";
         Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
 
-        String filters = "organization="+orgCode;
+        String filters = "organization="+organizationCode;
         if(!StringUtils.isEmpty(codeOrName)){
             filters += " g1;code?"+codeOrName+" g2;name?"+codeOrName+" g2";
         }
@@ -461,13 +461,13 @@ public class OrgDictController {
      */
     @RequestMapping("searchOrgDictItems")
     @ResponseBody
-    public Object searchOrgDictItems(Integer orgDictSeq,String orgCode,String codeOrName,int page, int rows) {
+    public Object searchOrgDictItems(Integer orgDictSeq,String organizationCode,String codeOrName,int page, int rows) {
         String url = "/adapter/org/items";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
 
-        String filters = "orgDict="+orgDictSeq+" g1;organization="+orgCode+" g2";
+        String filters = "orgDict="+orgDictSeq+" g1;organization="+organizationCode+" g2";
         if (!StringUtils.isEmpty(codeOrName)){
             filters += ";code?"+codeOrName+" g4;name?"+codeOrName+" g4";
         }

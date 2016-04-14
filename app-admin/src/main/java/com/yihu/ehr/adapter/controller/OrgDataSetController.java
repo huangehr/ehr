@@ -240,18 +240,18 @@ public class OrgDataSetController {
      */
     @RequestMapping("searchOrgDataSets")
     @ResponseBody
-    public Object searchOrgDataSets(String orgCode, String codeOrName, int page, int rows) {
+    public Object searchOrgDataSets(String organizationCode, String codeOrName, int page, int rows) {
         String url = "/adapter/org/data_sets";
         String resultStr = "";
         Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
 
-        if(StringUtils.isEmpty(orgCode)){
+        if(StringUtils.isEmpty(organizationCode)){
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("机构代码不能为空");
             return envelop;
         }
-        String filters = "organization="+orgCode;
+        String filters = "organization="+organizationCode;
         if(!StringUtils.isEmpty(codeOrName)){
             filters += " g1;code?"+codeOrName+" g2;name?"+codeOrName+" g2";
         }
@@ -402,12 +402,12 @@ public class OrgDataSetController {
      */
     @RequestMapping("searchOrgMetaDatas")
     @ResponseBody
-    public Object searchOrgMetaDatas(String orgCode,Integer orgDataSetSeq, String codeOrName, int page, int rows) {
+    public Object searchOrgMetaDatas(String organizationCode,Integer orgDataSetSeq, String codeOrName, int page, int rows) {
         String url = "/adapter/org/meta_datas";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        String filters = "orgDataSet="+orgDataSetSeq+" g1;organization="+orgCode+" g2";
+        String filters = "orgDataSet="+orgDataSetSeq+" g1;organization="+organizationCode+" g2";
         if (!StringUtils.isEmpty(codeOrName)){
             filters += ";code?"+codeOrName+" g4;name?"+codeOrName+" g4";
         }

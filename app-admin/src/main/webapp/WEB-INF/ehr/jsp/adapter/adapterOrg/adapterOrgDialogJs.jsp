@@ -145,7 +145,7 @@
                         fields: [{name: 'param', label: ''}]
                     },//搜索框的字段, name 必须是服务器返回的字段
                     grid: gridOp,
-                    valueField: 'organizationCode',
+                    valueField: 'orgCode',
                     textField: 'fullName',
                     selectBoxHeight: 300,
                     readonly: mode == 'modify',
