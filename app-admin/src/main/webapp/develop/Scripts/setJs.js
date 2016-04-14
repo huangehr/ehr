@@ -21,8 +21,8 @@ set.list = {
             {
                 display: '操作', isSort: false, width: '33%', render: function (rowdata, rowindex, value) {
 
-                var html = "<div class='grid_edit' style='' title='' onclick='set.list.updateSet(\"" + rowdata.id + "\")'></div> " +
-                    "<div class='grid_delete' style=''title='' onclick='set.list.deleteSet(\"" + rowdata.id + "\")'></div>";
+                var html = "<div class='grid_edit' style='' title='编辑' onclick='set.list.updateSet(\"" + rowdata.id + "\")'></div> " +
+                    "<div class='grid_delete' style=''title='删除' onclick='set.list.deleteSet(\"" + rowdata.id + "\")'></div>";
                 //var html = "<div class='grid_edit' style='margin-left: 30px;cursor:pointer;' title='修改' onclick='set.list.updateSet(\"" + rowdata.id + "\")'></div> " +
                 //    "<div class='grid_delete' style='margin-left: 70px;cursor:pointer;'title='删除' onclick='set.list.deleteSet(\"" + rowdata.id + "\")'></div>";
                 return html;

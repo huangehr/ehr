@@ -98,10 +98,10 @@
 								var html ='';
 								if(Util.isStrEquals(row.activated,true)){
 //										html +='<div class="grid_on"  onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:failure", row.id,0) + '"></div>';
-									html+= '<a class="grid_on" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}'])", "user:userInfoModifyDialog:failure", row.id,0,"失效") + '"></a>';
+									html+= '<a class="grid_on" href="javascript:void(0)" title="已生效" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}'])", "user:userInfoModifyDialog:failure", row.id,0,"失效") + '"></a>';
 								}else if(Util.isStrEquals(row.activated,false)){
 //										html +='<div class="grid_off" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:failure", row.id,1) + '"></div>';
-									html+='<a class="grid_off" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}'])", "user:userInfoModifyDialog:failure", row.id,1,"生效") + '"></a>';
+									html+='<a class="grid_off" href="javascript:void(0)" title="已失效" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}'])", "user:userInfoModifyDialog:failure", row.id,1,"生效") + '"></a>';
 								}
 								return html;
                             }},
@@ -111,8 +111,8 @@
 //								var html ='<div class="grid_edit"    title="编辑" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:open", row.id,'modify') + '"></div>'
 //										+'<div class="grid_delete"   title="删除"' +
 //										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoDialog:del", row.id,'delete') + '"></div>';
-                                var html = '<a class="grid_edit" style="" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:open", row.id, 'modify') + '"></a>';
-                                    html+= '<a class="grid_delete" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoDialog:del", row.id, 'delete') + '"></a>';
+                                var html = '<a class="grid_edit" title="编辑" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:open", row.id, 'modify') + '"></a>';
+                                    html+= '<a class="grid_delete" title="删除" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoDialog:del", row.id, 'delete') + '"></a>';
                                 return html;
 							}}
                         ],

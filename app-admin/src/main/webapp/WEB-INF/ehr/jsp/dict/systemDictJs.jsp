@@ -113,11 +113,11 @@
                             {display: '字典名称', name: 'name', width: '70%', align: 'left'},
                             {
                                 display: '操作', name: 'operator', width: '30%', render: function (row) {
-								var html ='<div class="grid_edit"  style=""  title="编辑" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "systemDict:systemInfoModifyDialog:update", row.id,row.name) + '"></div>'
-										+'<div class="grid_delete"  style="" title="删除"' +
-										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "systemDict:systemInfoModifyDialog:delete", row.id) + '"></div>';
-//                                var html = '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "systemDict:systemInfoModifyDialog:update", row.id, row.name) + '">编辑</a>/' +
-//                                        '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "systemDict:systemInfoModifyDialog:delete", row.id) + '">删除</a>';
+//								var html ='<div class="grid_edit"  style=""  title="编辑" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "systemDict:systemInfoModifyDialog:update", row.id,row.name) + '"></div>'
+//										+'<div class="grid_delete"  style="" title="删除"' +
+//										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "systemDict:systemInfoModifyDialog:delete", row.id) + '"></div>';
+                                var html = '<a href="javascript:void(0)" title="编辑" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "systemDict:systemInfoModifyDialog:update", row.id, row.name) + '">编辑</a>/' +
+                                        '<a href="javascript:void(0)" title="删除" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "systemDict:systemInfoModifyDialog:delete", row.id) + '">删除</a>';
                                 return html;
                             }
                             }
@@ -164,8 +164,8 @@
 //								var html ='<div class="grid_edit"  style=""  title="修改" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}','{4}'])", "systemDictEntity:systemDictEntityInfoModifyDialog:update", row.code,row.value,row.sort,row.catalog) + '"></div>'
 //										+'<div class="grid_delete"  style="" title="删除"' +
 //										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "systemDictEntity:systemDictEntityInfoModifyDialog:delete", row.code) + '"></div>';
-                                var html = '<a class="grid_edit" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}','{4}'])", "systemDictEntity:systemDictEntityInfoModifyDialog:update", row.code, row.value, row.sort, row.catalog) + '"></a>' +
-                                        '<a class="grid_delete" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "systemDictEntity:systemDictEntityInfoModifyDialog:delete", row.code) + '"></a> ';
+                                var html = '<a class="grid_edit" title="编辑" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}','{4}'])", "systemDictEntity:systemDictEntityInfoModifyDialog:update", row.code, row.value, row.sort, row.catalog) + '"></a>' +
+                                        '<a class="grid_delete" title="删除" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "systemDictEntity:systemDictEntityInfoModifyDialog:delete", row.code) + '"></a> ';
                                 return html;
                             }
                             }
