@@ -23,8 +23,8 @@ cdaType.list = {
 
                 //var html = "<div class='grid_edit' name='edit_click' style='margin-left: 60px;cursor:pointer;' onclick='cdaType.list.add(\"" + rowdata.id + "\", \"modify\")'></div> " +
                 //    "<div class='grid_delete' name='delete_click' style='margin-left: 110px;cursor:pointer;' onclick='cdaType.list.deleted(\"" + rowdata.id + "\")'></div>";
-                var html = "<a class='grid_edit' name='edit_click' style='' onclick='cdaType.list.add(\"" + rowdata.id + "\", \"modify\")'></a> " +
-                    "<a class='grid_delete' name='delete_click' style='' onclick='cdaType.list.deleted(\"" + rowdata.id + "\")'></a>";
+                var html = "<a class='grid_edit' title='编辑' name='edit_click' style='' onclick='cdaType.list.add(\"" + rowdata.id + "\", \"modify\")'></a> " +
+                    "<a class='grid_delete' title='删除' name='delete_click' style='' onclick='cdaType.list.deleted(\"" + rowdata.id + "\")'></a>";
                 return html;
             }
             }
