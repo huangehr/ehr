@@ -301,6 +301,26 @@ public class PatientController extends BaseRestController {
         }
         return localPath;
     }
+//    public String downloadPicture(
+//            @ApiParam(name = "group_name", value = "分组", defaultValue = "")
+//            @RequestParam(value = "group_name") String groupName,
+//            @ApiParam(name = "remote_file_name", value = "服务器头像名称", defaultValue = "")
+//            @RequestParam(value = "remote_file_name") String remoteFileName) throws Exception {
+//        String fileString = null;
+//        try {
+//
+//            byte[] bytes = fastDFSUtil.download(groupName,remoteFileName);
+//            fileString = new String(bytes, "utf-8");
+//            return fileString;
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (MyException e) {
+//            LogService.getLogger(DemographicInfo.class).error("人口头像图片下载失败；错误代码：" + e);
+//        }
+//        return fileString;
+//    }
+
+
 
 
     //显示头像在前端做

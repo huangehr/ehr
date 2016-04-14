@@ -187,11 +187,11 @@
                                     data: {userId: userId,activated:activated},
                                     success: function (data) {
                                         if (data.successFlg) {
-                                            $.Notice.success('修改成功');
+//                                            $.Notice.success('修改成功');
                                             isFirstPage = false;
                                             master.reloadGrid();
                                         } else {
-                                            $.Notice.error('修改失败');
+//                                            $.Notice.error('修改失败');
                                         }
                                     }
                                 });
