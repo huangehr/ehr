@@ -126,8 +126,8 @@
 //					var html ='<div class="grid_edit"  style="" title="" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "stddict:dictInfo:open", row.id,'modify') + '"></div>'
 //							+'<div class="grid_delete"  style="" title=""' +
 //							' onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "stddict:dictInfoGrid:delete", row.id) + '"></div>';
-                                    var html = '<a class="grid_edit"  href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "stddict:dictInfo:open", row.id, 'modify') + '"></a>' +
-                                            '<a class="grid_delete" href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "stddict:dictInfoGrid:delete", row.id) + '"></a>';
+                                    var html = '<a class="grid_edit"  href="#" title="编辑" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "stddict:dictInfo:open", row.id, 'modify') + '"></a>' +
+                                            '<a class="grid_delete" href="#" title="删除" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "stddict:dictInfoGrid:delete", row.id) + '"></a>';
                                     return html;
                                 }
                                 }
