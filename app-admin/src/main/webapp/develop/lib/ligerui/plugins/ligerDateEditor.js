@@ -67,7 +67,7 @@
             //g.text = g.inputText.wrap('<div class="l-text l-text-date "></div>').parent();
             g.text = g.inputText.wrap('<div class="l-text l-text-date j-text-wrapper"></div>').parent();
             // TODO [代码片段004][增加‘j-text-wrapper’类用于表单验证失败时样式控制][yezeh] 结束
-            g.text.append('<div class="l-text-l"></div><div class="l-text-r"></div>');
+            g.text.append('<div class="l-text-l"></div><div class="l-text-r"></div><i class="isdata" >格式错误!</i>');
             g.text.append(g.link);
             //添加个包裹，
             g.textwrapper = g.text.wrap('<div class="l-text-wrapper"></div>').parent();
@@ -794,14 +794,15 @@
         //恢复
         _rever: function ()
         {
-            var g = this, p = this.options;
-            if (!g.usedDate)
-            {
-                g.inputText.val("");
-            } else
-            {
-                g.inputText.val(g.getFormatDate(g.usedDate));
-            }
+            //TODO 2016/04/14  日期不恢复
+            //var g = this, p = this.options;
+            //if (!g.usedDate)
+            //{
+            //    g.inputText.val("");
+            //} else
+            //{
+            //    g.inputText.val(g.getFormatDate(g.usedDate));
+            //}
         },
         _getMatch: function (format)
         {
@@ -832,6 +833,7 @@
                     str = str.substring(mathLength);
                 } else
                 {
+
                     return null;
                 }
             }
@@ -841,7 +843,10 @@
         {
             var g = this, p = this.options;
             var r = this._getMatch();
-            if (!r) return null;
+            if (!r){
+
+                return null
+            };
             var t = dateStr.match(r.reg);
             if (!t) return null;
             var tt = {
@@ -879,6 +884,8 @@
             var newDate = g._bulidDate(val);
             if (!newDate)
             {
+                //日期格式如果输入错误提示cyc
+
                 g._rever();
                 return;
             }
@@ -903,6 +910,8 @@
                 minute: g.usedDate.getMinutes()
             };
             var formatVal = g.getFormatDate(newDate);
+            // 手动输入日期格式正确则隐藏提示窗cyc
+
             g.inputText.val(formatVal);
             g.trigger('changeDate', [formatVal]);
             if ($(g.dateeditor).is(":visible"))

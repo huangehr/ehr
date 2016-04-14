@@ -8,7 +8,6 @@
 */
 (function ($)
 {
-
     $.fn.ligerComboBox = function (options)
     {
         return $.ligerui.run.call(this, "ligerComboBox", arguments);
@@ -331,7 +330,10 @@
             }).focus(function ()
             {
                 if (p.disabled || p.readonly) return;
-                g.wrapper.addClass("l-text-focus");
+                //TODO 加了个IF  被动点击是不会有鼠标经过时间 加的样式l-text-over的
+                if(g.wrapper.hasClass("l-text-over")){
+                    g.wrapper.addClass("l-text-focus");
+                }
             });
             g.wrapper.hover(function ()
             {

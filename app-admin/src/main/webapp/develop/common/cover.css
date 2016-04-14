@@ -20,3 +20,7 @@ a:focus{color:#ffffff;text-decoration: none;}
 #span_nav_breadcrumb_content span{ font-weight: normal;}
 #span_nav_breadcrumb_content span.on{ color:#3eafe0}
 #span_nav_breadcrumb_content span.strong{ font-weight:bold;}
+
+/**/
+#div_left #div_typeTree{padding: 0 0 10px 0}
+.isdata {color: red;position: absolute;right: -81px;display: none;background: url(../images/icon-qp.png) no-repeat; height: 25px;line-height: 25px;width: 78px;padding: 0 0 0 15px;}

@@ -53,7 +53,7 @@
         <label>出生日期：</label>
 
         <div class="m-form-control">
-            <input type="text" id="inp_patientBirthday" class="required useTitle" placeholder="输入日期"
+            <input type="text" id="inp_patientBirthday" class="validate-date l-text-field validate-date"  placeholder="输入日期 格式(2016-04-15)"
                    required-title=<spring:message code="lbl.must.input"/> data-attr-scan="birthday"/>
         </div>
     </div>
