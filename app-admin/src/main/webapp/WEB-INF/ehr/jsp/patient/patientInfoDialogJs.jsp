@@ -15,6 +15,7 @@
         var dialog = frameElement.dialog;
         var dataModel = $.DataModel.init();
         var patientModel = "";
+        debugger
         var patientDialogType = '${patientDialogType}';
         if (!(Util.isStrEquals(patientDialogType, 'addPatient'))) {
             patientModel =${patientModel}.obj;
@@ -118,7 +119,7 @@
                     self.$patientCopyId.val(patientModel.idCardNo);
 
                    var pic = patientModel.localPath;
-                    if(!(Util.isStrEquals(pic,null)||Util.isStrEquals(pic,""))){
+                    if(!Util.isStrEmpty(pic)){
                         self.$picPath.html('<img src="${contextRoot}/patient/showImage?localImgPath='+pic+'" class="f-w88 f-h110"></img>');
                     }
                 }
@@ -206,7 +207,6 @@
                         }
                     });
                      var jsonData = JSON.stringify(values)+";"+patientDialogType;
-//                     values.patientDialogType = patientDialogType;
                     if(picHtml == 0){
                         updatePatient(jsonData);
 //                        updatePatient(JSON.stringify(values));

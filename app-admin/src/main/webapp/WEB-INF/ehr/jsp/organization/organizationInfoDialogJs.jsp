@@ -86,7 +86,11 @@
                 this.initDDL(orgTypeDictId,this.$orgType);
                 this.initDDL(settledWayDictId,this.$settledWay);
 				this.$form.attrScan();
-//				tags = tags.substring(1,tags.length-1);
+				var tags = '';
+				for(var i=0;i<org.tags.length;i++){
+					tags += (org.tags)[i]+';'
+				}
+				tags = tags.substring(0,tags.length-1);
 				this.$form.Fields.fillValues({
 					organizationCode: org.organizationCode,
 					fullName: org.fullName,
@@ -96,7 +100,7 @@
 					settledWay: org.settledWay,
 					admin:org.admin,
 					tel: org.tel,
-//					tags: tags,
+					tags: tags,
 					publicKey: org.publicKey,
 					validTime:org.validTime,
 					startTime:org.startTime
@@ -142,6 +146,10 @@
                     self.$form.attrScan();
                     var orgAddress = self.$form.Fields.location.getValue();
 					var orgModel = self.$form.Fields.getValues();
+					//标签字符串转化为数组
+					var tags = orgModel.tags;
+					tags = tags.split(/[;；]/)
+					orgModel.tags = tags;
 					//原location是对象，传到controller转化成model会报错--机构、地址分开传递（json串）
 					orgModel.location = "";
 					var addressModel = {
