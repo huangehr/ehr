@@ -111,7 +111,7 @@
                             }},
                             { display: '操作', name: 'operator', width: '10%', render: function (row) {
 //								var html ='<div class="grid_edit"  style=""  title="编辑" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "app:appInfo:open", row.id,'modify') + '"></div>'
-                                var html = '<a class="grid_edit" href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","app:appInfo:open", row.id,'modify')+'"></a>' ;
+                                var html = '<a class="grid_edit" title="编辑" href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","app:appInfo:open", row.id,'modify')+'"></a>' ;
                                 return html;
                             }}
                         ],
