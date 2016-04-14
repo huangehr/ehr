@@ -52,6 +52,12 @@
             $breadcrumbBar: $('#div_nav_breadcrumb_bar'),
             $breadcrumbContent: $('#span_nav_breadcrumb_content'),
             init: function () {
+
+                //判断用户是否初始密码
+                var bo = Util.getUrlQueryString("defaultPassWord");
+                if(Util.isStrEquals(bo,'true'))
+                    window.location.href = "${contextRoot}/user/initialChangePassword";
+
                 this.$mainContent.ligerLayout({
                     // 左侧导航栏菜单宽度
                     leftWidth: 190,

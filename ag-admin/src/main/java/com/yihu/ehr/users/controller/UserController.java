@@ -250,11 +250,11 @@ public class UserController extends BaseController {
     }
 
 
-    @RequestMapping(value = "/users/", method = RequestMethod.PUT)
+    @RequestMapping(value = "/user", method = RequestMethod.POST)
     @ApiOperation(value = "修改用户", notes = "重新绑定用户信息")
     public Envelop updateUser(
-            @ApiParam(name = "user_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "user_json_data") String userJsonData,
+            @ApiParam(name = "user_json_datas", value = "", defaultValue = "")
+            @RequestParam(value = "user_json_datas") String userJsonData,
             @ApiParam(name = "inputStream", value = "转换后的输入流", defaultValue = "")
             @RequestParam(value = "inputStream") String inputStream,
             @ApiParam(name = "imageName", value = "图片全名", defaultValue = "")
@@ -267,14 +267,15 @@ public class UserController extends BaseController {
                 path = userClient.uploadPicture(jsonData);
             }
 
-            UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
+            UserDetailModel detailModel = toEntity(userJsonData, UserDetailModel.class);
 
             if (!StringUtils.isEmpty(path)) {
                 detailModel.setImgRemotePath(path);
                 detailModel.setImgLocalPath("");
             }
 
-            detailModel.setPassword("e10adc3949ba59abbe56e057f20f883e"); //测试数据
+//            detailModel.setPassword("e10adc3949ba59abbe56e057f20f883e"); //todo:测试数据
+//            detailModel.setActivated(true); //todo:测试数据
             String errorMsg = null;
             if (StringUtils.isEmpty(detailModel.getLoginCode())) {
                 errorMsg += "账户不能为空";
@@ -491,7 +492,7 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "/users/existence", method = RequestMethod.GET)
-    @ApiOperation(value = "根据登录账号获取当前用户", notes = "根据登陆用户名及密码验证用户")
+    @ApiOperation(value = "用户属性唯一性验证", notes = "用户属性唯一性验证（用户名、省份证号、邮箱）")
     public Envelop existence(
             @ApiParam(name = "existenceType",value = "", defaultValue = "")
             @RequestParam(value = "existenceType") String existenceType,
@@ -525,7 +526,7 @@ public class UserController extends BaseController {
 
 
     @RequestMapping(value = "/users/changePassWord", method = RequestMethod.PUT)
-    @ApiOperation(value = "根据登录账号获取当前用户", notes = "根据登陆用户名及密码验证用户")
+    @ApiOperation(value = "修改用户密码", notes = "修改用户密码")
     public Envelop changePassWord(
             @ApiParam(name = "user_id",value = "password", defaultValue = "")
             @RequestParam(value = "user_id") String userId,
