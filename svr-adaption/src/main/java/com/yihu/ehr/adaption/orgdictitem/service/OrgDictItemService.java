@@ -79,9 +79,11 @@ public class OrgDictItemService extends BaseJpaService<OrgDictItem, XOrgDictItem
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public int getNextSort(long dictId) {
+    public int getNextSort(long dictId, String org) {
         Session session = currentSession();
-        Query query = session.createQuery("select max(sort) from OrgDictItem  where orgDict= '" + dictId + "'");
+        Query query = session.createQuery("select max(sort) from OrgDictItem  where orgDict= :dictId and organization=:organization");
+        query.setParameter("dictId", dictId);
+        query.setParameter("organization", org);
         int result;
         if (query.uniqueResult() == null) {
             result = 1;

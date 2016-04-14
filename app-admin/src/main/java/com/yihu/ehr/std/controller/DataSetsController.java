@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.datasset.DataSetModel;
 import com.yihu.ehr.agModel.standard.datasset.MetaDataModel;
 import com.yihu.ehr.agModel.standard.dict.DictModel;
-import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
@@ -18,7 +17,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -38,7 +40,7 @@ public class DataSetsController extends BaseUIController {
     @Value("${service-gateway.url}")
     private String adminUrl;
 
-//    @RequestMapping("/initial")
+    //    @RequestMapping("/initial")
 //    public String dataSetInitial() {
 //        return "/std/dataset/dataSet";
 //    }
@@ -92,30 +94,6 @@ public class DataSetsController extends BaseUIController {
             params.put("sorts","");
             params.put("page",page);
             params.put("size",rows);
-            params.put("version",version);
-            String envelopStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            return envelopStr;
-        }catch(Exception ex){
-            LogService.getLogger(DataSetsController.class).error(ex.getMessage());
-            envelop.setErrorMsg(ErrorCode.SystemError.toString());
-        }
-        return envelop;
-    }
-
-    @RequestMapping("/searchDataSetsWithoutPaging")
-    @ResponseBody
-    public Object searchDataSetsWithoutPaging(String codename, String version){
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(false);
-
-        String filters = "";
-        if (!StringUtils.isEmpty(codename)){
-            filters += "name?"+codename+" g1;code?"+codename+" g1;";
-        }
-        String url = "/data_sets/no_paging";
-        try{
-            Map<String,Object> params = new HashMap<>();
-            params.put("filters",filters);
             params.put("version",version);
             String envelopStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             return envelopStr;
@@ -318,6 +296,7 @@ public class DataSetsController extends BaseUIController {
     @ResponseBody
     public Object getMetaData(Long dataSetId, Long metaDataId, String version) {
         Envelop envelop = new Envelop();
+        Envelop result = new Envelop();
         String strErrMessage = "";
         if (StringUtils.isEmpty(dataSetId) || dataSetId.equals(0)) {
             strErrMessage += "请先选择数据集!";
@@ -339,6 +318,34 @@ public class DataSetsController extends BaseUIController {
             params.put("metaDataId",metaDataId);
             params.put("versionCode",version);
             String envelopStr = HttpClientUtil.doGet(comUrl+url,params,username,password);
+
+            result = getEnvelop(envelopStr);
+            MetaDataModel mdModel = getEnvelopModel(result.getObj(), MetaDataModel.class);
+            if(mdModel.getDictId() != 0){
+                Long dictId = mdModel.getDictId();
+
+                String urlForDict = "/dict";
+                Envelop dictResult = new Envelop();
+                Map<String, Object> paramsForDict = new HashMap<>();
+                paramsForDict.put("dictId", dictId);
+                paramsForDict.put("version_code",version);
+
+                String dictResultStr = HttpClientUtil.doGet(comUrl + urlForDict, paramsForDict, username, password);
+                dictResult = getEnvelop(dictResultStr);
+                if(dictResult.isSuccessFlg()){
+                    DictModel dictModel = getEnvelopModel(dictResult.getObj(),DictModel.class);
+                    mdModel.setDictCode(dictModel.getCode());
+                    mdModel.setDictName(dictModel.getName());
+                }
+            }
+            else{
+                mdModel.setDictCode("");
+                mdModel.setDictName("");
+            }
+
+            result.setObj(mdModel);
+            envelopStr = objectMapper.writeValueAsString(result);
+
             return envelopStr;
         } catch (Exception ex) {
             LogService.getLogger(DataSetsController.class).error(ex.getMessage());
@@ -437,24 +444,34 @@ public class DataSetsController extends BaseUIController {
      */
     @RequestMapping(value = "/getMetaDataDict", produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public String getMetaDataDict(String version) {
+    public String getMetaDataDict(String version, String param , Integer page, Integer rows) {
         String strResult = "[]";
         try {
-            //TODO
             String url = "/std/dicts";
             Map<String,Object> params = new HashMap<>();
+
+            StringBuffer stringBuffer = new StringBuffer();
+            if (!StringUtils.isEmpty(param)) {
+                stringBuffer.append("code?" + param + " g1;name?" + param + " g1;");
+            }
+            String filters = stringBuffer.toString();
+            params.put("filters", "");
+            if (!StringUtils.isEmpty(filters)) {
+                params.put("filters", filters);
+            }
             params.put("fields","");
-            params.put("filters","");
             params.put("sorts","");
-            params.put("page","1");
-            params.put("size","999");
+            params.put("page",page);
+            params.put("size",rows);
             params.put("version",version);
             String envelopStr = HttpClientUtil.doGet(adminUrl+url,params,username,password);
             Envelop envelopGet = objectMapper.readValue(envelopStr,Envelop.class);
             if (envelopGet.isSuccessFlg()) {
-                List<DictModel> dictModels = (List<DictModel>)getEnvelopList(envelopGet.getDetailModelList(),new ArrayList<DictModel>(),DictModel.class);
-                strResult = objectMapper.writeValueAsString(dictModels);
+                return envelopStr;
+                //List<DictModel> dictModels = (List<DictModel>)getEnvelopList(envelopGet.getDetailModelList(),new ArrayList<DictModel>(),DictModel.class);
+                //strResult = objectMapper.writeValueAsString(dictModels);
             }
+
         } catch (Exception ex) {
             LogService.getLogger(DataSetsController.class).error(ex.getMessage());
         }

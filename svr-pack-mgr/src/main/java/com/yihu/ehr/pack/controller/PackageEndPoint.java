@@ -1,5 +1,6 @@
 package com.yihu.ehr.pack.controller;
 
+import com.netflix.ribbon.proxy.annotation.Http;
 import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ArchiveStatus;
@@ -12,18 +13,14 @@ import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.pack.service.Package;
 import com.yihu.ehr.pack.service.PackageService;
+import com.yihu.ehr.task.MessageBuffer;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.encrypt.RSA;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.client.RedirectStrategy;
-import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -58,6 +55,9 @@ public class PackageEndPoint extends BaseRestController {
     @Autowired
     private UserClient userClient;
 
+    @Autowired
+    MessageBuffer messageBuffer;
+
     @RequestMapping(value = RestApi.Packages.PackageSearch, method = RequestMethod.GET)
     @ApiOperation(value = "搜索档案包", response = MPackage.class, responseContainer = "List", notes = "搜索档案包")
     public Collection<MPackage> packageList(
@@ -89,7 +89,7 @@ public class PackageEndPoint extends BaseRestController {
     @RequestMapping(value = RestApi.Packages.Packages, method = RequestMethod.POST)
     @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
     public void savePackageWithOrg(
-            @ApiParam(name = "package", value = "档案包", allowMultiple = true) MultipartHttpServletRequest jsonPackage,
+            @ApiParam(name = "package", value = "档案包", allowMultiple = true) MultipartHttpServletRequest pack,
             @ApiParam(name = "org_code", value = "机构代码")
             @RequestParam(value = "org_code") String orgCode,
             @ApiParam(name = "package_crypto", value = "档案包解压密码,二次加密")
@@ -97,15 +97,18 @@ public class PackageEndPoint extends BaseRestController {
             @ApiParam(name = "md5", value = "档案包MD5")
             @RequestParam(value = "md5", required = false) String md5) throws Exception {
 
-        if (jsonPackage.getFile("file") == null) throw new ApiException(ErrorCode.MissParameter, "file");
-        MultipartFile multipartFile = jsonPackage.getFile("file");
-        byte[] bytes = multipartFile.getBytes();
+        MultipartFile multipartFile = pack.getFile("file");
+        if (multipartFile == null) throw new ApiException(HttpStatus.FORBIDDEN, ErrorCode.MissParameter, "file");
+
         MKey key = securityClient.getOrgKey(orgCode);
         String privateKey = key.getPrivateKey();
-        if (null == privateKey) throw new ApiException(ErrorCode.GenerateUserKeyFailed);
+        if (null == privateKey)
+            throw new ApiException(HttpStatus.FORBIDDEN, "Invalid public key, maybe you miss the organization code?");
 
         String unzipPwd = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
-        packService.receive(new ByteArrayInputStream(bytes), unzipPwd);
+        Package aPackage = packService.receive(multipartFile.getInputStream(), unzipPwd);
+
+        messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
     }
 
     /**
@@ -208,8 +211,7 @@ public class PackageEndPoint extends BaseRestController {
     @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
     @Deprecated
     public void savePackageWithUser(
-            @ApiParam(name = "package", value = "档案包", allowMultiple = true)
-                    MultipartHttpServletRequest jsonPackage,
+            @ApiParam(name = "package", value = "档案包", allowMultiple = true) MultipartHttpServletRequest pack,
             @ApiParam(name = "user_name", value = "用户名")
             @RequestParam(value = "user_name") String userName,
             @ApiParam(name = "package_crypto", value = "档案包解压密码,二次加密")
@@ -217,14 +219,18 @@ public class PackageEndPoint extends BaseRestController {
             @ApiParam(name = "md5", value = "档案包MD5")
             @RequestParam(value = "md5") String md5) throws Exception {
 
-        if (jsonPackage.getFile("file") == null) throw new ApiException(ErrorCode.MissParameter, "file");
-        MultipartFile multipartFile = jsonPackage.getFile("file");
-        byte[] bytes = multipartFile.getBytes();
+        MultipartFile multipartFile = pack.getFile("file");
+        if (multipartFile == null) throw new ApiException(HttpStatus.FORBIDDEN, ErrorCode.MissParameter, "file");
+
         MUser user = userClient.getUserByUserName(userName);
         MKey key = securityClient.getUserKey(user.getId());
         String privateKey = key.getPrivateKey();
-        if (null == privateKey) throw new ApiException(ErrorCode.GenerateUserKeyFailed);
+        if (null == privateKey)
+            throw new ApiException(HttpStatus.FORBIDDEN, "Invalid public key, maybe you miss the user name?");
+
         String unzipPwd = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
-        packService.receive(new ByteArrayInputStream(bytes), unzipPwd);
+        Package aPackage = packService.receive(multipartFile.getInputStream(), unzipPwd);
+
+        messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
     }
 }

@@ -55,17 +55,17 @@ public class CDAVersionService extends BaseJpaService<CDAVersion, XCDAVersionRep
 
         } else {
             stagedVersion = new CDAVersion(baseVersion.getVersion(), author, baseVersion.getVersionName());
-            if (stagedVersion.getCommitTime() == null) {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-                Date time = null;
-                try {
-                    time = sdf.parse(sdf.format(new Date()));
-                    stagedVersion.setCommitTime(time);
-                } catch (ParseException e) {
-                    LogService.getLogger().error(e.getMessage());
-                }
-            }
+//            if (stagedVersion.getCommitTime() == null) {
+//                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//
+//                Date time = null;
+//                try {
+//                    time = sdf.parse(sdf.format(new Date()));
+//                    stagedVersion.setCommitTime(time);
+//                } catch (ParseException e) {
+//                    LogService.getLogger().error(e.getMessage());
+//                }
+//            }
         }
 
         buildVersionTables(stagedVersion);

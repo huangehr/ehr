@@ -1,6 +1,6 @@
 package com.yihu.ehr.extractor;
 
-import com.yihu.ehr.profile.ProfileDataSet;
+import com.yihu.ehr.profile.core.ProfileDataSet;
 import com.yihu.ehr.util.DateFormatter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

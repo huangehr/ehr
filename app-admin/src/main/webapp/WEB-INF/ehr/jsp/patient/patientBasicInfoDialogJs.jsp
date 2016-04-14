@@ -228,6 +228,8 @@
                     self.$form.show();
                     self.$cardInfo.css('visibility','hidden');
                     self.$recordForm.hide();
+                    console.log('coming');
+                    return false;
                 });
                 self.$cardManagerDialog.click(function () {
                     self.$cardManagerDialog.addClass("f-click-down").removeClass("f-click-up");
@@ -235,6 +237,8 @@
                     self.$cardInfo.css('visibility','visible');
                     self.$recordForm.hide();
                     self.$form.hide();
+                    console.log('coming');
+                    return false;
                 });
 
                 self.$recordManagerDialog.click(function () {
