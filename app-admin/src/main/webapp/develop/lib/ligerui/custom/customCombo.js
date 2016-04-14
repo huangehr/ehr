@@ -92,12 +92,14 @@
     };
 
     $.fn.customCombo = function (url, parms, selectedCall, child, readOnly) {
+        el = this;
+
         if(!selectedCall)
             selectedCall = function(id, name){
                 if(!name || !id)
                     return;
+                $(el).blur();
                 if(child){
-                    debugger
                     var childManager = child.ligerGetComboBoxManager();
                     var parms = childManager.get("parms");
                     var grid = childManager.getGrid();
@@ -116,7 +118,6 @@
                 }
             }
 
-        el = this;
         return new CustomCombo(el, url,
             {
                 parms: parms,
