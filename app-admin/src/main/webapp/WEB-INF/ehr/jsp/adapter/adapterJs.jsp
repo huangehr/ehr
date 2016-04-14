@@ -75,11 +75,11 @@
                             '${contextRoot}/adapter/getOrgList', p, undefined, undefined, false);
             }
 
-            function release(id,orgCode,versionCode) {
+            function release(id,organizationCode,versionCode) {
                 var dialog = $.ligerDialog.waitting('正在发布中,请稍候...');
                 var dataModel = $.DataModel.init();
                 dataModel.updateRemote('${contextRoot}/adapter/adapterDispatch', {
-                    data: {planId:id,orgCode:orgCode,versionCode:versionCode},
+                    data: {planId:id,organizationCode:organizationCode,versionCode:versionCode},
                     success: function (data) {
                         if (data.successFlg) {
                             $.ligerDialog.alert("发布成功!");
@@ -151,7 +151,7 @@
                             {display: '方案类别代码', name: 'type', hide: true},
                             {display: '方案代码', name: 'code', width: '10%', minColumnWidth: 60, align: 'left'},
                             {display: '方案名称', name: 'name', width: '20%', align: 'left'},
-                            {display: '标准版本', name: 'versionName', width: '10%', align: 'left'},
+                            {display: '标准版本', name: 'versionName', width: '6%', align: 'left'},
                             {display: '标准版本代码', name: 'version', hide: true},
                             {display: '采集机构代码', name: 'org', hide: true},
                             {display: '采集机构', name: 'orgValue', width: '20%', align: 'left'},
@@ -169,7 +169,7 @@
                                 }
                             },
                             {
-                                display: '操作', name: 'operator', width: '15%', render: function (row) {
+                                display: '操作', name: 'operator', width: '19%', render: function (row) {
 //								var html ='<div class="grid_edit"  style="margin-left: 10px;cursor:pointer;"  title="定制" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:open", row.id,'modify') + '"></div>'
 //										+'<div class="grid_delete"  style="margin-left: 40px;cursor:pointer;" title="适配"' +
 //										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoDialog:del", row.id,'delete') + '"></div>'
@@ -178,18 +178,22 @@
 //										+'<div class="grid_delete"  style="margin-left: 100px;cursor:pointer;" title="删除"' +
 //										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoDialog:del", row.id,'delete') + '"></div>';
 
-                                var html = '<a href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:customize", row.id, row.version) + '">定制</a>' +
-                                        '/<a href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:adapter", row.id, 'modify') + '">适配</a>' +
-                                        '/<a href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}',])", "adapter:adapterInfo:open", row.id, 'modify') + '">修改</a>' +
-                                        '/<a href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "adapter:adapterInfo:delete", row.id) + '">删除</a>';
+                                var html = '<a class="label_a" style="margin-left:0px;" href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:customize", row.id, row.version) + '">定制</a>' +
+                                        '<a class="label_a" style="margin-left:5px;" href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:adapter", row.id, 'modify') + '">适配</a>';
+//                                        '/<a href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}',])", "adapter:adapterInfo:open", row.id, 'modify') + '">修改</a>' +
+//                                        '/<a href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "adapter:adapterInfo:delete", row.id) + '">删除</a>';
                                 var text = "发布";
                                 if (row.status == 1) {
                                     text = "重新发布";
                                 }
 //								html+='<div class="grid_delete"  style="margin-left: 130px;cursor:pointer;" title="'+text+'"' +
 //										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3},'{4}','{5}'])", "adapter:adapterInfo:release", row.org,row.version,text,row.id) + '"></div>';
-                                html += '/<a href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}','{4}','{5}'])", "adapter:adapterInfo:release", row.org, row.version,text,row.id) + '">' + text + '</a>';
-                                return html;
+                                html += '<a class="label_a" style="margin-left:5px; href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}','{4}','{5}'])", "adapter:adapterInfo:release", row.org, row.version,text,row.id) + '">' + text + '</a>';
+								html += '<a class="grid_edit" href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}',])", "adapter:adapterInfo:open", row.id, 'modify') + '"></a>' +
+								'<a class="grid_delete" href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "adapter:adapterInfo:delete", row.id) + '"></a>';
+
+
+								return html;
                             }
                             }
                         ],
@@ -303,11 +307,11 @@
                     });
 
                     //定制适配方案
-                    $.subscribe('adapter:adapterInfo:release', function (event, orgCode, versionCode,title,id) {
+                    $.subscribe('adapter:adapterInfo:release', function (event, organizationCode, versionCode,title,id) {
 
                         $.ligerDialog.confirm('确定'+title+'该方案?', function (yes) {
                             if (yes) {
-                                release(id, orgCode, versionCode);
+                                release(id, organizationCode, versionCode);
                             }
                         });
                     });

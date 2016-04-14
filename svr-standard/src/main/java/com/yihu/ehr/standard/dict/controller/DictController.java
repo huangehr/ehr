@@ -2,14 +2,12 @@ package com.yihu.ehr.standard.dict.controller;
 
 import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.model.standard.MCDAType;
 import com.yihu.ehr.model.standard.MStdDict;
 import com.yihu.ehr.model.standard.MStdSource;
 import com.yihu.ehr.standard.cdatype.service.CDAType;
 import com.yihu.ehr.standard.commons.ExtendController;
-import com.yihu.ehr.standard.dict.service.Dict;
 import com.yihu.ehr.standard.dict.service.DictService;
-import com.yihu.ehr.standard.dict.service.IDict;
+import com.yihu.ehr.standard.dict.service.BaseDict;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -27,7 +25,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "dictionary", description = "标准字典", tags = {"标准字典"})
+@Api(value = "Dictionary", description = "字典服务")
 public class DictController extends ExtendController<MStdDict> {
 
     @Autowired
@@ -85,7 +83,7 @@ public class DictController extends ExtendController<MStdDict> {
             @RequestParam(value = "model") String model) throws Exception{
 
         Class entityClass = getServiceEntity(version);
-        IDict dict = (IDict) jsonToObj(model, entityClass);
+        BaseDict dict = (BaseDict) jsonToObj(model, entityClass);
 //        if(dictService.isExistByField("code", dict.getCode(), entityClass))
 //            throw errRepeatCode();
 
@@ -107,8 +105,8 @@ public class DictController extends ExtendController<MStdDict> {
             @RequestParam(value = "model") String model) throws Exception{
 
         Class entityClass = getServiceEntity(version);
-        IDict dictModel = (IDict) jsonToObj(model, entityClass);
-//        IDict dict = dictService.retrieve(id, entityClass);
+        BaseDict dictModel = (BaseDict) jsonToObj(model, entityClass);
+//        BaseDict dict = dictService.retrieve(id, entityClass);
 //        if(!dict.getCode().equals(dictModel.getCode()) &&
 //                dictService.isExistByField("code", dictModel.getCode(), entityClass))
 //            throw errRepeatCode();
@@ -184,12 +182,12 @@ public class DictController extends ExtendController<MStdDict> {
             @RequestParam(value = "id") long id,
             @ApiParam(name = "version", value = "版本编号", defaultValue = "")
             @RequestParam(value = "version") String version) throws Exception {
-        List<IDict> dicts = new ArrayList<>();
+        List<BaseDict> dicts = new ArrayList<>();
 
-        IDict dict = dictService.retrieve(id, getServiceEntity(version));
+        BaseDict dict = dictService.retrieve(id, getServiceEntity(version));
         dicts.add(dict);
         String childrenIds = getChildIncludeSelfByParentsAndChildrenIds(dicts,"",version);   //递归获取
-        List<IDict> returnDicts = dictService.getCdaTypeExcludeSelfAndChildren(childrenIds,version);
+        List<BaseDict> returnDicts = dictService.getCdaTypeExcludeSelfAndChildren(childrenIds,version);
 
         return  (List<MStdDict>)convertToModels(returnDicts,new ArrayList<MStdDict>(returnDicts.size()),MStdDict.class,"");
     }
@@ -200,11 +198,11 @@ public class DictController extends ExtendController<MStdDict> {
      * @param parents 父级信息
      * @param childrenIds   子级ID
      */
-    public String getChildIncludeSelfByParentsAndChildrenIds(List<IDict> parents,String childrenIds,String version) {
+    public String getChildIncludeSelfByParentsAndChildrenIds(List<BaseDict> parents, String childrenIds, String version) {
         for (int i = 0; i < parents.size(); i++) {
-            IDict dict = parents.get(i);
+            BaseDict dict = parents.get(i);
             childrenIds+=dict.getId()+",";
-            List<IDict> listChild = dictService.getChildrensByParentId(dict.getId(),version);
+            List<BaseDict> listChild = dictService.getChildrensByParentId(dict.getId(),version);
             if(listChild.size()>0){
                 childrenIds = getChildIncludeSelfByParentsAndChildrenIds(listChild,childrenIds,version);
             }

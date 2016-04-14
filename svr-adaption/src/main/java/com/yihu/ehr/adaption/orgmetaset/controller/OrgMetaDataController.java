@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -49,7 +50,7 @@ public class OrgMetaDataController extends ExtendController<MOrgMetaData> {
 
         OrgMetaData orgMetaData = jsonToObj(model, OrgMetaData.class);
         orgMetaData.setColumnLength(orgMetaData.getColumnLength()==null? 0 : orgMetaData.getColumnLength());
-        //orgMetaData.setCreateDate(new Date());
+        orgMetaData.setCreateDate(new Date());
         return getModel(orgMetaDataService.createOrgMetaData(orgMetaData));
     }
 
@@ -82,6 +83,7 @@ public class OrgMetaDataController extends ExtendController<MOrgMetaData> {
             @RequestParam(value = "model") String model) throws Exception {
 
         OrgMetaData dataModel = jsonToObj(model, OrgMetaData.class);
+        dataModel.setUpdateDate(new Date());
         return getModel(orgMetaDataService.save(dataModel));
     }
 

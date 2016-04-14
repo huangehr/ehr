@@ -2,7 +2,7 @@ package com.yihu.ehr.api.patient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.profile.Profile;
+import com.yihu.ehr.profile.core.Profile;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

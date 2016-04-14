@@ -146,6 +146,11 @@
           var validator = new jValidation.Validation(this.$loginForm,{immediate:true,onSubmit:false});
           if(validator.validate()) {
             this.$loginForm.submit();
+          }else{
+            //验证码错误重输
+            this.$captchaCode.val("");
+            $("#div_error_msg").html("验证码错误");
+            $("#ehong-code-tip-ck").trigger('click');
           }
         }
       };

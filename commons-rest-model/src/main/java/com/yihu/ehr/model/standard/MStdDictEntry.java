@@ -22,12 +22,6 @@ public class MStdDictEntry {
     String desc;
     int hashCode;
 
-    String OperationType;
-
-    public MStdDictEntry() {
-        this.OperationType = "";
-    }
-
     public long getId() {
         return id;
     }
@@ -79,13 +73,4 @@ public class MStdDictEntry {
     public void setHashCode(int hashCode) {
         this.hashCode = hashCode;
     }
-
-    public String getOperationType() {
-        return OperationType;
-    }
-
-    public void setOperationType(String operationType) {
-        OperationType = operationType;
-    }
-
 }

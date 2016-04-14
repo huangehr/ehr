@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -46,8 +47,7 @@ public class OrgDictController extends ExtendController<MOrgDict> {
             @RequestParam(value = "model") String model) throws Exception{
 
         OrgDict orgDict = jsonToObj(model, OrgDict.class);
-
-        //orgDict.setCreateDate(new Date());
+        orgDict.setCreateDate(new Date());
         return getModel(orgDictService.createOrgDict(orgDict));
     }
 
@@ -70,7 +70,7 @@ public class OrgDictController extends ExtendController<MOrgDict> {
             @RequestParam(value = "model") String model) throws Exception {
 
         OrgDict dataModel = jsonToObj(model, OrgDict.class);
-
+        dataModel.setUpdateDate(new Date());
         return getModel(orgDictService.save(dataModel));
 
     }

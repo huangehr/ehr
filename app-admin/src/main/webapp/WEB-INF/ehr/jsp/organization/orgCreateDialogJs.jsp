@@ -23,7 +23,7 @@
         /* *************************** 模块初始化 ***************************** */
         organizationInfo = {
             $form: $("#div_organization_info_form"),
-            $orgCode: $("#org_code"),
+            $organizationCode: $("#org_code"),
             $fullName: $('#full_name'),
             $shortName: $('#short_name'),
             $location: $('#location'),
@@ -41,7 +41,7 @@
                 this.bindEvents();
             },
             initForm: function () {
-                this.$orgCode.ligerTextBox({width: 240});
+                this.$organizationCode.ligerTextBox({width: 240});
                 this.$fullName.ligerTextBox({width: 240});
                 this.$shortName.ligerTextBox({width: 240});
                 this.$location.ligerComboBox({width: 240});
@@ -77,15 +77,15 @@
             bindEvents: function () {
                 var self = this;
                 $("#location,.u-dropdown-icon").click(function(){
-                    self.$orgCode.click();
+                    self.$organizationCode.click();
                 });
                 var validator =  new jValidation.Validation(this.$form, {immediate: true, onSubmit: false,onElementValidateForAjax:function(elm){
                     if(Util.isStrEquals($(elm).attr('id'),'org_code')){
                         var result = new jValidation.ajax.Result();
-                        var orgCode = self.$orgCode.val();
+                        var organizationCode = self.$organizationCode.val();
                         var dataModel = $.DataModel.init();
                         dataModel.fetchRemote("${contextRoot}/organization/validationOrg", {
-                            data: {orgCode:orgCode},
+                            data: {organizationCode:organizationCode},
                             async: false,
                             success: function (data) {
                                 if (data.successFlg) {
@@ -106,6 +106,10 @@
                     	self.$form.attrScan();
                     	var orgAddress = self.$form.Fields.location.getValue();
 						var orgModel = self.$form.Fields.getValues();
+						//标签字符串转化为数组
+						var tags = orgModel.tags;
+						tags = tags.split(/[;；]/)
+						orgModel.tags = tags;
 						//原location是对象，传到controller转化成model会报错--机构、地址分开传递（json串）
 						orgModel.location = "";
 						var addressModel = {

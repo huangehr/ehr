@@ -19,8 +19,7 @@
         // 表单校验工具类
         var jValidation = $.jValidation;
 
-        var allData = JSON.parse('${allData}');
-//        var orgLoc = allData[0];
+        var allData = ${allData};
         var user = allData.obj;
 
 
@@ -99,7 +98,7 @@
                         {name: '省份',code:'id',value:'name', url: '${contextRoot}/address/getParent', params: {level: '1'}},
                         {name: '城市', code:'id',value:'name',url: '${contextRoot}/address/getChildByParent'},
                         {
-                            name: '医院', code:'orgCode',value:'fullName',url: '${contextRoot}/address/getOrgs', beforeAjaxSend: function (ds, $options) {
+                            name: '医院', code:'organizationCode',value:'fullName',url: '${contextRoot}/address/getOrgs', beforeAjaxSend: function (ds, $options) {
                             var province = $options.eq(0).attr('title'),
                                     city = $options.eq(1).attr('title');
                             ds.params = $.extend({}, ds.params, {
@@ -163,8 +162,9 @@
                 self.$idCardCopy.val(user.idCardNo);
                 self.$emailCopy.val(user.email);
 
-                var pic = user.localPath;
-                if (!(Util.isStrEquals(pic, null) || Util.isStrEquals(pic, ""))) {
+                debugger
+                var pic = user.imgLocalPath;
+                if (!Util.isStrEmpty(pic)) {
                     self.$imageShow.html('<img src="${contextRoot}/user/showImage?localImgPath=' + pic + '" class="f-w88 f-h110"></img>');
                 }
 

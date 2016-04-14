@@ -177,11 +177,11 @@
 										chlid.children = [];
 										$.each(e.documents, function (k, d) {
 											chlid.children.push({
-												content: d.cdaDocumentName,
+												content: d.name,
 												cache: JSON.stringify({
 													cdaVersion: d.cdaVersion,
-													cdaDocumentId: d.cdaDocumentId,
-													orgCode: d.orgCode,
+													id: d.id,
+													organizationCode: d.organizationCode,
 													archiveKey: d.archiveKey,
 													dataSets: d.dataSets
 												})
@@ -244,8 +244,8 @@
 							//$('#ifm_record_template').attr('src', url);
 							var html='<form id="div_query_form" name="queryForm" method="post" target="_self" action="${contextRoot}/browser/personal-profile/document">'+
 									'<input type="hidden" id="cda_version" name="cda_version" value="'+cacheData.cdaVersion+'"/>'+
-									'<input type="hidden" id="cda_document_Id" name="cda_document_Id" value="'+cacheData.cdaDocumentId+'"/>'+
-									'<input type="hidden" id="org_code" name="org_code" value="'+cacheData.orgCode+'"/>'+
+									'<input type="hidden" id="cda_document_Id" name="cda_document_Id" value="'+cacheData.id+'"/>'+
+									'<input type="hidden" id="org_code" name="org_code" value="'+cacheData.organizationCode+'"/>'+
 									'<input type="hidden" id="archive_key" name="archive_key" value="'+cacheData.archiveKey+'"/>'+
 									'<input type="hidden"  name="origin_data" value="'+origin+'"/>'+
 									'<input type="hidden" id="data_set_list" name="data_set_list" />'+
@@ -253,8 +253,8 @@
 							var iframeDoc = document.getElementById("ifm_record_template").contentWindow.document;
 							iframeDoc.write(html);
 							iframeDoc.getElementById('cda_version').value = cacheData.cdaVersion;
-							iframeDoc.getElementById('cda_document_Id').value = cacheData.cdaDocumentId;
-							iframeDoc.getElementById('org_code').value = cacheData.orgCode;
+							iframeDoc.getElementById('cda_document_Id').value = cacheData.id;
+							iframeDoc.getElementById('org_code').value = cacheData.organizationCode;
 							iframeDoc.getElementById('archive_key').value = cacheData.archiveKey;
 							iframeDoc.getElementById('data_set_list').value = JSON.stringify(cacheData.dataSets||[]);
 							iframeDoc.getElementById('div_query_form').submit();

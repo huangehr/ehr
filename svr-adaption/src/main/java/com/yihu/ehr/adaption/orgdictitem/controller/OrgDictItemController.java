@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -47,9 +48,9 @@ public class OrgDictItemController extends ExtendController<MOrgDictItem> {
 
         OrgDictItem orgDictItem = jsonToObj(model, OrgDictItem.class);
         if (orgDictItem.getSort() == 0)
-            orgDictItem.setSort(orgDictItemService.getNextSort(orgDictItem.getOrgDict()));
+            orgDictItem.setSort(orgDictItemService.getNextSort(orgDictItem.getOrgDict(), orgDictItem.getOrganization()));
 
-//        orgDictItem.setCreateDate(new Date());
+        orgDictItem.setCreateDate(new Date());
         return getModel(orgDictItemService.createOrgDictItem(orgDictItem));
     }
 
@@ -84,6 +85,7 @@ public class OrgDictItemController extends ExtendController<MOrgDictItem> {
             @RequestParam(value = "model") String model) throws Exception {
 
         OrgDictItem dataModel = jsonToObj(model, OrgDictItem.class);
+        dataModel.setUpdateDate(new Date());
         return getModel(orgDictItemService.save(dataModel));
     }
 

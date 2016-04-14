@@ -106,6 +106,7 @@
         // $("div:first", this.gridbody).width(this.gridtablewidth);
         updateScroller.apply(self, arguments);
         checkColumnVisable.call(self);
+        resizeMinWidth.call(self);
     }
 
     function updateScroller () {
@@ -244,11 +245,23 @@
                         opts.onAfterShowData&&opts.onAfterShowData.apply(this, arguments);
                         $(".m-custom-scroll",this.gridview2).mCustomScrollbar("scrollTo");
                         resizeMinWidth.call(this);
+
+                        var mcs = this.mScroller[0].mcs;
+                        if(mcs) {
+                            this.gridheader[0].scrollLeft = -mcs.left;
+                            this.f.gridbody[0].scrollTop = -mcs.top;
+                        }
                     },
                     onAfterAddRow: function () {
 
                         updateScroller.apply(this, arguments);
                         $(".m-custom-scroll",this.gridview2).mCustomScrollbar("scrollTo","bottom");
+                    },
+                    onTreeExpanded: function () {
+                        this.resizeColumns();
+                    },
+                    onTreeCollapsed:function () {
+                        this.resizeColumns();
                     }
                 });
                 $.ligerMethos.Grid.adjustToWidth = function () {
@@ -260,7 +273,6 @@
                         if(!timmer) {
                             timmer = setTimeout(function () {
                                 self.resizeColumns();
-                                resizeMinWidth.call(self);
                                 win.clearTimeout(timmer);
                                 timmer = null;
                             },100);

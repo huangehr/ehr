@@ -52,26 +52,30 @@
 							{display: '版本号', name: 'version', width: '15%', align: 'left'},
 							{display: '版本名称', name: 'versionName', width: '10%', align: 'center'},
 							{display: '创建者', name: 'author', width: '15%',align:'left'},
-							{display: '创建时间', name: 'commitTime', width: '15%', align: 'left'},
+							{display: '发布时间', name: 'commitTime', width: '15%', align: 'left'},
 							{display: '继承版本', name: 'baseVersion', width: '15%', align: 'left'},
 							{display: '状态码', name: 'inStage', align: 'left',hide: true},
 							{display: '状态', name: 'inStage', width: '15%', align: 'center',
-								render:function(value){
-									return value.inStage == true ? "未发布":"已发布";
+								render:function(row){
+									var html ='<a class="label_a" name="delete_click"  onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "cdaVersion:commitVersion", row.version,row.inStage,0) + '">发布</a>'
+									return row.inStage !=true?'已发布':html;
 								}
 							},
 							{
 								display: '操作', name: 'operator', width: '15%', align: 'center',render: function(row){
 								var _title = "";
-								if(row.inStage == false){
-									_title="重新发布";
-									html ='<div class="grid_edit" name="delete_click"  style="margin: 10px auto;cursor:pointer;" title="'+_title+'" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "cdaVersion:commitVersion", row.version,row.inStage,0) + '"></div>';
-								} else{
-									_title = "发布";
-									html ='<div class="grid_edit" name="delete_click" style="margin-left: 60px;cursor:pointer;" title="'+_title+'" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "cdaVersion:commitVersion", row.version,row.inStage,0) + '"></div>'
-											+'<div class="grid_delete" name="delete_click" style="margin-left: 90px;cursor:pointer; title="删除"' +
-											' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "cdaVersion:del", row.version,row.inStage,0) + '"></div>';
-								}
+//								if(row.inStage == false){
+//									_title="重新发布";
+//									html ='<div class="grid_edit" name="delete_click"  style="margin: 10px auto;cursor:pointer;" title="'+_title+'" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "cdaVersion:commitVersion", row.version,row.inStage,0) + '"></div>';
+//								} else{
+//									_title = "发布";
+//									html ='<div class="grid_edit" name="delete_click" style="margin-left: 60px;cursor:pointer;" title="'+_title+'" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "cdaVersion:commitVersion", row.version,row.inStage,0) + '"></div>'
+//											+'<div class="grid_delete" name="delete_click" style="margin-left: 90px;cursor:pointer; title="删除"' +
+//											' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "cdaVersion:del", row.version,row.inStage,0) + '"></div>';
+//								}
+								html ='<a class="grid_edit" name="delete_click" style="" title="编辑" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "cdaVersion:commitVersion", row.version,row.inStage,0) + '"></a>'
+											+'<a class="grid_delete" name="delete_click" style="" title="删除"' +
+											' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "cdaVersion:del", row.version,row.inStage,0) + '"></a>';
 								return html;
 								}
 							},

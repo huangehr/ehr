@@ -185,10 +185,26 @@ public class UserController extends BaseController {
     @ApiOperation(value = "创建用户", notes = "重新绑定用户信息")
     public Envelop createUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "user_json_data") String userJsonData) {
+            @RequestParam(value = "user_json_data") String userJsonData,
+            @ApiParam(name = "inputStream", value = "转换后的输入流", defaultValue = "")
+            @RequestParam(value = "inputStream") String inputStream,
+            @ApiParam(name = "imageName", value = "图片全名", defaultValue = "")
+            @RequestParam(value = "imageName") String imageName) {
 
         try {
+            //头像上传,接收头像保存的远程路径  path
+            String path = null;
+            if (!StringUtils.isEmpty(inputStream)) {
+                String jsonData = inputStream + "," + imageName;
+                path = userClient.uploadPicture(jsonData);
+            }
+
             UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
+
+            if (!StringUtils.isEmpty(path)) {
+                detailModel.setImgRemotePath(path);
+                detailModel.setImgLocalPath("");
+            }
 
             String errorMsg = null;
             if (StringUtils.isEmpty(detailModel.getLoginCode())) {
@@ -238,10 +254,27 @@ public class UserController extends BaseController {
     @ApiOperation(value = "修改用户", notes = "重新绑定用户信息")
     public Envelop updateUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "user_json_data") String userJsonData) {
+            @RequestParam(value = "user_json_data") String userJsonData,
+            @ApiParam(name = "inputStream", value = "转换后的输入流", defaultValue = "")
+            @RequestParam(value = "inputStream") String inputStream,
+            @ApiParam(name = "imageName", value = "图片全名", defaultValue = "")
+            @RequestParam(value = "imageName") String imageName) {
         try {
+            //头像上传,接收头像保存的远程路径  path
+            String path = null;
+            if (!StringUtils.isEmpty(inputStream)) {
+                String jsonData = inputStream + "," + imageName;
+                path = userClient.uploadPicture(jsonData);
+            }
+
             UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
 
+            if (!StringUtils.isEmpty(path)) {
+                detailModel.setImgRemotePath(path);
+                detailModel.setImgLocalPath("");
+            }
+
+            detailModel.setPassword("e10adc3949ba59abbe56e057f20f883e"); //测试数据
             String errorMsg = null;
             if (StringUtils.isEmpty(detailModel.getLoginCode())) {
                 errorMsg += "账户不能为空";
@@ -305,6 +338,12 @@ public class UserController extends BaseController {
             if (mUser == null) {
                 return failed("用户信息获取失败!");
             }
+            if (!StringUtils.isEmpty(mUser.getImgRemotePath())) {
+                Map<String, String> map = toEntity(mUser.getImgRemotePath(), Map.class);
+                String localPath = userClient.downloadPicture(mUser.getId(), map.get("groupName"), map.get("remoteFileName"));
+                mUser.setImgLocalPath(localPath);
+            }
+
             UserDetailModel detailModel = convertToUserDetailModel(mUser);
 
             return success(detailModel);

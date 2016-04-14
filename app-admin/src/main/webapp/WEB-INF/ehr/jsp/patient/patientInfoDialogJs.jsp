@@ -15,6 +15,7 @@
         var dialog = frameElement.dialog;
         var dataModel = $.DataModel.init();
         var patientModel = "";
+        debugger
         var patientDialogType = '${patientDialogType}';
         if (!(Util.isStrEquals(patientDialogType, 'addPatient'))) {
             patientModel =${patientModel}.obj;
@@ -66,7 +67,7 @@
                         extensions: 'gif,jpg,jpeg,bmp,png',
                         mimeTypes: 'image/*'
                     },
-                    /*formData:{msg:"upload"},*/
+//                    formData:{msg:"upload"},
                     auto: false,
                     async:false
                 });
@@ -118,7 +119,7 @@
                     self.$patientCopyId.val(patientModel.idCardNo);
 
                    var pic = patientModel.localPath;
-                    if(!(Util.isStrEquals(pic,null)||Util.isStrEquals(pic,""))){
+                    if(!Util.isStrEmpty(pic)){
                         self.$picPath.html('<img src="${contextRoot}/patient/showImage?localImgPath='+pic+'" class="f-w88 f-h110"></img>');
                     }
                 }
@@ -205,17 +206,19 @@
                             street: workAddressList.names[3] || null
                         }
                     });
+                     var jsonData = JSON.stringify(values)+";"+patientDialogType;
                     if(picHtml == 0){
-                        updatePatient(JSON.stringify(values));
+                        updatePatient(jsonData);
+//                        updatePatient(JSON.stringify(values));
                     }else{
                         var upload = self.$patientImgUpload.instance;
                         var image = upload.getFiles().length;
                         if(image){
-                            upload.options.formData.patientJsonData =   encodeURIComponent(JSON.stringify(values));
+                            upload.options.formData.patientJsonData =   encodeURIComponent(jsonData);
                             upload.upload();
                             win.parent.patientDialogRefresh();
                         }else{
-                            updatePatient(JSON.stringify(values));
+                            updatePatient(jsonData);
                         }
                     }
                   }else{

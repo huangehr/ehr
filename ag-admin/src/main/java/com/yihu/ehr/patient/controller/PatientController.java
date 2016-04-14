@@ -22,8 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -72,23 +70,23 @@ public class PatientController extends BaseController {
             PatientModel patient = convertToModel(patientInfo, PatientModel.class);
             //获取家庭地址信息
             String homeAddressId = patientInfo.getHomeAddress();
-            if(StringUtils.isNotEmpty(homeAddressId)) {
+            if (StringUtils.isNotEmpty(homeAddressId)) {
                 MGeography geography = addressClient.getAddressById(homeAddressId);
-                String homeAddress = geography!=null?geography.fullAddress():"";
+                String homeAddress = geography != null ? geography.fullAddress() : "";
                 patient.setHomeAddress(homeAddress);
             }
             //性别
-            if(StringUtils.isNotEmpty(patientInfo.getGender())) {
+            if (StringUtils.isNotEmpty(patientInfo.getGender())) {
                 MConventionalDict dict = conventionalDictClient.getGender(patientInfo.getGender());
                 patient.setGender(dict == null ? "" : dict.getValue());
             }
             //联系电话
             Map<String, String> telephoneNo;
-            String tag="联系电话";
+            String tag = "联系电话";
             try {
                 telephoneNo = objectMapper.readValue(patient.getTelephoneNo(), Map.class);
             } catch (Exception e) {
-                telephoneNo=null;
+                telephoneNo = null;
             }
             if (telephoneNo != null && telephoneNo.containsKey(tag)) {
                 patient.setTelephoneNo(telephoneNo.get(tag));
@@ -138,11 +136,11 @@ public class PatientController extends BaseController {
             @PathVariable(value = "id_card_no") String idCardNo) throws Exception {
 
         MDemographicInfo demographicInfo = patientClient.getPatient(idCardNo);
-        if(!StringUtils.isEmpty(demographicInfo.getPicPath())){
-            Map<String,String> map = toEntity(demographicInfo.getPicPath(),Map.class);
-            String localPath = patientClient.downloadPicture(demographicInfo.getIdCardNo(),map.get("groupName"),map.get("remoteFileName"));
+        if (!StringUtils.isEmpty(demographicInfo.getPicPath())) {
+            Map<String, String> map = toEntity(demographicInfo.getPicPath(), Map.class);
+            String localPath = patientClient.downloadPicture(demographicInfo.getIdCardNo(), map.get("groupName"), map.get("remoteFileName"));
+            demographicInfo.setLocalPath(localPath);
         }
-//        Map<String,String> map = toEntity(demographicInfo.getPicPath(),Map.class);
 
         if (demographicInfo == null) {
             return failed("数据获取失败！");
@@ -170,7 +168,17 @@ public class PatientController extends BaseController {
             @ApiParam(name = "imageName", value = "图片全名", defaultValue = "")
             @RequestParam(value = "imageName") String imageName) throws Exception {
 
+        //头像上传,接收头像保存的远程路径  path
+        String path = null;
+        if (!StringUtils.isEmpty(inputStream)) {
+            String jsonData = inputStream + "," + imageName;
+            path = patientClient.uploadPicture(jsonData);
+        }
+
         PatientDetailModel detailModel = objectMapper.readValue(patientModelJsonData, PatientDetailModel.class);
+        if (!StringUtils.isEmpty(path)) {
+            detailModel.setPicPath(path);
+        }
         String errorMsg = "";
         if (StringUtils.isEmpty(detailModel.getName())) {
             errorMsg += "姓名不能为空!";
@@ -191,8 +199,7 @@ public class PatientController extends BaseController {
             return failed(errorMsg);
         }
         //身份证校验
-        if(patientClient.isExistIdCardNo(detailModel.getIdCardNo()))
-        {
+        if (patientClient.isExistIdCardNo(detailModel.getIdCardNo())) {
             return failed("身份证号已存在!");
         }
 
@@ -221,7 +228,7 @@ public class PatientController extends BaseController {
 
         //新增人口信息
         MDemographicInfo info = (MDemographicInfo) convertToModel(detailModel, MDemographicInfo.class);
-        info.setBirthday(StringToDate(detailModel.getBirthday(),AgAdminConstants.DateFormat));
+        info.setBirthday(StringToDate(detailModel.getBirthday(), AgAdminConstants.DateFormat));
         info = patientClient.createPatient(objectMapper.writeValueAsString(info));
         if (info == null) {
             return failed("保存失败!");
@@ -237,7 +244,7 @@ public class PatientController extends BaseController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/populations", method = RequestMethod.PUT)
+    @RequestMapping(value = "/population", method = RequestMethod.POST)
     @ApiOperation(value = "根据前端传回来的json修改人口信息")
     public Envelop updatePatient(
             @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
@@ -247,14 +254,17 @@ public class PatientController extends BaseController {
             @ApiParam(name = "imageName", value = "图片全名", defaultValue = "")
             @RequestParam(value = "imageName") String imageName) throws Exception {
 
-        //头像上传
-        String jsonData = inputStream+","+imageName;
-//        String path = patientClient.uploadPicture(jsonData);
-        String path = patientClient.uploadPicture(jsonData);
+        //头像上传,接收头像保存的远程路径  path
+        String path = null;
+        if (!StringUtils.isEmpty(inputStream)) {
+            String jsonData = inputStream + "," + imageName;
+            path = patientClient.uploadPicture(jsonData);
+        }
 
         PatientDetailModel detailModel = objectMapper.readValue(patientModelJsonData, PatientDetailModel.class);
-        if (!StringUtils.isEmpty(path)){
+        if (!StringUtils.isEmpty(path)) {
             detailModel.setPicPath(path);
+            detailModel.setLocalPath("");
         }
         String errorMsg = "";
         if (StringUtils.isEmpty(detailModel.getName())) {
@@ -301,7 +311,7 @@ public class PatientController extends BaseController {
 
         //修改人口信息
         MDemographicInfo info = (MDemographicInfo) convertToModel(detailModel, MDemographicInfo.class);
-        info.setBirthday(StringToDate(detailModel.getBirthday(),AgAdminConstants.DateFormat));
+        info.setBirthday(StringToDate(detailModel.getBirthday(), AgAdminConstants.DateFormat));
         info = patientClient.updatePatient(objectMapper.writeValueAsString(info));
         if (info == null) {
             return failed("保存失败!");
@@ -389,11 +399,11 @@ public class PatientController extends BaseController {
 
         //联系电话
         String tag = "联系电话";
-        Map<String, String> telephoneNo =null;
+        Map<String, String> telephoneNo = null;
         try {
             telephoneNo = objectMapper.readValue(detailModel.getTelephoneNo(), Map.class);
-        } catch (Exception e){
-            telephoneNo=null;
+        } catch (Exception e) {
+            telephoneNo = null;
         }
 
         detailModel.setTelephoneNo(null);

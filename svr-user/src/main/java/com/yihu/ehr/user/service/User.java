@@ -14,7 +14,6 @@ import java.util.UUID;
 @Table(name = "users")
 @Access(value = AccessType.PROPERTY)
 public class User {
-
     private String id;
     private Date createDate;
     private Date lastLoginTime;
@@ -30,6 +29,7 @@ public class User {
     private String gender;
     private String idCardNo;
     private String organization;
+
     // 未绑定属性
 	private String orgPost;
 	private String privilege;
@@ -45,10 +45,7 @@ public class User {
     private String imgRemotePath;
     private String imgLocalPath;
 
-
-
     public User() {
-//        id  = UUID.randomUUID().toString().replace("_","");
     }
 
     @Id

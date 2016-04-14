@@ -135,16 +135,20 @@
                             version: versions.getValue(),
                             mode: mode};
                     if(orgData){
-                        if(!firstInit)
+                        if(firstInit){
                             orgData.reload(p);
-                        else
+                            orgData.setValue(adapterPlan.org);
+                            orgData.setText(adapterPlan.orgValue);
                             firstInit = false;
+                        }
+                        else
+                            orgData.reload(p);
                     }
                     else{
                         orgData = self.$org.customCombo(
                                 '${contextRoot}/adapter/getOrgList', p, undefined, undefined, false);
-                        orgData.setValue(adapterPlan.orgValue);
-                        orgData.setText(adapterPlan.org);
+//                        orgData.setValue(adapterPlan.org);
+//                        orgData.setText(adapterPlan.orgValue);
                     }
                 }
 
@@ -188,7 +192,7 @@
                         extParms: '{"isCover": "false"}'
                     }
                     var pv = self.$parent.ligerGetComboBoxManager().getValue();
-                    if (pv) {
+                    if (pv && mode=='new') {
                         var parent = self.$parent.ligerGetComboBoxManager().getSelected();
                         $.Notice.confirm("映射机构采集标准与复方案采集标准不一致，是否覆盖映射机构采集标准？", function (r) {
                             parms.extParms = '{"isCover":"' + r + '"}';
@@ -212,9 +216,8 @@
                                 //调用主页面接口，重新刷新Grid
                                 win.closePlanDialog("保存成功")
                             } else {
-                                if (data.errorMsg == 'codeNotUnique') {
-                                    $.Notice.error('该代码已存在，请重新填写代码！');
-                                }
+                                if (data.errorMsg)
+                                    $.Notice.error(data.errorMsg);
                                 else
                                     $.Notice.error('出错了！');
                             }
@@ -231,7 +234,6 @@
                 });
                 //新增映射机构
                 this.$addOrg.click(function () {
-                    //
                     var title = '新增第三方标准';
                     var code = '';
                     var mode = 'new';
@@ -245,7 +247,8 @@
                         urlParms: {
                             code: code,
                             type: initType,
-                            mode: mode
+                            mode: mode,
+                            frm: "1"
                         },
                         isHidden: false,
                         opener: true,

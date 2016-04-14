@@ -102,24 +102,32 @@
                             {display:'机构类型',name:'orgTypeName', width: '8%', align:"left"},
                             {display:'机构代码',name:'orgCode', width: '9%', align:"left"},
                             {display:'机构全名',name:'fullName', width: '15%', align:"left"},
-                            {display:'联系人',name:'admin', width: '10%', align:"left"},
-                            {display:'联系方式',name:'tel', width: '10%', align:"left"},
+                            {display:'联系人',name:'admin', width: '8%', align:"left"},
+                            {display:'联系方式',name:'tel', width: '8%', align:"left"},
                             {display:'机构地址',name:'locationStrName', width: '20%', align:"left"},
-                            {display:'是否激活',name:'activityFlagName',width: '6%',isAllowHide: false},
+                            {display:'是否激活',name:'activityFlagName',width: '8%',isAllowHide: false,render:function(row){
+								var html = '';
+								if(row.activityFlag == 1){
+//									html +='<div class="grid_off" title="" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:activityFlg", row.orgCode,'1') + '"></div>';
+									html +='<a class="grid_on" title="" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:activityFlg", row.orgCode,'1') + '"></a>';
+
+								}else{
+//									html +='<div class="grid_on" title="" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:activityFlg", row.orgCode,'0') + '"></div>';
+									html +='<a class="grid_off" title="" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:activityFlg", row.orgCode,'0') + '"></a>';
+
+								}
+								return html;
+							}},
                             {display:'入驻方式',name:'settledWayName',width: '10%',isAllowHide: false},
-                            {display:'操作', name: 'operator', width: '12%', render: function (row) {
-//								var html ='<div class="grid_edit"  style="margin-left: 20px;cursor:pointer;" title="编辑" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:modify", row.orgCode,'modify') + '"></div>'
-//										+'<div class="grid_delete"  style="margin-left: 60px;cursor:pointer;" title="删除"' +
+                            {display:'操作', name: 'operator', width: '14%', render: function (row) {
+								var html = '';
+
+//								html +='<div class="grid_edit"  style="" title="编辑" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:modify", row.orgCode,'modify') + '"></div>'
+//										+'<div class="grid_delete"  style="" title="删除"' +
 //										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:del", row.orgCode,'del') + '"></div>';
-                                var html = '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:modify", row.orgCode,'modify') + '">编辑</a> / ';
-                                html += '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:del", row.orgCode, 'del') + '">删除</a> /';
-                                if(row.activityFlag == 1){
-//									html +='<div class="grid_activate" style="margin-left:100px;cursor:pointer;" title="失效" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:activityFlg", row.orgCode,'1') + '"></div>';
-									html += '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:activityFlg", row.orgCode, '1') + '">失效</a>';
-                                 }else{
-//									html +='<div class="grid_activate" style="margin-left:100px;cursor:pointer;" title="开启" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:activityFlg", row.orgCode,'0') + '"></div>';
-									html += '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:activityFlg", row.orgCode, '0') + '">开启</a>';
-                                }
+								html += '<a class="label_a" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:modify", row.orgCode,'modify') + '">模板配置</a>';
+								html += '<a class="grid_edit" style="margin-left:10px;" title="编辑" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:modify", row.orgCode,'modify') + '"></a>';
+                                html += '<a class="grid_delete" style="margin-left:0px;" title="删除" href="javascript:void(0)"  onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:del", row.orgCode, 'del') + '"></a>';
                                 return html;
                             }},
                             {name:'activityFlag',hide:true, align:"center"},
@@ -184,7 +192,6 @@
                 bindEvents: function () {
                     var self = this;
                     $.subscribe('org:orgInfoDialog:modify', function (event, orgCode, mode) {
-						debugger
                         var title = '修改机构信息';
                             self.orgInfoDialog = $.ligerDialog.open({
                             isHidden: false,

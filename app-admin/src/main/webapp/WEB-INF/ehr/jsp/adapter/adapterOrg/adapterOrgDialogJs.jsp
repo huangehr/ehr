@@ -10,6 +10,7 @@
         var jValidation = $.jValidation;
         var mode = '${mode}';
         var initType = '${initType}';
+        var frm = '${frm}';
         if(!Util.isStrEquals(mode,'new')){
             var info = JSON.parse('${info}');
         }
@@ -17,7 +18,7 @@
         /* *************************** 函数定义 ******************************* */
         function pageInit() {
             infoForm.init();
-            selForm.init();
+//            selForm.init();
         }
 
         /* *************************** 模块初始化 ***************************** */
@@ -46,15 +47,7 @@
                 this.bindEvents();
             },
             initForm: function () {
-                if(initType == 3){
-                    $("#areaDiv").css('display','block');
-                }
-                this.$area.ligerComboBox({valueField: 'id',textField: 'name',readonly:mode=='modify',
-                    onBeforeOpen: function () {
-                        selForm.show(true);
-                    }});
                 this.$type.ligerComboBox({valueField: 'id',textField: 'name',readonly:mode=='modify'});
-                infoForm.initOrg(infoForm.$org, "");
                 infoForm.initAdapterOrg(infoForm.$parent, "");
                 this.initDDL(21, this.$type);
                 this.$name.ligerTextBox({width:240,validate:{required:true }});
@@ -62,36 +55,13 @@
 
                 this.$form.attrScan();
                 if(!Util.isStrEmpty(info)){
-
                     var adapter = info.obj;
-
-//                    var province = adapter.address.province || '';
-//                    var city =adapter.address.city || '';
-//                    var district =adapter.address.district || '';
-//                    var town =adapter.address.town || '';
-
-                    var province = "省";
-                    var city ="市";
-                    var district ="县";
-                    var town ="街道/地址测试";
-                    var area=province;
-                    if (province!=city){
-                        area +=city;
-                    }
-                    area+=district+town;
-                    this.$area.ligerGetComboBoxManager().setValue(area);
-                    this.$area.ligerGetComboBoxManager().setText(area);
                     this.$form.Fields.fillValues({
                         code:adapter.code,
                         name:adapter.name,
-                        description:adapter.description ,
-                        province : province ,
-                        city :city,
-                        district : district,
-                        town : town,
+                        description:adapter.description
                     });
                 }
-
                 this.$form.show();
             },
             initDDL: function (dictId, target) {
@@ -108,20 +78,18 @@
                             data: data.detailModelList,
                             onSelected : function (value, text) {
                                 var type = value;
-                                if(type==1){
-                                    //厂商，初始标准只能是厂商
-                                    infoForm.initAdapterOrg(infoForm.$parent, type);
-                                    $("#areaDiv").css('display','none');
+                                if(type == 1){
+                                    $('#parent_div').hide();
                                 }
                                 else if(type==2){
-                                    //医院，初始标准没有限制
+                                    //厂商，初始标准只能是厂商
                                     infoForm.initAdapterOrg(infoForm.$parent, type);
-                                    $("#areaDiv").css('display','none');
+                                    $('#parent_div').show();
                                 }
                                 else if(type==3){
                                     //区域,初始标准只能选择厂商或区域
-                                    infoForm.initAdapterOrg(infoForm.$org, '1');
-                                    $("#areaDiv").css('display','block');
+                                    infoForm.initAdapterOrg(infoForm.$parent, '1');
+                                    $('#parent_div').show();
                                 }
                                 infoForm.initOrg(infoForm.$org, type);
                             }
@@ -135,6 +103,8 @@
                                 manager.selectItemByIndex(0);
                         }else if(initType){
                             manager.selectValue(initType);
+                        }else{
+                            manager.selectItemByIndex(0);
                         }
                     }});
 
@@ -165,28 +135,30 @@
                 var gridOp = this.getGridOp([
                     {display : '名称', name :'fullName',width : 210}
                 ],url) ;
+
                 this.orgCodeCombo = target.ligerComboBox({
-                    condition: { inputWidth: 90 ,width:0,labelWidth:0,hideSpace:true,fields: [{ name: 'param', label:''}] },//搜索框的字段, name 必须是服务器返回的字段
+                    condition: {
+                        inputWidth: 90,
+                        width: 0,
+                        labelWidth: 0,
+                        hideSpace: true,
+                        fields: [{name: 'param', label: ''}]
+                    },//搜索框的字段, name 必须是服务器返回的字段
                     grid: gridOp,
-                    valueField: 'orgCode',
+                    valueField: 'organizationCode',
                     textField: 'fullName',
-                    selectBoxHeight : 300,
-                    readonly:mode=='modify',
-                    onSelected: function(id,name){
-                        if(!name)
+                    selectBoxHeight: 300,
+                    readonly: mode == 'modify',
+                    onSelected: function (id, name) {
+                        if (!name)
                             return;
                         target.val(name);
                         $("#inp_adapterorg_name").focus();
-                        var area;
-                        if((area=$('#inp_adapterorg_area').val())){
-                            name += '(' + area + ')';
-                        }
                         $('#inp_adapterorg_name').val(name);
                     },
                     conditionSearchClick: function (g) {
-                        debugger;
-                        var param = g.rules.length>0? g.rules[0].value : '';
-                        param = {param:param }
+                        var param = g.rules.length > 0 ? g.rules[0].value : '';
+                        param = {param: param}
                         g.grid.set({
                             parms: param
                         });
@@ -194,7 +166,7 @@
                         g.grid.reload();
                     }
                 });
-
+                this.orgCodeCombo.clear();
                 if(!Util.isStrEmpty(info)){
                     this.orgCodeCombo.setValue(info.obj.org);
                     this.orgCodeCombo.setText(info.obj.orgValue);
@@ -205,7 +177,6 @@
                         url: url,
                         newPage:1
                     });
-                    grid.reload();
                 }
              },
             initAdapterOrg : function (target, type) {
@@ -247,7 +218,7 @@
                     grid.set({
                         url: url
                     });
-                    grid.reload();
+//                    grid.reload();
                 }
             },
             toJson : function (data) {
@@ -272,18 +243,13 @@
                     if(!validator.validate()){
                         return;
                     }
+                    if(values.type == 1){
+                        values.parent = "";
+                    }
                     self.$btnSave.attr('disabled','disabled');
                     if(mode=='new'){
-                        var code;
-                        if(values.type==3 && values.area)
-                            code = values.org + 'ORG' + values.areaCode;
-                        else{
-                            code = values.org;
-                            values.province = '';
-                            values.city = '';
-                            values.district = '';
-                            values.town = '';
-                        }
+                        values.code = values.org;
+                        var code = values.code;
                         dataMode = "type="+values.type+"&org="+values.org
                                 +"&address.province="+values.province+"&address.city="+values.city+"&address.district="+values.district+"&address.town="+values.town
                                 +"&code="+code+"&name="+values.name+"&parent="+values.parent+"&description="+values.description;
@@ -301,12 +267,12 @@
                             waittingDialog.close();
                             if(data.successFlg){
                                 var app = data.obj;
-                                if(parent.reloadMasterGrid){
+                                if(frm != '1'){
                                     parent.reloadMasterGrid();
                                     parent.closeDialog('保存成功！');
                                 }
                                 else{
-                                    parent.adapterModel(self.$form.Fields.getValues());
+                                    parent.adapterModel(values);
                                     $.ligerDialog.alert("保存成功", "提示", "success", function(){
                                         parent.closeDialog();
                                     }, null);
@@ -330,129 +296,6 @@
                 this.$btnCancel.click(function () {
                     parent.closeDialog();
 //                    dialog.close();
-                });
-            },
-            setAreaInfo: function (province, city, district, town, areaCode) {
-                this.$province.val(province);
-                this.$city.val(city);
-                this.$district.val(district);
-                this.$town.val(town);
-                this.$areaCode.val(areaCode);
-                var area=province;
-                if (province!=city){
-                    area +=city;
-                }
-                area+=district+town;
-                this.$area.ligerGetComboBoxManager().setValue(area);
-                this.$area.ligerGetComboBoxManager().setText(area);
-
-                var org = this.$org.ligerGetComboBoxManager().getText();
-                if(area && org){
-                    this.$name.val(org + '('+ area +')');
-                }
-            }
-        };
-        selForm = {
-            selArea : $('#selArea'),
-            $form:$('#area_sel_form'),
-            $province: $("#sel_province"),
-            $city: $("#sel_city"),
-            $district: $("#sel_district"),
-            $town: $("#sel_town"),
-
-            $btnOk: $("#btn_ok_sel"),
-            $btnCancel: $("#btn_cancel_sel"),
-
-            init: function () {
-                this.initForm();
-                this.bindEvents();
-            },
-            initForm: function () {
-                this.initDDL(1, this.$province);
-                this.$city.ligerComboBox({valueField: 'id',textField: 'name',width:160});
-                this.$district.ligerComboBox({valueField: 'id',textField: 'name',width:160});
-                this.$town.ligerComboBox({valueField: 'id',textField: 'name',width:160});
-                this.$form.show();
-            },
-            show : function (b, top, left) {
-                if(b){
-                    this.selArea.css('display','block');
-                }
-                else
-                    this.selArea.css('display','none');
-            },
-            initDDL: function (dictId, target, pid) {
-                var ajaxFunc = '';
-                var parms = {};
-                if(dictId==1){
-                    ajaxFunc = 'getParent';
-                    parms.level = 1;
-                }
-                else{
-                    ajaxFunc = 'getChildByParent';
-                    parms.pid = pid;
-                }
-                target.ligerComboBox({
-                    valueField: 'id',
-                    textField: 'value',
-                    width:160,
-                    allowBlank:true,
-                    selectBoxHeight:200,
-                    url :"${contextRoot}/address/"+ajaxFunc,
-                    parms:parms,
-                    dataGetter: function (result) {
-                        var rs = [];
-                        for(var p in result.obj){
-                            if(p)
-                                rs.push({id:result.obj[p].id,value:result.obj[p].name})
-                        }
-                        return rs;
-                    },
-                    onSelected:getOnSelectedFunc(dictId)
-                });
-                function getOnSelectedFunc(dictId){
-                    switch (dictId){
-                        case 1 :return function (id,text) {
-                                selForm.initDDL(2, selForm.$city,id);
-                                clearCombobox(selForm.$district);
-                                clearCombobox(selForm.$town);
-                            };
-                            break;
-                        case 2 : return function (id,text) {
-                                selForm.initDDL(3, selForm.$district,id);
-                                clearCombobox(selForm.$town);
-                            };
-                            break;
-                        case 3 : return function (id,text) {
-                                selForm.initDDL(4, selForm.$town,id);
-                            };
-                            break;
-                    }
-
-                    function clearCombobox(target){
-                        var manager = selForm.$district.ligerGetComboBoxManager();
-                        if(manager.set)
-                            manager.set({url:null,data:[]});
-                    }
-                }
-            },
-            bindEvents: function () {
-                this.$btnOk.click(function () {
-                    var province = selForm.$province.ligerGetComboBoxManager().getText();
-                    var city = selForm.$city.ligerGetComboBoxManager().getText();
-                    var district = selForm.$district.ligerGetComboBoxManager().getText();
-                    var town = selForm.$town.ligerGetComboBoxManager().getText();
-                    var provinceCode = selForm.$province.ligerGetComboBoxManager().getValue();
-                    var cityCode = selForm.$city.ligerGetComboBoxManager().getValue();
-                    var districtCode = selForm.$district.ligerGetComboBoxManager().getValue();
-                    var townCode = selForm.$town.ligerGetComboBoxManager().getValue();
-                    var areaCode = townCode||districtCode||cityCode||provinceCode;
-                    infoForm.setAreaInfo(province, city, district, town, areaCode);
-                    selForm.show(false);
-                });
-
-                this.$btnCancel.click(function () {
-                    selForm.show(false);
                 });
             }
         };

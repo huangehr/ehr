@@ -26,7 +26,7 @@ import java.util.Map;
  */
 @Transactional
 @Service
-public class DataSetService extends BaseHbmService<IDataSet>{
+public class DataSetService extends BaseHbmService<BaseDataSet>{
     private final static String ENTITY_PRE = "com.yihu.ehr.standard.datasets.service.DataSet";
 
     @Autowired
@@ -47,7 +47,7 @@ public class DataSetService extends BaseHbmService<IDataSet>{
 
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public boolean add(IDataSet dataSet, String version){
+    public boolean add(BaseDataSet dataSet, String version){
         String sql =
                 "INSERT INTO " + getTaleName(version) +
                 "(code, name, ref_standard, std_version, summary, hash, document_id, lang, catalog, publisher) " +

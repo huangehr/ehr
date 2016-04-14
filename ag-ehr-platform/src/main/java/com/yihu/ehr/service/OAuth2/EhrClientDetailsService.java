@@ -27,39 +27,13 @@ public class EhrClientDetailsService implements ClientDetailsService {
     @Autowired
     private AppClient appClient;
 
-//    public EhrClientDetailsService(){
-//
-//        // 直接在内存中添加简易ESB应用，重构后需要将此应用保存在数据库中
-//        BaseClientDetails baseClientDetails = new BaseClientDetails(
-//                "kHAbVppx44",
-//                "ehr",
-//                "read,user,user.demographic_id,user.health_profiles,organization",
-//                EhrTokenGranter.EhrAuthorizationCodeGranter.GRANT_TYPE,
-//                "ROLE_CLIENT",
-//                "http://www.yihu.com?key=value");
-//
-//        // 简易ESB
-//        baseClientDetails.setClientSecret("Bd2h8rdYhep6NKOO");
-//        clientDetailsStore.put("kHAbVppx44", baseClientDetails);
-//
-//        // 康赛应用
-//        baseClientDetails.setClientSecret("ks0odkx5hqcsOIPM");
-//        clientDetailsStore.put("iPOuvtrbzx", baseClientDetails);
-//    }
-
-
-
-
     public ClientDetails loadClientByClientId(String clientId) throws ClientRegistrationException {
-
         ClientDetails details = clientDetailsStore.get(clientId);
-
         if(details!=null){
             return details;
         }
 
         MApp app = appClient.getApp(clientId);
-
         if (app == null) {
             throw new NoSuchClientException("所请求应用不存在，id: " + clientId);
         }
@@ -71,8 +45,8 @@ public class EhrClientDetailsService implements ClientDetailsService {
                 EhrTokenGranter.EhrAuthorizationCodeGranter.GRANT_TYPE,
                 "ROLE_CLIENT",
                 app.getUrl());
-        baseClientDetails.setClientSecret(app.getSecret());
 
+        baseClientDetails.setClientSecret(app.getSecret());
         clientDetailsStore.put(app.getId(), baseClientDetails);
 
         return baseClientDetails;

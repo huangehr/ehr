@@ -92,7 +92,7 @@ public class LoginController extends BaseUIController {
                 MultiValueMap<String, String> conditionMap = new LinkedMultiValueMap<>();
                 conditionMap.add("user_json_data", toJson(userDetailModel));
                 RestTemplates templates = new RestTemplates();
-                resultStr = templates.doPut(comUrl + url,conditionMap);
+//                resultStr = templates.doPut(comUrl + url,conditionMap);//todo:临时注释
                 return "redirect:/index";
             }else{
 

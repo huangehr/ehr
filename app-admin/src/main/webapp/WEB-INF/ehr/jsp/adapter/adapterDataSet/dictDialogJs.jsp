@@ -50,7 +50,7 @@
                 this.$dictForm.show();
                 this.$dictForm.css('display','block');
             },
-            initCombo : function (dictId, target, value, text, childValue){
+            initCombo : function (dictId, target, value, text, parentValue){
                 var url = "${contextRoot}" + dictUrl[dictId];
                 var child = dictId == 1 ? $('#dict_info_orgDictEntrySeq') : undefined;
                 var combo = target.customCombo(
@@ -58,7 +58,7 @@
                             adapterPlanId: adapterPlanId,
                             dictId: parentId,
                             mode: mode,
-                            parentId: childValue},
+                            parentId: parentValue},
                         undefined, child, dictId==0 ? mode=='modify'|| mode=='view' : false
                 )
                 if(!Util.isStrEmpty(value)){
