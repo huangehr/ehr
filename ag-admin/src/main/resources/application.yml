@@ -1,5 +1,5 @@
 server:
-  port: 10000
+  port: ${ag-admin.server.port}
 
 management:
   port: ${server.port}
@@ -11,20 +11,6 @@ info:
     version: 1.0.0
   component: Zuul Server
 
-
-ribbon:
-  ReadTimeout: 300000
-  ConnectTimeout: 6000
-
-zuul:
-  ignored-services: "*"
-  routes:
-    svr-adaption: /api/v1.0/adapter/plan/adapterDataSet
-
----
-spring:
-  profiles: lincl
-
 hystrix:
   command:
     default:
@@ -33,7 +19,11 @@ hystrix:
 #          enabled: false
         isolation:
           thread:
-            timeoutInMilliseconds: 300000
+            timeoutInMilliseconds: 30000
+ribbon:
+  ReadTimeout: 30000
+  ConnectTimeout: 6000
+
 ---
 spring:
   profiles: dev

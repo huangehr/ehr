@@ -1,26 +1,9 @@
 server:
-  port: 10200
+  port: ${ag-ehr-platform.server.port}
 
 management:
   port: ${server.port}
 
----
-spring:
-  profiles: lincl
-
-ribbon:
-  ReadTimeout: 300000
-  ConnectTimeout: 6000
-
-hystrix:
-  command:
-    default:
-      execution:
-#        timeout:
-#          enabled: false
-        isolation:
-          thread:
-            timeoutInMilliseconds: 300000
 
 ---
 spring:
