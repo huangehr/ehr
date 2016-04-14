@@ -1,6 +1,17 @@
+
 spring:
   application:
     name: svr-org
+
+---
+spring:
+  profiles: lincl
+  cloud:
+    config:
+      username: user
+      password: configuration
+      uri: http://127.0.0.1:1221
+      label: lincl
 
 ---
 spring:

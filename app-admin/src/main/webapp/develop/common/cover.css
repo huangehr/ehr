@@ -14,3 +14,13 @@ a:focus{color:#ffffff;text-decoration: none;}
 /*判断是不是文本域，如果是 关闭按钮缩进10像素*/
 .uicyc-tar{ position:relative}
 .uicyc-tar >.l-trigger.l-trigger-cancel.l-text-trigger-cancel{ right:10px;position: absolute;top: 50%; height: 14px; margin-top: -7px;}
+
+/*左侧菜单结构修改*/
+.l-layout-left{overflow: initial;z-index: 20;}
+#span_nav_breadcrumb_content span{ font-weight: normal;}
+#span_nav_breadcrumb_content span.on{ color:#3eafe0}
+#span_nav_breadcrumb_content span.strong{ font-weight:bold;}
+
+/**/
+#div_left #div_typeTree{padding: 0 0 10px 0}
+.isdata {color: red;position: absolute;right: -81px;display: none;background: url(../images/icon-qp.png) no-repeat; height: 25px;line-height: 25px;width: 78px;padding: 0 0 0 15px;}

@@ -1,5 +1,5 @@
 server:
-  port: ${svr-user.server.port}
+  port: 10060
 
 management:
   port: ${server.port}
@@ -10,25 +10,33 @@ info:
     description: EHR platform user service.
     version: 1.0.0
 
-fast-dfs:
-  pool:
-    init-size: 5
-    max-size: 20
-    wait-time: 500
-  connect-timeout: 2
-  network-timeout: 30
-  charset: ISO8859-1
-  http:
-    tracker-http-port: 80
-    anti-steal-token: no
-    secret-key: FastDFS1234567890
+data-source:
+  driver-class-name: com.mysql.jdbc.Driver
+  initialize-size: 1
+  max-total: 20
+  max-idle: 10
+  min-idle: 1
+  validation-query: SELECT 1
+  test-on-borrow: true
+  remove-abandoned-timeout: 55
+
+deploy:
+  region: 3502
 
 ---
 spring:
-  profiles: dev
-
+  profiles: lincl
+data-source:
+  url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+  user-name: ha
+  password: ha
+  
 fast-dfs:
   tracker-server: 172.19.103.54:22122
+  
+---
+spring:
+  profiles: dev
 
 ---
 spring:

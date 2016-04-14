@@ -4,6 +4,17 @@ spring:
 
 ---
 spring:
+  profiles: lincl
+
+  cloud:
+    config:
+      server:
+        git:
+          uri: http://192.168.1.220:10080/EHR/ehr.config.git
+        default-label: lincl
+
+---
+spring:
   profiles: dev
 
   cloud:
