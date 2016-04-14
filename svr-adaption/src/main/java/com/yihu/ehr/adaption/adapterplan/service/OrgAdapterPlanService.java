@@ -385,6 +385,7 @@ public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAd
      * @param adapterCustomizes
      * @return
      */
+    @Transactional(propagation = Propagation.REQUIRED)
     private int unselectAdapterDataSet(Long planId, AdapterCustomize[] adapterCustomizes) {
         List<Long> addIds = new ArrayList<>();
         for (AdapterCustomize adapter : adapterCustomizes) {
