@@ -133,7 +133,7 @@
               { display: '编码', name: 'code',width: '33%', isAllowHide: false ,align:'left '},
               { display: '名称',name: 'name', width: '33%',isAllowHide: false  ,align:'left'},
               { display: '操作', name: 'operator', width: '34%', render: function (row) {
-                var html = '<div class="grid_edit" name="edit_click" style="" title="修改" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","grid:left:open", row.id,'modify')+'"></div> ' +
+                var html = '<div class="grid_edit" name="edit_click" style="" title="编辑" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","grid:left:open", row.id,'modify')+'"></div> ' +
                             '<div class="grid_delete" name="delete_click" style="" title ="删除" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","grid:left:delete", row.id)+'"></div>'
                 return html;
               }}
@@ -250,8 +250,8 @@
               { display: '编码', name: 'code',width: '33%', isAllowHide: false ,align:'left' },
               { display: '名称',name: 'name', width: '33%',isAllowHide: false  ,align:'left'},
               { display: '操作', name: 'operator', width: '34%', render: function (row) {
-				  var html = '<div class="grid_edit" name="edit_click" style="margin-left:85px;cursor:pointer;" title="修改" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}','{3}'])","grid:right:open", row.id,'modify')+'"></div> '
-						  +'<div class="grid_delete" name="delete_click" style="margin-left:20px;margin-top:10px;cursor:pointer;" title ="删除" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","grid:right:delete", row.id)+'"></div>';
+				  var html = '<div class="grid_edit" title="编辑" name="edit_click" style="margin-left:85px;cursor:pointer;" title="修改" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}','{3}'])","grid:right:open", row.id,'modify')+'"></div> '
+						  +'<div class="grid_delete" title="删除" name="delete_click" style="margin-left:20px;margin-top:10px;cursor:pointer;" title ="删除" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","grid:right:delete", row.id)+'"></div>';
 
 //                var html = '<a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}','{3}'])","grid:right:open", row.id,'modify')+'">修改</a>' +
 //                        ' / <a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","grid:right:delete", row.id)+'">删除</a>';

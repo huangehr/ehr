@@ -3,13 +3,12 @@ package com.yihu.ehr.std.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.dict.DictEntryModel;
 import com.yihu.ehr.agModel.standard.dict.DictModel;
-import com.yihu.ehr.agModel.standard.standardsource.StdSourceModel;
-import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.standard.MCDAVersion;
 import com.yihu.ehr.model.standard.MStdDict;
 import com.yihu.ehr.model.standard.MStdDictEntry;
-import com.yihu.ehr.model.standard.MStdSource;
+import com.yihu.ehr.std.service.CDAVersionClient;
 import com.yihu.ehr.std.service.DictClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
@@ -18,10 +17,11 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -35,6 +35,9 @@ public class DictController extends BaseController {
 
     @Autowired
     private DictClient dictClient;
+
+    @Autowired
+    private CDAVersionClient versionClient;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -58,7 +61,14 @@ public class DictController extends BaseController {
         ResponseEntity<Collection<MStdDict>> responseEntity = dictClient.searchDict(fields, filters, sorts, size, page, version);
 
         List<DictModel> dictModelList = (List<DictModel>) convertToModels(responseEntity.getBody(), new ArrayList<DictModel>(responseEntity.getBody().size()), DictModel.class, null);
-
+        MCDAVersion mcdaVersion = versionClient.getVersion(version);
+        if(dictModelList!=null)
+        {
+            for(int i=0;i<dictModelList.size();i++)
+            {
+                dictModelList.get(i).setInStage(mcdaVersion.isInStage()?0:1);
+            }
+        }
         Envelop envelop = getResult(dictModelList, getTotalCount(responseEntity), page, size);
 
         return envelop;
@@ -97,6 +107,8 @@ public class DictController extends BaseController {
         if (dictModel == null) {
             return failed("数据获取失败!");
         }
+        MCDAVersion mcdaVersion = versionClient.getVersion(versionCode);
+        dictModel.setInStage(mcdaVersion.isInStage()?0:1);
 
         return success(dictModel);
     }
@@ -403,6 +415,9 @@ public class DictController extends BaseController {
         if (dictEntryModel == null) {
             return failed("数据获取失败!");
         }
+//        MCDAVersion mcdaVersion = versionClient.getVersion(versionCode);
+//        dictEntryModel.setStaged(mcdaVersion.isInStage()?0:1);
+
         return success(dictEntryModel);
     }
 

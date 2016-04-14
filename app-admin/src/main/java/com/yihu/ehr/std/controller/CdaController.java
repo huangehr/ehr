@@ -1,24 +1,16 @@
 package com.yihu.ehr.std.controller;
 
-import antlr.ASdebug.IASDebugStream;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.cdadocument.CDAModel;
 import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
-import com.yihu.ehr.util.ResourceProperties;
-import com.yihu.ehr.util.RestTemplates;
-import com.yihu.ehr.util.controller.BaseController;
 import com.yihu.ehr.util.controller.BaseUIController;
 import com.yihu.ehr.util.log.LogService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -333,7 +325,7 @@ public class CdaController extends BaseUIController{
                 updateCdaModel.setCode(cdaModel.getCode());
                 updateCdaModel.setName(cdaModel.getName());
                 updateCdaModel.setSourceId(cdaModel.getSourceId());
-                updateCdaModel.setOperationType(cdaModel.getOperationType());
+                updateCdaModel.setType(cdaModel.getType());
                 updateCdaModel.setDescription(cdaModel.getDescription());
 
                 cdaModel.setUpdateUser(userDetailModel.getId());

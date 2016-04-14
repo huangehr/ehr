@@ -61,7 +61,7 @@
     <div class="m-form-group">
         <label><spring:message code="lbl.tip"/><spring:message code="spe.colon"/></label>
         <div class="m-form-control ">
-            <textarea id="dialog_tags" class="f-w240 max-length-100 validate-special-char" data-attr-scan="tags" maxlength="500"></textarea>
+            <textarea id="dialog_tags" class="f-w240 max-length-100 validate-special-char" placeholder="多个标签，请用分号隔开" data-attr-scan="tags" maxlength="500"></textarea>
         </div>
     </div>
 	<div class="m-form-control pane-attribute-toolbar">
