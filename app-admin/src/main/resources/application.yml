@@ -1,6 +1,7 @@
 server:
   contextPath: /ehr
   port: 8080
+  sessionTimeout:  300
 
 fast-dfs:
   pool:
@@ -14,22 +15,6 @@ fast-dfs:
     tracker-http-port: 80
     anti-steal-token: no
     secret-key: FastDFS1234567890
-
----
-spring:
-  profiles: lincl
-service-gateway:
-  username: user
-  password: eureka
-  url: http://localhost:10000/api/v1.0/admin
-  stdurl: http://localhost:10000/api/v1.0/admin/std
-  versionurl: http://localhost:10000/api/v1.0/admin/version
-  cdatypeurl: http://localhost:10000/api/v1.0/admin/cda_type
-  stdsourceurl: http://localhost:10000/api/v1.0/admin/standard_source
-  adaption: http://localhost:10030/api/v1.0/adapter
-
-fast-dfs:
-  tracker-server: 172.19.103.54:22122
 
 ---
 spring:
@@ -57,7 +42,10 @@ service-gateway:
   versionurl: http://172.19.103.75:10000/api/v1.0/admin/version
   cdatypeurl: http://172.19.103.75:10000/api/v1.0/admin/cda_type
   stdsourceurl: http://172.19.103.75:10000/api/v1.0/admin/standard_source
+  adaption: http://172.19.103.73:10150/api/v1.0/adapter
+
 
 fast-dfs:
   tracker-server: 172.19.103.13:22122
+
 
