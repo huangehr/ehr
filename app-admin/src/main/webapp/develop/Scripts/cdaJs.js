@@ -15,7 +15,7 @@ cda.list = {
     relationSearch: null,
     relationIds: "",//关系IDs
     manager: null,
-
+    versionStage:null,
     init: function () {
         this.top = $.Util.getTopWindowDOM();
         //CDA 列名
@@ -31,7 +31,7 @@ cda.list = {
                 //    "<div class='grid_delete' style='' title='删除' onclick='cda.list.deleteCda(\"" + rowdata.id + "\")'></div>";
                 var html = "<a class='label_a' title='关联' onclick='cda.list.updateCdaInfo(\"" + rowdata.id + "\",\"btn_relationship\")'>关联</a> " +
                     "<a class='grid_edit' style='margin-left:10px;' title='编辑' onclick='cda.list.updateCdaInfo(\"" + rowdata.id + "\",\"btn_basic\")'></a> "+
-                    "<a class='grid_delete'style='' title='删除' onclick='cda.list.deleteCda(\"" + rowdata.id +"\",\""+rowdata.staged+ "\")'></a>";
+                    "<a class='grid_delete'style='' title='删除' onclick='cda.list.deleteCda(\"" + rowdata.id +"\")'></a>";
                 return html;
             }
             }
@@ -73,8 +73,7 @@ cda.list = {
         $("#searchNmEntry").keyup(function (e) {
             if (e.keyCode == 13) {
                 var versionCode = $("#cdaVersion").ligerGetComboBoxManager().getValue();
-                versionCode = versionCode.split("|")[0];
-                var cdaid = $("#hdId").val();
+
                 cda.list.getRelationShipList(versionCode, cdaid);
             }
         });
@@ -85,6 +84,21 @@ cda.list = {
         cda.list.event();
 
         $("#div_left_tree").mCustomScrollbar({theme: "minimal-dark", axis: "yx"});
+    },
+    getStagedByValue:function()
+    {
+        debugger;
+        var _value = $("#cdaVersion").ligerGetComboBoxManager().getValue();
+        if (!_value && _value == "") return false;
+        var data = $("#cdaVersion").ligerComboBox().data;
+        for(var i =0;i<data.length;i++)
+        {
+            if(data[i].id==_value)
+            {
+                return data[i].inStage;
+            }
+        }
+        return false;
     },
     setCss: function () {
 
@@ -120,13 +134,15 @@ cda.list = {
                 for (var i = 0; i < cdaVersionList.length; i++) {
                     option.push({
                         text: cdaVersionList[i].versionName,
-                        id: cdaVersionList[i].version+"|"+cdaVersionList[i].inStage
+                        id: cdaVersionList[i].version,
+                        inStage:cdaVersionList[i].inStage
                     });
                 }
                 var select = $("#cdaVersion").ligerComboBox({
 
                     data: option,
                     onSelected: function (value, text) {
+                        u.versionStage = u.getStagedByValue();
                         var typeid = $("#hdType").val();
                         if (!$.Util.isStrEmpty(typeid)) {
                             cda.list.getCDAList();
@@ -144,9 +160,7 @@ cda.list = {
     },
     getCDAList: function () {
         var versionCode = $("#cdaVersion").ligerGetComboBoxManager().getValue();
-        var version_split = versionCode.split("|");
-        versionCode = version_split[0];
-        $("#btn_Delete").attr("attr_staged",version_split[1]);
+
         var typeid = $("#hdType").val();
         var u = cda.list;
         if (u.grid == null) {
@@ -169,10 +183,14 @@ cda.list = {
                 onSelectRow: function (rowdata, rowid, rowobj) {
                 },
                 onAfterShowData: function (currentData) {
+
                 }
             }));
 
             window.grid = u.grid;
+            $(".l-grid-body2").css({
+                'overflow-x':'hidden'
+            });
         }
         else {
             u.grid.set({
@@ -274,13 +292,11 @@ cda.list = {
 
     addCdaInfo: function () {
         var versionCode = $("#cdaVersion").ligerGetComboBoxManager().getValue();
-        var version_split = versionCode.split("|");
-        versionCode = version_split[0];
-        var staged = version_split[1];
+
         var typeId = $("#hdType").val();
         var typeName = $("#hdTypeName").val();
         var _tital = "CDA新增";
-        var _url = cda.list._url + "/cda/cdaBaseInfo?id=&versioncode=" + versionCode + "&typeid=" + typeId + "&typename=" + typeName + "&click_name=btn_basic"+"&staged="+staged;
+        var _url = cda.list._url + "/cda/cdaBaseInfo?id=&versioncode=" + versionCode + "&typeid=" + typeId + "&typename=" + typeName + "&click_name=btn_basic"+"&staged="+cda.list.versionStage;
         var callback = function () {
             cda.list.getCDAList();
         };
@@ -291,15 +307,13 @@ cda.list = {
         var _width = 955;
         var _tital = "数据集关联";
         var versionCode = $("#cdaVersion").ligerGetComboBoxManager().getValue();
-        var version_split = versionCode.split("|");
-        versionCode = version_split[0];
-        var staged=version_split[1];
-        var _url = cda.list._url + "/cda/cdaRelationship?id=" + cdaid + "&versioncode=" + versionCode + "&click_name=" + click_name+"&staged="+staged;
+
+        var _url = cda.list._url + "/cda/cdaRelationship?id=" + cdaid + "&versioncode=" + versionCode + "&click_name=" + click_name+"&staged="+cda.list.versionStage;
         if (click_name == "btn_basic") {
             _tital = "CDA编辑";
             _height = 450;
             _width = 500;
-            _url = cda.list._url + "/cda/cdaBaseInfo?id=" + cdaid + "&versioncode=" + versionCode + "&click_name=" + click_name+"&staged="+staged;
+            _url = cda.list._url + "/cda/cdaBaseInfo?id=" + cdaid + "&versioncode=" + versionCode + "&click_name=" + click_name+"&staged="+cda.list.versionStage;
         }
 
         var callback = function () {
@@ -307,11 +321,11 @@ cda.list = {
         };
         cda.list.showDialog(_tital, _url, _height, _width, callback);
     },
-    deleteCda: function (ids,staged) {
+    deleteCda: function (ids) {
 
-        if(staged!="1")
+        if(!cda.list.versionStage)
         {
-            $.Notice.error("已发布版本不可删除,请确认！");
+            $.Notice.error("已发布版本不可删除，请确认!");
             return;
         }
 
@@ -320,7 +334,7 @@ cda.list = {
             return;
         }
         var strVersionCode = $("#cdaVersion").ligerGetComboBoxManager().getValue();
-        strVersionCode=strVersionCode.split("|")[0];
+
         $.Notice.confirm('删除CDA将连同一起删除CDA数据集关系,是否确定删除该CDA?', function (confirm) {
             if (confirm) {
                 $.ajax({
@@ -357,10 +371,10 @@ cda.list = {
         });
         $("#btn_Delete").click(function () {
 
-            var staged = $(this).attr("attr_staged");
-            if(staged=='false')
+            console.log(cda.list.versionStage);
+            if(!cda.list.versionStage)
             {
-                $.Notice.error("已发布版本不能删除，请确认!","提示");
+                $.Notice.error("已发布版本不可删除，请确认!");
                 return;
             }
 
@@ -424,7 +438,7 @@ cda.attr = {
         }
 
         var staged = $.Util.getUrlQueryString('staged');
-        if(staged!="false")
+        if(staged!='false')
         {
             $("#btn_save").show();
         }

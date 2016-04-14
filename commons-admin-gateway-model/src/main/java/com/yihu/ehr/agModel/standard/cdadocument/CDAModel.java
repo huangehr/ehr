@@ -33,7 +33,7 @@ public class CDAModel {
 
     private String fileGroup;
 
-    private String operationType;
+    private String type;
 
     private String staged;
 
@@ -149,12 +149,12 @@ public class CDAModel {
         this.fileGroup = fileGroup;
     }
 
-    public String getOperationType() {
-        return operationType;
+    public String getType() {
+        return type;
     }
 
-    public void setOperationType(String operationType) {
-        this.operationType = operationType;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getStaged() {

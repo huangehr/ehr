@@ -42,7 +42,7 @@ public class DictController  extends BaseUIController {
     }
 
     @RequestMapping("template/stdDictInfo")
-    public String stdDictInfoTemplate(Model model, String dictId, String strVersionCode, String mode) {
+    public String stdDictInfoTemplate(Model model, String dictId, String strVersionCode, String mode,String staged) {
         Map<String, Object> params = new HashMap<>();
         DictModel dictModel = new DictModel();
         Envelop result = new Envelop();
@@ -87,12 +87,13 @@ public class DictController  extends BaseUIController {
         }
         model.addAttribute("info",toJson(dictModel));
         model.addAttribute("mode",mode);
+        model.addAttribute("staged",staged);
         model.addAttribute("contentPage","/std/dict/stdDictInfoDialog");
         return "simpleView";
     }
 
     @RequestMapping("template/dictEntryInfo")
-    public String dictEntryInfoTemplate(Model model, String id, String dictId, String strVersionCode, String mode) {
+    public String dictEntryInfoTemplate(Model model, String id, String dictId, String strVersionCode,String staged, String mode) {
         String resultStr = "";
         DictEntryModel dictEntryModel = new DictEntryModel();
         dictEntryModel.setDictId(Long.parseLong(dictId));
@@ -119,6 +120,7 @@ public class DictController  extends BaseUIController {
         }
         model.addAttribute("info", toJson(dictEntryModel));
         model.addAttribute("mode",mode);
+        model.addAttribute("staged",staged);
         model.addAttribute("contentPage","/std/dict/dictEntryInfoDialog");
         return "simpleView";
     }

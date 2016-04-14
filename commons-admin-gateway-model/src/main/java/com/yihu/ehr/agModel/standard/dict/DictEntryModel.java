@@ -7,15 +7,10 @@ package com.yihu.ehr.agModel.standard.dict;
 public class DictEntryModel {
 
     long id;
-
     long dictId;//字典ID
-
     String code;
-
     String value;
-
     String desc;
-
     int hashCode;
 
     public long getId() {

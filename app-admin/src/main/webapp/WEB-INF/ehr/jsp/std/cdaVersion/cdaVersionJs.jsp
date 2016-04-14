@@ -73,8 +73,8 @@
 //											+'<div class="grid_delete" name="delete_click" style="margin-left: 90px;cursor:pointer; title="删除"' +
 //											' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "cdaVersion:del", row.version,row.inStage,0) + '"></div>';
 //								}
-								html ='<a class="grid_edit" name="delete_click" style="" title="编辑" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "cdaVersion:commitVersion", row.version,row.inStage,0) + '"></a>'
-											+'<a class="grid_delete" name="delete_click" style="" title="删除"' +
+								//html ='<a class="grid_edit" name="delete_click" style="" title="编辑" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "cdaVersion:commitVersion", row.version,row.inStage,0) + '"></a>'
+								html ='<a class="grid_delete" name="delete_click" style="" title="删除"' +
 											' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "cdaVersion:del", row.version,row.inStage,0) + '"></a>';
 								return html;
 								}
