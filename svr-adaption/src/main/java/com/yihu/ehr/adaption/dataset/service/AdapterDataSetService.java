@@ -620,4 +620,47 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
         query.setParameterList("ids", metaIds);
         return ((Long) query.list().get(0)) > 0;
     }
+
+    /**
+     * 新增数据元映射关系
+     *
+     * @param adapterDataSet
+     * @param orgAdapterPlan
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void addAdapterDataSetFast(AdapterDataSet adapterDataSet, OrgAdapterPlan orgAdapterPlan) {
+        //新增需要适配的字典
+        Long planId = adapterDataSet.getAdapterPlanId();
+        String cdaVersion = orgAdapterPlan.getVersion();
+        if (adapterDataSet.getStdDict() != null && adapterDataSet.getStdDict() !=0) {
+//            if (!adapterDictService.isExist(planId, dictId)) {
+                adapterDictService.addAdapterDict(planId, adapterDataSet.getStdDict(), cdaVersion);
+//            }
+        }
+//        saveAdapterDataSet(adapterDataSet);
+//        return adapterDataSet;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public int copyAdapterDataSet(Long planId, String[] metaIds) {
+        Session s = currentSession();
+        String sql =
+                " insert into healtharchive.adapter_dataset " +
+                        " (plan_id, std_dataset, std_metadata, std_dict) " +
+                        "SELECT  " +
+                        "   :planId as plan_id, meta.dataset_id as std_dataset, meta.id as std_metadata,  meta.dict_id as std_dict " +
+                        "FROM" +
+                        "   std_meta_data_000000000000 meta " +
+                        "LEFT JOIN" +
+                        "   (SELECT * FROM adapter_dataset WHERE plan_id=:planId) adt " +
+                        "ON" +
+                        "   meta.id = adt.std_metadata " +
+                        "WHERE" +
+                        "   adt.id IS NULL AND meta.id in(:metaIds) ";
+        Query q = s.createSQLQuery(sql);
+        q.setParameter("planId", planId);
+        q.setParameterList("metaIds", metaIds);
+        int rs = q.executeUpdate();
+        return rs;
+    }
 }

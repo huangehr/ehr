@@ -178,8 +178,8 @@
 //										+'<div class="grid_delete"  style="margin-left: 100px;cursor:pointer;" title="删除"' +
 //										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoDialog:del", row.id,'delete') + '"></div>';
 
-                                var html = '<a class="label_a" style="margin-left:0px;" href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:customize", row.id, row.version) + '">定制</a>' +
-                                        '<a class="label_a" style="margin-left:5px;" href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:adapter", row.id, 'modify') + '">适配</a>';
+                                var html = '<a class="label_a" title="定制" style="margin-left:0px;" href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:customize", row.id, row.version) + '">定制</a>' +
+                                        '<a class="label_a" title="适配" style="margin-left:5px;" href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:adapter", row.id, 'modify') + '">适配</a>';
 //                                        '/<a href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}',])", "adapter:adapterInfo:open", row.id, 'modify') + '">修改</a>' +
 //                                        '/<a href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "adapter:adapterInfo:delete", row.id) + '">删除</a>';
                                 var text = "发布";
@@ -188,9 +188,9 @@
                                 }
 //								html+='<div class="grid_delete"  style="margin-left: 130px;cursor:pointer;" title="'+text+'"' +
 //										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3},'{4}','{5}'])", "adapter:adapterInfo:release", row.org,row.version,text,row.id) + '"></div>';
-                                html += '<a class="label_a" style="margin-left:5px; href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}','{4}','{5}'])", "adapter:adapterInfo:release", row.org, row.version,text,row.id) + '">' + text + '</a>';
-								html += '<a class="grid_edit" href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}',])", "adapter:adapterInfo:open", row.id, 'modify') + '"></a>' +
-								'<a class="grid_delete" href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "adapter:adapterInfo:delete", row.id) + '"></a>';
+                                html += '<a class="label_a" title="'+text+'" style="margin-left:5px; href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}','{4}','{5}'])", "adapter:adapterInfo:release", row.org, row.version,text,row.id) + '">' + text + '</a>';
+								html += '<a class="grid_edit" title="编辑" href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}',])", "adapter:adapterInfo:open", row.id, 'modify') + '"></a>' +
+								'<a class="grid_delete" title="删除" href="#" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "adapter:adapterInfo:delete", row.id) + '"></a>';
 
 
 								return html;

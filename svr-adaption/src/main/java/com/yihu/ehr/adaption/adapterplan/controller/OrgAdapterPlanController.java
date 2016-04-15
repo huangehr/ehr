@@ -159,6 +159,24 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
     }
 
 
+//    @RequestMapping(value = "/plan/adapterDataSet", method = RequestMethod.POST)
+//    @ApiOperation(value = "定制数据集")
+//    public boolean adapterDataSet(
+//            @ApiParam(name = "planId", value = "编号", defaultValue = "")
+//            @RequestParam("planId") Long planId,
+//            @ApiParam(name = "customizeData", value = "customizeData", defaultValue = "")
+//            @RequestParam("customizeData") String customizeData) throws Exception {
+//
+//        try {
+//            customizeData = customizeData.replace("DataSet", "").replace("MetaData", "");
+//            List<AdapterCustomize> adapterDataSetList = Arrays.asList(jsonToObj(customizeData, AdapterCustomize[].class));
+//            orgAdapterPlanService.adapterDataSet(planId, adapterDataSetList);
+//            return true;
+//        } catch (IOException ex) {
+//            throw errParm();
+//        }
+//    }
+
     @RequestMapping(value = "/plan/adapterDataSet", method = RequestMethod.POST)
     @ApiOperation(value = "定制数据集")
     public boolean adapterDataSet(
@@ -169,7 +187,7 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
 
         try {
             customizeData = customizeData.replace("DataSet", "").replace("MetaData", "");
-            List<AdapterCustomize> adapterDataSetList = Arrays.asList(jsonToObj(customizeData, AdapterCustomize[].class));
+            AdapterCustomize[] adapterDataSetList = jsonToObj(customizeData, AdapterCustomize[].class);
             orgAdapterPlanService.adapterDataSet(planId, adapterDataSetList);
             return true;
         } catch (IOException ex) {

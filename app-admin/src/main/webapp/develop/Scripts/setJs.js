@@ -12,6 +12,7 @@ set.list = {
     setSearch: null,
     elementSearch: null,
     selectObj: null,
+    versionStage:null,
     init: function () {
         this.top = $.Util.getTopWindowDOM();
         this.columns = [
@@ -20,8 +21,8 @@ set.list = {
             {
                 display: '操作', isSort: false, width: '33%', render: function (rowdata, rowindex, value) {
 
-                var html = "<div class='grid_edit' style='' title='' onclick='set.list.updateSet(\"" + rowdata.id + "\")'></div> " +
-                    "<div class='grid_delete' style=''title='' onclick='set.list.deleteSet(\"" + rowdata.id + "\")'></div>";
+                var html = "<div class='grid_edit' style='' title='编辑' onclick='set.list.updateSet(\"" + rowdata.id + "\")'></div> " +
+                    "<div class='grid_delete' style=''title='删除' onclick='set.list.deleteSet(\"" + rowdata.id + "\")'></div>";
                 //var html = "<div class='grid_edit' style='margin-left: 30px;cursor:pointer;' title='修改' onclick='set.list.updateSet(\"" + rowdata.id + "\")'></div> " +
                 //    "<div class='grid_delete' style='margin-left: 70px;cursor:pointer;'title='删除' onclick='set.list.deleteSet(\"" + rowdata.id + "\")'></div>";
                 return html;
@@ -91,6 +92,21 @@ set.list = {
         this.getVersionList();
         this.bindEvents();
     },
+    getStagedByValue:function()
+    {
+        debugger;
+        var _value = $("#cdaVersion").ligerGetComboBoxManager().getValue();
+        if (!_value && _value == "") return false;
+        var data = $("#cdaVersion").ligerComboBox().data;
+        for(var i =0;i<data.length;i++)
+        {
+            if(data[i].id==_value)
+            {
+                return data[i].inStage;
+            }
+        }
+        return false;
+    },
     bindEvents: function () {
         $(window).bind('resize', function () {
             var contentW = $('#grid_content').width();
@@ -129,12 +145,14 @@ set.list = {
                         //text: versionArr[1],
                         //id: versionArr[0]
                         text: result[i].versionName,
-                        id: result[i].version
+                        id: result[i].version,
+                        inStage:result[i].inStage
                     });
                 }
                 var select = $("#cdaVersion").ligerComboBox({
                     data: option,
                     onSelected: function (value, text) {
+                        u.versionStage = u.getStagedByValue();
                         set.list.getSetList(value);
                     }
                 });
@@ -286,7 +304,7 @@ set.list = {
     addSet: function () {
         var versionCode = $("#cdaVersion").ligerGetComboBoxManager().getValue();
         var _tital = "新增数据集";
-        var _url = set.list._url + "/std/dataset/setupdate?id=&versioncode=" + versionCode;
+        var _url = set.list._url + "/std/dataset/setupdate?id=&versioncode=" + versionCode+"&staged="+set.list.versionStage;
         var callback = function () {
             set.list.getSetList(versionCode);
         };
@@ -296,7 +314,7 @@ set.list = {
     updateSet: function (id) {
         var versionCode = $("#cdaVersion").ligerGetComboBoxManager().getValue();
         var _tital = "修改数据集";
-        var _url = set.list._url + "/std/dataset/setupdate?id=" + id + "&versioncode=" + versionCode;
+        var _url = set.list._url + "/std/dataset/setupdate?id=" + id + "&versioncode=" + versionCode+"&staged="+set.list.versionStage;
         var callback = function () {
             set.list.getSetList(versionCode);
         };
@@ -304,6 +322,13 @@ set.list = {
     },
     //删除数据集 窗口
     deleteSet: function (ids) {
+        console.log(set.list.versionStage)
+        if(!set.list.versionStage)
+        {
+            $.Notice.error("已发布版本不可删除，请确认!");
+            return;
+        }
+
         if (ids == null || ids == "") {
             $.Notice.error("请先选择需要删除的数据集!");
             return;
@@ -342,7 +367,7 @@ set.list = {
         var setid = $("#hdId").val();
         var _tital = "新增数据元";
 
-        var _url = set.list._url + "/std/dataset/elementupdate?id=&versioncode=" + versionCode + "&setid=" + setid;
+        var _url = set.list._url + "/std/dataset/elementupdate?id=&versioncode=" + versionCode + "&setid=" + setid+"&staged="+set.list.versionStage;
         var callback = function () {
             set.list.getElementList(versionCode, setid);
         };
@@ -352,13 +377,20 @@ set.list = {
         var versionCode = $("#cdaVersion").ligerGetComboBoxManager().getValue();
         var setid = $("#hdId").val();
         var _tital = "修改数据元";
-        var _url = set.list._url + "/std/dataset/elementupdate?id=" + id + "&versioncode=" + versionCode + "&setid=" + setid;
+        var _url = set.list._url + "/std/dataset/elementupdate?id=" + id + "&versioncode=" + versionCode + "&setid=" + setid+"&staged="+set.list.versionStage;
         var callback = function () {
             set.list.getElementList(versionCode, setid);
         };
         set.list.showDialog(_tital, _url, 560, 730, callback);
     },
     deleteElement: function (ids) {
+
+        if(!set.list.versionStage)
+        {
+            $.Notice.error("已发布版本不可删除，请确认!");
+            return;
+        }
+
         if (ids == null || ids == "") {
             $.Notice.error("请先选择需要删除的数据集!");
             return;
@@ -401,9 +433,15 @@ set.list = {
         });
         $("#btn_Delete_relation").click(function () {
 
+            //if(!set.list.versionStage)
+            //{
+            //    $.Notice.error("已发布版本不可删除，请确认!");
+            //    return;
+            //}
+
             var rows = set.list.elementGrid.getSelecteds();
             if (rows.length == 0) {
-                $.Notice.tip("请选择要删除的内容！");
+                $.Notice.error("请选择要删除的内容！");
                 return;
             }
             else {
@@ -426,6 +464,12 @@ set.attr = {
         $("#hdversion").val(versionCode);
         var setId = $.Util.getUrlQueryString('id');
         $("#hdId").val(setId);
+        var staged = $.Util.getUrlQueryString('staged');
+        if(staged=='false')
+        {
+            console.log(staged);
+            $("#btn_save").hide();
+        }
         this.getStandardSource();
         this.event();
     },
@@ -570,6 +614,12 @@ set.elementAttr = {
         $("#hdId").val(elementId);
         var setid = $.Util.getUrlQueryString('setid');
         $("#hdsetid").val(setid);
+        var staged = $.Util.getUrlQueryString('staged');
+        if(staged=='false')
+        {
+            console.log(staged);
+            $("#btn_save").hide();
+        }
         //this.getDictList();
         this.getElementInfo();
     },

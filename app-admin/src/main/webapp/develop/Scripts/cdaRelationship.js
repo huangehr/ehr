@@ -290,12 +290,13 @@
                 { display: '数据集名称', name: 'name',  align: 'left' }
             ],
             get: function (key, callback) {
-                var url = webRoot + "/std/dataset/searchDataSetsWithoutPaging";
+                var url = webRoot + "/std/dataset/searchDataSets";
+                console.log(url);
                 $.ajax({
                     url: url,
                     type:"post",
                     dataType:"json",
-                    data:{codename:key,version:versionCode},
+                    data:{codename:key,version:versionCode,page:1,rows:999},
                     success:function(data) {
                         if (data != null) {
                             var result = eval(data);

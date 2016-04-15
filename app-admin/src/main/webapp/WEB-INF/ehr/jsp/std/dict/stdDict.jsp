@@ -20,6 +20,7 @@
             <input type="text" id="searchNm" placeholder="<spring:message code="lbl.input.placehold"/>">
           </div>
           <div class="f-pt5 f-fr f-mr10" >
+
             <div title="新增" id="btn_create" class="image-create"  onclick="javascript:$.publish('stddict:dictInfo:open',['','new'])"></div>
           </div>
         </div>

@@ -37,8 +37,11 @@
          */
         function pageInit() {
             mainLayout.init();
-            navMenu.init();
+            //navMenu.init();
+
+            $.MenuInit(".l-layout-left",navMenu)
             notice.init();
+
         }
 
         /* ************************** 函数定义结束 **************************** */
@@ -52,6 +55,12 @@
             $breadcrumbBar: $('#div_nav_breadcrumb_bar'),
             $breadcrumbContent: $('#span_nav_breadcrumb_content'),
             init: function () {
+
+                //判断用户是否初始密码
+                var bo = Util.getUrlQueryString("defaultPassWord");
+                if(Util.isStrEquals(bo,'true'))
+                    window.location.href = "${contextRoot}/user/initialChangePassword";
+
                 this.$mainContent.ligerLayout({
                     // 左侧导航栏菜单宽度
                     leftWidth: 190,
@@ -66,76 +75,92 @@
             // 导航菜单数据源
             data: [
                 // 基础数据中心
-                {id: 1, text: '<spring:message code="title.register.manage.center"/>'},
+                {id: 1,level:1, text: '<spring:message code="title.register.manage.center"/>'},
                 {
                     id: 11,
                     pid: 1,
+                    level:2,
                     text: '<spring:message code="title.user.manage"/>',
                     url: '${contextRoot}/user/initial'
                 },
                 {
                     id: 12,
                     pid: 1,
+                    level:2,
                     text: '<spring:message code="title.org.manage"/>',
                     url: '${contextRoot}/organization/initial'
                 },
                 {
                     id: 13,
                     pid: 1,
+                    level:2,
                     text: '<spring:message code="title.patient.manage"/>',
                     url: '${contextRoot}/patient/initial'
                 },
                 //{id: 14, pid: 1, text: '<spring:message code="title.knowledge.base"/>'},
 
                 //标准规范中心
-                {id: 2, text: '<spring:message code="title.data.manage.center"/>'},
+                {id: 2,level:1, text: '<spring:message code="title.data.manage.center"/>'},
                 {
-                    id: 21,
+                    id: 61,
                     pid: 2,
+                    level:2,
+                    text: '平台标准'
+                },{
+                    id: 21,
+                    pid: 61,
+                    level:3,
                     text: '<spring:message code="title.std.source"/>',
                     url: '${contextRoot}/standardsource/initial'
                 },
                 {
                     id: 22,
-                    pid: 2,
+                    pid: 61,
+                    level:3,
                     text: '<spring:message code="title.dict.manage"/>',
                     url: '${contextRoot}/cdadict/initial'
                 },
                 {
                     id: 23,
-                    pid: 2,
+                    pid: 61,
+                    level:3,
                     text: '<spring:message code="title.standard.dataSet"/>',
                     url: '${contextRoot}/std/dataset/initial'
                 },
                 {
                     id: 24,
-                    pid: 2,
+                    pid: 61,
+                    level:3,
                     text: '<spring:message code="title.CDA.manage"/>',
                     url: '${contextRoot}/cda/initial'
                 },
                 {
+                    id: 27,
+                    pid: 61,
+                    level:3,
+                    text: 'CDA类别',
+                    url: '${contextRoot}/cdatype/index'
+                },
+                {
+                    id: 28,
+                    pid: 61,
+                    level:3,
+                    text: '标准版本管理',
+                    url: '${contextRoot}/cdaVersion/initial'
+                },
+                {
                     id: 25,
                     pid: 2,
+                    level:2,
                     text: '<spring:message code="title.org.std.collection.manage"/>',
                     url: '${contextRoot}/adapterorg/initial'
                 },
                 {
                     id: 26,
                     pid: 2,
+                    level:2,
                     text: '<spring:message code="title.adapter.manager"/>',
                     url: '${contextRoot}/adapter/initial'
-                },
-                {
-                    id: 27,
-                    pid: 2,
-                    text: 'CDA类别',
-                    url: '${contextRoot}/cdatype/index'
-                },
-                {
-                    id: 28,
-                    pid: 2,
-                    text: '标准版本管理',
-                    url: '${contextRoot}/cdaVersion/initial'
                 },
                 //资源管理中心
                 //{id: 3, text: '<spring:message code="title.resource.manage.center"/>'},
@@ -150,14 +175,15 @@
                 //{id: 6, text: '<spring:message code="title.server.manage.center"/>'},
 
                 //开放中心
-                {id: 3, text: '<spring:message code="title.open.hub.manage.center"/>'},
-                {id: 31, pid: 3, text: '<spring:message code="title.app.manage"/>', url: '${contextRoot}/app/initial'},
+                {id: 3,level:1, text: '<spring:message code="title.open.hub.manage.center"/>'},
+                {id: 31,level:2, pid: 3, text: '<spring:message code="title.app.manage"/>', url: '${contextRoot}/app/initial'},
 
                 //配置管理中心
-                {id: 4, text: '<spring:message code="title.setting.manage.center"/>'},
+                {id: 4,level:1,text: '<spring:message code="title.setting.manage.center"/>'},
                 {
                     id: 41,
                     pid: 4,
+                    level:2,
                     text: '<spring:message code="title.sysDict.manage"/>',
                     url: '${contextRoot}/dict/initial'
                 },
@@ -169,10 +195,11 @@
                  },*/
 
                 //健康档案浏览器
-                {id: 5, text: '<spring:message code="title.health.archive.browser"/>'},
+                {id: 5,level:1, text: '<spring:message code="title.health.archive.browser"/>'},
                 {
                     id: 51,
                     pid: 5,
+                    level:2,
                     text: '<spring:message code="title.template.manage"/>',
                     url: '${contextRoot}/template/initial'
                 }
@@ -187,63 +214,63 @@
             $level1Nodes: [],
             // 树形导航菜单节点集
             $treeNodes: $('li[outlinelevel]', this.$tree),
-            init: function () {
-                var self = this;
-                // 初始化树形菜单
-
-                //当浏览器刷新之后，展开刷新前点击的tree节点，
-                if (treePid) {
-                    //debugger;
-                    this.data[treePid].isExpand = true;
-                }
-                this.treeMenu = this.$tree.ligerTree({
-                    data: this.data,
-                    idFieldName: 'id',
-                    parentIDFieldName: 'pid',
-                    checkbox: false,
-                    treeLine: false,
-                    autoCheckboxEven: false,
-                    needCancel: false,
-                    btnClickToToggleOnly: false,
-                    slide: false,
-                    nodeDraggable: false,
-                    isExpand: false,
-                    parentIcon: null,
-                    adjustToWidth: true,
-                    onClick: function (obj) {
-                        var content = self.getBreadcrumbContent(obj.data);
-                        mainLayout.$breadcrumbContent.html(content);
-                        var dt = obj.data;
-                        var url = dt.url;
-                        var treedataindex = $(this.getParentTreeItem(obj.data.treedataindex)).attr("treedataindex") || "";
-                        //debugger;
-                        sessionStorage.setItem("treePid", treedataindex);
-                        sessionStorage.setItem("treeId", dt.id);
-                        if (url) {
-                            $("#contentPage").empty();
-                            $("#contentPage").load(url);
-//                            window.location.href = url;//+ '?' + 'treePid=' + treedataindex + '&treeId=' + dt.id
-                        }
-                    }
-                });
-                //当浏览器刷新之后，高亮显示刷新前点击的tree节点，并且显示当前位置（面包屑）Util.getUrlQueryString("treeId")
-                $(".l-expandable-open", this.treeMenu).not($("#" + treeId).find(".l-expandable-open")).click();
-                if (treeId) {
-                    var treeData = this.treeMenu.getDataByID(treeId);
-                    var content = self.getBreadcrumbContent(treeData);
-                    mainLayout.$breadcrumbContent.html(content);
-                    $('.l-body', "#" + treeId).addClass("l-selected");
-                    $("#contentPage").empty();
-                    if (treeData.url)
-                        $("#contentPage").load(treeData.url);
-                }
-                // 初始化树形菜单后，缓存一级节点
-                this.$level1Nodes = $('li[outlinelevel="1"]', this.$tree);
-                // 树形导航菜单节点集
-                this.$treeNodes = $('li[outlinelevel="2"]', this.$tree);
-                // 更新一级菜单图标
-                this.updateLevel1Icons();
-            },
+//            init: function () {
+//                var self = this;
+//                // 初始化树形菜单
+//
+//                //当浏览器刷新之后，展开刷新前点击的tree节点，
+//                if (treePid) {
+//                    //debugger;
+//                    this.data[treePid].isExpand = true;
+//                }
+//                this.treeMenu = this.$tree.ligerTree({
+//                    data: this.data,
+//                    idFieldName: 'id',
+//                    parentIDFieldName: 'pid',
+//                    checkbox: false,
+//                    treeLine: false,
+//                    autoCheckboxEven: false,
+//                    needCancel: false,
+//                    btnClickToToggleOnly: false,
+//                    slide: false,
+//                    nodeDraggable: false,
+//                    isExpand: false,
+//                    parentIcon: null,
+//                    adjustToWidth: true,
+//                    onClick: function (obj) {
+//                        var content = self.getBreadcrumbContent(obj.data);
+//                        mainLayout.$breadcrumbContent.html(content);
+//                        var dt = obj.data;
+//                        var url = dt.url;
+//                        var treedataindex = $(this.getParentTreeItem(obj.data.treedataindex)).attr("treedataindex") || "";
+//                        //debugger;
+//                        sessionStorage.setItem("treePid", treedataindex);//存储变量到SEssion
+//                        sessionStorage.setItem("treeId", dt.id);//存储变量到SEssion
+//                        if (url) {
+//                            $("#contentPage").empty();
+//                            $("#contentPage").load(url);
+////                            window.location.href = url;//+ '?' + 'treePid=' + treedataindex + '&treeId=' + dt.id
+//                        }
+//                    }
+//                });
+//                //当浏览器刷新之后，高亮显示刷新前点击的tree节点，并且显示当前位置（面包屑）Util.getUrlQueryString("treeId")
+//                $(".l-expandable-open", this.treeMenu).not($("#" + treeId).find(".l-expandable-open")).click();
+//                if (treeId) {
+//                    var treeData = this.treeMenu.getDataByID(treeId);
+//                    var content = self.getBreadcrumbContent(treeData);
+//                    mainLayout.$breadcrumbContent.html(content);
+//                    $('.l-body', "#" + treeId).addClass("l-selected");
+//                    $("#contentPage").empty();
+//                    if (treeData.url)
+//                        $("#contentPage").load(treeData.url);
+//                }
+//                // 初始化树形菜单后，缓存一级节点
+//                this.$level1Nodes = $('li[outlinelevel="1"]', this.$tree);
+//                // 树形导航菜单节点集
+//                this.$treeNodes = $('li[outlinelevel="2"]', this.$tree);
+//                // 更新一级菜单图标
+//                this.updateLevel1Icons();
+//            },
             // 更新一级菜单图标
             updateLevel1Icons: function () {
                 var self = this;
@@ -338,23 +365,6 @@
             }
         };
         /* ************************* 模块初始化结束 ************************** */
-        /* ************************* 左侧菜单栏滚动开始 ************************** */
-        $(window).load(function(){
-            $("#menucyc-scroll").mCustomScrollbar({
-                theme:"dark", //主题颜色
-                scrollButtons:{
-                    enable:true //是否使用上下滚动按钮
-                },
-                autoHideScrollbar: true, //是否自动隐藏滚动条
-                scrollInertia :0,//滚动延迟
-                horizontalScroll : false,//水平滚动条
-                callbacks:{
-                    //onScroll: function(){alert(1)} //滚动完成后触发事件
-                }
-            });
-
-        });
-        /* ************************* 左侧菜单栏滚动结束  ************************** */
         /* *************************** 页面初始化 **************************** */
 
         pageInit();

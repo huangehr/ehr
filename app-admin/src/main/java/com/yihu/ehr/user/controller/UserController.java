@@ -214,9 +214,9 @@ public class UserController extends BaseUIController {
                 }
 
                 userJsonDataModel = mapper.writeValueAsString(userModel);
-                params.add("user_json_data", userJsonDataModel);
+                params.add("user_json_datas", userJsonDataModel);
 
-                resultStr = templates.doPut(comUrl + url, params);
+                resultStr = templates.doPost(comUrl + "/user", params);
             }else{
                 resultStr = templates.doPost(comUrl + url, params);
             }

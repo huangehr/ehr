@@ -82,8 +82,8 @@
 //									var html ='<div class="grid_edit" title="修改" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "patient:patientInfoModifyDialog:open", row.idCardNo) + '"></div>'
 //										+'<div class="grid_delete" title="删除"' +
 //										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "patient:patientInfoModifyDialog:delete", row.idCardNo) + '"></div>';
-                                var html = '<a class="grid_edit" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "patient:patientInfoModifyDialog:open", row.idCardNo) + '"></a> ';
-                                html += '<a class="grid_delete" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "patient:patientInfoModifyDialog:delete", row.idCardNo) + '"></a>';
+                                var html = '<a class="grid_edit" title="编辑" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "patient:patientInfoModifyDialog:open", row.idCardNo) + '"></a> ';
+                                html += '<a class="grid_delete" title="删除" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "patient:patientInfoModifyDialog:delete", row.idCardNo) + '"></a>';
 									return html;
 								}
                             }
