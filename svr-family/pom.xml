@@ -2,17 +2,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>com.yihu.ehr</groupId>
+	<parent>
+		<groupId>com.yihu.ehr</groupId>
 		<artifactId>commons-dependencies-native</artifactId>
-        <version>1.1.0</version>
-        <relativePath>../commons-dependencies-native</relativePath>
-    </parent>
+		<version>1.1.0</version>
+		<relativePath>../commons-dependencies-native</relativePath>
+	</parent>
 
-	<artifactId>svr-standard</artifactId>
+	<artifactId>svr-family</artifactId>
 	<packaging>jar</packaging>
-	<name>svr-standard</name>
-	<description>EHR platform standard service</description>
+	<name>svr-family</name>
+	<description>EHR platform family service</description>
 
 	<properties>
 	</properties>
@@ -21,6 +21,10 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-actuator-docs</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
@@ -36,13 +40,34 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
+			<artifactId>spring-boot-starter-data-rest</artifactId>
 		</dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-feign</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-commons</artifactId>
+			<version>1.11.1.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-jpa</artifactId>
+			<version>1.9.1.RELEASE</version>
+		</dependency>
 		<dependency>
 			<groupId>com.yihu.ehr</groupId>
 			<artifactId>commons-util</artifactId>
@@ -54,39 +79,18 @@
 			<version>1.1.0</version>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-feign</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.yihu.ehr</groupId>
 			<artifactId>commons-rest-model</artifactId>
 			<version>1.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.yihu.ehr</groupId>
-			<artifactId>commons-data-fastdfs</artifactId>
+			<artifactId>commons-ui-swagger</artifactId>
 			<version>1.1.0</version>
 		</dependency>
-		<dependency>
-			<groupId>happy.fish</groupId>
-			<artifactId>fastDFS</artifactId>
-			<version>1.1.0</version>
-		</dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-data-redis</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-profile-core</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-redis-keyschema</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>happy.fish</groupId>
-            <artifactId>fastDFS</artifactId>
-            <version>1.1.0</version>
-        </dependency>
 	</dependencies>
 </project>
