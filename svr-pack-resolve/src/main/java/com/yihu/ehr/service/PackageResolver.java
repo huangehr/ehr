@@ -1,18 +1,15 @@
 package com.yihu.ehr.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.extractor.EventExtractor;
 import com.yihu.ehr.extractor.ExtractorChain;
-import com.yihu.ehr.extractor.KeyDataExtractor;
-import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.profile.*;
-import com.yihu.ehr.profile.core.DataSetTableOption;
-import com.yihu.ehr.profile.core.Profile;
-import com.yihu.ehr.profile.core.ProfileDataSet;
-import com.yihu.ehr.profile.core.QualifierTranslator;
+import com.yihu.ehr.profile.core.commons.Profile;
+import com.yihu.ehr.profile.core.lightweight.LightWeightProfile;
+import com.yihu.ehr.profile.core.structured.StructuredProfile;
+import com.yihu.ehr.profile.core.structured.StructuredDataSet;
+import com.yihu.ehr.profile.core.unStructured.UnStructuredDocumentFile;
+import com.yihu.ehr.profile.core.unStructured.UnStructuredProfile;
 import com.yihu.ehr.profile.persist.DataSetResolverWithTranslator;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
@@ -23,11 +20,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -52,7 +44,14 @@ public class PackageResolver {
     ExtractorChain extractorChain;
 
     @Autowired
-    private FastDFSUtil fastDFSUtil;
+    private StructuredPackageResolver structuredPackageResolver;
+
+    @Autowired
+    private UnStructuredPackageResolver unStructuredPackageResolver;
+
+    @Autowired
+    private  LightWeihgtPackageResolver lightWeihgtPackageResolver;
+
 
     private final static char PathSep = File.separatorChar;
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
@@ -75,285 +74,69 @@ public class PackageResolver {
      */
     public Profile doResolve(MPackage pack, String zipFile) throws Exception {
         File root = new Zipper().unzipFile(new File(zipFile), LocalTempPath + PathSep + pack.getId(), pack.getPwd());
-        if (root == null || !root.isDirectory() || root.list().length == 0) {
-            throw new RuntimeException("Invalid package file, package id: " + pack.getId());
-        }
-
-
-        Profile profile = new Profile();
-        UnStructuredProfile unStructuredProfile = new UnStructuredProfile();
-
-        File[] files = root.listFiles();
-        String firstFilepath = files[0].getPath();
-        String firstFolderName =  firstFilepath.substring(firstFilepath.lastIndexOf("\\")+1);
-
-        List<DocumentFile> documentFileList = new ArrayList<>();  //document底下的文件
-        for(File file:files){
-            String folderName = file.getPath().substring(file.getPath().lastIndexOf("\\")+1);
-            switch (firstFolderName){
-                case OriFolder:
-                    //结构化档案报处理
-                    structuredDataSetParse(profile, file.listFiles(),folderName);
-                    break;
-                case IndexFolder:
-                    //轻量级档案包处理
-                    parseDataSetLight(profile,file.listFiles());
-                case DocumentFolder:
-                    //非结构化档案包处理
-
-                    if(folderName.equals(DocumentFolder)){
-                        documentFileList = unstructuredDocumentParse(unStructuredProfile, file.listFiles());
-                    }else if(folderName.equals("meta.json")){
-                        unstructuredDataSetParse(unStructuredProfile,file,documentFileList);
-                    }
-                    break;
-                default: break;
-            }
-        }
-
-        makeEventSummary(profile);
-
-        houseKeep(zipFile, root);
-
-        return profile;
-    }
-
-    /**
-     * 结构化档案包解析JSON文件中的数据。
-     * @param profile
-     * @param files
-     * @throws IOException
-     */
-    void structuredDataSetParse(Profile profile, File[] files,String folderName) throws ParseException, IOException {
-        for (File file : files) {
-            String lastName = folderName.substring(folderName.lastIndexOf("\\")+1);
-            ProfileDataSet dataSet = generateDataSet(file, lastName.equals(OriFolder) ? true :false);
-
-            // 原始数据存储在表"数据集代码_ORIGIN"
-            String dataSetTable = lastName.equals(OriFolder) ? DataSetTableOption.originDataSetCode(dataSet.getCode()) : dataSet.getCode();
-            profile.addDataSet(dataSetTable, dataSet);
-            profile.setPatientId(dataSet.getPatientId());
-            profile.setEventNo(dataSet.getEventNo());
-            profile.setOrgCode(dataSet.getOrgCode());
-            profile.setCdaVersion(dataSet.getCdaVersion());
-
-            dataSet.setCode(dataSetTable);
-
-            // Extract key data from data set if exists
-            if (!lastName.equals(OriFolder)) {
-                if (profile.getCardId().length() == 0) {
-                    Object object = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.CardInfo);
-                    if (null != object) {
-                        Properties properties = (Properties) object;
-                        profile.setCardId(properties.getProperty("CardNo"));
-                    }
-                }
-
-                if (StringUtils.isEmpty(profile.getDemographicId())) {
-                    profile.setDemographicId((String) extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.DemographicInfo));
-                }
-
-                if (profile.getEventDate() == null) {
-                    profile.setEventDate((Date) extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.EventDate));
-                }
-            }
-            profile.addDataSet(dataSet.getCode(), dataSet);
-            file.delete();
-        }
-
-    }
-
-
-
-
-
-    /**
-     * 轻量级档案包解析JSON文件中的数据。
-     * @param profile
-     * @param
-     * @throws IOException
-     */
-    void parseDataSetLight(Profile profile,File[] files) throws IOException, ParseException {
-        if(files==null){
-            throw new IOException("There is no file");
-        }
-        File file = files[0];
-        JsonNode jsonNode = objectMapper.readTree(file);
-        if (jsonNode.isNull()) {
-            throw new IOException("Invalid json file when generate data set");
-        }
-        //设置数据集
-        dataSetResolverWithTranslator.parseLightJsonDataSet(profile,jsonNode);
-        file.delete();
-    }
-
-
-
-
-
-    /**
-     * 非标准化档案包解析document的文件。
-     * @param profile
-     * @param
-     * @throws IOException
-     */
-    void unstructuredDataSetParse(UnStructuredProfile profile, File file,List<DocumentFile> documentFileList) throws Exception {
-        JsonNode jsonNode = objectMapper.readTree(file);
-
-
-        //公共部分
-        String version = jsonNode.get("inner_version").asText();
-        //String dataSetCode = jsonNode.get("code").asText();
-        String eventNo = jsonNode.get("event_no").asText();
-        String patientId = jsonNode.get("patient_id").asText();
-        String orgCode = jsonNode.get("org_code").asText();
-        String eventDate = jsonNode.path("event_time").asText();
-
-        profile.setCdaVersion(version);
-        profile.setEventNo(eventNo);
-        profile.setDemographicId(patientId);
-        profile.setOrgCode(orgCode);
-
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        profile.setEventDate(format.parse(eventDate));
-
-        //data解析
-        JsonNode datas = jsonNode.get("data"); //保存
-
-        List<UnStructuredDocument> unStructuredDocumentList = new ArrayList<>();
-
-
-        for(int i=0;i<datas.size();i++){
-
-
-            JsonNode data = datas.get(i);
-
-            UnStructuredDocument unStructuredDocument = new UnStructuredDocument();
-            String cdaDocId = data.get("cda_doc_id").asText();
-            String url = data.get("url").asText();
-            String expiryDate = data.get("expiry_date").asText();
-
-            unStructuredDocument.setCdaDocId(cdaDocId);
-            unStructuredDocument.setUrl(url);
-            unStructuredDocument.setExpiryDate(format.parse(expiryDate));
-
-
-            String keyWordsStr = data.get("key_words").toString();
-//            JSONObject keyWordsObj = new JSONObject(keyWordsStr);
-//            Iterator keys = keyWordsObj.keys();
+//        if (root == null || !root.isDirectory() || root.list().length == 0) {
+//            throw new RuntimeException("Invalid package file, package id: " + pack.getId());
+//        }
 //
-//            List<Map<String,Object>> keyWordsList = new ArrayList<>();  //存放keyMap的数组
-//            keyWordsList = JSONObject2List(keys,keyWordsList,keyWordsObj);
-//            unStructuredDocument.setKeyWordsList(keyWordsList);
+//
+//        StructuredProfile structuredProfile = new StructuredProfile();          //结构化档案
+//        UnStructuredProfile unStructuredProfile = new UnStructuredProfile();    //非结构化档案
+//        LightWeightProfile lightWeightProfile = new LightWeightProfile();       //轻量级档案
+//
+//        File[] files = root.listFiles();
+//        String firstFilepath = files[0].getPath();
+//        String firstFolderName =  firstFilepath.substring(firstFilepath.lastIndexOf("\\")+1);
+//
+//        List<UnStructuredDocumentFile> unStructuredDocumentFileList = new ArrayList<>();  //document底下的文件
+//        for(File file:files){
+//            String folderName = file.getPath().substring(file.getPath().lastIndexOf("\\")+1);
+//            switch (firstFolderName){
+//                case OriFolder:
+//                    //结构化档案报处理
+//                    structuredProfile = structuredPackageResolver.structuredDataSetParse(structuredProfile, file.listFiles(),folderName);
+//                    break;
+//                case IndexFolder:
+//                    //轻量级档案包处理
+//                    lightWeightProfile = lightWeihgtPackageResolver.lightWeightDataSetParse(lightWeightProfile,file.listFiles());
+//                case DocumentFolder:
+//                    //非结构化档案包处理
+//                    if(folderName.equals(DocumentFolder)){
+//                        unStructuredDocumentFileList = unStructuredPackageResolver.unstructuredDocumentParse(unStructuredProfile, file.listFiles());
+//                    }else if(folderName.equals("meta.json")){
+//                        unStructuredProfile = unStructuredPackageResolver.unstructuredDataSetParse(unStructuredProfile,file, unStructuredDocumentFileList);
+//                    }
+//                    break;
+//                default: break;
+//            }
+//        }
 
-            unStructuredDocument.setKeyWordsStr(keyWordsStr);
-
-            //document底下文件处理
-            JsonNode contents = data.get("content");   //文件信息
-
-            List<UnStructuredContent> unStructuredContentList = new ArrayList<>();
-            for(int j=0;j<contents.size();j++){
-                //documentFiles;
-                UnStructuredContent unStructuredContent = new UnStructuredContent();
-                List<DocumentFile> documentFileListNew = new ArrayList<>();
-
-
-                JsonNode object = contents.get(j);
-                String mimeType = object.get("mime_type").asText();
-                String name = object.get("name").asText().replace("/","");
-
-                String[] names = name.split(",");
-
-                for(String filename:names){
-                    for(DocumentFile documentFile:documentFileList){
-                        String localFileName = documentFile.getLocalFileName();
-                        if(filename.equals(localFileName)){
-                            documentFile.setMimeType(mimeType);
-                            documentFile.setName(filename);
-                            documentFile.setLocalFileName(documentFile.getLocalFileName());
-                            documentFile.setRemotePath(documentFile.getRemotePath());
-                            documentFileListNew.add(documentFile);
-                        }
-                    }
-                }
-                unStructuredContent.setDocumentFileList(documentFileListNew);
-                unStructuredContentList.add(unStructuredContent);
-
-
-                unStructuredDocument.setUnStructuredContentList(unStructuredContentList);
-            }
-
-            unStructuredDocumentList.add(unStructuredDocument);
-
-        }
-        profile.setUnStructuredDocument(unStructuredDocumentList);
-
-
+//        makeEventSummary(structuredProfile);
+//
+//        houseKeep(zipFile, root);
+//
+//        return structuredProfile;
     }
 
-    /**
-     * 非标准化档案包解析document的文件。
-     * @param profile
-     * @param
-     * @throws IOException
-     */
-    List<DocumentFile> unstructuredDocumentParse(UnStructuredProfile profile, File[] files) throws Exception {
-        List<DocumentFile> documentFileList = new ArrayList<>();
-        for (File file : files) {
-            DocumentFile documentFile = new DocumentFile();
-            if (file.getAbsolutePath().endsWith(JsonExt)) continue;
-            //这里把图片保存的fastdfs
-            String filePath = file.getPath();
-            String extensionName = filePath.substring(file.getPath().lastIndexOf('.') + 1);
-            String localFileName = filePath.substring(file.getPath().lastIndexOf('\\') + 1);
-            InputStream is = new FileInputStream(file);
-            ObjectNode objectNode = fastDFSUtil.upload(is,extensionName,"");
-            String groupName = objectNode.get("groupName").toString();
-            String remoteFileName = objectNode.get("remoteFileName").toString();
-            String remotePath = "groupName:" + groupName + ",remoteFileName:" + remoteFileName;
-
-            documentFile.setLocalFileName(localFileName);
-            documentFile.setRemotePath(remotePath);
-            documentFileList.add(documentFile);
-        }
-        return documentFileList;
-    }
-
-    /**
-     * 生产数据集
-     * @param jsonFile
-     * @param isOrigin
-     * @return
-     * @throws IOException
-     */
-    public ProfileDataSet generateDataSet(File jsonFile, boolean isOrigin) throws IOException {
-        JsonNode jsonNode = objectMapper.readTree(jsonFile);
-        if (jsonNode.isNull()) {
-            throw new IOException("Invalid json file when generate data set");
-        }
-        ProfileDataSet dataSet = dataSetResolverWithTranslator.parseStructuredJsonDataSet(jsonNode, isOrigin);
-        return dataSet;
-    }
 
     /**
      * 根据此次的数据产生一个健康事件，并更新数据集的行ID.
      *
-     * @param profile
+     * @param structuredProfile
      */
-    public void makeEventSummary(Profile profile) {
+    public void makeEventSummary(StructuredProfile structuredProfile) {
         EventExtractor eventExtractor = context.getBean(EventExtractor.class);
 
-        for (String dataSetTable : profile.getDataSetTables()) {
-            if (StringUtils.isEmpty(profile.getSummary()) && eventExtractor.getDataSets().containsKey(dataSetTable)) {
-                profile.setSummary(eventExtractor.getDataSets().get(dataSetTable));
+        for (String dataSetTable : structuredProfile.getDataSetTables()) {
+            if (StringUtils.isEmpty(structuredProfile.getSummary()) && eventExtractor.getDataSets().containsKey(dataSetTable)) {
+                structuredProfile.setSummary(eventExtractor.getDataSets().get(dataSetTable));
             }
 
             int rowIndex = 0;
-            ProfileDataSet dataSet = profile.getDataSet(dataSetTable);
+            StructuredDataSet dataSet = structuredProfile.getDataSet(dataSetTable);
             String[] rowKeys = new String[dataSet.getRecordKeys().size()];
             dataSet.getRecordKeys().toArray(rowKeys);
             for (String rowKey : rowKeys) {
-                dataSet.updateRecordKey(rowKey, profile.getId() + "$" + rowIndex++);
+                dataSet.updateRecordKey(rowKey, structuredProfile.getId() + "$" + rowIndex++);
             }
         }
     }

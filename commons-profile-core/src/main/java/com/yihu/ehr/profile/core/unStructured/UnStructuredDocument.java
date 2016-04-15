@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile;
+package com.yihu.ehr.profile.core.unStructured;
 
 import java.util.Date;
 import java.util.List;
