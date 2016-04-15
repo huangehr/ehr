@@ -49,7 +49,7 @@ public class TemplateEndPoint extends BaseRestEndPoint {
     TemplateService templateService;
 
     @ApiOperation(value = "创建模板")
-    @RequestMapping(value = RestApi.HealthProfile.Templates, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.POST)
+    @RequestMapping(value = RestApi.ProfileTemplate.Templates, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.POST)
     public void saveTemplate(@ApiParam(value = "健康档案模板")
                              @RequestParam(value = "model") String model) {
         Template template = toEntity(model, Template.class);
@@ -58,7 +58,7 @@ public class TemplateEndPoint extends BaseRestEndPoint {
     }
 
     @ApiOperation(value = "获取模板列表", response = MTemplate.class, responseContainer = "List")
-    @RequestMapping(value = RestApi.HealthProfile.Templates, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.ProfileTemplate.Templates, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.GET)
     public Collection<MTemplate> getTemplates(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,title,cdaVersion,cdaDocumentId,organizationCode,createTime,pcTplURL,mobileTplURL")
             @RequestParam(value = "fields", required = false) String fields,
@@ -81,7 +81,7 @@ public class TemplateEndPoint extends BaseRestEndPoint {
     }
 
     @ApiOperation(value = "获取模板")
-    @RequestMapping(value = RestApi.HealthProfile.Template, method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.ProfileTemplate.Template, method = RequestMethod.GET)
     public MTemplate getTemplate(@ApiParam(value = "模板ID")
                                  @PathVariable(value = "id") int id) {
         Template template = templateService.getTemplate(id);
@@ -91,7 +91,7 @@ public class TemplateEndPoint extends BaseRestEndPoint {
     }
 
     @ApiOperation(value = "更新模板属性")
-    @RequestMapping(value = RestApi.HealthProfile.Template, method = RequestMethod.PUT)
+    @RequestMapping(value = RestApi.ProfileTemplate.Template, method = RequestMethod.PUT)
     public void getTemplate(@ApiParam(value = "模板ID")
                             @PathVariable(value = "id") int id,
                             @ApiParam(value = "模板JSON")
@@ -106,7 +106,7 @@ public class TemplateEndPoint extends BaseRestEndPoint {
     }
 
     @ApiOperation(value = "下载模板展示文件")
-    @RequestMapping(value = RestApi.HealthProfile.TemplateCtn, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE, method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.ProfileTemplate.TemplateCtn, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE, method = RequestMethod.GET)
     public void getTemplateContent(@ApiParam(value = "模板ID")
                                    @PathVariable(value = "id") int id,
                                    @ApiParam(value = "true表示PC端，false表示移动端")
@@ -125,7 +125,7 @@ public class TemplateEndPoint extends BaseRestEndPoint {
     }
 
     @ApiOperation(value = "更新模板展示文件")
-    @RequestMapping(value = RestApi.HealthProfile.TemplateCtn, method = RequestMethod.POST)
+    @RequestMapping(value = RestApi.ProfileTemplate.TemplateCtn, method = RequestMethod.POST)
     public void setTemplateContent(@ApiParam(value = "模板ID")
                                    @PathVariable(value = "id") int id,
                                    @ApiParam(value = "true表示PC端，false表示移动端")
@@ -137,17 +137,18 @@ public class TemplateEndPoint extends BaseRestEndPoint {
 
         InputStream stream = file.getInputStream();
         template.setContent(pc, stream);
+        templateService.updateTemplate(template);
     }
 
     @ApiOperation(value = "删除模板")
-    @RequestMapping(value = RestApi.HealthProfile.Template, method = RequestMethod.DELETE)
+    @RequestMapping(value = RestApi.ProfileTemplate.Template, method = RequestMethod.DELETE)
     public void deleteTemplate(@ApiParam(value = "模板ID")
                                @PathVariable(value = "id") int id) {
         templateService.deleteTemplate(id);
     }
 
     @ApiOperation(value = "打包下载模板", response = MTemplate.class, responseContainer = "List")
-    @RequestMapping(value = RestApi.HealthProfile.TemplatesDownloads, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE, method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.ProfileTemplate.TemplatesDownloads, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE, method = RequestMethod.GET)
     public void downloadTemplates(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "organizationCode=41872607-9")
             @RequestParam(value = "filters", required = false) String filters,
@@ -181,7 +182,7 @@ public class TemplateEndPoint extends BaseRestEndPoint {
             IOUtils.copy(new ByteArrayInputStream(FileUtils.readFileToByteArray(zipFile)), response.getOutputStream());
 
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-            response.setHeader("Content-Disposition", "attachment; filename=" + zipName);
+            response.setHeader("Content-Disposition", "attachment; filename=" + tempFile.getName() + ".zip");
             response.flushBuffer();
         } catch (IOException e) {
             String message = "Unable to download profile template, " + e.getMessage();

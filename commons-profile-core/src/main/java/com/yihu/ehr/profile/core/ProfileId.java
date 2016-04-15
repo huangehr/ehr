@@ -47,7 +47,7 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
      *
      * @return 新创建的ID对象.
      */
-    public static ProfileId get(final String orgId, final String patientId, final String eventNo, final Date timestamp) {
+    public static ProfileId create(final String orgId, final String patientId, final String eventNo, final Date timestamp) {
         return new ProfileId(orgId, patientId, eventNo, timestamp);
     }
 

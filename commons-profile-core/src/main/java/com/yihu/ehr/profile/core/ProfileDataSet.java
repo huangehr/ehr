@@ -25,7 +25,7 @@ public class ProfileDataSet {
     private String cdaVersion;
     private String remotePath;
 
-    private Map<String, Map<String, String>> records = new HashMap<>();
+    private Map<String, Map<String, String>> records = new TreeMap<>();
 
     public ProfileDataSet() {
     }

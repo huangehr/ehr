@@ -32,7 +32,7 @@ import java.util.Map;
  * @created 2016.02.03 14:15
  */
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0)
+@RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "patients", description = "患者服务")
 public class PatientsEndPoint {
     @Autowired
@@ -99,7 +99,7 @@ public class PatientsEndPoint {
         }
     }
 
-    @ApiOperation(value = "更新患者", response = boolean.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "更新患者", response = boolean.class)
     @RequestMapping(value = "/patients/{demographic_id}", method = {RequestMethod.PATCH})
     public String updatePatient(@ApiParam(name = "demographic_id", value = "身份证号")
                                 @PathVariable(value = "demographic_id") String demographicId,

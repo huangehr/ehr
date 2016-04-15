@@ -22,14 +22,14 @@ import java.util.List;
  * @created 2015.08.05 11:06
  */
 @RestController
-@RequestMapping(ApiVersion.Version1_0)
+@RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "health_profiles", description = "健康档案服务")
 public class HealthProfilesEndPoint {
     @Autowired
     ObjectMapper objectMapper;
 
     @RequestMapping(value = "/patient/health_profile/search", method = RequestMethod.GET)
-    @ApiOperation(value = "搜索档案", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "搜索患者档案")
+    @ApiOperation(value = "搜索档案", notes = "搜索患者档案")
     public List<Profile> searchProfiles(
             @ApiParam(required = true, name = "demographic_id", value = "患者人口学ID")
             @PathVariable(value = "demographic_id") String demographicId){
@@ -37,7 +37,7 @@ public class HealthProfilesEndPoint {
     }
 
     @RequestMapping(value = "/patients/{demographic_id}/health_profiles", method = RequestMethod.GET)
-    @ApiOperation(value = "获取档案列表", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "获取档案列表")
+    @ApiOperation(value = "获取档案列表", notes = "获取档案列表")
     public List<Profile> getProfiles(
             @ApiParam(required = true, name = "demographic_id", value = "患者人口学ID")
             @PathVariable(value = "demographic_id") String demographicId,
@@ -53,7 +53,7 @@ public class HealthProfilesEndPoint {
     }
 
     @RequestMapping(value = "/patients/{demographic_id}/health_profiles/{id}", method = RequestMethod.GET)
-    @ApiOperation(value = "获取档案", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "指定档案")
+    @ApiOperation(value = "获取档案", notes = "指定档案")
     public Object getProfile(
             @ApiParam(required = true, name = "demographic_id", value = "患者人口学ID")
             @PathVariable(value = "demographic_id") String demographicId,
@@ -67,7 +67,7 @@ public class HealthProfilesEndPoint {
     }
 
     @RequestMapping(value = "/data_set", method = RequestMethod.GET)
-    @ApiOperation(value = "获取数据集", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "返回指定数据集对象，若key不存在，返回错误信息")
+    @ApiOperation(value = "获取数据集", notes = "返回指定数据集对象，若key不存在，返回错误信息")
     public Object getDateSet(
             @RequestParam(value = "cda_version", required = true) String cda_version,
             @RequestParam(value = "data_set_code", required = true) String dataSetCode,

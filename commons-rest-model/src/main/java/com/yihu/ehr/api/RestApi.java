@@ -178,16 +178,20 @@ public class RestApi {
     }
 
     public static class HealthProfile{
-        public static final String Profiles                         = "/patients/{demographic_id}/health_profiles";
-        public static final String Profile                          = "/patient/health_profiles/{id}";
-        public static final String ProfileDateSets                  = "/patient/health_profiles/{id}/data_sets";
+        public static final String Profiles                         = "/health_profiles";
+        public static final String ProfileSearch                    = "/health_profiles/search";
+        public static final String Profile                          = "/health_profiles/{profile_id}";
+        public static final String ProfileDocument                  = "/health_profiles/{profile_id}/documents/{document_id}";
+    }
 
-        public static final String ProfileSearch                    = "/patient/health_profiles/search";
-        public static final String SanofiSupport                    = "/patient/health_profiles/{id}/physic_signs";
-
+    public static class ProfileTemplate{
         public static final String Templates                        = "/templates";
         public static final String TemplatesDownloads               = "/templates/downloads";
         public static final String Template                         = "/templates/{id}";
         public static final String TemplateCtn                      = "/templates/{id}/content";
+    }
+
+    public static class SanofiSupport{
+        public static final String PhysicSigns                      = "/sanofi/physic_signs";
     }
 }

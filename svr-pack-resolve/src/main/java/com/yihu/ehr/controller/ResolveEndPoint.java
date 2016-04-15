@@ -9,7 +9,7 @@ import com.yihu.ehr.feign.XPackageMgrClient;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.profile.core.Profile;
 import com.yihu.ehr.profile.persist.repo.ProfileRepository;
-import com.yihu.ehr.service.PackageResolver;
+import com.yihu.ehr.service.PackageResolveEngine;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -31,7 +31,7 @@ import java.io.FileOutputStream;
 @Api(value = "档案包解析", description = "档案包解析服务")
 public class ResolveEndPoint {
     @Autowired
-    PackageResolver resolver;
+    PackageResolveEngine resolver;
 
     @Autowired
     ProfileRepository profileRepo;
@@ -42,7 +42,7 @@ public class ResolveEndPoint {
     @Autowired
     XPackageMgrClient packageMgrClient;
 
-    @ApiOperation(value = "档案包入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "档案包入库")
     @RequestMapping(value = RestApi.Packages.Package, method = RequestMethod.PUT)
     public ResponseEntity<String> resolve(@ApiParam("id")
                                           @PathVariable("id") String packageId,
@@ -55,7 +55,7 @@ public class ResolveEndPoint {
         String zipFile = downloadTo(pack.getRemotePath());
 
         Profile profile = resolver.doResolve(pack, zipFile);
-        profileRepo.save(profile);
+        profileRepo.saveStructedProfile(profile);
 
         packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
                 "Identity: " + profile.getDemographicId() + ", profile: " + profile.getId());
@@ -63,7 +63,7 @@ public class ResolveEndPoint {
         return new ResponseEntity<>(echo ? profile.toJson() : "", HttpStatus.OK);
     }
 
-    @ApiOperation(value = "本地档案包解析", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "本地档案包解析")
     @RequestMapping(value = RestApi.Packages.Package, method = RequestMethod.POST)
     public ResponseEntity<String> resolve(@ApiParam(value = "档案包ID，忽略此值", defaultValue = "LocalPackage")
                                           @PathVariable("id") String packageId,
@@ -88,7 +88,7 @@ public class ResolveEndPoint {
 
             Profile profile = resolver.doResolve(pack, zipFile);
             if (!persist) {
-                profileRepo.save(profile);
+                profileRepo.saveStructedProfile(profile);
             }
 
             return new ResponseEntity<>(profile.toJson(), HttpStatus.OK);

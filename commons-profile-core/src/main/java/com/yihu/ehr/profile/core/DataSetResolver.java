@@ -97,7 +97,6 @@ public class DataSetResolver {
             String lastName = filePath.substring(filePath.lastIndexOf("\\")+1);
             if (lastName.equals("document")) {
                 //这里把图片保存的fastdfs
-
             }
 
         }
@@ -137,7 +136,7 @@ public class DataSetResolver {
             String path = map.getValue().asText();
             profileDataSet.setCode(code);
             profileDataSet.setRemotePath(path);
-            profile.addDataSet(code,profileDataSet);
+            //profile.addDataSet(code,profileDataSet);
         }
     }
 

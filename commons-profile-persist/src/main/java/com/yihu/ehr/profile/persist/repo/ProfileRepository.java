@@ -50,7 +50,7 @@ public class ProfileRepository {
      * @param profileId
      * @return
      */
-    public Profile findOne(String profileId, boolean loadStdDataSet, boolean loadOriginDataSet) throws IOException, ParseException {
+    public StructedProfile findOne(String profileId, boolean loadStdDataSet, boolean loadOriginDataSet) throws IOException, ParseException {
         ResultWrapper record = hbaseClient.getResultAsWrapper(ProfileTableOptions.Table, profileId);
         if (record.getResult().toString().equals("keyvalues=NONE")) throw new RuntimeException("Profile not found.");
 
@@ -65,7 +65,7 @@ public class ProfileRepository {
         String cdaVersion = record.getValueAsString(Family.Basic.toString(), BasicQualifier.CdaVersion.toString());
         String dataSets = record.getValueAsString(Family.Basic.toString(), BasicQualifier.DataSets.toString());
 
-        Profile profile = new Profile();
+        StructedProfile profile = new StructedProfile();
         profile.setId(profileId);
         profile.setCardId(cardId);
         profile.setOrgCode(orgCode);
@@ -168,7 +168,7 @@ public class ProfileRepository {
                                                     String[] innerCodes) throws IOException {
         List<String> metaDataCode = new ArrayList<>(innerCodes.length);
         for (int i = 0; i < innerCodes.length; ++i) {
-            Long dictId = Long.getLong(cacheReader.read(keySchema.metaDataDict(version, dataSetCode, innerCodes[i])));
+            Long dictId = cacheReader.read(keySchema.metaDataDict(version, dataSetCode, innerCodes[i]));
             String type = cacheReader.read(keySchema.metaDataType(version, dataSetCode, innerCodes[i]));
             if (dictId == null) {
                 continue;
@@ -182,9 +182,13 @@ public class ProfileRepository {
         }
 
         ProfileDataSet dataSet = new ProfileDataSet();
-        Result[] results = hbaseClient.getPartialRecords(dataSetCode,
+        Result[] results = hbaseClient.getPartialRecords(
+                dataSetCode,
                 rowKeys.toArray(new String[rowKeys.size()]),
-                DataSetTableOption.getFamilies(),
+                new String[]{
+                        DataSetTableOption.Family.Basic.toString(),
+                        DataSetTableOption.Family.MetaData.toString()
+                },
                 new String[][]{
                         DataSetTableOption.getQualifiers(DataSetTableOption.Family.Basic),
                         metaDataCode.toArray(new String[metaDataCode.size()])});
@@ -239,7 +243,7 @@ public class ProfileRepository {
      * @param profile
      * @throws IOException
      */
-    public void save(Profile profile) throws IOException {
+    public void saveStructedProfile(StructedProfile profile) throws IOException {
         // 先存档案
         hbaseClient.insertRecord(ProfileTableOptions.Table,
                 profile.getId(),
@@ -254,7 +258,7 @@ public class ProfileRepository {
                         profile.getSummary(),
                         profile.getDemographicId() == null ? "" : profile.getDemographicId(),
                         DateFormatter.utcDateTimeFormat(profile.getCreateDate()),
-                        profile.getDataSetsAsString(),
+                        profile.getDataSetRowKeyList(),
                         profile.getCdaVersion()
                 });
 
