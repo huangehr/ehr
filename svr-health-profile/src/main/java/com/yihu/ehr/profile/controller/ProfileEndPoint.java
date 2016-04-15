@@ -26,6 +26,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -74,9 +75,9 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     public Collection<MProfileIndices> searchProfile(
             @ApiParam(value = "搜索条件")
             @RequestParam("q") String query) {
-        List<ProfileIndices> indicesList = indicesService.search(query);
+        Page<ProfileIndices> indicesList = indicesService.search(query);
 
-        return convertToModels(indicesList, new ArrayList<>(), MProfileIndices.class, null);
+        return convertToModels(indicesList.getContent(), new ArrayList<>(), MProfileIndices.class, null);
     }
 
     @ApiOperation(value = "按时间获取档案列表", notes = "获取患者的就诊档案列表")
