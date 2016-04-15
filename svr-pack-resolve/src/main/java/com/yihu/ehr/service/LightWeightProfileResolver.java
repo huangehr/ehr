@@ -1,10 +1,6 @@
 package com.yihu.ehr.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.yihu.ehr.profile.core.Profile;
-
 import java.io.File;
-import java.io.IOException;
 
 /**
  * @author Sand

@@ -1,7 +1,7 @@
 server:
   contextPath: /ehr
   port: 8080
-  sessionTimeout:  300
+  sessionTimeout:  1800
 
 fast-dfs:
   pool:
