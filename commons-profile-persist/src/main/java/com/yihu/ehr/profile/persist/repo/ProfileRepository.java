@@ -241,7 +241,7 @@ public class ProfileRepository {
      * @param profile
      * @throws IOException
      */
-    public void save(Profile profile) throws IOException {
+    public void save(StructuredProfile profile) throws IOException {
         // 先存档案
         hbaseClient.insertRecord(ProfileTableOptions.Table,
                 profile.getId(),
@@ -275,7 +275,7 @@ public class ProfileRepository {
                         DataSetTableOption.Family.Basic.toString(),
                         DataSetTableOption.getQualifiers(DataSetTableOption.Family.Basic),
                         new String[]{
-                                structuredProfile.getId(),
+                                profile.getId(),
                                 dataSet.getCdaVersion(),
                                 DateFormatter.utcDateTimeFormat(new Date())
                         });

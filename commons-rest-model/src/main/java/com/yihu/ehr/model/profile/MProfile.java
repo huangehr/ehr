@@ -22,7 +22,7 @@ public class MProfile {
     private String summary;
     private Date eventDate;
 
-    private List<MDocument> documents = new ArrayList<>();
+    private List<MProfileDocument> documents = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -64,11 +64,11 @@ public class MProfile {
         this.orgName = orgName;
     }
 
-    public List<MDocument> getDocuments() {
+    public List<MProfileDocument> getDocuments() {
         return documents;
     }
 
-    public void setDocuments(List<MDocument> documents) {
+    public void setDocuments(List<MProfileDocument> documents) {
         this.documents = documents;
     }
 

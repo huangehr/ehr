@@ -3,10 +3,17 @@ package com.yihu.ehr.profile.service;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.yihu.ehr.model.profile.MDataSet;
 import com.yihu.ehr.model.profile.MRecord;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Map;
 
@@ -15,7 +22,23 @@ import java.util.Map;
  * @version 1.0
  * @created 2016.04.13 9:38
  */
-public class ProfileSerializer extends JsonSerializer<MDataSet> {
+@Component
+@DependsOn("objectMapper")
+public class ProfileDataSetSerializer extends JsonSerializer<MDataSet> {
+    @Autowired
+    ObjectMapper objectMapper;
+
+    @PostConstruct
+    public void init(){
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(MDataSet.class, this);
+        objectMapper.registerModule(module);
+
+        objectMapper.configure(SerializationFeature.WRITE_DATE_KEYS_AS_TIMESTAMPS, false);
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        objectMapper.configure(SerializationFeature.WRITE_DATES_WITH_ZONE_ID, true);
+    }
+
     @Override
     public void serialize(MDataSet dataSet, JsonGenerator jgen, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
         jgen.writeStartObject();
@@ -43,20 +66,4 @@ public class ProfileSerializer extends JsonSerializer<MDataSet> {
         jgen.writeEndObject();
         jgen.writeEndObject();
     }
-
-    /*@Override
-    public void serialize(MProfile mProfile, JsonGenerator jgen, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
-        jgen.writeStartObject();
-
-        jgen.writeStringField("id", mProfile.getId());
-        jgen.writeStringField("demographicId", mProfile.getDemographicId());
-        jgen.writeObjectField("eventDate", mProfile.getEventDate());
-        jgen.writeStringField("orgName", mProfile.getOrgCode());
-        jgen.writeStringField("orgCode", mProfile.getOrgName());
-        jgen.writeStringField("cdaVersion", mProfile.getCdaVersion());
-        jgen.writeStringField("summary", mProfile.getSummary());
-
-        jgen.write
-        jgen.writeEndObject();
-    }*/
 }

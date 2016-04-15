@@ -138,10 +138,10 @@
 
     <properties>
         <!-- Third Party -->
-        <pinyin4j.version>2.5.0</pinyin4j.version>
-        <zip4j.version>1.3.2</zip4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
+        <pinyin4j.version>2.5.0</pinyin4j.version>
+        <zip4j.version>1.3.2</zip4j.version>
         <commons.lang.version>2.3</commons.lang.version>
     </properties>
     <dependencies>

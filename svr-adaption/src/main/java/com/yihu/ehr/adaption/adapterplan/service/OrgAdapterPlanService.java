@@ -4,6 +4,7 @@ package com.yihu.ehr.adaption.adapterplan.service;
 import com.yihu.ehr.adaption.adapterorg.service.AdapterOrgService;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSet;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSetService;
+import com.yihu.ehr.adaption.dict.service.AdapterDictService;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
@@ -15,9 +16,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author lincl
@@ -31,7 +30,8 @@ public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAd
     AdapterDataSetService adapterDataSetService;
     @Autowired
     AdapterOrgService adapterOrgService;
-
+    @Autowired
+    AdapterDictService adapterDictService;
 
     /**
      * 新增方案信息
@@ -337,21 +337,14 @@ public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAd
 
 
     /**
-     * 标准定制
-     * 2015-12-31  定制速度优化以及添加事务控制
+     * 标准定制，
+     * 2016-4-14  定制速度优化
      *
      * @param planId
      * @param adapterCustomizes
      */
     @Transactional(propagation = Propagation.REQUIRED)
     public void adapterDataSet(Long planId, AdapterCustomize[] adapterCustomizes) {
-        //删除取消的 数据元、字典
-        int rs = unselectAdapterDataSet(planId, adapterCustomizes);
-
-        if(adapterCustomizes.length==0)
-            return;
-
-        OrgAdapterPlan orgAdapterPlan = retrieve(planId);
         List<String> metaIds = new ArrayList<>();
         for(AdapterCustomize adapter : adapterCustomizes){
             if (adapter.getPid().equals("0") || adapter.getPid().equals("-1")) {
@@ -360,47 +353,34 @@ public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAd
             }
             metaIds.add(adapter.getId());
         }
-        String[] metaIdArr = metaIds.toArray(new String[metaIds.size()]);
-        List<Map> ls = findAddAdapter(orgAdapterPlan, metaIdArr);
-        AdapterDataSet adapterDataSet;
-        for(Map<String, Integer> map : ls){
-            adapterDataSet = new AdapterDataSet();
-            adapterDataSet.setStdDict(parserLong(map.get("stdDict")));
-            adapterDataSet.setMetaDataId(parserLong(map.get("metaDataId")));
-            adapterDataSet.setDataSetId(parserLong(map.get("dataSetId")));
-            adapterDataSet.setAdapterPlanId(planId);
-            adapterDataSetService.addAdapterDataSetFast(adapterDataSet, orgAdapterPlan);
-        }
-        adapterDataSetService.copyAdapterDataSet(orgAdapterPlan, metaIdArr);
-    }
+        //删除取消的 数据元、字典
+        int rs = cancelSelectAdapterDataSet(planId, metaIds);
 
-    private long parserLong(Integer i){
+        if(metaIds.size()==0)
+            return;
 
-        return (long) i.intValue();
+        OrgAdapterPlan orgAdapterPlan = retrieve(planId);
+        //获取定制字典
+        List<Integer> ls = findAddAdapter(orgAdapterPlan, metaIds);
+        if(ls.size()>0)
+            adapterDictService.batchAddAdapterDict(orgAdapterPlan, ls);//新增定制字典项
+        adapterDataSetService.copyAdapterDataSet(orgAdapterPlan, metaIds);//新增定制数据元
     }
 
     /**
      * 删除取消的 数据元、字典
-     *
-     * @param planId
-     * @param adapterCustomizes
+     * create by lincl 2016-04-14
+     * @param planId 方案编号
+     * @param adapterMetaIds 适配数据元
      * @return
      */
     @Transactional(propagation = Propagation.REQUIRED)
-    private int unselectAdapterDataSet(Long planId, AdapterCustomize[] adapterCustomizes) {
-        List<Long> addIds = new ArrayList<>();
-        for (AdapterCustomize adapter : adapterCustomizes) {
-            if (adapter.getPid().equals("0") || adapter.getPid().equals("-1")) {
-                //没有数据元的数据集
-                continue;
-            }
-            addIds.add(Long.valueOf(adapter.getId()));//不删除的数据元ID
-        }
+    private int cancelSelectAdapterDataSet(Long planId, List<String> adapterMetaIds) {
         Session session = currentSession().getSessionFactory().openSession();
         int row = 0;
         try {
             String searchSql = "SELECT DISTINCT std_dict FROM adapter_dataset where plan_id=:planId and (std_dict is not null or std_dict<>'') ";
-            if (addIds.size() > 0) {
+            if (adapterMetaIds.size() > 0) {
                 searchSql +=
                         "and std_metadata not in (:ids)" +
                                 "and " +
@@ -410,8 +390,8 @@ public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAd
             }
             Query sq = session.createSQLQuery(searchSql);
             sq.setLong("planId", planId);
-            if (addIds.size() > 0) {
-                sq.setParameterList("ids", addIds);
+            if (adapterMetaIds.size() > 0) {
+                sq.setParameterList("ids", adapterMetaIds);
             }
             List<BigInteger> ls = sq.list();
             List parms = new ArrayList();
@@ -426,13 +406,13 @@ public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAd
             }
 
             String hql = "delete from adapter_dataset where plan_id = :planId ";
-            if (addIds.size() > 0) {
+            if (adapterMetaIds.size() > 0) {
                 hql += " and std_metadata not in (:ids)";
             }
             Query query = session.createSQLQuery(hql);
             query.setLong("planId", planId);
-            if (addIds.size() > 0) {
-                query.setParameterList("ids", addIds);
+            if (adapterMetaIds.size() > 0) {
+                query.setParameterList("ids", adapterMetaIds);
             }
             row = query.executeUpdate();
             session.close();
@@ -443,11 +423,18 @@ public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAd
         }
     }
 
-    private List<Map> findAddAdapter(OrgAdapterPlan orgAdapterPlan, String[] metaIds){
+    /**
+     * 获取适配的字典
+     * create by lincl 2016-04-14
+     * @param orgAdapterPlan 方案
+     * @param metaIds 适配数据元
+     * @return
+     */
+    private List<Integer> findAddAdapter(OrgAdapterPlan orgAdapterPlan, List metaIds){
         String metaTable = CDAVersionUtil.getMetaDataTableName(orgAdapterPlan.getVersion());
         String sql =
                 "SELECT  " +
-                "   meta.id as metaDataId, meta.dataset_id as dataSetId, meta.dict_id as stdDict " +
+                "   meta.dict_id as stdDict " +
                 "FROM" +
                 "   "+metaTable+" meta " +
                 "LEFT JOIN" +
@@ -455,12 +442,12 @@ public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAd
                 "ON" +
                 "   meta.id = adt.std_metadata " +
                 "WHERE" +
-                "   adt.id IS NULL AND meta.id in(:metaIds) ";
+                "   adt.id IS NULL AND meta.dict_id<>0 AND meta.id in(:metaIds) AND NOT EXISTS(SELECT 1 FROM adapter_dict WHERE std_dict=meta.dict_id and plan_id=:planId) " +
+                "GROUP BY meta.dict_id";
         Session session = currentSession();
         Query query = session.createSQLQuery(sql);
         query.setParameter("planId", orgAdapterPlan.getId());
         query.setParameterList("metaIds", metaIds);
-        query.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         return query.list();
     }
 }

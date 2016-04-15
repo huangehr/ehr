@@ -19,11 +19,11 @@ import java.util.List;
  * @created 2016.02.23 18:05
  */
 @RestController
-@RequestMapping(ApiVersion.Version1_0 + "/standards")
+@RequestMapping(value = ApiVersion.Version1_0 + "/standards", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "standards", description = "健康档案标准服务")
 public class StandardsEndPoint {
 
-    @ApiOperation(value = "获取健康档案数据标准版本", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "获取健康档案数据标准版本")
     @RequestMapping(value = "/versions/{version_id}", method = {RequestMethod.GET})
     public CDAVersionModel getVersion(
             @ApiParam(name = "version_id", value = "版本ID，若为latest则返回最新版本", defaultValue = "latest")
