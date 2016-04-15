@@ -109,11 +109,11 @@
 								var html = '';
 								if(row.activityFlag == 1){
 //									html +='<div class="grid_off" title="" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:activityFlg", row.orgCode,'1') + '"></div>';
-									html +='<a class="grid_off" title="" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:activityFlg", row.orgCode,'1') + '"></a>';
+									html +='<a class="grid_on" title="已激活" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:activityFlg", row.orgCode,'1') + '"></a>';
 
 								}else{
 //									html +='<div class="grid_on" title="" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:activityFlg", row.orgCode,'0') + '"></div>';
-									html +='<a class="grid_on" title="" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:activityFlg", row.orgCode,'0') + '"></a>';
+									html +='<a class="grid_off" title="未激活" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "org:orgInfoDialog:activityFlg", row.orgCode,'0') + '"></a>';
 
 								}
 								return html;

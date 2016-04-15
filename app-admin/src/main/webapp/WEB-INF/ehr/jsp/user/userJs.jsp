@@ -98,10 +98,10 @@
 								var html ='';
 								if(Util.isStrEquals(row.activated,true)){
 //										html +='<div class="grid_on"  onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:failure", row.id,0) + '"></div>';
-									html+= '<a class="grid_on" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:failure", row.id,0) + '"></a>';
+									html+= '<a class="grid_on" href="javascript:void(0)" title="已生效" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}'])", "user:userInfoModifyDialog:failure", row.id,0,"失效") + '"></a>';
 								}else if(Util.isStrEquals(row.activated,false)){
 //										html +='<div class="grid_off" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:failure", row.id,1) + '"></div>';
-									html+='<a class="grid_off" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:failure", row.id,1) + '"></a>';
+									html+='<a class="grid_off" href="javascript:void(0)" title="已失效" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}'])", "user:userInfoModifyDialog:failure", row.id,1,"生效") + '"></a>';
 								}
 								return html;
                             }},
@@ -111,8 +111,8 @@
 //								var html ='<div class="grid_edit"    title="编辑" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:open", row.id,'modify') + '"></div>'
 //										+'<div class="grid_delete"   title="删除"' +
 //										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoDialog:del", row.id,'delete') + '"></div>';
-                                var html = '<a class="grid_edit" style="" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:open", row.id, 'modify') + '"></a>';
-                                    html+= '<a class="grid_delete" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoDialog:del", row.id, 'delete') + '"></a>';
+                                var html = '<a class="grid_edit" title="编辑" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:open", row.id, 'modify') + '"></a>';
+                                    html+= '<a class="grid_delete" title="删除" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoDialog:del", row.id, 'delete') + '"></a>';
                                 return html;
 							}}
                         ],
@@ -178,20 +178,20 @@
                             url: '${contextRoot}/user/addUserInfoDialog?'+ $.now()
                         })
                     });
-                    //修改用户状态
-                    $.subscribe('user:userInfoModifyDialog:failure', function (event, userId,activated) {
-                        $.ligerDialog.confirm('确认要修改该行信息？<br>如果是请点击确认按钮，否则请点击取消。', function (yes) {
+                    //修改用户状态(生/失效)
+                    $.subscribe('user:userInfoModifyDialog:failure', function (event, userId,activated,msg) {
+                        $.ligerDialog.confirm('是否对该用户进行'+msg+'操作', function (yes) {
                             if (yes) {
                                 var dataModel = $.DataModel.init();
                                 dataModel.updateRemote('${contextRoot}/user/activityUser', {
                                     data: {userId: userId,activated:activated},
                                     success: function (data) {
                                         if (data.successFlg) {
-                                            $.Notice.success('修改成功');
+//                                            $.Notice.success('修改成功');
                                             isFirstPage = false;
                                             master.reloadGrid();
                                         } else {
-                                            $.Notice.error('修改失败');
+//                                            $.Notice.error('修改失败');
                                         }
                                     }
                                 });

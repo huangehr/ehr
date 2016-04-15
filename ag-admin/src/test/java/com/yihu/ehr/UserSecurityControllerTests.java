@@ -63,7 +63,7 @@ public class UserSecurityControllerTests {
         userModel.setEmail("555@qq.com");
         userModel.setTelephone("11111111111");
         String userModelJson = objectMapper.writeValueAsString(userModel);
-        Envelop envelop = userController.createUser(userModelJson);
+        Envelop envelop = userController.createUser(userModelJson,"","");
         assertTrue("用户新增失败", envelop.isSuccessFlg());
 
         userModel = (UserDetailModel)envelop.getObj();

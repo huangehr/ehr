@@ -30,6 +30,11 @@
 			</exclusions>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<optional>true</optional>
+		</dependency>
 		<!-- 使用intellij作为集成开发环境 -->
 		<dependency>
 			<groupId>org.apache.tomcat.embed</groupId>

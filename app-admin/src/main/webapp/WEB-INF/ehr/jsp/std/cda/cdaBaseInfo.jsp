@@ -61,7 +61,7 @@
         <%--<div class="l-button u-btn u-btn-primary u-btn-large f-ib f-vam" name="btn_create_file">--%>
         <%--<span>创建文档</span>--%>
         <%--</div>--%>
-        <div class="l-button u-btn u-btn-primary u-btn-large f-ib f-vam" name="btn_save">
+        <div class="l-button u-btn u-btn-primary u-btn-large f-ib f-vam" name="btn_save" style="display: none;" id="btn_save">
             <span>保存</span>
         </div>
         <div class="l-button u-btn u-btn-cancel u-btn-large f-ib f-vam close-toolbar" name="btn_close">

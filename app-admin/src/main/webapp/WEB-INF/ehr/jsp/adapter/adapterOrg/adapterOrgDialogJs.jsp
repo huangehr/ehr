@@ -78,13 +78,18 @@
                             data: data.detailModelList,
                             onSelected : function (value, text) {
                                 var type = value;
-                                if(type==1 || type==2){
+                                if(type == 1){
+                                    $('#parent_div').hide();
+                                }
+                                else if(type==2){
                                     //厂商，初始标准只能是厂商
                                     infoForm.initAdapterOrg(infoForm.$parent, type);
+                                    $('#parent_div').show();
                                 }
                                 else if(type==3){
                                     //区域,初始标准只能选择厂商或区域
-                                    infoForm.initAdapterOrg(infoForm.$org, '1');
+                                    infoForm.initAdapterOrg(infoForm.$parent, '1');
+                                    $('#parent_div').show();
                                 }
                                 infoForm.initOrg(infoForm.$org, type);
                             }
@@ -98,6 +103,8 @@
                                 manager.selectItemByIndex(0);
                         }else if(initType){
                             manager.selectValue(initType);
+                        }else{
+                            manager.selectItemByIndex(0);
                         }
                     }});
 
@@ -138,7 +145,7 @@
                         fields: [{name: 'param', label: ''}]
                     },//搜索框的字段, name 必须是服务器返回的字段
                     grid: gridOp,
-                    valueField: 'organizationCode',
+                    valueField: 'orgCode',
                     textField: 'fullName',
                     selectBoxHeight: 300,
                     readonly: mode == 'modify',
@@ -236,6 +243,9 @@
                     if(!validator.validate()){
                         return;
                     }
+                    if(values.type == 1){
+                        values.parent = "";
+                    }
                     self.$btnSave.attr('disabled','disabled');
                     if(mode=='new'){
                         values.code = values.org;
@@ -254,7 +264,6 @@
                     dataModel.updateRemote("${contextRoot}/adapterorg/"+ajaxFun,{
                         data: dataMode,
                         success: function(data) {
-                            debugger
                             waittingDialog.close();
                             if(data.successFlg){
                                 var app = data.obj;

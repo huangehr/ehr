@@ -1,9 +1,15 @@
 package com.yihu.ehr.adapter.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.thirdpartystandard.OrgDataSetDetailModel;
+import com.yihu.ehr.agModel.thirdpartystandard.OrgMetaDataDetailModel;
+import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +17,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +34,8 @@ public class OrgDataSetController {
     private String password;
     @Value("${service-gateway.url}")
     private String comUrl;
+    @Autowired
+    ObjectMapper objectMapper;
     @RequestMapping("/initialOld")
     public String orgDataSetInitOld(HttpServletRequest request,String adapterOrg){
         request.setAttribute("adapterOrg",adapterOrg);
@@ -154,7 +163,7 @@ public class OrgDataSetController {
      */
     @RequestMapping(value = "createOrgDataSet", produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public Object createOrgDataSet(String jsonDataModel) {
+    public Object createOrgDataSet(String jsonDataModel, HttpServletRequest request) {
 
         String url="/adapter/org/data_set";
         String resultStr = "";
@@ -162,13 +171,14 @@ public class OrgDataSetController {
         Map<String, Object> params = new HashMap<>();
 
         try{
-            //todo:缺少用户id
-            params.put("json_data", jsonDataModel);
+            OrgDataSetDetailModel orgDataSetDetailModel = toOrgDataSetDetailModel(jsonDataModel);
+            orgDataSetDetailModel.setCreateUser(getCurUser(request).getId());
+            params.put("json_data", toJson(orgDataSetDetailModel));
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//创建数据集
             return resultStr;
         } catch (Exception e) {
             envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            envelop.setErrorMsg("系统出错！");
             return envelop;
         }
 
@@ -180,21 +190,21 @@ public class OrgDataSetController {
      */
     @RequestMapping(value = "updateOrgDataSet", produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public Object updateOrgDataSet(String jsonDataModel) {
+    public Object updateOrgDataSet(String jsonDataModel, HttpServletRequest request) {
 
         String url="/adapter/org/data_set";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         try{
-
-            params.put("json_data",jsonDataModel);
+            OrgDataSetDetailModel orgDataSetDetailModel = toOrgDataSetDetailModel(jsonDataModel);
+            orgDataSetDetailModel.setUpdateUser(getCurUser(request).getId());
+            params.put("json_data", toJson(orgDataSetDetailModel));
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
-
             return resultStr;
         } catch (Exception e) {
             result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
+            result.setErrorMsg("系统出错!");
             return result;
         }
     }
@@ -230,18 +240,18 @@ public class OrgDataSetController {
      */
     @RequestMapping("searchOrgDataSets")
     @ResponseBody
-    public Object searchOrgDataSets(String orgCode, String codeOrName, int page, int rows) {
+    public Object searchOrgDataSets(String organizationCode, String codeOrName, int page, int rows) {
         String url = "/adapter/org/data_sets";
         String resultStr = "";
         Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
 
-        if(StringUtils.isEmpty(orgCode)){
+        if(StringUtils.isEmpty(organizationCode)){
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("机构代码不能为空");
             return envelop;
         }
-        String filters = "organization="+orgCode;
+        String filters = "organization="+organizationCode;
         if(!StringUtils.isEmpty(codeOrName)){
             filters += " g1;code?"+codeOrName+" g2;name?"+codeOrName+" g2";
         }
@@ -315,16 +325,17 @@ public class OrgDataSetController {
      */
     @RequestMapping(value = "createOrgMetaData", produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public Object createOrgMetaData(String jsonDataModel) {
+    public Object createOrgMetaData(String jsonDataModel, HttpServletRequest request) {
         String url="/adapter/org/meta_data";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("json_data",jsonDataModel);
 
         try{
+            OrgMetaDataDetailModel orgMetaDataDetailModel = toOrgMetaDataDetailModel(jsonDataModel);
+            orgMetaDataDetailModel.setCreateUser(getCurUser(request).getId());
+            params.put("json_data",toJson(orgMetaDataDetailModel));
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
-
             return resultStr;
         } catch (Exception e) {
             result.setSuccessFlg(false);
@@ -339,22 +350,22 @@ public class OrgDataSetController {
      */
     @RequestMapping(value = "updateOrgMetaData", produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public Object updateOrgMetaData(String jsonDataModel) {
-        //todo：缺少userid信息
+    public Object updateOrgMetaData(String jsonDataModel, HttpServletRequest request) {
         String url="/adapter/org/meta_data";
         String resultStr = "";
         Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
         try{
-            params.put("json_data", jsonDataModel);
+            OrgMetaDataDetailModel orgMetaDataDetailModel = toOrgMetaDataDetailModel(jsonDataModel);
+            orgMetaDataDetailModel.setUpdateUser(getCurUser(request).getId());
+            params.put("json_data", toJson(orgMetaDataDetailModel));
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
             return resultStr;
         } catch (Exception e) {
             envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            envelop.setErrorMsg("系统出错！");
             return envelop;
         }
-
     }
 
     /**
@@ -391,12 +402,12 @@ public class OrgDataSetController {
      */
     @RequestMapping("searchOrgMetaDatas")
     @ResponseBody
-    public Object searchOrgMetaDatas(String orgCode,Integer orgDataSetSeq, String codeOrName, int page, int rows) {
+    public Object searchOrgMetaDatas(String organizationCode,Integer orgDataSetSeq, String codeOrName, int page, int rows) {
         String url = "/adapter/org/meta_datas";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        String filters = "orgDataSet="+orgDataSetSeq+" g1;organization="+orgCode+" g2";
+        String filters = "orgDataSet="+orgDataSetSeq+" g1;organization="+organizationCode+" g2";
         if (!StringUtils.isEmpty(codeOrName)){
             filters += ";code?"+codeOrName+" g4;name?"+codeOrName+" g4";
         }
@@ -415,5 +426,21 @@ public class OrgDataSetController {
         }
     }
 
+    private OrgDataSetDetailModel toOrgDataSetDetailModel(String json) throws IOException {
+        return objectMapper.readValue(json, OrgDataSetDetailModel.class);
+    }
 
+    private OrgMetaDataDetailModel toOrgMetaDataDetailModel(String json) throws IOException {
+        return objectMapper.readValue(json, OrgMetaDataDetailModel.class);
+    }
+
+    private String toJson(Object obj) throws JsonProcessingException {
+
+        return objectMapper.writeValueAsString(obj);
+    }
+
+    private UserDetailModel getCurUser(HttpServletRequest request){
+
+        return (UserDetailModel)request.getSession().getAttribute(SessionAttributeKeys.CurrentUser);
+    }
 }

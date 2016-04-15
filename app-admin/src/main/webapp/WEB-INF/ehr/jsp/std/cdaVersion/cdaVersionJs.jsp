@@ -52,7 +52,7 @@
 							{display: '版本号', name: 'version', width: '15%', align: 'left'},
 							{display: '版本名称', name: 'versionName', width: '10%', align: 'center'},
 							{display: '创建者', name: 'author', width: '15%',align:'left'},
-							{display: '创建时间', name: 'commitTime', width: '15%', align: 'left'},
+							{display: '发布时间', name: 'commitTime', width: '15%', align: 'left'},
 							{display: '继承版本', name: 'baseVersion', width: '15%', align: 'left'},
 							{display: '状态码', name: 'inStage', align: 'left',hide: true},
 							{display: '状态', name: 'inStage', width: '15%', align: 'center',
@@ -73,8 +73,8 @@
 //											+'<div class="grid_delete" name="delete_click" style="margin-left: 90px;cursor:pointer; title="删除"' +
 //											' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "cdaVersion:del", row.version,row.inStage,0) + '"></div>';
 //								}
-								html ='<a class="grid_edit" name="delete_click" style="" title="编辑" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "cdaVersion:commitVersion", row.version,row.inStage,0) + '"></a>'
-											+'<a class="grid_delete" name="delete_click" style="" title="删除"' +
+								//html ='<a class="grid_edit" name="delete_click" style="" title="编辑" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "cdaVersion:commitVersion", row.version,row.inStage,0) + '"></a>'
+								html ='<a class="grid_delete" name="delete_click" style="" title="删除"' +
 											' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "cdaVersion:del", row.version,row.inStage,0) + '"></a>';
 								return html;
 								}

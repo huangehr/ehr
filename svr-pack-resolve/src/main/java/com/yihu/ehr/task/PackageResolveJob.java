@@ -6,9 +6,9 @@ import com.yihu.ehr.feign.XPackageMgrClient;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.mq.MessageBuffer;
-import com.yihu.ehr.profile.core.Profile;
+import com.yihu.ehr.profile.core.structured.StructuredProfile;
 import com.yihu.ehr.profile.persist.repo.ProfileRepository;
-import com.yihu.ehr.service.PackageResolveEngine;
+import com.yihu.ehr.service.PackageResolver;
 import com.yihu.ehr.util.log.LogService;
 import org.quartz.InterruptableJob;
 import org.quartz.JobExecutionContext;
@@ -50,16 +50,16 @@ public class PackageResolveJob implements InterruptableJob {
             LogService.getLogger().info("Quartz job: resolve package " + pack.getId());
 
             XPackageMgrClient packageMgrClient = SpringContext.getService(XPackageMgrClient.class);
-            PackageResolveEngine resolver = SpringContext.getService(PackageResolveEngine.class);
+            PackageResolver resolver = SpringContext.getService(PackageResolver.class);
             ProfileRepository profileRepository = SpringContext.getService(ProfileRepository.class);
 
             String zipFile = downloadTo(pack.getRemotePath());
 
-            Profile profile = resolver.doResolve(pack, zipFile);
-            profileRepository.saveStructedProfile(profile);
+            StructuredProfile structuredProfile = resolver.doResolve(pack, zipFile);
+            profileRepository.save(structuredProfile);
 
             packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
-                    "Identity: " + profile.getDemographicId() + ", profile: " + profile.getId());
+                    "Identity: " + structuredProfile.getDemographicId() + ", profile: " + structuredProfile.getId());
         } catch (Exception e) {
             LogService.getLogger().error(e.getMessage());
         }

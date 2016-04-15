@@ -8,8 +8,8 @@ import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.profile.MProfile;
-import com.yihu.ehr.profile.core.ProfileDataSet;
-import com.yihu.ehr.profile.core.StructedProfile;
+import com.yihu.ehr.profile.core.structured.StructuredDataSet;
+import com.yihu.ehr.profile.core.structured.StructuredProfile;
 import com.yihu.ehr.profile.persist.repo.ProfileRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -49,22 +49,22 @@ public class SanofiEndPoint {
         ObjectMapper objectMapper = SpringContext.getService("objectMapper");
         ObjectNode root = objectMapper.createObjectNode();
 
-        List<StructedProfile> profiles = new ArrayList<>();
+        List<StructuredProfile> profiles = new ArrayList<>();
         for (String id : profileList){
-            StructedProfile structedProfile = profileRepo.findOne(id, false, false);
+            StructuredProfile structedProfile = profileRepo.findOne(id, false, false);
             profiles.add(structedProfile);
         }
 
-        for (StructedProfile profile : profiles){
+        for (StructuredProfile profile : profiles){
             convert(root, profile);
         }
 
         return root.toString();
     }
 
-    private void convert(ObjectNode root, StructedProfile profile) throws IOException {
+    private void convert(ObjectNode root, StructuredProfile profile) throws IOException {
         JsonNode node = null;
-        for (ProfileDataSet dataSet : profile.getDataSets()) {
+        for (StructuredDataSet dataSet : profile.getDataSets()) {
             String[] innerCodes;
             switch (dataSet.getCode()) {
                 case "HDSA00_01": { // 人口学信息
@@ -133,7 +133,7 @@ public class SanofiEndPoint {
                     continue;
             }
 
-            ProfileDataSet echoDataSet = profileRepo.findDataSet(profile.getCdaVersion(),
+            StructuredDataSet echoDataSet = profileRepo.findDataSet(profile.getCdaVersion(),
                     dataSet.getCode(),
                     dataSet.getRecordKeys(),
                     innerCodes).getRight();

@@ -1,9 +1,11 @@
 package com.yihu.ehr.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
+import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MUser;
@@ -12,11 +14,13 @@ import com.yihu.ehr.user.feign.SecurityClient;
 import com.yihu.ehr.user.service.User;
 import com.yihu.ehr.user.service.UserManager;
 import com.yihu.ehr.util.controller.BaseRestController;
-import com.yihu.ehr.util.encode.HashUtil;
+import com.yihu.ehr.util.encode.*;
+import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.csource.common.MyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
@@ -24,6 +28,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.net.URLDecoder;
 import java.text.ParseException;
 import java.util.*;
 
@@ -48,6 +54,9 @@ public class UserController extends BaseRestController {
 
     @Autowired
     private ConventionalDictClient conventionalDictClient;
+
+    @Autowired
+    private FastDFSUtil fastDFSUtil;
 
     @RequestMapping(value = RestApi.Users.Users, method = RequestMethod.GET)
     @ApiOperation(value = "获取用户列表", notes = "根据查询条件获取用户列表在前端表格展示")
@@ -226,28 +235,121 @@ public class UserController extends BaseRestController {
         return userManager.getUserByIdCardNo(idCardNo) != null;
     }
 
-    @RequestMapping(value = RestApi.Users.UserAdminContact, method = RequestMethod.DELETE)
-    @ApiOperation(value = "用户联系方式解绑", notes = "将用户电话或邮件地址设置为空")
-    public boolean delteContact(
-            @ApiParam(name = "user_id", value = "", defaultValue = "")
-            @PathVariable(value = "user_id") String userId,
-            @ApiParam(name = "type", value = "", defaultValue = "")
-            @RequestParam(value = "type") String type) {
-        User user = userManager.getUser(userId);
-        if (type.equals("tel")) {
-            user.setTelephone("");
-        } else {
-            user.setEmail("");
-        }
-
-        userManager.saveUser(user);
-        return true;
-    }
+//    @RequestMapping(value = RestApi.Users.UserAdminContact, method = RequestMethod.DELETE)
+//    @ApiOperation(value = "用户联系方式解绑", notes = "将用户电话或邮件地址设置为空")
+//    public boolean delteContact(
+//            @ApiParam(name = "user_id", value = "", defaultValue = "")
+//            @PathVariable(value = "user_id") String userId,
+//            @ApiParam(name = "type", value = "", defaultValue = "")
+//            @RequestParam(value = "type") String type) {
+//        User user = userManager.getUser(userId);
+//        if (type.equals("tel")) {
+//            user.setTelephone("");
+//        } else {
+//            user.setEmail("");
+//        }
+//
+//        userManager.saveUser(user);
+//        return true;
+//    }
 
     @RequestMapping(value = RestApi.Users.UserEmailNoExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断用户邮件是否存在")
     public boolean isEmailExists(@RequestParam(value = "email") String email) {
 
         return userManager.getUserByEmail(email) != null;
+    }
+
+
+    /**
+     * 用户头像图片上传
+     * @return
+     * @throws IOException
+     */
+    @RequestMapping(value = "/user/picture",method = RequestMethod.POST)
+    @ApiOperation(value = "上传头像,把图片转成流的方式发送")
+    public String uploadPicture(
+            @ApiParam(name = "jsonData", value = "头像转化后的输入流")
+            @RequestBody String jsonData ) throws IOException {
+        if(jsonData == null){
+            return null;
+        }
+        String date = URLDecoder.decode(jsonData,"UTF-8");
+
+        String[] fileStreams = date.split(",");
+        String is = URLDecoder.decode(fileStreams[0],"UTF-8").replace(" ","+");
+        byte[] in = com.yihu.ehr.util.encode.Base64.decode(is);
+
+        String pictureName = fileStreams[1].substring(0,fileStreams[1].length()-1);
+        String fileExtension = pictureName.substring(pictureName.lastIndexOf(".") + 1).toLowerCase();
+        String description = null;
+        if ((pictureName != null) && (pictureName.length() > 0)) {
+            int dot = pictureName.lastIndexOf('.');
+            if ((dot > -1) && (dot < (pictureName.length()))) {
+                description = pictureName.substring(0, dot);
+            }
+        }
+        String path = null;
+        try {
+
+            InputStream inputStream = new ByteArrayInputStream(in);
+            ObjectNode objectNode = fastDFSUtil.upload(inputStream, fileExtension, description);
+            String groupName = objectNode.get("groupName").toString();
+            String remoteFileName = objectNode.get("remoteFileName").toString();
+            path = "{\"groupName\":" + groupName + ",\"remoteFileName\":" + remoteFileName + "}";
+
+        } catch (Exception e) {
+            LogService.getLogger(User.class).error("人口头像图片上传失败；错误代码："+e);
+        }
+        //返回文件路径
+        return path;
+    }
+
+
+    /**
+     * 用户头像图片下载
+     * @return
+     * @throws IOException
+     * @throws MyException
+     */
+    @RequestMapping(value = "/user/picture",method = RequestMethod.GET)
+    @ApiOperation(value = "下载头像")
+    public String downloadPicture(
+            @ApiParam(name = "user_id", value = "病人主键，和身份证号一致")
+            @RequestParam(value = "user_id") String userId ,
+            @ApiParam(name = "group_name", value = "分组", defaultValue = "")
+            @RequestParam(value = "group_name") String groupName,
+            @ApiParam(name = "remote_file_name", value = "服务器头像名称", defaultValue = "")
+            @RequestParam(value = "remote_file_name") String remoteFileName) throws Exception {
+
+        String splitMark = System.getProperty("file.separator");
+        String strPath = System.getProperty("java.io.tmpdir");
+
+        strPath += splitMark + "userImages" + splitMark + remoteFileName;
+
+        File file = new File(strPath);
+        String path = String.valueOf(file.getParentFile());
+        if (!file.getParentFile().exists()) {
+            file.getParentFile().mkdirs();
+        }
+        User user = userManager.getUser(userId);
+        if (!StringUtils.isEmpty(user.getImgLocalPath())) {
+            File fileName = new File(user.getImgLocalPath());
+            if (fileName.exists()) {
+                return user.getImgLocalPath();
+            }
+        }
+        //调用图片下载方法，返回文件的储存位置localPath，将localPath保存至人口信息表
+        String localPath = null;
+        try {
+            localPath = fastDFSUtil.download(groupName, remoteFileName, path);
+            user.setImgLocalPath(localPath);
+            userManager.saveUser(user);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (MyException e) {
+            LogService.getLogger(User.class).error("用户头像图片下载失败；错误代码：" + e);
+        }
+        return localPath;
     }
 }

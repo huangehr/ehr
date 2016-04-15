@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -62,11 +63,16 @@ public class LoginController extends BaseUIController {
             Envelop envelop = getEnvelop(resultStr);
             UserDetailModel userDetailModel =getEnvelopModel(envelop.getObj(),UserDetailModel.class);
 
+//            判断用户是否登入成功
             if (envelop.isSuccessFlg()){
                 String lastLoginTime = null;
 
-                if(!userDetailModel.getActivated()){
+//                判断用户密码是否初始密码
+                if (password.equals("123456"))
+                    model.addAttribute("defaultPassWord",true);
 
+//                判断用户是否失效
+                if(!userDetailModel.getActivated()){
                     model.addAttribute("userName", userName);
                     model.addAttribute("successFlg", false);
                     model.addAttribute("failMsg", "该用户已失效，请联系系统管理员重新生效。");
@@ -88,11 +94,13 @@ public class LoginController extends BaseUIController {
                 request.getSession().setAttribute("last_login_time", lastLoginTime);
                 //update lastLoginTime
                 userDetailModel.setLastLoginTime(now);
-                url="/users/";
+                url="/user";
                 MultiValueMap<String, String> conditionMap = new LinkedMultiValueMap<>();
-                conditionMap.add("user_json_data", toJson(userDetailModel));
+                conditionMap.add("user_json_datas", toJson(userDetailModel));
+                conditionMap.add("inputStream", "");
+                conditionMap.add("imageName", "");
                 RestTemplates templates = new RestTemplates();
-                resultStr = templates.doPut(comUrl + url,conditionMap);
+                resultStr = templates.doPost(comUrl + url,conditionMap);
                 return "redirect:/index";
             }else{
 

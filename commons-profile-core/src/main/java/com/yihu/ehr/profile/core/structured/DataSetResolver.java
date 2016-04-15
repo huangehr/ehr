@@ -1,12 +1,11 @@
-package com.yihu.ehr.profile.core;
+package com.yihu.ehr.profile.core.structured;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.yihu.ehr.profile.core.lightweight.LightWeightDataSet;
+import com.yihu.ehr.profile.core.lightweight.LightWeightProfile;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -27,8 +26,8 @@ public class DataSetResolver {
      * @param isOrigin
      * @return
      */
-    public ProfileDataSet parseStructuredJsonDataSet(JsonNode jsonNode, boolean isOrigin) {
-        ProfileDataSet dataSet = new ProfileDataSet();
+    public StructuredDataSet parseStructuredJsonDataSet(JsonNode jsonNode, boolean isOrigin) {
+        StructuredDataSet dataSet = new StructuredDataSet();
 
         try {
             assert jsonNode != null;
@@ -82,37 +81,16 @@ public class DataSetResolver {
     }
 
 
-
-    /**
-     * 非结构化档案报数据集处理
-     * @param profile
-     * @param files
-     * @throws JsonProcessingException
-     * @throws ParseException
-     */
-    public void  parseUnStructuredJsonDataSet(Profile profile, File[] files) throws JsonProcessingException, ParseException {
-
-        for (File file : files) {
-            String filePath = file.getPath();
-            String lastName = filePath.substring(filePath.lastIndexOf("\\")+1);
-            if (lastName.equals("document")) {
-                //这里把图片保存的fastdfs
-            }
-
-        }
-    }
-
-
     /**
      * 轻量级档案包数据集处理
-     * @param profile
+     * @param lightWeightProfile
      * @param jsonNode
      * @throws JsonProcessingException
      * @throws ParseException
      */
-    public void  parseLightJsonDataSet(Profile profile,JsonNode jsonNode) throws JsonProcessingException, ParseException {
+    public void  parseLightJsonDataSet(LightWeightProfile lightWeightProfile, JsonNode jsonNode) throws JsonProcessingException, ParseException {
 
-        ProfileDataSet profileDataSet = new ProfileDataSet();
+        LightWeightDataSet lightWeightDataSet = new LightWeightDataSet();
         String version = jsonNode.get("inner_version").asText();
         String eventNo = jsonNode.get("event_no").asText();
         String patientId = jsonNode.get("patient_id").asText();
@@ -122,21 +100,21 @@ public class DataSetResolver {
         JsonNode dataSets = jsonNode.get("dataset");
         Iterator<Map.Entry<String, JsonNode>> iterator = dataSets.fields();
         while (iterator.hasNext()) {
-            profile.setPatientId(patientId);
-            profile.setEventNo(eventNo);
-            profile.setOrgCode(orgCode);
-            profile.setCdaVersion(version);
+            lightWeightProfile.setPatientId(patientId);
+            lightWeightProfile.setEventNo(eventNo);
+            lightWeightProfile.setOrgCode(orgCode);
+            lightWeightProfile.setCdaVersion(version);
 
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-            profile.setEventDate(format.parse(eventDate));
+            lightWeightProfile.setEventDate(format.parse(eventDate));
 
             Map.Entry<String, JsonNode> map = iterator.next();
             String code = map.getKey();
             String path = map.getValue().asText();
-            profileDataSet.setCode(code);
-            profileDataSet.setRemotePath(path);
-            //profile.addDataSet(code,profileDataSet);
+            lightWeightDataSet.setCode(code);
+            lightWeightDataSet.setRemotePath(path);
+            lightWeightProfile.addDataSet(code, lightWeightDataSet);
         }
     }
 

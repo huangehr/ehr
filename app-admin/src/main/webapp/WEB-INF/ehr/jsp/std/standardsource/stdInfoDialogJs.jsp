@@ -76,6 +76,9 @@
                 });
 
                 this.$btnSave.click(function () {
+
+                    var dialog = $.ligerDialog.waitting("正在保存数据...");
+
                     var values = self.$form.Fields.getValues();
                     if(!validator.validate()){
                         return;
@@ -103,6 +106,9 @@
                         error: function () {
                             $.Notice.error( '对不起，更新失败，请联系管理员。');
                             self.$btnSave.removeAttr('disabled');
+                        },
+                        complete:function(){
+                            dialog.close();
                         }
                     });
                 });

@@ -13,14 +13,13 @@ import com.yihu.ehr.model.profile.MRecord;
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import com.yihu.ehr.profile.config.CdaDocumentOptions;
-import com.yihu.ehr.profile.core.DataSetTableOption;
-import com.yihu.ehr.profile.core.ProfileDataSet;
-import com.yihu.ehr.profile.core.StructedProfile;
+import com.yihu.ehr.profile.core.commons.DataSetTableOption;
+import com.yihu.ehr.profile.core.structured.StructuredDataSet;
+import com.yihu.ehr.profile.core.structured.StructuredProfile;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.persist.ProfileIndices;
 import com.yihu.ehr.profile.persist.repo.ProfileRepository;
 import com.yihu.ehr.profile.persist.repo.XProfileIndicesRepo;
-import com.yihu.ehr.profile.service.ProfileDataSetSerializer;
 import com.yihu.ehr.profile.service.TemplateService;
 import com.yihu.ehr.schema.OrgKeySchema;
 import com.yihu.ehr.schema.StdKeySchema;
@@ -102,14 +101,14 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         List<ProfileIndices> profileIndices = profileIndicesRepo.findByDemographicIdAndEventDateBetween(
                 demographicId, since, to);
 
-        List<StructedProfile> profiles = new ArrayList<>();
+        List<StructuredProfile> profiles = new ArrayList<>();
         for (ProfileIndices indices : profileIndices) {
-            StructedProfile profile = profileRepo.findOne(indices.getRowkey(), loadStdDataSet, loadOriginDataSet);
+            StructuredProfile profile = profileRepo.findOne(indices.getRowkey(), loadStdDataSet, loadOriginDataSet);
             profiles.add(profile);
         }
 
         List<MProfile> profileList = new ArrayList<>();
-        for (StructedProfile profile : profiles) {
+        for (StructuredProfile profile : profiles) {
             MProfile mProfile = convertProfile(profile);
 
             profileList.add(mProfile);
@@ -127,7 +126,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "load_std_data_set") boolean loadStdDataSet,
             @ApiParam(value = "是否加载原始数据集", defaultValue = "false")
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws IOException, ParseException {
-        StructedProfile profile = profileRepo.findOne(profileId, loadStdDataSet, loadOriginDataSet);
+        StructuredProfile profile = profileRepo.findOne(profileId, loadStdDataSet, loadOriginDataSet);
 
         return convertProfile(profile);
     }
@@ -143,7 +142,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "load_std_data_set") boolean loadStdDataSet,
             @ApiParam(value = "是否加载原始数据集", defaultValue = "false")
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws IOException, ParseException {
-        StructedProfile profile = profileRepo.findOne(profileId, loadStdDataSet, loadOriginDataSet);
+        StructuredProfile profile = profileRepo.findOne(profileId, loadStdDataSet, loadOriginDataSet);
         Collection<MCDADocument> cdaDocuments = getCustomizedCDADocuments(profile);
 
         return convertDocument(profile, cdaDocuments, documentId);
@@ -152,10 +151,10 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     /**
      * 此类目下卫生机构定制的CDA文档列表
      */
-    private Collection<MCDADocument> getCustomizedCDADocuments(StructedProfile profile){
+    private Collection<MCDADocument> getCustomizedCDADocuments(StructuredProfile profile){
         // 使用CDA类别关键数据元映射，取得与此档案相关联的CDA类别ID
         String cdaType = null;
-        for (ProfileDataSet dataSet : profile.getDataSets()){
+        for (StructuredDataSet dataSet : profile.getDataSets()){
             if(cdaDocumentOptions.isPrimaryDataSet(dataSet.getCode())){
                 cdaType = cdaDocumentOptions.getCdaDocumentTypeId(dataSet.getCode());
                 break;
@@ -178,7 +177,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return cdaDocuments;
     }
 
-    private MProfile convertProfile(StructedProfile profile){
+    private MProfile convertProfile(StructuredProfile profile){
         MProfile mProfile = new MProfile();
         mProfile.setId(profile.getId());
         mProfile.setCdaVersion(profile.getCdaVersion());
@@ -227,7 +226,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return mProfile;
     }
 
-    private MProfileDocument convertDocument(StructedProfile profile, Collection<MCDADocument> cdaDocuments, String documentId){
+    private MProfileDocument convertDocument(StructuredProfile profile, Collection<MCDADocument> cdaDocuments, String documentId){
         for (MCDADocument cdaDocument : cdaDocuments) {
             if (!cdaDocument.getId().equals(documentId)) continue;
 
@@ -258,7 +257,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return null;
     }
 
-    private void addDataset(String version, MProfileDocument document, ProfileDataSet dataSet) {
+    private void addDataset(String version, MProfileDocument document, StructuredDataSet dataSet) {
         if (dataSet != null) {
             String dataSetCode = DataSetTableOption.standardDataSetCode(dataSet.getCode());
 

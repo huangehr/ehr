@@ -1,18 +1,25 @@
 package com.yihu.ehr.adapter.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.thirdpartystandard.OrgDictDetailModel;
+import com.yihu.ehr.agModel.thirdpartystandard.OrgDictEntryDetailModel;
+import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +37,8 @@ public class OrgDictController {
     private String password;
     @Value("${service-gateway.url}")
     private String comUrl;
+    @Autowired
+    ObjectMapper objectMapper;
 
     @RequestMapping("initial")
     public String orgDictInit() {
@@ -148,14 +157,15 @@ public class OrgDictController {
      */
     @RequestMapping(value = "createOrgDict",produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public Object createOrgDict(String jsonDataModel){
-        // todo: 缺少userid字段信息
+    public Object createOrgDict(String jsonDataModel, HttpServletRequest request){
         String url="/adapter/org/dict";
         String resultStr = "";
         Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
         try{
-            params.put("json_data",jsonDataModel);
+            OrgDictDetailModel orgDictDetailModel = toOrgDictDetailModel(jsonDataModel);
+            orgDictDetailModel.setCreateUser(getCurUser(request).getId());
+            params.put("json_data", toJson(orgDictDetailModel));
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
 
             return resultStr;
@@ -199,14 +209,16 @@ public class OrgDictController {
      */
     @RequestMapping(value="updateOrgDict",produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public Object updateOrgDict(String jsonDataModel) {
+    public Object updateOrgDict(String jsonDataModel, HttpServletRequest request) {
 
         String url="/adapter/org/dict";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         try{
-            params.put("json_data",jsonDataModel);
+            OrgDictDetailModel orgDictDetailModel = toOrgDictDetailModel(jsonDataModel);
+            orgDictDetailModel.setUpdateUser(getCurUser(request).getId());
+            params.put("json_data",toJson(orgDictDetailModel));
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
 
             return resultStr;
@@ -227,13 +239,13 @@ public class OrgDictController {
      */
     @RequestMapping("searchOrgDicts")
     @ResponseBody
-    public Object searchOrgDicts(String orgCode,String codeOrName,int page, int rows) {
+    public Object searchOrgDicts(String organizationCode,String codeOrName,int page, int rows) {
         String url = "/adapter/org/dicts";
         String resultStr = "";
         Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
 
-        String filters = "organization="+orgCode;
+        String filters = "organization="+organizationCode;
         if(!StringUtils.isEmpty(codeOrName)){
             filters += " g1;code?"+codeOrName+" g2;name?"+codeOrName+" g2";
         }
@@ -260,7 +272,6 @@ public class OrgDictController {
      * @param id
      * @return
      */
-    //todo ： 网关没有找到该方法的对应接口
     @RequestMapping("getOrgDictItem")
     @ResponseBody
     public Object getOrgDictItem(String id) {
@@ -270,7 +281,6 @@ public class OrgDictController {
         Map<String, Object> params = new HashMap<>();
         params.put("id",id);
         try{
-            //todo 后台转换成model后传前台
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
 //            ObjectMapper mapper = new ObjectMapper();
 //            OrgDictItemModel orgDictItemModel = mapper.readValue(resultStr, OrgDictItemModel.class);
@@ -306,15 +316,18 @@ public class OrgDictController {
      */
     @RequestMapping(value="createOrgDictItem",produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public Object createOrgDictItem(String jsonDataModel){
+    public Object createOrgDictItem(String jsonDataModel, HttpServletRequest request){
 
         String url="/adapter/org/item";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("json_data",jsonDataModel);
+
 
         try{
+            OrgDictEntryDetailModel orgDictEntryDetailModel = toOrgDictEntryDetailModel(jsonDataModel);
+            orgDictEntryDetailModel.setCreateUser(getCurUser(request).getId());
+            params.put("json_data", toJson(orgDictEntryDetailModel));
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
 
             return resultStr;
@@ -419,13 +432,15 @@ public class OrgDictController {
      */
     @RequestMapping(value="updateDictItem",produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public Object updateDictItem(String jsonDataModel) {
+    public Object updateDictItem(String jsonDataModel, HttpServletRequest request) {
         String url="/adapter/org/item";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         try{
-            params.put("json_data",jsonDataModel);
+            OrgDictEntryDetailModel orgDictEntryDetailModel = toOrgDictEntryDetailModel(jsonDataModel);
+            orgDictEntryDetailModel.setUpdateUser(getCurUser(request).getId());
+            params.put("json_data", toJson(orgDictEntryDetailModel));
             resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
 
             return resultStr;
@@ -446,13 +461,13 @@ public class OrgDictController {
      */
     @RequestMapping("searchOrgDictItems")
     @ResponseBody
-    public Object searchOrgDictItems(Integer orgDictSeq,String orgCode,String codeOrName,int page, int rows) {
+    public Object searchOrgDictItems(Integer orgDictSeq,String organizationCode,String codeOrName,int page, int rows) {
         String url = "/adapter/org/items";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
 
-        String filters = "orgDict="+orgDictSeq+" g1;organization="+orgCode+" g2";
+        String filters = "orgDict="+orgDictSeq+" g1;organization="+organizationCode+" g2";
         if (!StringUtils.isEmpty(codeOrName)){
             filters += ";code?"+codeOrName+" g4;name?"+codeOrName+" g4";
         }
@@ -493,4 +508,21 @@ public class OrgDictController {
 //    }
 
 
+    private OrgDictDetailModel toOrgDictDetailModel(String json) throws IOException {
+        return objectMapper.readValue(json, OrgDictDetailModel.class);
+    }
+
+    private OrgDictEntryDetailModel toOrgDictEntryDetailModel(String json) throws IOException {
+        return objectMapper.readValue(json, OrgDictEntryDetailModel.class);
+    }
+
+    private String toJson(Object obj) throws JsonProcessingException {
+
+        return objectMapper.writeValueAsString(obj);
+    }
+
+    private UserDetailModel getCurUser(HttpServletRequest request){
+
+        return (UserDetailModel)request.getSession().getAttribute(SessionAttributeKeys.CurrentUser);
+    }
 }

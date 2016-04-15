@@ -6,10 +6,16 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
+import com.yihu.ehr.util.RestTemplates;
+import com.yihu.ehr.util.controller.BaseUIController;
+import com.yihu.ehr.util.encode.Base64;
 import com.yihu.ehr.util.log.LogService;
+import org.apache.commons.lang.ArrayUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,11 +24,9 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,7 +38,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/user")
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
-public class UserController {
+public class UserController extends BaseUIController {
     public static final String GroupField = "groupName";
     public static final String RemoteFileField = "remoteFileName";
     public static final String FileIdField = "fid";
@@ -162,18 +166,37 @@ public class UserController {
         String url = "/users/";
         String resultStr = "";
         Envelop envelop = new Envelop();
-        Map<String, Object> params = new HashMap<>();
+//        Map<String, Object> params = new HashMap<>();
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         ObjectMapper mapper = new ObjectMapper();
+        RestTemplates templates = new RestTemplates();
 
         String userJsonDataModel = URLDecoder.decode(userModelJsonData,"UTF-8");
         UserDetailModel userDetailModel = mapper.readValue(userJsonDataModel, UserDetailModel.class);
 
-        params.put("user_json_data", userJsonDataModel);
+        request.setCharacterEncoding("UTF-8");
+        InputStream inputStream = request.getInputStream();
+        String imageName = request.getParameter("name");
+
+        int temp = 0;
+        byte[] tempBuffer = new byte[1024];
+        byte[] fileBuffer = new byte[0];
+        while ((temp = inputStream.read(tempBuffer)) != -1) {
+            fileBuffer = ArrayUtils.addAll(fileBuffer,ArrayUtils.subarray(tempBuffer,0,temp));
+        }
+        inputStream.close();
+
+        String restStream = Base64.encode(fileBuffer);
+        String imageStream = URLEncoder.encode(restStream,"UTF-8");
+
+        params.add("inputStream",imageStream);
+        params.add("imageName",imageName);
+        params.add("user_json_data", userJsonDataModel);
 
         try {
             if (!StringUtils.isEmpty(userDetailModel.getId())) {
                 //修改
-                String getUser = HttpClientUtil.doGet(comUrl + "/users/admin/"+userDetailModel.getId(), params, username, password);
+                String getUser = templates.doGet(comUrl + "/users/admin/"+userDetailModel.getId());
                 envelop = mapper.readValue(getUser,Envelop.class);
                 String userJsonModel = mapper.writeValueAsString(envelop.getObj());
                 UserDetailModel userModel = mapper.readValue(userJsonModel,UserDetailModel.class);
@@ -191,11 +214,11 @@ public class UserController {
                 }
 
                 userJsonDataModel = mapper.writeValueAsString(userModel);
-                params.put("user_json_data", userJsonDataModel);
+                params.add("user_json_datas", userJsonDataModel);
 
-                resultStr = HttpClientUtil.doPut(comUrl + url, params, username, password);
+                resultStr = templates.doPost(comUrl + "/user", params);
             }else{
-                resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
+                resultStr = templates.doPost(comUrl + url, params);
             }
         } catch (Exception e) {
             envelop.setSuccessFlg(false);
@@ -241,7 +264,6 @@ public class UserController {
         params.put("userId", userId);
         try {
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-
             model.addAttribute("allData", resultStr);
             model.addAttribute("mode", mode);
             model.addAttribute("contentPage", "user/userInfoDialog");
@@ -374,5 +396,7 @@ public class UserController {
 
         return envelop;
     }
+
+
 
 }

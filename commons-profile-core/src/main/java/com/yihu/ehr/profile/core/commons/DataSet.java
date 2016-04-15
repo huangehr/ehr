@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.core;
+package com.yihu.ehr.profile.core.commons;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,7 +6,10 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.lang.SpringContext;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * 档案数据集。
@@ -15,7 +18,7 @@ import java.util.*;
  * @version 1.0
  * @created 2015.08.16 11:13
  */
-public class ProfileDataSet {
+public class DataSet {
     private String code;
     private String name;
     private String patientId;
@@ -23,12 +26,9 @@ public class ProfileDataSet {
     private String orgCode;
     private String orgName;
     private String cdaVersion;
-    private String remotePath;
 
-    private Map<String, Map<String, String>> records = new TreeMap<>();
+    private Map<String, Map<String, String>> records = new HashMap<>();
 
-    public ProfileDataSet() {
-    }
 
     public Set<String> getRecordKeys() {
         return this.records.keySet();
@@ -54,16 +54,23 @@ public class ProfileDataSet {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getOrgCode() {
         return orgCode;
+    }
+
+    public void setOrgCode(String orgCode) {
+        this.orgCode = orgCode;
     }
 
     public String getOrgName() {
         return orgName;
     }
-
-    public void setOrgCode(String orgCode) {
-        this.orgCode = orgCode;
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
     }
 
     public String getPatientId() {
@@ -80,14 +87,6 @@ public class ProfileDataSet {
 
     public void setEventNo(String eventNo) {
         this.eventNo = eventNo;
-    }
-
-    public String getRemotePath() {
-        return remotePath;
-    }
-
-    public void setRemotePath(String remotePath) {
-        this.remotePath = remotePath;
     }
 
     public void addRecord(String recordKey, Map<String, String> record) {
