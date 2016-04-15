@@ -642,15 +642,16 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public int copyAdapterDataSet(Long planId, String[] metaIds) {
+    public int copyAdapterDataSet(OrgAdapterPlan orgAdapterPlan, String[] metaIds) {
         Session s = currentSession();
+        String metaTable = CDAVersionUtil.getMetaDataTableName(orgAdapterPlan.getVersion());
         String sql =
                 " insert into healtharchive.adapter_dataset " +
                         " (plan_id, std_dataset, std_metadata, std_dict) " +
                         "SELECT  " +
                         "   :planId as plan_id, meta.dataset_id as std_dataset, meta.id as std_metadata,  meta.dict_id as std_dict " +
                         "FROM" +
-                        "   std_meta_data_000000000000 meta " +
+                        "   "+metaTable+" meta " +
                         "LEFT JOIN" +
                         "   (SELECT * FROM adapter_dataset WHERE plan_id=:planId) adt " +
                         "ON" +
@@ -658,7 +659,7 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
                         "WHERE" +
                         "   adt.id IS NULL AND meta.id in(:metaIds) ";
         Query q = s.createSQLQuery(sql);
-        q.setParameter("planId", planId);
+        q.setParameter("planId", orgAdapterPlan.getId());
         q.setParameterList("metaIds", metaIds);
         int rs = q.executeUpdate();
         return rs;

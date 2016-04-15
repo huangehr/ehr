@@ -5,6 +5,7 @@ import com.yihu.ehr.adaption.adapterorg.service.AdapterOrgService;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSet;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSetService;
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.transform.Transformers;
@@ -360,7 +361,7 @@ public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAd
             metaIds.add(adapter.getId());
         }
         String[] metaIdArr = metaIds.toArray(new String[metaIds.size()]);
-        List<Map> ls = findAddAdapter(planId, metaIdArr);
+        List<Map> ls = findAddAdapter(orgAdapterPlan, metaIdArr);
         AdapterDataSet adapterDataSet;
         for(Map<String, Integer> map : ls){
             adapterDataSet = new AdapterDataSet();
@@ -370,7 +371,7 @@ public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAd
             adapterDataSet.setAdapterPlanId(planId);
             adapterDataSetService.addAdapterDataSetFast(adapterDataSet, orgAdapterPlan);
         }
-        adapterDataSetService.copyAdapterDataSet(planId, metaIdArr);
+        adapterDataSetService.copyAdapterDataSet(orgAdapterPlan, metaIdArr);
     }
 
     private long parserLong(Integer i){
@@ -442,12 +443,13 @@ public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAd
         }
     }
 
-    private List<Map> findAddAdapter(Long planId, String[] metaIds){
+    private List<Map> findAddAdapter(OrgAdapterPlan orgAdapterPlan, String[] metaIds){
+        String metaTable = CDAVersionUtil.getMetaDataTableName(orgAdapterPlan.getVersion());
         String sql =
                 "SELECT  " +
                 "   meta.id as metaDataId, meta.dataset_id as dataSetId, meta.dict_id as stdDict " +
                 "FROM" +
-                "   std_meta_data_000000000000 meta " +
+                "   "+metaTable+" meta " +
                 "LEFT JOIN" +
                 "   (SELECT * FROM adapter_dataset WHERE plan_id=:planId) adt " +
                 "ON" +
@@ -456,7 +458,7 @@ public class OrgAdapterPlanService extends BaseJpaService<OrgAdapterPlan, XOrgAd
                 "   adt.id IS NULL AND meta.id in(:metaIds) ";
         Session session = currentSession();
         Query query = session.createSQLQuery(sql);
-        query.setParameter("planId", planId);
+        query.setParameter("planId", orgAdapterPlan.getId());
         query.setParameterList("metaIds", metaIds);
         query.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         return query.list();
