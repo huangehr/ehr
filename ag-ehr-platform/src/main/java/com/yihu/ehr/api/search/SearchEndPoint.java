@@ -21,10 +21,10 @@ import java.util.Date;
  * @created 2016.02.24 18:34
  */
 @RestController
-@RequestMapping(ApiVersion.Version1_0 + "/search")
+@RequestMapping(value = ApiVersion.Version1_0 + "/search", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "search", description = "搜索服务")
 public class SearchEndPoint {
-    @ApiOperation(value = "档案搜索", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "搜索健康档案")
+    @ApiOperation(value = "档案搜索", notes = "搜索健康档案")
     @RequestMapping(value = "/profiles", method = RequestMethod.GET)
     public Object searchProfiles(
             @ApiParam(required = true, name = "demographic_id", value = "患者人口学ID")
@@ -40,13 +40,13 @@ public class SearchEndPoint {
         return null;
     }
 
-    @ApiOperation(value = "患者搜索", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "搜索患者信息")
+    @ApiOperation(value = "患者搜索", notes = "搜索患者信息")
     @RequestMapping(value = "/users", method = RequestMethod.GET)
     public Object searchPatients() {
         return null;
     }
 
-    @ApiOperation(value = "组织机构搜索", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "组织机构搜索")
+    @ApiOperation(value = "组织机构搜索", notes = "组织机构搜索")
     @RequestMapping(value = "/organization", method = RequestMethod.GET)
     public Object searchOrganizations() {
         return null;

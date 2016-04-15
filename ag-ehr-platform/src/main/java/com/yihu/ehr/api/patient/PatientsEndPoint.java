@@ -7,8 +7,8 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.feign.PatientClient;
 import com.yihu.ehr.model.patient.MDemographicInfo;
-import com.yihu.ehr.profile.core.ProfileDataSet;
-import com.yihu.ehr.profile.core.DataSetResolver;
+import com.yihu.ehr.profile.core.structured.StructuredDataSet;
+import com.yihu.ehr.profile.core.structured.DataSetResolver;
 import com.yihu.ehr.util.DateFormatter;
 import com.yihu.ehr.util.IdValidator;
 import io.swagger.annotations.Api;
@@ -32,7 +32,7 @@ import java.util.Map;
  * @created 2016.02.03 14:15
  */
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0)
+@RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "patients", description = "患者服务")
 public class PatientsEndPoint {
     @Autowired
@@ -52,7 +52,7 @@ public class PatientsEndPoint {
             @ApiParam(name = "json", value = "患者人口学数据集")
             @RequestParam(value = "json", required = true) String patientInfo) throws IOException, ParseException {
         ObjectNode patientNode = (ObjectNode) objectMapper.readTree(patientInfo);
-        ProfileDataSet dataSet = dataSetResolver.parseStructuredJsonDataSet(patientNode, false);
+        StructuredDataSet dataSet = dataSetResolver.parseStructuredJsonDataSet(patientNode, false);
 
         for (String key : dataSet.getRecordKeys()) {
             Map<String, String> record = dataSet.getRecord(key);
@@ -99,7 +99,7 @@ public class PatientsEndPoint {
         }
     }
 
-    @ApiOperation(value = "更新患者", response = boolean.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "更新患者", response = boolean.class)
     @RequestMapping(value = "/patients/{demographic_id}", method = {RequestMethod.PATCH})
     public String updatePatient(@ApiParam(name = "demographic_id", value = "身份证号")
                                 @PathVariable(value = "demographic_id") String demographicId,

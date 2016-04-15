@@ -42,7 +42,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "users", description = "用户管理接口", tags = {"用户,登录帐号,密码"})
+@Api(value = "users", description = "用户管理接口")
 public class UserController extends BaseRestController {
 
     @Value("${default.password}")
@@ -237,23 +237,23 @@ public class UserController extends BaseRestController {
         return userManager.getUserByIdCardNo(idCardNo) != null;
     }
 
-    @RequestMapping(value = RestApi.Users.UserAdminContact, method = RequestMethod.DELETE)
-    @ApiOperation(value = "用户联系方式解绑", notes = "将用户电话或邮件地址设置为空")
-    public boolean delteContact(
-            @ApiParam(name = "user_id", value = "", defaultValue = "")
-            @PathVariable(value = "user_id") String userId,
-            @ApiParam(name = "type", value = "", defaultValue = "")
-            @RequestParam(value = "type") String type) {
-        User user = userManager.getUser(userId);
-        if (type.equals("tel")) {
-            user.setTelephone("");
-        } else {
-            user.setEmail("");
-        }
-
-        userManager.saveUser(user);
-        return true;
-    }
+//    @RequestMapping(value = RestApi.Users.UserAdminContact, method = RequestMethod.DELETE)
+//    @ApiOperation(value = "用户联系方式解绑", notes = "将用户电话或邮件地址设置为空")
+//    public boolean delteContact(
+//            @ApiParam(name = "user_id", value = "", defaultValue = "")
+//            @PathVariable(value = "user_id") String userId,
+//            @ApiParam(name = "type", value = "", defaultValue = "")
+//            @RequestParam(value = "type") String type) {
+//        User user = userManager.getUser(userId);
+//        if (type.equals("tel")) {
+//            user.setTelephone("");
+//        } else {
+//            user.setEmail("");
+//        }
+//
+//        userManager.saveUser(user);
+//        return true;
+//    }
 
     @RequestMapping(value = RestApi.Users.UserEmailNoExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断用户邮件是否存在")

@@ -26,36 +26,30 @@ import java.util.Map;
 public interface AdapterDispatchClient {
 
     @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "10000")
-    @RequestMapping(value = ApiVersion.Version1_0+"/adapter_dispatcher/org_standard_data/{org_code}", method = RequestMethod.GET)
-    @ApiOperation(value = "获取适配方案映射信息", response = RestEcho.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "获取采集标准适配方案信息，文件以Base64编码，压缩格式为zip")
+    @RequestMapping(value = ApiVersion.Version1_0 + "/adapter_dispatcher/org_standard_data/{org_code}", method = RequestMethod.GET)
     Object getSchemeMappingInfo(
             @RequestParam(value = "private_key", required = true) String privateKey,
             @RequestParam(value = "version_code", required = true) String versionCode,
             @RequestParam(value = "org_code", required = true) String orgcode);
 
-
-    @RequestMapping(value = ApiVersion.Version1_0+"/adapter_dispatcher/org_plan/version", method = RequestMethod.GET)
-    @ApiOperation(value = "根据机构编码获取最新映射版本号", response = RestEcho.class, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "指定版本的信息")
+    @RequestMapping(value = ApiVersion.Version1_0 + "/adapter_dispatcher/org_plan/version", method = RequestMethod.GET)
     Object getCDAVersionInfoByOrgCode(
             @ApiParam(name = "org_code", value = "机构编码")
             @RequestParam(value = "org_code") String orgCode);
 
 
-    @RequestMapping(value = ApiVersion.Version1_0+"/adapter_dispatcher/{org_code}", method = RequestMethod.GET)
-    @ApiOperation(value = "获取采集标准及适配方案信息", response = RestEcho.class, produces = "application/json", notes = "获取采集标准及适配方案信息，文件以Base64编码，压缩格式为zip")
+    @RequestMapping(value = ApiVersion.Version1_0 + "/adapter_dispatcher/{org_code}", method = RequestMethod.GET)
     public Object downAdaptions(
             @RequestParam(value = "private_key", required = true) String privateKey,
             @RequestParam(value = "version_code", required = true) String versionCode,
             @PathVariable(value = "org_code") String orgcode);
 
-
-    @RequestMapping(value = ApiVersion.Version1_0+"/adapter_dispatcher/{org_code}/source", method = RequestMethod.GET)
-    @ApiOperation(value = "下载适配数据包，此包内容包含：平台标准，机构标准与二者适配", response = RestEcho.class, produces = "application/json", notes = "获取采集标准及适配方案信息，文件以Base64编码，压缩格式为zip")
+    @RequestMapping(value = ApiVersion.Version1_0 + "/adapter_dispatcher/{org_code}/source", method = RequestMethod.GET)
     Map getAdaptionUrl(
             @ApiParam(required = true, name = "private_key", value = "用户名")
             @RequestParam(value = "private_key", required = true) String privateKey,
             @ApiParam(required = true, name = "version_code", value = "适配标准版本")
             @RequestParam(value = "version_code", required = true) String versionCode,
             @ApiParam(required = true, name = "org_code", value = "机构代码")
-            @PathVariable(value = "org_code") String orgcode) ;
+            @PathVariable(value = "org_code") String orgcode);
 }

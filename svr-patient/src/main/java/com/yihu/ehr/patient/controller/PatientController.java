@@ -268,41 +268,58 @@ public class PatientController extends BaseRestController {
      */
     @RequestMapping(value = "/populations/picture",method = RequestMethod.GET)
     @ApiOperation(value = "下载头像")
+    public String downloadPicture(
+            @ApiParam(name = "demographic_id", value = "病人主键，和身份证号一致")
+            @RequestParam(value = "demographic_id") String demographicId ,
+            @ApiParam(name = "group_name", value = "分组", defaultValue = "")
+            @RequestParam(value = "group_name") String groupName,
+            @ApiParam(name = "remote_file_name", value = "服务器头像名称", defaultValue = "")
+            @RequestParam(value = "remote_file_name") String remoteFileName) throws Exception {
+        String splitMark = System.getProperty("file.separator");
+        String strPath = System.getProperty("java.io.tmpdir");
+        strPath += splitMark + "patientImages" + splitMark + remoteFileName;
+        File file = new File(strPath);
+        String path = String.valueOf(file.getParentFile());
+        if (!file.getParentFile().exists()) {
+            file.getParentFile().mkdirs();
+        }
+        DemographicInfo demographicInfo = demographicService.getDemographicInfo(new DemographicId(demographicId));
+        if (!StringUtils.isEmpty(demographicInfo.getLocalPath())) {
+            File fileName = new File(demographicInfo.getLocalPath());
+            if (fileName.exists()) {
+                return demographicInfo.getLocalPath();
+            }
+        }
+        //调用图片下载方法，返回文件的储存位置localPath，将localPath保存至人口信息表
+        String localPath = null;
+        try {
+            localPath = fastDFSUtil.download(groupName, remoteFileName, path);
+            demographicInfo.setLocalPath(localPath);
+            demographicService.savePatient(demographicInfo);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (MyException e) {
+            LogService.getLogger(DemographicInfo.class).error("人口头像图片下载失败；错误代码：" + e);
+        }
+        return localPath;
+    }
 //    public String downloadPicture(
-//            @ApiParam(name = "demographic_id", value = "病人主键，和身份证号一致")
-//            @RequestParam(value = "demographic_id") String demographicId ,
 //            @ApiParam(name = "group_name", value = "分组", defaultValue = "")
 //            @RequestParam(value = "group_name") String groupName,
 //            @ApiParam(name = "remote_file_name", value = "服务器头像名称", defaultValue = "")
 //            @RequestParam(value = "remote_file_name") String remoteFileName) throws Exception {
-//        String splitMark = System.getProperty("file.separator");
-//        String strPath = System.getProperty("java.io.tmpdir");
-//        strPath += splitMark + "patientImages" + splitMark + remoteFileName;
-//        File file = new File(strPath);
-//        String path = String.valueOf(file.getParentFile());
-//        if (!file.getParentFile().exists()) {
-//            file.getParentFile().mkdirs();
-//        }
-//
-//        DemographicInfo demographicInfo = demographicService.getDemographicInfo(new DemographicId(demographicId));
-//        if (!StringUtils.isEmpty(demographicInfo.getLocalPath())) {
-//            File fileName = new File(demographicInfo.getLocalPath());
-//            if (fileName.exists()) {
-//                return demographicInfo.getLocalPath();
-//            }
-//        }
-//        //调用图片下载方法，返回文件的储存位置localPath，将localPath保存至人口信息表
-//        String localPath = null;
+//        String fileString = null;
 //        try {
-//            localPath = fastDFSUtil.download(groupName, remoteFileName, path);
-//            demographicInfo.setLocalPath(localPath);
-//            demographicService.savePatient(demographicInfo);
+//
+//            byte[] bytes = fastDFSUtil.download(groupName,remoteFileName);
+//            fileString = new String(bytes, "utf-8");
+//            return fileString;
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        } catch (MyException e) {
 //            LogService.getLogger(DemographicInfo.class).error("人口头像图片下载失败；错误代码：" + e);
 //        }
-//        return localPath;
+//        return fileString;
 //    }
     public String downloadPicture(
             @ApiParam(name = "group_name", value = "分组", defaultValue = "")

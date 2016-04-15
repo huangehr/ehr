@@ -2,7 +2,7 @@ package com.yihu.ehr.api.patient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.profile.core.Profile;
+import com.yihu.ehr.profile.core.structured.StructuredProfile;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -30,7 +30,7 @@ public class HealthProfilesEndPoint {
 
     @RequestMapping(value = "/patient/health_profile/search", method = RequestMethod.GET)
     @ApiOperation(value = "搜索档案", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "搜索患者档案")
-    public List<Profile> searchProfiles(
+    public List<StructuredProfile> searchProfiles(
             @ApiParam(required = true, name = "demographic_id", value = "患者人口学ID")
             @PathVariable(value = "demographic_id") String demographicId){
         return null;
@@ -38,7 +38,7 @@ public class HealthProfilesEndPoint {
 
     @RequestMapping(value = "/patients/{demographic_id}/health_profiles", method = RequestMethod.GET)
     @ApiOperation(value = "获取档案列表", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "获取档案列表")
-    public List<Profile> getProfiles(
+    public List<StructuredProfile> getProfiles(
             @ApiParam(required = true, name = "demographic_id", value = "患者人口学ID")
             @PathVariable(value = "demographic_id") String demographicId,
             @ApiParam(required = true, name = "from", value = "检索起始时间")

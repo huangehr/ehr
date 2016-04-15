@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.core;
+package com.yihu.ehr.profile.core.commons;
 
 import com.yihu.ehr.util.StringBuilderUtil;
 

@@ -1,11 +1,9 @@
-package com.yihu.ehr.profile;
+package com.yihu.ehr.profile.core.commons;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.lang.SpringContext;
-import com.yihu.ehr.profile.core.ProfileDataSet;
-import com.yihu.ehr.profile.core.ProfileId;
 import com.yihu.ehr.util.DateFormatter;
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,40 +16,35 @@ import java.util.*;
  * @version 1.0
  * @created 2015.08.16 10:44
  */
-public class UnStructuredProfile {
-
+public class Profile {
     private ObjectMapper objectMapper = SpringContext.getService("objectMapper");
 
-    private ProfileId archiveID;                        // 健康档案ID
+    private ProfileId profileId;                        // 健康档案ID
     private String cardId;                              // 就诊时用的就诊卡ID
     private String orgCode;                             // 机构代码
+    private String orgName;                             // 机构名称
     private String patientId;                           // 身份证号
     private String eventNo;                             // 事件号
     private Date eventDate;                             // 事件时间，如挂号，出院体检时间
-    private String demographicId;                       // 人口学ID patient_id
+    private String demographicId;                       // 人口学ID
     private String summary;                             // 档案摘要
-
-
-    //非结构化data数组内容
-    private List<UnStructuredDocument> unStructuredDocument;
-
 
     private Date createDate;                            // EhrArchive创建时间，由JSON包中提取
     private String cdaVersion;
 
     // 档案包含的数据集, key 为数据集的表名, 标准数据情况下, 表名为数据集代码, 原始数据集情况下, 表名为"数据集代码_ORIGIN"
-    private Map<String, ProfileDataSet> dataSets;
+    private Map<String, DataSet> dataSets;
 
-    public UnStructuredProfile() {
+    public Profile() {
         this.cardId = "";
         this.orgCode = "";
         this.patientId = "";
         this.eventNo = "";
-        this.dataSets = new TreeMap<>();
+        //this.dataSets = new TreeMap<>();
     }
 
     public String getId() {
-        if (archiveID == null){
+        if (profileId == null){
             if(StringUtils.isEmpty(orgCode)){
                 throw new IllegalArgumentException("Build profile id failed, organization code is empty.");
             }
@@ -64,18 +57,14 @@ public class UnStructuredProfile {
                 throw new IllegalArgumentException("Build profile id failed, unable to get event time.");
             }
 
-            this.archiveID = ProfileId.get(orgCode, patientId, eventNo, eventDate);
+            this.profileId = ProfileId.get(orgCode, patientId, eventNo, eventDate);
         }
 
-        return archiveID.toString();
+        return profileId.toString();
     }
 
     public void setId(String archiveId){
-        this.archiveID = new ProfileId(archiveId);
-    }
-    
-    public Collection<ProfileDataSet> getDataSets() {
-        return dataSets.values();
+        this.profileId = new ProfileId(archiveId);
     }
 
     public String getDataSetsAsString() {
@@ -91,17 +80,27 @@ public class UnStructuredProfile {
         return rootNode.toString();
     }
 
-    public void addDataSet(String dataSetCode, ProfileDataSet dataSet) {
-        this.dataSets.put(dataSetCode, dataSet);
-    }
+    
+//    public Collection<DataSet> getDataSets() {
+//        return dataSets.values();
+//    }
 
-    public void removeDataSet(String dataSetCode){
-        this.dataSets.remove(dataSetCode);
-    }
 
-    public ProfileDataSet getDataSet(String dataSetCode) {
-        return this.dataSets.get(dataSetCode);
-    }
+//    public void addDataSet(String dataSetCode, DataSet dataSet) {
+//        this.dataSets.put(dataSetCode, dataSet);
+//    }
+//
+//    public void removeDataSet(String dataSetCode){
+//        this.dataSets.remove(dataSetCode);
+//    }
+//
+//    public DataSet getDataSet(String dataSetCode) {
+//        return this.dataSets.get(dataSetCode);
+//    }
+//
+//    public Set<String> getDataSetTables(){
+//        return this.dataSets.keySet();
+//    }
 
     public String getCdaVersion() {
         return cdaVersion;
@@ -111,9 +110,7 @@ public class UnStructuredProfile {
         this.cdaVersion = cdaVersion;
     }
 
-    public Set<String> getDataSetTables(){
-        return this.dataSets.keySet();
-    }
+
 
     public String getCardId() {
         return cardId;
@@ -129,6 +126,10 @@ public class UnStructuredProfile {
 
     public void setOrgCode(String orgCode){
         this.orgCode = orgCode;
+    }
+
+    public String getOrgName(){
+        return orgName;
     }
 
     public String getPatientId() {
@@ -173,6 +174,7 @@ public class UnStructuredProfile {
 
     public Date getCreateDate() {
         if (createDate == null) createDate = new Date();
+
         return createDate;
     }
 
@@ -181,12 +183,26 @@ public class UnStructuredProfile {
     }
 
 
-    public List<UnStructuredDocument> getUnStructuredDocument() {
-        return unStructuredDocument;
-    }
+    public String toJson(){
+        ObjectNode root = objectMapper.createObjectNode();
+        root.put("id", getId().toString());
+        root.put("card_id", cardId);
+        root.put("org_code", orgCode);
+        root.put("org_name", orgName);
+        root.put("patient_id", patientId);
+        root.put("event_no", eventNo);
+        root.put("event_date", eventDate == null ? "" : DateFormatter.utcDateTimeFormat(eventDate));
+        root.put("cda_version", cdaVersion);
+        root.put("create_date", createDate == null ? "" : DateFormatter.utcDateTimeFormat(createDate));
+        root.put("summary", summary);
 
-    public void setUnStructuredDocument(List<UnStructuredDocument> unStructuredDocument) {
-        this.unStructuredDocument = unStructuredDocument;
+        ArrayNode dataSetsNode = root.putArray("data_sets");
+        for (String dataSetCode : dataSets.keySet()){
+            DataSet dataSet = dataSets.get(dataSetCode);
+            dataSetsNode.addPOJO(dataSet.toJson(false));
+        }
+
+        return root.toString();
     }
 
 }

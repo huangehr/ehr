@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.cache.CacheReader;
 import com.yihu.ehr.data.hadoop.HBaseClient;
 import com.yihu.ehr.data.hadoop.ResultWrapper;
-import com.yihu.ehr.profile.core.*;
+import com.yihu.ehr.profile.core.commons.*;
+import com.yihu.ehr.profile.core.structured.StructuredDataSet;
+import com.yihu.ehr.profile.core.structured.StructuredProfile;
 import com.yihu.ehr.schema.StdKeySchema;
 import com.yihu.ehr.util.DateFormatter;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -21,7 +23,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 
-import static com.yihu.ehr.profile.core.ProfileTableOptions.*;
+import static com.yihu.ehr.profile.core.commons.ProfileTableOptions.*;
 
 /**
  * 健康档案加载器. 可以根据健康档案ID或与之关联的事件ID加载档案.
@@ -50,7 +52,7 @@ public class ProfileRepository {
      * @param profileId
      * @return
      */
-    public Profile findOne(String profileId, boolean loadStdDataSet, boolean loadOriginDataSet) throws IOException, ParseException {
+    public StructuredProfile findOne(String profileId, boolean loadStdDataSet, boolean loadOriginDataSet) throws IOException, ParseException {
         ResultWrapper record = hbaseClient.getResultAsWrapper(ProfileTableOptions.Table, profileId);
         if (record.getResult().toString().equals("keyvalues=NONE")) throw new RuntimeException("Profile not found.");
 
@@ -65,17 +67,17 @@ public class ProfileRepository {
         String cdaVersion = record.getValueAsString(Family.Basic.toString(), BasicQualifier.CdaVersion.toString());
         String dataSets = record.getValueAsString(Family.Basic.toString(), BasicQualifier.DataSets.toString());
 
-        Profile profile = new Profile();
-        profile.setId(profileId);
-        profile.setCardId(cardId);
-        profile.setOrgCode(orgCode);
-        profile.setPatientId(patientId);
-        profile.setEventNo(eventNo);
-        profile.setEventDate(DateFormatter.utcDateTimeParse(eventDate));
-        profile.setSummary(summary);
-        profile.setDemographicId(demographicId);
-        profile.setCreateDate(DateFormatter.utcDateTimeParse(createDate));
-        profile.setCdaVersion(cdaVersion);
+        StructuredProfile structuredProfile = new StructuredProfile();
+        structuredProfile.setId(profileId);
+        structuredProfile.setCardId(cardId);
+        structuredProfile.setOrgCode(orgCode);
+        structuredProfile.setPatientId(patientId);
+        structuredProfile.setEventNo(eventNo);
+        structuredProfile.setEventDate(DateFormatter.utcDateTimeParse(eventDate));
+        structuredProfile.setSummary(summary);
+        structuredProfile.setDemographicId(demographicId);
+        structuredProfile.setCreateDate(DateFormatter.utcDateTimeParse(createDate));
+        structuredProfile.setCdaVersion(cdaVersion);
 
         // 加载数据集列表
         JsonNode root = objectMapper.readTree(dataSets);
@@ -87,23 +89,23 @@ public class ProfileRepository {
             if (loadStdDataSet || loadOriginDataSet) {
                 if (loadStdDataSet) {
                     if (!dataSetCode.contains(DataSetTableOption.OriginDataSetFlag)) {
-                        Pair<String, ProfileDataSet> pair = findDataSet(cdaVersion, dataSetCode, rowKeys);
-                        profile.addDataSet(pair.getLeft(), pair.getRight());
+                        Pair<String, StructuredDataSet> pair = findDataSet(cdaVersion, dataSetCode, rowKeys);
+                        structuredProfile.addDataSet(pair.getLeft(), pair.getRight());
                     }
                 }
                 if (loadOriginDataSet) {
                     if (dataSetCode.contains(DataSetTableOption.OriginDataSetFlag)) {
-                        Pair<String, ProfileDataSet> pair = findDataSet(cdaVersion, dataSetCode, rowKeys);
-                        profile.addDataSet(pair.getLeft(), pair.getRight());
+                        Pair<String, StructuredDataSet> pair = findDataSet(cdaVersion, dataSetCode, rowKeys);
+                        structuredProfile.addDataSet(pair.getLeft(), pair.getRight());
                     }
                 }
             } else {
-                Pair<String, ProfileDataSet> pair = findDataSetIndices(cdaVersion, dataSetCode, rowKeys);
-                profile.addDataSet(pair.getLeft(), pair.getRight());
+                Pair<String, StructuredDataSet> pair = findDataSetIndices(cdaVersion, dataSetCode, rowKeys);
+                structuredProfile.addDataSet(pair.getLeft(), pair.getRight());
             }
         }
 
-        return profile;
+        return structuredProfile;
     }
 
     /**
@@ -114,10 +116,10 @@ public class ProfileRepository {
      * @return
      * @throws IOException
      */
-    public Pair<String, ProfileDataSet> findDataSet(String cdaVersion,
-                                                    String dataSetCode,
-                                                    String[] rowKeys) throws IOException {
-        ProfileDataSet dataSet = new ProfileDataSet();
+    public Pair<String, StructuredDataSet> findDataSet(String cdaVersion,
+                                                       String dataSetCode,
+                                                       String[] rowKeys) throws IOException {
+        StructuredDataSet dataSet = new StructuredDataSet();
         dataSet.setCdaVersion(cdaVersion);
         dataSet.setCode(dataSetCode);
 
@@ -162,10 +164,10 @@ public class ProfileRepository {
      * @return
      * @throws IOException
      */
-    public Pair<String, ProfileDataSet> findDataSet(String version,
-                                                    String dataSetCode,
-                                                    Set<String> rowKeys,
-                                                    String[] innerCodes) throws IOException {
+    public Pair<String, StructuredDataSet> findDataSet(String version,
+                                                       String dataSetCode,
+                                                       Set<String> rowKeys,
+                                                       String[] innerCodes) throws IOException {
         List<String> metaDataCode = new ArrayList<>(innerCodes.length);
         for (int i = 0; i < innerCodes.length; ++i) {
             Long dictId = Long.getLong(cacheReader.read(keySchema.metaDataDict(version, dataSetCode, innerCodes[i])));
@@ -181,7 +183,7 @@ public class ProfileRepository {
             }
         }
 
-        ProfileDataSet dataSet = new ProfileDataSet();
+        StructuredDataSet dataSet = new StructuredDataSet();
         Result[] results = hbaseClient.getPartialRecords(dataSetCode,
                 rowKeys.toArray(new String[rowKeys.size()]),
                 DataSetTableOption.getFamilies(),
@@ -219,10 +221,10 @@ public class ProfileRepository {
      * @param rowKeys
      * @return
      */
-    public Pair<String, ProfileDataSet> findDataSetIndices(String cdaVersion,
-                                                           String dataSetCode,
-                                                           String[] rowKeys) {
-        ProfileDataSet dataSet = new ProfileDataSet();
+    public Pair<String, StructuredDataSet> findDataSetIndices(String cdaVersion,
+                                                              String dataSetCode,
+                                                              String[] rowKeys) {
+        StructuredDataSet dataSet = new StructuredDataSet();
         dataSet.setCdaVersion(cdaVersion);
         dataSet.setCode(dataSetCode);
 
@@ -239,7 +241,7 @@ public class ProfileRepository {
      * @param profile
      * @throws IOException
      */
-    public void save(Profile profile) throws IOException {
+    public void save(StructuredProfile profile) throws IOException {
         // 先存档案
         hbaseClient.insertRecord(ProfileTableOptions.Table,
                 profile.getId(),
@@ -261,7 +263,7 @@ public class ProfileRepository {
         // 数据集
         Set<String> tableSet = profile.getDataSetTables();
         for (String tableName : tableSet) {
-            ProfileDataSet dataSet = profile.getDataSet(tableName);
+            DataSet dataSet = profile.getDataSet(tableName);
 
             hbaseClient.beginBatchInsert(tableName, false);
             for (String key : dataSet.getRecordKeys()) {
