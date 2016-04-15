@@ -555,4 +555,22 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
         }
         return listInfo;
     }
+
+    /**
+     * 根据字典新增适配明细，
+     * create by lincl 2016-4-15
+     * @param orgAdapterPlan 方案
+     * @param dictIds 字典编号集
+     */
+    @Transactional(propagation= Propagation.REQUIRED)
+    public int batchAddAdapterDict(OrgAdapterPlan orgAdapterPlan, List dictIds) {
+        Session session = currentSession();
+        String strTableName = CDAVersionUtil.getDictEntryTableName(orgAdapterPlan.getVersion());
+        String sql = "insert into adapter_dict(plan_id, std_dict, std_dictentry) "+
+                "select  :planId as plan_id, tb.dict_id, tb.id from " + strTableName + " tb where  tb.dict_id in(:dictIds)";
+        Query query = session.createSQLQuery(sql);
+        query.setParameterList("dictIds", dictIds);
+        query.setLong("planId", orgAdapterPlan.getId());
+        return query.executeUpdate();
+    }
 }
