@@ -35,7 +35,7 @@ public class EhrClientDetailsService implements ClientDetailsService {
 
         MApp app = appClient.getApp(clientId);
         if (app == null) {
-            throw new NoSuchClientException("所请求应用不存在，id: " + clientId);
+            throw new NoSuchClientException("Invalid client id: " + clientId);
         }
 
         BaseClientDetails baseClientDetails = new BaseClientDetails(

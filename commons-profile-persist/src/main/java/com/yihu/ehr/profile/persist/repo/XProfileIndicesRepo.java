@@ -11,6 +11,6 @@ import java.util.List;
  * @version 1.0
  * @created 2016.04.07 16:29
  */
-public interface XProfileIndicesRepo extends SolrCrudRepository<ProfileIndices, String>, XProfileIndicesSearch {
+public interface XProfileIndicesRepo extends SolrCrudRepository<ProfileIndices, String>, XProfileIndicesRepoCustom {
     List<ProfileIndices> findByDemographicIdAndEventDateBetween(String demographicId, Date since, Date to);
 }

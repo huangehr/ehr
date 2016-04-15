@@ -1,15 +1,10 @@
 package com.yihu.ehr.profile.controller;
 
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.cache.CacheReader;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.model.profile.MDataSet;
-import com.yihu.ehr.model.profile.MProfileDocument;
-import com.yihu.ehr.model.profile.MProfile;
-import com.yihu.ehr.model.profile.MRecord;
+import com.yihu.ehr.model.profile.*;
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import com.yihu.ehr.profile.config.CdaDocumentOptions;
@@ -18,8 +13,8 @@ import com.yihu.ehr.profile.core.structured.StructuredDataSet;
 import com.yihu.ehr.profile.core.structured.StructuredProfile;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.persist.ProfileIndices;
+import com.yihu.ehr.profile.persist.ProfileIndicesService;
 import com.yihu.ehr.profile.persist.repo.ProfileRepository;
-import com.yihu.ehr.profile.persist.repo.XProfileIndicesRepo;
 import com.yihu.ehr.profile.service.TemplateService;
 import com.yihu.ehr.schema.OrgKeySchema;
 import com.yihu.ehr.schema.StdKeySchema;
@@ -37,7 +32,6 @@ import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
@@ -55,7 +49,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     private ProfileRepository profileRepo;
 
     @Autowired
-    private XProfileIndicesRepo profileIndicesRepo;
+    private ProfileIndicesService indicesService;
 
     @Autowired
     private TemplateService templateService;
@@ -75,12 +69,14 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @Autowired
     StdKeySchema stdKeySchema;
 
-    @ApiOperation(value = "搜索档案", notes = "读取一份档案")
+    @ApiOperation(value = "搜索档案", notes = "返回档案索引列表")
     @RequestMapping(value = RestApi.HealthProfile.ProfileSearch, method = RequestMethod.POST)
-    public List<MProfile> searchProfile(
+    public Collection<MProfileIndices> searchProfile(
             @ApiParam(value = "搜索条件")
             @RequestParam("q") String query) {
-        return null;
+        List<ProfileIndices> indicesList = indicesService.search(query);
+
+        return convertToModels(indicesList, new ArrayList<>(), MProfileIndices.class, null);
     }
 
     @ApiOperation(value = "按时间获取档案列表", notes = "获取患者的就诊档案列表")
@@ -98,7 +94,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws IOException, ParseException {
         demographicId = new String(Base64.decode(demographicId));
 
-        List<ProfileIndices> profileIndices = profileIndicesRepo.findByDemographicIdAndEventDateBetween(
+        List<ProfileIndices> profileIndices = indicesService.findByDemographicIdAndEventDateBetween(
                 demographicId, since, to);
 
         List<StructuredProfile> profiles = new ArrayList<>();
@@ -134,9 +130,9 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @ApiOperation(value = "获取档案文档", notes = "获取档案文档，按数据集整理")
     @RequestMapping(value = RestApi.HealthProfile.ProfileDocument, method = RequestMethod.GET)
     public MProfileDocument getProfileDocument(
-            @ApiParam(value = "档案ID")
+            @ApiParam(value = "档案ID", defaultValue = "41872607-9_10295435_000622450_1444060800000")
             @PathVariable("profile_id") String profileId,
-            @ApiParam(value = "文档ID")
+            @ApiParam(value = "文档ID", defaultValue = "0dae00065684e6570dc35654490aacb3")
             @PathVariable("document_id") String documentId,
             @ApiParam(value = "是否加载标准数据集", defaultValue = "true")
             @RequestParam(value = "load_std_data_set") boolean loadStdDataSet,
