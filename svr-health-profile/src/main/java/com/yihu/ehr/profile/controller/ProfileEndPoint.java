@@ -12,9 +12,9 @@ import com.yihu.ehr.model.profile.MRecord;
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import com.yihu.ehr.profile.config.CdaDocumentOptions;
-import com.yihu.ehr.profile.core.DataSetTableOption;
-import com.yihu.ehr.profile.core.Profile;
-import com.yihu.ehr.profile.core.ProfileDataSet;
+import com.yihu.ehr.profile.core.commons.DataSetTableOption;
+import com.yihu.ehr.profile.core.structured.StructuredProfile;
+import com.yihu.ehr.profile.core.structured.StructuredDataSet;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.persist.ProfileIndices;
 import com.yihu.ehr.profile.persist.repo.ProfileRepository;
@@ -89,15 +89,15 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         List<ProfileIndices> profileIndices = profileIndicesRepo.findByDemographicIdAndEventDateBetween(
                 demographicId, since, to);
 
-        List<Profile> profiles = new ArrayList<>();
+        List<StructuredProfile> structuredProfiles = new ArrayList<>();
         for (ProfileIndices indices : profileIndices) {
-            Profile profile = profileRepo.findOne(indices.getRowkey(), loadStdDataSet, loadOriginDataSet);
-            profiles.add(profile);
+            StructuredProfile structuredProfile = profileRepo.findOne(indices.getRowkey(), loadStdDataSet, loadOriginDataSet);
+            structuredProfiles.add(structuredProfile);
         }
 
         List<MProfile> profileList = new ArrayList<>();
-        for (Profile profile : profiles) {
-            MProfile mProfile = convertProfile(profile);
+        for (StructuredProfile structuredProfile : structuredProfiles) {
+            MProfile mProfile = convertProfile(structuredProfile);
 
             profileList.add(mProfile);
         }
@@ -111,7 +111,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @Autowired
     StdKeySchema stdKeySchema;
 
-    private void addDataset(String version, MDocument document, ProfileDataSet dataSet) {
+    private void addDataset(String version, MDocument document, StructuredDataSet dataSet) {
         if (dataSet != null) {
             String dataSetCode = DataSetTableOption.standardDataSetCode(dataSet.getCode());
 
@@ -139,9 +139,9 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "load_std_data_set") boolean loadStdDataSet,
             @ApiParam(value = "是否加载原始数据集", defaultValue = "false")
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws IOException, ParseException {
-        Profile profile = profileRepo.findOne(id, loadStdDataSet, loadOriginDataSet);
+        StructuredProfile structuredProfile = profileRepo.findOne(id, loadStdDataSet, loadOriginDataSet);
 
-        return convertProfile(profile);
+        return convertProfile(structuredProfile);
     }
 
     @ApiOperation(value = "获取档案数据集", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "获取档案数据集列表")
@@ -169,19 +169,19 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         objectMapper.registerModule(module);
     }
 
-    private MProfile convertProfile(Profile profile){
+    private MProfile convertProfile(StructuredProfile structuredProfile){
         MProfile mProfile = new MProfile();
-        mProfile.setId(profile.getId());
-        mProfile.setCdaVersion(profile.getCdaVersion());
-        mProfile.setOrgCode(profile.getOrgCode());
-        mProfile.setOrgName(cacheReader.read(orgKeySchema.name(profile.getOrgCode())));
-        mProfile.setEventDate(profile.getEventDate());
-        mProfile.setSummary(profile.getSummary());
-        mProfile.setDemographicId(profile.getDemographicId());
+        mProfile.setId(structuredProfile.getId());
+        mProfile.setCdaVersion(structuredProfile.getCdaVersion());
+        mProfile.setOrgCode(structuredProfile.getOrgCode());
+        mProfile.setOrgName(cacheReader.read(orgKeySchema.name(structuredProfile.getOrgCode())));
+        mProfile.setEventDate(structuredProfile.getEventDate());
+        mProfile.setSummary(structuredProfile.getSummary());
+        mProfile.setDemographicId(structuredProfile.getDemographicId());
 
         // 使用CDA类别关键数据元映射，取得与此档案相关联的CDA类别ID
         String cdaType = null;
-        for (ProfileDataSet dataSet : profile.getDataSets()){
+        for (StructuredDataSet dataSet : structuredProfile.getDataSets()){
             if(cdaDocumentOptions.isPrimaryDataSet(dataSet.getCode())){
                 cdaType = cdaDocumentOptions.getCdaDocumentTypeId(dataSet.getCode());
                 break;
@@ -193,10 +193,10 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         }
 
         // 此类目下卫生机构定制的CDA文档列表
-        Collection<MCDADocument> cdaDocuments = templateService.getOrganizationTemplates(profile.getOrgCode(), profile.getCdaVersion(), cdaType);
+        Collection<MCDADocument> cdaDocuments = templateService.getOrganizationTemplates(structuredProfile.getOrgCode(), structuredProfile.getCdaVersion(), cdaType);
         if (CollectionUtils.isEmpty(cdaDocuments)) {
-            LogService.getLogger().error("Unable to get cda document of version " + profile.getCdaVersion()
-                    + " for organization " + profile.getOrgCode() + ", template not uploaded?");
+            LogService.getLogger().error("Unable to get cda document of version " + structuredProfile.getCdaVersion()
+                    + " for organization " + structuredProfile.getOrgCode() + ", template not uploaded?");
 
             return null;
         }
@@ -209,19 +209,19 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             // CDA文档裁剪，根据从医院中实际采集到的数据集，对CDA进行裁剪
             boolean validDocument = false;
             List<MCdaDataSetRelationship> datasetRelationships = cdaDocumentClient.getCDADataSetRelationshipByCDAId(
-                    profile.getCdaVersion(),
+                    structuredProfile.getCdaVersion(),
                     cdaDocument.getId());
 
             for (MCdaDataSetRelationship datasetRelationship : datasetRelationships) {
                 String dataSetId = datasetRelationship.getDataSetId();
-                String dataSetCode = cacheReader.read(stdKeySchema.dataSetCode(profile.getCdaVersion(), dataSetId));
+                String dataSetCode = cacheReader.read(stdKeySchema.dataSetCode(structuredProfile.getCdaVersion(), dataSetId));
                 if (StringUtils.isEmpty(dataSetCode)) {
-                    throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Data set of version " + profile.getCdaVersion() + " not cached in redis.");
+                    throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Data set of version " + structuredProfile.getCdaVersion() + " not cached in redis.");
                 }
 
-                addDataset(profile.getCdaVersion(), document, profile.getDataSet(dataSetCode));
+                addDataset(structuredProfile.getCdaVersion(), document, structuredProfile.getDataSet(dataSetCode));
 
-                addDataset(profile.getCdaVersion(), document, profile.getDataSet(DataSetTableOption.originDataSetCode(dataSetCode)));
+                addDataset(structuredProfile.getCdaVersion(), document, structuredProfile.getDataSet(DataSetTableOption.originDataSetCode(dataSetCode)));
 
                 if (!validDocument) validDocument = !dataSetCode.startsWith("HDSA00_01");
             }

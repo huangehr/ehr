@@ -1,9 +1,10 @@
-package com.yihu.ehr.profile;
+package com.yihu.ehr.profile.core.unStructured;
 
 /**
- * Created by Administrator on 2016/4/7.
+ * Created by linaz on 2016/4/7.
+ *
  */
-public class DocumentFile {
+public class UnStructuredDocumentFile {
     String mimeType;
     String name;
     String localFileName;
