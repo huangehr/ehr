@@ -40,7 +40,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "users", description = "用户管理接口", tags = {"用户,登录帐号,密码"})
+@Api(value = "users", description = "用户管理接口")
 public class UserController extends BaseRestController {
 
     @Value("${default.password}")
