@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
  */
 @Service("resourceService")
 public class ResourceService {
-    @Autowired
-    private IResourceDao resourceDao;
+    /*@Autowired
+    private IResourceDao resourceDao;*/
 
 
     public String getDataset(String datasetCode, String orgCode) throws Exception {

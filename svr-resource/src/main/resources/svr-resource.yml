@@ -1,17 +1,3 @@
-server:
-  port: 10140
-
-management:
-  port: 10140
-
-info:
-  app:
-    name: ResourceServiceApp
-    description: Resource service.
-    version: 1.0.0
-
-
-
 logging:
   level:
     com:
@@ -26,7 +12,6 @@ data-source:
   validation-query: SELECT 1
   test-on-borrow: true
   remove-abandoned-timeout: 55
-
 ---
 spring:
   profiles: dev
