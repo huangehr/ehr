@@ -250,9 +250,9 @@ public class ProfileRepository {
         for (String tableName : tableSet) {
             DataSet dataSet;
             if(StringUtils.isEmpty(lightWeightProfile)){
-                dataSet = lightWeightProfile.getDataSet(tableName);
-            }else {
                 dataSet = structuredProfile.getDataSet(tableName);
+            }else {
+                dataSet = lightWeightProfile.getDataSet(tableName);
             }
 
             hbaseClient.beginBatchInsert(tableName, false);
@@ -362,7 +362,8 @@ public class ProfileRepository {
                         unStructuredProfile.getSummary(),
                         unStructuredProfile.getDemographicId() == null ? "" : unStructuredProfile.getDemographicId(),
                         DateFormatter.utcDateTimeFormat(unStructuredProfile.getCreateDate()),
-                        unStructuredProfile.getDataSetsAsString(),
+//                        unStructuredProfile.getDataSetsAsString(),
+                        "",  //非结构化档案暂时不保存数据集信息
                         unStructuredProfile.getCdaVersion()
                 });
 

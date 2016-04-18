@@ -101,7 +101,7 @@ public class LightWeihgtPackageResolver {
         }
         //设置数据集
         dataSetResolverWithTranslator.parseLightJsonDataSet(lightWeightProfile,jsonNode);
-        file.delete();
+        //file.delete();
         return lightWeightProfile;
     }
 

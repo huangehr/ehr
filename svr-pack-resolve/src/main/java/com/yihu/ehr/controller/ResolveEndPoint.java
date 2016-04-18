@@ -87,7 +87,8 @@ public class ResolveEndPoint {
         packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
                 "Identity: " + profile.getDemographicId() + ", profile: " + profile.getId());
 
-        return new ResponseEntity<>(echo ? profile.toJson() : "", HttpStatus.OK);
+        //return new ResponseEntity<>(echo ? profile.toJson() : "", HttpStatus.OK);
+        return null;
     }
 
     @ApiOperation(value = "本地档案包解析", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -128,7 +129,7 @@ public class ResolveEndPoint {
             } else if (profileType == ProfileType.NoStructured) {
                 unStructuredProfile = unStructuredPackageResolver.doResolve(pack, zipFile);
                 profileRepo.saveUnStructuredProfile(unStructuredProfile);
-                return new ResponseEntity<>(unStructuredProfile.toJson(), HttpStatus.OK);
+                //return new ResponseEntity<>(unStructuredProfile.toJson(), HttpStatus.OK);
             } else if (profileType == ProfileType.Lightweight) {
                 lightWeightProfile = lightWeihgtPackageResolver.doResolve(pack, zipFile);
                 profileRepo.saveLightWeightProfile(lightWeightProfile);
