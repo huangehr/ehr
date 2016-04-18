@@ -6,7 +6,6 @@ import com.yihu.ehr.agModel.standard.cdadocument.CdaDataSetRelationshipModel;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.MCDADocument;
-import com.yihu.ehr.model.standard.MCDAVersion;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import com.yihu.ehr.std.service.CDAClient;
 import com.yihu.ehr.std.service.CDAVersionClient;
@@ -304,8 +303,8 @@ public class CDAController extends BaseController {
         cdaModel.setCreateDate(DateToString(mcdaDocument.getCreateDate(), AgAdminConstants.DateTimeFormat));
         cdaModel.setUpdateDate(DateToString(mcdaDocument.getUpdateDate(), AgAdminConstants.DateTimeFormat));
 
-        MCDAVersion versionModel = versionClient.getVersion(mcdaDocument.getVersionCode());
-        cdaModel.setStaged(versionModel.isInStage() ? "1" : "0");
+//        MCDAVersion versionModel = versionClient.getVersion(mcdaDocument.getVersionCode());
+//        cdaModel.setStaged(versionModel.isInStage() ? "1" : "0");
 
         return cdaModel;
     }

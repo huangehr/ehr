@@ -341,7 +341,7 @@ public class UserController extends BaseController {
             }
             if (!StringUtils.isEmpty(mUser.getImgRemotePath())) {
                 Map<String, String> map = toEntity(mUser.getImgRemotePath(), Map.class);
-                String localPath = userClient.downloadPicture(mUser.getId(), map.get("groupName"), map.get("remoteFileName"));
+                String localPath = userClient.downloadPicture(map.get("groupName"), map.get("remoteFileName"));
                 mUser.setImgLocalPath(localPath);
             }
 

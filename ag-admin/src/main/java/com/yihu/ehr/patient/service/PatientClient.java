@@ -108,8 +108,7 @@ public interface PatientClient {
 
     @RequestMapping(value = "/populations/picture",method = RequestMethod.GET)
     @ApiOperation(value = "头像下载")
-    String downloadPicture(@ApiParam(name = "demographic_id", value = "病人主键，和身份证号一致")
-                           @RequestParam(value = "demographic_id") String demographicId ,
+    String downloadPicture(
                            @ApiParam(name = "group_name", value = "分组", defaultValue = "")
                            @RequestParam(value = "group_name") String groupName,
                            @ApiParam(name = "remote_file_name", value = "服务器头像名称", defaultValue = "")
