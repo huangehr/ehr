@@ -1,6 +1,6 @@
 package com.yihu.ehr.service;
 
-import com.yihu.ehr.profile.core.Profile;
+import com.yihu.ehr.profile.core.commons.Profile;
 
 import java.io.File;
 import java.io.IOException;
