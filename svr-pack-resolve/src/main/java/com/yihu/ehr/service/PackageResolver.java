@@ -1,18 +1,20 @@
 package com.yihu.ehr.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.extractor.EventExtractor;
 import com.yihu.ehr.extractor.ExtractorChain;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.profile.core.commons.Profile;
 import com.yihu.ehr.profile.core.lightweight.LightWeightProfile;
+import com.yihu.ehr.profile.core.nostructured.UnStructuredDocumentFile;
+import com.yihu.ehr.profile.core.nostructured.UnStructuredProfile;
 import com.yihu.ehr.profile.core.structured.StructuredProfile;
 import com.yihu.ehr.profile.core.structured.StructuredDataSet;
-import com.yihu.ehr.profile.core.unStructured.UnStructuredDocumentFile;
-import com.yihu.ehr.profile.core.unStructured.UnStructuredProfile;
 import com.yihu.ehr.profile.persist.DataSetResolverWithTranslator;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
+import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,71 +76,69 @@ public class PackageResolver {
      */
     public Profile doResolve(MPackage pack, String zipFile) throws Exception {
         File root = new Zipper().unzipFile(new File(zipFile), LocalTempPath + PathSep + pack.getId(), pack.getPwd());
-//        if (root == null || !root.isDirectory() || root.list().length == 0) {
-//            throw new RuntimeException("Invalid package file, package id: " + pack.getId());
-//        }
-//
-//
-//        StructuredProfile structuredProfile = new StructuredProfile();          //结构化档案
-//        UnStructuredProfile unStructuredProfile = new UnStructuredProfile();    //非结构化档案
-//        LightWeightProfile lightWeightProfile = new LightWeightProfile();       //轻量级档案
-//
-//        File[] files = root.listFiles();
-//        String firstFilepath = files[0].getPath();
-//        String firstFolderName =  firstFilepath.substring(firstFilepath.lastIndexOf("\\")+1);
-//
-//        List<UnStructuredDocumentFile> unStructuredDocumentFileList = new ArrayList<>();  //document底下的文件
-//        for(File file:files){
-//            String folderName = file.getPath().substring(file.getPath().lastIndexOf("\\")+1);
-//            switch (firstFolderName){
-//                case OriFolder:
-//                    //结构化档案报处理
-//                    structuredProfile = structuredPackageResolver.structuredDataSetParse(structuredProfile, file.listFiles(),folderName);
-//                    break;
-//                case IndexFolder:
-//                    //轻量级档案包处理
-//                    lightWeightProfile = lightWeihgtPackageResolver.lightWeightDataSetParse(lightWeightProfile,file.listFiles());
-//                case DocumentFolder:
-//                    //非结构化档案包处理
-//                    if(folderName.equals(DocumentFolder)){
-//                        unStructuredDocumentFileList = unStructuredPackageResolver.unstructuredDocumentParse(unStructuredProfile, file.listFiles());
-//                    }else if(folderName.equals("meta.json")){
-//                        unStructuredProfile = unStructuredPackageResolver.unstructuredDataSetParse(unStructuredProfile,file, unStructuredDocumentFileList);
-//                    }
-//                    break;
-//                default: break;
-//            }
-//        }
+        if (root == null || !root.isDirectory() || root.list().length == 0) {
+            throw new RuntimeException("Invalid package file, package id: " + pack.getId());
+        }
 
-//        makeEventSummary(structuredProfile);
-//
-//        houseKeep(zipFile, root);
-//
-//        return structuredProfile;
+
+        StructuredProfile structuredProfile = new StructuredProfile();          //结构化档案
+        UnStructuredProfile unStructuredProfile = new UnStructuredProfile();    //非结构化档案
+        LightWeightProfile lightWeightProfile = new LightWeightProfile();       //轻量级档案
+
+        File[] files = root.listFiles();
+        String firstFilepath = files[0].getPath();
+        String firstFolderName =  firstFilepath.substring(firstFilepath.lastIndexOf("\\")+1);
+
+        List<UnStructuredDocumentFile> unStructuredDocumentFileList = new ArrayList<>();  //document底下的文件
+        for(File file:files){
+            String folderName = file.getPath().substring(file.getPath().lastIndexOf("\\")+1);
+            switch (firstFolderName){
+                case OriFolder:
+                    //结构化档案报处理
+                    structuredProfile = structuredPackageResolver.structuredDataSetParse(structuredProfile, file.listFiles(),folderName);
+                    break;
+                case IndexFolder:
+                    //轻量级档案包处理
+                    lightWeightProfile = lightWeihgtPackageResolver.lightWeightDataSetParse(lightWeightProfile,file.listFiles());
+                case DocumentFolder:
+                    //非结构化档案包处理
+                    if(folderName.equals(DocumentFolder)){
+                        unStructuredDocumentFileList = unStructuredPackageResolver.unstructuredDocumentParse(unStructuredProfile, file.listFiles());
+                    }else if(folderName.equals("meta.json")){
+                        unStructuredProfile = unStructuredPackageResolver.unstructuredDataSetParse(unStructuredProfile,file, unStructuredDocumentFileList);
+                    }
+                    break;
+                default: break;
+            }
+        }
+
+        //makeEventSummary(structuredProfile);
+
+        houseKeep(zipFile, root);
+
+        return structuredProfile;
     }
 
 
-    /**
-     * 根据此次的数据产生一个健康事件，并更新数据集的行ID.
-     *
-     * @param structuredProfile
-     */
-    public void makeEventSummary(StructuredProfile structuredProfile) {
-        EventExtractor eventExtractor = context.getBean(EventExtractor.class);
-
-        for (String dataSetTable : structuredProfile.getDataSetTables()) {
-            if (StringUtils.isEmpty(structuredProfile.getSummary()) && eventExtractor.getDataSets().containsKey(dataSetTable)) {
-                structuredProfile.setSummary(eventExtractor.getDataSets().get(dataSetTable));
-            }
-
-            int rowIndex = 0;
-            StructuredDataSet dataSet = structuredProfile.getDataSet(dataSetTable);
-            String[] rowKeys = new String[dataSet.getRecordKeys().size()];
-            dataSet.getRecordKeys().toArray(rowKeys);
-            for (String rowKey : rowKeys) {
-                dataSet.updateRecordKey(rowKey, structuredProfile.getId() + "$" + rowIndex++);
-            }
+    public ProfileType getProfileType(MPackage pack, String zipFile) throws ZipException {
+        File root = new Zipper().unzipFile(new File(zipFile), LocalTempPath + PathSep + pack.getId(), pack.getPwd());
+        if (root == null || !root.isDirectory() || root.list().length == 0) {
+            throw new RuntimeException("Invalid package file, package id: " + pack.getId());
         }
+
+
+        File[] files = root.listFiles();
+        String firstFilepath = files[0].getPath();
+        String firstFolderName =  firstFilepath.substring(firstFilepath.lastIndexOf("\\")+1);
+
+        if (firstFolderName.equals(OriFolder)){
+            return ProfileType.Structured;
+        }else if(firstFolderName.equals(IndexFolder)){
+            return ProfileType.Lightweight;
+        }else if(firstFolderName.equals(DocumentFolder)){
+            return ProfileType.NoStructured;
+        }
+        return null;
     }
 
     private void houseKeep(String zipFile, File root) {
@@ -149,4 +149,5 @@ public class PackageResolver {
             LogService.getLogger(PackageResolver.class).warn("House keep failed after package resolve: " + e.getMessage());
         }
     }
+
 }

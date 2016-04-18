@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.core.unStructured;
+package com.yihu.ehr.profile.core.nostructured;
 
 import java.util.List;
 

@@ -31,6 +31,7 @@ public class Profile {
 
     private Date createDate;                            // EhrArchive创建时间，由JSON包中提取
     private String cdaVersion;
+    private String profileType;                         //档案类型
 
     // 档案包含的数据集, key 为数据集的表名, 标准数据情况下, 表名为数据集代码, 原始数据集情况下, 表名为"数据集代码_ORIGIN"
     private Map<String, DataSet> dataSets;
@@ -205,4 +206,11 @@ public class Profile {
         return root.toString();
     }
 
+    public String getProfileType() {
+        return profileType;
+    }
+
+    public void setProfileType(String profileType) {
+        this.profileType = profileType;
+    }
 }

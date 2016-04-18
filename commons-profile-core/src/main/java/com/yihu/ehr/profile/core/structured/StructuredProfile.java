@@ -1,9 +1,12 @@
 package com.yihu.ehr.profile.core.structured;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.lang.SpringContext;
+import com.yihu.ehr.profile.core.commons.DataSet;
 import com.yihu.ehr.profile.core.commons.Profile;
+import com.yihu.ehr.util.DateFormatter;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,6 +21,8 @@ import java.util.Set;
  * @created 2015.08.16 10:44
  */
 public class StructuredProfile extends Profile {
+
+    private ObjectMapper objectMapper = SpringContext.getService("objectMapper");
     // 档案包含的数据集, key 为数据集的表名, 原始数据集情况下, 表名为"数据集代码_ORIGIN"
     private Map<String, StructuredDataSet> dataSets = new HashMap<>();
 
@@ -52,5 +57,28 @@ public class StructuredProfile extends Profile {
 
     public Set<String> getDataSetTables(){
         return this.dataSets.keySet();
+    }
+
+
+    public String toJson(){
+        ObjectNode root = objectMapper.createObjectNode();
+        root.put("id", getId().toString());
+        root.put("card_id", this.getCardId());
+        root.put("org_code", this.getOrgCode());
+        root.put("org_name", this.getOrgName());
+        root.put("patient_id", this.getPatientId());
+        root.put("event_no", this.getEventNo());
+        root.put("event_date", this.getEventDate() == null ? "" : DateFormatter.utcDateTimeFormat(this.getEventDate()));
+        root.put("cda_version", this.getCdaVersion());
+        root.put("create_date", this.getCreateDate() == null ? "" : DateFormatter.utcDateTimeFormat(this.getCreateDate()));
+        root.put("summary", this.getSummary());
+
+        ArrayNode dataSetsNode = root.putArray("data_sets");
+        for (String dataSetCode : dataSets.keySet()){
+            DataSet dataSet = dataSets.get(dataSetCode);
+            dataSetsNode.addPOJO(dataSet.toJson(false));
+        }
+
+        return root.toString();
     }
 }
