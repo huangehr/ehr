@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.core.unStructured;
+package com.yihu.ehr.profile.core.nostructured;
 
 /**
  * Created by linaz on 2016/4/7.

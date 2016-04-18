@@ -44,7 +44,7 @@ import java.util.*;
  * @created 2016.02.23 11:24
  */
 @RestController
-@RequestMapping(ApiVersion.Version1_0 + "/authorizations", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+@RequestMapping(value = ApiVersion.Version1_0 + "/authorizations", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "authorizations", description = "认证与授权服务。注意此API使用Basic认证。")
 public class AuthorizationsEndPoint {
     private final static int TOKEN_LENGTH = 32;
@@ -100,11 +100,9 @@ public class AuthorizationsEndPoint {
     @ApiOperation(value = "为指定应用创建授权，若存在返回已有授权", notes = "提供Client Id/Secret作为Basic验证")
     @RequestMapping(value = "/clients/{client_id}", method = RequestMethod.PUT)
     public ResponseEntity<Json> createClientAuthorization(@ApiParam(value = "client_id", defaultValue = "kHAbVppx44")
-                                                          @PathVariable("client_id")
-                                                          String clientId,
+                                                          @PathVariable("client_id") String clientId,
                                                           @ApiParam(value = "info")
-                                                          @RequestParam(value = "info")
-                                                          String info,
+                                                          @RequestParam(value = "info") String info,
                                                           HttpServletRequest request) throws JsonProcessingException {
         Pair<String, String> basic = BasicAuthorizationExtractor.extract(request.getHeader("Authorization"));
         if (!basic.getKey().equals(clientId))

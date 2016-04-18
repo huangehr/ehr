@@ -31,9 +31,10 @@ public class Profile {
 
     private Date createDate;                            // EhrArchive创建时间，由JSON包中提取
     private String cdaVersion;
+    private String profileType;                         //档案类型
 
     // 档案包含的数据集, key 为数据集的表名, 标准数据情况下, 表名为数据集代码, 原始数据集情况下, 表名为"数据集代码_ORIGIN"
-    private Map<String, DataSet> dataSets;
+//    private Map<String, DataSet> dataSets;
 
     public Profile() {
         this.cardId = "";
@@ -67,18 +68,18 @@ public class Profile {
         this.profileId = new ProfileId(archiveId);
     }
 
-    public String getDataSetsAsString() {
-        ObjectMapper objectMapper = SpringContext.getService("objectMapper");
-        ObjectNode rootNode = objectMapper.createObjectNode();
-
-        for (String key : dataSets.keySet()) {
-            Set<String> rowKeys = dataSets.get(key).getRecordKeys();
-            String records = String.join(",", rowKeys);
-            rootNode.put(key, records);
-        }
-
-        return rootNode.toString();
-    }
+//    public String getDataSetsAsString() {
+//        ObjectMapper objectMapper = SpringContext.getService("objectMapper");
+//        ObjectNode rootNode = objectMapper.createObjectNode();
+//
+//        for (String key : dataSets.keySet()) {
+//            Set<String> rowKeys = dataSets.get(key).getRecordKeys();
+//            String records = String.join(",", rowKeys);
+//            rootNode.put(key, records);
+//        }
+//
+//        return rootNode.toString();
+//    }
 
     
 //    public Collection<DataSet> getDataSets() {
@@ -183,26 +184,33 @@ public class Profile {
     }
 
 
-    public String toJson(){
-        ObjectNode root = objectMapper.createObjectNode();
-        root.put("id", getId().toString());
-        root.put("card_id", cardId);
-        root.put("org_code", orgCode);
-        root.put("org_name", orgName);
-        root.put("patient_id", patientId);
-        root.put("event_no", eventNo);
-        root.put("event_date", eventDate == null ? "" : DateFormatter.utcDateTimeFormat(eventDate));
-        root.put("cda_version", cdaVersion);
-        root.put("create_date", createDate == null ? "" : DateFormatter.utcDateTimeFormat(createDate));
-        root.put("summary", summary);
+//    public String toJson(){
+//        ObjectNode root = objectMapper.createObjectNode();
+//        root.put("id", getId().toString());
+//        root.put("card_id", cardId);
+//        root.put("org_code", orgCode);
+//        root.put("org_name", orgName);
+//        root.put("patient_id", patientId);
+//        root.put("event_no", eventNo);
+//        root.put("event_date", eventDate == null ? "" : DateFormatter.utcDateTimeFormat(eventDate));
+//        root.put("cda_version", cdaVersion);
+//        root.put("create_date", createDate == null ? "" : DateFormatter.utcDateTimeFormat(createDate));
+//        root.put("summary", summary);
+//
+//        ArrayNode dataSetsNode = root.putArray("data_sets");
+//        for (String dataSetCode : dataSets.keySet()){
+//            DataSet dataSet = dataSets.get(dataSetCode);
+//            dataSetsNode.addPOJO(dataSet.toJson(false));
+//        }
+//
+//        return root.toString();
+//    }
 
-        ArrayNode dataSetsNode = root.putArray("data_sets");
-        for (String dataSetCode : dataSets.keySet()){
-            DataSet dataSet = dataSets.get(dataSetCode);
-            dataSetsNode.addPOJO(dataSet.toJson(false));
-        }
-
-        return root.toString();
+    public String getProfileType() {
+        return profileType;
     }
 
+    public void setProfileType(String profileType) {
+        this.profileType = profileType;
+    }
 }

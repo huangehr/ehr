@@ -1,7 +1,5 @@
 package com.yihu.ehr.profile.core.commons;
 
-import java.util.Map;
-
 /**
  * HBase数据库中健康档案表选项. 如列族名称等.
  * 健康档案列族结构: |basic|extension|
