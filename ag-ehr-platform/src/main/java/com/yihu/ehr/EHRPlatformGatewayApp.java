@@ -26,15 +26,21 @@ public class EHRPlatformGatewayApp  {
     @Value("${server.port}")
     int port;
 
+    @Value("${keystore.file}")
+    String keystore;
+
+    @Value("keystore.password")
+    String password;
+
 	public static void main(String[] args) {
 		SpringApplication.run(EHRPlatformGatewayApp.class, args);
 	}
 
     @Bean
     public EmbeddedServletContainerCustomizer containerCustomizer() throws FileNotFoundException {
-        final String absoluteKeystoreFile = ResourceUtils.getFile("C:/Windows/tomcat.keystore").getAbsolutePath();
+        final String absoluteKeystoreFile = ResourceUtils.getFile(keystore).getAbsolutePath();
 
-        final TomcatConnectorCustomizer customizer = new TomcatConnCustomizer(absoluteKeystoreFile, "123456", port);
+        final TomcatConnectorCustomizer customizer = new TomcatConnCustomizer(absoluteKeystoreFile, password, port);
 
         return new EmbeddedServletContainerCustomizer() {
             @Override

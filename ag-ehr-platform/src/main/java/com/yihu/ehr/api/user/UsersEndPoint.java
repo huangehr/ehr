@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 用户认证网关。
+ * 用户。
  *
  * @author Sand
  * @version 1.0

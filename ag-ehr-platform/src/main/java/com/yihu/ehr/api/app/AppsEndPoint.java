@@ -2,8 +2,6 @@ package com.yihu.ehr.api.app;
 
 import com.yihu.ehr.api.model.MToken;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.service.oauth2.EhrTokenStoreService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * 应用授权接口。
@@ -45,8 +42,8 @@ public class AppsEndPoint {
         MToken mToken = new MToken();
         mToken.setId(1);
         mToken.setToken(token.getValue());
-        mToken.setToken_last_eight(token.getValue().substring(token.getValue().length() - 8));
-        mToken.setUpdated_at(new Date());
+        mToken.setTokenLastEight(token.getValue().substring(token.getValue().length() - 8));
+        mToken.setUpdatedAt(new Date());
 
         return mToken;
     }

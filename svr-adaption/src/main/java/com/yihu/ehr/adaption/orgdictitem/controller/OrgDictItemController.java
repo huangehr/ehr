@@ -11,14 +11,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author lincl
@@ -50,7 +48,7 @@ public class OrgDictItemController extends ExtendController<MOrgDictItem> {
 
         OrgDictItem orgDictItem = jsonToObj(model, OrgDictItem.class);
         if (orgDictItemService.isExistOrgDictItem(orgDictItem.getOrgDict(), orgDictItem.getOrganization(), orgDictItem.getCode()))
-            throw new ApiException(ErrorCode.RepeatOrgDictItem, "该字典项已存在!");
+            throw new ApiException(ErrorCode.RepeatCode);
 
         if (orgDictItem.getSort() == 0)
             orgDictItem.setSort(orgDictItemService.getNextSort(orgDictItem.getOrgDict()));
@@ -78,7 +76,7 @@ public class OrgDictItemController extends ExtendController<MOrgDictItem> {
             @RequestParam(value = "ids") String ids) {
 
         if (ids != null && ids.length() > 0)
-            orgDictItemService.delete(ids.split(","));
+            orgDictItemService.delete(strToLongArr(ids));
         return true;
     }
 
@@ -101,7 +99,7 @@ public class OrgDictItemController extends ExtendController<MOrgDictItem> {
                 dataModel.setUpdateDate(new Date());
                 return getModel(orgDictItemService.save(dataModel));
             }
-            throw new ApiException(ErrorCode.RepeatOrgDictItem, "该字典项已存在!");
+            throw new ApiException(ErrorCode.RepeatCode);
         }
     }
 

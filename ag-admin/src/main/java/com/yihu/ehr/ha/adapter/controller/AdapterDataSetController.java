@@ -1,5 +1,6 @@
 package com.yihu.ehr.ha.adapter.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.adapter.AdapterDataSetModel;
 import com.yihu.ehr.agModel.adapter.DataSetModel;
 import com.yihu.ehr.constants.ApiVersion;
@@ -8,7 +9,9 @@ import com.yihu.ehr.ha.adapter.service.AdapterDataSetClient;
 import com.yihu.ehr.ha.adapter.utils.ExtendController;
 import com.yihu.ehr.model.adaption.MAdapterDataSet;
 import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.validate.Valid;
 import com.yihu.ehr.util.validate.ValidateResult;
+import feign.FeignException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,22 +112,19 @@ public class AdapterDataSetController extends ExtendController<AdapterDataSetMod
     @RequestMapping(value = "/metadata", method = RequestMethod.POST)
     public Envelop addAdapterMetaData(
             @ApiParam(name = "model", value = "说明")
-            @RequestParam(value = "model") String model) {
+            @Valid @RequestParam(value = "model") AdapterDataSetModel model) throws Exception{
 
-        try {
-            AdapterDataSetModel dataModel = jsonToObj(model);
-            ValidateResult validateResult = validate(dataModel);
-            if(!validateResult.isRs()){
-                return failed(validateResult.getMsg());
-            }
-            return success(adapterDataSetClient.createAdapterMetaData(model));
-        } catch (ApiException e) {
-            e.printStackTrace();
-            return failed(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return failedSystem();
-        }
+//        try {
+//            throw new Exception("chucuo");
+            return success(
+                    adapterDataSetClient.createAdapterMetaData(  objToJson(model) ));
+//        } catch (Exception e) {
+//            if(e.getCause() instanceof FeignException){
+//                return failed((e.getCause()).getMessage());
+//            }
+//            e.printStackTrace();
+//            return failedSystem();
+//        }
     }
 
 
