@@ -113,8 +113,7 @@ public interface UserClient {
 
     @RequestMapping(value = "/user/picture",method = RequestMethod.GET)
     @ApiOperation(value = "头像下载")
-    String downloadPicture(@ApiParam(name = "user_id", value = "用户id")
-                           @RequestParam(value = "user_id") String userId ,
+    String downloadPicture(
                            @ApiParam(name = "group_name", value = "分组", defaultValue = "")
                            @RequestParam(value = "group_name") String groupName,
                            @ApiParam(name = "remote_file_name", value = "服务器头像名称", defaultValue = "")
