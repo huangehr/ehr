@@ -3,8 +3,9 @@ package com.yihu.ehr.profile.persist;
 import com.yihu.ehr.profile.persist.repo.XProfileIndicesRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.solr.core.query.Criteria;
-import org.springframework.data.solr.core.query.Query;
 import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.stereotype.Service;
 
@@ -27,25 +28,26 @@ public class ProfileIndicesService {
         return profileIndicesRepo.findByDemographicIdAndEventDateBetween(demographicId, since, to);
     }
 
-    public Page<ProfileIndices> search(String queryString) {
+    public Page<ProfileIndices> search(String queryString, Pageable pageable) {
         Criteria criteria = buildCriteria(queryString);
 
-        return profileIndicesRepo.search(new SimpleQuery(criteria));
+        return profileIndicesRepo.find(new SimpleQuery(criteria), pageable);
     }
 
     private Criteria buildCriteria(String query) {
-        Criteria criteria = new Criteria();
+        Criteria criteria = new Criteria("demographic_id").contains("412726195111306268");
 
-        String conditions[] = query.split(";");
+        /*String conditions[] = query.split(";");
         for (String condition : conditions){
             if (condition.contains("demographicId")){
-                criteria = criteria.or("demographic_id").contains("412726195111306268");
+                criteria = criteria.or(new Criteria("demographic_id").contains("412726195111306268"));
             }
 
-            if (condition.contains("eventDate")){
+            *//*if (condition.contains("eventDate")){
                 criteria = criteria.or("event_date").between("2015-01-01", "2017-01-01");
-            }
-        }
-        return null;
+            }*//*
+        }*/
+
+        return criteria;
     }
 }

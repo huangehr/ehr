@@ -21,17 +21,17 @@ import com.yihu.ehr.schema.StdKeySchema;
 import com.yihu.ehr.util.controller.BaseRestEndPoint;
 import com.yihu.ehr.util.encode.Base64;
 import com.yihu.ehr.util.log.LogService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -72,10 +72,16 @@ public class ProfileEndPoint extends BaseRestEndPoint {
 
     @ApiOperation(value = "搜索档案", notes = "返回档案索引列表")
     @RequestMapping(value = RestApi.HealthProfile.ProfileSearch, method = RequestMethod.POST)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query", value = "页码(0..N)", defaultValue = "0"),
+            @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", value = "页大小", defaultValue = "5"),
+            @ApiImplicitParam(name = "sort", allowMultiple = true, dataType = "string", paramType = "query", value = "排序，格式: property(,asc|desc)")
+    })
     public Collection<MProfileIndices> searchProfile(
             @ApiParam(value = "搜索条件")
-            @RequestParam("q") String query) {
-        Page<ProfileIndices> indicesList = indicesService.search(query);
+            @RequestParam("query") String query,
+            @ApiIgnore Pageable pageable) {
+        Page<ProfileIndices> indicesList = indicesService.search(query, pageable);
 
         return convertToModels(indicesList.getContent(), new ArrayList<>(), MProfileIndices.class, null);
     }
@@ -85,6 +91,10 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     public Collection<MProfile> getProfiles(
             @ApiParam(value = "身份证号,使用Base64编码", defaultValue = "NDEyNzI2MTk1MTExMzA2MjY4")
             @RequestParam("demographic_id") String demographicId,
+            @ApiParam(value = "就诊机构列表", defaultValue = "2015-01-01")
+            @RequestParam(value = "organizations", required = false) String[] organizations,
+            @ApiParam(value = "事件类型", defaultValue = "住院")
+            @RequestParam(value = "event_type", required = false) String[] eventType,
             @ApiParam(value = "起始时间", defaultValue = "2015-01-01")
             @RequestParam("since") @DateTimeFormat(pattern = "yyyy-MM-dd") Date since,
             @ApiParam(value = "结束时间", defaultValue = "2016-12-31")
@@ -148,11 +158,11 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     /**
      * 此类目下卫生机构定制的CDA文档列表
      */
-    private Collection<MCDADocument> getCustomizedCDADocuments(StructuredProfile profile){
+    private Collection<MCDADocument> getCustomizedCDADocuments(StructuredProfile profile) {
         // 使用CDA类别关键数据元映射，取得与此档案相关联的CDA类别ID
         String cdaType = null;
-        for (StructuredDataSet dataSet : profile.getDataSets()){
-            if(cdaDocumentOptions.isPrimaryDataSet(dataSet.getCode())){
+        for (StructuredDataSet dataSet : profile.getDataSets()) {
+            if (cdaDocumentOptions.isPrimaryDataSet(dataSet.getCode())) {
                 cdaType = cdaDocumentOptions.getCdaDocumentTypeId(dataSet.getCode());
                 break;
             }
@@ -174,7 +184,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return cdaDocuments;
     }
 
-    private MProfile convertProfile(StructuredProfile profile){
+    private MProfile convertProfile(StructuredProfile profile) {
         MProfile mProfile = new MProfile();
         mProfile.setId(profile.getId());
         mProfile.setCdaVersion(profile.getCdaVersion());
@@ -223,7 +233,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return mProfile;
     }
 
-    private MProfileDocument convertDocument(StructuredProfile profile, Collection<MCDADocument> cdaDocuments, String documentId){
+    private MProfileDocument convertDocument(StructuredProfile profile, Collection<MCDADocument> cdaDocuments, String documentId) {
         for (MCDADocument cdaDocument : cdaDocuments) {
             if (!cdaDocument.getId().equals(documentId)) continue;
 
@@ -265,7 +275,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             Map<String, MRecord> records = new HashMap<>();
             mDataSet.setRecords(records);
 
-            for (String key : dataSet.getRecordKeys()){
+            for (String key : dataSet.getRecordKeys()) {
                 records.put(key, new MRecord(dataSet.getRecord(key)));
             }
 

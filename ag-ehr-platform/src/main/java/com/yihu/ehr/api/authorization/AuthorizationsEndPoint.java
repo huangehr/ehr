@@ -44,7 +44,7 @@ import java.util.*;
  * @created 2016.02.23 11:24
  */
 @RestController
-@RequestMapping(ApiVersion.Version1_0 + "/authorizations", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+@RequestMapping(value = ApiVersion.Version1_0 + "/authorizations", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "authorizations", description = "认证与授权服务。注意此API使用Basic认证。")
 public class AuthorizationsEndPoint {
     private final static int TOKEN_LENGTH = 32;
