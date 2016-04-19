@@ -112,8 +112,6 @@ public class PackageResolver {
             }
         }
 
-        //makeEventSummary(structuredProfile);
-
         houseKeep(zipFile, root);
 
         return structuredProfile;

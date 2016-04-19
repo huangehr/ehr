@@ -95,19 +95,20 @@ public class DataSetResolver {
         String eventNo = jsonNode.get("event_no").asText();
         String patientId = jsonNode.get("patient_id").asText();
         String orgCode = jsonNode.get("org_code").asText();
-        String eventDate = jsonNode.path("event_time").asText();        // 旧数据集结构可能不存在这个属性\
+        String eventDate = jsonNode.get("event_time").asText();        // 旧数据集结构可能不存在这个属性
+        String sumary = jsonNode.get("sumary").toString();
+
+        lightWeightProfile.setPatientId(patientId);
+        lightWeightProfile.setEventNo(eventNo);
+        lightWeightProfile.setOrgCode(orgCode);
+        lightWeightProfile.setCdaVersion(version);
+        lightWeightProfile.setSummary(sumary);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        lightWeightProfile.setEventDate(format.parse(eventDate));
 
         JsonNode dataSets = jsonNode.get("dataset");
         Iterator<Map.Entry<String, JsonNode>> iterator = dataSets.fields();
         while (iterator.hasNext()) {
-            lightWeightProfile.setPatientId(patientId);
-            lightWeightProfile.setEventNo(eventNo);
-            lightWeightProfile.setOrgCode(orgCode);
-            lightWeightProfile.setCdaVersion(version);
-
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-            lightWeightProfile.setEventDate(format.parse(eventDate));
 
             Map.Entry<String, JsonNode> map = iterator.next();
             String code = map.getKey();

@@ -2,15 +2,18 @@ package com.yihu.ehr.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.extractor.EventExtractor;
 import com.yihu.ehr.extractor.ExtractorChain;
 import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.profile.core.commons.Profile;
+import com.yihu.ehr.profile.core.lightweight.LightWeightDataSet;
 import com.yihu.ehr.profile.core.lightweight.LightWeightProfile;
-import com.yihu.ehr.profile.core.nostructured.UnStructuredDocumentFile;
-import com.yihu.ehr.profile.core.nostructured.UnStructuredProfile;
+import com.yihu.ehr.profile.core.structured.StructuredDataSet;
 import com.yihu.ehr.profile.core.structured.StructuredProfile;
 import com.yihu.ehr.profile.persist.DataSetResolverWithTranslator;
 import com.yihu.ehr.util.compress.Zipper;
+import com.yihu.ehr.util.log.LogService;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -18,8 +21,6 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 档案归档任务.
@@ -77,9 +78,10 @@ public class LightWeihgtPackageResolver {
             lightWeightProfile = lightWeightDataSetParse(lightWeightProfile,file.listFiles());
         }
 
-        //// TODO: 2016/4/15
-        //makeEventSummary(structuredProfile);
-        
+        makeEventSummary(lightWeightProfile);
+
+        houseKeep(zipFile, root);
+
         return lightWeightProfile;
     }
 
@@ -101,8 +103,39 @@ public class LightWeihgtPackageResolver {
         }
         //设置数据集
         dataSetResolverWithTranslator.parseLightJsonDataSet(lightWeightProfile,jsonNode);
-        //file.delete();
         return lightWeightProfile;
+    }
+
+    /**
+     * 根据此次的数据产生一个健康事件，并更新数据集的行ID.
+     *
+     * @param lightWeightProfile
+     */
+    public void makeEventSummary(LightWeightProfile lightWeightProfile) {
+        EventExtractor eventExtractor = context.getBean(EventExtractor.class);
+
+        for (String dataSetTable : lightWeightProfile.getDataSetTables()) {
+            if (StringUtils.isEmpty(lightWeightProfile.getSummary()) && eventExtractor.getDataSets().containsKey(dataSetTable)) {
+                lightWeightProfile.setSummary(eventExtractor.getDataSets().get(dataSetTable));
+            }
+
+            int rowIndex = 0;
+            LightWeightDataSet lightWeightDataSet = lightWeightProfile.getDataSet(dataSetTable);
+            String[] rowKeys = new String[lightWeightDataSet.getRecordKeys().size()];
+            lightWeightDataSet.getRecordKeys().toArray(rowKeys);
+            for (String rowKey : rowKeys) {
+                lightWeightDataSet.updateRecordKey(rowKey, lightWeightProfile.getId() + "$" + rowIndex++);
+            }
+        }
+    }
+
+    private void houseKeep(String zipFile, File root) {
+        try {
+            FileUtils.deleteQuietly(new File(zipFile));
+            FileUtils.deleteQuietly(root);
+        } catch (Exception e) {
+            LogService.getLogger(PackageResolver.class).warn("House keep failed after package resolve: " + e.getMessage());
+        }
     }
 
 
