@@ -68,7 +68,7 @@ public class OrganizationControllerTests {
 
         String orgCreateJson = objectMapper.writeValueAsString(orgDetailModel);
         String addrCreateJson = objectMapper.writeValueAsString(addrCreate);
-        envelop = orgController.create(orgCreateJson, addrCreateJson);
+        envelop = orgController.create(orgCreateJson, addrCreateJson,"","");
         assertNotEquals("机构新增失败！", envelop.isSuccessFlg(), false);
 
         // 新创建的orgDetailModel对象，用于下面的操作

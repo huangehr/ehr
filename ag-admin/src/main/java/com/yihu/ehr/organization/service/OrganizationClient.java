@@ -140,9 +140,9 @@ public interface OrganizationClient {
             @ApiParam(name = "org_code", value = "org_code", defaultValue = "")
             @PathVariable(value = "org_code") String orgCode);
 
-    @RequestMapping(value = "/organizations/picture" , method = RequestMethod.POST)
+    @RequestMapping(value = "/organizations/images" , method = RequestMethod.POST)
     @ApiOperation(value = "机构资质图片上传")
     public String uploadPicture(
-            @ApiParam(name = "json_data", value = "json_data", defaultValue = "")
-            @PathVariable(value = "json_data") String jsonData);
+            @ApiParam(name = "jsonData", value = "jsonData", defaultValue = "")
+            @PathVariable(value = "jsonData") String jsonData);
 }
