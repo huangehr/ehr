@@ -73,9 +73,9 @@ public class TemplateEndPoint extends BaseRestEndPoint {
             HttpServletRequest request,
             HttpServletResponse response
     ) throws ParseException {
-        List<Template> templateList = templateService.search(fields, filters, sorts, reducePage(page), size);
+        List<Template> templateList = templateService.search(fields, filters, sorts, page, size);
 
-        pagedResponse(request, response, (long) templateList.size(), page, size);
+        pagedResponse(request, response, templateService.getCount(filters), page, size);
 
         return convertToModels(templateList, new ArrayList<>(templateList.size()), MTemplate.class, fields);
     }
@@ -88,6 +88,17 @@ public class TemplateEndPoint extends BaseRestEndPoint {
         if (null == template) throw new ApiException(HttpStatus.NOT_FOUND, "Template not found");
 
         return convertToModel(template, MTemplate.class, null);
+    }
+
+    @ApiOperation(value = "判断模版名称是否已存在")
+    @RequestMapping(value = RestApi.HealthProfile.TemplateTitleExistence, method = RequestMethod.GET)
+    public boolean isNameExist(
+            @ApiParam(name = "version", value = "版本")
+            @RequestParam(value = "version") String version,
+            @ApiParam(name = "title", value = "标题")
+            @RequestParam(value = "title") String title) {
+
+        return templateService.isExistName(title, version);
     }
 
     @ApiOperation(value = "更新模板属性")
@@ -137,6 +148,7 @@ public class TemplateEndPoint extends BaseRestEndPoint {
 
         InputStream stream = file.getInputStream();
         template.setContent(pc, stream);
+        templateService.save(template);
     }
 
     @ApiOperation(value = "删除模板")

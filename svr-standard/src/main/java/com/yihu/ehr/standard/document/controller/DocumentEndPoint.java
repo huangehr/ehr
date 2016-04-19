@@ -71,6 +71,22 @@ public class DocumentEndPoint extends ExtendController<MCDADocument> {
         return convertToModels(ls, new ArrayList<>(ls.size()), MCDADocument.class, fields);
     }
 
+    @ApiOperation(value = "获取CDADocuments")
+    @RequestMapping(value = RestApi.Standards.Document, method = RequestMethod.GET)
+    public MCDADocument getCDADocuments(
+            @ApiParam(name = "version", value = "标准版本", defaultValue = "")
+            @RequestParam(value = "version") String version,
+            @ApiParam(name = "id", value = "编号")
+            @PathVariable(value = "id") String id
+    ) throws Exception {
+
+        Class entityClass = getServiceEntity(version);
+        if(cdaDocumentService.retrieve(id, entityClass)==null)
+            throw  errNotFound("cda文档", id);
+
+        return getModel(cdaDocumentService.retrieve(id, entityClass));
+    }
+
     //todo： 动态实体改版完后   归并到GetCDADocuments方法中
     @RequestMapping(value = "/std/CDADocuments/ids", method = RequestMethod.GET)
     @ApiOperation(value = "根据ids获取cda列表")

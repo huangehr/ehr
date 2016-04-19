@@ -43,6 +43,10 @@ public class TemplateService extends BaseJpaService<Template, XTemplateRepositor
         return search(fields, filters, sorts, page, size);
     }
 
+    public boolean isExistName(String title, String cdaVersion){
+
+        return getRepo().countByTitleAndCdaVersion(title, cdaVersion)>0;
+    }
     public void createTemplate(Template template) {
         save(template);
     }
