@@ -4,12 +4,10 @@ import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.feign.XCDAVersionClient;
 import com.yihu.ehr.query.BaseJpaService;
-import org.csource.common.MyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;

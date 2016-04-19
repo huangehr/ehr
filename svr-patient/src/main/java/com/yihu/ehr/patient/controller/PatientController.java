@@ -22,11 +22,13 @@ import org.apache.commons.lang.StringUtils;
 import org.csource.common.MyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import sun.java2d.pipe.BufferedTextPipe;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -267,84 +269,25 @@ public class PatientController extends BaseRestController {
     @RequestMapping(value = "/populations/picture",method = RequestMethod.GET)
     @ApiOperation(value = "下载头像")
     public String downloadPicture(
-            @ApiParam(name = "demographic_id", value = "病人主键，和身份证号一致")
-            @RequestParam(value = "demographic_id") String demographicId ,
             @ApiParam(name = "group_name", value = "分组", defaultValue = "")
             @RequestParam(value = "group_name") String groupName,
             @ApiParam(name = "remote_file_name", value = "服务器头像名称", defaultValue = "")
             @RequestParam(value = "remote_file_name") String remoteFileName) throws Exception {
-        String splitMark = System.getProperty("file.separator");
-        String strPath = System.getProperty("java.io.tmpdir");
-        strPath += splitMark + "patientImages" + splitMark + remoteFileName;
-        File file = new File(strPath);
-        String path = String.valueOf(file.getParentFile());
-        if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
-        }
-        DemographicInfo demographicInfo = demographicService.getDemographicInfo(new DemographicId(demographicId));
-        if (!StringUtils.isEmpty(demographicInfo.getLocalPath())) {
-            File fileName = new File(demographicInfo.getLocalPath());
-            if (fileName.exists()) {
-                return demographicInfo.getLocalPath();
-            }
-        }
-        //调用图片下载方法，返回文件的储存位置localPath，将localPath保存至人口信息表
-        String localPath = null;
+        String imageStream = null;
         try {
-            localPath = fastDFSUtil.download(groupName, remoteFileName, path);
-            demographicInfo.setLocalPath(localPath);
-            demographicService.savePatient(demographicInfo);
+
+            byte[] bytes = fastDFSUtil.download(groupName,remoteFileName);
+
+            String fileStream = Base64.encode(bytes);
+            imageStream = URLEncoder.encode(fileStream,"UTF-8");
+
         } catch (IOException e) {
             e.printStackTrace();
         } catch (MyException e) {
             LogService.getLogger(DemographicInfo.class).error("人口头像图片下载失败；错误代码：" + e);
         }
-        return localPath;
+        return imageStream;
     }
-
-
-    //显示头像在前端做
-//    /**
-//     * 注：因直接访问文件路径，无法显示文件信息
-//     * 将文件路径解析成字节流，通过字节流的方式读取文件
-//     * @param request
-//     * @param response
-//     * @param localImgPath       文件路径
-//     * @throws Exception
-//     */
-//    @RequestMapping(value = "/populations/picture/show",method = RequestMethod.PUT)
-//    @ApiOperation(value = "显示头像")
-//    public void showImage(
-//            @ApiParam(name = "local_img_path", value = "身份证号", defaultValue = "")
-//            @PathVariable(value = "local_img_path") String localImgPath,
-//            HttpServletRequest request,
-//            HttpServletResponse response) throws Exception{
-//        response.setContentType("text/html; charset=UTF-8");
-//        response.setContentType("image/jpeg");
-//        FileInputStream fis = null;
-//        OutputStream os = null;
-//        try {
-//            File file = new File(localImgPath);
-//            if (!file.exists()) {
-//                LogService.getLogger(PatientController.class).error("人口头像不存在：" + localImgPath);
-//                return;
-//            }
-//            fis = new FileInputStream(localImgPath);
-//            os = response.getOutputStream();
-//            int count = 0;
-//            byte[] buffer = new byte[1024 * 1024];
-//            while ((count = fis.read(buffer)) != -1)
-//                os.write(buffer, 0, count);
-//            os.flush();
-//        } catch (IOException e) {
-//            LogService.getLogger(PatientController.class).error(e.getMessage());
-//        } finally {
-//            if (os != null)
-//                os.close();
-//            if (fis != null)
-//                fis.close();
-//        }
-//    }
 
     @RequestMapping(value = "/populations/is_exist/{id_card_no}",method = RequestMethod.GET)
     @ApiOperation(value = "判断身份证是否存在")

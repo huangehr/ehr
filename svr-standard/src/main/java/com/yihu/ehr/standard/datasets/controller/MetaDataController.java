@@ -135,13 +135,9 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
 
         Class entityClass = getServiceEntity(version);
         BaseMetaData metaDataModel = (BaseMetaData) jsonToObj(model, entityClass);
-        BaseMetaData metaData = metaDataService.retrieve(id, entityClass);
-        if(metaData.getId()==0)
-            throw errNotFound("数据元", metaDataModel.getId());
-
-        if(!metaData.getCode().equals(metaDataModel.getCode())
-                && metaDataService.isColumnValExsit(metaDataModel.getDataSetId(), "code", metaDataModel.getCode(), entityClass))
-            throw errRepeatCode();
+//        BaseMetaData metaData = metaDataService.retrieve(id, entityClass);
+//        if(metaData.getId()==0)
+//            throw errNotFound("数据元", metaDataModel.getId());
 
         metaDataModel.setId(id);
         metaDataService.save(metaDataModel);
@@ -158,8 +154,6 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
             @RequestParam(value = "model", required = false) String model) throws Exception{
 
         BaseMetaData metaData = (BaseMetaData) jsonToObj(model, getServiceEntity(version));
-        if(metaDataService.isColumnValExsit(metaData.getDataSetId(), "code", metaData.getCode(), getServiceEntity(version)))
-            throw errRepeatCode();
         if(metaDataService.saveMetaData(metaData, version))
             return getModel(metaData);
         return null;

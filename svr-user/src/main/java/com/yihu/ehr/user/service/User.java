@@ -29,6 +29,7 @@ public class User {
     private String gender;
     private String idCardNo;
     private String organization;
+    private String source;
 
     // 未绑定属性
 	private String orgPost;
@@ -161,6 +162,14 @@ public class User {
     }
     public void setIdCardNo(String idCardNo) {
         this.idCardNo = idCardNo;
+    }
+
+    @Column(name = "source",  nullable = true)
+    public String getSource() {
+        return source;
+    }
+    public void setSource(String source) {
+        this.source = source;
     }
 
     @Column(name = "organization",  nullable = true)

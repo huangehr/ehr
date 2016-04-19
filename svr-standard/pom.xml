@@ -63,6 +63,11 @@
 			<artifactId>commons-data-fastdfs</artifactId>
 			<version>1.1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>happy.fish</groupId>
+			<artifactId>fastDFS</artifactId>
+			<version>1.1.0</version>
+		</dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-data-redis</artifactId>
@@ -76,6 +81,11 @@
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-redis-keyschema</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>happy.fish</groupId>
+            <artifactId>fastDFS</artifactId>
             <version>1.1.0</version>
         </dependency>
 	</dependencies>

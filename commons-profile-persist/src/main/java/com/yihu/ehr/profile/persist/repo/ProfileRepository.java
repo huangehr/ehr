@@ -5,7 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.cache.CacheReader;
 import com.yihu.ehr.data.hadoop.HBaseClient;
 import com.yihu.ehr.data.hadoop.ResultWrapper;
-import com.yihu.ehr.profile.core.*;
+import com.yihu.ehr.profile.core.commons.*;
+import com.yihu.ehr.profile.core.lightweight.LightWeightProfile;
+import com.yihu.ehr.profile.core.nostructured.UnStructuredProfile;
+import com.yihu.ehr.profile.core.structured.StructuredDataSet;
+import com.yihu.ehr.profile.core.structured.StructuredProfile;
 import com.yihu.ehr.schema.StdKeySchema;
 import com.yihu.ehr.util.DateFormatter;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -16,12 +20,13 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 
-import static com.yihu.ehr.profile.core.ProfileTableOptions.*;
+import static com.yihu.ehr.profile.core.commons.ProfileTableOptions.*;
 
 /**
  * 健康档案加载器. 可以根据健康档案ID或与之关联的事件ID加载档案.
@@ -50,7 +55,7 @@ public class ProfileRepository {
      * @param profileId
      * @return
      */
-    public Profile findOne(String profileId, boolean loadStdDataSet, boolean loadOriginDataSet) throws IOException, ParseException {
+    public StructuredProfile findOne(String profileId, boolean loadStdDataSet, boolean loadOriginDataSet) throws IOException, ParseException {
         ResultWrapper record = hbaseClient.getResultAsWrapper(ProfileTableOptions.Table, profileId);
         if (record.getResult().toString().equals("keyvalues=NONE")) throw new RuntimeException("Profile not found.");
 
@@ -65,17 +70,17 @@ public class ProfileRepository {
         String cdaVersion = record.getValueAsString(Family.Basic.toString(), BasicQualifier.CdaVersion.toString());
         String dataSets = record.getValueAsString(Family.Basic.toString(), BasicQualifier.DataSets.toString());
 
-        Profile profile = new Profile();
-        profile.setId(profileId);
-        profile.setCardId(cardId);
-        profile.setOrgCode(orgCode);
-        profile.setPatientId(patientId);
-        profile.setEventNo(eventNo);
-        profile.setEventDate(DateFormatter.utcDateTimeParse(eventDate));
-        profile.setSummary(summary);
-        profile.setDemographicId(demographicId);
-        profile.setCreateDate(DateFormatter.utcDateTimeParse(createDate));
-        profile.setCdaVersion(cdaVersion);
+        StructuredProfile structuredProfile = new StructuredProfile();
+        structuredProfile.setId(profileId);
+        structuredProfile.setCardId(cardId);
+        structuredProfile.setOrgCode(orgCode);
+        structuredProfile.setPatientId(patientId);
+        structuredProfile.setEventNo(eventNo);
+        structuredProfile.setEventDate(DateFormatter.utcDateTimeParse(eventDate));
+        structuredProfile.setSummary(summary);
+        structuredProfile.setDemographicId(demographicId);
+        structuredProfile.setCreateDate(DateFormatter.utcDateTimeParse(createDate));
+        structuredProfile.setCdaVersion(cdaVersion);
 
         // 加载数据集列表
         JsonNode root = objectMapper.readTree(dataSets);
@@ -87,23 +92,23 @@ public class ProfileRepository {
             if (loadStdDataSet || loadOriginDataSet) {
                 if (loadStdDataSet) {
                     if (!dataSetCode.contains(DataSetTableOption.OriginDataSetFlag)) {
-                        Pair<String, ProfileDataSet> pair = findDataSet(cdaVersion, dataSetCode, rowKeys);
-                        profile.addDataSet(pair.getLeft(), pair.getRight());
+                        Pair<String, StructuredDataSet> pair = findDataSet(cdaVersion, dataSetCode, rowKeys);
+                        structuredProfile.addDataSet(pair.getLeft(), pair.getRight());
                     }
                 }
                 if (loadOriginDataSet) {
                     if (dataSetCode.contains(DataSetTableOption.OriginDataSetFlag)) {
-                        Pair<String, ProfileDataSet> pair = findDataSet(cdaVersion, dataSetCode, rowKeys);
-                        profile.addDataSet(pair.getLeft(), pair.getRight());
+                        Pair<String, StructuredDataSet> pair = findDataSet(cdaVersion, dataSetCode, rowKeys);
+                        structuredProfile.addDataSet(pair.getLeft(), pair.getRight());
                     }
                 }
             } else {
-                Pair<String, ProfileDataSet> pair = findDataSetIndices(cdaVersion, dataSetCode, rowKeys);
-                profile.addDataSet(pair.getLeft(), pair.getRight());
+                Pair<String, StructuredDataSet> pair = findDataSetIndices(cdaVersion, dataSetCode, rowKeys);
+                structuredProfile.addDataSet(pair.getLeft(), pair.getRight());
             }
         }
 
-        return profile;
+        return structuredProfile;
     }
 
     /**
@@ -114,10 +119,10 @@ public class ProfileRepository {
      * @return
      * @throws IOException
      */
-    public Pair<String, ProfileDataSet> findDataSet(String cdaVersion,
-                                                    String dataSetCode,
-                                                    String[] rowKeys) throws IOException {
-        ProfileDataSet dataSet = new ProfileDataSet();
+    public Pair<String, StructuredDataSet> findDataSet(String cdaVersion,
+                                                       String dataSetCode,
+                                                       String[] rowKeys) throws IOException {
+        StructuredDataSet dataSet = new StructuredDataSet();
         dataSet.setCdaVersion(cdaVersion);
         dataSet.setCode(dataSetCode);
 
@@ -162,10 +167,10 @@ public class ProfileRepository {
      * @return
      * @throws IOException
      */
-    public Pair<String, ProfileDataSet> findDataSet(String version,
-                                                    String dataSetCode,
-                                                    Set<String> rowKeys,
-                                                    String[] innerCodes) throws IOException {
+    public Pair<String, StructuredDataSet> findDataSet(String version,
+                                                       String dataSetCode,
+                                                       Set<String> rowKeys,
+                                                       String[] innerCodes) throws IOException {
         List<String> metaDataCode = new ArrayList<>(innerCodes.length);
         for (int i = 0; i < innerCodes.length; ++i) {
             Long dictId = Long.getLong(cacheReader.read(keySchema.metaDataDict(version, dataSetCode, innerCodes[i])));
@@ -181,7 +186,7 @@ public class ProfileRepository {
             }
         }
 
-        ProfileDataSet dataSet = new ProfileDataSet();
+        StructuredDataSet dataSet = new StructuredDataSet();
         Result[] results = hbaseClient.getPartialRecords(dataSetCode,
                 rowKeys.toArray(new String[rowKeys.size()]),
                 DataSetTableOption.getFamilies(),
@@ -219,10 +224,10 @@ public class ProfileRepository {
      * @param rowKeys
      * @return
      */
-    public Pair<String, ProfileDataSet> findDataSetIndices(String cdaVersion,
-                                                           String dataSetCode,
-                                                           String[] rowKeys) {
-        ProfileDataSet dataSet = new ProfileDataSet();
+    public Pair<String, StructuredDataSet> findDataSetIndices(String cdaVersion,
+                                                              String dataSetCode,
+                                                              String[] rowKeys) {
+        StructuredDataSet dataSet = new StructuredDataSet();
         dataSet.setCdaVersion(cdaVersion);
         dataSet.setCode(dataSetCode);
 
@@ -233,35 +238,22 @@ public class ProfileRepository {
         return new ImmutablePair<>(dataSetCode, dataSet);
     }
 
+
     /**
-     * 保存档案。
-     *
-     * @param profile
+     * 结构化档案，轻量级档案插入数据集
+     * @param tableSet
+     * @param lightWeightProfile
+     * @param structuredProfile
      * @throws IOException
      */
-    public void save(Profile profile) throws IOException {
-        // 先存档案
-        hbaseClient.insertRecord(ProfileTableOptions.Table,
-                profile.getId(),
-                ProfileTableOptions.Family.Basic.toString(),
-                ProfileTableOptions.getQualifiers(ProfileTableOptions.Family.Basic),
-                new String[]{
-                        profile.getCardId(),
-                        profile.getOrgCode(),
-                        profile.getPatientId(),
-                        profile.getEventNo(),
-                        DateFormatter.utcDateTimeFormat(profile.getEventDate()),
-                        profile.getSummary(),
-                        profile.getDemographicId() == null ? "" : profile.getDemographicId(),
-                        DateFormatter.utcDateTimeFormat(profile.getCreateDate()),
-                        profile.getDataSetsAsString(),
-                        profile.getCdaVersion()
-                });
-
-        // 数据集
-        Set<String> tableSet = profile.getDataSetTables();
+    public void InsertDataSet(Set<String> tableSet,LightWeightProfile lightWeightProfile,StructuredProfile structuredProfile) throws IOException {
         for (String tableName : tableSet) {
-            ProfileDataSet dataSet = profile.getDataSet(tableName);
+            DataSet dataSet;
+            if(StringUtils.isEmpty(lightWeightProfile)){
+                dataSet = structuredProfile.getDataSet(tableName);
+            }else {
+                dataSet = lightWeightProfile.getDataSet(tableName);
+            }
 
             hbaseClient.beginBatchInsert(tableName, false);
             for (String key : dataSet.getRecordKeys()) {
@@ -273,7 +265,7 @@ public class ProfileRepository {
                         DataSetTableOption.Family.Basic.toString(),
                         DataSetTableOption.getQualifiers(DataSetTableOption.Family.Basic),
                         new String[]{
-                                profile.getId(),
+                                StringUtils.isEmpty(lightWeightProfile)? structuredProfile.getId():lightWeightProfile.getId(),
                                 dataSet.getCdaVersion(),
                                 DateFormatter.utcDateTimeFormat(new Date())
                         });
@@ -287,5 +279,109 @@ public class ProfileRepository {
 
             hbaseClient.endBatchInsert();
         }
+    }
+
+
+    /**
+     * 保存全量级档案。
+     *
+     * @param structuredProfile
+     * @throws IOException
+     */
+    public void saveStructuredProfile(StructuredProfile structuredProfile) throws IOException {
+        // 先存档案
+        hbaseClient.insertRecord(ProfileTableOptions.Table,
+                structuredProfile.getId(),
+                ProfileTableOptions.Family.Basic.toString(),
+                ProfileTableOptions.getQualifiers(ProfileTableOptions.Family.Basic),
+                new String[]{
+                        structuredProfile.getCardId(),
+                        structuredProfile.getOrgCode(),
+                        structuredProfile.getPatientId(),
+                        structuredProfile.getEventNo(),
+                        DateFormatter.utcDateTimeFormat(structuredProfile.getEventDate()),
+                        structuredProfile.getSummary(),
+                        structuredProfile.getDemographicId() == null ? "" : structuredProfile.getDemographicId(),
+                        DateFormatter.utcDateTimeFormat(structuredProfile.getCreateDate()),
+                        structuredProfile.getDataSetsAsString(),
+                        structuredProfile.getCdaVersion()
+                });
+
+        // 数据集
+        Set<String> tableSet = structuredProfile.getDataSetTables();
+        InsertDataSet(tableSet,null,structuredProfile);
+    }
+
+
+    /**
+     * 保存轻量量级档案。
+     *
+     * @param lightWeightProfile
+     * @throws IOException
+     */
+    public void saveLightWeightProfile(LightWeightProfile lightWeightProfile) throws IOException {
+        // 先存档案
+        hbaseClient.insertRecord(ProfileTableOptions.Table,
+                lightWeightProfile.getId(),
+                ProfileTableOptions.Family.Basic.toString(),
+                ProfileTableOptions.getQualifiers(ProfileTableOptions.Family.Basic),
+                new String[]{
+                        lightWeightProfile.getCardId(),
+                        lightWeightProfile.getOrgCode(),
+                        lightWeightProfile.getPatientId(),
+                        lightWeightProfile.getEventNo(),
+                        DateFormatter.utcDateTimeFormat(lightWeightProfile.getEventDate()),
+                        lightWeightProfile.getSummary(),
+                        lightWeightProfile.getDemographicId() == null ? "" : lightWeightProfile.getDemographicId(),
+                        DateFormatter.utcDateTimeFormat(lightWeightProfile.getCreateDate()),
+                        lightWeightProfile.getDataSetsAsString(),
+                        lightWeightProfile.getCdaVersion()
+                });
+
+        // 数据集
+        Set<String> tableSet = lightWeightProfile.getDataSetTables();
+        InsertDataSet(tableSet,lightWeightProfile,null);
+
+    }
+
+
+
+
+    public void saveUnStructuredProfile(UnStructuredProfile unStructuredProfile) throws IOException {
+        // 先存档案
+        hbaseClient.insertRecord(ProfileTableOptions.Table,
+                unStructuredProfile.getId(),
+                ProfileTableOptions.Family.Basic.toString(),
+                ProfileTableOptions.getQualifiers(ProfileTableOptions.Family.Basic),
+                new String[]{
+                        unStructuredProfile.getCardId(),
+                        unStructuredProfile.getOrgCode(),
+                        unStructuredProfile.getPatientId(),
+                        unStructuredProfile.getEventNo(),
+                        DateFormatter.utcDateTimeFormat(unStructuredProfile.getEventDate()),
+                        unStructuredProfile.getSummary(),
+                        unStructuredProfile.getDemographicId() == null ? "" : unStructuredProfile.getDemographicId(),
+                        DateFormatter.utcDateTimeFormat(unStructuredProfile.getCreateDate()),
+//                        unStructuredProfile.getDataSetsAsString(),
+                        "",  //非结构化档案暂时不保存数据集信息
+                        unStructuredProfile.getCdaVersion()
+                });
+
+        // 非结构化档案文档解析
+
+        hbaseClient.insertRecord(DocumentTableOption.Table,
+                unStructuredProfile.getId(),
+                DocumentTableOption.Family.Document.toString(),
+                DocumentTableOption.getQualifiers(DocumentTableOption.Family.Document),
+                new String[]{
+                        unStructuredProfile.getOrgCode(),
+                        unStructuredProfile.getPatientId(),
+                        unStructuredProfile.getEventNo(),
+                        DateFormatter.utcDateTimeFormat(unStructuredProfile.getEventDate()),  //日期格式化
+                        unStructuredProfile.getCdaVersion(),
+                        unStructuredProfile.getUnStructuredDocument().toString()  //// TODO: 2016/4/18 json格式化
+                });
+
+
     }
 }

@@ -1,7 +1,6 @@
 package com.yihu.ehr.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.deploy.util.ArrayUtil;
 import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.SessionAttributeKeys;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.lang.reflect.Array;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -216,9 +214,9 @@ public class UserController extends BaseUIController {
                 }
 
                 userJsonDataModel = mapper.writeValueAsString(userModel);
-                params.add("user_json_data", userJsonDataModel);
+                params.add("user_json_datas", userJsonDataModel);
 
-                resultStr = templates.doPut(comUrl + url, params);
+                resultStr = templates.doPost(comUrl + "/user", params);
             }else{
                 resultStr = templates.doPost(comUrl + url, params);
             }

@@ -403,7 +403,7 @@ public class OrganizationController extends BaseController {
             @RequestParam(value = "province") String province,
             @ApiParam(name = "city", value = "市")
             @RequestParam(value = "city") String city,
-            @ApiParam(name = "district", value = "市")
+            @ApiParam(name = "district", value = "县")
             @RequestParam(value = "district") String district) {
         try {
             Envelop envelop = new Envelop();
