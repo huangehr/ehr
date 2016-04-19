@@ -19,6 +19,8 @@ public class OrgModel {
     private String settledWay;
     private String settledWayName;
     private String createDate;
+    private String imgRemotePath;
+    private String imgLocalPath;
 
     public String getOrgCode() {
         return orgCode;
@@ -130,5 +132,21 @@ public class OrgModel {
 
     public void setCreateDate(String createDate) {
         this.createDate = createDate;
+    }
+
+    public String getImgRemotePath() {
+        return imgRemotePath;
+    }
+
+    public void setImgRemotePath(String imgRemotePath) {
+        this.imgRemotePath = imgRemotePath;
+    }
+
+    public String getImgLocalPath() {
+        return imgLocalPath;
+    }
+
+    public void setImgLocalPath(String imgLocalPath) {
+        this.imgLocalPath = imgLocalPath;
     }
 }

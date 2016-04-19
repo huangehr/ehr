@@ -32,6 +32,8 @@ public class OrgDetailModel{
     private String admin;
     private String tel;
     private String tags;
+    private String imgRemotePath;
+    private String imgLocalPath;
     //公钥信息
     String publicKey;
     String validTime;
@@ -244,5 +246,21 @@ public class OrgDetailModel{
 
     public void setStartTime(String startTime) {
         this.startTime = startTime;
+    }
+
+    public String getImgRemotePath() {
+        return imgRemotePath;
+    }
+
+    public void setImgRemotePath(String imgRemotePath) {
+        this.imgRemotePath = imgRemotePath;
+    }
+
+    public String getImgLocalPath() {
+        return imgLocalPath;
+    }
+
+    public void setImgLocalPath(String imgLocalPath) {
+        this.imgLocalPath = imgLocalPath;
     }
 }
