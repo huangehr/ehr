@@ -27,6 +27,7 @@ public class MDemographicInfo {
     private String telephoneNo ;                     // 电话号码，之前是个电话号码列表
     private String picPath = "";
     private String localPath = "";
+    private Date registerTime;   //注册时间
 
     public MDemographicInfo() {
     }
@@ -157,6 +158,14 @@ public class MDemographicInfo {
 
     public void setLocalPath(String localPath) {
         this.localPath = localPath;
+    }
+
+    public Date getRegisterTime() {
+        return registerTime;
+    }
+
+    public void setRegisterTime(Date registerTime) {
+        this.registerTime = registerTime;
     }
 }
 
