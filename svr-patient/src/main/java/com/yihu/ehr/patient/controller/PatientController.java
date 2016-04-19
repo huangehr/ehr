@@ -15,24 +15,18 @@ import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
-import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.lang.StringUtils;
 import org.csource.common.MyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import sun.java2d.pipe.BufferedTextPipe;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by zqb on 2015/8/14.
@@ -162,6 +156,7 @@ public class PatientController extends BaseRestController {
 //        }
         String pwd = "123456";
         demographicInfo.setPassword(HashUtil.hashStr(pwd));
+        demographicInfo.setRegisterTime(new Date());
         demographicService.savePatient(demographicInfo);
         return convertToModel(demographicInfo,MDemographicInfo.class);
     }

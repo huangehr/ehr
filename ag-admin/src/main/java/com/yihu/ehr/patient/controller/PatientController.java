@@ -68,6 +68,7 @@ public class PatientController extends BaseController {
         for (MDemographicInfo patientInfo : demographicInfos) {
 
             PatientModel patient = convertToModel(patientInfo, PatientModel.class);
+            patient.setRegisterTime(DateToString( patientInfo.getRegisterTime(),AgAdminConstants.DateTimeFormat));
             //获取家庭地址信息
             String homeAddressId = patientInfo.getHomeAddress();
             if (StringUtils.isNotEmpty(homeAddressId)) {

@@ -33,6 +33,7 @@ public class DemographicInfo {
     private String telephoneNo ;                     // 电话号码，之前是个电话号码列表
     private String picPath = "";
     private String localPath = "";
+    private Date registerTime;                      //注册时间
 
     public DemographicInfo() {
     }
@@ -169,5 +170,12 @@ public class DemographicInfo {
         this.localPath = localPath;
     }
 
+    @Column(name = "register_time",  nullable = true)
+    public Date getRegisterTime() {
+        return registerTime;
+    }
+    public void setRegisterTime(Date registerTime) {
+        this.registerTime = registerTime;
+    }
 }
 
