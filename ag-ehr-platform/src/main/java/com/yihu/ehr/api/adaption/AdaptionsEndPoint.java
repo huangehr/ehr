@@ -27,7 +27,7 @@ import java.util.Map;
  * @created 2016.02.03 14:15
  */
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0 + "/adaptions", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+@RequestMapping(value = ApiVersion.Version1_0 + "/adaptions")
 @Api(value = "adaptions", description = "标准适配服务")
 public class AdaptionsEndPoint {
     @Autowired
@@ -51,7 +51,7 @@ public class AdaptionsEndPoint {
     }
 
     @RequestMapping(value = "/{org_code}/source", method = RequestMethod.GET)
-    @ApiOperation(value = "获取机构最新适配的文件路径", notes = "此包内容包含：平台标准，机构标准与二者适配")
+    @ApiOperation(value = "获取机构最新适配的文件路径", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "此包内容包含：平台标准，机构标准与二者适配")
     public ResponseEntity<String> getOrgAdaptionUrl(
             @ApiParam(required = true, name = "version_code", value = "适配标准版本")
             @RequestParam(value = "version_code", required = true) String versionCode,

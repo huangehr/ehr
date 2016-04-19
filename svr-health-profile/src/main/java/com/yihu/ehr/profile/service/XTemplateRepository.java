@@ -1,5 +1,6 @@
 package com.yihu.ehr.profile.service;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;
@@ -13,4 +14,7 @@ public interface XTemplateRepository extends PagingAndSortingRepository<Template
     Template findByOrganizationCodeAndCdaDocumentIdAndCdaVersion(String orgCode, String cdaDocumentId, String cdaVersion);
 
     List<Template> findByOrganizationCodeAndCdaVersion(String orgCode, String cdaVersion);
+
+    @Query("SELECT count(e) FROM Template e WHERE e.title = ?1 AND e.cdaVersion = ?2")
+    int countByTitleAndCdaVersion(String title, String cdaVersion);
 }

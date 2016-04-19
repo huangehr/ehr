@@ -25,14 +25,14 @@ import java.util.Date;
  * @created 2016.02.24 17:25
  */
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0 + "/applications", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+@RequestMapping(ApiVersion.Version1_0 + "/applications")
 @Api(value = "applications", description = "应用管理服务")
 public class AppsEndPoint {
     @Autowired
     EhrTokenStoreService tokenStoreService;
 
     @ApiOperation(value = "检查应用授权", notes = "提供用户名/密码作为Basic验证")
-    @RequestMapping(value = "/{client_id}/tokens/{access_token}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{client_id}/tokens/{access_token}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.GET)
     public TokenModel checkClientAuthorization(@ApiParam(value = "client_id")
                                            @PathVariable("client_id") String clientId,
                                                @ApiParam(value = "access_token")
@@ -49,7 +49,7 @@ public class AppsEndPoint {
     }
 
     @ApiOperation(value = "重置应用授权", notes = "提供Client Id/Secret作为Basic验证")
-    @RequestMapping(value = "/{client_id}/tokens/{access_token}", method = RequestMethod.POST)
+    @RequestMapping(value = "/{client_id}/tokens/{access_token}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.POST)
     public String restClientAuthorization(@ApiParam(value = "client_id")
                                           @PathVariable("client_id") String clientId,
                                           @ApiParam(value = "access_token")
@@ -58,7 +58,7 @@ public class AppsEndPoint {
     }
 
     @ApiOperation(value = "删除应用授权", notes = "提供Client Id/Secret作为Basic验证")
-    @RequestMapping(value = "/{client_id}/tokens/{access_token}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{client_id}/tokens/{access_token}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.DELETE)
     public void revokeClientAuthorization(@ApiParam(value = "client_id")
                                           @PathVariable("client_id") String clientId,
                                           @ApiParam(value = "access_token")
