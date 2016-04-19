@@ -14,14 +14,13 @@ import java.util.Date;
 @Access(value = AccessType.PROPERTY)
 public class Families {
 
-
     private String id;
     private String addressId;
     private String creator;
     private Date createDate;
     private String householderIdCardNo;
     private int status;
-    private String telphone;
+    private String telephone;
 
     @Id
     @GeneratedValue(generator = "Generator")
@@ -74,11 +73,11 @@ public class Families {
         this.status = status;
     }
 
-    @Column(name = "telphone",  nullable = true)
-    public String getTelphone() {
-        return telphone;
+    @Column(name = "telephone",  nullable = true)
+    public String getTelephone() {
+        return telephone;
     }
-    public void setTelphone(String telphone) {
-        this.telphone = telphone;
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
     }
 }
