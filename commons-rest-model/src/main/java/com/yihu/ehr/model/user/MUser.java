@@ -21,7 +21,7 @@ public class MUser implements Serializable{
     private String gender;
     private String idCardNo;
     private String organization;
-    private int source;
+    private String source;
 
     // 未绑定属性
     private String orgPost;
@@ -157,11 +157,11 @@ public class MUser implements Serializable{
         this.organization = organization;
     }
 
-    public int getSource() {
+    public String getSource() {
         return source;
     }
 
-    public void setSource(int source) {
+    public void setSource(String source) {
         this.source = source;
     }
 
