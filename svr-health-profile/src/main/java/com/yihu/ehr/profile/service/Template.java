@@ -3,13 +3,11 @@ package com.yihu.ehr.profile.service;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.lang.SpringContext;
-import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.util.Date;
 
 /**
@@ -33,7 +31,8 @@ public class Template {
     final static String UrlSeparator = ";";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(generator = "Generator")
+    @GenericGenerator(name = "Generator", strategy = "increment")
     @Column(name = "id", unique = true, nullable = false)
     public int getId() {
         return id;

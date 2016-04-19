@@ -82,10 +82,19 @@ public class ExtendController<T> extends BaseController {
         return envelop;
     }
 
-    protected ValidateResult validate(T dataModel)
-            throws InvocationTargetException, IllegalAccessException {
+    protected ValidateResult validate(T dataModel) {
 
-        return ValidateUtil.validate(dataModel);
+        try {
+            return ValidateUtil.validate(dataModel);
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        ValidateResult validateResult = new ValidateResult();
+        validateResult.setMsg("数据验证失败！");
+        validateResult.setRs(false);
+        return validateResult;
     }
 
 }

@@ -347,7 +347,7 @@ public class ProfileRepository {
 
 
 
-    public void saveUnStructuredProfile(UnStructuredProfile unStructuredProfile) throws IOException {
+    public void saveUnStructuredProfile(UnStructuredProfile unStructuredProfile) throws IOException, ParseException {
         // 先存档案
         hbaseClient.insertRecord(ProfileTableOptions.Table,
                 unStructuredProfile.getId(),
@@ -379,7 +379,7 @@ public class ProfileRepository {
                         unStructuredProfile.getEventNo(),
                         DateFormatter.utcDateTimeFormat(unStructuredProfile.getEventDate()),  //日期格式化
                         unStructuredProfile.getCdaVersion(),
-                        unStructuredProfile.getUnStructuredDocument().toString()  //// TODO: 2016/4/18 json格式化
+                        objectMapper.writeValueAsString(unStructuredProfile.getUnStructuredDocumentList())  //// TODO: 2016/4/18 json格式化
                 });
 
 

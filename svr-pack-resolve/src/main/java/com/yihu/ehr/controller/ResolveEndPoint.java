@@ -1,5 +1,6 @@
 package com.yihu.ehr.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ArchiveStatus;
@@ -129,7 +130,7 @@ public class ResolveEndPoint {
             } else if (profileType == ProfileType.NoStructured) {
                 unStructuredProfile = unStructuredPackageResolver.doResolve(pack, zipFile);
                 profileRepo.saveUnStructuredProfile(unStructuredProfile);
-                //return new ResponseEntity<>(unStructuredProfile.toJson(), HttpStatus.OK);
+                return new ResponseEntity<>(new ObjectMapper().writeValueAsString(unStructuredProfile), HttpStatus.OK);
             } else if (profileType == ProfileType.Lightweight) {
                 lightWeightProfile = lightWeihgtPackageResolver.doResolve(pack, zipFile);
                 profileRepo.saveLightWeightProfile(lightWeightProfile);
@@ -141,7 +142,6 @@ public class ResolveEndPoint {
 //                profileRepo.save(profile);
 //            }
 
-            //return new ResponseEntity<>(profile.toJson(), HttpStatus.OK);
         } catch (Exception e) {
             throw new ApiException(HttpStatus.NOT_ACCEPTABLE, e.getMessage());
         }

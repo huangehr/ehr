@@ -15,7 +15,7 @@ public class MicroServices {
     public static final String Discovery = "svr-discovery";
     public static final String ESB = "svr-esb";
     public static final String Geography = "svr-geography";
-    public static final String HealthProfile = "svr-health-profiles";
+    public static final String HealthProfile = "svr-health-profile";
     public static final String Organization = "svr-org";
     public static final String Package = "svr-pack-mgr";
     public static final String PackageResolve = "svr-pack-resolve";

@@ -5,13 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.extractor.EventExtractor;
 import com.yihu.ehr.extractor.ExtractorChain;
 import com.yihu.ehr.extractor.KeyDataExtractor;
-import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.profile.core.commons.DataSetTableOption;
-import com.yihu.ehr.profile.core.commons.Profile;
-import com.yihu.ehr.profile.core.lightweight.LightWeightProfile;
-import com.yihu.ehr.profile.core.nostructured.UnStructuredDocumentFile;
-import com.yihu.ehr.profile.core.nostructured.UnStructuredProfile;
 import com.yihu.ehr.profile.core.structured.StructuredDataSet;
 import com.yihu.ehr.profile.core.structured.StructuredProfile;
 import com.yihu.ehr.profile.persist.DataSetResolverWithTranslator;
@@ -26,9 +21,7 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Properties;
 
 /**
@@ -88,7 +81,7 @@ public class StructuredPackageResolver {
 
         makeEventSummary(structuredProfile);
 
-        //houseKeep(zipFile, root);
+        houseKeep(zipFile, root);
 
         return structuredProfile;
     }
@@ -135,7 +128,6 @@ public class StructuredPackageResolver {
                 }
             }
             structuredProfile.addDataSet(dataSet.getCode(), dataSet);
-            file.delete();
         }
         return structuredProfile;
 
@@ -183,6 +175,13 @@ public class StructuredPackageResolver {
         }
     }
 
-
+    private void houseKeep(String zipFile, File root) {
+        try {
+            FileUtils.deleteQuietly(new File(zipFile));
+            FileUtils.deleteQuietly(root);
+        } catch (Exception e) {
+            LogService.getLogger(PackageResolver.class).warn("House keep failed after package resolve: " + e.getMessage());
+        }
+    }
 
 }
