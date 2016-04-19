@@ -1,10 +1,7 @@
 package com.yihu.ehr.profile.core.nostructured;
 
-import com.yihu.ehr.profile.core.structured.StructuredDataSet;
-
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Administrator on 2016/4/7.
@@ -14,7 +11,7 @@ public class UnStructuredDocument {
     String url;
     Date expiryDate;
 
-    Map<String, StructuredDataSet> keyWordsList;
+//    Map<String, StructuredDataSet> keyWordsList;
     String keyWordsStr;
     //非结构化content内容 类表包含两个字典 mime_type 和 name 和fastdfs保存的地址
     private List<UnStructuredContent> unStructuredContentList;

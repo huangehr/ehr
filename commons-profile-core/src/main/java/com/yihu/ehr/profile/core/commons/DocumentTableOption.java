@@ -123,7 +123,7 @@ public class DocumentTableOption {
      */
     public static String getDocimentsToQualifier(UnStructuredProfile unStructuredProfile) {
 
-        List<UnStructuredDocument> documentList = unStructuredProfile.getUnStructuredDocument();
+        List<UnStructuredDocument> documentList = unStructuredProfile.getUnStructuredDocumentList();
         return documentList.toString();
     }
 

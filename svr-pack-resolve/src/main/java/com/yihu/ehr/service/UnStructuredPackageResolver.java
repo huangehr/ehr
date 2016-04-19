@@ -15,6 +15,8 @@ import com.yihu.ehr.profile.core.nostructured.UnStructuredProfile;
 import com.yihu.ehr.profile.core.structured.StructuredProfile;
 import com.yihu.ehr.profile.persist.DataSetResolverWithTranslator;
 import com.yihu.ehr.util.compress.Zipper;
+import com.yihu.ehr.util.log.LogService;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -76,7 +78,6 @@ public class UnStructuredPackageResolver {
         if (root == null || !root.isDirectory() || root.list().length == 0) {
             throw new RuntimeException("Invalid package file, package id: " + pack.getId());
         }
-        StructuredProfile structuredProfile = new StructuredProfile();          //结构化档案
         UnStructuredProfile unStructuredProfile = new UnStructuredProfile();    //非结构化档案
         File[] files = root.listFiles();
         List<UnStructuredDocumentFile> unStructuredDocumentFileList = new ArrayList<>();  //document底下的文件
@@ -89,8 +90,9 @@ public class UnStructuredPackageResolver {
             }
         }
 
-        //// TODO: 2016/4/15
         //makeEventSummary(structuredProfile);
+
+        houseKeep(zipFile, root);
 
         return unStructuredProfile;
     }
@@ -146,6 +148,7 @@ public class UnStructuredPackageResolver {
         unStructuredProfile.setEventNo(eventNo);
         unStructuredProfile.setDemographicId(patientId);
         unStructuredProfile.setOrgCode(orgCode);
+        unStructuredProfile.setPatientId(patientId);
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         unStructuredProfile.setEventDate(format.parse(eventDate));
@@ -219,11 +222,21 @@ public class UnStructuredPackageResolver {
             unStructuredDocumentList.add(unStructuredDocument);
 
         }
-        unStructuredProfile.setUnStructuredDocument(unStructuredDocumentList);
+        unStructuredProfile.setUnStructuredDocumentList(unStructuredDocumentList);
 
         file.delete();
         return unStructuredProfile;
     }
+
+    private void houseKeep(String zipFile, File root) {
+        try {
+            FileUtils.deleteQuietly(new File(zipFile));
+            FileUtils.deleteQuietly(root);
+        } catch (Exception e) {
+            LogService.getLogger(PackageResolver.class).warn("House keep failed after package resolve: " + e.getMessage());
+        }
+    }
+
 
 
 }
