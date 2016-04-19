@@ -1,6 +1,10 @@
 package com.yihu.ehr.service;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 /**
  * @author Sand
@@ -9,4 +13,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  */
 public interface XMembersRepository extends PagingAndSortingRepository<Members, String> {
 
+    void deleteByFamilyId(String familyId);
+
+    List<Members> findByFamilyId(String familyId);
 }
