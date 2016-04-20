@@ -22,8 +22,6 @@ import java.util.Set;
  */
 public class LightWeightProfile extends Profile {
 
-    private ObjectMapper objectMapper = SpringContext.getService("objectMapper");
-    // 档案包含的数据集, key 为数据集的表名, 标准数据情况下, 表名为数据集代码, 原始数据集情况下, 表名为"数据集代码_ORIGIN"
     private Map<String, LightWeightDataSet> lightWeightDataSets = new HashMap<>();;
 
 
@@ -63,27 +61,5 @@ public class LightWeightProfile extends Profile {
         return this.lightWeightDataSets.keySet();
     }
 
-
-    public String toJson(){
-        ObjectNode root = objectMapper.createObjectNode();
-        root.put("id", getId().toString());
-        root.put("card_id", this.getCardId());
-        root.put("org_code", this.getOrgCode());
-        root.put("org_name", this.getOrgName());
-        root.put("patient_id", this.getPatientId());
-        root.put("event_no", this.getEventNo());
-        root.put("event_date", this.getEventDate() == null ? "" : DateFormatter.utcDateTimeFormat(this.getEventDate()));
-        root.put("cda_version", this.getCdaVersion());
-        root.put("create_date", this.getCreateDate() == null ? "" : DateFormatter.utcDateTimeFormat(this.getCreateDate()));
-        root.put("summary", this.getSummary());
-
-        ArrayNode dataSetsNode = root.putArray("data_sets");
-        for (String dataSetCode : lightWeightDataSets.keySet()){
-            DataSet dataSet = lightWeightDataSets.get(dataSetCode);
-            dataSetsNode.addPOJO(dataSet.toJson(false));
-        }
-
-        return root.toString();
-    }
 
 }

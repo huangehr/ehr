@@ -71,7 +71,7 @@ public class CDADataSetRelationshipManager extends BaseHbmService<BaseCDADataSet
      */
     public void deleteRelationshipByCdaIds(String version,String[] cdaIds) {
         Class entityClass = getRelationshipServiceEntity(version);
-        List<BaseCDADataSetRelationship> ls = search(entityClass, "cdaId="+ String.join(", ", cdaIds));
+        List<BaseCDADataSetRelationship> ls = search(entityClass, "cdaId="+ String.join(",", cdaIds));
         String ids = "";
         for(int i = 0;i<ls.size();i++){
             BaseCDADataSetRelationship cdaDataSetRelationship = ls.get(i);
@@ -252,19 +252,6 @@ public class CDADataSetRelationshipManager extends BaseHbmService<BaseCDADataSet
 
         cdaDocumentService.save(cdaInfo);
         return cdaInfo;
-    }
-
-    public int getRelationshipCountByCdaId(String cdaId,String VersionCode) {
-        Session session = currentSession();
-        String strTableName = CDAVersionUtil.getCDADatasetRelationshipTableName(VersionCode);
-        String strSql = "SELECT t.id," +
-                "t.cda_id," +
-                "t.dataSet_id" +
-                " from " + strTableName + " t where  t.cda_id = :cdaId ";
-        Query query = session.createSQLQuery(strSql);
-        query.setString("cdaId", cdaId);
-        List<Object> records = query.list();
-        return records.size();
     }
 
 

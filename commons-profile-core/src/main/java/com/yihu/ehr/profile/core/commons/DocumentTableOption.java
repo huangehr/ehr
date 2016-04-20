@@ -1,7 +1,7 @@
 package com.yihu.ehr.profile.core.commons;
 
-import com.yihu.ehr.profile.core.nostructured.UnStructuredDocument;
-import com.yihu.ehr.profile.core.nostructured.UnStructuredProfile;
+import com.yihu.ehr.profile.core.nostructured.NoStructuredDocument;
+import com.yihu.ehr.profile.core.nostructured.NoStructuredProfile;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class DocumentTableOption {
 
-    public static final String Table = "UnStructuredDocument";
+    public static final String Table = "UnStructuredDocuments";
 
     //数据集晚点再处理，也一样的和结构化档案存到profile中去。hbase重复的部分会自己覆盖掉
 
@@ -118,12 +118,12 @@ public class DocumentTableOption {
     /**
      * 解析文档，文档地下包含
      *
-     * @param unStructuredProfile
+     * @param noStructuredProfile
      * @return
      */
-    public static String getDocimentsToQualifier(UnStructuredProfile unStructuredProfile) {
+    public static String getDocimentsToQualifier(NoStructuredProfile noStructuredProfile) {
 
-        List<UnStructuredDocument> documentList = unStructuredProfile.getUnStructuredDocumentList();
+        List<NoStructuredDocument> documentList = noStructuredProfile.getNoStructuredDocumentList();
         return documentList.toString();
     }
 

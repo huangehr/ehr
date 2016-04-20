@@ -2,13 +2,12 @@ package com.yihu.ehr.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.common.PackageUtil;
 import com.yihu.ehr.extractor.EventExtractor;
 import com.yihu.ehr.extractor.ExtractorChain;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.profile.core.lightweight.LightWeightDataSet;
 import com.yihu.ehr.profile.core.lightweight.LightWeightProfile;
-import com.yihu.ehr.profile.core.structured.StructuredDataSet;
-import com.yihu.ehr.profile.core.structured.StructuredProfile;
 import com.yihu.ehr.profile.persist.DataSetResolverWithTranslator;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
@@ -30,7 +29,7 @@ import java.text.ParseException;
  * @created 2015.09.09 15:04
  */
 @Component
-public class LightWeihgtPackageResolver {
+public class LightWeightPackageResolver {
     @Autowired
     ApplicationContext context;
 
@@ -45,11 +44,6 @@ public class LightWeihgtPackageResolver {
 
     private final static char PathSep = File.separatorChar;
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
-    private final static String StdFolder = "standard";
-    private final static String OriFolder = "origin";
-    private final static String IndexFolder = "index";
-    private final static String DocumentFolder = "document";
-    private final static String JsonExt = ".json";
 
 
     /**
@@ -134,7 +128,7 @@ public class LightWeihgtPackageResolver {
             FileUtils.deleteQuietly(new File(zipFile));
             FileUtils.deleteQuietly(root);
         } catch (Exception e) {
-            LogService.getLogger(PackageResolver.class).warn("House keep failed after package resolve: " + e.getMessage());
+            LogService.getLogger(PackageUtil.class).warn("House keep failed after package resolve: " + e.getMessage());
         }
     }
 

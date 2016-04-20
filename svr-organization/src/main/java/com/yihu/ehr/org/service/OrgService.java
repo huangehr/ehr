@@ -31,8 +31,8 @@ public class OrgService extends BaseJpaService<Organization, XOrganizationReposi
         return organizationRepository.findOne(orgCode);
     }
 
-    public Organization getOrgByAdminLoginCode(String adminLoginCode) {
-        List<Organization> list =  organizationRepository.findByAdmin(adminLoginCode);
+    public Organization getOrgByAdminLoginCode(String orgCode,String adminLoginCode) {
+        List<Organization> list =  organizationRepository.findByOrgAdmin(orgCode,adminLoginCode);
         if (list.size()>0){
             return list.get(0);
         }else {

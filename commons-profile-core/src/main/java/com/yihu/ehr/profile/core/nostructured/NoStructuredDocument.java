@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Created by Administrator on 2016/4/7.
  */
-public class UnStructuredDocument {
+public class NoStructuredDocument {
     String cdaDocId;
     String url;
     Date expiryDate;
@@ -14,7 +14,7 @@ public class UnStructuredDocument {
 //    Map<String, StructuredDataSet> keyWordsList;
     String keyWordsStr;
     //非结构化content内容 类表包含两个字典 mime_type 和 name 和fastdfs保存的地址
-    private List<UnStructuredContent> unStructuredContentList;
+    private List<NoStructuredContent> noStructuredContentList;
 
     public String getCdaDocId() {
         return cdaDocId;
@@ -48,11 +48,11 @@ public class UnStructuredDocument {
         this.keyWordsStr = keyWordsStr;
     }
 
-    public List<UnStructuredContent> getUnStructuredContentList() {
-        return unStructuredContentList;
+    public List<NoStructuredContent> getNoStructuredContentList() {
+        return noStructuredContentList;
     }
 
-    public void setUnStructuredContentList(List<UnStructuredContent> unStructuredContentList) {
-        this.unStructuredContentList = unStructuredContentList;
+    public void setNoStructuredContentList(List<NoStructuredContent> noStructuredContentList) {
+        this.noStructuredContentList = noStructuredContentList;
     }
 }
