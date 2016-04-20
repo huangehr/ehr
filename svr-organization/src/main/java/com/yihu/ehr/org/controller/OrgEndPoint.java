@@ -1,7 +1,9 @@
 package com.yihu.ehr.org.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.org.feign.SecurityClient;
@@ -9,6 +11,9 @@ import com.yihu.ehr.org.service.OrgService;
 import com.yihu.ehr.org.service.Organization;
 import com.yihu.ehr.util.PinyinUtil;
 import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.util.encode.*;
+import com.yihu.ehr.util.encode.Base64;
+import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -18,6 +23,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -35,6 +45,9 @@ public class OrgEndPoint extends BaseRestController {
 
     @Autowired
     private SecurityClient securityClient;
+
+    @Autowired
+    private FastDFSUtil fastDFSUtil;
 
     /**
      * 机构列表查询
@@ -138,12 +151,14 @@ public class OrgEndPoint extends BaseRestController {
      * @param adminLoginCode
      * @return
      */
-    @RequestMapping(value = "/organizations/admin/{admin_login_code}", method = RequestMethod.GET)
-    @ApiOperation(value = "根据机构代码获取机构")
+    @RequestMapping(value = "/organizations/{org_code}/admin/{admin_login_code}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据管理员登录帐号获取机构")
     public MOrganization getOrgByAdminLoginCode(
-            @ApiParam(name = "admin_login_code", value = "管理员登录帐号", defaultValue = "")
+            @ApiParam(name = "org_code", value = "管理员登录帐号", defaultValue = "")
+            @PathVariable(value = "org_code") String orgCode,
+            @ApiParam(name = "admin_login_code", value = "机构代码", defaultValue = "")
             @PathVariable(value = "admin_login_code") String adminLoginCode) throws Exception {
-        Organization org = orgService.getOrgByAdminLoginCode(adminLoginCode);
+        Organization org = orgService.getOrgByAdminLoginCode(orgCode,adminLoginCode);
         MOrganization orgModel = convertToModel(org, MOrganization.class);
         return orgModel;
     }
@@ -235,5 +250,62 @@ public class OrgEndPoint extends BaseRestController {
             @ApiParam(name = "org_code", value = "org_code", defaultValue = "")
             @PathVariable(value = "org_code") String orgCode) {
         return orgService.isExistOrg(orgCode);
+    }
+
+
+    /**
+     * 机构资质上传
+     * @return
+     * @throws IOException
+     */
+    @RequestMapping(value = "/organizations/images",method = RequestMethod.POST)
+    @ApiOperation(value = "上传头像,把图片转成流的方式发送")
+    public String uploadImages(
+            @ApiParam(name = "jsonData", value = "头像转化后的输入流")
+            @RequestBody String jsonData ) throws Exception {
+        if(jsonData == null){
+            return null;
+        }
+        String date = URLDecoder.decode(jsonData,"UTF-8");
+
+        String[] fileStreams = date.split(",");
+        String is = URLDecoder.decode(fileStreams[0],"UTF-8").replace(" ","+");
+        byte[] in = Base64.decode(is);
+
+        String pictureName = fileStreams[1].substring(0,fileStreams[1].length()-1);
+        String fileExtension = pictureName.substring(pictureName.lastIndexOf(".") + 1).toLowerCase();
+        String description = null;
+        if ((pictureName != null) && (pictureName.length() > 0)) {
+            int dot = pictureName.lastIndexOf('.');
+            if ((dot > -1) && (dot < (pictureName.length()))) {
+                description = pictureName.substring(0, dot);
+            }
+        }
+        InputStream inputStream = new ByteArrayInputStream(in);
+        ObjectNode objectNode = fastDFSUtil.upload(inputStream, fileExtension, description);
+        String groupName = objectNode.get("groupName").toString();
+        String remoteFileName = objectNode.get("remoteFileName").toString();
+        String path = "{\"groupName\":" + groupName + ",\"remoteFileName\":" + remoteFileName + "}";
+        //返回文件路径
+        return path;
+    }
+
+
+    /**
+     * 机构资质下载
+     * @return
+     */
+    @RequestMapping(value = "/organizations/images",method = RequestMethod.GET)
+    @ApiOperation(value = "下载头像")
+    public String downloadPicture(
+            @ApiParam(name = "group_name", value = "分组", defaultValue = "")
+            @RequestParam(value = "group_name") String groupName,
+            @ApiParam(name = "remote_file_name", value = "服务器头像名称", defaultValue = "")
+            @RequestParam(value = "remote_file_name") String remoteFileName) throws Exception {
+        byte[] bytes = fastDFSUtil.download(groupName, remoteFileName);
+
+        String fileStream = Base64.encode(bytes);
+        String imageStream = URLEncoder.encode(fileStream, "UTF-8");
+        return imageStream;
     }
 }

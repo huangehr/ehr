@@ -68,6 +68,7 @@ public class PatientController extends BaseController {
         for (MDemographicInfo patientInfo : demographicInfos) {
 
             PatientModel patient = convertToModel(patientInfo, PatientModel.class);
+            patient.setRegisterTime(DateToString( patientInfo.getRegisterTime(),AgAdminConstants.DateTimeFormat));
             //获取家庭地址信息
             String homeAddressId = patientInfo.getHomeAddress();
             if (StringUtils.isNotEmpty(homeAddressId)) {
@@ -138,7 +139,7 @@ public class PatientController extends BaseController {
         MDemographicInfo demographicInfo = patientClient.getPatient(idCardNo);
         if (!StringUtils.isEmpty(demographicInfo.getPicPath())) {
             Map<String, String> map = toEntity(demographicInfo.getPicPath(), Map.class);
-            String localPath = patientClient.downloadPicture(demographicInfo.getIdCardNo(), map.get("groupName"), map.get("remoteFileName"));
+            String localPath = patientClient.downloadPicture(map.get("groupName"), map.get("remoteFileName"));
             demographicInfo.setLocalPath(localPath);
         }
 

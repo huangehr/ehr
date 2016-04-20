@@ -136,6 +136,11 @@ public class UserController extends BaseController {
                 MOrganization organization = orgClient.getOrg(mUser.getOrganization());
                 usersModel.setOrganizationName(organization == null ? "" : organization.getFullName());
             }
+            //获取标准来源信息
+            if(StringUtils.isNotEmpty(mUser.getSource())){
+                MConventionalDict dict = conventionalDictClient.getUserSource(mUser.getSource());
+                usersModel.setSourceName(dict == null ? "" : dict.getValue());
+            }
             usersModels.add(usersModel);
         }
 
@@ -341,7 +346,7 @@ public class UserController extends BaseController {
             }
             if (!StringUtils.isEmpty(mUser.getImgRemotePath())) {
                 Map<String, String> map = toEntity(mUser.getImgRemotePath(), Map.class);
-                String localPath = userClient.downloadPicture(mUser.getId(), map.get("groupName"), map.get("remoteFileName"));
+                String localPath = userClient.downloadPicture(map.get("groupName"), map.get("remoteFileName"));
                 mUser.setImgLocalPath(localPath);
             }
 
@@ -578,6 +583,13 @@ public class UserController extends BaseController {
             dict = conventionalDictClient.getUserType(userType);
             detailModel.setUserTypeName(dict == null ? "" : dict.getValue());
         }
+        //获取用户标准来源
+        String userSource = mUser.getSource();
+        if (StringUtils.isNotEmpty(userSource)){
+            dict = conventionalDictClient.getUserSource(userSource);
+            detailModel.setSourceName(dict == null ? "":dict.getValue());
+        }
+
         //获取归属机构
         String orgCode = mUser.getOrganization();
         if(StringUtils.isNotEmpty(orgCode)) {

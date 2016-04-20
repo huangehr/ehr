@@ -15,6 +15,7 @@ import com.yihu.ehr.user.service.User;
 import com.yihu.ehr.user.service.UserManager;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.encode.*;
+import com.yihu.ehr.util.encode.Base64;
 import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -30,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.*;
 
@@ -40,7 +42,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "users", description = "用户管理接口", tags = {"用户,登录帐号,密码"})
+@Api(value = "users", description = "用户管理接口")
 public class UserController extends BaseRestController {
 
     @Value("${default.password}")
@@ -315,41 +317,23 @@ public class UserController extends BaseRestController {
     @RequestMapping(value = "/user/picture",method = RequestMethod.GET)
     @ApiOperation(value = "下载头像")
     public String downloadPicture(
-            @ApiParam(name = "user_id", value = "病人主键，和身份证号一致")
-            @RequestParam(value = "user_id") String userId ,
             @ApiParam(name = "group_name", value = "分组", defaultValue = "")
             @RequestParam(value = "group_name") String groupName,
             @ApiParam(name = "remote_file_name", value = "服务器头像名称", defaultValue = "")
             @RequestParam(value = "remote_file_name") String remoteFileName) throws Exception {
-
-        String splitMark = System.getProperty("file.separator");
-        String strPath = System.getProperty("java.io.tmpdir");
-
-        strPath += splitMark + "userImages" + splitMark + remoteFileName;
-
-        File file = new File(strPath);
-        String path = String.valueOf(file.getParentFile());
-        if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
-        }
-        User user = userManager.getUser(userId);
-        if (!StringUtils.isEmpty(user.getImgLocalPath())) {
-            File fileName = new File(user.getImgLocalPath());
-            if (fileName.exists()) {
-                return user.getImgLocalPath();
-            }
-        }
-        //调用图片下载方法，返回文件的储存位置localPath，将localPath保存至人口信息表
-        String localPath = null;
+        String imageStream = null;
         try {
-            localPath = fastDFSUtil.download(groupName, remoteFileName, path);
-            user.setImgLocalPath(localPath);
-            userManager.saveUser(user);
+
+            byte[] bytes = fastDFSUtil.download(groupName, remoteFileName);
+
+            String fileStream = Base64.encode(bytes);
+            imageStream = URLEncoder.encode(fileStream, "UTF-8");
+
         } catch (IOException e) {
             e.printStackTrace();
         } catch (MyException e) {
-            LogService.getLogger(User.class).error("用户头像图片下载失败；错误代码：" + e);
+            LogService.getLogger(User.class).error("人口头像图片下载失败；错误代码：" + e);
         }
-        return localPath;
+        return imageStream;
     }
 }

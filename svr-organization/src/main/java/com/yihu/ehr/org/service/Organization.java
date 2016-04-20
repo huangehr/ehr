@@ -36,6 +36,10 @@ public class Organization  {
     private String location;        // 地址
     private int activityFlag;
     private String tags;
+
+    private String imgRemotePath;
+    private String imgLocalPath;
+
     public Organization() {
         //tags = new HashSet<>();
     }
@@ -137,6 +141,22 @@ public class Organization  {
     }
     public void setActivityFlag(int activityFlag) {
         this.activityFlag = activityFlag;
+    }
+
+    @Column(name = "img_remote_path",nullable = true)
+    public String getImgRemotePath() {
+        return imgRemotePath;
+    }
+    public void setImgRemotePath(String imgRemotePath) {
+        this.imgRemotePath = imgRemotePath;
+    }
+
+    @Column(name = "img_local_path",nullable = true)
+    public String getImgLocalPath() {
+        return imgLocalPath;
+    }
+    public void setImgLocalPath(String imgLocalPath) {
+        this.imgLocalPath = imgLocalPath;
     }
 
     @Column(name = "tags",  nullable = true)

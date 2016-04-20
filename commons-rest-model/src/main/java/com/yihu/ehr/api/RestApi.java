@@ -189,6 +189,7 @@ public class RestApi {
         public static final String TemplatesDownloads               = "/templates/downloads";
         public static final String Template                         = "/templates/{id}";
         public static final String TemplateCtn                      = "/templates/{id}/content";
+        public static final String TemplateTitleExistence             = "/templates/title/existence";
     }
 
     public static class SanofiSupport{

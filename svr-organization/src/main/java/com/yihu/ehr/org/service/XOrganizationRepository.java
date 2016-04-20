@@ -18,6 +18,6 @@ public interface XOrganizationRepository extends PagingAndSortingRepository<Orga
     @Query("select org.orgCode from Organization org where org.fullName like %:name% or org.shortName like %:name%")
     List<String> fingIdsByFullnameOrShortName(@Param("name") String name);
 
-    @Query("select org from Organization org where org.admin = :adminLoginCode")
-    List<Organization>findByAdmin(@Param("adminLoginCode")  String adminLoginCode);
+    @Query("select org from Organization org where org.admin = :adminLoginCode and org.orgCode = :orgCode")
+    List<Organization>findByOrgAdmin(@Param("orgCode")  String orgCode,@Param("adminLoginCode")  String adminLoginCode);
 }

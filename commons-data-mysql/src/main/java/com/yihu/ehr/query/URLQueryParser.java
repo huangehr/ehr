@@ -2,6 +2,7 @@ package com.yihu.ehr.query;
 
 import com.yihu.ehr.util.DateFormatter;
 import javafx.util.Pair;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.util.NumberUtils;
 
@@ -206,7 +207,9 @@ public class URLQueryParser<T> {
             for (String data : pair.getValue().split(",")){
                 if (pair.getKey().getJavaType().isEnum()){
                     values.add(Enum.valueOf(pair.getKey().getJavaType(), data));
-                } else{
+                } else if(pair.getKey().getJavaType().equals(Boolean.TYPE)){
+                    values.add(BooleanUtils.toBoolean(data));
+                } else {
                     values.add(data);
                 }
             }
