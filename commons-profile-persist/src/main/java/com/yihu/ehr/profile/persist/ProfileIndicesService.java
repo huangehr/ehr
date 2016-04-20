@@ -1,27 +1,18 @@
 package com.yihu.ehr.profile.persist;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.yihu.ehr.profile.persist.repo.XProfileIndicesRepo;
-import com.yihu.ehr.util.DateFormatter;
 import javafx.util.Pair;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.solr.core.query.Criteria;
 import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.stereotype.Service;
-import org.springframework.util.NumberUtils;
+import org.springframework.data.solr.core.query.Field;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import java.text.ParseException;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 档案索引服务。
@@ -64,72 +55,99 @@ public class ProfileIndicesService {
         return criteria;
     }
 
+    /**
+     * 谓词参见：{@link Criteria.OperationKey}
+     *
+     * equal：使用"="来表示，如：status=2
+     * contain：使用"?"来表示，如：name?'%医'
+     * startsWith：
+     * endsWith：
+     * expression：
+     * between：
+     * near：
+     * within：
+     * fuzzy：
+     * sloppy：
+     * function：
+     * in：使用"="来表示并用","逗号对值进行分隔，如：status=2,3,4,5
+     * >=：使用大于号和大于等于语法，如：createDate>2012
+     * <=：使用小于号和小于等于语法，如：createDate<=2015
+     * 分组：在条件后面加上空格，并设置分组号，如：createDate>2012 g1，具有相同组名的条件将使用or连接
+     * 多条件组合：使用";"来分隔
+     */
     static class SolrQueryParser{
-        /**
-         * like：使用"?"来表示，如：name?'%医'
-         * in：使用"="来表示并用","逗号对值进行分隔，如：status=2,3,4,5
-         * not in：使用"<>"来表示并用","逗号对值进行分隔，如：status=2,3,4,5
-         * =：使用"="来表示，如：status=2
-         * >=：使用大于号和大于等于语法，如：createDate>2012
-         * <=：使用小于号和小于等于语法，如：createDate<=2015
-         * 分组：在条件后面加上空格，并设置分组号，如：createDate>2012 g1，具有相同组名的条件将使用or连接
-         * 多条件组合：使用";"来分隔
-         * <p>
-         * 生成 where 条件。
-         *
-         * @param filter
-         */
-        protected Criteria splitFilter(String filter) throws ParseException {
-            Predicate predicate = null;
-            if (filter.contains("?")) {
-                Pair<Path, String> pair = getPair(filter, "[?]", root);
-                predicate = cb.like(pair.getKey(), "%" + pair.getValue() + "%");
-            } else if (filter.contains("<>")) {
-                Pair<Path, String> pair = getPair(filter, "<>", root);
 
-                if (pair.getValue().contains(",")) {
-                    predicate = cb.not(pair.getKey().in(pair.getValue().split(",")));
-                } else {
-                    predicate = cb.notEqual(pair.getKey(), pair.getValue());
-                }
-            } else if (filter.contains(">=")) {
-                Pair<Path, String> pair = getPair(filter, ">=", root);
-                predicate = cb.ge(pair.getKey(), NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
-            } else if (filter.contains(">")) {
-                Pair<Path, String> pair = getPair(filter, ">", root);
-                if (pair.getKey().getJavaType() == Date.class) {
-                    Date date = DateFormatter.simpleDateParse(pair.getValue());
-                    predicate = cb.greaterThan(pair.getKey(), date);
-                } else {
-                    predicate = cb.gt(pair.getKey(), NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
-                }
-            } else if (filter.contains("<=")) {
-                Pair<Path, String> pair = getPair(filter, "<=", root);
-                predicate = cb.le(pair.getKey(), NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
-            } else if (filter.contains("<")) {
-                Pair<Path, String> pair = getPair(filter, "<", root);
-                predicate = cb.lt(pair.getKey(), NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
-            } else if (filter.contains("=")) {
-                Pair<Path, String> pair = getPair(filter, "=");
+        static Criteria parseQuery(String query){
+            Multimap<String, Criteria> groups = ArrayListMultimap.create();
+            for (String filter : query.split(";")){
+                Criteria criteria = splitFilter(filter);
+                if (criteria == null) continue;
 
-                Set<Object> values = new HashSet<>();
-                for (String data : pair.getValue().split(",")){
-                    if (pair.getKey().getJavaType().isEnum()){
-                        values.add(Enum.valueOf(pair.getKey().getJavaType(), data));
-                    } else{
-                        values.add(data);
+                groups.put("", criteria);
+            }
+
+            Criteria root = null;
+            for (String key : groups.keySet()){
+                Collection<Criteria> criteriaCollection = groups.get(key);
+
+                Criteria sub = null;
+                for (Criteria criteria : criteriaCollection){
+                    if (sub == null){
+                        sub = criteria;
+                    } else {
+                        sub = sub.or(criteria);
                     }
                 }
 
-                predicate = pair.getKey().in(values);
+                if (root == null){
+                    root = sub;
+                } else {
+                    root = root.and(sub);
+                }
             }
 
-            return predicate;
+            return root;
         }
 
-        protected Pair<String, String> getPair(String filter, String splitter) {
+        static Criteria splitFilter(String filter) {
+            if (filter.contains("?")) {
+                Pair<String, String> pair = getPair(filter, "[?]");
+                return new Criteria(pair.getKey()).contains(pair.getValue());
+            } else if (filter.contains(">=")) {
+                Pair<String, String> pair = getPair(filter, ">=");
+                return new Criteria(pair.getKey()).greaterThanEqual(pair.getValue());
+            } else if (filter.contains(">")) {
+                Pair<String, String> pair = getPair(filter, ">");
+                return new Criteria(pair.getKey()).greaterThan(pair.getValue());
+            } else if (filter.contains("<=")) {
+                Pair<String, String> pair = getPair(filter, "<=");
+                return new Criteria(pair.getKey()).lessThanEqual(pair.getValue());
+            } else if (filter.contains("<")) {
+                Pair<String, String> pair = getPair(filter, "<");
+                return new Criteria(pair.getKey()).lessThan(pair.getValue());
+            } else if (filter.contains("=")) {
+                Pair<String, String> pair = getPair(filter, "=");
+
+                Set<Object> values = new HashSet<>();
+                for (String data : pair.getValue().split(",")){
+                    values.add(data);
+                }
+
+                return new Criteria(pair.getKey()).contains(pair.getValue());
+            }
+
+            return null;
+        }
+
+        static Pair<String, String> getPair(String filter, String splitter) {
             String[] tokens = filter.split(splitter);
             return new Pair<>(tokens[0], tokens[1]);
+        }
+
+        static void fieldConvert(Criteria criteria){
+            Field field = criteria.getField();
+            if (field.getName().equals("demographic_id")){
+            }
         }
     }
 }

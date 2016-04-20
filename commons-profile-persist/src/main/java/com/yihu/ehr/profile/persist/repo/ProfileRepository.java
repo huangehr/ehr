@@ -170,7 +170,7 @@ public class ProfileRepository {
                                                        String[] innerCodes) throws IOException {
         List<String> metaDataCode = new ArrayList<>(innerCodes.length);
         for (int i = 0; i < innerCodes.length; ++i) {
-            Long dictId = Long.getLong(cacheReader.read(keySchema.metaDataDict(version, dataSetCode, innerCodes[i])));
+            Long dictId = cacheReader.read(keySchema.metaDataDict(version, dataSetCode, innerCodes[i]));
             String type = cacheReader.read(keySchema.metaDataType(version, dataSetCode, innerCodes[i]));
             if (dictId == null) {
                 continue;
@@ -186,7 +186,10 @@ public class ProfileRepository {
         StructuredDataSet dataSet = new StructuredDataSet();
         Result[] results = hbaseClient.getPartialRecords(dataSetCode,
                 rowKeys.toArray(new String[rowKeys.size()]),
-                DataSetTableOption.getFamilies(),
+                new String[]{
+                        DataSetTableOption.Family.Basic.toString(),
+                        DataSetTableOption.Family.MetaData.toString()
+                },
                 new String[][]{
                         DataSetTableOption.getQualifiers(DataSetTableOption.Family.Basic),
                         metaDataCode.toArray(new String[metaDataCode.size()])});

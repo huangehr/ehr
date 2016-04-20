@@ -15,6 +15,7 @@ import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.persist.ProfileIndices;
 import com.yihu.ehr.profile.persist.ProfileIndicesService;
 import com.yihu.ehr.profile.persist.repo.ProfileRepository;
+import com.yihu.ehr.profile.service.Template;
 import com.yihu.ehr.profile.service.TemplateService;
 import com.yihu.ehr.schema.OrgKeySchema;
 import com.yihu.ehr.schema.StdKeySchema;
@@ -81,9 +82,10 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(value = "搜索条件")
             @RequestParam("query") String query,
             @ApiIgnore Pageable pageable) {
-        Page<ProfileIndices> indicesList = indicesService.search(query, pageable);
+        //Page<ProfileIndices> indicesList = indicesService.search(query, pageable);
 
-        return convertToModels(indicesList.getContent(), new ArrayList<>(), MProfileIndices.class, null);
+        //return convertToModels(indicesList.getContent(), new ArrayList<>(), MProfileIndices.class, null);
+        return null;
     }
 
     @ApiOperation(value = "按时间获取档案列表", notes = "获取患者的就诊档案列表")
@@ -150,7 +152,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(value = "是否加载原始数据集", defaultValue = "false")
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws IOException, ParseException {
         StructuredProfile profile = profileRepo.findOne(profileId, loadStdDataSet, loadOriginDataSet);
-        Collection<MCDADocument> cdaDocuments = getCustomizedCDADocuments(profile);
+        Map<Template, MCDADocument> cdaDocuments = getCustomizedCDADocuments(profile);
 
         return convertDocument(profile, cdaDocuments, documentId);
     }
@@ -158,7 +160,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     /**
      * 此类目下卫生机构定制的CDA文档列表
      */
-    private Collection<MCDADocument> getCustomizedCDADocuments(StructuredProfile profile) {
+    private Map<Template, MCDADocument> getCustomizedCDADocuments(StructuredProfile profile) {
         // 使用CDA类别关键数据元映射，取得与此档案相关联的CDA类别ID
         String cdaType = null;
         for (StructuredDataSet dataSet : profile.getDataSets()) {
@@ -173,7 +175,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         }
 
         // 此类目下卫生机构定制的CDA文档列表
-        Collection<MCDADocument> cdaDocuments = templateService.getOrganizationTemplates(profile.getOrgCode(), profile.getCdaVersion(), cdaType);
+        Map<Template, MCDADocument> cdaDocuments = templateService.getOrganizationTemplates(profile.getOrgCode(), profile.getCdaVersion(), cdaType);
         if (CollectionUtils.isEmpty(cdaDocuments)) {
             LogService.getLogger().error("Unable to get cda document of version " + profile.getCdaVersion()
                     + " for organization " + profile.getOrgCode() + ", template not uploaded?");
@@ -194,7 +196,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         mProfile.setSummary(profile.getSummary());
         mProfile.setDemographicId(profile.getDemographicId());
 
-        Collection<MCDADocument> cdaDocuments = getCustomizedCDADocuments(profile);
+        Map<Template, MCDADocument> cdaDocuments = getCustomizedCDADocuments(profile);
         if (CollectionUtils.isEmpty(cdaDocuments)) {
             LogService.getLogger().error("Unable to get cda document of version " + profile.getCdaVersion()
                     + " for organization " + profile.getOrgCode() + ", template not uploaded?");
@@ -202,10 +204,12 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             return null;
         }
 
-        for (MCDADocument cdaDocument : cdaDocuments) {
+        for (Template template : cdaDocuments.keySet()) {
+            MCDADocument cdaDocument = cdaDocuments.get(template);
             MProfileDocument document = new MProfileDocument();
             document.setId(cdaDocument.getId());
             document.setName(cdaDocument.getName());
+            document.setTemplateId(template.getId());
 
             // CDA文档裁剪，根据从医院中实际采集到的数据集，对CDA进行裁剪
             boolean validDocument = false;
@@ -233,13 +237,15 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return mProfile;
     }
 
-    private MProfileDocument convertDocument(StructuredProfile profile, Collection<MCDADocument> cdaDocuments, String documentId) {
-        for (MCDADocument cdaDocument : cdaDocuments) {
+    private MProfileDocument convertDocument(StructuredProfile profile, Map<Template, MCDADocument> cdaDocuments, String documentId) {
+        for (Template template : cdaDocuments.keySet()) {
+            MCDADocument cdaDocument = cdaDocuments.get(template);
             if (!cdaDocument.getId().equals(documentId)) continue;
 
             MProfileDocument document = new MProfileDocument();
             document.setId(cdaDocument.getId());
             document.setName(cdaDocument.getName());
+            document.setTemplateId(template.getId());
 
             // CDA文档裁剪，根据从医院中实际采集到的数据集，对CDA进行裁剪
             List<MCdaDataSetRelationship> datasetRelationships = cdaDocumentClient.getCDADataSetRelationshipByCDAId(
