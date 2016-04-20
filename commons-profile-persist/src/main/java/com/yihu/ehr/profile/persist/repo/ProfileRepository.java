@@ -7,7 +7,7 @@ import com.yihu.ehr.data.hadoop.HBaseClient;
 import com.yihu.ehr.data.hadoop.ResultWrapper;
 import com.yihu.ehr.profile.core.commons.*;
 import com.yihu.ehr.profile.core.lightweight.LightWeightProfile;
-import com.yihu.ehr.profile.core.nostructured.UnStructuredProfile;
+import com.yihu.ehr.profile.core.nostructured.NoStructuredProfile;
 import com.yihu.ehr.profile.core.structured.StructuredDataSet;
 import com.yihu.ehr.profile.core.structured.StructuredProfile;
 import com.yihu.ehr.schema.StdKeySchema;
@@ -173,7 +173,7 @@ public class ProfileRepository {
                                                        String[] innerCodes) throws IOException {
         List<String> metaDataCode = new ArrayList<>(innerCodes.length);
         for (int i = 0; i < innerCodes.length; ++i) {
-            Long dictId = Long.getLong(cacheReader.read(keySchema.metaDataDict(version, dataSetCode, innerCodes[i])));
+            Long dictId = cacheReader.read(keySchema.metaDataDict(version, dataSetCode, innerCodes[i]));
             String type = cacheReader.read(keySchema.metaDataType(version, dataSetCode, innerCodes[i]));
             if (dictId == null) {
                 continue;
@@ -189,7 +189,10 @@ public class ProfileRepository {
         StructuredDataSet dataSet = new StructuredDataSet();
         Result[] results = hbaseClient.getPartialRecords(dataSetCode,
                 rowKeys.toArray(new String[rowKeys.size()]),
-                DataSetTableOption.getFamilies(),
+                new String[]{
+                        DataSetTableOption.Family.Basic.toString(),
+                        DataSetTableOption.Family.MetaData.toString()
+                },
                 new String[][]{
                         DataSetTableOption.getQualifiers(DataSetTableOption.Family.Basic),
                         metaDataCode.toArray(new String[metaDataCode.size()])});
@@ -347,39 +350,39 @@ public class ProfileRepository {
 
 
 
-    public void saveUnStructuredProfile(UnStructuredProfile unStructuredProfile) throws IOException, ParseException {
+    public void saveUnStructuredProfile(NoStructuredProfile noStructuredProfile) throws IOException, ParseException {
         // 先存档案
         hbaseClient.insertRecord(ProfileTableOptions.Table,
-                unStructuredProfile.getId(),
+                noStructuredProfile.getId(),
                 ProfileTableOptions.Family.Basic.toString(),
                 ProfileTableOptions.getQualifiers(ProfileTableOptions.Family.Basic),
                 new String[]{
-                        unStructuredProfile.getCardId(),
-                        unStructuredProfile.getOrgCode(),
-                        unStructuredProfile.getPatientId(),
-                        unStructuredProfile.getEventNo(),
-                        DateFormatter.utcDateTimeFormat(unStructuredProfile.getEventDate()),
-                        unStructuredProfile.getSummary(),
-                        unStructuredProfile.getDemographicId() == null ? "" : unStructuredProfile.getDemographicId(),
-                        DateFormatter.utcDateTimeFormat(unStructuredProfile.getCreateDate()),
+                        noStructuredProfile.getCardId(),
+                        noStructuredProfile.getOrgCode(),
+                        noStructuredProfile.getPatientId(),
+                        noStructuredProfile.getEventNo(),
+                        DateFormatter.utcDateTimeFormat(noStructuredProfile.getEventDate()),
+                        noStructuredProfile.getSummary(),
+                        noStructuredProfile.getDemographicId() == null ? "" : noStructuredProfile.getDemographicId(),
+                        DateFormatter.utcDateTimeFormat(noStructuredProfile.getCreateDate()),
 //                        unStructuredProfile.getDataSetsAsString(),
                         "",  //非结构化档案暂时不保存数据集信息
-                        unStructuredProfile.getCdaVersion()
+                        noStructuredProfile.getCdaVersion()
                 });
 
         // 非结构化档案文档解析
 
         hbaseClient.insertRecord(DocumentTableOption.Table,
-                unStructuredProfile.getId(),
+                noStructuredProfile.getId(),
                 DocumentTableOption.Family.Document.toString(),
                 DocumentTableOption.getQualifiers(DocumentTableOption.Family.Document),
                 new String[]{
-                        unStructuredProfile.getOrgCode(),
-                        unStructuredProfile.getPatientId(),
-                        unStructuredProfile.getEventNo(),
-                        DateFormatter.utcDateTimeFormat(unStructuredProfile.getEventDate()),  //日期格式化
-                        unStructuredProfile.getCdaVersion(),
-                        objectMapper.writeValueAsString(unStructuredProfile.getUnStructuredDocumentList())  //// TODO: 2016/4/18 json格式化
+                        noStructuredProfile.getOrgCode(),
+                        noStructuredProfile.getPatientId(),
+                        noStructuredProfile.getEventNo(),
+                        DateFormatter.utcDateTimeFormat(noStructuredProfile.getEventDate()),  //日期格式化
+                        noStructuredProfile.getCdaVersion(),
+                        objectMapper.writeValueAsString(noStructuredProfile.getNoStructuredDocumentList())  //// TODO: 2016/4/18 json格式化
                 });
 
 

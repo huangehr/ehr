@@ -152,12 +152,14 @@ public class OrgEndPoint extends BaseRestController {
      * @param adminLoginCode
      * @return
      */
-    @RequestMapping(value = "/organizations/admin/{admin_login_code}", method = RequestMethod.GET)
-    @ApiOperation(value = "根据机构代码获取机构")
+    @RequestMapping(value = "/organizations/{org_code}/admin/{admin_login_code}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据管理员登录帐号获取机构")
     public MOrganization getOrgByAdminLoginCode(
-            @ApiParam(name = "admin_login_code", value = "管理员登录帐号", defaultValue = "")
+            @ApiParam(name = "org_code", value = "管理员登录帐号", defaultValue = "")
+            @PathVariable(value = "org_code") String orgCode,
+            @ApiParam(name = "admin_login_code", value = "机构代码", defaultValue = "")
             @PathVariable(value = "admin_login_code") String adminLoginCode) throws Exception {
-        Organization org = orgService.getOrgByAdminLoginCode(adminLoginCode);
+        Organization org = orgService.getOrgByAdminLoginCode(orgCode,adminLoginCode);
         MOrganization orgModel = convertToModel(org, MOrganization.class);
         return orgModel;
     }

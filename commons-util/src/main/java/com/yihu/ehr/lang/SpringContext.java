@@ -54,7 +54,14 @@ public class SpringContext implements ApplicationContextAware {
      * @return
      */
     public static <T> T getService(String serviceName, Object... args) {
-        T ref = getService(serviceName);
+        T ref = (T)springContext.getBean(serviceName, args);
+        if (ref == null) return null;
+
+        return ref;
+    }
+
+    public static <T> T getService(Class<T> beanCls, Object... args){
+        T ref = (T)springContext.getBean(beanCls, args);
         if (ref == null) return null;
 
         return ref;
