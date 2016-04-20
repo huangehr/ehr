@@ -30,6 +30,8 @@ public class MOrganization implements Serializable{
     private String location;        // 地址
     private int activityFlag;
     private String tags;
+    private String imgRemotePath;
+    private String imgLocalPath;
 
     public MOrganization() {
     }
@@ -122,6 +124,22 @@ public class MOrganization implements Serializable{
 
     public void setActivityFlag(int activityFlag) {
         this.activityFlag = activityFlag;
+    }
+
+    public String getImgRemotePath() {
+        return imgRemotePath;
+    }
+
+    public void setImgRemotePath(String imgRemotePath) {
+        this.imgRemotePath = imgRemotePath;
+    }
+
+    public String getImgLocalPath() {
+        return imgLocalPath;
+    }
+
+    public void setImgLocalPath(String imgLocalPath) {
+        this.imgLocalPath = imgLocalPath;
     }
 
     public List<String> getTags() {

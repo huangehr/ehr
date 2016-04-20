@@ -107,7 +107,7 @@ public class UserSecurityControllerTests {
 
         String orgCreateJson = objectMapper.writeValueAsString(orgDetailModel);
         String addrCreateJson = objectMapper.writeValueAsString(addrCreate);
-        envelop = orgController.create(orgCreateJson, addrCreateJson);
+        envelop = orgController.create(orgCreateJson, addrCreateJson,"","");
         assertNotEquals("机构新增失败！", envelop.isSuccessFlg(), false);
 
         //机构Security
