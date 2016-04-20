@@ -70,7 +70,12 @@ public class TemplateController extends ExtendController<TemplateModel> {
             ValidateResult validateResult = validate(templateModel);
             if(!validateResult.isRs())
                 return failed(validateResult.getMsg());
-
+            String filters =
+                    "cdaVersion="+ templateModel.getCdaVersion() +
+                    ";cdaDocumentId=" + templateModel.getCdaDocumentId() +
+                    ";organizationCode=" + templateModel.getOrganizationCode();
+            if(templateClient.getTemplates("id", filters, "", 1, 1).getBody().size()>0)
+                return failed("该类型模版已存在！");
             templateClient.saveTemplate(model);
             return success(null);
         } catch (IOException e) {
@@ -100,6 +105,17 @@ public class TemplateController extends ExtendController<TemplateModel> {
                 return failed(validateResult.getMsg());
 
             MTemplate template = templateClient.getTemplate(id);
+            if(!templateModel.getCdaVersion().equals(template.getCdaVersion())
+                    || !templateModel.getCdaDocumentId().equals(template.getCdaDocumentId())
+                    || !templateModel.getOrganizationCode().equals(template.getOrganizationCode())){
+                String filters =
+                        "cdaVersion="+ templateModel.getCdaVersion() +
+                        ";cdaDocumentId=" + templateModel.getCdaDocumentId() +
+                        ";organizationCode=" + templateModel.getOrganizationCode();
+                if(templateClient.getTemplates("id", filters, "", 1, 1).getBody().size()>0)
+                    return failed("该类型模版已存在！");
+            }
+
             BeanUtils.copyProperties(templateModel, template, "cdaDocumentName", "organizationName", "pcTplURL", "mobileTplURL", "createTime", "province", "city");
             if("copy".equals(mode)){
                 template.setId(0);
