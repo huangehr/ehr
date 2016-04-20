@@ -77,6 +77,7 @@ public class DemographicService {
             homeAddressIdList = addressClient.search(province,city,district);
             hql += " and homeAddress in (:homeAddressIdList)";
         }
+        hql += " order by registerTime desc";
         Query query = session.createQuery(hql);
         if (!StringUtils.isEmpty(search)) {
             query.setString("search", "%" + search + "%");
