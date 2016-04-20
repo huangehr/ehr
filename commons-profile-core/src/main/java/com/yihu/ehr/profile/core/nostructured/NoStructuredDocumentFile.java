@@ -4,7 +4,7 @@ package com.yihu.ehr.profile.core.nostructured;
  * Created by linaz on 2016/4/7.
  *
  */
-public class UnStructuredDocumentFile {
+public class NoStructuredDocumentFile {
     String mimeType;
     String name;
     String localFileName;

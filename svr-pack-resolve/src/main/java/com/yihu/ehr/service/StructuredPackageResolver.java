@@ -2,6 +2,8 @@ package com.yihu.ehr.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.common.PackageUtil;
+import com.yihu.ehr.constants.ProfileConstant;
 import com.yihu.ehr.extractor.EventExtractor;
 import com.yihu.ehr.extractor.ExtractorChain;
 import com.yihu.ehr.extractor.KeyDataExtractor;
@@ -47,11 +49,6 @@ public class StructuredPackageResolver {
 
     private final static char PathSep = File.separatorChar;
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
-    private final static String StdFolder = "standard";
-    private final static String OriFolder = "origin";
-    private final static String IndexFolder = "index";
-    private final static String DocumentFolder = "document";
-    private final static String JsonExt = ".json";
 
 
     /**
@@ -97,10 +94,10 @@ public class StructuredPackageResolver {
     public StructuredProfile structuredDataSetParse(StructuredProfile structuredProfile, File[] files, String folderName) throws ParseException, IOException {
         for (File file : files) {
             String lastName = folderName.substring(folderName.lastIndexOf("\\")+1);
-            StructuredDataSet dataSet = generateDataSet(file, lastName.equals(OriFolder) ? true :false);
+            StructuredDataSet dataSet = generateDataSet(file, lastName.equals(ProfileConstant.OriFolder) ? true :false);
 
             // 原始数据存储在表"数据集代码_ORIGIN"
-            String dataSetTable = lastName.equals(OriFolder) ? DataSetTableOption.originDataSetCode(dataSet.getCode()) : dataSet.getCode();
+            String dataSetTable = lastName.equals(ProfileConstant.OriFolder) ? DataSetTableOption.originDataSetCode(dataSet.getCode()) : dataSet.getCode();
             structuredProfile.addDataSet(dataSetTable, dataSet);
             structuredProfile.setPatientId(dataSet.getPatientId());
             structuredProfile.setEventNo(dataSet.getEventNo());
@@ -110,7 +107,7 @@ public class StructuredPackageResolver {
             dataSet.setCode(dataSetTable);
 
             // Extract key data from data set if exists
-            if (!lastName.equals(OriFolder)) {
+            if (!lastName.equals(ProfileConstant.OriFolder)) {
                 if (structuredProfile.getCardId().length() == 0) {
                     Object object = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.CardInfo);
                     if (null != object) {
@@ -180,7 +177,7 @@ public class StructuredPackageResolver {
             FileUtils.deleteQuietly(new File(zipFile));
             FileUtils.deleteQuietly(root);
         } catch (Exception e) {
-            LogService.getLogger(PackageResolver.class).warn("House keep failed after package resolve: " + e.getMessage());
+            LogService.getLogger(PackageUtil.class).warn("House keep failed after package resolve: " + e.getMessage());
         }
     }
 

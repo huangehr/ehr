@@ -1,20 +1,27 @@
 package com.yihu.ehr.task;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ArchiveStatus;
+import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.feign.XPackageMgrClient;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.mq.MessageBuffer;
-import com.yihu.ehr.profile.core.commons.Profile;
+import com.yihu.ehr.profile.core.lightweight.LightWeightProfile;
+import com.yihu.ehr.profile.core.nostructured.NoStructuredProfile;
 import com.yihu.ehr.profile.core.structured.StructuredProfile;
 import com.yihu.ehr.profile.persist.repo.ProfileRepository;
-import com.yihu.ehr.service.PackageResolver;
+import com.yihu.ehr.service.LightWeightPackageResolver;
+import com.yihu.ehr.common.PackageUtil;
+import com.yihu.ehr.service.StructuredPackageResolver;
+import com.yihu.ehr.service.NoStructuredPackageResolver;
 import com.yihu.ehr.util.log.LogService;
 import org.quartz.InterruptableJob;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.UnableToInterruptJobException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
@@ -26,6 +33,19 @@ import java.util.NoSuchElementException;
  */
 @Service
 public class PackageResolveJob implements InterruptableJob {
+
+    @Autowired
+    private StructuredPackageResolver structuredPackageResolver;
+
+    @Autowired
+    private NoStructuredPackageResolver noStructuredPackageResolver;
+
+    @Autowired
+    private LightWeightPackageResolver lightWeightPackageResolver;
+
+    @Autowired
+    ObjectMapper objectMapper;
+
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
 
     @Override
@@ -51,17 +71,35 @@ public class PackageResolveJob implements InterruptableJob {
             LogService.getLogger().info("Quartz job: resolve package " + pack.getId());
 
             XPackageMgrClient packageMgrClient = SpringContext.getService(XPackageMgrClient.class);
-            PackageResolver resolver = SpringContext.getService(PackageResolver.class);
-            ProfileRepository profileRepository = SpringContext.getService(ProfileRepository.class);
+            PackageUtil packageUtil = SpringContext.getService(PackageUtil.class);
+            ProfileRepository profileRepo = SpringContext.getService(ProfileRepository.class);
 
             String zipFile = downloadTo(pack.getRemotePath());
 
-            Profile structuredProfile = resolver.doResolve(pack, zipFile);
-            //// TODO: 2016/4/15  
-            //profileRepository.save(structuredProfile);
 
-            packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
-                    "Identity: " + structuredProfile.getDemographicId() + ", profile: " + structuredProfile.getId());
+            //三种档案
+            StructuredProfile structuredProfile;           //结构化档案
+            NoStructuredProfile noStructuredProfile;       //非结构化档案
+            LightWeightProfile lightWeightProfile;         //轻量级档案
+
+            ProfileType profileType = packageUtil.getProfileType(pack, zipFile);
+            if (profileType == ProfileType.Structured) {
+                structuredProfile = structuredPackageResolver.doResolve(pack, zipFile);
+                profileRepo.saveStructuredProfile(structuredProfile);
+                packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
+                        "Identity: " + structuredProfile.getDemographicId() + ", structuredProfile: " + structuredProfile.getId());
+            } else if (profileType == ProfileType.NoStructured) {
+                noStructuredProfile = noStructuredPackageResolver.doResolve(pack, zipFile);
+                profileRepo.saveUnStructuredProfile(noStructuredProfile);
+                packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
+                        "Identity: " + noStructuredProfile.getDemographicId() + ", unStructuredProfile: " + noStructuredProfile.getId());
+            } else if (profileType == ProfileType.Lightweight) {
+                lightWeightProfile = lightWeightPackageResolver.doResolve(pack, zipFile);
+                profileRepo.saveLightWeightProfile(lightWeightProfile);
+                packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
+                        "Identity: " + lightWeightProfile.getDemographicId() + ", lightWeightProfile: " + lightWeightProfile.getId());
+            }
+
         } catch (Exception e) {
             LogService.getLogger().error(e.getMessage());
         }

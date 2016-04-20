@@ -3,16 +3,15 @@ package com.yihu.ehr.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.yihu.ehr.common.PackageUtil;
+import com.yihu.ehr.constants.ProfileConstant;
 import com.yihu.ehr.extractor.ExtractorChain;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.profile.core.commons.Profile;
-import com.yihu.ehr.profile.core.lightweight.LightWeightProfile;
-import com.yihu.ehr.profile.core.nostructured.UnStructuredContent;
-import com.yihu.ehr.profile.core.nostructured.UnStructuredDocument;
-import com.yihu.ehr.profile.core.nostructured.UnStructuredDocumentFile;
-import com.yihu.ehr.profile.core.nostructured.UnStructuredProfile;
-import com.yihu.ehr.profile.core.structured.StructuredProfile;
+import com.yihu.ehr.profile.core.nostructured.NoStructuredContent;
+import com.yihu.ehr.profile.core.nostructured.NoStructuredDocument;
+import com.yihu.ehr.profile.core.nostructured.NoStructuredDocumentFile;
+import com.yihu.ehr.profile.core.nostructured.NoStructuredProfile;
 import com.yihu.ehr.profile.persist.DataSetResolverWithTranslator;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
@@ -37,7 +36,7 @@ import java.util.List;
  * @created 2015.09.09 15:04
  */
 @Component
-public class UnStructuredPackageResolver {
+public class NoStructuredPackageResolver {
     @Autowired
     ApplicationContext context;
 
@@ -55,12 +54,6 @@ public class UnStructuredPackageResolver {
 
     private final static char PathSep = File.separatorChar;
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
-    private final static String StdFolder = "standard";
-    private final static String OriFolder = "origin";
-    private final static String IndexFolder = "index";
-    private final static String DocumentFolder = "document";
-    private final static String JsonExt = ".json";
-
 
     /**
      * 执行归档作业。归档作为流程如下：
@@ -73,20 +66,20 @@ public class UnStructuredPackageResolver {
      * <p>
      * ObjectMapper Stream API使用，参见：http://wiki.fasterxml.com/JacksonStreamingApi
      */
-    public UnStructuredProfile doResolve(MPackage pack, String zipFile) throws Exception {
+    public NoStructuredProfile doResolve(MPackage pack, String zipFile) throws Exception {
         File root = new Zipper().unzipFile(new File(zipFile), LocalTempPath + PathSep + pack.getId(), pack.getPwd());
         if (root == null || !root.isDirectory() || root.list().length == 0) {
             throw new RuntimeException("Invalid package file, package id: " + pack.getId());
         }
-        UnStructuredProfile unStructuredProfile = new UnStructuredProfile();    //非结构化档案
+        NoStructuredProfile noStructuredProfile = new NoStructuredProfile();    //非结构化档案
         File[] files = root.listFiles();
-        List<UnStructuredDocumentFile> unStructuredDocumentFileList = new ArrayList<>();  //document底下的文件
+        List<NoStructuredDocumentFile> noStructuredDocumentFileList = new ArrayList<>();  //document底下的文件
         for(File file:files){
             String folderName = file.getPath().substring(file.getPath().lastIndexOf("\\")+1);
-            if(folderName.equals(DocumentFolder)){
-                unStructuredDocumentFileList = unstructuredDocumentParse(unStructuredProfile, file.listFiles());
+            if(folderName.equals(ProfileConstant.DocumentFolder)){
+                noStructuredDocumentFileList = unstructuredDocumentParse(noStructuredProfile, file.listFiles());
             }else if(folderName.equals("meta.json")){
-                unStructuredProfile = unstructuredDataSetParse(unStructuredProfile,file, unStructuredDocumentFileList);
+                noStructuredProfile = unstructuredDataSetParse(noStructuredProfile,file, noStructuredDocumentFileList);
             }
         }
 
@@ -94,7 +87,7 @@ public class UnStructuredPackageResolver {
 
         houseKeep(zipFile, root);
 
-        return unStructuredProfile;
+        return noStructuredProfile;
     }
 
 
@@ -104,11 +97,11 @@ public class UnStructuredPackageResolver {
      * @param
      * @throws IOException
      */
-    public List<UnStructuredDocumentFile> unstructuredDocumentParse(UnStructuredProfile profile, File[] files) throws Exception {
-        List<UnStructuredDocumentFile> unStructuredDocumentFileList = new ArrayList<>();
+    public List<NoStructuredDocumentFile> unstructuredDocumentParse(NoStructuredProfile profile, File[] files) throws Exception {
+        List<NoStructuredDocumentFile> noStructuredDocumentFileList = new ArrayList<>();
         for (File file : files) {
-            UnStructuredDocumentFile unStructuredDocumentFile = new UnStructuredDocumentFile();
-            if (file.getAbsolutePath().endsWith(JsonExt)) continue;
+            NoStructuredDocumentFile noStructuredDocumentFile = new NoStructuredDocumentFile();
+            if (file.getAbsolutePath().endsWith(ProfileConstant.JsonExt)) continue;
             //这里把图片保存的fastdfs
             String filePath = file.getPath();
             String extensionName = filePath.substring(file.getPath().lastIndexOf('.') + 1);
@@ -119,20 +112,20 @@ public class UnStructuredPackageResolver {
             String remoteFileName = objectNode.get("remoteFileName").toString();
             String remotePath = "groupName:" + groupName + ",remoteFileName:" + remoteFileName;
 
-            unStructuredDocumentFile.setLocalFileName(localFileName);
-            unStructuredDocumentFile.setRemotePath(remotePath);
-            unStructuredDocumentFileList.add(unStructuredDocumentFile);
+            noStructuredDocumentFile.setLocalFileName(localFileName);
+            noStructuredDocumentFile.setRemotePath(remotePath);
+            noStructuredDocumentFileList.add(noStructuredDocumentFile);
         }
-        return unStructuredDocumentFileList;
+        return noStructuredDocumentFileList;
     }
 
     /**
      * 非标准化档案包解析document的文件。
-     * @param unStructuredProfile
+     * @param noStructuredProfile
      * @param
      * @throws IOException
      */
-    public UnStructuredProfile unstructuredDataSetParse(UnStructuredProfile unStructuredProfile, File file, List<UnStructuredDocumentFile> unStructuredDocumentFileList) throws Exception {
+    public NoStructuredProfile unstructuredDataSetParse(NoStructuredProfile noStructuredProfile, File file, List<NoStructuredDocumentFile> noStructuredDocumentFileList) throws Exception {
         JsonNode jsonNode = objectMapper.readTree(file);
 
 
@@ -144,19 +137,19 @@ public class UnStructuredPackageResolver {
         String orgCode = jsonNode.get("org_code").asText();
         String eventDate = jsonNode.path("event_time").asText();
 
-        unStructuredProfile.setCdaVersion(version);
-        unStructuredProfile.setEventNo(eventNo);
-        unStructuredProfile.setDemographicId(patientId);
-        unStructuredProfile.setOrgCode(orgCode);
-        unStructuredProfile.setPatientId(patientId);
+        noStructuredProfile.setCdaVersion(version);
+        noStructuredProfile.setEventNo(eventNo);
+        noStructuredProfile.setDemographicId(patientId);
+        noStructuredProfile.setOrgCode(orgCode);
+        noStructuredProfile.setPatientId(patientId);
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        unStructuredProfile.setEventDate(format.parse(eventDate));
+        noStructuredProfile.setEventDate(format.parse(eventDate));
 
         //data解析
         JsonNode datas = jsonNode.get("data"); //保存
 
-        List<UnStructuredDocument> unStructuredDocumentList = new ArrayList<>();
+        List<NoStructuredDocument> noStructuredDocumentList = new ArrayList<>();
 
 
         for(int i=0;i<datas.size();i++){
@@ -164,14 +157,14 @@ public class UnStructuredPackageResolver {
 
             JsonNode data = datas.get(i);
 
-            UnStructuredDocument unStructuredDocument = new UnStructuredDocument();
+            NoStructuredDocument noStructuredDocument = new NoStructuredDocument();
             String cdaDocId = data.get("cda_doc_id").asText();
             String url = data.get("url").asText();
             String expiryDate = data.get("expiry_date").asText();
 
-            unStructuredDocument.setCdaDocId(cdaDocId);
-            unStructuredDocument.setUrl(url);
-            unStructuredDocument.setExpiryDate(format.parse(expiryDate));
+            noStructuredDocument.setCdaDocId(cdaDocId);
+            noStructuredDocument.setUrl(url);
+            noStructuredDocument.setExpiryDate(format.parse(expiryDate));
 
 
             String keyWordsStr = data.get("key_words").toString();
@@ -182,16 +175,16 @@ public class UnStructuredPackageResolver {
 //            keyWordsList = JSONObject2List(keys,keyWordsList,keyWordsObj);
 //            unStructuredDocument.setKeyWordsList(keyWordsList);
 
-            unStructuredDocument.setKeyWordsStr(keyWordsStr);
+            noStructuredDocument.setKeyWordsStr(keyWordsStr);
 
             //document底下文件处理
             JsonNode contents = data.get("content");   //文件信息
 
-            List<UnStructuredContent> unStructuredContentList = new ArrayList<>();
+            List<NoStructuredContent> noStructuredContentList = new ArrayList<>();
             for(int j=0;j<contents.size();j++){
                 //documentFiles;
-                UnStructuredContent unStructuredContent = new UnStructuredContent();
-                List<UnStructuredDocumentFile> unStructuredDocumentFileListNew = new ArrayList<>();
+                NoStructuredContent noStructuredContent = new NoStructuredContent();
+                List<NoStructuredDocumentFile> noStructuredDocumentFileListNew = new ArrayList<>();
 
 
                 JsonNode object = contents.get(j);
@@ -201,31 +194,31 @@ public class UnStructuredPackageResolver {
                 String[] names = name.split(",");
 
                 for(String filename:names){
-                    for(UnStructuredDocumentFile unStructuredDocumentFile : unStructuredDocumentFileList){
-                        String localFileName = unStructuredDocumentFile.getLocalFileName();
+                    for(NoStructuredDocumentFile noStructuredDocumentFile : noStructuredDocumentFileList){
+                        String localFileName = noStructuredDocumentFile.getLocalFileName();
                         if(filename.equals(localFileName)){
-                            unStructuredDocumentFile.setMimeType(mimeType);
-                            unStructuredDocumentFile.setName(filename);
-                            unStructuredDocumentFile.setLocalFileName(unStructuredDocumentFile.getLocalFileName());
-                            unStructuredDocumentFile.setRemotePath(unStructuredDocumentFile.getRemotePath());
-                            unStructuredDocumentFileListNew.add(unStructuredDocumentFile);
+                            noStructuredDocumentFile.setMimeType(mimeType);
+                            noStructuredDocumentFile.setName(filename);
+                            noStructuredDocumentFile.setLocalFileName(noStructuredDocumentFile.getLocalFileName());
+                            noStructuredDocumentFile.setRemotePath(noStructuredDocumentFile.getRemotePath());
+                            noStructuredDocumentFileListNew.add(noStructuredDocumentFile);
                         }
                     }
                 }
-                unStructuredContent.setUnStructuredDocumentFileList(unStructuredDocumentFileListNew);
-                unStructuredContentList.add(unStructuredContent);
+                noStructuredContent.setNoStructuredDocumentFileList(noStructuredDocumentFileListNew);
+                noStructuredContentList.add(noStructuredContent);
 
 
-                unStructuredDocument.setUnStructuredContentList(unStructuredContentList);
+                noStructuredDocument.setNoStructuredContentList(noStructuredContentList);
             }
 
-            unStructuredDocumentList.add(unStructuredDocument);
+            noStructuredDocumentList.add(noStructuredDocument);
 
         }
-        unStructuredProfile.setUnStructuredDocumentList(unStructuredDocumentList);
+        noStructuredProfile.setNoStructuredDocumentList(noStructuredDocumentList);
 
         file.delete();
-        return unStructuredProfile;
+        return noStructuredProfile;
     }
 
     private void houseKeep(String zipFile, File root) {
@@ -233,7 +226,7 @@ public class UnStructuredPackageResolver {
             FileUtils.deleteQuietly(new File(zipFile));
             FileUtils.deleteQuietly(root);
         } catch (Exception e) {
-            LogService.getLogger(PackageResolver.class).warn("House keep failed after package resolve: " + e.getMessage());
+            LogService.getLogger(PackageUtil.class).warn("House keep failed after package resolve: " + e.getMessage());
         }
     }
 
