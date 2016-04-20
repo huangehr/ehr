@@ -32,8 +32,6 @@ public class ConventionalDictController extends BaseRestController {
     private SystemDictEntryService dictEntryService;
 
     MConventionalDict getDictModel(Object dictEntry) {
-        if(dictEntry == null) throw new ApiException(ErrorCode.GetDictEntryFailed, "字典项不存在");
-
         return convertToModel(dictEntry, MConventionalDict.class, null);
     }
 
