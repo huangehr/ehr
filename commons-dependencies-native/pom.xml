@@ -34,8 +34,7 @@
         <module>../svr-esb</module>
         <module>../ag-admin</module>
         <module>../ag-ehr-platform</module>
-        <module>../app-admin</module>
-        <module>../app-ehr-browser</module>
+        <!--<module>../app-ehr-browser</module>-->
     </modules>
 
     <build>
@@ -55,6 +54,13 @@
                     <executable>true</executable>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
             <!--wagon 插件-->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -62,7 +68,7 @@
                 <version>1.0</version>
                 <configuration>
                     <fromFile>${project.build.directory}/${project.build.finalName}.jar</fromFile>
-                    <url>scp://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</url>
+                    <url>scp://D:/project-release</url>
                 </configuration>
             </plugin>
         </plugins>

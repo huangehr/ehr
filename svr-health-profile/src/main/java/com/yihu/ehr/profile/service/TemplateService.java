@@ -10,7 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -65,7 +67,7 @@ public class TemplateService extends BaseJpaService<Template, XTemplateRepositor
      * @param cdaType
      * @return
      */
-    public List<MCDADocument> getOrganizationTemplates(String orgCode, String cdaVersion, String cdaType) {
+    public Map<Template, MCDADocument> getOrganizationTemplates(String orgCode, String cdaVersion, String cdaType) {
         List<Template> templates = getRepo().findByOrganizationCodeAndCdaVersion(orgCode, cdaVersion);
         List<String> cdaDocumentIdList = new ArrayList<>(templates.size());
         cdaDocumentIdList.addAll(templates.stream().map(template -> template.getCdaDocumentId()).collect(Collectors.toList()));
@@ -80,7 +82,18 @@ public class TemplateService extends BaseJpaService<Template, XTemplateRepositor
                 1,
                 cdaVersion);
 
-        return documentList;
+        Map<Template, MCDADocument> cdaDocumentMap =  new HashMap<>();
+        for (MCDADocument document : documentList){
+            String cdaDocumentId = document.getId();
+            for (Template template : templates){
+                if(template.getCdaDocumentId().equals(cdaDocumentId)){
+                    cdaDocumentMap.put(template, document);
+                    break;
+                }
+            }
+        }
+
+        return cdaDocumentMap;
     }
 
     private XTemplateRepository getRepo() {
