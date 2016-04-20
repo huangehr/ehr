@@ -88,9 +88,8 @@ public class OrganizationControllerTests {
         orgNew.setAdmin("程海");
         String orgUpdateJson = objectMapper.writeValueAsString(orgNew);
         String addrUpdateJson = objectMapper.writeValueAsString(addrUpdate);
-        envelop = orgController.update(orgUpdateJson, addrUpdateJson);
+        envelop = orgController.update(orgUpdateJson, addrUpdateJson,"","");
         assertNotEquals("机构更新失败！", envelop.getObj(), null);
-
 
         //列表查询（page、size）---------------------3ok
         String fields = "";
