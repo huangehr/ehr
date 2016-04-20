@@ -59,6 +59,7 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
         List<User> users = userRepository.findByLoginCode(loginCode);
         if(users.size()>0){
             return users.get(0);
+            //查询用户权限
         }else {
             return null;
         }
