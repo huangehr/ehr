@@ -2,7 +2,6 @@ package com.yihu.ehr.org.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.sun.javafx.collections.MappingChange;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.org.MOrganization;
