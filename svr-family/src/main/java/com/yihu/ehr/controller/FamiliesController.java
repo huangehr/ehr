@@ -1,6 +1,7 @@
 package com.yihu.ehr.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.family.MFamilies;
 import com.yihu.ehr.service.Families;
 import com.yihu.ehr.service.FamiliesService;
@@ -70,6 +71,7 @@ public class FamiliesController extends BaseRestController {
             @RequestParam(value = "json_data") String jsonData) throws Exception {
 
         Families families = toEntity(jsonData,Families.class);
+        families.setId(getObjectId((BizObject.Families)));
         familiesService.createFamilies(families);
         return convertToModel(families,MFamilies.class);
     }

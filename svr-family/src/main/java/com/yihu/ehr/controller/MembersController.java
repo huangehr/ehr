@@ -1,6 +1,7 @@
 package com.yihu.ehr.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.family.MMembers;
 import com.yihu.ehr.service.Families;
 import com.yihu.ehr.service.FamiliesService;
@@ -32,9 +33,6 @@ public class MembersController extends BaseRestController {
 
     @Autowired
     private MembersService membersService;
-
-    @Autowired
-    private FamiliesService familiesService;
 
     @RequestMapping(value = "/members", method = RequestMethod.GET)
     @ApiOperation(value = "获取家庭成员列表")
@@ -75,6 +73,8 @@ public class MembersController extends BaseRestController {
             @RequestParam(value = "json_data") String jsonData) throws Exception {
 
         Members mb = toEntity(jsonData,Members.class);
+        mb.setId(getObjectId(BizObject.Members));
+        mb.setFamilyId(familiesId);
         membersService.createMembers(mb);
         return convertToModel(mb,MMembers.class);
     }
@@ -88,6 +88,7 @@ public class MembersController extends BaseRestController {
             @RequestParam(value = "json_data") String jsonData) throws Exception {
 
         Members mb = toEntity(jsonData,Members.class);
+        mb.setFamilyId(familiesId);
         membersService.updateMembers(mb);
         return convertToModel(mb,MMembers.class);
     }
