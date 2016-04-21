@@ -20,7 +20,9 @@ public enum BizObject {
     STANDARD((short)0x0009),
     App((short)0x00010),
     Dict((short)0x0011),
-    CdaType((short)0x0012);
+    CdaType((short)0x0012),
+    Families((short)0x0013),
+    Members((short)0x0014);
 
     public short getBizObject(){
         return bizObject;
