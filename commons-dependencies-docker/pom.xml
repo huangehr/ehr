@@ -39,7 +39,7 @@
         <module>../svr-user</module>
         <module>../svr-esb</module>
         <module>../ag-admin</module>
-        <!--<module>../ag-ehr-platform</module>-->
+        <module>../ag-ehr-platform</module>
         <module>../app-admin</module>
         <module>../app-ehr-browser</module>
     </modules>

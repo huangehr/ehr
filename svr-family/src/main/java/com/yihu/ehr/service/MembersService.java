@@ -47,9 +47,9 @@ public class MembersService extends BaseJpaService<Members, XMembersRepository> 
      * @param id 家庭成员ID
      * @Families 家庭成员
      */
-    public Members getMembersById(String id)
+    public Members getMembers(String familyId,String idCardNo)
     {
-        Members members = membersRep.findOne(id);
+        Members members = membersRep.findByFamilyIdAndIdCardNo(familyId,idCardNo);
 
         return members;
     }
@@ -95,9 +95,9 @@ public class MembersService extends BaseJpaService<Members, XMembersRepository> 
      *
      * @param id 家庭成员ID
      */
-    public void deleteMembers(String id)
+    public void deleteMembers(String familyId,String idCardNo)
     {
-        membersRep.delete(id);
+        membersRep.deleteByFamilyIdAndIdCardNo(familyId,idCardNo);
     }
 
     /*

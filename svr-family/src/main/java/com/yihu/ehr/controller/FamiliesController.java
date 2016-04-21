@@ -1,6 +1,8 @@
 package com.yihu.ehr.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.BizObject;
+import com.yihu.ehr.model.family.MFamilies;
 import com.yihu.ehr.service.Families;
 import com.yihu.ehr.service.FamiliesService;
 import com.yihu.ehr.service.Members;
@@ -33,7 +35,7 @@ public class FamiliesController extends BaseRestController {
 
     @RequestMapping(value = "/families", method = RequestMethod.GET)
     @ApiOperation(value = "获取家庭关系列表")
-    public Collection<Families> searchFamilies(
+    public Collection<MFamilies> searchFamilies(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -52,46 +54,47 @@ public class FamiliesController extends BaseRestController {
         {
             Page<Families> families = familiesService.getFamilies(sorts,page,size);
             pagedResponse(request,response,families.getTotalElements(),page,size);
-            return convertToModels(families.getContent(),new ArrayList<>(families.getNumber()),Families.class,fields);
+            return convertToModels(families.getContent(),new ArrayList<>(families.getNumber()),MFamilies.class,fields);
         }
         else
         {
             List<Families> families = familiesService.search(fields,filters,sorts,page,size);
             pagedResponse(request,response,familiesService.getCount(filters),page,size);
-            return convertToModels(families,new ArrayList<>(families.size()),Families.class,fields);
+            return convertToModels(families,new ArrayList<>(families.size()),MFamilies.class,fields);
         }
     }
 
     @RequestMapping(value = "/families", method = RequestMethod.POST)
     @ApiOperation(value = "创建家庭关系")
-    public Families createFamily(
+    public MFamilies createFamily(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestParam(value = "json_data") String jsonData) throws Exception {
 
         Families families = toEntity(jsonData,Families.class);
+        families.setId(getObjectId((BizObject.Families)));
         familiesService.createFamilies(families);
-        return convertToModel(families,Families.class);
+        return convertToModel(families,MFamilies.class);
     }
 
     @RequestMapping(value = "/families", method = RequestMethod.PUT)
     @ApiOperation(value = "修改家庭关系")
-    public Families updateFamily(
+    public MFamilies updateFamily(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestParam(value = "json_data") String jsonData) throws Exception {
 
         Families families = toEntity(jsonData,Families.class);
         familiesService.updateFamilies(families);
-        return convertToModel(families,Families.class);
+        return convertToModel(families,MFamilies.class);
     }
 
     @RequestMapping(value = "/families/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取家庭关系")
-    public Families getFamily(
+    public MFamilies getFamily(
             @ApiParam(name = "id", value = "", defaultValue = "")
             @PathVariable(value = "id") String id) {
 
         Families families = familiesService.getFamiliesById(id);
-        return convertToModel(families,Families.class);
+        return convertToModel(families,MFamilies.class);
     }
 
     @RequestMapping(value = "/families/{id}", method = RequestMethod.DELETE)
