@@ -12,6 +12,9 @@ import java.util.List;
  * Created by Administrator on 2016/3/16.
  */
 public class BaseUIController {
+
+    private static String ERR_SYSREM_DES = "系统错误,请联系管理员!";
+
     @Autowired
     public ObjectMapper objectMapper;
 
@@ -86,5 +89,23 @@ public class BaseUIController {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    public Envelop failed(String errMsg) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        envelop.setErrorMsg(errMsg);
+        return envelop;
+    }
+
+    public Envelop success(Object object) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        envelop.setObj(object);
+        return envelop;
+    }
+
+    protected Envelop failedSystem() {
+        return failed(ERR_SYSREM_DES);
     }
 }

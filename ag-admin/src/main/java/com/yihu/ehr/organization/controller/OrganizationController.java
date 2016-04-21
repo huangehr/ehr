@@ -237,15 +237,27 @@ public class OrganizationController extends BaseController {
         }
     }
 
-    @RequestMapping(value = "organizations" , method = RequestMethod.PUT)
+    @RequestMapping(value = "organization" , method = RequestMethod.POST)
     @ApiOperation(value = "修改机构")
     public Envelop update(
-            @ApiParam(name = "mOrganizationJsonData", value = "机构信息Json", defaultValue = "")
-            @RequestParam(value = "mOrganizationJsonData", required = false) String mOrganizationJsonData,
+            @ApiParam(name = "mOrganizationJsonDatas", value = "机构信息Json", defaultValue = "")
+            @RequestParam(value = "mOrganizationJsonDatas", required = false) String mOrganizationJsonData,
             @ApiParam(name = "geography_model_json_data",value = "地址信息Json",defaultValue = "")
-            @RequestParam(value = "geography_model_json_data", required = false) String geographyModelJsonData  ) {
+            @RequestParam(value = "geography_model_json_data", required = false) String geographyModelJsonData,
+            @ApiParam(name = "inputStream", value = "转换后的输入流", defaultValue = "")
+            @RequestParam(value = "inputStream") String inputStream,
+            @ApiParam(name = "imageName", value = "图片全名", defaultValue = "")
+            @RequestParam(value = "imageName") String imageName) {
       try {
           String errorMsg ="";
+
+          //头像上传,接收头像保存的远程路径  path
+          String path = null;
+          if (!StringUtils.isEmpty(inputStream)) {
+              String jsonData = inputStream + "," + imageName;
+              path = orgClient.uploadPicture(jsonData);
+          }
+
           GeographyModel geographyModel = objectMapper.readValue(geographyModelJsonData, GeographyModel.class);
 
           if (geographyModel.nullAddress()) {
@@ -253,6 +265,12 @@ public class OrganizationController extends BaseController {
           }
 
           OrgDetailModel orgDetailModel = objectMapper.readValue(mOrganizationJsonData, OrgDetailModel.class);
+
+          if (!StringUtils.isEmpty(path)) {
+              orgDetailModel.setImgRemotePath(path);
+              orgDetailModel.setImgLocalPath("");
+          }
+
           MOrganization mOrganization = convertToMOrganization(orgDetailModel);
           if (StringUtils.isEmpty(mOrganization.getOrgCode())) {
               errorMsg+="机构代码不能为空！";
@@ -305,6 +323,15 @@ public class OrganizationController extends BaseController {
                 return failed("机构代码不能为空！");
             }
             MOrganization mOrg = orgClient.getOrg(orgCode);
+
+
+            if (!StringUtils.isEmpty(mOrg.getImgRemotePath())) {
+                Map<String, String> map = toEntity(mOrg.getImgRemotePath(), Map.class);
+                String localPath = orgClient.downloadPicture(map.get("groupName"), map.get("remoteFileName"));
+                mOrg.setImgLocalPath(localPath);
+            }
+
+
             if (mOrg == null) {
                 return failed("机构获取失败");
             }

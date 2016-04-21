@@ -9,8 +9,9 @@ import java.util.List;
  * @created 2015.12.26 16:08
  */
 public class MProfileDocument {
-    private String id;      // CDA文档ID
-    private String name;    // CDA文档名称
+    private String id;                  // CDA文档ID
+    private String name;                // CDA文档名称
+    private Integer templateId;       // 展示模板ID
 
     private List<MDataSet> dataSets = new ArrayList<>();
 
@@ -36,5 +37,13 @@ public class MProfileDocument {
 
     public void setDataSets(List<MDataSet> dataSets) {
         this.dataSets = dataSets;
+    }
+
+    public Integer getTemplateId() {
+        return templateId;
+    }
+
+    public void setTemplateId(Integer templateId) {
+        this.templateId = templateId;
     }
 }

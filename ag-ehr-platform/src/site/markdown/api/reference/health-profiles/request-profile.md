@@ -36,7 +36,7 @@
 	<tr>
 		<td>demographic_id</td>
 		<td>string</td>
-		<td>患者身份证号</td>
+		<td>患者身份证号，使用Base64编码</td>
 	</tr>
 	<tr>
 		<td>from</td>
@@ -72,7 +72,7 @@
 	<tr>
 		<td>demographic_id</td>
 		<td>string</td>
-		<td>患者身份证号。若不为空，优先使用此字段</td>
+		<td>患者身份证号，使用Base64编码。若不为空，优先使用此字段</td>
 	</tr>
 	<tr>
 		<td>org_code</td>
@@ -126,7 +126,7 @@ API列表
 	<tr>
 		<td>demographic_id</td>
 		<td>string</td>
-		<td>患者身份证号</td>
+		<td>患者身份证号，使用Base64编码</td>
 	</tr>
 	<tr>
 		<td>from</td>
@@ -279,7 +279,7 @@ API列表
 	<tr>
 		<td>demographic_id</td>
 		<td>string</td>
-		<td>身份证号</td>
+		<td>身份证号，使用Base64编码</td>
 	</tr>
 	<tr>
 		<td>name</td>
@@ -310,9 +310,9 @@ API列表
 3. 使用姓名，性别，生日搜索档案
 
 
-	// 身份证号搜索参数
+	// 身份证号搜索参数，使用Base64编码
 	{
-		"demographic_id": 123456789013245678
+		"demographic_id": MTIzNDU2Nzg5MDEzMjQ1Njc4
 	}
 	
 	// 姓名+手机号搜索参数
