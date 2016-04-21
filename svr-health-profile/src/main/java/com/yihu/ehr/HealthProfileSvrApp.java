@@ -12,7 +12,7 @@ import org.springframework.data.solr.repository.config.EnableSolrRepositories;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableFeignClients
-@EnableSolrRepositories(basePackages = {"com.yihu.ehr.profile.persist.repo"}, multicoreSupport = true)
+@EnableSolrRepositories(basePackages = {"com.yihu.ehr.profile"}, multicoreSupport = true)
 public class HealthProfileSvrApp implements ApplicationContextAware {
 
     public static void main(String[] args) {
