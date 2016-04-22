@@ -1,6 +1,7 @@
 package com.yihu.ehr.model.family;// default package
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * @author Sand
@@ -12,7 +13,8 @@ public class MMembers {
     private String id;
     private String familyId;
     private String idCardNo;
-    private int familyRelation;
+    private String familyRelation;
+    private Date createDate;
 
     public String getId() {
         return id;
@@ -35,10 +37,17 @@ public class MMembers {
         this.idCardNo = idCardNo;
     }
 
-    public int getFamilyRelation() {
+    public String getFamilyRelation() {
         return familyRelation;
     }
-    public void setFamilyRelation(int familyRelation) {
+    public void setFamilyRelation(String familyRelation) {
         this.familyRelation = familyRelation;
+    }
+
+    public Date getCreateDate(){
+        return createDate;
+    }
+    public void setCreateDate(Date createDate){
+        this.createDate = createDate;
     }
 }
