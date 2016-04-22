@@ -23,20 +23,20 @@
 	<div class="m-form-group">
 		<label><spring:message code="lbl.identity.card"/><spring:message code="spe.colon"/></label>
 		<div class="l-text-wrapper m-form-control essential">
-			<input type="text" id="inp_idCard" class="required useTitle ajax validate-id-number"  required-title=<spring:message code="lbl.must.input"/> validate-id-number-title=<spring:message code="ehr.user.invalid.identity.no"/>  data-attr-scan="idCard"/>
+			<input type="text" id="inp_idCard" class="required useTitle ajax validate-id-number"  required-title=<spring:message code="lbl.must.input"/> validate-id-number-title=<spring:message code="ehr.user.invalid.identity.no"/>  data-attr-scan="idCardNo"/>
 		</div>
 	</div>
 	<div class="m-form-group">
 		<label><spring:message code="lbl.user.sex"/><spring:message code="spe.colon"/></label>
 		<div class="u-checkbox-wrap m-form-control">
-			<input type="radio" value="Male" name="sex" data-attr-scan><spring:message code="lbl.male"/>
-			<input type="radio" value="Female" name="sex" data-attr-scan><spring:message code="lbl.female"/>
+			<input type="radio" value="Male" name="gender" data-attr-scan><spring:message code="lbl.male"/>
+			<input type="radio" value="Female" name="gender" data-attr-scan><spring:message code="lbl.female"/>
 		</div>
 	</div>
 	<div class="m-form-group">
 		<label><spring:message code="lbl.marriage.status"/><spring:message code="spe.colon"/></label>
 		<div class="m-form-control">
-			<input type="text" id="inp_select_marriage" data-type="select" data-attr-scan="marriage">
+			<input type="text" id="inp_select_marriage" data-type="select" data-attr-scan="martialStatus">
 		</div>
 	</div>
 	<div class="m-form-group">
@@ -48,7 +48,7 @@
 	<div class="m-form-group">
 		<label><spring:message code="lbl.user.tel"/><spring:message code="spe.colon"/></label>
 		<div class="l-text-wrapper m-form-control essential">
-			<input type="text" id="inp_userTel" class="required useTitle validate-mobile-phone"  required-title=<spring:message code="lbl.must.input"/>  validate-mobile-phone-title=<spring:message code="lbl.input.true.tel"/> data-attr-scan="tel"/>
+			<input type="text" id="inp_userTel" class="required useTitle validate-mobile-phone"  required-title=<spring:message code="lbl.must.input"/>  validate-mobile-phone-title=<spring:message code="lbl.input.true.tel"/> data-attr-scan="telephone"/>
 		</div>
 	</div>
 	<div class="m-form-group">

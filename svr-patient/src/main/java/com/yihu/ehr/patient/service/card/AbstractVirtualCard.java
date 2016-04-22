@@ -1,11 +1,9 @@
 package com.yihu.ehr.patient.service.card;
 
-import com.yihu.ehr.patient.service.demographic.DemographicId;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * 抽象虚拟卡
@@ -32,7 +30,7 @@ public class AbstractVirtualCard extends AbstractCard {
 	String platform;
 
 	public AbstractVirtualCard() {
-		id  = UUID.randomUUID().toString().replace("-","");
+//		id  = UUID.randomUUID().toString().replace("-","");
 	}
 
 	@Id
@@ -70,11 +68,13 @@ public class AbstractVirtualCard extends AbstractCard {
 		this.status = status;
 	}
 
+
+
 	@Column(name = "card_type",  nullable = true)
 	public String getCardType() {
 		return cardType;
 	}
-	public void setCardType(String type) {
+	public void setCardType(String cardType) {
 		this.cardType = cardType;
 	}
 

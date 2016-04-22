@@ -7,7 +7,8 @@ import com.yihu.ehr.adaption.dict.service.AdapterDict;
 import com.yihu.ehr.adaption.dict.service.AdapterDictService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.adaption.MAdapterDict;
-import com.yihu.ehr.model.adaption.MDataSet;
+import com.yihu.ehr.model.adaption.MAdapterDictVo;
+import com.yihu.ehr.model.adaption.MAdapterRelationship;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -28,7 +29,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/adapter")
-@Api(protocols = "https", value = "adapterDict", description = "适配字典管理接口", tags = {"适配字典管理"})
+@Api(value = "adapterDict", description = "适配字典管理接口", tags = {"适配字典管理"})
 public class AdapterDictController extends ExtendController<MAdapterDict> {
 
     @Autowired
@@ -37,8 +38,8 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
     OrgAdapterPlanService orgAdapterPlanService;
 
     @RequestMapping(value = "/plan/{planId}/dicts", method = RequestMethod.GET)
-    @ApiOperation(value = "字典适配关系分页查询")
-    public Collection<MDataSet> searchAdapterDict(
+    @ApiOperation(value = "适配字典分页查询")
+    public Collection<MAdapterRelationship> searchAdapterDict(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "code", value = "代码查询值", defaultValue = "")
@@ -64,7 +65,7 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
 
     @RequestMapping(value = "/plan/{planId}/dict/{dictId}/entrys", method = RequestMethod.GET)
     @ApiOperation(value = "字典项适配关系分页查询")
-    public Collection<MAdapterDict> searchAdapterDictEntry(
+    public Collection<MAdapterDictVo> searchAdapterDictEntry(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "dictId", value = "字典编号", defaultValue = "")
@@ -106,7 +107,7 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
             @RequestParam(value = "adapterDictModel") String dictJsonModel) throws Exception {
 
         try {
-            return getModel(save(jsonToObj(dictJsonModel, MAdapterDict.class), new AdapterDict()));
+            return getModel(save(dictJsonModel, new AdapterDict()));
         } catch (IOException e) {
             throw errParm();
         }
@@ -124,7 +125,7 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
             AdapterDict adapterDict = adapterDictService.retrieve(id);
             if (adapterDict == null)
                 throw errNotFound();
-            return getModel(save(jsonToObj(dictJsonModel, MAdapterDict.class), adapterDict));
+            return getModel(save(dictJsonModel, adapterDict));
         } catch (IOException e) {
             throw errParm();
         }
@@ -136,16 +137,45 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
             @RequestParam("ids") String ids) throws Exception {
         if (StringUtils.isEmpty(ids))
             throw errMissId();
-        adapterDictService.delete(ids.split(","));
+        adapterDictService.delete(strToLongArr(ids));
         return true;
+    }
+
+    @RequestMapping(value = "/plan/{planId}/dict/{dictId}/std_entrys", method = RequestMethod.GET)
+    @ApiOperation(value = "过滤后的标准字典项分页查询")
+    public Collection<MAdapterRelationship> searchStdDictEntry(
+            @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
+            @PathVariable(value = "planId") Long planId,
+            @ApiParam(name = "dictId", value = "字典编号", defaultValue = "")
+            @PathVariable(value = "dictId") Long dictId,
+            @ApiParam(name = "seach_name", value = "代码查询值", defaultValue = "")
+            @RequestParam(value = "seach_name", required = false) String searchName,
+            @ApiParam(name = "mode", value = "编辑模式（new/modify）", defaultValue = "")
+            @RequestParam(value = "mode", required = false) String mode,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+
+        OrgAdapterPlan orgAdapterPlan = orgAdapterPlanService.retrieve(planId);
+        if (orgAdapterPlan == null)
+            throw errNotFound();
+        List ls = adapterDictService.searchStdDictEntry(orgAdapterPlan, dictId, searchName, mode, sorts, page, size);
+        pagedResponse(request, response, (long) adapterDictService.countStdDictEntry(orgAdapterPlan, dictId, searchName, mode), page, size);
+        return ls;
     }
 
     private MAdapterDict getAdapterDict(long id) {
         return convertToModel(adapterDictService.retrieve(id), MAdapterDict.class);
     }
 
-    private AdapterDict save(MAdapterDict adapterDictModel, AdapterDict adapterDict) {
+    private AdapterDict save(String dictJsonModel, AdapterDict adapterDict) throws IOException {
 
+        MAdapterDict adapterDictModel = toDecodeObj(dictJsonModel, MAdapterDict.class);
         adapterDict.setAdapterPlanId(adapterDictModel.getAdapterPlanId());
         adapterDict.setDictEntryId(adapterDictModel.getDictEntryId());
         adapterDict.setDictId(adapterDictModel.getDictId());

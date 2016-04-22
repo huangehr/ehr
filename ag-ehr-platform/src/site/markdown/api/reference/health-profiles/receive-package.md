@@ -179,8 +179,9 @@ meta.json
 				"url": "/api/patient/patient_id=10295514&event_no=000622508",
 				"expiry_date": "2016-10-10 00:00:00"
 				"key_words": {
-					//key格式: 数据集.数据元
-					"key": "word"    
+					"key1": "word1",
+					"key2": "word2",
+					"key3": "word3"
 				},
 				"content":{
 					"mime_type": "application/msword",
@@ -273,7 +274,7 @@ API列表
 
 接收第三方应用传送过来的患者健康档案。档案类型包含普通档案包，非结构化档案包与轻量级档案包，请参见相应档案包说明，按其结构封装数据。
 
-	POST /package
+	POST /packages
 	
 **参数**
 

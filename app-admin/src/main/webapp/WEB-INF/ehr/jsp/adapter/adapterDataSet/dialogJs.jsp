@@ -11,7 +11,7 @@
         var adapterPlanId = parent.getAdapterPlanId();
         var parentId = parent.getParentId();
         var mode = '${mode}';
-        var info = JSON.parse('${info}');
+        var info = JSON.parse('${model}');
         var dictUrl = [
                 '/adapterDataSet/getStdMetaData',
                 '/adapterDataSet/getOrgDataSet',
@@ -38,9 +38,10 @@
                     textField: 'name',
                     data:[{id:'',name:'请选择'},{id:'0',name:'值'},{id:'1',name:'编码'}]
                 });
-                $('#inp_info_metaDataId').ligerComboBox({readonly:mode=='modify'||mode=='view'});
-                this.initDDL(0,$('#inp_info_metaDataId'),info.metaDataId);
-                this.initDDL(1,$('#inp_info_orgDataSetSeq'),info.orgDataSetSeq);
+//                $('#inp_info_metaDataId').ligerComboBox({readonly:mode=='modify'||mode=='view'});
+                this.initCombo(0, $('#inp_info_metaDataId'), info.metaDataId, info.metaDataName);
+                this.initCombo(1, $('#inp_info_orgDataSetSeq'), info.orgDataSetSeq, info.orgDataSetName);
+                this.initCombo(2, $('#inp_info_orgMetaDataSeq'), info.orgMetaDataSeq, info.orgMetaDataName, info.orgDataSetSeq);
                 this.$dataMataForm.attrScan();
                 this.$dataMataForm.Fields.fillValues({
                     description:info.description,
@@ -58,6 +59,22 @@
                 this.$dataMataForm.show();
                 this.$dataMataForm.css('display','block');
             },
+            initCombo : function (dictId, target, value, text, parentValue){
+                var url = "${contextRoot}" + dictUrl[dictId];
+                var child = dictId == 1 ? $('#inp_info_orgMetaDataSeq') : undefined;
+                var combo = target.customCombo(
+                        url, {
+                            adapterPlanId: adapterPlanId,
+                            dataSetId: parentId,
+                            mode: mode,
+                            parentId: parentValue},
+                        undefined, child, dictId==0 ? mode=='modify'|| mode=='view' : false
+                )
+                if(!Util.isStrEmpty(value)){
+                    combo.setValue(value);
+                    combo.setText(text);
+                }
+            },
             initDDL: function (dictId, target, value, childValue, text) {
                 var self = this;
                 var dataModel = $.DataModel.init();
@@ -66,7 +83,6 @@
                 dataModel.fetchRemote(url,{
                     data:data,
                     success: function(data) {
-                        debugger;
                         data = self.toJson(data.obj);
                         target.ligerComboBox({
                             selectBoxHeight:220,
@@ -77,7 +93,6 @@
                             onSelected : self.getSelectFunc(dictId),
                             cancelable:false
                         });
-                        debugger;
                         var manager = target.ligerGetComboBoxManager();
                         manager.selectValue(value);
                     }
@@ -122,9 +137,15 @@
                     }
                     self.$btnSave.attr('disabled','disabled');
                     var values = self.$dataMataForm.Fields.getValues();
-                    var v = self.$dataMataForm.Fields.toSerializedString() +'&adapterPlanId='+adapterPlanId+'&dataSetId='+parentId;
+                    values.adapterPlanId = adapterPlanId;
+                    values.dataSetId = parentId;
+                    var parms = {
+                        id: values.id,
+                        model: JSON.stringify(values)
+                    }
                     var dataModel = $.DataModel.init();
-                    dataModel.updateRemote("${contextRoot}/adapterDataSet/updateAdapterMetaData",{data: v,
+                    dataModel.updateRemote("${contextRoot}/adapterDataSet/update",{
+                        data: parms,
                         success: function(data) {
                             if(data.successFlg){
                                 var app = data.obj;

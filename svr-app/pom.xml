@@ -4,9 +4,9 @@
 	<modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yihu.ehr</groupId>
-		<artifactId>commons-dependencies-docker</artifactId>
+		<artifactId>commons-dependencies-native</artifactId>
         <version>1.1.0</version>
-        <relativePath>../commons-dependencies-docker</relativePath>
+        <relativePath>../commons-dependencies-native</relativePath>
     </parent>
 
 	<artifactId>svr-app</artifactId>
@@ -85,6 +85,11 @@
 		<dependency>
 			<groupId>com.yihu.ehr</groupId>
 			<artifactId>commons-rest-model</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.yihu.ehr</groupId>
+			<artifactId>commons-ui-swagger</artifactId>
 			<version>1.1.0</version>
 		</dependency>
 	</dependencies>

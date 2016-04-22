@@ -10,6 +10,8 @@
 //        var dialog = frameElement.dialog;
         // 表单校验工具类
         var jValidation = $.jValidation;
+		var mode = '${mode}';
+
 
         /* *************************** 函数定义 ******************************* */
         function pageInit() {
@@ -39,11 +41,15 @@
                 this.$description.ligerTextBox({width:240,height:150 });
 
                 this.$form.attrScan();
-				var std = $.parseJSON('${std}');
+				var std = '';
+				if(mode == 'modify'){
+					var envelop = JSON.parse('${envelop}');
+					var std = envelop.obj;
+				}
                 this.$form.Fields.fillValues({
                     name: std.name,
                     code: std.code,
-                    type: std.sourceType.code,
+                    type: std.sourceType,
                     id: std.id,
                     description: std.description,
                 });
@@ -70,6 +76,9 @@
                 });
 
                 this.$btnSave.click(function () {
+
+                    var dialog = $.ligerDialog.waitting("正在保存数据...");
+
                     var values = self.$form.Fields.getValues();
                     if(!validator.validate()){
                         return;
@@ -97,6 +106,9 @@
                         error: function () {
                             $.Notice.error( '对不起，更新失败，请联系管理员。');
                             self.$btnSave.removeAttr('disabled');
+                        },
+                        complete:function(){
+                            dialog.close();
                         }
                     });
                 });

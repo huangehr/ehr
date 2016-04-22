@@ -113,6 +113,7 @@ public class URLHqlQueryParser<T> {
 
     /**
      * like：使用"?"来表示，如：name?'%医'
+     * not in：使用"<>"来表示并用","逗号对值进行分隔，如：status=2,3,4,5
      * in：使用"="来表示并用","逗号对值进行分隔，如：status=2,3,4,5
      * =：使用"="来表示，如：status=2
      * >=：使用大于号和大于等于语法，如：createDate>2012
@@ -139,9 +140,9 @@ public class URLHqlQueryParser<T> {
             String group = null;
             if (tokens.length == 2) group = tokens[1];
 
-            Criterion criterion = splitFilter(filterArray[i], classMetadata);
+            Criterion criterion = splitFilter(tokens[0], classMetadata);
 
-            if (group != null)
+            if (group == null)
                 group = Integer.toString(i);
 
             criterionMap.put(group,
@@ -175,20 +176,28 @@ public class URLHqlQueryParser<T> {
         Criterion criterion = null;
         if (filter.contains("?")) {
             Pair<Property, Object> pair = getPair(filter, "[?]", classMetadata);
-            criterion = pair.getKey().like(pair.getValue());
+            criterion = pair.getKey().like("%"+pair.getValue()+"%");
+        } else if (filter.contains("<>")) {
+            Pair<Property, Object> pair = getPair(filter, "<>", classMetadata);
+            if (pair.getValue().getClass().isArray()) {
+                criterion = pair.getKey().in((Object[])pair.getValue());
+            } else {
+                criterion = pair.getKey().eq(pair.getValue());
+            }
+            criterion = Restrictions.not(criterion);
+        }  else if (filter.contains(">=")) {
+            Pair<Property, Object> pair = getPair(filter, ">=", classMetadata);
+            criterion = pair.getKey().ge(pair.getValue());
         } else if (filter.contains(">")) {
             Pair<Property, Object> pair = getPair(filter, ">", classMetadata);
             //todo:  转成对应类型
             criterion = pair.getKey().gt(pair.getValue());
-        } else if (filter.contains(">=")) {
-            Pair<Property, Object> pair = getPair(filter, ">=", classMetadata);
-            criterion = pair.getKey().ge(pair.getValue());
-        } else if (filter.contains("<")) {
-            Pair<Property, Object> pair = getPair(filter, "<", classMetadata);
-            criterion = pair.getKey().lt(pair.getValue());
         } else if (filter.contains("<=")) {
             Pair<Property, Object> pair = getPair(filter, "<=", classMetadata);
             criterion = pair.getKey().le(pair.getValue());
+        } else if (filter.contains("<")) {
+            Pair<Property, Object> pair = getPair(filter, "<", classMetadata);
+            criterion = pair.getKey().lt(pair.getValue());
         } else if (filter.contains("=")) {
             Pair<Property, Object> pair = getPair(filter, "=", classMetadata);
             if (pair.getValue().getClass().isArray()) {
@@ -206,7 +215,7 @@ public class URLHqlQueryParser<T> {
         String valStr = tokens[1];
         Object val = tokens[1];
         try {
-            if(splitter.equals("=") && valStr.contains(",")){
+            if((splitter.equals("=") || splitter.equals("<>")) && valStr.contains(",")){
                 val = formatVal(tokens[0], valStr, true);
             }
             else if(!splitter.equals("[?]")){
@@ -261,13 +270,13 @@ public class URLHqlQueryParser<T> {
     private boolean isInteger(String fieldName) throws NoSuchFieldException {
 
         Field field = getField(fieldName);
-        return field.getAnnotatedType().getType().equals(Integer.TYPE);
+        return field.getType().equals(Integer.class) || field.getType().equals(Integer.TYPE);
     }
 
     private boolean isLong(String fieldName) throws NoSuchFieldException {
 
         Field field = getField(fieldName);
-        return field.getAnnotatedType().getType().equals(Long.TYPE);
+        return field.getType().equals(Long.class) || field.getType().equals(Long.TYPE);
     }
 
     private Field getField(String fieldName) throws NoSuchFieldException {

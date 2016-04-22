@@ -1,18 +1,25 @@
 package com.yihu.ehr.adapter.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.thirdpartystandard.OrgDictDetailModel;
+import com.yihu.ehr.agModel.thirdpartystandard.OrgDictEntryDetailModel;
+import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.constants.RestAPI;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,31 +27,40 @@ import java.util.Map;
  * Created by Administrator on 2015/8/12.
  */
 @RequestMapping("/orgdict")
-@Controller(RestAPI.OrgDictController)
+@Controller
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
 public class OrgDictController {
+
     @Value("${service-gateway.username}")
     private String username;
     @Value("${service-gateway.password}")
     private String password;
     @Value("${service-gateway.url}")
     private String comUrl;
+    @Autowired
+    ObjectMapper objectMapper;
 
     @RequestMapping("initial")
     public String orgDictInit() {
         return "/adapter/orgdict/index";
     }
 
+    /**
+     * 字典新增、修改窗口
+     * @param model
+     * @param id
+     * @param mode
+     * @return
+     */
     @RequestMapping("template/orgDictInfo")
     public Object orgDictInfoTemplate(Model model, String id, String mode) {
-        String url = "/orgDict/orgDict";
+        String url = "/adapter/org/dict";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("id",id);
         try {
             if(mode.equals("view") || mode.equals("modify")) {
-                //todo 后台转换成model后传前台
                 resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
                 model.addAttribute("rs", "success");
             }
@@ -59,37 +75,24 @@ public class OrgDictController {
             result.setErrorMsg(ErrorCode.SystemError.toString());
             return result;
         }
-//        OrgDictModel orgDictModel = new OrgDictModel();
-//        //mode定义：new modify view三种模式，新增，修改，查看
-//        if(mode.equals("view") || mode.equals("modify")){
-//            try {
-//                OrgDict orgDict  = (OrgDict) orgDictManager.getOrgDict(Long.parseLong(id));
-//                orgDictModel.setId(String.valueOf(orgDict.getId()));
-//                orgDictModel.setCode(StringUtil.latinString(orgDict.getCode()));
-//                orgDictModel.setName(StringUtil.latinString(orgDict.getName()));
-//                orgDictModel.setDescription(StringUtil.latinString(orgDict.getDescription()));
-//                model.addAttribute("rs","success");
-//            }catch (Exception ex){
-//                model.addAttribute("rs", "error");
-//            }
-//        }
-//        model.addAttribute("sort","");
-//        model.addAttribute("info", orgDictModel);
-//        model.addAttribute("mode",mode);
-//        model.addAttribute("contentPage","/adapter/orgCollection/dialog");
-//        return "simpleView";
     }
 
+    /**
+     * 字典项新增、修改窗口
+     * @param model
+     * @param id
+     * @param mode
+     * @return
+     */
     @RequestMapping("template/orgDictItemsInfo")
     public Object orgDictItemsInfoTemplate(Model model, String id, String mode) {
-        String url = "/orgDict/orgDict";
+        String url = "/adapter/org/item/"+id;
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("id",id);
         try {
             if(mode.equals("view") || mode.equals("modify")) {
-                //todo 后台转换成model后传前台
                 resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
                 model.addAttribute("rs", "success");
             }
@@ -104,25 +107,6 @@ public class OrgDictController {
             result.setErrorMsg(ErrorCode.SystemError.toString());
             return result;
         }
-//        OrgDictItemModel orgDictItemModel = new OrgDictItemModel();
-//        //mode定义：new modify view三种模式，新增，修改，查看
-//        if(mode.equals("view") || mode.equals("modify")){
-//            try {
-//                OrgDictItem orgDictItem  = (OrgDictItem) orgDictItemManager.getOrgDictItem(Long.parseLong(id));
-//                orgDictItemModel.setId(String.valueOf(orgDictItem.getId()));
-//                orgDictItemModel.setCode(StringUtil.latinString(orgDictItem.getCode()));
-//                orgDictItemModel.setName(StringUtil.latinString(orgDictItem.getName()));
-//                orgDictItemModel.setDescription(StringUtil.latinString(orgDictItem.getDescription()));
-//                model.addAttribute("sort",Integer.toString(orgDictItem.getSort()));
-//                model.addAttribute("rs","success");
-//            }catch (Exception ex){
-//                model.addAttribute("rs", "error");
-//            }
-//        }
-//        model.addAttribute("info", orgDictItemModel);
-//        model.addAttribute("mode",mode);
-//        model.addAttribute("contentPage","/adapter/orgCollection/dialog");
-//        return "simpleView";
     }
 
     /**
@@ -169,80 +153,27 @@ public class OrgDictController {
 
     /**
      * 创建机构字典
-     * @param code
-     * @param name
-     * @param description
-     * @param orgCode
-     * @param userId
      * @return
      */
     @RequestMapping(value = "createOrgDict",produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public Object createOrgDict(String orgCode,String code,String name,String description,String userId){
-
-        String url="";
+    public Object createOrgDict(String jsonDataModel, HttpServletRequest request){
+        String url="/adapter/org/dict";
         String resultStr = "";
-        Envelop result = new Envelop();
+        Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
         try{
-            url="/orgDict/isOrgDictExist";//todo:网关没有重复校验接口
-            params.put("orgCode",orgCode);
-            params.put("code",code);
-            params.put("name",name);
-            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);//重复校验
-            if(Boolean.parseBoolean(resultStr)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg("字典已存在！");
-                return result;
-            }
+            OrgDictDetailModel orgDictDetailModel = toOrgDictDetailModel(jsonDataModel);
+            orgDictDetailModel.setCreateUser(getCurUser(request).getId());
+            params.put("json_data", toJson(orgDictDetailModel));
+            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
 
-            url="/orgDict/createOrgDict";
-            params.put("description", description);
-            params.put("userId",userId);
-            //todo 失败，返回的错误信息怎么体现？
-            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//创建字典
-//            ObjectMapper mapper = new ObjectMapper();
-//            OrgDictModel orgDictModel = mapper.readValue(resultStr, OrgDictModel.class);
-            result.setObj(resultStr);
-            result.setSuccessFlg(true);
-            return result;
+            return resultStr;
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result;
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            return envelop;
         }
-//        Result result = new Result();
-//        try {
-//            boolean isExist = orgDictManager.isExistOrgDict(orgCode,code,name);   //重复校验
-//
-//            if(isExist){
-//                result.setSuccessFlg(false);
-//                result.setErrorMsg("该字典已存在！");
-//                return  result.toJson();
-//            }
-//            OrgDict orgDict = new OrgDict();
-//            orgDict.setCode(code);
-//            orgDict.setName(name);
-//            orgDict.setDescription(description);
-//            orgDict.setOrganization(orgCode);
-//            orgDict.setCreateDate(new Date());
-//            orgDict.setCreateUser(user);
-//            if(orgDictManager.createOrgDict(orgDict)==null){
-//
-//                result.setSuccessFlg(false);
-//                result.setErrorMsg("创建字典失败！");
-//                return  result.toJson();
-//            }
-//            OrgDictModel model = new OrgDictModel();
-//            model.setCode(orgDict.getCode());
-//            model.setName(orgDict.getName());
-//            model.setDescription(orgDict.getDescription());
-//            result.setSuccessFlg(true);
-//            result.setObj(model);
-//        }catch (Exception ex){
-//            result.setSuccessFlg(false);
-//        }
-//        return  result.toJson();
     }
 
     /**
@@ -254,7 +185,7 @@ public class OrgDictController {
     @ResponseBody
     public Object deleteOrgDict(long id) {
 
-        String url = "/orgDict/deleteOrgDict";
+        String url = "/adapter/org/dict/"+id;
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
@@ -262,165 +193,76 @@ public class OrgDictController {
         try {
             //todo:内部做级联删除(删除关联的字典项)
             resultStr = HttpClientUtil.doDelete(comUrl + url, params, username, password);
-            if(Boolean.parseBoolean(resultStr)){
-                result.setSuccessFlg(true);
-            }
-            else {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.InvalidDelete.toString());
-            }
-            return result;
-        } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result;
-        }
-//        Result result = new Result();
-//        try {
-//            XOrgDict orgDict = orgDictManager.getOrgDict(id);
-//            if(orgDict == null){
-//                result.setSuccessFlg(false);
-//                result.setErrorMsg("该字典不存在！");
-//                return  result.toJson();
-//            }
-//            orgDictManager.deleteOrgDict(id);
-//            orgDictItemManager.deleteOrgDictItemByDict(orgDict);
-//            result.setSuccessFlg(true);
-//            return  result.toJson();
-//        } catch (Exception e) {
-//            result.setSuccessFlg(false);
-//            result.setErrorMsg("删除字典失败！");
-//            return  result.toJson();
-//        }
-    }
 
-    /**
-     * 修改机构字典
-     * @param id
-     * @param code
-     * @param name
-     * @param description
-     * @param userId
-     * @return
-     */
-    @RequestMapping(value="updateOrgDict",produces = "text/html;charset=UTF-8")
-    @ResponseBody
-    public Object updateOrgDict(String orgCode,long id,String code,String name,String description,String userId) {
-
-        String url="";
-        String resultStr = "";
-        Envelop result = new Envelop();
-        Map<String, Object> params = new HashMap<>();
-        try{
-            url="/orgDict/orgDict";
-//            Map<String, Object> param1 = new HashMap<>();
-            params.put("id",id);
-            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);//数据已不存在
-            if(resultStr==null){
-                result.setSuccessFlg(false);
-                result.setErrorMsg("该字典已不存在，请刷新后重试！");
-                return result;
-            }
-            url="/orgDict/isOrgDictExist";//todo:网关没有重复校验接口
-            params.put("orgCode",orgCode);
-            params.put("code",code);
-            params.put("name",name);
-            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);//重复校验
-            if(Boolean.parseBoolean(resultStr)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg("字典已存在！");
-                return result;
-            }
-
-            url="/orgDict/updateOrgDict";
-            params.put("description", description);
-            params.put("userId",userId);
-            //todo 失败，返回的错误信息怎么体现？
-            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//更新字典
-//            ObjectMapper mapper = new ObjectMapper();
-//            OrgDictModel orgDictModel = mapper.readValue(resultStr, OrgDictModel.class);
-            result.setObj(resultStr);
-            result.setSuccessFlg(true);
-            return result;
-        } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result;
-        }
-//        Result result = new Result();
-//        try{
-//            XOrgDict orgDict = orgDictManager.getOrgDict(id);
-//            if(orgDict == null){
-//                result.setSuccessFlg(false);
-//                result.setErrorMsg("该字典不存在！");
-//            }else {
-//                //重复校验
-//                boolean updateFlg = orgDict.getCode().equals(code) || !orgDictManager.isExistOrgDict(orgCode, code, name);
-//                if (updateFlg) {
-//                    orgDict.setCode(code);
-//                    orgDict.setName(name);
-//                    orgDict.setDescription(description);
-//                    orgDict.setUpdateDate(new Date());
-//                    orgDict.setUpdateUser(user);
-//                    orgDictManager.updateOrgDict(orgDict);
-//                    result.setSuccessFlg(true);
-//                } else {
-//                    result.setSuccessFlg(false);
-//                    result.setErrorMsg("该字典已存在！");
-//                }
-//            }
-//            return  result.toJson();
-//        }catch (Exception e) {
-//            result.setSuccessFlg(false);
-//            result.setErrorMsg("修改字典失败！");
-//            return result.toJson();
-//        }
-    }
-
-
-    /**
-     * 条件查询
-     * @param codename
-     * @param page
-     * @param rows
-     * @return
-     */
-    @RequestMapping("searchOrgDicts")
-    @ResponseBody
-    public Object searchOrgDicts(String orgCode,String codename,int page, int rows) {
-        String url = "/orgDict/orgDicts";
-        String resultStr = "";
-        Envelop result = new Envelop();
-        Map<String, Object> params = new HashMap<>();
-        params.put("orgCode", orgCode);
-        params.put("code", codename);
-        params.put("name", codename);
-        params.put("page", page);
-        params.put("rows", rows);
-        try {
-            //todo 返回result.toJson()
-            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             return resultStr;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
             return result;
         }
-//        Result result=new Result();
-//        try {
-//            Map<String, Object> conditionMap = new HashMap<>();
-//            conditionMap.put("orgCode", orgCode);
-//            conditionMap.put("code", codename);
-//            conditionMap.put("page", page);
-//            conditionMap.put("rows", rows);
-//            List<OrgDictModel> detailModelList = orgDictManager.searchOrgDicts(conditionMap);
-//            Integer totalCount = orgDictManager.searchTotalCount(conditionMap);
-//            result = getResult(detailModelList, totalCount, page, rows);
-//            result.setSuccessFlg(true);
-//        }catch (Exception ex){
-//            result.setSuccessFlg(false);
-//        }
-//        return result.toJson();
+    }
+
+    /**
+     * 修改机构字典
+     * @param jsonDataModel
+     * @return
+     */
+    @RequestMapping(value="updateOrgDict",produces = "text/html;charset=UTF-8")
+    @ResponseBody
+    public Object updateOrgDict(String jsonDataModel, HttpServletRequest request) {
+
+        String url="/adapter/org/dict";
+        String resultStr = "";
+        Envelop result = new Envelop();
+        Map<String, Object> params = new HashMap<>();
+        try{
+            OrgDictDetailModel orgDictDetailModel = toOrgDictDetailModel(jsonDataModel);
+            orgDictDetailModel.setUpdateUser(getCurUser(request).getId());
+            params.put("json_data",toJson(orgDictDetailModel));
+            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
+
+            return resultStr;
+        } catch (Exception e) {
+            result.setSuccessFlg(false);
+            result.setErrorMsg(ErrorCode.SystemError.toString());
+            return result;
+        }
+    }
+
+
+    /**
+     * 条件查询
+     * @param codeOrName
+     * @param page
+     * @param rows
+     * @return
+     */
+    @RequestMapping("searchOrgDicts")
+    @ResponseBody
+    public Object searchOrgDicts(String organizationCode,String codeOrName,int page, int rows) {
+        String url = "/adapter/org/dicts";
+        String resultStr = "";
+        Envelop envelop = new Envelop();
+        Map<String, Object> params = new HashMap<>();
+
+        String filters = "organization="+organizationCode;
+        if(!StringUtils.isEmpty(codeOrName)){
+            filters += " g1;code?"+codeOrName+" g2;name?"+codeOrName+" g2";
+        }
+
+        params.put("fields", "");
+        params.put("filters", filters);
+        params.put("sorts", "");
+        params.put("page", page);
+        params.put("size", rows);
+        try {
+            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
+            return resultStr;
+        } catch (Exception e) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            return envelop;
+        }
     }
 
     //---------------------------以上是机构字典部分，以下是机构字典详情部分---------------------------
@@ -430,7 +272,6 @@ public class OrgDictController {
      * @param id
      * @return
      */
-    //todo ： 网关没有找到该方法的对应接口
     @RequestMapping("getOrgDictItem")
     @ResponseBody
     public Object getOrgDictItem(String id) {
@@ -440,7 +281,6 @@ public class OrgDictController {
         Map<String, Object> params = new HashMap<>();
         params.put("id",id);
         try{
-            //todo 后台转换成model后传前台
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
 //            ObjectMapper mapper = new ObjectMapper();
 //            OrgDictItemModel orgDictItemModel = mapper.readValue(resultStr, OrgDictItemModel.class);
@@ -470,92 +310,32 @@ public class OrgDictController {
 
 
     /**
-     * 创建机构字典数据
-     * @param orgDictSeq
-     * @param code
-     * @param name
-     * @param description
-     * @param userId
+     * 创建机构字典项数据
+     * @param jsonDataModel
      * @return
      */
     @RequestMapping(value="createOrgDictItem",produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public Object createOrgDictItem(Integer orgDictSeq,String orgCode,String code,String name,String description,String sort,String userId){
+    public Object createOrgDictItem(String jsonDataModel, HttpServletRequest request){
 
-        String url;
+        String url="/adapter/org/item";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        try{
-            url="/orgDictItem/isOrgDictItemExist";//todo:网关没有重复校验接口
-            params.put("orgDictSeq",orgDictSeq);
-            params.put("orgCode",orgCode);
-            params.put("code",code);
-            params.put("name",name);
-            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);//重复校验
-            if(Boolean.parseBoolean(resultStr)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg("数据元已存在！");
-                return result;
-            }
 
-            url="/orgDict/createOrgDictItem";
-            params.put("description", description);
-            params.put("sort", sort);
-            params.put("userId",userId);
-            //todo 失败，返回的错误信息怎么体现？
-            //todo : 网关没有url的请求方式
-            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//创建字典项
-//            ObjectMapper mapper = new ObjectMapper();
-//            OrgDictItemModel orgDictItemModel = mapper.readValue(resultStr, OrgDictItemModel.class);
-            result.setObj(resultStr);
-            result.setSuccessFlg(true);
-            return result;
+
+        try{
+            OrgDictEntryDetailModel orgDictEntryDetailModel = toOrgDictEntryDetailModel(jsonDataModel);
+            orgDictEntryDetailModel.setCreateUser(getCurUser(request).getId());
+            params.put("json_data", toJson(orgDictEntryDetailModel));
+            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
+
+            return resultStr;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
             return result;
         }
-//        Result result = new Result();
-//        try {
-//            boolean isExist = orgDictItemManager.isExistOrgDictItem(orgDictSeq,orgCode,code, name);   //重复校验
-//
-//            if(isExist){
-//                result.setSuccessFlg(false);
-//                result.setErrorMsg("该字典项已存在！");
-//                return  result.toJson();
-//            }
-//            OrgDictItem orgDictItem = new OrgDictItem();
-//            int nextSort;
-//            if(StringUtil.isEmpty(sort)){
-//                nextSort = orgDictItemManager.getNextSort(orgDictSeq);
-//            }else{
-//                nextSort = Integer.parseInt(sort);
-//            }
-//            orgDictItem.setCode(code);
-//            orgDictItem.setName(name);
-//            orgDictItem.setSort(nextSort);
-//            orgDictItem.setOrgDict(orgDictSeq);
-//            orgDictItem.setCreateDate(new Date());
-//            orgDictItem.setCreateUser(user);
-//            orgDictItem.setDescription(description);
-//            orgDictItem.setOrganization(orgCode);
-//            if(orgDictItemManager.createOrgDictItem(orgDictItem)==null){
-//                result.setSuccessFlg(false);
-//                result.setErrorMsg("创建字典项失败！");
-//                return  result.toJson();
-//            }
-//            OrgDictItemModel model = new OrgDictItemModel();
-//            model.setCode(orgDictItem.getCode());
-//            model.setName(orgDictItem.getName());
-//            model.setDescription(orgDictItem.getDescription());
-//            result.setSuccessFlg(true);
-//            result.setObj(model);
-//        }catch (Exception ex){
-//            result.setSuccessFlg(false);
-//        }
-//
-//        return  result.toJson();
     }
 
     /**
@@ -611,21 +391,16 @@ public class OrgDictController {
      */
     @RequestMapping("deleteOrgDictItemList")
     @ResponseBody
-    public Object deleteOrgDictItemList(@RequestParam("ids[]") Long[] ids) {
-        String url = "/orgDict/deleteOrgDictItem";
+    public Object deleteOrgDictItemList(String ids) {
+        String url = "/adapter/org/item";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         params.put("ids",ids);
         try {
             resultStr = HttpClientUtil.doDelete(comUrl + url, params, username, password);
-            if(Boolean.parseBoolean(resultStr)){
-                result.setSuccessFlg(true);
-            } else {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.InvalidDelete.toString());
-            }
-            return result;
+
+            return resultStr;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
@@ -651,116 +426,58 @@ public class OrgDictController {
     }
 
     /**
-     * 修改机构字典数据
-     * @param id
-     * @param code
-     * @param name
-     * @param description
-     * @param userId
+     * 修改机构字典项数据
+     * @param jsonDataModel
      * @return
      */
     @RequestMapping(value="updateDictItem",produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public Object updateDictItem(Long id,Integer orgDictSeq,String orgCode,String code,String name,String description,String sort,String userId) {
-
-        String url="";
+    public Object updateDictItem(String jsonDataModel, HttpServletRequest request) {
+        String url="/adapter/org/item";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
         try{
-            url="/orgDict/orgDictItem";//todo:网关没有对应接口
-//            Map<String, Object> param1 = new HashMap<>();
-            params.put("id",id);
-            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);//数据已不存在
-            if(resultStr==null){
-                result.setSuccessFlg(false);
-                result.setErrorMsg("该字典项已不存在，请刷新后重试！");
-                return result;
-            }
-            url="/orgDictItem/isOrgDictItemExist";//todo:网关没有重复校验接口
-            params.put("orgDictSeq",orgDictSeq);
-            params.put("orgCode",orgCode);
-            params.put("code",code);
-            params.put("name",name);
-            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);//重复校验
-            if(Boolean.parseBoolean(resultStr)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg("字典项已存在！");
-                return result;
-            }
+            OrgDictEntryDetailModel orgDictEntryDetailModel = toOrgDictEntryDetailModel(jsonDataModel);
+            orgDictEntryDetailModel.setUpdateUser(getCurUser(request).getId());
+            params.put("json_data", toJson(orgDictEntryDetailModel));
+            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
 
-            url="/orgDict/updateDictItem";
-            params.put("description", description);
-            params.put("sort", sort);
-            params.put("userId",userId);
-            //todo 失败，返回的错误信息怎么体现？
-            //todo : 网关没有url的请求方式
-            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);//更新字典项
-//            ObjectMapper mapper = new ObjectMapper();
-//            OrgDictItemModel orgDictItemModel = mapper.readValue(resultStr, OrgDictItemModel.class);
-            result.setObj(resultStr);
-            result.setSuccessFlg(true);
-            return result;
+            return resultStr;
         } catch (Exception e) {
             result.setSuccessFlg(false);
             result.setErrorMsg(ErrorCode.SystemError.toString());
             return result;
         }
-//        Result result = new Result();
-//        try{
-//            XOrgDictItem orgDictItem = orgDictItemManager.getOrgDictItem(id);
-//            if(orgDictItem == null){
-//                result.setSuccessFlg(false);
-//                result.setErrorMsg("该字典项不存在！");
-//            }else {
-//                //重复校验
-//                boolean updateFlg = orgDictItem.getCode().equals(code) || !orgDictItemManager.isExistOrgDictItem(orgDictSeq, orgCode, code, name);
-//                if (updateFlg) {
-//                    orgDictItem.setCode(code);
-//                    orgDictItem.setName(name);
-//                    orgDictItem.setDescription(description);
-//                    orgDictItem.setUpdateDate(new Date());
-//                    orgDictItem.setUpdateUser(user);
-//                    orgDictItem.setSort(Integer.parseInt(sort));
-//                    orgDictItem.setOrganization(orgCode);
-//                    orgDictItemManager.updateOrgDictItem(orgDictItem);
-//                    result.setSuccessFlg(true);
-//                } else {
-//                    result.setSuccessFlg(false);
-//                    result.setErrorMsg("该字典项已存在！");
-//                }
-//            }
-//            return  result.toJson();
-//        }catch (Exception e) {
-//            result.setSuccessFlg(false);
-//            result.setErrorMsg("修改字典项失败！");
-//            return result.toJson();
-//        }
     }
 
 
     /**
      * 条件查询
-     * @param codename
+     * @param codeOrName
      * @param page
      * @param rows
      * @return
      */
     @RequestMapping("searchOrgDictItems")
     @ResponseBody
-    public Object searchOrgDictItems(Integer orgDictSeq,String orgCode,String codename,int page, int rows) {
-        String url = "/orgDict/orgDictItems";
+    public Object searchOrgDictItems(Integer orgDictSeq,String organizationCode,String codeOrName,int page, int rows) {
+        String url = "/adapter/org/items";
         String resultStr = "";
         Envelop result = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("orgCode", orgCode);
-        params.put("orgDictSeq", orgDictSeq);
-        params.put("code", codename);
-        params.put("name", codename);
+
+        String filters = "orgDict="+orgDictSeq+" g1;organization="+organizationCode+" g2";
+        if (!StringUtils.isEmpty(codeOrName)){
+            filters += ";code?"+codeOrName+" g4;name?"+codeOrName+" g4";
+        }
+
+        params.put("fields", "");
+        params.put("filters", filters);
+        params.put("sorts", "");
         params.put("page", page);
-        params.put("rows", rows);
+        params.put("size", rows);
         try {
-            //todo 返回result.toJson()
             resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             return  resultStr;
         } catch (Exception e) {
@@ -768,22 +485,6 @@ public class OrgDictController {
             result.setErrorMsg(ErrorCode.SystemError.toString());
             return result;
         }
-//        Result result=new Result();
-//        try {
-//            Map<String, Object> conditionMap = new HashMap<>();
-//            conditionMap.put("orgDictSeq", orgDictSeq);
-//            conditionMap.put("orgCode", orgCode);
-//            conditionMap.put("code", codename);
-//            conditionMap.put("page", page);
-//            conditionMap.put("rows", rows);
-//            List<OrgDictItemModel> detailModelList = orgDictItemManager.searchOrgDictItems(conditionMap);
-//            Integer totalCount = orgDictItemManager.searchTotalCount(conditionMap);
-//            result = getResult(detailModelList, totalCount, page, rows);
-//            result.setSuccessFlg(true);
-//        }catch (Exception ex){
-//            result.setSuccessFlg(false);
-//        }
-//        return result.toJson();
     }
 
 //    //todo 没发现哪里用到以下这个方法
@@ -807,4 +508,21 @@ public class OrgDictController {
 //    }
 
 
+    private OrgDictDetailModel toOrgDictDetailModel(String json) throws IOException {
+        return objectMapper.readValue(json, OrgDictDetailModel.class);
+    }
+
+    private OrgDictEntryDetailModel toOrgDictEntryDetailModel(String json) throws IOException {
+        return objectMapper.readValue(json, OrgDictEntryDetailModel.class);
+    }
+
+    private String toJson(Object obj) throws JsonProcessingException {
+
+        return objectMapper.writeValueAsString(obj);
+    }
+
+    private UserDetailModel getCurUser(HttpServletRequest request){
+
+        return (UserDetailModel)request.getSession().getAttribute(SessionAttributeKeys.CurrentUser);
+    }
 }

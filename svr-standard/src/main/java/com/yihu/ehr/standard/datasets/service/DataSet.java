@@ -8,6 +8,6 @@ package com.yihu.ehr.standard.datasets.service;
  * @created 30-6月-2015 16:19:03
  */
 
-public class DataSet extends IDataSet{
+public class DataSet extends BaseDataSet {
 
 }

@@ -1,21 +1,26 @@
 package com.yihu.ehr.std.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.standard.cdatype.CdaTypeDetailModel;
+import com.yihu.ehr.agModel.standard.cdatype.CdaTypeModel;
+import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.constants.RestAPI;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
-import com.yihu.ehr.util.ResourceProperties;
-import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.util.controller.BaseUIController;
 import com.yihu.ehr.util.log.LogService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,15 +28,19 @@ import java.util.Map;
  * Created by AndyCai on 2015/12/14.
  */
 @RequestMapping("/cdatype")
-@Controller(RestAPI.StandardCDATypeController)
+@Controller
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
-public class CdaTypeController {
+public class CdaTypeController extends BaseUIController{
     @Value("${service-gateway.username}")
     private String username;
     @Value("${service-gateway.password}")
     private String password;
-    @Value("${service-gateway.url}")
+    @Value("${service-gateway.cdatypeurl}")
     private String comUrl;
+
+    @Autowired
+    ObjectMapper objectMapper;
+
     @RequestMapping("index")
     public String cdaTypeInitial(Model model) {
         model.addAttribute("contentPage", "std/cdaType/index");
@@ -39,173 +48,72 @@ public class CdaTypeController {
     }
 
     @RequestMapping("typeupdate")
-    public String typeupdate(Model model,String userId) {
-        model.addAttribute("UserId", userId);
+    public String typeupdate(Model model,HttpServletRequest request) {
+        UserDetailModel user = (UserDetailModel)request.getSession().getAttribute(SessionAttributeKeys.CurrentUser);
+        model.addAttribute("UserId", user.getId());
         model.addAttribute("contentPage", "std/cdaType/CdaTypeDetail");
         return "generalView";
     }
 
     @RequestMapping("getTreeGridData")
     @ResponseBody
-    public String getTreeGridData() {
-        String url = "/cdaType/getTreeGridData";
+    //获取TreeData 用于初始页面显示嵌套model
+    public Object getTreeGridData(String codeName) {
+        Envelop envelop = new Envelop();
+        String url = "/cda_types/cda_types_tree";
         String strResult = "";
-        try{
-            strResult = HttpClientUtil.doGet(comUrl+url,username,password);
-        }catch(Exception ex){
-            LogService.getLogger(CdaTypeController.class).error(ex.getMessage());
+        if (StringUtils.isEmpty(codeName)){
+            codeName = "";
         }
-        return strResult;
-
-       /* try {
-            List<XCDAType> listType = xcdaTypeManager.getCDATypeListByParentId("");
-            if (listType != null) {
-                List<CDATypeTreeModel> listTree = getCdaTypeChild(listType);
-                ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-                strResult = objectMapper.writeValueAsString(listTree);
-            }
-        } catch (Exception ex) {
-            LogService.getLogger(CdaTypeController_w.class).error(ex.getMessage());
-        }
-        return strResult;*/
-    }
-
-//    /**
-//     * 根据父级信息获取全部的子级信息
-//     * @param info 父级信息
-//     * @return 全部子级信息
-//     */
-//    public List<CDATypeTreeModel> getCdaTypeChild(List<XCDAType> info) {
-//        List<CDATypeTreeModel> treeInfo = new ArrayList<>();
-//        try {
-//            for (int i = 0; i < info.size(); i++) {
-//                CDAType typeInfo = (CDAType) info.get(i);
-//                CDATypeTreeModel tree = new CDATypeTreeModel();
-//                tree.setId(typeInfo.getId());
-//                tree.setCode(typeInfo.getCode());
-//                tree.setName(typeInfo.getName());
-//                tree.setDescription(typeInfo.getDescription());
-//                List<XCDAType> listChild = xcdaTypeManager.getCDATypeListByParentId(typeInfo.getId());
-//                List<CDATypeTreeModel> listChildTree = getCdaTypeChild(listChild);
-//                tree.setChildren(listChildTree);
-//                treeInfo.add(tree);
-//            }
-//        } catch (Exception ex) {
-//            LogService.getLogger(CdaTypeController_w.class).error(ex.getMessage());
-//        }
-//        return treeInfo;
-//    }
-
-//    /**
-//     * 根据父级类别获取全部的子类别ID，返回值包括父级的ID
-//     * @param info 父级信息
-//     * @param childrenIds   子级ID
-//     * @return 全部子级
-//     */
-//    public String getCdaTypeChildId(List<XCDAType> info,String childrenIds) {
-//        try {
-//            for (int i = 0; i < info.size(); i++) {
-//                CDAType typeInfo = (CDAType) info.get(i);
-//                childrenIds+=typeInfo.getId()+",";
-//                List<XCDAType> listChild = xcdaTypeManager.getCDATypeListByParentId(typeInfo.getId());
-//                if(listChild.size()>0)
-//                    childrenIds=getCdaTypeChildId(listChild,childrenIds);
-//            }
-//        } catch (Exception ex) {
-//            LogService.getLogger(CdaTypeController_w.class).error(ex.getMessage());
-//        }
-//        return childrenIds;
-//    }
-
-    @RequestMapping("GetCdaTypeListByKey")
-    @ResponseBody
-    public Object GetCdaTypeListByKey(String strKey, Integer page, Integer rows) {
-        // TODO 无对应
-        Envelop result = new Envelop();
-        String url = "/cdaType/***********";
         try{
             Map<String,Object> params = new HashMap<>();
-            params.put("strKey",strKey);
-            params.put("page",page);
-            params.put("rows",rows);
+            params.put("code_name",codeName);
+            strResult = HttpClientUtil.doGet(comUrl+url,params,username,password);
+            return strResult;
+        }catch(Exception ex){
+            LogService.getLogger(CdaTypeController.class).error(ex.getMessage());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            return envelop;
+        }
+    }
+
+    @RequestMapping("GetCdaTypeList")
+    @ResponseBody
+    public Object GetCdaTypeList(String strKey, Integer page, Integer rows) {
+        Envelop envelop = new Envelop();
+        String url = "/cda_types/no_paging";
+        String filters = "";
+        if(!StringUtils.isEmpty(strKey)){
+            filters = "code?"+strKey+" g1;name?"+strKey+" g1;";
+        }
+        try{
+            Map<String,Object> params = new HashMap<>();
+            params.put("filters",filters);
             String _rus = HttpClientUtil.doGet(comUrl+url,params,username,password);
-            if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg("cda类别获取失败");
-            }else{
-                //result.setSuccessFlg(true);
-                return _rus;
-            }
+            return _rus;
         }catch (Exception ex){
             LogService.getLogger(CdaTypeController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result;
-
-        /*Result result = new Result();
-        try {
-            Map<String, Object> mapKey = new HashMap<>();
-            mapKey.put("key", strKey);
-            mapKey.put("page", page);
-            mapKey.put("rows", rows);
-            List<XCDAType> listType = xcdaTypeManager.getCDATypeListByKey(mapKey);
-            if (listType == null) {
-                result.setSuccessFlg(false);
-                result.setErrorMsg("数据获取失败!");
-                return result;
-            }
-            List<CDATypeForInterface> listInfo = getTypeForInterface(listType);
-            if(rows<=0)
-            {
-                rows=1;
-            }
-            result = getResult(listInfo, 1, page, rows);
-        } catch (Exception ex) {
-            LogService.getLogger(CdaTypeController_w.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg("系统错误，请联系管理员!");
-        }
-        return result;*/
+        return envelop;
     }
 
     @RequestMapping("getCdaTypeById")
     @ResponseBody
     public Object getCdaTypeById(String strIds) {
-        Envelop result = new Envelop();
-        String url = "/cdaType/cdaType";
+        Envelop envelop = new Envelop();
+        String url = "/cda_types/id/"+strIds;
         try{
-            Map<String,Object> params = new HashMap<>();
-            params.put("typeId",strIds);
-            String _rus = HttpClientUtil.doGet(comUrl+url,params,username,password);
-            if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg("cda类别获取失败");
-            }else{
-                result.setSuccessFlg(true);
-                result.setObj(_rus);
-            }
+            String envelopStr = HttpClientUtil.doGet(comUrl+url,username,password);
+            return envelopStr;
         }catch (Exception ex){
             LogService.getLogger(CdaTypeController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result;
-
-       /* Result result = new Result();
-        result.setSuccessFlg(false);
-        try {
-            List<XCDAType> listType = xcdaTypeManager.getCdatypeInfoByIds(strIds);
-            if (listType.size() > 0) {
-                result.setSuccessFlg(true);
-                List<CDATypeForInterface> listInfo = getTypeForInterface(listType);
-                result.setObj(listInfo.get(0));
-            }
-        } catch (Exception ex) {
-            LogService.getLogger(CdaController.class).error(ex.getMessage());
-            result.setErrorMsg("系统错误，请联系管理员!");
-        }
-        return result;*/
+        return envelop;
     }
 
     @RequestMapping("delteCdaTypeInfo")
@@ -218,7 +126,7 @@ public class CdaTypeController {
      */
     public Object delteCdaTypeInfo(String ids) {
         Envelop result = new Envelop();
-        String url = "/cdaType/cdaType";
+        String url = "/cda_types/"+ids;
         if (StringUtils.isEmpty(ids)){
             result.setErrorMsg("请选择要删除的数据");
             result.setSuccessFlg(false);
@@ -240,217 +148,147 @@ public class CdaTypeController {
             result.setErrorMsg(ErrorCode.SystemError.toString());
         }
         return result;
-
-
-       /* try {
-            String strErrorMsg = "";
-            if (ids == null || ids == "") {
-                strErrorMsg += "请先选择将要删除的数据";
-            }
-            if (strErrorMsg != "") {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(strErrorMsg);
-            }
-            List<XCDAType> listParentType = xcdaTypeManager.getCdatypeInfoByIds(ids);
-            String childrenIds = getCdaTypeChildId(listParentType, "");
-            if(childrenIds.length()>0) {
-                childrenIds = childrenIds.substring(0, childrenIds.length() - 1);
-            }
-            boolean reault = xcdaTypeManager.deleteCdaType(childrenIds);
-            if (reault) {
-                result.setSuccessFlg(true);
-            } else {
-                result.setSuccessFlg(false);
-                result.setErrorMsg("删除失败!");
-            }
-        } catch (Exception ex) {
-            LogService.getLogger(CdaController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg("系统错误，请联系管理员!");
-        }
-        return result;*/
     }
 
     @RequestMapping("SaveCdaType")
     @ResponseBody
-    public Object SaveCdaType(String info) {
-        Envelop result = new Envelop();
-        String url = "/cdaType/SaveCdaType";
-        //TODO 前台js做为空判断
-//        if(StringUtil.isEmpty(info.getCode())){
-//            strErrorMsg += "���벻��Ϊ��! ";
-//        }
-//        if(StringUtil.isEmpty(info.getParentName())){
-//            strErrorMsg += "���Ʋ���Ϊ�գ�";
-//        }
-//        if(!StringUtil.isEmpty(strErrorMsg)){
-//            result.setSuccessFlg(false);
-//            result.setErrorMsg(strErrorMsg);
-//            return result.toJson();
-//        }
+    //新增、修改的保存合二为一
+    public Object SaveCdaType(String dataJson,HttpServletRequest request) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        String url = "/cda_types";
+        UserDetailModel userDetailModel = (UserDetailModel)request.getSession().getAttribute(SessionAttributeKeys.CurrentUser);
+        String createUserId = userDetailModel.getId();
         try {
-            //TODO 提供code唯一性验证api
-            Map<String, Object> params = new HashMap<>();
-            params.put("typeJson", info);
-            String _rus = HttpClientUtil.doPost(comUrl+url,params,username,password);
-            if(StringUtils.isEmpty(_rus)){
-                result.setSuccessFlg(false);
-                result.setErrorMsg("cadtype保存失败");
-            }else{
-                result.setSuccessFlg(true);
+            CdaTypeDetailModel detailModel = objectMapper.readValue(dataJson,CdaTypeDetailModel.class);
+            if(StringUtils.isEmpty(detailModel.getCode())){
+                envelop.setErrorMsg("cda类别编码不能为空！");
+                return envelop;
             }
+            if(StringUtils.isEmpty(detailModel.getName())){
+                envelop.setErrorMsg("cda类别名称不能为空！");
+                return envelop;
+            }
+            Map<String,Object> params = new HashMap<>();
+            String cdaTypeId = detailModel.getId();
+            // 新增cda类别
+            String envelopStr = "";
+            if(StringUtils.isEmpty(cdaTypeId)){
+                detailModel.setCreateUser(createUserId);
+                String jsonData = objectMapper.writeValueAsString(detailModel);
+                params.put("jsonData",jsonData);
+                envelopStr = HttpClientUtil.doPost(comUrl+url,params,username,password);
+                return envelopStr;
+            }
+            // 修改cda类别（先获取，再赋值）
+            String urlGet = "/cda_types/id/"+cdaTypeId;
+            String envelopStrGet = HttpClientUtil.doGet(comUrl+urlGet,username,password);
+            Envelop envelopGet = objectMapper.readValue(envelopStrGet,Envelop.class);
+            if (!envelopGet.isSuccessFlg()){
+                return envelopStrGet;
+            }
+            CdaTypeDetailModel modelForUpdate = getEnvelopModel(envelopGet.getObj(),CdaTypeDetailModel.class);
+            modelForUpdate.setCode(detailModel.getCode());
+            modelForUpdate.setDescription(detailModel.getDescription());
+            modelForUpdate.setName(detailModel.getName());
+            modelForUpdate.setParentId(detailModel.getParentId());
+            modelForUpdate.setUpdateUser(createUserId);
+            String typeJson = objectMapper.writeValueAsString(modelForUpdate);
+            params.put("jsonData", typeJson);
+
+            String envelopStrUpdate = HttpClientUtil.doPut(comUrl + url, params, username, password);
+            return envelopStrUpdate;
         } catch (Exception ex){
             LogService.getLogger(CdaTypeController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return result;
-
-
-        /* try {
-            String strErrorMsg = "";
-            if (info.getCode() == null || info.getCode() == "") {
-                strErrorMsg += "代码不能为空!";
-            }
-            if (info.getName() == null || info.getName() == "") {
-                strErrorMsg += "名称不能为空!";
-            }
-            XCDAType xcdaType = new CDAType();
-            //id 不为空则先获取数据，再进行修改
-            if (!StringUtil.isEmpty(info.getId())) {
-                List<XCDAType> listType = xcdaTypeManager.getCdatypeInfoByIds(info.getId());
-                if (listType.size() > 0) {
-                    xcdaType = listType.get(0);
-                }
-                if(!info.getCode().equals(xcdaType.getCode()) && xcdaTypeManager.isCodeExist(info.getCode())){
-                    strErrorMsg = "代码已存在!";
-                }
-                xcdaType.setUpdateUser(info.getUserId());
-                xcdaType.setUpdateDate(new Date());
-            } else {
-                if(xcdaTypeManager.isCodeExist(info.getCode())){
-                    strErrorMsg = "代码已存在!";
-                }
-                xcdaType.setCreateUser(info.getUserId());
-                xcdaType.setCreateDate(new Date());
-            }
-            xcdaType.setCode(info.getCode());
-            xcdaType.setName(info.getName());
-            xcdaType.setParentId(info.getParentId());
-            xcdaType.setDescription(info.getDescription());
-            if (!strErrorMsg.equals("")) {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(strErrorMsg);
-                return result;
-            }
-            boolean iResult = false;
-            if (info.getId() == "") {
-                XEnvironmentOption environmentOption = ServiceFactory.getService(Services.EnvironmentOption);
-                Object objectID = new ObjectId(Short.parseShort(environmentOption.getOption(EnvironmentOptions.AdminRegion)), BizObject.StdArchive);
-                xcdaType.setId(objectID.toString());
-                iResult = xcdaTypeManager.insertCdaType(xcdaType);
-            } else {
-                iResult = xcdaTypeManager.updateCdaType(xcdaType);
-            }
-            if (iResult) {
-                result.setSuccessFlg(true);
-            } else {
-                result.setSuccessFlg(false);
-                result.setErrorMsg("保存失败!");
-            }
-        } catch (Exception ex) {
-            LogService.getLogger(CdaController.class).error(ex.getMessage());
-            result.setSuccessFlg(false);
-            result.setErrorMsg("系统错误，请联系管理员!");
-        }
-        return result;*/
+        return envelop;
     }
 
-    @RequestMapping("getParentType")
+    /**
+     * 获取可以作为父类别的cda类别列表
+     * @param strId
+     * @param codeName
+     * @return
+     */
+    @RequestMapping("getCdaTypeExcludeSelfAndChildren")
     @ResponseBody
-    public String getParentType(String strId, String key) {
-        String url = "/cdaType/getParentType";
-        String _strResult = "";
+    public Object getCdaTypeExcludeSelfAndChildren(String strId, String codeName) {
+        //页面新增修改访问的是同个接口
+        Envelop envelop = new Envelop();
         try{
-            Map<String,Object> params = new HashMap<>();
-            params.put("typeId",strId);
-            params.put("code",key);
-            params.put("name",key);
-            _strResult = HttpClientUtil.doGet(comUrl+url,params,username,password);
-        }catch(Exception ex){
+            //新增cda类别是获取的是所有类别
+            if(StringUtils.isEmpty(strId)){
+                String urlGetAll = "/cda_types/no_paging";
+                String filters = "";
+                if(!StringUtils.isEmpty(codeName)){
+                    filters = "code?"+codeName+" g1;name?"+codeName+" g1;";
+                }
+                Map<String,Object> params = new HashMap<>();
+                params.put("filters",filters);
+                String envelopStr = HttpClientUtil.doGet(comUrl+urlGetAll,params,username,password);
+                return envelopStr;
+            }
+            //修改时获取自身及其子类。。以外的cda类别
+            String urlGetOthers = "/types/parent";
+            Map<String,Object> args = new HashMap<>();
+            args.put("id",strId);
+            String envelopStrOthers = HttpClientUtil.doGet(comUrl+urlGetOthers,args,username,password);
+            return envelopStrOthers;
+        }catch (Exception ex){
             LogService.getLogger(CdaTypeController.class).error(ex.getMessage());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            return envelop;
         }
-        return _strResult;
 
-       /*String strResult = "";
-        try {
-            List<XCDAType> listParentType = xcdaTypeManager.getCdatypeInfoByIds(strId);
-            String childrenIds = getCdaTypeChildId(listParentType,"");
-            if(childrenIds.length()>0) {
-                childrenIds = childrenIds.substring(0, childrenIds.length() - 1);
-            }
-            List<XCDAType> listType = xcdaTypeManager.getParentType(childrenIds,key);
-            if (listType != null) {
-                List<CDATypeForInterface> listInfo = getTypeForInterface(listType);
-                ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-                strResult = objectMapper.writeValueAsString(listInfo);
-            }
-        } catch (Exception ex) {
-            LogService.getLogger(CdaTypeController_w.class).error(ex.getMessage());
-        }
-        return strResult;*/
     }
 
     @RequestMapping("getCDATypeListByParentId")
     @ResponseBody
-    public String getCDATypeListByParentId(String ids) {
-        String url = "/cdaType/getCDATypeListByParentId";
-        String _strResult = "";
+    //根据父级ID获取下一级cda类别（不含子类的子类。。）
+    public Object getCDATypeListByParentId(String ids) {
+        Envelop envelop = new Envelop();
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String,Object> params = new HashMap<>();
+        params.put("parent_id",ids);
+        String url = "/children_cda_types";
+
         try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("typeId", ids);
-            _strResult = HttpClientUtil.doGet(comUrl + url, params, username, password);
+            String envelopStr = HttpClientUtil.doGet(comUrl + url,params,username, password);
+            envelop = mapper.readValue(envelopStr,Envelop.class);
+
+            return envelop.getDetailModelList();
         } catch (Exception ex) {
             LogService.getLogger(CdaTypeController.class).error(ex.getMessage());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        return _strResult;
+        return envelop;
     }
 
-/*        String strResult = "";
-        try {
-            List<XCDAType> listType = xcdaTypeManager.getCDATypeListByParentId(ids);
-            List<CDATypeForInterface> cdaTypeModels = getTypeForInterface(listType);
-            if (listType != null) {
-                ObjectMapper objectMapper = ServiceFactory.getService(Services.ObjectMapper);
-                strResult = objectMapper.writeValueAsString(cdaTypeModels);
-            }
-        } catch (Exception ex) {
-                LogService.getLogger(CdaController.class).error(ex.getMessage());
+
+    /**
+     * 删除cda类别前先判断是否有关联的cda文档
+     * @param ids
+     * @return
+     */
+    @RequestMapping("isExitRelativeCDA")
+    @ResponseBody
+    public Object isExitRelativeCDA(String ids){
+        Envelop envelop = new Envelop();
+        String url = "/isExitRelativeCDA";
+        try{
+            Map<String,Object> params = new HashMap<>();
+            params.put("ids",ids);
+            String envelopStr = HttpClientUtil.doGet(comUrl+url,params,username,password);
+            return envelopStr;
+        }catch (Exception ex){
+            LogService.getLogger(CdaTypeController.class).error(ex.getMessage());
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            return envelop;
         }
-        return strResult;
-    }*/
-
-
-//    public List<CDATypeForInterface> getTypeForInterface(List<XCDAType> listType) {
-//        if (listType == null) {
-//            return null;
-//        }
-//        List<CDATypeForInterface> listInfo = new ArrayList<>();
-//        for (int i = 0; i < listType.size(); i++) {
-//            CDAType cdaType = (CDAType) listType.get(i);
-//            CDATypeForInterface info = new CDATypeForInterface();
-//            info.setId(cdaType.getId());
-//            info.setCode(cdaType.getCode());
-//            info.setName(cdaType.getName());
-//            info.setParentId(cdaType.getParentId());
-//            String strParentName = "";
-//            if (cdaType.getParentId() != null && !cdaType.getParentId().equals("")) {
-//                strParentName = cdaType.getParentCdaType()!=null?cdaType.getParentCdaType().getName():"";
-//            }
-//            info.setParentName(strParentName);
-//            info.setDescription(cdaType.getDescription());
-//            listInfo.add(info);
-//        }
-//        return listInfo;
-//    }
+    }
 }

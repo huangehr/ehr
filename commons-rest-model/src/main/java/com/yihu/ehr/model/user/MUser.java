@@ -21,6 +21,8 @@ public class MUser implements Serializable{
     private String gender;
     private String idCardNo;
     private String organization;
+    private String source;
+
     // 未绑定属性
     private String orgPost;
     private String privilege;
@@ -153,6 +155,14 @@ public class MUser implements Serializable{
 
     public void setOrganization(String organization) {
         this.organization = organization;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 
     public String getOrgPost() {

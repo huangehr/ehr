@@ -12,9 +12,7 @@ import com.yihu.ehr.adaption.feignclient.DataSetClient;
 import com.yihu.ehr.adaption.feignclient.DispatchLogClient;
 import com.yihu.ehr.adaption.log.LogService;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.adaption.MAdapterPlan;
-import com.yihu.ehr.model.standard.MDispatchLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -34,7 +32,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/adapter")
-@Api(protocols = "https", value = "plan", description = "适配器管理接口", tags = {"适配器管理"})
+@Api(value = "plan", description = "适配器管理接口", tags = {"适配器管理"})
 public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
     @Autowired
     private OrgAdapterPlanService orgAdapterPlanService;
@@ -114,7 +112,7 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
 
         if (StringUtils.isEmpty(ids))
             errMissId();
-        orgAdapterPlanService.deleteOrgAdapterPlan(ids.split(","));
+        orgAdapterPlanService.deleteOrgAdapterPlan(strToLongArr(ids));
         return true;
     }
 
@@ -125,7 +123,7 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
             @ApiParam(name = "type", value = "类型", defaultValue = "")
             @RequestParam("type") String type,
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
-            @PathVariable(value = "version") String version) throws Exception {
+            @RequestParam(value = "version") String version) throws Exception {
 
         List<OrgAdapterPlan> orgAdapterPlans = orgAdapterPlanService.findList(type, version);
         List<Map<String, String>> adapterPlan = new ArrayList<>();
@@ -161,17 +159,35 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
     }
 
 
-    @RequestMapping(value = "/plan/{planId}/adapterDataSet", method = RequestMethod.POST)
+//    @RequestMapping(value = "/plan/adapterDataSet", method = RequestMethod.POST)
+//    @ApiOperation(value = "定制数据集")
+//    public boolean adapterDataSet(
+//            @ApiParam(name = "planId", value = "编号", defaultValue = "")
+//            @RequestParam("planId") Long planId,
+//            @ApiParam(name = "customizeData", value = "customizeData", defaultValue = "")
+//            @RequestParam("customizeData") String customizeData) throws Exception {
+//
+//        try {
+//            customizeData = customizeData.replace("DataSet", "").replace("MetaData", "");
+//            List<AdapterCustomize> adapterDataSetList = Arrays.asList(jsonToObj(customizeData, AdapterCustomize[].class));
+//            orgAdapterPlanService.adapterDataSet(planId, adapterDataSetList);
+//            return true;
+//        } catch (IOException ex) {
+//            throw errParm();
+//        }
+//    }
+
+    @RequestMapping(value = "/plan/adapterDataSet", method = RequestMethod.POST)
     @ApiOperation(value = "定制数据集")
     public boolean adapterDataSet(
             @ApiParam(name = "planId", value = "编号", defaultValue = "")
-            @PathVariable("planId") Long planId,
+            @RequestParam("planId") Long planId,
             @ApiParam(name = "customizeData", value = "customizeData", defaultValue = "")
             @RequestParam("customizeData") String customizeData) throws Exception {
 
         try {
             customizeData = customizeData.replace("DataSet", "").replace("MetaData", "");
-            List<AdapterCustomize> adapterDataSetList = Arrays.asList(jsonToObj(customizeData, AdapterCustomize[].class));
+            AdapterCustomize[] adapterDataSetList = jsonToObj(customizeData, AdapterCustomize[].class);
             orgAdapterPlanService.adapterDataSet(planId, adapterDataSetList);
             return true;
         } catch (IOException ex) {
@@ -222,7 +238,11 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
         List<AdapterCustomize> stdCustomizeList = new ArrayList<>();
 
         Map<String, String> map = (Map<String, String>) dataSetClient.getDataSetMapByIds(version, "");
-        Map<String, Map> metaDatas = (Map<String, Map>) dataSetClient.getMetaDataMapByIds(version, "");
+        Map parms = new HashMap<>();
+        parms.put("version", version);
+        parms.put("metaIds", "");
+        Map<String, Map> metaDatas = (Map<String, Map>) dataSetClient.getMetaDataMapByIds(toJson(parms));
+        int rootCheckCount = 0;
         for (String dataSetId : map.keySet()) {
             AdapterCustomize parent = new AdapterCustomize();
             parent.setId("stdDataSet" + dataSetId);
@@ -231,8 +251,10 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
             std = true;
             childCheckCount = 0;
             Map<String, String> metaDataList = metaDatas.get(dataSetId);
-            if (metaDataList == null)
+            if (metaDataList == null){
+                rootCheckCount++;
                 continue;
+            }
             for (String k : metaDataList.keySet()) {
                 check = false;
                 for (AdapterCustomize adapterCustomize : adapterCustomizeList) {
@@ -255,6 +277,7 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
             }
             if (metaDataList.size() == childCheckCount && childCheckCount > 0) {
                 parent.setIschecked(true);//子节点全选
+                rootCheckCount++;
             }
             stdCustomizeList.add(parent);
         }
@@ -265,6 +288,8 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
             stdRoot.setPid("-1");
             stdRoot.setText("数据集");
             stdCustomizeList.add(stdRoot);
+            if(map.size() == rootCheckCount)
+                stdRoot.setIschecked(true);
         }
         return stdCustomizeList;
     }
@@ -279,12 +304,15 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
         //数据集
         String ids = adapterDataSetList.toString();
         ids = ids.substring(1, ids.length() - 1);
-        Map<Integer, String> map = (Map<Integer, String>) dataSetClient.getDataSetMapByIds(version, ids);
+        Map<String, String> map = (Map<String, String>) dataSetClient.getDataSetMapByIds(version, ids);
+        String text = "";
         for (Long adapterDataSet : adapterDataSetList) {
+            if(StringUtils.isEmpty(text = map.get(String.valueOf(adapterDataSet))))
+                continue;
             AdapterCustomize parent = new AdapterCustomize();
             parent.setId("adapterDataSet" + adapterDataSet);
             parent.setPid("adapter0");
-            parent.setText(map.get(adapterDataSet.intValue()));
+            parent.setText(text);
             parent.setIschecked(true);
             adapterCustomizeList.add(parent);
             adapter = true;
@@ -295,14 +323,20 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
         for (AdapterDataSet adapterDataSet : adapterMetaDataList) {
             metaDataIds += "," + adapterDataSet.getMetaDataId();
         }
-        Map metaDatas = dataSetClient.getMetaDataMapByIds(version, metaDataIds.substring(1));
-        Map tmp;
+        Map parms = new HashMap<>();
+        parms.put("version", version);
+        parms.put("metaIds", metaDataIds.length()>0 ? metaDataIds.substring(1) : "");
+        Map metaDatas = dataSetClient.getMetaDataMapByIds(toJson(parms));
+        Map<String, String> tmp;
         for (AdapterDataSet adapterDataSet : adapterMetaDataList) {
+            if ((tmp = (Map) metaDatas.get(String.valueOf(adapterDataSet.getDataSetId()))) == null
+                    ||  (text = tmp.get(String.valueOf(adapterDataSet.getMetaDataId())))==null)
+                continue;
+
             AdapterCustomize child = new AdapterCustomize();
             child.setId("adapterMetaData" + adapterDataSet.getMetaDataId());
             child.setPid("adapterDataSet" + adapterDataSet.getDataSetId());
-            if ((tmp = (Map) metaDatas.get(adapterDataSet.getDataSetId().intValue())) != null)
-                child.setText(((String) tmp.get(adapterDataSet.getMetaDataId().intValue())));
+            child.setText(text);
             child.setIschecked(true);
             adapterCustomizeList.add(child);
             adapter = true;
@@ -322,11 +356,12 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
     private OrgAdapterPlan saveModel(String parmJson, String isCover, Long id) {
         OrgAdapterPlan plan = null;
         try {
-            plan = jsonToObj(parmJson, OrgAdapterPlan.class);
+            plan = toDecodeObj(parmJson, OrgAdapterPlan.class);
         } catch (IOException e) {
             throw errParm();
         }
         OrgAdapterPlan orgAdapterPlan = orgAdapterPlanService.retrieve(id);
+        orgAdapterPlan = orgAdapterPlan==null? new OrgAdapterPlan():orgAdapterPlan;
         boolean checkCode = true;
         if (plan.getId() != null && plan.getCode().equals(orgAdapterPlan.getCode()))
             checkCode = false;

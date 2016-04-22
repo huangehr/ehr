@@ -12,6 +12,7 @@ set.list = {
     setSearch: null,
     elementSearch: null,
     selectObj: null,
+    versionStage:null,
     init: function () {
         this.top = $.Util.getTopWindowDOM();
         this.columns = [
@@ -20,8 +21,10 @@ set.list = {
             {
                 display: '操作', isSort: false, width: '33%', render: function (rowdata, rowindex, value) {
 
-                var html = "<div class='grid_edit' onclick='set.list.updateSet(\"" + rowdata.id + "\")'></div> " +
-                    "<div class='grid_delete' onclick='set.list.deleteSet(\"" + rowdata.id + "\")'></div>";
+                var html = "<div class='grid_edit' style='' title='编辑' onclick='set.list.updateSet(\"" + rowdata.id + "\")'></div> " +
+                    "<div class='grid_delete' style=''title='删除' onclick='set.list.deleteSet(\"" + rowdata.id + "\")'></div>";
+                //var html = "<div class='grid_edit' style='margin-left: 30px;cursor:pointer;' title='修改' onclick='set.list.updateSet(\"" + rowdata.id + "\")'></div> " +
+                //    "<div class='grid_delete' style='margin-left: 70px;cursor:pointer;'title='删除' onclick='set.list.deleteSet(\"" + rowdata.id + "\")'></div>";
                 return html;
             }
             }
@@ -34,8 +37,10 @@ set.list = {
             {display: '检验字典', name: 'dictName', align: 'left', width: '20%'},
             {
                 display: '操作', width: '15%', isSort: false, render: function (rowdata, rowindex, value) {
-                var html = "<a href='#' onclick='set.list.updateElement(\"" + rowdata.id + "\")'>修改 / </a>" +
-                    "<a href='#' onclick='set.list.deleteElement(\"" + rowdata.id + "\")'>删除</a>";
+                //var html = "<div class='grid_edit' style='' title='' onclick='set.list.updateElement(\"" + rowdata.id + "\")'></div> " +
+                //    "<div class='grid_delete' style='' title='' onclick='set.list.deleteElement(\"" + rowdata.id + "\")'></div>";
+                var html = "<a class='grid_edit' href='#' onclick='set.list.updateElement(\"" + rowdata.id + "\")'></a>" +
+                    "<a class='grid_delete' href='#' onclick='set.list.deleteElement(\"" + rowdata.id + "\")'></a>";
                 return html;
             }
             }
@@ -83,10 +88,24 @@ set.list = {
             "margin-left": 100, "margin-top": -20
         });
         this.setCss();
-        debugger;
         this.event();
         this.getVersionList();
         this.bindEvents();
+    },
+    getStagedByValue:function()
+    {
+        debugger;
+        var _value = $("#cdaVersion").ligerGetComboBoxManager().getValue();
+        if (!_value && _value == "") return false;
+        var data = $("#cdaVersion").ligerComboBox().data;
+        for(var i =0;i<data.length;i++)
+        {
+            if(data[i].id==_value)
+            {
+                return data[i].inStage;
+            }
+        }
+        return false;
     },
     bindEvents: function () {
         $(window).bind('resize', function () {
@@ -108,24 +127,32 @@ set.list = {
     getVersionList: function () {
         var u = set.list;
         $.ajax({
-            url: u._url + "/cdadict/getCdaVersionList",
+           // url: u._url + "/cdadict/getCdaVersionList",
+            //调通测试暂时使用
+            url: u._url + "/cdaVersion/getVersionList",
             type: "post",
             dataType: "json",
             data: {page: "1", rows: "100"},
             success: function (data) {
-                var result = eval(data.result);
+                var envelop = eval(data);
+                var result = envelop.detailModelList;
+                //var result = eval(data.result);
                 var option = [];
                 for (var i = 0; i < result.length; i++) {
-                    var version = result[i].version;
-                    var versionArr = version.split(",");
+                    //var version = result[i].version;
+                    //var versionArr = version.split(",");
                     option.push({
-                        text: versionArr[1],
-                        id: versionArr[0]
+                        //text: versionArr[1],
+                        //id: versionArr[0]
+                        text: result[i].versionName,
+                        id: result[i].version,
+                        inStage:result[i].inStage
                     });
                 }
                 var select = $("#cdaVersion").ligerComboBox({
                     data: option,
                     onSelected: function (value, text) {
+                        u.versionStage = u.getStagedByValue();
                         set.list.getSetList(value);
                     }
                 });
@@ -140,7 +167,7 @@ set.list = {
         $.ajax({
             type: "get",
             url: u._url + "/std/dataset/searchDataSets",
-            data: {codename: u.setSearch.getValue(), version: versionCode, page: 1, rows: 0},// 你的formid
+            data: {codename: u.setSearch.getValue(), version: versionCode, page: 1, rows: 100},// 你的formid
             async: true,
             dataType: "json",
             error: function (request) {
@@ -150,8 +177,10 @@ set.list = {
                 //清空数组
                 u.enableData = [];
                 var resultData = eval(data);
-                if (data != null) {
-                    var _result = data.detailModelList;
+                //if (data != null) {
+                if (resultData.successFlg) {
+
+                        var _result = data.detailModelList;
                     for (var i = 0; i < _result.length; i++) {
                         u.enableData.push(_result[i]);
                     }
@@ -275,7 +304,7 @@ set.list = {
     addSet: function () {
         var versionCode = $("#cdaVersion").ligerGetComboBoxManager().getValue();
         var _tital = "新增数据集";
-        var _url = set.list._url + "/std/dataset/setupdate?id=&versioncode=" + versionCode;
+        var _url = set.list._url + "/std/dataset/setupdate?id=&versioncode=" + versionCode+"&staged="+set.list.versionStage;
         var callback = function () {
             set.list.getSetList(versionCode);
         };
@@ -285,7 +314,7 @@ set.list = {
     updateSet: function (id) {
         var versionCode = $("#cdaVersion").ligerGetComboBoxManager().getValue();
         var _tital = "修改数据集";
-        var _url = set.list._url + "/std/dataset/setupdate?id=" + id + "&versioncode=" + versionCode;
+        var _url = set.list._url + "/std/dataset/setupdate?id=" + id + "&versioncode=" + versionCode+"&staged="+set.list.versionStage;
         var callback = function () {
             set.list.getSetList(versionCode);
         };
@@ -293,6 +322,13 @@ set.list = {
     },
     //删除数据集 窗口
     deleteSet: function (ids) {
+        console.log(set.list.versionStage)
+        if(!set.list.versionStage)
+        {
+            $.Notice.error("已发布版本不可删除，请确认!");
+            return;
+        }
+
         if (ids == null || ids == "") {
             $.Notice.error("请先选择需要删除的数据集!");
             return;
@@ -331,7 +367,7 @@ set.list = {
         var setid = $("#hdId").val();
         var _tital = "新增数据元";
 
-        var _url = set.list._url + "/std/dataset/elementupdate?id=&versioncode=" + versionCode + "&setid=" + setid;
+        var _url = set.list._url + "/std/dataset/elementupdate?id=&versioncode=" + versionCode + "&setid=" + setid+"&staged="+set.list.versionStage;
         var callback = function () {
             set.list.getElementList(versionCode, setid);
         };
@@ -341,13 +377,20 @@ set.list = {
         var versionCode = $("#cdaVersion").ligerGetComboBoxManager().getValue();
         var setid = $("#hdId").val();
         var _tital = "修改数据元";
-        var _url = set.list._url + "/std/dataset/elementupdate?id=" + id + "&versioncode=" + versionCode + "&setid=" + setid;
+        var _url = set.list._url + "/std/dataset/elementupdate?id=" + id + "&versioncode=" + versionCode + "&setid=" + setid+"&staged="+set.list.versionStage;
         var callback = function () {
             set.list.getElementList(versionCode, setid);
         };
         set.list.showDialog(_tital, _url, 560, 730, callback);
     },
     deleteElement: function (ids) {
+
+        if(!set.list.versionStage)
+        {
+            $.Notice.error("已发布版本不可删除，请确认!");
+            return;
+        }
+
         if (ids == null || ids == "") {
             $.Notice.error("请先选择需要删除的数据集!");
             return;
@@ -390,9 +433,15 @@ set.list = {
         });
         $("#btn_Delete_relation").click(function () {
 
+            //if(!set.list.versionStage)
+            //{
+            //    $.Notice.error("已发布版本不可删除，请确认!");
+            //    return;
+            //}
+
             var rows = set.list.elementGrid.getSelecteds();
             if (rows.length == 0) {
-                $.Notice.tip("请选择要删除的内容！");
+                $.Notice.error("请选择要删除的内容！");
                 return;
             }
             else {
@@ -411,11 +460,16 @@ set.list = {
 set.attr = {
     set_form: $("#div_set_info_form"),
     init: function () {
-        debugger;
         var versionCode = $.Util.getUrlQueryString('versioncode');
         $("#hdversion").val(versionCode);
         var setId = $.Util.getUrlQueryString('id');
         $("#hdId").val(setId);
+        var staged = $.Util.getUrlQueryString('staged');
+        if(staged=='false')
+        {
+            console.log(staged);
+            $("#btn_save").hide();
+        }
         this.getStandardSource();
         this.event();
     },
@@ -426,13 +480,18 @@ set.attr = {
             u._url = $("#hd_url").val();
         }
         var cdaVersion = $("#hdversion").val();
+
         $.ajax({
-            url: u._url + "/cdadict/getStdSourceList",
+            //url: u._url + "/cdadict/getStdSourceList",
+            url: u._url + "/standardsource/getStdSourceList",
             type: "post",
             dataType: "json",
-            data: {strVersionCode: cdaVersion},
+           // data: {strVersionCode: cdaVersion},
+            //data: {version: cdaVersion},
             success: function (data) {
-                var result = eval(data.result);
+                //var result = eval(data.result);
+                var envelop = eval(data);
+                var result = envelop.detailModelList;
                 var option = [];
                 if (result != null) {
                     for (var i = 0; i < result.length; i++) {
@@ -476,14 +535,13 @@ set.attr = {
             dataType: "json",
             data: {dataSetId: id, versionCode: versionCode},
             success: function (data) {
-                //debugger;
                 //  cda.list.clearCdaDetail();
 
                 var result = eval(data);
                 var info = result.obj;
                 if (info != null) {
                     set.attr.set_form.attrScan();
-
+                    info.refStandard = info.reference;
                     set.attr.set_form.Fields.fillValues(info);
                     // cda.attr.cda_form.Fields.source_id.setValue("0dae0006561b759649f63220dcacfd00");
                 }
@@ -532,7 +590,6 @@ set.attr = {
         })
     },
     event: function () {
-        debugger;
         // 表单校验工具类
         var jValidation = $.jValidation;
         var validator = new jValidation.Validation(this.set_form, {immediate: true, onSubmit: false});
@@ -557,36 +614,87 @@ set.elementAttr = {
         $("#hdId").val(elementId);
         var setid = $.Util.getUrlQueryString('setid');
         $("#hdsetid").val(setid);
+        var staged = $.Util.getUrlQueryString('staged');
+        if(staged=='false')
+        {
+            console.log(staged);
+            $("#btn_save").hide();
+        }
         //this.getDictList();
         this.getElementInfo();
     },
     getDictList: function (initValue, initText) {
         var version = $("#hdversion").val();
+        var url = set.list._url + "/std/dataset/getMetaDataDict?version=" + version;
         set.elementAttr.dict_select = $("#criterionDict").ligerComboBox({
-            url: set.list._url + "/std/dataset/getMetaDataDict?version=" + version,
+            condition: { inputWidth: 90 ,width:0,labelWidth:0,hideSpace:true,fields: [{ name: 'param', label:''}] },
+            url: url,
+            grid: getGridOptions(true),
             valueField: 'id',
             textField: 'name',
-            selectBoxWidth: 400,
+            width : 240,
+            selectBoxHeight : 260,
+            //selectBoxWidth: 400,
             autocomplete: true,
             keySupport: true,
-            width: 400,
-            initValue: initValue,
-            initText: initText,
+            //width: 400,
+            onSelected: function(id,name){
+                $("#criterionDict").val(name);
+            },
+            conditionSearchClick: function (g) {
+                var param = g.rules.length>0? g.rules[0].value : '';
+                param = {param:param }
+                g.grid.set({
+                    parms: param,
+                    newPage: 1
+                });
+                g.grid.reload();
+            },
             onSuccess: function () {
+                //set.elementAttr.dict_select.setValue(initValue);
                 $("#criterionDict").css({"width": 213, "height": 28});
-                $(".l-text-combobox").css({"width": 227});
-                $(".l-box-select-absolute").css({"width": 227});
+                $(".l-text-combobox").css({"width": 229});
+                $(".l-box-select-absolute").css({"width": 229});
             },
             onAfterSetData: function () {
 
             }
         });
+
+        if(initValue != ""){
+            $("#criterionDict").ligerGetComboBoxManager().setValue(initValue);
+            $("#criterionDict").ligerGetComboBoxManager().setText(initText);
+        }
+
+        function getGridOptions(checkbox) {
+            var options = {
+                columns: [
+                    {display : '名称', name :'name',width : 210}
+                ],
+                allowAdjustColWidth : true,
+                editorTopDiff : 41,
+                headerRowHeight : 0,
+                height : '100%',
+                heightDiff : 0,
+                pageSize: 15,
+                pagesizeParmName : 'rows',
+                record : "totalCount",
+                root : "detailModelList",
+                rowHeight : 30,
+                rownumbers :false,
+                switchPageSizeApplyComboBox: false,
+                width :"98%",
+                url : url
+            };
+            return options;
+        }
+
+
         $("#datatype").ligerComboBox({
             height: 28,
             width: 220
         })
-        set.elementAttr.dict_select.setValue(initValue);
-        set.elementAttr.dict_select.setText(initText);
+
     },
     getElementInfo: function () {
 
@@ -605,29 +713,28 @@ set.elementAttr = {
             data: {dataSetId: dataSetId, metaDataId: metaDataId, version: version},
             async: true,
             success: function (data) {
-                debugger;
+
                 if (data != null) {
-                    var info = eval(data).detailModelList;
+
+                    var info = eval(data).obj;
                     set.elementAttr.element_form.attrScan();
-                    set.elementAttr.element_form.Fields.fillValues(info[0]);
-                    $("#metaDataCodeCopy").val(info[0].innerCode);
-                    $("#fieldNameCopy").val(info[0].columnName);
-                    $("#datatype").val(info[0].columnType);
-                    //set.elementAttr.dict_select.setValue(info[0].dictId);
-                    set.elementAttr.getDictList(info[0].dictId, info[0].dictName);
-                    debugger;
+                    set.elementAttr.element_form.Fields.fillValues(info);
+
+                    $("#metaDataCodeCopy").val(info.innerCode);
+                    $("#fieldNameCopy").val(info.columnName);
+                    $("#datatype").val(info.columnType);
+                    set.elementAttr.getDictList(info.dictId, info.dictName);
                     $("#primaryKey").attr('checked', false);
-                    if (info[0].primaryKey == "1") {
+                    if (info.primaryKey == "1") {
                         $("#primaryKey").attr('checked', true);
                     }
                     $("#whetherNull").attr('checked', false);
-                    if (info[0].nullable == "1") {
+                    if (info.nullable == "1") {
                         $("#whetherNull").attr('checked', true);
                     }
                 }
             },
             error: function (data) {
-
             },
             complete: function () {
                 set.elementAttr.event();
@@ -644,11 +751,13 @@ set.elementAttr = {
             id = "0";
         dataJson[0]["id"] = id;
 
+
         var versionCode = $("#hdversion").val();
-        dataJson[0]["version"] = versionCode;
+        //dataJson[0]["version"] = versionCode;
+        var version = versionCode;
 
         var setId = $("#hdsetid").val();
-        dataJson[0]["datasetId"] = setId;
+        dataJson[0]["dataSetId"] = setId;
 
 
         var dictId = set.elementAttr.dict_select.getValue();
@@ -671,7 +780,7 @@ set.elementAttr = {
             url: _url,
             type: "POST",
             dataType: "json",
-            data: dataJson[0],
+            data: {info:JSON.stringify(dataJson[0]),version:version},
             success: function (data) {
                 if (data != null) {
                     var _res = eval(data);
@@ -699,7 +808,6 @@ set.elementAttr = {
                     var hdversion = $("#hdversion").val();
                     var datasetId = $("#hdsetid").val();
                     var ErrorMsg = null;
-                    debugger
                     if (Util.isStrEquals($(elm).attr("id"), 'metaDataInnerCode')) {
                         var metaDataCode = $("#metaDataInnerCode").val();
                         var metaDataCodeCopy = $("#metaDataCodeCopy").val();
@@ -709,6 +817,7 @@ set.elementAttr = {
                         ErrorMsg = '内部代码不能重复';
                         return set.elementAttr.validatorSearchNm(hdversion, datasetId, metaDataCode, ErrorMsg, 'metaDataCodeMsg');
                     }
+                    //没有做验证
                     if (Util.isStrEquals($(elm).attr("id"), 'fieldName')) {
                         var fieldName = $("#fieldName").val();
                         var fieldNameCopy = $("#fieldNameCopy").val();
@@ -750,7 +859,7 @@ set.elementAttr = {
             data: {version: hdversion, datasetId: datasetId, searchNm: searchNm, metaDataCodeMsg: metaDataCodeMsg},
             async: false,
             success: function (data) {
-                if (data.successFlg) {
+                if (!data.successFlg) {
                     result.setResult(true);
                 } else {
                     result.setResult(false);

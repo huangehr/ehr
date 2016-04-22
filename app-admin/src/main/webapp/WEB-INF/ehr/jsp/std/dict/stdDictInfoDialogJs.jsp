@@ -30,6 +30,12 @@
             $btnCancel: $("#btn_cancel"),
 
             init: function () {
+                var staged = '${staged}';
+
+                if(staged=='false')
+                {
+                    $("#btn_save").hide();
+                }
                 this.initForm();
                 this.bindEvents();
             },
@@ -44,12 +50,13 @@
                 this.$description.ligerTextBox({width:240,height:100 });
 
                 this.$form.attrScan();
+
 				var info = $.parseJSON('${info}')
                 this.$form.Fields.fillValues({
                     name: info.name,
                     code: info.code,
-                    <%--baseDictId: info.baseDictId,--%>
-                    stdSource : info.stdSource,
+                    //baseDictId: info.baseDictId,
+                    stdSource : info.sourceId,
                     stdVersion : info.stdVersion,
                     id: info.id ,
                     description: info.description,
@@ -57,20 +64,20 @@
 
                 this.$form.show();
             },
-            initDDL: function (dictId, target) {
+            initDDL: function (mode, target) {
                 var dataModel = $.DataModel.init();
                 var strVersionCode = parent.getStrVersion();
                 var url = '';
-                if(dictId==1){
-                    url = "${contextRoot}/cdadict/getStdSourceList?strVersionCode="+strVersionCode;
+                if(mode==1){
+                    url = "${contextRoot}/cdadict/getStdSourceList";
                     dataModel.fetchRemote(url,{
                         success: function(data) {
-                            var d = eval('('+ data.result +')');
+                            //var d = eval('('+ data.detailModelList +')');
                             target.ligerComboBox({
                                 selectBoxHeight:220,
                                 valueField: 'id',
                                 textField: 'name',
-                                data: d
+                                data: data.detailModelList
                             });
                     }});
                 }
@@ -161,13 +168,7 @@
                                 parent.closeDialog('left', '保存成功！');
 //                                dialog.close();
                             }else{
-                                if(data.errorMsg=='codeNotUnique'){
-                                    $.Notice.error('该代码已存在，请重新填写代码！');
-                                }
-                                else if(data.message)
-                                    $.Notice.error(data.message);
-                                else
-                                    $.Notice.error('出错了！');
+                                $.Notice.error(data.errorMsg);
                             }
                             self.$btnSave.removeAttr('disabled');
                         },

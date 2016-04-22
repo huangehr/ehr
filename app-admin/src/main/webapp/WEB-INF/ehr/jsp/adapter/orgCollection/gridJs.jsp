@@ -9,12 +9,13 @@
       var retrieve = null;
       var master = null;
       var conditionArea = null;
-      var orgCode = '${adapterOrg}';
+      var organizationCode = '${adapterOrg}';
       var entryRetrieve = null;
       var entryMater = null;
       var cfgModel = 0;
       var changeFlag=false;
       var dialogOpener = null;
+      var isFirstPage = true;
       var cfg = [
         {
           left:{title:'数据集', cls:'', search:'/orgdataset/searchOrgDataSets', goAdd:'/orgdataset/template/orgDataInfo', del:'/orgdataset/deleteOrgDataSet'},
@@ -65,9 +66,9 @@
         initAdapterOrg: function () {
           var dataModel = $.DataModel.init();
           dataModel.fetchRemote("${contextRoot}/adapterorg/getAdapterOrg",{
-            data:{code:orgCode},
+            data:{code:organizationCode},
             success: function(data) {
-              var model = data.obj.adapterOrg;
+              var model = data.obj;
               $("#adapterorg_name").val(model.name);
 				$('#adapterorg_type').val(model.typeValue);
 				$('#adapterorg_org').val(model.orgValue);
@@ -132,11 +133,8 @@
               { display: '编码', name: 'code',width: '33%', isAllowHide: false ,align:'left '},
               { display: '名称',name: 'name', width: '33%',isAllowHide: false  ,align:'left'},
               { display: '操作', name: 'operator', width: '34%', render: function (row) {
-                var html = '<div class="grid_edit" name="edit_click" style="" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","grid:left:open", row.id,'modify')+'"></div> ' +
-                            '<div class="grid_delete" name="delete_click" style="" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","grid:left:delete", row.id)+'"></div>'
-
-//                var html = '<a href="#" class="grid_edit" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","grid:left:open", row.id,'modify')+'"><div  class="grid_edit"></div></a>' +
-//                        ' / <a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","grid:left:delete", row.id)+'"><div  class="grid_delete"></div></a>';
+                var html = '<div class="grid_edit" name="edit_click" style="" title="编辑" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","grid:left:open", row.id,'modify')+'"></div> ' +
+                            '<div class="grid_delete" name="delete_click" style="" title ="删除" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","grid:left:delete", row.id)+'"></div>'
                 return html;
               }}
             ],
@@ -161,16 +159,19 @@
           this.grid.adjustToWidth();
         },
         reloadGrid: function () {
+          if(isFirstPage){
+            this.grid.options.newPage = 1;
+          }
           var searchNm = $("#searchNm").val();
           var values = {
-            codename: searchNm,
-            orgCode: orgCode
+            codeOrName: searchNm,
+            organizationCode: organizationCode
           };
           if (changeFlag){
             var url = '${contextRoot}' + cfg[cfgModel].left.search;
-            this.grid.setOptions({url:url,parms: $.extend({},values), newPage:1});
+            this.grid.setOptions({url:url,parms: $.extend({},values)});
           }else{
-            this.grid.setOptions({parms: $.extend({},values), newPage:1});
+            this.grid.setOptions({parms: $.extend({},values)});
             //重新查询
             this.grid.loadData(true);
           }
@@ -203,8 +204,14 @@
                 dataModel.updateRemote('${contextRoot}'+ cfg[cfgModel].left.del,{
                   data:{id:id},
                   success:function(data){
-                    $.Notice.success( '操作成功！');
-                    master.reloadGrid();
+                    if(data.successFlg){
+                      $.Notice.success( '操作成功！');
+                      isFirstPage = false;
+                      master.reloadGrid();
+                    }else{
+                      $.Notice.success( '操作失败！');
+                    }
+
                   }
                 });
               }
@@ -243,8 +250,11 @@
               { display: '编码', name: 'code',width: '33%', isAllowHide: false ,align:'left' },
               { display: '名称',name: 'name', width: '33%',isAllowHide: false  ,align:'left'},
               { display: '操作', name: 'operator', width: '34%', render: function (row) {
-                var html = '<a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}','{3}'])","grid:right:open", row.id,'modify')+'">修改</a>' +
-                        ' / <a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","grid:right:delete", row.id)+'">删除</a>';
+				  var html = '<div class="grid_edit" title="编辑" name="edit_click" style="margin-left:85px;cursor:pointer;" title="修改" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}','{3}'])","grid:right:open", row.id,'modify')+'"></div> '
+						  +'<div class="grid_delete" title="删除" name="delete_click" style="margin-left:20px;margin-top:10px;cursor:pointer;" title ="删除" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","grid:right:delete", row.id)+'"></div>';
+
+//                var html = '<a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}','{3}'])","grid:right:open", row.id,'modify')+'">修改</a>' +
+//                        ' / <a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","grid:right:delete", row.id)+'">删除</a>';
                 return html;
               }}
             ],
@@ -271,8 +281,8 @@
               seq = row.sequence;
           }
           var values = {
-            orgCode :orgCode,
-            codename: searchNmEntry,
+            organizationCode :organizationCode,
+            codeOrName: searchNmEntry,
             orgDataSetSeq:seq,
             orgDictSeq:seq
           };
@@ -326,13 +336,13 @@
                 $.Notice.warn( '请选择要删除的数据行！');
                 return;
               }
-              ids = [];
+              ids ="";
               for(var i=0;i<rows.length;i++){
-                ids.push(rows[i].id)
+                ids += rows[i].id+",";
               }
             }
             else
-              ids = [ids];
+              ids = ids;
 
             $.Notice.confirm('确认删除所选数据？', function (r) {
               if(r){
@@ -354,13 +364,14 @@
       };
       /* ******************Dialog页面回调接口****************************** */
       win.reloadMasterGrid = function () {
+        isFirstPage = false;
         if(dialogOpener==0||dialogOpener==2)
           master.reloadGrid();
         else
           entryMater.reloadGrid();
       };
       win.getOrgCode = function () {
-        return orgCode;
+        return organizationCode;
       };
       win.getSeq = function () {
         var row = master.grid.getSelectedRow();

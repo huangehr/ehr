@@ -1,7 +1,12 @@
 package com.yihu.ehr.model.org;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 机构,由 XOrgManager 创建并维护.
@@ -13,6 +18,7 @@ import java.util.Date;
 public class MOrganization implements Serializable{
     private String orgCode;         // 机构代码,对医院编码属性需要调研
     private String admin;            // 机构管理员
+
     private boolean settled;        // 是否已接入,对第三方平台有效.
     private String settledWay;    // 接入方式：直连/平台接入
     private String fullName;        // 全名
@@ -23,6 +29,7 @@ public class MOrganization implements Serializable{
     private Date createDate;        // 创建日期
     private String location;        // 地址
     private int activityFlag;
+    private String tags;
 
     public MOrganization() {
     }
@@ -101,9 +108,10 @@ public class MOrganization implements Serializable{
         this.location = location;
     }
 
-    public boolean getSettled() {
+    public boolean isSettled() {
         return settled;
     }
+
     public void setSettled(boolean settled) {
         this.settled = settled;
     }
@@ -114,6 +122,23 @@ public class MOrganization implements Serializable{
 
     public void setActivityFlag(int activityFlag) {
         this.activityFlag = activityFlag;
+    }
+
+    public List<String> getTags() {
+        List<String> list = new ArrayList<>();
+        if(org.springframework.util.StringUtils.isEmpty(tags)){
+        }else {
+            String[] arr = tags.split(";|；");
+            list = Arrays.asList(arr);
+        }
+        return list;
+    }
+    public void setTags(List<String> tags) {
+        if(tags.size()>0){
+            this.tags = StringUtils.join(tags.toArray(),";");
+        }else {
+            this.tags = "";
+        }
     }
 
 }

@@ -35,7 +35,7 @@ public class FastDFSConfig {
     @Value("${fast-dfs.network-timeout}")
     private int networkTimeout;
 
-    @Value("${fast-dfs.fast-dfs.charset}")
+    @Value("${fast-dfs.charset}")
     private String charset;
 
     @Value("${fast-dfs.tracker-server}")

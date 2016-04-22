@@ -1,6 +1,7 @@
 package com.yihu.ehr.config;
 
 
+import com.yihu.ehr.standard.datasets.service.BaseDataSet;
 import com.yihu.ehr.util.classpool.ClassPoolUtils;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.hibernate.SessionFactory;
@@ -36,11 +37,13 @@ public class StdHibernateConfig extends HibernateConfig  {
         vesionedEntitys.put("com.yihu.ehr.standard.datasets.service.MetaData", "std_meta_data_");
         vesionedEntitys.put("com.yihu.ehr.standard.dict.service.Dict", "std_dictionary_");
         vesionedEntitys.put("com.yihu.ehr.standard.dict.service.DictEntry", "std_dictionary_entry_");
+        vesionedEntitys.put("com.yihu.ehr.standard.document.service.CDADocument", "std_cda_document_");
+        vesionedEntitys.put("com.yihu.ehr.standard.document.service.CDADataSetRelationship", "std_cda_data_set_relationship_");
     }
 
     private static void addPath(File f) throws Exception {
-        URL u = f.toURL();
-        URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+        URL u = f.toURI().toURL();
+        URLClassLoader urlClassLoader = (URLClassLoader) BaseDataSet.class.getClassLoader();
         Class urlClass = URLClassLoader.class;
         Method method = urlClass.getDeclaredMethod("addURL", new Class[]{URL.class});
         method.setAccessible(true);
@@ -56,7 +59,7 @@ public class StdHibernateConfig extends HibernateConfig  {
         sessionFactory.setAnnotatedClasses(tableClass.toArray(new Class[tableClass.size()]));
         sessionFactory.setDataSource(dataSource);
         sessionFactory.getHibernateProperties().setProperty("hibernate.show_sql", "true");
-        sessionFactory.getHibernateProperties().setProperty("hibernate.format_sql", formatSQL);
+        sessionFactory.getHibernateProperties().setProperty("hibernate.format_sql", "true");
 
         String splitMark = System.getProperty("file.separator");
         String path = System.getProperty("user.home") +splitMark+ "ehr" + splitMark + "std" + splitMark;

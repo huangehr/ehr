@@ -144,8 +144,31 @@
             sessionStorage.removeItem("treeId");
           }
           var validator = new jValidation.Validation(this.$loginForm,{immediate:true,onSubmit:false});
+
           if(validator.validate()) {
             this.$loginForm.submit();
+            <%--function errorPassWord(inpNum) {--%>
+              <%--if (Util.isStrEmpty(errorPassWords)) {--%>
+                <%--errorPassWords = 0;--%>
+              <%--}--%>
+              <%--if (errorPassWords >= 5 || inpNum >= 5) {--%>
+                <%--var dataModel = $.DataModel.init();--%>
+                <%--dataModel.updateRemote("${contextRoot}/user/activityUser", {--%>
+                  <%--data: {userId: userId, activated: 0},--%>
+                  <%--success: function (data) {--%>
+                    <%--$.ligerDialog.waitting('错误密码输入次数过多，该账户已被锁定，请通过OA至管理员重置密码！');--%>
+                    <%--setTimeout(function () {--%>
+                      <%--window.location.href = "${contextRoot}/login";--%>
+                    <%--}, 3000);--%>
+                  <%--}--%>
+                <%--})--%>
+              <%--}--%>
+            <%--}--%>
+          }else{
+            //验证码错误重输
+            this.$captchaCode.val("");
+            $("#div_error_msg").html("验证码错误");
+            $("#ehong-code-tip-ck").trigger('click');
           }
         }
       };

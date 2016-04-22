@@ -23,7 +23,7 @@ public class OrgDictItemService extends BaseJpaService<OrgDictItem, XOrgDictItem
 
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public boolean isExistOrgDictItem(int orgDictSeq, String orgCode, String code) {
+    public boolean isExistOrgDictItem(long orgDictSeq, String orgCode, String code) {
         return ((XOrgDictItemRepository) getRepository()).isExistOrgDictItem(orgDictSeq, orgCode, code).size() != 0;
     }
 
@@ -79,9 +79,11 @@ public class OrgDictItemService extends BaseJpaService<OrgDictItem, XOrgDictItem
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public int getNextSort(long dictId) {
+    public int getNextSort(long dictId, String org) {
         Session session = currentSession();
-        Query query = session.createQuery("select max(sort) from OrgDictItem  where orgDict= '" + dictId + "'");
+        Query query = session.createQuery("select max(sort) from OrgDictItem  where orgDict= :dictId and organization=:organization");
+        query.setParameter("dictId", dictId);
+        query.setParameter("organization", org);
         int result;
         if (query.uniqueResult() == null) {
             result = 1;
@@ -91,7 +93,7 @@ public class OrgDictItemService extends BaseJpaService<OrgDictItem, XOrgDictItem
         return result;
     }
 
-    public List findByDict(int orgDictSeq, String orgCode) {
+    public List findByDict(long orgDictSeq, String orgCode) {
         String hql = " from OrgDictItem where orgDict=:orgDictSeq and organization=:orgCode";
         Query query = currentSession().createQuery(hql);
         query.setParameter("orgDictSeq", orgDictSeq);
@@ -99,4 +101,7 @@ public class OrgDictItemService extends BaseJpaService<OrgDictItem, XOrgDictItem
         return query.list();
     }
 
+    public OrgDictItem getOrgDicEntryBySequence(String orgCode,int sequence){
+        return ((XOrgDictItemRepository) getRepository()).getOrgDicEntryBySequence(orgCode, sequence);
+    }
 }

@@ -18,21 +18,12 @@ public class MCDADocument {
     private Date updateDate;
     private String updateUser;
     private String versionCode;
-    /**
-     * 输出排版路径
-     */
     private String printOut;
     private String schema;
-    /**
-     * 标准来源ID
-     */
     private String sourceId;
     private int hashCode;
     private String fileGroup;
-    private String typeId;
-    public MCDADocument() {
-
-    }
+    private String type;
 
     public String getCode() {
         return code;
@@ -146,11 +137,11 @@ public class MCDADocument {
         this.fileGroup = fileGroup;
     }
 
-    public String getTypeId() {
-        return typeId;
+    public String getType() {
+        return type;
     }
 
-    public void setTypeId(String typeId) {
-        this.typeId = typeId;
+    public void setType(String type) {
+        this.type = type;
     }
 }

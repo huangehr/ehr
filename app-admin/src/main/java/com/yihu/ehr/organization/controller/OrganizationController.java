@@ -1,17 +1,21 @@
 package com.yihu.ehr.organization.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.org.OrgDetailModel;
+import com.yihu.ehr.agModel.org.OrgModel;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.HttpClientUtil;
-import com.yihu.ehr.util.ResourceProperties;
+import com.yihu.ehr.util.controller.BaseUIController;
+import com.yihu.ehr.util.log.LogService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author zlf
@@ -20,7 +24,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/organization")
-public class OrganizationController {
+public class OrganizationController extends BaseUIController{
     @Value("${service-gateway.username}")
     private String username;
     @Value("${service-gateway.password}")
@@ -36,36 +40,17 @@ public class OrganizationController {
     @RequestMapping("dialog/orgInfo")
     public String orgInfoTemplate(Model model, String orgCode, String mode) {
 
-        String getOrgUrl = "/organization/org_model";
-        Map<String, Object> params = new HashMap<>();
-        params.put("orgCode",orgCode);
-
+        String getOrgUrl = "/organizations/"+orgCode;
         String resultStr = "";
         try{
-            resultStr = HttpClientUtil.doGet(comUrl + getOrgUrl, params, username, password);
-
-            model.addAttribute("mode",mode);
-            model.addAttribute("org",resultStr);
-            model.addAttribute("contentPage","organization/organizationInfoDialog");
-            return  "simpleView";
+            resultStr = HttpClientUtil.doGet(comUrl + getOrgUrl, username, password);
+        } catch (Exception e){
+            LogService.getLogger(OrganizationController.class).error(e.getMessage());
         }
-        catch (Exception e){
-
-            model.addAttribute("mode",mode);
-            model.addAttribute("org",resultStr);
-            model.addAttribute("contentPage","organization/organizationInfoDialog");
-            return  "simpleView";
-        }
-
-        /*
-        XOrganization org = orgManager.getOrg(orgCode);
-        OrgModel orgModel = orgManager.getOrgModel(org);
-
         model.addAttribute("mode",mode);
-        model.addAttribute("org",orgModel);
+        model.addAttribute("envelop",resultStr);
         model.addAttribute("contentPage","organization/organizationInfoDialog");
         return  "simpleView";
-        */
     }
 
     @RequestMapping("dialog/create")
@@ -78,91 +63,75 @@ public class OrganizationController {
     @RequestMapping(value = "searchOrgs",produces = "text/html;charset=UTF-8")
     @ResponseBody
     public Object searchOrgs(String searchNm, String searchWay,String orgType, String province, String city, String district, int page, int rows) {
-
-        String url = "/organization/organizations";
-        String resultStr = "";
-        Envelop result = new Envelop();
-        Map<String, Object> params = new HashMap<>();
-        params.put("orgCode", searchNm);
-        params.put("fullName", searchNm);
-        params.put("searchWay", searchWay);
-        params.put("orgType", orgType);
-        params.put("province", province);
-        params.put("city", city);
-        params.put("district", district);
-        params.put("page", page);
-        params.put("pageSize", rows);
-
+        Envelop envelop = new Envelop();
         try {
-            resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
-            //todo:jsp展示需调整
-            //todo:后台直接返回总行数及相应的数据集
+            //获取地址的 ids
+            String addrIds = "";
+            if(!"".equals(province)){
+                String urlAddr = "/geographies";
+                Map<String,Object> args = new HashMap<>();
+                args.put("province",province);
+                args.put("city",city);
+                args.put("district",district);
+                String envelopStrAddr = HttpClientUtil.doGet(comUrl+urlAddr,args,username,password);
+                Envelop envelopAddr = getEnvelop(envelopStrAddr);
+                if (envelopAddr.isSuccessFlg()){
+                    List<String> addrList = (List<String>)getEnvelopList(envelopAddr.getDetailModelList(),new ArrayList<String>(),String.class);
+                    for(String id : addrList){
+                        addrIds += id + ",";
+                    }
+                    String[] addrIdsArrays = addrList.toArray(new String[addrList.size()]);
+                    addrIds = String.join(",",addrIdsArrays);
+                }
+            }
+
+            //分页查询机构列表
+            String url = "/organizations";
+            String filters = "";
+            Map<String, Object> params = new HashMap<>();
+            if(!StringUtils.isEmpty(searchNm)){
+                filters += "orgCode?"+searchNm+" g1;fullName?"+searchNm+" g1;";
+            }
+            if(!StringUtils.isEmpty(searchWay)){
+                filters += "settledWay="+searchWay+";";
+            }
+            if(!StringUtils.isEmpty(orgType)){
+                filters += "orgType="+orgType+";";
+            }
+            //添加地址过滤条件
+            if(!"".equals(addrIds)){
+                filters += "location="+addrIds+";";
+            }
+            params.put("fields","");
+            params.put("filters",filters);
+            params.put("sorts","");
+            params.put("size",rows);
+            params.put("page",page);
+            String resultStr = HttpClientUtil.doGet(comUrl + url, params, username, password);
             return resultStr;
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result;
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            return envelop;
         }
-
-        /*
-        Map<String, Object> conditionMap = new HashMap<>();
-        conditionMap.put("orgCode", searchNm);
-        conditionMap.put("fullName", searchNm);
-
-        conditionMap.put("searchWay", searchWay);
-        conditionMap.put("orgType", orgType);
-        conditionMap.put("province", province);
-        conditionMap.put("city", city);
-        conditionMap.put("district", district);
-
-        conditionMap.put("page", page);
-        conditionMap.put("pageSize", rows);
-
-        List<OrgDetailModel> detailModelList = orgManager.searchOrgDetailModel(conditionMap);
-        Integer totalCount = orgManager.searchInt(conditionMap);
-        Result result = getResult(detailModelList, totalCount, page, rows);
-
-        return result.toJson();*/
     }
 
     @RequestMapping("deleteOrg")
     @ResponseBody
     public Object deleteOrg(String orgCode) {
-
-        String getOrgUrl = "/organization/organization";
+        String getOrgUrl = "/organizations/"+orgCode;
         String resultStr = "";
-        Envelop result = new Envelop();
-
+        Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("orgCode",orgCode);
-
         try {
             resultStr = HttpClientUtil.doDelete(comUrl + getOrgUrl, params, username, password);
-
-            if(Boolean.parseBoolean(resultStr)){
-                result.setSuccessFlg(true);
-            }
-            else {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.InvalidDelete.toString());
-            }
-            return result;
-
+            return resultStr;
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
-
-            return result;
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
         }
-        /*
-        try {
-            orgManager.delete(orgCode);
-            Result result = getSuccessResult(true);
-            return result.toJson();
-        } catch (Exception e) {
-            Result result = getSuccessResult(false);
-            return result.toJson();
-        }*/
+        return envelop;
+
     }
 
     /**
@@ -174,234 +143,131 @@ public class OrganizationController {
     @ResponseBody
     public Object activity(String orgCode,String activityFlag) {
 
-        String url = "/organization/activity";
+        String url = "/organizations/"+orgCode+"/"+activityFlag;
         String resultStr = "";
-        Envelop result = new Envelop();
-
+        Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("orgCode",orgCode);
-
         try {
             resultStr = HttpClientUtil.doPut(comUrl + url, params, username, password);
             if(Boolean.parseBoolean(resultStr)){
-                result.setSuccessFlg(true);
+                envelop.setSuccessFlg(true);
             }
             else {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.InvalidUpdate.toString());
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg(ErrorCode.InvalidUpdate.toString());
             }
-            return result;
+            return envelop;
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            return result;
+            envelop.setSuccessFlg(false);
+            return envelop;
         }
-
-        /*
-        try {
-            XOrganization org = orgManager.getOrg(orgCode);
-            if("1".equals(activityFlag)){
-                org.setActivityFlag(0);
-                orgManager.update(org);
-            }else{
-                org.setActivityFlag(1);
-                orgManager.update(org);
-            }
-
-            Result result = getSuccessResult(true);
-            return result.toJson();
-        } catch (Exception e) {
-            Result result = getSuccessResult(false);
-            return result.toJson();
-        }*/
     }
 
     @RequestMapping("updateOrg")
     @ResponseBody
-    public Object updateOrg(String orgModel) {
-
-        String url = "/organization/org";
-        String resultStr = "";
-        Envelop result = new Envelop();
+    public Object updateOrg(String orgModel,String addressModel,String mode) {
+        //新增或修改 根据mode 选择
+        String url = "/organizations";
+        String envelopStr = "";
+        Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("orgModel",orgModel);
+        params.put("mOrganizationJsonData",orgModel);
+        params.put("geography_model_json_data",addressModel);
         try {
-            resultStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
-            //todo: 需要在后台追加唯一性判断
-            result.setObj(resultStr);
-            result.setSuccessFlg(true);
-            return result;
-        } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result;
-        }
-
-        /*
-        Map<String, String> message = new HashMap<>();
-        Result result = new Result();
-        try {
-            if (orgModel.getUpdateFlg().equals("0")){
-                if(orgManager.isExistOrg(orgModel.getOrgCode())){
-                    result.setSuccessFlg(false);
-                    result.setErrorMsg("该机构已存在!");
-                    return result.toJson();
+            if("new".equals(mode)){
+                envelopStr = HttpClientUtil.doPost(comUrl + url, params, username, password);
+            }else {
+                ObjectMapper objectMapper = new ObjectMapper();
+                //读取参数，转化为模型
+                OrgDetailModel org = objectMapper.readValue(orgModel,OrgDetailModel.class);
+                //查询数据库得到对应的模型
+                String getOrgUrl = "/organizations/"+org.getOrgCode();
+                String envelopStrGet = HttpClientUtil.doGet(comUrl + getOrgUrl, params, username, password);
+                envelop = objectMapper.readValue(envelopStrGet,Envelop.class);
+                if (!envelop.isSuccessFlg()){
+                    return envelop;
                 }
-                XOrganization org = orgManager.register(orgModel.getOrgCode(), orgModel.getFullName(), orgModel.getShortName());
-
-                org.setActivityFlag(1);
-                org.getLocation().setCity(orgModel.getCity());
-                org.getLocation().setDistrict(orgModel.getDistrict());
-                org.getLocation().setProvince(orgModel.getProvince());
-                org.getLocation().setTown(orgModel.getTown());
-                org.getLocation().setStreet(orgModel.getStreet());
-
-                org.setAdmin(orgModel.getAdmin());
-                org.setTel(orgModel.getTel());
-                org.setType(absDictEManage.getOrgType(orgModel.getOrgType()));
-                org.setSettleWay(absDictEManage.getSettledWay(orgModel.getSettledWay()));
-                org.addTag(orgModel.getTags());
-
-                orgManager.update(org);
-
-                result.setSuccessFlg(true);
-                return result.toJson();
+                OrgDetailModel orgForUpdate = getEnvelopModel(envelop.getObj(),OrgDetailModel.class);
+                //将修改值存储到查询返回的对象中
+                orgForUpdate.setFullName(org.getFullName());
+                orgForUpdate.setShortName(org.getShortName());
+                orgForUpdate.setSettledWay(org.getSettledWay());
+                orgForUpdate.setAdmin(org.getAdmin());
+                orgForUpdate.setTel(org.getTel());
+                orgForUpdate.setOrgType(org.getOrgType());
+                orgForUpdate.setTags(org.getTags());
+                String mOrgUpdateJson = objectMapper.writeValueAsString(orgForUpdate);
+                params.put("mOrganizationJsonData",mOrgUpdateJson);
+                envelopStr = HttpClientUtil.doPut(comUrl + url, params, username, password);
             }
-            else{
-                result.setSuccessFlg(orgManager.update(orgModel));
-                result.setErrorMsg("该机构不存在。");
-                return result.toJson();
-            }
-
+            return envelopStr;
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg("更新失败，请联系管理员");
-            return result.toJson();
-        }*/
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            return envelop;
+        }
     }
 
     @RequestMapping("getOrg")
     @ResponseBody
     public Object getOrg(String orgCode) {
 
-        String getOrgUrl = "/organization/org_model";
+        String getOrgUrl = "/organizations/"+orgCode;
         Map<String, Object> params = new HashMap<>();
         params.put("orgCode",orgCode);
 
-        Envelop result = new Envelop();
+        Envelop envelop = new Envelop();
         String resultStr = "";
-
         try{
             resultStr = HttpClientUtil.doGet(comUrl + getOrgUrl, params, username, password);
-            result.setObj(resultStr);
-            result.setSuccessFlg(true);
-            return result;
+            return resultStr;
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result;
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            return envelop;
         }
-
-        /*
-        XOrganization org = orgManager.getOrg(orgCode);
-        OrgModel orgModel = orgManager.getOrgModel(org);
-        Map<String, OrgModel> data = new HashMap<>();
-        data.put("orgModel", orgModel);
-
-        Result result = new Result();
-        result.setObj(data);
-        return result.toJson();*/
     }
 
     @RequestMapping("distributeKey")
     @ResponseBody
     public Object distributeKey(String orgCode) {
 
-        String getOrgUrl = "/organization/distributeKey";
+        String getOrgUrl = "/organizations/key";
         String resultStr = "";
-        Envelop result = new Envelop();
+        Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
-        params.put("orgCode",orgCode);
+        params.put("org_code",orgCode);
         try {
-            resultStr = HttpClientUtil.doGet(comUrl + getOrgUrl, params, username, password);
-            if(Boolean.parseBoolean(resultStr)){
-                result.setSuccessFlg(true);
-            }
-            else {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.InvalidUpdate.toString());
-            }
-            return result;
+            resultStr = HttpClientUtil.doPost(comUrl + getOrgUrl, params, username, password);
+            return resultStr;
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result;
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            return envelop;
         }
-
-        /*
-        try {
-            Result result = getSuccessResult(true);
-            XUserSecurity userSecurity = securityManager.getUserPublicKeyByOrgCd(orgCode);
-            Map<String, String> keyMap = new HashMap<>();
-            if (userSecurity == null) {
-                userSecurity = securityManager.createSecurityByOrgCd(orgCode);
-
-            }else{
-                //result.setErrorMsg("公钥信息已存在。");
-                //这里删除原有的公私钥重新分配
-                String userKeyId = securityManager.getUserKeyByOrgCd(orgCode);
-                securityManager.deleteSecurity(userSecurity.getId());
-                securityManager.deleteUserKey(userKeyId);
-                userSecurity = securityManager.createSecurityByOrgCd(orgCode);
-            }
-            //String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT);
-            String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT)
-                    + "~" + DateUtil.toString(userSecurity.getExpiryDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT);
-
-            keyMap.put("publicKey", userSecurity.getPublicKey());
-            keyMap.put("validTime", validTime);
-            keyMap.put("startTime", DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT));
-            result.setObj(keyMap);
-            result.setSuccessFlg(true);
-            return result.toJson();
-        } catch (Exception ex) {
-            Result result = getSuccessResult(false);
-            return result.toJson();
-        }*/
     }
 
 
     @RequestMapping("validationOrg")
     @ResponseBody
     public Object validationOrg(String orgCode){
-
-        String getOrgUrl = "/organization/isOrgCodeExist";
+        String getOrgUrl = "/organizations/existence/"+orgCode;
         String resultStr = "";
-        Envelop result = new Envelop();
-        Map<String, Object> params = new HashMap<>();
-        params.put("orgCode",orgCode);
+        Envelop envelop = new Envelop();
         try {
-            resultStr = HttpClientUtil.doGet(comUrl + getOrgUrl, params, username, password);
-            if(Boolean.parseBoolean(resultStr)){
-                result.setSuccessFlg(true);
+            resultStr = HttpClientUtil.doGet(comUrl + getOrgUrl, username, password);
+            if(!Boolean.parseBoolean(resultStr)){
+                envelop.setSuccessFlg(true);
             }
             else {
-                result.setSuccessFlg(false);
-                result.setErrorMsg(ErrorCode.InvalidUpdate.toString());
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg(ErrorCode.InvalidUpdate.toString());
             }
-            return result;
+            return envelop;
         } catch (Exception e) {
-            result.setSuccessFlg(false);
-            result.setErrorMsg(ErrorCode.SystemError.toString());
-            return result;
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            return envelop;
         }
-
-        /*
-        XOrganization org = orgManager.getOrg(searchNm);
-        if(org == null){
-            Result result = getSuccessResult(true);
-            return result.toJson();
-        }
-        Result result = getSuccessResult(false);
-        return  result.toJson();*/
     }
 }

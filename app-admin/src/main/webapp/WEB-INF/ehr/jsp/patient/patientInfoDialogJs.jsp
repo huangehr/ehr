@@ -14,6 +14,12 @@
         var jValidation = $.jValidation;
         var dialog = frameElement.dialog;
         var dataModel = $.DataModel.init();
+        var patientModel = "";
+        debugger
+        var patientDialogType = '${patientDialogType}';
+        if (!(Util.isStrEquals(patientDialogType, 'addPatient'))) {
+            patientModel =${patientModel}.obj;
+        }
         /* ************************** 变量定义结束 ******************************** */
 
         /* *************************** 函数定义 ******************************* */
@@ -44,7 +50,7 @@
             $resetArea: $("#reset_password"),
             $resetPassword: $("#div_resetPassword"),
             $patientImgUpload: $("#div_patient_img_upload"),
-            $parientCopyId:$("#inp_parientCopyId"),
+            $patientCopyId:$("#inp_patientCopyId"),
             $picPath:$('#div_file_list'),
 
             init: function () {
@@ -61,7 +67,7 @@
                         extensions: 'gif,jpg,jpeg,bmp,png',
                         mimeTypes: 'image/*'
                     },
-                    /*formData:{msg:"upload"},*/
+//                    formData:{msg:"upload"},
                     auto: false,
                     async:false
                 });
@@ -79,71 +85,41 @@
                 self.$realName.ligerTextBox({width: 240});
                 self.$idCardNo.ligerTextBox({width: 240});
                 self.$gender.ligerRadio();
+                self.initDDL(4,this.$patientMartialStatus);
                 self.initDDL(5, this.$patientNation);
                 self.$patientNation.ligerTextBox({width: 240});
                 self.$patientNativePlace.ligerTextBox({width: 240});
                 self.$patientBirthday.ligerDateEditor({format: "yyyy-MM-dd"});
-
-                self.$birthPlace.addressDropdown({tabsData:[
-                    {name: '省份', url: '${contextRoot}/address/getParent', params: {level:'1'}},
-                    {name: '城市', url: '${contextRoot}/address/getChildByParent'},
-                    {name: '县区', url: '${contextRoot}/address/getChildByParent'},
-                    {name: '街道', maxlength: 200}
-                ]});
-                self.$homeAddress.addressDropdown({tabsData:[
-                    {name: '省份', url: '${contextRoot}/address/getParent', params: {level:'1'}},
-                    {name: '城市', url: '${contextRoot}/address/getChildByParent'},
-                    {name: '县区', url: '${contextRoot}/address/getChildByParent'},
-                    {name: '街道', maxlength: 200}
-                ]});
-                self.$workAddress.addressDropdown({tabsData:[
-                    {name: '省份', url: '${contextRoot}/address/getParent', params: {level:'1'}},
-                    {name: '城市', url: '${contextRoot}/address/getChildByParent'},
-                    {name: '县区', url: '${contextRoot}/address/getChildByParent'},
-                    {name: '街道', maxlength: 200}
-                ]});
-
+                self.initAddress(self.$birthPlace);
+                self.initAddress(self.$homeAddress);
+                self.initAddress(self.$workAddress);
                 self.$residenceType.ligerRadio();
                 self.$patientTel.ligerTextBox({width: 240});
                 self.$patientEmail.ligerTextBox({width: 240});
-
-                self.$patientMartialStatus.ligerComboBox(
-                        {
-                            url: '${contextRoot}/dict/searchDictEntryList',
-                            valueField: 'code',
-                            textField: 'value',
-                            dataParmName: 'detailModelList',
-                            urlParms: {
-                                dictId: 4
-                            },
-                            onSuccess: function () {
-                                self.$form.Fields.fillValues({martialStatus: '${patientModel.martialStatus}'});
-                            },
-                            autocomplete: true
-                        });
-
                 self.$resetArea.hide();
                 self.$form.attrScan();
-                if (!(Util.isStrEquals('${patientDialogType}', 'addPanient'))) {
+                if (!(Util.isStrEquals(patientDialogType, 'addPatient'))) {
                     self.$resetArea.show();
+                    var birthPlaceInfo = patientModel.birthPlaceInfo;
+                    var homeAddressInfo = patientModel.homeAddressInfo;
+                    var workAddressInfo = patientModel.workAddressInfo;
                     self.$form.Fields.fillValues({
-                        name: '${patientModel.name}',
-                        idCardNo: '${patientModel.idCardNo}',
-                        gender: '${patientModel.gender}',
-                        nativePlace: '${patientModel.nativePlace}',
-                        birthday: '${patientModel.birthday}',
-                        birthPlace: ['${patientModel.birthPlace.province}', '${patientModel.birthPlace.city}','${patientModel.birthPlace.district}','${patientModel.birthPlace.street}'],
-                        homeAddress:['${patientModel.homeAddress.province}', '${patientModel.homeAddress.city}','${patientModel.homeAddress.district}','${patientModel.homeAddress.street}'] ,
-                        workAddress: ['${patientModel.workAddress.province}', '${patientModel.workAddress.city}','${patientModel.workAddress.district}','${patientModel.workAddress.street}'],
-
-                        residenceType: '${patientModel.residenceType}',
-                        tel: '${patientModel.tel}',
-                        email: '${patientModel.email}'
+                        name: patientModel.name,
+                        idCardNo: patientModel.idCardNo,
+                        gender: patientModel.gender,
+                        nativePlace: patientModel.nativePlace,
+                        birthday: patientModel.birthday,
+                        birthPlaceInfo: birthPlaceInfo&&[birthPlaceInfo.province,birthPlaceInfo.city,birthPlaceInfo.district,birthPlaceInfo.street],
+                        homeAddressInfo: homeAddressInfo&&[homeAddressInfo.province,homeAddressInfo.city,homeAddressInfo.district,homeAddressInfo.street] ,
+                        workAddressInfo: workAddressInfo&&[workAddressInfo.province,workAddressInfo.city,workAddressInfo.district,workAddressInfo.street],
+                        residenceType: patientModel.residenceType,
+                        telephoneNo: patientModel.telephoneNo,
+                        email: patientModel.email
                     });
-                    self.$parientCopyId.val('${patientModel.idCardNo}');
+                    self.$patientCopyId.val(patientModel.idCardNo);
 
-                   var pic = "${patientModel.localPath}";
-                    if(!(Util.isStrEquals(pic,null)||Util.isStrEquals(pic,""))){
+                   var pic = patientModel.localPath;
+                    if(!Util.isStrEmpty(pic)){
                         self.$picPath.html('<img src="${contextRoot}/patient/showImage?localImgPath='+pic+'" class="f-w88 f-h110"></img>');
                     }
                 }
@@ -151,17 +127,25 @@
             initDDL: function (dictId, target) {
                 var self = this;
                 target.ligerComboBox({
-                    url: "${contextRoot}/dict/autoSearchDictEntryList",
+                    url: "${contextRoot}/dict/searchDictEntryList",
                     dataParmName: 'detailModelList',
                     urlParms: {dictId: dictId},
                     valueField: 'code',
                     textField: 'value',
                     autocomplete:true,
-                    cancelable:false,
                     onSuccess: function () {
-                        self.$form.Fields.fillValues({nation: '${patientModel.nation}'});
-                    },
+                        self.$form.Fields.fillValues({nation: patientModel.nation});
+                        self.$form.Fields.fillValues({martialStatus: patientModel.martialStatus});
+                    }
                 });
+            },
+            initAddress: function (target){
+                target.addressDropdown({tabsData:[
+                    {name: '省份',code:'id',value:'name', url: '${contextRoot}/address/getParent', params: {level:'1'}},
+                    {name: '城市',code:'id',value:'name', url: '${contextRoot}/address/getChildByParent'},
+                    {name: '县区',code:'id',value:'name', url: '${contextRoot}/address/getChildByParent'},
+                    {name: '街道',maxlength: 200}
+                ]});
             },
 
             bindEvents: function () {
@@ -172,7 +156,7 @@
                 var idCardNo = self.$form.Fields.idCardNo.getValue();
                 var validator =  new jValidation.Validation(this.$form, {immediate: true, onSubmit: false,onElementValidateForAjax:function(elm){
                     if(Util.isStrEquals($(elm).attr('id'),'inp_idCardNo')){
-                        var copyCardNo = self.$parientCopyId.val();
+                        var copyCardNo = self.$patientCopyId.val();
                         var result = new jValidation.ajax.Result();
                         var idCardNo = self.$idCardNo.val();
                         var dataModel = $.DataModel.init();
@@ -183,7 +167,7 @@
                             data: {searchNm:idCardNo},
                             async: false,
                             success: function (data) {
-                                if (data.successFlg) {
+                                if (!data.successFlg) {
                                     result.setResult(true);
                                 } else {
                                     result.setResult(false);
@@ -199,40 +183,42 @@
                 patientInfo.$updateBtn.click(function () {
                  var picHtml = self.$picPath.children().length;
                  if(validator.validate()){
-                    var addressList = self.$form.Fields.birthPlace.getValue();
-                    var homeAddressList = self.$form.Fields.homeAddress.getValue();
-                    var workAddressList = self.$form.Fields.workAddress.getValue();
+                    var addressList = self.$form.Fields.birthPlaceInfo.getValue();
+                    var homeAddressList = self.$form.Fields.homeAddressInfo.getValue();
+                    var workAddressList = self.$form.Fields.workAddressInfo.getValue();
                     var values = $.extend({},self.$form.Fields.getValues(),{
-                        birthPlace: {
+                        birthPlaceInfo: {
                             province:  addressList.names[0] || null,
                             city: addressList.names[1] || null,
                             district: addressList.names[2] || null,
                             street: addressList.names[3] || null
                         },
-                        homeAddress:{
+                        homeAddressInfo:{
                             province:  homeAddressList.names[0] || null,
                             city: homeAddressList.names[1] || null,
                             district: homeAddressList.names[2] || null,
                             street: homeAddressList.names[3] || null
                         },
-                        workAddress:{
+                        workAddressInfo:{
                             province:  workAddressList.names[0] || null,
                             city: workAddressList.names[1] || null,
                             district: workAddressList.names[2] || null,
                             street: workAddressList.names[3] || null
                         }
                     });
+                     var jsonData = JSON.stringify(values)+";"+patientDialogType;
                     if(picHtml == 0){
-                        updatePatient(JSON.stringify(values));
+                        updatePatient(jsonData);
+//                        updatePatient(JSON.stringify(values));
                     }else{
                         var upload = self.$patientImgUpload.instance;
                         var image = upload.getFiles().length;
                         if(image){
-                            upload.options.formData.patientJsonData =   encodeURIComponent(JSON.stringify(values));
+                            upload.options.formData.patientJsonData =   encodeURIComponent(jsonData);
                             upload.upload();
                             win.parent.patientDialogRefresh();
                         }else{
-                            updatePatient(JSON.stringify(values));
+                            updatePatient(jsonData);
                         }
                     }
                   }else{
@@ -241,12 +227,20 @@
                 });
                 function updatePatient(patientJsonData){
                     dataModel.updateRemote("${contextRoot}/patient/updatePatient", {
-                        data: {patientJsonData:patientJsonData },
+                        data: {patientJsonData:patientJsonData,patientDialogType:patientDialogType},
                         success: function (data) {
                             if(data.successFlg){
-                                win.parent.$.Notice.success('修改成功');
+                                if (Util.isStrEquals(patientDialogType, 'addPatient')){
+                                    win.parent.$.Notice.success('新增成功');
+                                }else{
+                                    win.parent.$.Notice.success('修改成功');
+                                }
                             }else{
-                                win.parent.$.Notice.error('修改失败');
+                                if (Util.isStrEquals(patientDialogType, 'addPatient')){
+                                    win.parent.$.Notice.error('新增失败');
+                                }else{
+                                    win.parent.$.Notice.error('修改失败');
+                                }
                             }
                             win.parent.patientDialogRefresh();
                             dialog.close();
@@ -267,7 +261,7 @@
                                     } else {
                                         win.parent.$.Notice.error('密码修改失败');
                                     }
-                                    dialog.close();
+                                    //dialog.close();
                                 }
                             })
                         }

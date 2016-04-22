@@ -2,7 +2,6 @@ package com.yihu.ehr.patient.service.demographic;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.Map;
 
 /**
  * 人口学信息接口实现类.
@@ -31,9 +30,10 @@ public class DemographicInfo {
     private String workAddress;                    // 工作地址
     private String homeAddress;                    // 家庭地址
     private String password;                        //密码
-    private String telphoneNo ;                     // 电话号码，之前是个电话号码列表
+    private String telephoneNo ;                     // 电话号码，之前是个电话号码列表
     private String picPath = "";
     private String localPath = "";
+    private Date registerTime;                      //注册时间
 
     public DemographicInfo() {
     }
@@ -146,11 +146,11 @@ public class DemographicInfo {
     }
 
     @Column(name = "telphone_number",  nullable = true)
-    public String getTelphoneNo() {
-        return telphoneNo;
+    public String getTelephoneNo() {
+        return telephoneNo;
     }
-    public void setTelphoneNo(String telphoneNo) {
-        this.telphoneNo = telphoneNo;
+    public void setTelephoneNo(String telephoneNo) {
+        this.telephoneNo = telephoneNo;
     }
 
 
@@ -170,5 +170,12 @@ public class DemographicInfo {
         this.localPath = localPath;
     }
 
+    @Column(name = "register_time",  nullable = true)
+    public Date getRegisterTime() {
+        return registerTime;
+    }
+    public void setRegisterTime(Date registerTime) {
+        this.registerTime = registerTime;
+    }
 }
 

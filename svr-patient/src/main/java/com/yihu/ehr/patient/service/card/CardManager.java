@@ -58,18 +58,18 @@ public class CardManager {
         String cardType = (String)args.get("cardType");   //","otherCard
         int rows = (Integer)args.get("rows");
         int page = (Integer)args.get("page");
-        String sqlPhysical="from AbstractPhysicalCard a where (a.number like :number)";
-        String sqlVirtual="from AbstractVirtualCard a where (a.number like :number)";
+        String sqlPhysical="from AbstractPhysicalCard card where (card.number like :number)";
+        String sqlVirtual="from AbstractVirtualCard card where (card.number like :number)";
         if ("bind_card".equals(type) && !StringUtils.isEmpty(idCardNo)){
-            sqlPhysical += " and (idCardNo=:idCardNo)";
-            sqlVirtual += " and (idCardNo=:idCardNo)";
+            sqlPhysical += " and (card.idCardNo=:idCardNo)";
+            sqlVirtual += " and (card.idCardNo=:idCardNo)";
         }else{
-            sqlPhysical += " and (idCardNo=null or trim(idCardNo)='')";
-            sqlVirtual += " and (idCardNo=null or trim(idCardNo)='')";
+            sqlPhysical += " and (card.idCardNo=null or trim(card.idCardNo)='')";
+            sqlVirtual += " and (card.idCardNo=null or trim(card.idCardNo)='')";
         }
         if (!StringUtils.isEmpty(cardType)){
-            sqlPhysical += " and (cardType=:cardType)";
-            sqlVirtual += " and (cardType=:cardType)";
+            sqlPhysical += " and (card.cardType=:cardType)";
+            sqlVirtual += " and (card.cardType=:cardType)";
         }
         Query queryPhysical = session.createQuery(sqlPhysical);
         Query queryVirtual = session.createQuery(sqlVirtual);
@@ -87,8 +87,8 @@ public class CardManager {
         queryPhysical.setMaxResults(rows);
         queryPhysical.setFirstResult((page - 1) * rows);
         cards = queryPhysical.list();
-        int physicalCount = searchCardInt(args, true);
-        int first = 0;
+        int physicalCount = searchCardInt(args);
+        int first;
         if(cards.size()<rows){
             int left = page * rows - physicalCount;
             if(cards.size()==0){
@@ -101,50 +101,39 @@ public class CardManager {
                 rows = left>rows?rows:left;
                 first = (page - 1) * rows;
             }
-            queryVirtual.setMaxResults(rows);
             queryVirtual.setFirstResult(first);
+            queryVirtual.setMaxResults(rows);
             cards.addAll(queryVirtual.list());
         }
 
         return cards;
     }
 
-    public Integer searchCardInt(Map<String, Object> args ,boolean onlyPhysical) {
+    public Integer searchCardInt(Map<String, Object> args ) {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         String idCardNo = (String) args.get("idCardNo");
         String number = (String)args.get("number");
         String type = (String) args.get("type");
         String cardType = (String)args.get("cardType");   //","otherCard
-        int rows = (Integer)args.get("rows");
-        int page = (Integer)args.get("page");
-        String sqlPhysical="from AbstractPhysicalCard a where (a.number like :number)";
-        String sqlVirtual="from AbstractVirtualCard a where (a.number like :number)";
+        String sql="select count(*) from AbstractPhysicalCard card where (card.number like :number)";
         if ("bind_card".equals(type) && !StringUtils.isEmpty(idCardNo)){
-            sqlPhysical += " and (idCardNo=:idCardNo)";
-            sqlVirtual += " and (idCardNo=:idCardNo)";
+            sql += " and (card.idCardNo=:idCardNo)";
         }else{
-            sqlPhysical += " and (idCardNo=null or trim(idCardNo)='')";
-            sqlVirtual += " and (idCardNo=null or trim(idCardNo)='')";
+            sql += " and (card.idCardNo=null or trim(idCardNo)='')";
         }
         if (!StringUtils.isEmpty(cardType)){
-            sqlPhysical += " and (cardType=:cardType)";
-            sqlVirtual += " and (cardType=:cardType)";
+            sql += " and (card.cardType=:cardType)";
         }
-        Query queryPhysical = session.createQuery(sqlPhysical);
-        Query queryVirtual = session.createQuery(sqlVirtual);
-        queryPhysical.setString("number", "%"+number+"%");
-        queryVirtual.setString("number", "%"+number+"%");
+        Query query = session.createQuery(sql);
+        query.setString("number", "%"+number+"%");
         if (!StringUtils.isEmpty(idCardNo)) {
-            queryPhysical.setParameter("idCardNo", idCardNo);
-            queryVirtual.setParameter("idCardNo", idCardNo);
+            query.setParameter("idCardNo", idCardNo);
         }
         if (!StringUtils.isEmpty(cardType)){
-            queryPhysical.setParameter("cardType", cardType);
-            queryVirtual.setParameter("cardType", cardType);
+            query.setParameter("cardType", cardType);
         }
-        List<AbstractCard> physicalCards = queryPhysical.list();
-        List<AbstractCard> virtualCards = queryVirtual.list();
-        return physicalCards.size()+virtualCards.size();
+        //List<AbstractCard> cards = query.list();
+        return ((Long)query.list().get(0)).intValue();
 
     }
 

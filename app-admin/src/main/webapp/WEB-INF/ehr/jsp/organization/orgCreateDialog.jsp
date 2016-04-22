@@ -6,7 +6,7 @@
     <div class="m-form-group">
         <label><spring:message code="lbl.org.code"/><spring:message code="spe.colon"/></label>
         <div class="l-text-wrapper m-form-control essential">
-            <input type="text" id="org_code" class="required useTitle ajax validate-space validate-org-code f-w240 max-length-20"  required-title=<spring:message code="lbl.must.input"/> data-attr-scan="orgCode"/>
+            <input type="text" id="org_code" class="required useTitle ajax validate-space validate-org-code f-w240 max-length-20"  required-title=<spring:message code="lbl.must.input"/> data-attr-scan="organizationCode"/>
         </div>
     </div>
 
@@ -33,8 +33,8 @@
 
     <div class="m-form-group">
         <label><spring:message code="lbl.join.mode"/><spring:message code="spe.colon"/></label>
-        <div class="l-text-wrapper m-form-control ">
-            <input type="text" id="settled_way" data-type="select"  data-attr-scan="settledWay">
+        <div class="l-text-wrapper m-form-control essential">
+            <input type="text" id="settled_way" class="required" data-type="select"  data-attr-scan="settledWay">
         </div>
     </div>
 
@@ -52,15 +52,16 @@
     </div>
     <div class="m-form-group">
         <label><spring:message code="lbl.org.type"/><spring:message code="spe.colon"/></label>
-        <div class="l-text-wrapper m-form-control">
-            <input type="text" id="org_type" class=" f-w240" data-type="select"  data-attr-scan="orgType"/>
+        <div class="l-text-wrapper m-form-control essential">
+            <input type="text" id="org_type" class=" f-w240 required" data-type="select"  data-attr-scan="orgType"/>
         </div>
+        <spring:message code="spe.colon"/>
     </div>
 
     <div class="m-form-group">
         <label><spring:message code="lbl.tip"/><spring:message code="spe.colon"/></label>
         <div class="m-form-control ">
-            <textarea id="dialog_tags" class="f-w240 max-length-100 validate-special-char" data-attr-scan="tags" maxlength="500"></textarea>
+            <textarea id="dialog_tags" class="f-w240 max-length-100 validate-special-char" placeholder="多个标签，请用分号隔开" data-attr-scan="tags" maxlength="500"></textarea>
         </div>
     </div>
 	<div class="m-form-control pane-attribute-toolbar">

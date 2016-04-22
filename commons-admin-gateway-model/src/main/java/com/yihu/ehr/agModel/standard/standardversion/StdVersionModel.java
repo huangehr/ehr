@@ -6,8 +6,7 @@ package com.yihu.ehr.agModel.standard.standardversion;
 public class StdVersionModel {
     private String author;
     private String commitTime;
-    private boolean isInStage;
-    private String stageName;
+    private boolean inStage;
     private String version;
     private String versionName;
     private String baseVersion;
@@ -30,19 +29,11 @@ public class StdVersionModel {
     }
 
     public boolean isInStage() {
-        return isInStage;
+        return inStage;
     }
 
-    public void setIsInStage(boolean isInStage) {
-        this.isInStage = isInStage;
-    }
-
-    public String getStageName() {
-        return stageName;
-    }
-
-    public void setStageName(String stageName) {
-        this.stageName = stageName;
+    public void setInStage(boolean inStage) {
+        this.inStage = inStage;
     }
 
     public String getVersion() {

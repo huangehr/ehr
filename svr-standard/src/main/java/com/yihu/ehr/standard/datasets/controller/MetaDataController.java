@@ -1,23 +1,22 @@
 package com.yihu.ehr.standard.datasets.controller;
 
+import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.MStdMetaData;
 import com.yihu.ehr.standard.commons.ExtendController;
-import com.yihu.ehr.standard.datasets.service.IMetaData;
+import com.yihu.ehr.standard.datasets.service.BaseMetaData;
 import com.yihu.ehr.standard.datasets.service.MetaDataService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.net.URLDecoder;
+import java.util.*;
 
 /**
  * @author lincl
@@ -25,8 +24,8 @@ import java.util.Map;
  * @created 2016.2.3
  */
 @RestController
-@RequestMapping(ApiVersion.Version1_0 + "/std")
-@Api(protocols = "https", value = "metadata", description = "标准数据元", tags = {"标准数据元"})
+@RequestMapping(ApiVersion.Version1_0)
+@Api(value = "Meta data", description = "数据元服务")
 public class MetaDataController extends ExtendController<MStdMetaData> {
 
     @Autowired
@@ -37,7 +36,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
         return  metaDataService.getServiceEntity(version);
     }
 
-    @RequestMapping(value = "/meta_datas", method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Standards.MetaDatas, method = RequestMethod.GET)
     @ApiOperation(value = "查询数据元")
     public Collection<MStdMetaData> searchDataSets(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -62,7 +61,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
     }
 
 
-    @RequestMapping(value = "/meta_datas", method = RequestMethod.DELETE)
+    @RequestMapping(value = RestApi.Standards.MetaDatas, method = RequestMethod.DELETE)
     @ApiOperation(value = "批量删除数据元")
     public boolean deleteMetaDatas(
             @ApiParam(name = "ids", value = "编号集", defaultValue = "")
@@ -74,18 +73,20 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
         return true;
     }
 
-    @RequestMapping(value = "/data_set/{dataSetId}/meta_data", method = RequestMethod.DELETE)
+
+    @RequestMapping(value = RestApi.Standards.MetaDatasWithDataSet, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据集关联的数据元")
     public boolean deleteMetaDataByDataSet(
-            @ApiParam(name = "dataSetId", value = "数据集编号", defaultValue = "")
-            @PathVariable(value = "dataSetId") long dataSetId,
+            @ApiParam(name = "data_set_id", value = "数据集编号", defaultValue = "")
+            @PathVariable(value = "data_set_id") long dataSetId,
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version) throws Exception{
 
         return metaDataService.deleteByField("dataSetId", dataSetId, getServiceEntity(version)) > 0;
     }
 
-    @RequestMapping(value = "/meta_data/{id}", method = RequestMethod.DELETE)
+
+    @RequestMapping(value = RestApi.Standards.MetaData, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据元")
     public boolean deleteMetaData(
             @ApiParam(name = "id", value = "编号集", defaultValue = "")
@@ -97,7 +98,8 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
         return true;
     }
 
-    @RequestMapping(value = "/meta_data/{id}", method = RequestMethod.GET)
+
+    @RequestMapping(value = RestApi.Standards.MetaData, method = RequestMethod.GET)
     @ApiOperation(value = "获取数据元")
     public MStdMetaData getMetaData(
             @ApiParam(name = "id", value = "数据元编号", defaultValue = "")
@@ -108,31 +110,42 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
         return getModel(metaDataService.retrieve(id, getServiceEntity(version)));
     }
 
+    @RequestMapping(value = RestApi.Standards.MetaDatasWithDataSet, method = RequestMethod.GET)
+    @ApiOperation(value = "根据数据集id获取数据元")
+    public Collection<MStdMetaData> getMetaDataByDataSetId(
+            @ApiParam(name = "data_set_id", value = "数据元编号", defaultValue = "")
+            @PathVariable(value = "data_set_id") long dataSetIs,
+            @ApiParam(name = "version", value = "版本", defaultValue = "")
+            @RequestParam(value = "version") String version) throws Exception{
+        Class entityClass = getServiceEntity(version);
+        List<BaseMetaData> list = metaDataService.search(entityClass,"dataSetId="+dataSetIs);
+        return convertToModels(list, new ArrayList<>(list.size()), MStdMetaData.class, "");
+    }
 
-    @RequestMapping(value = "/meta_data", method = RequestMethod.PUT)
+
+    @RequestMapping(value = RestApi.Standards.MetaData, method = RequestMethod.PUT)
     @ApiOperation(value = "更新数据元")
     public MStdMetaData updataMetaSet(
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version,
+            @ApiParam(name = "id", value = "数据元编号", defaultValue = "")
+            @PathVariable(value = "id") long id,
             @ApiParam(name = "model", value = "数据源模型", defaultValue = "")
             @RequestParam(value = "model", required = false) String model) throws Exception{
 
         Class entityClass = getServiceEntity(version);
-        IMetaData metaDataModel = (IMetaData) jsonToObj(model, entityClass);
-        IMetaData metaData = metaDataService.retrieve(metaDataModel.getId(), entityClass);
-        if(metaData.getId()==0)
-            throw errNotFound("数据元", metaDataModel.getId());
+        BaseMetaData metaDataModel = (BaseMetaData) jsonToObj(model, entityClass);
+//        BaseMetaData metaData = metaDataService.retrieve(id, entityClass);
+//        if(metaData.getId()==0)
+//            throw errNotFound("数据元", metaDataModel.getId());
 
-        if(!metaData.getCode().equals(metaDataModel.getCode())
-                && metaDataService.isColumnValExsit(metaDataModel.getDataSetId(), "code", metaDataModel.getCode(), entityClass))
-            throw errRepeatCode();
-
-        BeanUtils.copyProperties(model, metaData);
+        metaDataModel.setId(id);
         metaDataService.save(metaDataModel);
         return getModel(metaDataModel);
     }
 
-    @RequestMapping(value = "/meta_data", method = RequestMethod.POST)
+
+    @RequestMapping(value = RestApi.Standards.MetaDatas, method = RequestMethod.POST)
     @ApiOperation(value = "新增数据元")
     public MStdMetaData saveMetaSet(
             @ApiParam(name = "version", value = "版本", defaultValue = "")
@@ -140,49 +153,50 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
             @ApiParam(name = "model", value = "数据源模型", defaultValue = "")
             @RequestParam(value = "model", required = false) String model) throws Exception{
 
-        IMetaData metaData = (IMetaData) jsonToObj(model, getServiceEntity(version));
-        if(metaDataService.isColumnValExsit(metaData.getDataSetId(), "code", metaData.getCode(), getServiceEntity(version)))
-            throw errRepeatCode();
+        BaseMetaData metaData = (BaseMetaData) jsonToObj(model, getServiceEntity(version));
         if(metaDataService.saveMetaData(metaData, version))
             return getModel(metaData);
         return null;
     }
 
 
-    @RequestMapping(value = "/meta_data/validate/code", method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Standards.MetaDataCodeExistence, method = RequestMethod.GET)
     @ApiOperation(value = "验证数据元代码是否重复")
-    public boolean validateCode(
+    public boolean validateInnerCode(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @RequestParam(value = "version") String version,
-            @ApiParam(name = "dataSetId", value = "数据集编号", defaultValue = "")
-            @RequestParam(value = "dataSetId") long dataSetId,
-            @ApiParam(name = "code", value = "查询代码", defaultValue = "")
-            @RequestParam(value = "code") String code) throws Exception{
+            @ApiParam(name = "data_set_id", value = "数据集编号", defaultValue = "")
+            @PathVariable(value = "data_set_id") long dataSetId,
+            @ApiParam(name = "inner_code", value = "查询代码", defaultValue = "")
+            @RequestParam(value = "inner_code") String innerCode) throws Exception{
 
-        return metaDataService.isColumnValExsit(dataSetId, "code", code, getServiceEntity(version));
+        return metaDataService.isColumnValExsit(dataSetId, "innerCode", innerCode, getServiceEntity(version));
     }
 
-    @RequestMapping(value = "/meta_data/validate/name", method = RequestMethod.GET)
+
+    @RequestMapping(value = RestApi.Standards.MetaDataNameExistence, method = RequestMethod.GET)
     @ApiOperation(value = "验证数据元名称是否重复")
     public boolean validatorName(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @RequestParam(value = "version") String version,
-            @ApiParam(name = "dataSetId", value = "数据集编号", defaultValue = "")
-            @RequestParam(value = "dataSetId") long dataSetId,
+            @ApiParam(name = "data_set_id", value = "数据集编号", defaultValue = "")
+            @RequestParam(value = "data_set_id") long dataSetId,
             @ApiParam(name = "name", value = "查询名称", defaultValue = "")
             @RequestParam(value = "name") String name) throws Exception {
 
         return metaDataService.isColumnValExsit(dataSetId, "name", name, getServiceEntity(version));
     }
 
-    @RequestMapping(value = "/meta_datas/map", method = RequestMethod.GET)
+
+    @RequestMapping(value = RestApi.Standards.MetaDatasName, method = RequestMethod.POST)
     @ApiOperation(value = "获取数据元 id-name : map集")
     public Map getMetaDataMapByIds(
-            @ApiParam(name = "version", value = "版本号", defaultValue = "")
-            @RequestParam(value = "version") String version,
-            @ApiParam(name = "medaIds", value = "数据元编号", defaultValue = "")
-            @RequestParam(value = "medaIds") String metaIds) {
+            @ApiParam(name = "parmModel", value = "参数模型", defaultValue = "")
+            @RequestBody String parmModel) throws IOException {
 
-        return metaDataService.getMetaDataMapByIds(strToLongArr(metaIds), version);
+        parmModel = URLDecoder.decode(parmModel, "UTF-8");
+        Map<String, String> parms = jsonToObj(parmModel, Map.class);
+        return metaDataService.getMetaDataMapByIds(strToLongArr(parms.get("metaIds")), parms.get("version"));
     }
+
 }

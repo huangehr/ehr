@@ -1,6 +1,9 @@
 package com.yihu.ehr.api.esb;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+//import com.yihu.ehr.config.FastDFSConfig;
 import com.yihu.ehr.constants.ApiVersion;
+//import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.feign.SimplifiedESBClient;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -8,9 +11,14 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import springfox.documentation.spring.web.json.Json;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 /**
  * @author Sand
@@ -19,11 +27,14 @@ import springfox.documentation.spring.web.json.Json;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/simplified-esb")
-@Api(protocols = "https", value = "simplified-esb", description = "简易ESB服务临时接口")
+@Api(value = "simplified-esb", description = "简易ESB服务临时接口")
 public class SimplifiedEsbEndPoint {
     @Autowired
     private SimplifiedESBClient simplifiedESBClient;
+    //@Autowired
+    //private FastDFSConfig FastDFSConfig;
 
+    /*
     @ApiOperation("获取版本列表")
     @RequestMapping(value = "/applications", method = RequestMethod.GET)
     public ResponseEntity<Json> getApplications() {
@@ -37,17 +48,31 @@ public class SimplifiedEsbEndPoint {
                                                String id) {
         return new ResponseEntity<>(new Json(""), HttpStatus.OK);
     }
+*/
 
-    @ApiOperation("日志上传")
-    @RequestMapping(value = "/uploadLog", method = RequestMethod.POST)
-    public ResponseEntity<String> uploadLogger(@ApiParam("orgCode") @RequestParam(value = "orgCode", required = true)
-                                               String orgCode,
-                                               @ApiParam("ip") @RequestParam(value = "ip", required = true)
-                                               String ip,
-                                               @ApiParam("file") @RequestParam(value = "file", required = true)
-                                               MultipartFile file) throws Exception {
-        return new ResponseEntity<>(simplifiedESBClient.uploadLog(orgCode, ip, new String(file.getBytes(), "UTF-8")) + "", HttpStatus.OK);
+    @ApiOperation("判断是否需要上传日志")
+    @RequestMapping(value = "/getUploadFlag", method = RequestMethod.GET)
+    public ResponseEntity<Boolean> getUploadFlag(@ApiParam("orgCode") @RequestParam(value = "orgCode", required = true)
+                                                 String orgCode,
+                                                 @ApiParam("systemCode") @RequestParam(value = "systemCode", required = true)
+                                                 String systemCode) throws Exception {
+        return new ResponseEntity<>(simplifiedESBClient.getUploadFlag(orgCode, systemCode), HttpStatus.OK);
     }
+
+    /*@ApiOperation("日志上传")
+    @RequestMapping(value = "/uploadLog", method = RequestMethod.POST)
+    public ResponseEntity<Boolean> uploadLogger(@ApiParam("orgCode") @RequestParam(value = "orgCode", required = true)
+                                                String orgCode,
+                                                @ApiParam("ip") @RequestParam(value = "ip", required = false)
+                                                String ip,
+                                                @ApiParam("file") @RequestParam(value = "file", required = true)
+                                                MultipartFile file) throws Exception {
+        InputStream in = new ByteArrayInputStream(file.getBytes());
+        FastDFSUtil fdfs = FastDFSConfig.fastDFSUtil();
+        ObjectNode jsonResult = fdfs.upload(in, "zip", "");
+        String filePath = jsonResult.get("fid").textValue();
+        return new ResponseEntity<Boolean>(simplifiedESBClient.uploadLog(orgCode, ip, filePath), HttpStatus.OK);
+    }*/
 
     @ApiOperation("查询版本是否需要更新")
     @RequestMapping(value = "/getUpdateFlag", method = RequestMethod.GET)
@@ -63,7 +88,7 @@ public class SimplifiedEsbEndPoint {
 
     ///api/v1.0/simplified-esb/downUpdateWar
     @ApiOperation("下载项目")
-    @RequestMapping(value = "/downUpdateWar", method = RequestMethod.GET)
+    @RequestMapping(value = "/downUpdateWar", method = RequestMethod.POST)
     public ResponseEntity downUpdateWar(@ApiParam("systemCode") @RequestParam(value = "systemCode", required = true)
                                         String systemCode,
                                         @ApiParam("orgCode") @RequestParam(value = "orgCode", required = true)
@@ -83,9 +108,11 @@ public class SimplifiedEsbEndPoint {
             @ApiParam("versionName") @RequestParam(value = "versionName", required = true)
             String versionName,
             @ApiParam("updateDate") @RequestParam(value = "updateDate", required = true)
-            String updateDate) {
+            String updateDate,
+            @ApiParam("message") @RequestParam(value = "message", required = true)
+            String message) {
 
-        return new ResponseEntity<>(simplifiedESBClient.uploadResult(systemCode, orgCode, versionCode, versionName, updateDate), HttpStatus.OK);
+        return new ResponseEntity<>(simplifiedESBClient.uploadResult(systemCode, orgCode, versionCode, versionName, updateDate, message), HttpStatus.OK);
     }
 
     @ApiOperation("补采功能")
@@ -126,10 +153,12 @@ public class SimplifiedEsbEndPoint {
     public ResponseEntity changeHisPenetrationStatus(
             @ApiParam("result") @RequestParam(value = "result", required = true)
             String result,
+            @ApiParam("message") @RequestParam(value = "message", required = true)
+            String message,
             @ApiParam("status") @RequestParam(value = "status", required = true)
             String status,
             @ApiParam("id") @RequestParam(value = "id", required = true)
             String id) {
-        return new ResponseEntity<>(simplifiedESBClient.changeHisPenetrationStatus(result, status, id), HttpStatus.OK);
+        return new ResponseEntity<>(simplifiedESBClient.changeHisPenetrationStatus(result, status, id, message), HttpStatus.OK);
     }
 }

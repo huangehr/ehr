@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -22,12 +23,12 @@ import java.util.*;
  */
 public class BaseController extends AbstractController {
 
-    private static String ERR_SYSREM_DES="系统错误,请联系管理员!";
+    private static String ERR_SYSREM_DES = "系统错误,请联系管理员!";
 
     private static String X_Total_Count = "X-Total-Count";
 
     @Autowired
-    ObjectMapper objectMapper;
+    public ObjectMapper objectMapper;
 
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
@@ -44,8 +45,7 @@ public class BaseController extends AbstractController {
      * @return
      */
     public <T> T convertToModel(Object source, Class<T> targetCls, String... properties) {
-        if(source==null)
-        {
+        if (source == null) {
             return null;
         }
         T target = BeanUtils.instantiate(targetCls);
@@ -59,7 +59,7 @@ public class BaseController extends AbstractController {
             T entity = objectMapper.readValue(json, entityCls);
             return entity;
         } catch (IOException ex) {
-            throw new ApiException(ErrorCode.SystemError,  "无法转换json, " + ex.getMessage());
+            throw new ApiException(ErrorCode.SystemError, "无法转换json, " + ex.getMessage());
         }
     }
 
@@ -73,8 +73,7 @@ public class BaseController extends AbstractController {
      * @return
      */
     public <T> Collection<T> convertToModels(Collection sources, Collection<T> targets, Class<T> targetCls, String properties) {
-        if(sources==null)
-        {
+        if (sources == null) {
             return null;
         }
         Iterator iterator = sources.iterator();
@@ -120,53 +119,118 @@ public class BaseController extends AbstractController {
         result.setTotalCount(totalCount);
         result.setCurrPage(currPage);
         result.setPageSize(rows);
-        if(result.getTotalCount()%result.getPageSize()>0){
-            result.setTotalPage((result.getTotalCount()/result.getPageSize())+1);
-        }else {
-            result.setTotalPage(result.getTotalCount()/result.getPageSize());
+        if (result.getTotalCount() % result.getPageSize() > 0) {
+            result.setTotalPage((result.getTotalCount() / result.getPageSize()) + 1);
+        } else {
+            result.setTotalPage(result.getTotalCount() / result.getPageSize());
         }
 
         return result;
     }
 
-    public String trimEnd(String param,String trimChars)
-    {
-        if(param.endsWith(trimChars))
-        {
-            param = param.substring(0,param.length()-trimChars.length());
+    public String trimEnd(String param, String trimChars) {
+        if (param.endsWith(trimChars)) {
+            param = param.substring(0, param.length() - trimChars.length());
         }
         return param;
     }
 
-    public String trimStart(String param,String trimChars)
-    {
-        if(param.startsWith(trimChars))
-        {
-            param = param.substring(trimChars.length(),param.length());
+    public String trimStart(String param, String trimChars) {
+        if (param.startsWith(trimChars)) {
+            param = param.substring(trimChars.length(), param.length());
         }
         return param;
     }
 
-    public Envelop failed(String errMsg){
+    public Envelop failed(String errMsg) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         envelop.setErrorMsg(errMsg);
         return envelop;
     }
 
-    public Envelop success(Object object){
+    public Envelop success(Object object) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
         envelop.setObj(object);
         return envelop;
     }
 
-    protected Envelop failedSystem(){
+    protected Envelop failedSystem() {
         return failed(ERR_SYSREM_DES);
     }
 
-    protected int getTotalCount(ResponseEntity responseEntity)
-    {
+    protected int getTotalCount(ResponseEntity responseEntity) {
         return Integer.parseInt(responseEntity.getHeaders().get(X_Total_Count).get(0));
     }
+
+    public <T> T getEnvelopModel(String jsonData, Class<T> targetCls) {
+        try {
+            Envelop envelop = objectMapper.readValue(jsonData, Envelop.class);
+            String objJsonData = objectMapper.writeValueAsString(envelop.getObj());
+            T model = objectMapper.readValue(objJsonData, targetCls);
+
+            return model;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    public <T> Collection<T> getEnvelopList(String jsonData, Collection<T> targets, Class<T> targetCls) {
+        try {
+            Envelop envelop = objectMapper.readValue(jsonData, Envelop.class);
+            for(int i=0;i<envelop.getDetailModelList().size();i++)
+            {
+                String objJsonData = objectMapper.writeValueAsString(envelop.getDetailModelList().get(i));
+                T model = objectMapper.readValue(objJsonData,targetCls);
+
+                targets.add(model);
+            }
+            return targets;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+
+    }
+
+    /**
+     * 将字符串转为Data
+     * @param dateTime 日期字符串
+     * @param formatRule 转换格式
+     * @return 时间格式的日期
+     */
+    public Date StringToDate(String dateTime,String formatRule)
+    {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(formatRule);
+            return dateTime==null?null:sdf.parse(dateTime);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 将日期转为字符串
+     * @param dateTime 日期
+     * @param formatRule 转换格式
+     * @return 日期字符串
+     */
+    public String DateToString(Date dateTime,String formatRule)
+    {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(formatRule);
+            return dateTime==null?null:sdf.format(dateTime);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
 }

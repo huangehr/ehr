@@ -36,7 +36,7 @@
             $title: $("#inp_title"),
 
             versionNo: '',
-            orgCode: '',
+            organizationCode: '',
             cda: '',
 
             $dataset: $("#inp_dataset"),
@@ -59,9 +59,9 @@
                         searchCda(value);
                     }
                 });
-                <%--self.orgCode = this.$org.ligerComboBox({--%>
+                <%--self.organizationCode = this.$org.ligerComboBox({--%>
                 <%--url:'${contextRoot}/template/searchOrg',--%>
-                <%--valueField: 'orgCode',--%>
+                <%--valueField: 'organizationCode',--%>
                 <%--textField: 'fullName',--%>
                 <%--dataParmName:'detailModelList',--%>
                 <%--autocomplete:true,--%>
@@ -72,10 +72,10 @@
                     width: 240,
                     selectBoxWidth: 240,
                     tabsData: [
-                        {name: '省份', url: '${contextRoot}/address/getParent', params: {level: '1'}},
-                        {name: '城市', url: '${contextRoot}/address/getChildByParent'},
+                        {name: '省份',code:'id',values:'name', url: '${contextRoot}/address/getParent', params: {level: '1'}},
+                        {name: '城市',code:'id',values:'name', url: '${contextRoot}/address/getChildByParent'},
                         {
-                            name: '医院', url: '${contextRoot}/address/getOrgs', beforeAjaxSend: function (ds, $options) {
+                            name: '医院',code:'id',values:'name', url: '${contextRoot}/address/getOrgs', beforeAjaxSend: function (ds, $options) {
                             var province = $options.eq(0).attr('title'),
                                     city = $options.eq(1).attr('title');
                             ds.params = $.extend({}, ds.params, {
@@ -107,8 +107,8 @@
                     id: archiveTpl.id,
                     title: mode=='copy'?'':archiveTpl.title,
                     version: archiveTpl.cdaVersion,
-                    cdaType: archiveTpl.cdaDocumentId,
-                    orgCode: ["${province}", "${city}", "${orgCode}"]
+                    cdaType: archiveTpl.id,
+                    organizationCode: ["${province}", "${city}", "${organizationCode}"]
                 });
 				$('#oldTitle').val(archiveTpl.title);
             },
@@ -151,7 +151,7 @@
                 self.$addBtn.click(function () {
                     if (validator.validate()) {
                         var TemplateModel = self.$form.Fields.getValues();
-                        TemplateModel.orgCode = TemplateModel.orgCode.keys[2];
+                        TemplateModel.organizationCode = TemplateModel.organizationCode.keys[2];
                         var dataModel = $.DataModel.init();
 
                         dataModel.createRemote("${contextRoot}/template/" + ajaxFun, {

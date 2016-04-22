@@ -1,12 +1,11 @@
 package com.yihu.ehr.standard.dict.controller;
 
+import com.yihu.ehr.api.RestApi;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.standard.MStdDictEntry;
 import com.yihu.ehr.standard.commons.ExtendController;
+import com.yihu.ehr.standard.dict.service.BaseDictEntry;
 import com.yihu.ehr.standard.dict.service.DictEntryService;
-import com.yihu.ehr.standard.dict.service.IDictEntry;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -25,8 +24,8 @@ import java.util.List;
  * @created 2016.2.1
  */
 @RestController
-@RequestMapping(ApiVersion.Version1_0 + "/std/dict")
-@Api(protocols = "https", value = "/entry", description = "标准字典项", tags = {"标准字典项"})
+@RequestMapping(ApiVersion.Version1_0)
+@Api(value = "Entry", description = "字典项服务")
 public class DictEntryController extends ExtendController<MStdDictEntry> {
 
     @Autowired
@@ -37,27 +36,30 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
     }
 
 
-    @RequestMapping(value = "/entry", method = RequestMethod.PUT)
+    @RequestMapping(value = RestApi.Standards.Entry, method = RequestMethod.PUT)
     @ApiOperation(value = "修改字典项")
     public MStdDictEntry updateDictEntry(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
             @RequestParam(value = "version") String version,
+            @ApiParam(name = "id", value = "标准版本", defaultValue = "")
+            @PathVariable(value = "id") long id,
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam(value = "model") String model) throws Exception{
 
         Class entityClass = getServiceEntity(version);
-        IDictEntry dictEntryModel = (IDictEntry) jsonToObj(model, entityClass);
-        IDictEntry dictEntry = dictEntryService.retrieve(dictEntryModel.getId(), entityClass);
-        if(!dictEntry.getCode().equals(dictEntryModel.getCode())
-                && dictEntryService.isExistByField("code", dictEntryModel.getCode(), entityClass))
-            throw errRepeatCode();
+        BaseDictEntry dictEntryModel = (BaseDictEntry) jsonToObj(model, entityClass);
+//        BaseDictEntry dictEntry = dictEntryService.retrieve(id, entityClass);
+//        if(!dictEntry.getCode().equals(dictEntryModel.getCode())
+//                && dictEntryService.isExistByField("code", dictEntryModel.getCode(), entityClass))
+//            throw errRepeatCode();
 
+        dictEntryModel.setId(id);
         dictEntryService.save(dictEntryModel);
         return getModel(dictEntryModel);
     }
 
 
-    @RequestMapping(value = "/entry", method = RequestMethod.POST)
+    @RequestMapping(value = RestApi.Standards.Entries, method = RequestMethod.POST)
     @ApiOperation(value = "新增字典项")
     public MStdDictEntry addDictEntry(
             @ApiParam(name = "version", value = "cda版本号", defaultValue = "")
@@ -66,63 +68,54 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
             @RequestParam(value = "model") String model) throws Exception{
 
         Class entityClass = getServiceEntity(version);
-        IDictEntry dictEntry = (IDictEntry) jsonToObj(model, entityClass);
-        if(dictEntryService.isExistByField("code", dictEntry.getCode(), entityClass))
-            throw errRepeatCode();
+        BaseDictEntry dictEntry = (BaseDictEntry) jsonToObj(model, entityClass);
+//        if(dictEntryService.isExistByField("code", dictEntry.getCode(), entityClass))
+//            throw errRepeatCode();
         if (dictEntryService.add(dictEntry, version))
             return getModel(dictEntry);
         return null;
     }
 
 
-    @RequestMapping(value = "/entry", method = RequestMethod.DELETE)
+    @RequestMapping(value = RestApi.Standards.Entry, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除字典项")
     public boolean deleteDictEntry(
             @ApiParam(name = "version", value = "cda版本号", defaultValue = "")
             @RequestParam(value = "version") String version,
-            @ApiParam(name = "dictId", value = "字典编号", defaultValue = "")
-            @RequestParam(value = "dictId") long dictId,
             @ApiParam(name = "id", value = "字典项编号", defaultValue = "")
-            @RequestParam(value = "id") long id) throws Exception{
+            @PathVariable(value = "id") long id) throws Exception{
 
-        return dictEntryService.deleteByFields(
-                    new String[]{"dictId", "id"},
-                    new Object[]{dictId, id},
-                    getServiceEntity(version)) > 0;
+        return dictEntryService.delete(id, getServiceEntity(version)) > 0;
     }
 
-    @RequestMapping(value = "/entrys", method = RequestMethod.DELETE)
+
+    @RequestMapping(value = RestApi.Standards.Entries, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除字典项")
     public boolean deleteDictEntrys(
             @ApiParam(name = "version", value = "cda版本号", defaultValue = "")
             @RequestParam(value = "version") String version,
-            @ApiParam(name = "dictId", value = "字典编号", defaultValue = "")
-            @RequestParam(value = "dictId") long dictId,
             @ApiParam(name = "ids", value = "字典项编号", defaultValue = "")
             @RequestParam(value = "ids") String ids) throws Exception{
 
-        return dictEntryService.deleteByFields(
-                    new String[]{"dictId", "id"},
-                    new Object[]{dictId, strToLongArr(ids)},
-                    getServiceEntity(version)
-                ) > 0;
+        return dictEntryService.delete(strToLongArr(ids), getServiceEntity(version)) > 0;
     }
 
-    @RequestMapping(value = "/{dictId}/entry", method = RequestMethod.DELETE)
+
+    @RequestMapping(value = RestApi.Standards.EntriesWithDictionary, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除字典关联的所有字典项")
     public boolean deleteDictEntryList(
             @ApiParam(name = "version", value = "cda版本号", defaultValue = "")
             @RequestParam(value = "version") String version,
-            @ApiParam(name = "dictId", value = "字典编号", defaultValue = "")
-            @PathVariable(value = "dictId") long dictId) throws Exception{
+            @ApiParam(name = "dict_id", value = "字典编号", defaultValue = "")
+            @PathVariable(value = "dict_id") long dictId) throws Exception{
 
         return dictEntryService.deleteByField("dictId", dictId, getServiceEntity(version)) > 0;
     }
 
 
-    @RequestMapping(value = "/entrys", method = RequestMethod.GET)
+    @RequestMapping(value = RestApi.Standards.Entries, method = RequestMethod.GET)
     @ApiOperation(value = "查询字典项")
-    public Collection<MStdDictEntry> searchDataSets(
+    public Collection<MStdDictEntry> searchDictEntry(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -144,7 +137,8 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
         return convertToModels(ls, new ArrayList<>(ls.size()), MStdDictEntry.class, fields);
     }
 
-    @RequestMapping(value = "/entry/{id}", method = RequestMethod.GET)
+
+    @RequestMapping(value = RestApi.Standards.Entry, method = RequestMethod.GET)
     @ApiOperation(value = "获取字典项")
     public MStdDictEntry getDictEntry(
             @ApiParam(name = "id", value = "字典项编号", defaultValue = "")
@@ -155,4 +149,12 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
         return getModel(dictEntryService.retrieve(id, getServiceEntity(version)));
     }
 
+    @RequestMapping(value = RestApi.Standards.EntryCodeIsExist,method = RequestMethod.GET)
+    public boolean isExistEntryCode(
+            @RequestParam(value = "dict_id")long dictId,
+            @RequestParam(value = "code")String code,
+            @RequestParam(value = "version_code")String versionCode) {
+        Class entityClass = getServiceEntity(versionCode);
+        return dictEntryService.isExistByFields(new String[]{"dictId","code"}, new Object[]{dictId,code}, entityClass);
+    }
 }

@@ -21,8 +21,10 @@ cdaType.list = {
             {
                 display: '操作', isSort: false, width: 200, align: 'center', render: function (rowdata, rowindex, value) {
 
-                var html = "<div class='grid_edit' name='edit_click' style='margin-left: 60px;' onclick='cdaType.list.add(\"" + rowdata.id + "\", \"modify\")'></div> " +
-                    "<div class='grid_delete' name='delete_click' style='margin-left: 110px;' onclick='cdaType.list.deleted(\"" + rowdata.id + "\")'></div>";
+                //var html = "<div class='grid_edit' name='edit_click' style='margin-left: 60px;cursor:pointer;' onclick='cdaType.list.add(\"" + rowdata.id + "\", \"modify\")'></div> " +
+                //    "<div class='grid_delete' name='delete_click' style='margin-left: 110px;cursor:pointer;' onclick='cdaType.list.deleted(\"" + rowdata.id + "\")'></div>";
+                var html = "<a class='grid_edit' title='编辑' name='edit_click' style='' onclick='cdaType.list.add(\"" + rowdata.id + "\", \"modify\")'></a> " +
+                    "<a class='grid_delete' title='删除' name='delete_click' style='' onclick='cdaType.list.deleted(\"" + rowdata.id + "\")'></a>";
                 return html;
             }
             }
@@ -40,21 +42,21 @@ cdaType.list = {
 
     getTypeList: function () {
         var u = cdaType.list;
+        var codeName = $('#inp_search').val();
         $.ajax({
             url: u._url + "/cdatype/getTreeGridData",
             type: "get",
             dataType: "json",
-            data: null,
+            data:{codeName:codeName},
             success: function (data) {
-
-                var result = eval(data);
-
+                var envelop = eval(data);
+                var result = envelop.detailModelList;
                 if (result != null) {
                     cdaType.list.setUserList(result);
                 }
-                else {
-                    $.Notice.error("数据获取失败！");
-                }
+                //else {
+                //    $.Notice.error("数据获取失败！");
+                //}
             }
         })
     },
@@ -132,31 +134,42 @@ cdaType.list = {
             $.Notice.error("请先选择需要删除的数据!");
             return;
         }
-
-        //先判断是否存在子集
+        //判断该cda类别或其子类别是否有关联的cda文档，---前提 没有批量删除功能
         $.ajax({
-            url: cdaType.list._url + "/cdatype/getCDATypeListByParentId",
+            url: cdaType.list._url + "/cdatype/isExitRelativeCDA",
             type: "get",
             dataType: "json",
             data: {ids: ids},
             success: function (data) {
                 var _res = eval(data);
-                if (_res != null && _res.length > 0) {
-                    debugger;
-
-                    var _text = "当前类别存在子类别,删除将会同时删除子类别,并引起相关联的CDA无法显示！\n请确认是否删除？";
-                    for (var i = 0; i < _res.length; i++) {
-                        ids += "," + _res[i].id;
+                if (_res.successFlg) {
+                    $.Notice.error("该cda类别不能删除！当前类别或其子类别存在关联的cda文档！");
+                    return;
+                }
+                //先判断是否存在子集
+                $.ajax({
+                    url: cdaType.list._url + "/cdatype/getCDATypeListByParentId",
+                    type: "get",
+                    dataType: "json",
+                    data: {ids: ids},
+                    success: function (data) {
+                        var _res = data;
+                        if (_res != null && _res.length > 0) {
+                            var _text = "当前类别存在子类别,删除将会同时删除子类别！\n请确认是否删除？";
+                            for (var i = 0; i < _res.length; i++) {
+                                ids += "," + _res[i].id;
+                            }
+                            // ids = ids.substr(1);
+                            cdaType.list.doDeleted(ids, _text);
+                        }
+                        else {
+                            var _text = "确定删除当前cda类别？";
+                            cdaType.list.doDeleted(ids, _text);
+                        }
                     }
-                    // ids = ids.substr(1);
-                    cdaType.list.doDeleted(ids, _text);
-                }
-                else {
-                    var _text = "删除该类目将会引起相关联的CDA无法显示！\n请确认是否删除？";
-                    cdaType.list.doDeleted(ids, _text);
-                }
+                });
             }
-        });
+        })
     },
     doDeleted: function (ids, _text) {
         $.Notice.confirm(_text, function (confirm) {
@@ -230,7 +243,6 @@ cdaType.attr = {
     validator: null,
     parent_select: null,
     init: function () {
-        debugger;
 
         var typeId = $.Util.getUrlQueryString('id');
         $("#hdId").val(typeId);
@@ -244,13 +256,12 @@ cdaType.attr = {
         });
     },
     getParentType: function (initValue, initText) {
-        debugger;
         cdaType.attr.parent_select = $("#ipt_select").ligerComboBox({
-            url: cdaType.list._url + "/cdatype/getParentType?strId=" + $("#hdId").val(),
+            url: cdaType.list._url + "/cdatype/getCdaTypeExcludeSelfAndChildren?strId=" + $("#hdId").val(),
             valueField: 'id',
             textField: 'name',
+            dataParmName: 'detailModelList',
             selectBoxWidth: 240,
-            autocomplete: true,
             keySupport: true,
             width: 240,
             initValue: initValue,
@@ -282,8 +293,8 @@ cdaType.attr = {
             data: {strIds: id},
             success: function (data) {
 
-                var result = eval(data);
-                var info = result.obj;
+                var envelop = eval(data);
+                var info = envelop.obj;
                 if (info != null) {
                     cdaType.attr.type_form.attrScan();
                     cdaType.attr.type_form.Fields.fillValues(info);
@@ -309,7 +320,7 @@ cdaType.attr = {
         dataJson[0]["id"] = id;
 
         var user_id = $("#hd_user").val();
-        dataJson[0]["userId"] = user_id;
+        dataJson[0]["createUser"] = user_id;
 
         var parent_id = cdaType.attr.parent_select.getValue();
         dataJson[0]["parentId"] = parent_id;
@@ -320,7 +331,7 @@ cdaType.attr = {
             url: _url,
             type: "POST",
             dataType: "json",
-            data: dataJson[0],
+            data: {dataJson:JSON.stringify(dataJson[0])},
             success: function (data) {
                 if (data != null) {
 

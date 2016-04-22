@@ -11,8 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,7 +24,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class DictService extends BaseHbmService<IDict> {
+public class DictService extends BaseHbmService<BaseDict> {
     private final static String ENTITY_PRE = "com.yihu.ehr.standard.dict.service.Dict";
 
     @Autowired
@@ -42,9 +44,9 @@ public class DictService extends BaseHbmService<IDict> {
     }
 
     @Transactional(propagation= Propagation.REQUIRED)
-    public boolean add(IDict dict){
+    public boolean add(BaseDict dict, String version){
         String sql =
-                "INSERT INTO " + getTaleName(dict.getStdVersion()) +
+                "INSERT INTO " + getTaleName(version) +
                         "(code, name, author, base_dict, create_date, description, source, std_version, hash) " +
                         "VALUES (:code, :name, :author, :base_dict, :create_date, :description, :source, :std_version, :hash)";
         Query query = currentSession().createSQLQuery(sql);
@@ -52,7 +54,7 @@ public class DictService extends BaseHbmService<IDict> {
         query.setParameter("name", dict.getName());
         query.setParameter("author", dict.getAuthor());
         query.setParameter("base_dict", dict.getBaseDict());
-        query.setParameter("create_date", dict.getCreatedate());
+        query.setParameter("create_date", dict.getCreateDate());
         query.setParameter("description", dict.getDescription());
         query.setParameter("source", dict.getSourceId());
         query.setParameter("std_version", dict.getStdVersion());
@@ -95,6 +97,41 @@ public class DictService extends BaseHbmService<IDict> {
         }
         return map;
     }
+
+
+    public List<BaseDict> getChildrensByParentId(long baseDictId, String version) {
+        Session session = currentSession();
+        Class clz = getServiceEntity(version);
+        String hql="";
+        if(StringUtils.isEmpty(baseDictId)){
+            hql += "from "+clz.getSimpleName()+" a where 1=1 and (a.baseDict is null or a.baseDict='')";
+        }else{
+            hql += "from "+clz.getSimpleName()+" a where 1=1 and a.baseDict =:baseDict";
+        }
+        Query query = session.createQuery(hql);
+        if(!StringUtils.isEmpty(baseDictId)){
+            query.setLong("baseDict", baseDictId);
+        }
+        return query.list();
+    }
+
+    public List<BaseDict> getCdaTypeExcludeSelfAndChildren(String childrenIds, String version) {
+        Session session = currentSession();
+        Class clz = getServiceEntity(version);
+
+        String[] ids = childrenIds.split(",");
+
+        Long[] idsL = new Long[ids.length];
+        for (int i = 0; i < ids.length; i++) {
+            idsL[i] = Long.parseLong(ids[i]);
+        }
+
+        String  hql = "from "+clz.getSimpleName()+" a where 1=1 and a.id not in (:ids)";
+        Query query = session.createQuery(hql);
+        query.setParameterList("ids",idsL);
+        return query.list();
+    }
+
 
     //TODO: 从excel导入字典、字典项
 }

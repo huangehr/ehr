@@ -16,6 +16,8 @@
 
         //公钥管理弹框
         var publicKeyMsgDialog = null;
+		var envelop = JSON.parse('${envelop}');
+		var org = envelop.obj;
 
         /* *************************** 函数定义 ******************************* */
         function pageInit() {
@@ -27,7 +29,7 @@
             //form
             $form: $("#div_organization_info_form"),
 
-            $orgCode: $("#org_code"),
+            $organizationCode: $("#org_code"),
             $fullName: $('#full_name'),
             $shortName: $('#short_name'),
             $location: $('#location'),
@@ -64,7 +66,7 @@
             },
             initForm: function () {
 
-                this.$orgCode.ligerTextBox({width: 240});
+                this.$organizationCode.ligerTextBox({width: 240});
                 this.$fullName.ligerTextBox({width: 240});
                 this.$shortName.ligerTextBox({width: 240});
                 this.$location.ligerComboBox({width: 240});
@@ -75,37 +77,39 @@
                 this.$tel.ligerTextBox({width: 240, height:28});
                 this.$tel.removeClass('l-text-field-number');
                 this.$location.addressDropdown({tabsData:[
-                    {name: '省份', url: '${contextRoot}/address/getParent', params: {level:'1'}},
-                    {name: '城市', url: '${contextRoot}/address/getChildByParent'},
-                    {name: '县区', url: '${contextRoot}/address/getChildByParent'},
+                    {name: '省份',code:'id',value:'name', url: '${contextRoot}/address/getParent', params: {level:'1'}},
+                    {name: '城市',code:'id',value:'name', url: '${contextRoot}/address/getChildByParent'},
+                    {name: '县区',code:'id',value:'name', url: '${contextRoot}/address/getChildByParent'},
                     {name: '街道', maxlength:200}
                 ]});
 
                 this.initDDL(orgTypeDictId,this.$orgType);
                 this.initDDL(settledWayDictId,this.$settledWay);
+				this.$form.attrScan();
+				var tags = '';
+				for(var i=0;i<org.tags.length;i++){
+					tags += (org.tags)[i]+';'
+				}
+				tags = tags.substring(0,tags.length-1);
+				this.$form.Fields.fillValues({
+					organizationCode: org.organizationCode,
+					fullName: org.fullName,
+					shortName: org.shortName,
+					//location: org.location,
+					orgType: org.orgType,
+					settledWay: org.settledWay,
+					admin:org.admin,
+					tel: org.tel,
+					tags: tags,
+					publicKey: org.publicKey,
+					validTime:org.validTime,
+					startTime:org.startTime
+				});
+				this.$publicKeyMessage.val(org.publicKey);
+				this.$publicKeyValidTime.html(org.validTime);
+				this.$publicKeyStartTime.html(org.startTime);
 
-                this.$form.attrScan();
-                var tags = '${org.tags}';
-                tags = tags.substring(1,tags.length-1);
-                this.$form.Fields.fillValues({
-                    orgCode: '${org.orgCode}',
-                    fullName: '${org.fullName}',
-                    shortName: '${org.shortName}',
-                    //location: '${org.location}',
-                    orgType: '${org.orgType}',
-                    settledWay: '${org.settledWay}',
-                    admin:'${org.admin}',
-                    tel: '${org.tel}',
-                    tags: tags,
-                    publicKey:'${org.publicKey}',
-                    validTime:'${org.validTime}',
-                    startTime:'${org.startTime}'
-                });
-                this.$publicKeyMessage.val('${org.publicKey}');
-                this.$publicKeyValidTime.html('${org.validTime}');
-                this.$publicKeyStartTime.html('${org.startTime}');
-
-                this.$form.Fields.location.setValue(['${org.province}','${org.city}','${org.district}','${org.street}']);
+				this.$form.Fields.location.setValue([org.province,org.city,org.district,org.street]);
 
                 if ('${mode}' == 'view') {
                     this.$form.addClass("m-form-readonly");
@@ -133,7 +137,7 @@
             bindEvents: function () {
                 var self = this;
                 $('#location,.u-dropdown-icon').click(function(){
-                    self.$orgCode.click();
+                    self.$organizationCode.click();
                 });
                 var validator =  new jValidation.Validation(self.$form, {immediate: true, onSubmit: false});
                 self.$updateOrgBtn.click(function () {
@@ -141,16 +145,29 @@
                     var dataModel = $.DataModel.init();
                     self.$form.attrScan();
                     var orgAddress = self.$form.Fields.location.getValue();
-                    var orgModel = $.extend({},self.$form.Fields.getValues(),
+					var orgModel = self.$form.Fields.getValues();
+					//标签字符串转化为数组
+					var tags = orgModel.tags;
+					tags = tags.split(/[;；]/)
+					orgModel.tags = tags;
+					//原location是对象，传到controller转化成model会报错--机构、地址分开传递（json串）
+					orgModel.location = "";
+					var addressModel = {
+                            province:  orgAddress.names[0],
+                            city: orgAddress.names[1],
+                            district: orgAddress.names[2],
+                            town: "",
+                            street: orgAddress.names[3]
+					};
+                    /*var orgModel = $.extend({},self.$form.Fields.getValues(),
                             {location: "" },
                             {province:  orgAddress.names[0]},
                             {city: orgAddress.names[1]},
                             {district: orgAddress.names[2]},
                             {town: ""},
-                            {street: orgAddress.names[3]},
-                            {updateFlg:'1'}
-                    );
-                   /* if(Util.isStrEquals(orgModel.orgCode,'')){
+                            {street: orgAddress.names[3]}
+                    );*/
+                   /* if(Util.isStrEquals(orgModel.organizationCode,'')){
                         $.Notice.warn('组织机构代码不能为空');
                         return;
                     }
@@ -171,8 +188,8 @@
                         return;
                     }*/
                     dataModel.createRemote("${contextRoot}/organization/updateOrg", {
-                        data: orgModel,
-                                success: function (data) {
+                        data:  {orgModel:JSON.stringify(orgModel),addressModel:JSON.stringify(addressModel),mode:"modify"},
+						success: function (data) {
                                     if(data.successFlg){
                                         parent.reloadMasterGrid();
                                         $.Notice.success('操作成功');
@@ -198,10 +215,10 @@
                     //分配公钥点击事件
                     self.$allotpublicKey.click(function () {
 
-                        var code = self.$form.Fields.orgCode.getValue();
+                        var code = self.$form.Fields.organizationCode.getValue();
                         var dataModel = $.DataModel.init();
                         dataModel.createRemote('${contextRoot}/organization/distributeKey', {
-                            data: {orgCode:code},
+                            data: {organizationCode:code},
                             success: function (data) {
                                 if(data.successFlg){
                                     self.$publicKeyMessage.val(data.obj.publicKey);

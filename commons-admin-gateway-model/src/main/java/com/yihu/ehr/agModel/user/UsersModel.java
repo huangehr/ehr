@@ -15,6 +15,9 @@ public class UsersModel {
     private String email;
     private boolean activated;
     private String lastLoginTime;
+    private String source;
+    private String sourceName;
+
 
     public String getId() {
         return id;
@@ -102,5 +105,21 @@ public class UsersModel {
 
     public void setLastLoginTime(String lastLoginTime) {
         this.lastLoginTime = lastLoginTime;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public String getSourceName() {
+        return sourceName;
+    }
+
+    public void setSourceName(String sourceName) {
+        this.sourceName = sourceName;
     }
 }

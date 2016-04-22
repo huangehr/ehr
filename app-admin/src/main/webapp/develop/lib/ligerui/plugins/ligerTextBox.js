@@ -217,7 +217,14 @@
                 g.trigger('changeValue', [""]);
             });
             /*****************TODO结束*******************/
-
+            /*****************TODO开始（判断是不是文本域，如果是 关闭按钮缩进10像素）*******************/
+            $("body").delegate("textarea.l-text-field","mouseover",function(){
+                var tares=$(this).closest("div");
+                if(!tares.hasClass("uicyc-tar")){
+                    tares.addClass("uicyc-tar");
+                }
+            });
+            /*****************TODO结束*******************/
             g.wrapper.hover(function ()
             {
                 g.trigger('mouseOver');

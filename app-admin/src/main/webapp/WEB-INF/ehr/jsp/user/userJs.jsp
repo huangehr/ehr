@@ -15,6 +15,8 @@
             // 用户类型字典Id
             var settledWayDictId = 15;
 
+            var isFirstPage = true;
+
             /* *************************** 函数定义 ******************************* */
             /**
              * 页面初始化。
@@ -26,13 +28,16 @@
             }
             //多条件查询参数设置
             function reloadGrid (url, params) {
+                if (isFirstPage){
+                    userInfoGrid.options.newPage = 1;
+                }
                 userInfoGrid.set({
                     url: url,
-                    parms: params,
-                    newPage:1
-
+                    parms: params
                 });
+
                 userInfoGrid.reload();
+                isFirstPage = true;
             }
 
             /* *************************** 模块初始化 ***************************** */
@@ -83,27 +88,33 @@
                         columns: [
                             // 隐藏列：hide: true（隐藏），isAllowHide: false（列名右击菜单中不显示）
                             {name: 'id', hide: true, isAllowHide: false},
-                            {display: '用户类型', name: 'userTypeValue', width: '10%',align:'left'},
+                            {display: '用户类型', name: 'userTypeName', width: '10%',align:'left'},
                             {display: '姓名', name: 'realName', width: '8%',align:'left'},
                             {display: '账号',name: 'loginCode', width:'12%', isAllowHide: false,align:'left'},
-                            {display: '所属机构', name: 'organization', width: '17%',align:'left'},
+                            {display: '所属机构', name: 'organizationName', width: '17%',align:'left'},
                             {display: '联系方式', name: 'telephone',width: '12%',align:'left'},
                             {display: '用户邮箱', name: 'email', width: '12%', resizable: true,align:'left'},
-                            {display: '是否激活', name: 'activated', width: '5%', minColumnWidth: 20},
-                            {display: '最近登录时间', name: 'lastLoginTime', width: '12%',align:'left'},
+                            {display: '是否生/失效', name: 'activated', width: '8%', minColumnWidth: 20,render:function(row){
+								var html ='';
+								if(Util.isStrEquals(row.activated,true)){
+//										html +='<div class="grid_on"  onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:failure", row.id,0) + '"></div>';
+									html+= '<a class="grid_on" href="javascript:void(0)" title="已生效" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}'])", "user:userInfoModifyDialog:failure", row.id,0,"失效") + '"></a>';
+								}else if(Util.isStrEquals(row.activated,false)){
+//										html +='<div class="grid_off" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:failure", row.id,1) + '"></div>';
+									html+='<a class="grid_off" href="javascript:void(0)" title="已失效" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}'])", "user:userInfoModifyDialog:failure", row.id,1,"生效") + '"></a>';
+								}
+								return html;
+                            }},
+							{display: '最近登录时间', name: 'lastLoginTime', width: '12%',align:'left'},
                             {
-                                display: '操作', name: 'operator', width: '12%', render: function (row) {
-                                var html = '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:open", row.id, 'modify') + '">编辑</a> / ';
-                                    html+= '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoDialog:del", row.id, 'delete') + '">删除</a> / ';
-                                    if(Util.isStrEquals(row.activated,"是")){
-                                           html+= '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:failure", row.id,0) + '">失效</a>';
-                                       }else if(Util.isStrEquals(row.activated,"否")){
-                                           html+='<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:failure", row.id,1) + '">开启</a>';
-                                       }
-
+                                display: '操作', name: 'operator', width: '10%', render: function (row) {
+//								var html ='<div class="grid_edit"    title="编辑" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:open", row.id,'modify') + '"></div>'
+//										+'<div class="grid_delete"   title="删除"' +
+//										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoDialog:del", row.id,'delete') + '"></div>';
+                                var html = '<a class="grid_edit" title="编辑" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoModifyDialog:open", row.id, 'modify') + '"></a>';
+                                    html+= '<a class="grid_delete" title="删除" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "user:userInfoDialog:del", row.id, 'delete') + '"></a>';
                                 return html;
-                            }
-                            }
+							}}
                         ],
                         enabledEdit: true,
                         validate: true,
@@ -167,19 +178,20 @@
                             url: '${contextRoot}/user/addUserInfoDialog?'+ $.now()
                         })
                     });
-                    //修改用户状态
-                    $.subscribe('user:userInfoModifyDialog:failure', function (event, userId,activated) {
-                        $.ligerDialog.confirm('确认要修改该行信息？<br>如果是请点击确认按钮，否则请点击取消。', function (yes) {
+                    //修改用户状态(生/失效)
+                    $.subscribe('user:userInfoModifyDialog:failure', function (event, userId,activated,msg) {
+                        $.ligerDialog.confirm('是否对该用户进行'+msg+'操作', function (yes) {
                             if (yes) {
                                 var dataModel = $.DataModel.init();
                                 dataModel.updateRemote('${contextRoot}/user/activityUser', {
                                     data: {userId: userId,activated:activated},
                                     success: function (data) {
                                         if (data.successFlg) {
-                                            $.Notice.success('修改成功');
+//                                            $.Notice.success('修改成功');
+                                            isFirstPage = false;
                                             master.reloadGrid();
                                         } else {
-                                            $.Notice.error('修改失败');
+//                                            $.Notice.error('修改失败');
                                         }
                                     }
                                 });
@@ -191,10 +203,13 @@
                         $.ligerDialog.confirm('确认删除该行信息？<br>如果是请点击确认按钮，否则请点击取消。',function(yes){
                             if(yes){
                                 var dataModel = $.DataModel.init();
-                                dataModel.updateRemote("${contextRoot}/user/deleteUser",{data:{userId:userId},
+                                dataModel.updateRemote("${contextRoot}/user/deleteUser",{
+                                    data:{userId:userId},
+                                    async:true,
                                     success: function(data) {
                                         if(data.successFlg){
                                             $.Notice.success('删除成功。');
+                                            isFirstPage = false;
                                             master.reloadGrid();
                                         }else{
                                             $.Notice.error('删除失败。');
@@ -216,6 +231,7 @@
                 master.reloadGrid();
             };
             win.closeUserInfoDialog = function (callback) {
+                isFirstPage = false;
                 if(callback){
                     callback.call(win);
                     master.reloadGrid();
@@ -223,6 +239,7 @@
                 master.userInfoDialog.close();
             };
             win.closeAddUserInfoDialog = function (callback) {
+                isFirstPage = false;
                 if(callback){
                     callback.call(win);
                     master.reloadGrid();

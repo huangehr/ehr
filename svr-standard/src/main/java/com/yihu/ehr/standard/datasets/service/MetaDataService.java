@@ -3,12 +3,10 @@ package com.yihu.ehr.standard.datasets.service;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.query.BaseHbmService;
-import com.yihu.ehr.standard.cdaversion.service.CDAVersion;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -27,7 +25,7 @@ import java.util.Map;
  */
 @Transactional
 @Service
-public class MetaDataService extends BaseHbmService<IMetaData>{
+public class MetaDataService extends BaseHbmService<BaseMetaData>{
 
     private final static String ENTITY_PRE = "com.yihu.ehr.standard.datasets.service.MetaData";
 
@@ -53,7 +51,7 @@ public class MetaDataService extends BaseHbmService<IMetaData>{
                 );
     }
 
-    public boolean saveMetaData(IMetaData metaData, String version) {
+    public boolean saveMetaData(BaseMetaData metaData, String version) {
         Session session = currentSession();
         String sql = "insert into " + getTaleName(version) +
                     "(dataset_id, code, inner_code, name, type, format, dict_id, definition, nullable, column_type, column_name, column_length, primary_key, hash) " +
@@ -87,10 +85,10 @@ public class MetaDataService extends BaseHbmService<IMetaData>{
         Criteria criteria = currentSession().createCriteria(getServiceEntity(version));
         if (ids != null && ids.length != 0)
             criteria.add(Restrictions.in("id", ids));
-        List<MetaData> records = criteria.list();
+        List<BaseMetaData> records = criteria.list();
         Map<Long, Map<Long, String>> rs = new HashMap<>();
         Map<Long, String> ch;
-        for(MetaData metaData : records){
+        for(BaseMetaData metaData : records){
             ch = rs.get(metaData.getDataSetId());
             if (ch == null) {
                 ch = new HashMap<>();

@@ -145,7 +145,7 @@
         makeParams.call(this, index);
         dm.fetchRemote(ds.url,{data: ds.params, success: function (remoteData) {
             var data = remoteData[p.dataRoot];
-            var panelData = self.tabPanelDatas[index] = handleData.call(self,data);
+            var panelData = self.tabPanelDatas[index] = handleData.call(self,data,ds);
             var renderData = [];
             $.each(self.opt.groups, function () {
                 var items = [];
@@ -236,14 +236,15 @@
         $dropdownIcon.addClass('f-combo-focus');
         $tabWrap.show();
     }
-    function handleData(data) {
+    function handleData(data,ds) {
         var self = this;
         var dataTemp = [];
         for(var key in data) {
-            var name = data[key];
+            var id = data[key][ds.code];
+            var name = data[key][ds.value];
             var abbrChars = $.Pinyin.getAbbrChars(name);
             var fullChars = $.Pinyin.getFullChars(name);
-            dataTemp.push(Util.format("{0}||{1}||{2}||{3}",abbrChars,fullChars,key,name));
+            dataTemp.push(Util.format("{0}||{1}||{2}||{3}",abbrChars,fullChars,id,name));
         }
         dataTemp.sort();
 

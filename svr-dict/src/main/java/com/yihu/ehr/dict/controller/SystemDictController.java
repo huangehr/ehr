@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,7 +27,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "Dictionary", description = "系统全局字典管理", tags = {"系统字典"})
+@Api(value = "Dictionary", description = "系统全局字典管理", tags = {"系统字典"})
 public class SystemDictController extends BaseRestController {
     @Autowired
     SystemDictService dictService;
@@ -45,7 +46,7 @@ public class SystemDictController extends BaseRestController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) Integer page,
             HttpServletRequest request,
-            HttpServletResponse response) {
+            HttpServletResponse response) throws Exception {
         page = reducePage(page);
 
         if (StringUtils.isEmpty(filters)) {
@@ -65,8 +66,6 @@ public class SystemDictController extends BaseRestController {
             @ApiParam(name = "dictionary", value = "字典JSON结构")
             @RequestParam(value = "dictionary") String dictJson) {
         SystemDict dict = toEntity(dictJson, SystemDict.class);
-        Long id = dictService.getNextId();
-        dict.setId(id);
         SystemDict systemDict = dictService.createDict(dict);
         return convertToModel(systemDict, MSystemDict.class, null);
     }
@@ -101,11 +100,11 @@ public class SystemDictController extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(value = "/dictionaries/existence/{app_name}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dictionaries/existence" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典名称是否已经存在")
-    boolean isAppNameExists(
-            @ApiParam(name = "app_name", value = "app_name", defaultValue = "")
-            @PathVariable(value = "app_name") String appName){
-        return dictService.isDictNameExists(appName);
+    public boolean isDictNameExists(
+            @ApiParam(name = "dict_name", value = "dict_name", defaultValue = "")
+            @RequestParam(value = "dict_name") String dictName){
+        return dictService.isDictNameExists(dictName);
     }
 }

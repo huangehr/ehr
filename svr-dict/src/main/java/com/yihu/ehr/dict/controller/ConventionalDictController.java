@@ -25,7 +25,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "Conventional-Dictionaries", description = "获取常用字典项", tags = {"惯用字典"})
+@Api(value = "Conventional-Dictionaries", description = "获取常用字典项", tags = {"惯用字典"})
 public class ConventionalDictController extends BaseRestController {
 
     @Autowired
@@ -280,6 +280,16 @@ public class ConventionalDictController extends BaseRestController {
         @ApiParam(name = "code", value = "字典代码", defaultValue = "")
         @RequestParam(value = "code") String code) {
             SystemDictEntry drugFlag = dictEntryService.getDictEntry(25, code);
+
+        return getDictModel(drugFlag);
+    }
+
+    @RequestMapping(value = "/dictionaries/user_source", method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户来源字典项", response = MConventionalDict.class)
+    public MConventionalDict getUserSource(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        SystemDictEntry drugFlag = dictEntryService.getDictEntry(26, code);
 
         return getDictModel(drugFlag);
     }

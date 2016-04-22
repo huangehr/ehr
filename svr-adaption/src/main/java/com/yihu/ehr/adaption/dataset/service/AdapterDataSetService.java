@@ -5,14 +5,15 @@ import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlan;
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanService;
 import com.yihu.ehr.adaption.dict.service.AdapterDictService;
 import com.yihu.ehr.adaption.feignclient.DictClient;
-import com.yihu.ehr.model.adaption.MAdapterDataSet;
-import com.yihu.ehr.model.adaption.MDataSet;
+import com.yihu.ehr.model.adaption.MAdapterDataVo;
+import com.yihu.ehr.model.adaption.MAdapterRelationship;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.StandardBasicTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -43,7 +44,7 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
     /**
      * 根据方案ID及查询条件查询数据集适配关系
      */
-    public List<MDataSet> searchAdapterDataSet(OrgAdapterPlan plan, String code, String name, String orders, int page, int rows) {
+    public List<MAdapterRelationship> searchAdapterDataSet(OrgAdapterPlan plan, String code, String name, String orders, int page, int rows) {
         long planId = plan.getId();
         String version = plan.getVersion();
         String dsTableName = CDAVersionUtil.getDataSetTableName(version);
@@ -56,11 +57,17 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
         sb.append("  from adapter_dataset ads     ");
         sb.append("        left join " + dsTableName + " ds on ads.std_dataset = ds.id  ");
         sb.append("  where ads.plan_id = " + planId);
-        if (!StringUtils.isEmpty(code))
-            sb.append("     and ds.code like :code");
-        if (!StringUtils.isEmpty(name))
-            sb.append("     and ds.name like :name");
-        sb.append(makeOrder(orders));
+
+        if (!StringUtils.isEmpty(code)){
+            if (!StringUtils.isEmpty(name))
+                sb.append(" and  (ds.code like :code or ds.name like :name) ");
+            else
+                sb.append(" and ds.code like :code ");
+        }
+        else if (!StringUtils.isEmpty(name))
+            sb.append(" and ds.name like :name ");
+
+        sb.append(makeOrder(orders, "ds"));
         SQLQuery sqlQuery = session.createSQLQuery(sb.toString());
         if (!StringUtils.isEmpty(code))
             sqlQuery.setParameter("code", "%" + code + "%");
@@ -69,17 +76,24 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
         page = page == 0 ? 1 : page;
         sqlQuery.setMaxResults(rows);
         sqlQuery.setFirstResult((page - 1) * rows);
-        sqlQuery.setResultTransformer(Transformers.aliasToBean(MDataSet.class));
-        return sqlQuery.list();
+//        return sqlQuery.addEntity(MDataSet.class).list();
+        return sqlQuery
+                .addScalar("id", StandardBasicTypes.LONG )
+                .addScalar("code", StandardBasicTypes.STRING)
+                .addScalar("name", StandardBasicTypes.STRING)
+                .setResultTransformer(Transformers.aliasToBean(MAdapterRelationship.class))
+                .list();
     }
 
-    private String makeOrder(String orders) {
+    private String makeOrder(String orders, String tablePre) {
+        if(StringUtils.isEmpty(orders))
+            return "";
         String sql = "";
         for (String order : orders.split(",")) {
             if (order.startsWith("+"))
-                sql += "," + order.substring(1);
+                sql += "," + tablePre + "." + order.substring(1);
             else if (order.startsWith("-"))
-                sql += "," + order.substring(1) + " desc";
+                sql += "," + tablePre + "." + order.substring(1) + " desc";
         }
         return StringUtils.isEmpty(sql) ?
                 "" :
@@ -104,10 +118,16 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
         sb.append("   from adapter_dataset ads     ");
         sb.append("        left join " + dsTableName + " ds on ads.std_dataset = ds.id  ");
         sb.append("  where ads.plan_id = " + planId);
-        if (!StringUtils.isEmpty(code))
-            sb.append("     and ds.code like :code");
-        if (!StringUtils.isEmpty(name))
-            sb.append("     and ds.name like :name");
+
+        if (!StringUtils.isEmpty(code)){
+            if (!StringUtils.isEmpty(name))
+                sb.append(" and  (ds.code like :code or ds.name like :name) ");
+            else
+                sb.append(" and ds.code like :code ");
+        }
+        else if (!StringUtils.isEmpty(name))
+            sb.append(" and ds.name like :name ");
+
         sb.append(") t");
         SQLQuery sqlQuery = session.createSQLQuery(sb.toString());
         if (!StringUtils.isEmpty(code))
@@ -121,7 +141,7 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
     /**
      * 根据datasetId搜索数据元适配关系
      */
-    public List<MAdapterDataSet> searchAdapterMetaData(OrgAdapterPlan orgAdapterPlan, long dataSetId, String code, String name, String orders, int page, int rows) {
+    public List<MAdapterDataVo> searchAdapterMetaData(OrgAdapterPlan orgAdapterPlan, long dataSetId, String code, String name, String orders, int page, int rows) {
 
         String orgCode = orgAdapterPlan.getOrg();
         String dsTableName = CDAVersionUtil.getDataSetTableName(orgAdapterPlan.getVersion());
@@ -152,21 +172,45 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
         sb.append("        left join org_std_metadata orgMD on (orgMD.sequence = ads.org_metadata and orgMD.organization='" + orgCode + "')  ");
         sb.append("  where ads.plan_id = " + planId);
         sb.append("        and ads.std_dataset = " + dataSetId);
-        if (!StringUtils.isEmpty(code))
-            sb.append("     and md.inner_code like :code");
-        if (!StringUtils.isEmpty(name))
-            sb.append("     and md.name like :name");
-        sb.append(makeOrder(orders));
+        if (!StringUtils.isEmpty(code)){
+            if (!StringUtils.isEmpty(name)){
+                sb.append("     and (md.inner_code like :code ");
+                sb.append("         or md.name like :name)");
+            }else
+                sb.append("     and md.inner_code like :code ");
+        }
+        else if (!StringUtils.isEmpty(name)){
+            sb.append("   and md.name like :name)");
+        }
+
+        sb.append(makeOrder(orders, "md"));
         SQLQuery sqlQuery = session.createSQLQuery(sb.toString());
         if (!StringUtils.isEmpty(code))
             sqlQuery.setParameter("code", "%" + code + "%");
         if (!StringUtils.isEmpty(name))
             sqlQuery.setParameter("name", "%" + name + "%");
         page = page == 0 ? 1 : page;
-        sqlQuery.setMaxResults(rows);
-        sqlQuery.setFirstResult((page - 1) * rows);
-        sqlQuery.setResultTransformer(Transformers.aliasToBean(MAdapterDataSet.class));
-        return sqlQuery.list();
+
+        sqlQuery.setMaxResults(rows)
+                .setFirstResult((page - 1) * rows);
+        return sqlQuery
+                .addScalar("id", StandardBasicTypes.LONG)
+                .addScalar("adapterPlanId", StandardBasicTypes.LONG)
+                .addScalar("dataSetId", StandardBasicTypes.LONG)
+                .addScalar("dataSetCode", StandardBasicTypes.STRING)
+                .addScalar("dataSetName", StandardBasicTypes.STRING)
+                .addScalar("metaDataId", StandardBasicTypes.LONG)
+                .addScalar("metaDataCode", StandardBasicTypes.STRING)
+                .addScalar("metaDataName", StandardBasicTypes.STRING)
+                .addScalar("dataTypeName", StandardBasicTypes.STRING)
+                .addScalar("orgDataSetSeq", StandardBasicTypes.LONG)
+                .addScalar("orgDataSetCode", StandardBasicTypes.STRING)
+                .addScalar("orgDataSetName", StandardBasicTypes.STRING)
+                .addScalar("orgMetaDataSeq", StandardBasicTypes.LONG)
+                .addScalar("orgMetaDataCode", StandardBasicTypes.STRING)
+                .addScalar("orgMetaDataName", StandardBasicTypes.STRING)
+                .setResultTransformer(Transformers.aliasToBean(MAdapterDataVo.class))
+                .list();
     }
 
 
@@ -206,7 +250,7 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
         String cdaVersion = orgAdapterPlan.getVersion();
         Map map = dictClient.getDictMapByIds(cdaVersion, adapterDataSet.getDataSetId(), adapterDataSet.getMetaDataId());
         if (map != null) {
-            Long dictId = Long.parseLong((String) map.get("dictId"));
+            Long dictId = Long.parseLong(String.valueOf(map.get("dictId")));
             adapterDataSet.setStdDict(dictId);
             if (!adapterDictService.isExist(planId, dictId)) {
                 adapterDictService.addAdapterDict(planId, dictId, cdaVersion);
@@ -254,13 +298,13 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
         Long stdDictId, planId;
         //要先删除数据字典映射
         for (Object id : ids) {
-            AdapterDataSet ds = retrieve(Long.parseLong((String) id));
+            AdapterDataSet ds = retrieve((Long) id);
             stdDictId = ds.getStdDict();
             if (stdDictId != null) {
                 planId = ds.getAdapterPlanId();
                 key = planId + "," + stdDictId;
                 if ((value = map.get("key")) == null)
-                    value = new ArrayList<Long>();
+                    value = new ArrayList<>();
                 value.add(ds.getId());
                 map.put(key, value);
             }
@@ -480,5 +524,131 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, XAdapt
             listInfo.add(info);
         }
         return listInfo;
+    }
+
+
+    /**
+     * 根据条件搜索标准字典项适配关系
+     *
+     */
+    public List<MAdapterRelationship> searchStdMeta(
+            OrgAdapterPlan orgAdapterPlan, long dataSetId, String seachName, String mode, String orders, int page, int rows) {
+
+        String metaTable = CDAVersionUtil.getMetaDataTableName(orgAdapterPlan.getVersion());
+        Session session = currentSession();
+        String sql =
+                "SELECT meta.id, meta.code, meta.name " +
+                "FROM" +
+                "   "+ metaTable +" meta " +
+                "LEFT JOIN" +
+                "   (SELECT * FROM adapter_dataset ad where ad.plan_id = :planId) adapterDataSet " +
+                "ON" +
+                "   meta.id = adapterDataSet.std_metadata " +
+                "WHERE" +
+                "   meta.dataset_id = :dataSetId ";
+        if("new".equals(mode))
+            sql += " AND adapterDataSet.id is null ";
+        if(!StringUtils.isEmpty(seachName))
+            sql += " AND (meta.code like :seachName or meta.name like :seachName) ";
+
+        sql += makeOrder(orders, "meta");
+
+        SQLQuery sqlQuery = session.createSQLQuery(sql);
+        if (!StringUtils.isEmpty(seachName))
+            sqlQuery.setParameter("seachName", "%" + seachName + "%");
+        sqlQuery.setParameter("dataSetId", dataSetId);
+        sqlQuery.setParameter("planId", orgAdapterPlan.getId());
+        page = page == 0 ? 1 : page;
+        sqlQuery.setMaxResults(rows);
+        sqlQuery.setFirstResult((page - 1) * rows);
+
+        return sqlQuery
+                .addScalar("id", StandardBasicTypes.LONG)
+                .addScalar("code", StandardBasicTypes.STRING)
+                .addScalar("name", StandardBasicTypes.STRING)
+                .setResultTransformer(Transformers.aliasToBean(MAdapterRelationship.class))
+                .list();
+    }
+
+
+    /**
+     * 根据条件搜索标准字典项总数
+     *
+     */
+    public int countStdMeta(
+            OrgAdapterPlan orgAdapterPlan, long dataSetId, String seachName, String mode) {
+
+        String metaTable = CDAVersionUtil.getMetaDataTableName(orgAdapterPlan.getVersion());
+        Session session = currentSession();
+        String sql =
+                "SELECT count(*) " +
+                "FROM" +
+                "   "+ metaTable +" meta " +
+                "LEFT JOIN" +
+                "   (SELECT * FROM adapter_dataset ad where ad.plan_id = :planId) adapterDataSet " +
+                "ON" +
+                "   meta.id = adapterDataSet.std_metadata " +
+                "WHERE" +
+                "   meta.dataset_id = :dataSetId ";
+        if("new".equals(mode))
+            sql += " AND adapterDataSet.id is null ";
+        if(!StringUtils.isEmpty(seachName))
+            sql += " AND (meta.code like :seachName or meta.name like :seachName) ";
+
+        SQLQuery sqlQuery = session.createSQLQuery(sql);
+        if (!StringUtils.isEmpty(seachName))
+            sqlQuery.setParameter("seachName", "%" + seachName + "%");
+        sqlQuery.setParameter("dataSetId", dataSetId);
+        sqlQuery.setParameter("planId", orgAdapterPlan.getId());
+
+        return ((BigInteger)sqlQuery.list().get(0)).intValue();
+    }
+
+    public boolean isLeftMeta(Long planId, Long dataSetId, Long[] metaIds){
+        String hql =
+                "SELECT " +
+                "   COUNT(*) " +
+                "FROM " +
+                "   AdapterDataSet " +
+                "where " +
+                "   dataSetId = :dataSetId AND adapterPlanId = :planId and id NOT IN(:ids)";
+
+        Session session = currentSession();
+        Query query = session.createQuery(hql);
+        query.setParameter("planId", planId);
+        query.setParameter("dataSetId", dataSetId);
+        query.setParameterList("ids", metaIds);
+        return ((Long) query.list().get(0)) > 0;
+    }
+
+    /**
+     * 批量新增适配数据元，从标准数据元表拷贝
+     * create by lincl 2016-4-14
+     * @param orgAdapterPlan
+     * @param metaIds
+     * @return
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    public int copyAdapterDataSet(OrgAdapterPlan orgAdapterPlan, List metaIds) {
+        Session s = currentSession();
+        String metaTable = CDAVersionUtil.getMetaDataTableName(orgAdapterPlan.getVersion());
+        String sql =
+                " insert into healtharchive.adapter_dataset " +
+                        " (plan_id, std_dataset, std_metadata, std_dict) " +
+                        "SELECT  " +
+                        "   :planId as plan_id, meta.dataset_id as std_dataset, meta.id as std_metadata,  meta.dict_id as std_dict " +
+                        "FROM" +
+                        "   "+metaTable+" meta " +
+                        "LEFT JOIN" +
+                        "   (SELECT * FROM adapter_dataset WHERE plan_id=:planId) adt " +
+                        "ON" +
+                        "   meta.id = adt.std_metadata " +
+                        "WHERE" +
+                        "   adt.id IS NULL AND meta.id in(:metaIds) ";
+        Query q = s.createSQLQuery(sql);
+        q.setParameter("planId", orgAdapterPlan.getId());
+        q.setParameterList("metaIds", metaIds);
+        int rs = q.executeUpdate();
+        return rs;
     }
 }

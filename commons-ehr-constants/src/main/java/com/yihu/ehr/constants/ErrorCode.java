@@ -65,6 +65,7 @@ public enum ErrorCode {
     InvalidAppRegister("ehr.app.register.invalid"),
 
     MissIdentityNo("ehr.patient.miss.identity.no"),
+    RepeatedIdentityNo("ehr.patient.repeat.identity.no"),
     InvalidIdentityNo("ehr.patient.invalid.identity.no"),
     PatientRegisterFailed("ehr.patient.register.failed"),
     InvalidFormatPatientRegister("ehr.patient.invalid.register.info"),

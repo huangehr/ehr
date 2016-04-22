@@ -53,7 +53,7 @@
         <label>出生日期：</label>
 
         <div class="m-form-control">
-            <input type="text" id="inp_patientBirthday" class="required useTitle" placeholder="输入日期"
+            <input type="text" id="inp_patientBirthday" class="validate-date l-text-field validate-date"  placeholder="输入日期 格式(2016-04-15)"
                    required-title=<spring:message code="lbl.must.input"/> data-attr-scan="birthday"/>
         </div>
     </div>
@@ -90,7 +90,7 @@
         <label>联系方式：</label>
 
         <div class="l-text-wrapper m-form-control">
-            <input type="text" id="inp_patientTel" class="required useTitle" data-attr-scan="tel"/>
+            <input type="text" id="inp_patientTel" class="required useTitle" data-attr-scan="telephoneNo"/>
         </div>
     </div>
     <div class="m-form-group">
@@ -130,7 +130,7 @@
                         <label>类型：</label>
 
                         <div class="l-text-wrapper m-form-control">
-                            <input type="text" id="inp_cardType" class="required useTitle" data-attr-scan="type"/>
+                            <input type="text" id="inp_cardType" class="required useTitle" data-attr-scan="cardType"/>
                         </div>
                     </div>
                     <div class="m-form-group">
@@ -159,7 +159,7 @@
                         <label>发行机构：</label>
 
                         <div class="l-text-wrapper m-form-control">
-                            <input type="text" id="inp_issueOrg" class="required useTitle" data-attr-scan="releaseOrg"/>
+                            <input type="text" id="inp_issueOrg" class="required useTitle" data-attr-scan="releaseOrgName"/>
                         </div>
                     </div>
                     <div class="m-form-group">
@@ -174,7 +174,7 @@
 
                         <div class="l-text-wrapper m-form-control">
                             <input type="text" id="inp_cardStatus" class="required useTitle"
-                                   data-attr-scan="statusValue"/>
+                                   data-attr-scan="statusName"/>
                         </div>
                     </div>
                     <div class="m-form-group">

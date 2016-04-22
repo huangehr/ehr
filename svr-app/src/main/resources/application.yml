@@ -1,10 +1,8 @@
 server:
-   port: 10080
+  port: ${svr-app.server.port}
 
-
-security:
-  user:
-    password: app
+management:
+  port: ${server.port}
 
 info:
   app:
@@ -15,33 +13,11 @@ info:
 ---
 spring:
   profiles: dev
-eureka:
-  instance:
-    ip-address: localhost
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@localhost:8761}/eureka/
 
 ---
 spring:
   profiles: test
-eureka:
-  instance:
-    ip-address: 172.19.103.73
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@172.19.103.73:8761}/eureka/
 
 ---
 spring:
   profiles: prod
-
-eureka:
-  instance:
-    ip-address: 172.19.103.73
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@172.19.103.73:8761}/eureka/

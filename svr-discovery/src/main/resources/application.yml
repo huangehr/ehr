@@ -1,34 +1,32 @@
-spring:
-  profiles:
-    active: dev
-
 server:
   port: 8761
+
+spring:
+  cloud:
+    config:
+      enabled: false
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    serviceUrl:
+      defaultZone: http://127.0.0.1:${server.port}/eureka/
 
 info:
   app:
     name: DiscoveryService
     description: EHR platform global discovery service
     version: 1.0.0
-security:
-  user:
-    password: eureka
 
-eureka:
-  instance:
-      hostname: localhost
-  client:
-    #don't register this app as a service in eureka
-    register-with-eureka: false
-    fetch-registry: false
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
-    server:
-      wait-time-in-ms-when-sync-empty: 0
-      enable-self-preservation: false
+---
+spring:
+  profiles: dev
 
-    instance:
-      hostname: localhost
-  server:
-      enable-self-preservation: false
-      waitTimeInMsWhenSyncEmpty: 500000
+---
+spring:
+  profiles: test
+
+---
+spring:
+  profiles: prod

@@ -1,11 +1,9 @@
 package com.yihu.ehr.model.app;
-import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.user.MUser;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * APP Model。
@@ -27,6 +25,7 @@ public class MApp implements Serializable {
     private String catalog;
     private String status;
     private String description;
+    private String tags;
 
 	public MApp(){
     }
@@ -117,5 +116,22 @@ public class MApp implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<String> getTags() {
+        List<String> list = new ArrayList<>();
+        if(org.springframework.util.StringUtils.isEmpty(tags)){
+        }else {
+            String[] arr = tags.split(";|；");
+            list = Arrays.asList(arr);
+        }
+        return list;
+    }
+    public void setTags(List<String> tags) {
+        if(tags.size()>0){
+            this.tags = StringUtils.join(tags.toArray(),";");
+        }else {
+            this.tags = "";
+        }
     }
 }

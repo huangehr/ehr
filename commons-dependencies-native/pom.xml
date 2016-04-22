@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>commons-dependencies</artifactId>
+        <groupId>com.yihu.ehr</groupId>
+        <version>1.1.0</version>
+        <relativePath>../commons-dependencies/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>commons-dependencies-native</artifactId>
+    <name>commons-dependencies-native</name>
+    <packaging>pom</packaging>
+    <description>Spring Boot原始应用部署模板</description>
+
+    <modules>
+        <module>../svr-adaption</module>
+        <module>../svr-app</module>
+        <module>../svr-configuration</module>
+        <module>../svr-dict</module>
+        <module>../svr-discovery</module>
+        <module>../svr-geography</module>
+        <module>../svr-health-profile</module>
+        <module>../svr-organization</module>
+        <module>../svr-pack-mgr</module>
+        <module>../svr-pack-resolve</module>
+        <module>../svr-patient</module>
+        <module>../svr-security</module>
+        <module>../svr-special-dict</module>
+        <module>../svr-standard</module>
+        <module>../svr-user</module>
+        <module>../svr-esb</module>
+        <module>../ag-admin</module>
+        <module>../ag-ehr-platform</module>
+        <module>../app-admin</module>
+        <module>../app-ehr-browser</module>
+    </modules>
+
+    <build>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>2.8</version>
+            </extension>
+        </extensions>
+        <plugins>
+            <!--spring 插件-->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <executable>true</executable>
+                </configuration>
+            </plugin>
+            <!--wagon 插件-->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>wagon-maven-plugin</artifactId>
+                <version>1.0</version>
+                <configuration>
+                    <fromFile>${project.build.directory}/${project.build.finalName}.jar</fromFile>
+                    <url>scp://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</url>
+                </configuration>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <!--site 插件-->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>3.3</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.maven.doxia</groupId>
+                            <artifactId>doxia-module-markdown</artifactId>
+                            <version>1.5</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <distributionManagement>
+                <repository>
+                    <id>192.168.1.220</id>
+                    <url>ssh://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>test</id>
+            <distributionManagement>
+                <repository>
+                    <id>test</id>
+                    <url>ssh://root:ceshi@192.168.1.220/home/root/ehr-release</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <activation>
+                <property>
+                    <name>spring.profiles.active</name>
+                    <value>default,prod</value>
+                </property>
+            </activation>
+            <distributionManagement>
+                <repository>
+                    <id>prod</id>
+                    <url>ssh://root:111111@11.1.2.21/home/root/ehr-release</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>prod-src</id>
+            <distributionManagement>
+                <repository>
+                    <id>prod</id>
+                    <url>ssh://root:111111@11.1.2.15/home/root/git</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+    </profiles>
+
+</project>

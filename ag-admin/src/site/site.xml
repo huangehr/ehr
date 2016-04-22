@@ -37,6 +37,9 @@
         <menu name="解决方案">
             <item name="概览" href="solutions/index.html"/>
         </menu>
+        <menu name="调研报告">
+            <item name="武夷山市立医院调研报" href="r&amp;d/WuyiMountainHospital.html"/>
+        </menu>
         <menu name="团队">
             <item name="概览"/>
         </menu>

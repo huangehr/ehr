@@ -1,6 +1,10 @@
 package com.yihu.ehr.agModel.app;
 
-import java.util.Date;
+import org.apache.commons.lang.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by yww on 2016/2/23.
@@ -12,8 +16,8 @@ public class AppDetailModel {
     private String url;
     private String creator;
     private String auditor;
-    private Date createTime;
-    private Date auditTime;
+    private String createTime;
+    private String auditTime;
     private String catalog;
     private String catalogName;
     private String status;
@@ -69,19 +73,19 @@ public class AppDetailModel {
         this.auditor = auditor;
     }
 
-    public Date getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 
-    public Date getAuditTime() {
+    public String getAuditTime() {
         return auditTime;
     }
 
-    public void setAuditTime(Date auditTime) {
+    public void setAuditTime(String auditTime) {
         this.auditTime = auditTime;
     }
 
@@ -125,11 +129,20 @@ public class AppDetailModel {
         this.description = description;
     }
 
-    public String getTags() {
-        return tags;
+    public List<String> getTags() {
+        List<String> list = new ArrayList<>();
+        if(org.springframework.util.StringUtils.isEmpty(tags)){
+        }else {
+            String[] arr = tags.split(";|；");
+            list = Arrays.asList(arr);
+        }
+        return list;
     }
-
-    public void setTags(String tags) {
-        this.tags = tags;
+    public void setTags(List<String> tags) {
+        if(tags.size()>0){
+            this.tags = StringUtils.join(tags.toArray(),";");
+        }else {
+            this.tags = "";
+        }
     }
 }

@@ -3,18 +3,14 @@
 //import com.eureka2.shading.codehaus.jackson.map.ObjectMapper;
 //import com.yihu.ehr.StandardServiceApp;
 //import com.yihu.ehr.model.standard.MCDADocument;
-//import com.yihu.ehr.standard.cda.controller.CdaController;
-//import com.yihu.ehr.standard.cda.service.CDADocument;
+//import com.yihu.ehr.standard.document.controller.DocumentEndPoint;
 //import org.junit.FixMethodOrder;
 //import org.junit.Test;
 //import org.junit.runner.RunWith;
 //import org.junit.runners.MethodSorters;
 //import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.builder.SpringApplicationBuilder;
 //import org.springframework.boot.test.SpringApplicationConfiguration;
-//import org.springframework.context.ApplicationContext;
 //import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-//import org.springframework.transaction.annotation.Transactional;
 //
 //import static org.springframework.test.util.AssertionErrors.assertTrue;
 //
@@ -22,13 +18,13 @@
 //@RunWith(SpringJUnit4ClassRunner.class)
 //@SpringApplicationConfiguration(classes = StandardServiceApp.class)
 //@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-//@Transactional
+////@Transactional
 //public class CdaControllerTests {
 //
 ////	ApplicationContext applicationContext;
 //
 //	@Autowired
-//	private CdaController cdaController;
+//	private DocumentEndPoint cdaController;
 //
 //
 //    @Test

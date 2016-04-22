@@ -1,18 +1,17 @@
 package com.yihu.ehr.agModel.user;
 
-import java.util.Date;
-
 /**
  * Created by AndyCai on 2016/2/22.
  */
 public class UserDetailModel {
     private String id;
-    private Date createDate;
-    private Date lastLoginTime;
+    private String createDate;
+    private String lastLoginTime;
     private String email;
     private String loginCode;
     private String realName;
-    private String password="123456";
+    private String password;
+    private String newPassWord;
     private Boolean activated;
     private String validateCode;
     private String userType;
@@ -24,6 +23,8 @@ public class UserDetailModel {
     private String idCardNo;
     private String organization;
     private String organizationName;
+    private String province;
+    private String city;
 
     // 未绑定属性
     private String orgPost;
@@ -44,6 +45,10 @@ public class UserDetailModel {
     private String validTime;
     private String startTime;
 
+    private String source;
+    private String sourceName;
+
+
     public String getId() {
         return id;
     }
@@ -52,19 +57,19 @@ public class UserDetailModel {
         this.id = id;
     }
 
-    public Date getCreateDate() {
+    public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(String createDate) {
         this.createDate = createDate;
     }
 
-    public Date getLastLoginTime() {
+    public String getLastLoginTime() {
         return lastLoginTime;
     }
 
-    public void setLastLoginTime(Date lastLoginTime) {
+    public void setLastLoginTime(String lastLoginTime) {
         this.lastLoginTime = lastLoginTime;
     }
 
@@ -282,5 +287,45 @@ public class UserDetailModel {
 
     public void setStartTime(String startTime) {
         this.startTime = startTime;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getNewPassWord() {
+        return newPassWord;
+    }
+
+    public void setNewPassWord(String newPassWord) {
+        this.newPassWord = newPassWord;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public String getSourceName() {
+        return sourceName;
+    }
+
+    public void setSourceName(String sourceName) {
+        this.sourceName = sourceName;
     }
 }

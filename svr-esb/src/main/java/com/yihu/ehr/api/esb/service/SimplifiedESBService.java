@@ -25,6 +25,8 @@ public class SimplifiedESBService {
     private IHosLogDao hosLogDao;
     @Autowired
     private IHosSqlTaskDao hosSqlTaskDao;
+    @Autowired
+    private IHosLogStatusDao hosLogStatusDao;
 
 
     public HosEsbMiniRelease getUpdateFlag(String versionCode, String systemCode, String orgCode) throws Exception {
@@ -81,10 +83,11 @@ public class SimplifiedESBService {
     }
 
     @Transactional
-    public void changeHisPenetrationStatus(String id, String status, String result) {
+    public void changeHisPenetrationStatus(String id, String status, String result, String message) {
         HosSqlTask hqt = hosSqlTaskDao.getOne(id);
         hqt.setStatus(status);
         hqt.setResult(result);
+        hqt.setMessage(message);
     }
 
     @Transactional
@@ -93,14 +96,24 @@ public class SimplifiedESBService {
     }
 
     @Transactional
-    public String uploadResult(String systemCode, String orgCode, String versionCode, String versionName, String updateDate) throws Exception {
+    public String uploadResult(String systemCode, String orgCode, String versionCode, String versionName, String updateDate, String message) throws Exception {
         HosEsbMiniInstallLog hosEsbMiniInstallLog = new HosEsbMiniInstallLog();
         hosEsbMiniInstallLog.setOrgCode(orgCode);
         hosEsbMiniInstallLog.setSystemCode(systemCode);
         hosEsbMiniInstallLog.setCurrentVersionCode(versionCode);
         hosEsbMiniInstallLog.setCurrentVersionName(versionName);
+        hosEsbMiniInstallLog.setMessage(message);
         hosEsbMiniInstallLog.setInstallTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(updateDate));
         hosEsbMiniInstallLogDao.save(hosEsbMiniInstallLog);
         return "";
+    }
+
+    public boolean getUploadFlagByOrgCodeAndSystemCode(String orgCode, String systemCode) {
+        List<HosLogStatus> hlss = hosLogStatusDao.findBySystemCodeAndOrgCodeAndStatus(orgCode, systemCode);
+        if (hlss != null && hlss.size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

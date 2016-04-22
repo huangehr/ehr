@@ -67,7 +67,7 @@
             //g.text = g.inputText.wrap('<div class="l-text l-text-date "></div>').parent();
             g.text = g.inputText.wrap('<div class="l-text l-text-date j-text-wrapper"></div>').parent();
             // TODO [代码片段004][增加‘j-text-wrapper’类用于表单验证失败时样式控制][yezeh] 结束
-            g.text.append('<div class="l-text-l"></div><div class="l-text-r"></div>');
+            g.text.append('<div class="l-text-l"></div><div class="l-text-r"></div><i class="isdata" >格式错误!</i>');
             g.text.append(g.link);
             //添加个包裹，
             g.textwrapper = g.text.wrap('<div class="l-text-wrapper"></div>').parent();
@@ -90,8 +90,7 @@
             dateeditorHTML += "            </tbody>";
             dateeditorHTML += "        </table>";
             dateeditorHTML += "        <ul class='l-box-dateeditor-monthselector'><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ul>";
-            dateeditorHTML += "        <ul class='l-box-dateeditor-yearselector'><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ul>";
-            dateeditorHTML += "        <ul class='l-box-dateeditor-hourselector'><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ul>";
+            dateeditorHTML += "        <select class='l-box-dateeditor-yearselector' size=10 style='overflow-y: auto;'></select>";
             dateeditorHTML += "        <ul class='l-box-dateeditor-minuteselector'><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ul>";
             dateeditorHTML += "    </div>";
             dateeditorHTML += "    <div class='l-box-dateeditor-toolbar'>";
@@ -299,18 +298,32 @@
             g.buttons.btnYear.click(function ()
             {
                 //build year list
+                /*if (!g.body.yearselector.is(":visible"))
+                 {
+                 $("li", g.body.yearselector).each(function (i, item)
+                 {
+                 var currentYear = g.currentDate.year + (i - 4);
+                 if (currentYear == g.currentDate.year)
+                 $(this).addClass("l-selected");
+                 else
+                 $(this).removeClass("l-selected");
+                 $(this).html(currentYear);
+                 });
+                 }*/
+                /* ******************TODO 时间空间年选则改成下拉列表开始****************************** */
                 if (!g.body.yearselector.is(":visible"))
                 {
-                    $("li", g.body.yearselector).each(function (i, item)
-                    {
-                        var currentYear = g.currentDate.year + (i - 4);
-                        if (currentYear == g.currentDate.year)
-                            $(this).addClass("l-selected");
-                        else
-                            $(this).removeClass("l-selected");
-                        $(this).html(currentYear);
-                    });
+                    var opthtml='';
+                    for(i=g.currentDate.year-50;i<=g.currentDate.year+50;i++){
+                        opthtml+="<option value="+i+">"+i+"</option>";
+                    }
+                    $(g.body.yearselector).html(opthtml);
+                    setTimeout(function(){
+                        $(g.body.yearselector).find("option[value="+g.currentDate.year+"]").attr('selected',true)
+                    },500);
+
                 }
+                /* ******************TODO 时间空间年选则改成下拉列表结束****************************** */
 
                 g.body.yearselector.slideToggle();
             });
@@ -318,12 +331,20 @@
             {
                 $(this).slideUp();
             });
-            $("li", g.body.yearselector).click(function ()
+            /* $("li", g.body.yearselector).click(function ()
+             {
+             g.currentDate.year = parseInt($(this).html());
+             g.body.yearselector.slideToggle();
+             g.bulidContent();
+             });*/
+            /* ******************TODO 时间空间年选则改成下拉列表开始****************************** */
+            $(g.body.yearselector).change(function ()
             {
-                g.currentDate.year = parseInt($(this).html());
+                g.currentDate.year = parseInt($(this).find("option:selected").html());
                 g.body.yearselector.slideToggle();
                 g.bulidContent();
             });
+            /* ******************TODO 时间空间年选则改成下拉列表结束****************************** */
             //select month
             g.buttons.btnMonth.click(function ()
             {
@@ -773,14 +794,15 @@
         //恢复
         _rever: function ()
         {
-            var g = this, p = this.options;
-            if (!g.usedDate)
-            {
-                g.inputText.val("");
-            } else
-            {
-                g.inputText.val(g.getFormatDate(g.usedDate));
-            }
+            //TODO 2016/04/14  日期不恢复
+            //var g = this, p = this.options;
+            //if (!g.usedDate)
+            //{
+            //    g.inputText.val("");
+            //} else
+            //{
+            //    g.inputText.val(g.getFormatDate(g.usedDate));
+            //}
         },
         _getMatch: function (format)
         {
@@ -811,6 +833,7 @@
                     str = str.substring(mathLength);
                 } else
                 {
+
                     return null;
                 }
             }
@@ -820,7 +843,10 @@
         {
             var g = this, p = this.options;
             var r = this._getMatch();
-            if (!r) return null;
+            if (!r){
+
+                return null
+            };
             var t = dateStr.match(r.reg);
             if (!t) return null;
             var tt = {
@@ -858,6 +884,8 @@
             var newDate = g._bulidDate(val);
             if (!newDate)
             {
+                //日期格式如果输入错误提示cyc
+
                 g._rever();
                 return;
             }
@@ -882,6 +910,8 @@
                 minute: g.usedDate.getMinutes()
             };
             var formatVal = g.getFormatDate(newDate);
+            // 手动输入日期格式正确则隐藏提示窗cyc
+
             g.inputText.val(formatVal);
             g.trigger('changeDate', [formatVal]);
             if ($(g.dateeditor).is(":visible"))

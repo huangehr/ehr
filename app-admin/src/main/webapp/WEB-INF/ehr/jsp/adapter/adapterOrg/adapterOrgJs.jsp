@@ -45,7 +45,6 @@
         initDDL: function (dictId, target) {
           var target = $(target);
           var dataModel = $.DataModel.init();
-
           dataModel.fetchRemote("${contextRoot}/dict/searchDictEntryList",{data:{dictId: dictId,page: 1, rows: 10},
             success: function(data) {
               target.ligerComboBox({
@@ -109,12 +108,17 @@
               { display: '标准代码', name: 'code',hide:true,  isAllowHide: false },
               { display: '标准类别', name: 'typeValue', width: '15%' ,align:'left'},
               { display: '标准名称',name: 'name', width: '25%', align:'left', isAllowHide: false },
-              { display: '采集机构', name: 'orgValue', width: '20%',resizable: true ,align:'left'},
+              { display: '采集机构', name: 'orgValue', width: '23%',resizable: true ,align:'left'},
               { display: '继承标准', name: 'parentValue', width: '25%',minColumnWidth: 20 ,align:'left'},
-              { display: '操作', name: 'operator', width: '15%', render: function (row) {
-                var html = '<a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","adapter:adapterInfo:manager", row.code,'manager')+'">维护 /</a>' +
-                           '<a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","adapter:adapterInfo:open", row.code,'modify')+'">修改 /</a>' +
-                           '<a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","adapter:adapterInfo:del", row.code,'del')+'">删除</a>';
+              { display: '操作', name: 'operator', width: '12%', render: function (row) {
+//				  var html ='<div class="grid_edit"  style=""  title="维护" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:manager", row.code,'manager') + '"></div>'
+//						  +'<div class="grid_edit"  style="" title="修改"' +
+//						  ' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:open", row.code,'modify') + '"></div>'
+//						  +'<div class="grid_delete"  style="" title="删除"' +
+//						  ' onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}'])", "adapter:adapterInfo:del", row.code,'del') + '"></div>';
+                var html = '<a class="label_a" href="#" title="维护" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","adapter:adapterInfo:manager", row.code,'manager')+'">维护</a>' +
+                           '<a class="grid_edit" href="#" title="编辑" style="margin-left:10px;" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","adapter:adapterInfo:open", row.code,'modify')+'"></a>' +
+                           '<a class="grid_delete" href="#" title="删除" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","adapter:adapterInfo:del", row.code,'del')+'"></a>';
                 return html;
               }}
             ],
@@ -191,8 +195,11 @@
                 dataModel.updateRemote('${contextRoot}/adapterorg/delAdapterOrg',{
                   data:{code:code},
                   success:function(data){
-                    $.Notice.success( '操作成功！');
-                    master.reloadGrid();
+                    if(data.successFlg){
+                      $.Notice.success( '删除成功！');
+                      master.reloadGrid();
+                    } else
+                      $.Notice.error( '删除失败！');
                   }
                 });
               }

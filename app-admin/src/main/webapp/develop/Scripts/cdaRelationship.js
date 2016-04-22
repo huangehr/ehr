@@ -86,7 +86,6 @@
             base.p.get(jq_search.val().trim(), base.loadData);
         },
         loadData: function (data) {
-            debugger;
             var selectedData = [], newData = [];
             var uniqueField = base.p.uniqueField,
                 storage = base.p.storage;
@@ -102,11 +101,12 @@
             base.grid.reload({ Rows: newData });
         },
         isChecked: function (rowdata) {
-
             var uniqueField = base.p.uniqueField,
                 storage = base.p.storage;
             for (var i = 0; i < storage.length; i++) {
                 if (storage[i][uniqueField] == rowdata[uniqueField]) {
+                    storage[i].name = rowdata.name;
+                    storage[i].code = rowdata.code;
                     base.addItem(storage[i]);
                     return true;
                 }
@@ -114,7 +114,6 @@
             return false;
         },
         onChecked: function (checked, data, rowid, rowdata) {
-
             $("#pane-list-selected").addClass("changed");//取消是否提示
             // 非多选内容
             if (!base.p.multiple) {
@@ -139,6 +138,7 @@
             var strSetId = "";
             for(var i=0;i<base.p.storage.length;i++)
             {
+                //添加
                 strSetId+=base.p.storage[i].id+",";
             }
             strSetId=strSetId.substring(0,strSetId.length-1);
@@ -172,7 +172,6 @@
             }
         },
         addItem: function (data) {
-            debugger;
             var jq_ul = $("#pane-list-selected");
             // var itemclass = data[base.p.uniqueField].replace("(", "_").replace(")", "_");
             var itemclass = data[base.p.uniqueField].toString().replace("(", "_").replace(")", "_");
@@ -292,11 +291,12 @@
             ],
             get: function (key, callback) {
                 var url = webRoot + "/std/dataset/searchDataSets";
+                console.log(url);
                 $.ajax({
                     url: url,
                     type:"post",
                     dataType:"json",
-                    data:{codename:key,version:versionCode,page:1,rows:0},
+                    data:{codename:key,version:versionCode,page:1,rows:999},
                     success:function(data) {
                         if (data != null) {
                             var result = eval(data);

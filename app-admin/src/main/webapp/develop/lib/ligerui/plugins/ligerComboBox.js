@@ -8,7 +8,6 @@
 */
 (function ($)
 {
-
     $.fn.ligerComboBox = function (options)
     {
         return $.ligerui.run.call(this, "ligerComboBox", arguments);
@@ -110,6 +109,10 @@
     {
         $.ligerui.controls.ComboBox.base.constructor.call(this, element, options);
     };
+
+    //[代码片段：start] add by linc 2016.3.29
+    var gridManager;
+    //[代码片段：end] add by linc 2016.3.29
     $.ligerui.controls.ComboBox.ligerExtend($.ligerui.controls.Input, {
         __getType: function ()
         {
@@ -327,7 +330,10 @@
             }).focus(function ()
             {
                 if (p.disabled || p.readonly) return;
-                g.wrapper.addClass("l-text-focus");
+                //TODO 加了个IF  被动点击是不会有鼠标经过时间 加的样式l-text-over的
+                if(g.wrapper.hasClass("l-text-over")){
+                    g.wrapper.addClass("l-text-focus");
+                }
             });
             g.wrapper.hover(function ()
             {
@@ -1317,6 +1323,9 @@
                 });
             }
             g.grid.refreshSize();
+            //[代码片段：start] add by linc 2016.3.29
+            gridManager = g.grid;
+            //[代码片段：end] add by linc 2016.3.29
         },
         getGridHeight: function (height)
         {
@@ -1850,6 +1859,12 @@
     //设置文本框和隐藏控件的值
     $.ligerui.controls.ComboBox.prototype.setInputValue = $.ligerui.controls.ComboBox.prototype._changeValue;
 
+    //[代码片段：start] add by linc 2016.3.29
+    $.ligerui.controls.ComboBox.prototype.getGrid = function () {
+
+        return gridManager;
+    };
+    //[代码片段：end] add by linc 2016.3.29
 
     //Key Init
     (function ()

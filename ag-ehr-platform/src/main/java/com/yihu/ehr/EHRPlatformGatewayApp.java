@@ -1,56 +1,57 @@
 package com.yihu.ehr;
 
-import com.yihu.ehr.config.TomcatConnCustomizer;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.embedded.ConfigurableEmbeddedServletContainer;
-import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
-import org.springframework.boot.context.embedded.tomcat.TomcatConnectorCustomizer;
-import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Bean;
-import org.springframework.util.ResourceUtils;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 
-import java.io.FileNotFoundException;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
 
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableFeignClients
+@EnableEurekaClient
+@EnableZuulProxy
 public class EHRPlatformGatewayApp  {
-    @Value("${server.port}")
-    int port;
+    public static void printParameter(NetworkInterface ni) throws SocketException {
+        System.out.println(" Name = " + ni.getName());
+        System.out.println(" Display Name = " + ni.getDisplayName());
+        System.out.println(" Is up = " + ni.isUp());
+        System.out.println(" Support multicast = " + ni.supportsMulticast());
+        System.out.println(" Is loopback = " + ni.isLoopback());
+        System.out.println(" Is virtual = " + ni.isVirtual());
+        System.out.println(" Is point to point = " + ni.isPointToPoint());
+        System.out.println(" Hardware address = " + ni.getHardwareAddress());
+        System.out.println(" MTU = " + ni.getMTU());
 
-    @Value("${keystore.file}")
-    String keystore;
+        System.out.println("\nList of Interface Addresses:");
+        List<InterfaceAddress> list = ni.getInterfaceAddresses();
+        Iterator<InterfaceAddress> it = list.iterator();
 
-    @Value("keystore.password")
-    String password;
-
-	public static void main(String[] args) {
-		SpringApplication.run(EHRPlatformGatewayApp.class, args);
-	}
-
-    @Bean
-    public EmbeddedServletContainerCustomizer containerCustomizer() throws FileNotFoundException {
-        final String absoluteKeystoreFile = ResourceUtils.getFile(keystore).getAbsolutePath();
-
-        final TomcatConnectorCustomizer customizer = new TomcatConnCustomizer(absoluteKeystoreFile, password, port);
-
-        return new EmbeddedServletContainerCustomizer() {
-            @Override
-            public void customize(ConfigurableEmbeddedServletContainer container) {
-                if(container instanceof TomcatEmbeddedServletContainerFactory) {
-                    TomcatEmbeddedServletContainerFactory containerFactory = (TomcatEmbeddedServletContainerFactory) container;
-                    containerFactory.addConnectorCustomizers(customizer);
-                }
-            };
-        };
+        while (it.hasNext()) {
+            InterfaceAddress ia = it.next();
+            System.out.println(" Address = " + ia.getAddress());
+            System.out.println(" Broadcast = " + ia.getBroadcast());
+            System.out.println(" Network prefix length = " + ia.getNetworkPrefixLength());
+            System.out.println("");
+        }
     }
 
+    public static void main(String[] args) throws SocketException {
+        /*Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();
+        while (en.hasMoreElements()) {
+            NetworkInterface ni = en.nextElement();
+            printParameter(ni);
+
+        }*/
+
+		SpringApplication.run(EHRPlatformGatewayApp.class, args);
+	}
 }

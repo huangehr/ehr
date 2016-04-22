@@ -29,7 +29,7 @@ public class DispatchLog {
     private String password;
 
     public void createId(){
-        Object objectID = new ObjectId(adminRegion, BizObject.StdArchive);
+        Object objectID = new ObjectId(adminRegion, BizObject.StdProfile);
         setId(objectID.toString());
     }
     @Id

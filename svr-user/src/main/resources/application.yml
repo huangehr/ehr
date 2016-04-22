@@ -1,6 +1,8 @@
 server:
-  port: 10120
+  port: ${svr-user.server.port}
 
+management:
+  port: ${server.port}
 
 info:
   app:
@@ -8,49 +10,30 @@ info:
     description: EHR platform user service.
     version: 1.0.0
 
+fast-dfs:
+  pool:
+    init-size: 5
+    max-size: 20
+    wait-time: 500
+  connect-timeout: 2
+  network-timeout: 30
+  charset: ISO8859-1
+  http:
+    tracker-http-port: 80
+    anti-steal-token: no
+    secret-key: FastDFS1234567890
+
 ---
 spring:
   profiles: dev
-eureka:
-  instance:
-    ip-address: localhost
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@localhost:8761}/eureka/
 
----
-spring:
-  profiles: sand-home-dev
-
-eureka:
-  instance:
-    ip-address: localhost
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
+fast-dfs:
+  tracker-server: 172.19.103.54:22122
 
 ---
 spring:
   profiles: test
-eureka:
-  instance:
-    ip-address: 172.19.103.73
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@172.19.103.73:8761}/eureka/
-
 
 ---
 spring:
   profiles: prod
-
-eureka:
-  instance:
-    ip-address: 172.19.103.73
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@172.19.103.73:8761}/eureka/

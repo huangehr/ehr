@@ -3,14 +3,15 @@ package com.yihu.ehr.adaption.dict.service;
 
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlan;
 import com.yihu.ehr.adaption.adapterplan.service.OrgAdapterPlanService;
-import com.yihu.ehr.model.adaption.MAdapterDict;
-import com.yihu.ehr.model.adaption.MDataSet;
+import com.yihu.ehr.model.adaption.MAdapterDictVo;
+import com.yihu.ehr.model.adaption.MAdapterRelationship;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.StandardBasicTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -37,7 +38,7 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
      *
      */
     @Transactional(propagation = Propagation.NEVER)
-    public List<MDataSet> searchAdapterDict(OrgAdapterPlan orgAdapterPlan, String code, String name, String orders, int page, int rows) {
+    public List<MAdapterRelationship> searchAdapterDict(OrgAdapterPlan orgAdapterPlan, String code, String name, String orders, int page, int rows) {
         long planId = orgAdapterPlan.getId();
         String dictTableName = CDAVersionUtil.getDictTableName(orgAdapterPlan.getVersion());
         Session session = currentSession();
@@ -48,12 +49,18 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
         sb.append("       ,ds.name  ");
         sb.append("   from adapter_dict ad          ");
         sb.append("        left join " + dictTableName + " ds on ad.std_dict = ds.id  ");
-        sb.append("  where ad.plan_id = " + planId);
-        if (!StringUtils.isEmpty(code))
-            sb.append("     and ds.code like :code");
-        if (!StringUtils.isEmpty(name))
-            sb.append("     and ds.name like :name");
-        sb.append(makeOrder(orders));
+        sb.append("  where ad.plan_id = " + planId + " and ds.id is not null ");
+
+        if (!StringUtils.isEmpty(code)){
+            if (!StringUtils.isEmpty(name))
+                sb.append(" and (ds.code like :code or ds.name like :name) ");
+            else
+                sb.append(" and ds.code like :code ");
+        }
+        else if (!StringUtils.isEmpty(name))
+            sb.append(" and ds.name like :name ");
+
+        sb.append(makeOrder(orders, "ds"));
         SQLQuery sqlQuery = session.createSQLQuery(sb.toString());
         if (!StringUtils.isEmpty(code))
             sqlQuery.setParameter("code", "%" + code + "%");
@@ -62,17 +69,23 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
         page = page == 0 ? 1 : page;
         sqlQuery.setMaxResults(rows);
         sqlQuery.setFirstResult((page - 1) * rows);
-        sqlQuery.setResultTransformer(Transformers.aliasToBean(MDataSet.class));
-        return sqlQuery.list();
+        return sqlQuery
+                .addScalar("id", StandardBasicTypes.LONG )
+                .addScalar("code", StandardBasicTypes.STRING)
+                .addScalar("name", StandardBasicTypes.STRING)
+                .setResultTransformer(Transformers.aliasToBean(MAdapterRelationship.class))
+                .list();
     }
 
-    private String makeOrder(String orders) {
+    private String makeOrder(String orders, String vo) {
+        if(StringUtils.isEmpty(orders))
+            return "";
         String sql = "";
         for (String order : orders.split(",")) {
             if (order.startsWith("+"))
-                sql += "," + order.substring(1);
+                sql += "," + vo + "." + order.substring(1);
             else if (order.startsWith("-"))
-                sql += "," + order.substring(1) + " desc";
+                sql += "," + vo + "." + order.substring(1) + " desc";
         }
         return StringUtils.isEmpty(sql) ?
                 "" :
@@ -90,16 +103,21 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
 
         StringBuilder sb = new StringBuilder();
         sb.append(" select count(*) from (");
-        sb.append(" select distinct  " + dictTableName + ".id    ");
-        sb.append("       ," + dictTableName + ".code  ");
-        sb.append("       ," + dictTableName + ".name  ");
+        sb.append(" select distinct  ds.id    ");
+        sb.append("       ,ds.code  ");
+        sb.append("       ,ds.name  ");
         sb.append("   from adapter_dict ad          ");
-        sb.append("        left join " + dictTableName + " on ad.std_dict = " + dictTableName + ".id  ");
+        sb.append("        left join " + dictTableName + " ds on ad.std_dict = ds.id  ");
         sb.append("  where ad.plan_id = " + planId);
-        if (!StringUtils.isEmpty(code))
-            sb.append("     and ds.code like :code");
-        if (!StringUtils.isEmpty(name))
-            sb.append("     and ds.name like :name");
+
+        if (!StringUtils.isEmpty(code)){
+            if (!StringUtils.isEmpty(name))
+                sb.append(" and (ds.code like :code or ds.name like :name) ");
+            else
+                sb.append(" and ds.code like :code ");
+        }
+        else if (!StringUtils.isEmpty(name))
+            sb.append(" and ds.name like :name ");
         sb.append(" ) t");
 
         SQLQuery sqlQuery = session.createSQLQuery(sb.toString());
@@ -115,7 +133,7 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
      * 根据条件搜索字典项适配关系
      *
      */
-    public List<MAdapterDict> searchAdapterDictEntry(OrgAdapterPlan orgAdapterPlan, long dictId, String code, String name, String orders, int page, int rows) {
+    public List<MAdapterDictVo> searchAdapterDictEntry(OrgAdapterPlan orgAdapterPlan, long dictId, String code, String name, String orders, int page, int rows) {
         String orgCode = orgAdapterPlan.getOrg();
         String dictTableName = CDAVersionUtil.getDictTableName(orgAdapterPlan.getVersion());
         String deTableName = CDAVersionUtil.getDictEntryTableName(orgAdapterPlan.getVersion());
@@ -123,17 +141,17 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
         Session session = currentSession();
         StringBuilder sb = new StringBuilder();
         sb.append(" select ad.id                       ");
-        sb.append("       ,ad.plan_id                  ");
+        sb.append("       ,ad.plan_id as adapterPlanId         ");
         sb.append("       ,ds.id   as dictId ");
         sb.append("       ,ds.code as dictCode ");
         sb.append("       ,ds.name as dictName ");
         sb.append("       ,de.id  as dictEntryId    ");
-        sb.append("       ,de.code as DictEntrycode   ");
-        sb.append("       ,de.value as DictEntryName   ");
-        sb.append("       ,orgDict.id as orgDictId  ");
+        sb.append("       ,de.code as dictEntryCode   ");
+        sb.append("       ,de.value as dictEntryName   ");
+        sb.append("       ,orgDict.id as orgDictSeq  ");
         sb.append("       ,orgDict.code as orgDictCode");
-        sb.append("       ,orgDict.name as orgDictNanme");
-        sb.append("       ,orgDE.id as orgDictEntryId  ");
+        sb.append("       ,orgDict.name as orgDictName");
+        sb.append("       ,orgDE.id as orgDictEntrySeq  ");
         sb.append("       ,orgDE.code as orgDictEntryCode");
         sb.append("       ,orgDE.name as orgDictEntryName");
         sb.append("   from adapter_dict ad ");
@@ -143,11 +161,16 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
         sb.append("        left join org_std_dictentry orgDE on ( orgDE.sequence = ad.org_dictentry and orgDE.organization='" + orgCode + "' ) ");
         sb.append("  where ad.plan_id = " + orgAdapterPlan.getId());
         sb.append("    and ad.std_dict = " + dictId);
-        if (!StringUtils.isEmpty(code))
-            sb.append("     and de.code like :code");
-        if (!StringUtils.isEmpty(name))
-            sb.append("     and de.name like :name");
-        sb.append(makeOrder(orders));
+
+        if (!StringUtils.isEmpty(code)){
+            if (!StringUtils.isEmpty(name))
+                sb.append("     and (de.code like :code or de.value like :name)");
+            else
+                sb.append("     and de.code like :code ");
+        }else if (!StringUtils.isEmpty(name))
+            sb.append("     and de.value like :name");
+
+        sb.append(makeOrder(orders, "de"));
         SQLQuery sqlQuery = session.createSQLQuery(sb.toString());
         if (!StringUtils.isEmpty(code))
             sqlQuery.setParameter("code", "%" + code + "%");
@@ -156,8 +179,102 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
         page = page == 0 ? 1 : page;
         sqlQuery.setMaxResults(rows);
         sqlQuery.setFirstResult((page - 1) * rows);
-        sqlQuery.setResultTransformer(Transformers.aliasToBean(MAdapterDict.class));
-        return sqlQuery.list();
+
+        return sqlQuery
+                .addScalar("id", StandardBasicTypes.LONG)
+                .addScalar("adapterPlanId", StandardBasicTypes.LONG)
+                .addScalar("dictId", StandardBasicTypes.LONG)
+                .addScalar("dictCode", StandardBasicTypes.STRING)
+                .addScalar("dictName", StandardBasicTypes.STRING)
+                .addScalar("dictEntryId", StandardBasicTypes.LONG)
+                .addScalar("dictEntryCode", StandardBasicTypes.STRING)
+                .addScalar("dictEntryName", StandardBasicTypes.STRING)
+                .addScalar("orgDictSeq", StandardBasicTypes.LONG)
+                .addScalar("orgDictCode", StandardBasicTypes.STRING)
+                .addScalar("orgDictName", StandardBasicTypes.STRING)
+                .addScalar("orgDictEntrySeq", StandardBasicTypes.LONG)
+                .addScalar("orgDictEntryCode", StandardBasicTypes.STRING)
+                .addScalar("orgDictEntryName", StandardBasicTypes.STRING)
+                .setResultTransformer(Transformers.aliasToBean(MAdapterDictVo.class))
+                .list();
+    }
+
+
+    /**
+     * 根据条件搜索标准字典项适配关系
+     *
+     */
+    public List<MAdapterRelationship> searchStdDictEntry(
+            OrgAdapterPlan orgAdapterPlan, long dictId, String seachName, String mode, String orders, int page, int rows) {
+
+        String deTableName = CDAVersionUtil.getDictEntryTableName(orgAdapterPlan.getVersion());
+        Session session = currentSession();
+        String sql =
+                "SELECT entry.id, entry.code, entry.value as name " +
+                "FROM" +
+                "   "+ deTableName +" entry " +
+                "LEFT JOIN" +
+                "   (SELECT * FROM adapter_dict ad where ad.plan_id = :planId) adapterDict " +
+                "ON" +
+                "   entry.id = adapterDict.std_dictentry " +
+                "WHERE" +
+                "   entry.dict_id = :dictId ";
+        if("new".equals(mode))
+            sql += " AND adapterDict.id is null ";
+        if(!StringUtils.isEmpty(seachName))
+            sql += " AND (entry.code like :seachName or entry.value like :seachName) ";
+
+        sql += makeOrder(orders, "entry");
+
+        SQLQuery sqlQuery = session.createSQLQuery(sql);
+        if (!StringUtils.isEmpty(seachName))
+            sqlQuery.setParameter("seachName", "%" + seachName + "%");
+        sqlQuery.setParameter("dictId", dictId);
+        sqlQuery.setParameter("planId", orgAdapterPlan.getId());
+        page = page == 0 ? 1 : page;
+        sqlQuery.setMaxResults(rows);
+        sqlQuery.setFirstResult((page - 1) * rows);
+
+        return sqlQuery
+                .addScalar("id", StandardBasicTypes.LONG)
+                .addScalar("code", StandardBasicTypes.STRING)
+                .addScalar("name", StandardBasicTypes.STRING)
+                .setResultTransformer(Transformers.aliasToBean(MAdapterRelationship.class))
+                .list();
+    }
+
+
+    /**
+     * 根据条件搜索标准字典项总数
+     *
+     */
+    public int countStdDictEntry(
+            OrgAdapterPlan orgAdapterPlan, long dictId, String seachName, String mode) {
+
+        String deTableName = CDAVersionUtil.getDictEntryTableName(orgAdapterPlan.getVersion());
+        Session session = currentSession();
+        String sql =
+                "SELECT count(*) " +
+                "FROM" +
+                "   "+ deTableName +" entry " +
+                "LEFT JOIN" +
+                "   (SELECT * FROM adapter_dict ad where ad.plan_id = :planId) adapterDict " +
+                "ON" +
+                "   entry.id = adapterDict.std_dictentry " +
+                "WHERE" +
+                "   entry.dict_id = :dictId ";
+        if("new".equals(mode))
+            sql += " AND adapterDict.id is null ";
+        if(!StringUtils.isEmpty(seachName))
+            sql += " AND (entry.code like :seachName or entry.value like :seachName) ";
+
+        SQLQuery sqlQuery = session.createSQLQuery(sql);
+        if (!StringUtils.isEmpty(seachName))
+            sqlQuery.setParameter("seachName", "%" + seachName + "%");
+        sqlQuery.setParameter("dictId", dictId);
+        sqlQuery.setParameter("planId", orgAdapterPlan.getId());
+
+        return ((BigInteger)sqlQuery.list().get(0)).intValue();
     }
 
     /**
@@ -172,13 +289,13 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
         StringBuilder sb = new StringBuilder();
         sb.append(" select count(*)    ");
         sb.append("   from adapter_dict ad     ");
-        sb.append("        left join " + deTableName + " on ad.std_dictentry = " + deTableName + ".id ");
+        sb.append("        left join " + deTableName + " de on ad.std_dictentry = de.id ");
         sb.append("  where ad.plan_id = " + orgAdapterPlan.getId());
         sb.append("    and ad.std_dict = " + dictId);
         if (!StringUtils.isEmpty(code))
-            sb.append("     and md.inner_code like :code");
+            sb.append("     and de.code like :code");
         if (!StringUtils.isEmpty(name))
-            sb.append("     and md.name like :name");
+            sb.append("     and de.value like :name");
         SQLQuery sqlQuery = session.createSQLQuery(sb.toString());
         if (!StringUtils.isEmpty(code))
             sqlQuery.setParameter("code", "%" + code + "%");
@@ -437,5 +554,23 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
             listInfo.add(info);
         }
         return listInfo;
+    }
+
+    /**
+     * 根据字典新增适配明细，
+     * create by lincl 2016-4-15
+     * @param orgAdapterPlan 方案
+     * @param dictIds 字典编号集
+     */
+    @Transactional(propagation= Propagation.REQUIRED)
+    public int batchAddAdapterDict(OrgAdapterPlan orgAdapterPlan, List dictIds) {
+        Session session = currentSession();
+        String strTableName = CDAVersionUtil.getDictEntryTableName(orgAdapterPlan.getVersion());
+        String sql = "insert into adapter_dict(plan_id, std_dict, std_dictentry) "+
+                "select  :planId as plan_id, tb.dict_id, tb.id from " + strTableName + " tb where  tb.dict_id in(:dictIds)";
+        Query query = session.createSQLQuery(sql);
+        query.setParameterList("dictIds", dictIds);
+        query.setLong("planId", orgAdapterPlan.getId());
+        return query.executeUpdate();
     }
 }

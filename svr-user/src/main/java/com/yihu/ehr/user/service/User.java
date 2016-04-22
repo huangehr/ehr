@@ -14,7 +14,6 @@ import java.util.UUID;
 @Table(name = "users")
 @Access(value = AccessType.PROPERTY)
 public class User {
-
     private String id;
     private Date createDate;
     private Date lastLoginTime;
@@ -30,6 +29,8 @@ public class User {
     private String gender;
     private String idCardNo;
     private String organization;
+    private String source;
+
     // 未绑定属性
 	private String orgPost;
 	private String privilege;
@@ -40,14 +41,12 @@ public class User {
     private String medicalRole;
     private String techTitle;
     private String adminTitle;
+    private String DType;
 
     private String imgRemotePath;
     private String imgLocalPath;
 
-
-
     public User() {
-        id  = UUID.randomUUID().toString().replace("_","");
     }
 
     @Id
@@ -77,7 +76,7 @@ public class User {
         this.lastLoginTime = lastLoginTime;
     }
 
-    @Column(name = "email",  nullable = false)
+    @Column(name = "email",  nullable = true)
     public String getEmail() {
         return email;
     }
@@ -165,6 +164,14 @@ public class User {
         this.idCardNo = idCardNo;
     }
 
+    @Column(name = "source",  nullable = true)
+    public String getSource() {
+        return source;
+    }
+    public void setSource(String source) {
+        this.source = source;
+    }
+
     @Column(name = "organization",  nullable = true)
     public String getOrganization() {
         return organization;
@@ -227,6 +234,14 @@ public class User {
     }
     public void setAdminTitle(String adminTitle) {
         this.adminTitle = adminTitle;
+    }
+
+    @Column(name = "DType",  nullable = true)
+    public String getDType() {
+        return DType;
+    }
+    public void setDType(String DType) {
+        this.DType = DType;
     }
 
     @Column(name = "img_remote_path",  nullable = true)

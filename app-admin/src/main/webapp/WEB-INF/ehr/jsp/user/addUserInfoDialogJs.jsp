@@ -42,7 +42,7 @@
             $userTel: $('#inp_userTel'),
             $org: $('#inp_org'),
             $major: $('#inp_major'),
-            $sex: $('input[name="sex"]', this.$form),
+            $sex: $('input[name="gender"]', this.$form),
             $uploader: $("#div_user_img_upload"),
             $inp_select_marriage: $("#inp_select_marriage"),
             $inp_select_userType: $("#inp_select_userType"),
@@ -82,13 +82,14 @@
                 this.$sex.ligerRadio();
                 this.$org.addressDropdown({
                     tabsData: [
-                        {name: '省份', url: '${contextRoot}/address/getParent', params: {level: '1'}},
-                        {name: '城市', url: '${contextRoot}/address/getChildByParent'},
+                        {name: '省份', code:'id',value:'name',url: '${contextRoot}/address/getParent', params: {level: '1'}},
+                        {name: '城市', code:'id',value:'name',url: '${contextRoot}/address/getChildByParent'},
                         {
-                            name: '医院', url: '${contextRoot}/address/getOrgs', beforeAjaxSend: function (ds, $options) {
+                            name: '医院', code:'organizationCode',value:'fullName',url: '${contextRoot}/address/getOrgs', beforeAjaxSend: function (ds, $options) {
                             var province = $options.eq(0).attr('title'),
                                     city = $options.eq(1).attr('title');
                             ds.params = $.extend({}, ds.params, {
+
                                 province: province,
                                 city: city
                             });
@@ -124,13 +125,6 @@
                             $('#inp_major_div').show();
                         else
                             $('#inp_major_div').hide();
-                        /*if (Util.isStrEquals(value, 'Doctor')) {
-                            addUserInfo.$major.parent().parent().addClass("essential");
-                            addUserInfo.$major.addClass("required useTitle");
-                        } else {
-                            addUserInfo.$major.parent().parent().removeClass("essential");
-                            addUserInfo.$major.removeClass("required useTitle");
-                        }*/
                     },
                     //autocomplete: true,
                     onSuccess: function (data) {
@@ -153,7 +147,7 @@
                         }
                         if(Util.isStrEquals($(elm).attr("id"),'inp_idCard')){
                             var idCard = $("#inp_idCard").val();
-                            return checkDataSourceName('id_card_no',idCard,"该身份证已存在");
+                            return checkDataSourceName('id_card_no',idCard,"该身份证号已被注册，请确认。");
                         }
                        if(Util.isStrEquals($(elm).attr("id"),'inp_userEmail')){
                            var email = $("#inp_userEmail").val();
@@ -166,15 +160,15 @@
                 function checkDataSourceName(type,inputValue,errorMsg){
                     var result = new jValidation.ajax.Result();
                     var dataModel = $.DataModel.init();
-                    dataModel.fetchRemote("${contextRoot}/user/searchUser", {
-                        data: {type:type,searchNm:inputValue},
+                    dataModel.fetchRemote("${contextRoot}/user/existence", {
+                        data: {existenceType:type,existenceNm:inputValue},
                         async: false,
                         success: function (data) {
                             if (data.successFlg) {
-                                result.setResult(true);
-                            } else {
                                 result.setResult(false);
                                 result.setErrorMsg(errorMsg);
+                            } else {
+                                result.setResult(true);
                             }
                         }
                     });
@@ -187,8 +181,9 @@
                     var addUser = self.$form.Fields.getValues();
                    if(validator.validate()){
                         var organizationKeys = addUser.organization['keys'];
-                        addUser.orgCode = organizationKeys[2];
-                        addUser.orgName = addUser.organization['names'][2];
+//                        addUser.organizationCode = organizationKeys[2];
+//                        addUser.orgName = addUser.organization['names'][2];
+                    addUser.organization = organizationKeys[2];
                     if (userImgHtml == 0) {
                         updateUser(addUser);
                     } else {
@@ -201,26 +196,12 @@
                             updateUser(addUser);
                         }
                     }
-/*                        var upload = self.$uploader.instance;
-                        upload.options.formData.userModelJsonData =  JSON.stringify(addUser);
-                        upload.upload();*/
 
-                /*        var dataModel = $.DataModel.init();
-                        dataModel.createRemote("${contextRoot}/user/updateUser", {
-                            data: addUser,
-                            success: function (data) {
-                                if (data.successFlg) {
-                                    win.parent.closeAddUserInfoDialog(function () {
-                                        win.parent.$.Notice.success('用户新增成功');
-                                    });
-                                } else {
-                                    window.top.$.Notice.error(data.errorMsg);
-                                }
-                            }
-                        });*/
                     }else{
                    return;
                    }
+
+
                 });
 
                 function updateUser(userModel) {

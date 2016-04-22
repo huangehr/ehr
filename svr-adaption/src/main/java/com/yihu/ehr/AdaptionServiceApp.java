@@ -12,7 +12,6 @@ import org.springframework.context.ApplicationContextAware;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableFeignClients
-//@EnableAspectJAutoProxy(proxyTargetClass = true)
 public class AdaptionServiceApp  implements ApplicationContextAware {
 
     public static void main(String[] args) {
@@ -21,7 +20,5 @@ public class AdaptionServiceApp  implements ApplicationContextAware {
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        //force the bean to get loaded as soon as possible
-        applicationContext.getBean("requestMappingHandlerAdapter");
     }
 }

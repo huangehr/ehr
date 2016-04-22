@@ -43,9 +43,9 @@
                 init: function () {
                     this.$element.show();
                     this.$homeAddress.addressDropdown({tabsData:[
-                        {name: '省份', url: '${contextRoot}/address/getParent', params: {level:'1'}},
-                        {name: '城市', url: '${contextRoot}/address/getChildByParent'},
-                        {name: '县区', url: '${contextRoot}/address/getChildByParent'}
+                        {name: '省份',code:'id',value:'name', url: '${contextRoot}/address/getParent', params: {level:'1'}},
+                        {name: '城市',code:'id',value:'name', url: '${contextRoot}/address/getChildByParent'},
+                        {name: '县区',code:'id',value:'name', url: '${contextRoot}/address/getChildByParent'}
                     ]});
                     this.$searchPatient.ligerTextBox({width: 240 });
                     this.bindEvents();
@@ -74,32 +74,38 @@
                         columns: [
                             {display: '姓名', name: 'name', width: '15%',align: 'left'},
                             {display: '身份证号', name: 'idCardNo', width: '20%', align: 'left'},
-                            {display: '性别', name: 'genderValue', width: '10%'},
-                            {display: '联系方式', name: 'tel', width: '15%', resizable: true,align: 'left'},
+                            {display: '性别', name: 'gender', width: '10%'},
+                            {display: '联系方式', name: 'telephoneNo', width: '15%', resizable: true,align: 'left'},
                             {display: '家庭地址', name: 'homeAddress', width: '30%', minColumnWidth: 20,align: 'left'},
                             {
                                 display: '操作', name: 'operator', width: '10%', render: function (row) {
-                                var html = '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "patient:patientInfoModifyDialog:open", row.idCardNo) + '">修改</a> /';
-                                html += '<a href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "patient:patientInfoModifyDialog:delete", row.idCardNo) + '"> 删除</a>';
-
-                                return html;
-                            }
+//									var html ='<div class="grid_edit" title="修改" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "patient:patientInfoModifyDialog:open", row.idCardNo) + '"></div>'
+//										+'<div class="grid_delete" title="删除"' +
+//										' onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "patient:patientInfoModifyDialog:delete", row.idCardNo) + '"></div>';
+                                var html = '<a class="grid_edit" title="编辑" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "patient:patientInfoModifyDialog:open", row.idCardNo) + '"></a> ';
+                                html += '<a class="grid_delete" title="删除" href="javascript:void(0)" onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "patient:patientInfoModifyDialog:delete", row.idCardNo) + '"></a>';
+									return html;
+								}
                             }
                         ],
                         onDblClickRow: function (row) {
                             $.ligerDialog.open({
-                                title:'<div class="f-ib" style="border-style: solid; border-radius: 2px; width: 120px;height: 36px;cursor: pointer;line-height: 36px;text-align: center;border: 2px solid" id="div_patientBasicMsgDialog">病人基本信息</div><div class="f-ib f-ml10"  id="div_cardManagerDialog"  style="border-style: solid; border-radius: 2px; width: 120px;height: 36px;cursor: pointer;line-height: 36px;text-align: center;border: 2px solid">卡管理</div>',
+                                title:'',
                                 height: 600,
                                 width: 570,
                                 url: '${contextRoot}/patient/patientDialogType',
                                 load: true,
-                                isDrag:false,
+                                isDrag:true,
                                 urlParms: {
                                     idCardNo: row.idCardNo,
                                     patientDialogType: 'patientInfoMessage'
                                 },
                                 isHidden: false
                             });
+                            var buttonsWrap = '<span style="position:relative; z-index:10;"><button class="f-ib f-tac f-w100 f-click-down" id="div_patientBasicMsgDialog">病人基本信息</button><button class="f-ib f-ml10 f-tac f-w100 f-click-up"  id="div_cardManagerDialog">卡管理</button></span>';
+                            $('.l-dialog .l-dialog-tc-inner').eq(0).append( $(buttonsWrap));
+                            $('.l-dialog .l-dialog-title').eq(0).css({position:'absolute',left:-40,width:'100%',height:40,'z-index': 2});
+
                         }
                     }));
                     grid.adjustToWidth();
@@ -131,7 +137,7 @@
                             height:600,
                             url:'${contextRoot}/patient/patientDialogType',
                             urlParms:{
-                                patientDialogType:'addPanient'
+                                patientDialogType:'addPatient'
                             }
                         })
                     });
@@ -145,7 +151,7 @@
                             url:'${contextRoot}/patient/patientDialogType',
                             urlParms:{
                                 idCardNo:idCardNo,
-                                patientDialogType:'updatePanient'
+                                patientDialogType:'updatePatient'
                             }
                         })
                     });

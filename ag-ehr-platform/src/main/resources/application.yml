@@ -1,76 +1,18 @@
 server:
-  port: 443
+  port: ${ag-ehr-platform.server.port}
 
-endpoints:
-  restart:
-    enabled: true
-  shutdown:
-    enabled: true
-  health:
-    sensitive: false
+management:
+  port: ${server.port}
+
 
 ---
 spring:
   profiles: dev
 
-  thymeleaf:
-    cache: false
-
-keystore:
-  file: C:/Windows/tomcat.keystore
-  password: 123456
-
-eureka:
-  instance:
-    ip-address: 127.0.0.1
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
-
----
-spring:
-  profiles: sand-home-dev
-
-  thymeleaf:
-      cache: false
-
-keystore:
-  file: C:/Windows/tomcat.keystore
-  password: 123456
-
-eureka:
-  instance:
-    ip-address: 127.0.0.1
-  client:
-    registerWithEureka: false
-    fetchRegistry: false
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
-
 ---
 spring:
   profiles: test
 
-keystore:
-  file: /home/tomcat.keystore
-  password: 123456
-
-eureka:
-  instance:
-    ip-address: 172.19.103.73
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/
-
 ---
 spring:
   profiles: prod
-
-eureka:
-  instance:
-    ip-address: unknown
-  client:
-    registerWithEureka: false
-    fetchRegistry: true
-    serviceUrl.defaultZone: ${vcap.services.eureka-service.credentials.uri:http://user:eureka@127.0.0.1:8761}/eureka/

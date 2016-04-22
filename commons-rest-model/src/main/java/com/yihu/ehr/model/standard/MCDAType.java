@@ -1,10 +1,8 @@
 package com.yihu.ehr.model.standard;
 
-import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
 import java.util.Date;
-import java.util.UUID;
+import java.util.Objects;
 
 /**
  * CDA类型
@@ -95,5 +93,19 @@ public class MCDAType {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MCDAType mcdaType = (MCDAType) o;
+        return Objects.equals(id, mcdaType.id) &&
+                Objects.equals(code, mcdaType.code);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, code);
     }
 }

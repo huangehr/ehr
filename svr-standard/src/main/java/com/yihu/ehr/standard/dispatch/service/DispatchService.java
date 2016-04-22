@@ -2,22 +2,22 @@ package com.yihu.ehr.standard.dispatch.service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
-import com.yihu.ehr.log.LogService;
-import com.yihu.ehr.standard.cda.service.CDADocument;
-import com.yihu.ehr.standard.cda.service.CDADocumentManager;
-import com.yihu.ehr.standard.cda.service.CDADataSetRelationship;
-import com.yihu.ehr.standard.cda.service.CDADataSetRelationshipManager;
-import com.yihu.ehr.standard.cdaversion.service.CDAVersion;
-import com.yihu.ehr.standard.cdaversion.service.CDAVersionService;
+import com.yihu.ehr.standard.datasets.service.BaseDataSet;
+import com.yihu.ehr.standard.datasets.service.BaseMetaData;
+import com.yihu.ehr.standard.dict.service.BaseDict;
+import com.yihu.ehr.standard.dict.service.BaseDictEntry;
+import com.yihu.ehr.standard.document.service.CDADocument;
+import com.yihu.ehr.standard.document.service.CDADocumentService;
+import com.yihu.ehr.standard.document.service.CDADataSetRelationship;
+import com.yihu.ehr.standard.document.service.CDADataSetRelationshipManager;
+import com.yihu.ehr.standard.version.service.CDAVersion;
+import com.yihu.ehr.standard.version.service.CDAVersionService;
 import com.yihu.ehr.standard.datasets.service.DataSetService;
-import com.yihu.ehr.standard.datasets.service.IDataSet;
-import com.yihu.ehr.standard.datasets.service.IMetaData;
 import com.yihu.ehr.standard.datasets.service.MetaDataService;
 import com.yihu.ehr.standard.dict.service.DictEntryService;
 import com.yihu.ehr.standard.dict.service.DictService;
-import com.yihu.ehr.standard.dict.service.IDict;
-import com.yihu.ehr.standard.dict.service.IDictEntry;
 import com.yihu.ehr.util.compress.Zipper;
+import com.yihu.ehr.util.log.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -61,9 +61,14 @@ public class DispatchService {
     @Autowired
     DictEntryService dictEntryService;
     @Autowired
-    CDADocumentManager cdaDocumentManager;
+    CDADocumentService cdaDocumentService;
     @Autowired
     CDADataSetRelationshipManager cdaDataSetRelationshipManager;
+
+    private Class getServiceEntity(String version){
+        return cdaDocumentService.getServiceEntity(version);
+    }
+
     @Autowired
     FastDFSUtil fastDFSUtil;
     public static  Map<String, String> typeMapping = new HashMap<>();
@@ -231,10 +236,10 @@ public class DispatchService {
      * 创建数据集文件
      */
     @Transactional(propagation = Propagation.SUPPORTS)
-    public List<IMetaData> createDataSetFile(String strFilePath, String strFileName, List<IDataSet> dataSet, String version)
+    public List<BaseMetaData> createDataSetFile(String strFilePath, String strFileName, List<BaseDataSet> dataSet, String version)
             throws Exception {
         //创建数据集XML 返回数据集IDList
-        List<IMetaData> listMetaDta = new ArrayList<>();
+        List<BaseMetaData> listMetaDta = new ArrayList<>();
         Document doc = createDocument();
         Element root = doc.createElement("table");
         root.setAttribute("name", "std_dataset");
@@ -247,17 +252,8 @@ public class DispatchService {
         root.appendChild(getColumnElement(doc, colRoot, strColumn));
 
         //创建数据集详细信息
-        for (IDataSet xDataSet : dataSet) {
+        for (BaseDataSet xDataSet : dataSet) {
             Element rowRoot = doc.createElement("row");
-            String type = typeMapping.get(xDataSet.getOperationType());
-            if(type==null){
-                type = "add";
-                listMetaDta.addAll(
-                        metaDataService.search(
-                                metaDataService.getServiceEntity(version), "dataSetId=" + xDataSet.getId()));
-            }
-            rowRoot.setAttribute("type", type);
-
             appendChild(rowRoot, doc.createElement("summary"), "");
             appendChild(rowRoot, doc.createElement("valid"), "1");
             appendChild(rowRoot, doc.createElement("inner_version"), xDataSet.getStdVersion());
@@ -283,7 +279,7 @@ public class DispatchService {
      * 创建数据元文件
      */
     @Transactional(propagation = Propagation.SUPPORTS)
-    public void createMetaDataFile(String strFilePath, String strFileName, String version, List<IMetaData> metaDataList)
+    public void createMetaDataFile(String strFilePath, String strFileName, String version, List<BaseMetaData> metaDataList)
             throws Exception{
         //创建数据元XML
         Document doc = createDocument();
@@ -298,10 +294,8 @@ public class DispatchService {
         root.appendChild(getColumnElement(doc, colRoot, strColumn));
 
         //创建数据元明细信息
-        for (IMetaData metaData : metaDataList) {
+        for (BaseMetaData metaData : metaDataList) {
             Element rowRoot = doc.createElement("row");
-            String type = typeMapping.get(metaData.getOperationType());
-            rowRoot.setAttribute("type", type==null ? "add" : type);
 
             appendChild(rowRoot, doc.createElement("inner_version"), version);
             appendChild(rowRoot, doc.createElement("code"), metaData.getInnerCode());
@@ -335,10 +329,10 @@ public class DispatchService {
      * 创建字典文件
      */
     @Transactional(propagation = Propagation.SUPPORTS)
-    public List<IDictEntry> createDictFile(String strFilePath, String strFileName, List<IDict> dicts, String sourceVersionId)
+    public List<BaseDictEntry> createDictFile(String strFilePath, String strFileName, List<BaseDict> dicts, String sourceVersionId)
         throws Exception{
         //创建字典XML，返回字典值 List
-        List<IDictEntry> listEntry = new ArrayList<>();
+        List<BaseDictEntry> listEntry = new ArrayList<>();
         Document doc = createDocument();
         Element root = doc.createElement("table");
         root.setAttribute("name", "std_dict");
@@ -349,16 +343,8 @@ public class DispatchService {
         //创建数据元文件列信息
         root.appendChild(getColumnElement(doc, colRoot, strColumn));
 
-        for (IDict xDict : dicts) {
+        for (BaseDict xDict : dicts) {
             Element rowRoot = doc.createElement("row");
-            String type = typeMapping.get(xDict.getOperationType());
-            if(type==null){
-                type = "add";
-                listEntry.addAll(
-                        dictEntryService.search(
-                                dictEntryService.getServiceEntity(sourceVersionId), "dictId="+xDict.getId()));
-            }
-            rowRoot.setAttribute("type", type);
 
             appendChild(rowRoot, doc.createElement("valid"), "1");
             appendChild(rowRoot, doc.createElement("inner_version"), xDict.getInnerVersion());
@@ -387,7 +373,7 @@ public class DispatchService {
      * 创建字典值XML文件
      */
     @Transactional(propagation = Propagation.SUPPORTS)
-    public void createDictEntryFile(String strFilePath, String strFileName, String version, List<IDictEntry> dictEntry)
+    public void createDictEntryFile(String strFilePath, String strFileName, String version, List<BaseDictEntry> dictEntry)
         throws Exception{
         //创建字典值XML
         Document doc = createDocument();
@@ -400,7 +386,7 @@ public class DispatchService {
 
         //创建数据元文件列信息
         root.appendChild(getColumnElement(doc, colRoot, strColumn));
-        for (IDictEntry xDictEntry : dictEntry) {
+        for (BaseDictEntry xDictEntry : dictEntry) {
             Element rowRoot = doc.createElement("row");
             String type = typeMapping.get(xDictEntry.getOperationType());
             rowRoot.setAttribute("type", type==null ? "add" : type);
@@ -592,7 +578,7 @@ public class DispatchService {
         for (int i = 0; i < listCDA.size(); i++) {
             CDADocument info = listCDA.get(i);
             Element rowRoot = doc.createElement("row");
-            String type = typeMapping.get(info.getOperationType());
+            String type = typeMapping.get(info.getType());
             if(type==null)
                 type = "add";
             rowRoot.setAttribute("type", type);
@@ -633,7 +619,7 @@ public class DispatchService {
         createStandardVersionFile(strXMLFilePath, "std_inner_version.xml", listVersion);
 
         //创建数据集文件，并获取数据元信息
-        List<IMetaData> listMateData =
+        List<BaseMetaData> listMateData =
                 createDataSetFile(strXMLFilePath, "std_dataset.xml",
                     dataSetService.findAll(dataSetService.getServiceEntity(sourceVersionId)), sourceVersionId);
 
@@ -642,7 +628,9 @@ public class DispatchService {
 
         //创建CDA文档
         String strCDAFileName = "std_cda.xml";
-        List<CDADocument> listCDA = cdaDocumentManager.getDocumentList(sourceVersionId, "", "", "", 0, 0);
+
+        Class entityClass = getServiceEntity(sourceVersionId);
+        List<CDADocument> listCDA = cdaDocumentService.search(entityClass, "id="+ sourceVersionId);
         createCDAFile(strXMLFilePath, strCDAFileName, listCDA);
 
         //创建关系文档
@@ -651,7 +639,7 @@ public class DispatchService {
         createCDADatasetRelationshipFile(strXMLFilePath, strRelationFileName, listRelation);
 
         //创建字典文档，并获取字典值信息
-        List<IDictEntry> listEntry =
+        List<BaseDictEntry> listEntry =
                 createDictFile(strXMLFilePath, "std_dict.xml",
                         dictService.findAll(dictService.getServiceEntity(sourceVersionId)), sourceVersionId);
 
@@ -683,10 +671,6 @@ public class DispatchService {
         for (int i = 0; i < listRelastion.size(); i++) {
             CDADataSetRelationship info = listRelastion.get(i);
             Element rowRoot = doc.createElement("row");
-            String type = typeMapping.get(info.getOperationType());
-            if(type==null)
-                type = "add";
-            rowRoot.setAttribute("type", type);
 
             appendChild(rowRoot, doc.createElement("id"), info.getId());
             appendChild(rowRoot, doc.createElement("cda_id"), info.getCdaId());

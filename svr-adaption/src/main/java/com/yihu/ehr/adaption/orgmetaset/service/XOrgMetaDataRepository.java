@@ -16,4 +16,6 @@ public interface XOrgMetaDataRepository extends PagingAndSortingRepository<OrgMe
     @Query("select metadata from OrgMetaData metadata where orgDataSet= :orgDataSetSeq and organization=:orgCode  and code = :code")
     List<OrgMetaData> isExistOrgMetaData(@Param("orgDataSetSeq")int orgDataSetSeq, @Param("orgCode")String orgCode, @Param("code")String code);
 
+    @Query("select metadata from OrgMetaData metadata where organization=:org_code  and sequence = :sequence")
+    OrgMetaData getMetaDataBySequence(@Param("org_code")String orgCode,@Param("sequence") int sequence);
 }

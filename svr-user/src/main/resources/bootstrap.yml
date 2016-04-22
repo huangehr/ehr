@@ -9,17 +9,7 @@ spring:
     config:
       username: user
       password: configuration
-      uri: http://localhost:1221
-      label: dev
-
----
-spring:
-  profiles: sand-home-dev
-  cloud:
-    config:
-      username: user
-      password: configuration
-      uri: http://localhost:1221
+      uri: http://192.168.1.220:1221
       label: dev
 
 ---
@@ -32,4 +22,12 @@ spring:
       uri: http://172.19.103.73:1221
       label: dev
 
-
+---
+spring:
+  profiles: prod
+  cloud:
+    config:
+      username: user
+      password: configuration
+      uri: http://11.1.2.21:1221
+      label: master

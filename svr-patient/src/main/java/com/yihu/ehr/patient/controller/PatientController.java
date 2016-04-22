@@ -9,29 +9,31 @@ import com.yihu.ehr.patient.service.demographic.DemographicId;
 import com.yihu.ehr.patient.service.demographic.DemographicInfo;
 import com.yihu.ehr.patient.service.demographic.DemographicService;
 import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.util.encode.Base64;
 import com.yihu.ehr.util.encode.HashUtil;
 import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.csource.common.MyException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.*;
 
 /**
  * Created by zqb on 2015/8/14.
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(protocols = "https", value = "patient", description = "人口管理", tags = {"人口管理"})
+@Api(value = "patient", description = "人口管理", tags = {"人口管理"})
 public class PatientController extends BaseRestController {
 
     @Autowired
@@ -41,8 +43,7 @@ public class PatientController extends BaseRestController {
 
     /**
      * 根据条件查询人口信息
-     * @param name
-     * @param idCardNo
+     * @param search
      * @param province
      * @param city
      * @param district
@@ -54,16 +55,14 @@ public class PatientController extends BaseRestController {
     @RequestMapping(value = "/populations",method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询人")
     public List<MDemographicInfo> searchPatient(
-            @ApiParam(name = "name", value = "姓名", defaultValue = "")
-            @RequestParam(value = "name") String name,
-            @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
-            @RequestParam(value = "id_card_no") String idCardNo,
-            @ApiParam(name = "province", value = "省", defaultValue = "")
-            @RequestParam(value = "province") String province,
-            @ApiParam(name = "city", value = "市", defaultValue = "")
-            @RequestParam(value = "city") String city,
-            @ApiParam(name = "district", value = "县", defaultValue = "")
-            @RequestParam(value = "district") String district,
+            @ApiParam(name = "search", value = "搜索内容", defaultValue = "")
+            @RequestParam(value = "search",required = false) String search,
+            @ApiParam(name = "home_province", value = "省", defaultValue = "")
+            @RequestParam(value = "home_province",required = false) String province,
+            @ApiParam(name = "home_city", value = "市", defaultValue = "")
+            @RequestParam(value = "home_city",required = false) String city,
+            @ApiParam(name = "home_district", value = "县", defaultValue = "")
+            @RequestParam(value = "home_district",required = false) String district,
             @ApiParam(name = "page", value = "当前页", defaultValue = "")
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
@@ -71,8 +70,7 @@ public class PatientController extends BaseRestController {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
         Map<String, Object> conditionMap = new HashMap<>();
-        conditionMap.put("name", name);
-        conditionMap.put("idCardNo", idCardNo);
+        conditionMap.put("search", search);
         conditionMap.put("page", page);
         conditionMap.put("pageSize", rows);
         conditionMap.put("province", province);
@@ -158,8 +156,9 @@ public class PatientController extends BaseRestController {
 //        }
         String pwd = "123456";
         demographicInfo.setPassword(HashUtil.hashStr(pwd));
+        demographicInfo.setRegisterTime(new Date());
         demographicService.savePatient(demographicInfo);
-        return convertToModel(demographicInfo,MDemographicInfo.class,null);
+        return convertToModel(demographicInfo,MDemographicInfo.class);
     }
 
     /**
@@ -185,7 +184,7 @@ public class PatientController extends BaseRestController {
 //            demographicInfo.setLocalPath("");
 //        }
         demographicService.savePatient(demographicInfo);
-        return convertToModel(demographicInfo,MDemographicInfo.class,null);
+        return convertToModel(demographicInfo,MDemographicInfo.class);
     }
 
 
@@ -208,83 +207,81 @@ public class PatientController extends BaseRestController {
 
     /**
      * 人口信息头像图片上传
-     * @param request
      * @return
      * @throws IOException
      */
-    public String webupload(HttpServletRequest request) throws IOException {
-        if(request==null){
-            return "";
-        }else {
-            InputStream inputStearm = request.getInputStream();
-            String fileName = (String) request.getParameter("name");
-            if(fileName == null){
-                return null;
-            }
-            String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-            String description = null;
-            if ((fileName != null) && (fileName.length() > 0)) {
-                int dot = fileName.lastIndexOf('.');
-                if ((dot > -1) && (dot < (fileName.length()))) {
-                    description = fileName.substring(0, dot);
-                }
-            }
-            ObjectNode objectNode = null;
-            String path = null;
-            try {
-                objectNode = fastDFSUtil.upload(inputStearm, fileExtension, description);
-                String groupName = objectNode.get("groupName").toString();
-                String remoteFileName = objectNode.get("remoteFileName").toString();
-                path = "{groupName:" + groupName + ",remoteFileName:" + remoteFileName + "}";
-            } catch (Exception e) {
-                LogService.getLogger(DemographicInfo.class).error("人口头像图片上传失败；错误代码："+e);
-            }
-            //返回文件路径
-            return path;
+    @RequestMapping(value = "/populations/picture",method = RequestMethod.POST)
+    @ApiOperation(value = "上传头像,把图片转成流的方式发送")
+    public String uploadPicture(
+            @ApiParam(name = "jsonData", value = "头像转化后的输入流")
+            @RequestBody String jsonData ) throws IOException {
+        if(jsonData == null){
+            return null;
         }
+        String date = URLDecoder.decode(jsonData,"UTF-8");
+
+        String[] fileStreams = date.split(",");
+        String is = URLDecoder.decode(fileStreams[0],"UTF-8").replace(" ","+");
+        byte[] in = Base64.decode(is);
+
+        String pictureName = fileStreams[1].substring(0,fileStreams[1].length()-1);
+        String fileExtension = pictureName.substring(pictureName.lastIndexOf(".") + 1).toLowerCase();
+        String description = null;
+        if ((pictureName != null) && (pictureName.length() > 0)) {
+            int dot = pictureName.lastIndexOf('.');
+            if ((dot > -1) && (dot < (pictureName.length()))) {
+                description = pictureName.substring(0, dot);
+            }
+        }
+        String path = null;
+        try {
+
+//            FileOutputStream fileOutputStream = new FileOutputStream(new File("F:\\m\\"+pictureName));
+//            fileOutputStream.write(in);
+//            fileOutputStream.flush();
+//            fileOutputStream.close();
+
+            InputStream inputStream = new ByteArrayInputStream(in);
+            ObjectNode objectNode = fastDFSUtil.upload(inputStream, fileExtension, description);
+            String groupName = objectNode.get("groupName").toString();
+            String remoteFileName = objectNode.get("remoteFileName").toString();
+            path = "{\"groupName\":" + groupName + ",\"remoteFileName\":" + remoteFileName + "}";
+
+        } catch (Exception e) {
+            LogService.getLogger(DemographicInfo.class).error("人口头像图片上传失败；错误代码："+e);
+        }
+        //返回文件路径
+        return path;
     }
 
 
     /**
-     * 注：因直接访问文件路径，无法显示文件信息
-     * 将文件路径解析成字节流，通过字节流的方式读取文件
-     * @param request
-     * @param response
-     * @param localImgPath       文件路径
-     * @throws Exception
+     * 人口信息头像图片下载
+     * @return
+     * @throws IOException
+     * @throws MyException
      */
-    @RequestMapping(value = "/populations/images/{local_img_path}",method = RequestMethod.PUT)
-    @ApiOperation(value = "显示头像")
-    public void showImage(
-            @ApiParam(name = "local_img_path", value = "身份证号", defaultValue = "")
-            @PathVariable(value = "local_img_path") String localImgPath,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception{
-        response.setContentType("text/html; charset=UTF-8");
-        response.setContentType("image/jpeg");
-        FileInputStream fis = null;
-        OutputStream os = null;
+    @RequestMapping(value = "/populations/picture",method = RequestMethod.GET)
+    @ApiOperation(value = "下载头像")
+    public String downloadPicture(
+            @ApiParam(name = "group_name", value = "分组", defaultValue = "")
+            @RequestParam(value = "group_name") String groupName,
+            @ApiParam(name = "remote_file_name", value = "服务器头像名称", defaultValue = "")
+            @RequestParam(value = "remote_file_name") String remoteFileName) throws Exception {
+        String imageStream = null;
         try {
-            File file = new File(localImgPath);
-            if (!file.exists()) {
-                LogService.getLogger(PatientController.class).error("人口头像不存在：" + localImgPath);
-                return;
-            }
-            fis = new FileInputStream(localImgPath);
-            os = response.getOutputStream();
-            int count = 0;
-            byte[] buffer = new byte[1024 * 1024];
-            while ((count = fis.read(buffer)) != -1)
-                os.write(buffer, 0, count);
-            os.flush();
+
+            byte[] bytes = fastDFSUtil.download(groupName,remoteFileName);
+
+            String fileStream = Base64.encode(bytes);
+            imageStream = URLEncoder.encode(fileStream,"UTF-8");
+
         } catch (IOException e) {
-            LogService.getLogger(PatientController.class).error(e.getMessage());
-        } finally {
-            if (os != null)
-                os.close();
-            if (fis != null)
-                fis.close();
+            e.printStackTrace();
+        } catch (MyException e) {
+            LogService.getLogger(DemographicInfo.class).error("人口头像图片下载失败；错误代码：" + e);
         }
+        return imageStream;
     }
 
     @RequestMapping(value = "/populations/is_exist/{id_card_no}",method = RequestMethod.GET)
@@ -295,5 +292,9 @@ public class PatientController extends BaseRestController {
 
         return demographicService.getDemographicInfo(new DemographicId(idCardNo)) != null;
     }
+
+
+
+
 
 }

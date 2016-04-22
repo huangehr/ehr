@@ -7,7 +7,8 @@ import com.yihu.ehr.adaption.dataset.service.AdapterDataSet;
 import com.yihu.ehr.adaption.dataset.service.AdapterDataSetService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.adaption.MAdapterDataSet;
-import com.yihu.ehr.model.adaption.MDataSet;
+import com.yihu.ehr.model.adaption.MAdapterDataVo;
+import com.yihu.ehr.model.adaption.MAdapterRelationship;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -30,7 +31,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/adapter")
-@Api(protocols = "https", value = "adapterDataSet", description = "适配数据集接口", tags = {"适配数据集"})
+@Api(value = "adapterDataSet", description = "适配数据集接口", tags = {"适配数据集"})
 public class AdapterDataSetController extends ExtendController<MAdapterDataSet> {
 
     @Autowired
@@ -39,8 +40,8 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
     OrgAdapterPlanService orgAdapterPlanService;
 
     @RequestMapping(value = "/plan/{planId}/datasets", method = RequestMethod.GET)
-    @ApiOperation(value = "根据方案ID及查询条件查询数据集适配关系")
-    public Collection<MDataSet> searchAdapterDataSet(
+    @ApiOperation(value = "查询定制数据集")
+    public Collection<MAdapterRelationship> searchAdapterDataSet(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "code", value = "代码查询值", defaultValue = "")
@@ -65,8 +66,8 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
     }
 
     @RequestMapping("/plan/{planId}/datasets/{dataSetId}/datametas")
-    @ApiOperation(value = "根据dataSetId搜索数据元适配关系")
-    public Collection<MAdapterDataSet> searchAdapterMetaData(
+    @ApiOperation(value = "搜索定制数据元")
+    public Collection<MAdapterDataVo> searchAdapterMetaData(
             @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
             @PathVariable(value = "planId") Long planId,
             @ApiParam(name = "dataSetId", value = "数据集id", defaultValue = "")
@@ -130,19 +131,61 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
     @RequestMapping(value = "/datametas", method = RequestMethod.DELETE)
     @ApiOperation(value = "批量删除数据元映射关系")
     public boolean delMetaData(
+            @ApiParam(name = "ids", value = "数据元编号集")
             @RequestParam("ids") String ids) throws Exception{
 
         if (StringUtils.isEmpty(ids))
             throw errMissId();
-        adapterDataSetService.deleteAdapterDataSet(ids.split(","));
+        adapterDataSetService.deleteAdapterDataSet(strToLongArr(ids));
         return true;
     }
 
+    @RequestMapping(value = "/data_set/{data_set_id}/is_left/meta", method = RequestMethod.GET)
+    @ApiOperation(value = "判断除了metaIds之外是否还存在其他的数据元")
+    public boolean isLeftMeta(
+            @ApiParam(name = "plan_id", value = "数据集编号")
+            @RequestParam("plan_id") long planId,
+            @ApiParam(name = "data_set_id", value = "数据集编号")
+            @PathVariable("data_set_id") long dataSetId,
+            @ApiParam(name = "meta_ids", value = "数据元编号集")
+            @RequestParam("meta_ids") String metaIds) {
+
+        return adapterDataSetService.isLeftMeta(planId, dataSetId, strToLongArr(metaIds));
+    }
+
+    @RequestMapping(value = "/plan/{planId}/data_set/{data_set_id}/std_meta", method = RequestMethod.GET)
+    @ApiOperation(value = "过滤后的标准数据元分页查询")
+    public Collection<MAdapterRelationship> searchStdMeta(
+            @ApiParam(name = "planId", value = "适配方案id", defaultValue = "")
+            @PathVariable(value = "planId") Long planId,
+            @ApiParam(name = "data_set_id", value = "字典编号", defaultValue = "")
+            @PathVariable(value = "data_set_id") Long dataSetId,
+            @ApiParam(name = "seach_name", value = "代码查询值", defaultValue = "")
+            @RequestParam(value = "seach_name", required = false) String searchName,
+            @ApiParam(name = "mode", value = "编辑模式（new/modify）", defaultValue = "")
+            @RequestParam(value = "mode", required = false) String mode,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+
+        OrgAdapterPlan orgAdapterPlan = orgAdapterPlanService.retrieve(planId);
+        if (orgAdapterPlan == null)
+            throw errNotFound();
+
+        List ls = adapterDataSetService.searchStdMeta(orgAdapterPlan, dataSetId, searchName, mode, sorts, page, size);
+        pagedResponse(request, response, (long) adapterDataSetService.countStdMeta(orgAdapterPlan, dataSetId, searchName, mode), page, size);
+        return ls;
+    }
 
     private AdapterDataSet saveAdapterMetaData(AdapterDataSet adapterDataSet, String jsonModel)  {
         AdapterDataSet adapterDataSetModel = null;
         try {
-            adapterDataSetModel = jsonToObj(jsonModel, AdapterDataSet.class);
+            adapterDataSetModel = toDecodeObj(jsonModel, AdapterDataSet.class);
         } catch (IOException e) {
             throw errParm();
         }

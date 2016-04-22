@@ -9,19 +9,19 @@
       var retrieve = null;
       var master = null;
       var conditionArea = null;
-      var adapterPlanId = ${adapterPlanId};
+      var adapterPlanId = ${dataModel};
       var entryRetrieve = null;
       var entryMater = null;
       var cfgModel = 0;
       var changeFlag=false;
       var cfg = [
         {
-          left:{title:'平台数据集', cls:'', search:'/adapterDataSet/searchAdapterDataSet', goAdd:'', del:''},
-          right:{title:'数据元映射', cls:'', search:'/adapterDataSet/searchAdapterMetaData', goAdd:'/adapterDataSet/template/adapterMetaDataInfo', del:'/adapterDataSet/delMetaData',delLs:'/adapterDataSet/delMetaData'}
+          left:{title:'平台数据集', cls:'', search:'/adapterDataSet/dataSetList', goAdd:'', del:''},
+          right:{title:'数据元映射', cls:'', search:'/adapterDataSet/metaDataList', goAdd:'/adapterDataSet/gotoModify', del:'/adapterDataSet/delete',delLs:'/adapterDataSet/delete'}
         },
         {
           left:{title:'平台字典', cls:'', search:'/adapterDict/searchAdapterDict', goAdd:'', del:''},
-          right:{title:'字典项映射', cls:'', search:'/adapterDict/searchAdapterDictEntry', goAdd:'/adapterDict/template/adapterMetaDataInfo', del:'/adapterDict/delDictEntry',delLs:'/adapterDict/delDictEntry'}
+          right:{title:'字典项映射', cls:'', search:'/adapterDict/searchAdapterDictEntry', goAdd:'/adapterDict/gotoModify', del:'/adapterDict/delete',delLs:'/adapterDict/delete'}
         }
       ];
       /* *************************** 函数定义 ******************************* */
@@ -77,7 +77,7 @@
           var dataModel = $.DataModel.init();
 			conditionArea.$adapter_plan_org.css({width: 200})
 
-          dataModel.fetchRemote("${contextRoot}/adapter/getAdapterPlanById",{
+          dataModel.fetchRemote("${contextRoot}/adapter/model",{
             data:{id:adapterPlanId},
             success: function(data) {
               var model = data.obj;
@@ -170,7 +170,7 @@
 
           var searchNm = $("#searchNm").val();
           var values = {
-            strKey: searchNm,
+            searchNm: searchNm,
             adapterPlanId: adapterPlanId
           };
           if (changeFlag){
@@ -196,17 +196,17 @@
           var columnCfg =[];
           var code = 'code';
           var name = 'name';
-          if(cfgModel==1){
-            code = 'dictCode';
-            name = 'dictName';
-          }
+//          if(cfgModel==1){
+//            code = 'dictCode';
+//            name = 'dictName';
+//          }
           columnCfg = [
             { display: 'id', name: 'id', hide:true },
             { display: '代码', name: code,width: '50%', isAllowHide: false ,align:'left' },
             { display: '名称',name: name, width: '50%',isAllowHide: false ,align:'left' }
 //            { display: '操作', name: 'operator', width: '34%', render: function (row) {
-//              var html = '<a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","grid:left:open", row.id,'modify')+'">修改</a>' +
-//                      ' / <a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","grid:left:delete", row.id)+'">删除</a>';
+//              var html = '<a class="grid_edit" href="#" title="编辑" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}'])","grid:left:open", row.id,'modify')+'"></a>' +
+//                      '<a class="grid_delete" href="#" title="删除" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","grid:left:delete", row.id)+'"></a>';
 //              return html;
 //            }}
           ];
@@ -263,7 +263,7 @@
           }
           var values = {
             adapterPlanId :adapterPlanId,
-            strKey: searchNmEntry,
+            searchNmEntry: searchNmEntry,
             dataSetId:parentId,
             dictId:parentId
           };
@@ -308,6 +308,7 @@
           });
 
           $.subscribe('grid:right:delete',function(event,ids) {
+            debugger
             if(!ids){
               var rows = entryMater.grid.getSelectedRows();
               if(rows.length==0){
@@ -322,9 +323,16 @@
 
             $.Notice.confirm('确认删除所选数据？', function (r) {
               if(r){
+                var extParms = {
+                  plan_id: adapterPlanId
+                };
+                var parent = master.grid.getSelectedRow();
+                if(parent){
+                  extParms.data_set_id = parent.id;
+                }
                 var dataModel = $.DataModel.init();
                 dataModel.updateRemote('${contextRoot}'+cfg[cfgModel].right.delLs,{
-                  data:{id:ids},
+                  data:{ids: ids, extParms: JSON.stringify(extParms)},
                   success:function(data){
                     if (data.successFlg) {
                       $.Notice.success('操作成功！');
@@ -351,8 +359,11 @@
               { display: '机构数据元代码', name: 'orgMetaDataCode',width: '14%', isAllowHide: false  ,align:'left'},
               { display: '机构数据元名称',name: 'orgMetaDataName', width: '14%',isAllowHide: false  ,align:'left'},
               { display: '操作', name: 'operator', width: '16%', render: function (row) {
-                var html = '<a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}','{3}'])","grid:right:open", row.id,'modify')+'">修改</a>' +
-                        ' / <a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","grid:right:delete", row.id)+'">删除</a>';
+				  var html ='<div class="grid_edit"  style=""  title="修改" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}'])", "grid:right:open", row.id,'modify') + '"></div>'
+						  +'<div class="grid_delete"  style="" title="删除"' +
+						  'onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "grid:right:delete", row.id) + '"></div>';
+				  var html = '<a class="grid_edit" href="#" title="编辑" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}','{3}'])","grid:right:open", row.id,'modify')+'"></a>' +
+                        '<a class="grid_delete" href="#" title="删除" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","grid:right:delete", row.id)+'"></a>';
                 return html;
               }}
             ]
@@ -368,8 +379,11 @@
               { display: '机构字典项代码', name: 'orgDictEntryCode',width: '14%', isAllowHide: false  ,align:'left'},
               { display: '机构字典项值',name: 'orgDictEntryName', width: '14%',isAllowHide: false  ,align:'left'},
               { display: '操作', name: 'operator', width: '16%', render: function (row) {
-                var html = '<a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}','{3}'])","grid:right:open", row.id,'modify')+'">修改</a>' +
-                        ' / <a href="#" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","grid:right:delete", row.id)+'">删除</a>';
+//				  var html ='<div class="grid_edit"  style=""  title="修改" onclick="javascript:' + Util.format("$.publish('{0}',['{1}','{2}','{3}'])", "grid:right:open", row.id,'modify') + '"></div>'
+//						  +'<div class="grid_delete"  style="" title="删除"' +
+//						  ' onclick="javascript:' + Util.format("$.publish('{0}',['{1}'])", "grid:right:delete", row.id) + '"></div>';
+                var html = '<a class="grid_edit" href="#" title="编辑" onclick="javascript:'+Util.format("$.publish('{0}',['{1}','{2}','{3}'])","grid:right:open", row.id,'modify')+'"></a>' +
+                        '<a class="grid_delete" href="#" title="删除" onclick="javascript:'+Util.format("$.publish('{0}',['{1}'])","grid:right:delete", row.id)+'"></a>';
                 return html;
               }}
             ]

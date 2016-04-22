@@ -1,9 +1,10 @@
 package com.yihu.ehr.org.service;
 
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 机构,由 XOrgManager 创建并维护.
@@ -14,8 +15,13 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "organizations")
-@Access(value = AccessType.PROPERTY)
+@Access(value = AccessType.FIELD)
 public class Organization  {
+
+    @Id
+    @GeneratedValue(generator = "Generator")
+    @GenericGenerator(name = "Generator", strategy = "assigned")
+    @Column(name = "org_code", unique = true, nullable = false)
     private String orgCode;         // 机构代码,对医院编码属性需要调研
     private String admin;            // 机构管理员
     private boolean settled;        // 是否已接入,对第三方平台有效.
@@ -29,12 +35,12 @@ public class Organization  {
     private Date createDate;        // 创建日期
     private String location;        // 地址
     private int activityFlag;
+    private String tags;
     public Organization() {
         //tags = new HashSet<>();
     }
 
-    @Id
-    @Column(name = "org_code", unique = true, nullable = false)
+
     public String getOrgCode() {
         return orgCode;
     }
@@ -49,35 +55,6 @@ public class Organization  {
     public void setAdmin(String admin) {
         this.admin = admin;
     }
-
-
-
-//    @Column(name = "tags",  nullable = true)
-//    public String getTags() {
-//        return String.join(",", tags);
-//    }
-//    public void setTags(String tags) {
-//        if(tags == null) return;
-//        String[] tagToken = tags.split(",");
-//        for (String token: tagToken){
-//            token = token.trim();
-//            if(token.length() == 0) continue;
-//            this.tags.add(token);
-//        }
-//    }
-////    public String getTagsStr(){
-////        return String.join(",", tags);
-////    }
-//    public void addTag(String tag) {
-//        if(tag == null || tag.length() == 0) return;
-//        if (tags.contains(tag)) return;
-//        tags.add(tag);
-//    }
-//    public void removeTag(String tag) {
-//        this.tags.remove(tag);
-//    }
-
-
 
     @Column(name = "create_date",  nullable = true)
     public Date getCreateDate() {
@@ -160,6 +137,24 @@ public class Organization  {
     }
     public void setActivityFlag(int activityFlag) {
         this.activityFlag = activityFlag;
+    }
+
+    @Column(name = "tags",  nullable = true)
+    public List<String> getTags() {
+        List<String> list = new ArrayList<>();
+        if(org.springframework.util.StringUtils.isEmpty(tags)){
+        }else {
+            String[] arr = tags.split(";|；");
+            list = Arrays.asList(arr);
+        }
+        return list;
+    }
+    public void setTags(List<String> tags) {
+        if(tags.size()>0){
+            this.tags = StringUtils.join(tags.toArray(),";");
+        }else {
+            this.tags = "";
+        }
     }
 
 

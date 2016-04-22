@@ -48,13 +48,6 @@
 //        assertTrue("查询失败！" , result != null);
 //    }
 //
-//    @Test
-//    public void cGetCdaTypeByCodeOrName() throws Exception{
-//        String code = "";
-//        String name = "";
-//        Object result = cdaTypeController.getCdaTypeByCodeOrName(code,name);
-//        assertTrue("查询失败！" , result != null);
-//    }
 //
 //    @Test
 //    public void dGetCdaTypeById() throws Exception{
@@ -63,12 +56,6 @@
 //        assertTrue("查询失败！" , result != null);
 //    }
 //
-//    @Test
-//    public void gGetCdaTypeByIds() throws Exception{
-//        String[] ids = new String[]{"0dae000656720d12269e0319806c0ef1","0dae000656720d25269e0319806c0ef2"};
-//        Object result = cdaTypeController.getCdaTypeByIds(ids);
-//        assertTrue("查询失败！" , result != null);
-//    }
 //
 //    @Test
 //    public void jSaveCDAType() throws Exception{

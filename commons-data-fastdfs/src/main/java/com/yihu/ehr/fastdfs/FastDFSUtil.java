@@ -223,10 +223,10 @@ public class FastDFSUtil {
      * @param localPath      本地路径
      * @return 是否下载成功
      */
-    public String download(String groupName, String remoteFileName, String localPath) throws IOException, MyException {
+    public String download(String groupName, String remoteFileName, String localPath) throws Exception {
         StorageClient client = clientPool.getStorageClient();
         try {
-            String localFileName = localPath + "\\" + remoteFileName.replaceAll("/", "_");
+            String localFileName = localPath + remoteFileName.replaceAll("/", "_");
             client.download_file(groupName, remoteFileName, 0, 0, localFileName);
 
             return localFileName;
@@ -241,7 +241,7 @@ public class FastDFSUtil {
      * @param groupName
      * @param remoteFileName
      */
-    public void delete(String groupName, String remoteFileName) throws IOException, MyException {
+    public void delete(String groupName, String remoteFileName) throws Exception {
         StorageClient client = clientPool.getStorageClient();
         try {
             client.delete_file(groupName, remoteFileName);

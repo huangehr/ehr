@@ -79,4 +79,9 @@ public class OrgDataSetService extends BaseJpaService<OrgDataSet, XOrgDataSetRep
         return seq;
     }
 
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public OrgDataSet getDataSetBySequence(String orgCode,int sequence)
+    {
+        return ((XOrgDataSetRepository) getRepository()).getDataSetBySequence(orgCode,sequence);
+    }
 }

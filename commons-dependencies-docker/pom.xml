@@ -18,6 +18,7 @@
     <properties>
         <docker.host></docker.host>
         <docker.expose.port></docker.expose.port>
+        <maven.test.skip>true</maven.test.skip>
     </properties>
 
     <modules>
@@ -27,7 +28,7 @@
         <module>../svr-dict</module>
         <module>../svr-discovery</module>
         <module>../svr-geography</module>
-        <module>../svr-health-profiles</module>
+        <module>../svr-health-profile</module>
         <module>../svr-organization</module>
         <module>../svr-pack-mgr</module>
         <module>../svr-pack-resolve</module>
@@ -36,6 +37,7 @@
         <module>../svr-special-dict</module>
         <module>../svr-standard</module>
         <module>../svr-user</module>
+        <module>../svr-esb</module>
         <module>../ag-admin</module>
         <module>../ag-ehr-platform</module>
         <module>../app-admin</module>
@@ -44,19 +46,17 @@
 
     <build>
         <plugins>
+            <!--spring 插件-->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <executable>true</executable>
+                </configuration>
             </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
-                <!--spring 插件-->
-                <plugin>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-maven-plugin</artifactId>
-                </plugin>
-
                 <!--docker 插件-->
                 <plugin>
                     <groupId>com.spotify</groupId>
@@ -72,11 +72,8 @@
                     </executions>
                     <configuration>
                         <dockerHost>${docker.host}</dockerHost>
-
                         <dockerDirectory>${project.build.sourceDirectory}/docker</dockerDirectory>
-
                         <imageName>${project.artifactId}:${project.version}</imageName>
-
                         <resources>
                             <resource>
                                 <targePath>/</targePath>
@@ -84,12 +81,11 @@
                                 <include>${project.build.finalName}.jar</include>
                             </resource>
                         </resources>
-
                         <pushImage>false</pushImage>
                     </configuration>
                 </plugin>
 
-                <!--markdown site 插件-->
+                <!--site 插件-->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>

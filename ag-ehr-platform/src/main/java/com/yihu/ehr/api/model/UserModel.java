@@ -20,7 +20,8 @@ public class UserModel implements Serializable{
     private String martialStatus;
     private String gender;
     private String idCardNo;
-    private OrganizationModel organization;
+    private OrgModel organization;
+
     // 未绑定属性
     private String orgPost;
     private String privilege;
@@ -147,11 +148,11 @@ public class UserModel implements Serializable{
         this.idCardNo = idCardNo;
     }
 
-    public OrganizationModel getOrganization() {
+    public OrgModel getOrganization() {
         return organization;
     }
 
-    public void setOrganization(OrganizationModel organization) {
+    public void setOrganization(OrgModel organization) {
         this.organization = organization;
     }
 

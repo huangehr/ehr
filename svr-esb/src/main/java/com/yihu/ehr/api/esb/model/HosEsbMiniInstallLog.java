@@ -23,6 +23,7 @@ public class HosEsbMiniInstallLog implements java.io.Serializable {
     private String currentVersionName;
     private String currentVersionCode;
     private Date installTime;
+    private String message;
 
 
     // Constructors
@@ -56,8 +57,8 @@ public class HosEsbMiniInstallLog implements java.io.Serializable {
     // Property accessors
     @Id
     @Column(name = "id", unique = true, nullable = false, length = 64)
-    @GenericGenerator(name="systemUUID",strategy="uuid")
-    @GeneratedValue(generator="systemUUID")
+    @GenericGenerator(name = "systemUUID", strategy = "uuid")
+    @GeneratedValue(generator = "systemUUID")
     public String getId() {
         return this.id;
     }
@@ -111,5 +112,12 @@ public class HosEsbMiniInstallLog implements java.io.Serializable {
         this.installTime = installTime;
     }
 
+    @Column(name = "message", length = 0)
+    public String getMessage() {
+        return message;
+    }
 
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }

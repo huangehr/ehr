@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.3.2.RELEASE</version>
+        <version>1.3.3.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.yihu.ehr</groupId>
@@ -129,24 +129,19 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-parent</artifactId>
-                <version>Brixton.M4</version>
+                <version>Brixton.M5</version>
                 <type>pom</type>
                 <scope>import</scope>
-                <!--<groupId>org.springframework.cloud</groupId>-->
-                <!--<artifactId>spring-cloud-starter-parent</artifactId>-->
-                <!--<version>Angel.SR6</version>-->
-                <!--<type>pom</type>-->
-                <!--<scope>import</scope>-->
             </dependency>
         </dependencies>
     </dependencyManagement>
 
     <properties>
         <!-- Third Party -->
-        <pinyin4j.version>2.5.0</pinyin4j.version>
-        <zip4j.version>1.3.2</zip4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
+        <pinyin4j.version>2.5.0</pinyin4j.version>
+        <zip4j.version>1.3.2</zip4j.version>
         <commons.lang.version>2.3</commons.lang.version>
     </properties>
     <dependencies>
@@ -202,22 +197,19 @@
         </dependency>
     </dependencies>
 
-    <modules>
-        <module>../commons-ehr-constants</module>
-        <module>../commons-ui-swagger</module>
-        <module>../commons-util</module>
-
-        <module>../commons-data-fastdfs</module>
-        <module>../commons-data-hbase</module>
-        <module>../commons-data-mysql</module>
-        <module>../commons-data-redis</module>
-        <module>../commons-data-solr</module>
-        <module>../commons-thrift-services</module>
-        <module>../commons-thrift-client</module>
-        <module>../commons-thrift-server</module>
-        <module>../commons-rest-model</module>
-        <module>../commons-admin-gateway-model</module>
-    </modules>
+    <build>
+        <plugins>
+            <!--maven java 编译插件-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <repositories>
         <repository>
@@ -227,6 +219,22 @@
             <releases>
                 <enabled>true</enabled>
             </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <!--<repository>
+            <id>spring-snapshots</id>
+            <name>Spring Snapshots</name>
+            <url>https://repo.spring.io/snapshot</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>-->
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
@@ -244,19 +252,41 @@
                 <enabled>false</enabled>
             </snapshots>
         </pluginRepository>
+        <!--<pluginRepository>
+            <id>spring-snapshots</id>
+            <name>Spring Snapshots</name>
+            <url>https://repo.spring.io/snapshot</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>-->
+        <pluginRepository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
     </pluginRepositories>
 
-    <build>
-        <plugins>
-            <!--maven java 编译插件-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <modules>
+        <module>../commons-ehr-constants</module>
+        <module>../commons-ui-swagger</module>
+        <module>../commons-util</module>
+        <module>../commons-data-fastdfs</module>
+        <module>../commons-data-hbase</module>
+        <module>../commons-data-mysql</module>
+        <module>../commons-data-redis</module>
+        <module>../commons-data-solr</module>
+        <module>../commons-redis-keyschema</module>
+        <module>../commons-profile-core</module>
+        <module>../commons-profile-persist</module>
+        <!--<module>../commons-thrift-services</module>
+        <module>../commons-thrift-client</module>
+        <module>../commons-thrift-server</module>-->
+        <module>../commons-rest-model</module>
+        <module>../commons-admin-gateway-model</module>
+        <module>../commons-redis-mq</module>
+    </modules>
 </project>

@@ -2,7 +2,7 @@
 //
 //import com.yihu.ehr.StandardServiceApp;
 //import com.yihu.ehr.model.standard.MCDAVersion;
-//import com.yihu.ehr.standard.cdaversion.controller.CdaVersionController;
+//import com.yihu.ehr.standard.version.controller.VersionController;
 //import org.junit.FixMethodOrder;
 //import org.junit.Test;
 //import org.junit.runner.RunWith;
@@ -10,7 +10,6 @@
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.boot.test.SpringApplicationConfiguration;
 //import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-//import org.springframework.transaction.annotation.Transactional;
 //
 //import static org.junit.Assert.assertTrue;
 //
@@ -18,11 +17,11 @@
 //@RunWith(SpringJUnit4ClassRunner.class)
 //@SpringApplicationConfiguration(classes = StandardServiceApp.class)
 //@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-//@Transactional
+////@Transactional
 //public class CdaVersionTests {
 //
 //    @Autowired
-//    private CdaVersionController cdaVersionController;
+//    private VersionController cdaVersionController;
 //
 //    @Test
 //    public void testIsLatestVersions() throws Exception{
