@@ -75,6 +75,7 @@ public class MembersService extends BaseJpaService<Members, XMembersRepository> 
      */
     public Members createMembers(Members members)
     {
+        members.setCreateDate(new Date());
         membersRep.save(members);
 
         return members;
