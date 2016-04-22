@@ -1,6 +1,7 @@
 package com.yihu.ehr.util;
 
 import org.springframework.http.HttpMethod;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpMessageConverterExtractor;
 import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.RestClientException;
@@ -13,6 +14,7 @@ import java.util.Map;
 /** HTTP 请求工具类
  * Created by zqb on 2016/3/18.
  */
+@Component
 public class RestTemplates extends RestTemplate{
     public RestTemplates() {
         super();

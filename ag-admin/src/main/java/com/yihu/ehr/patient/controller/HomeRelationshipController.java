@@ -3,12 +3,14 @@ package com.yihu.ehr.patient.controller;
 import com.yihu.ehr.agModel.patient.HomeGroupModel;
 import com.yihu.ehr.agModel.patient.HomeRelationshipModel;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.model.patient.MDemographicInfo;
+import com.yihu.ehr.patient.service.FamiliesClient;
+import com.yihu.ehr.patient.service.MembersClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -24,20 +27,37 @@ import java.util.List;
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
 @Api(value = "home_relationship", description = "家庭关系管理", tags = {"家庭庴管理"})
-public class HomeRelationshipController extends BaseController{
+public class HomeRelationshipController extends BaseController {
 
+    @Autowired
+    private MembersClient membersClient;
+
+    @Autowired
+    private FamiliesClient familiesClient;
 
     @RequestMapping(value = "/home_relationship", method = RequestMethod.GET)
-    @ApiOperation(value = "根据条件查询人")
+    @ApiOperation(value = "根据查询条件查家庭关系")
     public Envelop getHomeRelationship(
-            @ApiParam(name = "id", value = "患者Id", defaultValue = "")
-            @RequestParam(value = "id") String id,
-            @ApiParam(name = "page", value = "当前页", defaultValue = "")
-            @RequestParam(value = "page") Integer page,
-            @ApiParam(name = "rows", value = "行数", defaultValue = "")
-            @RequestParam(value = "rows") Integer rows) {
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) {
         try {
-            ResponseEntity<List<MDemographicInfo>> responseEntity = null;
+
+            //TODO: 根据查询条件查询家庭组ID
+            ResponseEntity<Collection<Object>> familiesResponseEntity = familiesClient.searchFamilies(fields, filters, sorts, size, page);
+
+            //TODO:根据查询所得的家庭组ID查询家庭成员
+            filters="familyId="+"";
+            ResponseEntity<Collection<Object>> MemgersResponseEntity = membersClient.searchMembers(fields, filters, sorts, size, page);
+
+
             //List<MDemographicInfo> demographicInfos = responseEntity.getBody();
             List<HomeRelationshipModel> relationshipModels = new ArrayList<>();
 //            for (HomeRelationshipModel relationshipModel : demographicInfos) {
@@ -73,26 +93,35 @@ public class HomeRelationshipController extends BaseController{
 //                relationshipModels.add(patient);
 //            }
             //getTotalCount(responseEntity)
-            return getResult(relationshipModels,0 , page, rows);
-        }
-        catch (Exception ex)
-        {
+            return getResult(relationshipModels, 0, page, size);
+        } catch (Exception ex) {
             ex.printStackTrace();
             return failedSystem();
         }
     }
 
     @RequestMapping(value = "/home_group", method = RequestMethod.GET)
-    @ApiOperation(value = "根据条件查询人")
+    @ApiOperation(value = "根据查询条件查询家庭群组")
     public Envelop getHomeGroup(
-            @ApiParam(name = "id", value = "患者Id", defaultValue = "")
-            @RequestParam(value = "id") String id,
-            @ApiParam(name = "page", value = "当前页", defaultValue = "")
-            @RequestParam(value = "page") Integer page,
-            @ApiParam(name = "rows", value = "行数", defaultValue = "")
-            @RequestParam(value = "rows") Integer rows) {
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) {
         try {
-            //ResponseEntity<List<MDemographicInfo>> responseEntity = null;
+
+            //TODO：根据查询条件获取家庭组ID
+            ResponseEntity<Collection<Object>> membersResponseEntity = membersClient.searchMembers(fields, filters, sorts, size, page);
+
+            //TODO:根据家庭组ID获取家庭组信息
+            filters="id="+"";
+
+            ResponseEntity<Collection<Object>> familyResponseEntity = familiesClient.searchFamilies(fields, filters, sorts, size, page);
             //List<MDemographicInfo> demographicInfos = responseEntity.getBody();
             List<HomeGroupModel> homeGroupModels = new ArrayList<>();
 //            for (HomeRelationshipModel relationshipModel : demographicInfos) {
@@ -128,12 +157,20 @@ public class HomeRelationshipController extends BaseController{
 //                relationshipModels.add(patient);
 //            }
             //getTotalCount(responseEntity)
-            return getResult(homeGroupModels,0 , page, rows);
-        }
-        catch (Exception ex)
-        {
+            return getResult(homeGroupModels, 0, page, size);
+        } catch (Exception ex) {
             ex.printStackTrace();
             return failedSystem();
         }
+    }
+
+    public HomeRelationshipModel ConvertToHomeRelationshipModel()
+    {
+        return null;
+    }
+
+    public HomeGroupModel ConvertToHomeGroupModel()
+    {
+        return null;
     }
 }
