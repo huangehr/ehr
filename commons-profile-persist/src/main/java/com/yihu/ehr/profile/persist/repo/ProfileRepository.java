@@ -137,7 +137,7 @@ public class ProfileRepository {
             Map<String, String> record = new HashMap<>();
 
             // 数据集内容
-            Result result = (Result)obj;
+            Result result = (Result) obj;
             List<Cell> cellList = result.listCells();
             if (cellList == null) continue;
 
@@ -175,7 +175,6 @@ public class ProfileRepository {
         for (int i = 0; i < innerCodes.length; ++i) {
             Long dictId = cacheReader.read(keySchema.metaDataDict(version, dataSetCode, innerCodes[i]));
             String type = cacheReader.read(keySchema.metaDataType(version, dataSetCode, innerCodes[i]));
-            type = type == null ? "S1" : type;
             if (dictId == null || dictId == 0) {
                 metaDataCode.add(QualifierTranslator.hBaseQualifier(innerCodes[i], type));
             } else if (dictId > 0) {
@@ -203,9 +202,8 @@ public class ProfileRepository {
             Map<String, String> record = new HashMap<>();
             for (Cell cell : cellList) {
                 String qualifier = Bytes.toString(CellUtil.cloneQualifier(cell));
-                String value = Bytes.toString(CellUtil.cloneValue(cell));
-
                 if (qualifier.startsWith("HDS") || qualifier.startsWith("JDS")) {
+                    String value = Bytes.toString(CellUtil.cloneValue(cell));
                     record.put(qualifier.substring(0, qualifier.lastIndexOf("_")), value);
                 }
             }
@@ -242,49 +240,6 @@ public class ProfileRepository {
 
 
     /**
-     * 结构化档案，轻量级档案插入数据集
-     * @param tableSet
-     * @param lightWeightProfile
-     * @param structuredProfile
-     * @throws IOException
-     */
-    public void InsertDataSet(Set<String> tableSet,LightWeightProfile lightWeightProfile,StructuredProfile structuredProfile) throws IOException {
-        for (String tableName : tableSet) {
-            DataSet dataSet;
-            if(StringUtils.isEmpty(lightWeightProfile)){
-                dataSet = structuredProfile.getDataSet(tableName);
-            }else {
-                dataSet = lightWeightProfile.getDataSet(tableName);
-            }
-
-            hbaseClient.beginBatchInsert(tableName, false);
-            for (String key : dataSet.getRecordKeys()) {
-                Map<String, String> record = dataSet.getRecord(key);
-                String[][] hbDataArray = DataSetTableOption.metaDataToQualifier(record);
-
-                // 所属档案ID，标准版本号
-                hbaseClient.batchInsert(key,
-                        DataSetTableOption.Family.Basic.toString(),
-                        DataSetTableOption.getQualifiers(DataSetTableOption.Family.Basic),
-                        new String[]{
-                                StringUtils.isEmpty(lightWeightProfile)? structuredProfile.getId():lightWeightProfile.getId(),
-                                dataSet.getCdaVersion(),
-                                DateTimeUtils.utcDateTimeFormat(new Date())
-                        });
-
-                // 数据元
-                hbaseClient.batchInsert(key,
-                        DataSetTableOption.Family.MetaData.toString(),
-                        hbDataArray[0],
-                        hbDataArray[1]);
-            }
-
-            hbaseClient.endBatchInsert();
-        }
-    }
-
-
-    /**
      * 保存全量级档案。
      *
      * @param structuredProfile
@@ -311,7 +266,7 @@ public class ProfileRepository {
 
         // 数据集
         Set<String> tableSet = structuredProfile.getDataSetTables();
-        InsertDataSet(tableSet,null,structuredProfile);
+        InsertDataSet(tableSet, null, structuredProfile);
     }
 
 
@@ -342,13 +297,17 @@ public class ProfileRepository {
 
         // 数据集
         Set<String> tableSet = lightWeightProfile.getDataSetTables();
-        InsertDataSet(tableSet,lightWeightProfile,null);
+        InsertDataSet(tableSet, lightWeightProfile, null);
 
     }
 
-
-
-
+    /**
+     * 保存非结构化档案。
+     *
+     * @param noStructuredProfile
+     * @throws IOException
+     * @throws ParseException
+     */
     public void saveUnStructuredProfile(NoStructuredProfile noStructuredProfile) throws IOException, ParseException {
         // 先存档案
         hbaseClient.insertRecord(ProfileTableOptions.Table,
@@ -364,13 +323,11 @@ public class ProfileRepository {
                         noStructuredProfile.getSummary(),
                         noStructuredProfile.getDemographicId() == null ? "" : noStructuredProfile.getDemographicId(),
                         DateTimeUtils.utcDateTimeFormat(noStructuredProfile.getCreateDate()),
-//                        unStructuredProfile.getDataSetsAsString(),
-                        "",  //非结构化档案暂时不保存数据集信息
+                        "",  // TODO 非结构化档案暂时不保存数据集信息
                         noStructuredProfile.getCdaVersion()
                 });
 
         // 非结构化档案文档解析
-
         hbaseClient.insertRecord(DocumentTableOption.Table,
                 noStructuredProfile.getId(),
                 DocumentTableOption.Family.Document.toString(),
@@ -383,7 +340,48 @@ public class ProfileRepository {
                         noStructuredProfile.getCdaVersion(),
                         objectMapper.writeValueAsString(noStructuredProfile.getNoStructuredDocumentList())  //// TODO: 2016/4/18 json格式化
                 });
+    }
 
+    /**
+     * 轻量级档案插入数据集
+     *
+     * @param tableSet
+     * @param lightWeightProfile
+     * @param structuredProfile
+     * @throws IOException
+     */
+    private void InsertDataSet(Set<String> tableSet, LightWeightProfile lightWeightProfile, StructuredProfile structuredProfile) throws IOException {
+        for (String tableName : tableSet) {
+            DataSet dataSet;
+            if (StringUtils.isEmpty(lightWeightProfile)) {
+                dataSet = structuredProfile.getDataSet(tableName);
+            } else {
+                dataSet = lightWeightProfile.getDataSet(tableName);
+            }
 
+            hbaseClient.beginBatchInsert(tableName, false);
+            for (String key : dataSet.getRecordKeys()) {
+                Map<String, String> record = dataSet.getRecord(key);
+                String[][] hbDataArray = DataSetTableOption.metaDataToQualifier(record);
+
+                // 所属档案ID，标准版本号
+                hbaseClient.batchInsert(key,
+                        DataSetTableOption.Family.Basic.toString(),
+                        DataSetTableOption.getQualifiers(DataSetTableOption.Family.Basic),
+                        new String[]{
+                                StringUtils.isEmpty(lightWeightProfile) ? structuredProfile.getId() : lightWeightProfile.getId(),
+                                dataSet.getCdaVersion(),
+                                DateTimeUtils.utcDateTimeFormat(new Date())
+                        });
+
+                // 数据元
+                hbaseClient.batchInsert(key,
+                        DataSetTableOption.Family.MetaData.toString(),
+                        hbDataArray[0],
+                        hbDataArray[1]);
+            }
+
+            hbaseClient.endBatchInsert();
+        }
     }
 }

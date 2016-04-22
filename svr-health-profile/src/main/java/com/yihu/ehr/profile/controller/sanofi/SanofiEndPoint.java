@@ -112,7 +112,7 @@ public class SanofiEndPoint {
     }
 
     @ApiOperation(value = "获取体征数据", notes = "获取体征数据")
-    @RequestMapping(value = ServiceApi.SanofiSupport.PhysicSigns, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.SanofiSupport.PhysicSigns, method = RequestMethod.GET)
     public String getBodySigns(
             @ApiParam(value = "身份证号,使用Base64编码", defaultValue = "NDEyNzI2MTk1MTExMzA2MjY4")
             @RequestParam(value = "demographic_id", required = false) String demographicId,
@@ -196,10 +196,10 @@ public class SanofiEndPoint {
             mergeData(section, profile, dataSet, innerCodes);
         }
 
-        // 住院护理体征记录
+        // 生命体征：住院护理体征记录
         dataSet = profile.getDataSet("HDSD00_08");
         if (dataSet != null && dataSet.getRecordKeys().size() > 0){
-            section = document.withArray("physical_exam");
+            section = document.withArray("vitals");
             innerCodes = new String[]{
                     "HDSD00_08_025",
                     "HDSD00_08_075",
@@ -264,8 +264,9 @@ public class SanofiEndPoint {
             for (String recordKey : dataSet.getRecordKeys()) {
                 ObjectNode arrayNode = array.addObject();
                 Map<String, String> record = dataSet.getRecord(recordKey);
-                for (String innerCode : record.keySet()) {
-                    arrayNode.put(innerCode, record.get(innerCode));
+                for (String innerCode : innerCodes) {
+                    String value = record.get(innerCode);
+                    arrayNode.put(innerCode, StringUtils.isEmpty(value) ? "" : value);
                 }
             }
         } else if (section.isObject()) {
