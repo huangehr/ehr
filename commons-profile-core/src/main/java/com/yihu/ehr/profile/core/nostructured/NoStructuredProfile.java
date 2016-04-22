@@ -5,7 +5,7 @@ import com.yihu.ehr.profile.core.commons.Profile;
 import java.util.List;
 
 /**
- * 健康档案。
+ * 非结构化健康档案。
  *
  * @author Sand
  * @version 1.0
@@ -23,5 +23,4 @@ public class NoStructuredProfile extends Profile{
     public void setNoStructuredDocumentList(List<NoStructuredDocument> noStructuredDocumentList) {
         this.noStructuredDocumentList = noStructuredDocumentList;
     }
-
 }

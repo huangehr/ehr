@@ -26,6 +26,9 @@ public class UtilConfiguration {
     @Bean
     ObjectMapper objectMapper(){
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(SerializationFeature.WRITE_DATE_KEYS_AS_TIMESTAMPS, false);
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        objectMapper.configure(SerializationFeature.WRITE_DATES_WITH_ZONE_ID, true);
 
         return objectMapper;
     }

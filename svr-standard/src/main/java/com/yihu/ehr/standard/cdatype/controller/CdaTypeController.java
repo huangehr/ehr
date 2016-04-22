@@ -1,11 +1,10 @@
 package com.yihu.ehr.standard.cdatype.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.standard.MCDAType;
-import com.yihu.ehr.model.standard.MStdDict;
 import com.yihu.ehr.standard.cdatype.service.CDAType;
 import com.yihu.ehr.standard.cdatype.service.CDATypeManager;
 import com.yihu.ehr.util.controller.BaseRestController;
@@ -34,7 +33,7 @@ public class CdaTypeController extends BaseRestController {
     private CDATypeManager cdaTypeManager;
 
 
-    @RequestMapping(value = RestApi.Standards.TypeChildren, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.TypeChildren, method = RequestMethod.GET)
     @ApiOperation(value = "根据父级ID获取下级")
     public List<MCDAType> getChildrenByPatientId(
             @ApiParam(name = "id", value = "父级id",defaultValue = "")
@@ -45,7 +44,7 @@ public class CdaTypeController extends BaseRestController {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.TypesChildren, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.TypesChildren, method = RequestMethod.GET)
     @ApiOperation(value = "根据父级类别获取父级类别所在以下所有子集类别（包括当前父级列表）")
     public List<MCDAType> getChildIncludeSelfByParentIdsAndKey(
             @ApiParam(name = "patient_ids", value = "父级id")
@@ -63,7 +62,7 @@ public class CdaTypeController extends BaseRestController {
     }
 
 
-//    @RequestMapping(value = RestApi.Standards.TypeList,method = RequestMethod.GET)
+//    @RequestMapping(value = ServiceApi.Standards.TypeList,method = RequestMethod.GET)
 //    @ApiOperation(value = "根据code或者name获取CDAType列表")
 //    public List<MCDAType> getCdaTypeByCodeOrName(
 //            @ApiParam(name = "code", value = "代码")
@@ -84,7 +83,7 @@ public class CdaTypeController extends BaseRestController {
 //        return (List<MCDAType>)convertToModels(cdaTypeList,new ArrayList<MCDAType>(cdaTypeList.size()),MCDAType.class,"");
 //    }
 
-    @RequestMapping(value = RestApi.Standards.Types, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.Types, method = RequestMethod.GET)
     @ApiOperation(value = "标准类别分页搜索")
     public Collection<MCDAType> searchType(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
@@ -105,7 +104,7 @@ public class CdaTypeController extends BaseRestController {
         return convertToModels(appList, new ArrayList<>(appList.size()), MCDAType.class, fields);
     }
 
-    @RequestMapping(value = RestApi.Standards.NoPageTypes, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.NoPageTypes, method = RequestMethod.GET)
     @ApiOperation(value = "标准字典不分页搜索")
     public List<MCDAType> searchSourcesWithoutPaging(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -116,7 +115,7 @@ public class CdaTypeController extends BaseRestController {
 
 
 
-    @RequestMapping(value = RestApi.Standards.Type, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.Type, method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取CDAType")
     public MCDAType getCdaTypeById(
             @ApiParam(name = "id", value = "id")
@@ -128,7 +127,7 @@ public class CdaTypeController extends BaseRestController {
 
 
 
-    @RequestMapping(value = RestApi.Standards.Types, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.Types, method = RequestMethod.POST)
     @ApiOperation(value = "新增CDAType")
     public MCDAType saveCDAType(
             @ApiParam(name = "model", value = "model")
@@ -142,7 +141,7 @@ public class CdaTypeController extends BaseRestController {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.Type,method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Standards.Type,method = RequestMethod.PUT)
     @ApiOperation(value = "修改CDAType")
     public MCDAType updateCDAType(
             @ApiParam(name = "id", value = "编号")
@@ -158,7 +157,7 @@ public class CdaTypeController extends BaseRestController {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.TypesCodeExistence , method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.TypesCodeExistence , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的机构代码是否已经存在")
     public boolean isCDATypeExists(
             @ApiParam(name = "code", value = "code", defaultValue = "")
@@ -172,7 +171,7 @@ public class CdaTypeController extends BaseRestController {
      * 删除CDA类别，若该类别存在子类别，将一并删除子类别
      * 先根据当前的类别ID获取全部子类别ID，再进行删除
      */
-    @RequestMapping(value = RestApi.Standards.Types, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.Types, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除CDA类别，若该类别存在子类别，将一并删除子类别")
     public boolean deleteCDATypeByPatientIds(
             @ApiParam(name = "ids", value = "ids")
@@ -186,7 +185,7 @@ public class CdaTypeController extends BaseRestController {
         return cdaTypeManager.deleteCdaType(childrenIds);
     }
 
-    @RequestMapping(value = RestApi.Standards.TypeOther, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.TypeOther, method = RequestMethod.GET)
     @ApiOperation(value = "获取cdaType列表（不包含本身）")
     public List<MCDAType> getOtherCDAType(
             @ApiParam(name = "id", value = "cdaType编号")
@@ -196,7 +195,7 @@ public class CdaTypeController extends BaseRestController {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.TypeParent, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.TypeParent, method = RequestMethod.GET)
     @ApiOperation(value = "根据当前类别获取自己的父级以及同级以及同级所在父级类别列表")
     public List<MCDAType> getCdaTypeExcludeSelfAndChildren(
             @ApiParam(name = "id", value = "id")

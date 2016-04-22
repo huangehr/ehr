@@ -1,7 +1,7 @@
 package com.yihu.ehr.extractor;
 
 import com.yihu.ehr.profile.core.structured.StructuredDataSet;
-import com.yihu.ehr.util.DateFormatter;
+import com.yihu.ehr.util.DateTimeUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +29,7 @@ public class EventExtractor extends KeyDataExtractor {
                     if (metaData.contains(recordKey)) {
                         String value = record.get(recordKey);
                         if (value != null) {
-                            return DateFormatter.simpleDateTimeParse(value);
+                            return DateTimeUtils.simpleDateTimeParse(value);
                         }
                     }
                 }

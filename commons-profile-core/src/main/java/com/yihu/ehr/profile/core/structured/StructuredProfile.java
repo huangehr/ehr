@@ -1,12 +1,10 @@
 package com.yihu.ehr.profile.core.structured;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.profile.core.commons.DataSet;
 import com.yihu.ehr.profile.core.commons.Profile;
-import com.yihu.ehr.util.DateFormatter;
+import com.yihu.ehr.util.DateTimeUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,15 +12,13 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 健康档案。
+ * 结构化健康档案。
  *
  * @author Sand
  * @version 1.0
  * @created 2015.08.16 10:44
  */
 public class StructuredProfile extends Profile {
-
-    private ObjectMapper objectMapper = SpringContext.getService("objectMapper");
     // 档案包含的数据集, key 为数据集的表名, 原始数据集情况下, 表名为"数据集代码_ORIGIN"
     private Map<String, StructuredDataSet> dataSets = new HashMap<>();
 
@@ -31,7 +27,6 @@ public class StructuredProfile extends Profile {
     }
 
     public String getDataSetsAsString() {
-        ObjectMapper objectMapper = SpringContext.getService("objectMapper");
         ObjectNode rootNode = objectMapper.createObjectNode();
 
         for (String key : dataSets.keySet()) {
@@ -59,8 +54,7 @@ public class StructuredProfile extends Profile {
         return this.dataSets.keySet();
     }
 
-
-    public String toJson(){
+    public String jsonFormat(){
         ObjectNode root = objectMapper.createObjectNode();
         root.put("id", getId().toString());
         root.put("card_id", this.getCardId());
@@ -68,9 +62,9 @@ public class StructuredProfile extends Profile {
         root.put("org_name", this.getOrgName());
         root.put("patient_id", this.getPatientId());
         root.put("event_no", this.getEventNo());
-        root.put("event_date", this.getEventDate() == null ? "" : DateFormatter.utcDateTimeFormat(this.getEventDate()));
+        root.put("event_date", this.getEventDate() == null ? "" : DateTimeUtils.utcDateTimeFormat(this.getEventDate()));
         root.put("cda_version", this.getCdaVersion());
-        root.put("create_date", this.getCreateDate() == null ? "" : DateFormatter.utcDateTimeFormat(this.getCreateDate()));
+        root.put("create_date", this.getCreateDate() == null ? "" : DateTimeUtils.utcDateTimeFormat(this.getCreateDate()));
         root.put("summary", this.getSummary());
 
         ArrayNode dataSetsNode = root.putArray("data_sets");

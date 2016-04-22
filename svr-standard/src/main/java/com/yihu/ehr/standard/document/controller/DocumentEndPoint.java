@@ -1,6 +1,6 @@
 package com.yihu.ehr.standard.document.controller;
 
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
@@ -46,7 +46,7 @@ public class DocumentEndPoint extends ExtendController<MCDADocument> {
         return cdaDatasetRelationshipManager.getRelationshipServiceEntity(version);
     }
 
-    @RequestMapping(value = RestApi.Standards.Documents, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.Documents, method = RequestMethod.GET)
     @ApiOperation(value = "根据条件获取cda文档列表")
     public Collection<MCDADocument> GetCDADocuments(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -72,7 +72,7 @@ public class DocumentEndPoint extends ExtendController<MCDADocument> {
     }
 
     @ApiOperation(value = "获取CDADocuments")
-    @RequestMapping(value = RestApi.Standards.Document, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.Document, method = RequestMethod.GET)
     public MCDADocument getCDADocuments(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
             @RequestParam(value = "version") String version,
@@ -104,7 +104,7 @@ public class DocumentEndPoint extends ExtendController<MCDADocument> {
 
 
     @ApiOperation(value = "新增CDADocuments")
-    @RequestMapping(value = RestApi.Standards.Documents, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.Documents, method = RequestMethod.POST)
     public MCDADocument saveCDADocuments(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
             @RequestParam(value = "version") String version,
@@ -121,7 +121,7 @@ public class DocumentEndPoint extends ExtendController<MCDADocument> {
 
 
     @ApiOperation(value = "修改CDADocuments")
-    @RequestMapping(value = RestApi.Standards.Document, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Standards.Document, method = RequestMethod.PUT)
     public MCDADocument updateCDADocuments(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
             @RequestParam(value = "version") String version,
@@ -143,7 +143,7 @@ public class DocumentEndPoint extends ExtendController<MCDADocument> {
     }
 
     @ApiOperation(value = "删除CDADocuments")
-    @RequestMapping(value = RestApi.Standards.Documents, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.Documents, method = RequestMethod.DELETE)
     public boolean deleteCDADocuments(
             @ApiParam(name = "ids", value = "文档编号集")
             @RequestParam(value = "ids") String[] ids,
@@ -157,7 +157,7 @@ public class DocumentEndPoint extends ExtendController<MCDADocument> {
     /***********************************************************************************************************/
     /************** document data set relationship   ***********************************************************/
     /***********************************************************************************************************/
-    @RequestMapping(value = RestApi.Standards.DataSetRelationships, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.DataSetRelationships, method = RequestMethod.GET)
     @ApiOperation(value = "根据条件获取getCDADataSetRelationship列表")
     public Collection<MCdaDataSetRelationship> getCDADataSetRelationships(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -204,7 +204,7 @@ public class DocumentEndPoint extends ExtendController<MCDADocument> {
      * @return 操作结果
      */
     @ApiOperation(value = "保存CDADataSetRelationship")
-    @RequestMapping(value = RestApi.Standards.DataSetRelationships, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.DataSetRelationships, method = RequestMethod.POST)
     public boolean saveCDADataSetRelationship(
             @ApiParam(name = "data_set_ids", value = "data_set_ids")
             @RequestParam(value = "data_set_ids") String[] dataSetIds,
@@ -218,7 +218,7 @@ public class DocumentEndPoint extends ExtendController<MCDADocument> {
     }
 
     @ApiOperation(value = "根基id删除CDADataSetRelationship")
-    @RequestMapping(value = RestApi.Standards.DataSetRelationships, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.DataSetRelationships, method = RequestMethod.DELETE)
     public boolean deleteCDADataSetRelationship(
             @ApiParam(name = "version", value = "versionCode")
             @RequestParam(value = "version") String versionCode,
@@ -232,7 +232,7 @@ public class DocumentEndPoint extends ExtendController<MCDADocument> {
     /************** document file  ****************************************************************************/
     /***********************************************************************************************************/
 
-    @RequestMapping(value = RestApi.Standards.DocumentFileExistence, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.DocumentFileExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断文件是否存在")
     public boolean FileExists(
             @ApiParam(name = "version", value = "版本号")
@@ -243,7 +243,7 @@ public class DocumentEndPoint extends ExtendController<MCDADocument> {
         return cdaDocumentService.isFileExists(cdaId, versionCode);
     }
 
-    @RequestMapping(value = RestApi.Standards.DocumentCreateFile, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.DocumentCreateFile, method = RequestMethod.POST)
     @ApiOperation(value = "生成CDA文件")
     public boolean createCDASchemaFile(
             @ApiParam(name = "version", value = "版本号")
@@ -264,7 +264,7 @@ public class DocumentEndPoint extends ExtendController<MCDADocument> {
      * @return XML信息
      * @version 1.0.1 将临时目录转移至fastDFS。
      */
-    @RequestMapping(value = RestApi.Standards.DocumentGetFile, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.DocumentGetFile, method = RequestMethod.GET)
     @ApiOperation(value = "获取cda文档的XML文件信息。")
     public String getCdaXmlFileInfo(
             @ApiParam(name = "version", value = "版本号")

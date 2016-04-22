@@ -1,6 +1,6 @@
 package com.yihu.ehr.query;
 
-import com.yihu.ehr.util.DateFormatter;
+import com.yihu.ehr.util.DateTimeUtils;
 import javafx.util.Pair;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
@@ -189,7 +189,7 @@ public class URLQueryParser<T> {
         } else if (filter.contains(">")) {
             Pair<Path, String> pair = getPair(filter, ">", root);
             if (pair.getKey().getJavaType() == Date.class) {
-                Date date = DateFormatter.simpleDateParse(pair.getValue());
+                Date date = DateTimeUtils.simpleDateParse(pair.getValue());
                 predicate = cb.greaterThan(pair.getKey(), date);
             } else {
                 predicate = cb.gt(pair.getKey(), NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));

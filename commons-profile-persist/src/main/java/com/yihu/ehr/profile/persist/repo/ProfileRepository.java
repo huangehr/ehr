@@ -11,7 +11,7 @@ import com.yihu.ehr.profile.core.nostructured.NoStructuredProfile;
 import com.yihu.ehr.profile.core.structured.StructuredDataSet;
 import com.yihu.ehr.profile.core.structured.StructuredProfile;
 import com.yihu.ehr.schema.StdKeySchema;
-import com.yihu.ehr.util.DateFormatter;
+import com.yihu.ehr.util.DateTimeUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.hbase.Cell;
@@ -76,10 +76,10 @@ public class ProfileRepository {
         structuredProfile.setOrgCode(orgCode);
         structuredProfile.setPatientId(patientId);
         structuredProfile.setEventNo(eventNo);
-        structuredProfile.setEventDate(DateFormatter.utcDateTimeParse(eventDate));
+        structuredProfile.setEventDate(DateTimeUtils.utcDateTimeParse(eventDate));
         structuredProfile.setSummary(summary);
         structuredProfile.setDemographicId(demographicId);
-        structuredProfile.setCreateDate(DateFormatter.utcDateTimeParse(createDate));
+        structuredProfile.setCreateDate(DateTimeUtils.utcDateTimeParse(createDate));
         structuredProfile.setCdaVersion(cdaVersion);
 
         // 加载数据集列表
@@ -175,9 +175,8 @@ public class ProfileRepository {
         for (int i = 0; i < innerCodes.length; ++i) {
             Long dictId = cacheReader.read(keySchema.metaDataDict(version, dataSetCode, innerCodes[i]));
             String type = cacheReader.read(keySchema.metaDataType(version, dataSetCode, innerCodes[i]));
-            if (dictId == null) {
-                continue;
-            } else if (dictId == 0) {
+            type = type == null ? "S1" : type;
+            if (dictId == null || dictId == 0) {
                 metaDataCode.add(QualifierTranslator.hBaseQualifier(innerCodes[i], type));
             } else if (dictId > 0) {
                 String[] temp = QualifierTranslator.splitMetaData(innerCodes[i]);
@@ -270,7 +269,7 @@ public class ProfileRepository {
                         new String[]{
                                 StringUtils.isEmpty(lightWeightProfile)? structuredProfile.getId():lightWeightProfile.getId(),
                                 dataSet.getCdaVersion(),
-                                DateFormatter.utcDateTimeFormat(new Date())
+                                DateTimeUtils.utcDateTimeFormat(new Date())
                         });
 
                 // 数据元
@@ -302,10 +301,10 @@ public class ProfileRepository {
                         structuredProfile.getOrgCode(),
                         structuredProfile.getPatientId(),
                         structuredProfile.getEventNo(),
-                        DateFormatter.utcDateTimeFormat(structuredProfile.getEventDate()),
+                        DateTimeUtils.utcDateTimeFormat(structuredProfile.getEventDate()),
                         structuredProfile.getSummary(),
                         structuredProfile.getDemographicId() == null ? "" : structuredProfile.getDemographicId(),
-                        DateFormatter.utcDateTimeFormat(structuredProfile.getCreateDate()),
+                        DateTimeUtils.utcDateTimeFormat(structuredProfile.getCreateDate()),
                         structuredProfile.getDataSetsAsString(),
                         structuredProfile.getCdaVersion()
                 });
@@ -333,10 +332,10 @@ public class ProfileRepository {
                         lightWeightProfile.getOrgCode(),
                         lightWeightProfile.getPatientId(),
                         lightWeightProfile.getEventNo(),
-                        DateFormatter.utcDateTimeFormat(lightWeightProfile.getEventDate()),
+                        DateTimeUtils.utcDateTimeFormat(lightWeightProfile.getEventDate()),
                         lightWeightProfile.getSummary(),
                         lightWeightProfile.getDemographicId() == null ? "" : lightWeightProfile.getDemographicId(),
-                        DateFormatter.utcDateTimeFormat(lightWeightProfile.getCreateDate()),
+                        DateTimeUtils.utcDateTimeFormat(lightWeightProfile.getCreateDate()),
                         lightWeightProfile.getDataSetsAsString(),
                         lightWeightProfile.getCdaVersion()
                 });
@@ -361,10 +360,10 @@ public class ProfileRepository {
                         noStructuredProfile.getOrgCode(),
                         noStructuredProfile.getPatientId(),
                         noStructuredProfile.getEventNo(),
-                        DateFormatter.utcDateTimeFormat(noStructuredProfile.getEventDate()),
+                        DateTimeUtils.utcDateTimeFormat(noStructuredProfile.getEventDate()),
                         noStructuredProfile.getSummary(),
                         noStructuredProfile.getDemographicId() == null ? "" : noStructuredProfile.getDemographicId(),
-                        DateFormatter.utcDateTimeFormat(noStructuredProfile.getCreateDate()),
+                        DateTimeUtils.utcDateTimeFormat(noStructuredProfile.getCreateDate()),
 //                        unStructuredProfile.getDataSetsAsString(),
                         "",  //非结构化档案暂时不保存数据集信息
                         noStructuredProfile.getCdaVersion()
@@ -380,7 +379,7 @@ public class ProfileRepository {
                         noStructuredProfile.getOrgCode(),
                         noStructuredProfile.getPatientId(),
                         noStructuredProfile.getEventNo(),
-                        DateFormatter.utcDateTimeFormat(noStructuredProfile.getEventDate()),  //日期格式化
+                        DateTimeUtils.utcDateTimeFormat(noStructuredProfile.getEventDate()),  //日期格式化
                         noStructuredProfile.getCdaVersion(),
                         objectMapper.writeValueAsString(noStructuredProfile.getNoStructuredDocumentList())  //// TODO: 2016/4/18 json格式化
                 });

@@ -1,6 +1,6 @@
 package com.yihu.ehr.standard.dispatch.controller;
 
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.MDispatchLog;
 import com.yihu.ehr.standard.commons.ExtendController;
@@ -30,7 +30,7 @@ public class DispatchLogController extends ExtendController<MDispatchLog> {
     @Autowired
     private DispatchLogService dispatchLogService;
 
-    @RequestMapping(value = RestApi.Standards.DispatchLogs, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.DispatchLogs, method = RequestMethod.GET)
     @ApiOperation(value = "获取日志信息")
     public MDispatchLog getLog(
             @ApiParam(required = true, name = "version", value = "版本号")
@@ -46,7 +46,7 @@ public class DispatchLogController extends ExtendController<MDispatchLog> {
         return null;
     }
 
-    @RequestMapping(value = RestApi.Standards.DispatchLogs, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.DispatchLogs, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除日志信息")
     public boolean deleteLog(
             @ApiParam(required = true, name = "version", value = "版本号")
@@ -57,7 +57,7 @@ public class DispatchLogController extends ExtendController<MDispatchLog> {
         return dispatchLogService.delete(versionCode, orgCode);
     }
 
-    @RequestMapping(value = RestApi.Standards.DispatchLogs, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.DispatchLogs, method = RequestMethod.POST)
     @ApiOperation(value = "新增日志信息")
     public MDispatchLog saveLog(
             @ApiParam(name = "model", value = "数据模型")

@@ -1,7 +1,7 @@
 package com.yihu.ehr.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.ProfileType;
@@ -74,7 +74,7 @@ public class ResolveEndPoint {
      * ObjectMapper Stream API使用，参见：http://wiki.fasterxml.com/JacksonStreamingApi
      */
     @ApiOperation(value = "档案包入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @RequestMapping(value = RestApi.Packages.Package, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Packages.Package, method = RequestMethod.PUT)
     public ResponseEntity<String> resolve(
             @ApiParam("id")
             @PathVariable("id") String packageId,
@@ -127,7 +127,7 @@ public class ResolveEndPoint {
      * ObjectMapper Stream API使用，参见：http://wiki.fasterxml.com/JacksonStreamingApi
      */
     @ApiOperation(value = "本地档案包解析", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @RequestMapping(value = RestApi.Packages.Package, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Packages.Package, method = RequestMethod.POST)
     public ResponseEntity<String> resolve(
             @ApiParam(value = "档案包ID，忽略此值", defaultValue = "LocalPackage")
             @PathVariable("id") String packageId,

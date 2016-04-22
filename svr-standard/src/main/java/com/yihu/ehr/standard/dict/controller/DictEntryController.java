@@ -1,6 +1,6 @@
 package com.yihu.ehr.standard.dict.controller;
 
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.MStdDictEntry;
 import com.yihu.ehr.standard.commons.ExtendController;
@@ -36,7 +36,7 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.Entry, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Standards.Entry, method = RequestMethod.PUT)
     @ApiOperation(value = "修改字典项")
     public MStdDictEntry updateDictEntry(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
@@ -59,7 +59,7 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.Entries, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.Entries, method = RequestMethod.POST)
     @ApiOperation(value = "新增字典项")
     public MStdDictEntry addDictEntry(
             @ApiParam(name = "version", value = "cda版本号", defaultValue = "")
@@ -77,7 +77,7 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.Entry, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.Entry, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除字典项")
     public boolean deleteDictEntry(
             @ApiParam(name = "version", value = "cda版本号", defaultValue = "")
@@ -89,7 +89,7 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.Entries, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.Entries, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除字典项")
     public boolean deleteDictEntrys(
             @ApiParam(name = "version", value = "cda版本号", defaultValue = "")
@@ -101,7 +101,7 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.EntriesWithDictionary, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.EntriesWithDictionary, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除字典关联的所有字典项")
     public boolean deleteDictEntryList(
             @ApiParam(name = "version", value = "cda版本号", defaultValue = "")
@@ -113,7 +113,7 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.Entries, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.Entries, method = RequestMethod.GET)
     @ApiOperation(value = "查询字典项")
     public Collection<MStdDictEntry> searchDictEntry(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -138,7 +138,7 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.Entry, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.Entry, method = RequestMethod.GET)
     @ApiOperation(value = "获取字典项")
     public MStdDictEntry getDictEntry(
             @ApiParam(name = "id", value = "字典项编号", defaultValue = "")
@@ -149,7 +149,7 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
         return getModel(dictEntryService.retrieve(id, getServiceEntity(version)));
     }
 
-    @RequestMapping(value = RestApi.Standards.EntryCodeIsExist,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.EntryCodeIsExist,method = RequestMethod.GET)
     public boolean isExistEntryCode(
             @RequestParam(value = "dict_id")long dictId,
             @RequestParam(value = "code")String code,

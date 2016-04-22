@@ -1,7 +1,6 @@
 package com.yihu.ehr.pack.controller;
 
-import com.netflix.ribbon.proxy.annotation.Http;
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.ErrorCode;
@@ -30,7 +29,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -58,7 +56,7 @@ public class PackageEndPoint extends BaseRestController {
     @Autowired
     MessageBuffer messageBuffer;
 
-    @RequestMapping(value = RestApi.Packages.PackageSearch, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Packages.PackageSearch, method = RequestMethod.GET)
     @ApiOperation(value = "搜索档案包", response = MPackage.class, responseContainer = "List", notes = "搜索档案包")
     public Collection<MPackage> packageList(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -86,7 +84,7 @@ public class PackageEndPoint extends BaseRestController {
      *
      * @param packageCrypto zip密码密文, file 请求体中文件参数名
      */
-    @RequestMapping(value = RestApi.Packages.Packages, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Packages.Packages, method = RequestMethod.POST)
     @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
     public void savePackageWithOrg(
             @ApiParam(name = "package", value = "档案包", allowMultiple = true) MultipartHttpServletRequest pack,
@@ -117,7 +115,7 @@ public class PackageEndPoint extends BaseRestController {
      * @param id
      * @return
      */
-    @RequestMapping(value = RestApi.Packages.Package, method = {RequestMethod.GET})
+    @RequestMapping(value = ServiceApi.Packages.Package, method = {RequestMethod.GET})
     @ApiOperation(value = "获取档案包", notes = "获取档案包的信息")
     public ResponseEntity<MPackage> getPackage(@ApiParam(name = "id", value = "档案包编号")
                                                @PathVariable(value = "id") String id) throws IOException {
@@ -140,7 +138,7 @@ public class PackageEndPoint extends BaseRestController {
      * @param id
      * @return
      */
-    @RequestMapping(value = RestApi.Packages.Package, method = {RequestMethod.PUT})
+    @RequestMapping(value = ServiceApi.Packages.Package, method = {RequestMethod.PUT})
     @ApiOperation(value = "获取档案包", notes = "获取档案包的信息")
     public ResponseEntity<MPackage> reportStatus(@ApiParam(value = "档案包编号")
                                                  @PathVariable(value = "id") String id,
@@ -166,7 +164,7 @@ public class PackageEndPoint extends BaseRestController {
      * @param id
      * @return
      */
-    @RequestMapping(value = RestApi.Packages.Package, method = {RequestMethod.DELETE})
+    @RequestMapping(value = ServiceApi.Packages.Package, method = {RequestMethod.DELETE})
     @ApiOperation(value = "删除档案", response = Object.class, notes = "删除一个数据包")
     public void deletePackage(@ApiParam(name = "id", value = "档案包编号")
                               @PathVariable(value = "id")
@@ -180,7 +178,7 @@ public class PackageEndPoint extends BaseRestController {
      * @param id
      * @return
      */
-    @RequestMapping(value = RestApi.Packages.PackageDownloads, method = {RequestMethod.GET})
+    @RequestMapping(value = ServiceApi.Packages.PackageDownloads, method = {RequestMethod.GET})
     @ApiOperation(value = "获取档案包", notes = "获取档案包的信息")
     public ResponseEntity<MPackage> downloadPackage(@ApiParam(name = "id", value = "档案包编号")
                                                     @PathVariable(value = "id")
@@ -207,7 +205,7 @@ public class PackageEndPoint extends BaseRestController {
      *
      * @param packageCrypto zip密码密文, file 请求体中文件参数名
      */
-    @RequestMapping(value = RestApi.Packages.LegacyPackages, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Packages.LegacyPackages, method = RequestMethod.POST)
     @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
     @Deprecated
     public void savePackageWithUser(

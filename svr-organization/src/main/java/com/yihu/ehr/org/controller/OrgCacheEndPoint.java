@@ -1,8 +1,7 @@
 package com.yihu.ehr.org.controller;
 
 import com.netflix.discovery.converters.Auto;
-import com.netflix.ribbon.proxy.annotation.Http;
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.cache.CacheReader;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.org.MOrganization;
@@ -36,20 +35,20 @@ public class OrgCacheEndPoint {
     CacheReader cacheReader;
 
     @ApiOperation("缓存机构数据")
-    @RequestMapping(value = RestApi.Caches.Organizations, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Caches.Organizations, method = RequestMethod.PUT)
     public void cache(@ApiParam(value = "reload", defaultValue = "true")
                       @RequestParam("reload") boolean reload) {
         orgCache.cacheData(reload);
     }
 
     @ApiOperation("获取缓存机构列表")
-    @RequestMapping(value = RestApi.Caches.Organizations, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Caches.Organizations, method = RequestMethod.GET)
     public ResponseEntity<List<MOrganization>> organizations() {
         return new ResponseEntity<>(orgCache.organizations(), orgCache.organizations().size() == 0 ? HttpStatus.NOT_FOUND : HttpStatus.OK);
     }
 
     @ApiOperation("获取缓存机构")
-    @RequestMapping(value = RestApi.Caches.Organization, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Caches.Organization, method = RequestMethod.GET)
     public ResponseEntity<MOrganization> organization(@ApiParam(value = "org_code", defaultValue = "")
                                                       @RequestParam("org_code") String orgCode) {
         MOrganization organization = orgCache.organization(orgCode);

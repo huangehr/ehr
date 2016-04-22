@@ -9,7 +9,7 @@ import com.yihu.ehr.api.esb.service.SimplifiedESBService;
 import com.yihu.ehr.config.FastDFSConfig;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
-import com.yihu.ehr.util.DateFormatter;
+import com.yihu.ehr.util.DateTimeUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -74,7 +74,7 @@ public class SimplifiedESBController {
             //fdfs.download(jsonResult.get("groupName").textValue(), jsonResult.get("remoteFileName").textValue(), "E:\\");
             HosLog lh = new HosLog();
             lh.setOrgCode(orgCode);
-            lh.setUploadTime(DateFormatter.simpleDateTimeFormat(new Date()));
+            lh.setUploadTime(DateTimeUtils.simpleDateTimeFormat(new Date()));
             lh.setFilePath(filePath);
             lh.setId(ip);
             simplifiedESBService.saveHosLog(lh);

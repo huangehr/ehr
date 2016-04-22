@@ -1,10 +1,8 @@
 package com.yihu.ehr.standard.dict.controller;
 
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.MStdDict;
-import com.yihu.ehr.model.standard.MStdSource;
-import com.yihu.ehr.standard.cdatype.service.CDAType;
 import com.yihu.ehr.standard.commons.ExtendController;
 import com.yihu.ehr.standard.dict.service.DictService;
 import com.yihu.ehr.standard.dict.service.BaseDict;
@@ -36,7 +34,7 @@ public class DictController extends ExtendController<MStdDict> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.Dictionaries, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.Dictionaries, method = RequestMethod.GET)
     @ApiOperation(value = "查询字典")
     public Collection<MStdDict> searchDataSets(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -61,7 +59,7 @@ public class DictController extends ExtendController<MStdDict> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.NoPageDictionaries, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.NoPageDictionaries, method = RequestMethod.GET)
     @ApiOperation(value = "标准字典不分页搜索")
     public Collection<MStdDict> searchSourcesWithoutPaging(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -74,7 +72,7 @@ public class DictController extends ExtendController<MStdDict> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.Dictionaries, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.Dictionaries, method = RequestMethod.POST)
     @ApiOperation(value = "新增字典")
     public MStdDict addDict(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
@@ -94,7 +92,7 @@ public class DictController extends ExtendController<MStdDict> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.Dictionary, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Standards.Dictionary, method = RequestMethod.PUT)
     @ApiOperation(value = "修改字典")
     public MStdDict updateDict(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
@@ -116,7 +114,7 @@ public class DictController extends ExtendController<MStdDict> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.Dictionary, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.Dictionary, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除字典")
     public boolean deleteDict(
             @ApiParam(name = "version", value = "cda版本号", defaultValue = "")
@@ -128,7 +126,7 @@ public class DictController extends ExtendController<MStdDict> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.Dictionaries, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.Dictionaries, method = RequestMethod.DELETE)
     @ApiOperation(value = "批量删除字典")
     public boolean deleteDicts(
             @ApiParam(name = "version", value = "cda版本号", defaultValue = "")
@@ -140,7 +138,7 @@ public class DictController extends ExtendController<MStdDict> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.Dictionary, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.Dictionary, method = RequestMethod.GET)
     @ApiOperation(value = "获取字典详细信息")
     public MStdDict getCdaDictInfo(
             @ApiParam(name = "id", value = "字典编号", defaultValue = "")
@@ -152,7 +150,7 @@ public class DictController extends ExtendController<MStdDict> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.MetaDataWithDict, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.MetaDataWithDict, method = RequestMethod.GET)
     @ApiOperation(value = "获取字典 map集")
     public Map getDictMapByIds(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
@@ -165,7 +163,7 @@ public class DictController extends ExtendController<MStdDict> {
         return dictService.getDictMapByIds(version, dataSetId, metaDataId);
     }
 
-    @RequestMapping(value = RestApi.Standards.DictCodeIsExist,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.DictCodeIsExist,method = RequestMethod.GET)
     public boolean isExistDictCode(
             @RequestParam(value = "dict_code")String dictCode,
             @RequestParam("version_code")String versionCode)
@@ -175,7 +173,7 @@ public class DictController extends ExtendController<MStdDict> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.DictParent, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.DictParent, method = RequestMethod.GET)
     @ApiOperation(value = "根据当前类别获取自己的父级以及同级以及同级所在父级类别列表")
     public List<MStdDict> getCdaTypeExcludeSelfAndChildren(
             @ApiParam(name = "id", value = "id")

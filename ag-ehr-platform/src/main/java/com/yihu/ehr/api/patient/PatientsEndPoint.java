@@ -9,7 +9,7 @@ import com.yihu.ehr.feign.PatientClient;
 import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.profile.core.structured.StructuredDataSet;
 import com.yihu.ehr.profile.core.structured.DataSetResolver;
-import com.yihu.ehr.util.DateFormatter;
+import com.yihu.ehr.util.DateTimeUtils;
 import com.yihu.ehr.util.IdValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -74,7 +74,7 @@ public class PatientsEndPoint {
             if (dataSet.getCdaVersion().equals("000000000000")) {
                 demoInfo.setName(record.get("HDSA00_01_009"));
                 demoInfo.setIdCardNo(record.get("HDSA00_01_017"));
-                demoInfo.setBirthday(DateFormatter.simpleDateParse(record.get("HDSA00_01_012")));
+                demoInfo.setBirthday(DateTimeUtils.simpleDateParse(record.get("HDSA00_01_012")));
                 demoInfo.setGender(record.get("HDSA00_01_011"));
                 demoInfo.setNation(record.get("HDSA00_01_014"));
                 demoInfo.setMartialStatus(record.get("HDSA00_01_015"));
@@ -84,7 +84,7 @@ public class PatientsEndPoint {
             } else {
                 demoInfo.setName(record.get("HDSD00_01_002"));
                 demoInfo.setIdCardNo(record.get("HDSA00_01_017"));
-                demoInfo.setBirthday(DateFormatter.simpleDateParse(record.get("HDSA00_01_012")));
+                demoInfo.setBirthday(DateTimeUtils.simpleDateParse(record.get("HDSA00_01_012")));
                 demoInfo.setGender(record.get("HDSA00_01_011"));
                 demoInfo.setNation(record.get("HDSA00_01_014"));
                 demoInfo.setMartialStatus(record.get("HDSD00_01_017"));

@@ -103,7 +103,7 @@ public class StdCache {
                     String metaDataTypeKey = keySchema.metaDataType(version, dataSetCode, innerCode);
                     String metaDataDictKey = keySchema.metaDataDict(version, dataSetCode, innerCode);
 
-                    if (redisClient.hasKey(metaDataTypeKey)) {
+                    if (!force && redisClient.hasKey(metaDataTypeKey)) {
                         LogService.getLogger().warn("Meta data duplicated: " + metaDataTypeKey);
                     }
 

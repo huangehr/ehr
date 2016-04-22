@@ -1,8 +1,6 @@
 package com.yihu.ehr.std.service;
 
-import com.yihu.ehr.agModel.standard.datasset.DataSetModel;
-import com.yihu.ehr.agModel.standard.dict.DictModel;
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.standard.MStdDataSet;
@@ -30,7 +28,7 @@ import java.util.List;
 @ApiIgnore
 public interface DataSetClient {
 
-    @RequestMapping(value = RestApi.Standards.DataSets, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.DataSets, method = RequestMethod.GET)
     @ApiOperation("查询数据集的方法")
     ResponseEntity<Collection<MStdDataSet>> searchDataSets(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -47,7 +45,7 @@ public interface DataSetClient {
             @RequestParam(value = "version") String version);
 
 
-    @RequestMapping(value = RestApi.Standards.DataSet, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.DataSet, method = RequestMethod.DELETE)
     @ApiOperation("删除数据集信息")
     boolean deleteDataSet(
             @ApiParam(name = "id", value = "数据集编号", defaultValue = "")
@@ -56,7 +54,7 @@ public interface DataSetClient {
             @RequestParam(value = "version") String version);
 
 
-    @RequestMapping(value = RestApi.Standards.DataSets, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.DataSets, method = RequestMethod.DELETE)
     @ApiOperation(value = "批量删除数据集信息")
     boolean deleteDataSet(
             @ApiParam(name = "ids", value = "数据集编号", defaultValue = "")
@@ -65,7 +63,7 @@ public interface DataSetClient {
             @RequestParam(value = "version") String version);
 
 
-    @RequestMapping(value = RestApi.Standards.DataSet, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.DataSet, method = RequestMethod.GET)
     @ApiOperation(value = "获取数据集信息")
     MStdDataSet getDataSet(
             @ApiParam(name = "id", value = "数据集编号", defaultValue = "")
@@ -74,7 +72,7 @@ public interface DataSetClient {
             @RequestParam(value = "version") String version);
 
 
-    @RequestMapping(value = RestApi.Standards.DataSets, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.DataSets, method = RequestMethod.POST)
     @ApiOperation(value = "新增数据集信息")
     MStdDataSet saveDataSet(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
@@ -84,7 +82,7 @@ public interface DataSetClient {
 
 
 
-    @RequestMapping(value = RestApi.Standards.DataSet, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Standards.DataSet, method = RequestMethod.PUT)
     @ApiOperation(value = "修改数据集信息")
     MStdDataSet updateDataSet(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
@@ -94,13 +92,13 @@ public interface DataSetClient {
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam(value = "model") String model);
 
-    @RequestMapping(value = RestApi.Standards.DataSetCodeIsExist,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.DataSetCodeIsExist,method = RequestMethod.GET)
     boolean isExistCode(
             @RequestParam(value = "code")String code,
             @RequestParam(value = "version_code")String versionCode);
 
     //以下是数据元部分
-    @RequestMapping(value = RestApi.Standards.MetaDatas, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.MetaDatas, method = RequestMethod.POST)
     @ApiOperation(value = "新增数据元")
     MStdMetaData saveMetaSet(
             @ApiParam(name = "version", value = "版本", defaultValue = "")
@@ -109,7 +107,7 @@ public interface DataSetClient {
             @RequestParam(value = "model", required = false) String metadataJsonData);
 
 
-    @RequestMapping(value = RestApi.Standards.MetaDatas, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.MetaDatas, method = RequestMethod.GET)
     @ApiOperation(value = "查询数据元")
     ResponseEntity<Collection<MStdMetaData>> searchMetaDatas(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -126,7 +124,7 @@ public interface DataSetClient {
             @RequestParam(value = "version") String version);
 
 
-    @RequestMapping(value = RestApi.Standards.MetaData, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.MetaData, method = RequestMethod.GET)
     @ApiOperation(value = "获取数据元")
     MStdMetaData getMetaData(
             @ApiParam(name = "id", value = "数据元ID", defaultValue = "")
@@ -135,7 +133,7 @@ public interface DataSetClient {
             @RequestParam(value = "version") String version);
 
 
-    @RequestMapping(value = RestApi.Standards.MetaData, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Standards.MetaData, method = RequestMethod.PUT)
     @ApiOperation(value = "更新数据元")
     MStdMetaData updataMetaSet(
             @ApiParam(name = "version", value = "版本", defaultValue = "")
@@ -146,7 +144,7 @@ public interface DataSetClient {
             @RequestParam(value = "model", required = false) String model);
 
 
-    @RequestMapping(value = RestApi.Standards.MetaData, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.MetaData, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据元")
     boolean deleteMetaData(
             @ApiParam(name = "id", value = "编号集", defaultValue = "")
@@ -154,7 +152,7 @@ public interface DataSetClient {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version);
 
-    @RequestMapping(value = RestApi.Standards.MetaDatasWithDataSet, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.MetaDatasWithDataSet, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据集关联的数据元")
     boolean deleteMetaDataByDataSet(
             @ApiParam(name = "data_set_id", value = "数据集编号", defaultValue = "")
@@ -162,7 +160,7 @@ public interface DataSetClient {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version);
 
-    @RequestMapping(value = RestApi.Standards.MetaDatas, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.MetaDatas, method = RequestMethod.DELETE)
     @ApiOperation(value = "批量删除数据元")
     boolean deleteMetaDatas(
             @ApiParam(name = "ids", value = "编号集", defaultValue = "")
@@ -170,7 +168,7 @@ public interface DataSetClient {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version);
 
-    @RequestMapping(value = RestApi.Standards.MetaDataCodeExistence, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.MetaDataCodeExistence, method = RequestMethod.GET)
     @ApiOperation(value = "验证数据元代码是否重复")
     boolean validateInnerCode(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
@@ -180,7 +178,7 @@ public interface DataSetClient {
             @ApiParam(name = "inner_code", value = "查询代码", defaultValue = "")
             @RequestParam(value = "inner_code") String innerCode);
 
-    @RequestMapping(value = RestApi.Standards.MetaDataNameExistence, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.MetaDataNameExistence, method = RequestMethod.GET)
     @ApiOperation(value = "验证数据元名称是否重复")
     public boolean validatorName(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
@@ -190,7 +188,7 @@ public interface DataSetClient {
             @ApiParam(name = "name", value = "查询名称", defaultValue = "")
             @RequestParam(value = "name") String name);
 
-    @RequestMapping(value = RestApi.Standards.DataSetsIds, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.DataSetsIds, method = RequestMethod.GET)
     @ApiOperation(value = "根据数据集ids(用逗号隔开)获取数据集信息")
     List<MStdDataSet> getDataSets(
             @ApiParam(name = "ids", value = "数据集编号", defaultValue = "")
@@ -198,7 +196,7 @@ public interface DataSetClient {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version);
 
-    @RequestMapping(value = RestApi.Standards.MetaDatasWithDataSet, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.MetaDatasWithDataSet, method = RequestMethod.GET)
     @ApiOperation(value = "根据数据集id获取数据元")
     List<MStdMetaData> getMetaDataByDataSetId(
             @ApiParam(name = "data_set_id", value = "数据元编号", defaultValue = "")
@@ -206,7 +204,7 @@ public interface DataSetClient {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version);
 
-    @RequestMapping(value = RestApi.Standards.NoPageDataSets, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.NoPageDataSets, method = RequestMethod.GET)
     List<MStdDataSet> search(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,

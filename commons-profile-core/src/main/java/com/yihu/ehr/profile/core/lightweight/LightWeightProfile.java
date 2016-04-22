@@ -1,12 +1,7 @@
 package com.yihu.ehr.profile.core.lightweight;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.lang.SpringContext;
-import com.yihu.ehr.profile.core.commons.DataSet;
 import com.yihu.ehr.profile.core.commons.Profile;
-import com.yihu.ehr.util.DateFormatter;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 健康档案。
+ * 轻量级健康档案。
  *
  * @author Sand
  * @version 1.0
@@ -24,16 +19,12 @@ public class LightWeightProfile extends Profile {
 
     private Map<String, LightWeightDataSet> lightWeightDataSets = new HashMap<>();;
 
-
     public Collection<LightWeightDataSet> getDataSets() {
         return lightWeightDataSets.values();
     }
 
-
     public String getDataSetsAsString() {
-        ObjectMapper objectMapper = SpringContext.getService("objectMapper");
         ObjectNode rootNode = objectMapper.createObjectNode();
-
         for (String key : lightWeightDataSets.keySet()) {
             Set<String> rowKeys = lightWeightDataSets.get(key).getRecordKeys();
             String records = String.join(",", rowKeys);
@@ -55,11 +46,7 @@ public class LightWeightProfile extends Profile {
         return this.lightWeightDataSets.get(dataSetCode);
     }
 
-
-
     public Set<String> getDataSetTables(){
         return this.lightWeightDataSets.keySet();
     }
-
-
 }

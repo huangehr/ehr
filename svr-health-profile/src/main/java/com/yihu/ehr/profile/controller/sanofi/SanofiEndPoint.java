@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.profile.core.structured.StructuredDataSet;
@@ -20,13 +20,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.Criteria;
-import org.springframework.data.solr.core.query.Query;
 import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.data.solr.server.support.MulticoreSolrServerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -56,7 +53,7 @@ public class SanofiEndPoint {
     private Map<String, SolrTemplate> solrTemplateMap = new HashMap<>();
 
     /*@ApiOperation(value = "获取体征数据", notes = "获取体征数据")
-    @RequestMapping(value = RestApi.SanofiSupport.PhysicSigns, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.SanofiSupport.PhysicSigns, method = RequestMethod.POST)
     public ResponseEntity<List<ClinicalSign>> search(
             @ApiParam(value = "身份证号,使用Base64编码", defaultValue = "NDEyNzI2MTk1MTExMzA2MjY4")
             @RequestParam(value = "demographic_id", required = false) String demographicId,
@@ -115,7 +112,7 @@ public class SanofiEndPoint {
     }
 
     @ApiOperation(value = "获取体征数据", notes = "获取体征数据")
-    @RequestMapping(value = RestApi.SanofiSupport.PhysicSigns, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.SanofiSupport.PhysicSigns, method = RequestMethod.POST)
     public String getBodySigns(
             @ApiParam(value = "身份证号,使用Base64编码", defaultValue = "NDEyNzI2MTk1MTExMzA2MjY4")
             @RequestParam(value = "demographic_id", required = false) String demographicId,
@@ -132,7 +129,7 @@ public class SanofiEndPoint {
             @ApiParam(value = "结束日期", defaultValue = "2016-10-01")
             @RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd") Date to) throws IOException, ParseException {
         ObjectMapper objectMapper = SpringContext.getService("objectMapper");
-        ArrayNode root = objectMapper.createArrayNode();
+        ArrayNode document = objectMapper.createArrayNode();
 
         List<Demographic> demographics = searchProfile(demographicId, name, telephone, gender, birthday, since, to);
 
@@ -143,11 +140,13 @@ public class SanofiEndPoint {
         }
 
         for (StructuredProfile profile : profiles) {
-            ObjectNode objectNode = root.addObject();
-            convert(objectNode, profile);
+            ObjectNode section = objectMapper.createObjectNode();
+            convert(section, profile);
+
+            if (section.size() > 1) document.addPOJO(section);
         }
 
-        return root.toString();
+        return document.toString();
     }
 
     private List<Demographic> searchProfile(String demographicId,
@@ -179,101 +178,105 @@ public class SanofiEndPoint {
         return page.getContent();
     }
 
-    private void convert(ObjectNode root, StructuredProfile profile) throws IOException {
-        JsonNode node = null;
-        for (StructuredDataSet dataSet : profile.getDataSets()) {
-            String[] innerCodes;
-            switch (dataSet.getCode()) {
-                case "HDSA00_01": { // 人口学信息
-                    node = root.with("demographic_info");
-                    innerCodes = new String[]{
-                            "HDSA00_01_009",
-                            "HDSA00_01_011",
-                            "HDSA00_01_012",
-                            "HDSA00_01_017"};
-                }
-                break;
+    private void convert(ObjectNode document, StructuredProfile profile) throws IOException {
+        JsonNode section;
+        StructuredDataSet dataSet;
+        String[] innerCodes;
 
-                case "HDSC01_02": { // 体格检查-来源：门诊挂号
-                    node = root.withArray("physical_exam");
-                    innerCodes = new String[]{
-                            "JDSC01_02_07",
-                            "JDSC01_02_08"};
-                }
-                break;
+        // 人口学信息
+        dataSet = profile.getDataSet("HDSA00_01");
+        if (dataSet.getRecordKeys().size() > 0){
+            section = document.with("demographic_info");
+            innerCodes = new String[]{
+                    "HDSA00_01_009",
+                    "HDSA00_01_011",
+                    "HDSA00_01_012",
+                    "HDSA00_01_017"};
 
-                case "HDSD00_08": { // 体格检查-来源：住院护理体征记录
-                    node = root.withArray("physical_exam");
-                    innerCodes = new String[]{
-                            "HDSD00_08_025",
-                            "HDSD00_08_075",
-                            "HDSD00_08_041",
-                            "HDSD00_08_060",
-                            "HDSD00_08_068"};
-                }
-                break;
+            mergeData(section, profile, dataSet, innerCodes);
+        }
 
-                case "HDSD02_03": { // 检验
-                    node = root.withArray("lis");
-                    innerCodes = new String[]{
-                            "JDSD02_03_13", // 中文名
-                            "JDSD02_03_14", // 英文名
-                            "JDSD02_03_04", // 结果值
-                            "JDSD02_03_05", // 结果类型
-                            "HDSD00_01_547",// 单位
-                            "JDSD02_03_06", // 参考值上限
-                            "JDSD02_03_07", // 参考值下限
-                    };
-                }
-                break;
+        // 住院护理体征记录
+        dataSet = profile.getDataSet("HDSD00_08");
+        if (dataSet != null && dataSet.getRecordKeys().size() > 0){
+            section = document.withArray("physical_exam");
+            innerCodes = new String[]{
+                    "HDSD00_08_025",
+                    "HDSD00_08_075",
+                    "HDSD00_08_041",
+                    "HDSD00_08_060",
+                    "HDSD00_08_068"};
 
-                case "HDSC02_11": { // 临时医嘱
-                    node = root.withArray("stat_order");
-                    innerCodes = new String[]{
-                            "HDSD00_15_020",
-                            "HDSD00_15_028"
-                    };
-                }
-                break;
+            mergeData(section, profile, dataSet, innerCodes);
+        }
 
-                case "HDSC02_12": {   // 长期医嘱
-                    node = root.withArray("stand_order");
-                    innerCodes = new String[]{
-                            "HDSD00_15_020",
-                            "HDSD00_15_026",
-                            "HDSD00_15_028"
-                    };
-                }
-                break;
+        // 检验
+        dataSet = profile.getDataSet("HDSD02_03");
+        if (dataSet != null && dataSet.getRecordKeys().size() > 0){
+            section = document.withArray("lis");
+            innerCodes = new String[]{
+                    "JDSD02_03_13", // 中文名
+                    "JDSD02_03_14", // 英文名
+                    "JDSD02_03_04", // 结果值
+                    "JDSD02_03_05", // 结果类型
+                    "HDSD00_01_547",// 单位
+                    "JDSD02_03_06", // 参考值上限
+                    "JDSD02_03_07", // 参考值下限
+            };
 
-                default:
-                    continue;
+            mergeData(section, profile, dataSet, innerCodes);
+        }
+
+        // 临时医嘱
+        dataSet = profile.getDataSet("HDSC02_11");
+        if (dataSet != null && dataSet.getRecordKeys().size() > 0){
+            section = document.withArray("stat_order");
+            innerCodes = new String[]{
+                    "HDSD00_15_020",
+                    "HDSD00_15_028"
+            };
+
+            mergeData(section, profile, dataSet, innerCodes);
+        }
+
+        // 长期医嘱
+        dataSet = profile.getDataSet("HDSC02_12");
+        if (dataSet != null && dataSet.getRecordKeys().size() > 0){
+            section = document.withArray("stand_order");
+            innerCodes = new String[]{
+                    "HDSD00_15_020",
+                    "HDSD00_15_026",
+                    "HDSD00_15_028"
+            };
+
+            mergeData(section, profile, dataSet, innerCodes);
+        }
+    }
+
+    private void mergeData(JsonNode section, StructuredProfile profile, StructuredDataSet emptyDataSet, String[] innerCodes) throws IOException {
+        StructuredDataSet dataSet = profileRepo.findDataSet(profile.getCdaVersion(),
+                emptyDataSet.getCode(),
+                emptyDataSet.getRecordKeys(),
+                innerCodes).getRight();
+
+        if (section.isArray()) {
+            ArrayNode array = (ArrayNode) section;
+            for (String recordKey : dataSet.getRecordKeys()) {
+                ObjectNode arrayNode = array.addObject();
+                Map<String, String> record = dataSet.getRecord(recordKey);
+                for (String innerCode : record.keySet()) {
+                    arrayNode.put(innerCode, record.get(innerCode));
+                }
             }
-
-            StructuredDataSet echoDataSet = profileRepo.findDataSet(profile.getCdaVersion(),
-                    dataSet.getCode(),
-                    dataSet.getRecordKeys(),
-                    innerCodes).getRight();
-
-            if (node.isArray()) {
-                ArrayNode array = (ArrayNode) node;
-                for (String recordKey : echoDataSet.getRecordKeys()) {
-                    ObjectNode arrayNode = array.addObject();
-                    Map<String, String> record = echoDataSet.getRecord(recordKey);
-                    for (String innerCode : record.keySet()) {
-                        arrayNode.put(innerCode, record.get(innerCode));
-                    }
+        } else if (section.isObject()) {
+            ObjectNode objectNode = (ObjectNode) section;
+            for (String recordKey : dataSet.getRecordKeys()) {
+                Map<String, String> record = dataSet.getRecord(recordKey);
+                for (String innerCode : record.keySet()) {
+                    objectNode.put(innerCode, record.get(innerCode));
                 }
-            } else if (node.isObject()) {
-                ObjectNode objectNode = (ObjectNode) node;
-                for (String recordKey : echoDataSet.getRecordKeys()) {
-                    Map<String, String> record = echoDataSet.getRecord(recordKey);
-                    for (String innerCode : record.keySet()) {
-                        objectNode.put(innerCode, record.get(innerCode));
-                    }
 
-                    break;  // 就一行
-                }
+                break;  // 就一行
             }
         }
     }

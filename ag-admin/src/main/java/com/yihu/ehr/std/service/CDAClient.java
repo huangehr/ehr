@@ -1,6 +1,6 @@
 package com.yihu.ehr.std.service;
 
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.standard.MCDADocument;
@@ -22,7 +22,7 @@ import java.util.List;
 @ApiIgnore
 public interface CDAClient {
 
-    @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Standards.Documents, method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Standards.Documents, method = RequestMethod.GET)
     @ApiOperation(value = "根据条件获取cda列表")
     ResponseEntity<List<MCDADocument>> GetCDADocuments(
             @RequestParam(value = "fields", required = false) String fields,
@@ -40,7 +40,7 @@ public interface CDAClient {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version") String version);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Standards.DataSetRelationships, method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Standards.DataSetRelationships, method = RequestMethod.GET)
     @ApiOperation(value = "根据条件获取getCDADataSetRelationship列表")
     List<MCdaDataSetRelationship> getCDADataSetRelationships(
             @ApiParam(name = "document_Id", value = "文档编号")
@@ -48,7 +48,7 @@ public interface CDAClient {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version") String versionCode);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Standards.Documents, method = RequestMethod.POST)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Standards.Documents, method = RequestMethod.POST)
     @ApiOperation(value = "保存CDADocuments")
     MCDADocument saveCDADocuments(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
@@ -57,7 +57,7 @@ public interface CDAClient {
             @RequestParam(value = "model") String cdaDocumentJsonData);
 
     @ApiOperation(value = "修改CDADocuments")
-    @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Standards.Document, method = RequestMethod.PUT)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Standards.Document, method = RequestMethod.PUT)
     MCDADocument updateCDADocuments(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
             @RequestParam(value = "version") String version,
@@ -67,7 +67,7 @@ public interface CDAClient {
             @RequestParam(value = "model") String cdaDocumentJsonData);
 
     @ApiOperation(value = "删除CDADocuments")
-    @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Standards.Documents, method = RequestMethod.DELETE)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Standards.Documents, method = RequestMethod.DELETE)
     boolean deleteCDADocuments(
             @ApiParam(name = "ids", value = "ids")
             @RequestParam(value = "ids") List<String> ids,
@@ -75,7 +75,7 @@ public interface CDAClient {
             @RequestParam(value = "version") String versionCode);
 
     @ApiOperation(value = "保存CDADataSetRelationship")
-    @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Standards.DataSetRelationships, method = RequestMethod.POST)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Standards.DataSetRelationships, method = RequestMethod.POST)
     boolean saveCDADataSetRelationship(
             @ApiParam(name = "data_set_ids", value = "data_set_ids")
             @RequestParam(value = "data_set_ids") String dataSetIds,
@@ -87,7 +87,7 @@ public interface CDAClient {
             @RequestParam(value = "xml_info") String xmlInfo);
 
     @ApiOperation(value = "根基id删除CDADataSetRelationship")
-    @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Standards.DataSetRelationships, method = RequestMethod.DELETE)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Standards.DataSetRelationships, method = RequestMethod.DELETE)
     boolean deleteCDADataSetRelationship(
             @ApiParam(name = "version", value = "versionCode")
             @RequestParam(value = "version") String versionCode,
@@ -102,7 +102,7 @@ public interface CDAClient {
             @ApiParam(name = "document_Id", value = "document_Id")
             @RequestParam(value = "document_Id") String cdaId);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Standards.DocumentFileExistence, method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Standards.DocumentFileExistence, method = RequestMethod.GET)
     @ApiOperation(value = "根据cdaId和versionCode判断文件是否存在")
     boolean FileExists(
             @ApiParam(name = "version", value = "版本号")
@@ -110,7 +110,7 @@ public interface CDAClient {
             @ApiParam(name = "id", value = "文档编号")
             @PathVariable(value = "id") String cdaId);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Standards.DocumentCreateFile, method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Standards.DocumentCreateFile, method = RequestMethod.GET)
     @ResponseBody
     boolean createCDASchemaFile(
             @ApiParam(name = "version", value = "版本号")
@@ -119,7 +119,7 @@ public interface CDAClient {
             @PathVariable(value = "id") String cdaId);
 
 
-    @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Standards.DocumentGetFile, method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Standards.DocumentGetFile, method = RequestMethod.GET)
     @ResponseBody
     String getCdaXmlFileInfo(
             @ApiParam(name = "version", value = "版本号")
@@ -128,7 +128,7 @@ public interface CDAClient {
             @PathVariable(value = "id") String cdaId);
 
     @ApiOperation(value = "获取CDADocuments")
-    @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Standards.Document, method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Standards.Document, method = RequestMethod.GET)
     MCDADocument getCDADocuments(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
             @RequestParam(value = "version") String version,

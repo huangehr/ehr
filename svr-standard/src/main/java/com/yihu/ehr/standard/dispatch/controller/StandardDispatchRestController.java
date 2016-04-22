@@ -1,6 +1,6 @@
 package com.yihu.ehr.standard.dispatch.controller;
 
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
@@ -36,7 +36,7 @@ public class StandardDispatchRestController extends ExtendController {
     @Autowired
     FastDFSUtil fastDFSUtil;
 
-    @RequestMapping(value = RestApi.Standards.Dispatches, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.Dispatches, method = RequestMethod.GET)
     @ApiOperation(value = "获取适配方案摘要", response = RestEcho.class, produces = "application/json",
             notes = "获取两个指定版本的标准化数据差异与适配方案，文件以Base64编码，压缩格式为zip")
     public Object getSchemeInfo(
@@ -94,7 +94,7 @@ public class StandardDispatchRestController extends ExtendController {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.Dispatches, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.Dispatches, method = RequestMethod.POST)
     @ApiOperation(value = "生成适配方案摘要", produces = "application/json",
             notes = "")
     public Map createSchemeInfo(

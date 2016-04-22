@@ -1,6 +1,6 @@
 package com.yihu.ehr.standard.datasets.controller;
 
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.MStdMetaData;
 import com.yihu.ehr.standard.commons.ExtendController;
@@ -36,7 +36,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
         return  metaDataService.getServiceEntity(version);
     }
 
-    @RequestMapping(value = RestApi.Standards.MetaDatas, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.MetaDatas, method = RequestMethod.GET)
     @ApiOperation(value = "查询数据元")
     public Collection<MStdMetaData> searchDataSets(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -61,7 +61,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.MetaDatas, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.MetaDatas, method = RequestMethod.DELETE)
     @ApiOperation(value = "批量删除数据元")
     public boolean deleteMetaDatas(
             @ApiParam(name = "ids", value = "编号集", defaultValue = "")
@@ -74,7 +74,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.MetaDatasWithDataSet, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.MetaDatasWithDataSet, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据集关联的数据元")
     public boolean deleteMetaDataByDataSet(
             @ApiParam(name = "data_set_id", value = "数据集编号", defaultValue = "")
@@ -86,7 +86,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.MetaData, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.MetaData, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据元")
     public boolean deleteMetaData(
             @ApiParam(name = "id", value = "编号集", defaultValue = "")
@@ -99,7 +99,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.MetaData, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.MetaData, method = RequestMethod.GET)
     @ApiOperation(value = "获取数据元")
     public MStdMetaData getMetaData(
             @ApiParam(name = "id", value = "数据元编号", defaultValue = "")
@@ -110,7 +110,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
         return getModel(metaDataService.retrieve(id, getServiceEntity(version)));
     }
 
-    @RequestMapping(value = RestApi.Standards.MetaDatasWithDataSet, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.MetaDatasWithDataSet, method = RequestMethod.GET)
     @ApiOperation(value = "根据数据集id获取数据元")
     public Collection<MStdMetaData> getMetaDataByDataSetId(
             @ApiParam(name = "data_set_id", value = "数据元编号", defaultValue = "")
@@ -123,7 +123,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.MetaData, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Standards.MetaData, method = RequestMethod.PUT)
     @ApiOperation(value = "更新数据元")
     public MStdMetaData updataMetaSet(
             @ApiParam(name = "version", value = "版本", defaultValue = "")
@@ -145,7 +145,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.MetaDatas, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.MetaDatas, method = RequestMethod.POST)
     @ApiOperation(value = "新增数据元")
     public MStdMetaData saveMetaSet(
             @ApiParam(name = "version", value = "版本", defaultValue = "")
@@ -160,7 +160,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.MetaDataCodeExistence, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.MetaDataCodeExistence, method = RequestMethod.GET)
     @ApiOperation(value = "验证数据元代码是否重复")
     public boolean validateInnerCode(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
@@ -174,7 +174,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.MetaDataNameExistence, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.MetaDataNameExistence, method = RequestMethod.GET)
     @ApiOperation(value = "验证数据元名称是否重复")
     public boolean validatorName(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
@@ -188,7 +188,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.MetaDatasName, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.MetaDatasName, method = RequestMethod.POST)
     @ApiOperation(value = "获取数据元 id-name : map集")
     public Map getMetaDataMapByIds(
             @ApiParam(name = "parmModel", value = "参数模型", defaultValue = "")

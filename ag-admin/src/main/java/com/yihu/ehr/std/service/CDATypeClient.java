@@ -1,7 +1,6 @@
 package com.yihu.ehr.std.service;
 
-import com.yihu.ehr.agModel.standard.dict.DictModel;
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.standard.MCDAType;
@@ -26,14 +25,14 @@ import java.util.List;
 @ApiIgnore
 public interface CDATypeClient {
 
-    @RequestMapping(value = RestApi.Standards.TypeChildren, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.TypeChildren, method = RequestMethod.GET)
     @ApiOperation(value = "根据父级ID获取下级")
     List<MCDAType> getChildrenByPatientId(
             @ApiParam(name = "id", value = "父级id",defaultValue = "")
             @RequestParam(value = "id",required = false) String parentId);
 
 
-    @RequestMapping(value = RestApi.Standards.TypesChildren, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.TypesChildren, method = RequestMethod.GET)
     @ApiOperation(value = "根据父级类别获取父级类别所在以下所有子集类别（包括当前父级列表）")
     List<MCDAType> getChildIncludeSelfByParentIdsAndKey(
             @ApiParam(name = "patient_ids", value = "父级id")
@@ -42,7 +41,7 @@ public interface CDATypeClient {
             @RequestParam(value = "key") String key);
 
 
-    @RequestMapping(value = RestApi.Standards.Type, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.Type, method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取CDAType")
     MCDAType getCdaTypeById(
             @ApiParam(name = "id", value = "id")
@@ -50,14 +49,14 @@ public interface CDATypeClient {
 
 
 
-    @RequestMapping(value = RestApi.Standards.Types, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.Types, method = RequestMethod.POST)
     @ApiOperation(value = "新增CDAType")
     MCDAType saveCDAType(
             @ApiParam(name = "model", value = "model")
             @RequestParam(value = "model") String jsonData);
 
 
-    @RequestMapping(value = RestApi.Standards.Type,method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Standards.Type,method = RequestMethod.PUT)
     @ApiOperation(value = "修改CDAType")
     MCDAType updateCDAType(
             @ApiParam(name = "id", value = "编号")
@@ -66,21 +65,21 @@ public interface CDATypeClient {
             @RequestParam(value = "model") String jsonData);
 
 
-    @RequestMapping(value = RestApi.Standards.TypesCodeExistence , method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.TypesCodeExistence , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的机构代码是否已经存在")
     boolean isCDATypeExists(
             @ApiParam(name = "code", value = "code", defaultValue = "")
             @RequestParam(value = "code") String code);
 
 
-    @RequestMapping(value = RestApi.Standards.Types, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.Types, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除CDA类别，若该类别存在子类别，将一并删除子类别")
     boolean deleteCDATypeByPatientIds(
             @ApiParam(name = "ids", value = "ids")
             @RequestParam(value = "ids") String ids);
 
 
-    @RequestMapping(value = RestApi.Standards.Types, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.Types, method = RequestMethod.GET)
     @ApiOperation(value = "标准类别分页搜索")
     ResponseEntity<Collection<MCDAType>> searchType(
             @RequestParam(value = "fields", required = false) String fields,
@@ -90,12 +89,12 @@ public interface CDATypeClient {
             @RequestParam(value = "page", required = false) int page);
 
 
-    @RequestMapping(value = RestApi.Standards.NoPageTypes, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.NoPageTypes, method = RequestMethod.GET)
     ResponseEntity<Collection<MCDAType>> search(
             @RequestParam(value = "filters", required = false) String filters);
 
 
-    @RequestMapping(value = RestApi.Standards.TypeParent, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.TypeParent, method = RequestMethod.GET)
     @ApiOperation(value = "根据当前类别获取自己的父级以及同级以及同级所在父级类别列表")
     List<MCDAType> getCdaTypeExcludeSelfAndChildren(
             @ApiParam(name = "id", value = "id")

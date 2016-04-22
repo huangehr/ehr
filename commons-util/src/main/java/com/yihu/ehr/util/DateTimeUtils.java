@@ -5,17 +5,18 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * ʱ���ʽ�����ߣ�ʹ���̱߳��ر�����ʽ�Ż����󴴽����̣���ʡ��Դ��
  * @author Sand
  * @version 1.0
  * @created 2015.08.26 8:49
  */
-public class DateFormatter {
-    static final String simpleDateTimePattern = "yyyy-MM-dd HH:mm:ss";
-    static final String utcDateTimePattern = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-    static final String slashDateTimePattern = "yyyy/MM/dd HH:mm:ss";
-    static final String simpleDatePattern = "yyyy-MM-dd";
-    static final String simpleDateTimeShortPattern = "yyyy/MM/dd HH:mm";
+public class DateTimeUtils {
+    public static final String simpleDateTimePattern = "yyyy-MM-dd HH:mm:ss";
+    public static final String utcDateTimePattern = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    public static final String slashDateTimePattern = "yyyy/MM/dd HH:mm:ss";
+    public static final String simpleDatePattern = "yyyy-MM-dd";
+    public static final String simpleDateTimeShortPattern = "yyyy/MM/dd HH:mm";
+
+    public static final String ISO8601Pattern = "yyyy-MM-dd'T'HH:mm:ssZ";
 
     private static ThreadLocal<SimpleDateFormat> simpleDateTimeShortFormat = new ThreadLocal<SimpleDateFormat>(){
         @Override

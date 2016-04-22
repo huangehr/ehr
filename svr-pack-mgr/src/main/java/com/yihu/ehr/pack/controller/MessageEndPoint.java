@@ -2,7 +2,7 @@ package com.yihu.ehr.pack.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.Channel;
 import com.yihu.ehr.model.packs.MPackage;
@@ -43,7 +43,7 @@ public class MessageEndPoint extends BaseRestController {
     RedisTemplate redisTemplate;
 
     @ApiOperation(value = "发送档案包解析消息", notes = "发送档案包解析消息")
-    @RequestMapping(value = RestApi.Packages.ResolveMessage, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Packages.ResolveMessage, method = RequestMethod.PUT)
     public void sendResolveMessage(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "receiveDate>2016-03-01,archiveStatus=Received,Acquired,Finished")
             @RequestParam(value = "filters", required = false) String filters,

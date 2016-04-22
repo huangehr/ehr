@@ -1,6 +1,6 @@
 package com.yihu.ehr.standard.stdsrc.controller;
 
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.MStdSource;
 import com.yihu.ehr.standard.commons.ExtendController;
@@ -33,7 +33,7 @@ public class StandardSourceController extends ExtendController<MStdSource> {
     @Autowired
     private StdSourceService stdSourceService;
 
-    @RequestMapping(value = RestApi.Standards.Sources, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.Sources, method = RequestMethod.GET)
     @ApiOperation(value = "标准来源分页搜索")
     public Collection<MStdSource> searchSources(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
@@ -54,7 +54,7 @@ public class StandardSourceController extends ExtendController<MStdSource> {
         return convertToModels(appList, new ArrayList<>(appList.size()), MStdSource.class, fields);
     }
 
-    @RequestMapping(value = RestApi.Standards.NoPageSources, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.NoPageSources, method = RequestMethod.GET)
     @ApiOperation(value = "标准来源分页搜索(不分页)")
     public Collection<MStdSource> searchSourcesWithoutPaging(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -66,7 +66,7 @@ public class StandardSourceController extends ExtendController<MStdSource> {
 
 
 
-    @RequestMapping(value = RestApi.Standards.Source, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.Source, method = RequestMethod.GET)
     @ApiOperation(value = "获取标准来源信息")
     public MStdSource getStdSource(
             @ApiParam(name = "id", value = "标准来源编号", defaultValue = "")
@@ -76,7 +76,7 @@ public class StandardSourceController extends ExtendController<MStdSource> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.Source, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Standards.Source, method = RequestMethod.PUT)
     @ApiOperation(value = "修改标准来源")
     public MStdSource updateStdSource(
             @ApiParam(name = "id", value = "标准来源编号", defaultValue = "")
@@ -95,7 +95,7 @@ public class StandardSourceController extends ExtendController<MStdSource> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.Sources, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.Sources, method = RequestMethod.POST)
     @ApiOperation(value = "新增标准来源")
     public MStdSource addStdSource(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
@@ -109,7 +109,7 @@ public class StandardSourceController extends ExtendController<MStdSource> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.Sources, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.Sources, method = RequestMethod.DELETE)
     @ApiOperation(value = "通过id组删除标准来源，多个id以,分隔")
     public boolean delStdSources(
             @ApiParam(name = "ids", value = "标准来源编号", defaultValue = "")
@@ -119,7 +119,7 @@ public class StandardSourceController extends ExtendController<MStdSource> {
         return true;
     }
 
-    @RequestMapping(value = RestApi.Standards.Source, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.Source, method = RequestMethod.DELETE)
     @ApiOperation(value = "通过id删除标准来源")
     public boolean delStdSource(
             @ApiParam(name = "id", value = "标准来源编号", defaultValue = "")
@@ -129,7 +129,7 @@ public class StandardSourceController extends ExtendController<MStdSource> {
         return true;
     }
 
-    @RequestMapping(value = RestApi.Standards.IsSourceCodeExist,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.IsSourceCodeExist,method = RequestMethod.GET)
     public boolean isCodeExist(@RequestParam(value="code")String code) throws ParseException {
 
         return stdSourceService.isSourceCodeExist(code);

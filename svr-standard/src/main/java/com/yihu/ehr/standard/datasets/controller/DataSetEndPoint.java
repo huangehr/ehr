@@ -1,9 +1,8 @@
 package com.yihu.ehr.standard.datasets.controller;
 
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.MStdDataSet;
-import com.yihu.ehr.model.standard.MStdDict;
 import com.yihu.ehr.standard.commons.ExtendController;
 import com.yihu.ehr.standard.datasets.service.BaseDataSet;
 import com.yihu.ehr.standard.datasets.service.DataSetService;
@@ -37,7 +36,7 @@ public class DataSetEndPoint extends ExtendController<MStdDataSet> {
         return dataSetService.getServiceEntity(version);
     }
 
-    @RequestMapping(value = RestApi.Standards.DataSets, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.DataSets, method = RequestMethod.GET)
     @ApiOperation(value = "查询数据集的方法")
     public Collection<MStdDataSet> searchDataSets(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -62,7 +61,7 @@ public class DataSetEndPoint extends ExtendController<MStdDataSet> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.NoPageDataSets, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.NoPageDataSets, method = RequestMethod.GET)
     @ApiOperation(value = "标准数据集不分页搜索")
     public Collection<MStdDataSet> searchSourcesWithoutPaging(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -75,7 +74,7 @@ public class DataSetEndPoint extends ExtendController<MStdDataSet> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.DataSet, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.DataSet, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据集信息")
     public boolean deleteDataSet(
             @ApiParam(name = "id", value = "数据集编号", defaultValue = "")
@@ -87,7 +86,7 @@ public class DataSetEndPoint extends ExtendController<MStdDataSet> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.DataSets, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.DataSets, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据集信息")
     public boolean deleteDataSet(
             @ApiParam(name = "ids", value = "数据集编号", defaultValue = "")
@@ -99,7 +98,7 @@ public class DataSetEndPoint extends ExtendController<MStdDataSet> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.DataSet, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.DataSet, method = RequestMethod.GET)
     @ApiOperation(value = "获取数据集信息")
     public MStdDataSet getDataSet(
             @ApiParam(name = "id", value = "数据集编号", defaultValue = "")
@@ -111,7 +110,7 @@ public class DataSetEndPoint extends ExtendController<MStdDataSet> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.DataSetsIds, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.DataSetsIds, method = RequestMethod.GET)
     @ApiOperation(value = "根据数据集ids(用逗号隔开)获取数据集信息")
     public Collection<MStdDataSet> getDataSets(
             @ApiParam(name = "ids", value = "数据集编号", defaultValue = "")
@@ -124,7 +123,7 @@ public class DataSetEndPoint extends ExtendController<MStdDataSet> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.DataSets, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.DataSets, method = RequestMethod.POST)
     @ApiOperation(value = "新增数据集信息")
     public MStdDataSet saveDataSet(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
@@ -142,7 +141,7 @@ public class DataSetEndPoint extends ExtendController<MStdDataSet> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.DataSet, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Standards.DataSet, method = RequestMethod.PUT)
     @ApiOperation(value = "修改数据集信息")
     public MStdDataSet updateDataSet(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
@@ -165,7 +164,7 @@ public class DataSetEndPoint extends ExtendController<MStdDataSet> {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.DataSetsName, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.DataSetsName, method = RequestMethod.GET)
     @ApiOperation(value = "获取数据集 id-name : map集")
     public Map getDataSetMapByIds(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
@@ -178,7 +177,7 @@ public class DataSetEndPoint extends ExtendController<MStdDataSet> {
                 version);
     }
 
-    @RequestMapping(value = RestApi.Standards.DataSetCodeIsExist,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.DataSetCodeIsExist,method = RequestMethod.GET)
     public boolean isExistCode(
             @RequestParam(value = "code")String code,
             @RequestParam(value = "version_code")String versionCode)

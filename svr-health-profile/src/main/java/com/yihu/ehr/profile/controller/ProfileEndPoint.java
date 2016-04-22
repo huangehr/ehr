@@ -1,6 +1,6 @@
 package com.yihu.ehr.profile.controller;
 
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.cache.CacheReader;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.exception.ApiException;
@@ -25,7 +25,6 @@ import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -72,7 +71,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     StdKeySchema stdKeySchema;
 
     @ApiOperation(value = "搜索档案", notes = "返回档案索引列表")
-    @RequestMapping(value = RestApi.HealthProfile.ProfileSearch, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.HealthProfile.ProfileSearch, method = RequestMethod.POST)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query", value = "页码(0..N)", defaultValue = "0"),
             @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", value = "页大小", defaultValue = "5"),
@@ -89,7 +88,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     }
 
     @ApiOperation(value = "按时间获取档案列表", notes = "获取患者的就诊档案列表")
-    @RequestMapping(value = RestApi.HealthProfile.Profiles, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.HealthProfile.Profiles, method = RequestMethod.GET)
     public Collection<MProfile> getProfiles(
             @ApiParam(value = "身份证号,使用Base64编码", defaultValue = "NDEyNzI2MTk1MTExMzA2MjY4")
             @RequestParam("demographic_id") String demographicId,
@@ -127,7 +126,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     }
 
     @ApiOperation(value = "获取档案", notes = "读取一份档案")
-    @RequestMapping(value = RestApi.HealthProfile.Profile, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.HealthProfile.Profile, method = RequestMethod.GET)
     public MProfile getProfile(
             @ApiParam(value = "档案ID", defaultValue = "41872607-9_10295435_000622450_1444060800000")
             @PathVariable("profile_id") String profileId,
@@ -141,7 +140,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     }
 
     @ApiOperation(value = "获取档案文档", notes = "获取档案文档，按数据集整理")
-    @RequestMapping(value = RestApi.HealthProfile.ProfileDocument, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.HealthProfile.ProfileDocument, method = RequestMethod.GET)
     public MProfileDocument getProfileDocument(
             @ApiParam(value = "档案ID", defaultValue = "41872607-9_10295435_000622450_1444060800000")
             @PathVariable("profile_id") String profileId,

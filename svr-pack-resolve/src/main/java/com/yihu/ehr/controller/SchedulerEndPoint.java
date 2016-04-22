@@ -1,6 +1,6 @@
 package com.yihu.ehr.controller;
 
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.task.PackageResolveJob;
@@ -12,13 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.ParseException;
 import java.util.Set;
 import java.util.UUID;
 
@@ -38,7 +36,7 @@ public class SchedulerEndPoint {
     Scheduler scheduler;
 
     @ApiOperation(value = "设置任务调度器状态")
-    @RequestMapping(value = RestApi.PackageResolve.Scheduler, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.PackageResolve.Scheduler, method = RequestMethod.PUT)
     public ResponseEntity<String> updateScheduler(
             @ApiParam(name = "pause", value = "true: 执行, false: 暂停", defaultValue = "true")
             @RequestParam(value = "pause") boolean pause) {
@@ -56,7 +54,7 @@ public class SchedulerEndPoint {
     }
 
     @ApiOperation(value = "添加解析任务")
-    @RequestMapping(value = RestApi.PackageResolve.Scheduler, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.PackageResolve.Scheduler, method = RequestMethod.POST)
     public ResponseEntity<String> addJob(@ApiParam(name = "count", value = "任务数量", defaultValue = "8")
                                          @RequestParam(value = "count") int count,
                                          @ApiParam(name = "cronExp", value = "触发器CRON表达式", defaultValue = "0/2 * * * * ?")
@@ -84,7 +82,7 @@ public class SchedulerEndPoint {
     }
 
     @ApiOperation(value = "删除解析任务")
-    @RequestMapping(value = RestApi.PackageResolve.Scheduler, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.PackageResolve.Scheduler, method = RequestMethod.DELETE)
     public ResponseEntity<String> removeJob(@ApiParam(name = "count", value = "任务数量", defaultValue = "8")
                                             @RequestParam(value = "count") int count) {
         try {

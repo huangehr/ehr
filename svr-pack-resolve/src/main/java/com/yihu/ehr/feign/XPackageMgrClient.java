@@ -1,6 +1,6 @@
 package com.yihu.ehr.feign;
 
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.MicroServices;
@@ -20,10 +20,10 @@ import springfox.documentation.annotations.ApiIgnore;
 @ApiIgnore
 @FeignClient(name = MicroServices.Package)
 public interface XPackageMgrClient {
-    @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Packages.Package, method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Packages.Package, method = RequestMethod.GET)
     MPackage getPackage(@PathVariable(value = "id") String id);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Packages.Package, method = RequestMethod.PUT)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Packages.Package, method = RequestMethod.PUT)
     void reportStatus(@PathVariable(value = "id") String id,
                       @RequestParam(value = "status") ArchiveStatus status,
                       @RequestParam(value = "message") String message);
