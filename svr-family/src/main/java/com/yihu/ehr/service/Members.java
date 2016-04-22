@@ -17,7 +17,7 @@ public class Members {
     private String id;
     private String familyId;
     private String idCardNo;
-    private int familyRelation;
+    private String familyRelation;
 
     @Id
     @GeneratedValue(generator = "Generator")
@@ -47,10 +47,10 @@ public class Members {
     }
 
     @Column(name = "family_relation",  nullable = false)
-    public int getFamilyRelation() {
+    public String getFamilyRelation() {
         return familyRelation;
     }
-    public void setFamilyRelation(int familyRelation) {
+    public void setFamilyRelation(String familyRelation) {
         this.familyRelation = familyRelation;
     }
 }
