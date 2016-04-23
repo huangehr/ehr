@@ -2,6 +2,7 @@ package com.yihu.ehr.patient.service;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.model.family.MFamilies;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -24,7 +25,7 @@ public interface FamiliesClient {
 
     @RequestMapping(value = "/families", method = RequestMethod.GET)
     @ApiOperation(value = "获取家庭关系列表")
-    ResponseEntity<Collection<Object>> searchFamilies(
+    ResponseEntity<Collection<MFamilies>> searchFamilies(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -38,19 +39,19 @@ public interface FamiliesClient {
 
     @RequestMapping(value = "/families", method = RequestMethod.POST)
     @ApiOperation(value = "创建家庭关系")
-    Object createFamily(
+    MFamilies createFamily(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestParam(value = "json_data") String jsonData) ;
 
     @RequestMapping(value = "/families", method = RequestMethod.PUT)
     @ApiOperation(value = "修改家庭关系")
-    Object updateFamily(
+    MFamilies updateFamily(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestParam(value = "json_data") String jsonData);
 
     @RequestMapping(value = "/families/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取家庭关系")
-    Object getFamily(
+    MFamilies getFamily(
             @ApiParam(name = "id", value = "", defaultValue = "")
             @PathVariable(value = "id") String id) ;
 
