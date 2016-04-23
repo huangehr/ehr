@@ -3,13 +3,18 @@ package com.yihu.ehr.patient.controller;
 import com.yihu.ehr.agModel.patient.HomeGroupModel;
 import com.yihu.ehr.agModel.patient.HomeRelationshipModel;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.family.MFamilies;
+import com.yihu.ehr.model.family.MMembers;
+import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.patient.service.FamiliesClient;
 import com.yihu.ehr.patient.service.MembersClient;
+import com.yihu.ehr.patient.service.PatientClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,6 +40,9 @@ public class HomeRelationshipController extends BaseController {
     @Autowired
     private FamiliesClient familiesClient;
 
+    @Autowired
+    private PatientClient patientClient;
+
     @RequestMapping(value = "/home_relationship", method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件查家庭关系")
     public Envelop getHomeRelationship(
@@ -50,50 +58,24 @@ public class HomeRelationshipController extends BaseController {
             @RequestParam(value = "page", required = false) int page) {
         try {
 
-            //TODO: 根据查询条件查询家庭组ID
-            ResponseEntity<Collection<Object>> familiesResponseEntity = familiesClient.searchFamilies(fields, filters, sorts, size, page);
-
-            //TODO:根据查询所得的家庭组ID查询家庭成员
-            filters="familyId="+"";
-            ResponseEntity<Collection<Object>> MemgersResponseEntity = membersClient.searchMembers(fields, filters, sorts, size, page);
-
-
-            //List<MDemographicInfo> demographicInfos = responseEntity.getBody();
+            // 根据查询条件查询家庭组ID
+            List<MFamilies> mFamilies = (List<MFamilies>)familiesClient.searchFamilies(fields, filters, sorts, size, page).getBody();
+            if(mFamilies==null || mFamilies.size()==0)
+            {
+                return getResult(null, 0, page, size);
+            }
+            //根据查询所得的家庭组ID查询家庭成员
+            filters="familyId="+mFamilies.get(0).getId();
+            ResponseEntity<Collection<MMembers>> membersResponseEntity = membersClient.searchMembers(fields, filters, sorts, size, page);
+            List<MMembers> mMemberses = (List<MMembers>)membersResponseEntity.getBody();
             List<HomeRelationshipModel> relationshipModels = new ArrayList<>();
-//            for (HomeRelationshipModel relationshipModel : demographicInfos) {
-//
-//                PatientModel patient = convertToModel(patientInfo, PatientModel.class);
-//                patient.setRegisterTime(DateToString(patientInfo.getRegisterTime(), AgAdminConstants.DateTimeFormat));
-//                //获取家庭地址信息
-//                String homeAddressId = patientInfo.getHomeAddress();
-//                if (StringUtils.isNotEmpty(homeAddressId)) {
-//                    MGeography geography = addressClient.getAddressById(homeAddressId);
-//                    String homeAddress = geography != null ? geography.fullAddress() : "";
-//                    patient.setHomeAddress(homeAddress);
-//                }
-//                //性别
-//                if (StringUtils.isNotEmpty(patientInfo.getGender())) {
-//                    MConventionalDict dict = conventionalDictClient.getGender(patientInfo.getGender());
-//                    patient.setGender(dict == null ? "" : dict.getValue());
-//                }
-//                //联系电话
-//                Map<String, String> telephoneNo;
-//                String tag = "联系电话";
-//                try {
-//                    telephoneNo = objectMapper.readValue(patient.getTelephoneNo(), Map.class);
-//                } catch (Exception e) {
-//                    telephoneNo = null;
-//                }
-//                if (telephoneNo != null && telephoneNo.containsKey(tag)) {
-//                    patient.setTelephoneNo(telephoneNo.get(tag));
-//                } else {
-//                    patient.setTelephoneNo(null);
-//                }
-//
-//                relationshipModels.add(patient);
-//            }
-            //getTotalCount(responseEntity)
-            return getResult(relationshipModels, 0, page, size);
+            for(MMembers mMembers :mMemberses )
+            {
+                HomeRelationshipModel relationshipModel = convertToHomeRelationshipModel(mMembers);
+                relationshipModels.add(relationshipModel);
+            }
+
+            return getResult(relationshipModels, getTotalCount(membersResponseEntity), page, size);
         } catch (Exception ex) {
             ex.printStackTrace();
             return failedSystem();
@@ -115,62 +97,76 @@ public class HomeRelationshipController extends BaseController {
             @RequestParam(value = "page", required = false) int page) {
         try {
 
-            //TODO：根据查询条件获取家庭组ID
-            ResponseEntity<Collection<Object>> membersResponseEntity = membersClient.searchMembers(fields, filters, sorts, size, page);
+            //根据查询条件获取家庭组ID
+            List<MMembers> mMemberses = (List<MMembers>)membersClient.searchMembers(fields, filters, sorts, size, page).getBody();
+            if(mMemberses==null || mMemberses.size()==0)
+            {
+                return getResult(null, 0, page, size);
+            }
+            String id="";
+            String idCardNo = mMemberses.get(0).getIdCardNo();
+            for(MMembers mMembers : mMemberses)
+            {
+                id+=mMembers.getFamilyId()+",";
+            }
+            id = trimEnd(id,",");
+            //根据家庭组ID获取家庭组信息
+            filters="id="+id;
 
-            //TODO:根据家庭组ID获取家庭组信息
-            filters="id="+"";
-
-            ResponseEntity<Collection<Object>> familyResponseEntity = familiesClient.searchFamilies(fields, filters, sorts, size, page);
-            //List<MDemographicInfo> demographicInfos = responseEntity.getBody();
+            ResponseEntity<Collection<MFamilies>> familyResponseEntity = familiesClient.searchFamilies(fields, filters, sorts, size, page);
+            List<MFamilies> mFamiliesList = (List<MFamilies>)familyResponseEntity.getBody();
             List<HomeGroupModel> homeGroupModels = new ArrayList<>();
-//            for (HomeRelationshipModel relationshipModel : demographicInfos) {
-//
-//                PatientModel patient = convertToModel(patientInfo, PatientModel.class);
-//                patient.setRegisterTime(DateToString(patientInfo.getRegisterTime(), AgAdminConstants.DateTimeFormat));
-//                //获取家庭地址信息
-//                String homeAddressId = patientInfo.getHomeAddress();
-//                if (StringUtils.isNotEmpty(homeAddressId)) {
-//                    MGeography geography = addressClient.getAddressById(homeAddressId);
-//                    String homeAddress = geography != null ? geography.fullAddress() : "";
-//                    patient.setHomeAddress(homeAddress);
-//                }
-//                //性别
-//                if (StringUtils.isNotEmpty(patientInfo.getGender())) {
-//                    MConventionalDict dict = conventionalDictClient.getGender(patientInfo.getGender());
-//                    patient.setGender(dict == null ? "" : dict.getValue());
-//                }
-//                //联系电话
-//                Map<String, String> telephoneNo;
-//                String tag = "联系电话";
-//                try {
-//                    telephoneNo = objectMapper.readValue(patient.getTelephoneNo(), Map.class);
-//                } catch (Exception e) {
-//                    telephoneNo = null;
-//                }
-//                if (telephoneNo != null && telephoneNo.containsKey(tag)) {
-//                    patient.setTelephoneNo(telephoneNo.get(tag));
-//                } else {
-//                    patient.setTelephoneNo(null);
-//                }
-//
-//                relationshipModels.add(patient);
-//            }
-            //getTotalCount(responseEntity)
-            return getResult(homeGroupModels, 0, page, size);
+            for(MFamilies mFamilies:mFamiliesList)
+            {
+                HomeGroupModel groupModel = convertToHomeGroupModel(mFamilies,idCardNo);
+                homeGroupModels.add(groupModel);
+            }
+
+            return getResult(homeGroupModels, getTotalCount(familyResponseEntity), page, size);
         } catch (Exception ex) {
             ex.printStackTrace();
             return failedSystem();
         }
     }
 
-    public HomeRelationshipModel ConvertToHomeRelationshipModel()
+    public HomeRelationshipModel convertToHomeRelationshipModel(MMembers mMembers)
     {
-        return null;
+        HomeRelationshipModel relationshipModel = new HomeRelationshipModel();
+
+        relationshipModel.setId(mMembers.getId());
+        if(StringUtils.isNotEmpty(mMembers.getIdCardNo()))
+        {
+            MDemographicInfo info =patientClient.getPatient(mMembers.getIdCardNo());
+            relationshipModel.setAge(info==null?"0":String.valueOf(getAgeByBirthday(info.getBirthday())));
+            relationshipModel.setName(info==null?"0":info.getName());
+        }
+       // relationshipModel.setRelationTime();
+        //TODO：获取关系字典信息
+
+
+        return relationshipModel;
     }
 
-    public HomeGroupModel ConvertToHomeGroupModel()
+    public HomeGroupModel convertToHomeGroupModel(MFamilies mFamilies,String idCardNo)
     {
-        return null;
+        HomeGroupModel groupModel = new HomeGroupModel();
+
+        groupModel.setId(mFamilies.getId());
+        if(StringUtils.isNotEmpty(mFamilies.getHouseholderIdCardNo()))
+        {
+            MDemographicInfo info =patientClient.getPatient(mFamilies.getHouseholderIdCardNo());
+            groupModel.setName(info==null?"0":info.getName());
+        }
+        groupModel.setCreateTime(groupModel.getCreateTime());
+        String filters="familyId="+mFamilies.getId()+";idCardNo="+idCardNo;
+        List<MMembers> mMemberses = (List<MMembers>)membersClient.searchMembers("", filters, "", 15, 1).getBody();
+        if(mMemberses!=null && mMemberses.size()>0)
+        {
+            //获取关系ID
+           // String relationId = mMemberses.get(0).getFamilyRelation();
+            //TODO：获取关系字典信息
+        }
+
+        return groupModel;
     }
 }

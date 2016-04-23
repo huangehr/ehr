@@ -4,10 +4,20 @@ package com.yihu.ehr.agModel.patient;
  * Created by AndyCai on 2016/4/20.
  */
 public class HomeRelationshipModel {
+
+    String id;
     String name;
     String age;
     String relationShipName;
     String relationTime;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
