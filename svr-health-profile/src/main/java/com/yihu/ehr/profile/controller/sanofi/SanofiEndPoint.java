@@ -6,24 +6,25 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.profile.core.structured.StructuredDataSet;
 import com.yihu.ehr.profile.core.structured.StructuredProfile;
+import com.yihu.ehr.profile.persist.ProfileIndices;
+import com.yihu.ehr.profile.persist.ProfileIndicesService;
 import com.yihu.ehr.profile.persist.repo.ProfileRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
-import org.apache.solr.client.solrj.impl.CloudSolrServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.solr.core.SolrTemplate;
-import org.springframework.data.solr.core.query.Criteria;
-import org.springframework.data.solr.core.query.SimpleQuery;
-import org.springframework.data.solr.server.support.MulticoreSolrServerFactory;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -45,78 +46,17 @@ import java.util.*;
 @Api(value = "赛诺菲数据服务", description = "赛诺菲项目体征数据提取服务")
 public class SanofiEndPoint {
     @Autowired
-    private CloudSolrServer cloudSolrServer;
-
-    @Autowired
     private ProfileRepository profileRepo;
 
-    private Map<String, SolrTemplate> solrTemplateMap = new HashMap<>();
-
-    /*@ApiOperation(value = "获取体征数据", notes = "获取体征数据")
-    @RequestMapping(value = ServiceApi.SanofiSupport.PhysicSigns, method = RequestMethod.POST)
-    public ResponseEntity<List<ClinicalSign>> search(
-            @ApiParam(value = "身份证号,使用Base64编码", defaultValue = "NDEyNzI2MTk1MTExMzA2MjY4")
-            @RequestParam(value = "demographic_id", required = false) String demographicId,
-            @ApiParam(value = "姓名")
-            @RequestParam(value = "name", required = false) String name,
-            @ApiParam(value = "联系电话")
-            @RequestParam(value = "telephone", required = false) String telephone,
-            @ApiParam(value = "性别")
-            @RequestParam(value = "gender", required = false) String gender,
-            @ApiParam(value = "出生日期")
-            @RequestParam(value = "birthday", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date birthday,
-            @ApiParam(value = "起始日期", defaultValue = "2015-10-01")
-            @RequestParam("since") @DateTimeFormat(pattern = "yyyy-MM-dd") Date since,
-            @ApiParam(value = "结束日期", defaultValue = "2016-10-01")
-            @RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd") Date to) {
-        // 搜索档案
-
-
-        // 提取档案数据
-        List<Demographic> demographics = page.getContent();
-        if (demographics.size() == 0) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        List<ClinicalSign> clinicalSigns = new ArrayList<>();
-        for (Demographic demographic : demographics){
-            String profileId = demographic.getProfileId();
-
-            Query query = buildQuery(profileId, Lis.CreateDate, since, to);
-            Page<Lis> lis = getSolrTemplate(Lis.LisCore).queryForPage(query, Lis.class);
-
-            ClinicalSign clinicalSign = new ClinicalSign();
-            clinicalSign.setDemographic(demographic);
-            clinicalSign.setLis(lis.getContent());
-
-            clinicalSigns.add(clinicalSign);
-        }
-
-        return new ResponseEntity<>(clinicalSigns, HttpStatus.OK);
-    }
-
-    Query buildQuery(String profileId, String createDateField, Date since, Date to){
-        Criteria criteria = new Criteria("rowkey").startsWith(profileId).and(createDateField).between(since, to);
-
-        return new SimpleQuery(criteria);
-    }*/
-
-    SolrTemplate getSolrTemplate(String core) {
-        SolrTemplate solrTemplate = solrTemplateMap.get(core);
-        if (null == solrTemplate) {
-            solrTemplate = new SolrTemplate(new MulticoreSolrServerFactory(cloudSolrServer));
-            solrTemplate.setSolrCore(core);
-            solrTemplate.afterPropertiesSet();
-            solrTemplateMap.put(core, solrTemplate);
-        }
-
-        return solrTemplate;
-    }
+    @Autowired
+    private ProfileIndicesService indicesService;
 
     @ApiOperation(value = "获取体征数据", notes = "获取体征数据")
     @RequestMapping(value = ServiceApi.SanofiSupport.PhysicSigns, method = RequestMethod.GET)
-    public String getBodySigns(
+    public ResponseEntity<String> getBodySigns(
             @ApiParam(value = "身份证号,使用Base64编码", defaultValue = "NDEyNzI2MTk1MTExMzA2MjY4")
             @RequestParam(value = "demographic_id", required = false) String demographicId,
-            @ApiParam(value = "姓名")
+            @ApiParam(value = "患者姓名")
             @RequestParam(value = "name", required = false) String name,
             @ApiParam(value = "联系电话")
             @RequestParam(value = "telephone", required = false) String telephone,
@@ -128,17 +68,23 @@ public class SanofiEndPoint {
             @RequestParam("since") @DateTimeFormat(pattern = "yyyy-MM-dd") Date since,
             @ApiParam(value = "结束日期", defaultValue = "2016-10-01")
             @RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd") Date to) throws IOException, ParseException {
-        ObjectMapper objectMapper = SpringContext.getService("objectMapper");
-        ArrayNode document = objectMapper.createArrayNode();
+        demographicId = demographicId == null ? null : new String(Base64.getDecoder().decode(demographicId));
 
-        List<Demographic> demographics = searchProfile(demographicId, name, telephone, gender, birthday, since, to);
+        Pageable pageable = new PageRequest(0, 20);
+        Page<ProfileIndices> profileIndices = indicesService.findByDemographic(demographicId, null, name, telephone, gender, birthday, since, to, pageable);
+
+        if (profileIndices == null) return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
 
         List<StructuredProfile> profiles = new ArrayList<>();
-        for (Demographic demographic : demographics) {
-            StructuredProfile structedProfile = profileRepo.findOne(demographic.getProfileId(), false, false);
+        for (ProfileIndices indices : profileIndices.getContent()) {
+            StructuredProfile structedProfile = profileRepo.findOne(indices.getProfileId(), false, false);
             profiles.add(structedProfile);
         }
 
+        if (profiles.size() == 0) return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
+
+        ObjectMapper objectMapper = SpringContext.getService("objectMapper");
+        ArrayNode document = objectMapper.createArrayNode();
         for (StructuredProfile profile : profiles) {
             ObjectNode section = objectMapper.createObjectNode();
             convert(section, profile);
@@ -146,36 +92,7 @@ public class SanofiEndPoint {
             if (section.size() > 1) document.addPOJO(section);
         }
 
-        return document.toString();
-    }
-
-    private List<Demographic> searchProfile(String demographicId,
-                                            String name,
-                                            String telephone,
-                                            String gender,
-                                            Date birthday,
-                                            Date since,
-                                            Date to) {
-        Criteria criteria = null;
-        if (StringUtils.isNotEmpty(demographicId)) {
-            criteria = new Criteria(Demographic.IdCardNo).contains(new String(com.yihu.ehr.util.encode.Base64.decode(demographicId)));
-        } else if (StringUtils.isNotEmpty(name)) {
-            criteria = new Criteria(Demographic.LegacyName).contains(name).or(new Criteria(Demographic.Name).contains(name));
-
-            if (StringUtils.isNotEmpty(telephone)) {
-                criteria = criteria.connect();
-                criteria.and(new Criteria(Demographic.LegacyTelephone).contains(telephone).or(new Criteria(Demographic.Telephone).contains(telephone)));
-            } else if (StringUtils.isNotEmpty(gender) && birthday != null) {
-                criteria = criteria.connect();
-                criteria = criteria.and(new Criteria(Demographic.LegacyGender).contains(gender).or(new Criteria(Demographic.Gender).contains(gender)));
-
-                criteria = criteria.connect();
-                criteria = criteria.and(new Criteria(Demographic.Birthday).between(DateUtils.addDays(birthday, -3), DateUtils.addDays(birthday, 3)));
-            }
-        }
-
-        Page<Demographic> page = getSolrTemplate(Demographic.DemographicCore).queryForPage(new SimpleQuery(criteria), Demographic.class);
-        return page.getContent();
+        return new ResponseEntity<>(document.toString(), HttpStatus.NOT_FOUND);
     }
 
     private void convert(ObjectNode document, StructuredProfile profile) throws IOException {

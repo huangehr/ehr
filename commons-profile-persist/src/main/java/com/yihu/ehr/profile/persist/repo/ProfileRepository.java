@@ -10,15 +10,23 @@ import com.yihu.ehr.profile.core.lightweight.LightWeightProfile;
 import com.yihu.ehr.profile.core.nostructured.NoStructuredProfile;
 import com.yihu.ehr.profile.core.structured.StructuredDataSet;
 import com.yihu.ehr.profile.core.structured.StructuredProfile;
+import com.yihu.ehr.profile.persist.Demographic;
 import com.yihu.ehr.schema.StdKeySchema;
 import com.yihu.ehr.util.DateTimeUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.solr.client.solrj.impl.CloudSolrServer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.solr.core.SolrTemplate;
+import org.springframework.data.solr.core.query.Criteria;
+import org.springframework.data.solr.core.query.SimpleQuery;
+import org.springframework.data.solr.server.support.MulticoreSolrServerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -37,6 +45,9 @@ import static com.yihu.ehr.profile.core.commons.ProfileTableOptions.*;
  */
 @Service
 public class ProfileRepository {
+    @Autowired
+    private CloudSolrServer cloudSolrServer;
+
     @Autowired
     HBaseClient hbaseClient;
 
@@ -57,7 +68,7 @@ public class ProfileRepository {
      */
     public StructuredProfile findOne(String profileId, boolean loadStdDataSet, boolean loadOriginDataSet) throws IOException, ParseException {
         ResultWrapper record = hbaseClient.getResultAsWrapper(ProfileTableOptions.Table, profileId);
-        if (record.getResult().toString().equals("keyvalues=NONE")) throw new RuntimeException("Profile not found.");
+        if (record.getResult().toString().equals("keyvalues=NONE")) return null;
 
         String cardId = record.getValueAsString(Family.Basic.toString(), BasicQualifier.CardId.toString());
         String orgCode = record.getValueAsString(Family.Basic.toString(), BasicQualifier.OrgCode.toString());
@@ -143,9 +154,8 @@ public class ProfileRepository {
 
             for (Cell cell : cellList) {
                 String qualifier = Bytes.toString(CellUtil.cloneQualifier(cell));
-                String value = Bytes.toString(CellUtil.cloneValue(cell));
-
                 if (qualifier.startsWith("HDS") || qualifier.startsWith("JDS")) {
+                    String value = Bytes.toString(CellUtil.cloneValue(cell));
                     record.put(qualifier, value);
                 }
             }
@@ -207,6 +217,7 @@ public class ProfileRepository {
                     record.put(qualifier.substring(0, qualifier.lastIndexOf("_")), value);
                 }
             }
+
             dataSet.addRecord(Bytes.toString(result.getRow()), record);
         }
 

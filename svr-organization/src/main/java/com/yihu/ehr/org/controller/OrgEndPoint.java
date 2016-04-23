@@ -11,9 +11,6 @@ import com.yihu.ehr.org.service.OrgService;
 import com.yihu.ehr.org.service.Organization;
 import com.yihu.ehr.util.PinyinUtil;
 import com.yihu.ehr.util.controller.BaseRestController;
-import com.yihu.ehr.util.encode.*;
-import com.yihu.ehr.util.encode.Base64;
-import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -270,7 +267,7 @@ public class OrgEndPoint extends BaseRestController {
 
         String[] fileStreams = date.split(",");
         String is = URLDecoder.decode(fileStreams[0],"UTF-8").replace(" ","+");
-        byte[] in = Base64.decode(is);
+        byte[] in = Base64.getDecoder().decode(is);
 
         String pictureName = fileStreams[1].substring(0,fileStreams[1].length()-1);
         String fileExtension = pictureName.substring(pictureName.lastIndexOf(".") + 1).toLowerCase();
@@ -304,7 +301,7 @@ public class OrgEndPoint extends BaseRestController {
             @RequestParam(value = "remote_file_name") String remoteFileName) throws Exception {
         byte[] bytes = fastDFSUtil.download(groupName, remoteFileName);
 
-        String fileStream = Base64.encode(bytes);
+        String fileStream = new String(Base64.getEncoder().encode(bytes));
         String imageStream = URLEncoder.encode(fileStream, "UTF-8");
         return imageStream;
     }

@@ -1,18 +1,19 @@
 package com.yihu.ehr.profile.persist.repo;
 
-import com.yihu.ehr.lang.SpringContext;
+import com.yihu.ehr.profile.core.commons.ProfileId;
+import com.yihu.ehr.profile.persist.Demographic;
 import com.yihu.ehr.profile.persist.ProfileIndices;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.solr.client.solrj.impl.CloudSolrServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.solr.core.SolrTemplate;
-import org.springframework.data.solr.core.query.Query;
-import org.springframework.data.solr.repository.support.SimpleSolrRepository;
+import org.springframework.data.solr.core.query.Criteria;
+import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.data.solr.server.support.MulticoreSolrServerFactory;
 import org.springframework.stereotype.Repository;
 
-import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -28,23 +29,14 @@ public class XProfileIndicesRepoImpl implements XProfileIndicesRepoCustom {
     @Autowired
     private CloudSolrServer cloudSolrServer;
 
-    private final static String ProfileCore = "HealthArchives";
-
     private Map<String, SolrTemplate> solrTemplateMap = new HashMap<>();
 
-    public XProfileIndicesRepoImpl(){
+    public XProfileIndicesRepoImpl() {
     }
 
-    public Page<ProfileIndices> find(Query query, Pageable pageable) {
-        query.setPageRequest(pageable);
-        Page<ProfileIndices> result = getSolrTemplate(ProfileCore).queryForPage(query, ProfileIndices.class);
-
-        return result;
-    }
-
-    SolrTemplate getSolrTemplate(String core){
+    private SolrTemplate getSolrTemplate(String core) {
         SolrTemplate solrTemplate = solrTemplateMap.get(core);
-        if(null == solrTemplate){
+        if (null == solrTemplate) {
             solrTemplate = new SolrTemplate(new MulticoreSolrServerFactory(cloudSolrServer));
             solrTemplate.setSolrCore(core);
             solrTemplate.afterPropertiesSet();
@@ -52,5 +44,11 @@ public class XProfileIndicesRepoImpl implements XProfileIndicesRepoCustom {
         }
 
         return solrTemplate;
+    }
+
+    public <T> Page<T> query(String core, Criteria criteria, Class<T> beanCls) {
+        SolrTemplate solrTemplate = getSolrTemplate(core);
+
+        return solrTemplate.queryForPage(new SimpleQuery(criteria), beanCls);
     }
 }

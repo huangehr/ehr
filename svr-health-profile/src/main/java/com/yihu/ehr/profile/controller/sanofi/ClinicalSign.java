@@ -1,5 +1,7 @@
 package com.yihu.ehr.profile.controller.sanofi;
 
+import com.yihu.ehr.profile.persist.Demographic;
+
 import java.util.List;
 
 /**

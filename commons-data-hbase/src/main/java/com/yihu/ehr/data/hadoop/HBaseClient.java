@@ -34,7 +34,7 @@ public class HBaseClient {
     String batchTableName;
     boolean synchronizeMode;
     Map<String, Put> batchPuts = new HashMap<>();
-    
+
     public boolean isTableExists(String tableName) throws IOException {
         Connection connection = getConnection();
         Admin admin = connection.getAdmin();
@@ -62,7 +62,7 @@ public class HBaseClient {
         admin.close();
         connection.close();
     }
-    
+
     public void dropTable(String tableName) throws IOException {
         Connection connection = getConnection();
         Admin admin = connection.getAdmin();
@@ -75,7 +75,7 @@ public class HBaseClient {
             connection.close();
         }
     }
-    
+
     public List<String> getTableList(String regex, boolean includeSysTables) throws IOException {
         Connection connection = getConnection();
         Admin admin = connection.getAdmin();
@@ -97,10 +97,10 @@ public class HBaseClient {
 
         return tables;
     }
-    
+
     public void insertRecord(String tableName, String rowKey, String family, Object[] columns, Object[] values) throws IOException {
         hbaseTemplate.execute(tableName, new TableCallback<Object>() {
-            
+
             public Object doInTable(HTableInterface htable) throws Throwable {
                 Put put = new Put(Bytes.toBytes(rowKey));
                 for (int j = 0; j < columns.length; j++) {
@@ -138,7 +138,7 @@ public class HBaseClient {
 
     public void endBatchInsert() throws IOException {
         hbaseTemplate.execute(batchTableName, new TableCallback<Object>() {
-            
+
             public Object doInTable(HTableInterface table) throws Throwable {
                 Object[] results = null;
 
@@ -157,10 +157,9 @@ public class HBaseClient {
         });
     }
 
-    
     public Object[] getRecords(String tableName, String[] rowKeys, String[] familyNames) {
         return hbaseTemplate.execute(tableName, new TableCallback<Object[]>() {
-            
+
             public Object[] doInTable(HTableInterface table) throws Throwable {
                 List<Get> gets = new ArrayList<>(rowKeys.length);
                 for (String rowKey : rowKeys) {
@@ -180,10 +179,9 @@ public class HBaseClient {
         });
     }
 
-    
     public Object[] deleteRecords(String tableName, String[] rowKeys) {
         return hbaseTemplate.execute(tableName, new TableCallback<Object[]>() {
-            
+
             public Object[] doInTable(HTableInterface table) throws Throwable {
                 List<Delete> deletes = new ArrayList<>(rowKeys.length);
                 for (String rowKey : rowKeys) {
@@ -199,10 +197,9 @@ public class HBaseClient {
         });
     }
 
-    
     public void updateRecord(String tableName, String rowKey, String familyName, String columnName, String value) throws IOException {
         hbaseTemplate.execute(tableName, new TableCallback<Object>() {
-            
+
             public Object doInTable(HTableInterface table) throws Throwable {
                 Put put = new Put(Bytes.toBytes(rowKey));
                 put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes(columnName), Bytes.toBytes(value));
@@ -213,10 +210,9 @@ public class HBaseClient {
         });
     }
 
-    
     public void deleteRecord(String tableName, String rowKey) throws IOException {
         hbaseTemplate.execute(tableName, new TableCallback<Object>() {
-            
+
             public Object doInTable(HTableInterface table) throws Throwable {
                 Delete deleteAll = new Delete(Bytes.toBytes(rowKey));
 
@@ -230,15 +226,13 @@ public class HBaseClient {
         hbaseTemplate.delete(tableName, rowKey, familyName);
     }
 
-    
     public void deleteColumn(String tableName, String rowKey, String familyName, String columnName) throws IOException {
         hbaseTemplate.delete(tableName, rowKey, familyName, columnName);
     }
 
-    
     public Result getRecord(String tableName, String rowKey) throws IOException {
         Result context = hbaseTemplate.get(tableName, rowKey, new RowMapper<Result>() {
-            
+
             public Result mapRow(Result result, int rowNum) throws Exception {
                 return result;
             }
@@ -247,71 +241,78 @@ public class HBaseClient {
         return context;
     }
 
-    
+    /**
+     * 读取一条记录的部分数据。
+     *
+     * @param tableName
+     * @param rowKey
+     * @param familyNames
+     * @param innerCodes
+     * @return
+     * @throws IOException
+     */
     public Result getPartialRecord(String tableName, String rowKey, String[] familyNames, String[][] innerCodes) throws IOException {
         assert familyNames.length > 0 && innerCodes.length == familyNames.length;
 
         return hbaseTemplate.execute(tableName, new TableCallback<Result>() {
-            
-            public Result doInTable(HTableInterface htable) throws Throwable {
-                Get get = new Get(Bytes.toBytes(rowKey));
-                for (int i = 0; i < familyNames.length; ++i) {
-                    String familyName = familyNames[i];
-                    String[] columns = innerCodes[i];
-
-                    if (columns == null || columns.length == 0) {
-                        get.addFamily(Bytes.toBytes(familyName));
-                        continue;
-                    } else {
-                        for (int j = 0; j < columns.length; ++j) {
-                            get.addColumn(Bytes.toBytes(familyName), Bytes.toBytes(columns[j]));
-                        }
-                    }
-                }
-
-                Result result = htable.get(get);
-                return result;
+            public Result doInTable(HTableInterface table) throws Throwable {
+                Result[] results = getRecords(table, new String[]{rowKey}, familyNames, innerCodes);
+                return results[0];
             }
         });
     }
 
-    
+    /**
+     * 读取多条记录的部分数据。
+     *
+     * @param tableName
+     * @param rowKeys
+     * @param familyNames
+     * @param innerCodes
+     * @return
+     */
     public Result[] getPartialRecords(String tableName, String[] rowKeys, String[] familyNames, String[][] innerCodes) {
         return hbaseTemplate.execute(tableName, new TableCallback<Result[]>() {
-            
+
             public Result[] doInTable(HTableInterface table) throws Throwable {
-                List<Get> gets = new ArrayList<>(rowKeys.length);
-                for (String rowKey : rowKeys) {
-                    Get get = new Get(Bytes.toBytes(rowKey));
-                    for (int i = 0; i < familyNames.length; ++i) {
-                        String familyName = familyNames[i];
-                        String[] columns = innerCodes[i];
-
-                        if (columns == null || columns.length == 0) {
-                            get.addFamily(Bytes.toBytes(familyName));
-                            continue;
-                        } else {
-                            for (int j = 0; j < columns.length; ++j) {
-                                get.addColumn(Bytes.toBytes(familyName), Bytes.toBytes(columns[j]));
-                            }
-                        }
-                    }
-
-                    gets.add(get);
-                }
-
-                Result[] results = new Result[gets.size()];
-                table.batch(gets, results);
-
-                return results;
+                return getRecords(table, rowKeys, familyNames, innerCodes);
             }
         });
     }
 
-    
-    public String getValue(String tableName, String rowKey, String familyName, String columnName) throws IOException {
+    private Result[] getRecords(HTableInterface table,
+                                String[] rowKeys,
+                                String[] familyNames,
+                                String[][] innerCodes) throws IOException, InterruptedException {
+        List<Get> gets = new ArrayList<>(rowKeys.length);
+        for (String rowKey : rowKeys) {
+            Get get = new Get(Bytes.toBytes(rowKey));
+            for (int i = 0; i < familyNames.length; ++i) {
+                String familyName = familyNames[i];
+                String[] columns = innerCodes[i];
+
+                if (columns == null || columns.length == 0) {
+                    get.addFamily(Bytes.toBytes(familyName));
+                    continue;
+                } else {
+                    for (int j = 0; j < columns.length; ++j) {
+                        get.addColumn(Bytes.toBytes(familyName), Bytes.toBytes(columns[j]));
+                    }
+                }
+            }
+
+            gets.add(get);
+        }
+
+        Result[] results = new Result[gets.size()];
+        table.batch(gets, results);
+
+        return results;
+    }
+
+    public String getCell(String tableName, String rowKey, String familyName, String columnName) throws IOException {
         String value = hbaseTemplate.get(tableName, rowKey, familyName, columnName, new RowMapper<String>() {
-            
+
             public String mapRow(Result result, int rowNum) throws Exception {
                 return Bytes.toString(result.value());
             }
@@ -320,12 +321,11 @@ public class HBaseClient {
         return value;
     }
 
-    
+
     public ResultWrapper getResultAsWrapper(String tableName, String rowKey) throws IOException {
         return new ResultWrapper(getRecord(tableName, rowKey));
     }
 
-    
     public void truncate(List<String> tables) throws IOException {
         Connection connection = getConnection();
         Admin admin = connection.getAdmin();
@@ -346,10 +346,9 @@ public class HBaseClient {
         }
     }
 
-    
     public ResultScanner getScanner(String tableName, Scan scan) {
         return hbaseTemplate.execute(tableName, new TableCallback<ResultScanner>() {
-            
+
             public ResultScanner doInTable(HTableInterface hTableInterface) throws Throwable {
                 ResultScanner resultScanner = hTableInterface.getScanner(scan);
 
@@ -358,14 +357,9 @@ public class HBaseClient {
         });
     }
 
-    private Connection getConnection() throws IOException {
-        Connection connection = ConnectionFactory.createConnection(hbaseTemplate.getConfiguration());
-        return connection;
-    }
-
     public ObjectNode getTableMetaData(String tableName) {
         return hbaseTemplate.execute(tableName, new TableCallback<ObjectNode>() {
-            
+
             public ObjectNode doInTable(HTableInterface table) throws Throwable {
                 ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
                 ObjectNode root = objectMapper.createObjectNode();
@@ -380,5 +374,10 @@ public class HBaseClient {
                 return root;
             }
         });
+    }
+
+    private Connection getConnection() throws IOException {
+        Connection connection = ConnectionFactory.createConnection(hbaseTemplate.getConfiguration());
+        return connection;
     }
 }

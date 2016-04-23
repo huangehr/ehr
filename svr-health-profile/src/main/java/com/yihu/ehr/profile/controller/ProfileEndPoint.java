@@ -1,10 +1,14 @@
 package com.yihu.ehr.profile.controller;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.cache.CacheReader;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.model.profile.*;
+import com.yihu.ehr.model.profile.MDataSet;
+import com.yihu.ehr.model.profile.MProfile;
+import com.yihu.ehr.model.profile.MProfileDocument;
+import com.yihu.ehr.model.profile.MRecord;
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import com.yihu.ehr.profile.config.CdaDocumentOptions;
@@ -19,19 +23,20 @@ import com.yihu.ehr.profile.service.Template;
 import com.yihu.ehr.profile.service.TemplateService;
 import com.yihu.ehr.schema.OrgKeySchema;
 import com.yihu.ehr.schema.StdKeySchema;
+import com.yihu.ehr.util.DateTimeUtils;
 import com.yihu.ehr.util.controller.BaseRestEndPoint;
-import com.yihu.ehr.util.encode.Base64;
 import com.yihu.ehr.util.log.LogService;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -46,6 +51,17 @@ import java.util.*;
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "健康档案服务", description = "健康档案服务")
 public class ProfileEndPoint extends BaseRestEndPoint {
+    private final static String SampleQuery = "{\n" +
+            "\"demographicId\": \"412726195111306268\",\n" +
+            "\"organizationCode\": \"41872607-9\",\n" +
+            "\"patientId\": \"10295435\",\n" +
+            "\"eventNo\": \"000622450\",\n" +
+            "\"name\": \"段廷兰\",\n" +
+            "\"telephone\": \"11\",\n" +
+            "\"gender\": \"女\",\n" +
+            "\"birthday\": \"1951-11-30\"\n" +
+            "}";
+
     @Autowired
     private ProfileRepository profileRepo;
 
@@ -70,27 +86,44 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @Autowired
     StdKeySchema stdKeySchema;
 
-    @ApiOperation(value = "搜索档案", notes = "返回档案索引列表")
-    @RequestMapping(value = ServiceApi.HealthProfile.ProfileSearch, method = RequestMethod.POST)
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query", value = "页码(0..N)", defaultValue = "0"),
-            @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", value = "页大小", defaultValue = "5"),
-            @ApiImplicitParam(name = "sort", allowMultiple = true, dataType = "string", paramType = "query", value = "排序，格式: (+-)属性名(,)")
-    })
-    public Collection<MProfileIndices> searchProfile(
-            @ApiParam(value = "搜索条件")
-            @RequestParam("query") String query,
-            @ApiIgnore Pageable pageable) {
-        //Page<ProfileIndices> indicesList = indicesService.search(query, pageable);
+    @ApiOperation(value = "搜索档案", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "返回符合条件的档案列表")
+    @RequestMapping(value = ServiceApi.HealthProfile.ProfileSearch, method = RequestMethod.GET)
+    public Collection<MProfile> searchProfile(
+            @ApiParam(value = "搜索参数", defaultValue = SampleQuery)
+            @RequestParam(value = "query") String query,
+            @ApiParam(value = "起始日期", defaultValue = "2015-10-01")
+            @RequestParam("since") @DateTimeFormat(pattern = "yyyy-MM-dd") Date since,
+            @ApiParam(value = "结束日期", defaultValue = "2016-10-01")
+            @RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,
+            @ApiParam(value = "是否返回标准数据", defaultValue = "true")
+            @RequestParam(value = "load_std_data_set") boolean loadStdDataSet,
+            @ApiParam(value = "是否返回原始数据", defaultValue = "false")
+            @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws IOException, ParseException {
+        ObjectNode document = (ObjectNode) objectMapper.readTree(query);
+        if (document == null)
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Request parameter 'query' is not a valid json format.");
 
-        //return convertToModels(indicesList.getContent(), new ArrayList<>(), MProfileIndices.class, null);
-        return null;
+        String demographicId = document.get("demographicId").textValue();
+        String orgCode = document.get("organizationCode").textValue();
+        String patientId = document.get("patientId").textValue();
+        String eventNo = document.get("eventNo").textValue();
+        String name = document.get("name").textValue();
+        String telephone = document.get("telephone").textValue();
+        String gender = document.get("gender").textValue();
+        Date birthday = DateTimeUtils.simpleDateParse(document.get("birthday").textValue());
+
+        Page<ProfileIndices> profileIndices = indicesService.findByIndices(orgCode, patientId, eventNo, since, to, null);
+        if (profileIndices.getContent().size() == 0) {
+            profileIndices = indicesService.findByDemographic(demographicId, orgCode, name, telephone, gender, birthday, since, to, null);
+        }
+
+        return loadAndConvertProfiles(profileIndices, loadStdDataSet, loadOriginDataSet);
     }
 
     @ApiOperation(value = "按时间获取档案列表", notes = "获取患者的就诊档案列表")
     @RequestMapping(value = ServiceApi.HealthProfile.Profiles, method = RequestMethod.GET)
     public Collection<MProfile> getProfiles(
-            @ApiParam(value = "身份证号,使用Base64编码", defaultValue = "NDEyNzI2MTk1MTExMzA2MjY4")
+            @ApiParam(value = "身份证号,使用Base64编码", defaultValue = "412726195111306268")
             @RequestParam("demographic_id") String demographicId,
             @ApiParam(value = "就诊机构列表", defaultValue = "2015-01-01")
             @RequestParam(value = "organizations", required = false) String[] organizations,
@@ -104,14 +137,20 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "load_std_data_set") boolean loadStdDataSet,
             @ApiParam(value = "是否加载原始数据集", defaultValue = "false")
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws IOException, ParseException {
-        demographicId = new String(Base64.decode(demographicId));
+        Page<ProfileIndices> profileIndices = indicesService.findByDemographicIdAndEventDateBetween(
+                demographicId, since, to, null);
 
-        List<ProfileIndices> profileIndices = indicesService.findByDemographicIdAndEventDateBetween(
-                demographicId, since, to);
+        return loadAndConvertProfiles(profileIndices, loadStdDataSet, loadOriginDataSet);
+    }
+
+    private Collection<MProfile> loadAndConvertProfiles(Page<ProfileIndices> profileIndices,
+                                                        boolean loadStdDataSet,
+                                                        boolean loadOriginDataSet) throws IOException, ParseException {
+        if (profileIndices.getContent().size() == 0) return null;
 
         List<StructuredProfile> profiles = new ArrayList<>();
         for (ProfileIndices indices : profileIndices) {
-            StructuredProfile profile = profileRepo.findOne(indices.getRowkey(), loadStdDataSet, loadOriginDataSet);
+            StructuredProfile profile = profileRepo.findOne(indices.getProfileId(), loadStdDataSet, loadOriginDataSet);
             profiles.add(profile);
         }
 
