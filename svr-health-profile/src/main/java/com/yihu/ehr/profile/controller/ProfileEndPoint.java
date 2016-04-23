@@ -1,5 +1,6 @@
 package com.yihu.ehr.profile.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.cache.CacheReader;
@@ -99,18 +100,21 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "load_std_data_set") boolean loadStdDataSet,
             @ApiParam(value = "是否返回原始数据", defaultValue = "false")
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws IOException, ParseException {
-        ObjectNode document = (ObjectNode) objectMapper.readTree(query);
-        if (document == null)
+        Map<String, String> document;
+        try{
+            document = objectMapper.readValue(query, Map.class);
+        }catch(JsonProcessingException ex){
             throw new ApiException(HttpStatus.BAD_REQUEST, "Request parameter 'query' is not a valid json format.");
+        }
 
-        String demographicId = document.get("demographicId").textValue();
-        String orgCode = document.get("organizationCode").textValue();
-        String patientId = document.get("patientId").textValue();
-        String eventNo = document.get("eventNo").textValue();
-        String name = document.get("name").textValue();
-        String telephone = document.get("telephone").textValue();
-        String gender = document.get("gender").textValue();
-        Date birthday = DateTimeUtils.simpleDateParse(document.get("birthday").textValue());
+        String demographicId = document.get("demographicId");
+        String orgCode = document.get("organizationCode");
+        String patientId = document.get("patientId");
+        String eventNo = document.get("eventNo");
+        String name = document.get("name");
+        String telephone = document.get("telephone");
+        String gender = document.get("gender");
+        Date birthday = DateTimeUtils.simpleDateParse(document.get("birthday"));
 
         Page<ProfileIndices> profileIndices = indicesService.findByIndices(orgCode, patientId, eventNo, since, to, null);
         if (profileIndices.getContent().size() == 0) {
@@ -123,7 +127,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @ApiOperation(value = "按时间获取档案列表", notes = "获取患者的就诊档案列表")
     @RequestMapping(value = ServiceApi.HealthProfile.Profiles, method = RequestMethod.GET)
     public Collection<MProfile> getProfiles(
-            @ApiParam(value = "身份证号,使用Base64编码", defaultValue = "412726195111306268")
+            @ApiParam(value = "身份证号", defaultValue = "412726195111306268")
             @RequestParam("demographic_id") String demographicId,
             @ApiParam(value = "就诊机构列表", defaultValue = "2015-01-01")
             @RequestParam(value = "organizations", required = false) String[] organizations,
