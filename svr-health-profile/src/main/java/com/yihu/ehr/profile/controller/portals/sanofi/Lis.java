@@ -1,7 +1,6 @@
-package com.yihu.ehr.profile.controller.sanofi;
+package com.yihu.ehr.profile.controller.portals.sanofi;
 
 import org.apache.solr.client.solrj.beans.Field;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.util.Date;
 

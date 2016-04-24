@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.controller;
+package com.yihu.ehr.profile.controller.portals.commons;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;

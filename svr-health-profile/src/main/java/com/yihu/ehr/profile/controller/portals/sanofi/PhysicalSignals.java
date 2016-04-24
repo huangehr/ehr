@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.controller.sanofi;
+package com.yihu.ehr.profile.controller.portals.sanofi;
 
 /**
  * @author Sand
