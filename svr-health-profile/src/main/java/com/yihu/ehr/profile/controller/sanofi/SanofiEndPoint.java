@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.controller.portals.sanofi;
+package com.yihu.ehr.profile.controller.sanofi;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

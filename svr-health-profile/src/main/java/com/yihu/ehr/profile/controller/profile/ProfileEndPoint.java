@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.controller.portals.commons;
+package com.yihu.ehr.profile.controller.profile;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -44,13 +44,15 @@ import java.text.ParseException;
 import java.util.*;
 
 /**
+ * 档案接口。提供就诊数据的原始档案，以CDA文档配置作为数据内容架构。
+ *
  * @author Sand
  * @version 1.0
  * @created 2015.12.26 16:08
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-@Api(value = "健康档案服务", description = "健康档案服务")
+@Api(value = "健康档案服务", description = "提供档案搜索及完整档案下载")
 public class ProfileEndPoint extends BaseRestEndPoint {
     private final static String SampleQuery = "{\n" +
             "\"demographicId\": \"412726195111306268\",\n" +
@@ -87,11 +89,11 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @Autowired
     StdKeySchema stdKeySchema;
 
-    @ApiOperation(value = "搜索档案", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "返回符合条件的档案列表")
-    @RequestMapping(value = ServiceApi.HealthProfile.ProfileSearch, method = RequestMethod.GET)
+    @ApiOperation(value = "搜索档案", notes = "返回符合条件的档案列表")
+    @RequestMapping(value = ServiceApi.HealthProfile.ProfileSearch, method = RequestMethod.POST)
     public Collection<MProfile> searchProfile(
             @ApiParam(value = "搜索参数", defaultValue = SampleQuery)
-            @RequestParam(value = "query") String query,
+            @RequestBody String query,
             @ApiParam(value = "起始日期", defaultValue = "2015-10-01")
             @RequestParam("since") @DateTimeFormat(pattern = "yyyy-MM-dd") Date since,
             @ApiParam(value = "结束日期", defaultValue = "2016-10-01")
