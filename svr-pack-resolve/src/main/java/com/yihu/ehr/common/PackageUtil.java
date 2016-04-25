@@ -54,7 +54,7 @@ public class PackageUtil {
         String firstFolderName =  firstFilepath.substring(firstFilepath.lastIndexOf("\\")+1);
 
         if (firstFolderName.equals(ProfileConstant.OriFolder)){
-            return ProfileType.Structured;
+            return ProfileType.FullWeight;
         }else if(firstFolderName.equals(ProfileConstant.IndexFolder)){
             return ProfileType.Lightweight;
         }else if(firstFolderName.equals(ProfileConstant.DocumentFolder)){

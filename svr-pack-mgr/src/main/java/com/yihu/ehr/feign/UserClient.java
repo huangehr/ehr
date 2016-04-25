@@ -1,6 +1,6 @@
 package com.yihu.ehr.feign;
 
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.*;
 import com.yihu.ehr.model.user.MUser;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -17,7 +17,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @ApiIgnore
 @FeignClient(name = MicroServices.User)
 public interface UserClient {
-    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Users.User, method = GET)
+    @RequestMapping(value = ApiVersion.Version1_0+ ServiceApi.Users.User, method = GET)
     MUser getUserByUserName(@PathVariable(value = "user_name") String userName);
 
 }

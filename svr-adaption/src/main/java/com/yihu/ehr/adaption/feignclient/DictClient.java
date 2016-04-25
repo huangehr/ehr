@@ -1,6 +1,6 @@
 package com.yihu.ehr.adaption.feignclient;
 
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import io.swagger.annotations.ApiOperation;
@@ -23,7 +23,7 @@ import java.util.Map;
 @FeignClient(name = MicroServices.Standard)
 public interface DictClient {
 
-    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Standards.MetaDataWithDict, method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0+ ServiceApi.Standards.MetaDataWithDict, method = RequestMethod.GET)
     @ApiOperation(value = "获取字典 map集")
     Map getDictMapByIds(
             @RequestParam(value = "version") String version,

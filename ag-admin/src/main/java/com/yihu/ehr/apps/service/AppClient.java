@@ -1,6 +1,6 @@
 package com.yihu.ehr.apps.service;
 
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.app.MApp;
@@ -18,7 +18,7 @@ import java.util.List;
 @FeignClient(name=MicroServices.Application)
 public interface AppClient {
 
-    @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Apps.Apps, method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.Apps, method = RequestMethod.GET)
     @ApiOperation(value = "获取App列表")
     ResponseEntity<List<MApp>> getApps(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -32,31 +32,31 @@ public interface AppClient {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Apps.Apps, method = RequestMethod.POST)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.Apps, method = RequestMethod.POST)
     @ApiOperation(value = "创建App")
     MApp createApp(
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true, defaultValue = "{\"name\": \"\", \"url\": \"\", \"catalog\": \"\", \"description\": \"\", \"creator\":\"\"}")
             @RequestParam(value = "app", required = false) String appJson);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Apps.App, method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.App, method = RequestMethod.GET)
     @ApiOperation(value = "获取App")
     MApp getApp(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
             @PathVariable(value = "app_id") String appId);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Apps.Apps, method = RequestMethod.PUT)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.Apps, method = RequestMethod.PUT)
     @ApiOperation(value = "更新App")
     MApp updateApp(
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true)
             @RequestParam(value = "app", required = false) String appJson);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Apps.App, method = RequestMethod.DELETE)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.App, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除app")
     boolean deleteApp(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
             @PathVariable(value = "app_id") String appId);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Apps.AppStatus, method = RequestMethod.PUT)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.AppStatus, method = RequestMethod.PUT)
     @ApiOperation(value = "修改状态")
     boolean updateStatus(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
@@ -64,14 +64,14 @@ public interface AppClient {
             @ApiParam(name = "app_status", value = "状态", defaultValue = "")
             @RequestParam(value = "app_status") String appStatus);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Apps.AppExistence, method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.AppExistence, method = RequestMethod.GET)
     boolean isAppExists(
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
             @PathVariable(value = "app_id") String appId,
             @ApiParam(name = "secret", value = "", defaultValue = "")
             @RequestParam(value = "secret") String secret);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Apps.AppNameExistence, method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.AppNameExistence, method = RequestMethod.GET)
     boolean isAppNameExists(
             @ApiParam(value = "app_name")
             @PathVariable(value = "app_name") String appName);

@@ -12,6 +12,7 @@ import org.springframework.context.ApplicationContextAware;
 @EnableEurekaServer
 @EnableFeignClients
 public class ResourceServiceApp implements ApplicationContextAware {
+
     public static void main(String[] args) {
         SpringApplication.run(ResourceServiceApp.class, args);
     }

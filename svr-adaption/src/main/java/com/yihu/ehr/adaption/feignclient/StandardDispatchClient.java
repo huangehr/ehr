@@ -1,6 +1,6 @@
 package com.yihu.ehr.adaption.feignclient;
 
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import io.swagger.annotations.ApiOperation;
@@ -20,7 +20,7 @@ import java.util.Map;
 @ApiIgnore
 public interface StandardDispatchClient {
 
-    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Standards.Dispatches, method = RequestMethod.POST)
+    @RequestMapping(value = ApiVersion.Version1_0+ ServiceApi.Standards.Dispatches, method = RequestMethod.POST)
     @ApiOperation(value = "生成适配方案摘要", produces = "application/json", notes = "")
     Map createSchemeInfo(
             @ApiParam(required = true, name = "version", value = "要生成的目标版本")

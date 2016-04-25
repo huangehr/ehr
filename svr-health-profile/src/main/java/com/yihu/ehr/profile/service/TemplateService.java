@@ -4,6 +4,7 @@ import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.feign.XCDAVersionClient;
 import com.yihu.ehr.query.BaseJpaService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,7 +78,7 @@ public class TemplateService extends BaseJpaService<Template, XTemplateRepositor
         List<MCDADocument> documentList = cdaDocumentClient.getCDADocumentByIds(
                 "id,name",
                 "id=" + String.join(",", cdaDocumentIdList) + "&type=" + cdaType,
-                "",
+                "+name",
                 1000,
                 1,
                 cdaVersion);
@@ -86,6 +87,8 @@ public class TemplateService extends BaseJpaService<Template, XTemplateRepositor
         for (MCDADocument document : documentList){
             String cdaDocumentId = document.getId();
             for (Template template : templates){
+                if(StringUtils.isEmpty(template.getCdaDocumentId())) continue;
+
                 if(template.getCdaDocumentId().equals(cdaDocumentId)){
                     cdaDocumentMap.put(template, document);
                     break;

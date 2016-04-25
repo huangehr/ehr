@@ -1,28 +1,18 @@
 package com.yihu.ehr.security.controller;
 
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.security.MToken;
-import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.security.feign.AppClient;
 import com.yihu.ehr.security.feign.UserClient;
-import com.yihu.ehr.security.service.Key;
 import com.yihu.ehr.security.service.KeyManager;
-import com.yihu.ehr.security.service.Token;
 import com.yihu.ehr.security.service.TokenManager;
-import com.yihu.ehr.util.DateUtil;
 import com.yihu.ehr.util.controller.BaseRestController;
-import com.yihu.ehr.util.encrypt.RSA;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URLDecoder;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Sand
@@ -53,7 +43,7 @@ public class TokenEndPoint extends BaseRestController {
      * note, string, 必选
      * fingerprint, string, 可选,为空则创建临时Token,即temp
      */
-    @RequestMapping(value = RestApi.Securities.UserTokens, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Securities.UserTokens, method = RequestMethod.PUT)
     @ApiOperation(value = "创建用户Token，存在直接返回", produces = "application/json", notes = "此Token用于第三方与平台之间的会话")
     public MToken createUserToken(
             @ApiParam(required = true, name = "user_id", value = "用户id")
@@ -76,7 +66,7 @@ public class TokenEndPoint extends BaseRestController {
      * @param clientId
      * @return
      */
-    @RequestMapping(value = RestApi.Securities.ClientTokens, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Securities.ClientTokens, method = RequestMethod.PUT)
     @ApiOperation(value = "创建应用Token，存在直接返回", produces = "application/json", notes = "此Token用于第三方与平台之间的会话")
     public MToken createClientToken(@ApiParam(required = true, name = "client_id", value = "应用id")
                                     @PathVariable(value = "client_id") String clientId,

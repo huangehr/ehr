@@ -1,6 +1,6 @@
 package com.yihu.ehr.std.service;
 
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.standard.MCDAVersion;
@@ -24,7 +24,7 @@ import java.util.Collection;
 @ApiIgnore
 public interface CDAVersionClient {
 
-    @RequestMapping(value = RestApi.Standards.Versions, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.Versions, method = RequestMethod.GET)
     @ApiOperation(value = "适配采集标准")
     ResponseEntity<Collection<MCDAVersion>> searchCDAVersions(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
@@ -39,47 +39,47 @@ public interface CDAVersionClient {
             @RequestParam(value = "page", required = false) int page);
 
 
-    @RequestMapping(value = RestApi.Standards.VersionLatestExistence, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.VersionLatestExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断是否是最新已发布版本")
     boolean isLatestVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @PathVariable(value = "version") String version);
 
 
-    @RequestMapping(value = RestApi.Standards.Versions, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.Versions, method = RequestMethod.POST)
     @ApiOperation(value = "新增cda版本")
     MCDAVersion addVersion(
             @ApiParam(name = "userLoginCode", value = "用户登录名")
             @RequestParam(value = "userLoginCode") String userLoginCode);
 
 
-    @RequestMapping(value = RestApi.Standards.Version, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.Version, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除版本版本（编辑状态/非编辑状态）")
     boolean dropCDAVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @PathVariable(value = "version") String version);
 
-    @RequestMapping(value = RestApi.Standards.VersionRevert, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.VersionRevert, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除编辑状态的版本")
     boolean revertVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @PathVariable(value = "version") String version);
 
 
-    @RequestMapping(value = RestApi.Standards.VersionCommit, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Standards.VersionCommit, method = RequestMethod.PUT)
     @ApiOperation(value = "发布新版本")
     boolean commitVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @PathVariable(value = "version") String version);
 
-    @RequestMapping(value = RestApi.Standards.VersionBackStage, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Standards.VersionBackStage, method = RequestMethod.PUT)
     @ApiOperation(value = "将最新的已发布版本修改为编辑状态")
     boolean rollbackToStage(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @RequestParam(value = "version") String version);
 
 
-    @RequestMapping(value = RestApi.Standards.Version, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Standards.Version, method = RequestMethod.PUT)
     @ApiOperation(value = "修改版本信息")
     MCDAVersion updateVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
@@ -94,24 +94,24 @@ public interface CDAVersionClient {
             @RequestParam(value = "baseVersion") String baseVersion);
 
 
-    @RequestMapping(value = RestApi.Standards.VersionNameExistence, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.VersionNameExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断版本名称是否已存在")
     boolean checkVersionName(
             @ApiParam(name = "versionName", value = "版本名称", defaultValue = "")
             @RequestParam(value = "versionName") String versionName);
 
 
-    @RequestMapping(value = RestApi.Standards.VersionInStageExist, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.VersionInStageExist, method = RequestMethod.GET)
     @ApiOperation(value = "检查是否存在处于编辑状态的版本")
     boolean existInStage();
 
-    @RequestMapping(value = RestApi.Standards.Version, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.Version, method = RequestMethod.GET)
     @ApiOperation(value = "获取版本信息")
     MCDAVersion getVersion(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
             @PathVariable(value = "version") String version);
 
-    @RequestMapping(value = RestApi.Standards.VersionLatest, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.VersionLatest, method = RequestMethod.GET)
     @ApiOperation(value = "获取最新版本")
     MCDAVersion getLatestVersion();
 }

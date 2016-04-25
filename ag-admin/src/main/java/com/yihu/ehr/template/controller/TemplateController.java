@@ -105,7 +105,8 @@ public class TemplateController extends ExtendController<TemplateModel> {
                 return failed(validateResult.getMsg());
 
             MTemplate template = templateClient.getTemplate(id);
-            if(!templateModel.getCdaVersion().equals(template.getCdaVersion())
+            if("copy".equals(mode)
+                    || !templateModel.getCdaVersion().equals(template.getCdaVersion())
                     || !templateModel.getCdaDocumentId().equals(template.getCdaDocumentId())
                     || !templateModel.getOrganizationCode().equals(template.getOrganizationCode())){
                 String filters =

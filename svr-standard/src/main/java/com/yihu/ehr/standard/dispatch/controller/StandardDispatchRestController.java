@@ -1,13 +1,12 @@
 package com.yihu.ehr.standard.dispatch.controller;
 
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.standard.commons.ExtendController;
 import com.yihu.ehr.standard.dispatch.service.DispatchService;
 import com.yihu.ehr.util.RestEcho;
-import com.yihu.ehr.util.encode.Base64;
 import com.yihu.ehr.util.encrypt.RSA;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.Map;
 
 /**
@@ -36,7 +36,7 @@ public class StandardDispatchRestController extends ExtendController {
     @Autowired
     FastDFSUtil fastDFSUtil;
 
-    @RequestMapping(value = RestApi.Standards.Dispatches, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.Dispatches, method = RequestMethod.GET)
     @ApiOperation(value = "获取适配方案摘要", response = RestEcho.class, produces = "application/json",
             notes = "获取两个指定版本的标准化数据差异与适配方案，文件以Base64编码，压缩格式为zip")
     public Object getSchemeInfo(
@@ -49,7 +49,7 @@ public class StandardDispatchRestController extends ExtendController {
 
         Map<String, Object> schema = null;
         String password = null;
-        String fileBytes = null;
+        byte[] fileBytes = null;
 
         try {
 
@@ -73,7 +73,7 @@ public class StandardDispatchRestController extends ExtendController {
 
             password = (String) schema.get("password");
             byte[] bytes = fastDFSUtil.download(group, remoteFile);
-            fileBytes = Base64.encode(bytes);
+            fileBytes = Base64.getEncoder().encode(bytes);
         } catch (Exception e) {
             return new RestEcho().failed(ErrorCode.DownArchiveFileFailed, "下载标准适配版本失败");
         }
@@ -94,7 +94,7 @@ public class StandardDispatchRestController extends ExtendController {
     }
 
 
-    @RequestMapping(value = RestApi.Standards.Dispatches, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.Dispatches, method = RequestMethod.POST)
     @ApiOperation(value = "生成适配方案摘要", produces = "application/json",
             notes = "")
     public Map createSchemeInfo(

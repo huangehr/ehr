@@ -1,14 +1,14 @@
 package com.yihu.ehr.api;
 
 /**
- * REST API URL. 此处定义的URL可用于服务对外提供的地址及HTTP客户端请求地址.
+ * 微服务REST API. 此处定义的URL可用于服务对外提供的地址及HTTP客户端请求地址.
  * URL定义遵循健康档案平台REST规范.
  *
  * @author Sand
  * @version 1.0
  * @created 2015.09.09 15:04
  */
-public class RestApi {
+public class ServiceApi {
     public static class Caches{
         public static final String Organizations                   = "/caches/organizations";
         public static final String Organization                    = "/caches/organizations/{org_code}";
@@ -189,7 +189,7 @@ public class RestApi {
         public static final String TemplatesDownloads               = "/templates/downloads";
         public static final String Template                         = "/templates/{id}";
         public static final String TemplateCtn                      = "/templates/{id}/content";
-        public static final String TemplateTitleExistence             = "/templates/title/existence";
+        public static final String TemplateTitleExistence           = "/template/title/existence";
     }
 
     public static class SanofiSupport{

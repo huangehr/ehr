@@ -1,9 +1,10 @@
-package com.yihu.ehr.profile.core.structured;
+package com.yihu.ehr.profile.core.commons;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.yihu.ehr.profile.core.lightweight.LightWeightDataSet;
 import com.yihu.ehr.profile.core.lightweight.LightWeightProfile;
+import com.yihu.ehr.profile.core.structured.FullWeightDataSet;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
@@ -26,8 +27,8 @@ public class DataSetResolver {
      * @param isOrigin
      * @return
      */
-    public StructuredDataSet parseStructuredJsonDataSet(JsonNode jsonNode, boolean isOrigin) {
-        StructuredDataSet dataSet = new StructuredDataSet();
+    public FullWeightDataSet parseStructuredJsonDataSet(JsonNode jsonNode, boolean isOrigin) {
+        FullWeightDataSet dataSet = new FullWeightDataSet();
 
         try {
             assert jsonNode != null;
@@ -83,12 +84,12 @@ public class DataSetResolver {
 
     /**
      * 轻量级档案包数据集处理
-     * @param lightWeightProfile
+     * @param structuredProfileModel
      * @param jsonNode
      * @throws JsonProcessingException
      * @throws ParseException
      */
-    public void  parseLightJsonDataSet(LightWeightProfile lightWeightProfile, JsonNode jsonNode) throws JsonProcessingException, ParseException {
+    public void  parseLightJsonDataSet(StructuredProfileModel structuredProfileModel, JsonNode jsonNode) throws JsonProcessingException, ParseException {
 
         LightWeightDataSet lightWeightDataSet = new LightWeightDataSet();
         String version = jsonNode.get("inner_version").asText();
@@ -98,13 +99,13 @@ public class DataSetResolver {
         String eventDate = jsonNode.get("event_time").asText();        // 旧数据集结构可能不存在这个属性
         String sumary = jsonNode.get("sumary").toString();
 
-        lightWeightProfile.setPatientId(patientId);
-        lightWeightProfile.setEventNo(eventNo);
-        lightWeightProfile.setOrgCode(orgCode);
-        lightWeightProfile.setCdaVersion(version);
-        lightWeightProfile.setSummary(sumary);
+        structuredProfileModel.setPatientId(patientId);
+        structuredProfileModel.setEventNo(eventNo);
+        structuredProfileModel.setOrgCode(orgCode);
+        structuredProfileModel.setCdaVersion(version);
+        structuredProfileModel.setSummary(sumary);
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        lightWeightProfile.setEventDate(format.parse(eventDate));
+        structuredProfileModel.setEventDate(format.parse(eventDate));
 
         JsonNode dataSets = jsonNode.get("dataset");
         Iterator<Map.Entry<String, JsonNode>> iterator = dataSets.fields();
@@ -114,8 +115,8 @@ public class DataSetResolver {
             String code = map.getKey();
             String path = map.getValue().asText();
             lightWeightDataSet.setCode(code);
-            lightWeightDataSet.setRemotePath(path);
-            lightWeightProfile.addDataSet(code, lightWeightDataSet);
+            lightWeightDataSet.setUrl(path);
+            structuredProfileModel.addLightWeightDataSet(code, lightWeightDataSet);
         }
     }
 

@@ -1,21 +1,24 @@
 package com.yihu.ehr.util;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * ʱ���ʽ�����ߣ�ʹ���̱߳��ر�����ʽ�Ż����󴴽����̣���ʡ��Դ��
  * @author Sand
  * @version 1.0
  * @created 2015.08.26 8:49
  */
-public class DateFormatter {
-    static final String simpleDateTimePattern = "yyyy-MM-dd HH:mm:ss";
-    static final String utcDateTimePattern = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-    static final String slashDateTimePattern = "yyyy/MM/dd HH:mm:ss";
-    static final String simpleDatePattern = "yyyy-MM-dd";
-    static final String simpleDateTimeShortPattern = "yyyy/MM/dd HH:mm";
+public class DateTimeUtils {
+    public static final String simpleDateTimePattern = "yyyy-MM-dd HH:mm:ss";
+    public static final String utcDateTimePattern = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    public static final String slashDateTimePattern = "yyyy/MM/dd HH:mm:ss";
+    public static final String simpleDatePattern = "yyyy-MM-dd";
+    public static final String simpleDateTimeShortPattern = "yyyy/MM/dd HH:mm";
+
+    public static final String ISO8601Pattern = "yyyy-MM-dd'T'HH:mm:ssZ";
 
     private static ThreadLocal<SimpleDateFormat> simpleDateTimeShortFormat = new ThreadLocal<SimpleDateFormat>(){
         @Override
@@ -58,6 +61,8 @@ public class DateFormatter {
     }
 
     public static Date simpleDateTimeParse(final String date) throws ParseException {
+        if(StringUtils.isEmpty(date)) return null;
+
         Date parsedDate = simpleDateTimeFormat.get().parse(date);
         return parsedDate;
     }
@@ -68,6 +73,8 @@ public class DateFormatter {
     }
 
     public static Date utcDateTimeParse(final String date) throws ParseException {
+        if(StringUtils.isEmpty(date)) return null;
+
         Date parsedDate = utcDateTimeFormat.get().parse(date);
         return parsedDate;
     }
@@ -88,6 +95,8 @@ public class DateFormatter {
     }
 
     public static Date simpleDateParse(final String date) throws ParseException {
+        if(StringUtils.isEmpty(date)) return null;
+
         Date parsedDate = simpleDateFormat.get().parse(date);
         return parsedDate;
     }

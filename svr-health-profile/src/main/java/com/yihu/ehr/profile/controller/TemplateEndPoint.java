@@ -1,7 +1,7 @@
 package com.yihu.ehr.profile.controller;
 
 import com.google.common.io.Files;
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.profile.MTemplate;
@@ -9,12 +9,10 @@ import com.yihu.ehr.profile.service.Template;
 import com.yihu.ehr.profile.service.TemplateService;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.controller.BaseRestEndPoint;
-import com.yihu.ehr.util.file.FileUtil;
 import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.compress.archivers.zip.ZipUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -34,7 +32,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author Sand
@@ -49,7 +46,7 @@ public class TemplateEndPoint extends BaseRestEndPoint {
     TemplateService templateService;
 
     @ApiOperation(value = "创建模板")
-    @RequestMapping(value = RestApi.ProfileTemplate.Templates, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.ProfileTemplate.Templates, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.POST)
     public void saveTemplate(@ApiParam(value = "健康档案模板")
                              @RequestParam(value = "model") String model) {
         Template template = toEntity(model, Template.class);
@@ -58,7 +55,7 @@ public class TemplateEndPoint extends BaseRestEndPoint {
     }
 
     @ApiOperation(value = "获取模板列表", response = MTemplate.class, responseContainer = "List")
-    @RequestMapping(value = RestApi.ProfileTemplate.Templates, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.ProfileTemplate.Templates, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.GET)
     public Collection<MTemplate> getTemplates(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,title,cdaVersion,cdaDocumentId,organizationCode,createTime,pcTplURL,mobileTplURL")
             @RequestParam(value = "fields", required = false) String fields,
@@ -81,7 +78,7 @@ public class TemplateEndPoint extends BaseRestEndPoint {
     }
 
     @ApiOperation(value = "获取模板")
-    @RequestMapping(value = RestApi.ProfileTemplate.Template, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.ProfileTemplate.Template, method = RequestMethod.GET)
     public MTemplate getTemplate(@ApiParam(value = "模板ID")
                                  @PathVariable(value = "id") int id) {
         Template template = templateService.getTemplate(id);
@@ -91,7 +88,7 @@ public class TemplateEndPoint extends BaseRestEndPoint {
     }
 
     @ApiOperation(value = "判断模版名称是否已存在")
-    @RequestMapping(value = RestApi.ProfileTemplate.TemplateTitleExistence, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.ProfileTemplate.TemplateTitleExistence, method = RequestMethod.GET)
     public boolean isNameExist(
             @ApiParam(name = "version", value = "版本")
             @RequestParam(value = "version") String version,
@@ -102,7 +99,7 @@ public class TemplateEndPoint extends BaseRestEndPoint {
     }
 
     @ApiOperation(value = "更新模板属性")
-    @RequestMapping(value = RestApi.ProfileTemplate.Template, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.ProfileTemplate.Template, method = RequestMethod.PUT)
     public void getTemplate(@ApiParam(value = "模板ID")
                             @PathVariable(value = "id") int id,
                             @ApiParam(value = "模板JSON")
@@ -117,7 +114,7 @@ public class TemplateEndPoint extends BaseRestEndPoint {
     }
 
     @ApiOperation(value = "下载模板展示文件")
-    @RequestMapping(value = RestApi.ProfileTemplate.TemplateCtn, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.ProfileTemplate.TemplateCtn, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE, method = RequestMethod.GET)
     public void getTemplateContent(@ApiParam(value = "模板ID")
                                    @PathVariable(value = "id") int id,
                                    @ApiParam(value = "true表示PC端，false表示移动端")
@@ -136,7 +133,7 @@ public class TemplateEndPoint extends BaseRestEndPoint {
     }
 
     @ApiOperation(value = "更新模板展示文件")
-    @RequestMapping(value = RestApi.ProfileTemplate.TemplateCtn, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.ProfileTemplate.TemplateCtn, method = RequestMethod.POST)
     public void setTemplateContent(@ApiParam(value = "模板ID")
                                    @PathVariable(value = "id") int id,
                                    @ApiParam(value = "true表示PC端，false表示移动端")
@@ -152,14 +149,14 @@ public class TemplateEndPoint extends BaseRestEndPoint {
     }
 
     @ApiOperation(value = "删除模板")
-    @RequestMapping(value = RestApi.ProfileTemplate.Template, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.ProfileTemplate.Template, method = RequestMethod.DELETE)
     public void deleteTemplate(@ApiParam(value = "模板ID")
                                @PathVariable(value = "id") int id) {
         templateService.deleteTemplate(id);
     }
 
     @ApiOperation(value = "打包下载模板", response = MTemplate.class, responseContainer = "List")
-    @RequestMapping(value = RestApi.ProfileTemplate.TemplatesDownloads, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.ProfileTemplate.TemplatesDownloads, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE, method = RequestMethod.GET)
     public void downloadTemplates(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "organizationCode=41872607-9")
             @RequestParam(value = "filters", required = false) String filters,

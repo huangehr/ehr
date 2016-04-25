@@ -1,12 +1,8 @@
 package com.yihu.ehr.profile.core.lightweight;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.lang.SpringContext;
-import com.yihu.ehr.profile.core.commons.DataSet;
-import com.yihu.ehr.profile.core.commons.Profile;
-import com.yihu.ehr.util.DateFormatter;
+import com.yihu.ehr.constants.ProfileType;
+import com.yihu.ehr.profile.core.structured.FullWeightProfile;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,26 +10,32 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 健康档案。
+ * 轻量级健康档案。
  *
  * @author Sand
  * @version 1.0
  * @created 2015.08.16 10:44
  */
-public class LightWeightProfile extends Profile {
+public class LightWeightProfile extends FullWeightProfile {
+
+    private ProfileType profileType;                         // 档案类型
 
     private Map<String, LightWeightDataSet> lightWeightDataSets = new HashMap<>();;
 
+    public ProfileType getProfileType() {
+        return ProfileType.Lightweight;
+    }
 
-    public Collection<LightWeightDataSet> getDataSets() {
+    public void setProfileType(ProfileType profileType) {
+        this.profileType = profileType;
+    }
+
+    public Collection<LightWeightDataSet> getLightWeightDataSets() {
         return lightWeightDataSets.values();
     }
 
-
     public String getDataSetsAsString() {
-        ObjectMapper objectMapper = SpringContext.getService("objectMapper");
         ObjectNode rootNode = objectMapper.createObjectNode();
-
         for (String key : lightWeightDataSets.keySet()) {
             Set<String> rowKeys = lightWeightDataSets.get(key).getRecordKeys();
             String records = String.join(",", rowKeys);
@@ -55,11 +57,7 @@ public class LightWeightProfile extends Profile {
         return this.lightWeightDataSets.get(dataSetCode);
     }
 
-
-
     public Set<String> getDataSetTables(){
         return this.lightWeightDataSets.keySet();
     }
-
-
 }

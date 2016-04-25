@@ -1,6 +1,6 @@
 package com.yihu.ehr.apps.controller;
 
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.apps.service.App;
 import com.yihu.ehr.apps.service.AppService;
 import com.yihu.ehr.constants.ApiVersion;
@@ -35,7 +35,7 @@ public class AppEndPoint extends BaseRestController {
     @Autowired
     private AppService appService;
 
-    @RequestMapping(value = RestApi.Apps.Apps, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Apps.Apps, method = RequestMethod.POST)
     @ApiOperation(value = "创建App")
     public MApp createApp(
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true, defaultValue = "{\"name\": \"\", \"url\": \"\", \"catalog\": \"\", \"description\": \"\", \"creator\":\"\"}")
@@ -46,7 +46,7 @@ public class AppEndPoint extends BaseRestController {
         return convertToModel(app, MApp.class);
     }
 
-    @RequestMapping(value = RestApi.Apps.Apps, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Apps.Apps, method = RequestMethod.GET)
     @ApiOperation(value = "获取App列表")
     public Collection<MApp> getApps(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
@@ -76,7 +76,7 @@ public class AppEndPoint extends BaseRestController {
         }
     }
 
-    @RequestMapping(value = RestApi.Apps.Apps, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Apps.Apps, method = RequestMethod.PUT)
     @ApiOperation(value = "更新App")
     public MApp updateApp(
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true)
@@ -87,7 +87,7 @@ public class AppEndPoint extends BaseRestController {
         return convertToModel(app, MApp.class);
     }
 
-    @RequestMapping(value = RestApi.Apps.App, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Apps.App, method = RequestMethod.GET)
     @ApiOperation(value = "获取App")
     public MApp getApp(
             @ApiParam(name = "app_id", value = "id")
@@ -96,7 +96,7 @@ public class AppEndPoint extends BaseRestController {
         return convertToModel(app, MApp.class);
     }
 
-    @RequestMapping(value = RestApi.Apps.App, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Apps.App, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除App")
     public boolean deleteApp(
             @ApiParam(name = "app_id", value = "id")
@@ -105,7 +105,7 @@ public class AppEndPoint extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(value = RestApi.Apps.AppStatus, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Apps.AppStatus, method = RequestMethod.PUT)
     @ApiOperation(value = "修改状态")
     public boolean updateStatus(
             @ApiParam(name = "app_id", value = "id")
@@ -116,7 +116,7 @@ public class AppEndPoint extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(value = RestApi.Apps.AppExistence, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Apps.AppExistence, method = RequestMethod.GET)
     @ApiOperation(value = "验证应用是否存在")
     public boolean isAppExistence(
             @ApiParam(name = "app_id", value = "id")
@@ -126,7 +126,7 @@ public class AppEndPoint extends BaseRestController {
         return appService.findByIdAndSecret(appId, secret);
     }
 
-    @RequestMapping(value = RestApi.Apps.AppNameExistence, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Apps.AppNameExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断应用名称是否已经存在")
     boolean isAppNameExists(
             @ApiParam(value = "app_name")

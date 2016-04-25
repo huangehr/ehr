@@ -1,12 +1,11 @@
 package com.yihu.ehr.std.service;
 
 import com.yihu.ehr.agModel.standard.dict.DictModel;
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.standard.MStdDict;
 import com.yihu.ehr.model.standard.MStdDictEntry;
-import com.yihu.ehr.model.standard.MStdSource;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,7 +28,7 @@ import java.util.Map;
 @ApiIgnore
 public interface DictClient {
 
-    @RequestMapping(value = RestApi.Standards.Dictionaries, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.Dictionaries, method = RequestMethod.GET)
     @ApiOperation(value = "查询字典")
     ResponseEntity<Collection<MStdDict>> searchDict(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -46,7 +44,7 @@ public interface DictClient {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version)throws Exception;
 
-    @RequestMapping(value = RestApi.Standards.Dictionaries, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.Dictionaries, method = RequestMethod.POST)
     @ApiOperation(value = "新增字典")
     MStdDict addDict(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
@@ -55,7 +53,7 @@ public interface DictClient {
             @RequestParam(value = "model") String model);
 
 
-    @RequestMapping(value = RestApi.Standards.Dictionary, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Standards.Dictionary, method = RequestMethod.PUT)
     @ApiOperation(value = "修改字典")
     MStdDict updateDict(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
@@ -66,7 +64,7 @@ public interface DictClient {
             @RequestParam(value = "model") String model);
 
 
-    @RequestMapping(value = RestApi.Standards.Dictionary, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.Dictionary, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除字典")
     boolean deleteDict(
             @ApiParam(name = "version", value = "cda版本号", defaultValue = "")
@@ -75,7 +73,7 @@ public interface DictClient {
             @PathVariable(value = "id") long id);
 
 
-    @RequestMapping(value = RestApi.Standards.Dictionaries, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.Dictionaries, method = RequestMethod.DELETE)
     @ApiOperation(value = "批量删除字典")
     boolean deleteDicts(
             @ApiParam(name = "version", value = "cda版本号", defaultValue = "")
@@ -84,7 +82,7 @@ public interface DictClient {
             @RequestParam(value = "ids") String ids);
 
 
-    @RequestMapping(value = RestApi.Standards.Dictionary, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.Dictionary, method = RequestMethod.GET)
     @ApiOperation(value = "获取字典详细信息")
     MStdDict getCdaDictInfo(
             @ApiParam(name = "id", value = "字典编号", defaultValue = "")
@@ -93,7 +91,7 @@ public interface DictClient {
             @RequestParam(value = "version") String version);
 
 
-    @RequestMapping(value = RestApi.Standards.MetaDataWithDict, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.MetaDataWithDict, method = RequestMethod.GET)
     @ApiOperation(value = "获取字典map集")
     Map getDictMapByIds(
             @ApiParam(name = "version", value = "版本号", defaultValue = "")
@@ -104,7 +102,7 @@ public interface DictClient {
             @PathVariable(value = "meta_data_id") Long metaDataId);
 
 
-    @RequestMapping(value = RestApi.Standards.DictCodeIsExist,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.DictCodeIsExist,method = RequestMethod.GET)
     boolean isExistDictCode(
             @RequestParam(value = "dict_code")String dictCode,
             @RequestParam("version_code")String versionCode);
@@ -112,14 +110,14 @@ public interface DictClient {
 
 
     //以下是字典项
-    @RequestMapping(value = RestApi.Standards.Entries, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.Entries, method = RequestMethod.POST)
     @ApiOperation(value = "新增字典项")
     MStdDictEntry addDictEntry(
             @RequestParam(value = "version") String version,
             @RequestParam(value = "model") String model);
 
 
-    @RequestMapping(value = RestApi.Standards.Entry, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Standards.Entry, method = RequestMethod.PUT)
     @ApiOperation(value = "修改字典项")
     MStdDictEntry updateDictEntry(
             @RequestParam(value = "version") String version,
@@ -127,7 +125,7 @@ public interface DictClient {
             @RequestParam(value = "model") String model) ;
 
 
-    @RequestMapping(value = RestApi.Standards.Entries, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.Entries, method = RequestMethod.GET)
     @ApiOperation(value = "查询字典项")
     ResponseEntity<Collection<MStdDictEntry>> searchDictEntry(
             @RequestParam(value = "fields", required = false) String fields,
@@ -138,41 +136,41 @@ public interface DictClient {
             @RequestParam(value = "version") String version);
 
 
-    @RequestMapping(value = RestApi.Standards.Entry, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.Entry, method = RequestMethod.GET)
     @ApiOperation(value = "获取字典项")
     MStdDictEntry getDictEntry(
             @PathVariable(value = "id") long id,
             @RequestParam(value = "version") String version);
 
 
-    @RequestMapping(value = RestApi.Standards.Entry, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.Entry, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除字典项")
     boolean deleteDictEntry(
             @RequestParam(value = "version") String version,
             @PathVariable(value = "id") long id);
 
 
-    @RequestMapping(value = RestApi.Standards.Entries, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.Entries, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除字典项")
     boolean deleteDictEntrys(
             @RequestParam(value = "version") String version,
             @RequestParam(value = "ids") String ids);
 
 
-    @RequestMapping(value = RestApi.Standards.EntriesWithDictionary, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Standards.EntriesWithDictionary, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除字典关联的所有字典项")
     boolean deleteDictEntryList(
             @RequestParam(value = "version") String version,
             @PathVariable(value = "dict_id") long dictId);
 
-    @RequestMapping(value = RestApi.Standards.EntryCodeIsExist,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.EntryCodeIsExist,method = RequestMethod.GET)
     boolean isExistEntryCode(
             @RequestParam(value = "dict_id")long dictId,
             @RequestParam(value = "code")String code,
             @RequestParam(value = "version_code")String versionCode);
 
 
-    @RequestMapping(value = RestApi.Standards.NoPageDictionaries, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.NoPageDictionaries, method = RequestMethod.GET)
     ResponseEntity<Collection<DictModel>> search(
             @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "version") String version);

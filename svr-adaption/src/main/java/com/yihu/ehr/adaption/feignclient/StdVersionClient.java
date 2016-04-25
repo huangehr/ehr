@@ -1,7 +1,7 @@
 package com.yihu.ehr.adaption.feignclient;
 
 
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.standard.MCDAVersion;
@@ -22,7 +22,7 @@ import springfox.documentation.annotations.ApiIgnore;
 @FeignClient(name = MicroServices.Standard)
 public interface StdVersionClient {
 
-    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Standards.Version, method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0+ ServiceApi.Standards.Version, method = RequestMethod.GET)
     @ApiOperation(value = "获取版本信息")
     MCDAVersion getVersion(@PathVariable(value = "version") String version) throws Exception;
 }

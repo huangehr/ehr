@@ -8,7 +8,7 @@ import com.yihu.ehr.feign.*;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.model.security.MKey;
-import com.yihu.ehr.util.DateFormatter;
+import com.yihu.ehr.util.DateTimeUtils;
 import com.yihu.ehr.util.IdValidator;
 import com.yihu.ehr.util.RestEcho;
 import io.swagger.annotations.ApiOperation;
@@ -308,7 +308,7 @@ public class LegacyEndPoint {
             String homeAddressJsonData = objectMaper.writeValueAsString(homeAddress);
             String birthPlacejsonData = objectMaper.writeValueAsString(birthAddress);
 
-            demoInfo.setBirthday(DateFormatter.simpleDateParse(birthday));
+            demoInfo.setBirthday(DateTimeUtils.simpleDateParse(birthday));
             demoInfo.setNativePlace(nativePlace);
             //demoInfo.setTelephoneNo(telMap.get(0));
             demoInfo.setTelephoneNo(new ObjectMapper().writeValueAsString(telMap));//电话号码格式调整
@@ -353,7 +353,7 @@ public class LegacyEndPoint {
 //        conditionMap.add("package_crypto", packageCrypto);
 //        conditionMap.add("md5", md5);
 //        RestTemplate template = new RestTemplate();
-//        template.postForObject(packageIpAddress+ ApiVersion.Version1_0+ RestApi.Packages.LegacyPackages, conditionMap, String.class);
+//        template.postForObject(packageIpAddress+ ApiVersion.Version1_0+ ServiceApi.Packages.LegacyPackages, conditionMap, String.class);
 //        return new RestEcho().success().putMessage("ok");
 //    }
 

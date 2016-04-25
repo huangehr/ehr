@@ -1,14 +1,12 @@
 package com.yihu.ehr.profile.config;
 
+import com.yihu.ehr.profile.core.commons.DataSetTableOption;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Sand
@@ -19,7 +17,7 @@ import java.util.Set;
 @ConfigurationProperties(prefix = "cda-document")
 public class CdaDocumentOptions {
     // 数据集代码与CDA类别ID之间的映射
-    Map<String, String> primaryDataSet = new HashMap<>();
+    Map<String, String> primaryDataSet = new TreeMap<>();
 
     public Map<String, String> getPrimaryDataSet() {
         return primaryDataSet;
@@ -33,6 +31,7 @@ public class CdaDocumentOptions {
 
             key = key.replaceAll("^\\d{1,2}\\.", "");
             this.primaryDataSet.put(key, value);
+            if(!key.contains(DataSetTableOption.OriginDataSetFlag)) this.primaryDataSet.put(DataSetTableOption.originDataSetCode(key), value);
         }
     }
 

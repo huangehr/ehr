@@ -2,7 +2,7 @@ package com.yihu.ehr.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
@@ -15,7 +15,6 @@ import com.yihu.ehr.user.service.User;
 import com.yihu.ehr.user.service.UserManager;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.encode.*;
-import com.yihu.ehr.util.encode.Base64;
 import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -60,7 +59,7 @@ public class UserController extends BaseRestController {
     @Autowired
     private FastDFSUtil fastDFSUtil;
 
-    @RequestMapping(value = RestApi.Users.Users, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Users.Users, method = RequestMethod.GET)
     @ApiOperation(value = "获取用户列表", notes = "根据查询条件获取用户列表在前端表格展示")
     public List<MUser> searchUsers(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
@@ -81,7 +80,7 @@ public class UserController extends BaseRestController {
         return (List<MUser>) convertToModels(userList, new ArrayList<MUser>(userList.size()), MUser.class, fields);
     }
 
-    @RequestMapping(value = RestApi.Users.Users, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Users.Users, method = RequestMethod.POST)
     @ApiOperation(value = "创建用户", notes = "重新绑定用户信息")
     public MUser createUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
@@ -104,7 +103,7 @@ public class UserController extends BaseRestController {
         return convertToModel(user, MUser.class, null);
     }
 
-    @RequestMapping(value = RestApi.Users.Users, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Users.Users, method = RequestMethod.PUT)
     @ApiOperation(value = "修改用户", notes = "重新绑定用户信息")
     public MUser updateUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
@@ -120,7 +119,7 @@ public class UserController extends BaseRestController {
         return convertToModel(user, MUser.class);
     }
 
-    @RequestMapping(value = RestApi.Users.UserAdmin, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Users.UserAdmin, method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取获取用户信息")
     public MUser getUser(
             @ApiParam(name = "user_id", value = "", defaultValue = "")
@@ -130,7 +129,7 @@ public class UserController extends BaseRestController {
         return userModel;
     }
 
-    @RequestMapping(value = RestApi.Users.UserAdmin, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Users.UserAdmin, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除用户", notes = "根据id删除用户")
     public boolean deleteUser(
             @ApiParam(name = "user_id", value = "用户编号", defaultValue = "")
@@ -139,7 +138,7 @@ public class UserController extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(value = RestApi.Users.UserAdmin, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Users.UserAdmin, method = RequestMethod.PUT)
     @ApiOperation(value = "改变用户状态", notes = "根据id更新用户")
     public boolean activityUser(
             @ApiParam(name = "user_id", value = "id", defaultValue = "")
@@ -150,7 +149,7 @@ public class UserController extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(value = RestApi.Users.User, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Users.User, method = RequestMethod.GET)
     @ApiOperation(value = "根据登录账号获取当前用户", notes = "根据登陆用户名及密码验证用户")
     public MUser getUserByLoginCode(
             @ApiParam(name = "user_name", value = "登录账号", defaultValue = "")
@@ -159,7 +158,7 @@ public class UserController extends BaseRestController {
         return convertToModel(user, MUser.class);
     }
 
-    @RequestMapping(value = RestApi.Users.UserAdminPassword, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Users.UserAdminPassword, method = RequestMethod.PUT)
     @ApiOperation(value = "重设密码", notes = "用户忘记密码管理员帮助重新还原密码，初始密码123456")
     public boolean resetPass(
             @ApiParam(name = "user_id", value = "id", defaultValue = "")
@@ -168,7 +167,7 @@ public class UserController extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(value = RestApi.Users.UserAdminPasswordReset, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Users.UserAdminPasswordReset, method = RequestMethod.PUT)
     @ApiOperation(value = "修改密码", notes = "根基传入的用户id和新的密码修改用户的密码")
     public boolean changePassWord(
             @ApiParam(name = "user_id", value = "user_id", defaultValue = "")
@@ -180,7 +179,7 @@ public class UserController extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(value = RestApi.Users.UserAdminKey, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Users.UserAdminKey, method = RequestMethod.PUT)
     @ApiOperation(value = "重新分配密钥", notes = "重新分配密钥")
     public Map<String, String> distributeKey(
             @ApiParam(name = "user_id", value = "登录帐号", defaultValue = "")
@@ -210,7 +209,7 @@ public class UserController extends BaseRestController {
      * @param userName
      * @param password
      */
-    @RequestMapping(value = RestApi.Users.UserVerification, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Users.UserVerification, method = RequestMethod.GET)
     @ApiOperation(value = "根据登陆用户名及密码验证用户", notes = "根据登陆用户名及密码验证用户")
     public MUser getUserByNameAndPassword(
             @ApiParam(name = "user_name", value = "登录账号", defaultValue = "")
@@ -221,7 +220,7 @@ public class UserController extends BaseRestController {
         return convertToModel(user, MUser.class);
     }
 
-    @RequestMapping(value = RestApi.Users.UserExistence, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Users.UserExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断用户名是否存在")
     public boolean isUserNameExists(
             @ApiParam(name = "user_name", value = "user_name", defaultValue = "")
@@ -229,7 +228,7 @@ public class UserController extends BaseRestController {
         return userManager.getUserByUserName(userName) != null;
     }
 
-    @RequestMapping(value = RestApi.Users.UserIdCardNoExistence, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Users.UserIdCardNoExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断用户身份证号是否存在")
     public boolean isIdCardExists(
             @ApiParam(name = "id_card_no", value = "id_card_no", defaultValue = "")
@@ -237,7 +236,7 @@ public class UserController extends BaseRestController {
         return userManager.getUserByIdCardNo(idCardNo) != null;
     }
 
-//    @RequestMapping(value = RestApi.Users.UserAdminContact, method = RequestMethod.DELETE)
+//    @RequestMapping(value = ServiceApi.Users.UserAdminContact, method = RequestMethod.DELETE)
 //    @ApiOperation(value = "用户联系方式解绑", notes = "将用户电话或邮件地址设置为空")
 //    public boolean delteContact(
 //            @ApiParam(name = "user_id", value = "", defaultValue = "")
@@ -255,7 +254,7 @@ public class UserController extends BaseRestController {
 //        return true;
 //    }
 
-    @RequestMapping(value = RestApi.Users.UserEmailNoExistence, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Users.UserEmailNoExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断用户邮件是否存在")
     public boolean isEmailExists(@RequestParam(value = "email") String email) {
 
@@ -280,7 +279,7 @@ public class UserController extends BaseRestController {
 
         String[] fileStreams = date.split(",");
         String is = URLDecoder.decode(fileStreams[0],"UTF-8").replace(" ","+");
-        byte[] in = com.yihu.ehr.util.encode.Base64.decode(is);
+        byte[] in = Base64.getDecoder().decode(is);
 
         String pictureName = fileStreams[1].substring(0,fileStreams[1].length()-1);
         String fileExtension = pictureName.substring(pictureName.lastIndexOf(".") + 1).toLowerCase();
@@ -326,7 +325,7 @@ public class UserController extends BaseRestController {
 
             byte[] bytes = fastDFSUtil.download(groupName, remoteFileName);
 
-            String fileStream = Base64.encode(bytes);
+            String fileStream = new String(Base64.getEncoder().encode(bytes));
             imageStream = URLEncoder.encode(fileStream, "UTF-8");
 
         } catch (IOException e) {

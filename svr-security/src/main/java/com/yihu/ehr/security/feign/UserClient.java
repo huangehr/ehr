@@ -1,6 +1,6 @@
 package com.yihu.ehr.security.feign;
 
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.*;
 import com.yihu.ehr.model.user.MUser;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -18,13 +18,13 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @FeignClient(name = MicroServices.User)
 public interface UserClient {
 
-    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Users.User, method = GET)
+    @RequestMapping(value = ApiVersion.Version1_0+ ServiceApi.Users.User, method = GET)
     MUser getUserByLoginCode(@PathVariable(value = "user_name") String userName);
     
-    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Users.UserAdmin, method = GET)
+    @RequestMapping(value = ApiVersion.Version1_0+ ServiceApi.Users.UserAdmin, method = GET)
     MUser getUser(@PathVariable(value = "user_id") String userId);
 
-    @RequestMapping(value = ApiVersion.Version1_0+RestApi.Users.UserVerification, method = GET)
+    @RequestMapping(value = ApiVersion.Version1_0+ ServiceApi.Users.UserVerification, method = GET)
     MUser getUserByNameAndPassword(
             @RequestParam(value = "user_name") String userName,
             @RequestParam(value = "password") String password);

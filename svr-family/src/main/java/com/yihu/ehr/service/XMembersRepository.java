@@ -15,5 +15,10 @@ public interface XMembersRepository extends PagingAndSortingRepository<Members, 
 
     void deleteByFamilyId(String familyId);
 
+    void deleteByFamilyIdAndIdCardNo(String familyId,String idCardNo);
+
     List<Members> findByFamilyId(String familyId);
+
+    Members findByFamilyIdAndIdCardNo(String familyId,String idCardNo);
+
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.common.PackageUtil;
 import com.yihu.ehr.constants.ProfileConstant;
+import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.extractor.ExtractorChain;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.packs.MPackage;
@@ -72,6 +73,7 @@ public class NoStructuredPackageResolver {
             throw new RuntimeException("Invalid package file, package id: " + pack.getId());
         }
         NoStructuredProfile noStructuredProfile = new NoStructuredProfile();    //非结构化档案
+        noStructuredProfile.setProfileType(ProfileType.NoStructured);
         File[] files = root.listFiles();
         List<NoStructuredDocumentFile> noStructuredDocumentFileList = new ArrayList<>();  //document底下的文件
         for(File file:files){

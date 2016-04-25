@@ -279,8 +279,6 @@ public class UserController extends BaseController {
                 detailModel.setImgLocalPath("");
             }
 
-//            detailModel.setPassword("e10adc3949ba59abbe56e057f20f883e"); //todo:测试数据
-//            detailModel.setActivated(true); //todo:测试数据
             String errorMsg = null;
             if (StringUtils.isEmpty(detailModel.getLoginCode())) {
                 errorMsg += "账户不能为空";

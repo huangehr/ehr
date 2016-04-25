@@ -1,6 +1,8 @@
 package com.yihu.ehr.model.profile;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.yihu.ehr.util.DateTimeUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
@@ -20,6 +22,8 @@ public class MProfile {
     private String demographicId;
     private String cdaVersion;
     private String summary;
+
+    @JsonFormat(pattern = DateTimeUtils.ISO8601Pattern, locale = "zh" , timezone="GMT+8")
     private Date eventDate;
 
     private List<MProfileDocument> documents = new ArrayList<>();

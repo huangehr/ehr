@@ -1,13 +1,11 @@
 package com.yihu.ehr.profile.feign;
 
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
-import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,7 +21,7 @@ import java.util.List;
 @ApiIgnore
 @FeignClient(MicroServices.Standard)
 public interface XCDADocumentClient {
-    @RequestMapping(value = ApiVersion.Version1_0 + RestApi.Standards.Documents, method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Standards.Documents, method = RequestMethod.GET)
     List<MCDADocument> getCDADocumentByIds(@RequestParam(value = "fields") String fields,
                                                     @RequestParam(value = "filters") String filters,
                                                     @RequestParam(value = "sorts") String sorts,

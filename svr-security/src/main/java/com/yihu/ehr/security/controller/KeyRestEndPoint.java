@@ -1,6 +1,6 @@
 package com.yihu.ehr.security.controller;
 
-import com.yihu.ehr.api.RestApi;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.security.feign.AppClient;
@@ -35,7 +35,7 @@ public class KeyRestEndPoint extends BaseRestController {
     @Autowired
     private UserClient userClient;
 
-    @RequestMapping(value = RestApi.Securities.UserKey, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Securities.UserKey, method = RequestMethod.GET)
     @ApiOperation(value = "获取用户Key", notes = "公-私钥用于与健康档案平台加密传输数据使用")
     public MKey getUserKey(
             @ApiParam(name = "user_id", value = "用户名")
@@ -46,7 +46,7 @@ public class KeyRestEndPoint extends BaseRestController {
         return convertToModel(key, MKey.class);
     }
 
-    @RequestMapping(value = RestApi.Securities.UserKey, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Securities.UserKey, method = RequestMethod.POST)
     @ApiOperation(value = "为用户创建Key")
     public MKey createUserKey(
             @ApiParam(name = "user_id", value = "用户代码")
@@ -55,7 +55,7 @@ public class KeyRestEndPoint extends BaseRestController {
         return convertToModel(key, MKey.class);
     }
 
-    @RequestMapping(value = RestApi.Securities.UserKeyId, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Securities.UserKeyId, method = RequestMethod.GET)
     @ApiOperation(value = "获取用户key的id")
     public String getKeyIdByUserId(
             @ApiParam(name = "user_id", value = "用户id")
@@ -82,7 +82,7 @@ public class KeyRestEndPoint extends BaseRestController {
      * }
      */
     //现在tocken通过网关认证来获取
-//    @RequestMapping(value = RestApi.Securities.UserToken, method = RequestMethod.PUT)
+//    @RequestMapping(value = ServiceApi.Securities.UserToken, method = RequestMethod.PUT)
 //    @ApiOperation(value = "获取用户登录用的临时会话Token", produces = "application/json", notes = "此Token用于客户与平台之间的会话，时效性时差为20分钟")
 //    public Object createTempUserToken(
 //            @ApiParam(required = true, name = "user_name", value = "用户名")
@@ -140,7 +140,7 @@ public class KeyRestEndPoint extends BaseRestController {
 //        return map;
 //    }
 
-    @RequestMapping(value = RestApi.Securities.deleteUserKey, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Securities.deleteUserKey, method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除Key")
     public boolean deleteKeyByUserId(
             @ApiParam(name = "user_id", value = "user_id")
@@ -152,7 +152,7 @@ public class KeyRestEndPoint extends BaseRestController {
     }
 
 
-    @RequestMapping(value = RestApi.Securities.OrganizationKey, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Securities.OrganizationKey, method = RequestMethod.GET)
     @ApiOperation(value = "获取机构Key", notes = "公-私钥用于与健康档案平台加密传输数据使用")
     public MKey getOrgKey(
             @ApiParam(name = "org_code", value = "机构代码")
@@ -164,7 +164,7 @@ public class KeyRestEndPoint extends BaseRestController {
         return convertToModel(key, MKey.class);
     }
 
-    @RequestMapping(value = RestApi.Securities.OrganizationKey, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Securities.OrganizationKey, method = RequestMethod.POST)
     @ApiOperation(value = "为机构创建Key")
     public MKey createOrgKey(
             @ApiParam(name = "org_code", value = "机构代码")
@@ -173,7 +173,7 @@ public class KeyRestEndPoint extends BaseRestController {
         return convertToModel(key, MKey.class);
     }
 
-    @RequestMapping(value = RestApi.Securities.OrganizationPublicKey, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Securities.OrganizationPublicKey, method = RequestMethod.GET)
     @ApiOperation(value = "获取机构公钥")
     public String getOrgPublicKey(
             @ApiParam(name = "org_code", value = "机构代码")
@@ -181,7 +181,7 @@ public class KeyRestEndPoint extends BaseRestController {
         return keyManager.getOrgKey(orgCode);
     }
 
-    @RequestMapping(value = RestApi.Securities.deleteOrgKey, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Securities.deleteOrgKey, method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除Key")
     public boolean deleteKeyByOrgCode(
             @ApiParam(name = "org_code", value = "org_code")
@@ -192,7 +192,7 @@ public class KeyRestEndPoint extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(value = RestApi.Securities.Keys, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Securities.Keys, method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取Key")
     public MKey getKey(
             @ApiParam(name = "id", value = "security代码")

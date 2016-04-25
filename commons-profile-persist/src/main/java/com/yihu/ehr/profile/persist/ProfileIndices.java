@@ -33,27 +33,20 @@ public class ProfileIndices {
         this.id = id;
     }
 
-    public String getRowkey() {
-        return rowkey;
-    }
-
-    public void setRowkey(String rowkey) {
-        this.rowkey = rowkey;
+    public String getProfileId() {
+        return rowkey.contains("$") ? rowkey.substring(0, rowkey.indexOf("$")) : rowkey;
     }
 
     public String getDemographicId() {
         return demographicId;
     }
 
-    public void setDemographicId(String demographicId) {
-        this.demographicId = demographicId;
-    }
-
     public Date getEventDate() {
         return eventDate;
     }
 
-    public void setEventDate(Date eventDate) {
-        this.eventDate = eventDate;
+    public String getRowkey() {
+        return rowkey;
     }
+
 }

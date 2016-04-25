@@ -1,7 +1,7 @@
 package com.yihu.ehr.util.encrypt;
 
-import com.yihu.ehr.util.encode.Base64;
 import com.yihu.ehr.util.log.LogService;
+import java.util.Base64;
 
 import javax.crypto.Cipher;
 import java.security.*;
@@ -42,12 +42,11 @@ public class RSA {
     }
 
     public static String encodeKey(Key key) {
-//        return HexEncode.toHexString(key.getEncoded());
-        return Base64.encode(key.getEncoded());
+        return new String(Base64.getEncoder().encode(key.getEncoded()));
     }
 
     public static Key genPrivateKey(String key) {
-        byte[] bytes = Base64.decode(key);
+        byte[] bytes = Base64.getDecoder().decode(key);
         PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(bytes);
         try {
             KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
@@ -61,7 +60,7 @@ public class RSA {
     }
 
     public static Key genPublicKey(String key) {
-        byte[] bytes = Base64.decode(key);
+        byte[] bytes = Base64.getDecoder().decode(key);
         X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(bytes);
         try {
             KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
@@ -85,8 +84,7 @@ public class RSA {
         Cipher cipher = Cipher.getInstance(KEY_ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, key);
 
-//        return HexEncode.toHexString(cipher.doFinal(data.getBytes()));
-        return Base64.encode(cipher.doFinal(data.getBytes()));
+        return new String(Base64.getEncoder().encode(cipher.doFinal(data.getBytes())));
     }
 
     /**
@@ -100,7 +98,7 @@ public class RSA {
         cipher.init(Cipher.DECRYPT_MODE, key);
 
         //return new String(cipher.doFinal(HexEncode.toBytes(data)));
-        return new String(cipher.doFinal(Base64.decode(data)));
+        return new String(cipher.doFinal(Base64.getDecoder().decode(data)));
     }
 
     /**
@@ -113,11 +111,6 @@ public class RSA {
     public static String encryptByPriKey(String data, String privateKey) throws Exception {
         Cipher cipher = Cipher.getInstance(KEY_ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, genPrivateKey(privateKey));
-        return Base64.encode(cipher.doFinal(data.getBytes()));
+        return new String(Base64.getEncoder().encode(cipher.doFinal(data.getBytes())));
     }
-
-
-
-
-
 }

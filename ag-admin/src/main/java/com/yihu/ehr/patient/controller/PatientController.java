@@ -60,45 +60,51 @@ public class PatientController extends BaseController {
             @ApiParam(name = "page", value = "当前页", defaultValue = "")
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
-            @RequestParam(value = "rows") Integer rows) throws Exception {
+            @RequestParam(value = "rows") Integer rows) {
+        try {
+            ResponseEntity<List<MDemographicInfo>> responseEntity = patientClient.searchPatient(search, province, city, district, page, rows);
+            List<MDemographicInfo> demographicInfos = responseEntity.getBody();
+            List<PatientModel> patients = new ArrayList<>();
+            for (MDemographicInfo patientInfo : demographicInfos) {
 
-        ResponseEntity<List<MDemographicInfo>> responseEntity = patientClient.searchPatient(search, province, city, district, page, rows);
-        List<MDemographicInfo> demographicInfos = responseEntity.getBody();
-        List<PatientModel> patients = new ArrayList<>();
-        for (MDemographicInfo patientInfo : demographicInfos) {
+                PatientModel patient = convertToModel(patientInfo, PatientModel.class);
+                patient.setRegisterTime(DateToString(patientInfo.getRegisterTime(), AgAdminConstants.DateTimeFormat));
+                //获取家庭地址信息
+                String homeAddressId = patientInfo.getHomeAddress();
+                if (StringUtils.isNotEmpty(homeAddressId)) {
+                    MGeography geography = addressClient.getAddressById(homeAddressId);
+                    String homeAddress = geography != null ? geography.fullAddress() : "";
+                    patient.setHomeAddress(homeAddress);
+                }
+                //性别
+                if (StringUtils.isNotEmpty(patientInfo.getGender())) {
+                    MConventionalDict dict = conventionalDictClient.getGender(patientInfo.getGender());
+                    patient.setGender(dict == null ? "" : dict.getValue());
+                }
+                //联系电话
+                Map<String, String> telephoneNo;
+                String tag = "联系电话";
+                try {
+                    telephoneNo = objectMapper.readValue(patient.getTelephoneNo(), Map.class);
+                } catch (Exception e) {
+                    telephoneNo = null;
+                }
+                if (telephoneNo != null && telephoneNo.containsKey(tag)) {
+                    patient.setTelephoneNo(telephoneNo.get(tag));
+                } else {
+                    patient.setTelephoneNo(null);
+                }
 
-            PatientModel patient = convertToModel(patientInfo, PatientModel.class);
-            patient.setRegisterTime(DateToString( patientInfo.getRegisterTime(),AgAdminConstants.DateTimeFormat));
-            //获取家庭地址信息
-            String homeAddressId = patientInfo.getHomeAddress();
-            if (StringUtils.isNotEmpty(homeAddressId)) {
-                MGeography geography = addressClient.getAddressById(homeAddressId);
-                String homeAddress = geography != null ? geography.fullAddress() : "";
-                patient.setHomeAddress(homeAddress);
-            }
-            //性别
-            if (StringUtils.isNotEmpty(patientInfo.getGender())) {
-                MConventionalDict dict = conventionalDictClient.getGender(patientInfo.getGender());
-                patient.setGender(dict == null ? "" : dict.getValue());
-            }
-            //联系电话
-            Map<String, String> telephoneNo;
-            String tag = "联系电话";
-            try {
-                telephoneNo = objectMapper.readValue(patient.getTelephoneNo(), Map.class);
-            } catch (Exception e) {
-                telephoneNo = null;
-            }
-            if (telephoneNo != null && telephoneNo.containsKey(tag)) {
-                patient.setTelephoneNo(telephoneNo.get(tag));
-            } else {
-                patient.setTelephoneNo(null);
+                patients.add(patient);
             }
 
-            patients.add(patient);
+            return getResult(patients, getTotalCount(responseEntity), page, rows);
         }
-
-        return getResult(patients, getTotalCount(responseEntity), page, rows);
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
     }
 
 

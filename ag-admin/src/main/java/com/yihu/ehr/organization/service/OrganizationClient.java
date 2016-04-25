@@ -7,10 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
@@ -144,5 +141,13 @@ public interface OrganizationClient {
     @ApiOperation(value = "机构资质图片上传")
     public String uploadPicture(
             @ApiParam(name = "jsonData", value = "jsonData", defaultValue = "")
-            @PathVariable(value = "jsonData") String jsonData);
+            @RequestBody String jsonData);
+
+    @RequestMapping(value = "/organizations/images",method = RequestMethod.GET)
+    @ApiOperation(value = "头像下载")
+    String downloadPicture(
+            @ApiParam(name = "group_name", value = "分组", defaultValue = "")
+            @RequestParam(value = "group_name") String groupName,
+            @ApiParam(name = "remote_file_name", value = "服务器头像名称", defaultValue = "")
+            @RequestParam(value = "remote_file_name") String remoteFileName);
 }

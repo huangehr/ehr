@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.controller.sanofi;
+package com.yihu.ehr.profile.persist;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.beans.Field;

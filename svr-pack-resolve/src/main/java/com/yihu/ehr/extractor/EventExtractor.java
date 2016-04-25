@@ -1,7 +1,7 @@
 package com.yihu.ehr.extractor;
 
-import com.yihu.ehr.profile.core.structured.StructuredDataSet;
-import com.yihu.ehr.util.DateFormatter;
+import com.yihu.ehr.profile.core.structured.FullWeightDataSet;
+import com.yihu.ehr.util.DateTimeUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -21,15 +21,15 @@ public class EventExtractor extends KeyDataExtractor {
     private List<String> metaData = new ArrayList<>();            // 事件时间数据元
 
     @Override
-    public Object extract(StructuredDataSet structuredDataSet, Filter filter) throws ParseException {
-        if (filter == Filter.EventDate && dataSets.containsKey(structuredDataSet.getCode())) {
-            for (String key : structuredDataSet.getRecordKeys()) {
-                Map<String, String> record = structuredDataSet.getRecord(key);
+    public Object extract(FullWeightDataSet fullWeightDataSet, Filter filter) throws ParseException {
+        if (filter == Filter.EventDate && dataSets.containsKey(fullWeightDataSet.getCode())) {
+            for (String key : fullWeightDataSet.getRecordKeys()) {
+                Map<String, String> record = fullWeightDataSet.getRecord(key);
                 for (String recordKey : record.keySet()) {
                     if (metaData.contains(recordKey)) {
                         String value = record.get(recordKey);
                         if (value != null) {
-                            return DateFormatter.simpleDateTimeParse(value);
+                            return DateTimeUtils.simpleDateTimeParse(value);
                         }
                     }
                 }

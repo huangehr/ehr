@@ -3,6 +3,7 @@ package com.yihu.ehr.service;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * @author Sand
@@ -17,7 +18,8 @@ public class Members {
     private String id;
     private String familyId;
     private String idCardNo;
-    private int familyRelation;
+    private String familyRelation;
+    private Date createDate;
 
     @Id
     @GeneratedValue(generator = "Generator")
@@ -47,10 +49,19 @@ public class Members {
     }
 
     @Column(name = "family_relation",  nullable = false)
-    public int getFamilyRelation() {
+    public String getFamilyRelation() {
         return familyRelation;
     }
-    public void setFamilyRelation(int familyRelation) {
+    public void setFamilyRelation(String familyRelation) {
         this.familyRelation = familyRelation;
     }
+
+    @Column(name="create_date",nullable = true)
+    public Date getCreateDate(){
+        return createDate;
+    }
+    public void setCreateDate(Date createDate){
+        this.createDate = createDate;
+    }
+
 }
