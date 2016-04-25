@@ -1,5 +1,7 @@
 package com.yihu.ehr.util;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -59,6 +61,8 @@ public class DateTimeUtils {
     }
 
     public static Date simpleDateTimeParse(final String date) throws ParseException {
+        if(StringUtils.isEmpty(date)) return null;
+
         Date parsedDate = simpleDateTimeFormat.get().parse(date);
         return parsedDate;
     }
@@ -69,6 +73,8 @@ public class DateTimeUtils {
     }
 
     public static Date utcDateTimeParse(final String date) throws ParseException {
+        if(StringUtils.isEmpty(date)) return null;
+
         Date parsedDate = utcDateTimeFormat.get().parse(date);
         return parsedDate;
     }
@@ -89,6 +95,8 @@ public class DateTimeUtils {
     }
 
     public static Date simpleDateParse(final String date) throws ParseException {
+        if(StringUtils.isEmpty(date)) return null;
+
         Date parsedDate = simpleDateFormat.get().parse(date);
         return parsedDate;
     }

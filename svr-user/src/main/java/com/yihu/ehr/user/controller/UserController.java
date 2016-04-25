@@ -15,7 +15,6 @@ import com.yihu.ehr.user.service.User;
 import com.yihu.ehr.user.service.UserManager;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.encode.*;
-import com.yihu.ehr.util.encode.Base64;
 import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -280,7 +279,7 @@ public class UserController extends BaseRestController {
 
         String[] fileStreams = date.split(",");
         String is = URLDecoder.decode(fileStreams[0],"UTF-8").replace(" ","+");
-        byte[] in = com.yihu.ehr.util.encode.Base64.decode(is);
+        byte[] in = Base64.getDecoder().decode(is);
 
         String pictureName = fileStreams[1].substring(0,fileStreams[1].length()-1);
         String fileExtension = pictureName.substring(pictureName.lastIndexOf(".") + 1).toLowerCase();
@@ -326,7 +325,7 @@ public class UserController extends BaseRestController {
 
             byte[] bytes = fastDFSUtil.download(groupName, remoteFileName);
 
-            String fileStream = Base64.encode(bytes);
+            String fileStream = new String(Base64.getEncoder().encode(bytes));
             imageStream = URLEncoder.encode(fileStream, "UTF-8");
 
         } catch (IOException e) {

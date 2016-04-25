@@ -8,7 +8,6 @@ import com.yihu.ehr.data.hadoop.HBaseClient;
 import com.yihu.ehr.data.hadoop.ResultWrapper;
 import com.yihu.ehr.profile.core.commons.*;
 import com.yihu.ehr.profile.core.lightweight.LightWeightDataSet;
-import com.yihu.ehr.profile.core.lightweight.LightWeightProfile;
 import com.yihu.ehr.profile.core.nostructured.NoStructuredProfile;
 import com.yihu.ehr.profile.core.structured.FullWeightDataSet;
 import com.yihu.ehr.profile.core.structured.FullWeightProfile;
@@ -27,7 +26,8 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 
-import static com.yihu.ehr.profile.core.commons.ProfileTableOptions.*;
+import static com.yihu.ehr.profile.core.commons.ProfileTableOptions.BasicQualifier;
+import static com.yihu.ehr.profile.core.commons.ProfileTableOptions.Family;
 
 /**
  * 健康档案加载器. 可以根据健康档案ID或与之关联的事件ID加载档案.

@@ -9,7 +9,6 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.standard.MCDAVersion;
 import com.yihu.ehr.util.RestEcho;
-import com.yihu.ehr.util.encode.Base64;
 import com.yihu.ehr.util.encrypt.RSA;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +71,7 @@ public class AdapterDispatchController {
 
             password = (String) mapResult.get("password");
             byte[] bytes = fastDFSUtil.download(group, remoteFile);
-            fileBytes = Base64.encode(bytes);
+            fileBytes = new String(Base64.getEncoder().encode(bytes));
         } catch (Exception e) {
             return new RestEcho().failed(ErrorCode.DownArchiveFileFailed, "下载标准适配版本失败");
         }
@@ -120,7 +120,7 @@ public class AdapterDispatchController {
 
             password = (String) mapResult.get("password");
             byte[] bytes = fastDFSUtil.download(group, remoteFile);
-            fileBytes = Base64.encode(bytes);
+            fileBytes = new String(Base64.getEncoder().encode(bytes));
         } catch (Exception e) {
             return new RestEcho().failed(ErrorCode.DownArchiveFileFailed, "下载机构标准数据包失败");
         }

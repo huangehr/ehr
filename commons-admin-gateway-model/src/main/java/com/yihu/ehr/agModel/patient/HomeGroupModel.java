@@ -4,9 +4,18 @@ package com.yihu.ehr.agModel.patient;
  * Created by AndyCai on 2016/4/20.
  */
 public class HomeGroupModel {
+    String id;
     String name;
     String relationshipName;
-    String relationTime;
+    String createTime;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -24,11 +33,11 @@ public class HomeGroupModel {
         this.relationshipName = relationshipName;
     }
 
-    public String getRelationTime() {
-        return relationTime;
+    public String getCreateTime() {
+        return createTime;
     }
 
-    public void setRelationTime(String relationTime) {
-        this.relationTime = relationTime;
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
     }
 }

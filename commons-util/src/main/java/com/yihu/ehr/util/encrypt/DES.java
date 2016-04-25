@@ -1,6 +1,7 @@
 package com.yihu.ehr.util.encrypt;
 
 import com.yihu.ehr.util.encode.HexEncode;
+import org.apache.commons.codec.binary.Hex;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
