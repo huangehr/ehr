@@ -117,11 +117,11 @@ public class IndicatorsDictController extends BaseRestController {
         return icd10IndicatorRelationService.isUsage(id);
     }
 
-    @RequestMapping(value = "/dict/indicator/existence/name/{name}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/indicator/existence/name" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典名称是否已经存在")
     public boolean isNameExists(
             @ApiParam(name = "name", value = "name", defaultValue = "")
-            @PathVariable(value = "name") String name){
+            @RequestParam(value = "name") String name){
         return indicatorsDictService.isNameExist(name);
     }
 

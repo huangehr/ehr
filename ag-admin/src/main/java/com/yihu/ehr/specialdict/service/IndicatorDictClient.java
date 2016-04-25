@@ -7,6 +7,7 @@ import com.yihu.ehr.model.specialdict.MIndicatorsDict;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -49,7 +50,7 @@ public interface IndicatorDictClient {
 
     @RequestMapping(value = "/dict/indicators", method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件查询相应的指标字典信息。" )
-    Collection<MIndicatorsDict> getIndicatorsDictList(
+    ResponseEntity<Collection<MIndicatorsDict>> getIndicatorsDictList(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,code,name,type,unit,upperLimit,lowerLimit,description")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
@@ -67,11 +68,11 @@ public interface IndicatorDictClient {
             @ApiParam(name = "id", value = "指标字典代码")
             @PathVariable( value = "id") String id);
 
-    @RequestMapping(value = "/dict/indicator/existence/name/{name}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/indicator/existence/name" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典名称是否已经存在")
     boolean isNameExists(
             @ApiParam(name = "name", value = "name", defaultValue = "")
-            @PathVariable(value = "name") String name);
+            @RequestParam(value = "name") String name);
 
     @RequestMapping(value = "/dict/indicator/existence/code/{code}" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典代码是否已经存在")

@@ -12,9 +12,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -110,14 +112,15 @@ public class HealthProblemDictController extends BaseController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) Integer page){
 
-        List<MHealthProblemDict> hpDictList =(List<MHealthProblemDict>)hpDictClient.getHpDictList(fields, filters, sorts, size, page);
         List<HealthProblemDictModel> hpDictModelList = new ArrayList<>();
-
-        for (MHealthProblemDict mHpDict:hpDictList){
+        ResponseEntity<Collection<MHealthProblemDict>> responseEntity = hpDictClient.getHpDictList(fields, filters, sorts, size, page);
+        Collection<MHealthProblemDict> mHealthProblemDicts  = responseEntity.getBody();
+        Integer totalCount = getTotalCount(responseEntity);
+        for (MHealthProblemDict mHpDict:mHealthProblemDicts){
             HealthProblemDictModel hpDictModel = convertToModel(mHpDict,HealthProblemDictModel.class);
             hpDictModelList.add(hpDictModel);
         }
-        Envelop envelop = getResult(hpDictModelList,0,page,size);
+        Envelop envelop = getResult(hpDictModelList,totalCount,page,size);
 
         return envelop;
     }
@@ -135,11 +138,11 @@ public class HealthProblemDictController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = "/dict/hp/existence/name/{name}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/hp/existence/name" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典名称是否已经存在")
     public Envelop isNameExist(
             @ApiParam(name = "name", value = "name", defaultValue = "")
-            @PathVariable(value = "name") String name){
+            @RequestParam(value = "name") String name){
 
         Envelop envelop = new Envelop();
         boolean result = hpDictClient.isNameExists(name);
@@ -216,10 +219,11 @@ public class HealthProblemDictController extends BaseController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page){
 
-        List<MHpIcd10Relation> hpDictList =(List<MHpIcd10Relation>)hpDictClient.getHpIcd10RelationList(fields, filters, sorts, size, page);
         List<HpIcd10RelationModel> hpIcd10RelationModelList = new ArrayList<>();
-
-        for (MHpIcd10Relation mHpIcd10Relation:hpDictList){
+        ResponseEntity<Collection<MHpIcd10Relation>> responseEntity = hpDictClient.getHpIcd10RelationList(fields, filters, sorts, size, page);
+        Collection<MHpIcd10Relation> mHpIcd10Relations  = responseEntity.getBody();
+        Integer totalCount = getTotalCount(responseEntity);
+        for (MHpIcd10Relation mHpIcd10Relation:mHpIcd10Relations){
             HpIcd10RelationModel hpIcd10RelationModel = convertToModel(mHpIcd10Relation,HpIcd10RelationModel.class);
             hpIcd10RelationModelList.add(hpIcd10RelationModel);
         }
