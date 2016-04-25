@@ -44,4 +44,9 @@ public class ProfileIndices {
     public Date getEventDate() {
         return eventDate;
     }
+
+    public String getRowkey() {
+        return rowkey;
+    }
+
 }
