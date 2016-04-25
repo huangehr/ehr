@@ -9,8 +9,8 @@ import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import com.yihu.ehr.profile.config.CdaDocumentOptions;
 import com.yihu.ehr.profile.core.commons.DataSetTableOption;
-import com.yihu.ehr.profile.core.structured.StructuredDataSet;
-import com.yihu.ehr.profile.core.structured.StructuredProfile;
+import com.yihu.ehr.profile.core.structured.FullWeightDataSet;
+import com.yihu.ehr.profile.core.structured.FullWeightProfile;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.persist.ProfileIndices;
 import com.yihu.ehr.profile.persist.ProfileIndicesService;
@@ -109,14 +109,14 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         List<ProfileIndices> profileIndices = indicesService.findByDemographicIdAndEventDateBetween(
                 demographicId, since, to);
 
-        List<StructuredProfile> profiles = new ArrayList<>();
+        List<FullWeightProfile> profiles = new ArrayList<>();
         for (ProfileIndices indices : profileIndices) {
-            StructuredProfile profile = profileRepo.findOne(indices.getRowkey(), loadStdDataSet, loadOriginDataSet);
+            FullWeightProfile profile = profileRepo.findOne(indices.getRowkey(), loadStdDataSet, loadOriginDataSet);
             profiles.add(profile);
         }
 
         List<MProfile> profileList = new ArrayList<>();
-        for (StructuredProfile profile : profiles) {
+        for (FullWeightProfile profile : profiles) {
             MProfile mProfile = convertProfile(profile);
 
             profileList.add(mProfile);
@@ -134,7 +134,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "load_std_data_set") boolean loadStdDataSet,
             @ApiParam(value = "是否加载原始数据集", defaultValue = "false")
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws IOException, ParseException {
-        StructuredProfile profile = profileRepo.findOne(profileId, loadStdDataSet, loadOriginDataSet);
+        FullWeightProfile profile = profileRepo.findOne(profileId, loadStdDataSet, loadOriginDataSet);
 
         return convertProfile(profile);
     }
@@ -150,7 +150,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "load_std_data_set") boolean loadStdDataSet,
             @ApiParam(value = "是否加载原始数据集", defaultValue = "false")
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws IOException, ParseException {
-        StructuredProfile profile = profileRepo.findOne(profileId, loadStdDataSet, loadOriginDataSet);
+        FullWeightProfile profile = profileRepo.findOne(profileId, loadStdDataSet, loadOriginDataSet);
         Map<Template, MCDADocument> cdaDocuments = getCustomizedCDADocuments(profile);
 
         return convertDocument(profile, cdaDocuments, documentId);
@@ -159,10 +159,10 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     /**
      * 此类目下卫生机构定制的CDA文档列表
      */
-    private Map<Template, MCDADocument> getCustomizedCDADocuments(StructuredProfile profile) {
+    private Map<Template, MCDADocument> getCustomizedCDADocuments(FullWeightProfile profile) {
         // 使用CDA类别关键数据元映射，取得与此档案相关联的CDA类别ID
         String cdaType = null;
-        for (StructuredDataSet dataSet : profile.getDataSets()) {
+        for (FullWeightDataSet dataSet : profile.getFullWeightDataSets()) {
             if (cdaDocumentOptions.isPrimaryDataSet(dataSet.getCode())) {
                 cdaType = cdaDocumentOptions.getCdaDocumentTypeId(dataSet.getCode());
                 break;
@@ -185,7 +185,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return cdaDocuments;
     }
 
-    private MProfile convertProfile(StructuredProfile profile) {
+    private MProfile convertProfile(FullWeightProfile profile) {
         MProfile mProfile = new MProfile();
         mProfile.setId(profile.getId());
         mProfile.setCdaVersion(profile.getCdaVersion());
@@ -223,9 +223,9 @@ public class ProfileEndPoint extends BaseRestEndPoint {
                     throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Data set of version " + profile.getCdaVersion() + " not cached in redis.");
                 }
 
-                addDataset(profile.getCdaVersion(), document, profile.getDataSet(dataSetCode));
+                addDataset(profile.getCdaVersion(), document, profile.getFullWeightDataSet(dataSetCode));
 
-                addDataset(profile.getCdaVersion(), document, profile.getDataSet(DataSetTableOption.originDataSetCode(dataSetCode)));
+                addDataset(profile.getCdaVersion(), document, profile.getFullWeightDataSet(DataSetTableOption.originDataSetCode(dataSetCode)));
 
                 if (!validDocument) validDocument = !dataSetCode.startsWith("HDSA00_01");
             }
@@ -236,7 +236,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return mProfile;
     }
 
-    private MProfileDocument convertDocument(StructuredProfile profile, Map<Template, MCDADocument> cdaDocuments, String documentId) {
+    private MProfileDocument convertDocument(FullWeightProfile profile, Map<Template, MCDADocument> cdaDocuments, String documentId) {
         for (Template template : cdaDocuments.keySet()) {
             MCDADocument cdaDocument = cdaDocuments.get(template);
             if (!cdaDocument.getId().equals(documentId)) continue;
@@ -258,9 +258,9 @@ public class ProfileEndPoint extends BaseRestEndPoint {
                     throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Data set of version " + profile.getCdaVersion() + " not cached in redis.");
                 }
 
-                addDataset(profile.getCdaVersion(), document, profile.getDataSet(dataSetCode));
+                addDataset(profile.getCdaVersion(), document, profile.getFullWeightDataSet(dataSetCode));
 
-                addDataset(profile.getCdaVersion(), document, profile.getDataSet(DataSetTableOption.originDataSetCode(dataSetCode)));
+                addDataset(profile.getCdaVersion(), document, profile.getFullWeightDataSet(DataSetTableOption.originDataSetCode(dataSetCode)));
             }
 
             return document;
@@ -269,7 +269,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return null;
     }
 
-    private void addDataset(String version, MProfileDocument document, StructuredDataSet dataSet) {
+    private void addDataset(String version, MProfileDocument document, FullWeightDataSet dataSet) {
         if (dataSet != null) {
             String dataSetCode = DataSetTableOption.standardDataSetCode(dataSet.getCode());
 

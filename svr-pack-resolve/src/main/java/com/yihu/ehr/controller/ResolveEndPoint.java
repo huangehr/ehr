@@ -9,9 +9,10 @@ import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.feign.XPackageMgrClient;
 import com.yihu.ehr.model.packs.MPackage;
+import com.yihu.ehr.profile.core.commons.StructuredProfileModel;
 import com.yihu.ehr.profile.core.lightweight.LightWeightProfile;
 import com.yihu.ehr.profile.core.nostructured.NoStructuredProfile;
-import com.yihu.ehr.profile.core.structured.StructuredProfile;
+import com.yihu.ehr.profile.core.structured.FullWeightProfile;
 import com.yihu.ehr.profile.persist.repo.ProfileRepository;
 import com.yihu.ehr.service.LightWeightPackageResolver;
 import com.yihu.ehr.common.PackageUtil;
@@ -86,18 +87,15 @@ public class ResolveEndPoint {
 
         String zipFile = downloadTo(pack.getRemotePath());
 
-        //三种档案
-        StructuredProfile structuredProfile;           //结构化档案
-        NoStructuredProfile noStructuredProfile;       //非结构化档案
-        LightWeightProfile lightWeightProfile;         //轻量级档案
-
+        StructuredProfileModel structuredProfileModel = null;           //结构化档案
+        NoStructuredProfile noStructuredProfile;                        //非结构化档案
         ProfileType profileType = packageUtil.getProfileType(pack, zipFile);
-        if (profileType == ProfileType.Structured) {
-            structuredProfile = structuredPackageResolver.doResolve(pack, zipFile);
-            profileRepo.saveStructuredProfile(structuredProfile);
+        if (profileType == ProfileType.FullWeight) {
+            structuredProfileModel = structuredPackageResolver.doResolve(pack, zipFile);
+            profileRepo.saveStructuredProfileModel(structuredProfileModel);
             packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
-                    "Identity: " + structuredProfile.getDemographicId() + ", structuredProfile: " + structuredProfile.getId());
-            return new ResponseEntity<>(echo ? objectMapper.writeValueAsString(structuredProfile) : "", HttpStatus.OK);
+                    "Identity: " + structuredProfileModel.getDemographicId() + ", structuredProfile: " + structuredProfileModel.getId());
+            return new ResponseEntity<>(echo ? objectMapper.writeValueAsString(structuredProfileModel) : "", HttpStatus.OK);
         } else if (profileType == ProfileType.NoStructured) {
             noStructuredProfile = noStructuredPackageResolver.doResolve(pack, zipFile);
             profileRepo.saveUnStructuredProfile(noStructuredProfile);
@@ -105,11 +103,11 @@ public class ResolveEndPoint {
                     "Identity: " + noStructuredProfile.getDemographicId() + ", unStructuredProfile: " + noStructuredProfile.getId());
             return new ResponseEntity<>(echo ? objectMapper.writeValueAsString(noStructuredProfile) : "", HttpStatus.OK);
         } else if (profileType == ProfileType.Lightweight) {
-            lightWeightProfile = lightWeightPackageResolver.doResolve(pack, zipFile);
-            profileRepo.saveLightWeightProfile(lightWeightProfile);
+            structuredProfileModel = lightWeightPackageResolver.doResolve(pack, zipFile);
+            profileRepo.saveStructuredProfileModel(structuredProfileModel);
             packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
-                    "Identity: " + lightWeightProfile.getDemographicId() + ", lightWeightProfile: " + lightWeightProfile.getId());
-            return new ResponseEntity<>(echo ? objectMapper.writeValueAsString(lightWeightProfile) : "", HttpStatus.OK);
+                    "Identity: " + structuredProfileModel.getDemographicId() + ", lightWeightProfile: " + structuredProfileModel.getId());
+            return new ResponseEntity<>(echo ? objectMapper.writeValueAsString(structuredProfileModel) : "", HttpStatus.OK);
         }
         return null;
     }
@@ -151,30 +149,31 @@ public class ResolveEndPoint {
             pack.setArchiveStatus(ArchiveStatus.Received);
 
 
-            //三种档案
-            StructuredProfile structuredProfile;           //结构化档案
-            NoStructuredProfile noStructuredProfile;       //非结构化档案
-            LightWeightProfile lightWeightProfile;         //轻量级档案
+            StructuredProfileModel structuredProfileModel = new StructuredProfileModel();           //结构化档案
+            NoStructuredProfile noStructuredProfile;                        //非结构化档案
 
             ProfileType profileType = packageUtil.getProfileType(pack, zipFile);
-            if (profileType == ProfileType.Structured) {
-                structuredProfile = structuredPackageResolver.doResolve(pack, zipFile);
-                if(persist){
-                    profileRepo.saveStructuredProfile(structuredProfile);
-                }
-                return new ResponseEntity<>(objectMapper.writeValueAsString(structuredProfile), HttpStatus.OK);
-            } else if (profileType == ProfileType.NoStructured) {
+
+            if (profileType == ProfileType.NoStructured) {
                 noStructuredProfile = noStructuredPackageResolver.doResolve(pack, zipFile);
                 if(persist){
                     profileRepo.saveUnStructuredProfile(noStructuredProfile);
                 }
                 return new ResponseEntity<>(new ObjectMapper().writeValueAsString(noStructuredProfile), HttpStatus.OK);
             } else if (profileType == ProfileType.Lightweight) {
-                lightWeightProfile = lightWeightPackageResolver.doResolve(pack, zipFile);
+                structuredProfileModel.setProfileType(profileType);
+                structuredProfileModel = lightWeightPackageResolver.doResolve(pack, zipFile);
                 if(persist){
-                    profileRepo.saveLightWeightProfile(lightWeightProfile);
+                    profileRepo.saveStructuredProfileModel(structuredProfileModel);
                 }
-                return new ResponseEntity<>(objectMapper.writeValueAsString(lightWeightProfile), HttpStatus.OK);
+                return new ResponseEntity<>(objectMapper.writeValueAsString(structuredProfileModel), HttpStatus.OK);
+            }if (profileType == ProfileType.FullWeight) {
+                structuredProfileModel.setProfileType(profileType);
+                structuredProfileModel = structuredPackageResolver.doResolve(pack, zipFile);
+                if(persist){
+                    profileRepo.saveStructuredProfileModel(structuredProfileModel);
+                }
+                return new ResponseEntity<>(objectMapper.writeValueAsString(structuredProfileModel), HttpStatus.OK);
             }
             return null;
 

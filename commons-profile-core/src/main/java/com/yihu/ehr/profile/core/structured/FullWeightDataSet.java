@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.core.commons;
+package com.yihu.ehr.profile.core.structured;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +18,8 @@ import java.util.TreeSet;
  * @version 1.0
  * @created 2015.08.16 11:13
  */
-public class DataSet {
+public class FullWeightDataSet {
+
     private String code;
     private String name;
     private String patientId;
@@ -156,4 +157,5 @@ public class DataSet {
             return root;
         }
     }
+
 }

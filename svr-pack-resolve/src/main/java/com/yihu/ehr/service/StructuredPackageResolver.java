@@ -4,13 +4,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.common.PackageUtil;
 import com.yihu.ehr.constants.ProfileConstant;
+import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.extractor.EventExtractor;
 import com.yihu.ehr.extractor.ExtractorChain;
 import com.yihu.ehr.extractor.KeyDataExtractor;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.profile.core.commons.DataSetTableOption;
-import com.yihu.ehr.profile.core.structured.StructuredDataSet;
-import com.yihu.ehr.profile.core.structured.StructuredProfile;
+import com.yihu.ehr.profile.core.commons.StructuredProfileModel;
+import com.yihu.ehr.profile.core.structured.FullWeightDataSet;
+import com.yihu.ehr.profile.core.structured.FullWeightProfile;
 import com.yihu.ehr.profile.persist.DataSetResolverWithTranslator;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
@@ -62,71 +64,72 @@ public class StructuredPackageResolver {
      * <p>
      * ObjectMapper Stream API使用，参见：http://wiki.fasterxml.com/JacksonStreamingApi
      */
-    public StructuredProfile doResolve(MPackage pack, String zipFile) throws Exception {
+    public StructuredProfileModel doResolve(MPackage pack, String zipFile) throws Exception {
         File root = new Zipper().unzipFile(new File(zipFile), LocalTempPath + PathSep + pack.getId(), pack.getPwd());
         if (root == null || !root.isDirectory() || root.list().length == 0) {
             throw new RuntimeException("Invalid package file, package id: " + pack.getId());
         }
-        StructuredProfile structuredProfile = new StructuredProfile();          //结构化档案
+        StructuredProfileModel structuredProfileModel = new StructuredProfileModel();          //结构化档案
+        structuredProfileModel.setProfileType(ProfileType.FullWeight);
 
         File[] files = root.listFiles();
 
         for(File file:files){
             String folderName = file.getPath().substring(file.getPath().lastIndexOf("\\")+1);
-            structuredProfile = structuredDataSetParse(structuredProfile, file.listFiles(),folderName);
+            structuredProfileModel = structuredDataSetParse(structuredProfileModel, file.listFiles(),folderName);
         }
 
-        makeEventSummary(structuredProfile);
+        makeEventSummary(structuredProfileModel);
 
         houseKeep(zipFile, root);
 
-        return structuredProfile;
+        return structuredProfileModel;
     }
 
 
 
     /**
      * 结构化档案包解析JSON文件中的数据。
-     * @param structuredProfile
+     * @param structuredProfileModel
      * @param files
      * @throws IOException
      */
-    public StructuredProfile structuredDataSetParse(StructuredProfile structuredProfile, File[] files, String folderName) throws ParseException, IOException {
+    public StructuredProfileModel structuredDataSetParse(StructuredProfileModel structuredProfileModel, File[] files, String folderName) throws ParseException, IOException {
         for (File file : files) {
             String lastName = folderName.substring(folderName.lastIndexOf("\\")+1);
-            StructuredDataSet dataSet = generateDataSet(file, lastName.equals(ProfileConstant.OriFolder) ? true :false);
+            FullWeightDataSet dataSet = generateDataSet(file, lastName.equals(ProfileConstant.OriFolder) ? true :false);
 
             // 原始数据存储在表"数据集代码_ORIGIN"
             String dataSetTable = lastName.equals(ProfileConstant.OriFolder) ? DataSetTableOption.originDataSetCode(dataSet.getCode()) : dataSet.getCode();
-            structuredProfile.addDataSet(dataSetTable, dataSet);
-            structuredProfile.setPatientId(dataSet.getPatientId());
-            structuredProfile.setEventNo(dataSet.getEventNo());
-            structuredProfile.setOrgCode(dataSet.getOrgCode());
-            structuredProfile.setCdaVersion(dataSet.getCdaVersion());
+            structuredProfileModel.addFullWeightDataSet(dataSetTable, dataSet);
+            structuredProfileModel.setPatientId(dataSet.getPatientId());
+            structuredProfileModel.setEventNo(dataSet.getEventNo());
+            structuredProfileModel.setOrgCode(dataSet.getOrgCode());
+            structuredProfileModel.setCdaVersion(dataSet.getCdaVersion());
 
             dataSet.setCode(dataSetTable);
 
             // Extract key data from data set if exists
             if (!lastName.equals(ProfileConstant.OriFolder)) {
-                if (structuredProfile.getCardId().length() == 0) {
+                if (structuredProfileModel.getCardId().length() == 0) {
                     Object object = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.CardInfo);
                     if (null != object) {
                         Properties properties = (Properties) object;
-                        structuredProfile.setCardId(properties.getProperty("CardNo"));
+                        structuredProfileModel.setCardId(properties.getProperty("CardNo"));
                     }
                 }
 
-                if (StringUtils.isEmpty(structuredProfile.getDemographicId())) {
-                    structuredProfile.setDemographicId((String) extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.DemographicInfo));
+                if (StringUtils.isEmpty(structuredProfileModel.getDemographicId())) {
+                    structuredProfileModel.setDemographicId((String) extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.DemographicInfo));
                 }
 
-                if (structuredProfile.getEventDate() == null) {
-                    structuredProfile.setEventDate((Date) extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.EventDate));
+                if (structuredProfileModel.getEventDate() == null) {
+                    structuredProfileModel.setEventDate((Date) extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.EventDate));
                 }
             }
-            structuredProfile.addDataSet(dataSet.getCode(), dataSet);
+            structuredProfileModel.addFullWeightDataSet(dataSet.getCode(), dataSet);
         }
-        return structuredProfile;
+        return structuredProfileModel;
 
     }
 
@@ -139,12 +142,12 @@ public class StructuredPackageResolver {
      * @return
      * @throws IOException
      */
-    public StructuredDataSet generateDataSet(File jsonFile, boolean isOrigin) throws IOException {
+    public FullWeightDataSet generateDataSet(File jsonFile, boolean isOrigin) throws IOException {
         JsonNode jsonNode = objectMapper.readTree(jsonFile);
         if (jsonNode.isNull()) {
             throw new IOException("Invalid json file when generate data set");
         }
-        StructuredDataSet dataSet = dataSetResolverWithTranslator.parseStructuredJsonDataSet(jsonNode, isOrigin);
+        FullWeightDataSet dataSet = dataSetResolverWithTranslator.parseStructuredJsonDataSet(jsonNode, isOrigin);
         return dataSet;
     }
 
@@ -152,22 +155,22 @@ public class StructuredPackageResolver {
     /**
      * 根据此次的数据产生一个健康事件，并更新数据集的行ID.
      *
-     * @param structuredProfile
+     * @param structuredProfileModel
      */
-    public void makeEventSummary(StructuredProfile structuredProfile) {
+    public void makeEventSummary(StructuredProfileModel structuredProfileModel) {
         EventExtractor eventExtractor = context.getBean(EventExtractor.class);
 
-        for (String dataSetTable : structuredProfile.getDataSetTables()) {
-            if (StringUtils.isEmpty(structuredProfile.getSummary()) && eventExtractor.getDataSets().containsKey(dataSetTable)) {
-                structuredProfile.setSummary(eventExtractor.getDataSets().get(dataSetTable));
+        for (String dataSetTable : structuredProfileModel.getFullWeightDataTables()) {
+            if (StringUtils.isEmpty(structuredProfileModel.getSummary()) && eventExtractor.getDataSets().containsKey(dataSetTable)) {
+                structuredProfileModel.setSummary(eventExtractor.getDataSets().get(dataSetTable));
             }
 
             int rowIndex = 0;
-            StructuredDataSet dataSet = structuredProfile.getDataSet(dataSetTable);
+            FullWeightDataSet dataSet = structuredProfileModel.getFullWeightData(dataSetTable);
             String[] rowKeys = new String[dataSet.getRecordKeys().size()];
             dataSet.getRecordKeys().toArray(rowKeys);
             for (String rowKey : rowKeys) {
-                dataSet.updateRecordKey(rowKey, structuredProfile.getId() + "$" + rowIndex++);
+                dataSet.updateRecordKey(rowKey, structuredProfileModel.getId() + "$" + rowIndex++);
             }
         }
     }

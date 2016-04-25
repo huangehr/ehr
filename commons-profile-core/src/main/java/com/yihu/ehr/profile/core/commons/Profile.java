@@ -27,7 +27,7 @@ public class Profile {
     private String summary;                             // 档案摘要
     private Date createDate;                            // 包创建时间
     private String cdaVersion;
-    private String profileType;                         // 档案类型
+//    private String profileType;                         // 档案类型
 
     public Profile() {
         this.cardId = "";
@@ -136,14 +136,6 @@ public class Profile {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
-    }
-
-    public String getProfileType() {
-        return profileType;
-    }
-
-    public void setProfileType(String profileType) {
-        this.profileType = profileType;
     }
 
     public String jsonFormat() {

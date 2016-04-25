@@ -1,6 +1,6 @@
 package com.yihu.ehr.extractor;
 
-import com.yihu.ehr.profile.core.structured.StructuredDataSet;
+import com.yihu.ehr.profile.core.structured.FullWeightDataSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -28,7 +28,7 @@ public class ExtractorChain {
         extractors[2] = context.getBean(CardInfoExtractor.class);
     }
 
-    public Object doExtract(StructuredDataSet dataSet, KeyDataExtractor.Filter filter) throws ParseException {
+    public Object doExtract(FullWeightDataSet dataSet, KeyDataExtractor.Filter filter) throws ParseException {
         for (KeyDataExtractor extractor : extractors){
             Object data = extractor.extract(dataSet, filter);
             if (data != null) return data;

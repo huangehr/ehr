@@ -44,6 +44,23 @@ public class DataSetTableOption {
         }
     }
 
+
+    // 列
+    public enum ExtensionQualifier {
+        //机构健康档案url
+        Url("url");
+
+        private String qualifier;
+
+        ExtensionQualifier(String qualifier) {
+            this.qualifier = qualifier;
+        }
+
+        public String toString() {
+            return qualifier;
+        }
+    }
+
     /**
      * 获取列族。
      *
@@ -71,6 +88,10 @@ public class DataSetTableOption {
             };
         } else if (family == Family.MetaData){
             return null;
+        }else if(family == Family.Extension){
+            return new String[]{
+                    ExtensionQualifier.Url.toString()
+            };
         }
 
         return null;

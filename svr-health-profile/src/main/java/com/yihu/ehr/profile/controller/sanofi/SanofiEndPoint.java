@@ -7,8 +7,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.lang.SpringContext;
-import com.yihu.ehr.profile.core.structured.StructuredDataSet;
-import com.yihu.ehr.profile.core.structured.StructuredProfile;
+import com.yihu.ehr.profile.core.structured.FullWeightDataSet;
+import com.yihu.ehr.profile.core.structured.FullWeightProfile;
 import com.yihu.ehr.profile.persist.repo.ProfileRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -133,13 +133,13 @@ public class SanofiEndPoint {
 
         List<Demographic> demographics = searchProfile(demographicId, name, telephone, gender, birthday, since, to);
 
-        List<StructuredProfile> profiles = new ArrayList<>();
+        List<FullWeightProfile> profiles = new ArrayList<>();
         for (Demographic demographic : demographics) {
-            StructuredProfile structedProfile = profileRepo.findOne(demographic.getProfileId(), false, false);
+            FullWeightProfile structedProfile = profileRepo.findOne(demographic.getProfileId(), false, false);
             profiles.add(structedProfile);
         }
 
-        for (StructuredProfile profile : profiles) {
+        for (FullWeightProfile profile : profiles) {
             ObjectNode section = objectMapper.createObjectNode();
             convert(section, profile);
 
@@ -178,13 +178,13 @@ public class SanofiEndPoint {
         return page.getContent();
     }
 
-    private void convert(ObjectNode document, StructuredProfile profile) throws IOException {
+    private void convert(ObjectNode document, FullWeightProfile profile) throws IOException {
         JsonNode section;
-        StructuredDataSet dataSet;
+        FullWeightDataSet dataSet;
         String[] innerCodes;
 
         // 人口学信息
-        dataSet = profile.getDataSet("HDSA00_01");
+        dataSet = profile.getFullWeightDataSet("HDSA00_01");
         if (dataSet.getRecordKeys().size() > 0){
             section = document.with("demographic_info");
             innerCodes = new String[]{
@@ -197,7 +197,7 @@ public class SanofiEndPoint {
         }
 
         // 住院护理体征记录
-        dataSet = profile.getDataSet("HDSD00_08");
+        dataSet = profile.getFullWeightDataSet("HDSD00_08");
         if (dataSet != null && dataSet.getRecordKeys().size() > 0){
             section = document.withArray("physical_exam");
             innerCodes = new String[]{
@@ -211,7 +211,7 @@ public class SanofiEndPoint {
         }
 
         // 检验
-        dataSet = profile.getDataSet("HDSD02_03");
+        dataSet = profile.getFullWeightDataSet("HDSD02_03");
         if (dataSet != null && dataSet.getRecordKeys().size() > 0){
             section = document.withArray("lis");
             innerCodes = new String[]{
@@ -228,7 +228,7 @@ public class SanofiEndPoint {
         }
 
         // 临时医嘱
-        dataSet = profile.getDataSet("HDSC02_11");
+        dataSet = profile.getFullWeightDataSet("HDSC02_11");
         if (dataSet != null && dataSet.getRecordKeys().size() > 0){
             section = document.withArray("stat_order");
             innerCodes = new String[]{
@@ -240,7 +240,7 @@ public class SanofiEndPoint {
         }
 
         // 长期医嘱
-        dataSet = profile.getDataSet("HDSC02_12");
+        dataSet = profile.getFullWeightDataSet("HDSC02_12");
         if (dataSet != null && dataSet.getRecordKeys().size() > 0){
             section = document.withArray("stand_order");
             innerCodes = new String[]{
@@ -253,8 +253,8 @@ public class SanofiEndPoint {
         }
     }
 
-    private void mergeData(JsonNode section, StructuredProfile profile, StructuredDataSet emptyDataSet, String[] innerCodes) throws IOException {
-        StructuredDataSet dataSet = profileRepo.findDataSet(profile.getCdaVersion(),
+    private void mergeData(JsonNode section, FullWeightProfile profile, FullWeightDataSet emptyDataSet, String[] innerCodes) throws IOException {
+        FullWeightDataSet dataSet = profileRepo.findDataSet(profile.getCdaVersion(),
                 emptyDataSet.getCode(),
                 emptyDataSet.getRecordKeys(),
                 innerCodes).getRight();

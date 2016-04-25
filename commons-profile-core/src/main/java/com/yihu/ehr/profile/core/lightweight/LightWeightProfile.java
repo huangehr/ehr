@@ -1,7 +1,8 @@
 package com.yihu.ehr.profile.core.lightweight;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.profile.core.commons.Profile;
+import com.yihu.ehr.constants.ProfileType;
+import com.yihu.ehr.profile.core.structured.FullWeightProfile;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -15,11 +16,21 @@ import java.util.Set;
  * @version 1.0
  * @created 2015.08.16 10:44
  */
-public class LightWeightProfile extends Profile {
+public class LightWeightProfile extends FullWeightProfile {
+
+    private ProfileType profileType;                         // 档案类型
 
     private Map<String, LightWeightDataSet> lightWeightDataSets = new HashMap<>();;
 
-    public Collection<LightWeightDataSet> getDataSets() {
+    public ProfileType getProfileType() {
+        return ProfileType.Lightweight;
+    }
+
+    public void setProfileType(ProfileType profileType) {
+        this.profileType = profileType;
+    }
+
+    public Collection<LightWeightDataSet> getLightWeightDataSets() {
         return lightWeightDataSets.values();
     }
 
