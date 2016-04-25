@@ -75,9 +75,9 @@ public class SanofiEndPoint {
 
         if (profileIndices == null) return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
 
-        List<StructuredProfile> profiles = new ArrayList<>();
+        List<FullWeightProfile> profiles = new ArrayList<>();
         for (ProfileIndices indices : profileIndices.getContent()) {
-            StructuredProfile structedProfile = profileRepo.findOne(indices.getProfileId(), false, false);
+            FullWeightProfile structedProfile = profileRepo.findOne(indices.getProfileId(), false, false);
             profiles.add(structedProfile);
         }
 
@@ -85,15 +85,6 @@ public class SanofiEndPoint {
 
         ObjectMapper objectMapper = SpringContext.getService("objectMapper");
         ArrayNode document = objectMapper.createArrayNode();
-
-        List<Demographic> demographics = searchProfile(demographicId, name, telephone, gender, birthday, since, to);
-
-        List<FullWeightProfile> profiles = new ArrayList<>();
-        for (Demographic demographic : demographics) {
-            FullWeightProfile structedProfile = profileRepo.findOne(demographic.getProfileId(), false, false);
-            profiles.add(structedProfile);
-        }
-
         for (FullWeightProfile profile : profiles) {
             ObjectNode section = objectMapper.createObjectNode();
             convert(section, profile);
