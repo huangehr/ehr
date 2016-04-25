@@ -1,6 +1,6 @@
 package com.yihu.ehr.profile.core.lightweight;
 
-import com.yihu.ehr.profile.core.commons.DataSet;
+import com.yihu.ehr.profile.core.structured.FullWeightDataSet;
 
 /**
  * 档案数据集。
@@ -9,14 +9,15 @@ import com.yihu.ehr.profile.core.commons.DataSet;
  * @version 1.0
  * @created 2015.08.16 11:13
  */
-public class LightWeightDataSet extends DataSet{
-    private String remotePath;
+public class LightWeightDataSet extends FullWeightDataSet {
+    //机构健康档案Url
+    private String url;
 
-    public String getRemotePath() {
-        return remotePath;
+    public String getUrl() {
+        return url;
     }
 
-    public void setRemotePath(String remotePath) {
-        this.remotePath = remotePath;
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

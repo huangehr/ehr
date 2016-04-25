@@ -1,7 +1,7 @@
 package com.yihu.ehr.profile.persist;
 
 import com.yihu.ehr.cache.CacheReader;
-import com.yihu.ehr.profile.core.structured.DataSetResolver;
+import com.yihu.ehr.profile.core.commons.DataSetResolver;
 import com.yihu.ehr.profile.core.commons.QualifierTranslator;
 import com.yihu.ehr.schema.StdKeySchema;
 import com.yihu.ehr.util.log.LogService;
