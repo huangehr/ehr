@@ -81,5 +81,6 @@ public interface TemplateClient {
     @RequestMapping(value = ServiceApi.ProfileTemplate.TemplateTitleExistence, method = RequestMethod.GET)
     boolean isNameExist(
             @RequestParam(value = "version") String version,
-            @RequestParam(value = "title") String title);
+            @RequestParam(value = "title") String title,
+            @RequestParam(value = "org_code") String orgCode);
 }
