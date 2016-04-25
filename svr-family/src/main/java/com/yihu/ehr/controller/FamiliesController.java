@@ -52,7 +52,7 @@ public class FamiliesController extends BaseRestController {
         //过滤条件为空
         if(StringUtils.isEmpty(filters))
         {
-            Page<Families> families = familiesService.getFamilies(sorts,page,size);
+            Page<Families> families = familiesService.getFamilies(sorts,reducePage(page),size);
             pagedResponse(request,response,families.getTotalElements(),page,size);
             return convertToModels(families.getContent(),new ArrayList<>(families.getNumber()),MFamilies.class,fields);
         }
