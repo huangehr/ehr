@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.agModel.standard.standardsource.StdSourceDetailModel;
 import com.yihu.ehr.agModel.standard.standardsource.StdSourceModel;
+import com.yihu.ehr.agModel.standard.standardversion.StdVersionModel;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.std.service.StandardSourceClient;
+import com.yihu.ehr.model.standard.*;
+import com.yihu.ehr.std.service.*;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.standard.MStdSource;
 import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.HttpClientUtil;
 import com.yihu.ehr.util.controller.BaseController;
 import com.yihu.ehr.util.operator.DateUtil;
 import io.swagger.annotations.ApiOperation;
@@ -19,10 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by yww on 2016/3/1.
@@ -35,13 +34,25 @@ public class StandardSourceController extends BaseController {
     private StandardSourceClient stdSourcrClient;
 
     @Autowired
+    private CDAVersionClient cdaVersionClient;
+
+    @Autowired
+    private DictClient dictClient;
+
+    @Autowired
+    private DataSetClient dataSetClient;
+
+    @Autowired
+    private CDAClient cdaClient;
+
+    @Autowired
     private ConventionalDictEntryClient conDictEntryClient;
 
     @Autowired
     private ObjectMapper objectMapper;
 
 
-    List<StdSourceModel> getStdSourceModel(Collection<MStdSource> stdSources){
+    List<StdSourceModel> getStdSourceModel(Collection<MStdSource> stdSources) {
         List<StdSourceModel> sourcrModelList = new ArrayList<>();
         for (MStdSource stdSource : stdSources) {
             StdSourceModel sourceModel = convertToModel(stdSource, StdSourceModel.class);
@@ -69,7 +80,7 @@ public class StandardSourceController extends BaseController {
             @RequestParam(value = "page", required = false) int page) throws Exception {
         ResponseEntity<Collection<MStdSource>> responseEntity = stdSourcrClient.searchSources(fields, filters, sorts, size, page);
         Collection<MStdSource> stdSources = responseEntity.getBody();
-        List<StdSourceModel> sourcrModelList  = getStdSourceModel(stdSources);
+        List<StdSourceModel> sourcrModelList = getStdSourceModel(stdSources);
         int totalCount = getTotalCount(responseEntity);
         return getResult(sourcrModelList, totalCount, page, size);
     }
@@ -114,14 +125,13 @@ public class StandardSourceController extends BaseController {
      */
     private StdSourceDetailModel convertToStdSourceDetailModel(MStdSource mStdSource) {
 
-        if(mStdSource==null)
-        {
+        if (mStdSource == null) {
             return null;
         }
 
         StdSourceDetailModel sourceDetailModel = convertToModel(mStdSource, StdSourceDetailModel.class);
         sourceDetailModel.setCreateDate(DateToString(mStdSource.getCreateDate(), AgAdminConstants.DateTimeFormat));
-        sourceDetailModel.setUpdateDate(DateToString(mStdSource.getUpdateDate(),AgAdminConstants.DateTimeFormat));
+        sourceDetailModel.setUpdateDate(DateToString(mStdSource.getUpdateDate(), AgAdminConstants.DateTimeFormat));
         //标准来源类型字典
         MConventionalDict sourcerTypeDict = conDictEntryClient.getStdSourceType(mStdSource.getSourceType());
         sourceDetailModel.setSourceValue(sourcerTypeDict == null ? "" : sourcerTypeDict.getValue());
@@ -151,13 +161,11 @@ public class StandardSourceController extends BaseController {
             return failed(errorMsg);
         }
         MStdSource mStdSourceOld = stdSourcrClient.getStdSource(sourceDetailModel.getId());
-        if(mStdSourceOld==null)
-        {
+        if (mStdSourceOld == null) {
             return failed("标准来源不存在,请确认!");
         }
-        if(!mStdSourceOld.getCode().equals(sourceDetailModel.getCode())
-                &&stdSourcrClient.isCodeExist(sourceDetailModel.getCode()))
-        {
+        if (!mStdSourceOld.getCode().equals(sourceDetailModel.getCode())
+                && stdSourcrClient.isCodeExist(sourceDetailModel.getCode())) {
             return failed("代码已存在!");
         }
 
@@ -192,8 +200,7 @@ public class StandardSourceController extends BaseController {
         if (StringUtils.isNotEmpty(errorMsg)) {
             return failed(errorMsg);
         }
-        if(stdSourcrClient.isCodeExist(sourceDetailModel.getCode()))
-        {
+        if (stdSourcrClient.isCodeExist(sourceDetailModel.getCode())) {
             return failed("代码已存在!");
         }
 
@@ -210,12 +217,60 @@ public class StandardSourceController extends BaseController {
 
     @RequestMapping(value = "/sources", method = RequestMethod.DELETE)
     @ApiOperation(value = "通过id组删除标准来源，多个id以,分隔")
-    public boolean delStdSources(
+    public Envelop delStdSources(
             @ApiParam(name = "ids", value = "标准来源编号", defaultValue = "")
             @RequestParam(value = "ids") String ids) throws Exception {
 
-        return stdSourcrClient.delStdSources(ids);
+        Envelop envelop = new Envelop();
+        envelop = isDeleteStdSource(ids);
+        if (!envelop.isSuccessFlg())
+            return envelop;
+        boolean bo = stdSourcrClient.delStdSources(ids);
+        if (!bo) {
+            envelop.setErrorMsg("标准来源删除失败");
+        }
+        envelop.setSuccessFlg(bo);
+        return envelop;
+    }
 
+    public Envelop isDeleteStdSource(String id) {
+
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+
+        try {
+            //查询所有版本
+            ResponseEntity<Collection<MCDAVersion>> responseEntity = cdaVersionClient.searchCDAVersions("", "", "", 1000, 1);
+            Collection<MCDAVersion> mCdaVersions = responseEntity.getBody();
+
+            for (MCDAVersion mcdaVersion : mCdaVersions) {
+                ResponseEntity<Collection<MStdDict>> dict = dictClient.searchDict("", "sourceId=" + id, "", id.split(",").length, 1, mcdaVersion.getVersion());
+                if (dict.getBody().size() > 0) {
+                    envelop.setErrorMsg("该标准来源正在被标准字典使用，不可删除");
+                    envelop.setSuccessFlg(false);
+                    return envelop;
+                }
+
+                ResponseEntity<Collection<MStdDataSet>> dataSets = dataSetClient.searchDataSets("", "reference=" + id, "", id.split(",").length, 1, mcdaVersion.getVersion());
+                if (dataSets.getBody().size() > 0) {
+                    envelop.setErrorMsg("该标准来源正在被标准数据集使用，不可删除");
+                    envelop.setSuccessFlg(false);
+                    return envelop;
+                }
+
+                ResponseEntity<List<MCDADocument>> cdaDocument = cdaClient.GetCDADocuments("", "sourceId=" + id, "", id.split(",").length, 1, mcdaVersion.getVersion());
+                if (cdaDocument.getBody().size() > 0) {
+                    envelop.setErrorMsg("该标准来源正在被CDA文档使用，不可删除");
+                    envelop.setSuccessFlg(false);
+                    return envelop;
+                }
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return envelop;
     }
 
     @RequestMapping(value = "/source/{id}", method = RequestMethod.DELETE)
@@ -232,15 +287,13 @@ public class StandardSourceController extends BaseController {
         return stdSourcrClient.isCodeExist(code);
     }
 
-    public MStdSource convertToMStdSource(StdSourceDetailModel detailModel)
-    {
-        if(detailModel==null)
-        {
+    public MStdSource convertToMStdSource(StdSourceDetailModel detailModel) {
+        if (detailModel == null) {
             return null;
         }
-        MStdSource mStdSource = convertToModel(detailModel,MStdSource.class);
-        mStdSource.setCreateDate(StringToDate(detailModel.getCreateDate(),AgAdminConstants.DateTimeFormat));
-        mStdSource.setUpdateDate(StringToDate(detailModel.getUpdateDate(),AgAdminConstants.DateTimeFormat));
+        MStdSource mStdSource = convertToModel(detailModel, MStdSource.class);
+        mStdSource.setCreateDate(StringToDate(detailModel.getCreateDate(), AgAdminConstants.DateTimeFormat));
+        mStdSource.setUpdateDate(StringToDate(detailModel.getUpdateDate(), AgAdminConstants.DateTimeFormat));
 
         return mStdSource;
     }
