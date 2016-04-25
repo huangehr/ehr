@@ -20,7 +20,6 @@ import com.yihu.ehr.profile.service.TemplateService;
 import com.yihu.ehr.schema.OrgKeySchema;
 import com.yihu.ehr.schema.StdKeySchema;
 import com.yihu.ehr.util.controller.BaseRestEndPoint;
-import com.yihu.ehr.util.encode.Base64;
 import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.*;
 import org.apache.commons.lang.StringUtils;
@@ -104,23 +103,22 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "load_std_data_set") boolean loadStdDataSet,
             @ApiParam(value = "是否加载原始数据集", defaultValue = "false")
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws IOException, ParseException {
-        demographicId = new String(Base64.decode(demographicId));
-
-        List<ProfileIndices> profileIndices = indicesService.findByDemographicIdAndEventDateBetween(
-                demographicId, since, to);
-
-        List<FullWeightProfile> profiles = new ArrayList<>();
-        for (ProfileIndices indices : profileIndices) {
-            FullWeightProfile profile = profileRepo.findOne(indices.getRowkey(), loadStdDataSet, loadOriginDataSet);
-            profiles.add(profile);
-        }
+//        demographicId = new String(Base64.getDecoder().decode(demographicId));
+//        List<ProfileIndices> profileIndices = indicesService.findByDemographicIdAndEventDateBetween(
+//                demographicId, since, to);
+//
+//        List<FullWeightProfile> profiles = new ArrayList<>();
+//        for (ProfileIndices indices : profileIndices) {
+//            FullWeightProfile profile = profileRepo.findOne(indices.getRowkey(), loadStdDataSet, loadOriginDataSet);
+//            profiles.add(profile);
+//        }
 
         List<MProfile> profileList = new ArrayList<>();
-        for (FullWeightProfile profile : profiles) {
-            MProfile mProfile = convertProfile(profile);
-
-            profileList.add(mProfile);
-        }
+//        for (FullWeightProfile profile : profiles) {
+//            MProfile mProfile = convertProfile(profile);
+//
+//            profileList.add(mProfile);
+//        }
 
         return profileList;
     }
