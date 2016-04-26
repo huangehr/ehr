@@ -12,9 +12,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -112,14 +114,15 @@ public class IndicatorDictController extends BaseController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) Integer page){
 
-        List<MIndicatorsDict> indicatorsDictList =(List<MIndicatorsDict>)indicatorDictClient.getIndicatorsDictList(fields, filters, sorts, size, page);
         List<IndicatorsDictModel> indicatorsDictModelList = new ArrayList<>();
-
-        for (MIndicatorsDict mIndicatorsDict:indicatorsDictList){
+        ResponseEntity<Collection<MIndicatorsDict>> responseEntity = indicatorDictClient.getIndicatorsDictList(fields, filters, sorts, size, page);
+        Collection<MIndicatorsDict> mIndicatorsDicts = responseEntity.getBody();
+        Integer totalCount = getTotalCount(responseEntity);
+        for (MIndicatorsDict mIndicatorsDict:mIndicatorsDicts){
             IndicatorsDictModel indicatorsDictModel = changeToModel(mIndicatorsDict);
             indicatorsDictModelList.add(indicatorsDictModel);
         }
-        Envelop envelop = getResult(indicatorsDictModelList,0,page,size);
+        Envelop envelop = getResult(indicatorsDictModelList,totalCount,page,size);
 
         return envelop;
     }
@@ -137,11 +140,11 @@ public class IndicatorDictController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = "/dict/indicator/existence/name/{name}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/indicator/existence/name" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典名称是否已经存在")
     public Envelop isNameExists(
             @ApiParam(name = "name", value = "name", defaultValue = "")
-            @PathVariable(value = "name") String name){
+            @RequestParam(value = "name") String name){
         Envelop envelop = new Envelop();
         boolean result = indicatorDictClient.isNameExists(name);
         envelop.setSuccessFlg(result);
@@ -149,7 +152,7 @@ public class IndicatorDictController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = "/dict/indicator/existence/code/{code}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/indicator/existence/code" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典代码是否已经存在")
     public Envelop isCodeExists(
             @ApiParam(name = "code", value = "code", defaultValue = "")

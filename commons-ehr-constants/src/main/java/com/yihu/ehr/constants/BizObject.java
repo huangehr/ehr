@@ -22,7 +22,13 @@ public enum BizObject {
     Dict((short)0x0011),
     CdaType((short)0x0012),
     Families((short)0x0013),
-    Members((short)0x0014);
+    Members((short)0x0014),
+    Resources((short)0x0015),
+    Dimensions((short)0x0016),
+    DimensionsCategories((short)0x0017),
+    ResourceMetadata((short)0x0018),
+    AppResource((short)0x0019),
+    AppResourceMetadata((short)0x0020);
 
     public short getBizObject(){
         return bizObject;

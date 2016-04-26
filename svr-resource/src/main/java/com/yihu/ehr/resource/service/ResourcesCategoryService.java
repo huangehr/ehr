@@ -68,7 +68,7 @@ public class ResourcesCategoryService implements IResourcesCategoryService {
             return Result.error("包含子分类，无法删除！");
         }
         //判断是否包含资源
-        List<RsResources> rsList = resourcesDao.getResourcesByCategory(id);
+        List<RsResources> rsList = resourcesDao.findByType(id);
         if(rsList!=null && rsList.size()>0)
         {
             return Result.error("该分类包含资源，无法删除！");
