@@ -10,7 +10,7 @@
     </parent>
 
 	<artifactId>svr-oauth2</artifactId>
-	<packaging>jar</packaging>
+	<packaging>${packaging}</packaging>
 	<name>svr-oauth2</name>
 	<description>EHR OAuth2服务</description>
 

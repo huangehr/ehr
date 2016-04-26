@@ -10,7 +10,7 @@
     </parent>
 
 	<artifactId>svr-pack-resolve</artifactId>
-	<packaging>jar</packaging>
+	<packaging>${packaging}</packaging>
 	<name>svr-pack-resolve</name>
 	<description>EHR platform json package resolver</description>
 
@@ -66,6 +66,11 @@
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-data-fastdfs</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>happy.fish</groupId>
+            <artifactId>fastDFS</artifactId>
             <version>1.1.0</version>
         </dependency>
         <dependency>

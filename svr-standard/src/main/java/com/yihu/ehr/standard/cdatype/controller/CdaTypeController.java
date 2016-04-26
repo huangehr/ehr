@@ -133,7 +133,7 @@ public class CdaTypeController extends BaseRestController {
             @ApiParam(name = "model", value = "model")
             @RequestParam(value = "model") String jsonData) throws Exception {
 
-        CDAType cdaType =  new ObjectMapper().readValue(jsonData, CDAType.class);
+        CDAType cdaType =  toEntity(jsonData, CDAType.class);
         cdaType.setId(getObjectId(BizObject.CdaType));
         cdaType.setCreateDate(new Date());
         cdaType = cdaTypeManager.save(cdaType);
@@ -149,7 +149,7 @@ public class CdaTypeController extends BaseRestController {
             @ApiParam(name = "model", value = "json模型")
             @RequestParam(value = "model") String jsonData) throws Exception {
 
-        CDAType cdaType =  new ObjectMapper().readValue(jsonData, CDAType.class);
+        CDAType cdaType =  toEntity(jsonData, CDAType.class);
         cdaType.setUpdateDate(new Date());
         cdaType.setId(id);
         cdaType = cdaTypeManager.save(cdaType);

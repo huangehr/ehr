@@ -10,7 +10,7 @@
     </parent>
 
 	<artifactId>svr-special-dict</artifactId>
-	<packaging>jar</packaging>
+	<packaging>${packaging}</packaging>
 	<name>svr-special-dict</name>
 	<description>EHR platform special dict service</description>
 
