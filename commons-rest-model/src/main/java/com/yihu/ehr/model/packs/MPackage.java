@@ -18,9 +18,11 @@ public class MPackage implements Serializable {
     String message;
     String md5;
     String orgCode;
+    String clientId;
     Date receiveDate;
     Date parseDate;
     Date finishDate;
+    boolean resourced;
     ArchiveStatus archiveStatus;
 
     public ArchiveStatus getArchiveStatus() {
@@ -101,5 +103,21 @@ public class MPackage implements Serializable {
 
     public void setMd5(String md5) {
         this.md5 = md5;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    public boolean isResourced() {
+        return resourced;
+    }
+
+    public void setResourced(boolean resourced) {
+        this.resourced = resourced;
     }
 }
