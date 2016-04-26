@@ -83,6 +83,14 @@ public interface HealthProblemDictClient {
             @ApiParam(name = "dictionary", value = "字典JSON结构")
             @RequestParam(value = "dictionary") String dictJson);
 
+    @RequestMapping(value = "/dict/hp/icd10s", method = RequestMethod.POST)
+    @ApiOperation(value = "为健康问题增加ICD10疾病关联,--批量增加关联。" )
+    Collection<MHpIcd10Relation> createHpIcd10Relations(
+            @ApiParam(name = "hp_id", value = "健康问题Id")
+            @RequestParam(value = "hp_id") String hpId,
+            @ApiParam(name = "icd10_ids", value = "关联的icd10字典ids,多个以逗号连接")
+            @RequestParam(value = "icd10_ids") String icd10Ids);
+
     @RequestMapping(value = "/dict/hp/icd10", method = RequestMethod.PUT)
     @ApiOperation(value = "为健康问题修改ICD10疾病关联。" )
     MHpIcd10Relation updateHpIcd10Relation(
@@ -94,6 +102,12 @@ public interface HealthProblemDictClient {
     boolean deleteHpIcd10Relation(
             @ApiParam(name = "id", value = "关联ID", defaultValue = "")
             @RequestParam(value = "id", required = true) String id);
+
+    @RequestMapping(value = "/dict/hp/icd10s", method = RequestMethod.DELETE)
+    @ApiOperation(value = "为健康问题删除ICD10疾病关联,批量删除关联。" )
+    boolean deleteHpIcd10Relations(
+            @ApiParam(name = "ids", value = "关联IDs", defaultValue = "")
+            @RequestParam(value = "ids", required = true) String ids);
 
     @RequestMapping(value = "/dict/hp/icd10s", method = RequestMethod.GET)
     @ApiOperation(value = "根据健康问题查询相应的ICD10关联列表信息。" )
@@ -108,6 +122,12 @@ public interface HealthProblemDictClient {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page);
+
+    @RequestMapping(value = "/dict/hp/icd10s/no_paging", method = RequestMethod.GET)
+    @ApiOperation(value = "根据健康问题查询相应的ICD10关联列表信息。" )
+    ResponseEntity<Collection<MHpIcd10Relation>> getHpIcd10RelationListWithoutPaging(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters);
 
     @RequestMapping(value = "/dict/hp/icd10/existence" , method = RequestMethod.GET)
     @ApiOperation(value = "判断健康问题与ICD10的关联关系在系统中是否已存在")

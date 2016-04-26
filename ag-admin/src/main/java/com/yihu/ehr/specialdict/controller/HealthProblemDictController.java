@@ -173,6 +173,26 @@ public class HealthProblemDictController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = "/dict/hp/icd10s", method = RequestMethod.POST)
+    @ApiOperation(value = "为健康问题增加ICD10疾病关联,--批量增加关联。" )
+    public Envelop createHpIcd10Relation(
+            @ApiParam(name = "hp_id", value = "健康问题Id")
+            @RequestParam(value = "hp_id") String hpId,
+            @ApiParam(name = "icd10_ids", value = "关联的icd10字典ids,多个以逗号连接")
+            @RequestParam(value = "icd10_ids") String icd10Ids){
+        Envelop envelop = new Envelop();
+        Collection<MHpIcd10Relation> mHpIcd10Relations = hpDictClient.createHpIcd10Relations(hpId, icd10Ids);
+        List<HpIcd10RelationModel> hpIcd10RelationModels = (List<HpIcd10RelationModel>)convertToModels(mHpIcd10Relations,new ArrayList<>(),HpIcd10RelationModel.class,null);
+        if(hpIcd10RelationModels.size() != 0){
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(hpIcd10RelationModels);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("批量关联icd10字典失败！");
+        }
+        return envelop;
+    }
+
     @RequestMapping(value = "/dict/hp/icd10", method = RequestMethod.PUT)
     @ApiOperation(value = "为健康问题修改ICD10疾病关联。" )
     public Envelop updateHpIcd10Relation(
@@ -205,6 +225,18 @@ public class HealthProblemDictController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = "/dict/hp/icd10s", method = RequestMethod.DELETE)
+    @ApiOperation(value = "为健康问题删除ICD10疾病关联---批量删除。" )
+    public Envelop deleteHpIcd10Relations(
+            @ApiParam(name = "ids", value = "关联IDs", defaultValue = "")
+            @RequestParam(value = "ids", required = true) String ids){
+
+        Envelop envelop = new Envelop();
+        boolean bo = hpDictClient.deleteHpIcd10Relations(ids);
+        envelop.setSuccessFlg(bo);
+        return envelop;
+    }
+
     @RequestMapping(value = "/dict/hp/icd10s", method = RequestMethod.GET)
     @ApiOperation(value = "根据健康问题查询相应的ICD10关联列表信息。" )
     public Envelop getHpIcd10RelationList(
@@ -227,8 +259,25 @@ public class HealthProblemDictController extends BaseController {
             HpIcd10RelationModel hpIcd10RelationModel = convertToModel(mHpIcd10Relation,HpIcd10RelationModel.class);
             hpIcd10RelationModelList.add(hpIcd10RelationModel);
         }
-        Envelop envelop = getResult(hpIcd10RelationModelList,0,page,size);
+        Envelop envelop = getResult(hpIcd10RelationModelList,totalCount,page,size);
+        return envelop;
+    }
 
+    @RequestMapping(value = "/dict/hp/icd10s/no_paging", method = RequestMethod.GET)
+    @ApiOperation(value = "根据健康问题查询相应的ICD10关联列表信息.--不分页。" )
+    public Envelop getHpIcd10RelationListWithoutPaging(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters){
+        Envelop envelop = new Envelop();
+        List<HpIcd10RelationModel> hpIcd10RelationModelList = new ArrayList<>();
+        ResponseEntity<Collection<MHpIcd10Relation>> responseEntity = hpDictClient.getHpIcd10RelationListWithoutPaging(filters);
+        Collection<MHpIcd10Relation> mHpIcd10Relations  = responseEntity.getBody();
+        for (MHpIcd10Relation mHpIcd10Relation:mHpIcd10Relations){
+            HpIcd10RelationModel hpIcd10RelationModel = convertToModel(mHpIcd10Relation,HpIcd10RelationModel.class);
+            hpIcd10RelationModelList.add(hpIcd10RelationModel);
+        }
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(hpIcd10RelationModelList);
         return envelop;
     }
 

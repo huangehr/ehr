@@ -2,6 +2,7 @@ package com.yihu.ehr.dict.service;
 
 import com.yihu.ehr.query.BaseJpaService;
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -54,6 +55,18 @@ public class HpIcd10RelationService extends BaseJpaService<HpIcd10Relation, XHpI
             return false;
         }
         return true;
+    }
+
+    /**
+     * 根据ID删除标准来源
+     *
+     * @param ids
+     */
+    public int delete(String[] ids) {
+        String hql = "DELETE FROM HpIcd10Relation WHERE id in (:ids)";
+        Query query = currentSession().createQuery(hql);
+        query.setParameterList("ids", ids);
+        return query.executeUpdate();
     }
 
 }
