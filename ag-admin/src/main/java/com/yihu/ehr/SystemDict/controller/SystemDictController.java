@@ -152,7 +152,7 @@ public class SystemDictController extends BaseController {
                 return failed("名称已存在!");
             }
             systemDict = convertToMSystemDict(systemDictModel);
-            systemDict = systemDictClient.updateDictionary(toString(systemDict));
+            systemDict = systemDictClient.updateDictionary(objectMapper.writeValueAsString(systemDict));
             systemDictModel = convertToSysDictModel(systemDict);
 
             if (systemDictModel == null) {
