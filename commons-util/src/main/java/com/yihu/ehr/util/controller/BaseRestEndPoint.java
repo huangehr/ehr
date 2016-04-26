@@ -57,7 +57,7 @@ public class BaseRestEndPoint extends AbstractController {
 
     public <T> T toEntity(String json, Class<T> entityCls) {
         try {
-            T entity = objectMapper.readValue(json, entityCls);
+            T entity = objectMapper.readValue(json.replace(" ","+"), entityCls);
             return entity;
         } catch (IOException ex) {
             throw new ApiException(ErrorCode.SystemError, "Unable to parse json, " + ex.getMessage());
