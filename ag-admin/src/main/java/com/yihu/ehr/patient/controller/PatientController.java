@@ -144,8 +144,9 @@ public class PatientController extends BaseController {
 
         MDemographicInfo demographicInfo = patientClient.getPatient(idCardNo);
         if (!StringUtils.isEmpty(demographicInfo.getPicPath())) {
-            Map<String, String> map = toEntity(demographicInfo.getPicPath(), Map.class);
-            String localPath = patientClient.downloadPicture(map.get("groupName"), map.get("remoteFileName"));
+//            Map<String, String> map = toEntity(demographicInfo.getPicPath(), Map.class);
+            String imagePath[] = demographicInfo.getPicPath().split(":");
+            String localPath = patientClient.downloadPicture(imagePath[0], imagePath[1]);
             demographicInfo.setLocalPath(localPath);
         }
 
