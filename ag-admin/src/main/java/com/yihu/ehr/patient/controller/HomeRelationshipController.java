@@ -2,6 +2,7 @@ package com.yihu.ehr.patient.controller;
 
 import com.yihu.ehr.agModel.patient.HomeGroupModel;
 import com.yihu.ehr.agModel.patient.HomeRelationshipModel;
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.family.MFamilies;
 import com.yihu.ehr.model.family.MMembers;
@@ -140,7 +141,8 @@ public class HomeRelationshipController extends BaseController {
             relationshipModel.setAge(info==null?"0":String.valueOf(getAgeByBirthday(info.getBirthday())));
             relationshipModel.setName(info==null?"0":info.getName());
         }
-       // relationshipModel.setRelationTime();
+
+        relationshipModel.setRelationTime(DateToString(mMembers.getCreateDate(), AgAdminConstants.DateFormat));
         //TODO：获取关系字典信息
 
 
@@ -157,7 +159,7 @@ public class HomeRelationshipController extends BaseController {
             MDemographicInfo info =patientClient.getPatient(mFamilies.getHouseholderIdCardNo());
             groupModel.setName(info==null?"0":info.getName());
         }
-        groupModel.setCreateTime(groupModel.getCreateTime());
+        groupModel.setCreateTime(DateToString(mFamilies.getCreateDate(), AgAdminConstants.DateFormat));
         String filters="familyId="+mFamilies.getId()+";idCardNo="+idCardNo;
         List<MMembers> mMemberses = (List<MMembers>)membersClient.searchMembers("", filters, "", 15, 1).getBody();
         if(mMemberses!=null && mMemberses.size()>0)
