@@ -53,6 +53,16 @@ public class ResourceMetadataService extends BaseJpaService<RsResourceMetadata,R
     }
 
     /*
+     *根据资源ID删除资源数据元
+     *
+     * @param id 资源数据元ID
+     */
+    public void deleteRsMetadataByResourceId(String resourceId)
+    {
+        rsMetadataDao.deleteByResourcesId(resourceId);
+    }
+
+    /*
      *资源数据元获取
      *
      * @param sorts 排序
