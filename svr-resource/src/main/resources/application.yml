@@ -10,7 +10,10 @@ info:
     description: Resource service.
     version: 1.0.0
 
-
+hadoop:
+  hbase-properties:
+    - hbase.zookeeper.property.clientPort: 2181
+    - zookeeper.znode.parent: /hbase-unsecure
 
 logging:
   level:
@@ -32,25 +35,43 @@ spring:
   profiles: dev
   redis:
     host: 192.168.1.220 # Redis server host.
+  data:
+    solr:
+      zk-host: node1.jkzldev.com,node2.jkzldev.com,node4.jkzldev.com:2181/solr
 data-source:
   url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
   user-name: ha
   password: ha
+hadoop:
+  hbase-properties:
+    - hbase.zookeeper.quorum: node2.jkzldev.com,node1.jkzldev.com,node4.jkzldev.com
 ---
 spring:
   profiles: test
   redis:
     host: 172.19.103.47 # Redis server host.
+  data:
+    solr:
+      zk-host: node1.jkzldev.com,node2.jkzldev.com,node4.jkzldev.com:2181/solr
 data-source:
   url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
   user-name: weifuwu
   password: weifuwu
+hadoop:
+  hbase-properties:
+    - hbase.zookeeper.quorum: node2.jkzldev.com,node1.jkzldev.com,node4.jkzldev.com
 ---
 spring:
   profiles: prod
   redis:
     host: 11.1.2.20 # Redis server host.
+  data:
+    solr:
+      zk-host: node1.jkzldev.com,node2.jkzldev.com,node4.jkzldev.com:2181/solr
 data-source:
   url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
   user-name: ha
   password: jkzlxm
+hadoop:
+  hbase-properties:
+    - hbase.zookeeper.quorum: node2.jkzl.com,node3.jkzl.com,node1.jkzl.com
