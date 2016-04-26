@@ -7,5 +7,5 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  * Created by lyr on 2016/4/25.
  */
 public interface ResourceMetadataDao extends PagingAndSortingRepository<RsResourceMetadata,String>{
-
+    void deleteByResourcesId(String resourcesId);
 }

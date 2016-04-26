@@ -2,6 +2,7 @@ package com.yihu.ehr.resource.service;
 
 
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.resource.dao.ResourceMetadataDao;
 import com.yihu.ehr.resource.dao.ResourcesDao;
 import com.yihu.ehr.resource.model.RsResources;
 import com.yihu.ehr.resource.service.intf.IResourcesService;
@@ -9,9 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 
 /**
@@ -22,9 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class ResourcesService extends BaseJpaService<RsResources, ResourcesDao> implements IResourcesService {
     @Autowired
     private ResourcesDao rsDao;
+    @Autowired
+    private ResourceMetadataDao rsMetadataDao;
 
     /*
-     *资源创建
+     * 资源创建
      *
      * @param resource 资源实体
      * @return RsResources 资源实体
@@ -36,7 +40,7 @@ public class ResourcesService extends BaseJpaService<RsResources, ResourcesDao> 
     }
 
     /*
-     *资源更新
+     * 资源更新
      *
      * @param resource 资源实体
      */
@@ -46,17 +50,18 @@ public class ResourcesService extends BaseJpaService<RsResources, ResourcesDao> 
     }
 
     /*
-     *资源删除
+     * 资源删除
      *
      * @param id 资源ID
      */
     public void deleteResource(String id)
     {
+        rsMetadataDao.deleteByResourcesId(id);
         rsDao.delete(id);
     }
 
     /*
-     *资源获取
+     * 资源获取
      *
      * @param sorts 排序
      * @param page 页码

@@ -1,42 +1,237 @@
 package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.resource.service.intf.IResourcesService;
+import com.yihu.ehr.constants.BizObject;
+import com.yihu.ehr.resource.model.RsAppResource;
+import com.yihu.ehr.resource.model.RsAppResourceMetadata;
+import com.yihu.ehr.resource.service.intf.IResourceGrantService;
+import com.yihu.ehr.resource.service.intf.IResourceMetadataGrantService;
+import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
- * Created by hzp on 2016/4/13.
+ * Created by lyr on 2016/4/26.
  */
 
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0 + "/rs/grant")
-@Api(value = "rsGrant", description = "资源授权服务接口")
-public class ResourcesGrantController {
+@RequestMapping(value = ApiVersion.Version1_0 + "/resource/grants")
+@Api(value = "resourceGrant", description = "资源授权服务接口")
+public class ResourcesGrantController extends BaseRestController{
     @Autowired
-    private IResourcesService resourceService;
+    private IResourceGrantService rsGrantService;
+    @Autowired
+    private IResourceMetadataGrantService rsMetadataGrantService;
 
+    @ApiOperation("资源授权单个应用")
+    @RequestMapping(value="/{resourceId}",method = RequestMethod.POST)
+    public RsAppResource grantResource(
+            @ApiParam(name="resourceId",value="资源ID",defaultValue = "")
+            @PathVariable(value="resourceId") String resourceId,
+            @ApiParam(name="appId",value="资源ID",defaultValue = "")
+            @RequestParam(name="appId") String appId) throws Exception
+    {
+        RsAppResource appRs = new RsAppResource();
 
+        appRs.setId(getObjectId(BizObject.AppResource));
+        appRs.setAppId(appId);
+        appRs.setResourceId(resourceId);
 
-    /**
-     *获取某数据集数据
-     */
-    @ApiOperation("获取某数据集数据")
-    @RequestMapping(value = "/getDataset", method = RequestMethod.GET)
-    public String getDataset(@ApiParam("datasetCode") @RequestParam(value = "datasetCode", required = true) String datasetCode,@ApiParam("orgCode") @RequestParam(value = "orgCode", required = true) String orgCode,
-                                 @ApiParam("systemCode") @RequestParam(value = "systemCode", required = true) String systemCode) {
-        try {
-            //判断是否有权限
+        rsGrantService.grantResource(appRs);
+        return appRs;
+    }
 
-            return "";//resourceService.getDataset(datasetCode,orgCode);
-        } catch (Exception e) {
-            return "";
+    @ApiOperation("资源授权多个应用")
+    @RequestMapping(value="/{resourceId}/batch",method = RequestMethod.POST)
+    public Collection<RsAppResource> grantResourceMany(
+            @ApiParam(name="resourceId",value="资源ID",defaultValue = "")
+            @PathVariable(value="resourceId") String resourceId,
+            @ApiParam(name="appId",value="资源ID",defaultValue = "")
+            @RequestParam(name="appId") String appId) throws Exception
+    {
+        String[] appIdArray = appId.split(",");
+        List<RsAppResource> appRsList = new ArrayList<RsAppResource>();
+
+        for(String _appId : appIdArray)
+        {
+            RsAppResource appRs = new RsAppResource();
+
+            appRs.setId(getObjectId(BizObject.AppResource));
+            appRs.setAppId(_appId);
+            appRs.setResourceId(resourceId);
+
+            appRsList.add(appRs);
+        }
+
+        rsGrantService.grantResourceBatch(appRsList);
+        return convertToModels(appRsList,new ArrayList<>(appRsList.size()),RsAppResource.class,"");
+    }
+
+    @ApiOperation("资源授权删除")
+    @RequestMapping(value="/{id}",method = RequestMethod.DELETE)
+    public boolean deleteGrant(
+            @ApiParam(name="id",value="授权ID",defaultValue = "")
+            @PathVariable(value="id")String id) throws Exception
+    {
+        rsGrantService.deleteResourceGrant(id);
+        return true;
+    }
+
+    @ApiOperation("资源授权批量删除")
+    @RequestMapping(method = RequestMethod.DELETE)
+    public boolean deleteGrantBatch(
+            @ApiParam(name="id",value="授权ID",defaultValue = "")
+            @RequestParam(value="id")String id) throws Exception
+    {
+        String[] idArray = id.split(",");
+
+        for(String _id:idArray)
+        {
+            rsGrantService.deleteResourceGrant(_id);
+        }
+
+        return true;
+    }
+
+    @ApiOperation("资源授权查询")
+    @RequestMapping(value="",method = RequestMethod.GET)
+    public Collection<RsAppResource> queryAppResourceGrant(
+            @ApiParam(name="fields",value="返回字段",defaultValue = "")
+            @RequestParam(name="fields",required = false)String fields,
+            @ApiParam(name="filters",value="过滤",defaultValue = "")
+            @RequestParam(name="filters",required = false)String filters,
+            @ApiParam(name="sorts",value="排序",defaultValue = "")
+            @RequestParam(name="sorts",required = false)String sorts,
+            @ApiParam(name="page",value="页码",defaultValue = "1")
+            @RequestParam(name="page",required = false)int page,
+            @ApiParam(name="size",value="分页大小",defaultValue = "15")
+            @RequestParam(name="size",required = false)int size,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception
+    {
+        //过滤条件为空
+        if(StringUtils.isEmpty(filters))
+        {
+            Page<RsAppResource> rsGrant = rsGrantService.getAppResourceGrant(sorts,reducePage(page),size);
+            pagedResponse(request,response,rsGrant.getTotalElements(),page,size);
+            return convertToModels(rsGrant.getContent(),new ArrayList<>(rsGrant.getNumber()),RsAppResource.class,fields);
+        }
+        else
+        {
+            List<RsAppResource> rsGrant = rsGrantService.search(fields,filters,sorts,page,size);
+            pagedResponse(request,response,rsGrantService.getCount(filters),page,size);
+            return convertToModels(rsGrant,new ArrayList<>(rsGrant.size()),RsAppResource.class,fields);
+        }
+    }
+
+    @ApiOperation("资源数据元授权")
+    @RequestMapping(value="/{appResourceId}/metadata/{metadataId}",method = RequestMethod.POST)
+    public RsAppResourceMetadata grantRsMetaData(
+            @ApiParam(name="appResourceId",value="资源ID",defaultValue = "")
+            @PathVariable(value="appResourceId")String appResourceId,
+            @ApiParam(name="metadataId",value="资源数据元ID",defaultValue = "")
+            @PathVariable(value="metadataId")String metadataId)throws Exception
+    {
+        RsAppResourceMetadata appRsMetadata = new RsAppResourceMetadata();
+        appRsMetadata.setId(getObjectId(BizObject.AppResourceMetadata));
+        appRsMetadata.setAppResourceId(appResourceId);
+        appRsMetadata.setMetadataId(metadataId);
+
+        rsMetadataGrantService.grantRsMetadata(appRsMetadata);
+        return appRsMetadata;
+    }
+
+    @ApiOperation("资源数据元批量授权")
+    @RequestMapping(value="/{appResourceId}/metadata/batch",method = RequestMethod.POST)
+    public Collection<RsAppResourceMetadata> grantRsMetaDataBatch(
+            @ApiParam(name="appResourceId",value="资源ID",defaultValue = "")
+            @PathVariable(value="appResourceId")String appResourceId,
+            @ApiParam(name="metadataId",value="资源数据元ID",defaultValue = "")
+            @RequestParam(value="metadataId")String metadataId)throws Exception
+    {
+        String[] metadataIdArray = metadataId.split(metadataId);
+        List<RsAppResourceMetadata> appRsMetadataList = new ArrayList<RsAppResourceMetadata>();
+
+        for(String _metadataId : metadataIdArray)
+        {
+            RsAppResourceMetadata appRsMetadata = new RsAppResourceMetadata();
+
+            appRsMetadata.setId(getObjectId(BizObject.AppResourceMetadata));
+            appRsMetadata.setAppResourceId(appResourceId);
+            appRsMetadata.setMetadataId(_metadataId);
+
+            appRsMetadataList.add(appRsMetadata);
+        }
+
+        rsMetadataGrantService.grantRsMetadataBatch(appRsMetadataList);
+        return appRsMetadataList;
+    }
+
+    @ApiOperation("资源数据元授权删除")
+    @RequestMapping(value="/metadata/{id}",method = RequestMethod.DELETE)
+    public boolean deleteMetadataGrant(
+            @ApiParam(name="id",value="授权ID",defaultValue = "")
+            @PathVariable(value="id")String id) throws Exception
+    {
+        rsMetadataGrantService.deleteRsMetadataGrant(id);
+        return true;
+    }
+
+    @ApiOperation("资源数据元授权批量删除")
+    @RequestMapping(value="/metadata",method = RequestMethod.DELETE)
+    public boolean deleteMetadataGrantBatch(
+            @ApiParam(name="id",value="授权ID",defaultValue = "")
+            @RequestParam(value="id")String id) throws Exception
+    {
+        String[] idArray = id.split(",");
+
+        for(String _id:idArray)
+        {
+            rsMetadataGrantService.deleteRsMetadataGrant(_id);
+        }
+
+        return true;
+    }
+
+    @ApiOperation("资源数据元授权查询")
+    @RequestMapping(value="/metadata",method = RequestMethod.GET)
+    public Collection<RsAppResourceMetadata> queryAppRsMetadataGrant(
+            @ApiParam(name="fields",value="返回字段",defaultValue = "")
+            @RequestParam(name="fields",required = false)String fields,
+            @ApiParam(name="filters",value="过滤",defaultValue = "")
+            @RequestParam(name="filters",required = false)String filters,
+            @ApiParam(name="sorts",value="排序",defaultValue = "")
+            @RequestParam(name="sorts",required = false)String sorts,
+            @ApiParam(name="page",value="页码",defaultValue = "1")
+            @RequestParam(name="page",required = false)int page,
+            @ApiParam(name="size",value="分页大小",defaultValue = "15")
+            @RequestParam(name="size",required = false)int size,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception
+    {
+        //过滤条件为空
+        if(StringUtils.isEmpty(filters))
+        {
+            Page<RsAppResourceMetadata> rsMetadataGrant = rsMetadataGrantService.getAppRsMetadataGrant(sorts,reducePage(page),size);
+            pagedResponse(request,response,rsMetadataGrant.getTotalElements(),page,size);
+            return convertToModels(rsMetadataGrant.getContent(),new ArrayList<>(rsMetadataGrant.getNumber()),RsAppResourceMetadata.class,fields);
+        }
+        else
+        {
+            List<RsAppResourceMetadata> rsMetadataGrant = rsMetadataGrantService.search(fields,filters,sorts,page,size);
+            pagedResponse(request,response,rsGrantService.getCount(filters),page,size);
+            return convertToModels(rsMetadataGrant,new ArrayList<>(rsMetadataGrant.size()),RsAppResourceMetadata.class,fields);
         }
     }
 }

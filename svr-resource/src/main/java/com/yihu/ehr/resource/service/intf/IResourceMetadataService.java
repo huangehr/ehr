@@ -15,6 +15,8 @@ public interface IResourceMetadataService {
 
     void deleteResourceMetadata(String id);
 
+    void deleteRsMetadataByResourceId(String resourceId);
+
     long getCount(String filters) throws java.text.ParseException;
 
     List search(String fields, String filters, String sorts, Integer page, Integer size) throws java.text.ParseException;

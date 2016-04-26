@@ -2,6 +2,7 @@ package com.yihu.ehr.resource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.DimensionCategoryDao;
+import com.yihu.ehr.resource.dao.DimensionDao;
 import com.yihu.ehr.resource.model.RsDimensionCategory;
 import com.yihu.ehr.resource.service.intf.IDimensionCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class DimensionCategoryService extends BaseJpaService<RsDimensionCategory,DimensionCategoryDao> implements IDimensionCategoryService{
     @Autowired
     private DimensionCategoryDao dmcDao;
+    @Autowired
+    private DimensionDao dimensionDao;
 
     /*
      *维度类别创建
@@ -47,8 +50,18 @@ public class DimensionCategoryService extends BaseJpaService<RsDimensionCategory
      *
      * @param id 维度类别ID
      */
-    public void deleteDimensionCategory(String id)
+    public void deleteDimensionCategory(String id) throws Exception
     {
+        if(dimensionDao.countByCategoryId(id) > 0)
+        {
+            throw new Exception("该维度类别包含维度数据！");
+        }
+
+        if(dmcDao.countByPid(id) > 0)
+        {
+            throw new Exception("该维度类别包含子类别！");
+        }
+
         dmcDao.delete(id);
     }
 

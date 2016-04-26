@@ -14,7 +14,7 @@ public interface IDimensionCategoryService {
 
     void updateDimensionCategory(RsDimensionCategory dimensionCategory);
 
-    void deleteDimensionCategory(String id);
+    void deleteDimensionCategory(String id) throws Exception;
 
     long getCount(String filters) throws java.text.ParseException;
 

@@ -2,6 +2,7 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
+import com.yihu.ehr.resource.model.RsAppResource;
 import com.yihu.ehr.resource.model.RsResources;
 import com.yihu.ehr.resource.service.intf.IResourcesService;
 import io.swagger.annotations.Api;
@@ -64,7 +65,7 @@ public class ResourcesController extends BaseRestController {
     }
 
     @ApiOperation("资源查询")
-    @RequestMapping(value="",method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     public Collection<RsResources> queryResources(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(name="fields",required = false)String fields,

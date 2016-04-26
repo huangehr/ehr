@@ -63,6 +63,16 @@ public class ResourceMetadataController extends BaseRestController {
         return true;
     }
 
+    @ApiOperation("根据资源ID批量删除资源数据元")
+    @RequestMapping(method = RequestMethod.DELETE)
+    public boolean deleteResourceMetadataPatch(
+            @ApiParam(name="resourceId",value="资源ID",defaultValue = "")
+            @RequestParam(value="resourceId") String resourceId) throws Exception
+    {
+        rsMetadataService.deleteRsMetadataByResourceId(resourceId);
+        return true;
+    }
+
     @ApiOperation("资源数据元查询")
     @RequestMapping(value="",method = RequestMethod.GET)
     public Collection<RsResourceMetadata> queryDimensions(
