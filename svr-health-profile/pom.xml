@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>svr-health-profile</artifactId>
-	<packaging>jar</packaging>
+	<packaging>${packaging}</packaging>
 	<name>svr-health-profile</name>
 	<description>EHR platform health profiles service</description>
 

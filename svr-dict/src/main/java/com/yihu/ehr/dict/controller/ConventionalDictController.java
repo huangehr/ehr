@@ -291,4 +291,13 @@ public class ConventionalDictController extends BaseRestController {
 
         return getDictModel(drugFlag);
     }
+
+    @RequestMapping(value = "/dictionaries/family_relationship", method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户来源字典项", response = MConventionalDict.class)
+    public MConventionalDict getFamilyRelationship(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        SystemDictEntry drugFlag = dictEntryService.getDictEntry(27, code);
+        return getDictModel(drugFlag);
+    }
 }
