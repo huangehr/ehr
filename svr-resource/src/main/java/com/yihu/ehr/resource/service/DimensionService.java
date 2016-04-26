@@ -1,27 +1,24 @@
 package com.yihu.ehr.resource.service;
 
-
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.resource.dao.ResourcesDao;
-import com.yihu.ehr.resource.model.RsResources;
-import com.yihu.ehr.resource.service.intf.IResourcesService;
+import com.yihu.ehr.resource.dao.DimensionDao;
+import com.yihu.ehr.resource.model.RsDimension;
+import com.yihu.ehr.resource.service.intf.IDimensionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 /**
  * Created by lyr on 2016/4/25.
  */
-@Service("resourcesService")
+@Service
 @Transactional
-public class ResourcesService extends BaseJpaService<RsResources, ResourcesDao> implements IResourcesService {
+public class DimensionService extends BaseJpaService<RsDimension,DimensionDao>  implements IDimensionService{
     @Autowired
-    private ResourcesDao rsDao;
+    private DimensionDao dimensionDao;
 
     /*
      *资源创建
@@ -29,10 +26,10 @@ public class ResourcesService extends BaseJpaService<RsResources, ResourcesDao> 
      * @param resource 资源实体
      * @return RsResources 资源实体
      */
-    public RsResources createResource(RsResources resource)
+    public RsDimension createDimension(RsDimension dimension)
     {
-        rsDao.save(resource);
-        return resource;
+        dimensionDao.save(dimension);
+        return dimension;
     }
 
     /*
@@ -40,9 +37,9 @@ public class ResourcesService extends BaseJpaService<RsResources, ResourcesDao> 
      *
      * @param resource 资源实体
      */
-    public void updateResource(RsResources resource)
+    public void updateDimension(RsDimension dimension)
     {
-        rsDao.save(resource);
+        dimensionDao.save(dimension);
     }
 
     /*
@@ -50,9 +47,9 @@ public class ResourcesService extends BaseJpaService<RsResources, ResourcesDao> 
      *
      * @param id 资源ID
      */
-    public void deleteResource(String id)
+    public void deleteDimension(String id)
     {
-        rsDao.delete(id);
+        dimensionDao.delete(id);
     }
 
     /*
@@ -63,11 +60,10 @@ public class ResourcesService extends BaseJpaService<RsResources, ResourcesDao> 
      * @param size 分页大小
      * @return Page<RsResources> 资源
      */
-    public Page<RsResources> getResources(String sorts, int page, int size)
+    public Page<RsDimension> getDimensions(String sorts, int page, int size)
     {
         Pageable pageable =  new PageRequest(page,size,parseSorts(sorts));
 
-        return rsDao.findAll(pageable);
+        return dimensionDao.findAll(pageable);
     }
-
 }
