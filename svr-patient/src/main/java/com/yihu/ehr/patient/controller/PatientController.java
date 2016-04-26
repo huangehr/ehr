@@ -3,6 +3,7 @@ package com.yihu.ehr.patient.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.patient.service.demographic.DemographicId;
@@ -15,7 +16,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.csource.common.MyException;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,7 +42,8 @@ public class PatientController extends BaseRestController {
     private DemographicService demographicService;
     @Autowired
     private FastDFSUtil fastDFSUtil;
-
+    @Autowired
+    ObjectMapper objectMapper;
     /**
      * 根据条件查询人口信息
      * @param search
@@ -163,7 +167,11 @@ public class PatientController extends BaseRestController {
             @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
             @RequestParam(value = "patient_model_json_data") String patientModelJsonData) throws Exception{
         DemographicInfo demographicInfo = toEntity(patientModelJsonData, DemographicInfo.class);
-        demographicService.savePatient(demographicInfo);
+        DemographicInfo old = demographicService.getDemographicInfo(new DemographicId(demographicInfo.getIdCardNo()));
+        if(old==null)
+            throw new ApiException(HttpStatus.NOT_FOUND, "该对象没找到");
+        BeanUtils.copyProperties(demographicInfo, old, "registerTime");
+        demographicService.savePatient(old);
         return convertToModel(demographicInfo,MDemographicInfo.class);
     }
 

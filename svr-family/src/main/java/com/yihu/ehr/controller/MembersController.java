@@ -52,7 +52,7 @@ public class MembersController extends BaseRestController {
 
         if(StringUtils.isEmpty(filters))
         {
-            Page<Members> members = membersService.getMembers(sorts,page,size);
+            Page<Members> members = membersService.getMembers(sorts,reducePage(page),size);
             pagedResponse(request,response,members.getTotalElements(),page,size);
             return convertToModels(members.getContent(),new ArrayList<>(members.getNumber()),MMembers.class,fields);
         }
@@ -64,7 +64,7 @@ public class MembersController extends BaseRestController {
         }
     }
 
-    @RequestMapping(value = "/families/{families_id}members", method = RequestMethod.POST)
+    @RequestMapping(value = "/families/{families_id}/members", method = RequestMethod.POST)
     @ApiOperation(value = "创建家庭成员")
     public MMembers createMember(
             @ApiParam(name = "families_id", value = "家庭关系ID", defaultValue = "")
@@ -79,7 +79,7 @@ public class MembersController extends BaseRestController {
         return convertToModel(mb,MMembers.class);
     }
 
-    @RequestMapping(value = "/families/{families_id}members", method = RequestMethod.PUT)
+    @RequestMapping(value = "/families/{families_id}/members", method = RequestMethod.PUT)
     @ApiOperation(value = "修改家庭成员")
     public MMembers updateMember(
             @ApiParam(name = "families_id", value = "家庭关系ID", defaultValue = "")
@@ -93,7 +93,7 @@ public class MembersController extends BaseRestController {
         return convertToModel(mb,MMembers.class);
     }
 
-    @RequestMapping(value = "/families/{families_id}members{id_card_no}", method = RequestMethod.GET)
+    @RequestMapping(value = "/families/{families_id}/members/{id_card_no}", method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取家庭成员")
     public MMembers getMember(
             @ApiParam(name = "families_id", value = "家庭关系ID", defaultValue = "")
@@ -105,7 +105,7 @@ public class MembersController extends BaseRestController {
         return convertToModel(mb,MMembers.class);
     }
 
-    @RequestMapping(value = "/families/{families_id}members/{id_card_no}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/families/{families_id}/members/{id_card_no}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除家庭成员")
     public boolean deleteMember(
             @ApiParam(name = "families_id", value = "家庭关系ID", defaultValue = "")

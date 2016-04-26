@@ -9,6 +9,7 @@ import com.yihu.ehr.model.specialdict.MIcd10IndicatorRelation;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -51,7 +52,7 @@ public interface Icd10DictClient {
 
     @RequestMapping(value = "/dict/icd10s", method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件查询相应的ICD10字典信息。" )
-    Collection<MIcd10Dict> getIcd10DictList(
+    ResponseEntity<Collection<MIcd10Dict>> getIcd10DictList(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,code,name,chronicFlag,infectiousFlag,description")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
@@ -69,11 +70,11 @@ public interface Icd10DictClient {
             @ApiParam(name = "id", value = "icd10字典代码")
             @PathVariable( value = "id") String id);
 
-    @RequestMapping(value = "/dict/icd10/existence/name/{name}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/icd10/existence/name" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典名称是否已经存在")
     boolean isNameExists(
             @ApiParam(name = "name", value = "name", defaultValue = "")
-            @PathVariable(value = "name") String name);
+            @RequestParam(value = "name") String name);
 
     @RequestMapping(value = "/dict/icd10/existence/code/{code}" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典代码是否已经存在")
@@ -103,7 +104,7 @@ public interface Icd10DictClient {
 
     @RequestMapping(value = "/dict/icd10/drugs", method = RequestMethod.GET)
     @ApiOperation(value = "根据ICD10查询相应的药品关联列表信息。" )
-    Collection<MIcd10DrugRelation> getIcd10DrugRelationList(
+    ResponseEntity<Collection<MIcd10DrugRelation>> getIcd10DrugRelationList(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,icd10Id,drugId")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
@@ -145,7 +146,7 @@ public interface Icd10DictClient {
 
     @RequestMapping(value = "/dict/icd10/indicators", method = RequestMethod.GET)
     @ApiOperation(value = "根据ICD10查询相应的指标关联列表信息。" )
-    Collection<MIcd10IndicatorRelation> getIcd10IndicatorRelationList(
+    ResponseEntity<Collection<MIcd10IndicatorRelation>> getIcd10IndicatorRelationList(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,icd10Id,indicatorId")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")

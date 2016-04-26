@@ -429,7 +429,7 @@ public class CDATypeController extends BaseController {
             cdaTypeIds += cdaTypeIds+cdaTypeModel.getId()+",";
         }
         cdaTypeIds = cdaTypeIds.substring(0, cdaTypeIds.length() - 1);
-        String filters = "operationType="+cdaTypeIds;
+        String filters = "type="+cdaTypeIds;
         //获取当前所有版本
         ResponseEntity<Collection<MCDAVersion>> entity = cdaVersionClient.searchCDAVersions("", "", "", 1000, 1);
         Collection<MCDAVersion> mCdaVersions = entity.getBody();

@@ -6,6 +6,7 @@ import com.yihu.ehr.model.specialdict.MDrugDict;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -48,7 +49,7 @@ public interface DrugDictClient {
 
     @ApiOperation(value = "获取字典列表")
     @RequestMapping(value = "/dict/drugs", method = RequestMethod.GET)
-    Collection<MDrugDict> getDrugDictList(
+    ResponseEntity<Collection<MDrugDict>> getDrugDictList(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器", defaultValue = "")
@@ -72,9 +73,9 @@ public interface DrugDictClient {
             @ApiParam(name = "code", value = "code", defaultValue = "")
             @PathVariable(value = "code") String code);
 
-    @RequestMapping(value = "/dict/drug/existence/name/{name}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/drug/existence/name" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典名称是否已经存在")
     boolean isNameExist(
             @ApiParam(name = "name", value = "name", defaultValue = "")
-            @PathVariable(value = "name") String name);
+            @RequestParam(value = "name") String name);
 }
