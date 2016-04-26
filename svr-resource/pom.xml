@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>svr-resource</artifactId>
-    <packaging>jar</packaging>
+    <packaging>${packaging}</packaging>
     <name>svr-resource</name>
 
     <dependencies>

@@ -10,7 +10,7 @@
     </parent>
 
 	<artifactId>svr-security</artifactId>
-	<packaging>jar</packaging>
+	<packaging>${packaging}</packaging>
 	<name>svr-security</name>
 	<description>EHR platform security service</description>
 

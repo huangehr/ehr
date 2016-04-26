@@ -10,7 +10,7 @@
     </parent>
 
 	<artifactId>svr-configuration</artifactId>
-	<packaging>jar</packaging>
+	<packaging>${packaging}</packaging>
 	<name>svr-configuration</name>
 	<description>EHR platform configuration service</description>
 

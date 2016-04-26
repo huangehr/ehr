@@ -10,7 +10,7 @@
     </parent>
 
 	<artifactId>svr-geography</artifactId>
-	<packaging>jar</packaging>
+	<packaging>${packaging}</packaging>
 	<name>svr-geography</name>
 	<description>EHR platform geography service</description>
 

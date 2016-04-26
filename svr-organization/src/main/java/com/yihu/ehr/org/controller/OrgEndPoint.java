@@ -105,8 +105,7 @@ public class OrgEndPoint extends BaseRestController {
     public MOrganization create(
             @ApiParam(name = "mOrganizationJsonData", value = "机构代码", defaultValue = "")
             @RequestParam(value = "mOrganizationJsonData") String orgJsonData) throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        Organization org = objectMapper.readValue(orgJsonData, Organization.class);
+        Organization org = toEntity(orgJsonData, Organization.class);
         org.setCreateDate(new Date());
         org.setActivityFlag(1);
         org.setPyCode(PinyinUtil.getPinYinHeadChar(org.getFullName(), false));
