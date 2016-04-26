@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -50,7 +51,7 @@ public class TemplateEndPoint extends BaseRestEndPoint {
     public void saveTemplate(@ApiParam(value = "健康档案模板")
                              @RequestParam(value = "model") String model) {
         Template template = toEntity(model, Template.class);
-
+        template.setCreateTime(new Date());
         templateService.save(template);
     }
 
@@ -93,9 +94,11 @@ public class TemplateEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本")
             @RequestParam(value = "version") String version,
             @ApiParam(name = "title", value = "标题")
-            @RequestParam(value = "title") String title) {
+            @RequestParam(value = "title") String title,
+            @ApiParam(name = "org_code", value = "机构代码")
+            @RequestParam(value = "org_code") String orgCode) {
 
-        return templateService.isExistName(title, version);
+        return templateService.isExistName(title, version, orgCode);
     }
 
     @ApiOperation(value = "更新模板属性")
