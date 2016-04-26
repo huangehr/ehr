@@ -120,6 +120,7 @@ public class TemplateController extends ExtendController<TemplateModel> {
             BeanUtils.copyProperties(templateModel, template, "cdaDocumentName", "organizationName", "pcTplURL", "mobileTplURL", "createTime", "province", "city");
             if("copy".equals(mode)){
                 template.setId(0);
+                template.setCreateTime(null);
                 templateClient.saveTemplate(objToJson(template));
             }
             else
@@ -146,12 +147,19 @@ public class TemplateController extends ExtendController<TemplateModel> {
             @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "searchName", value = "查询值（机构名称或模版名称）", defaultValue = "")
             @RequestParam(value = "searchName", required = false) String searchName,
+            @ApiParam(name = "orgCode", value = "指定机构", defaultValue = "")
+            @RequestParam(value = "orgCode", required = false) String orgCode,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) {
 
-        if(!StringUtils.isEmpty(searchName)){
+        if(!StringUtils.isEmpty(orgCode)){
+            filters = "organizationCode="+ orgCode +";"+ filters;
+            if(!StringUtils.isEmpty(searchName))
+                filters = "title?"+searchName+";" + filters;
+        }
+        else if(!StringUtils.isEmpty(searchName)){
             filters = "title?"+searchName+" g1;" + filters;
             List<MOrganization> orgs = organizationClient.searchOrgs("orgCode,fullName", "fullName?"+searchName, "", 100, 1).getBody();
             if(orgs!=null && orgs.size()>0){
@@ -205,9 +213,11 @@ public class TemplateController extends ExtendController<TemplateModel> {
             @ApiParam(name = "version", value = "版本")
             @RequestParam(value = "version") String version,
             @ApiParam(name = "title", value = "标题")
-            @RequestParam(value = "title") String title) {
+            @RequestParam(value = "title") String title,
+            @ApiParam(name = "org_code", value = "机构代码")
+            @RequestParam(value = "org_code") String orgCode) {
         try {
-            boolean b = templateClient.isNameExist(version, title);
+            boolean b = templateClient.isNameExist(version, title, orgCode);
             Envelop envelop = success(null);
             envelop.setObj(b);
             return envelop;

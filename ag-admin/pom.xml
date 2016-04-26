@@ -10,7 +10,7 @@
     </parent>
 
 	<artifactId>ag-admin</artifactId>
-	<packaging>jar</packaging>
+	<packaging>${packaging}</packaging>
 	<name>总支撑管理网关</name>
 	<description>总支撑管理网关</description>
 

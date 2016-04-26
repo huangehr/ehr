@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -84,7 +86,7 @@ public class SystemDictController extends BaseRestController {
     @RequestMapping(value = "/dictionaries", method = RequestMethod.PUT)
     public MSystemDict updateDictionary(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) {
+            @RequestParam(value = "dictionary") String dictJson) throws Exception {
         SystemDict dict = toEntity(dictJson, SystemDict.class);
         if (null == dictService.retrieve(dict.getId())) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
         dictService.updateDict(dict);

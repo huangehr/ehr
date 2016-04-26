@@ -20,7 +20,10 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
 
@@ -132,7 +135,7 @@ public class SystemDictController extends BaseController {
             @ApiParam(name = "dictionary", value = "字典JSON结构")
             @RequestParam(value = "dictionary") String dictJson) {
         try {
-            SystemDictModel systemDictModel = objectMapper.readValue(dictJson,SystemDictModel.class);
+            SystemDictModel systemDictModel = toEntity(dictJson,SystemDictModel.class);
             if(StringUtils.isEmpty(systemDictModel.getName()))
             {
                 return failed("名称不能为空!");

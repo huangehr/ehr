@@ -85,7 +85,7 @@ public class UserController extends BaseRestController {
     public MUser createUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
-        User user = new ObjectMapper().readValue(userJsonData, User.class);
+        User user = toEntity(userJsonData, User.class);
         user.setId(getObjectId(BizObject.User));
         user.setCreateDate(new Date());
         if (!StringUtils.isEmpty(user.getPassword())){
@@ -108,8 +108,7 @@ public class UserController extends BaseRestController {
     public MUser updateUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        User user = objectMapper.readValue(userJsonData, User.class);
+        User user = toEntity(userJsonData, User.class);
         String userType = user.getUserType();
         MConventionalDict dict = conventionalDictClient.getUserType(userType);
         if(dict!=null){
