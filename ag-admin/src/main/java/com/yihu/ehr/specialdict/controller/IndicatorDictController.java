@@ -152,7 +152,7 @@ public class IndicatorDictController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = "/dict/indicator/existence/code" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/indicator/existence/code/{code}" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典代码是否已经存在")
     public Envelop isCodeExists(
             @ApiParam(name = "code", value = "code", defaultValue = "")
