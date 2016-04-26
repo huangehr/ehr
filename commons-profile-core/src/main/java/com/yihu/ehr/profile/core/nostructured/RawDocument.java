@@ -6,13 +6,12 @@ import java.util.List;
 /**
  * Created by Administrator on 2016/4/7.
  */
-public class NoStructuredDocument {
+public class RawDocument {
     String cdaDocId;
     String url;
     Date expiryDate;
-
-//    Map<String, StructuredDataSet> keyWordsList;
     String keyWordsStr;
+
     //非结构化content内容 类表包含两个字典 mime_type 和 name 和fastdfs保存的地址
     private List<NoStructuredContent> noStructuredContentList;
 

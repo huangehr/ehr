@@ -1,7 +1,10 @@
 package com.yihu.ehr.profile.core.commons;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.lang.SpringContext;
+import com.yihu.ehr.profile.core.EventType;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -27,13 +30,34 @@ public class Profile {
     private String summary;                             // 档案摘要
     private Date createDate;                            // 包创建时间
     private String cdaVersion;
-    private String profileType;                         // 档案类型
+    private ProfileType profileType;
+    private EventType eventType;
 
     public Profile() {
         this.cardId = "";
         this.orgCode = "";
         this.patientId = "";
         this.eventNo = "";
+    }
+
+    public ProfileType getProfileType() {
+        return profileType;
+    }
+
+    public void setProfileType(ProfileType profileType) {
+        this.profileType = profileType;
+    }
+
+    public String getDataSetIndices(){
+        throw new NotImplementedException("Subclass must override getDataSetIndices().");
+    }
+
+    public EventType getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(EventType eventType) {
+        this.eventType = eventType;
     }
 
     public String getId() {
@@ -47,7 +71,7 @@ public class Profile {
             }
 
             if (eventDate == null) {
-                throw new IllegalArgumentException("Build profile id failed, unable to get event time.");
+                throw new IllegalArgumentException("Build profile id failed, unable to get event date.");
             }
 
             this.profileId = ProfileId.get(orgCode, patientId, eventNo, eventDate);
@@ -138,15 +162,7 @@ public class Profile {
         this.createDate = createDate;
     }
 
-    public String getProfileType() {
-        return profileType;
-    }
-
-    public void setProfileType(String profileType) {
-        this.profileType = profileType;
-    }
-
-    public String jsonFormat() {
-        return "";
+    public String toJson() {
+        throw new NotImplementedException("Subclass must override toJson().");
     }
 }

@@ -105,7 +105,7 @@ public class Package {
         this.message = message;
     }
 
-    @Column(name = "md5")
+    @Column(name = "md5_value")
     public String getMd5() {
         return md5;
     }
@@ -123,6 +123,7 @@ public class Package {
         this.orgCode = orgCode;
     }
 
+    @Column(name = "client_id")
     public String getClientId() {
         return clientId;
     }
@@ -131,6 +132,7 @@ public class Package {
         this.clientId = clientId;
     }
 
+    @Column(name = "resourced")
     public Boolean isResourced() {
         return resourced;
     }

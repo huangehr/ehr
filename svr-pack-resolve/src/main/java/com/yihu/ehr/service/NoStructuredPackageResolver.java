@@ -5,13 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.common.PackageUtil;
 import com.yihu.ehr.constants.ProfileConstant;
+import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.extractor.ExtractorChain;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.profile.core.nostructured.NoStructuredContent;
-import com.yihu.ehr.profile.core.nostructured.NoStructuredDocument;
+import com.yihu.ehr.profile.core.nostructured.RawDocument;
 import com.yihu.ehr.profile.core.nostructured.NoStructuredDocumentFile;
-import com.yihu.ehr.profile.core.nostructured.NoStructuredProfile;
+import com.yihu.ehr.profile.core.nostructured.NonStructedProfile;
 import com.yihu.ehr.profile.persist.DataSetResolverWithTranslator;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
@@ -66,12 +67,13 @@ public class NoStructuredPackageResolver {
      * <p>
      * ObjectMapper Stream API使用，参见：http://wiki.fasterxml.com/JacksonStreamingApi
      */
-    public NoStructuredProfile doResolve(MPackage pack, String zipFile) throws Exception {
+    public NonStructedProfile doResolve(MPackage pack, String zipFile) throws Exception {
         File root = new Zipper().unzipFile(new File(zipFile), LocalTempPath + PathSep + pack.getId(), pack.getPwd());
         if (root == null || !root.isDirectory() || root.list().length == 0) {
             throw new RuntimeException("Invalid package file, package id: " + pack.getId());
         }
-        NoStructuredProfile noStructuredProfile = new NoStructuredProfile();    //非结构化档案
+        NonStructedProfile noStructuredProfile = new NonStructedProfile();    //非结构化档案
+        noStructuredProfile.setProfileType(ProfileType.NonStructured);
         File[] files = root.listFiles();
         List<NoStructuredDocumentFile> noStructuredDocumentFileList = new ArrayList<>();  //document底下的文件
         for(File file:files){
@@ -97,7 +99,7 @@ public class NoStructuredPackageResolver {
      * @param
      * @throws IOException
      */
-    public List<NoStructuredDocumentFile> unstructuredDocumentParse(NoStructuredProfile profile, File[] files) throws Exception {
+    public List<NoStructuredDocumentFile> unstructuredDocumentParse(NonStructedProfile profile, File[] files) throws Exception {
         List<NoStructuredDocumentFile> noStructuredDocumentFileList = new ArrayList<>();
         for (File file : files) {
             NoStructuredDocumentFile noStructuredDocumentFile = new NoStructuredDocumentFile();
@@ -125,7 +127,7 @@ public class NoStructuredPackageResolver {
      * @param
      * @throws IOException
      */
-    public NoStructuredProfile unstructuredDataSetParse(NoStructuredProfile noStructuredProfile, File file, List<NoStructuredDocumentFile> noStructuredDocumentFileList) throws Exception {
+    public NonStructedProfile unstructuredDataSetParse(NonStructedProfile noStructuredProfile, File file, List<NoStructuredDocumentFile> noStructuredDocumentFileList) throws Exception {
         JsonNode jsonNode = objectMapper.readTree(file);
 
 
@@ -149,7 +151,7 @@ public class NoStructuredPackageResolver {
         //data解析
         JsonNode datas = jsonNode.get("data"); //保存
 
-        List<NoStructuredDocument> noStructuredDocumentList = new ArrayList<>();
+        List<RawDocument> rawDocumentList = new ArrayList<>();
 
 
         for(int i=0;i<datas.size();i++){
@@ -157,14 +159,14 @@ public class NoStructuredPackageResolver {
 
             JsonNode data = datas.get(i);
 
-            NoStructuredDocument noStructuredDocument = new NoStructuredDocument();
+            RawDocument rawDocument = new RawDocument();
             String cdaDocId = data.get("cda_doc_id").asText();
             String url = data.get("url").asText();
             String expiryDate = data.get("expiry_date").asText();
 
-            noStructuredDocument.setCdaDocId(cdaDocId);
-            noStructuredDocument.setUrl(url);
-            noStructuredDocument.setExpiryDate(format.parse(expiryDate));
+            rawDocument.setCdaDocId(cdaDocId);
+            rawDocument.setUrl(url);
+            rawDocument.setExpiryDate(format.parse(expiryDate));
 
 
             String keyWordsStr = data.get("key_words").toString();
@@ -175,7 +177,7 @@ public class NoStructuredPackageResolver {
 //            keyWordsList = JSONObject2List(keys,keyWordsList,keyWordsObj);
 //            unStructuredDocument.setKeyWordsList(keyWordsList);
 
-            noStructuredDocument.setKeyWordsStr(keyWordsStr);
+            rawDocument.setKeyWordsStr(keyWordsStr);
 
             //document底下文件处理
             JsonNode contents = data.get("content");   //文件信息
@@ -209,13 +211,13 @@ public class NoStructuredPackageResolver {
                 noStructuredContentList.add(noStructuredContent);
 
 
-                noStructuredDocument.setNoStructuredContentList(noStructuredContentList);
+                rawDocument.setNoStructuredContentList(noStructuredContentList);
             }
 
-            noStructuredDocumentList.add(noStructuredDocument);
+            rawDocumentList.add(rawDocument);
 
         }
-        noStructuredProfile.setNoStructuredDocumentList(noStructuredDocumentList);
+        noStructuredProfile.setRawDocuments(rawDocumentList);
 
         file.delete();
         return noStructuredProfile;

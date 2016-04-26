@@ -58,7 +58,7 @@ public class PackageUtil {
         }else if(firstFolderName.equals(ProfileConstant.IndexFolder)){
             return ProfileType.Lightweight;
         }else if(firstFolderName.equals(ProfileConstant.DocumentFolder)){
-            return ProfileType.NoStructured;
+            return ProfileType.NonStructured;
         }
         return null;
     }

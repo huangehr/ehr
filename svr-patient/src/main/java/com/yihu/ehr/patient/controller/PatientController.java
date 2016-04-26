@@ -3,20 +3,22 @@ package com.yihu.ehr.patient.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.patient.service.demographic.DemographicId;
 import com.yihu.ehr.patient.service.demographic.DemographicInfo;
 import com.yihu.ehr.patient.service.demographic.DemographicService;
 import com.yihu.ehr.util.controller.BaseRestController;
-import com.yihu.ehr.util.encode.Base64;
 import com.yihu.ehr.util.encode.HashUtil;
 import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.csource.common.MyException;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +42,8 @@ public class PatientController extends BaseRestController {
     private DemographicService demographicService;
     @Autowired
     private FastDFSUtil fastDFSUtil;
-
+    @Autowired
+    ObjectMapper objectMapper;
     /**
      * 根据条件查询人口信息
      * @param search
@@ -176,14 +179,18 @@ public class PatientController extends BaseRestController {
 
         //将文件保存至服务器，返回文件的path，
         //String picPath = webupload(request);
-        ObjectMapper objectMapper = new ObjectMapper();
+//        ObjectMapper objectMapper = new ObjectMapper();
         DemographicInfo demographicInfo = objectMapper.readValue(patientModelJsonData, DemographicInfo.class);
+        DemographicInfo old = demographicService.getDemographicInfo(new DemographicId(demographicInfo.getIdCardNo()));
+        if(old==null)
+            throw new ApiException(HttpStatus.NOT_FOUND, "该对象没找到");
+        BeanUtils.copyProperties(demographicInfo, old, "registerTime");
         //将文件path保存至数据库
 //        demographicInfo.setPicPath(picPath);
 //        if(picPath != null){
 //            demographicInfo.setLocalPath("");
 //        }
-        demographicService.savePatient(demographicInfo);
+        demographicService.savePatient(old);
         return convertToModel(demographicInfo,MDemographicInfo.class);
     }
 
@@ -222,7 +229,7 @@ public class PatientController extends BaseRestController {
 
         String[] fileStreams = date.split(",");
         String is = URLDecoder.decode(fileStreams[0],"UTF-8").replace(" ","+");
-        byte[] in = Base64.decode(is);
+        byte[] in = Base64.getDecoder().decode(is);
 
         String pictureName = fileStreams[1].substring(0,fileStreams[1].length()-1);
         String fileExtension = pictureName.substring(pictureName.lastIndexOf(".") + 1).toLowerCase();
@@ -273,7 +280,7 @@ public class PatientController extends BaseRestController {
 
             byte[] bytes = fastDFSUtil.download(groupName,remoteFileName);
 
-            String fileStream = Base64.encode(bytes);
+            String fileStream = Base64.getEncoder().encodeToString(bytes);
             imageStream = URLEncoder.encode(fileStream,"UTF-8");
 
         } catch (IOException e) {

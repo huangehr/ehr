@@ -8,6 +8,7 @@ import com.yihu.ehr.model.specialdict.MHpIcd10Relation;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -50,7 +51,7 @@ public interface HealthProblemDictClient {
 
     @RequestMapping(value = "/dict/hps", method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件查询相应的ICD10字典信息。" )
-    Collection<MHealthProblemDict> getHpDictList(
+    ResponseEntity<Collection<MHealthProblemDict>> getHpDictList(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,code,name,description")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
@@ -62,11 +63,11 @@ public interface HealthProblemDictClient {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page);
 
-    @RequestMapping(value = "/dict/hp/existence/name/{name}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/hp/existence/name" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典名称是否已经存在")
     boolean isNameExists(
             @ApiParam(name = "name", value = "name", defaultValue = "")
-            @PathVariable(value = "name") String name);
+            @RequestParam(value = "name") String name);
 
     @RequestMapping(value = "/dict/hp/existence/code/{code}" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典代码是否已经存在")
@@ -96,7 +97,7 @@ public interface HealthProblemDictClient {
 
     @RequestMapping(value = "/dict/hp/icd10s", method = RequestMethod.GET)
     @ApiOperation(value = "根据健康问题查询相应的ICD10关联列表信息。" )
-    Collection<MHpIcd10Relation> getHpIcd10RelationList(
+    ResponseEntity<Collection<MHpIcd10Relation>> getHpIcd10RelationList(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,hpId,icd10Id")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")

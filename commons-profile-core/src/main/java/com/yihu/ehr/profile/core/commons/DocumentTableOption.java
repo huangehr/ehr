@@ -1,7 +1,7 @@
 package com.yihu.ehr.profile.core.commons;
 
-import com.yihu.ehr.profile.core.nostructured.NoStructuredDocument;
-import com.yihu.ehr.profile.core.nostructured.NoStructuredProfile;
+import com.yihu.ehr.profile.core.nostructured.RawDocument;
+import com.yihu.ehr.profile.core.nostructured.NonStructedProfile;
 
 import java.util.List;
 
@@ -121,9 +121,9 @@ public class DocumentTableOption {
      * @param noStructuredProfile
      * @return
      */
-    public static String getDocimentsToQualifier(NoStructuredProfile noStructuredProfile) {
+    public static String getDocimentsToQualifier(NonStructedProfile noStructuredProfile) {
 
-        List<NoStructuredDocument> documentList = noStructuredProfile.getNoStructuredDocumentList();
+        List<RawDocument> documentList = noStructuredProfile.getRawDocuments();
         return documentList.toString();
     }
 

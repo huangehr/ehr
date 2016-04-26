@@ -3,11 +3,12 @@ package com.yihu.ehr.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.common.PackageUtil;
+import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.extractor.EventExtractor;
 import com.yihu.ehr.extractor.ExtractorChain;
 import com.yihu.ehr.model.packs.MPackage;
+import com.yihu.ehr.profile.core.commons.StructuredProfile;
 import com.yihu.ehr.profile.core.lightweight.LightWeightDataSet;
-import com.yihu.ehr.profile.core.lightweight.LightWeightProfile;
 import com.yihu.ehr.profile.persist.DataSetResolverWithTranslator;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
@@ -57,36 +58,37 @@ public class LightWeightPackageResolver {
      * <p>
      * ObjectMapper Stream API使用，参见：http://wiki.fasterxml.com/JacksonStreamingApi
      */
-    public LightWeightProfile doResolve(MPackage pack, String zipFile) throws Exception {
+    public StructuredProfile doResolve(MPackage pack, String zipFile) throws Exception {
         File root = new Zipper().unzipFile(new File(zipFile), LocalTempPath + PathSep + pack.getId(), pack.getPwd());
         if (root == null || !root.isDirectory() || root.list().length == 0) {
             throw new RuntimeException("Invalid package file, package id: " + pack.getId());
         }
 
 
-        LightWeightProfile lightWeightProfile = new LightWeightProfile();       //轻量级档案
+        StructuredProfile structuredProfile = new StructuredProfile();       //轻量级档案
+        structuredProfile.setProfileType(ProfileType.Lightweight);
 
         File[] files = root.listFiles();
 
         for(File file:files){
-            lightWeightProfile = lightWeightDataSetParse(lightWeightProfile,file.listFiles());
+            structuredProfile = lightWeightDataSetParse(structuredProfile,file.listFiles());
         }
 
-        makeEventSummary(lightWeightProfile);
+        makeEventSummary(structuredProfile);
 
         houseKeep(zipFile, root);
 
-        return lightWeightProfile;
+        return structuredProfile;
     }
 
 
     /**
      * 轻量级档案包解析JSON文件中的数据。
-     * @param lightWeightProfile
+     * @param structuredProfile
      * @param
      * @throws IOException
      */
-    public LightWeightProfile lightWeightDataSetParse(LightWeightProfile lightWeightProfile, File[] files) throws IOException, ParseException {
+    public StructuredProfile lightWeightDataSetParse(StructuredProfile structuredProfile, File[] files) throws IOException, ParseException {
         if(files==null){
             throw new IOException("There is no file");
         }
@@ -96,29 +98,29 @@ public class LightWeightPackageResolver {
             throw new IOException("Invalid json file when generate data set");
         }
         //设置数据集
-        dataSetResolverWithTranslator.parseLightJsonDataSet(lightWeightProfile,jsonNode);
-        return lightWeightProfile;
+        dataSetResolverWithTranslator.parseLightJsonDataSet(structuredProfile,jsonNode);
+        return structuredProfile;
     }
 
     /**
      * 根据此次的数据产生一个健康事件，并更新数据集的行ID.
      *
-     * @param lightWeightProfile
+     * @param structuredProfile
      */
-    public void makeEventSummary(LightWeightProfile lightWeightProfile) {
+    public void makeEventSummary(StructuredProfile structuredProfile) {
         EventExtractor eventExtractor = context.getBean(EventExtractor.class);
 
-        for (String dataSetTable : lightWeightProfile.getDataSetTables()) {
-            if (StringUtils.isEmpty(lightWeightProfile.getSummary()) && eventExtractor.getDataSets().containsKey(dataSetTable)) {
-                lightWeightProfile.setSummary(eventExtractor.getDataSets().get(dataSetTable));
+        for (String dataSetTable : structuredProfile.getLightWeightDataSetTables()) {
+            if (StringUtils.isEmpty(structuredProfile.getSummary()) && eventExtractor.getDataSets().containsKey(dataSetTable)) {
+                structuredProfile.setSummary(eventExtractor.getDataSets().get(dataSetTable));
             }
 
             int rowIndex = 0;
-            LightWeightDataSet lightWeightDataSet = lightWeightProfile.getDataSet(dataSetTable);
+            LightWeightDataSet lightWeightDataSet = structuredProfile.getLightWeightDataSet(dataSetTable);
             String[] rowKeys = new String[lightWeightDataSet.getRecordKeys().size()];
             lightWeightDataSet.getRecordKeys().toArray(rowKeys);
             for (String rowKey : rowKeys) {
-                lightWeightDataSet.updateRecordKey(rowKey, lightWeightProfile.getId() + "$" + rowIndex++);
+                lightWeightDataSet.updateRecordKey(rowKey, structuredProfile.getId() + "$" + rowIndex++);
             }
         }
     }

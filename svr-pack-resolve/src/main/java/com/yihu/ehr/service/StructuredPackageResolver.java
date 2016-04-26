@@ -4,13 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.common.PackageUtil;
 import com.yihu.ehr.constants.ProfileConstant;
+import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.extractor.EventExtractor;
 import com.yihu.ehr.extractor.ExtractorChain;
 import com.yihu.ehr.extractor.KeyDataExtractor;
 import com.yihu.ehr.model.packs.MPackage;
+import com.yihu.ehr.profile.core.StdDataSet;
 import com.yihu.ehr.profile.core.commons.DataSetTableOption;
-import com.yihu.ehr.profile.core.structured.StructuredDataSet;
-import com.yihu.ehr.profile.core.structured.StructuredProfile;
+import com.yihu.ehr.profile.core.commons.StructuredProfile;
 import com.yihu.ehr.profile.persist.DataSetResolverWithTranslator;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
@@ -68,6 +69,7 @@ public class StructuredPackageResolver {
             throw new RuntimeException("Invalid package file, package id: " + pack.getId());
         }
         StructuredProfile structuredProfile = new StructuredProfile();          //结构化档案
+        structuredProfile.setProfileType(ProfileType.Structured);
 
         File[] files = root.listFiles();
 
@@ -94,11 +96,11 @@ public class StructuredPackageResolver {
     public StructuredProfile structuredDataSetParse(StructuredProfile structuredProfile, File[] files, String folderName) throws ParseException, IOException {
         for (File file : files) {
             String lastName = folderName.substring(folderName.lastIndexOf("\\")+1);
-            StructuredDataSet dataSet = generateDataSet(file, lastName.equals(ProfileConstant.OriFolder) ? true :false);
+            StdDataSet dataSet = generateDataSet(file, lastName.equals(ProfileConstant.OriFolder) ? true :false);
 
             // 原始数据存储在表"数据集代码_ORIGIN"
             String dataSetTable = lastName.equals(ProfileConstant.OriFolder) ? DataSetTableOption.originDataSetCode(dataSet.getCode()) : dataSet.getCode();
-            structuredProfile.addDataSet(dataSetTable, dataSet);
+            structuredProfile.addFullWeightDataSet(dataSetTable, dataSet);
             structuredProfile.setPatientId(dataSet.getPatientId());
             structuredProfile.setEventNo(dataSet.getEventNo());
             structuredProfile.setOrgCode(dataSet.getOrgCode());
@@ -124,7 +126,7 @@ public class StructuredPackageResolver {
                     structuredProfile.setEventDate((Date) extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.EventDate));
                 }
             }
-            structuredProfile.addDataSet(dataSet.getCode(), dataSet);
+            structuredProfile.addFullWeightDataSet(dataSet.getCode(), dataSet);
         }
         return structuredProfile;
 
@@ -139,12 +141,12 @@ public class StructuredPackageResolver {
      * @return
      * @throws IOException
      */
-    public StructuredDataSet generateDataSet(File jsonFile, boolean isOrigin) throws IOException {
+    public StdDataSet generateDataSet(File jsonFile, boolean isOrigin) throws IOException {
         JsonNode jsonNode = objectMapper.readTree(jsonFile);
         if (jsonNode.isNull()) {
             throw new IOException("Invalid json file when generate data set");
         }
-        StructuredDataSet dataSet = dataSetResolverWithTranslator.parseStructuredJsonDataSet(jsonNode, isOrigin);
+        StdDataSet dataSet = dataSetResolverWithTranslator.parseStructuredJsonDataSet(jsonNode, isOrigin);
         return dataSet;
     }
 
@@ -157,13 +159,13 @@ public class StructuredPackageResolver {
     public void makeEventSummary(StructuredProfile structuredProfile) {
         EventExtractor eventExtractor = context.getBean(EventExtractor.class);
 
-        for (String dataSetTable : structuredProfile.getDataSetTables()) {
+        for (String dataSetTable : structuredProfile.getFullWeightDataTables()) {
             if (StringUtils.isEmpty(structuredProfile.getSummary()) && eventExtractor.getDataSets().containsKey(dataSetTable)) {
                 structuredProfile.setSummary(eventExtractor.getDataSets().get(dataSetTable));
             }
 
             int rowIndex = 0;
-            StructuredDataSet dataSet = structuredProfile.getDataSet(dataSetTable);
+            StdDataSet dataSet = structuredProfile.getFullWeightData(dataSetTable);
             String[] rowKeys = new String[dataSet.getRecordKeys().size()];
             dataSet.getRecordKeys().toArray(rowKeys);
             for (String rowKey : rowKeys) {

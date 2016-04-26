@@ -1,8 +1,8 @@
-package com.yihu.ehr.profile.core.structured;
+package com.yihu.ehr.profile.core;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.profile.core.commons.DataSet;
+import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.profile.core.commons.Profile;
 import com.yihu.ehr.util.DateTimeUtils;
 
@@ -15,46 +15,39 @@ import java.util.Set;
  * 结构化健康档案。
  *
  * @author Sand
- * @version 1.0
  * @created 2015.08.16 10:44
  */
-public class StructuredProfile extends Profile {
-    // 档案包含的数据集, key 为数据集的表名, 原始数据集情况下, 表名为"数据集代码_ORIGIN"
-    private Map<String, StructuredDataSet> dataSets = new HashMap<>();
+public class StructedProfile extends Profile {
+    private Map<String, StdDataSet> dataSets = new HashMap<>();
 
-    public Collection<StructuredDataSet> getDataSets() {
+    public StructedProfile(){
+        this.setProfileType(ProfileType.Structured);
+    }
+
+    public void insertDataSet(String dataSetCode, StdDataSet dataSet) {
+        this.dataSets.put(dataSetCode, dataSet);
+    }
+
+    public StdDataSet getDataSet(String dataSetCode) {
+        return this.dataSets.get(dataSetCode);
+    }
+
+    public Collection<StdDataSet> getDataSets() {
         return dataSets.values();
     }
 
-    public String getDataSetsAsString() {
+    public String getDataSetIndices() {
         ObjectNode rootNode = objectMapper.createObjectNode();
 
-        for (String key : dataSets.keySet()) {
-            Set<String> rowKeys = dataSets.get(key).getRecordKeys();
-            String records = String.join(",", rowKeys);
-            rootNode.put(key, records);
+        for (String dataSetCode : dataSets.keySet()) {
+            Set<String> recordKeys = dataSets.get(dataSetCode).getRecordKeys();
+            rootNode.put(dataSetCode, String.join(",", recordKeys));
         }
 
         return rootNode.toString();
     }
 
-    public void addDataSet(String dataSetCode, StructuredDataSet dataSet) {
-        this.dataSets.put(dataSetCode, dataSet);
-    }
-
-    public void removeDataSet(String dataSetCode){
-        this.dataSets.remove(dataSetCode);
-    }
-
-    public StructuredDataSet getDataSet(String dataSetCode) {
-        return this.dataSets.get(dataSetCode);
-    }
-
-    public Set<String> getDataSetTables(){
-        return this.dataSets.keySet();
-    }
-
-    public String jsonFormat(){
+    public String toJson(){
         ObjectNode root = objectMapper.createObjectNode();
         root.put("id", getId().toString());
         root.put("card_id", this.getCardId());
@@ -69,8 +62,8 @@ public class StructuredProfile extends Profile {
 
         ArrayNode dataSetsNode = root.putArray("data_sets");
         for (String dataSetCode : dataSets.keySet()){
-            DataSet dataSet = dataSets.get(dataSetCode);
-            dataSetsNode.addPOJO(dataSet.toJson(false));
+            StdDataSet dataSet = dataSets.get(dataSetCode);
+            dataSetsNode.addPOJO(dataSet.toJson());
         }
 
         return root.toString();

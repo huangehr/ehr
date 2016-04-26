@@ -157,21 +157,21 @@ public class AddressController extends BaseController{
 
 
     /**
-     * 根据省市县查询地址
-     * @param province
-     * @param city
-     * @param district
-     * @return
-     */
-    @RequestMapping(value = "/geographies" , method = RequestMethod.GET)
-    @ApiOperation(value = "根据省市县查询地址并返回地址编号列表")
-    public Envelop search(
-            @ApiParam(name = "province", value = "省", defaultValue = "")
-            @RequestParam(value = "province") String province,
-            @ApiParam(name = "city", value = "市", defaultValue = "")
-            @RequestParam(value = "city") String city,
-            @ApiParam(name = "district", value = "县", defaultValue = "")
-            @RequestParam(value = "district") String district) {
+ * 根据省市县查询地址
+ * @param province
+ * @param city
+ * @param district
+ * @return
+ */
+        @RequestMapping(value = "/geographies" , method = RequestMethod.GET)
+        @ApiOperation(value = "根据省市县查询地址并返回地址编号列表")
+        public Envelop search(
+                @ApiParam(name = "province", value = "省", defaultValue = "")
+                @RequestParam(value = "province",required=false) String province,
+                @ApiParam(name = "city", value = "市", defaultValue = "")
+                @RequestParam(value = "city",required=false) String city,
+                @ApiParam(name = "district", value = "县", defaultValue = "")
+                @RequestParam(value = "district",required=false) String district) {
 
         Envelop envelop = new Envelop();
 

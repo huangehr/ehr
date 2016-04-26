@@ -1,6 +1,6 @@
 package com.yihu.ehr.extractor;
 
-import com.yihu.ehr.profile.core.structured.StructuredDataSet;
+import com.yihu.ehr.profile.core.StdDataSet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -29,10 +29,10 @@ public class IdentityExtractor extends KeyDataExtractor {
     private static final String IdCardNoDictEntry = "01;02";    // 身份字典项代码：身份证号与护照
 
     @Override
-    public Object extract(StructuredDataSet structuredDataSet, Filter filter) throws ParseException {
-        if (filter == Filter.DemographicInfo && dataSets.contains(structuredDataSet.getCode())) {
-            for (String key : structuredDataSet.getRecordKeys()) {
-                Map<String, String> record = structuredDataSet.getRecord(key);
+    public Object extract(StdDataSet dataSet, Filter filter) throws ParseException {
+        if (filter == Filter.DemographicInfo && dataSets.contains(dataSet.getCode())) {
+            for (String key : dataSet.getRecordKeys()) {
+                Map<String, String> record = dataSet.getRecord(key);
                 String value = record.get(IdCardTypeMetaData);
                 if (value != null) {
                     if (IdCardNoDictEntry.contains(value)) {

@@ -1,6 +1,6 @@
 package com.yihu.ehr.extractor;
 
-import com.yihu.ehr.profile.core.structured.StructuredDataSet;
+import com.yihu.ehr.profile.core.StdDataSet;
 
 import java.text.ParseException;
 
@@ -19,5 +19,5 @@ public abstract class KeyDataExtractor {
         EventDate
     }
 
-    public abstract Object extract(StructuredDataSet dataSet, Filter filter) throws ParseException;
+    public abstract Object extract(StdDataSet dataSet, Filter filter) throws ParseException;
 }

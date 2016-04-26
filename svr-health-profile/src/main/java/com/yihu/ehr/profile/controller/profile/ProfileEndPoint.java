@@ -1,21 +1,15 @@
 package com.yihu.ehr.profile.controller.profile;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.cache.CacheReader;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.model.profile.MDataSet;
-import com.yihu.ehr.model.profile.MProfile;
-import com.yihu.ehr.model.profile.MProfileDocument;
-import com.yihu.ehr.model.profile.MRecord;
+import com.yihu.ehr.model.profile.*;
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import com.yihu.ehr.profile.config.CdaDocumentOptions;
 import com.yihu.ehr.profile.core.commons.DataSetTableOption;
-import com.yihu.ehr.profile.core.structured.StructuredDataSet;
-import com.yihu.ehr.profile.core.structured.StructuredProfile;
+import com.yihu.ehr.profile.core.StructedProfile;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.persist.ProfileIndices;
 import com.yihu.ehr.profile.persist.ProfileIndicesService;
@@ -27,10 +21,9 @@ import com.yihu.ehr.schema.StdKeySchema;
 import com.yihu.ehr.util.DateTimeUtils;
 import com.yihu.ehr.util.controller.BaseRestEndPoint;
 import com.yihu.ehr.util.log.LogService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import org.apache.commons.lang.StringUtils;
+import org.apache.htrace.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -54,17 +47,6 @@ import java.util.*;
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "健康档案服务", description = "提供档案搜索及完整档案下载")
 public class ProfileEndPoint extends BaseRestEndPoint {
-    private final static String SampleQuery = "{\n" +
-            "\"demographicId\": \"412726195111306268\",\n" +
-            "\"organizationCode\": \"41872607-9\",\n" +
-            "\"patientId\": \"10295435\",\n" +
-            "\"eventNo\": \"000622450\",\n" +
-            "\"name\": \"段廷兰\",\n" +
-            "\"telephone\": \"11\",\n" +
-            "\"gender\": \"女\",\n" +
-            "\"birthday\": \"1951-11-30\"\n" +
-            "}";
-
     @Autowired
     private ProfileRepository profileRepo;
 
@@ -92,7 +74,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @ApiOperation(value = "搜索档案", notes = "返回符合条件的档案列表")
     @RequestMapping(value = ServiceApi.HealthProfile.ProfileSearch, method = RequestMethod.POST)
     public Collection<MProfile> searchProfile(
-            @ApiParam(value = "搜索参数", defaultValue = SampleQuery)
+            @ApiParam(value = "搜索参数", defaultValue = "")
             @RequestBody String query,
             @ApiParam(value = "起始日期", defaultValue = "2015-10-01")
             @RequestParam("since") @DateTimeFormat(pattern = "yyyy-MM-dd") Date since,
@@ -154,18 +136,18 @@ public class ProfileEndPoint extends BaseRestEndPoint {
                                                         boolean loadOriginDataSet) throws IOException, ParseException {
         if (profileIndices.getContent().size() == 0) return null;
 
-        List<StructuredProfile> profiles = new ArrayList<>();
+        List<StructedProfile> profiles = new ArrayList<>();
         for (ProfileIndices indices : profileIndices) {
             StructuredProfile profile = profileRepo.findOne(indices.getProfileId(), loadStdDataSet, loadOriginDataSet);
             profiles.add(profile);
         }
 
         List<MProfile> profileList = new ArrayList<>();
-        for (StructuredProfile profile : profiles) {
-            MProfile mProfile = convertProfile(profile);
-
-            profileList.add(mProfile);
-        }
+//        for (StructedProfile profile : profiles) {
+//            MProfile mProfile = convertProfile(profile);
+//
+//            profileList.add(mProfile);
+//        }
 
         return profileList;
     }
@@ -179,7 +161,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "load_std_data_set") boolean loadStdDataSet,
             @ApiParam(value = "是否加载原始数据集", defaultValue = "false")
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws IOException, ParseException {
-        StructuredProfile profile = profileRepo.findOne(profileId, loadStdDataSet, loadOriginDataSet);
+        StructedProfile profile = profileRepo.findOne(profileId, loadStdDataSet, loadOriginDataSet);
 
         return convertProfile(profile);
     }
@@ -195,7 +177,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "load_std_data_set") boolean loadStdDataSet,
             @ApiParam(value = "是否加载原始数据集", defaultValue = "false")
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws IOException, ParseException {
-        StructuredProfile profile = profileRepo.findOne(profileId, loadStdDataSet, loadOriginDataSet);
+        StructedProfile profile = profileRepo.findOne(profileId, loadStdDataSet, loadOriginDataSet);
         Map<Template, MCDADocument> cdaDocuments = getCustomizedCDADocuments(profile);
 
         return convertDocument(profile, cdaDocuments, documentId);
@@ -204,7 +186,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     /**
      * 此类目下卫生机构定制的CDA文档列表
      */
-    private Map<Template, MCDADocument> getCustomizedCDADocuments(StructuredProfile profile) {
+    private Map<Template, MCDADocument> getCustomizedCDADocuments(StructedProfile profile) {
         // 使用CDA类别关键数据元映射，取得与此档案相关联的CDA类别ID
         String cdaType = null;
         for (StructuredDataSet dataSet : profile.getDataSets()) {

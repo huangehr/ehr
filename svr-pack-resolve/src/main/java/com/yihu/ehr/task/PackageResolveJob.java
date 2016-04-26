@@ -8,9 +8,8 @@ import com.yihu.ehr.feign.XPackageMgrClient;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.mq.MessageBuffer;
-import com.yihu.ehr.profile.core.lightweight.LightWeightProfile;
-import com.yihu.ehr.profile.core.nostructured.NoStructuredProfile;
-import com.yihu.ehr.profile.core.structured.StructuredProfile;
+import com.yihu.ehr.profile.core.commons.StructuredProfile;
+import com.yihu.ehr.profile.core.nostructured.NonStructedProfile;
 import com.yihu.ehr.profile.persist.repo.ProfileRepository;
 import com.yihu.ehr.service.LightWeightPackageResolver;
 import com.yihu.ehr.common.PackageUtil;
@@ -77,27 +76,25 @@ public class PackageResolveJob implements InterruptableJob {
             String zipFile = downloadTo(pack.getRemotePath());
 
 
-            //三种档案
-            StructuredProfile structuredProfile;           //结构化档案
-            NoStructuredProfile noStructuredProfile;       //非结构化档案
-            LightWeightProfile lightWeightProfile;         //轻量级档案
+            StructuredProfile structuredProfile = null;           //结构化档案
+            NonStructedProfile noStructuredProfile;                        //非结构化档案
 
             ProfileType profileType = packageUtil.getProfileType(pack, zipFile);
             if (profileType == ProfileType.Structured) {
                 structuredProfile = structuredPackageResolver.doResolve(pack, zipFile);
-                profileRepo.saveStructuredProfile(structuredProfile);
+                profileRepo.saveStructuredProfileModel(structuredProfile);
                 packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
                         "Identity: " + structuredProfile.getDemographicId() + ", structuredProfile: " + structuredProfile.getId());
-            } else if (profileType == ProfileType.NoStructured) {
+            } else if (profileType == ProfileType.NonStructured) {
                 noStructuredProfile = noStructuredPackageResolver.doResolve(pack, zipFile);
                 profileRepo.saveUnStructuredProfile(noStructuredProfile);
                 packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
                         "Identity: " + noStructuredProfile.getDemographicId() + ", unStructuredProfile: " + noStructuredProfile.getId());
             } else if (profileType == ProfileType.Lightweight) {
-                lightWeightProfile = lightWeightPackageResolver.doResolve(pack, zipFile);
-                profileRepo.saveLightWeightProfile(lightWeightProfile);
+                structuredProfile = lightWeightPackageResolver.doResolve(pack, zipFile);
+                profileRepo.saveStructuredProfileModel(structuredProfile);
                 packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
-                        "Identity: " + lightWeightProfile.getDemographicId() + ", lightWeightProfile: " + lightWeightProfile.getId());
+                        "Identity: " + structuredProfile.getDemographicId() + ", lightWeightProfile: " + structuredProfile.getId());
             }
 
         } catch (Exception e) {

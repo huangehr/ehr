@@ -12,9 +12,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -112,14 +114,15 @@ public class DrugDictController extends BaseController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) Integer page){
 
-        List<MDrugDict> drugDictList =(List<MDrugDict>)drugDictClient.getDrugDictList(fields, filters, sorts, size, page);
         List<DrugDictModel> drugDictModelList = new ArrayList<>();
-
-        for (MDrugDict mDrugDict:drugDictList){
+        ResponseEntity<Collection<MDrugDict>> responseEntity = drugDictClient.getDrugDictList(fields, filters, sorts, size, page);
+        Collection<MDrugDict> mDrugDicts  = responseEntity.getBody();
+        for (MDrugDict mDrugDict:mDrugDicts){
             DrugDictModel drugDictModel = changeToModel(mDrugDict);
             drugDictModelList.add(drugDictModel);
         }
-        Envelop envelop = getResult(drugDictModelList,0,page,size);
+        Integer totalCount = getTotalCount(responseEntity);
+        Envelop envelop = getResult(drugDictModelList,totalCount,page,size);
 
         return envelop;
     }
@@ -150,11 +153,11 @@ public class DrugDictController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = "/dict/drug/existence/name/{name}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/drug/existence/name" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典名称是否已经存在")
     public Envelop isNameExist(
             @ApiParam(name = "name", value = "name", defaultValue = "")
-            @PathVariable(value = "name") String name){
+            @RequestParam(value = "name") String name){
 
         Envelop envelop = new Envelop();
         boolean result = drugDictClient.isNameExist(name);
