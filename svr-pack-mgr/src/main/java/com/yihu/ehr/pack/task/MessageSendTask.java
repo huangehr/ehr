@@ -1,18 +1,13 @@
-package com.yihu.ehr.task;
+package com.yihu.ehr.pack.task;
 
 import com.yihu.ehr.constants.Channel;
 import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.pack.service.Package;
-import com.yihu.ehr.pack.service.PackageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**

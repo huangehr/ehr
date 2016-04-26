@@ -22,7 +22,7 @@ public class MPackage implements Serializable {
     Date receiveDate;
     Date parseDate;
     Date finishDate;
-    boolean resourced;
+    Boolean resourced;
     ArchiveStatus archiveStatus;
 
     public ArchiveStatus getArchiveStatus() {
@@ -113,11 +113,11 @@ public class MPackage implements Serializable {
         this.clientId = clientId;
     }
 
-    public boolean isResourced() {
+    public Boolean isResourced() {
         return resourced;
     }
 
-    public void setResourced(boolean resourced) {
+    public void setResourced(Boolean resourced) {
         this.resourced = resourced;
     }
 }

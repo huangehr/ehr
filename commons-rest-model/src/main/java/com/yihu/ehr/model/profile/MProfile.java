@@ -22,8 +22,6 @@ public class MProfile {
     private String demographicId;
     private String cdaVersion;
     private String summary;
-
-    @JsonFormat(pattern = DateTimeUtils.ISO8601Pattern, locale = "zh" , timezone="GMT+8")
     private Date eventDate;
 
     private List<MProfileDocument> documents = new ArrayList<>();

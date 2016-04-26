@@ -1,4 +1,4 @@
-package com.yihu.ehr.feign;
+package com.yihu.ehr.pack.feign;
 
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;

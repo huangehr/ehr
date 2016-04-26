@@ -29,7 +29,7 @@ public class Package {
     private Date receiveDate;
     private Date parseDate;
     private Date finishDate;
-    private boolean resourced;                          // 是否已经资源化处理
+    private Boolean resourced;                          // 是否已经资源化处理
     private ArchiveStatus archiveStatus;
 
     @Id
@@ -131,11 +131,11 @@ public class Package {
         this.clientId = clientId;
     }
 
-    public boolean isResourced() {
+    public Boolean isResourced() {
         return resourced;
     }
 
-    public void setResourced(boolean resourced) {
+    public void setResourced(Boolean resourced) {
         this.resourced = resourced;
     }
 

@@ -1,11 +1,10 @@
-package com.yihu.ehr.task;
+package com.yihu.ehr.pack.task;
 
 import com.yihu.ehr.model.packs.MPackage;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**

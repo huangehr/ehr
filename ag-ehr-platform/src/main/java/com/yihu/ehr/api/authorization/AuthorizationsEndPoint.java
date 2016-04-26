@@ -229,7 +229,10 @@ public class AuthorizationsEndPoint {
         tokenModel.setId(1);
         tokenModel.setToken(token);
         tokenModel.setTokenLastEight(token.substring(token.length() - 8));
+        tokenModel.setCreatedAt(new Date());
         tokenModel.setUpdatedAt(new Date());
+        tokenModel.setFingerprint(fingerprint);
+        tokenModel.setTokenHash(HashUtil.hashStr(token));
 
         return tokenModel;
     }
