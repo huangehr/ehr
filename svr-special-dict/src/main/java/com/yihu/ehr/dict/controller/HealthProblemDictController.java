@@ -119,11 +119,11 @@ public class HealthProblemDictController extends BaseRestController {
         }
     }
 
-    @RequestMapping(value = "/dict/hp/existence/name/{name}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/hp/existence/name" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典名称是否已经存在")
     public boolean isNameExists(
             @ApiParam(name = "name", value = "name", defaultValue = "")
-            @PathVariable(value = "name") String name){
+            @RequestParam(value = "name") String name){
         return hpDictService.isNameExist(name);
     }
 

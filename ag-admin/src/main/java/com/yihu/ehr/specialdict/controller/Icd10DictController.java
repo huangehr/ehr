@@ -16,9 +16,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -116,14 +118,15 @@ public class Icd10DictController extends BaseController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) Integer page){
 
-        List<MIcd10Dict> icd10DictList =(List<MIcd10Dict>)icd10DictClient.getIcd10DictList(fields, filters, sorts, size, page);
         List<Icd10DictModel> icd10DictModelList = new ArrayList<>();
-
-        for (MIcd10Dict mIcd10Dict:icd10DictList){
+        ResponseEntity<Collection<MIcd10Dict>> responseEntity = icd10DictClient.getIcd10DictList(fields, filters, sorts, size, page);
+        Collection<MIcd10Dict> mIcd10Dicts = responseEntity.getBody();
+        Integer totalCount = getTotalCount(responseEntity);
+        for (MIcd10Dict mIcd10Dict:mIcd10Dicts){
             Icd10DictModel icd10DictModel= changeToModel(mIcd10Dict);
             icd10DictModelList.add(icd10DictModel);
         }
-        Envelop envelop = getResult(icd10DictModelList,0,page,size);
+        Envelop envelop = getResult(icd10DictModelList,totalCount,page,size);
 
         return envelop;
     }
@@ -154,11 +157,11 @@ public class Icd10DictController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = "/dict/icd10/existence/name/{name}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/icd10/existence/name" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典名称是否已经存在")
     public Envelop isNameExist(
             @ApiParam(name = "name", value = "name", defaultValue = "")
-            @PathVariable(value = "name") String name){
+            @RequestParam(value = "name") String name){
 
         Envelop envelop = new Envelop();
         boolean result = icd10DictClient.isNameExists(name);
@@ -235,14 +238,15 @@ public class Icd10DictController extends BaseController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page){
 
-        List<MIcd10DrugRelation> icd10DrugRelationList =(List<MIcd10DrugRelation>)icd10DictClient.getIcd10DrugRelationList(fields, filters, sorts, size, page);
         List<Icd10DrugRelationModel> icd10DrugRelationModelList = new ArrayList<>();
-
-        for (MIcd10DrugRelation mIcd10DrugRelation:icd10DrugRelationList){
+        ResponseEntity<Collection<MIcd10DrugRelation>> responseEntity = icd10DictClient.getIcd10DrugRelationList(fields, filters, sorts, size, page);
+        Collection<MIcd10DrugRelation> mIcd10DrugRelations = responseEntity.getBody();
+        Integer totalCount = getTotalCount(responseEntity);
+        for (MIcd10DrugRelation mIcd10DrugRelation:mIcd10DrugRelations){
             Icd10DrugRelationModel icd10DrugRelationModel = convertToModel(mIcd10DrugRelation,Icd10DrugRelationModel.class);
             icd10DrugRelationModelList.add(icd10DrugRelationModel);
         }
-        Envelop envelop = getResult(icd10DrugRelationModelList,0,page,size);
+        Envelop envelop = getResult(icd10DrugRelationModelList,totalCount,page,size);
 
         return envelop;
     }
@@ -330,14 +334,15 @@ public class Icd10DictController extends BaseController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page){
 
-        List<MIcd10IndicatorRelation> mIcd10IndicatorRelationList =(List<MIcd10IndicatorRelation>)icd10DictClient.getIcd10IndicatorRelationList(fields, filters, sorts, size, page);
         List<Icd10IndicatorRelationModel> icd10IndicatorRelationModelList = new ArrayList<>();
-
-        for (MIcd10IndicatorRelation mIcd10IndicatorRelation:mIcd10IndicatorRelationList){
+        ResponseEntity<Collection<MIcd10IndicatorRelation>> responseEntity = icd10DictClient.getIcd10IndicatorRelationList(fields, filters, sorts, size, page);
+        Collection<MIcd10IndicatorRelation> mIcd10IndicatorRelations = responseEntity.getBody();
+        Integer totalCount = getTotalCount(responseEntity);
+        for (MIcd10IndicatorRelation mIcd10IndicatorRelation:mIcd10IndicatorRelations){
             Icd10IndicatorRelationModel icd10DrugRelationModel = convertToModel(mIcd10IndicatorRelation,Icd10IndicatorRelationModel.class);
             icd10IndicatorRelationModelList.add(icd10DrugRelationModel);
         }
-        Envelop envelop = getResult(icd10IndicatorRelationModelList,0,page,size);
+        Envelop envelop = getResult(icd10IndicatorRelationModelList,totalCount,page,size);
 
         return envelop;
     }
