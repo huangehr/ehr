@@ -281,7 +281,8 @@ public class OrgEndPoint extends BaseRestController {
         ObjectNode objectNode = fastDFSUtil.upload(inputStream, fileExtension, description);
         String groupName = objectNode.get("groupName").toString();
         String remoteFileName = objectNode.get("remoteFileName").toString();
-        String path = "{\"groupName\":" + groupName + ",\"remoteFileName\":" + remoteFileName + "}";
+//        String path = "{\"groupName\":" + groupName + ",\"remoteFileName\":" + remoteFileName + "}";
+        String path = groupName.substring(1,groupName.length()-1) + ":" + remoteFileName.substring(1,remoteFileName.length()-1);
         //返回文件路径
         return path;
     }
