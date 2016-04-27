@@ -8,7 +8,7 @@ package com.yihu.ehr.constants;
 public enum ProfileType {
     NonStructured(0),
     Structured(1),
-    Lightweight(2);
+    Link(2);
 
     private int type;
     ProfileType(int type){

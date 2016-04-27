@@ -6,10 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.lang.SpringContext;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 标准档案数据集。
@@ -28,7 +25,7 @@ public class StdDataSet {
     protected Date eventDate;
     protected Date createDate;
 
-    protected Map<String, DataRecord> records = new HashMap<>();
+    protected Map<String, DataRecord> records = new TreeMap<>();
 
     public String getCode() {
         return code;
@@ -108,6 +105,18 @@ public class StdDataSet {
 
     public Map<String, DataRecord> getRecords() {
         return records;
+    }
+
+    public int getRecordCount(){
+        return records.size();
+    }
+
+    public String getFirstRowkey(){
+        for (String rowkey : records.keySet()){
+            return rowkey;
+        }
+
+        return null;
     }
 
     public void updateRecordKey(String origin, String newer) {

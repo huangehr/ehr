@@ -1,4 +1,4 @@
-package com.yihu.ehr.config;
+package com.yihu.ehr.data.hbase.config;
 
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;

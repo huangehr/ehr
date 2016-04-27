@@ -1,4 +1,4 @@
-package com.yihu.ehr.extractor;
+package com.yihu.ehr.profile.core.extractor;
 
 import com.yihu.ehr.profile.core.StdDataSet;
 import org.springframework.beans.factory.annotation.Autowired;

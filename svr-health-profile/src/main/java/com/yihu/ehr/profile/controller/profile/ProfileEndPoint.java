@@ -8,7 +8,7 @@ import com.yihu.ehr.model.profile.*;
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import com.yihu.ehr.profile.config.CdaDocumentOptions;
-import com.yihu.ehr.profile.core.commons.DataSetTableOption;
+import com.yihu.ehr.profile.core.commons.DataSetUtil;
 import com.yihu.ehr.profile.core.StructedProfile;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.persist.ProfileIndices;
@@ -252,7 +252,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
 
                 addDataset(profile.getCdaVersion(), document, profile.getDataSet(dataSetCode));
 
-                addDataset(profile.getCdaVersion(), document, profile.getDataSet(DataSetTableOption.originDataSetCode(dataSetCode)));
+                addDataset(profile.getCdaVersion(), document, profile.getDataSet(DataSetUtil.originDataSetCode(dataSetCode)));
 
                 if (!validDocument) validDocument = !dataSetCode.startsWith("HDSA00_01");
             }
@@ -287,7 +287,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
 
                 addDataset(profile.getCdaVersion(), document, profile.getDataSet(dataSetCode));
 
-                addDataset(profile.getCdaVersion(), document, profile.getDataSet(DataSetTableOption.originDataSetCode(dataSetCode)));
+                addDataset(profile.getCdaVersion(), document, profile.getDataSet(DataSetUtil.originDataSetCode(dataSetCode)));
             }
 
             return document;
@@ -298,7 +298,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
 
     private void addDataset(String version, MProfileDocument document, StructuredDataSet dataSet) {
         if (dataSet != null) {
-            String dataSetCode = DataSetTableOption.standardDataSetCode(dataSet.getCode());
+            String dataSetCode = DataSetUtil.standardDataSetCode(dataSet.getCode());
 
             MDataSet mDataSet = new MDataSet();
             mDataSet.setName(cacheReader.read(stdKeySchema.dataSetNameByCode(version, dataSetCode)));

@@ -1,7 +1,7 @@
 package com.yihu.ehr.profile.core.commons;
 
-import com.yihu.ehr.profile.core.nostructured.RawDocument;
-import com.yihu.ehr.profile.core.nostructured.NonStructedProfile;
+import com.yihu.ehr.profile.core.RawDocument;
+import com.yihu.ehr.profile.core.NonStructedProfile;
 
 import java.util.List;
 

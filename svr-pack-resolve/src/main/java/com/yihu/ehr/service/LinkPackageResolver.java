@@ -1,21 +1,16 @@
 package com.yihu.ehr.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.common.PackageUtil;
 import com.yihu.ehr.constants.ProfileType;
-import com.yihu.ehr.extractor.EventExtractor;
-import com.yihu.ehr.extractor.ExtractorChain;
+import com.yihu.ehr.profile.core.extractor.EventExtractor;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.profile.core.commons.StructuredProfile;
 import com.yihu.ehr.profile.core.lightweight.LightWeightDataSet;
-import com.yihu.ehr.profile.persist.DataSetResolverWithTranslator;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -30,22 +25,7 @@ import java.text.ParseException;
  * @created 2015.09.09 15:04
  */
 @Component
-public class LightWeightPackageResolver {
-    @Autowired
-    ApplicationContext context;
-
-    @Autowired
-    DataSetResolverWithTranslator dataSetResolverWithTranslator;
-
-    @Autowired
-    ObjectMapper objectMapper;
-
-    @Autowired
-    ExtractorChain extractorChain;
-
-    private final static char PathSep = File.separatorChar;
-    private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
-
+public class LinkPackageResolver extends PackageResolver {
 
     /**
      * 执行归档作业。归档作为流程如下：
@@ -66,7 +46,7 @@ public class LightWeightPackageResolver {
 
 
         StructuredProfile structuredProfile = new StructuredProfile();       //轻量级档案
-        structuredProfile.setProfileType(ProfileType.Lightweight);
+        structuredProfile.setProfileType(ProfileType.Link);
 
         File[] files = root.listFiles();
 

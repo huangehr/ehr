@@ -11,11 +11,19 @@ import java.util.Set;
 public class DataRecord {
     Map<String, String> metaDataGroup;
 
+    public Map<String, String> getMetaDataGroup(){
+        return metaDataGroup;
+    }
+
     public Set<String> getMetaDataCodes(){
         return metaDataGroup.keySet();
     }
 
-    public String getMetaData(String code){
-        return metaDataGroup.get(code);
+    public String getMetaData(String metaDataCode){
+        return metaDataGroup.get(metaDataCode);
+    }
+
+    public void putMetaData(String metaDataCode, String value){
+        metaDataGroup.put(metaDataCode, value);
     }
 }

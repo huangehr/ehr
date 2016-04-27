@@ -1,24 +1,18 @@
 package com.yihu.ehr.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.common.PackageUtil;
 import com.yihu.ehr.constants.ProfileConstant;
 import com.yihu.ehr.constants.ProfileType;
-import com.yihu.ehr.extractor.ExtractorChain;
-import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.profile.core.nostructured.NoStructuredContent;
-import com.yihu.ehr.profile.core.nostructured.RawDocument;
-import com.yihu.ehr.profile.core.nostructured.NoStructuredDocumentFile;
-import com.yihu.ehr.profile.core.nostructured.NonStructedProfile;
-import com.yihu.ehr.profile.persist.DataSetResolverWithTranslator;
+import com.yihu.ehr.profile.core.RawDocument;
+import com.yihu.ehr.profile.core.RawDocumentList;
+import com.yihu.ehr.profile.core.NonStructedProfile;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -37,51 +31,26 @@ import java.util.List;
  * @created 2015.09.09 15:04
  */
 @Component
-public class NoStructuredPackageResolver {
-    @Autowired
-    ApplicationContext context;
-
-    @Autowired
-    DataSetResolverWithTranslator dataSetResolverWithTranslator;
-
-    @Autowired
-    ObjectMapper objectMapper;
-
-    @Autowired
-    ExtractorChain extractorChain;
-
-    @Autowired
-    private FastDFSUtil fastDFSUtil;
-
+public class DocumentPackageResolver extends PackageResolver {
     private final static char PathSep = File.separatorChar;
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
 
-    /**
-     * 执行归档作业。归档作为流程如下：
-     * 1. 从JSON档案管理器中获取一个待归档的JSON文档，并标记为Acquired，表示正在归档，并记录开始时间。
-     * 2. 解压zip档案包，如果解压失败，或检查解压后的目录结果不符合规定，将文档状态标记为 Failed，记录日志并返回。
-     * 3. 读取包中的 origin, standard 文件夹中的 JSON 数据并解析。
-     * 4. 对关联字典的数据元进行标准化，将字典的值直接写入数据
-     * 5. 解析完的数据存入HBase，并将JSON文档的状态标记为 Finished。
-     * 6. 以上步骤有任何一个失败的，将文档标记为 InDoubt 状态，即无法决定该JSON档案的去向，需要人为干预。
-     * <p>
-     * ObjectMapper Stream API使用，参见：http://wiki.fasterxml.com/JacksonStreamingApi
-     */
     public NonStructedProfile doResolve(MPackage pack, String zipFile) throws Exception {
         File root = new Zipper().unzipFile(new File(zipFile), LocalTempPath + PathSep + pack.getId(), pack.getPwd());
         if (root == null || !root.isDirectory() || root.list().length == 0) {
             throw new RuntimeException("Invalid package file, package id: " + pack.getId());
         }
+
         NonStructedProfile noStructuredProfile = new NonStructedProfile();    //非结构化档案
         noStructuredProfile.setProfileType(ProfileType.NonStructured);
         File[] files = root.listFiles();
-        List<NoStructuredDocumentFile> noStructuredDocumentFileList = new ArrayList<>();  //document底下的文件
+        List<RawDocumentList> documentListList = new ArrayList<>();  //document底下的文件
         for(File file:files){
             String folderName = file.getPath().substring(file.getPath().lastIndexOf("\\")+1);
             if(folderName.equals(ProfileConstant.DocumentFolder)){
-                noStructuredDocumentFileList = unstructuredDocumentParse(noStructuredProfile, file.listFiles());
+                documentListList = unstructuredDocumentParse(noStructuredProfile, file.listFiles());
             }else if(folderName.equals("meta.json")){
-                noStructuredProfile = unstructuredDataSetParse(noStructuredProfile,file, noStructuredDocumentFileList);
+                noStructuredProfile = unstructuredDataSetParse(noStructuredProfile,file, documentListList);
             }
         }
 
@@ -99,10 +68,10 @@ public class NoStructuredPackageResolver {
      * @param
      * @throws IOException
      */
-    public List<NoStructuredDocumentFile> unstructuredDocumentParse(NonStructedProfile profile, File[] files) throws Exception {
-        List<NoStructuredDocumentFile> noStructuredDocumentFileList = new ArrayList<>();
+    public List<RawDocumentList> unstructuredDocumentParse(NonStructedProfile profile, File[] files) throws Exception {
+        List<RawDocumentList> documentListList = new ArrayList<>();
         for (File file : files) {
-            NoStructuredDocumentFile noStructuredDocumentFile = new NoStructuredDocumentFile();
+            RawDocumentList documentList = new RawDocumentList();
             if (file.getAbsolutePath().endsWith(ProfileConstant.JsonExt)) continue;
             //这里把图片保存的fastdfs
             String filePath = file.getPath();
@@ -114,11 +83,11 @@ public class NoStructuredPackageResolver {
             String remoteFileName = objectNode.get("remoteFileName").toString();
             String remotePath = "groupName:" + groupName + ",remoteFileName:" + remoteFileName;
 
-            noStructuredDocumentFile.setLocalFileName(localFileName);
-            noStructuredDocumentFile.setRemotePath(remotePath);
-            noStructuredDocumentFileList.add(noStructuredDocumentFile);
+            documentList.setLocalFileName(localFileName);
+            documentList.setRemotePath(remotePath);
+            documentListList.add(documentList);
         }
-        return noStructuredDocumentFileList;
+        return documentListList;
     }
 
     /**
@@ -127,7 +96,7 @@ public class NoStructuredPackageResolver {
      * @param
      * @throws IOException
      */
-    public NonStructedProfile unstructuredDataSetParse(NonStructedProfile noStructuredProfile, File file, List<NoStructuredDocumentFile> noStructuredDocumentFileList) throws Exception {
+    public NonStructedProfile unstructuredDataSetParse(NonStructedProfile noStructuredProfile, File file, List<RawDocumentList> documentListList) throws Exception {
         JsonNode jsonNode = objectMapper.readTree(file);
 
 
@@ -164,9 +133,9 @@ public class NoStructuredPackageResolver {
             String url = data.get("url").asText();
             String expiryDate = data.get("expiry_date").asText();
 
-            rawDocument.setCdaDocId(cdaDocId);
-            rawDocument.setUrl(url);
-            rawDocument.setExpiryDate(format.parse(expiryDate));
+            rawDocument.setCdaDocumentId(cdaDocId);
+            rawDocument.setFileUrl(url);
+            rawDocument.setExpireDate(format.parse(expiryDate));
 
 
             String keyWordsStr = data.get("key_words").toString();
@@ -186,7 +155,7 @@ public class NoStructuredPackageResolver {
             for(int j=0;j<contents.size();j++){
                 //documentFiles;
                 NoStructuredContent noStructuredContent = new NoStructuredContent();
-                List<NoStructuredDocumentFile> noStructuredDocumentFileListNew = new ArrayList<>();
+                List<RawDocumentList> documentListListNew = new ArrayList<>();
 
 
                 JsonNode object = contents.get(j);
@@ -196,18 +165,18 @@ public class NoStructuredPackageResolver {
                 String[] names = name.split(",");
 
                 for(String filename:names){
-                    for(NoStructuredDocumentFile noStructuredDocumentFile : noStructuredDocumentFileList){
-                        String localFileName = noStructuredDocumentFile.getLocalFileName();
+                    for(RawDocumentList documentList : documentListList){
+                        String localFileName = documentList.getLocalFileName();
                         if(filename.equals(localFileName)){
-                            noStructuredDocumentFile.setMimeType(mimeType);
-                            noStructuredDocumentFile.setName(filename);
-                            noStructuredDocumentFile.setLocalFileName(noStructuredDocumentFile.getLocalFileName());
-                            noStructuredDocumentFile.setRemotePath(noStructuredDocumentFile.getRemotePath());
-                            noStructuredDocumentFileListNew.add(noStructuredDocumentFile);
+                            documentList.setMimeType(mimeType);
+                            documentList.setName(filename);
+                            documentList.setLocalFileName(documentList.getLocalFileName());
+                            documentList.setRemotePath(documentList.getRemotePath());
+                            documentListListNew.add(documentList);
                         }
                     }
                 }
-                noStructuredContent.setNoStructuredDocumentFileList(noStructuredDocumentFileListNew);
+                noStructuredContent.setNoStructuredDocumentFileList(documentListListNew);
                 noStructuredContentList.add(noStructuredContent);
 
 

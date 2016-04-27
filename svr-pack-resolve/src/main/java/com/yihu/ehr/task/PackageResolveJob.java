@@ -2,19 +2,15 @@ package com.yihu.ehr.task;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ArchiveStatus;
-import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.feign.XPackageMgrClient;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.mq.MessageBuffer;
-import com.yihu.ehr.profile.core.commons.StructuredProfile;
-import com.yihu.ehr.profile.core.nostructured.NonStructedProfile;
+import com.yihu.ehr.profile.core.commons.Profile;
 import com.yihu.ehr.profile.persist.repo.ProfileRepository;
-import com.yihu.ehr.service.LightWeightPackageResolver;
 import com.yihu.ehr.common.PackageUtil;
-import com.yihu.ehr.service.StructuredPackageResolver;
-import com.yihu.ehr.service.NoStructuredPackageResolver;
+import com.yihu.ehr.service.PackageResolveEngine;
 import com.yihu.ehr.util.log.LogService;
 import org.quartz.InterruptableJob;
 import org.quartz.JobExecutionContext;
@@ -34,13 +30,7 @@ import java.util.NoSuchElementException;
 public class PackageResolveJob implements InterruptableJob {
 
     @Autowired
-    private StructuredPackageResolver structuredPackageResolver;
-
-    @Autowired
-    private NoStructuredPackageResolver noStructuredPackageResolver;
-
-    @Autowired
-    private LightWeightPackageResolver lightWeightPackageResolver;
+    private PackageResolveEngine resolveEngine;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -67,7 +57,7 @@ public class PackageResolveJob implements InterruptableJob {
         try{
             if (pack == null) return;
 
-            LogService.getLogger().info("Quartz job: resolve package " + pack.getId());
+            LogService.getLogger().info("Package resolve job: package " + pack.getId());
 
             XPackageMgrClient packageMgrClient = SpringContext.getService(XPackageMgrClient.class);
             PackageUtil packageUtil = SpringContext.getService(PackageUtil.class);
@@ -75,27 +65,12 @@ public class PackageResolveJob implements InterruptableJob {
 
             String zipFile = downloadTo(pack.getRemotePath());
 
+            Profile profile = resolveEngine.doResolve(pack, zipFile);
+            profileRepo.save(profile);
 
-            StructuredProfile structuredProfile = null;           //结构化档案
-            NonStructedProfile noStructuredProfile;                        //非结构化档案
-
-            ProfileType profileType = packageUtil.getProfileType(pack, zipFile);
-            if (profileType == ProfileType.Structured) {
-                structuredProfile = structuredPackageResolver.doResolve(pack, zipFile);
-                profileRepo.saveStructuredProfileModel(structuredProfile);
-                packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
-                        "Identity: " + structuredProfile.getDemographicId() + ", structuredProfile: " + structuredProfile.getId());
-            } else if (profileType == ProfileType.NonStructured) {
-                noStructuredProfile = noStructuredPackageResolver.doResolve(pack, zipFile);
-                profileRepo.saveUnStructuredProfile(noStructuredProfile);
-                packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
-                        "Identity: " + noStructuredProfile.getDemographicId() + ", unStructuredProfile: " + noStructuredProfile.getId());
-            } else if (profileType == ProfileType.Lightweight) {
-                structuredProfile = lightWeightPackageResolver.doResolve(pack, zipFile);
-                profileRepo.saveStructuredProfileModel(structuredProfile);
-                packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
-                        "Identity: " + structuredProfile.getDemographicId() + ", lightWeightProfile: " + structuredProfile.getId());
-            }
+            packageMgrClient.reportStatus(pack.getId(),
+                    ArchiveStatus.Finished,
+                    String.format("Rowkey: %s, identity: %s", profile.getDemographicId(), profile.getId()));
 
         } catch (Exception e) {
             LogService.getLogger().error(e.getMessage());

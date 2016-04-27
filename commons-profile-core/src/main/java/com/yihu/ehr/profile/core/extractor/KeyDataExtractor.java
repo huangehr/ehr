@@ -1,4 +1,4 @@
-package com.yihu.ehr.extractor;
+package com.yihu.ehr.profile.core.extractor;
 
 import com.yihu.ehr.profile.core.StdDataSet;
 
@@ -16,7 +16,8 @@ public abstract class KeyDataExtractor {
     public enum Filter{
         CardInfo,
         DemographicInfo,
-        EventDate
+        EventDate,
+        EventType
     }
 
     public abstract Object extract(StdDataSet dataSet, Filter filter) throws ParseException;

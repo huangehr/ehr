@@ -1,32 +1,27 @@
 package com.yihu.ehr.profile.core.commons;
 
+import java.util.Map;
+
 /**
  * HBase数据库中健康档案表选项. 如列族名称等.
  * 健康档案列族结构: |basic|extension|
  * 健康事件列族结构: |basic|extension|
  * 数据集列族结构: |basic|meta_data|extension|
- *
  * @author Sand
- * @version 1.0
- * @created 2015.08.23 18:11
+ * @created 2016.04.27 17:06
  */
-public class ProfileTableOptions {
-    public static final String Table = "HealthArchives";
+public enum ProfileFamily {
+    Basic("basic"),
+    Extension("extension");
 
-    // 列族
-    public enum Family {
-        Basic("basic"),
-        Extension("extension");
+    private String family;
 
-        private String family;
+    ProfileFamily(String family){
+        this.family = family;
+    }
 
-        Family(String family){
-            this.family = family;
-        }
-
-         public String toString(){
-             return family;
-         }
+    public String toString(){
+        return family;
     }
 
     // 列
@@ -36,6 +31,8 @@ public class ProfileTableOptions {
         PatientId("patient_id"),
         EventNo("event_no"),
         EventDate("event_date"),
+        EventType("event_type"),
+        ProfileType("profile_type"),
         Summary("summary"),
         DemographicId("demographic_id"),
         CreateDate("create_date"),
@@ -60,8 +57,8 @@ public class ProfileTableOptions {
      */
     public static String[] getFamilies() {
         return new String[]{
-                Family.Basic.toString(),
-                Family.Extension.toString()
+                ProfileFamily.Basic.toString(),
+                ProfileFamily.Extension.toString()
         };
     }
 
@@ -70,8 +67,8 @@ public class ProfileTableOptions {
      *
      * @return
      */
-    public static String[] getQualifiers(Family family) {
-        if (family == Family.Basic) {
+    public static String[] getColumns(ProfileFamily family) {
+        if (family == ProfileFamily.Basic) {
             return new String[]{
                     BasicQualifier.CardId.toString(),
                     BasicQualifier.OrgCode.toString(),

@@ -15,7 +15,7 @@ public class LinkProfile extends StructedProfile {
     public Date expireDate;
 
     public LinkProfile(){
-        setProfileType(ProfileType.Lightweight);
+        setProfileType(ProfileType.Link);
     }
 
     public Date getExpireDate() {

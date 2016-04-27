@@ -3,7 +3,7 @@ package com.yihu.ehr.common;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ProfileConstant;
 import com.yihu.ehr.constants.ProfileType;
-import com.yihu.ehr.extractor.ExtractorChain;
+import com.yihu.ehr.profile.core.extractor.ExtractorChain;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.profile.persist.DataSetResolverWithTranslator;
 import com.yihu.ehr.util.compress.Zipper;
@@ -15,10 +15,9 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 
 /**
- * 档案归档任务.
+ * 档案包工具.
  *
  * @author Sand
- * @version 1.0
  * @created 2015.09.09 15:04
  */
 @Component
@@ -35,19 +34,14 @@ public class PackageUtil {
     @Autowired
     ExtractorChain extractorChain;
 
-
     private final static char PathSep = File.separatorChar;
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
-
-
-
 
     public ProfileType getProfileType(MPackage pack, String zipFile) throws ZipException {
         File root = new Zipper().unzipFile(new File(zipFile), LocalTempPath + PathSep + pack.getId(), pack.getPwd());
         if (root == null || !root.isDirectory() || root.list().length == 0) {
             throw new RuntimeException("Invalid package file, package id: " + pack.getId());
         }
-
 
         File[] files = root.listFiles();
         String firstFilepath = files[0].getPath();
@@ -56,12 +50,11 @@ public class PackageUtil {
         if (firstFolderName.equals(ProfileConstant.OriFolder)){
             return ProfileType.Structured;
         }else if(firstFolderName.equals(ProfileConstant.IndexFolder)){
-            return ProfileType.Lightweight;
+            return ProfileType.Link;
         }else if(firstFolderName.equals(ProfileConstant.DocumentFolder)){
             return ProfileType.NonStructured;
         }
+
         return null;
     }
-
-
 }

@@ -10,12 +10,12 @@ import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.feign.XPackageMgrClient;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.profile.core.commons.StructuredProfile;
-import com.yihu.ehr.profile.core.nostructured.NonStructedProfile;
+import com.yihu.ehr.profile.core.NonStructedProfile;
 import com.yihu.ehr.profile.persist.repo.ProfileRepository;
-import com.yihu.ehr.service.LightWeightPackageResolver;
+import com.yihu.ehr.service.LinkPackageResolver;
 import com.yihu.ehr.common.PackageUtil;
-import com.yihu.ehr.service.StructuredPackageResolver;
-import com.yihu.ehr.service.NoStructuredPackageResolver;
+import com.yihu.ehr.service.StdPackageResolver;
+import com.yihu.ehr.service.DocumentPackageResolver;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -49,13 +49,13 @@ public class ResolveEndPoint {
     XPackageMgrClient packageMgrClient;
 
     @Autowired
-    private StructuredPackageResolver structuredPackageResolver;
+    private StdPackageResolver stdPackageResolver;
 
     @Autowired
-    private NoStructuredPackageResolver noStructuredPackageResolver;
+    private DocumentPackageResolver documentPackageResolver;
 
     @Autowired
-    private LightWeightPackageResolver lightWeightPackageResolver;
+    private LinkPackageResolver linkPackageResolver;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -89,19 +89,19 @@ public class ResolveEndPoint {
         NonStructedProfile noStructuredProfile;                        //非结构化档案
         ProfileType profileType = packageUtil.getProfileType(pack, zipFile);
         if (profileType == ProfileType.Structured) {
-            structuredProfile = structuredPackageResolver.doResolve(pack, zipFile);
+            structuredProfile = stdPackageResolver.doResolve(pack, zipFile);
             profileRepo.saveStructuredProfileModel(structuredProfile);
             packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
                     "Identity: " + structuredProfile.getDemographicId() + ", structuredProfile: " + structuredProfile.getId());
             return new ResponseEntity<>(echo ? objectMapper.writeValueAsString(structuredProfile) : "", HttpStatus.OK);
         } else if (profileType == ProfileType.NonStructured) {
-            noStructuredProfile = noStructuredPackageResolver.doResolve(pack, zipFile);
+            noStructuredProfile = documentPackageResolver.doResolve(pack, zipFile);
             profileRepo.saveUnStructuredProfile(noStructuredProfile);
             packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
                     "Identity: " + noStructuredProfile.getDemographicId() + ", unStructuredProfile: " + noStructuredProfile.getId());
             return new ResponseEntity<>(echo ? objectMapper.writeValueAsString(noStructuredProfile) : "", HttpStatus.OK);
-        } else if (profileType == ProfileType.Lightweight) {
-            structuredProfile = lightWeightPackageResolver.doResolve(pack, zipFile);
+        } else if (profileType == ProfileType.Link) {
+            structuredProfile = linkPackageResolver.doResolve(pack, zipFile);
             profileRepo.saveStructuredProfileModel(structuredProfile);
             packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
                     "Identity: " + structuredProfile.getDemographicId() + ", lightWeightProfile: " + structuredProfile.getId());
@@ -146,32 +146,31 @@ public class ResolveEndPoint {
             pack.setId(packageId);
             pack.setArchiveStatus(ArchiveStatus.Received);
 
-
             StructuredProfile structuredProfile = new StructuredProfile();           //结构化档案
             NonStructedProfile noStructuredProfile;                        //非结构化档案
 
             ProfileType profileType = packageUtil.getProfileType(pack, zipFile);
 
             if (profileType == ProfileType.NonStructured) {
-                noStructuredProfile = noStructuredPackageResolver.doResolve(pack, zipFile);
+                noStructuredProfile = documentPackageResolver.doResolve(pack, zipFile);
                 if(persist){
                     profileRepo.saveUnStructuredProfile(noStructuredProfile);
                 }
                 return new ResponseEntity<>(new ObjectMapper().writeValueAsString(noStructuredProfile), HttpStatus.OK);
-            } else if (profileType == ProfileType.Lightweight) {
+            } else if (profileType == ProfileType.Link) {
                 structuredProfile.setProfileType(profileType);
-                structuredProfile = lightWeightPackageResolver.doResolve(pack, zipFile);
+                structuredProfile = linkPackageResolver.doResolve(pack, zipFile);
                 if(persist){
                     profileRepo.saveStructuredProfileModel(structuredProfile);
                 }
                 return new ResponseEntity<>(objectMapper.writeValueAsString(structuredProfile), HttpStatus.OK);
             }if (profileType == ProfileType.Structured) {
                 structuredProfile.setProfileType(profileType);
-                structuredProfile = structuredPackageResolver.doResolve(pack, zipFile);
+                structuredProfile = stdPackageResolver.doResolve(pack, zipFile);
                 if(persist){
                     profileRepo.saveStructuredProfileModel(structuredProfile);
                 }
-                return new ResponseEntity<>(objectMapper.writeValueAsString(structuredProfile), HttpStatus.OK);
+                return new ResponseEntity<>(objectMapper.writeValueAsString(profile.toJson()), HttpStatus.OK);
             }
             return null;
 
@@ -179,9 +178,6 @@ public class ResolveEndPoint {
             throw new ApiException(HttpStatus.NOT_ACCEPTABLE, e.getMessage());
         }
     }
-
-
-
 
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
 
