@@ -162,7 +162,7 @@ public class CDADataSetRelationshipManager extends BaseHbmService<BaseCDADataSet
                 && !cdaDocument.getSchema().equals("")) {
             fastDFSUtil.delete(cdaDocument.getFileGroup(), cdaDocument.getSchema());
         }
-        if (dataSetIds==null) return true;
+        if (dataSetIds==null || dataSetIds.length==0) return true;
 
         List<CDADataSetRelationship> infos = new ArrayList<>();
         for (int i = 0; i < dataSetIds.length; i++) {
