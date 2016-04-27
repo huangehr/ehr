@@ -8,12 +8,13 @@ import com.yihu.ehr.model.profile.*;
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import com.yihu.ehr.profile.config.CdaDocumentOptions;
+import com.yihu.ehr.profile.core.StdDataSet;
 import com.yihu.ehr.profile.core.commons.DataSetUtil;
 import com.yihu.ehr.profile.core.StructedProfile;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.persist.ProfileIndices;
 import com.yihu.ehr.profile.persist.ProfileIndicesService;
-import com.yihu.ehr.profile.persist.repo.ProfileRepository;
+import com.yihu.ehr.profile.persist.ProfileService;
 import com.yihu.ehr.profile.service.Template;
 import com.yihu.ehr.profile.service.TemplateService;
 import com.yihu.ehr.schema.OrgKeySchema;
@@ -48,7 +49,7 @@ import java.util.*;
 @Api(value = "健康档案服务", description = "提供档案搜索及完整档案下载")
 public class ProfileEndPoint extends BaseRestEndPoint {
     @Autowired
-    private ProfileRepository profileRepo;
+    private ProfileService profileService;
 
     @Autowired
     private ProfileIndicesService indicesService;
@@ -138,7 +139,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
 
         List<StructedProfile> profiles = new ArrayList<>();
         for (ProfileIndices indices : profileIndices) {
-            StructuredProfile profile = profileRepo.findOne(indices.getProfileId(), loadStdDataSet, loadOriginDataSet);
+            StructedProfile profile = profileService.getProfile(indices.getProfileId(), loadStdDataSet, loadOriginDataSet);
             profiles.add(profile);
         }
 
@@ -161,7 +162,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "load_std_data_set") boolean loadStdDataSet,
             @ApiParam(value = "是否加载原始数据集", defaultValue = "false")
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws IOException, ParseException {
-        StructedProfile profile = profileRepo.findOne(profileId, loadStdDataSet, loadOriginDataSet);
+        StructedProfile profile = profileService.getProfile(profileId, loadStdDataSet, loadOriginDataSet);
 
         return convertProfile(profile);
     }
@@ -177,7 +178,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "load_std_data_set") boolean loadStdDataSet,
             @ApiParam(value = "是否加载原始数据集", defaultValue = "false")
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws IOException, ParseException {
-        StructedProfile profile = profileRepo.findOne(profileId, loadStdDataSet, loadOriginDataSet);
+        StructedProfile profile = profileService.getProfile(profileId, loadStdDataSet, loadOriginDataSet);
         Map<Template, MCDADocument> cdaDocuments = getCustomizedCDADocuments(profile);
 
         return convertDocument(profile, cdaDocuments, documentId);
@@ -189,7 +190,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     private Map<Template, MCDADocument> getCustomizedCDADocuments(StructedProfile profile) {
         // 使用CDA类别关键数据元映射，取得与此档案相关联的CDA类别ID
         String cdaType = null;
-        for (StructuredDataSet dataSet : profile.getDataSets()) {
+        for (StdDataSet dataSet : profile.getDataSets()) {
             if (cdaDocumentOptions.isPrimaryDataSet(dataSet.getCode())) {
                 cdaType = cdaDocumentOptions.getCdaDocumentTypeId(dataSet.getCode());
                 break;
@@ -212,7 +213,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return cdaDocuments;
     }
 
-    private MProfile convertProfile(StructuredProfile profile) {
+    private MProfile convertProfile(StructedProfile profile) {
         MProfile mProfile = new MProfile();
         mProfile.setId(profile.getId());
         mProfile.setCdaVersion(profile.getCdaVersion());
@@ -263,7 +264,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return mProfile;
     }
 
-    private MProfileDocument convertDocument(StructuredProfile profile, Map<Template, MCDADocument> cdaDocuments, String documentId) {
+    private MProfileDocument convertDocument(StructedProfile profile, Map<Template, MCDADocument> cdaDocuments, String documentId) {
         for (Template template : cdaDocuments.keySet()) {
             MCDADocument cdaDocument = cdaDocuments.get(template);
             if (!cdaDocument.getId().equals(documentId)) continue;
@@ -296,7 +297,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return null;
     }
 
-    private void addDataset(String version, MProfileDocument document, StructuredDataSet dataSet) {
+    private void addDataset(String version, MProfileDocument document, StdDataSet dataSet) {
         if (dataSet != null) {
             String dataSetCode = DataSetUtil.standardDataSetCode(dataSet.getCode());
 
@@ -308,7 +309,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             mDataSet.setRecords(records);
 
             for (String key : dataSet.getRecordKeys()) {
-                records.put(key, new MRecord(dataSet.getRecord(key)));
+                records.put(key, new MRecord(dataSet.getRecord(key).getMetaDataGroup()));
             }
 
             document.getDataSets().add(mDataSet);

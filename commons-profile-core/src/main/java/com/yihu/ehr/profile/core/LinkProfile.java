@@ -1,8 +1,8 @@
 package com.yihu.ehr.profile.core;
 
-import com.yihu.ehr.constants.ProfileType;
-
 import java.util.Date;
+
+import static com.yihu.ehr.profile.core.ProfileType.Link;
 
 /**
  * 轻量级健康档案。其数据集保存的是机构健康档案中的链接。
@@ -15,7 +15,7 @@ public class LinkProfile extends StructedProfile {
     public Date expireDate;
 
     public LinkProfile(){
-        setProfileType(ProfileType.Link);
+        setProfileType(Link);
     }
 
     public Date getExpireDate() {

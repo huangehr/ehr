@@ -1,17 +1,19 @@
 package com.yihu.ehr.profile.core.commons;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.yihu.ehr.profile.core.DataRecord;
 import com.yihu.ehr.profile.core.StdDataSet;
-import com.yihu.ehr.profile.core.lightweight.LightWeightDataSet;
 import org.springframework.stereotype.Component;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
- * 简易数据集解析器。
+ * 简易数据集解析器。仅将JSON结构中的数据集解析成KEY-VALUE模式，不提供字段翻译功能，
+ * 例如将类型为S1的数据元添加_S后缀。
+ *
+ * 此类用于接口接受到使用数据集提供数据的情况。若是档案包中的数据集解析并存入HBase，请使用其派生类。
  *
  * @author Sand
  * @version 1.0
@@ -22,6 +24,7 @@ public class DataSetResolver {
 
     /**
      * 结构化档案包数据集处理
+     *
      * @param jsonNode
      * @param isOrigin
      * @return
@@ -47,7 +50,7 @@ public class DataSetResolver {
 
             JsonNode jsonRecords = jsonNode.get("data");
             for (int i = 0; i < jsonRecords.size(); ++i) {
-                Map<String, String> record = new HashMap<>();
+                DataRecord record = new DataRecord();
 
                 JsonNode jsonRecord = jsonRecords.get(i);
                 Iterator<Map.Entry<String, JsonNode>> iterator = jsonRecord.fields();
@@ -62,9 +65,9 @@ public class DataSetResolver {
                             isOrigin);
 
                     if(qualifiedMetaData != null){
-                        record.put(qualifiedMetaData[0], qualifiedMetaData[1]);
+                        record.putMetaData(qualifiedMetaData[0], qualifiedMetaData[1]);
                         if (qualifiedMetaData.length > 2)
-                            record.put(qualifiedMetaData[2], qualifiedMetaData[3]);
+                            record.putMetaData(qualifiedMetaData[2], qualifiedMetaData[3]);
                     }
                 }
 
@@ -78,45 +81,6 @@ public class DataSetResolver {
         }
 
         return dataSet;
-    }
-
-
-    /**
-     * 轻量级档案包数据集处理
-     * @param structuredProfile
-     * @param jsonNode
-     * @throws JsonProcessingException
-     * @throws ParseException
-     */
-    public void  parseLightJsonDataSet(StructuredProfile structuredProfile, JsonNode jsonNode) throws JsonProcessingException, ParseException {
-
-        LightWeightDataSet lightWeightDataSet = new LightWeightDataSet();
-        String version = jsonNode.get("inner_version").asText();
-        String eventNo = jsonNode.get("event_no").asText();
-        String patientId = jsonNode.get("patient_id").asText();
-        String orgCode = jsonNode.get("org_code").asText();
-        String eventDate = jsonNode.get("event_time").asText();        // 旧数据集结构可能不存在这个属性
-        String sumary = jsonNode.get("sumary").toString();
-
-        structuredProfile.setPatientId(patientId);
-        structuredProfile.setEventNo(eventNo);
-        structuredProfile.setOrgCode(orgCode);
-        structuredProfile.setCdaVersion(version);
-        structuredProfile.setSummary(sumary);
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        structuredProfile.setEventDate(format.parse(eventDate));
-
-        JsonNode dataSets = jsonNode.get("dataset");
-        Iterator<Map.Entry<String, JsonNode>> iterator = dataSets.fields();
-        while (iterator.hasNext()) {
-
-            Map.Entry<String, JsonNode> map = iterator.next();
-            String code = map.getKey();
-            String path = map.getValue().asText();
-            lightWeightDataSet.setCode(code);
-            lightWeightDataSet.setUrl(path);
-            structuredProfile.addLightWeightDataSet(code, lightWeightDataSet);
-        }
     }
 
     /**

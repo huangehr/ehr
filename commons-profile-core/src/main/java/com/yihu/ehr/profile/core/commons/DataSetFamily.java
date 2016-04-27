@@ -21,7 +21,7 @@ public enum DataSetFamily {
         return family;
     }
 
-    public static String[] getFamilies() {
+    /*public static String[] getFamilies() {
         return new String[]{
                 DataSetFamily.Basic.toString(),
                 DataSetFamily.MetaData.toString(),
@@ -33,46 +33,27 @@ public enum DataSetFamily {
         if (family == DataSetFamily.Basic) {
             return new String[]{
                     BasicColumns.ProfileId.toString(),
-                    BasicColumns.InnerVersion.toString(),
+                    BasicColumns.CdaVersion.toString(),
                     BasicColumns.OrgCode.toString(),
                     BasicColumns.LastUpdateTime.toString()
             };
         } else if (family == DataSetFamily.MetaData){
             return null;
-        }else if(family == DataSetFamily.Extension){
-            return new String[]{
-                    ExtensionColumns.Url.toString()
-            };
         }
 
         return null;
-    }
+    }*/
 
     // Basic列
     public enum BasicColumns {
         ProfileId("archive_id"),
-        InnerVersion("inner_version"),
+        CdaVersion("inner_version"),
         OrgCode("org_code"),
         LastUpdateTime("last_update_time");
 
         private String qualifier;
 
         BasicColumns(String qualifier) {
-            this.qualifier = qualifier;
-        }
-
-        public String toString() {
-            return qualifier;
-        }
-    }
-
-    // Extension列
-    public enum ExtensionColumns {
-        Url("url");
-
-        private String qualifier;
-
-        ExtensionColumns(String qualifier) {
             this.qualifier = qualifier;
         }
 

@@ -3,7 +3,6 @@ package com.yihu.ehr.profile.core;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.profile.core.commons.ProfileId;
 import com.yihu.ehr.profile.core.extractor.EventExtractor;

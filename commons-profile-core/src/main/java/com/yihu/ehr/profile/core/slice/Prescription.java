@@ -1,7 +1,7 @@
 package com.yihu.ehr.profile.core.slice;
 
-import com.yihu.ehr.profile.core.commons.DataSet;
-import com.yihu.ehr.profile.core.commons.Profile;
+import com.yihu.ehr.profile.core.StdDataSet;
+import com.yihu.ehr.profile.core.StructedProfile;
 
 import java.util.List;
 
@@ -12,6 +12,6 @@ import java.util.List;
  * @created 2016.04.25 16:56
  */
 public class Prescription {
-    Profile profile;            // 处方所在档案
-    List<DataSet> data;         // 处方数据
+    StructedProfile profile;            // 处方所在档案
+    List<StdDataSet> data;              // 处方数据
 }

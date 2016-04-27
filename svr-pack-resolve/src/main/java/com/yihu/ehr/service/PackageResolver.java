@@ -1,8 +1,8 @@
 package com.yihu.ehr.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.profile.core.StructedProfile;
 import com.yihu.ehr.profile.core.extractor.ExtractorChain;
-import com.yihu.ehr.profile.core.commons.Profile;
 import com.yihu.ehr.profile.persist.DataSetResolverWithTranslator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -34,5 +34,5 @@ public abstract class PackageResolver {
     private final static char PathSep = File.separatorChar;
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
 
-    public abstract void resolve(Profile profile, File root) throws IOException, ParseException;
+    public abstract void resolve(StructedProfile profile, File root) throws IOException, ParseException;
 }

@@ -1,5 +1,6 @@
 package com.yihu.ehr.profile.core.extractor;
 
+import com.yihu.ehr.profile.core.DataRecord;
 import com.yihu.ehr.profile.core.StdDataSet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -32,15 +33,15 @@ public class IdentityExtractor extends KeyDataExtractor {
     public Object extract(StdDataSet dataSet, Filter filter) throws ParseException {
         if (filter == Filter.DemographicInfo && dataSets.contains(dataSet.getCode())) {
             for (String key : dataSet.getRecordKeys()) {
-                Map<String, String> record = dataSet.getRecord(key);
-                String value = record.get(IdCardTypeMetaData);
+                DataRecord record = dataSet.getRecord(key);
+                String value = record.getMetaData(IdCardTypeMetaData);
                 if (value != null) {
                     if (IdCardNoDictEntry.contains(value)) {
-                        return record.get(IdCardNoMetaData);
+                        return record.getMetaData(IdCardNoMetaData);
                     }
                 } else {
                     // default as identity card no
-                    return record.get(IdCardNoMetaData);
+                    return record.getMetaData(IdCardNoMetaData);
                 }
             }
         }

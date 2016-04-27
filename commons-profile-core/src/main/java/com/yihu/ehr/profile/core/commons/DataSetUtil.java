@@ -1,7 +1,10 @@
 package com.yihu.ehr.profile.core.commons;
 
+import com.yihu.ehr.profile.core.LinkDataSet;
 import com.yihu.ehr.profile.core.StdDataSet;
+import com.yihu.ehr.util.DateTimeUtils;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,14 +47,24 @@ public class DataSetUtil {
         return dataSetCode.endsWith(OriginDataSetFlag);
     }
 
-    public static Map<String, String> getBasicFamilyMap(StdDataSet dataSet){
+    public static Map<String, String> getBasicFamilyQualifier(String profileId, StdDataSet dataSet){
         Map<String, String> map = new HashMap<>();
-        map.put("", );
+        map.put(DataSetFamily.BasicColumns.ProfileId.toString(), profileId);
+        map.put(DataSetFamily.BasicColumns.CdaVersion.toString(), dataSet.getCdaVersion());
+        map.put(DataSetFamily.BasicColumns.OrgCode.toString(), dataSet.getOrgCode());
+        map.put(DataSetFamily.BasicColumns.LastUpdateTime.toString(), DateTimeUtils.utcDateTimeFormat(new Date()));
 
         return map;
     }
 
-    public static Map<String, String> getMetaDataFamilyMap(String rowkey, StdDataSet dataSet){
+    public static Map<String, String> getMetaDataFamilyQualifier(String rowkey, StdDataSet dataSet){
         return dataSet.getRecord(rowkey).getMetaDataGroup();
+    }
+
+    public static Map<String, String> getExtensionFamilyQualifier(LinkDataSet dataSet){
+        Map<String, String> map = new HashMap<>();
+        map.put(dataSet.getCode(), dataSet.getUrl());
+
+        return map;
     }
 }

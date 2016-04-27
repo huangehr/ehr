@@ -7,11 +7,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.lang.SpringContext;
+import com.yihu.ehr.profile.core.DataRecord;
 import com.yihu.ehr.profile.core.StdDataSet;
 import com.yihu.ehr.profile.core.StructedProfile;
 import com.yihu.ehr.profile.persist.ProfileIndices;
 import com.yihu.ehr.profile.persist.ProfileIndicesService;
-import com.yihu.ehr.profile.persist.repo.ProfileRepository;
+import com.yihu.ehr.profile.persist.ProfileService;
+import com.yihu.ehr.profile.persist.repo.DataSetRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -45,7 +47,10 @@ import java.util.*;
 @Api(value = "赛诺菲数据服务", description = "赛诺菲项目体征数据提取服务")
 public class SanofiEndPoint {
     @Autowired
-    private ProfileRepository profileRepo;
+    private ProfileService profileService;
+
+    @Autowired
+    private DataSetRepository dataSetRepo;
 
     @Autowired
     private ProfileIndicesService indicesService;
@@ -76,7 +81,7 @@ public class SanofiEndPoint {
 
         List<StructedProfile> profiles = new ArrayList<>();
         for (ProfileIndices indices : profileIndices.getContent()) {
-            StructedProfile structedProfile = profileRepo.findOne(indices.getProfileId(), false, false);
+            StructedProfile structedProfile = profileService.getProfile(indices.getProfileId(), false, false);
             profiles.add(structedProfile);
         }
 
@@ -169,28 +174,29 @@ public class SanofiEndPoint {
         }
     }
 
-    private void mergeData(JsonNode section, StructedProfile profile, StdDataSet emptyDataSet, String[] innerCodes) throws IOException {
-        StdDataSet dataSet = profileRepo.findDataSet(profile.getCdaVersion(),
+    private void mergeData(JsonNode section, StructedProfile profile, StdDataSet emptyDataSet, String[] metaDataCodes) throws IOException {
+        StdDataSet dataSet = dataSetRepo.findOne(profile.getCdaVersion(),
                 emptyDataSet.getCode(),
+                profile.getProfileType(),
                 emptyDataSet.getRecordKeys(),
-                innerCodes).getRight();
+                metaDataCodes).getRight();
 
         if (section.isArray()) {
             ArrayNode array = (ArrayNode) section;
             for (String recordKey : dataSet.getRecordKeys()) {
                 ObjectNode arrayNode = array.addObject();
-                Map<String, String> record = dataSet.getRecord(recordKey);
-                for (String innerCode : innerCodes) {
-                    String value = record.get(innerCode);
-                    arrayNode.put(innerCode, StringUtils.isEmpty(value) ? "" : value);
+                DataRecord record = dataSet.getRecord(recordKey);
+                for (String metaDataCode : metaDataCodes) {
+                    String value = record.getMetaData(metaDataCode);
+                    arrayNode.put(metaDataCode, StringUtils.isEmpty(value) ? "" : value);
                 }
             }
         } else if (section.isObject()) {
             ObjectNode objectNode = (ObjectNode) section;
             for (String recordKey : dataSet.getRecordKeys()) {
-                Map<String, String> record = dataSet.getRecord(recordKey);
-                for (String innerCode : record.keySet()) {
-                    objectNode.put(innerCode, record.get(innerCode));
+                DataRecord record = dataSet.getRecord(recordKey);
+                for (String metaDataCode : record.getMetaDataCodes()) {
+                    objectNode.put(metaDataCode, record.getMetaData(metaDataCode));
                 }
 
                 break;  // 就一行

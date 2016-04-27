@@ -1,6 +1,5 @@
 package com.yihu.ehr.profile.core;
 
-import com.yihu.ehr.constants.ProfileType;
 import org.springframework.util.CollectionUtils;
 
 import java.io.File;
@@ -14,11 +13,11 @@ import java.util.List;
  * @created 2016.04.13 15:28
  */
 public class ProfileGenerator {
-    public final static String StructedProfileStdFolder = "standard";
-    public final static String StructedProfileOriFolder = "origin";
-    public final static String NonstructedProfileDocFolder = "documents";
-    public final static String NonstructedProfileMetaFile = "meta.json";
-    public final static String LightWeightProfileIndexFolder = "index";
+    public final static String StandardFolder = "standard";
+    public final static String OriginFolder = "origin";
+    public final static String DocumentFolder = "documents";
+    public final static String MetaDataFile = "meta.json";
+    public final static String LinkFolder = "index";
     public final static String JsonExt = ".json";
 
     /**
@@ -31,11 +30,11 @@ public class ProfileGenerator {
         List<String> directories = CollectionUtils.arrayToList(root.list());
         List<String> files = CollectionUtils.arrayToList(root.listFiles());
 
-        if (directories.contains(StructedProfileStdFolder) && directories.contains(StructedProfileOriFolder)) {
+        if (directories.contains(StandardFolder) && directories.contains(OriginFolder)) {
             return new StructedProfile();
-        } else if (directories.contains(NonstructedProfileDocFolder) && files.contains(NonstructedProfileMetaFile)) {
+        } else if (directories.contains(DocumentFolder) && files.contains(MetaDataFile)) {
             return new NonStructedProfile();
-        } else if (directories.size() == 1 && directories.contains(LightWeightProfileIndexFolder)) {
+        } else if (directories.size() == 1 && directories.contains(LinkFolder)) {
             return new LinkProfile();
         }
 

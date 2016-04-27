@@ -1,10 +1,10 @@
 package com.yihu.ehr.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.profile.core.ProfileGenerator;
-import com.yihu.ehr.profile.core.commons.Profile;
+import com.yihu.ehr.profile.core.ProfileType;
+import com.yihu.ehr.profile.core.StructedProfile;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.io.FileUtils;
@@ -17,7 +17,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.yihu.ehr.constants.ProfileType.*;
+import static com.yihu.ehr.profile.core.ProfileType.*;
 
 /**
  * 档案解析引擎.
@@ -47,13 +47,13 @@ public class PackageResolveEngine {
      * 5. 解析完的数据存入HBase，并将JSON文档的状态标记为 Finished。
      * 6. 以上步骤有任何一个失败的，将文档标记为 Failed 状态，即无法决定该JSON档案的去向，需要人为干预。
      */
-    public Profile doResolve(MPackage pack, String zipFile) throws Exception {
+    public StructedProfile doResolve(MPackage pack, String zipFile) throws Exception {
         File root = new Zipper().unzipFile(new File(zipFile), TempPath + pack.getId(), pack.getPwd());
         if (root == null || !root.isDirectory() || root.list().length == 0) {
             throw new RuntimeException("Invalid package file, package id: " + pack.getId());
         }
 
-        Profile profile = ProfileGenerator.generate(root);
+        StructedProfile profile = ProfileGenerator.generate(root);
         PackageResolver packageResolver;
         switch (profile.getProfileType()) {
             case NonStructured:
@@ -75,6 +75,7 @@ public class PackageResolveEngine {
 
         packageResolver.resolve(profile, root);
         profile.regular();
+
         houseKeep(zipFile, root);
 
         return profile;
