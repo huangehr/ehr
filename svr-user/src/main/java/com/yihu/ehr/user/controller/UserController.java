@@ -296,7 +296,8 @@ public class UserController extends BaseRestController {
             ObjectNode objectNode = fastDFSUtil.upload(inputStream, fileExtension, description);
             String groupName = objectNode.get("groupName").toString();
             String remoteFileName = objectNode.get("remoteFileName").toString();
-            path = "{\"groupName\":" + groupName + ",\"remoteFileName\":" + remoteFileName + "}";
+//            path = "{\"groupName\":" + groupName + ",\"remoteFileName\":" + remoteFileName + "}";
+            path = groupName + ":" + remoteFileName;
 
         } catch (Exception e) {
             LogService.getLogger(User.class).error("人口头像图片上传失败；错误代码："+e);
