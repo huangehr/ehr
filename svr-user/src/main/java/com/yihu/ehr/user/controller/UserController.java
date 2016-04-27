@@ -297,7 +297,7 @@ public class UserController extends BaseRestController {
             String groupName = objectNode.get("groupName").toString();
             String remoteFileName = objectNode.get("remoteFileName").toString();
 //            path = "{\"groupName\":" + groupName + ",\"remoteFileName\":" + remoteFileName + "}";
-            path = groupName + ":" + remoteFileName;
+            path = groupName.substring(1,groupName.length()-1) + ":" + remoteFileName.substring(1,remoteFileName.length()-1);
 
         } catch (Exception e) {
             LogService.getLogger(User.class).error("人口头像图片上传失败；错误代码："+e);
