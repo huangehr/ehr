@@ -1,5 +1,6 @@
 package com.yihu.ehr.dict.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ErrorCode;
@@ -10,6 +11,7 @@ import com.yihu.ehr.dict.service.HpIcd10RelationService;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.specialdict.MHealthProblemDict;
 import com.yihu.ehr.model.specialdict.MHpIcd10Relation;
+import com.yihu.ehr.model.standard.MCDAType;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -150,6 +152,26 @@ public class HealthProblemDictController extends BaseRestController {
         return convertToModel(relation, MHpIcd10Relation.class, null);
     }
 
+    @RequestMapping(value = "/dict/hp/icd10s", method = RequestMethod.POST)
+    @ApiOperation(value = "为健康问题增加ICD10疾病关联,--批量增加关联。" )
+    public Collection<MHpIcd10Relation> createHpIcd10Relations(
+            @ApiParam(name = "hp_id", value = "健康问题Id")
+            @RequestParam(value = "hp_id") String hpId,
+            @ApiParam(name = "icd10_ids", value = "关联的icd10字典ids,多个以逗号连接")
+            @RequestParam(value = "icd10_ids") String icd10Ids) throws Exception {
+        Collection<MHpIcd10Relation> mHpIcd10Relations = new ArrayList<>();
+        for(String icd10Id : icd10Ids.split(",")){
+            HpIcd10Relation relation = new HpIcd10Relation();
+            relation.setHpId(hpId);
+            relation.setIcd10Id(icd10Id);
+            String id = getObjectId(BizObject.Dict);
+            relation.setId(id);
+            hpIcd10RelationService.save(relation);
+            mHpIcd10Relations.add(convertToModel(relation, MHpIcd10Relation.class, null));
+        }
+        return mHpIcd10Relations;
+    }
+
     @RequestMapping(value = "/dict/hp/icd10", method = RequestMethod.PUT)
     @ApiOperation(value = "为健康问题修改ICD10疾病关联。" )
     public MHpIcd10Relation updateHpIcd10Relation(
@@ -170,6 +192,15 @@ public class HealthProblemDictController extends BaseRestController {
 
         hpIcd10RelationService.delete(id);
 
+        return true;
+    }
+
+    @RequestMapping(value = "/dict/hp/icd10s", method = RequestMethod.DELETE)
+    @ApiOperation(value = "通过id组删除健康问题与ICD10关联，多个id以,分隔")
+    public boolean deleteHpIcd10Relations(
+            @ApiParam(name = "ids", value = "关联关系ids", defaultValue = "")
+            @RequestParam(value = "ids") String ids) throws Exception {
+        hpIcd10RelationService.delete(ids.split(","));
         return true;
     }
 
@@ -200,6 +231,15 @@ public class HealthProblemDictController extends BaseRestController {
             pagedResponse(request, response, hpIcd10RelationService.getCount(filters), page, size);
             return convertToModels(hpIcd10RelationList, new ArrayList<>(hpIcd10RelationList.size()), MHpIcd10Relation.class, fields);
         }
+    }
+
+    @RequestMapping(value = "/dict/hp/icd10s/no_paging", method = RequestMethod.GET)
+    @ApiOperation(value = "根据健康问题查询相应的ICD10关联列表信息,不分页。")
+    public Collection<MHpIcd10Relation> getHpIcd10RelationListWithoutPaging(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+        List<HpIcd10Relation> hpIcd10Relations = hpIcd10RelationService.search(filters);
+        return convertToModels(hpIcd10Relations, new ArrayList<MHpIcd10Relation>(hpIcd10Relations.size()), MHpIcd10Relation.class, "");
     }
 
     @RequestMapping(value = "/dict/hp/icd10/existence" , method = RequestMethod.GET)
