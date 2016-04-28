@@ -10,7 +10,7 @@
     </parent>
 
 	<artifactId>app-ehr-browser</artifactId>
-	<packaging>war</packaging>
+	<packaging>${packaging}</packaging>
 
 	<name>健康档案浏览器应用</name>
 	<description>健康档案浏览器应用</description>

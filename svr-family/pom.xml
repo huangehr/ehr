@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>svr-family</artifactId>
-	<packaging>jar</packaging>
+	<packaging>${packaging}</packaging>
 	<name>svr-family</name>
 	<description>EHR platform family service</description>
 

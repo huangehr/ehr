@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>svr-patient</artifactId>
-	<packaging>jar</packaging>
+	<packaging>${packaging}</packaging>
 	<name>svr-patient</name>
 	<description>EHR platform patient service</description>
 

@@ -10,8 +10,7 @@
     </parent>
 
 	<artifactId>svr-organization</artifactId>
-	<packaging>jar</packaging>
-
+	<packaging>${packaging}</packaging>
 	<name>svr-organization</name>
 	<description>EHR platform organization service.</description>
 

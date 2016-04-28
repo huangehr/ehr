@@ -11,4 +11,6 @@ import java.util.List;
 public interface ResourcesDao extends PagingAndSortingRepository<RsResources,String> {
 
     List<RsResources> findByType(String type);
+
+    List<RsResources> findByCode(String code);
  }

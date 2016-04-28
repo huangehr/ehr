@@ -105,8 +105,7 @@ public class OrgEndPoint extends BaseRestController {
     public MOrganization create(
             @ApiParam(name = "mOrganizationJsonData", value = "机构代码", defaultValue = "")
             @RequestParam(value = "mOrganizationJsonData") String orgJsonData) throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        Organization org = objectMapper.readValue(orgJsonData, Organization.class);
+        Organization org = toEntity(orgJsonData, Organization.class);
         org.setCreateDate(new Date());
         org.setActivityFlag(1);
         org.setPyCode(PinyinUtil.getPinYinHeadChar(org.getFullName(), false));
@@ -282,7 +281,8 @@ public class OrgEndPoint extends BaseRestController {
         ObjectNode objectNode = fastDFSUtil.upload(inputStream, fileExtension, description);
         String groupName = objectNode.get("groupName").toString();
         String remoteFileName = objectNode.get("remoteFileName").toString();
-        String path = "{\"groupName\":" + groupName + ",\"remoteFileName\":" + remoteFileName + "}";
+//        String path = "{\"groupName\":" + groupName + ",\"remoteFileName\":" + remoteFileName + "}";
+        String path = groupName.substring(1,groupName.length()-1) + ":" + remoteFileName.substring(1,remoteFileName.length()-1);
         //返回文件路径
         return path;
     }

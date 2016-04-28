@@ -136,7 +136,7 @@ public class UserController extends BaseController {
                 MOrganization organization = orgClient.getOrg(mUser.getOrganization());
                 usersModel.setOrganizationName(organization == null ? "" : organization.getFullName());
             }
-            //获取标准来源信息
+            //获取用户来源信息
             if(StringUtils.isNotEmpty(mUser.getSource())){
                 MConventionalDict dict = conventionalDictClient.getUserSource(mUser.getSource());
                 usersModel.setSourceName(dict == null ? "" : dict.getValue());
@@ -343,8 +343,9 @@ public class UserController extends BaseController {
                 return failed("用户信息获取失败!");
             }
             if (!StringUtils.isEmpty(mUser.getImgRemotePath())) {
-                Map<String, String> map = toEntity(mUser.getImgRemotePath(), Map.class);
-                String localPath = userClient.downloadPicture(map.get("groupName"), map.get("remoteFileName"));
+//                Map<String, String> map = toEntity(mUser.getImgRemotePath(), Map.class);
+                String imagePath[] = mUser.getImgRemotePath().split(":");
+                String localPath = userClient.downloadPicture(imagePath[0], imagePath[1]);
                 mUser.setImgLocalPath(localPath);
             }
 

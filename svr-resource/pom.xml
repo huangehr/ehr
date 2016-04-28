@@ -103,6 +103,22 @@
             <artifactId>ehr-dbhelper</artifactId>
             <version>1.1.7</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-data-hbase</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-data-solr</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-solrj</artifactId>
+            <version>5.2.1</version>
+        </dependency>
     </dependencies>
 
     <repositories>

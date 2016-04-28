@@ -85,7 +85,7 @@ public class UserController extends BaseRestController {
     public MUser createUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
-        User user = new ObjectMapper().readValue(userJsonData, User.class);
+        User user = toEntity(userJsonData, User.class);
         user.setId(getObjectId(BizObject.User));
         user.setCreateDate(new Date());
         if (!StringUtils.isEmpty(user.getPassword())){
@@ -108,8 +108,7 @@ public class UserController extends BaseRestController {
     public MUser updateUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        User user = objectMapper.readValue(userJsonData, User.class);
+        User user = toEntity(userJsonData, User.class);
         String userType = user.getUserType();
         MConventionalDict dict = conventionalDictClient.getUserType(userType);
         if(dict!=null){
@@ -297,7 +296,8 @@ public class UserController extends BaseRestController {
             ObjectNode objectNode = fastDFSUtil.upload(inputStream, fileExtension, description);
             String groupName = objectNode.get("groupName").toString();
             String remoteFileName = objectNode.get("remoteFileName").toString();
-            path = "{\"groupName\":" + groupName + ",\"remoteFileName\":" + remoteFileName + "}";
+//            path = "{\"groupName\":" + groupName + ",\"remoteFileName\":" + remoteFileName + "}";
+            path = groupName.substring(1,groupName.length()-1) + ":" + remoteFileName.substring(1,remoteFileName.length()-1);
 
         } catch (Exception e) {
             LogService.getLogger(User.class).error("人口头像图片上传失败；错误代码："+e);
