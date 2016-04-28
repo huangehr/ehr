@@ -1,6 +1,4 @@
-package com.yihu.ehr.profile.core.commons;
-
-import java.util.Map;
+package com.yihu.ehr.profile.core.profile;
 
 /**
  * HBase数据库中健康档案表选项. 如列族名称等.
@@ -33,7 +31,6 @@ public enum ProfileFamily {
         EventDate("event_date"),
         EventType("event_type"),
         ProfileType("profile_type"),
-        Summary("summary"),
         DemographicId("demographic_id"),
         CreateDate("create_date"),
         DataSets("data_sets"),
@@ -75,7 +72,6 @@ public enum ProfileFamily {
                     BasicQualifier.PatientId.toString(),
                     BasicQualifier.EventNo.toString(),
                     BasicQualifier.EventDate.toString(),
-                    BasicQualifier.Summary.toString(),
                     BasicQualifier.DemographicId.toString(),
                     BasicQualifier.CreateDate.toString(),
                     BasicQualifier.DataSets.toString(),

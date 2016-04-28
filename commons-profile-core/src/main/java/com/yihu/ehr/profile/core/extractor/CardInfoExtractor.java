@@ -1,6 +1,6 @@
 package com.yihu.ehr.profile.core.extractor;
 
-import com.yihu.ehr.profile.core.StdDataSet;
+import com.yihu.ehr.profile.core.profile.StdDataSet;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;

@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.core;
+package com.yihu.ehr.profile.core.profile;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

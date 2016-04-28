@@ -1,12 +1,14 @@
 package com.yihu.ehr.data.hbase;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.shaded.org.apache.commons.collections.map.HashedMap;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.hbase.util.Pair;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -81,8 +83,8 @@ public class CellBundle {
                     Pair<String, String> pair = (Pair<String, String>) column;
 
                     put.addColumn(Bytes.toBytes(family),
-                            Bytes.toBytes(pair.getFirst()),
-                            Bytes.toBytes(pair.getSecond()));
+                            Bytes.toBytes(pair.getLeft()),
+                            Bytes.toBytes(StringUtils.isEmpty(pair.getRight()) ? "" : pair.getRight()));
                 }
             }
 
@@ -132,7 +134,7 @@ public class CellBundle {
 
         public void addValues(String family, Map<String, String> values){
             Set value = getFamily(family);
-            value.addAll(values.keySet().stream().map(key -> new Pair(key, values.get(key))).collect(Collectors.toList()));
+            value.addAll(values.keySet().stream().map(key -> new ImmutablePair<>(key, values.get(key))).collect(Collectors.toList()));
         }
 
         public Set<String> getFamilies(){

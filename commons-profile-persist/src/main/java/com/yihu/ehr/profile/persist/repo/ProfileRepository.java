@@ -1,11 +1,10 @@
 package com.yihu.ehr.profile.persist.repo;
 
-import com.yihu.ehr.profile.core.ProfileType;
+import com.yihu.ehr.profile.core.profile.*;
 import com.yihu.ehr.data.hbase.CellBundle;
 import com.yihu.ehr.data.hbase.HBaseDao;
 import com.yihu.ehr.data.hbase.ResultUtil;
-import com.yihu.ehr.profile.core.*;
-import com.yihu.ehr.profile.core.commons.*;
+import com.yihu.ehr.profile.core.util.*;
 import com.yihu.ehr.util.DateTimeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -28,35 +27,33 @@ public class ProfileRepository {
     @Autowired
     HBaseDao hbaseDao;
 
-    public void save(StructedProfile profile) throws IOException {
+    public void save(StandardProfile profile) throws IOException {
         // 先存档案
         CellBundle profileBundle = new CellBundle();
         profileBundle.addValues(profile.getId(), ProfileFamily.Basic, ProfileUtil.getBasicFamilyCellMap(profile));
         hbaseDao.saveOrUpdate(ProfileUtil.Table, profileBundle);
 
-        if (profile instanceof StructedProfile) {
-            for (StdDataSet dataSet : profile.getDataSets()) {
-                CellBundle dataSetBundle = new CellBundle();
-                for (String rowkey : dataSet.getRecordKeys()) {
-                    dataSetBundle.addValues(
-                            rowkey,
-                            DataSetFamily.Basic,
-                            DataSetUtil.getBasicFamilyQualifier(profile.getId(), dataSet));
-                    dataSetBundle.addValues(
-                            rowkey,
-                            DataSetFamily.MetaData,
-                            DataSetUtil.getMetaDataFamilyQualifier(rowkey, dataSet));
+        for (StdDataSet dataSet : profile.getDataSets()) {
+            CellBundle dataSetBundle = new CellBundle();
+            for (String rowkey : dataSet.getRecordKeys()) {
+                dataSetBundle.addValues(
+                        rowkey,
+                        DataSetFamily.Basic,
+                        DataSetUtil.getBasicFamilyQualifier(profile.getId(), dataSet));
+                dataSetBundle.addValues(
+                        rowkey,
+                        DataSetFamily.MetaData,
+                        DataSetUtil.getMetaDataFamilyQualifier(rowkey, dataSet));
 
-                    if (dataSet instanceof LinkDataSet) {
-                        dataSetBundle.addValues(
-                                rowkey,
-                                DataSetFamily.Extension,
-                                DataSetUtil.getExtensionFamilyQualifier((LinkDataSet) dataSet));
-                    }
+                if (dataSet instanceof LinkDataSet) {
+                    dataSetBundle.addValues(
+                            rowkey,
+                            DataSetFamily.Extension,
+                            DataSetUtil.getExtensionFamilyQualifier((LinkDataSet) dataSet));
                 }
-
-                hbaseDao.saveOrUpdate(dataSet.getCode(), dataSetBundle);
             }
+
+            hbaseDao.saveOrUpdate(dataSet.getCode(), dataSetBundle);
         }
     }
 
@@ -66,7 +63,7 @@ public class ProfileRepository {
      * @param profileId
      * @return
      */
-    public Pair<StructedProfile, String> findOne(String profileId, boolean loadStdDataSet, boolean loadOriginDataSet) throws IOException, ParseException {
+    public Pair<StandardProfile, String> findOne(String profileId, boolean loadStdDataSet, boolean loadOriginDataSet) throws IOException, ParseException {
         CellBundle profileCellBundle = new CellBundle();
         profileCellBundle.addRow(profileId);
 
@@ -82,15 +79,14 @@ public class ProfileRepository {
         String eventDate = record.getCellValue(ProfileFamily.Basic, ProfileFamily.BasicQualifier.EventDate);
         String eventType = record.getCellValue(ProfileFamily.Basic, ProfileFamily.BasicQualifier.EventType);
         String profileType = record.getCellValue(ProfileFamily.Basic, ProfileFamily.BasicQualifier.ProfileType);
-        String summary = record.getCellValue(ProfileFamily.Basic, ProfileFamily.BasicQualifier.Summary);
         String demographicId = record.getCellValue(ProfileFamily.Basic, ProfileFamily.BasicQualifier.DemographicId);
         String createDate = record.getCellValue(ProfileFamily.Basic, ProfileFamily.BasicQualifier.CreateDate);
         String cdaVersion = record.getCellValue(ProfileFamily.Basic, ProfileFamily.BasicQualifier.CdaVersion);
         String dataSets = record.getCellValue(ProfileFamily.Basic, ProfileFamily.BasicQualifier.DataSets);
 
-        profileType = StringUtils.isEmpty(profileType) ? Integer.toString(ProfileType.Structured.getType()) : profileType;
+        profileType = StringUtils.isEmpty(profileType) ? Integer.toString(ProfileType.Standard.getType()) : profileType;
 
-        StructedProfile profile = ProfileGenerator.generate(ProfileType.valueOf(profileType));
+        StandardProfile profile = ProfileGenerator.generate(ProfileType.valueOf(profileType));
         profile.setId(profileId);
         profile.setCardId(cardId);
         profile.setOrgCode(orgCode);
@@ -99,7 +95,6 @@ public class ProfileRepository {
         profile.setEventDate(DateTimeUtils.utcDateTimeParse(eventDate));
         profile.setEventType(EventType.valueOf(eventType));
         profile.setProfileType(ProfileType.valueOf(profileType));
-        profile.setSummary(summary);
         profile.setDemographicId(demographicId);
         profile.setCreateDate(DateTimeUtils.utcDateTimeParse(createDate));
         profile.setCdaVersion(cdaVersion);

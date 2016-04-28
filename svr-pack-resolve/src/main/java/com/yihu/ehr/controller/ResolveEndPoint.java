@@ -4,18 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ArchiveStatus;
-import com.yihu.ehr.profile.core.ProfileType;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.feign.XPackageMgrClient;
 import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.profile.core.NonStructedProfile;
-import com.yihu.ehr.profile.core.StructedProfile;
-import com.yihu.ehr.profile.persist.repo.ProfileRepository;
-import com.yihu.ehr.service.LinkPackageResolver;
+import com.yihu.ehr.profile.core.profile.StandardProfile;
+import com.yihu.ehr.profile.persist.ProfileService;
 import com.yihu.ehr.service.PackageResolveEngine;
-import com.yihu.ehr.service.StdPackageResolver;
-import com.yihu.ehr.service.DocumentPackageResolver;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -37,7 +32,7 @@ import java.io.FileOutputStream;
 @Api(value = "档案包解析", description = "档案包解析服务")
 public class ResolveEndPoint {
     @Autowired
-    ProfileRepository profileRepo;
+    ProfileService profileService;
 
     @Autowired
     FastDFSUtil fastDFSUtil;
@@ -49,23 +44,14 @@ public class ResolveEndPoint {
     XPackageMgrClient packageMgrClient;
 
     @Autowired
-    private StdPackageResolver stdPackageResolver;
-
-    @Autowired
-    private DocumentPackageResolver documentPackageResolver;
-
-    @Autowired
-    private LinkPackageResolver linkPackageResolver;
-
-    @Autowired
     ObjectMapper objectMapper;
 
     @ApiOperation(value = "档案包入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @RequestMapping(value = ServiceApi.Packages.Package, method = RequestMethod.PUT)
     public ResponseEntity<String> resolve(
-            @ApiParam("id")
+            @ApiParam(value = "id", defaultValue = "0dae000555ff6a9f1d323246807324d6")
             @PathVariable("id") String packageId,
-            @ApiParam(value = "返回档案数据", defaultValue = "false")
+            @ApiParam(value = "返回档案数据", defaultValue = "true")
             @RequestParam("echo") boolean echo) throws Exception {
 
         MPackage pack = packageMgrClient.getPackage(packageId);
@@ -73,8 +59,8 @@ public class ResolveEndPoint {
 
         String zipFile = downloadTo(pack.getRemotePath());
 
-        StructedProfile profile = resolveEngine.doResolve(pack, zipFile);
-        profileRepo.save(profile);
+        StandardProfile profile = resolveEngine.doResolve(pack, zipFile);
+        profileService.saveProfile(profile);
 
         if (echo) {
             return new ResponseEntity<>(profile.toJson(), HttpStatus.OK);
@@ -82,7 +68,6 @@ public class ResolveEndPoint {
 
         return null;
     }
-
 
     /**
      * 执行归档作业。归档作为流程如下：
@@ -119,12 +104,8 @@ public class ResolveEndPoint {
             pack.setId(packageId);
             pack.setArchiveStatus(ArchiveStatus.Received);
 
-            StructedProfile profile = resolveEngine.doResolve(pack, zipFile);
-            profileRepo.save(profile);
-
-            packageMgrClient.reportStatus(pack.getId(),
-                    ArchiveStatus.Finished,
-                    String.format("Rowkey: %s, identity: %s", profile.getDemographicId(), profile.getId()));
+            StandardProfile profile = resolveEngine.doResolve(pack, zipFile);
+            if(persist) profileService.saveProfile(profile);
 
             return new ResponseEntity<>(profile.toJson(), HttpStatus.OK);
         } catch (Exception e) {

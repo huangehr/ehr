@@ -1,8 +1,8 @@
 package com.yihu.ehr.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.yihu.ehr.profile.core.NonStructedProfile;
-import com.yihu.ehr.profile.core.StructedProfile;
+import com.yihu.ehr.profile.core.profile.FileProfile;
+import com.yihu.ehr.profile.core.profile.StandardProfile;
 import com.yihu.ehr.util.DateTimeUtils;
 import org.springframework.stereotype.Component;
 
@@ -19,16 +19,15 @@ import java.text.ParseException;
  */
 @Component
 public class DocumentPackageResolver extends PackageResolver {
-
     @Override
-    public void resolve(StructedProfile profile, File root) throws IOException, ParseException {
-        NonStructedProfile nonStructedProfile = (NonStructedProfile) profile;
+    public void resolve(StandardProfile profile, File root) throws IOException, ParseException {
+        FileProfile fileProfile = (FileProfile) profile;
 
         File metaFile = new File(root.getAbsolutePath() + File.pathSeparator + "meta.json");
-        parseFile(nonStructedProfile, metaFile);
+        parseFile(fileProfile, metaFile);
     }
 
-    private void parseFile(NonStructedProfile profile, File metaFile) throws IOException, ParseException {
+    private void parseFile(FileProfile profile, File metaFile) throws IOException, ParseException {
         JsonNode jsonNode = objectMapper.readTree(metaFile);
 
         String patientId = jsonNode.get("patient_id").asText();
@@ -44,7 +43,7 @@ public class DocumentPackageResolver extends PackageResolver {
         profile.setEventDate(DateTimeUtils.utcDateTimeParse(eventDate));
     }
 
-    /*public List<RawDocumentList> unstructuredDocumentParse(NonStructedProfile profile, File[] files) throws Exception {
+    /*public List<RawDocumentList> unstructuredDocumentParse(FileProfile profile, File[] files) throws Exception {
         List<RawDocumentList> documentListList = new ArrayList<>();
         for (File file : files) {
             RawDocumentList documentList = new RawDocumentList();
@@ -65,7 +64,7 @@ public class DocumentPackageResolver extends PackageResolver {
         }
         return documentListList;
     }
-    public NonStructedProfile unstructuredDataSetParse(NonStructedProfile noStructuredProfile, File file, List<RawDocumentList> documentListList) throws Exception {
+    public FileProfile unstructuredDataSetParse(FileProfile noStructuredProfile, File file, List<RawDocumentList> documentListList) throws Exception {
         JsonNode jsonNode = objectMapper.readTree(file);
         String version = jsonNode.get("inner_version").asText();
         String eventNo = jsonNode.get("event_no").asText();

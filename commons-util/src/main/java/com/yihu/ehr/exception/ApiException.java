@@ -106,8 +106,9 @@ public class ApiException extends RuntimeException {
         ObjectMapper objectMapper = SpringContext.getService("objectMapper");
         ObjectNode objectNode = objectMapper.createObjectNode();
 
-        if (message != null) objectNode.put("message", message);
-        if (documentURL != null) objectNode.put("document_url", documentURL);
+        objectNode.put("message", message != null ? message : "");
+        objectNode.put("document_url", documentURL != null ? documentURL : "");
+
         if (resourceErrors != null) objectNode.put("errors", objectMapper.writeValueAsString(resourceErrors));
 
         return objectNode.toString();

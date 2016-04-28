@@ -1,7 +1,7 @@
 package com.yihu.ehr.profile.core.extractor;
 
-import com.yihu.ehr.profile.core.DataRecord;
-import com.yihu.ehr.profile.core.StdDataSet;
+import com.yihu.ehr.profile.core.profile.DataRecord;
+import com.yihu.ehr.profile.core.profile.StdDataSet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

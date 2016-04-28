@@ -8,9 +8,9 @@ import com.yihu.ehr.model.profile.*;
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import com.yihu.ehr.profile.config.CdaDocumentOptions;
-import com.yihu.ehr.profile.core.StdDataSet;
-import com.yihu.ehr.profile.core.commons.DataSetUtil;
-import com.yihu.ehr.profile.core.StructedProfile;
+import com.yihu.ehr.profile.core.profile.StandardProfile;
+import com.yihu.ehr.profile.core.profile.StdDataSet;
+import com.yihu.ehr.profile.core.util.DataSetUtil;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.persist.ProfileIndices;
 import com.yihu.ehr.profile.persist.ProfileIndicesService;
@@ -137,14 +137,14 @@ public class ProfileEndPoint extends BaseRestEndPoint {
                                                         boolean loadOriginDataSet) throws IOException, ParseException {
         if (profileIndices.getContent().size() == 0) return null;
 
-        List<StructedProfile> profiles = new ArrayList<>();
+        List<StandardProfile> profiles = new ArrayList<>();
         for (ProfileIndices indices : profileIndices) {
-            StructedProfile profile = profileService.getProfile(indices.getProfileId(), loadStdDataSet, loadOriginDataSet);
+            StandardProfile profile = profileService.getProfile(indices.getProfileId(), loadStdDataSet, loadOriginDataSet);
             profiles.add(profile);
         }
 
         List<MProfile> profileList = new ArrayList<>();
-//        for (StructedProfile profile : profiles) {
+//        for (StandardProfile profile : profiles) {
 //            MProfile mProfile = convertProfile(profile);
 //
 //            profileList.add(mProfile);
@@ -162,7 +162,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "load_std_data_set") boolean loadStdDataSet,
             @ApiParam(value = "是否加载原始数据集", defaultValue = "false")
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws IOException, ParseException {
-        StructedProfile profile = profileService.getProfile(profileId, loadStdDataSet, loadOriginDataSet);
+        StandardProfile profile = profileService.getProfile(profileId, loadStdDataSet, loadOriginDataSet);
 
         return convertProfile(profile);
     }
@@ -178,7 +178,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "load_std_data_set") boolean loadStdDataSet,
             @ApiParam(value = "是否加载原始数据集", defaultValue = "false")
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws IOException, ParseException {
-        StructedProfile profile = profileService.getProfile(profileId, loadStdDataSet, loadOriginDataSet);
+        StandardProfile profile = profileService.getProfile(profileId, loadStdDataSet, loadOriginDataSet);
         Map<Template, MCDADocument> cdaDocuments = getCustomizedCDADocuments(profile);
 
         return convertDocument(profile, cdaDocuments, documentId);
@@ -187,7 +187,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     /**
      * 此类目下卫生机构定制的CDA文档列表
      */
-    private Map<Template, MCDADocument> getCustomizedCDADocuments(StructedProfile profile) {
+    private Map<Template, MCDADocument> getCustomizedCDADocuments(StandardProfile profile) {
         // 使用CDA类别关键数据元映射，取得与此档案相关联的CDA类别ID
         String cdaType = null;
         for (StdDataSet dataSet : profile.getDataSets()) {
@@ -213,7 +213,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return cdaDocuments;
     }
 
-    private MProfile convertProfile(StructedProfile profile) {
+    private MProfile convertProfile(StandardProfile profile) {
         MProfile mProfile = new MProfile();
         mProfile.setId(profile.getId());
         mProfile.setCdaVersion(profile.getCdaVersion());
@@ -264,7 +264,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return mProfile;
     }
 
-    private MProfileDocument convertDocument(StructedProfile profile, Map<Template, MCDADocument> cdaDocuments, String documentId) {
+    private MProfileDocument convertDocument(StandardProfile profile, Map<Template, MCDADocument> cdaDocuments, String documentId) {
         for (Template template : cdaDocuments.keySet()) {
             MCDADocument cdaDocument = cdaDocuments.get(template);
             if (!cdaDocument.getId().equals(documentId)) continue;

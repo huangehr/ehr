@@ -1,11 +1,11 @@
-package com.yihu.ehr.profile.core.commons;
+package com.yihu.ehr.profile.core.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.yihu.ehr.profile.core.DataRecord;
-import com.yihu.ehr.profile.core.StdDataSet;
+import com.yihu.ehr.profile.core.profile.DataRecord;
+import com.yihu.ehr.profile.core.profile.StdDataSet;
+import com.yihu.ehr.util.DateTimeUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -40,13 +40,15 @@ public class DataSetResolver {
             String eventNo = jsonNode.get("event_no").asText();
             String patientId = jsonNode.get("patient_id").asText();
             String orgCode = jsonNode.get("org_code").asText();
-            String eventDate = jsonNode.path("event_time").asText();        // 旧数据集结构可能不存在这个属性
+            String createDate = jsonNode.get("create_date").asText();
+            String eventDate = jsonNode.path("event_time").asText();    // 旧数据集结构可能不存在这个属性
 
             dataSet.setPatientId(patientId);
             dataSet.setEventNo(eventNo);
             dataSet.setCdaVersion(version);
             dataSet.setCode(dataSetCode);
             dataSet.setOrgCode(orgCode);
+            dataSet.setCreateDate(DateTimeUtils.simpleDateParse(createDate));
 
             JsonNode jsonRecords = jsonNode.get("data");
             for (int i = 0; i < jsonRecords.size(); ++i) {

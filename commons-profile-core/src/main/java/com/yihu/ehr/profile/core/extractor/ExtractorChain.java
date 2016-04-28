@@ -1,6 +1,6 @@
 package com.yihu.ehr.profile.core.extractor;
 
-import com.yihu.ehr.profile.core.StdDataSet;
+import com.yihu.ehr.profile.core.profile.StdDataSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.core.commons;
+package com.yihu.ehr.profile.core.util;
 
 /**
  * @author linaz

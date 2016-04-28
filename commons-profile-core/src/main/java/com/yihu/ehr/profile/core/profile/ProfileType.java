@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.core;
+package com.yihu.ehr.profile.core.profile;
 
 /**
  * @author linaz
@@ -6,8 +6,8 @@ package com.yihu.ehr.profile.core;
  * @created 2015.12.20 15:37
  */
 public enum ProfileType {
-    NonStructured(0),
-    Structured(1),
+    Standard(10),
+    Document(1),
     Link(2);
 
     private int type;

@@ -1,10 +1,9 @@
-package com.yihu.ehr.profile.core;
+package com.yihu.ehr.profile.core.profile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.lang.SpringContext;
-import com.yihu.ehr.profile.core.commons.ProfileId;
 import com.yihu.ehr.profile.core.extractor.EventExtractor;
 import com.yihu.ehr.profile.core.extractor.KeyDataExtractor;
 import com.yihu.ehr.util.DateTimeUtils;
@@ -14,37 +13,35 @@ import java.text.ParseException;
 import java.util.*;
 
 /**
- * 结构化健康档案。
+ * 标准健康档案（结构化）。
  *
  * @author Sand
  * @created 2015.08.16 10:44
  */
-public class StructedProfile {
+public class StandardProfile {
     protected ObjectMapper objectMapper = SpringContext.getService("objectMapper");
 
     private ProfileId profileId;                        // 健康档案ID
     private String cardId;                              // 就诊时用的就诊卡ID
     private String orgCode;                             // 机构代码
-    private String orgName;                             // 机构名称
     private String patientId;                           // 身份证号
     private String eventNo;                             // 事件号
     private Date eventDate;                             // 事件时间，如挂号，出院体检时间
     private String demographicId;                       // 人口学ID
-    private String summary;                             // 档案摘要
     private Date createDate;                            // 包创建时间
     private String cdaVersion;
     private ProfileType profileType;
     private EventType eventType;
 
-    protected Map<String, StdDataSet> dataSets = new HashMap<>();
+    protected Map<String, StdDataSet> dataSets = new TreeMap<>();
 
-    public StructedProfile(){
+    public StandardProfile(){
         cardId = "";
         orgCode = "";
         patientId = "";
         eventNo = "";
 
-        this.setProfileType(ProfileType.Structured);
+        this.setProfileType(ProfileType.Standard);
     }
 
     public ProfileType getProfileType() {
@@ -111,10 +108,6 @@ public class StructedProfile {
         this.orgCode = orgCode;
     }
 
-    public String getOrgName() {
-        return orgName;
-    }
-
     public String getPatientId() {
         return patientId;
     }
@@ -145,14 +138,6 @@ public class StructedProfile {
 
     public void setEventDate(Date date) {
         this.eventDate = date;
-    }
-
-    public String getSummary() {
-        return summary;
-    }
-
-    public void setSummary(String summary) {
-        this.summary = summary;
     }
 
     public Date getCreateDate() {
@@ -193,38 +178,45 @@ public class StructedProfile {
         root.put("id", getId().toString());
         root.put("card_id", this.getCardId());
         root.put("org_code", this.getOrgCode());
-        root.put("org_name", this.getOrgName());
         root.put("patient_id", this.getPatientId());
         root.put("event_no", this.getEventNo());
         root.put("event_date", this.getEventDate() == null ? "" : DateTimeUtils.utcDateTimeFormat(this.getEventDate()));
         root.put("cda_version", this.getCdaVersion());
         root.put("create_date", this.getCreateDate() == null ? "" : DateTimeUtils.utcDateTimeFormat(this.getCreateDate()));
-        root.put("vent_type", this.getEventType().toString());
+        root.put("event_type", this.getEventType().toString());
 
-        ArrayNode dataSetsNode = root.putArray("data_sets");
+        ObjectNode dataSetsNode = root.putObject("data_sets");
         for (String dataSetCode : dataSets.keySet()){
             StdDataSet dataSet = dataSets.get(dataSetCode);
-            dataSetsNode.addPOJO(dataSet.toJson());
+            dataSetsNode.putPOJO(dataSetCode, dataSet.toJson());
         }
 
         return root.toString();
     }
 
-    public void regular() throws ParseException {
-        EventExtractor eventExtractor = SpringContext.getService(EventExtractor.class);
+    public void regularRowKey() {
         for (String dataSetCode : dataSets.keySet()) {
             StdDataSet dataSet = dataSets.get(dataSetCode);
-
-            if (getEventType() == null){
-                EventType eventType = (EventType)eventExtractor.extract(dataSet, KeyDataExtractor.Filter.EventType);
-                setEventType(eventType);
-            }
 
             int rowIndex = 0;
             String sortFormat = dataSet.getRecordCount() > 10 ? "%s$%03d" : "%s$%1d";
             String[] rowKeys = dataSet.getRecordKeys().toArray(new String[dataSet.getRecordCount()]);
             for (String rowKey : rowKeys) {
                 dataSet.updateRecordKey(rowKey, String.format(sortFormat, getId(), rowIndex++));
+            }
+        }
+    }
+
+    public void determineEventType() throws ParseException {
+        if (getEventType() != null) return;
+
+        EventExtractor eventExtractor = SpringContext.getService(EventExtractor.class);
+        for (String dataSetCode : dataSets.keySet()) {
+            StdDataSet dataSet = dataSets.get(dataSetCode);
+            EventType eventType = (EventType) eventExtractor.extract(dataSet, KeyDataExtractor.Filter.EventType);
+            if (eventType != null) {
+                setEventType(eventType);
+                break;
             }
         }
     }

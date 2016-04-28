@@ -1,5 +1,9 @@
-package com.yihu.ehr.profile.core;
+package com.yihu.ehr.profile.core.util;
 
+import com.yihu.ehr.profile.core.profile.FileProfile;
+import com.yihu.ehr.profile.core.profile.LinkProfile;
+import com.yihu.ehr.profile.core.profile.ProfileType;
+import com.yihu.ehr.profile.core.profile.StandardProfile;
 import org.springframework.util.CollectionUtils;
 
 import java.io.File;
@@ -26,14 +30,14 @@ public class ProfileGenerator {
      * @param root
      * @return
      */
-    public static StructedProfile generate(File root) {
+    public static StandardProfile generate(File root) {
         List<String> directories = CollectionUtils.arrayToList(root.list());
         List<String> files = CollectionUtils.arrayToList(root.listFiles());
 
         if (directories.contains(StandardFolder) && directories.contains(OriginFolder)) {
-            return new StructedProfile();
+            return new StandardProfile();
         } else if (directories.contains(DocumentFolder) && files.contains(MetaDataFile)) {
-            return new NonStructedProfile();
+            return new FileProfile();
         } else if (directories.size() == 1 && directories.contains(LinkFolder)) {
             return new LinkProfile();
         }
@@ -41,13 +45,13 @@ public class ProfileGenerator {
         return null;
     }
 
-    public static StructedProfile generate(ProfileType type){
+    public static StandardProfile generate(ProfileType type){
         switch(type){
-            case NonStructured:
-                return new NonStructedProfile();
+            case Document:
+                return new FileProfile();
 
-            case Structured:
-                return new StructedProfile();
+            case Standard:
+                return new StandardProfile();
 
             case Link:
                 return new LinkProfile();

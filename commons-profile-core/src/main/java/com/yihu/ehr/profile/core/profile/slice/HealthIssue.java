@@ -1,6 +1,6 @@
-package com.yihu.ehr.profile.core.slice;
+package com.yihu.ehr.profile.core.profile.slice;
 
-import com.yihu.ehr.profile.core.StructedProfile;
+import com.yihu.ehr.profile.core.profile.StandardProfile;
 
 /**
  * 健康问题。
@@ -15,5 +15,5 @@ public class HealthIssue {
     int treatmentTimes;             // 就诊次数（包括随访，门诊及住院）
     int residentTimes;              // 住院次数
 
-    StructedProfile lastProfile;    // 最后一次就诊的档案
+    StandardProfile lastProfile;    // 最后一次就诊的档案
 }

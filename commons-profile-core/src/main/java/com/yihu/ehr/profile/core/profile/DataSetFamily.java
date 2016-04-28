@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.core.commons;
+package com.yihu.ehr.profile.core.profile;
 
 /**
  * 数据集表列族。
@@ -17,7 +17,7 @@ public enum DataSetFamily {
         this.family = family;
     }
 
-    public String value() {
+    public String toString() {
         return family;
     }
 

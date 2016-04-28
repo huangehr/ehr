@@ -7,9 +7,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.lang.SpringContext;
-import com.yihu.ehr.profile.core.DataRecord;
-import com.yihu.ehr.profile.core.StdDataSet;
-import com.yihu.ehr.profile.core.StructedProfile;
+import com.yihu.ehr.profile.core.profile.DataRecord;
+import com.yihu.ehr.profile.core.profile.StdDataSet;
+import com.yihu.ehr.profile.core.profile.StandardProfile;
 import com.yihu.ehr.profile.persist.ProfileIndices;
 import com.yihu.ehr.profile.persist.ProfileIndicesService;
 import com.yihu.ehr.profile.persist.ProfileService;
@@ -79,17 +79,17 @@ public class SanofiEndPoint {
 
         if (profileIndices == null) return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
 
-        List<StructedProfile> profiles = new ArrayList<>();
+        List<StandardProfile> profiles = new ArrayList<>();
         for (ProfileIndices indices : profileIndices.getContent()) {
-            StructedProfile structedProfile = profileService.getProfile(indices.getProfileId(), false, false);
-            profiles.add(structedProfile);
+            StandardProfile standardProfile = profileService.getProfile(indices.getProfileId(), false, false);
+            profiles.add(standardProfile);
         }
 
         if (profiles.size() == 0) return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
 
         ObjectMapper objectMapper = SpringContext.getService("objectMapper");
         ArrayNode document = objectMapper.createArrayNode();
-        for (StructedProfile profile : profiles) {
+        for (StandardProfile profile : profiles) {
             ObjectNode section = objectMapper.createObjectNode();
             convert(section, profile);
 
@@ -99,7 +99,7 @@ public class SanofiEndPoint {
         return new ResponseEntity<>(document.toString(), HttpStatus.NOT_FOUND);
     }
 
-    private void convert(ObjectNode document, StructedProfile profile) throws IOException {
+    private void convert(ObjectNode document, StandardProfile profile) throws IOException {
         JsonNode section;
         StdDataSet dataSet;
         String[] innerCodes;
@@ -174,7 +174,7 @@ public class SanofiEndPoint {
         }
     }
 
-    private void mergeData(JsonNode section, StructedProfile profile, StdDataSet emptyDataSet, String[] metaDataCodes) throws IOException {
+    private void mergeData(JsonNode section, StandardProfile profile, StdDataSet emptyDataSet, String[] metaDataCodes) throws IOException {
         StdDataSet dataSet = dataSetRepo.findOne(profile.getCdaVersion(),
                 emptyDataSet.getCode(),
                 profile.getProfileType(),

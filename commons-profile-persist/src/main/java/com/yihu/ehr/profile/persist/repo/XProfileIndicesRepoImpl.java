@@ -1,10 +1,5 @@
 package com.yihu.ehr.profile.persist.repo;
 
-import com.yihu.ehr.profile.core.commons.ProfileId;
-import com.yihu.ehr.profile.persist.Demographic;
-import com.yihu.ehr.profile.persist.ProfileIndices;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.apache.solr.client.solrj.impl.CloudSolrServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,9 +9,7 @@ import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.data.solr.server.support.MulticoreSolrServerFactory;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

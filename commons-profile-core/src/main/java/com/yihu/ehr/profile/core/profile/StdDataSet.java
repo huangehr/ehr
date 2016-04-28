@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.core;
+package com.yihu.ehr.profile.core.profile;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -129,8 +129,7 @@ public class StdDataSet {
     public JsonNode toJson() {
         ObjectMapper objectMapper = SpringContext.getService("objectMapper");
 
-        ObjectNode root = dataSetHeader(objectMapper);
-        return dataSetBody(root);
+        return dataSetBody(dataSetHeader(objectMapper));
     }
 
     protected ObjectNode dataSetHeader(ObjectMapper objectMapper){
@@ -144,19 +143,17 @@ public class StdDataSet {
     }
 
     protected ObjectNode dataSetBody(ObjectNode root){
-        ArrayNode arrayNode = root.putArray("records");
+        ObjectNode records = root.putObject("records");
         for (String rowKey : this.records.keySet()) {
-            ObjectNode row = arrayNode.addObject();
-
-            DataRecord record = records.get(rowKey);
+            DataRecord record = this.records.get(rowKey);
             if (record == null){
-                row.put(rowKey, (String)null);
+                records.put(rowKey, (String)null);
             }else {
-                ObjectNode metaData = row.putObject(rowKey);
+                ObjectNode metaData = records.putObject(rowKey);
 
                 Set<String> codes = record.getMetaDataCodes();
                 for (String code : codes) {
-                    metaData.put(code, record.getMetaData(code));
+                    metaData.put(code.substring(0, code.lastIndexOf('_')), record.getMetaData(code));
                 }
             }
         }

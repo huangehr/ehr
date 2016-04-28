@@ -7,8 +7,8 @@ import com.yihu.ehr.feign.XPackageMgrClient;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.mq.MessageBuffer;
-import com.yihu.ehr.profile.core.StructedProfile;
-import com.yihu.ehr.profile.persist.repo.ProfileRepository;
+import com.yihu.ehr.profile.core.profile.StandardProfile;
+import com.yihu.ehr.profile.persist.ProfileService;
 import com.yihu.ehr.service.PackageResolveEngine;
 import com.yihu.ehr.util.log.LogService;
 import org.quartz.InterruptableJob;
@@ -59,12 +59,12 @@ public class PackageResolveJob implements InterruptableJob {
             LogService.getLogger().info("Package resolve job: package " + pack.getId());
 
             XPackageMgrClient packageMgrClient = SpringContext.getService(XPackageMgrClient.class);
-            ProfileRepository profileRepo = SpringContext.getService(ProfileRepository.class);
+            ProfileService profileService = SpringContext.getService(ProfileService.class);
 
             String zipFile = downloadTo(pack.getRemotePath());
 
-            StructedProfile profile = resolveEngine.doResolve(pack, zipFile);
-            profileRepo.save(profile);
+            StandardProfile profile = resolveEngine.doResolve(pack, zipFile);
+            profileService.saveProfile(profile);
 
             packageMgrClient.reportStatus(pack.getId(),
                     ArchiveStatus.Finished,

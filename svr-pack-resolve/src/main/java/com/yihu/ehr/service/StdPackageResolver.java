@@ -1,10 +1,10 @@
 package com.yihu.ehr.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.yihu.ehr.profile.core.ProfileGenerator;
-import com.yihu.ehr.profile.core.StdDataSet;
-import com.yihu.ehr.profile.core.StructedProfile;
-import com.yihu.ehr.profile.core.commons.DataSetUtil;
+import com.yihu.ehr.profile.core.util.ProfileGenerator;
+import com.yihu.ehr.profile.core.profile.StandardProfile;
+import com.yihu.ehr.profile.core.profile.StdDataSet;
+import com.yihu.ehr.profile.core.util.DataSetUtil;
 import com.yihu.ehr.profile.core.extractor.KeyDataExtractor;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
@@ -24,18 +24,18 @@ import java.util.Properties;
 @Component
 public class StdPackageResolver extends PackageResolver {
     @Override
-    public void resolve(StructedProfile profile, File root) throws IOException, ParseException {
-        File standardFolder = new File(root.getAbsolutePath() + File.pathSeparator + ProfileGenerator.StandardFolder);
+    public void resolve(StandardProfile profile, File root) throws IOException, ParseException {
+        File standardFolder = new File(root.getAbsolutePath() + File.separator + ProfileGenerator.StandardFolder);
         parseFiles(profile, standardFolder.listFiles(), false);
 
-        File originFolder = new File(root.getAbsolutePath() + File.pathSeparator + ProfileGenerator.OriginFolder);
+        File originFolder = new File(root.getAbsolutePath() + File.separator + ProfileGenerator.OriginFolder);
         parseFiles(profile, originFolder.listFiles(), true);
     }
 
     /**
      * 结构化档案包解析JSON文件中的数据。
      */
-    private void parseFiles(StructedProfile profile, File[] files, boolean origin) throws ParseException, IOException {
+    private void parseFiles(StandardProfile profile, File[] files, boolean origin) throws ParseException, IOException {
         for (File file : files) {
             StdDataSet dataSet = generateDataSet(file, origin);
 
@@ -65,6 +65,7 @@ public class StdPackageResolver extends PackageResolver {
             profile.setEventNo(dataSet.getEventNo());
             profile.setOrgCode(dataSet.getOrgCode());
             profile.setCdaVersion(dataSet.getCdaVersion());
+            profile.setCreateDate(dataSet.getCreateDate());
             profile.insertDataSet(dataSetCode, dataSet);
         }
     }

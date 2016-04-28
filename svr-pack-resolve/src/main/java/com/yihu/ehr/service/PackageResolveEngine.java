@@ -1,10 +1,9 @@
 package com.yihu.ehr.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.profile.core.ProfileGenerator;
-import com.yihu.ehr.profile.core.ProfileType;
-import com.yihu.ehr.profile.core.StructedProfile;
+import com.yihu.ehr.profile.core.util.ProfileGenerator;
+import com.yihu.ehr.profile.core.profile.ProfileType;
+import com.yihu.ehr.profile.core.profile.StandardProfile;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.io.FileUtils;
@@ -17,7 +16,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.yihu.ehr.profile.core.ProfileType.*;
+import static com.yihu.ehr.profile.core.profile.ProfileType.*;
 
 /**
  * 档案解析引擎.
@@ -30,9 +29,6 @@ import static com.yihu.ehr.profile.core.ProfileType.*;
 public class PackageResolveEngine {
     @Autowired
     ApplicationContext context;
-
-    @Autowired
-    ObjectMapper objectMapper;
 
     Map<ProfileType, PackageResolver> packageResolvers;
 
@@ -47,38 +43,43 @@ public class PackageResolveEngine {
      * 5. 解析完的数据存入HBase，并将JSON文档的状态标记为 Finished。
      * 6. 以上步骤有任何一个失败的，将文档标记为 Failed 状态，即无法决定该JSON档案的去向，需要人为干预。
      */
-    public StructedProfile doResolve(MPackage pack, String zipFile) throws Exception {
-        File root = new Zipper().unzipFile(new File(zipFile), TempPath + pack.getId(), pack.getPwd());
-        if (root == null || !root.isDirectory() || root.list().length == 0) {
-            throw new RuntimeException("Invalid package file, package id: " + pack.getId());
+    public StandardProfile doResolve(MPackage pack, String zipFile) throws Exception {
+        File root = null;
+        try {
+            root = new Zipper().unzipFile(new File(zipFile), TempPath + pack.getId(), pack.getPwd());
+            if (root == null || !root.isDirectory() || root.list().length == 0) {
+                throw new RuntimeException("Invalid package file, package id: " + pack.getId());
+            }
+
+            StandardProfile profile = ProfileGenerator.generate(root);
+            PackageResolver packageResolver;
+            switch (profile.getProfileType()) {
+                case Standard:
+                    packageResolver = packageResolvers.get(ProfileType.Standard);
+                    break;
+
+                case Document:
+                    packageResolver = packageResolvers.get(ProfileType.Document);
+                    break;
+
+                case Link:
+                    packageResolver = packageResolvers.get(ProfileType.Link);
+                    break;
+
+                default:
+                    packageResolver = null;
+                    break;
+            }
+
+            packageResolver.resolve(profile, root);
+
+            profile.regularRowKey();
+            profile.determineEventType();
+
+            return profile;
+        } finally {
+            houseKeep(zipFile, root);
         }
-
-        StructedProfile profile = ProfileGenerator.generate(root);
-        PackageResolver packageResolver;
-        switch (profile.getProfileType()) {
-            case NonStructured:
-                packageResolver = packageResolvers.get(ProfileType.NonStructured);
-                break;
-
-            case Structured:
-                packageResolver = packageResolvers.get(ProfileType.Structured);
-                break;
-
-            case Link:
-                packageResolver = packageResolvers.get(ProfileType.Link);
-                break;
-
-            default:
-                packageResolver = null;
-                break;
-        }
-
-        packageResolver.resolve(profile, root);
-        profile.regular();
-
-        houseKeep(zipFile, root);
-
-        return profile;
     }
 
     private void houseKeep(String zipFile, File root) {
@@ -91,10 +92,10 @@ public class PackageResolveEngine {
     }
 
     @PostConstruct
-    private void init(){
+    private void init() {
         packageResolvers = new HashMap<>();
-        packageResolvers.put(NonStructured, new StdPackageResolver());
-        packageResolvers.put(Link, new LinkPackageResolver());
-        packageResolvers.put(Structured, new DocumentPackageResolver());
+        packageResolvers.put(Standard, context.getBean(StdPackageResolver.class));
+        packageResolvers.put(Document, context.getBean(DocumentPackageResolver.class));
+        packageResolvers.put(Link, context.getBean(LinkPackageResolver.class));
     }
 }

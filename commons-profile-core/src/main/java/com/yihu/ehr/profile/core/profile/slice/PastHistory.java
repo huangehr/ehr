@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.core.slice;
+package com.yihu.ehr.profile.core.profile.slice;
 
 /**
  * 既往史。

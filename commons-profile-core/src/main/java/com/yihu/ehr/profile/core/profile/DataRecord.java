@@ -1,15 +1,15 @@
-package com.yihu.ehr.profile.core;
+package com.yihu.ehr.profile.core.profile;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * @author Sand
  * @created 2016.04.26 18:55
  */
 public class DataRecord {
-    Map<String, String> metaDataGroup;
+    Map<String, String> metaDataGroup = new TreeMap<>();
 
     public Map<String, String> getMetaDataGroup(){
         return metaDataGroup;

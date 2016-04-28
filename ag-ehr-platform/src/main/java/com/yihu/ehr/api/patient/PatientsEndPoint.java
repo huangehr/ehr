@@ -7,9 +7,9 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.feign.PatientClient;
 import com.yihu.ehr.model.patient.MDemographicInfo;
-import com.yihu.ehr.profile.core.DataRecord;
-import com.yihu.ehr.profile.core.StdDataSet;
-import com.yihu.ehr.profile.core.commons.DataSetResolver;
+import com.yihu.ehr.profile.core.profile.DataRecord;
+import com.yihu.ehr.profile.core.profile.StdDataSet;
+import com.yihu.ehr.profile.core.util.DataSetResolver;
 import com.yihu.ehr.util.DateTimeUtils;
 import com.yihu.ehr.util.IdValidator;
 import io.swagger.annotations.Api;
@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Map;
 
 /**
  * 患者注册接口。患者注册之后，可以为患者申请为平台用户提供快捷信息录入。

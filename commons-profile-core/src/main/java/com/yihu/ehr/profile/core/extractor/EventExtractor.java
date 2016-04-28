@@ -1,8 +1,8 @@
 package com.yihu.ehr.profile.core.extractor;
 
-import com.yihu.ehr.profile.core.DataRecord;
-import com.yihu.ehr.profile.core.EventType;
-import com.yihu.ehr.profile.core.StdDataSet;
+import com.yihu.ehr.profile.core.profile.DataRecord;
+import com.yihu.ehr.profile.core.profile.EventType;
+import com.yihu.ehr.profile.core.profile.StdDataSet;
 import com.yihu.ehr.util.DateTimeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
