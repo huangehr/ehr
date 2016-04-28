@@ -1,8 +1,8 @@
 package com.yihu.ehr.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.yihu.ehr.profile.core.profile.FileProfile;
-import com.yihu.ehr.profile.core.profile.StandardProfile;
+import com.yihu.ehr.profile.core.FileProfile;
+import com.yihu.ehr.profile.core.StdProfile;
 import com.yihu.ehr.util.DateTimeUtils;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +20,7 @@ import java.text.ParseException;
 @Component
 public class DocumentPackageResolver extends PackageResolver {
     @Override
-    public void resolve(StandardProfile profile, File root) throws IOException, ParseException {
+    public void resolve(StdProfile profile, File root) throws IOException, ParseException {
         FileProfile fileProfile = (FileProfile) profile;
 
         File metaFile = new File(root.getAbsolutePath() + File.pathSeparator + "meta.json");

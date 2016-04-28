@@ -7,7 +7,7 @@ import com.yihu.ehr.feign.XPackageMgrClient;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.mq.MessageBuffer;
-import com.yihu.ehr.profile.core.profile.StandardProfile;
+import com.yihu.ehr.profile.core.StdProfile;
 import com.yihu.ehr.profile.persist.ProfileService;
 import com.yihu.ehr.service.PackageResolveEngine;
 import com.yihu.ehr.util.log.LogService;
@@ -63,7 +63,7 @@ public class PackageResolveJob implements InterruptableJob {
 
             String zipFile = downloadTo(pack.getRemotePath());
 
-            StandardProfile profile = resolveEngine.doResolve(pack, zipFile);
+            StdProfile profile = resolveEngine.doResolve(pack, zipFile);
             profileService.saveProfile(profile);
 
             packageMgrClient.reportStatus(pack.getId(),

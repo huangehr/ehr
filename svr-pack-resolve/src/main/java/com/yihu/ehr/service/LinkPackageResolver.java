@@ -2,10 +2,10 @@ package com.yihu.ehr.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.yihu.ehr.profile.core.profile.DataRecord;
-import com.yihu.ehr.profile.core.profile.LinkDataSet;
-import com.yihu.ehr.profile.core.profile.LinkProfile;
-import com.yihu.ehr.profile.core.profile.StandardProfile;
+import com.yihu.ehr.profile.core.DataRecord;
+import com.yihu.ehr.profile.core.LinkDataSet;
+import com.yihu.ehr.profile.core.LinkProfile;
+import com.yihu.ehr.profile.core.StdProfile;
 import com.yihu.ehr.util.DateTimeUtils;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +24,7 @@ import java.util.Iterator;
 @Component
 public class LinkPackageResolver extends PackageResolver {
     @Override
-    public void resolve(StandardProfile profile, File root) throws IOException, ParseException {
+    public void resolve(StdProfile profile, File root) throws IOException, ParseException {
         LinkProfile linkProfile = (LinkProfile) profile;
 
         File indexFile = new File(root.getAbsolutePath() + File.pathSeparator + "index/patient_index.json");

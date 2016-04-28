@@ -1,15 +1,15 @@
 package com.yihu.ehr.profile.persist.repo;
 
 import com.yihu.ehr.cache.CacheReader;
-import com.yihu.ehr.profile.core.profile.ProfileType;
-import com.yihu.ehr.data.hbase.CellBundle;
+import com.yihu.ehr.profile.core.ProfileType;
+import com.yihu.ehr.data.hbase.TableBundle;
 import com.yihu.ehr.data.hbase.HBaseDao;
 import com.yihu.ehr.data.hbase.ResultUtil;
-import com.yihu.ehr.profile.core.profile.DataRecord;
-import com.yihu.ehr.profile.core.profile.LinkDataSet;
-import com.yihu.ehr.profile.core.profile.StdDataSet;
-import com.yihu.ehr.profile.core.profile.DataSetFamily;
-import com.yihu.ehr.profile.core.util.QualifierTranslator;
+import com.yihu.ehr.profile.core.DataRecord;
+import com.yihu.ehr.profile.core.LinkDataSet;
+import com.yihu.ehr.profile.core.StdDataSet;
+import com.yihu.ehr.profile.core.DataSetFamily;
+import com.yihu.ehr.profile.util.QualifierTranslator;
 import com.yihu.ehr.schema.StdKeySchema;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -56,9 +56,9 @@ public class DataSetRepository {
         dataSet.setCdaVersion(cdaVersion);
         dataSet.setCode(dataSetCode);
 
-        CellBundle dataSetBundle = new CellBundle();
+        TableBundle dataSetBundle = new TableBundle();
         for (String rowkey : rowkeys) {
-            dataSetBundle.addRow(rowkey);
+            dataSetBundle.addRows(rowkey);
             /*dataSetBundle.addFamily(rowkey, DataSetFamily.Basic);
             dataSetBundle.addFamily(rowkey, DataSetFamily.MetaData);
             dataSetBundle.addFamily(rowkey, DataSetFamily.Extension);*/
@@ -99,7 +99,7 @@ public class DataSetRepository {
             }
         }
 
-        CellBundle dataSetBundle = new CellBundle();
+        TableBundle dataSetBundle = new TableBundle();
         for (String rowkey : rowkeys) {
             dataSetBundle.addFamily(rowkey, DataSetFamily.Basic);
             dataSetBundle.addColumns(rowkey, DataSetFamily.MetaData, metaDataCode.toArray());

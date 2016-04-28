@@ -1,8 +1,8 @@
 package com.yihu.ehr.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.profile.core.profile.StandardProfile;
-import com.yihu.ehr.profile.core.extractor.ExtractorChain;
+import com.yihu.ehr.profile.core.StdProfile;
+import com.yihu.ehr.profile.extractor.ExtractorChain;
 import com.yihu.ehr.profile.persist.DataSetResolverWithTranslator;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,5 +27,5 @@ public abstract class PackageResolver {
     @Autowired
     protected ExtractorChain extractorChain;
 
-    public abstract void resolve(StandardProfile profile, File root) throws IOException, ParseException;
+    public abstract void resolve(StdProfile profile, File root) throws IOException, ParseException;
 }

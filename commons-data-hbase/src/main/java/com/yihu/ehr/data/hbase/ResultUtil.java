@@ -20,10 +20,10 @@ public class ResultUtil {
         this.result = (Result) result;
     }
 
-    public String getCellValue(Object family, Object column){
+    public String getCellValue(Object family, Object column, String defaultValue){
         byte[] value = result.getValue(Bytes.toBytes(family.toString()), Bytes.toBytes(column.toString()));
 
-        return Bytes.toString(value);
+        return value == null ? defaultValue : Bytes.toString(value);
     }
 
     public List<Cell> listCells(){

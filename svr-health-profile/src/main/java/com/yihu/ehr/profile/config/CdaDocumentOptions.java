@@ -1,6 +1,6 @@
 package com.yihu.ehr.profile.config;
 
-import com.yihu.ehr.profile.core.util.DataSetUtil;
+import com.yihu.ehr.profile.util.DataSetUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

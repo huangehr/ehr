@@ -1,11 +1,11 @@
 package com.yihu.ehr.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.yihu.ehr.profile.core.util.ProfileGenerator;
-import com.yihu.ehr.profile.core.profile.StandardProfile;
-import com.yihu.ehr.profile.core.profile.StdDataSet;
-import com.yihu.ehr.profile.core.util.DataSetUtil;
-import com.yihu.ehr.profile.core.extractor.KeyDataExtractor;
+import com.yihu.ehr.profile.core.StdProfile;
+import com.yihu.ehr.profile.util.ProfileGenerator;
+import com.yihu.ehr.profile.core.StdDataSet;
+import com.yihu.ehr.profile.util.DataSetUtil;
+import com.yihu.ehr.profile.extractor.KeyDataExtractor;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +24,7 @@ import java.util.Properties;
 @Component
 public class StdPackageResolver extends PackageResolver {
     @Override
-    public void resolve(StandardProfile profile, File root) throws IOException, ParseException {
+    public void resolve(StdProfile profile, File root) throws IOException, ParseException {
         File standardFolder = new File(root.getAbsolutePath() + File.separator + ProfileGenerator.StandardFolder);
         parseFiles(profile, standardFolder.listFiles(), false);
 
@@ -35,7 +35,7 @@ public class StdPackageResolver extends PackageResolver {
     /**
      * 结构化档案包解析JSON文件中的数据。
      */
-    private void parseFiles(StandardProfile profile, File[] files, boolean origin) throws ParseException, IOException {
+    private void parseFiles(StdProfile profile, File[] files, boolean origin) throws ParseException, IOException {
         for (File file : files) {
             StdDataSet dataSet = generateDataSet(file, origin);
 

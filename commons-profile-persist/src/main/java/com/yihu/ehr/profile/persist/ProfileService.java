@@ -2,10 +2,10 @@ package com.yihu.ehr.profile.persist;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.profile.core.profile.ProfileType;
-import com.yihu.ehr.profile.core.profile.StandardProfile;
-import com.yihu.ehr.profile.core.profile.StdDataSet;
-import com.yihu.ehr.profile.core.util.DataSetUtil;
+import com.yihu.ehr.profile.core.ProfileType;
+import com.yihu.ehr.profile.core.StdProfile;
+import com.yihu.ehr.profile.core.StdDataSet;
+import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.profile.persist.repo.DataSetRepository;
 import com.yihu.ehr.profile.persist.repo.ProfileRepository;
 import org.apache.commons.lang3.tuple.Pair;
@@ -34,7 +34,7 @@ public class ProfileService {
     @Autowired
     ObjectMapper objectMapper;
 
-    public void saveProfile(StandardProfile profile) throws IOException {
+    public void saveProfile(StdProfile profile) throws IOException {
         profileRepo.save(profile);
     }
 
@@ -48,9 +48,9 @@ public class ProfileService {
      * @throws IOException
      * @throws ParseException
      */
-    public StandardProfile getProfile(String profileId, boolean loadStdDataSet, boolean loadOriginDataSet) throws IOException, ParseException {
-        Pair<StandardProfile, String> result = profileRepo.findOne(profileId, loadStdDataSet, loadOriginDataSet);
-        StandardProfile profile = result.getLeft();
+    public StdProfile getProfile(String profileId, boolean loadStdDataSet, boolean loadOriginDataSet) throws IOException, ParseException {
+        Pair<StdProfile, String> result = profileRepo.findOne(profileId, loadStdDataSet, loadOriginDataSet);
+        StdProfile profile = result.getLeft();
         profile.determineEventType();
 
         String cdaVersion = profile.getCdaVersion();
@@ -82,7 +82,10 @@ public class ProfileService {
             }
         }
 
-
         return profile;
+    }
+
+    public void deleteProfile(String profileId) throws IOException {
+        profileRepo.delete(profileId);
     }
 }

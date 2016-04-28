@@ -8,9 +8,9 @@ import com.yihu.ehr.model.profile.*;
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import com.yihu.ehr.profile.config.CdaDocumentOptions;
-import com.yihu.ehr.profile.core.profile.StandardProfile;
-import com.yihu.ehr.profile.core.profile.StdDataSet;
-import com.yihu.ehr.profile.core.util.DataSetUtil;
+import com.yihu.ehr.profile.core.StdProfile;
+import com.yihu.ehr.profile.core.StdDataSet;
+import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.persist.ProfileIndices;
 import com.yihu.ehr.profile.persist.ProfileIndicesService;
@@ -86,9 +86,9 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(value = "是否返回原始数据", defaultValue = "false")
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws IOException, ParseException {
         Map<String, String> document;
-        try{
+        try {
             document = objectMapper.readValue(query, Map.class);
-        }catch(JsonProcessingException ex){
+        } catch (JsonProcessingException ex) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Request parameter 'query' is not a valid json format.");
         }
 
@@ -137,20 +137,27 @@ public class ProfileEndPoint extends BaseRestEndPoint {
                                                         boolean loadOriginDataSet) throws IOException, ParseException {
         if (profileIndices.getContent().size() == 0) return null;
 
-        List<StandardProfile> profiles = new ArrayList<>();
+        List<StdProfile> profiles = new ArrayList<>();
         for (ProfileIndices indices : profileIndices) {
-            StandardProfile profile = profileService.getProfile(indices.getProfileId(), loadStdDataSet, loadOriginDataSet);
+            StdProfile profile = profileService.getProfile(indices.getProfileId(), loadStdDataSet, loadOriginDataSet);
             profiles.add(profile);
         }
 
         List<MProfile> profileList = new ArrayList<>();
-//        for (StandardProfile profile : profiles) {
+//        for (StdProfile profile : profiles) {
 //            MProfile mProfile = convertProfile(profile);
 //
 //            profileList.add(mProfile);
 //        }
 
         return profileList;
+    }
+
+    @ApiOperation(value = "删除档案", notes = "删除一份档案，包括数据集")
+    @RequestMapping(value = ServiceApi.HealthProfile.Profile, method = RequestMethod.DELETE)
+    public void deleteProfile(@ApiParam(value = "档案ID", defaultValue = "")
+                              @PathVariable("profile_id") String profileId) throws IOException {
+        profileService.deleteProfile(profileId);
     }
 
     @ApiOperation(value = "获取档案", notes = "读取一份档案")
@@ -162,7 +169,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "load_std_data_set") boolean loadStdDataSet,
             @ApiParam(value = "是否加载原始数据集", defaultValue = "false")
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws IOException, ParseException {
-        StandardProfile profile = profileService.getProfile(profileId, loadStdDataSet, loadOriginDataSet);
+        StdProfile profile = profileService.getProfile(profileId, loadStdDataSet, loadOriginDataSet);
 
         return convertProfile(profile);
     }
@@ -178,7 +185,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "load_std_data_set") boolean loadStdDataSet,
             @ApiParam(value = "是否加载原始数据集", defaultValue = "false")
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws IOException, ParseException {
-        StandardProfile profile = profileService.getProfile(profileId, loadStdDataSet, loadOriginDataSet);
+        StdProfile profile = profileService.getProfile(profileId, loadStdDataSet, loadOriginDataSet);
         Map<Template, MCDADocument> cdaDocuments = getCustomizedCDADocuments(profile);
 
         return convertDocument(profile, cdaDocuments, documentId);
@@ -187,7 +194,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     /**
      * 此类目下卫生机构定制的CDA文档列表
      */
-    private Map<Template, MCDADocument> getCustomizedCDADocuments(StandardProfile profile) {
+    private Map<Template, MCDADocument> getCustomizedCDADocuments(StdProfile profile) {
         // 使用CDA类别关键数据元映射，取得与此档案相关联的CDA类别ID
         String cdaType = null;
         for (StdDataSet dataSet : profile.getDataSets()) {
@@ -213,14 +220,13 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return cdaDocuments;
     }
 
-    private MProfile convertProfile(StandardProfile profile) {
+    private MProfile convertProfile(StdProfile profile) {
         MProfile mProfile = new MProfile();
         mProfile.setId(profile.getId());
         mProfile.setCdaVersion(profile.getCdaVersion());
         mProfile.setOrgCode(profile.getOrgCode());
         mProfile.setOrgName(cacheReader.read(orgKeySchema.name(profile.getOrgCode())));
         mProfile.setEventDate(profile.getEventDate());
-        mProfile.setSummary(profile.getSummary());
         mProfile.setDemographicId(profile.getDemographicId());
 
         Map<Template, MCDADocument> cdaDocuments = getCustomizedCDADocuments(profile);
@@ -264,7 +270,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return mProfile;
     }
 
-    private MProfileDocument convertDocument(StandardProfile profile, Map<Template, MCDADocument> cdaDocuments, String documentId) {
+    private MProfileDocument convertDocument(StdProfile profile, Map<Template, MCDADocument> cdaDocuments, String documentId) {
         for (Template template : cdaDocuments.keySet()) {
             MCDADocument cdaDocument = cdaDocuments.get(template);
             if (!cdaDocument.getId().equals(documentId)) continue;
