@@ -35,6 +35,12 @@ public interface DrugDictClient {
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") String id);
 
+    @ApiOperation(value = "批量删除字典")
+    @RequestMapping(value = "dict/drugs", method = RequestMethod.DELETE)
+    boolean deleteDrugDicts(
+            @ApiParam(name = "ids", value = "字典IDs", defaultValue = "")
+            @RequestParam(value = "ids") String ids);
+
     @ApiOperation(value = "修改字典")
     @RequestMapping(value = "/dict/drug", method = RequestMethod.PUT)
     MDrugDict updateDrugDict(

@@ -77,6 +77,38 @@ public class Icd10DictController extends BaseRestController {
         return true;
     }
 
+    @RequestMapping(value = "dict/icd10s", method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据ids批量删除删除icd10疾病字典(含与药品及指标的关联关系。)")
+    public boolean deleteIcd10Dicts(
+            @ApiParam(name = "ids", value = "icd10字典代码,多个以逗号隔开")
+            @RequestParam( value = "ids") String ids) {
+        String[] icd10Ids = ids.split(",");
+        List<String> drugRelationIds = new ArrayList<>();
+        List<String> indicationRelationIds = new ArrayList<>();
+        for(String icd10Id:icd10Ids){
+            List<Icd10DrugRelation> icd10DrugRelations = icd10DrugRelationService.getIcd10DrugRelationListByIcd10Id(icd10Id);
+            if (icd10DrugRelations != null) {
+                for(Icd10DrugRelation icd10DrugRelation : icd10DrugRelations ){
+                    drugRelationIds.add(icd10DrugRelation.getId());
+                }
+            }
+            List<Icd10IndicatorRelation> icd10IndicatorRelations = icd10IndicatorRelationService.getIcd10IndicatorRelationListByIcd10Id(icd10Id);
+            if (icd10IndicatorRelations != null) {
+                for(Icd10IndicatorRelation icd10IndicatorRelation : icd10IndicatorRelations ){
+                    indicationRelationIds.add(icd10IndicatorRelation.getId());
+                }
+            }
+        }
+        if(drugRelationIds.size() != 0){
+            icd10DrugRelationService.delete(drugRelationIds);
+        }
+        if(indicationRelationIds.size() != 0){
+            icd10IndicatorRelationService.delete(indicationRelationIds);
+        }
+        icd10DictService.delete(icd10Ids);
+        return true;
+    }
+
     @RequestMapping(value = "/dict/icd10", method = RequestMethod.PUT)
     @ApiOperation(value = "更新ICD10字典" )
     public MIcd10Dict updateIcd10Dict(
@@ -169,6 +201,26 @@ public class Icd10DictController extends BaseRestController {
         return convertToModel(relation, MIcd10DrugRelation.class, null);
     }
 
+    @RequestMapping(value = "/dict/icd10/drugs", method = RequestMethod.POST)
+    @ApiOperation(value = "为ICD10增加药品关联。--批量关联" )
+    public Collection<MIcd10DrugRelation> createIcd10DrugRelations(
+            @ApiParam(name = "icd10_id", value = "健康问题Id")
+            @RequestParam(value = "icd10_id") String icd10Id,
+            @ApiParam(name = "drug_ids", value = "关联的药品字典ids,多个以逗号连接")
+            @RequestParam(value = "drug_ids") String drugIds) throws Exception {
+        Collection<Icd10DrugRelation> icd10DrugRelations = new ArrayList<>();
+        for(String drugId : drugIds.split(",")){
+            Icd10DrugRelation icd10DrugRelation = new Icd10DrugRelation();
+            icd10DrugRelation.setIcd10Id(icd10Id);
+            icd10DrugRelation.setDrugId(drugId);
+            String id = getObjectId(BizObject.Dict);
+            icd10DrugRelation.setId(id);
+            icd10DrugRelationService.save(icd10DrugRelation);
+            icd10DrugRelations.add(icd10DrugRelation);
+        }
+        return convertToModels(icd10DrugRelations, new ArrayList<MIcd10DrugRelation>(icd10DrugRelations.size()), MIcd10DrugRelation.class, null);
+    }
+
     @RequestMapping(value = "/dict/icd10/drug", method = RequestMethod.PUT)
     @ApiOperation(value = "为ICD10修改药品关联。" )
     public MIcd10DrugRelation updateIcd10DrugRelation(
@@ -188,6 +240,17 @@ public class Icd10DictController extends BaseRestController {
             @RequestParam(value = "id", required = true) String id) throws Exception{
 
         icd10DrugRelationService.delete(id);
+
+        return true;
+    }
+
+    @RequestMapping(value = "/dict/icd10/drugs", method = RequestMethod.DELETE)
+    @ApiOperation(value = "为ICD10删除药品关联。--批量删除，多个以逗号隔开" )
+    public boolean deleteIcd10DrugRelations(
+            @ApiParam(name = "ids", value = "关联IDs", defaultValue = "")
+            @RequestParam(value = "ids", required = true) String ids) throws Exception{
+
+        icd10DrugRelationService.delete(ids.split(","));
 
         return true;
     }
@@ -221,6 +284,15 @@ public class Icd10DictController extends BaseRestController {
         }
     }
 
+    @RequestMapping(value = "/dict/icd10/drugs/no_paging", method = RequestMethod.GET)
+    @ApiOperation(value = "根据ICD10查询相应的药品关联列表信息,------不分页。")
+    public Collection<MIcd10DrugRelation> getIcd10DrugRelationListWithoutPaging(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+        List<Icd10DrugRelation> icd10DrugRelations = icd10DrugRelationService.search(filters);
+        return convertToModels(icd10DrugRelations, new ArrayList<MIcd10DrugRelation>(icd10DrugRelations.size()), MIcd10DrugRelation.class, "");
+    }
+
     @RequestMapping(value = "/dict/icd10/drug/existence" , method = RequestMethod.GET)
     @ApiOperation(value = "判断ICD10与药品字典的关联关系在系统中是否已存在")
     public boolean isIcd10DrugRelaExist(
@@ -247,6 +319,27 @@ public class Icd10DictController extends BaseRestController {
         return convertToModel(relation, MIcd10IndicatorRelation.class, null);
     }
 
+    @RequestMapping(value = "/dict/icd10/indicators", method = RequestMethod.POST)
+    @ApiOperation(value = "为ICD10增加指标关联。---批量关联，" )
+    public Collection<MIcd10IndicatorRelation> createIcd10IndicatorRelations(
+            @ApiParam(name = "icd10_id", value = "健康问题Id")
+            @RequestParam(value = "icd10_id") String icd10Id,
+            @ApiParam(name = "indicator_ids", value = "关联的指标字典ids,多个以逗号连接")
+            @RequestParam(value = "indicator_ids") String indicatorIds) throws Exception{
+
+        Collection<Icd10IndicatorRelation> relations = new ArrayList<>();
+        for(String indicatorId : indicatorIds.split(",")){
+            Icd10IndicatorRelation relation = new Icd10IndicatorRelation();
+            relation.setIcd10Id(icd10Id);
+            relation.setIndicatorId(indicatorId);
+            String id = getObjectId(BizObject.Dict);
+            relation.setId(id);
+            icd10IndicatorRelationService.save(relation);
+            relations.add(relation);
+        }
+        return convertToModels(relations, new ArrayList<MIcd10IndicatorRelation>(relations.size()), MIcd10IndicatorRelation.class, null);
+    }
+
     @RequestMapping(value = "/dict/icd10/indicator", method = RequestMethod.PUT)
     @ApiOperation(value = "为ICD10修改指标关联。" )
     public MIcd10IndicatorRelation updateIcd10IndicatorRelation(
@@ -266,6 +359,17 @@ public class Icd10DictController extends BaseRestController {
             @RequestParam(value = "id", required = true) String id) throws Exception{
 
         icd10IndicatorRelationService.delete(id);
+
+        return true;
+    }
+
+    @RequestMapping(value = "/dict/icd10/indicators", method = RequestMethod.DELETE)
+    @ApiOperation(value = "为ICD10删除指标关联。--批量删除，多个以逗号隔开" )
+    public boolean deleteIcd10IndicatorRelations(
+            @ApiParam(name = "ids", value = "关联IDs", defaultValue = "")
+            @RequestParam(value = "ids", required = true) String ids) throws Exception{
+
+        icd10IndicatorRelationService.delete(ids.split(","));
 
         return true;
     }
@@ -297,6 +401,15 @@ public class Icd10DictController extends BaseRestController {
             pagedResponse(request, response, icd10IndicatorRelationService.getCount(filters), page, size);
             return convertToModels(icd10IndicatorRelationList, new ArrayList<>(icd10IndicatorRelationList.size()), MIcd10IndicatorRelation.class, fields);
         }
+    }
+
+    @RequestMapping(value = "/dict/icd10/indicators/no_paging", method = RequestMethod.GET)
+    @ApiOperation(value = "根据ICD10查询相应的指标关联列表信息,---不分页。")
+    public Collection<MIcd10IndicatorRelation> getIcd10IndicatorRelationListWithoutPaging(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+        List<Icd10IndicatorRelation> icd10IndicatorRelations = icd10IndicatorRelationService.search(filters);
+        return convertToModels(icd10IndicatorRelations, new ArrayList<MIcd10IndicatorRelation>(icd10IndicatorRelations.size()), MIcd10IndicatorRelation.class, "");
     }
 
     @RequestMapping(value = "/dict/icd10/indicator/existence" , method = RequestMethod.GET)

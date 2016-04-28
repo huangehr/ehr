@@ -69,6 +69,29 @@ public class HealthProblemDictController extends BaseRestController {
         return true;
     }
 
+    @RequestMapping(value = "dict/hps", method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据ids批量删除健康问题字典（含健康问题字典及与ICD10的关联关系。）")
+    public boolean deleteHpDicts(
+            @ApiParam(name = "ids", value = "字典代码,多个以逗号隔开")
+            @RequestParam( value = "ids") String ids) {
+
+        String[] hpIds = ids.split(",");
+        List<String> relationIds = new ArrayList<>();
+        for(String hpId:hpIds){
+            List<HpIcd10Relation> hpIcd10RelationList = hpIcd10RelationService.getHpIcd10RelationListByHpId(hpId);
+            if (hpIcd10RelationList != null) {
+                for(HpIcd10Relation hpIcd10Relation : hpIcd10RelationList ){
+                    relationIds.add(hpIcd10Relation.getId());
+                }
+            }
+        }
+        if (relationIds.size() != 0){
+            hpIcd10RelationService.delete(relationIds);
+        }
+        hpDictService.delete(ids.split(","));
+        return true;
+    }
+
     @RequestMapping(value = "/dict/hp", method = RequestMethod.PUT)
     @ApiOperation(value = "更新健康问题字典" )
     public MHealthProblemDict updateHpDict(
@@ -196,7 +219,7 @@ public class HealthProblemDictController extends BaseRestController {
     }
 
     @RequestMapping(value = "/dict/hp/icd10s", method = RequestMethod.DELETE)
-    @ApiOperation(value = "通过id组删除健康问题与ICD10关联，多个id以,分隔")
+    @ApiOperation(value = "通过ids批量删除健康问题与ICD10关联，多个id以,分隔")
     public boolean deleteHpIcd10Relations(
             @ApiParam(name = "ids", value = "关联关系ids", defaultValue = "")
             @RequestParam(value = "ids") String ids) throws Exception {
