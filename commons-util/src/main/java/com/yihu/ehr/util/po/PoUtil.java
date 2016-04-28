@@ -35,8 +35,12 @@ public class PoUtil {
         Field fields[] = objClass.getDeclaredFields();
         for (Field field:fields) {
             String fieldValue = getFieldValue(obj, field);
-            if(fieldValue!=null && !properties.contains(field.getName())){
-                strBuffer.append(" and "+field.getName()+"='"+fieldValue+"'");
+            if(!properties.contains(field.getName())){
+                if (fieldValue!=null ) {
+                    strBuffer.append(" and "+field.getName()+"='"+fieldValue+"'");
+                }else{
+                    strBuffer.append(" and ("+field.getName()+" is null)");
+                }
             }
         }
         return strBuffer.toString();

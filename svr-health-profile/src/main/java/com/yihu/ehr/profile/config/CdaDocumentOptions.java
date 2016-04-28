@@ -1,6 +1,6 @@
 package com.yihu.ehr.profile.config;
 
-import com.yihu.ehr.profile.core.commons.DataSetTableOption;
+import com.yihu.ehr.profile.core.util.DataSetUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -31,7 +31,7 @@ public class CdaDocumentOptions {
 
             key = key.replaceAll("^\\d{1,2}\\.", "");
             this.primaryDataSet.put(key, value);
-            if(!key.contains(DataSetTableOption.OriginDataSetFlag)) this.primaryDataSet.put(DataSetTableOption.originDataSetCode(key), value);
+            if(!key.contains(DataSetUtil.OriginDataSetFlag)) this.primaryDataSet.put(DataSetUtil.originDataSetCode(key), value);
         }
     }
 

@@ -4,20 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ArchiveStatus;
-import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.feign.XPackageMgrClient;
 import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.profile.core.commons.StructuredProfileModel;
-import com.yihu.ehr.profile.core.lightweight.LightWeightProfile;
-import com.yihu.ehr.profile.core.nostructured.NoStructuredProfile;
-import com.yihu.ehr.profile.core.structured.FullWeightProfile;
-import com.yihu.ehr.profile.persist.repo.ProfileRepository;
-import com.yihu.ehr.service.LightWeightPackageResolver;
-import com.yihu.ehr.common.PackageUtil;
-import com.yihu.ehr.service.StructuredPackageResolver;
-import com.yihu.ehr.service.NoStructuredPackageResolver;
+import com.yihu.ehr.profile.core.profile.StandardProfile;
+import com.yihu.ehr.profile.persist.ProfileService;
+import com.yihu.ehr.service.PackageResolveEngine;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -39,47 +32,26 @@ import java.io.FileOutputStream;
 @Api(value = "档案包解析", description = "档案包解析服务")
 public class ResolveEndPoint {
     @Autowired
-    PackageUtil packageUtil;
-
-    @Autowired
-    ProfileRepository profileRepo;
+    ProfileService profileService;
 
     @Autowired
     FastDFSUtil fastDFSUtil;
 
     @Autowired
+    private PackageResolveEngine resolveEngine;
+
+    @Autowired
     XPackageMgrClient packageMgrClient;
-
-    @Autowired
-    private StructuredPackageResolver structuredPackageResolver;
-
-    @Autowired
-    private NoStructuredPackageResolver noStructuredPackageResolver;
-
-    @Autowired
-    private LightWeightPackageResolver lightWeightPackageResolver;
 
     @Autowired
     ObjectMapper objectMapper;
 
-
-    /**
-     * 执行归档作业。归档作为流程如下：
-     * 1. 从JSON档案管理器中获取一个待归档的JSON文档，并标记为Acquired，表示正在归档，并记录开始时间。
-     * 2. 解压zip档案包，如果解压失败，或检查解压后的目录结果不符合规定，将文档状态标记为 Failed，记录日志并返回。
-     * 3. 读取包中的 origin, standard 文件夹中的 JSON 数据并解析。
-     * 4. 对关联字典的数据元进行标准化，将字典的值直接写入数据
-     * 5. 解析完的数据存入HBase，并将JSON文档的状态标记为 Finished。
-     * 6. 以上步骤有任何一个失败的，将文档标记为 InDoubt 状态，即无法决定该JSON档案的去向，需要人为干预。
-     * <p>
-     * ObjectMapper Stream API使用，参见：http://wiki.fasterxml.com/JacksonStreamingApi
-     */
     @ApiOperation(value = "档案包入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @RequestMapping(value = ServiceApi.Packages.Package, method = RequestMethod.PUT)
     public ResponseEntity<String> resolve(
-            @ApiParam("id")
+            @ApiParam(value = "id", defaultValue = "0dae000555ff6a9f1d323246807324d6")
             @PathVariable("id") String packageId,
-            @ApiParam(value = "返回档案数据", defaultValue = "false")
+            @ApiParam(value = "返回档案数据", defaultValue = "true")
             @RequestParam("echo") boolean echo) throws Exception {
 
         MPackage pack = packageMgrClient.getPackage(packageId);
@@ -87,31 +59,15 @@ public class ResolveEndPoint {
 
         String zipFile = downloadTo(pack.getRemotePath());
 
-        StructuredProfileModel structuredProfileModel = null;           //结构化档案
-        NoStructuredProfile noStructuredProfile;                        //非结构化档案
-        ProfileType profileType = packageUtil.getProfileType(pack, zipFile);
-        if (profileType == ProfileType.FullWeight) {
-            structuredProfileModel = structuredPackageResolver.doResolve(pack, zipFile);
-            profileRepo.saveStructuredProfileModel(structuredProfileModel);
-            packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
-                    "Identity: " + structuredProfileModel.getDemographicId() + ", structuredProfile: " + structuredProfileModel.getId());
-            return new ResponseEntity<>(echo ? objectMapper.writeValueAsString(structuredProfileModel) : "", HttpStatus.OK);
-        } else if (profileType == ProfileType.NoStructured) {
-            noStructuredProfile = noStructuredPackageResolver.doResolve(pack, zipFile);
-            profileRepo.saveUnStructuredProfile(noStructuredProfile);
-            packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
-                    "Identity: " + noStructuredProfile.getDemographicId() + ", unStructuredProfile: " + noStructuredProfile.getId());
-            return new ResponseEntity<>(echo ? objectMapper.writeValueAsString(noStructuredProfile) : "", HttpStatus.OK);
-        } else if (profileType == ProfileType.Lightweight) {
-            structuredProfileModel = lightWeightPackageResolver.doResolve(pack, zipFile);
-            profileRepo.saveStructuredProfileModel(structuredProfileModel);
-            packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
-                    "Identity: " + structuredProfileModel.getDemographicId() + ", lightWeightProfile: " + structuredProfileModel.getId());
-            return new ResponseEntity<>(echo ? objectMapper.writeValueAsString(structuredProfileModel) : "", HttpStatus.OK);
+        StandardProfile profile = resolveEngine.doResolve(pack, zipFile);
+        profileService.saveProfile(profile);
+
+        if (echo) {
+            return new ResponseEntity<>(profile.toJson(), HttpStatus.OK);
         }
+
         return null;
     }
-
 
     /**
      * 执行归档作业。归档作为流程如下：
@@ -148,42 +104,14 @@ public class ResolveEndPoint {
             pack.setId(packageId);
             pack.setArchiveStatus(ArchiveStatus.Received);
 
+            StandardProfile profile = resolveEngine.doResolve(pack, zipFile);
+            if(persist) profileService.saveProfile(profile);
 
-            StructuredProfileModel structuredProfileModel = new StructuredProfileModel();           //结构化档案
-            NoStructuredProfile noStructuredProfile;                        //非结构化档案
-
-            ProfileType profileType = packageUtil.getProfileType(pack, zipFile);
-
-            if (profileType == ProfileType.NoStructured) {
-                noStructuredProfile = noStructuredPackageResolver.doResolve(pack, zipFile);
-                if(persist){
-                    profileRepo.saveUnStructuredProfile(noStructuredProfile);
-                }
-                return new ResponseEntity<>(new ObjectMapper().writeValueAsString(noStructuredProfile), HttpStatus.OK);
-            } else if (profileType == ProfileType.Lightweight) {
-                structuredProfileModel.setProfileType(profileType);
-                structuredProfileModel = lightWeightPackageResolver.doResolve(pack, zipFile);
-                if(persist){
-                    profileRepo.saveStructuredProfileModel(structuredProfileModel);
-                }
-                return new ResponseEntity<>(objectMapper.writeValueAsString(structuredProfileModel), HttpStatus.OK);
-            }if (profileType == ProfileType.FullWeight) {
-                structuredProfileModel.setProfileType(profileType);
-                structuredProfileModel = structuredPackageResolver.doResolve(pack, zipFile);
-                if(persist){
-                    profileRepo.saveStructuredProfileModel(structuredProfileModel);
-                }
-                return new ResponseEntity<>(objectMapper.writeValueAsString(structuredProfileModel), HttpStatus.OK);
-            }
-            return null;
-
+            return new ResponseEntity<>(profile.toJson(), HttpStatus.OK);
         } catch (Exception e) {
             throw new ApiException(HttpStatus.NOT_ACCEPTABLE, e.getMessage());
         }
     }
-
-
-
 
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
 

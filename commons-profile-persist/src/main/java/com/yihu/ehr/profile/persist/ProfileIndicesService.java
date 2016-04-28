@@ -53,10 +53,10 @@ public class ProfileIndicesService {
         }
 
         // 患者ID与事件号可直接定位档案范围
-        if (!StringUtils.isAnyEmpty(patientId, eventNo)) {
+        if (StringUtils.isNotEmpty(patientId) && StringUtils.isNotEmpty(eventNo)) {
             if (null != criteria) criteria = criteria.connect();
 
-            criteria = new Criteria("rowkey").contains(patientId, eventNo);
+            criteria = criteria.and(new Criteria("rowkey").contains(patientId, eventNo));
             return indicesRepo.query(ProfileCore, criteria, ProfileIndices.class);
         }
 

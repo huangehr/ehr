@@ -182,6 +182,15 @@ public class ServiceApi {
         public static final String ProfileSearch                    = "/health_profiles/search";
         public static final String Profile                          = "/health_profiles/{profile_id}";
         public static final String ProfileDocument                  = "/health_profiles/{profile_id}/documents/{document_id}";
+
+        public static final String Diagnosis                        = "/health_profile/disease/diagnosis";
+        public static final String MajorIssues                      = "/health_profile/disease/major_issues";
+
+        public static final String Prescriptions                    = "/health_profile/prescriptions";
+        public static final String Drugs                            = "/health_profile/drugs";
+        public static final String Lis                              = "/health_profile/lis";
+        public static final String PhysicalExam                     = "/health_profile/physical_examinations";
+        public static final String PastHistories                    = "/health_profile/past_histories";
     }
 
     public static class ProfileTemplate{

@@ -8,25 +8,28 @@ import java.util.Date;
 /**
  * JSON档案包。
  *
- * @author Air
- * @version 1.0
+ * 2016.04.25 增加来源机构，来源应用，档案md5及是否被资源化
+ *
+ * @author Sand
  * @created 2015.07.09 15:08
  */
 @Entity
 @Table(name = "json_archives")
 @Access(value = AccessType.PROPERTY)
 public class Package {
-    public final static String pathSeparator = ":";     // 统一使用冒号作为路径分隔符
+    public final static String pathSeparator = ":";     // 使用冒号作为路径分隔符，与Linux一致
 
     private String id;
     private String pwd;
     private String remotePath;
     private String message;
-    //private String md5;
-    //private String orgCode;
+    private String md5;
+    private String orgCode;
+    private String clientId;                            // 档案应用来源
     private Date receiveDate;
     private Date parseDate;
     private Date finishDate;
+    private Boolean resourced;                          // 是否已经资源化处理
     private ArchiveStatus archiveStatus;
 
     @Id
@@ -102,7 +105,7 @@ public class Package {
         this.message = message;
     }
 
-    /*@Column(name = "md5")
+    @Column(name = "md5_value")
     public String getMd5() {
         return md5;
     }
@@ -119,7 +122,25 @@ public class Package {
     public void setOrgCode(String orgCode) {
         this.orgCode = orgCode;
     }
-*/
+
+    @Column(name = "client_id")
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    @Column(name = "resourced")
+    public Boolean isResourced() {
+        return resourced;
+    }
+
+    public void setResourced(Boolean resourced) {
+        this.resourced = resourced;
+    }
+
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

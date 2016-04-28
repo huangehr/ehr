@@ -2,21 +2,14 @@ package com.yihu.ehr.task;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ArchiveStatus;
-import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.feign.XPackageMgrClient;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.mq.MessageBuffer;
-import com.yihu.ehr.profile.core.commons.StructuredProfileModel;
-import com.yihu.ehr.profile.core.lightweight.LightWeightProfile;
-import com.yihu.ehr.profile.core.nostructured.NoStructuredProfile;
-import com.yihu.ehr.profile.core.structured.FullWeightProfile;
-import com.yihu.ehr.profile.persist.repo.ProfileRepository;
-import com.yihu.ehr.service.LightWeightPackageResolver;
-import com.yihu.ehr.common.PackageUtil;
-import com.yihu.ehr.service.StructuredPackageResolver;
-import com.yihu.ehr.service.NoStructuredPackageResolver;
+import com.yihu.ehr.profile.core.profile.StandardProfile;
+import com.yihu.ehr.profile.persist.ProfileService;
+import com.yihu.ehr.service.PackageResolveEngine;
 import com.yihu.ehr.util.log.LogService;
 import org.quartz.InterruptableJob;
 import org.quartz.JobExecutionContext;
@@ -36,13 +29,7 @@ import java.util.NoSuchElementException;
 public class PackageResolveJob implements InterruptableJob {
 
     @Autowired
-    private StructuredPackageResolver structuredPackageResolver;
-
-    @Autowired
-    private NoStructuredPackageResolver noStructuredPackageResolver;
-
-    @Autowired
-    private LightWeightPackageResolver lightWeightPackageResolver;
+    private PackageResolveEngine resolveEngine;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -69,35 +56,19 @@ public class PackageResolveJob implements InterruptableJob {
         try{
             if (pack == null) return;
 
-            LogService.getLogger().info("Quartz job: resolve package " + pack.getId());
+            LogService.getLogger().info("Package resolve job: package " + pack.getId());
 
             XPackageMgrClient packageMgrClient = SpringContext.getService(XPackageMgrClient.class);
-            PackageUtil packageUtil = SpringContext.getService(PackageUtil.class);
-            ProfileRepository profileRepo = SpringContext.getService(ProfileRepository.class);
+            ProfileService profileService = SpringContext.getService(ProfileService.class);
 
             String zipFile = downloadTo(pack.getRemotePath());
 
+            StandardProfile profile = resolveEngine.doResolve(pack, zipFile);
+            profileService.saveProfile(profile);
 
-            StructuredProfileModel structuredProfileModel = null;           //结构化档案
-            NoStructuredProfile noStructuredProfile;                        //非结构化档案
-
-            ProfileType profileType = packageUtil.getProfileType(pack, zipFile);
-            if (profileType == ProfileType.FullWeight) {
-                structuredProfileModel = structuredPackageResolver.doResolve(pack, zipFile);
-                profileRepo.saveStructuredProfileModel(structuredProfileModel);
-                packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
-                        "Identity: " + structuredProfileModel.getDemographicId() + ", structuredProfile: " + structuredProfileModel.getId());
-            } else if (profileType == ProfileType.NoStructured) {
-                noStructuredProfile = noStructuredPackageResolver.doResolve(pack, zipFile);
-                profileRepo.saveUnStructuredProfile(noStructuredProfile);
-                packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
-                        "Identity: " + noStructuredProfile.getDemographicId() + ", unStructuredProfile: " + noStructuredProfile.getId());
-            } else if (profileType == ProfileType.Lightweight) {
-                structuredProfileModel = lightWeightPackageResolver.doResolve(pack, zipFile);
-                profileRepo.saveStructuredProfileModel(structuredProfileModel);
-                packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
-                        "Identity: " + structuredProfileModel.getDemographicId() + ", lightWeightProfile: " + structuredProfileModel.getId());
-            }
+            packageMgrClient.reportStatus(pack.getId(),
+                    ArchiveStatus.Finished,
+                    String.format("Rowkey: %s, identity: %s", profile.getDemographicId(), profile.getId()));
 
         } catch (Exception e) {
             LogService.getLogger().error(e.getMessage());

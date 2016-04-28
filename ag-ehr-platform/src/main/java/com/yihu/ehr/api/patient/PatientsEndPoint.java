@@ -7,8 +7,9 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.feign.PatientClient;
 import com.yihu.ehr.model.patient.MDemographicInfo;
-import com.yihu.ehr.profile.core.commons.DataSetResolver;
-import com.yihu.ehr.profile.core.structured.FullWeightDataSet;
+import com.yihu.ehr.profile.core.profile.DataRecord;
+import com.yihu.ehr.profile.core.profile.StdDataSet;
+import com.yihu.ehr.profile.core.util.DataSetResolver;
 import com.yihu.ehr.util.DateTimeUtils;
 import com.yihu.ehr.util.IdValidator;
 import io.swagger.annotations.Api;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Map;
 
 /**
  * 患者注册接口。患者注册之后，可以为患者申请为平台用户提供快捷信息录入。
@@ -52,10 +52,10 @@ public class PatientsEndPoint {
             @ApiParam(name = "json", value = "患者人口学数据集")
             @RequestParam(value = "json", required = true) String patientInfo) throws IOException, ParseException {
         ObjectNode patientNode = (ObjectNode) objectMapper.readTree(patientInfo);
-        FullWeightDataSet dataSet = dataSetResolver.parseStructuredJsonDataSet(patientNode, false);
+        StdDataSet dataSet = dataSetResolver.parseStructuredJsonDataSet(patientNode, false);
 
         for (String key : dataSet.getRecordKeys()) {
-            Map<String, String> record = dataSet.getRecord(key);
+            DataRecord record = dataSet.getRecord(key);
 
             if (StringUtils.isEmpty(demographicId)) {
                 throw new ApiException(HttpStatus.NOT_ACCEPTABLE, ErrorCode.MissParameter, "Missing identity card no.");
@@ -72,25 +72,25 @@ public class PatientsEndPoint {
 
             MDemographicInfo demoInfo = new MDemographicInfo();
             if (dataSet.getCdaVersion().equals("000000000000")) {
-                demoInfo.setName(record.get("HDSA00_01_009"));
-                demoInfo.setIdCardNo(record.get("HDSA00_01_017"));
-                demoInfo.setBirthday(DateTimeUtils.simpleDateParse(record.get("HDSA00_01_012")));
-                demoInfo.setGender(record.get("HDSA00_01_011"));
-                demoInfo.setNation(record.get("HDSA00_01_014"));
-                demoInfo.setMartialStatus(record.get("HDSA00_01_015"));
-                demoInfo.setNativePlace(record.get("HDSA00_01_022"));
-                demoInfo.setEmail(record.get("HDSA00_01_021"));
-                demoInfo.setTelephoneNo(record.get("HDSA00_01_019"));
+                demoInfo.setName(record.getMetaData("HDSA00_01_009"));
+                demoInfo.setIdCardNo(record.getMetaData("HDSA00_01_017"));
+                demoInfo.setBirthday(DateTimeUtils.simpleDateParse(record.getMetaData("HDSA00_01_012")));
+                demoInfo.setGender(record.getMetaData("HDSA00_01_011"));
+                demoInfo.setNation(record.getMetaData("HDSA00_01_014"));
+                demoInfo.setMartialStatus(record.getMetaData("HDSA00_01_015"));
+                demoInfo.setNativePlace(record.getMetaData("HDSA00_01_022"));
+                demoInfo.setEmail(record.getMetaData("HDSA00_01_021"));
+                demoInfo.setTelephoneNo(record.getMetaData("HDSA00_01_019"));
             } else {
-                demoInfo.setName(record.get("HDSD00_01_002"));
-                demoInfo.setIdCardNo(record.get("HDSA00_01_017"));
-                demoInfo.setBirthday(DateTimeUtils.simpleDateParse(record.get("HDSA00_01_012")));
-                demoInfo.setGender(record.get("HDSA00_01_011"));
-                demoInfo.setNation(record.get("HDSA00_01_014"));
-                demoInfo.setMartialStatus(record.get("HDSD00_01_017"));
-                demoInfo.setNativePlace(record.get("HDSA00_11_051"));
-                demoInfo.setEmail(record.get("HDSA00_01_021"));
-                demoInfo.setTelephoneNo(record.get("HDSD00_01_008"));
+                demoInfo.setName(record.getMetaData("HDSD00_01_002"));
+                demoInfo.setIdCardNo(record.getMetaData("HDSA00_01_017"));
+                demoInfo.setBirthday(DateTimeUtils.simpleDateParse(record.getMetaData("HDSA00_01_012")));
+                demoInfo.setGender(record.getMetaData("HDSA00_01_011"));
+                demoInfo.setNation(record.getMetaData("HDSA00_01_014"));
+                demoInfo.setMartialStatus(record.getMetaData("HDSD00_01_017"));
+                demoInfo.setNativePlace(record.getMetaData("HDSA00_11_051"));
+                demoInfo.setEmail(record.getMetaData("HDSA00_01_021"));
+                demoInfo.setTelephoneNo(record.getMetaData("HDSD00_01_008"));
             }
 
             patientClient.createPatient(objectMapper.writeValueAsString(demoInfo));

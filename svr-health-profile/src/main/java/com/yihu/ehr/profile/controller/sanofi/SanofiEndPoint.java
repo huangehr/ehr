@@ -6,13 +6,14 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.lang.SpringContext;
-import com.yihu.ehr.profile.core.structured.FullWeightDataSet;
-import com.yihu.ehr.profile.core.structured.FullWeightProfile;
+import com.yihu.ehr.profile.core.profile.DataRecord;
+import com.yihu.ehr.profile.core.profile.StdDataSet;
+import com.yihu.ehr.profile.core.profile.StandardProfile;
 import com.yihu.ehr.profile.persist.ProfileIndices;
 import com.yihu.ehr.profile.persist.ProfileIndicesService;
-import com.yihu.ehr.profile.persist.repo.ProfileRepository;
+import com.yihu.ehr.profile.persist.ProfileService;
+import com.yihu.ehr.profile.persist.repo.DataSetRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -46,7 +47,10 @@ import java.util.*;
 @Api(value = "赛诺菲数据服务", description = "赛诺菲项目体征数据提取服务")
 public class SanofiEndPoint {
     @Autowired
-    private ProfileRepository profileRepo;
+    private ProfileService profileService;
+
+    @Autowired
+    private DataSetRepository dataSetRepo;
 
     @Autowired
     private ProfileIndicesService indicesService;
@@ -75,17 +79,17 @@ public class SanofiEndPoint {
 
         if (profileIndices == null) return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
 
-        List<FullWeightProfile> profiles = new ArrayList<>();
+        List<StandardProfile> profiles = new ArrayList<>();
         for (ProfileIndices indices : profileIndices.getContent()) {
-            FullWeightProfile structedProfile = profileRepo.findOne(indices.getProfileId(), false, false);
-            profiles.add(structedProfile);
+            StandardProfile standardProfile = profileService.getProfile(indices.getProfileId(), false, false);
+            profiles.add(standardProfile);
         }
 
         if (profiles.size() == 0) return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
 
         ObjectMapper objectMapper = SpringContext.getService("objectMapper");
         ArrayNode document = objectMapper.createArrayNode();
-        for (FullWeightProfile profile : profiles) {
+        for (StandardProfile profile : profiles) {
             ObjectNode section = objectMapper.createObjectNode();
             convert(section, profile);
 
@@ -95,13 +99,13 @@ public class SanofiEndPoint {
         return new ResponseEntity<>(document.toString(), HttpStatus.NOT_FOUND);
     }
 
-    private void convert(ObjectNode document, FullWeightProfile profile) throws IOException {
+    private void convert(ObjectNode document, StandardProfile profile) throws IOException {
         JsonNode section;
-        FullWeightDataSet dataSet;
+        StdDataSet dataSet;
         String[] innerCodes;
 
         // 人口学信息
-        dataSet = profile.getFullWeightDataSet("HDSA00_01");
+        dataSet = profile.getDataSet("HDSA00_01");
         if (dataSet.getRecordKeys().size() > 0){
             section = document.with("demographic_info");
             innerCodes = new String[]{
@@ -114,7 +118,7 @@ public class SanofiEndPoint {
         }
 
         // 生命体征：住院护理体征记录
-        dataSet = profile.getFullWeightDataSet("HDSD00_08");
+        dataSet = profile.getDataSet("HDSD00_08");
         if (dataSet != null && dataSet.getRecordKeys().size() > 0){
             section = document.withArray("vitals");
             innerCodes = new String[]{
@@ -128,7 +132,7 @@ public class SanofiEndPoint {
         }
 
         // 检验
-        dataSet = profile.getFullWeightDataSet("HDSD02_03");
+        dataSet = profile.getDataSet("HDSD02_03");
         if (dataSet != null && dataSet.getRecordKeys().size() > 0){
             section = document.withArray("lis");
             innerCodes = new String[]{
@@ -145,7 +149,7 @@ public class SanofiEndPoint {
         }
 
         // 临时医嘱
-        dataSet = profile.getFullWeightDataSet("HDSC02_11");
+        dataSet = profile.getDataSet("HDSC02_11");
         if (dataSet != null && dataSet.getRecordKeys().size() > 0){
             section = document.withArray("stat_order");
             innerCodes = new String[]{
@@ -157,7 +161,7 @@ public class SanofiEndPoint {
         }
 
         // 长期医嘱
-        dataSet = profile.getFullWeightDataSet("HDSC02_12");
+        dataSet = profile.getDataSet("HDSC02_12");
         if (dataSet != null && dataSet.getRecordKeys().size() > 0){
             section = document.withArray("stand_order");
             innerCodes = new String[]{
@@ -170,28 +174,29 @@ public class SanofiEndPoint {
         }
     }
 
-    private void mergeData(JsonNode section, FullWeightProfile profile, FullWeightDataSet emptyDataSet, String[] innerCodes) throws IOException {
-        FullWeightDataSet dataSet = profileRepo.findDataSet(profile.getCdaVersion(),
+    private void mergeData(JsonNode section, StandardProfile profile, StdDataSet emptyDataSet, String[] metaDataCodes) throws IOException {
+        StdDataSet dataSet = dataSetRepo.findOne(profile.getCdaVersion(),
                 emptyDataSet.getCode(),
+                profile.getProfileType(),
                 emptyDataSet.getRecordKeys(),
-                innerCodes).getRight();
+                metaDataCodes).getRight();
 
         if (section.isArray()) {
             ArrayNode array = (ArrayNode) section;
             for (String recordKey : dataSet.getRecordKeys()) {
                 ObjectNode arrayNode = array.addObject();
-                Map<String, String> record = dataSet.getRecord(recordKey);
-                for (String innerCode : innerCodes) {
-                    String value = record.get(innerCode);
-                    arrayNode.put(innerCode, StringUtils.isEmpty(value) ? "" : value);
+                DataRecord record = dataSet.getRecord(recordKey);
+                for (String metaDataCode : metaDataCodes) {
+                    String value = record.getMetaData(metaDataCode);
+                    arrayNode.put(metaDataCode, StringUtils.isEmpty(value) ? "" : value);
                 }
             }
         } else if (section.isObject()) {
             ObjectNode objectNode = (ObjectNode) section;
             for (String recordKey : dataSet.getRecordKeys()) {
-                Map<String, String> record = dataSet.getRecord(recordKey);
-                for (String innerCode : record.keySet()) {
-                    objectNode.put(innerCode, record.get(innerCode));
+                DataRecord record = dataSet.getRecord(recordKey);
+                for (String metaDataCode : record.getMetaDataCodes()) {
+                    objectNode.put(metaDataCode, record.getMetaData(metaDataCode));
                 }
 
                 break;  // 就一行
