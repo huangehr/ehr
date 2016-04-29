@@ -11,9 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 /**
@@ -83,7 +83,7 @@ public class TemplateService extends BaseJpaService<Template, XTemplateRepositor
                 1,
                 cdaVersion);
 
-        Map<Template, MCDADocument> cdaDocumentMap =  new HashMap<>();
+        Map<Template, MCDADocument> cdaDocumentMap =  new TreeMap<>();
         for (MCDADocument document : documentList){
             String cdaDocumentId = document.getId();
             for (Template template : templates){

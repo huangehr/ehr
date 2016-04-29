@@ -1,13 +1,7 @@
 package com.yihu.ehr.model.profile;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.lang.SpringContext;
-import com.yihu.ehr.util.StringBuilderUtil;
-import org.apache.commons.lang.StringUtils;
-
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * 档案数据集。
@@ -20,7 +14,7 @@ public class MDataSet {
     private String code;
     private String name;
 
-    private Map<String, MRecord> records = new HashMap<>();
+    private Map<String, MRecord> records = new TreeMap<>();
 
     public String getCode() {
         return code;
@@ -44,20 +38,5 @@ public class MDataSet {
 
     public void setRecords(Map<String, MRecord> records) {
         this.records = records;
-    }
-
-    public String toString(){
-        ObjectMapper objectMapper = SpringContext.getService("objectMapper");
-        ObjectNode objectNode = objectMapper.createObjectNode();
-        for (String key : records.keySet()){
-            ObjectNode cells = objectNode.putObject(key);
-
-            MRecord record = records.get(key);
-            for (String cell : record.getCells().keySet()){
-                cells.put(cell, record.getCells().get(cell));
-            }
-        }
-
-        return objectNode.toString();
     }
 }

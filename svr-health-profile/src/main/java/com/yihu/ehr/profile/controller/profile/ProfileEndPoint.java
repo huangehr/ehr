@@ -48,6 +48,17 @@ import java.util.*;
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "健康档案服务", description = "提供档案搜索及完整档案下载")
 public class ProfileEndPoint extends BaseRestEndPoint {
+    private final static String SampleQuery = "{\n" +
+            "\"demographicId\": \"412726195111306268\",\n" +
+            "\"organizationCode\": \"41872607-9\",\n" +
+            "\"patientId\": \"10295435\",\n" +
+            "\"eventNo\": \"000622450\",\n" +
+            "\"name\": \"段廷兰\",\n" +
+            "\"telephone\": \"11\",\n" +
+            "\"gender\": \"女\",\n" +
+            "\"birthday\": \"1951-11-30\"\n" +
+            "}";
+
     @Autowired
     private ProfileService profileService;
 
@@ -73,84 +84,29 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     StdKeySchema stdKeySchema;
 
     @ApiOperation(value = "搜索档案", notes = "返回符合条件的档案列表")
-    @RequestMapping(value = ServiceApi.HealthProfile.ProfileSearch, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.HealthProfile.Profiles, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.POST)
     public Collection<MProfile> searchProfile(
-            @ApiParam(value = "搜索参数", defaultValue = "")
-            @RequestBody String query,
+            @ApiParam(value = "搜索参数", defaultValue = SampleQuery)
+            @RequestBody MProfileSearch query,
             @ApiParam(value = "起始日期", defaultValue = "2015-10-01")
             @RequestParam("since") @DateTimeFormat(pattern = "yyyy-MM-dd") Date since,
             @ApiParam(value = "结束日期", defaultValue = "2016-10-01")
-            @RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,
-            @ApiParam(value = "是否返回标准数据", defaultValue = "true")
-            @RequestParam(value = "load_std_data_set") boolean loadStdDataSet,
-            @ApiParam(value = "是否返回原始数据", defaultValue = "false")
-            @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws IOException, ParseException {
-        Map<String, String> document;
-        try {
-            document = objectMapper.readValue(query, Map.class);
-        } catch (JsonProcessingException ex) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Request parameter 'query' is not a valid json format.");
-        }
-
-        String demographicId = document.get("demographicId");
-        String orgCode = document.get("organizationCode");
-        String patientId = document.get("patientId");
-        String eventNo = document.get("eventNo");
-        String name = document.get("name");
-        String telephone = document.get("telephone");
-        String gender = document.get("gender");
-        Date birthday = DateTimeUtils.simpleDateParse(document.get("birthday"));
+            @RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd") Date to) throws IOException, ParseException {
+        String demographicId = query.getDemographicId();
+        String orgCode = query.getOrganizationCode();
+        String patientId = query.getPatientId();
+        String eventNo = query.getEventNo();
+        String name = query.getName();
+        String telephone = query.getTelephone();
+        String gender = query.getGender();
+        Date birthday = DateTimeUtils.simpleDateParse(query.getBirthday());
 
         Page<ProfileIndices> profileIndices = indicesService.findByIndices(orgCode, patientId, eventNo, since, to, null);
         if (profileIndices.getContent().size() == 0) {
             profileIndices = indicesService.findByDemographic(demographicId, orgCode, name, telephone, gender, birthday, since, to, null);
         }
 
-        return loadAndConvertProfiles(profileIndices, loadStdDataSet, loadOriginDataSet);
-    }
-
-    @ApiOperation(value = "按时间获取档案列表", notes = "获取患者的就诊档案列表")
-    @RequestMapping(value = ServiceApi.HealthProfile.Profiles, method = RequestMethod.GET)
-    public Collection<MProfile> getProfiles(
-            @ApiParam(value = "身份证号", defaultValue = "412726195111306268")
-            @RequestParam("demographic_id") String demographicId,
-            @ApiParam(value = "就诊机构列表", defaultValue = "2015-01-01")
-            @RequestParam(value = "organizations", required = false) String[] organizations,
-            @ApiParam(value = "事件类型", defaultValue = "住院")
-            @RequestParam(value = "event_type", required = false) String[] eventType,
-            @ApiParam(value = "起始时间", defaultValue = "2015-01-01")
-            @RequestParam("since") @DateTimeFormat(pattern = "yyyy-MM-dd") Date since,
-            @ApiParam(value = "结束时间", defaultValue = "2016-12-31")
-            @RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,
-            @ApiParam(value = "是否加载标准数据集", defaultValue = "true")
-            @RequestParam(value = "load_std_data_set") boolean loadStdDataSet,
-            @ApiParam(value = "是否加载原始数据集", defaultValue = "false")
-            @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws IOException, ParseException {
-        Page<ProfileIndices> profileIndices = indicesService.findByDemographicIdAndEventDateBetween(
-                demographicId, since, to, null);
-
-        return loadAndConvertProfiles(profileIndices, loadStdDataSet, loadOriginDataSet);
-    }
-
-    private Collection<MProfile> loadAndConvertProfiles(Page<ProfileIndices> profileIndices,
-                                                        boolean loadStdDataSet,
-                                                        boolean loadOriginDataSet) throws IOException, ParseException {
-        if (profileIndices.getContent().size() == 0) return null;
-
-        List<StdProfile> profiles = new ArrayList<>();
-        for (ProfileIndices indices : profileIndices) {
-            StdProfile profile = profileService.getProfile(indices.getProfileId(), loadStdDataSet, loadOriginDataSet);
-            profiles.add(profile);
-        }
-
-        List<MProfile> profileList = new ArrayList<>();
-//        for (StdProfile profile : profiles) {
-//            MProfile mProfile = convertProfile(profile);
-//
-//            profileList.add(mProfile);
-//        }
-
-        return profileList;
+        return loadAndConvertProfiles(profileIndices, false, false);
     }
 
     @ApiOperation(value = "删除档案", notes = "删除一份档案，包括数据集")
@@ -191,8 +147,29 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return convertDocument(profile, cdaDocuments, documentId);
     }
 
+    private Collection<MProfile> loadAndConvertProfiles(Page<ProfileIndices> profileIndices,
+                                                        boolean loadStdDataSet,
+                                                        boolean loadOriginDataSet) throws IOException, ParseException {
+        if (profileIndices.getContent().size() == 0) return null;
+
+        List<StdProfile> profiles = new ArrayList<>();
+        for (ProfileIndices indices : profileIndices) {
+            StdProfile profile = profileService.getProfile(indices.getProfileId(), loadStdDataSet, loadOriginDataSet);
+            profiles.add(profile);
+        }
+
+        List<MProfile> profileList = new ArrayList<>();
+        for (StdProfile profile : profiles) {
+            MProfile mProfile = convertProfile(profile);
+
+            profileList.add(mProfile);
+        }
+
+        return profileList;
+    }
+
     /**
-     * 此类目下卫生机构定制的CDA文档列表
+     * 卫生机构定制的CDA文档列表
      */
     private Map<Template, MCDADocument> getCustomizedCDADocuments(StdProfile profile) {
         // 使用CDA类别关键数据元映射，取得与此档案相关联的CDA类别ID
@@ -228,6 +205,8 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         mProfile.setOrgName(cacheReader.read(orgKeySchema.name(profile.getOrgCode())));
         mProfile.setEventDate(profile.getEventDate());
         mProfile.setDemographicId(profile.getDemographicId());
+        mProfile.setProfileType(profile.getProfileType());
+        mProfile.setEventType(profile.getEventType());
 
         Map<Template, MCDADocument> cdaDocuments = getCustomizedCDADocuments(profile);
         if (CollectionUtils.isEmpty(cdaDocuments)) {
@@ -257,9 +236,9 @@ public class ProfileEndPoint extends BaseRestEndPoint {
                     throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Data set of version " + profile.getCdaVersion() + " not cached in redis.");
                 }
 
-                addDataset(profile.getCdaVersion(), document, profile.getDataSet(dataSetCode));
+                convertDataSet(profile.getCdaVersion(), document, profile.getDataSet(dataSetCode));
 
-                addDataset(profile.getCdaVersion(), document, profile.getDataSet(DataSetUtil.originDataSetCode(dataSetCode)));
+                convertDataSet(profile.getCdaVersion(), document, profile.getDataSet(DataSetUtil.originDataSetCode(dataSetCode)));
 
                 if (!validDocument) validDocument = !dataSetCode.startsWith("HDSA00_01");
             }
@@ -292,9 +271,9 @@ public class ProfileEndPoint extends BaseRestEndPoint {
                     throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Data set of version " + profile.getCdaVersion() + " not cached in redis.");
                 }
 
-                addDataset(profile.getCdaVersion(), document, profile.getDataSet(dataSetCode));
+                convertDataSet(profile.getCdaVersion(), document, profile.getDataSet(dataSetCode));
 
-                addDataset(profile.getCdaVersion(), document, profile.getDataSet(DataSetUtil.originDataSetCode(dataSetCode)));
+                convertDataSet(profile.getCdaVersion(), document, profile.getDataSet(DataSetUtil.originDataSetCode(dataSetCode)));
             }
 
             return document;
@@ -303,7 +282,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return null;
     }
 
-    private void addDataset(String version, MProfileDocument document, StdDataSet dataSet) {
+    private void convertDataSet(String version, MProfileDocument document, StdDataSet dataSet) {
         if (dataSet != null) {
             String dataSetCode = DataSetUtil.standardDataSetCode(dataSet.getCode());
 
@@ -311,11 +290,12 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             mDataSet.setName(cacheReader.read(stdKeySchema.dataSetNameByCode(version, dataSetCode)));
             mDataSet.setCode(dataSet.getCode());
 
-            Map<String, MRecord> records = new HashMap<>();
-            mDataSet.setRecords(records);
-
             for (String key : dataSet.getRecordKeys()) {
-                records.put(key, new MRecord(dataSet.getRecord(key).getMetaDataGroup()));
+                if(dataSet.getRecord(key) != null) {
+                    mDataSet.getRecords().put(key, new MRecord(dataSet.getRecord(key).getMetaDataGroup()));
+                } else {
+                    mDataSet.getRecords().put(key, null);
+                }
             }
 
             document.getDataSets().add(mDataSet);

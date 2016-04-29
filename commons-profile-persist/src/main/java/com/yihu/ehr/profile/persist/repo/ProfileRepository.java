@@ -92,7 +92,7 @@ public class ProfileRepository {
         String dataSets = record.getCellValue(ProfileFamily.Basic, ProfileFamily.BasicQualifier.DataSets, null);
 
         ProfileType pType = ProfileType.create(profileType);
-        EventType eType = StringUtils.isEmpty(eventType) ? null : EventType.values()[Integer.getInteger(eventType)];
+        EventType eType = StringUtils.isEmpty(eventType) ? null : EventType.create(eventType);
 
         StdProfile profile = ProfileGenerator.generate(pType);
         profile.setId(profileId);
