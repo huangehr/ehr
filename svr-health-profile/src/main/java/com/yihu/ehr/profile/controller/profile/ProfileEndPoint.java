@@ -102,8 +102,12 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         Date birthday = DateTimeUtils.simpleDateParse(query.getBirthday());
 
         Page<ProfileIndices> profileIndices = indicesService.findByIndices(orgCode, patientId, eventNo, since, to, null);
-        if (profileIndices.getContent().size() == 0) {
+        if (profileIndices == null || profileIndices.getContent().isEmpty()) {
             profileIndices = indicesService.findByDemographic(demographicId, orgCode, name, telephone, gender, birthday, since, to, null);
+        }
+
+        if (profileIndices == null || profileIndices.getContent().isEmpty()) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "No profile found with this query!");
         }
 
         return loadAndConvertProfiles(profileIndices, false, false);
@@ -127,7 +131,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws IOException, ParseException {
         StdProfile profile = profileService.getProfile(profileId, loadStdDataSet, loadOriginDataSet);
 
-        return convertProfile(profile);
+        return convertProfile(profile, loadStdDataSet || loadOriginDataSet);
     }
 
     @ApiOperation(value = "获取档案文档", notes = "获取档案文档，按数据集整理")
@@ -160,7 +164,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
 
         List<MProfile> profileList = new ArrayList<>();
         for (StdProfile profile : profiles) {
-            MProfile mProfile = convertProfile(profile);
+            MProfile mProfile = convertProfile(profile, loadStdDataSet || loadOriginDataSet);
 
             profileList.add(mProfile);
         }
@@ -168,36 +172,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return profileList;
     }
 
-    /**
-     * 卫生机构定制的CDA文档列表
-     */
-    private Map<Template, MCDADocument> getCustomizedCDADocuments(StdProfile profile) {
-        // 使用CDA类别关键数据元映射，取得与此档案相关联的CDA类别ID
-        String cdaType = null;
-        for (StdDataSet dataSet : profile.getDataSets()) {
-            if (cdaDocumentOptions.isPrimaryDataSet(dataSet.getCode())) {
-                cdaType = cdaDocumentOptions.getCdaDocumentTypeId(dataSet.getCode());
-                break;
-            }
-        }
-
-        if (cdaType == null) {
-            throw new RuntimeException("Cannot find cda document type by data set code, forget primary data set & cda document mapping?");
-        }
-
-        // 此类目下卫生机构定制的CDA文档列表
-        Map<Template, MCDADocument> cdaDocuments = templateService.getOrganizationTemplates(profile.getOrgCode(), profile.getCdaVersion(), cdaType);
-        if (CollectionUtils.isEmpty(cdaDocuments)) {
-            LogService.getLogger().error("Unable to get cda document of version " + profile.getCdaVersion()
-                    + " for organization " + profile.getOrgCode() + ", template not uploaded?");
-
-            return null;
-        }
-
-        return cdaDocuments;
-    }
-
-    private MProfile convertProfile(StdProfile profile) {
+    private MProfile convertProfile(StdProfile profile, boolean containDataSet) {
         MProfile mProfile = new MProfile();
         mProfile.setId(profile.getId());
         mProfile.setCdaVersion(profile.getCdaVersion());
@@ -233,12 +208,14 @@ public class ProfileEndPoint extends BaseRestEndPoint {
                 String dataSetId = datasetRelationship.getDataSetId();
                 String dataSetCode = cacheReader.read(stdKeySchema.dataSetCode(profile.getCdaVersion(), dataSetId));
                 if (StringUtils.isEmpty(dataSetCode)) {
-                    throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Data set of version " + profile.getCdaVersion() + " not cached in redis.");
+                    throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR,
+                            "Data set of version " + profile.getCdaVersion() + " not cached in redis.");
                 }
 
-                convertDataSet(profile.getCdaVersion(), document, profile.getDataSet(dataSetCode));
-
-                convertDataSet(profile.getCdaVersion(), document, profile.getDataSet(DataSetUtil.originDataSetCode(dataSetCode)));
+                if (containDataSet) {
+                    convertDataSet(profile.getCdaVersion(), document, profile.getDataSet(dataSetCode));
+                    convertDataSet(profile.getCdaVersion(), document, profile.getDataSet(DataSetUtil.originDataSetCode(dataSetCode)));
+                }
 
                 if (!validDocument) validDocument = !dataSetCode.startsWith("HDSA00_01");
             }
@@ -300,5 +277,34 @@ public class ProfileEndPoint extends BaseRestEndPoint {
 
             document.getDataSets().add(mDataSet);
         }
+    }
+
+    /**
+     * 卫生机构定制的CDA文档列表
+     */
+    private Map<Template, MCDADocument> getCustomizedCDADocuments(StdProfile profile) {
+        // 使用CDA类别关键数据元映射，取得与此档案相关联的CDA类别ID
+        String cdaType = null;
+        for (StdDataSet dataSet : profile.getDataSets()) {
+            if (cdaDocumentOptions.isPrimaryDataSet(dataSet.getCode())) {
+                cdaType = cdaDocumentOptions.getCdaDocumentTypeId(dataSet.getCode());
+                break;
+            }
+        }
+
+        if (cdaType == null) {
+            throw new RuntimeException("Cannot find cda document type by data set code, forget primary data set & cda document mapping?");
+        }
+
+        // 此类目下卫生机构定制的CDA文档列表
+        Map<Template, MCDADocument> cdaDocuments = templateService.getOrganizationTemplates(profile.getOrgCode(), profile.getCdaVersion(), cdaType);
+        if (CollectionUtils.isEmpty(cdaDocuments)) {
+            LogService.getLogger().error("Unable to get cda document of version " + profile.getCdaVersion()
+                    + " for organization " + profile.getOrgCode() + ", template not uploaded?");
+
+            return null;
+        }
+
+        return cdaDocuments;
     }
 }
