@@ -15,6 +15,9 @@
     <description>EHR solr component</description>
 
     <properties>
+        <solrj.version>5.4.0</solrj.version>
+        <hbase.client.version>1.0.1.1</hbase.client.version>
+        <spring.data.hadoop.version>2.2.0.RELEASE</spring.data.hadoop.version>
     </properties>
 
     <dependencies>
@@ -36,17 +39,6 @@
                     <groupId>org.apache.commons</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.json-lib</groupId>
-            <artifactId>json-lib</artifactId>
-            <version>2.4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-data-hbase</artifactId>
-            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
