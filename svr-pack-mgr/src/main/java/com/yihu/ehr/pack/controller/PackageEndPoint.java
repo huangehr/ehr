@@ -93,7 +93,8 @@ public class PackageEndPoint extends BaseRestController {
             @ApiParam(name = "package_crypto", value = "档案包解压密码,二次加密")
             @RequestParam(value = "package_crypto") String packageCrypto,
             @ApiParam(name = "md5", value = "档案包MD5")
-            @RequestParam(value = "md5", required = false) String md5) throws Exception {
+            @RequestParam(value = "md5", required = false) String md5,
+            HttpServletRequest request) throws Exception {
 
         MultipartFile multipartFile = pack.getFile("file");
         if (multipartFile == null) throw new ApiException(HttpStatus.FORBIDDEN, ErrorCode.MissParameter, "file");

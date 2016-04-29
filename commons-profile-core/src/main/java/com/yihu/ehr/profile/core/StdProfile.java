@@ -23,6 +23,7 @@ public class StdProfile {
     private ProfileId profileId;                        // 健康档案ID
     private String cardId;                              // 就诊时用的就诊卡ID
     private String orgCode;                             // 机构代码
+    private String clientId;                            // 应用来源
     private String patientId;                           // 身份证号
     private String eventNo;                             // 事件号
     private Date eventDate;                             // 事件时间，如挂号，出院体检时间
@@ -170,6 +171,14 @@ public class StdProfile {
         }
 
         return rootNode.toString();
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
     }
 
     public String toJson(){
