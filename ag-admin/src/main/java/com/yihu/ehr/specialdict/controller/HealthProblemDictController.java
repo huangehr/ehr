@@ -58,6 +58,17 @@ public class HealthProblemDictController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = "dict/hps", method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据ids批量删除健康问题字典,多个以逗号隔开")
+    public Envelop deleteHpDicts(
+            @ApiParam(name = "ids", value = "字典IDs", defaultValue = "")
+            @RequestParam(value = "ids") String ids) {
+        Envelop envelop = new Envelop();
+        boolean bo = hpDictClient.deleteHpDicts(ids);
+        envelop.setSuccessFlg(bo);
+        return envelop;
+    }
+
     @RequestMapping(value = "/dict/hp", method = RequestMethod.PUT)
     @ApiOperation(value = "更新健康问题字典" )
     public Envelop updateHpDict(
@@ -175,7 +186,7 @@ public class HealthProblemDictController extends BaseController {
 
     @RequestMapping(value = "/dict/hp/icd10s", method = RequestMethod.POST)
     @ApiOperation(value = "为健康问题增加ICD10疾病关联,--批量增加关联。" )
-    public Envelop createHpIcd10Relation(
+    public Envelop createHpIcd10Relations(
             @ApiParam(name = "hp_id", value = "健康问题Id")
             @RequestParam(value = "hp_id") String hpId,
             @ApiParam(name = "icd10_ids", value = "关联的icd10字典ids,多个以逗号连接")

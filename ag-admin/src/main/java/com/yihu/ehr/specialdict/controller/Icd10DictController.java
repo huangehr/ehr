@@ -64,6 +64,17 @@ public class Icd10DictController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = "dict/icd10s", method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据ids批量删除icd10疾病字典(含与药品及指标的关联关系。)")
+    public Envelop deleteIcd10Dicts(
+            @ApiParam(name = "ids", value = "字典ID", defaultValue = "")
+            @RequestParam(value = "ids") String ids) {
+        Envelop envelop = new Envelop();
+        Boolean bo = icd10DictClient.deleteIcd10Dicts(ids);
+        envelop.setSuccessFlg(bo);
+        return envelop;
+    }
+
     @RequestMapping(value = "/dict/icd10", method = RequestMethod.PUT)
     @ApiOperation(value = "更新ICD10字典" )
     public Envelop updateIcd10Dict(
@@ -91,7 +102,8 @@ public class Icd10DictController extends BaseController {
             @PathVariable(value = "id") String id){
 
         MIcd10Dict icd10Dict = icd10DictClient.getIcd10Dict(id);
-        Icd10DictModel icd10DictModel = changeToModel(icd10Dict);
+        //Icd10DictModel icd10DictModel = changeToModel(icd10Dict);
+        Icd10DictModel icd10DictModel = convertToModel(icd10Dict,Icd10DictModel.class);
 
         Envelop envelop = new Envelop();
         if(icd10DictModel != null){
@@ -118,14 +130,14 @@ public class Icd10DictController extends BaseController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) Integer page){
 
-        List<Icd10DictModel> icd10DictModelList = new ArrayList<>();
         ResponseEntity<Collection<MIcd10Dict>> responseEntity = icd10DictClient.getIcd10DictList(fields, filters, sorts, size, page);
         Collection<MIcd10Dict> mIcd10Dicts = responseEntity.getBody();
         Integer totalCount = getTotalCount(responseEntity);
-        for (MIcd10Dict mIcd10Dict:mIcd10Dicts){
-            Icd10DictModel icd10DictModel= changeToModel(mIcd10Dict);
-            icd10DictModelList.add(icd10DictModel);
-        }
+//        for (MIcd10Dict mIcd10Dict:mIcd10Dicts){
+//            Icd10DictModel icd10DictModel= changeToModel(mIcd10Dict);
+//            icd10DictModelList.add(icd10DictModel);
+//        }
+        List<Icd10DictModel> icd10DictModelList = (List<Icd10DictModel>)convertToModels(mIcd10Dicts,new ArrayList<Icd10DictModel>(mIcd10Dicts.size()),Icd10DictModel.class,null);
         Envelop envelop = getResult(icd10DictModelList,totalCount,page,size);
 
         return envelop;
@@ -192,6 +204,28 @@ public class Icd10DictController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = "/dict/icd10/drugs", method = RequestMethod.POST)
+    @ApiOperation(value = "为ICD10增加药品关联。----批量关联" )
+    public Object createIcd10DrugRelation(
+            @ApiParam(name = "icd10_id",value = "icd10字典id")
+            @RequestParam(value = "icd10_id") String icd10Id,
+            @ApiParam(name = "drug_ids",value = "所关联的药品字典ids，多个以逗号分隔")
+            @RequestParam(value = "drug_ids") String drugIds){
+
+        Envelop envelop = new Envelop();
+        Collection<MIcd10DrugRelation> mIcd10DrugRelations = icd10DictClient.createIcd10DrugRelations(icd10Id, drugIds);
+        List<Icd10DrugRelationModel> icd10DrugRelationModels = (List<Icd10DrugRelationModel>)convertToModels(mIcd10DrugRelations,
+                new ArrayList<>(mIcd10DrugRelations.size()),Icd10DrugRelationModel.class,null);
+        if(icd10DrugRelationModels.size() != 0){
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(icd10DrugRelationModels);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("创建字典关联失败");
+        }
+        return envelop;
+    }
+
     @RequestMapping(value = "/dict/icd10/drug", method = RequestMethod.PUT)
     @ApiOperation(value = "为ICD10修改药品关联。" )
     public Envelop updateIcd10DrugRelation(
@@ -224,6 +258,17 @@ public class Icd10DictController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = "/dict/icd10/drugs", method = RequestMethod.DELETE)
+    @ApiOperation(value = "为ICD10删除药品关联。--批量删除，多个以逗号隔开" )
+    public Envelop deleteIcd10DrugRelations(
+            @ApiParam(name = "ids", value = "关联IDs", defaultValue = "")
+            @RequestParam(value = "ids", required = true) String ids){
+        Envelop envelop = new Envelop();
+        boolean bo = icd10DictClient.deleteIcd10DrugRelations(ids);
+        envelop.setSuccessFlg(bo);
+        return envelop;
+    }
+
     @RequestMapping(value = "/dict/icd10/drugs", method = RequestMethod.GET)
     @ApiOperation(value = "根据ICD10查询相应的药品关联列表信息。" )
     public Envelop getIcd10DrugRelationList(
@@ -248,6 +293,20 @@ public class Icd10DictController extends BaseController {
         }
         Envelop envelop = getResult(icd10DrugRelationModelList,totalCount,page,size);
 
+        return envelop;
+    }
+
+    @RequestMapping(value = "/dict/icd10/drugs/no_paging", method = RequestMethod.GET)
+    @ApiOperation(value = "根据ICD10查询相应的药品关联列表信息。---不分页" )
+    public Envelop getIcd10DrugRelationListWithoutPaging(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters){
+        Envelop envelop = new Envelop();
+        Collection<MIcd10DrugRelation> mIcd10DrugRelations = icd10DictClient.getIcd10DrugRelationListWithoutPaging(filters);
+        List<Icd10DrugRelationModel> icd10DrugRelationModelList = (List<Icd10DrugRelationModel>)convertToModels(mIcd10DrugRelations,
+                new ArrayList<Icd10DrugRelationModel>(),Icd10DrugRelationModel.class,null);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(icd10DrugRelationModelList);
         return envelop;
     }
 
@@ -288,6 +347,27 @@ public class Icd10DictController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = "/dict/icd10/indicators", method = RequestMethod.POST)
+    @ApiOperation(value = "为ICD10增加指标关联。---批量关联，" )
+    public Envelop createIcd10IndicatorRelations(
+            @ApiParam(name = "icd10_id", value = "健康问题Id")
+            @RequestParam(value = "icd10_id") String icd10Id,
+            @ApiParam(name = "indicator_ids", value = "关联的指标字典ids,多个以逗号连接")
+            @RequestParam(value = "indicator_ids") String indicatorIds){
+        Collection<MIcd10IndicatorRelation> icd10IndicatorRelations = icd10DictClient.createIcd10IndicatorRelations(icd10Id,indicatorIds);
+        List<Icd10IndicatorRelationModel> icd10IndicatorRelationModels = (List<Icd10IndicatorRelationModel>)convertToModels(icd10IndicatorRelations,
+                new ArrayList<>(icd10IndicatorRelations.size()),Icd10IndicatorRelationModel.class,null);
+        Envelop envelop = new Envelop();
+        if(icd10IndicatorRelationModels.size() != 0){
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(icd10IndicatorRelationModels);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("创建字典关联失败");
+        }
+        return envelop;
+    }
+
     @RequestMapping(value = "/dict/icd10/indicator", method = RequestMethod.PUT)
     @ApiOperation(value = "为ICD10修改指标关联。" )
     public Envelop updateIcd10IndicatorRelation(
@@ -320,6 +400,17 @@ public class Icd10DictController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = "/dict/icd10/indicators", method = RequestMethod.DELETE)
+    @ApiOperation(value = "为ICD10删除指标关联。--批量删除，多个以逗号隔开" )
+    public Envelop deleteIcd10IndicatorRelations(
+            @ApiParam(name = "ids", value = "关联IDs", defaultValue = "")
+            @RequestParam(value = "ids", required = true) String ids){
+        Envelop envelop = new Envelop();
+        boolean bo = icd10DictClient.deleteIcd10IndicatorRelations(ids);
+        envelop.setSuccessFlg(bo);
+        return envelop;
+    }
+
     @RequestMapping(value = "/dict/icd10/indicators", method = RequestMethod.GET)
     @ApiOperation(value = "根据ICD10查询相应的指标关联列表信息。" )
     public Envelop getIcd10IndicatorRelationList(
@@ -344,6 +435,20 @@ public class Icd10DictController extends BaseController {
         }
         Envelop envelop = getResult(icd10IndicatorRelationModelList,totalCount,page,size);
 
+        return envelop;
+    }
+
+    @RequestMapping(value = "/dict/icd10/indicators/no_paging", method = RequestMethod.GET)
+    @ApiOperation(value = "根据ICD10查询相应的指标关联列表信息。---不分页" )
+    public Envelop getIcd10IndicatorRelationListWithoutPaging(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters){
+        Envelop envelop = new Envelop();
+        Collection<MIcd10IndicatorRelation> mIcd10IndicatorRelations = icd10DictClient.getIcd10IndicatorRelationListWithoutPaging(filters);
+        List<Icd10IndicatorRelationModel> icd10IndicatorRelationModels = (List<Icd10IndicatorRelationModel>)convertToModels(mIcd10IndicatorRelations,
+                new ArrayList<Icd10IndicatorRelationModel>(),Icd10IndicatorRelationModel.class,null);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(icd10IndicatorRelationModels);
         return envelop;
     }
 

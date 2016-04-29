@@ -57,6 +57,16 @@ public class DrugDictController extends BaseRestController {
         return true;
     }
 
+    @RequestMapping(value = "dict/drugs", method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据ids批量删除药品字典")
+    public boolean deleteDrugDicts(
+            @ApiParam(name = "ids", value = "药品字典代码")
+            @RequestParam( value = "ids") String ids) throws Exception {
+
+        drugDictService.delete(ids.split(","));
+        return true;
+    }
+
     @RequestMapping(value = "/dict/drug", method = RequestMethod.PUT)
     @ApiOperation(value = "更新药品字典" )
     public MDrugDict updateDrugDict(
