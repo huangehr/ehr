@@ -1,9 +1,6 @@
 package com.yihu.ehr.resource.service;
 
 
-import com.yihu.ehr.resource.common.ActionResult;
-import com.yihu.ehr.resource.common.DataGridResult;
-import com.yihu.ehr.resource.common.Result;
 import com.yihu.ehr.resource.dao.ResourcesCategoryDao;
 import com.yihu.ehr.resource.dao.ResourcesDao;
 import com.yihu.ehr.resource.model.RsCategory;
@@ -22,15 +19,15 @@ import java.util.UUID;
 @Service("resourcesCategoryService")
 public class ResourcesCategoryService implements IResourcesCategoryService {
 
-    @Resource(name = "resourcesCategoryDao")
+    /*@Resource(name = "resourcesCategoryDao")
     private ResourcesCategoryDao resourcesCategoryDao;
 
     @Resource(name = "resourcesDao")
     private ResourcesDao resourcesDao;
 
-    /**
+    *//**
      * 新增资源分类
-     */
+     *//*
     public Result addResourcesCategory(RsCategory obj) throws Exception{
         obj.setId(UUID.randomUUID().toString().replace("-",""));
         if(resourcesCategoryDao.addResourcesCategory(obj))
@@ -44,9 +41,9 @@ public class ResourcesCategoryService implements IResourcesCategoryService {
         }
     }
 
-    /**
+    *//**
      * 修改资源分类
-     */
+     *//*
     public Result editResourcesCategory(RsCategory obj) throws Exception{
         if(resourcesCategoryDao.editResourcesCategory(obj))
         {
@@ -57,9 +54,9 @@ public class ResourcesCategoryService implements IResourcesCategoryService {
         }
     }
 
-    /**
+    *//**
      * 删除资源分类
-     */
+     *//*
     public Result deleteResourcesCategory(String id) throws Exception{
         //判断是否有子节点
         List<RsCategory> childrenList = resourcesCategoryDao.getChildrenCategory(id);
@@ -87,6 +84,6 @@ public class ResourcesCategoryService implements IResourcesCategoryService {
     public DataGridResult queryResourcesCategory(String id,String name,String pid) throws Exception {
 
         return resourcesCategoryDao.queryResourcesCategory(id,name,pid);
-    }
+    }*/
 
 }

@@ -12,5 +12,5 @@ public interface ResourcesDao extends PagingAndSortingRepository<RsResources,Str
 
     List<RsResources> findByType(String type);
 
-    List<RsResources> findByCode(String code);
+    RsResources findByCode(String code);
  }
