@@ -1,11 +1,10 @@
 package com.yihu.ehr.resource.dao;
 
 
-import com.yihu.ehr.resource.common.DataGridResult;
-import com.yihu.ehr.solr.query.HbaseList;
-import com.yihu.ehr.solr.query.HbaseQuery;
-import com.yihu.ehr.solr.query.SolrQuery;
-import net.sf.json.JSONObject;
+import com.yihu.ehr.query.common.model.DataList;
+import com.yihu.ehr.query.jdbc.DBHelper;
+import com.yihu.ehr.query.services.HbaseQuery;
+import com.yihu.ehr.query.services.SolrQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,20 +15,33 @@ import org.springframework.stereotype.Service;
  */
 @Service("resourcesQueryDao")
 public class ResourcesQueryDao extends BaseDao {
-    @Autowired
-    HbaseQuery hbase;
 
     @Autowired
+    DBHelper db;
+    @Autowired
+    HbaseQuery hbase;
+    @Autowired
     SolrQuery solr;
+
     /**
      * habse单core
      */
-    public DataGridResult getHbaseSingleCore(String core,String metadata,String queryParams,Integer page,Integer size) throws Exception
+    public DataList getHbaseSingleCore(String core,String metadata,String queryParams,Integer page,Integer size) throws Exception
     {
-        long count = solr.count("HealthArchives","patient_id:10295435");
-        HbaseList groupList = solr.getGroupCount("HealthArchives","patient_id");//根据病人ID分组
-        JSONObject obj = hbase.queryByRowkey("HealthArchives", "41872607-9_10295435_000622450_1444060800000");
-        HbaseList list = hbase.queryBySolr("HealthArchives", "patient_id:10295435", null, 1, 50);
+        /*DataList list= hbase.queryBySolr("EHR_CENTER", "patient_id:10293555", null, 1, 50);
+        DataList list2= solr.getGroupCount("EHR_CENTER","patient_id");
+        QueryEntity qe = new QueryEntity("EHR_CENTER",1,50);
+        List<QueryCondition> cl = new ArrayList<>();
+        cl.add(new QueryCondition("archive_id","41872607-9_10289499_000618952_1443715200000"));
+        List<SolrJoinEntity> joinList =  new ArrayList<>();
+        joinList.add(new SolrJoinEntity("EHR_CENTER_SUB_shard1_replica1","main_rowkey","rowkey",cl));
+        DataList list3= hbase.query(qe,joinList);
+        List list4 = db.query("select * from RS_CATEGORY");
+        List<RsCategory> list5 = db.query(RsCategory.class,"select * from RS_CATEGORY");
+        long count = solr.count("EHR_CENTER","patient_id:10293555");
+        DataList groupList = solr.getGroupCount("EHR_CENTER","patient_id");//根据病人ID分组
+        DataList list6 = hbase.queryBySolr("EHR_CENTER", "patient_id:10293555", null, 1, 50);
+        DataList list7 = hbase.queryBySolr("EHR_CENTER_SUB", "patient_id:10293555", null, 1, 50);*/
 
         return null;
     }
@@ -37,15 +49,16 @@ public class ResourcesQueryDao extends BaseDao {
     /**
      * habsee多core
      */
-    public DataGridResult getHbaseMultiCore(String core,String metadata,String queryParams,Integer page,Integer size) throws Exception
+    public DataList getHbaseMultiCore(String core,String metadata,String queryParams,Integer page,Integer size) throws Exception
     {
+
         return null;
     }
 
     /**
      * habse的solr分组统计
      */
-    public DataGridResult getHbaseSolr(String core,String metadata,String queryParams,Integer page,Integer size) throws Exception
+    public DataList getHbaseSolr(String core,String metadata,String queryParams,Integer page,Integer size) throws Exception
     {
         return null;
     }
@@ -53,7 +66,7 @@ public class ResourcesQueryDao extends BaseDao {
     /**
      * ETL数据
      */
-    public DataGridResult getEtlData(String datasource,String table,String cols,String queryParams,Integer page,Integer size) throws Exception
+    public DataList getEtlData(String datasource,String table,String cols,String queryParams,Integer page,Integer size) throws Exception
     {
         return null;
     }
@@ -61,7 +74,7 @@ public class ResourcesQueryDao extends BaseDao {
     /**
      * 配置数据
      */
-    public DataGridResult getConfigData(String datasource,String table,String cols,String queryParams,Integer page,Integer size) throws Exception
+    public DataList getConfigData(String datasource,String table,String cols,String queryParams,Integer page,Integer size) throws Exception
     {
         return null;
     }
@@ -69,7 +82,7 @@ public class ResourcesQueryDao extends BaseDao {
     /**
      * 字典数据
      */
-    public DataGridResult getDictData(String dictName) throws Exception
+    public DataList getDictData(String dictName) throws Exception
     {
         return null;
     }

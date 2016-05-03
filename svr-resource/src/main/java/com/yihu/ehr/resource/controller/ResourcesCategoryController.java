@@ -1,17 +1,8 @@
 package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.resource.common.Result;
-import com.yihu.ehr.resource.model.RsCategory;
-import com.yihu.ehr.resource.service.intf.IResourcesCategoryService;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import net.sf.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -22,21 +13,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = ApiVersion.Version1_0 + "/rs/category")
 @Api(value = "rsCategory", description = "资源分类服务接口")
 public class ResourcesCategoryController {
-    @Autowired
+    /*@Autowired
     private IResourcesCategoryService resourcesCategoryService;
 
     @RequestMapping(value = "/addResourcesCategory", method = RequestMethod.POST)
     @ApiOperation(value = "新增资源分类")
     public Result addResourcesCategory(
             @ApiParam(name = "category", value = "对象JSON结构体", allowMultiple = true, defaultValue = "{\"name\": \"\", \"pid\": \"\", \"description\": \"\"}")
-            @RequestParam(value = "category", required = true) String categoryJson) {
-        try {
+            @RequestParam(value = "category", required = true) String categoryJson) throws Exception {
             RsCategory obj = (RsCategory)JSONObject.toBean(JSONObject.fromObject(categoryJson),RsCategory.class);
             return resourcesCategoryService.addResourcesCategory(obj);
-        }
-        catch (Exception e) {
-            return Result.error(e.getMessage());
-        }
     }
 
     @RequestMapping(value = "/editResourcesCategory", method = RequestMethod.POST)
@@ -75,5 +61,5 @@ public class ResourcesCategoryController {
             return Result.error(e.getMessage());
         }
     }
-
+*/
 }
