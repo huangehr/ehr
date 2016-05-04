@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -40,6 +41,7 @@ public class IndicatorsDictController extends BaseRestController {
             @RequestParam(value = "dictionary") String dictJson) throws Exception {
 
         IndicatorsDict dict = toEntity(dictJson, IndicatorsDict.class);
+        dict.setCreateDate(new Date());
         String id = getObjectId(BizObject.Dict);
         dict.setId(id);
         IndicatorsDict indicatorsDict = indicatorsDictService.createDict(dict);
@@ -74,6 +76,7 @@ public class IndicatorsDictController extends BaseRestController {
 
         IndicatorsDict dict = toEntity(dictJson, IndicatorsDict.class);
         if (null == indicatorsDictService.retrieve(dict.getId())) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
+        dict.setUpdateDate(new Date());
         indicatorsDictService.save(dict);
         return convertToModel(dict, MIndicatorsDict.class);
     }
