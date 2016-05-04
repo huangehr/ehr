@@ -13,6 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -104,13 +105,13 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
     }
 
 
-    @RequestMapping(value = "/datameta/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/datameta/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改数据元映射关系")
     public MAdapterDataSet updateAdapterMetaData(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") Long id,
             @ApiParam(name = "jsonModel", value = "数据元模型", defaultValue = "")
-            @RequestParam(value = "jsonModel") String jsonModel) throws Exception{
+            @RequestBody String jsonModel) throws Exception{
 
         AdapterDataSet adapterDataSet = adapterDataSetService.retrieve(id);
         if(adapterDataSet==null)
@@ -119,11 +120,11 @@ public class AdapterDataSetController extends ExtendController<MAdapterDataSet> 
     }
 
 
-    @RequestMapping(value = "/datameta", method = RequestMethod.POST)
+    @RequestMapping(value = "/datameta", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增数据元映射关系")
     public MAdapterDataSet createAdapterMetaData(
             @ApiParam(name = "jsonModel", value = "数据元模型", defaultValue = "")
-            @RequestParam(value = "jsonModel") String jsonModel) throws Exception{
+            @RequestBody String jsonModel) throws Exception{
 
         return getModel(saveAdapterMetaData(new AdapterDataSet(), jsonModel));
     }

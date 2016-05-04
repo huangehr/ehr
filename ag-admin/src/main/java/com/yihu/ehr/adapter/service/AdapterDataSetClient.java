@@ -8,11 +8,9 @@ import com.yihu.ehr.model.adaption.MAdapterRelationship;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
@@ -71,20 +69,20 @@ public interface AdapterDataSetClient {
             @PathVariable(value = "id") Long id);
 
 
-    @RequestMapping(value = "/datameta/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/datameta/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改数据元映射关系")
     MAdapterDataSet updateAdapterMetaData(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") Long id,
             @ApiParam(name = "jsonModel", value = "数据元模型", defaultValue = "")
-            @RequestParam(value = "jsonModel") String jsonModel);
+            @RequestBody String jsonModel);
 
 
-    @RequestMapping(value = "/datameta", method = RequestMethod.POST)
+    @RequestMapping(value = "/datameta", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增数据元映射关系")
     MAdapterDataSet createAdapterMetaData(
             @ApiParam(name = "jsonModel", value = "数据元模型", defaultValue = "")
-            @RequestParam(value = "jsonModel") String jsonModel);
+            @RequestBody String jsonModel);
 
     @RequestMapping(value = "/datametas", method = RequestMethod.DELETE)
     @ApiOperation(value = "批量删除数据元映射关系")

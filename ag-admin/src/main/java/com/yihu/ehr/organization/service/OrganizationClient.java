@@ -6,6 +6,7 @@ import com.yihu.ehr.model.org.MOrganization;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -55,19 +56,19 @@ public interface OrganizationClient {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/organizations" , method = RequestMethod.POST)
+    @RequestMapping(value = "/organizations" , method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建机构")
     MOrganization create(
             @ApiParam(name = "mOrganizationJsonData", value = "机构代码", defaultValue = "")
-            @RequestParam(value = "mOrganizationJsonData") String orgModelJsonData ) ;
+            @RequestBody String orgModelJsonData ) ;
 
 
 
-    @RequestMapping(value = "/organizations" , method = RequestMethod.PUT)
+    @RequestMapping(value = "/organizations" , method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改机构")
     MOrganization update(
             @ApiParam(name = "mOrganizationJsonData", value = "机构代码", defaultValue = "")
-            @RequestParam(value = "mOrganizationJsonData") String orgModelJsonData ) ;
+            @RequestBody String orgModelJsonData ) ;
 
 
     /**

@@ -49,7 +49,7 @@ public class TemplateEndPoint extends BaseRestEndPoint {
     @ApiOperation(value = "创建模板")
     @RequestMapping(value = ServiceApi.ProfileTemplate.Templates, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.POST)
     public void saveTemplate(@ApiParam(value = "健康档案模板")
-                             @RequestParam(value = "model") String model) {
+                             @RequestBody String model) {
         Template template = toEntity(model, Template.class);
         template.setCreateTime(new Date());
         templateService.save(template);
@@ -102,11 +102,11 @@ public class TemplateEndPoint extends BaseRestEndPoint {
     }
 
     @ApiOperation(value = "更新模板属性")
-    @RequestMapping(value = ServiceApi.ProfileTemplate.Template, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.ProfileTemplate.Template, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public void getTemplate(@ApiParam(value = "模板ID")
                             @PathVariable(value = "id") int id,
                             @ApiParam(value = "模板JSON")
-                            @RequestParam("model") String model) {
+                            @RequestBody String model) {
         Template tpl = templateService.getTemplate(id);
         if (null == tpl) throw new ApiException(HttpStatus.NOT_FOUND, "Template not found");
 

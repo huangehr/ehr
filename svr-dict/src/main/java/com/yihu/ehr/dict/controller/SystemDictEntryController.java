@@ -10,6 +10,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -62,10 +63,10 @@ public class SystemDictEntryController extends BaseRestController {
     }
 
     @ApiOperation(value = "创建字典项")
-    @RequestMapping(value = "/dictionaries/entries", method = RequestMethod.POST)
+    @RequestMapping(value = "/dictionaries/entries", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MDictionaryEntry createDictEntry(
             @ApiParam(name = "entry", value = "字典JSON结构")
-            @RequestParam(value = "entry") String entryJson) {
+            @RequestBody String entryJson) {
         SystemDictEntry entry = toEntity(entryJson, SystemDictEntry.class);
         SystemDict systemDict = dictService.retrieve(entry.getDictId());
         if (systemDict == null) throw new ApiException(ErrorCode.GetDictFaild, "所属字典不存在");
@@ -101,10 +102,10 @@ public class SystemDictEntryController extends BaseRestController {
     }
 
     @ApiOperation(value = "修改字典项")
-    @RequestMapping(value = "/dictionaries/entries", method = RequestMethod.PUT)
+    @RequestMapping(value = "/dictionaries/entries", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MDictionaryEntry updateDictEntry(
             @ApiParam(name = "entry", value = "字典JSON结构")
-            @RequestParam(value = "entry") String entryJson) {
+            @RequestBody String entryJson) {
         SystemDictEntry entry = toEntity(entryJson, SystemDictEntry.class);
         SystemDictEntry temp = systemDictEntryService.retrieve(new DictEntryKey(entry.getCode(), entry.getDictId()));
         if (null == temp) {
@@ -116,13 +117,13 @@ public class SystemDictEntryController extends BaseRestController {
         return convertToModel(entry, MDictionaryEntry.class, null);
     }
 
-    @RequestMapping(value = "/dictionaries/existence/{dict_id}/{code}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dictionaries/existence/{dict_id}" , method = RequestMethod.GET)
     @ApiOperation(value = "根基dictId和code判断提交的字典项名称是否已经存在")
     public boolean isDictEntryCodeExists(
             @ApiParam(name = "dict_id", value = "dict_id", defaultValue = "")
             @PathVariable(value = "dict_id") long dictId,
             @ApiParam(name = "code", value = "code", defaultValue = "")
-            @PathVariable(value = "code") String code){
+            @RequestParam(value = "code") String code){
         return systemDictEntryService.isDictContainEntry(dictId, code);
     }
 }

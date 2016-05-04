@@ -12,6 +12,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -127,11 +128,11 @@ public class CdaTypeController extends BaseRestController {
 
 
 
-    @RequestMapping(value = ServiceApi.Standards.Types, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.Types, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增CDAType")
     public MCDAType saveCDAType(
             @ApiParam(name = "model", value = "model")
-            @RequestParam(value = "model") String jsonData) throws Exception {
+            @RequestBody String jsonData) throws Exception {
 
         CDAType cdaType =  toEntity(jsonData, CDAType.class);
         cdaType.setId(getObjectId(BizObject.CdaType));
@@ -141,13 +142,13 @@ public class CdaTypeController extends BaseRestController {
     }
 
 
-    @RequestMapping(value = ServiceApi.Standards.Type,method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Standards.Type,method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改CDAType")
     public MCDAType updateCDAType(
             @ApiParam(name = "id", value = "编号")
             @RequestParam(value = "id") String id,
             @ApiParam(name = "model", value = "json模型")
-            @RequestParam(value = "model") String jsonData) throws Exception {
+            @RequestBody String jsonData) throws Exception {
 
         CDAType cdaType =  toEntity(jsonData, CDAType.class);
         cdaType.setUpdateDate(new Date());

@@ -7,10 +7,8 @@ import com.yihu.ehr.model.geography.MGeographyDict;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
@@ -53,11 +51,11 @@ public interface AddressClient {
      * 地址检查并保存
      * @return
      */
-    @RequestMapping(value = "/geographies", method = RequestMethod.POST)
+    @RequestMapping(value = "/geographies", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "地址检查,如果地址在数据库中不存在，这新增这条记录，否则返回地址id")
     String saveAddress(
             @ApiParam(name = "json_data", value = "地址json字符串")
-            @RequestParam( value = "json_data") String GeographyModelJsonData) ;
+            @RequestBody String GeographyModelJsonData) ;
 
 
     /**

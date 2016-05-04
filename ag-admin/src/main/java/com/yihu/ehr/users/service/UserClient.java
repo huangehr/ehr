@@ -7,6 +7,7 @@ import com.yihu.ehr.model.user.MUser;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -31,15 +32,15 @@ public interface UserClient {
             @RequestParam(value = "size", required = false) int size,
             @RequestParam(value = "page", required = false) int page);
 
-    @RequestMapping(value = ServiceApi.Users.Users, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Users.Users, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建用户", notes = "重新绑定用户信息")
     MUser createUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "user_json_data") String userJsonData);
+            @RequestBody String userJsonData);
 
-    @RequestMapping(value = ServiceApi.Users.Users, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Users.Users, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改用户", notes = "重新绑定用户信息")
-    MUser updateUser(@RequestParam(value = "user_json_data") String userJsonData);
+    MUser updateUser(@RequestBody String userJsonData);
 
     @RequestMapping(value = ServiceApi.Users.UserAdmin, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除用户", notes = "根据用户id删除用户")

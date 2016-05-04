@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -100,11 +101,11 @@ public class OrgEndPoint extends BaseRestController {
      * @param orgJsonData
      * @throws Exception
      */
-    @RequestMapping(value = "/organizations", method = RequestMethod.POST)
+    @RequestMapping(value = "/organizations", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建机构")
     public MOrganization create(
             @ApiParam(name = "mOrganizationJsonData", value = "机构代码", defaultValue = "")
-            @RequestParam(value = "mOrganizationJsonData") String orgJsonData) throws Exception {
+            @RequestBody String orgJsonData) throws Exception {
         Organization org = toEntity(orgJsonData, Organization.class);
         org.setCreateDate(new Date());
         org.setActivityFlag(1);
@@ -113,11 +114,11 @@ public class OrgEndPoint extends BaseRestController {
         return convertToModel(org, MOrganization.class);
     }
 
-    @RequestMapping(value = "organizations", method = RequestMethod.PUT)
+    @RequestMapping(value = "organizations", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改机构")
     public MOrganization update(
             @ApiParam(name = "mOrganizationJsonData", value = "机构代码", defaultValue = "")
-            @RequestParam(value = "mOrganizationJsonData") String orgJsonData) throws Exception {
+            @RequestBody String orgJsonData) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         Organization org = objectMapper.readValue(orgJsonData, Organization.class);
         org.setPyCode(PinyinUtil.getPinYinHeadChar(org.getFullName(), false));
