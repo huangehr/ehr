@@ -13,6 +13,7 @@ class MProfileSearch {
     private String telephone;
     private String gender;
     private String birthday;
+    private String cdaDocumentId;
 
     String getDemographicId() {
         return demographicId;
@@ -76,5 +77,13 @@ class MProfileSearch {
 
     void setBirthday(String birthday) {
         this.birthday = birthday;
+    }
+
+    public String getCdaDocumentId() {
+        return cdaDocumentId;
+    }
+
+    public void setCdaDocumentId(String cdaDocumentId) {
+        this.cdaDocumentId = cdaDocumentId;
     }
 }

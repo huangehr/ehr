@@ -3,13 +3,17 @@ package com.yihu.ehr.profile.core;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.lang.SpringContext;
+import com.yihu.ehr.profile.annotation.Column;
+import com.yihu.ehr.profile.annotation.Table;
 import com.yihu.ehr.profile.extractor.EventExtractor;
 import com.yihu.ehr.profile.extractor.KeyDataExtractor;
+import com.yihu.ehr.profile.util.ProfileUtil;
 import com.yihu.ehr.util.DateTimeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.ParseException;
 import java.util.*;
+import static com.yihu.ehr.profile.core.ProfileFamily.*;
 
 /**
  * 标准健康档案（结构化）。
@@ -17,6 +21,7 @@ import java.util.*;
  * @author Sand
  * @created 2015.08.16 10:44
  */
+@Table(ProfileUtil.Table)
 public class StdProfile {
     protected ObjectMapper objectMapper = SpringContext.getService("objectMapper");
 
@@ -44,22 +49,6 @@ public class StdProfile {
         this.setProfileType(ProfileType.Standard);
     }
 
-    public ProfileType getProfileType() {
-        return profileType;
-    }
-
-    public void setProfileType(ProfileType profileType) {
-        this.profileType = profileType;
-    }
-
-    public EventType getEventType() {
-        return eventType;
-    }
-
-    public void setEventType(EventType eventType) {
-        this.eventType = eventType;
-    }
-
     public String getId() {
         if (profileId == null) {
             if (StringUtils.isEmpty(orgCode)) {
@@ -84,6 +73,25 @@ public class StdProfile {
         this.profileId = new ProfileId(archiveId);
     }
 
+    @Column(value = BasicQualifier.ProfileType, family = ProfileFamily.Basic)
+    public ProfileType getProfileType() {
+        return profileType;
+    }
+
+    public void setProfileType(ProfileType profileType) {
+        this.profileType = profileType;
+    }
+
+    @Column(value = BasicQualifier.EventType, family = ProfileFamily.Basic)
+    public EventType getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(EventType eventType) {
+        this.eventType = eventType;
+    }
+
+    @Column(value = BasicQualifier.CdaVersion, family = ProfileFamily.Basic)
     public String getCdaVersion() {
         return cdaVersion;
     }
@@ -92,6 +100,7 @@ public class StdProfile {
         this.cdaVersion = cdaVersion;
     }
 
+    @Column(value = BasicQualifier.CardId, family = ProfileFamily.Basic)
     public String getCardId() {
         return cardId;
     }
@@ -100,6 +109,7 @@ public class StdProfile {
         this.cardId = cardId;
     }
 
+    @Column(value = BasicQualifier.OrgCode, family = ProfileFamily.Basic)
     public String getOrgCode() {
         return orgCode;
     }
@@ -108,6 +118,7 @@ public class StdProfile {
         this.orgCode = orgCode;
     }
 
+    @Column(value = BasicQualifier.PatientId, family = ProfileFamily.Basic)
     public String getPatientId() {
         return patientId;
     }
@@ -116,6 +127,7 @@ public class StdProfile {
         this.patientId = patientId;
     }
 
+    @Column(value = BasicQualifier.EventNo, family = ProfileFamily.Basic)
     public String getEventNo() {
         return eventNo;
     }
@@ -124,6 +136,7 @@ public class StdProfile {
         this.eventNo = eventNo;
     }
 
+    @Column(value = BasicQualifier.DemographicId, family = ProfileFamily.Basic)
     public String getDemographicId() {
         return demographicId;
     }
@@ -132,6 +145,7 @@ public class StdProfile {
         this.demographicId = demographicId;
     }
 
+    @Column(value = BasicQualifier.EventDate, family = ProfileFamily.Basic)
     public Date getEventDate() {
         return eventDate;
     }
@@ -140,6 +154,7 @@ public class StdProfile {
         this.eventDate = date;
     }
 
+    @Column(value = BasicQualifier.CreateDate, family = ProfileFamily.Basic)
     public Date getCreateDate() {
         if (createDate == null) createDate = new Date();
 

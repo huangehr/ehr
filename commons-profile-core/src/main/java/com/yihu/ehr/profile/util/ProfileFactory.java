@@ -16,7 +16,7 @@ import java.util.List;
  * @version 1.0
  * @created 2016.04.13 15:28
  */
-public class ProfileGenerator {
+public class ProfileFactory {
     public final static String StandardFolder = "standard";
     public final static String OriginFolder = "origin";
     public final static String DocumentFolder = "documents";

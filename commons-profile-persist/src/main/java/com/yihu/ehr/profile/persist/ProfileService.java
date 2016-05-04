@@ -48,11 +48,9 @@ public class ProfileService {
      * @throws IOException
      * @throws ParseException
      */
-    public StdProfile getProfile(String profileId, boolean loadStdDataSet, boolean loadOriginDataSet) throws IOException, ParseException {
-        Pair<StdProfile, String> result = profileRepo.findOne(profileId, loadStdDataSet, loadOriginDataSet);
+    public StdProfile getProfile(String profileId, boolean loadStdDataSet, boolean loadOriginDataSet) throws Exception {
+        Pair<StdProfile, String> result = profileRepo.findOne(profileId);
         StdProfile profile = result.getLeft();
-        profile.determineEventType();
-
         String cdaVersion = profile.getCdaVersion();
         ProfileType pType = profile.getProfileType();
 
@@ -81,6 +79,8 @@ public class ProfileService {
                 profile.insertDataSet(pair.getLeft(), pair.getRight());
             }
         }
+
+        profile.determineEventType();
 
         return profile;
     }

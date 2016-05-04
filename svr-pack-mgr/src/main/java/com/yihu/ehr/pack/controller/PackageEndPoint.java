@@ -5,15 +5,15 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.pack.feign.SecurityClient;
-import com.yihu.ehr.pack.feign.UserClient;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MUser;
+import com.yihu.ehr.pack.feign.SecurityClient;
+import com.yihu.ehr.pack.feign.UserClient;
 import com.yihu.ehr.pack.service.Package;
 import com.yihu.ehr.pack.service.PackageService;
 import com.yihu.ehr.pack.task.MessageBuffer;
-import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.util.controller.BaseRestEndPoint;
 import com.yihu.ehr.util.encrypt.RSA;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,7 +32,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 档案包控制器。
@@ -43,7 +45,7 @@ import java.util.*;
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "package_service", description = "档案包服务")
-public class PackageEndPoint extends BaseRestController {
+public class PackageEndPoint extends BaseRestEndPoint {
     @Autowired
     private SecurityClient securityClient;
 
@@ -101,11 +103,13 @@ public class PackageEndPoint extends BaseRestController {
 
         MKey key = securityClient.getOrgKey(orgCode);
         String privateKey = key.getPrivateKey();
-        if (null == privateKey)
+        if (null == privateKey) {
             throw new ApiException(HttpStatus.FORBIDDEN, "Invalid public key, maybe you miss the organization code?");
+        }
 
         String unzipPwd = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
-        Package aPackage = packService.receive(multipartFile.getInputStream(), unzipPwd);
+        String clientId = getClientId(request);
+        Package aPackage = packService.receive(multipartFile.getInputStream(), unzipPwd, clientId);
 
         messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
     }
@@ -228,7 +232,7 @@ public class PackageEndPoint extends BaseRestController {
             throw new ApiException(HttpStatus.FORBIDDEN, "Invalid public key, maybe you miss the user name?");
 
         String unzipPwd = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
-        Package aPackage = packService.receive(multipartFile.getInputStream(), unzipPwd);
+        Package aPackage = packService.receive(multipartFile.getInputStream(), unzipPwd, "kHAbVppx44"); // 旧接口仅提供给ESB应用
 
         messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
     }

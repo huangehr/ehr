@@ -157,6 +157,12 @@ public class BaseRestEndPoint extends AbstractController {
         response.setHeader(ResourceLink, linkMap(map));
     }
 
+    public String getClientId(HttpServletRequest request){
+        String userAgent = request.getHeader("User-Agent");
+
+        return StringUtils.isEmpty(userAgent) ? "" : userAgent.split(" ")[1];
+    }
+
     private String linkMap(Map<String, String> map) {
         StringBuffer links = new StringBuffer("");
         for (String key : map.keySet()) {

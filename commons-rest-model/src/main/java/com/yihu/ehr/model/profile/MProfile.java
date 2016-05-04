@@ -21,6 +21,7 @@ public class MProfile {
     private String orgName;
     private String demographicId;
     private String cdaVersion;
+    private String clientId;
     private Date eventDate;
     private ProfileType profileType;
     private EventType eventType;
@@ -97,5 +98,13 @@ public class MProfile {
 
     public void setEventType(EventType eventType) {
         this.eventType = eventType;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
     }
 }

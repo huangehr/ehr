@@ -2,7 +2,7 @@ package com.yihu.ehr.service;
 
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.profile.core.StdProfile;
-import com.yihu.ehr.profile.util.ProfileGenerator;
+import com.yihu.ehr.profile.util.ProfileFactory;
 import com.yihu.ehr.profile.core.ProfileType;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
@@ -51,7 +51,7 @@ public class PackageResolveEngine {
                 throw new RuntimeException("Invalid package file, package id: " + pack.getId());
             }
 
-            StdProfile profile = ProfileGenerator.generate(root);
+            StdProfile profile = ProfileFactory.generate(root);
             PackageResolver packageResolver;
             switch (profile.getProfileType()) {
                 case Standard:
@@ -73,6 +73,7 @@ public class PackageResolveEngine {
 
             packageResolver.resolve(profile, root);
 
+            profile.setClientId(pack.getClientId());
             profile.regularRowKey();
             profile.determineEventType();
 

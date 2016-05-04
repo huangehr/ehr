@@ -102,6 +102,7 @@ public class ResolveEndPoint {
             MPackage pack = new MPackage();
             pack.setPwd(password);
             pack.setId(packageId);
+            pack.setClientId("kHAbVppx44");
             pack.setArchiveStatus(ArchiveStatus.Received);
 
             StdProfile profile = resolveEngine.doResolve(pack, zipFile);

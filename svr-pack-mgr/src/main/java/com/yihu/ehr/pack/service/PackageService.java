@@ -37,9 +37,9 @@ public class PackageService extends BaseJpaService<Package, XPackageRepository> 
     @Autowired
     FastDFSUtil fastDFSUtil;
 
-    public Package receive(InputStream is, String pwd) {
+    public Package receive(InputStream is, String pwd, String clientId) {
         Map<String, String> metaData = storeJsonPackage(is);
-        return checkIn(metaData.get("id"), metaData.get("path"), pwd);
+        return checkIn(metaData.get("id"), metaData.get("path"), pwd, clientId);
     }
 
     public Package getPackage(String id) {
@@ -133,12 +133,13 @@ public class PackageService extends BaseJpaService<Package, XPackageRepository> 
      * @param pwd  zip密码
      * @return 索引存储成功
      */
-    Package checkIn(String id, String path, String pwd) {
+    Package checkIn(String id, String path, String pwd, String clientId) {
         try {
             Package aPackage = new Package();
             aPackage.setId(id);
             aPackage.setRemotePath(path);
             aPackage.setPwd(pwd);
+            aPackage.setClientId(clientId);
             aPackage.setReceiveDate(new Date());
             aPackage.setArchiveStatus(ArchiveStatus.Received);
             getRepo().save(aPackage);

@@ -6,59 +6,16 @@ package com.yihu.ehr.profile.core;
  * @author Sand
  * @created 2016.04.27 16:56
  */
-public enum DataSetFamily {
-    Basic("basic"),
-    MetaData("meta_data"),
-    Extension("extension");
-
-    private String family;
-
-    DataSetFamily(String family) {
-        this.family = family;
-    }
-
-    public String toString() {
-        return family;
-    }
-
-    /*public static String[] getFamilies() {
-        return new String[]{
-                DataSetFamily.Basic.toString(),
-                DataSetFamily.MetaData.toString(),
-                DataSetFamily.Extension.toString()
-        };
-    }
-
-    public static String[] getColumns(DataSetFamily family) {
-        if (family == DataSetFamily.Basic) {
-            return new String[]{
-                    BasicColumns.ProfileId.toString(),
-                    BasicColumns.CdaVersion.toString(),
-                    BasicColumns.OrgCode.toString(),
-                    BasicColumns.LastUpdateTime.toString()
-            };
-        } else if (family == DataSetFamily.MetaData){
-            return null;
-        }
-
-        return null;
-    }*/
+public class DataSetFamily {
+    public static final String Basic = "basic";
+    public static final String MetaData = "meta_data";
+    public static final String Extension = "extension";
 
     // Basic列
-    public enum BasicColumns {
-        ProfileId("archive_id"),
-        CdaVersion("inner_version"),
-        OrgCode("org_code"),
-        LastUpdateTime("last_update_time");
-
-        private String qualifier;
-
-        BasicColumns(String qualifier) {
-            this.qualifier = qualifier;
-        }
-
-        public String toString() {
-            return qualifier;
-        }
+    public static class BasicColumns {
+        public static final String ProfileId = "archive_id";
+        public static final String CdaVersion = "inner_version";
+        public static final String OrgCode = "org_code";
+        public static final String LastUpdateTime = "last_update_time";
     }
 }
