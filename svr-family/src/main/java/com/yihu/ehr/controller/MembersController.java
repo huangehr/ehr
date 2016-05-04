@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,13 +65,13 @@ public class MembersController extends BaseRestController {
         }
     }
 
-    @RequestMapping(value = "/families/{families_id}/members", method = RequestMethod.POST)
+    @RequestMapping(value = "/families/{families_id}/members", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建家庭成员")
     public MMembers createMember(
             @ApiParam(name = "families_id", value = "家庭关系ID", defaultValue = "")
             @PathVariable(value = "families_id") String familiesId,
             @ApiParam(name = "json_data", value = "", defaultValue = "")
-            @RequestParam(value = "json_data") String jsonData) throws Exception {
+            @RequestBody String jsonData) throws Exception {
 
         Members mb = toEntity(jsonData,Members.class);
         mb.setId(getObjectId(BizObject.Members));
@@ -79,13 +80,13 @@ public class MembersController extends BaseRestController {
         return convertToModel(mb,MMembers.class);
     }
 
-    @RequestMapping(value = "/families/{families_id}/members", method = RequestMethod.PUT)
+    @RequestMapping(value = "/families/{families_id}/members", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改家庭成员")
     public MMembers updateMember(
             @ApiParam(name = "families_id", value = "家庭关系ID", defaultValue = "")
             @PathVariable(value = "families_id") String familiesId,
             @ApiParam(name = "json_data", value = "", defaultValue = "")
-            @RequestParam(value = "json_data") String jsonData) throws Exception {
+            @RequestBody String jsonData) throws Exception {
 
         Members mb = toEntity(jsonData,Members.class);
         mb.setFamilyId(familiesId);
