@@ -1,7 +1,7 @@
 package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.resource.common.Result;
+import com.yihu.ehr.query.common.model.DataList;
 import com.yihu.ehr.resource.service.intf.IResourcesQueryService;
 import com.yihu.ehr.resource.service.intf.IResourcesService;
 import io.swagger.annotations.Api;
@@ -32,23 +32,20 @@ public class ResourcesQueryController {
      */
     @ApiOperation("获取资源数据")
     @RequestMapping(value = "/getResources", method = RequestMethod.GET)
-    public Result getResources(@ApiParam("resourcesCode") @RequestParam(value = "resourcesCode", required = true) String resourcesCode,
+    public DataList getResources(@ApiParam("resourcesCode") @RequestParam(value = "resourcesCode", required = true) String resourcesCode,
                                @ApiParam("appId") @RequestParam(value = "appId", required = true) String appId,
                                @ApiParam("queryParams") @RequestParam(value = "queryParams", required = false) String queryParams,
                                @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-                               @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) {
-        try {
+                               @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception{
+
             //判断app是否有权限
             if(true)
             {
                 return resourcesQueryService.getResources(resourcesCode,appId,queryParams,page,size);
             }
             else{
-                return Result.error("该应用[appId="+appId+"]无权访问资源[resourcesCode="+resourcesCode+"]");
+                throw new Exception("该应用[appId="+appId+"]无权访问资源[resourcesCode="+resourcesCode+"]");
             }
 
-        } catch (Exception e) {
-            return Result.error(e.getMessage());
-        }
     }
 }

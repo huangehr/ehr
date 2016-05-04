@@ -36,6 +36,12 @@ public interface IndicatorDictClient {
             @ApiParam(name = "id", value = "指标字典代码")
             @PathVariable( value = "id") String id);
 
+    @RequestMapping(value = "dict/indicators", method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据ids批量删除指标字典")
+    boolean deleteIndicatorsDicts(
+            @ApiParam(name = "ids", value = "指标字典代码")
+            @RequestParam( value = "ids") String ids);
+
     @RequestMapping(value = "/dict/indicator", method = RequestMethod.PUT)
     @ApiOperation(value = "更新指标字典" )
     MIndicatorsDict updateIndicatorsDict(

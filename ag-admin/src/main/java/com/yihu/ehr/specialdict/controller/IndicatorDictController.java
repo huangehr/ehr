@@ -60,6 +60,17 @@ public class IndicatorDictController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = "dict/indicators", method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据id批量删除指标字典")
+    public Envelop deleteIndicatorsDicts(
+            @ApiParam(name = "ids", value = "字典ID", defaultValue = "")
+            @RequestParam(value = "ids") String ids) {
+        Envelop envelop = new Envelop();
+        Boolean bo = indicatorDictClient.deleteIndicatorsDicts(ids);
+        envelop.setSuccessFlg(bo);
+        return envelop;
+    }
+
     @RequestMapping(value = "/dict/indicator", method = RequestMethod.PUT)
     @ApiOperation(value = "更新指标字典" )
     public Envelop updateIndicatorsDict(

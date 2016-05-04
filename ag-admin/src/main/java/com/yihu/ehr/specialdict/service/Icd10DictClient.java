@@ -38,6 +38,12 @@ public interface Icd10DictClient {
             @ApiParam(name = "id", value = "icd10字典代码")
             @PathVariable( value = "id") String id);
 
+    @RequestMapping(value = "dict/icd10s", method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据ids批量删除icd10疾病字典(含与药品及指标的关联关系。)")
+    boolean deleteIcd10Dicts(
+            @ApiParam(name = "ids", value = "icd10字典代码,多个以逗号隔开")
+            @RequestParam( value = "ids") String ids);
+
     @RequestMapping(value = "/dict/icd10", method = RequestMethod.PUT)
     @ApiOperation(value = "更新ICD10字典" )
     MIcd10Dict updateIcd10Dict(
@@ -90,6 +96,14 @@ public interface Icd10DictClient {
             @ApiParam(name = "dictionary", value = "字典JSON结构")
             @RequestParam(value = "dictionary") String dictJson);
 
+    @RequestMapping(value = "/dict/icd10/drugs", method = RequestMethod.POST)
+    @ApiOperation(value = "为ICD10增加药品关联。--批量关联" )
+    Collection<MIcd10DrugRelation> createIcd10DrugRelations(
+            @ApiParam(name = "icd10_id", value = "健康问题Id")
+            @RequestParam(value = "icd10_id") String icd10Id,
+            @ApiParam(name = "drug_ids", value = "关联的药品字典ids,多个以逗号连接")
+            @RequestParam(value = "drug_ids") String drugIds);
+
     @RequestMapping(value = "/dict/icd10/drug", method = RequestMethod.PUT)
     @ApiOperation(value = "为ICD10修改药品关联。" )
     MIcd10DrugRelation updateIcd10DrugRelation(
@@ -101,6 +115,12 @@ public interface Icd10DictClient {
     boolean deleteIcd10DrugRelation(
             @ApiParam(name = "id", value = "关联ID", defaultValue = "")
             @RequestParam(value = "id", required = true) String id);
+
+    @RequestMapping(value = "/dict/icd10/drugs", method = RequestMethod.DELETE)
+    @ApiOperation(value = "为ICD10删除药品关联。--批量删除，多个以逗号隔开" )
+    boolean deleteIcd10DrugRelations(
+            @ApiParam(name = "ids", value = "关联IDs", defaultValue = "")
+            @RequestParam(value = "ids", required = true) String ids);
 
     @RequestMapping(value = "/dict/icd10/drugs", method = RequestMethod.GET)
     @ApiOperation(value = "根据ICD10查询相应的药品关联列表信息。" )
@@ -115,6 +135,12 @@ public interface Icd10DictClient {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page);
+
+    @RequestMapping(value = "/dict/icd10/drugs/no_paging", method = RequestMethod.GET)
+    @ApiOperation(value = "根据ICD10查询相应的药品关联列表信息。---不分页" )
+    Collection<MIcd10DrugRelation> getIcd10DrugRelationListWithoutPaging(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters);
 
     @RequestMapping(value = "/dict/icd10/drug/existence" , method = RequestMethod.GET)
     @ApiOperation(value = "判断ICD10与药品字典的关联关系在系统中是否已存在")
@@ -132,6 +158,14 @@ public interface Icd10DictClient {
             @ApiParam(name = "dictionary", value = "字典JSON结构")
             @RequestParam(value = "dictionary") String dictJson);
 
+    @RequestMapping(value = "/dict/icd10/indicators", method = RequestMethod.POST)
+    @ApiOperation(value = "为ICD10增加指标关联。---批量关联，" )
+    Collection<MIcd10IndicatorRelation> createIcd10IndicatorRelations(
+            @ApiParam(name = "icd10_id", value = "健康问题Id")
+            @RequestParam(value = "icd10_id") String icd10Id,
+            @ApiParam(name = "indicator_ids", value = "关联的指标字典ids,多个以逗号连接")
+            @RequestParam(value = "indicator_ids") String indicatorIds);
+
     @RequestMapping(value = "/dict/icd10/indicator", method = RequestMethod.PUT)
     @ApiOperation(value = "为ICD10修改指标关联。" )
     MIcd10IndicatorRelation updateIcd10IndicatorRelation(
@@ -143,6 +177,12 @@ public interface Icd10DictClient {
     boolean deleteIcd10IndicatorRelation(
             @ApiParam(name = "id", value = "关联ID", defaultValue = "")
             @RequestParam(value = "id", required = true) String id);
+
+    @RequestMapping(value = "/dict/icd10/indicators", method = RequestMethod.DELETE)
+    @ApiOperation(value = "为ICD10删除指标关联。--批量删除，多个以逗号隔开" )
+    boolean deleteIcd10IndicatorRelations(
+            @ApiParam(name = "ids", value = "关联IDs", defaultValue = "")
+            @RequestParam(value = "ids", required = true) String ids);
 
     @RequestMapping(value = "/dict/icd10/indicators", method = RequestMethod.GET)
     @ApiOperation(value = "根据ICD10查询相应的指标关联列表信息。" )
@@ -157,6 +197,12 @@ public interface Icd10DictClient {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page);
+
+    @RequestMapping(value = "/dict/icd10/indicators/no_paging", method = RequestMethod.GET)
+    @ApiOperation(value = "根据ICD10查询相应的指标关联列表信息。---不分页" )
+    Collection<MIcd10IndicatorRelation> getIcd10IndicatorRelationListWithoutPaging(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters);
 
     @RequestMapping(value = "/dict/icd10/indicator/existence" , method = RequestMethod.GET)
     @ApiOperation(value = "判断ICD10与指标字典的关联关系在系统中是否已存在")

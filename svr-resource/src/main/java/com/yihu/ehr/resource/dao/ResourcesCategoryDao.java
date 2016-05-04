@@ -1,8 +1,7 @@
 package com.yihu.ehr.resource.dao;
 
 
-import com.yihu.ehr.dbhelper.common.DBList;
-import com.yihu.ehr.resource.common.DataGridResult;
+import com.yihu.ehr.query.common.model.DataList;
 import com.yihu.ehr.resource.model.RsCategory;
 import org.springframework.stereotype.Service;
 
@@ -19,42 +18,47 @@ public class ResourcesCategoryDao extends BaseDao {
      * 新增资源分类
      */
     public Boolean addResourcesCategory(RsCategory obj) throws Exception{
-        String sql = "insert into RS_CATEGORY(ID,NAME,PID,DESCRIPTION) values (?,?,?,?)";
+        /*String sql = "insert into RS_CATEGORY(ID,NAME,PID,DESCRIPTION) values (?,?,?,?)";
 
         Boolean re = this.getDB().execute(sql,obj.getId(),obj.getName(),obj.getPid(),obj.getDescription());
         if(!re && this.getDB().errorMessage.length()>0)
         {
             throw new Exception(this.getDB().errorMessage);
         }
-        return re;
+        return re;*/
+        return null;
     }
 
     /**
      * 修改资源分类
      */
     public Boolean editResourcesCategory(RsCategory obj) throws Exception{
-        String sql = "update RS_CATEGORY set NAME=?,PID=?,DESCRIPTION=? where ID=?";
+        /*String sql = "update RS_CATEGORY set NAME=?,PID=?,DESCRIPTION=? where ID=?";
 
         Boolean re = this.getDB().execute(sql,obj.getName(),obj.getPid(),obj.getDescription(),obj.getId());
         if(!re && this.getDB().errorMessage.length()>0)
         {
             throw new Exception(this.getDB().errorMessage);
         }
-        return re;
+        return re;*/
+
+        return null;
     }
 
     /**
      * 删除资源分类
      */
     public Boolean deleteResourcesCategory(String id) throws Exception{
-        String sql = "delete from RS_CATEGORY where ID=?";
+        /*String sql = "delete from RS_CATEGORY where ID=?";
 
         Boolean re = this.getDB().execute(sql,id);
         if(!re && this.getDB().errorMessage.length()>0)
         {
             throw new Exception(this.getDB().errorMessage);
         }
-        return re;
+        return re;*/
+
+        return null;
     }
 
     /**
@@ -62,15 +66,17 @@ public class ResourcesCategoryDao extends BaseDao {
      */
     public List<RsCategory> getChildrenCategory(String pid) throws Exception
     {
-        String sql = "select * from RS_CATEGORY where pid=?";
-        return this.getDB().query(RsCategory.class,sql,pid);
+        /*String sql = "select * from RS_CATEGORY where pid=?";
+        return this.getDB().query(RsCategory.class,sql,pid);*/
+
+        return null;
     }
 
     /**
      * 获取资源分类
      */
-    public DataGridResult queryResourcesCategory(String id,String name,String pid) throws Exception {
-        String sql = "select * from RS_CATEGORY where 1=1";
+    public DataList queryResourcesCategory(String id,String name,String pid) throws Exception {
+        /*String sql = "select * from RS_CATEGORY where 1=1";
 
         if(id!=null && id.length()>0)
         {
@@ -85,7 +91,9 @@ public class ResourcesCategoryDao extends BaseDao {
             sql += " and pid='"+pid+"'";
         }
         DBList list = this.getQE().queryBySql(sql);
-        return DataGridResult.fromDBList(list);
+        return DataGridResult.fromDBList(list);*/
+
+        return null;
     }
 
 }

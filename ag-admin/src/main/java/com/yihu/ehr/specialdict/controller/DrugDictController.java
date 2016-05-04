@@ -60,6 +60,18 @@ public class DrugDictController extends BaseController {
         return envelop;
     }
 
+    @ApiOperation(value = "批量删除字典")
+    @RequestMapping(value = "/dict/drugs", method = RequestMethod.DELETE)
+    public Envelop deleteDrugDicts(
+            @ApiParam(name = "ids", value = "字典IDs", defaultValue = "")
+            @RequestParam(value = "ids") String ids) {
+
+        Envelop envelop = new Envelop();
+        Boolean bo = drugDictClient.deleteDrugDicts(ids);
+        envelop.setSuccessFlg(bo);
+        return envelop;
+    }
+
     @ApiOperation(value = "修改字典")
     @RequestMapping(value = "/dict/drug", method = RequestMethod.PUT)
     public Envelop updateDrugDict(

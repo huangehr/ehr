@@ -37,6 +37,12 @@ public interface HealthProblemDictClient {
             @ApiParam(name = "id", value = "字典ID")
             @PathVariable(value = "id") String id) ;
 
+    @RequestMapping(value = "dict/hps", method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据ids批量删除健康问题字典（含健康问题字典及与ICD10的关联关系。）")
+    boolean deleteHpDicts(
+            @ApiParam(name = "ids", value = "字典IDs")
+            @RequestParam(value = "ids") String ids) ;
+
     @RequestMapping(value = "/dict/hp", method = RequestMethod.PUT)
     @ApiOperation(value = "更新健康问题字典" )
     MHealthProblemDict updateHpDict(

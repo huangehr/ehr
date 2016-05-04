@@ -19,7 +19,7 @@ public class OrgDetailModel{
     private boolean settled;
     private String settledWay;
     private String settledWayName;
-    private int activityFlg;
+    private int activityFlag;
     private String activityFlgName;
     private String createDate;
     private String location;
@@ -111,12 +111,12 @@ public class OrgDetailModel{
         this.settledWayName = settledWayName;
     }
 
-    public int getActivityFlg() {
-        return activityFlg;
+    public int getActivityFlag() {
+        return activityFlag;
     }
 
-    public void setActivityFlg(int activityFlg) {
-        this.activityFlg = activityFlg;
+    public void setActivityFlag(int activityFlag) {
+        this.activityFlag = activityFlag;
     }
 
     public String getActivityFlgName() {
