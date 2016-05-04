@@ -2,6 +2,7 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
+import com.yihu.ehr.model.resource.MRsResources;
 import com.yihu.ehr.resource.model.RsAppResource;
 import com.yihu.ehr.resource.model.RsResources;
 import com.yihu.ehr.resource.service.intf.IResourcesService;
@@ -10,6 +11,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import com.yihu.ehr.util.controller.BaseRestController;
@@ -33,25 +37,25 @@ public class ResourcesController extends BaseRestController {
 
     @ApiOperation("创建资源")
     @RequestMapping(method = RequestMethod.POST)
-    public RsResources createResource(
+    public MRsResources createResource(
             @ApiParam(name="resource",value="资源",defaultValue = "")
             @RequestParam(name="resource")String resource) throws Exception
     {
         RsResources  rs= toEntity(resource,RsResources.class);
         rs.setId(getObjectId(BizObject.Resources));
         rsService.createResource(rs);
-        return rs;
+        return convertToModel(rs,MRsResources.class);
     }
 
     @ApiOperation("更新资源")
     @RequestMapping(method = RequestMethod.PUT)
-    public RsResources updateResources(
+    public MRsResources updateResources(
             @ApiParam(name="resource",value="资源",defaultValue="")
             @RequestParam(name="resource")String resource) throws Exception
     {
         RsResources  rs= toEntity(resource,RsResources.class);
         rsService.updateResource(rs);
-        return rs;
+        return convertToModel(rs,MRsResources.class);
     }
 
     @ApiOperation("资源删除")
@@ -64,9 +68,25 @@ public class ResourcesController extends BaseRestController {
         return true;
     }
 
+    @ApiOperation("资源删除")
+    @RequestMapping(method = RequestMethod.DELETE)
+    public boolean deleteResourcesPatch(
+            @ApiParam(name="id",value="资源ID",defaultValue = "")
+            @RequestParam(name="id") String id) throws Exception
+    {
+        String[] ids = id.split(",");
+
+        for(String id_ : ids)
+        {
+            rsService.deleteResource(id_);
+        }
+
+        return true;
+    }
+
     @ApiOperation("资源查询")
     @RequestMapping(method = RequestMethod.GET)
-    public Collection<RsResources> queryResources(
+    public Page<MRsResources> queryResources(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(name="fields",required = false)String fields,
             @ApiParam(name="filters",value="过滤",defaultValue = "")
@@ -80,19 +100,27 @@ public class ResourcesController extends BaseRestController {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception
     {
+        Pageable pageable = new PageRequest(reducePage(page),size);
+        long total = 0;
+        Collection<MRsResources> rsList;
+
         //过滤条件为空
         if(StringUtils.isEmpty(filters))
         {
             Page<RsResources> resources = rsService.getResources(sorts,reducePage(page),size);
-            pagedResponse(request,response,resources.getTotalElements(),page,size);
-            return convertToModels(resources.getContent(),new ArrayList<>(resources.getNumber()),RsResources.class,fields);
+            total = resources.getTotalElements();
+            rsList = convertToModels(resources.getContent(),new ArrayList<>(resources.getNumber()),MRsResources.class,fields);
         }
         else
         {
             List<RsResources> resources = rsService.search(fields,filters,sorts,page,size);
-            pagedResponse(request,response,rsService.getCount(filters),page,size);
-            return convertToModels(resources,new ArrayList<>(resources.size()),RsResources.class,fields);
+            total = rsService.getCount(filters);
+            rsList = convertToModels(resources,new ArrayList<>(resources.size()),MRsResources.class,fields);
         }
 
+        pagedResponse(request,response,total,page,size);
+        Page<MRsResources> rsPage = new PageImpl<MRsResources>((List<MRsResources>)rsList,pageable,total);
+
+        return rsPage;
     }
 }

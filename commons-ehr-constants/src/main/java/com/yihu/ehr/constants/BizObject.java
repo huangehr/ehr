@@ -28,7 +28,8 @@ public enum BizObject {
     DimensionsCategories((short)0x0017),
     ResourceMetadata((short)0x0018),
     AppResource((short)0x0019),
-    AppResourceMetadata((short)0x0020);
+    AppResourceMetadata((short)0x0020),
+    ResourceCategory((short)0x0021);
 
     public short getBizObject(){
         return bizObject;

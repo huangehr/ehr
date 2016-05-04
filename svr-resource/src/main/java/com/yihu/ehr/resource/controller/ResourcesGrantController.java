@@ -2,6 +2,8 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
+import com.yihu.ehr.model.resource.MRsAppResource;
+import com.yihu.ehr.model.resource.MRsAppResourceMetadata;
 import com.yihu.ehr.resource.model.RsAppResource;
 import com.yihu.ehr.resource.model.RsAppResourceMetadata;
 import com.yihu.ehr.resource.service.intf.IResourceGrantService;
@@ -12,6 +14,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,7 +41,7 @@ public class ResourcesGrantController extends BaseRestController{
 
     @ApiOperation("资源授权单个应用")
     @RequestMapping(value="/{resourceId}",method = RequestMethod.POST)
-    public RsAppResource grantResource(
+    public MRsAppResource grantResource(
             @ApiParam(name="resourceId",value="资源ID",defaultValue = "")
             @PathVariable(value="resourceId") String resourceId,
             @ApiParam(name="appId",value="资源ID",defaultValue = "")
@@ -49,12 +54,12 @@ public class ResourcesGrantController extends BaseRestController{
         appRs.setResourceId(resourceId);
 
         rsGrantService.grantResource(appRs);
-        return appRs;
+        return convertToModel(appRs, MRsAppResource.class);
     }
 
     @ApiOperation("资源授权多个应用")
     @RequestMapping(value="/{resourceId}/batch",method = RequestMethod.POST)
-    public Collection<RsAppResource> grantResourceMany(
+    public Collection<MRsAppResource> grantResourceMany(
             @ApiParam(name="resourceId",value="资源ID",defaultValue = "")
             @PathVariable(value="resourceId") String resourceId,
             @ApiParam(name="appId",value="资源ID",defaultValue = "")
@@ -75,7 +80,7 @@ public class ResourcesGrantController extends BaseRestController{
         }
 
         rsGrantService.grantResourceBatch(appRsList);
-        return convertToModels(appRsList,new ArrayList<>(appRsList.size()),RsAppResource.class,"");
+        return convertToModels(appRsList,new ArrayList<>(appRsList.size()),MRsAppResource.class,"");
     }
 
     @ApiOperation("资源授权删除")
@@ -106,7 +111,7 @@ public class ResourcesGrantController extends BaseRestController{
 
     @ApiOperation("资源授权查询")
     @RequestMapping(value="",method = RequestMethod.GET)
-    public Collection<RsAppResource> queryAppResourceGrant(
+    public Page<MRsAppResource> queryAppResourceGrant(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(name="fields",required = false)String fields,
             @ApiParam(name="filters",value="过滤",defaultValue = "")
@@ -120,24 +125,33 @@ public class ResourcesGrantController extends BaseRestController{
             HttpServletRequest request,
             HttpServletResponse response) throws Exception
     {
+        Pageable pageable = new PageRequest(reducePage(page),size);
+        long total = 0;
+        Collection<MRsAppResource> rsAppList;
+
         //过滤条件为空
         if(StringUtils.isEmpty(filters))
         {
             Page<RsAppResource> rsGrant = rsGrantService.getAppResourceGrant(sorts,reducePage(page),size);
-            pagedResponse(request,response,rsGrant.getTotalElements(),page,size);
-            return convertToModels(rsGrant.getContent(),new ArrayList<>(rsGrant.getNumber()),RsAppResource.class,fields);
+            total = rsGrant.getTotalElements();
+            rsAppList = convertToModels(rsGrant.getContent(),new ArrayList<>(rsGrant.getNumber()),MRsAppResource.class,fields);
         }
         else
         {
             List<RsAppResource> rsGrant = rsGrantService.search(fields,filters,sorts,page,size);
-            pagedResponse(request,response,rsGrantService.getCount(filters),page,size);
-            return convertToModels(rsGrant,new ArrayList<>(rsGrant.size()),RsAppResource.class,fields);
+            total = rsGrantService.getCount(filters);
+            rsAppList = convertToModels(rsGrant,new ArrayList<>(rsGrant.size()),MRsAppResource.class,fields);
         }
+
+        pagedResponse(request,response,total,page,size);
+        Page<MRsAppResource> rsAppPage = new PageImpl<MRsAppResource>((List<MRsAppResource>)rsAppList,pageable,total);
+
+        return rsAppPage;
     }
 
     @ApiOperation("资源数据元授权")
     @RequestMapping(value="/{appResourceId}/metadata/{metadataId}",method = RequestMethod.POST)
-    public RsAppResourceMetadata grantRsMetaData(
+    public MRsAppResourceMetadata grantRsMetaData(
             @ApiParam(name="appResourceId",value="资源ID",defaultValue = "")
             @PathVariable(value="appResourceId")String appResourceId,
             @ApiParam(name="metadataId",value="资源数据元ID",defaultValue = "")
@@ -149,12 +163,12 @@ public class ResourcesGrantController extends BaseRestController{
         appRsMetadata.setMetadataId(metadataId);
 
         rsMetadataGrantService.grantRsMetadata(appRsMetadata);
-        return appRsMetadata;
+        return convertToModel(appRsMetadata, MRsAppResourceMetadata.class);
     }
 
     @ApiOperation("资源数据元批量授权")
     @RequestMapping(value="/{appResourceId}/metadata/batch",method = RequestMethod.POST)
-    public Collection<RsAppResourceMetadata> grantRsMetaDataBatch(
+    public Collection<MRsAppResourceMetadata> grantRsMetaDataBatch(
             @ApiParam(name="appResourceId",value="资源ID",defaultValue = "")
             @PathVariable(value="appResourceId")String appResourceId,
             @ApiParam(name="metadataId",value="资源数据元ID",defaultValue = "")
@@ -175,7 +189,7 @@ public class ResourcesGrantController extends BaseRestController{
         }
 
         rsMetadataGrantService.grantRsMetadataBatch(appRsMetadataList);
-        return appRsMetadataList;
+        return convertToModels(appRsMetadataList,new ArrayList<>(appRsMetadataList.size()),MRsAppResourceMetadata.class,"");
     }
 
     @ApiOperation("资源数据元授权删除")
@@ -206,7 +220,7 @@ public class ResourcesGrantController extends BaseRestController{
 
     @ApiOperation("资源数据元授权查询")
     @RequestMapping(value="/metadata",method = RequestMethod.GET)
-    public Collection<RsAppResourceMetadata> queryAppRsMetadataGrant(
+    public Page<MRsAppResourceMetadata> queryAppRsMetadataGrant(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(name="fields",required = false)String fields,
             @ApiParam(name="filters",value="过滤",defaultValue = "")
@@ -220,18 +234,27 @@ public class ResourcesGrantController extends BaseRestController{
             HttpServletRequest request,
             HttpServletResponse response) throws Exception
     {
+        Pageable pageable = new PageRequest(reducePage(page),size);
+        long total = 0;
+        Collection<MRsAppResourceMetadata> rsAppMetaList;
+
         //过滤条件为空
         if(StringUtils.isEmpty(filters))
         {
             Page<RsAppResourceMetadata> rsMetadataGrant = rsMetadataGrantService.getAppRsMetadataGrant(sorts,reducePage(page),size);
-            pagedResponse(request,response,rsMetadataGrant.getTotalElements(),page,size);
-            return convertToModels(rsMetadataGrant.getContent(),new ArrayList<>(rsMetadataGrant.getNumber()),RsAppResourceMetadata.class,fields);
+            total = rsMetadataGrant.getTotalElements();
+            rsAppMetaList = convertToModels(rsMetadataGrant.getContent(),new ArrayList<>(rsMetadataGrant.getNumber()),MRsAppResourceMetadata.class,fields);
         }
         else
         {
             List<RsAppResourceMetadata> rsMetadataGrant = rsMetadataGrantService.search(fields,filters,sorts,page,size);
-            pagedResponse(request,response,rsGrantService.getCount(filters),page,size);
-            return convertToModels(rsMetadataGrant,new ArrayList<>(rsMetadataGrant.size()),RsAppResourceMetadata.class,fields);
+            total = rsMetadataGrantService.getCount(filters);
+            rsAppMetaList =convertToModels(rsMetadataGrant,new ArrayList<>(rsMetadataGrant.size()),MRsAppResourceMetadata.class,fields);
         }
+
+        pagedResponse(request,response,total,page,size);
+        Page<MRsAppResourceMetadata> rsPage = new PageImpl<MRsAppResourceMetadata>((List<MRsAppResourceMetadata>)rsAppMetaList,pageable,total);
+
+        return rsPage;
     }
 }

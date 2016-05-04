@@ -2,6 +2,7 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
+import com.yihu.ehr.model.resource.MRsDimension;
 import com.yihu.ehr.resource.model.RsDimension;
 import com.yihu.ehr.resource.service.intf.IDimensionService;
 import com.yihu.ehr.util.controller.BaseRestController;
@@ -10,6 +11,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,25 +37,25 @@ public class DimensionController extends BaseRestController {
 
     @ApiOperation("创建维度")
     @RequestMapping(method = RequestMethod.POST)
-    public RsDimension createDimension(
+    public MRsDimension createDimension(
             @ApiParam(name="dimension",value="维度",defaultValue = "")
             @RequestParam(name="dimension")String dimension) throws Exception
     {
         RsDimension dimens = toEntity(dimension,RsDimension.class);
         dimens.setId(getObjectId(BizObject.Dimensions));
         dimensionService.createDimension(dimens);
-        return dimens;
+        return convertToModel(dimens,MRsDimension.class);
     }
 
     @ApiOperation("更新维度")
     @RequestMapping(method = RequestMethod.PUT)
-    public RsDimension updateDimension(
+    public MRsDimension updateDimension(
             @ApiParam(name="dimension",value="维度",defaultValue="")
             @RequestParam(name="dimension")String dimension) throws Exception
     {
         RsDimension  dimens= toEntity(dimension,RsDimension.class);
         dimensionService.updateDimension(dimens);
-        return dimens;
+        return convertToModel(dimens,MRsDimension.class);
     }
 
     @ApiOperation("维度删除")
@@ -66,7 +70,7 @@ public class DimensionController extends BaseRestController {
 
     @ApiOperation("维度查询")
     @RequestMapping(value="",method = RequestMethod.GET)
-    public Collection<RsDimension> queryDimensions(
+    public Page<MRsDimension> queryDimensions(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(name="fields",required = false)String fields,
             @ApiParam(name="filters",value="过滤",defaultValue = "")
@@ -80,18 +84,27 @@ public class DimensionController extends BaseRestController {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception
     {
+        Pageable pageable = new PageRequest(reducePage(page),size);
+        long total = 0;
+        Collection<MRsDimension> rsDimensionList;
+
         //过滤条件为空
         if(StringUtils.isEmpty(filters))
         {
             Page<RsDimension> dimensions = dimensionService.getDimensions(sorts,reducePage(page),size);
-            pagedResponse(request,response,dimensions.getTotalElements(),page,size);
-            return convertToModels(dimensions.getContent(),new ArrayList<>(dimensions.getNumber()),RsDimension.class,fields);
+            total = dimensions.getTotalElements();
+            rsDimensionList =  convertToModels(dimensions.getContent(),new ArrayList<>(dimensions.getNumber()),MRsDimension.class,fields);
         }
         else
         {
             List<RsDimension> dimensions = dimensionService.search(fields,filters,sorts,page,size);
-            pagedResponse(request,response,dimensionService.getCount(filters),page,size);
-            return convertToModels(dimensions,new ArrayList<>(dimensions.size()),RsDimension.class,fields);
+            total =  dimensionService.getCount(filters);
+            rsDimensionList =  convertToModels(dimensions,new ArrayList<>(dimensions.size()),MRsDimension.class,fields);
         }
+
+        pagedResponse(request,response,total,page,size);
+        Page<MRsDimension> rsPage = new PageImpl<MRsDimension>((List<MRsDimension>)rsDimensionList,pageable,total);
+
+        return rsPage;
     }
 }

@@ -1,7 +1,5 @@
 package com.yihu.ehr.resource.service.intf;
 
-
-import com.yihu.ehr.resource.common.DataGridResult;
 import com.yihu.ehr.resource.model.RsAppResource;
 import com.yihu.ehr.resource.model.RsDimension;
 import com.yihu.ehr.resource.model.RsResources;

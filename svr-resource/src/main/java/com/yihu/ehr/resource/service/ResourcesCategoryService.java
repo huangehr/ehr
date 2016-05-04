@@ -1,12 +1,18 @@
 package com.yihu.ehr.resource.service;
 
 
+import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.ResourcesCategoryDao;
 import com.yihu.ehr.resource.dao.ResourcesDao;
 import com.yihu.ehr.resource.model.RsCategory;
 import com.yihu.ehr.resource.model.RsResources;
 import com.yihu.ehr.resource.service.intf.IResourcesCategoryService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -14,76 +20,54 @@ import java.util.UUID;
 
 
 /**
- * Created by hzp on 2016/4/19.
+ * Created by lyr on 2016/5/4.
  */
-@Service("resourcesCategoryService")
-public class ResourcesCategoryService implements IResourcesCategoryService {
+@Service
+@Transactional
+public class ResourcesCategoryService extends BaseJpaService<RsCategory,ResourcesCategoryDao> implements IResourcesCategoryService {
 
-    /*@Resource(name = "resourcesCategoryDao")
-    private ResourcesCategoryDao resourcesCategoryDao;
+    @Autowired
+    private ResourcesCategoryDao rsCategoryDao;
+    @Autowired
+    private ResourcesDao rsDao;
 
-    @Resource(name = "resourcesDao")
-    private ResourcesDao resourcesDao;
-
-    *//**
-     * 新增资源分类
-     *//*
-    public Result addResourcesCategory(RsCategory obj) throws Exception{
-        obj.setId(UUID.randomUUID().toString().replace("-",""));
-        if(resourcesCategoryDao.addResourcesCategory(obj))
+    /*
+     * 删除资源类别
+     *
+     * @param id 资源类别id
+     */
+    public void deleteRsCategory(String id) throws Exception
+    {
+        if(rsCategoryDao.countByPid(id) > 0)
         {
-            ActionResult re = new ActionResult(true,"新增资源分类成功！");
-            re.setData(obj.getId());
-            return re;
+            throw new Exception("此类别包含子类别!");
         }
-        else{
-            return Result.error("新增资源分类失败！");
+
+        if(rsDao.countByCategoryId(id) > 0)
+        {
+            throw new Exception("此类别包含资源!");
         }
+
+        rsCategoryDao.delete(id);
     }
 
-    *//**
-     * 修改资源分类
-     *//*
-    public Result editResourcesCategory(RsCategory obj) throws Exception{
-        if(resourcesCategoryDao.editResourcesCategory(obj))
-        {
-            return Result.success("修改资源分类成功！");
-        }
-        else{
-            return Result.error("修改资源分类失败！");
-        }
+    /*
+     * 创建或更新资源类别
+     *
+     * @param rsCategory 资源类别
+     * @return RsCategory 资源类别
+     */
+    public RsCategory createOrUpdRsCategory(RsCategory rsCategory)
+    {
+        rsCategoryDao.save(rsCategory);
+
+        return rsCategory;
     }
 
-    *//**
-     * 删除资源分类
-     *//*
-    public Result deleteResourcesCategory(String id) throws Exception{
-        //判断是否有子节点
-        List<RsCategory> childrenList = resourcesCategoryDao.getChildrenCategory(id);
-        if(childrenList!=null && childrenList.size()>0)
-        {
-            return Result.error("包含子分类，无法删除！");
-        }
-        //判断是否包含资源
-        List<RsResources> rsList = resourcesDao.findByType(id);
-        if(rsList!=null && rsList.size()>0)
-        {
-            return Result.error("该分类包含资源，无法删除！");
-        }
+    public Page<RsCategory> getRsCategories(String sorts, int page, int size)
+    {
+        Pageable pageable = new PageRequest(page,size,parseSorts(sorts));
 
-        if(resourcesCategoryDao.deleteResourcesCategory(id))
-        {
-            return Result.success("删除资源分类成功！");
-        }
-        else{
-            return Result.error("删除资源分类失败！");
-        }
+        return rsCategoryDao.findAll(pageable);
     }
-
-
-    public DataGridResult queryResourcesCategory(String id,String name,String pid) throws Exception {
-
-        return resourcesCategoryDao.queryResourcesCategory(id,name,pid);
-    }*/
-
 }
