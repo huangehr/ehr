@@ -6,11 +6,9 @@ import com.yihu.ehr.model.adaption.MOrgDataSet;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
@@ -29,11 +27,11 @@ public interface OrgDataSetClient {
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") long id);
 
-    @RequestMapping(value = "/adapter/org/data_set", method = RequestMethod.POST)
+    @RequestMapping(value = "/adapter/org/data_set", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建机构数据集")
     MOrgDataSet createOrgDataSet(
             @ApiParam(name = "model", value = "json_data", defaultValue = "")
-            @RequestParam(value = "model") String jsonData);
+            @RequestBody String jsonData);
 
 
     @RequestMapping(value = "/adapter/org/data_set/{id}", method = RequestMethod.DELETE)
@@ -43,11 +41,11 @@ public interface OrgDataSetClient {
             @PathVariable(value = "id") long id);
 
 
-    @RequestMapping(value = "/adapter/org/data_set", method = RequestMethod.PUT)
+    @RequestMapping(value = "/adapter/org/data_set", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改机构数据集")
     MOrgDataSet updateOrgDataSet(
             @ApiParam(name = "model", value = "json_data", defaultValue = "")
-            @RequestParam(value = "model") String jsonData);
+            @RequestBody String jsonData);
 
 
     @RequestMapping(value = "/adapter/org/data_sets", method = RequestMethod.GET)

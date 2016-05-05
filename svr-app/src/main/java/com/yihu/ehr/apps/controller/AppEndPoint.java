@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,11 +36,11 @@ public class AppEndPoint extends BaseRestController {
     @Autowired
     private AppService appService;
 
-    @RequestMapping(value = ServiceApi.Apps.Apps, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Apps.Apps, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建App")
     public MApp createApp(
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true, defaultValue = "{\"name\": \"\", \"url\": \"\", \"catalog\": \"\", \"description\": \"\", \"creator\":\"\"}")
-            @RequestParam(value = "app", required = false) String appJson) throws Exception {
+            @RequestBody String appJson) throws Exception {
         App app = toEntity(appJson, App.class);
         app.setId(getObjectId(BizObject.App));
         app = appService.createApp(app);
@@ -76,11 +77,11 @@ public class AppEndPoint extends BaseRestController {
         }
     }
 
-    @RequestMapping(value = ServiceApi.Apps.Apps, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Apps.Apps, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "更新App")
     public MApp updateApp(
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true)
-            @RequestParam(value = "app", required = false) String appJson) throws Exception {
+            @RequestBody String appJson) throws Exception {
         App app = toEntity(appJson, App.class);
         if (appService.retrieve(app.getId()) == null) throw new ApiException(ErrorCode.InvalidAppId, "应用不存在");
         appService.save(app);

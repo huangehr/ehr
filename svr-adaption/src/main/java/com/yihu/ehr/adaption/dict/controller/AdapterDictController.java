@@ -13,6 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -100,11 +101,11 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
         return getAdapterDict(id);
     }
 
-    @RequestMapping(value = "/entry", method = RequestMethod.POST)
+    @RequestMapping(value = "/entry", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "保存字典项映射关系")
     public MAdapterDict createAdapterDictEntry(
             @ApiParam(name = "adapterDictModel", value = "字典数据模型", defaultValue = "")
-            @RequestParam(value = "adapterDictModel") String dictJsonModel) throws Exception {
+            @RequestBody String dictJsonModel) throws Exception {
 
         try {
             return getModel(save(dictJsonModel, new AdapterDict()));
@@ -113,13 +114,13 @@ public class AdapterDictController extends ExtendController<MAdapterDict> {
         }
     }
 
-    @RequestMapping(value = "/entry/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/entry/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改字典项映射关系")
     public MAdapterDict updateAdapterDictEntry(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") Long id,
             @ApiParam(name = "adapterDictModel", value = "字典数据模型", defaultValue = "")
-            @RequestParam(value = "adapterDictModel") String dictJsonModel) throws Exception {
+            @RequestBody String dictJsonModel) throws Exception {
 
         try {
             AdapterDict adapterDict = adapterDictService.retrieve(id);

@@ -8,11 +8,9 @@ import com.yihu.ehr.model.dict.MSystemDict;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
@@ -41,10 +39,10 @@ public interface SystemDictClient {
             @RequestParam(value = "page", required = false) Integer page) ;
 
     @ApiOperation(value = "创建字典", response = MSystemDict.class, produces = "application/json")
-    @RequestMapping(value = "/dictionaries", method = RequestMethod.POST)
+    @RequestMapping(value = "/dictionaries", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     MSystemDict createDictionary(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) ;
+            @RequestBody String dictJson) ;
 
     @ApiOperation(value = "获取字典", response = MSystemDict.class, produces = "application/json")
     @RequestMapping(value = "/dictionaries/{id}", method = RequestMethod.GET)
@@ -53,10 +51,10 @@ public interface SystemDictClient {
             @PathVariable(value = "id") long id);
 
     @ApiOperation(value = "修改字典")
-    @RequestMapping(value = "/dictionaries", method = RequestMethod.PUT)
+    @RequestMapping(value = "/dictionaries", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     MSystemDict updateDictionary(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) ;
+            @RequestBody String dictJson) ;
 
     @ApiOperation(value = "删除字典")
     @RequestMapping(value = "/dictionaries/{id}", method = RequestMethod.DELETE)
@@ -79,10 +77,10 @@ public interface SystemDictClient {
             @RequestParam(value = "page", required = false) Integer page) ;
 
     @ApiOperation(value = "创建字典项")
-    @RequestMapping(value = "/dictionaries/entries", method = RequestMethod.POST)
+    @RequestMapping(value = "/dictionaries/entries", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     MConventionalDict createDictEntry(
             @ApiParam(name = "entry", value = "字典JSON结构")
-            @RequestParam(value = "entry") String entryJson) ;
+            @RequestBody String entryJson) ;
 
     @ApiOperation(value = "获取字典项")
     @RequestMapping(value = "/dictionaries/{dict_id}/entries/{code}", method = RequestMethod.GET)
@@ -101,10 +99,10 @@ public interface SystemDictClient {
             @PathVariable(value = "code") String code) ;
 
     @ApiOperation(value = "修改字典项")
-    @RequestMapping(value = "/dictionaries/entries", method = RequestMethod.PUT)
+    @RequestMapping(value = "/dictionaries/entries", method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     MConventionalDict updateDictEntry(
             @ApiParam(name = "entry", value = "字典JSON结构")
-            @RequestParam(value = "entry") String entryJson);
+            @RequestBody String entryJson);
 
     @RequestMapping(value = "/dictionaries/existence" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典名称是否已经存在")
@@ -112,11 +110,11 @@ public interface SystemDictClient {
             @ApiParam(name = "dict_name", value = "dict_name", defaultValue = "")
             @RequestParam(value = "dict_name") String dictName);
 
-    @RequestMapping(value = "/dictionaries/existence/{dict_id}/{code}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dictionaries/existence/{dict_id}" , method = RequestMethod.GET)
     @ApiOperation(value = "根基dictId和code判断提交的字典项名称是否已经存在")
     boolean isDictEntryCodeExists(
             @ApiParam(name = "dict_id", value = "dict_id", defaultValue = "")
             @PathVariable(value = "dict_id") long dictId,
             @ApiParam(name = "code", value = "code", defaultValue = "")
-            @PathVariable(value = "code") String code);
+            @RequestParam(value = "code") String code);
 }

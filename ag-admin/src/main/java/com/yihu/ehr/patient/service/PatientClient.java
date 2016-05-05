@@ -6,6 +6,7 @@ import com.yihu.ehr.model.patient.MDemographicInfo;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -69,11 +70,11 @@ public interface PatientClient {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/populations",method = RequestMethod.POST)
+    @RequestMapping(value = "/populations",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "根据前端传回来的json创建一个人口信息")
     MDemographicInfo createPatient(
             @ApiParam(name = "json_data", value = "病人信息", defaultValue = "")
-            @RequestParam(value = "json_data") String jsonData) ;
+            @RequestBody String jsonData) ;
 
     /**
      * 根据前端传回来的json修改人口信息
@@ -82,11 +83,11 @@ public interface PatientClient {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/populations",method = RequestMethod.PUT)
+    @RequestMapping(value = "/populations",method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "根据前端传回来的json修改人口信息")
     MDemographicInfo updatePatient(
             @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
-            @RequestParam(value = "patient_model_json_data") String patientModelJsonData);
+            @RequestBody String patientModelJsonData);
 
     @RequestMapping(value = "/populations/password/{id_card_no}",method = RequestMethod.PUT)
     @ApiOperation(value = "初始化密码",notes = "用户忘记密码时重置密码，初始密码为123456")

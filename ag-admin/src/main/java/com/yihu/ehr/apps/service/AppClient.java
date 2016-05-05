@@ -7,6 +7,7 @@ import com.yihu.ehr.model.app.MApp;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,11 +33,11 @@ public interface AppClient {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.Apps, method = RequestMethod.POST)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.Apps, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建App")
     MApp createApp(
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true, defaultValue = "{\"name\": \"\", \"url\": \"\", \"catalog\": \"\", \"description\": \"\", \"creator\":\"\"}")
-            @RequestParam(value = "app", required = false) String appJson);
+            @RequestBody String appJson);
 
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.App, method = RequestMethod.GET)
     @ApiOperation(value = "获取App")
@@ -44,11 +45,11 @@ public interface AppClient {
             @ApiParam(name = "app_id", value = "id", defaultValue = "")
             @PathVariable(value = "app_id") String appId);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.Apps, method = RequestMethod.PUT)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.Apps, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "更新App")
     MApp updateApp(
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true)
-            @RequestParam(value = "app", required = false) String appJson);
+            @RequestBody String appJson);
 
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.App, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除app")

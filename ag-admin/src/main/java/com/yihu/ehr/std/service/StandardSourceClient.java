@@ -7,11 +7,9 @@ import com.yihu.ehr.model.standard.MStdSource;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
@@ -46,20 +44,20 @@ public interface StandardSourceClient {
             @PathVariable(value = "id") String id);
 
 
-    @RequestMapping(value = ServiceApi.Standards.Source, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Standards.Source, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改标准来源，通过id取数据，取不到数据时新增，否则修改")
     MStdSource updateStdSource(
             @ApiParam(name = "id", value = "标准来源编号", defaultValue = "")
             @PathVariable(value = "id") String id,
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
-            @RequestParam(value = "model") String model);
+            @RequestBody String model);
 
 
-    @RequestMapping(value = ServiceApi.Standards.Sources, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.Sources, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增标准来源")
     MStdSource addStdSource(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
-            @RequestParam(value = "model") String model);
+            @RequestBody String model);
 
 
     @RequestMapping(value = ServiceApi.Standards.Sources, method = RequestMethod.DELETE)

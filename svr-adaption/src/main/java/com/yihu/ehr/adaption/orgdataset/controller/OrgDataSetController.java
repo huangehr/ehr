@@ -10,6 +10,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,11 +46,11 @@ public class OrgDataSetController extends ExtendController<MOrgDataSet> {
         return getModel(orgDataSetService.retrieve(id));
     }
 
-    @RequestMapping(value = "/data_set", method = RequestMethod.POST)
+    @RequestMapping(value = "/data_set", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建机构数据集")
     public MOrgDataSet createOrgDataSet(
             @ApiParam(name = "model", value = "适配字典数据模型", defaultValue = "")
-            @RequestParam(value = "model") String model) throws Exception{
+            @RequestBody String model) throws Exception{
 
         OrgDataSet orgDataSet = objectMapper.readValue(model, OrgDataSet.class);
         orgDataSet.setCreateDate(new Date());
@@ -68,11 +69,11 @@ public class OrgDataSetController extends ExtendController<MOrgDataSet> {
     }
 
 
-    @RequestMapping(value = "/data_set", method = RequestMethod.PUT)
+    @RequestMapping(value = "/data_set", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改机构数据集")
     public MOrgDataSet updateOrgDataSet(
             @ApiParam(name = "model", value = "适配字典数据模型", defaultValue = "")
-            @RequestParam(value = "model") String model) throws Exception{
+            @RequestBody String model) throws Exception{
 
         OrgDataSet dataModel = objectMapper.readValue(model, OrgDataSet.class);
         if(orgDataSetService.retrieve(dataModel.getId())==null)

@@ -6,11 +6,9 @@ import com.yihu.ehr.model.adaption.MAdapterOrg;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
@@ -44,11 +42,11 @@ public interface AdapterOrgClient {
             @PathVariable(value = "code") String code) ;
 
 
-    @RequestMapping(value = "/adapter/org", method = RequestMethod.POST)
+    @RequestMapping(value = "/adapter/org", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增采集标准")
     MAdapterOrg addAdapterOrg(
             @ApiParam(name = "json_data", value = "采集机构模型", defaultValue = "")
-            @RequestParam(value = "json_data", required = false) String jsonData) ;
+            @RequestBody String jsonData) ;
 
 
     @RequestMapping(value = "/adapter/org/{code}", method = RequestMethod.PUT)

@@ -12,6 +12,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -104,12 +105,12 @@ public class DocumentEndPoint extends ExtendController<MCDADocument> {
 
 
     @ApiOperation(value = "新增CDADocuments")
-    @RequestMapping(value = ServiceApi.Standards.Documents, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.Documents, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MCDADocument saveCDADocuments(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
             @RequestParam(value = "version") String version,
             @ApiParam(name = "model", value = "文档json数据模型")
-            @RequestParam(value = "model") String model) throws Exception {
+            @RequestBody String model) throws Exception {
 
         Class entityClass = getServiceEntity(version);
         BaseCDADocument cdaDocument = (BaseCDADocument) toEntity(model, entityClass);
@@ -121,14 +122,14 @@ public class DocumentEndPoint extends ExtendController<MCDADocument> {
 
 
     @ApiOperation(value = "修改CDADocuments")
-    @RequestMapping(value = ServiceApi.Standards.Document, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Standards.Document, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MCDADocument updateCDADocuments(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
             @RequestParam(value = "version") String version,
             @ApiParam(name = "id", value = "编号")
             @PathVariable(value = "id") String id,
             @ApiParam(name = "model", value = "文档json数据模型")
-            @RequestParam(value = "model") String model
+            @RequestBody String model
             ) throws Exception {
 
         Class entityClass = getServiceEntity(version);

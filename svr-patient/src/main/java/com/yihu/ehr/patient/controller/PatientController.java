@@ -19,6 +19,7 @@ import org.csource.common.MyException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -142,11 +143,11 @@ public class PatientController extends BaseRestController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/populations",method = RequestMethod.POST)
+    @RequestMapping(value = "/populations",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "根据前端传回来的json创建一个人口信息")
     public MDemographicInfo createPatient(
             @ApiParam(name = "json_data", value = "身份证号", defaultValue = "")
-            @RequestParam(value = "json_data") String jsonData) throws Exception{
+            @RequestBody String jsonData) throws Exception{
         DemographicInfo demographicInfo = toEntity(jsonData, DemographicInfo.class);
         String pwd = "123456";
         demographicInfo.setPassword(HashUtil.hashStr(pwd));
@@ -161,11 +162,11 @@ public class PatientController extends BaseRestController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/populations",method = RequestMethod.PUT)
+    @RequestMapping(value = "/populations",method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "根据前端传回来的json修改人口信息")
     public MDemographicInfo updatePatient(
             @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
-            @RequestParam(value = "patient_model_json_data") String patientModelJsonData) throws Exception{
+            @RequestBody String patientModelJsonData) throws Exception{
         DemographicInfo demographicInfo = toEntity(patientModelJsonData, DemographicInfo.class);
         DemographicInfo old = demographicService.getDemographicInfo(new DemographicId(demographicInfo.getIdCardNo()));
         if(old==null)

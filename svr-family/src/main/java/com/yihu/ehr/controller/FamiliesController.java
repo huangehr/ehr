@@ -11,6 +11,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
@@ -64,11 +65,11 @@ public class FamiliesController extends BaseRestController {
         }
     }
 
-    @RequestMapping(value = "/families", method = RequestMethod.POST)
+    @RequestMapping(value = "/families", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建家庭关系")
     public MFamilies createFamily(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
-            @RequestParam(value = "json_data") String jsonData) throws Exception {
+            @RequestBody String jsonData) throws Exception {
 
         Families families = toEntity(jsonData,Families.class);
         families.setId(getObjectId((BizObject.Families)));
@@ -76,11 +77,11 @@ public class FamiliesController extends BaseRestController {
         return convertToModel(families,MFamilies.class);
     }
 
-    @RequestMapping(value = "/families", method = RequestMethod.PUT)
+    @RequestMapping(value = "/families", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改家庭关系")
     public MFamilies updateFamily(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
-            @RequestParam(value = "json_data") String jsonData) throws Exception {
+            @RequestBody String jsonData) throws Exception {
 
         Families families = toEntity(jsonData,Families.class);
         familiesService.updateFamilies(families);

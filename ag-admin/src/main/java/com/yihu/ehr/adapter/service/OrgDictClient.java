@@ -6,11 +6,9 @@ import com.yihu.ehr.model.adaption.MOrgDict;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
@@ -29,11 +27,11 @@ public interface OrgDictClient {
             @ApiParam(name = "id", value = "查询条件", defaultValue = "")
             @RequestParam(value = "id", required = false) long id);
 
-    @RequestMapping(value = "/adapter/org/dict", method = RequestMethod.POST)
+    @RequestMapping(value = "/adapter/org/dict", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建机构字典")
     MOrgDict createOrgDict(
             @ApiParam(name = "model", value = "字典信息", defaultValue = "")
-            @RequestParam(value = "model") String jsonData);
+            @RequestBody String jsonData);
 
 
     @RequestMapping(value = "/adapter/org/dict/{id}", method = RequestMethod.DELETE)
@@ -43,11 +41,11 @@ public interface OrgDictClient {
             @PathVariable(value = "id") long id);
 
 
-    @RequestMapping(value = "/adapter/org/dict", method = RequestMethod.PUT)
+    @RequestMapping(value = "/adapter/org/dict", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改机构字典")
     MOrgDict updateOrgDict(
             @ApiParam(name = "model", value = "字典信息", defaultValue = "")
-            @RequestParam(value = "model") String jsonData);
+            @RequestBody String jsonData);
 
 
     @RequestMapping(value = "/adapter/org/dicts", method = RequestMethod.GET)
