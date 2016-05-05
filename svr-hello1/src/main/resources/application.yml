@@ -1,8 +1,0 @@
-server:
-  port: 10001
-
-info:
-  app:
-    name: hello1Service
-    description: EHR platform hello1 service.
-    version: 1.0.0

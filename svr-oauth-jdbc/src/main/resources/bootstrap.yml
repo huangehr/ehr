@@ -1,3 +1,0 @@
-spring:
-  application:
-    name: svr-oauth-jdbc
