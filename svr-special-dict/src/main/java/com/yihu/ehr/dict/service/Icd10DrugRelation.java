@@ -4,6 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * ICD10特殊字典管理.
@@ -23,6 +24,8 @@ public class Icd10DrugRelation implements Serializable{
     private String id;
     private String icd10Id;
     private String drugId;
+    private String createUser;
+    private Date createDate;
 
     @Id
     @GeneratedValue(generator = "Generator")
@@ -49,5 +52,21 @@ public class Icd10DrugRelation implements Serializable{
     }
     public void setDrugId(String drugId) {
         this.drugId = drugId;
+    }
+
+    @Column(name = "create_user",  nullable = true)
+    public String getCreateUser() {
+        return createUser;
+    }
+    public void setCreateUser(String createUser) {
+        this.createUser = createUser;
+    }
+
+    @Column(name = "create_date",  nullable = true)
+    public Date getCreateDate() {
+        return createDate;
+    }
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
     }
 }

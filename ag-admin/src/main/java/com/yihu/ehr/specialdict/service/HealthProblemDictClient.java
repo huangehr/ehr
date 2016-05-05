@@ -95,7 +95,9 @@ public interface HealthProblemDictClient {
             @ApiParam(name = "hp_id", value = "健康问题Id")
             @RequestParam(value = "hp_id") String hpId,
             @ApiParam(name = "icd10_ids", value = "关联的icd10字典ids,多个以逗号连接")
-            @RequestParam(value = "icd10_ids") String icd10Ids);
+            @RequestParam(value = "icd10_ids") String icd10Ids,
+            @ApiParam(name = "create_user",value = "创建者")
+            @RequestParam(value = "create_user") String createUser);
 
     @RequestMapping(value = "/dict/hp/icd10", method = RequestMethod.PUT)
     @ApiOperation(value = "为健康问题修改ICD10疾病关联。" )
@@ -131,7 +133,7 @@ public interface HealthProblemDictClient {
 
     @RequestMapping(value = "/dict/hp/icd10s/no_paging", method = RequestMethod.GET)
     @ApiOperation(value = "根据健康问题查询相应的ICD10关联列表信息。" )
-    ResponseEntity<Collection<MHpIcd10Relation>> getHpIcd10RelationListWithoutPaging(
+    Collection<MHpIcd10Relation> getHpIcd10RelationListWithoutPaging(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters);
 

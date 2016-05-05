@@ -1,6 +1,7 @@
 package com.yihu.ehr.agModel.specialdict;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 医生
@@ -17,6 +18,8 @@ public class Icd10IndicatorRelationModel implements Serializable{
 	private String id;
 	private String icd10Id;
 	private String indicatorId;
+    private String createUser;
+    private Date createDate;
 
 	public String getId() {
 		return id;
@@ -41,4 +44,20 @@ public class Icd10IndicatorRelationModel implements Serializable{
 	public void setIndicatorId(String indicatorId) {
 		this.indicatorId = indicatorId;
 	}
+
+    public String getCreateUser() {
+        return createUser;
+    }
+
+    public void setCreateUser(String createUser) {
+        this.createUser = createUser;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
 }

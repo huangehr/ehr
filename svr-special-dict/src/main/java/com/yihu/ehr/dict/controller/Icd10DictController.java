@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -44,6 +45,7 @@ public class Icd10DictController extends BaseRestController {
             @RequestParam(value = "dictionary") String dictJson) throws Exception {
 
         Icd10Dict dict = toEntity(dictJson, Icd10Dict.class);
+        dict.setCreateDate(new Date());
         String id = getObjectId(BizObject.Dict);
         dict.setId(id);
         Icd10Dict  icd10Dict= icd10DictService.createDict(dict);
@@ -117,6 +119,7 @@ public class Icd10DictController extends BaseRestController {
 
         Icd10Dict dict = toEntity(dictJson, Icd10Dict.class);
         if (null == icd10DictService.retrieve(dict.getId())) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
+        dict.setUpdateDate(new Date());
         icd10DictService.save(dict);
         return convertToModel(dict, MIcd10Dict.class);
     }
@@ -197,6 +200,7 @@ public class Icd10DictController extends BaseRestController {
         Icd10DrugRelation relation = toEntity(dictJson, Icd10DrugRelation.class);
         String id = getObjectId(BizObject.Dict);
         relation.setId(id);
+        relation.setCreateDate(new Date());
         icd10DrugRelationService.save(relation);
         return convertToModel(relation, MIcd10DrugRelation.class, null);
     }
@@ -207,10 +211,14 @@ public class Icd10DictController extends BaseRestController {
             @ApiParam(name = "icd10_id", value = "健康问题Id")
             @RequestParam(value = "icd10_id") String icd10Id,
             @ApiParam(name = "drug_ids", value = "关联的药品字典ids,多个以逗号连接")
-            @RequestParam(value = "drug_ids") String drugIds) throws Exception {
+            @RequestParam(value = "drug_ids") String drugIds,
+            @ApiParam(name = "create_user",value = "创建者")
+            @RequestParam(value = "create_user") String createUser) throws Exception {
         Collection<Icd10DrugRelation> icd10DrugRelations = new ArrayList<>();
         for(String drugId : drugIds.split(",")){
             Icd10DrugRelation icd10DrugRelation = new Icd10DrugRelation();
+            icd10DrugRelation.setCreateUser(createUser);
+            icd10DrugRelation.setCreateDate(new Date());
             icd10DrugRelation.setIcd10Id(icd10Id);
             icd10DrugRelation.setDrugId(drugId);
             String id = getObjectId(BizObject.Dict);
@@ -315,6 +323,7 @@ public class Icd10DictController extends BaseRestController {
         Icd10IndicatorRelation relation = toEntity(dictJson, Icd10IndicatorRelation.class);
         String id = getObjectId(BizObject.Dict);
         relation.setId(id);
+        relation.setCreateDate(new Date());
         icd10IndicatorRelationService.save(relation);
         return convertToModel(relation, MIcd10IndicatorRelation.class, null);
     }
@@ -325,11 +334,15 @@ public class Icd10DictController extends BaseRestController {
             @ApiParam(name = "icd10_id", value = "健康问题Id")
             @RequestParam(value = "icd10_id") String icd10Id,
             @ApiParam(name = "indicator_ids", value = "关联的指标字典ids,多个以逗号连接")
-            @RequestParam(value = "indicator_ids") String indicatorIds) throws Exception{
+            @RequestParam(value = "indicator_ids") String indicatorIds,
+            @ApiParam(name = "create_user",value = "创建者")
+            @RequestParam(value = "create_user") String createUser) throws Exception{
 
         Collection<Icd10IndicatorRelation> relations = new ArrayList<>();
         for(String indicatorId : indicatorIds.split(",")){
             Icd10IndicatorRelation relation = new Icd10IndicatorRelation();
+            relation.setCreateUser(createUser);
+            relation.setCreateDate(new Date());
             relation.setIcd10Id(icd10Id);
             relation.setIndicatorId(indicatorId);
             String id = getObjectId(BizObject.Dict);
