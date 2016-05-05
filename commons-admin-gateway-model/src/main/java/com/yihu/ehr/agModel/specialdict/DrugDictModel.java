@@ -1,6 +1,7 @@
 package com.yihu.ehr.agModel.specialdict;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 医生
@@ -26,6 +27,10 @@ public class DrugDictModel implements Serializable{
 	private String unit;
 	private String specifications;
 	private String description;
+    private String createUser;
+    private Date createDate;
+    private String updateUser;
+    private Date updateDate;
 
 	public String getId() {
 		return id;
@@ -122,4 +127,36 @@ public class DrugDictModel implements Serializable{
 	public void setFlagName(String flagName) {
 		this.flagName = flagName;
 	}
+
+    public String getCreateUser() {
+        return createUser;
+    }
+
+    public void setCreateUser(String createUser) {
+        this.createUser = createUser;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public String getUpdateUser() {
+        return updateUser;
+    }
+
+    public void setUpdateUser(String updateUser) {
+        this.updateUser = updateUser;
+    }
+
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
 }

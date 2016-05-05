@@ -2,10 +2,8 @@ package com.yihu.ehr.feign;
 
 import com.yihu.ehr.constants.*;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 /**
@@ -15,8 +13,8 @@ import springfox.documentation.annotations.ApiIgnore;
 @ApiIgnore
 public interface PatientClient {
 
-    @RequestMapping(value = ApiVersion.Version1_0+"/populations",method = RequestMethod.POST)
-    void createPatient(@RequestParam(value = "json_data") String jsonData);
+    @RequestMapping(value = ApiVersion.Version1_0+"/populations",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    void createPatient(@RequestBody String jsonData);
 
 
     @RequestMapping(value = ApiVersion.Version1_0+"/populations/{id_card_no}/register",method = RequestMethod.GET)

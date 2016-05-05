@@ -9,6 +9,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,11 +43,11 @@ public class OrgMetaDataController extends ExtendController<MOrgMetaData> {
     }
 
 
-    @RequestMapping(value = "/meta", method = RequestMethod.POST)
+    @RequestMapping(value = "/meta", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增数据元")
     public MOrgMetaData createOrgMetaData(
             @ApiParam(name = "model", value = "数据模型", defaultValue = "")
-            @RequestParam(value = "model") String model) throws Exception {
+            @RequestBody String model) throws Exception {
 
         OrgMetaData orgMetaData = jsonToObj(model, OrgMetaData.class);
         orgMetaData.setColumnLength(orgMetaData.getColumnLength()==null? 0 : orgMetaData.getColumnLength());
@@ -76,11 +77,11 @@ public class OrgMetaDataController extends ExtendController<MOrgMetaData> {
         return true;
     }
 
-    @RequestMapping(value = "/meta", method = RequestMethod.PUT)
+    @RequestMapping(value = "/meta", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改数据元")
     public MOrgMetaData updateOrgMetaData(
             @ApiParam(name = "model", value = "数据模型", defaultValue = "")
-            @RequestParam(value = "model") String model) throws Exception {
+            @RequestBody String model) throws Exception {
 
         OrgMetaData dataModel = jsonToObj(model, OrgMetaData.class);
         dataModel.setUpdateDate(new Date());

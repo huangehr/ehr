@@ -11,6 +11,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -66,11 +67,11 @@ public class AdapterOrgController extends ExtendController<MAdapterOrg> {
     }
 
 
-    @RequestMapping(value = "/org", method = RequestMethod.POST)
+    @RequestMapping(value = "/org", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增采集标准")
     public MAdapterOrg addAdapterOrg(
             @ApiParam(name = "json_data", value = "采集机构模型", defaultValue = "")
-            @RequestParam(value = "json_data", required = false) String jsonData) throws Exception{
+            @RequestBody String jsonData) throws Exception{
 
         AdapterOrg adapterOrg = jsonToObj(jsonData, AdapterOrg.class);
         AdapterOrg exist = adapterOrgService.retrieve(adapterOrg.getCode());

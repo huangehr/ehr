@@ -1,6 +1,7 @@
 package com.yihu.ehr.model.specialdict;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 医生
@@ -21,6 +22,10 @@ public class MIcd10Dict implements Serializable{
 	private String chronicFlag;
 	private String infectiousFlag;
 	private String description;
+    private String createUser;
+    private Date createDate;
+    private String updateUser;
+    private Date updateDate;
 
 	public String getId() {
 		return id;
@@ -77,4 +82,32 @@ public class MIcd10Dict implements Serializable{
 	public void setDescription(String description) {
 		this.description = description;
 	}
+
+    public String getCreateUser() {
+        return createUser;
+    }
+    public void setCreateUser(String createUser) {
+        this.createUser = createUser;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public String getUpdateUser() {
+        return updateUser;
+    }
+    public void setUpdateUser(String updateUser) {
+        this.updateUser = updateUser;
+    }
+
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
 }

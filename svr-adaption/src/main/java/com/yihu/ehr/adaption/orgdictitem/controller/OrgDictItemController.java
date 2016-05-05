@@ -9,6 +9,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,11 +41,11 @@ public class OrgDictItemController extends ExtendController<MOrgDictItem> {
         return getModel(orgDictItemService.retrieve(id));
     }
 
-    @RequestMapping(value = "/item", method = RequestMethod.POST)
+    @RequestMapping(value = "/item", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增字典项")
     public MOrgDictItem createOrgDictItem(
             @ApiParam(name = "model", value = "数据模型", defaultValue = "")
-            @RequestParam(value = "model") String model) throws Exception{
+            @RequestBody String model) throws Exception{
 
         OrgDictItem orgDictItem = jsonToObj(model, OrgDictItem.class);
         if (orgDictItem.getSort() == 0)
@@ -78,11 +79,11 @@ public class OrgDictItemController extends ExtendController<MOrgDictItem> {
     }
 
 
-    @RequestMapping(value = "/item", method = RequestMethod.PUT)
+    @RequestMapping(value = "/item", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改字典项")
     public MOrgDictItem updateDictItem(
             @ApiParam(name = "model", value = "数据模型", defaultValue = "")
-            @RequestParam(value = "model") String model) throws Exception {
+            @RequestBody String model) throws Exception {
 
         OrgDictItem dataModel = jsonToObj(model, OrgDictItem.class);
         dataModel.setUpdateDate(new Date());

@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * ICD10特殊字典管理.
@@ -25,6 +26,10 @@ public class HealthProblemDict implements Serializable{
     private String code;
     private String name;
     private String description;
+    private String createUser;
+    private Date createDate;
+    private String updateUser;
+    private Date updateDate;
 
     @Id
     @GeneratedValue(generator = "Generator")
@@ -61,4 +66,35 @@ public class HealthProblemDict implements Serializable{
         this.description = description;
     }
 
+    @Column(name = "create_user",  nullable = true)
+    public String getCreateUser() {
+        return createUser;
+    }
+    public void setCreateUser(String createUser) {
+        this.createUser = createUser;
+    }
+
+    @Column(name = "create_date",  nullable = true)
+    public Date getCreateDate() {
+        return createDate;
+    }
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    @Column(name = "update_user",  nullable = true)
+    public String getUpdateUser() {
+        return updateUser;
+    }
+    public void setUpdateUser(String updateUser) {
+        this.updateUser = updateUser;
+    }
+
+    @Column(name = "update_date",  nullable = true)
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
 }

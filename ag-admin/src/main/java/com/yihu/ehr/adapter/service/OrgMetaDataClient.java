@@ -6,11 +6,9 @@ import com.yihu.ehr.model.adaption.MOrgMetaData;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
@@ -30,11 +28,11 @@ public interface OrgMetaDataClient {
             @PathVariable(value = "id") long id);
 
 
-    @RequestMapping(value = "/adapter/org/meta", method = RequestMethod.POST)
+    @RequestMapping(value = "/adapter/org/meta", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增数据元")
     MOrgMetaData createOrgMetaData(
             @ApiParam(name = "model", value = "json_data", defaultValue = "")
-            @RequestParam(value = "model") String jsonData);
+            @RequestBody String jsonData);
 
 
     @RequestMapping(value = "/adapter/org/meta/{id}", method = RequestMethod.DELETE)
@@ -49,11 +47,11 @@ public interface OrgMetaDataClient {
             @ApiParam(name = "ids", value = "编号集", defaultValue = "")
             @RequestParam(value = "ids") String ids);
 
-    @RequestMapping(value = "/adapter/org/meta", method = RequestMethod.PUT)
+    @RequestMapping(value = "/adapter/org/meta", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改数据元")
     MOrgMetaData updateOrgMetaData(
             @ApiParam(name = "model", value = "json_data", defaultValue = "")
-            @RequestParam(value = "model") String jsonData);
+            @RequestBody String jsonData);
 
 
     @RequestMapping(value = "/adapter/org/page", method = RequestMethod.GET)

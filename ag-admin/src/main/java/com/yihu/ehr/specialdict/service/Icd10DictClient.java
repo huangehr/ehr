@@ -102,7 +102,9 @@ public interface Icd10DictClient {
             @ApiParam(name = "icd10_id", value = "健康问题Id")
             @RequestParam(value = "icd10_id") String icd10Id,
             @ApiParam(name = "drug_ids", value = "关联的药品字典ids,多个以逗号连接")
-            @RequestParam(value = "drug_ids") String drugIds);
+            @RequestParam(value = "drug_ids") String drugIds,
+            @ApiParam(name = "create_user",value = "创建者")
+            @RequestParam(value = "create_user") String createUser);
 
     @RequestMapping(value = "/dict/icd10/drug", method = RequestMethod.PUT)
     @ApiOperation(value = "为ICD10修改药品关联。" )
@@ -164,7 +166,9 @@ public interface Icd10DictClient {
             @ApiParam(name = "icd10_id", value = "健康问题Id")
             @RequestParam(value = "icd10_id") String icd10Id,
             @ApiParam(name = "indicator_ids", value = "关联的指标字典ids,多个以逗号连接")
-            @RequestParam(value = "indicator_ids") String indicatorIds);
+            @RequestParam(value = "indicator_ids") String indicatorIds,
+            @ApiParam(name = "create_user",value = "创建者")
+            @RequestParam(value = "create_user") String createUser);
 
     @RequestMapping(value = "/dict/icd10/indicator", method = RequestMethod.PUT)
     @ApiOperation(value = "为ICD10修改指标关联。" )

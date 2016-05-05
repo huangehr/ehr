@@ -9,11 +9,9 @@ import com.yihu.ehr.model.standard.MStdDictEntry;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
@@ -44,16 +42,16 @@ public interface DictClient {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version)throws Exception;
 
-    @RequestMapping(value = ServiceApi.Standards.Dictionaries, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.Dictionaries, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增字典")
     MStdDict addDict(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
             @RequestParam(value = "version") String stdVersion,
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
-            @RequestParam(value = "model") String model);
+            @RequestBody String model);
 
 
-    @RequestMapping(value = ServiceApi.Standards.Dictionary, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Standards.Dictionary, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改字典")
     MStdDict updateDict(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
@@ -61,7 +59,7 @@ public interface DictClient {
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") long id,
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
-            @RequestParam(value = "model") String model);
+            @RequestBody String model);
 
 
     @RequestMapping(value = ServiceApi.Standards.Dictionary, method = RequestMethod.DELETE)
@@ -110,19 +108,19 @@ public interface DictClient {
 
 
     //以下是字典项
-    @RequestMapping(value = ServiceApi.Standards.Entries, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.Entries, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增字典项")
     MStdDictEntry addDictEntry(
             @RequestParam(value = "version") String version,
-            @RequestParam(value = "model") String model);
+            @RequestBody String model);
 
 
-    @RequestMapping(value = ServiceApi.Standards.Entry, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Standards.Entry, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改字典项")
     MStdDictEntry updateDictEntry(
             @RequestParam(value = "version") String version,
             @PathVariable(value = "id") long id,
-            @RequestParam(value = "model") String model) ;
+            @RequestBody String model) ;
 
 
     @RequestMapping(value = ServiceApi.Standards.Entries, method = RequestMethod.GET)

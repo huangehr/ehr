@@ -6,11 +6,9 @@ import com.yihu.ehr.model.family.MMembers;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
@@ -37,21 +35,21 @@ public interface MembersClient {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) ;
 
-    @RequestMapping(value = "/families/{families_id}members", method = RequestMethod.POST)
+    @RequestMapping(value = "/families/{families_id}members", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建家庭成员")
     MMembers createMember(
             @ApiParam(name = "families_id", value = "家庭关系ID", defaultValue = "")
             @PathVariable(value = "families_id") String familiesId,
             @ApiParam(name = "json_data", value = "", defaultValue = "")
-            @RequestParam(value = "json_data") String jsonData) ;
+            @RequestBody String jsonData) ;
 
-    @RequestMapping(value = "/families/{families_id}members", method = RequestMethod.PUT)
+    @RequestMapping(value = "/families/{families_id}members", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改家庭成员")
     MMembers updateMember(
             @ApiParam(name = "families_id", value = "家庭关系ID", defaultValue = "")
             @PathVariable(value = "families_id") String familiesId,
             @ApiParam(name = "json_data", value = "", defaultValue = "")
-            @RequestParam(value = "json_data") String jsonData) ;
+            @RequestBody String jsonData) ;
 
     @RequestMapping(value = "/families/{families_id}members{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取家庭成员")

@@ -17,6 +17,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -80,11 +81,11 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
     }
 
 
-    @RequestMapping(value = "/plan", method = RequestMethod.POST)
+    @RequestMapping(value = "/plan", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "保存适配方案")
     public MAdapterPlan saveAdapterPlan(
             @ApiParam(name = "parmJson", value = "数据模型", defaultValue = "")
-            @RequestParam(value = "parmJson") String parmJson,
+            @RequestBody String parmJson,
             @ApiParam(name = "isCover", value = "是否覆盖", defaultValue = "")
             @RequestParam(value = "isCover") String isCover) throws Exception {
 
@@ -92,13 +93,13 @@ public class OrgAdapterPlanController extends ExtendController<MAdapterPlan> {
     }
 
 
-    @RequestMapping(value = "/plan/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/plan/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "更新适配方案")
     public MAdapterPlan updateAdapterPlan(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") Long id,
             @ApiParam(name = "parmJson", value = "数据模型", defaultValue = "")
-            @RequestParam(value = "parmJson") String parmJson) throws Exception {
+            @RequestBody String parmJson) throws Exception {
 
         return getModel(saveModel(parmJson, "", id));
     }

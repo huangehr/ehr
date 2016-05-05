@@ -1,23 +1,10 @@
-package com.yihu.ehr.resource.model;
+package com.yihu.ehr.model.resource;
 
-import org.apache.hadoop.hbase.shaded.org.codehaus.jackson.annotate.JsonProperty;
-import org.apache.hadoop.hbase.shaded.org.codehaus.jackson.annotate.JsonRawValue;
-import org.apache.hadoop.hbase.shaded.org.codehaus.jackson.annotate.JsonSetter;
-import org.apache.htrace.fasterxml.jackson.annotation.JsonGetter;
-import org.apache.htrace.fasterxml.jackson.annotation.JsonInclude;
-import org.hibernate.annotations.GenericGenerator;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
-
-import javax.persistence.*;
 /**
- * Created by hzp on 2016/4/21.
+ * Created by hzp on 2016/5/4.
  * 资源列表
  */
-@Entity
-@Table(name = "rs_resources")
-@Access(value = AccessType.PROPERTY)
-public class RsResources {
+public class MRsResources {
     private String id;
     private String code;
     private String name;
@@ -28,10 +15,6 @@ public class RsResources {
     private String relatedDatasets;
     private String description;
 
-    @Id
-    @GeneratedValue(generator = "Generator")
-    @GenericGenerator(name = "Generator", strategy = "assigned")
-    @Column(name = "id", unique = true, nullable = false)
     public String getId() {
         return id;
     }
@@ -39,7 +22,6 @@ public class RsResources {
         this.id = id;
     }
 
-    @Column(name="code",nullable = false)
     public String getCode() {
         return code;
     }
@@ -47,7 +29,6 @@ public class RsResources {
         this.code = code;
     }
 
-    @Column(name="name",nullable = false)
     public String getName() {
         return name;
     }
@@ -55,7 +36,6 @@ public class RsResources {
         this.name = name;
     }
 
-    @Column(name="category_id",nullable=false)
     public String getCategoryId() {
         return categoryId;
     }
@@ -63,7 +43,6 @@ public class RsResources {
         this.categoryId = categoryId;
     }
 
-    @Column(name="type",nullable = false)
     public String getType() {
         return type;
     }
@@ -71,7 +50,6 @@ public class RsResources {
         this.type = type;
     }
 
-    @Column(name="related_action")
     public String getRelatedAction() {
         return relatedAction;
     }
@@ -79,7 +57,6 @@ public class RsResources {
         this.relatedAction = relatedAction;
     }
 
-    @Column(name="related_datasource")
     public String getRelatedDatasource() {
         return relatedDatasource;
     }
@@ -87,7 +64,6 @@ public class RsResources {
         this.relatedDatasource = relatedDatasource;
     }
 
-    @Column(name="related_datasets")
     public String getRelatedDatasets() {
         return relatedDatasets;
     }
@@ -95,7 +71,6 @@ public class RsResources {
         this.relatedDatasets = relatedDatasets;
     }
 
-    @Column(name="description")
     public String getDescription() {
         return description;
     }
