@@ -87,9 +87,7 @@ public class DictController extends ExtendController<MStdDict> {
 //            throw errRepeatCode();
 
         dict.setCreateDate(new Date());
-        if(dictService.add(dict, version))
-            return getModel(dict);
-         return null;
+        return getModel(dictService.insert(dict));
     }
 
 

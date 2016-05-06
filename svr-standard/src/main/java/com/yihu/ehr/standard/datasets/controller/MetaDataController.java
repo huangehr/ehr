@@ -160,9 +160,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
             @RequestBody String model) throws Exception{
 
         BaseMetaData metaData = (BaseMetaData) jsonToObj(model, getServiceEntity(version));
-        if(metaDataService.saveMetaData(metaData, version))
-            return getModel(metaData);
-        return null;
+        return getModel(metaDataService.insert(metaData));
     }
 
 

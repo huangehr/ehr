@@ -136,9 +136,8 @@ public class DataSetEndPoint extends ExtendController<MStdDataSet> {
         BaseDataSet dataSet = (BaseDataSet) jsonToObj(model, entityClass);
 //        if (dataSetService.isExistByField("code", dataSet.getCode(), entityClass))
 //            throw new ApiException(ErrorCode.RapeatDataSetCode, "代码重复！");
-        if(dataSetService.add(dataSet, version))
-            return getModel(dataSet);
-        return null;
+
+        return getModel(dataSetService.insert(dataSet));
     }
 
 

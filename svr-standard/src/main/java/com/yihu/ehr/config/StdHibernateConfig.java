@@ -1,6 +1,7 @@
 package com.yihu.ehr.config;
 
 
+import com.yihu.ehr.query.ExtJdbcTemplate;
 import com.yihu.ehr.standard.datasets.service.BaseDataSet;
 import com.yihu.ehr.util.classpool.ClassPoolUtils;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -68,11 +69,18 @@ public class StdHibernateConfig extends HibernateConfig  {
     }
 
     @Bean
-    public HibernateTransactionManager transactionManager(SessionFactory sessionFactory){
+    public HibernateTransactionManager transactionManager(SessionFactory sessionFactory, BasicDataSource dataSource){
         HibernateTransactionManager transactionManager = new HibernateTransactionManager();
         transactionManager.setSessionFactory(sessionFactory);
-
+        transactionManager.setDataSource(dataSource);
         return transactionManager;
+    }
+
+
+    @Bean
+    public ExtJdbcTemplate jdbcTemplate(BasicDataSource dataSource){
+
+        return  new ExtJdbcTemplate(dataSource);
     }
 
     //创建基于版本的实体类
