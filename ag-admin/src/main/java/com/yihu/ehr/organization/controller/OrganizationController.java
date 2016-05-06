@@ -1,10 +1,16 @@
 package com.yihu.ehr.organization.controller;
 
 import com.yihu.ehr.SystemDict.service.ConventionalDictEntryClient;
+import com.yihu.ehr.adapter.service.AdapterOrgClient;
+import com.yihu.ehr.adapter.service.PlanClient;
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.geography.service.AddressClient;
+import com.yihu.ehr.model.adaption.MAdapterOrg;
+import com.yihu.ehr.model.adaption.MAdapterPlan;
+import com.yihu.ehr.model.profile.MTemplate;
+import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.model.dict.MConventionalDict;
@@ -14,6 +20,8 @@ import com.yihu.ehr.security.service.SecurityClient;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.agModel.org.OrgDetailModel;
 import com.yihu.ehr.model.security.MKey;
+import com.yihu.ehr.template.service.TemplateClient;
+import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import com.yihu.ehr.util.operator.DateUtil;
@@ -51,6 +59,18 @@ public class OrganizationController extends BaseController {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserClient userClient;
+
+    @Autowired
+    private AdapterOrgClient adapterOrgClient;
+
+    @Autowired
+    private PlanClient planClient;
+
+    @Autowired
+    private TemplateClient templateClient;
 
     @RequestMapping(value = "/organizations", method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询机构列表")
@@ -142,7 +162,30 @@ public class OrganizationController extends BaseController {
             if (StringUtils.isEmpty(orgCode)) {
                 return failed("机构代码不能为空！");
             }
-
+            //用户
+            ResponseEntity<List<MUser>> userEntity = userClient.searchUsers("", "organization="+orgCode, "", 1, 1);
+            List<MUser> users = userEntity.getBody();
+            if(users.size()>0){
+                return failed("删除失败!该组织机构下面存在用户，请先删除用户！");
+            }
+            //第三方标准
+            ResponseEntity<Collection<MAdapterOrg>> mAdapterEntity = adapterOrgClient.searchAdapterOrg("", "org="+orgCode, "", 1, 1);
+            List<MAdapterOrg> mAdapterOrgs = (List<MAdapterOrg>) mAdapterEntity.getBody();
+            if(mAdapterOrgs.size()>0){
+                return failed("删除失败!该组织机构下面存在第三方标准，请先删除第三方标准！");
+            }
+            //标准适配
+            ResponseEntity<Collection<MAdapterPlan>> mAdapterPlanEntity = planClient.searchAdapterPlan("", "org="+orgCode, "", 1, 1);
+            List<MAdapterPlan> mAdapterPlans = (List<MAdapterPlan>) mAdapterPlanEntity.getBody();
+            if(mAdapterPlans.size()>0){
+                return failed("删除失败!该组织机构下面存在标准适配，请先删除标准适配！");
+            }
+            //模板管理
+            ResponseEntity<Collection<MTemplate>> mTemplateEntity = templateClient.getTemplates("", "organizationCode="+orgCode, "", 1, 1);
+            List<MTemplate> mTemplates = (List<MTemplate>) mTemplateEntity.getBody();
+            if(mTemplates.size()>0){
+                return failed("删除失败!该组织机构下面存在模板，请先删除模板！");
+            }
             if (!securityClient.deleteKeyByOrgCode(orgCode)) {
                 return failed("删除失败!");
             }
