@@ -119,7 +119,7 @@ public class DataSetEndPoint extends ExtendController<MStdDataSet> {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version) {
         Class entityClass = getServiceEntity(version);
-        List<BaseDataSet> list = dataSetService.search(entityClass,"id="+ids);
+        List<BaseDataSet> list = dataSetService.search(entityClass,"", "id="+ids, "+id");
         return convertToModels(list, new ArrayList<>(list.size()), MStdDataSet.class, "");
     }
 

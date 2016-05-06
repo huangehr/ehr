@@ -56,8 +56,13 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
             HttpServletResponse response) throws Exception{
 
         Class entityClass = getServiceEntity(version);
-        List ls = metaDataService.search(entityClass, fields, filters, sorts, page, size);
-        pagedResponse(request, response, metaDataService.getCount(entityClass, filters), page, size);
+        List ls;
+        if(size == -1)
+            ls = metaDataService.search(entityClass, fields, filters, sorts);
+        else{
+            ls = metaDataService.search(entityClass, fields, filters, sorts, page, size);
+            pagedResponse(request, response, metaDataService.getCount(entityClass, filters), page, size);
+        }
         return convertToModels(ls, new ArrayList<>(ls.size()), MStdMetaData.class, fields);
     }
 
