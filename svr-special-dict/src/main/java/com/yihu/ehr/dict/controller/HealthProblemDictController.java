@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -46,6 +47,7 @@ public class HealthProblemDictController extends BaseRestController {
         HealthProblemDict dict = toEntity(dictJson, HealthProblemDict.class);
         String id = getObjectId(BizObject.Dict);
         dict.setId(id);
+        dict.setCreateDate(new Date());
         HealthProblemDict healthProblemDict = hpDictService.createDict(dict);
         return convertToModel(healthProblemDict, MHealthProblemDict.class, null);
     }
@@ -100,6 +102,7 @@ public class HealthProblemDictController extends BaseRestController {
 
         HealthProblemDict dict = toEntity(dictJson, HealthProblemDict.class);
         if (null == hpDictService.retrieve(dict.getId())) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
+        dict.setUpdateDate(new Date());
         hpDictService.save(dict);
         return convertToModel(dict, MHealthProblemDict.class);
     }
@@ -171,6 +174,7 @@ public class HealthProblemDictController extends BaseRestController {
         HpIcd10Relation relation = toEntity(dictJson, HpIcd10Relation.class);
         String id = getObjectId(BizObject.Dict);
         relation.setId(id);
+        relation.setCreateDate(new Date());
         hpIcd10RelationService.save(relation);
         return convertToModel(relation, MHpIcd10Relation.class, null);
     }
@@ -181,10 +185,14 @@ public class HealthProblemDictController extends BaseRestController {
             @ApiParam(name = "hp_id", value = "健康问题Id")
             @RequestParam(value = "hp_id") String hpId,
             @ApiParam(name = "icd10_ids", value = "关联的icd10字典ids,多个以逗号连接")
-            @RequestParam(value = "icd10_ids") String icd10Ids) throws Exception {
+            @RequestParam(value = "icd10_ids") String icd10Ids,
+            @ApiParam(name = "create_user",value = "创建者")
+            @RequestParam(value = "create_user") String createUser) throws Exception {
         Collection<MHpIcd10Relation> mHpIcd10Relations = new ArrayList<>();
         for(String icd10Id : icd10Ids.split(",")){
             HpIcd10Relation relation = new HpIcd10Relation();
+            relation.setCreateUser(createUser);
+            relation.setCreateDate(new Date());
             relation.setHpId(hpId);
             relation.setIcd10Id(icd10Id);
             String id = getObjectId(BizObject.Dict);

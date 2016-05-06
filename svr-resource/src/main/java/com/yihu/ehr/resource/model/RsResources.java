@@ -1,10 +1,15 @@
 package com.yihu.ehr.resource.model;
 
+import org.apache.hadoop.hbase.shaded.org.codehaus.jackson.annotate.JsonProperty;
+import org.apache.hadoop.hbase.shaded.org.codehaus.jackson.annotate.JsonRawValue;
+import org.apache.hadoop.hbase.shaded.org.codehaus.jackson.annotate.JsonSetter;
+import org.apache.htrace.fasterxml.jackson.annotation.JsonGetter;
+import org.apache.htrace.fasterxml.jackson.annotation.JsonInclude;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 
-import javax.annotation.Generated;
 import javax.persistence.*;
-
 /**
  * Created by hzp on 2016/4/21.
  * 资源列表
@@ -13,7 +18,6 @@ import javax.persistence.*;
 @Table(name = "rs_resources")
 @Access(value = AccessType.PROPERTY)
 public class RsResources {
-
     private String id;
     private String code;
     private String name;

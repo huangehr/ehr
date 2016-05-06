@@ -2,6 +2,7 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
+import com.yihu.ehr.model.resource.MRsDimensionCategory;
 import com.yihu.ehr.resource.model.RsDimensionCategory;
 import com.yihu.ehr.resource.service.intf.IDimensionCategoryService;
 import com.yihu.ehr.util.controller.BaseRestController;
@@ -10,6 +11,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,25 +35,25 @@ public class DimensionCategoryController extends BaseRestController{
 
     @ApiOperation("创建维度类别")
     @RequestMapping(method = RequestMethod.POST)
-    public RsDimensionCategory createDimensionCategory(
+    public MRsDimensionCategory createDimensionCategory(
             @ApiParam(name="dimensionCategory",value="维度类别",defaultValue = "")
             @RequestParam(name="dimensionCategory")String dimensionCategory) throws Exception
     {
         RsDimensionCategory dmc = toEntity(dimensionCategory,RsDimensionCategory.class);
         dmc.setId(getObjectId(BizObject.DimensionsCategories));
         dmcService.createDimensionCategory(dmc);
-        return dmc;
+        return convertToModel(dmc,MRsDimensionCategory.class);
     }
 
     @ApiOperation("更新维度类别")
     @RequestMapping(method = RequestMethod.PUT)
-    public RsDimensionCategory updateDimensionCategory(
+    public MRsDimensionCategory updateDimensionCategory(
             @ApiParam(name="dimensionCategory",value="维度类别",defaultValue="")
             @RequestParam(name="dimensionCategory")String dimensionCategory) throws Exception
     {
         RsDimensionCategory  dmc= toEntity(dimensionCategory,RsDimensionCategory.class);
         dmcService.updateDimensionCategory(dmc);
-        return dmc;
+        return convertToModel(dmc,MRsDimensionCategory.class);
     }
 
     @ApiOperation("维度类别删除")
@@ -64,7 +68,7 @@ public class DimensionCategoryController extends BaseRestController{
 
     @ApiOperation("维度类别查询")
     @RequestMapping(value="",method = RequestMethod.GET)
-    public Collection<RsDimensionCategory> queryCategories(
+    public Page<MRsDimensionCategory> queryCategories(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(name="fields",required = false)String fields,
             @ApiParam(name="filters",value="过滤",defaultValue = "")
@@ -78,18 +82,27 @@ public class DimensionCategoryController extends BaseRestController{
             HttpServletRequest request,
             HttpServletResponse response) throws Exception
     {
+        Pageable pageable = new PageRequest(reducePage(page),size);
+        long total = 0;
+        Collection<MRsDimensionCategory> rsDimCateGoryList;
+
         //过滤条件为空
         if(StringUtils.isEmpty(filters))
         {
             Page<RsDimensionCategory> dmcs = dmcService.getDimensionCategories(sorts,reducePage(page),size);
-            pagedResponse(request,response,dmcs.getTotalElements(),page,size);
-            return convertToModels(dmcs.getContent(),new ArrayList<>(dmcs.getNumber()),RsDimensionCategory.class,fields);
+            total = dmcs.getTotalElements();
+            rsDimCateGoryList = convertToModels(dmcs.getContent(),new ArrayList<>(dmcs.getNumber()),MRsDimensionCategory.class,fields);
         }
         else
         {
             List<RsDimensionCategory> dmcs = dmcService.search(fields,filters,sorts,page,size);
-            pagedResponse(request,response,dmcService.getCount(filters),page,size);
-            return convertToModels(dmcs,new ArrayList<>(dmcs.size()),RsDimensionCategory.class,fields);
+            total = dmcService.getCount(filters);
+            rsDimCateGoryList =  convertToModels(dmcs,new ArrayList<>(dmcs.size()),MRsDimensionCategory.class,fields);
         }
+
+        pagedResponse(request,response,total,page,size);
+        Page<MRsDimensionCategory> rsPage = new PageImpl<MRsDimensionCategory>((List<MRsDimensionCategory>)rsDimCateGoryList,pageable,total);
+
+        return rsPage;
     }
 }

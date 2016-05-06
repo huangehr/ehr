@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -42,6 +43,7 @@ public class DrugDictController extends BaseRestController {
         DrugDict dict = toEntity(dictJson, DrugDict.class);
         String id = getObjectId(BizObject.Dict);
         dict.setId(id);
+        dict.setCreateDate(new Date());
         DrugDict drugDict = drugDictService.createDict(dict);
 
         return convertToModel(drugDict, MDrugDict.class, null);
@@ -75,6 +77,7 @@ public class DrugDictController extends BaseRestController {
 
         DrugDict dict = toEntity(dictJson, DrugDict.class);
         if (null == drugDictService.retrieve(dict.getId())) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
+        dict.setUpdateDate(new Date());
         drugDictService.save(dict);
         return convertToModel(dict, MDrugDict.class);
     }

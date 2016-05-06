@@ -1,7 +1,7 @@
 package com.yihu.ehr.resource.service;
 
 
-import com.yihu.ehr.resource.common.DataGridResult;
+import com.yihu.ehr.query.common.model.DataList;
 import com.yihu.ehr.resource.dao.ResourcesDao;
 import com.yihu.ehr.resource.dao.ResourcesQueryDao;
 import com.yihu.ehr.resource.model.ResourcesType;
@@ -34,10 +34,9 @@ public class ResourcesQueryService implements IResourcesQueryService {
      * @return
      * @throws Exception
      */
-    public DataGridResult getResources(String resourcesCode,String appId,String queryParams,Integer page,Integer size) throws Exception {
-
+    public DataList getResources(String resourcesCode,String appId,String queryParams,Integer page,Integer size) throws Exception {
         //获取资源信息
-        RsResources rs = null;//resourcesDao.findByCode(resourcesCode);
+        RsResources rs = resourcesDao.findByCode(resourcesCode);
         if(true)
         {
             //资源结构/权限
