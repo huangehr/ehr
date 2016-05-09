@@ -69,20 +69,23 @@ public class TemplateService extends BaseJpaService<Template, XTemplateRepositor
      * @return
      */
     public Map<Template, MCDADocument> getOrganizationTemplates(String orgCode, String cdaVersion, String cdaType) {
-        List<Template> templates = getRepo().findByOrganizationCodeAndCdaVersion(orgCode, cdaVersion);
+        // 机构模板
+        List<Template> templates = getRepo().findByOrganizationCodeAndCdaVersionAndCdaDocumentIdIsNotNull(orgCode, cdaVersion);
         List<String> cdaDocumentIdList = new ArrayList<>(templates.size());
         cdaDocumentIdList.addAll(templates.stream().map(template -> template.getCdaDocumentId()).collect(Collectors.toList()));
 
         if (cdaDocumentIdList.size() == 0) return null;
 
-        List<MCDADocument> documentList = cdaDocumentClient.getCDADocumentByIds(
+        // 指定CDA类别下的文档列表
+        List<MCDADocument> documentList = cdaDocumentClient.getCDADocuments(
                 "id,name",
-                "id=" + String.join(",", cdaDocumentIdList) + "&type=" + cdaType,
+                "id=" + String.join(",", cdaDocumentIdList) + ";type=" + cdaType,
                 "+name",
                 1000,
                 1,
                 cdaVersion);
 
+        // 与机构定制的模板对比
         Map<Template, MCDADocument> cdaDocumentMap =  new TreeMap<>();
         for (MCDADocument document : documentList){
             String cdaDocumentId = document.getId();

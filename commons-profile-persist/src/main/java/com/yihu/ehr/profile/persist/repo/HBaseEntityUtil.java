@@ -52,12 +52,14 @@ public class HBaseEntityUtil {
 
             String value = record.getCellValue(column.family(), column.value(), null);
             Object targetValue = null;
-            if (returnType == Enum.class){
-                targetValue = returnType.getEnumConstants()[Integer.parseInt(value)];
-            } else if (returnType == Date.class){
-                targetValue = DateTimeUtils.utcDateTimeParse(value);
-            } else {
-                targetValue = value;
+            if(value != null){
+                if (returnType.getSuperclass() == Enum.class){
+                    targetValue = returnType.getEnumConstants()[Integer.parseInt(value)];
+                } else if (returnType == Date.class){
+                    targetValue = DateTimeUtils.utcDateTimeParse(value);
+                } else {
+                    targetValue = value;
+                }
             }
 
             setter.invoke(entity, returnType.cast(targetValue));

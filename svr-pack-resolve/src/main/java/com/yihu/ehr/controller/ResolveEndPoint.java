@@ -89,6 +89,8 @@ public class ResolveEndPoint {
             @RequestPart() MultipartFile file,
             @ApiParam("档案包密码")
             @RequestParam("password") String password,
+            @ApiParam(value = "档案包密码", defaultValue = "usa911Em")
+            @RequestParam("clientId") String clientId,
             @ApiParam(value = "是否入库")
             @RequestParam(value = "persist", defaultValue = "false") boolean persist) throws FileNotFoundException {
 
@@ -102,10 +104,12 @@ public class ResolveEndPoint {
             MPackage pack = new MPackage();
             pack.setPwd(password);
             pack.setId(packageId);
-            pack.setClientId("kHAbVppx44");
+            pack.setClientId(clientId);
             pack.setArchiveStatus(ArchiveStatus.Received);
 
             StdProfile profile = resolveEngine.doResolve(pack, zipFile);
+            profile.setClientId(clientId);
+
             if(persist) profileService.saveProfile(profile);
 
             return new ResponseEntity<>(profile.toJson(), HttpStatus.OK);

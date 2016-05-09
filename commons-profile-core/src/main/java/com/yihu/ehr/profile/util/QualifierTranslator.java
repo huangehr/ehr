@@ -16,11 +16,11 @@ public class QualifierTranslator {
     /**
      * 以数据内部标识为基础，数据类型为辅助，产生一个HBase列名。
      *
-     * @param innerCode
+     * @param metaData
      * @return
      */
-    public static String hBaseQualifier(String innerCode, String type){
-        return new StringBuilderUtil("%1_%2").arg(innerCode).arg(type.substring(0, 1).toUpperCase()).toString();
+    public static String hBaseQualifier(String metaData, String type){
+        return new StringBuilderUtil("%1_%2").arg(metaData).arg(type.substring(0, 1).toUpperCase()).toString();
     }
 
     public static String[] splitMetaData(String innerCode){

@@ -13,7 +13,7 @@ import java.util.List;
 public interface XTemplateRepository extends PagingAndSortingRepository<Template, Integer> {
     Template findByOrganizationCodeAndCdaDocumentIdAndCdaVersion(String orgCode, String cdaDocumentId, String cdaVersion);
 
-    List<Template> findByOrganizationCodeAndCdaVersion(String orgCode, String cdaVersion);
+    List<Template> findByOrganizationCodeAndCdaVersionAndCdaDocumentIdIsNotNull(String orgCode, String cdaVersion);
 
     @Query("SELECT count(e) FROM Template e WHERE e.title = ?1 AND e.cdaVersion = ?2 AND e.organizationCode = ?3")
     int countByTitleAndCdaVersionAndOrgCode(String title, String cdaVersion, String orgCode);

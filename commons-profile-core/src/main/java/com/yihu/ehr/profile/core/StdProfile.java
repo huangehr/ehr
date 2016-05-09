@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.text.ParseException;
 import java.util.*;
+
 import static com.yihu.ehr.profile.core.ProfileFamily.*;
 
 /**
@@ -40,13 +41,13 @@ public class StdProfile {
 
     protected Map<String, StdDataSet> dataSets = new TreeMap<>();
 
-    public StdProfile(){
+    public StdProfile() {
         cardId = "";
         orgCode = "";
         patientId = "";
         eventNo = "";
 
-        this.setProfileType(ProfileType.Standard);
+        setProfileType(ProfileType.Standard);
     }
 
     public String getId() {
@@ -73,7 +74,7 @@ public class StdProfile {
         this.profileId = new ProfileId(archiveId);
     }
 
-    @Column(value = BasicQualifier.ProfileType, family = ProfileFamily.Basic)
+    @Column(value = BasicColumns.ProfileType, family = ProfileFamily.Basic)
     public ProfileType getProfileType() {
         return profileType;
     }
@@ -82,7 +83,7 @@ public class StdProfile {
         this.profileType = profileType;
     }
 
-    @Column(value = BasicQualifier.EventType, family = ProfileFamily.Basic)
+    @Column(value = BasicColumns.EventType, family = ProfileFamily.Basic)
     public EventType getEventType() {
         return eventType;
     }
@@ -91,7 +92,7 @@ public class StdProfile {
         this.eventType = eventType;
     }
 
-    @Column(value = BasicQualifier.CdaVersion, family = ProfileFamily.Basic)
+    @Column(value = BasicColumns.CdaVersion, family = ProfileFamily.Basic)
     public String getCdaVersion() {
         return cdaVersion;
     }
@@ -100,7 +101,7 @@ public class StdProfile {
         this.cdaVersion = cdaVersion;
     }
 
-    @Column(value = BasicQualifier.CardId, family = ProfileFamily.Basic)
+    @Column(value = BasicColumns.CardId, family = ProfileFamily.Basic)
     public String getCardId() {
         return cardId;
     }
@@ -109,7 +110,7 @@ public class StdProfile {
         this.cardId = cardId;
     }
 
-    @Column(value = BasicQualifier.OrgCode, family = ProfileFamily.Basic)
+    @Column(value = BasicColumns.OrgCode, family = ProfileFamily.Basic)
     public String getOrgCode() {
         return orgCode;
     }
@@ -118,7 +119,7 @@ public class StdProfile {
         this.orgCode = orgCode;
     }
 
-    @Column(value = BasicQualifier.PatientId, family = ProfileFamily.Basic)
+    @Column(value = BasicColumns.PatientId, family = ProfileFamily.Basic)
     public String getPatientId() {
         return patientId;
     }
@@ -127,7 +128,7 @@ public class StdProfile {
         this.patientId = patientId;
     }
 
-    @Column(value = BasicQualifier.EventNo, family = ProfileFamily.Basic)
+    @Column(value = BasicColumns.EventNo, family = ProfileFamily.Basic)
     public String getEventNo() {
         return eventNo;
     }
@@ -136,7 +137,7 @@ public class StdProfile {
         this.eventNo = eventNo;
     }
 
-    @Column(value = BasicQualifier.DemographicId, family = ProfileFamily.Basic)
+    @Column(value = BasicColumns.DemographicId, family = ProfileFamily.Basic)
     public String getDemographicId() {
         return demographicId;
     }
@@ -145,7 +146,7 @@ public class StdProfile {
         this.demographicId = demographicId;
     }
 
-    @Column(value = BasicQualifier.EventDate, family = ProfileFamily.Basic)
+    @Column(value = BasicColumns.EventDate, family = ProfileFamily.Basic)
     public Date getEventDate() {
         return eventDate;
     }
@@ -154,7 +155,7 @@ public class StdProfile {
         this.eventDate = date;
     }
 
-    @Column(value = BasicQualifier.CreateDate, family = ProfileFamily.Basic)
+    @Column(value = BasicColumns.CreateDate, family = ProfileFamily.Basic)
     public Date getCreateDate() {
         if (createDate == null) createDate = new Date();
 
@@ -196,25 +197,31 @@ public class StdProfile {
         this.clientId = clientId;
     }
 
-    public String toJson(){
+    public String toJson() {
+         return jsonFormat().toString();
+    }
+
+    protected ObjectNode jsonFormat() {
         ObjectNode root = objectMapper.createObjectNode();
         root.put("id", getId().toString());
-        root.put("card_id", this.getCardId());
-        root.put("org_code", this.getOrgCode());
-        root.put("patient_id", this.getPatientId());
-        root.put("event_no", this.getEventNo());
-        root.put("event_date", this.getEventDate() == null ? "" : DateTimeUtils.utcDateTimeFormat(this.getEventDate()));
-        root.put("cda_version", this.getCdaVersion());
-        root.put("create_date", this.getCreateDate() == null ? "" : DateTimeUtils.utcDateTimeFormat(this.getCreateDate()));
-        root.put("event_type", this.getEventType().toString());
+        root.put("cardId", this.getCardId());
+        root.put("orgCode", this.getOrgCode());
+        root.put("patientId", this.getPatientId());
+        root.put("eventNo", this.getEventNo());
+        root.put("cdaVersion", this.getCdaVersion());
+        root.put("clientId", this.getClientId());
+        root.put("eventDate", DateTimeUtils.utcDateTimeFormat(this.getEventDate()));
+        root.put("createDate", DateTimeUtils.utcDateTimeFormat(this.getCreateDate()));
+        root.put("eventType", this.getEventType().toString());
+        root.put("profileType", this.getProfileType().toString());
 
-        ObjectNode dataSetsNode = root.putObject("data_sets");
-        for (String dataSetCode : dataSets.keySet()){
+        ObjectNode dataSetsNode = root.putObject("dataSets");
+        for (String dataSetCode : dataSets.keySet()) {
             StdDataSet dataSet = dataSets.get(dataSetCode);
             dataSetsNode.putPOJO(dataSetCode, dataSet.toJson());
         }
 
-        return root.toString();
+        return root;
     }
 
     public void regularRowKey() {

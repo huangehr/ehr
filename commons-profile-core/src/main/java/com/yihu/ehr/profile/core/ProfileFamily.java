@@ -9,11 +9,11 @@ package com.yihu.ehr.profile.core;
  * @created 2016.04.27 17:06
  */
 public class ProfileFamily{
+    // 列族
     public static final String Basic = "basic";
     public static final String Extension = "extension";
 
-    // 列
-    public static class BasicQualifier{
+    public static class BasicColumns {
         public static final String CardId = "card_id";
         public static final String OrgCode = "org_code";
         public static final String PatientId = "patient_id";
@@ -35,8 +35,8 @@ public class ProfileFamily{
      */
     public static String[] getFamilies() {
         return new String[]{
-                ProfileFamily.Basic.toString(),
-                ProfileFamily.Extension.toString()
+                ProfileFamily.Basic,
+                ProfileFamily.Extension
         };
     }
 
@@ -48,16 +48,16 @@ public class ProfileFamily{
     public static String[] getColumns(String family) {
         if (family.equals(ProfileFamily.Basic)) {
             return new String[]{
-                    BasicQualifier.CardId.toString(),
-                    BasicQualifier.OrgCode.toString(),
-                    BasicQualifier.PatientId.toString(),
-                    BasicQualifier.EventNo.toString(),
-                    BasicQualifier.EventDate.toString(),
-                    BasicQualifier.DemographicId.toString(),
-                    BasicQualifier.ClientId.toString(),
-                    BasicQualifier.CreateDate.toString(),
-                    BasicQualifier.DataSets.toString(),
-                    BasicQualifier.CdaVersion.toString()
+                    BasicColumns.CardId.toString(),
+                    BasicColumns.OrgCode.toString(),
+                    BasicColumns.PatientId.toString(),
+                    BasicColumns.EventNo.toString(),
+                    BasicColumns.EventDate.toString(),
+                    BasicColumns.DemographicId.toString(),
+                    BasicColumns.ClientId.toString(),
+                    BasicColumns.CreateDate.toString(),
+                    BasicColumns.DataSets.toString(),
+                    BasicColumns.CdaVersion.toString()
             };
         }
 

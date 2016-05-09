@@ -22,12 +22,12 @@ import java.util.List;
 @FeignClient(MicroServices.Standard)
 public interface XCDADocumentClient {
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Standards.Documents, method = RequestMethod.GET)
-    List<MCDADocument> getCDADocumentByIds(@RequestParam(value = "fields") String fields,
-                                                    @RequestParam(value = "filters") String filters,
-                                                    @RequestParam(value = "sorts") String sorts,
-                                                    @RequestParam(value = "size") int size,
-                                                    @RequestParam(value = "page") int page,
-                                                    @RequestParam(value = "version") String version);
+    List<MCDADocument> getCDADocuments(@RequestParam(value = "fields") String fields,
+                                       @RequestParam(value = "filters") String filters,
+                                       @RequestParam(value = "sorts") String sorts,
+                                       @RequestParam(value = "size") int size,
+                                       @RequestParam(value = "page") int page,
+                                       @RequestParam(value = "version") String version);
 
     @RequestMapping(value = ApiVersion.Version1_0 + "/std/cda_data_set_relationships/cda_id", method = RequestMethod.GET)
     List<MCdaDataSetRelationship> getCDADataSetRelationshipByCDAId(

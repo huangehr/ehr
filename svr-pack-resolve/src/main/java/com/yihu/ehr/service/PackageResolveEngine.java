@@ -32,7 +32,7 @@ public class PackageResolveEngine {
 
     Map<ProfileType, PackageResolver> packageResolvers;
 
-    private final static String TempPath = System.getProperty("java.io.tmpdir") + File.separatorChar;
+    private final static String TempPath = System.getProperty("java.io.tmpdir") + java.io.File.separator;
 
     /**
      * 执行归档作业。归档作为流程如下：
@@ -51,15 +51,15 @@ public class PackageResolveEngine {
                 throw new RuntimeException("Invalid package file, package id: " + pack.getId());
             }
 
-            StdProfile profile = ProfileFactory.generate(root);
+            StdProfile profile = ProfileFactory.createProfile(root);
             PackageResolver packageResolver;
             switch (profile.getProfileType()) {
                 case Standard:
                     packageResolver = packageResolvers.get(ProfileType.Standard);
                     break;
 
-                case Document:
-                    packageResolver = packageResolvers.get(ProfileType.Document);
+                case File:
+                    packageResolver = packageResolvers.get(ProfileType.File);
                     break;
 
                 case Link:
@@ -96,7 +96,7 @@ public class PackageResolveEngine {
     private void init() {
         packageResolvers = new HashMap<>();
         packageResolvers.put(Standard, context.getBean(StdPackageResolver.class));
-        packageResolvers.put(Document, context.getBean(DocumentPackageResolver.class));
+        packageResolvers.put(File, context.getBean(FilePackageResolver.class));
         packageResolvers.put(Link, context.getBean(LinkPackageResolver.class));
     }
 }

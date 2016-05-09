@@ -30,13 +30,12 @@ public class ProfileFactory {
      * @param root
      * @return
      */
-    public static StdProfile generate(File root) {
+    public static StdProfile createProfile(File root) {
         List<String> directories = CollectionUtils.arrayToList(root.list());
-        List<String> files = CollectionUtils.arrayToList(root.listFiles());
 
         if (directories.contains(StandardFolder) && directories.contains(OriginFolder)) {
             return new StdProfile();
-        } else if (directories.contains(DocumentFolder) && files.contains(MetaDataFile)) {
+        } else if (directories.contains(DocumentFolder)) {
             return new FileProfile();
         } else if (directories.size() == 1 && directories.contains(LinkFolder)) {
             return new LinkProfile();
@@ -45,9 +44,9 @@ public class ProfileFactory {
         return null;
     }
 
-    public static StdProfile generate(ProfileType type){
+    public static StdProfile createProfile(ProfileType type){
         switch(type){
-            case Document:
+            case File:
                 return new FileProfile();
 
             case Standard:

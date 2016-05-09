@@ -17,22 +17,21 @@ import java.util.*;
 @ConfigurationProperties(prefix = "cda-document-type-options")
 public class CdaDocumentTypeOptions {
     // 数据集代码与CDA类别ID之间的映射
-    Map<Integer, String> eventType = new HashMap<>();
+    Map<String, String> eventType = new HashMap<>();
 
-    public Map<Integer, String> getEventType() {
+    public Map<String, String> getEventType() {
         return eventType;
     }
 
     @PostConstruct
     public void postConstruct() {
-        Set<Integer> keys = new HashSet<>(this.eventType.keySet());
-        /*for (String key : keys) {
+        Set<String> keys = new HashSet<>(this.eventType.keySet());
+        for (String key : keys) {
             String value = this.eventType.remove(key);
 
             key = key.replaceAll("^\\d{1,2}\\.", "");
             this.eventType.put(key, value);
-            if(!key.contains(DataSetUtil.OriginDataSetFlag)) this.eventType.put(DataSetUtil.originDataSetCode(key), value);
-        }*/
+        }
     }
 
     public String getCdaDocumentTypeId(String eventType){

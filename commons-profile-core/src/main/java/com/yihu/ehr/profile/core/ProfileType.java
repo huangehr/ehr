@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum ProfileType {
     Standard(0),
-    Document(1),
+    File(1),
     Link(2);
 
     private int type;

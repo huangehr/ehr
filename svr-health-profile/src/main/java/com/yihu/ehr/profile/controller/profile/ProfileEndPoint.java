@@ -20,6 +20,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 /**
@@ -48,9 +50,6 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     private ProfileService profileService;
 
     @Autowired
-    private ProfileIndicesService indicesService;
-
-    @Autowired
     private ProfileUtil profileUtil;
 
     @ApiOperation(value = "搜索档案", notes = "返回符合条件的档案列表")
@@ -61,24 +60,16 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(value = "起始日期", defaultValue = "2015-10-01")
             @RequestParam("since") @DateTimeFormat(pattern = "yyyy-MM-dd") Date since,
             @ApiParam(value = "结束日期", defaultValue = "2016-10-01")
-            @RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd") Date to) throws Exception {
-        String demographicId = query.getDemographicId();
-        String orgCode = query.getOrganizationCode();
-        String patientId = query.getPatientId();
-        String eventNo = query.getEventNo();
-        String name = query.getName();
-        String telephone = query.getTelephone();
-        String gender = query.getGender();
-        Date birthday = DateTimeUtils.simpleDateParse(query.getBirthday());
+            @RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
 
-        Page<ProfileIndices> profileIndices = indicesService.findByIndices(orgCode, patientId, eventNo, since, to, null);
-        if (profileIndices == null || profileIndices.getContent().isEmpty()) {
-            profileIndices = indicesService.findByDemographic(demographicId, orgCode, name, telephone, gender, birthday, since, to, null);
-        }
-
+        Page<ProfileIndices> profileIndices = profileUtil.searchProfile(query, since, to);
         if (profileIndices == null || profileIndices.getContent().isEmpty()) {
             throw new ApiException(HttpStatus.NOT_FOUND, "No profile found with this query!");
         }
+
+        pagedResponse(request, response, (long)(profileIndices.getContent().size()), 1, 100);
 
         return profileUtil.loadAndConvertProfiles(profileIndices, false, false);
     }
@@ -131,7 +122,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             }
         }
 
-        if (templateId == null || cdaDocument == null) throw new ApiException(HttpStatus.NOT_FOUND, "Document not found.");
+        if (templateId == null || cdaDocument == null) throw new ApiException(HttpStatus.NOT_FOUND, "File not found.");
 
         return profileUtil.convertDocument(profile, cdaDocument, templateId, loadStdDataSet || loadStdDataSet);
     }

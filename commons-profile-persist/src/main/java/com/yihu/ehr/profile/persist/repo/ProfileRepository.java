@@ -8,6 +8,7 @@ import com.yihu.ehr.data.hbase.TableBundle;
 import com.yihu.ehr.data.hbase.HBaseDao;
 import com.yihu.ehr.data.hbase.ResultUtil;
 import com.yihu.ehr.profile.util.DataSetUtil;
+import com.yihu.ehr.profile.util.FileTableUtil;
 import com.yihu.ehr.profile.util.ProfileFactory;
 import com.yihu.ehr.profile.util.ProfileUtil;
 import org.apache.commons.lang.StringUtils;
@@ -17,7 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * 健康档案加载器. 可以根据健康档案ID或与之关联的事件ID加载档案.
@@ -33,31 +37,53 @@ public class ProfileRepository {
 
     public void save(StdProfile profile) throws IOException {
         // 先存档案
-        TableBundle profileBundle = new TableBundle();
-        profileBundle.addValues(profile.getId(), ProfileFamily.Basic, ProfileUtil.getBasicFamilyCellMap(profile));
-        hbaseDao.saveOrUpdate(ProfileUtil.Table, profileBundle);
+        TableBundle bundle = new TableBundle();
+        bundle.addValues(profile.getId(), ProfileFamily.Basic, ProfileUtil.getBasicFamilyCellMap(profile));
+        hbaseDao.saveOrUpdate(ProfileUtil.Table, bundle);
 
+        // 再存数据集
         for (StdDataSet dataSet : profile.getDataSets()) {
-            TableBundle dataSetBundle = new TableBundle();
+            bundle.clear();
+
             for (String rowkey : dataSet.getRecordKeys()) {
-                dataSetBundle.addValues(
+                bundle.addValues(
                         rowkey,
                         DataSetFamily.Basic,
                         DataSetUtil.getBasicFamilyQualifier(profile.getId(), dataSet));
-                dataSetBundle.addValues(
+                bundle.addValues(
                         rowkey,
                         DataSetFamily.MetaData,
                         DataSetUtil.getMetaDataFamilyQualifier(rowkey, dataSet));
 
                 if (dataSet instanceof LinkDataSet) {
-                    dataSetBundle.addValues(
+                    bundle.addValues(
                             rowkey,
                             DataSetFamily.Extension,
                             DataSetUtil.getExtensionFamilyQualifier((LinkDataSet) dataSet));
                 }
             }
 
-            hbaseDao.saveOrUpdate(dataSet.getCode(), dataSetBundle);
+            hbaseDao.saveOrUpdate(dataSet.getCode(), bundle);
+        }
+
+        // 文件型文档，存储文件记录
+        bundle.clear();
+        if (profile instanceof FileProfile) {
+            FileProfile fileProfile = (FileProfile)profile;
+
+            int i = 0;
+            Map<String, RawDocumentList> rawDocuments = fileProfile.getDocuments();
+            for (String cdaDocumentId : rawDocuments.keySet()){
+                RawDocumentList rawDocumentList = rawDocuments.get(cdaDocumentId);
+                for (RawDocument rawDocument : rawDocumentList){
+                    String rowkey = String.format("%s$%s", fileProfile.getId(), i++);
+
+                    bundle.addValues(rowkey, FileFamily.Basic, FileTableUtil.getBasicFamilyCellMap(fileProfile));
+                    bundle.addValues(rowkey, FileFamily.Files, FileTableUtil.getFileFamilyCellMap(rawDocument));
+                }
+            }
+
+            hbaseDao.saveOrUpdate(FileTableUtil.Table, bundle);
         }
     }
 
@@ -76,14 +102,14 @@ public class ProfileRepository {
 
         ResultUtil record = new ResultUtil(results[0]);
 
-        String dataSets = record.getCellValue(ProfileFamily.Basic, ProfileFamily.BasicQualifier.DataSets, null);
-        String eventType = record.getCellValue(ProfileFamily.Basic, ProfileFamily.BasicQualifier.EventType, null);
-        String profileType = record.getCellValue(ProfileFamily.Basic, ProfileFamily.BasicQualifier.ProfileType, ProfileType.Standard.toString());
+        String dataSets = record.getCellValue(ProfileFamily.Basic, ProfileFamily.BasicColumns.DataSets, null);
+        String eventType = record.getCellValue(ProfileFamily.Basic, ProfileFamily.BasicColumns.EventType, null);
+        String profileType = record.getCellValue(ProfileFamily.Basic, ProfileFamily.BasicColumns.ProfileType, ProfileType.Standard.toString());
 
         ProfileType pType = ProfileType.create(profileType);
         EventType eType = StringUtils.isEmpty(eventType) ? null : EventType.create(eventType);
 
-        StdProfile profile = ProfileFactory.generate(pType);
+        StdProfile profile = ProfileFactory.createProfile(pType);
         HBaseEntityUtil.assembleEntity(results[0], profile);
 
         profile.setId(profileId);
@@ -101,7 +127,7 @@ public class ProfileRepository {
         if (results == null) throw new RuntimeException("Profile not found.");
 
         ResultUtil record = new ResultUtil(results[0]);
-        String dataSets = record.getCellValue(ProfileFamily.Basic, ProfileFamily.BasicQualifier.DataSets, null);
+        String dataSets = record.getCellValue(ProfileFamily.Basic, ProfileFamily.BasicColumns.DataSets, null);
 
         // 删除数据集中的数据
         ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);

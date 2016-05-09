@@ -14,12 +14,14 @@ import com.yihu.ehr.profile.core.StdDataSet;
 import com.yihu.ehr.profile.core.StdProfile;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.persist.ProfileIndices;
+import com.yihu.ehr.profile.persist.ProfileIndicesService;
 import com.yihu.ehr.profile.persist.ProfileService;
 import com.yihu.ehr.profile.service.Template;
 import com.yihu.ehr.profile.service.TemplateService;
 import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.schema.OrgKeySchema;
 import com.yihu.ehr.schema.StdKeySchema;
+import com.yihu.ehr.util.DateTimeUtils;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +30,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.util.*;
 
 /**
  * 健康档案工具。
@@ -41,6 +41,9 @@ import java.util.Map;
  */
 @Service
 public class ProfileUtil {
+    @Autowired
+    private ProfileIndicesService indicesService;
+
     @Autowired
     private ProfileService profileService;
 
@@ -61,6 +64,24 @@ public class ProfileUtil {
 
     @Autowired
     private StdKeySchema stdKeySchema;
+
+    public Page<ProfileIndices> searchProfile(MProfileSearch query, Date since, Date to) throws ParseException {
+        String demographicId = query.getDemographicId();
+        String orgCode = query.getOrganizationCode();
+        String patientId = query.getPatientId();
+        String eventNo = query.getEventNo();
+        String name = query.getName();
+        String telephone = query.getTelephone();
+        String gender = query.getGender();
+        Date birthday = DateTimeUtils.simpleDateParse(query.getBirthday());
+
+        Page<ProfileIndices> profileIndices = indicesService.findByIndices(orgCode, patientId, eventNo, since, to, null);
+        if (profileIndices == null || profileIndices.getContent().isEmpty()) {
+            profileIndices = indicesService.findByDemographic(demographicId, orgCode, name, telephone, gender, birthday, since, to, null);
+        }
+
+        return profileIndices;
+    }
 
     public Collection<MProfile> loadAndConvertProfiles(Page<ProfileIndices> profileIndices,
                                                         boolean loadStdDataSet,
