@@ -24,7 +24,7 @@ public class MicroServices {
     public static final String Standard = "svr-standard";
     public static final String User = "svr-user";
     public static final String Family = "svr-family";
-
+    public static final String Cipher = "svr-cipher";
     /*
     public static final String Adaption       = "${micro-service.adaption}";
     public static final String Application    = "${micro-service.application}";
