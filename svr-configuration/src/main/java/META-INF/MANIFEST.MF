@@ -1,68 +1,68 @@
 Manifest-Version: 1.0
-Class-Path: springfox-core-2.1.2.jar commons-codec-1.6.jar spring-data
- -rest-webmvc-2.4.2.RELEASE.jar logback-core-1.1.3.jar spring-boot-sta
+Class-Path: springfox-core-2.1.2.jar commons-codec-1.6.jar oauth2-data
+ -rest-webmvc-2.4.2.RELEASE.jar logback-core-1.1.3.jar oauth2-boot-sta
  rter-1.3.1.RELEASE.jar jboss-logging-3.3.0.Final.jar evo-inflector-1.
  2.1.jar log4j-over-slf4j-1.7.13.jar tomcat-embed-logging-juli-8.0.30.
- jar spring-cloud-security-1.1.0.M3.jar reactor-stream-2.0.7.RELEASE.j
+ jar oauth2-cloud-security-1.1.0.M3.jar reactor-stream-2.0.7.RELEASE.j
  ar jackson-databind-2.6.4.jar snakeyaml-1.16.jar reactor-bus-2.0.7.RE
- LEASE.jar spring-cloud-starter-1.1.0.M4.jar spring-cloud-starter-eure
+ LEASE.jar oauth2-cloud-starter-1.1.0.M4.jar oauth2-cloud-starter-eure
  ka-1.1.0.M4.jar logback-classic-1.1.3.jar ribbon-core-2.1.0.jar sprin
- gfox-swagger2-2.1.2.jar spring-beans-4.2.4.RELEASE.jar classmate-1.2.
- 0.jar spring-web-4.2.4.RELEASE.jar spring-boot-1.3.1.RELEASE.jar jett
- ison-1.3.7.jar validation-api-1.1.0.Final.jar springfox-spring-web-2.
- 1.2.jar hystrix-core-1.4.21.jar jul-to-slf4j-1.7.13.jar spring-cloud-
+ gfox-swagger2-2.1.2.jar oauth2-beans-4.2.4.RELEASE.jar classmate-1.2.
+ 0.jar oauth2-web-4.2.4.RELEASE.jar oauth2-boot-1.3.1.RELEASE.jar jett
+ ison-1.3.7.jar validation-api-1.1.0.Final.jar springfox-oauth2-web-2.
+ 1.2.jar hystrix-core-1.4.21.jar jul-to-slf4j-1.7.13.jar oauth2-cloud-
  config-server-1.1.0.M4.jar commons-lang-2.3.jar bcpkix-jdk15on-1.47.j
- ar spring-security-crypto-4.0.3.RELEASE.jar springfox-swagger-common-
+ ar oauth2-security-crypto-4.0.3.RELEASE.jar springfox-swagger-common-
  2.1.2.jar json-path-2.0.0.jar httpcore-4.4.4.jar bcprov-jdk15on-1.47.
  jar javax.servlet-api-3.1.0.jar guava-18.0.jar netty-common-4.0.25.Fi
- nal.jar netty-transport-4.0.25.Final.jar spring-security-rsa-1.0.1.RE
- LEASE.jar spring-cloud-netflix-core-1.1.0.M4.jar rxnetty-contexts-0.4
- .9.jar spring-boot-actuator-1.3.1.RELEASE.jar spring-context-4.2.4.RE
+ nal.jar netty-transport-4.0.25.Final.jar oauth2-security-rsa-1.0.1.RE
+ LEASE.jar oauth2-cloud-netflix-core-1.1.0.M4.jar rxnetty-contexts-0.4
+ .9.jar oauth2-boot-actuator-1.3.1.RELEASE.jar oauth2-context-4.2.4.RE
  LEASE.jar msg-simple-1.1.jar netflix-commons-util-0.1.1.jar ribbon-lo
  adbalancer-2.1.0.jar slf4j-api-1.7.13.jar jackson-core-asl-1.9.13.jar
-  swagger-models-1.5.0.jar spring-plugin-metadata-1.2.0.RELEASE.jar sp
+  swagger-models-1.5.0.jar oauth2-plugin-metadata-1.2.0.RELEASE.jar sp
  ring-security-jwt-1.0.3.RELEASE.jar governator-annotations-1.10.4.jar
-  xmlpull-1.1.3.1.jar commons-configuration-1.8.jar spring-security-oa
- uth2-2.0.8.RELEASE.jar spring-cloud-starter-oauth2-1.1.0.M3.jar aspec
- tjrt-1.8.7.jar reactor-core-2.0.7.RELEASE.jar spring-boot-actuator-do
- cs-1.3.1.RELEASE.jar spring-security-core-4.0.3.RELEASE.jar hibernate
+  xmlpull-1.1.3.1.jar commons-configuration-1.8.jar oauth2-security-oa
+ uth2-2.0.8.RELEASE.jar oauth2-cloud-starter-oauth2-1.1.0.M3.jar aspec
+ tjrt-1.8.7.jar reactor-core-2.0.7.RELEASE.jar oauth2-boot-actuator-do
+ cs-1.3.1.RELEASE.jar oauth2-security-core-4.0.3.RELEASE.jar hibernate
  -validator-5.2.2.Final.jar asm-1.0.2.jar eureka2-client-shaded-2.0.0-
- rc.2.jar jsch-0.1.50.jar reactor-spring-core-2.0.7.RELEASE.jar json-s
- mart-2.1.1.jar netty-buffer-4.0.25.Final.jar spring-boot-autoconfigur
- e-1.3.1.RELEASE.jar spring-boot-starter-logging-1.3.1.RELEASE.jar jer
+ rc.2.jar jsch-0.1.50.jar reactor-oauth2-core-2.0.7.RELEASE.jar json-s
+ mart-2.1.1.jar netty-buffer-4.0.25.Final.jar oauth2-boot-autoconfigur
+ e-1.3.1.RELEASE.jar oauth2-boot-starter-logging-1.3.1.RELEASE.jar jer
  sey-apache-client4-1.19.jar stax-api-1.0.1.jar netty-codec-4.0.25.Fin
- al.jar spring-hateoas-0.19.0.RELEASE.jar spring-core-4.2.4.RELEASE.ja
+ al.jar oauth2-hateoas-0.19.0.RELEASE.jar oauth2-core-4.2.4.RELEASE.ja
  r netflix-statistics-0.1.1.jar commons-collections-3.2.2.jar tomcat-e
- mbed-core-8.0.30.jar spring-cloud-context-1.1.0.M4.jar mapstruct-1.0.
- 0.Beta4.jar spring-data-rest-core-2.4.2.RELEASE.jar aopalliance-1.0.j
- ar spring-expression-4.2.4.RELEASE.jar org.eclipse.jgit-3.5.3.2014121
+ mbed-core-8.0.30.jar oauth2-cloud-context-1.1.0.M4.jar mapstruct-1.0.
+ 0.Beta4.jar oauth2-data-rest-core-2.4.2.RELEASE.jar aopalliance-1.0.j
+ ar oauth2-expression-4.2.4.RELEASE.jar org.eclipse.jgit-3.5.3.2014121
  80710-r.jar netflix-eventbus-0.1.2.jar ribbon-transport-2.1.0.jar net
  ty-codec-http-4.0.25.Final.jar springfox-swagger-ui-2.1.2.jar pinyin4
- j-2.5.0.jar asm-3.3.1.jar jersey-client-1.19.jar spring-aop-4.2.4.REL
- EASE.jar spring-boot-starter-tomcat-1.3.1.RELEASE.jar ribbon-eureka-2
+ j-2.5.0.jar asm-3.3.1.jar jersey-client-1.19.jar oauth2-aop-4.2.4.REL
+ EASE.jar oauth2-boot-starter-tomcat-1.3.1.RELEASE.jar ribbon-eureka-2
  .1.0.jar archaius-core-0.7.1.jar aspectjweaver-1.8.7.jar rxnetty-serv
  o-0.4.9.jar xstream-1.4.2.jar jsr305-2.0.1.jar jackson-coreutils-1.6.
- jar spring-tx-4.2.4.RELEASE.jar gs-collections-5.1.0.jar spring-secur
+ jar oauth2-tx-4.2.4.RELEASE.jar gs-collections-5.1.0.jar oauth2-secur
  ity-web-4.0.3.RELEASE.jar tomcat-embed-el-8.0.30.jar netty-transport-
  native-epoll-4.0.25.Final.jar ribbon-httpclient-2.1.0.jar springfox-s
- chema-2.1.2.jar eureka-client-1.3.4.jar spring-data-commons-1.11.2.RE
- LEASE.jar zip4j-1.3.2.jar spring-boot-starter-security-1.3.1.RELEASE.
- jar httpclient-4.5.1.jar guice-4.0.jar servo-core-0.10.0.jar spring-p
+ chema-2.1.2.jar eureka-client-1.3.4.jar oauth2-data-commons-1.11.2.RE
+ LEASE.jar zip4j-1.3.2.jar oauth2-boot-starter-security-1.3.1.RELEASE.
+ jar httpclient-4.5.1.jar guice-4.0.jar servo-core-0.10.0.jar oauth2-p
  lugin-core-1.2.0.RELEASE.jar springfox-spi-2.1.2.jar xpp3_min-1.1.4c.
- jar swagger-annotations-1.5.0.jar spring-boot-starter-data-rest-1.3.1
+ jar swagger-annotations-1.5.0.jar oauth2-boot-starter-data-rest-1.3.1
  .RELEASE.jar jackson-core-2.6.4.jar javax.inject-1.jar jcl-over-slf4j
- -1.7.13.jar jersey-core-1.19.jar spring-boot-starter-actuator-1.3.1.R
- ELEASE.jar spring-cloud-commons-1.1.0.M4.jar spring-context-support-4
- .2.4.RELEASE.jar spring-session-1.0.2.RELEASE.jar ribbon-2.1.0.jar re
- actor-spring-context-2.0.7.RELEASE.jar tomcat-embed-websocket-8.0.30.
- jar spring-webmvc-4.2.4.RELEASE.jar json-patch-1.7.jar rxjava-1.0.14.
+ -1.7.13.jar jersey-core-1.19.jar oauth2-boot-starter-actuator-1.3.1.R
+ ELEASE.jar oauth2-cloud-commons-1.1.0.M4.jar oauth2-context-support-4
+ .2.4.RELEASE.jar oauth2-session-1.0.2.RELEASE.jar ribbon-2.1.0.jar re
+ actor-oauth2-context-2.0.7.RELEASE.jar tomcat-embed-websocket-8.0.30.
+ jar oauth2-webmvc-4.2.4.RELEASE.jar json-patch-1.7.jar rxjava-1.0.14.
  jar btf-1.2.jar jackson-mapper-asl-1.9.13.jar rxnetty-0.4.9.jar JavaE
  WAH-0.7.9.jar gs-collections-api-5.1.0.jar servo-internal-0.10.0.jar 
- spring-boot-starter-validation-1.3.1.RELEASE.jar spring-cloud-starter
- -ribbon-1.1.0.M4.jar reactive-streams-1.0.0.jar spring-boot-starter-w
+ oauth2-boot-starter-validation-1.3.1.RELEASE.jar oauth2-cloud-starter
+ -ribbon-1.1.0.M4.jar reactive-streams-1.0.0.jar oauth2-boot-starter-w
  eb-1.3.1.RELEASE.jar jsr311-api-1.1.1.jar jackson-annotations-2.6.4.j
- ar netty-handler-4.0.25.Final.jar spring-cloud-config-client-1.1.0.M4
- .jar spring-cloud-starter-security-1.1.0.M3.jar spring-security-confi
+ ar netty-handler-4.0.25.Final.jar oauth2-cloud-config-client-1.1.0.M4
+ .jar oauth2-cloud-starter-security-1.1.0.M3.jar oauth2-security-confi
  g-4.0.3.RELEASE.jar
 Main-Class: com.yihu.ehr.configuration.ConfigurationServiceApp
 
