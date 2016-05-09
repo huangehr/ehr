@@ -198,7 +198,7 @@ public interface DataSetClient {
     @ApiOperation(value = "根据数据集id获取数据元")
     List<MStdMetaData> getMetaDataByDataSetId(
             @ApiParam(name = "data_set_id", value = "数据元编号", defaultValue = "")
-            @PathVariable(value = "data_set_id") long dataSetIs,
+            @PathVariable(value = "data_set_ids") String dataSetIs,
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version);
 
