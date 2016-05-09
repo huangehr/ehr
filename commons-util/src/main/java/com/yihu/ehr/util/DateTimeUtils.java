@@ -56,8 +56,6 @@ public class DateTimeUtils {
     };
 
     public static String simpleDateTimeFormat(final Date date){
-        if(date == null) return "";
-
         String time = simpleDateTimeFormat.get().format(date);
         return time;
     }
@@ -70,8 +68,6 @@ public class DateTimeUtils {
     }
 
     public static String utcDateTimeFormat(final Date date){
-        if(date == null) return "";
-
         String time = utcDateTimeFormat.get().format(date);
         return time;
     }

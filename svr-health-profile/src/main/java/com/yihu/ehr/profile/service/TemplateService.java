@@ -11,9 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 /**
@@ -69,24 +69,21 @@ public class TemplateService extends BaseJpaService<Template, XTemplateRepositor
      * @return
      */
     public Map<Template, MCDADocument> getOrganizationTemplates(String orgCode, String cdaVersion, String cdaType) {
-        // 机构模板
-        List<Template> templates = getRepo().findByOrganizationCodeAndCdaVersionAndCdaDocumentIdIsNotNull(orgCode, cdaVersion);
+        List<Template> templates = getRepo().findByOrganizationCodeAndCdaVersion(orgCode, cdaVersion);
         List<String> cdaDocumentIdList = new ArrayList<>(templates.size());
         cdaDocumentIdList.addAll(templates.stream().map(template -> template.getCdaDocumentId()).collect(Collectors.toList()));
 
         if (cdaDocumentIdList.size() == 0) return null;
 
-        // 指定CDA类别下的文档列表
-        List<MCDADocument> documentList = cdaDocumentClient.getCDADocuments(
+        List<MCDADocument> documentList = cdaDocumentClient.getCDADocumentByIds(
                 "id,name",
-                "id=" + String.join(",", cdaDocumentIdList) + ";type=" + cdaType,
+                "id=" + String.join(",", cdaDocumentIdList) + "&type=" + cdaType,
                 "+name",
                 1000,
                 1,
                 cdaVersion);
 
-        // 与机构定制的模板对比
-        Map<Template, MCDADocument> cdaDocumentMap =  new TreeMap<>();
+        Map<Template, MCDADocument> cdaDocumentMap =  new HashMap<>();
         for (MCDADocument document : documentList){
             String cdaDocumentId = document.getId();
             for (Template template : templates){

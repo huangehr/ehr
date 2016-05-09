@@ -14,6 +14,10 @@ public class SolrJoinEntity {
     private String toCol;
     private List<QueryCondition> conditions; //过滤条件
 
+    public SolrJoinEntity()
+    {}
+
+
     /**
      * 构造函数
      */

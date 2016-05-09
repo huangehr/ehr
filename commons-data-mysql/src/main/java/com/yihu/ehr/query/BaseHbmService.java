@@ -9,8 +9,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -28,25 +26,12 @@ public class BaseHbmService<T> {
     @Autowired
     protected StdSessionFactoryBean localSessionFactoryBean;
 
-    @Autowired
-    protected ExtJdbcTemplate jdbcTemplate;
 
     /************************************************************************/
     /**************  save                        ****************************/
     /************************************************************************/
     public void save(T entity) {
         currentSession().saveOrUpdate(entity);
-    }
-
-    /**
-     * 插入数据， id策略为increment
-     * @param obj
-     * @return
-     */
-    @Transactional(propagation = Propagation.REQUIRED)
-    public T insert(T obj) throws InvocationTargetException, IllegalAccessException, SQLException, NoSuchFieldException, NoSuchMethodException {
-
-        return (T) jdbcTemplate.insert(obj);
     }
 
     /************************************************************************/

@@ -7,13 +7,12 @@ import org.springframework.boot.context.web.SpringBootServletInitializer;
 
 @SpringBootApplication
 public class AppEhrBrowser extends SpringBootServletInitializer {
-
-	public static void main(String[] args) {
-		SpringApplication.run(AppEhrBrowser.class, args);
-	}
-
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         return application.sources(AppEhrBrowser.class);
     }
+
+	public static void main(String[] args) {
+		SpringApplication.run(AppEhrBrowser.class, args);
+	}
 }

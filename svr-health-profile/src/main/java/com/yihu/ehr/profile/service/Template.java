@@ -18,7 +18,7 @@ import java.util.Date;
 @Entity
 @Table(name = "archive_template")
 @Access(value = AccessType.PROPERTY)
-public class Template implements Comparable {
+public class Template {
     private int id;
     private String title;
     private String cdaVersion;
@@ -143,14 +143,5 @@ public class Template implements Comparable {
 
     private FastDFSUtil fastDFSUtil(){
         return SpringContext.getService(FastDFSUtil.class);
-    }
-
-    @Override
-    public int compareTo(Object o) {
-        if(o instanceof Template) {
-            return ((Template)o).title.compareTo(title);
-        }
-
-        return 0;
     }
 }

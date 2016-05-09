@@ -1,9 +1,9 @@
 package com.yihu.ehr.model.profile;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.yihu.ehr.util.DateTimeUtils;
 import org.apache.commons.lang.StringUtils;
-import com.yihu.ehr.profile.core.EventType;
-import com.yihu.ehr.profile.core.ProfileType;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,10 +21,8 @@ public class MProfile {
     private String orgName;
     private String demographicId;
     private String cdaVersion;
-    private String clientId;
+    private String summary;
     private Date eventDate;
-    private ProfileType profileType;
-    private EventType eventType;
 
     private List<MProfileDocument> documents = new ArrayList<>();
 
@@ -34,6 +32,14 @@ public class MProfile {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 
     public Date getEventDate() {
@@ -69,7 +75,7 @@ public class MProfile {
     }
 
     public String getDemographicId() {
-        return StringUtils.isEmpty(demographicId) ? "" : demographicId;
+        return demographicId;
     }
 
     public void setDemographicId(String demographicId) {
@@ -82,29 +88,5 @@ public class MProfile {
 
     public void setCdaVersion(String cdaVersion) {
         this.cdaVersion = cdaVersion;
-    }
-
-    public ProfileType getProfileType() {
-        return profileType;
-    }
-
-    public void setProfileType(ProfileType profileType) {
-        this.profileType = profileType;
-    }
-
-    public EventType getEventType() {
-        return eventType;
-    }
-
-    public void setEventType(EventType eventType) {
-        this.eventType = eventType;
-    }
-
-    public String getClientId() {
-        return clientId;
-    }
-
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
     }
 }

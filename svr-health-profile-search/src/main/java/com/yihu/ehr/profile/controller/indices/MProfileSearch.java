@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.controller.profile;
+package com.yihu.ehr.profile.controller.indices;
 
 /**
  * @author Sand

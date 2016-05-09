@@ -3,18 +3,13 @@ package com.yihu.ehr.profile.core;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.lang.SpringContext;
-import com.yihu.ehr.profile.annotation.Column;
-import com.yihu.ehr.profile.annotation.Table;
 import com.yihu.ehr.profile.extractor.EventExtractor;
 import com.yihu.ehr.profile.extractor.KeyDataExtractor;
-import com.yihu.ehr.profile.util.ProfileUtil;
 import com.yihu.ehr.util.DateTimeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.ParseException;
 import java.util.*;
-
-import static com.yihu.ehr.profile.core.ProfileFamily.*;
 
 /**
  * 标准健康档案（结构化）。
@@ -22,14 +17,12 @@ import static com.yihu.ehr.profile.core.ProfileFamily.*;
  * @author Sand
  * @created 2015.08.16 10:44
  */
-@Table(ProfileUtil.Table)
 public class StdProfile {
     protected ObjectMapper objectMapper = SpringContext.getService("objectMapper");
 
     private ProfileId profileId;                        // 健康档案ID
     private String cardId;                              // 就诊时用的就诊卡ID
     private String orgCode;                             // 机构代码
-    private String clientId;                            // 应用来源
     private String patientId;                           // 身份证号
     private String eventNo;                             // 事件号
     private Date eventDate;                             // 事件时间，如挂号，出院体检时间
@@ -41,13 +34,29 @@ public class StdProfile {
 
     protected Map<String, StdDataSet> dataSets = new TreeMap<>();
 
-    public StdProfile() {
+    public StdProfile(){
         cardId = "";
         orgCode = "";
         patientId = "";
         eventNo = "";
 
-        setProfileType(ProfileType.Standard);
+        this.setProfileType(ProfileType.Standard);
+    }
+
+    public ProfileType getProfileType() {
+        return profileType;
+    }
+
+    public void setProfileType(ProfileType profileType) {
+        this.profileType = profileType;
+    }
+
+    public EventType getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(EventType eventType) {
+        this.eventType = eventType;
     }
 
     public String getId() {
@@ -74,25 +83,6 @@ public class StdProfile {
         this.profileId = new ProfileId(archiveId);
     }
 
-    @Column(value = BasicColumns.ProfileType, family = ProfileFamily.Basic)
-    public ProfileType getProfileType() {
-        return profileType;
-    }
-
-    public void setProfileType(ProfileType profileType) {
-        this.profileType = profileType;
-    }
-
-    @Column(value = BasicColumns.EventType, family = ProfileFamily.Basic)
-    public EventType getEventType() {
-        return eventType;
-    }
-
-    public void setEventType(EventType eventType) {
-        this.eventType = eventType;
-    }
-
-    @Column(value = BasicColumns.CdaVersion, family = ProfileFamily.Basic)
     public String getCdaVersion() {
         return cdaVersion;
     }
@@ -101,7 +91,6 @@ public class StdProfile {
         this.cdaVersion = cdaVersion;
     }
 
-    @Column(value = BasicColumns.CardId, family = ProfileFamily.Basic)
     public String getCardId() {
         return cardId;
     }
@@ -110,7 +99,6 @@ public class StdProfile {
         this.cardId = cardId;
     }
 
-    @Column(value = BasicColumns.OrgCode, family = ProfileFamily.Basic)
     public String getOrgCode() {
         return orgCode;
     }
@@ -119,7 +107,6 @@ public class StdProfile {
         this.orgCode = orgCode;
     }
 
-    @Column(value = BasicColumns.PatientId, family = ProfileFamily.Basic)
     public String getPatientId() {
         return patientId;
     }
@@ -128,7 +115,6 @@ public class StdProfile {
         this.patientId = patientId;
     }
 
-    @Column(value = BasicColumns.EventNo, family = ProfileFamily.Basic)
     public String getEventNo() {
         return eventNo;
     }
@@ -137,7 +123,6 @@ public class StdProfile {
         this.eventNo = eventNo;
     }
 
-    @Column(value = BasicColumns.DemographicId, family = ProfileFamily.Basic)
     public String getDemographicId() {
         return demographicId;
     }
@@ -146,7 +131,6 @@ public class StdProfile {
         this.demographicId = demographicId;
     }
 
-    @Column(value = BasicColumns.EventDate, family = ProfileFamily.Basic)
     public Date getEventDate() {
         return eventDate;
     }
@@ -155,7 +139,6 @@ public class StdProfile {
         this.eventDate = date;
     }
 
-    @Column(value = BasicColumns.CreateDate, family = ProfileFamily.Basic)
     public Date getCreateDate() {
         if (createDate == null) createDate = new Date();
 
@@ -189,39 +172,25 @@ public class StdProfile {
         return rootNode.toString();
     }
 
-    public String getClientId() {
-        return clientId;
-    }
-
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
-
-    public String toJson() {
-         return jsonFormat().toString();
-    }
-
-    protected ObjectNode jsonFormat() {
+    public String toJson(){
         ObjectNode root = objectMapper.createObjectNode();
         root.put("id", getId().toString());
-        root.put("cardId", this.getCardId());
-        root.put("orgCode", this.getOrgCode());
-        root.put("patientId", this.getPatientId());
-        root.put("eventNo", this.getEventNo());
-        root.put("cdaVersion", this.getCdaVersion());
-        root.put("clientId", this.getClientId());
-        root.put("eventDate", DateTimeUtils.utcDateTimeFormat(this.getEventDate()));
-        root.put("createDate", DateTimeUtils.utcDateTimeFormat(this.getCreateDate()));
-        root.put("eventType", this.getEventType().toString());
-        root.put("profileType", this.getProfileType().toString());
+        root.put("card_id", this.getCardId());
+        root.put("org_code", this.getOrgCode());
+        root.put("patient_id", this.getPatientId());
+        root.put("event_no", this.getEventNo());
+        root.put("event_date", this.getEventDate() == null ? "" : DateTimeUtils.utcDateTimeFormat(this.getEventDate()));
+        root.put("cda_version", this.getCdaVersion());
+        root.put("create_date", this.getCreateDate() == null ? "" : DateTimeUtils.utcDateTimeFormat(this.getCreateDate()));
+        root.put("event_type", this.getEventType().toString());
 
-        ObjectNode dataSetsNode = root.putObject("dataSets");
-        for (String dataSetCode : dataSets.keySet()) {
+        ObjectNode dataSetsNode = root.putObject("data_sets");
+        for (String dataSetCode : dataSets.keySet()){
             StdDataSet dataSet = dataSets.get(dataSetCode);
             dataSetsNode.putPOJO(dataSetCode, dataSet.toJson());
         }
 
-        return root;
+        return root.toString();
     }
 
     public void regularRowKey() {

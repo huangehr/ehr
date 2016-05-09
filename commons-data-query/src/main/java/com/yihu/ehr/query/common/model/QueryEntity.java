@@ -1,7 +1,11 @@
 package com.yihu.ehr.query.common.model;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JavaType;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by hzp on 2015/11/17.
@@ -97,4 +101,26 @@ public class QueryEntity {
         conditions.add(condition);
     }
 
+
+    /**
+     * 通过JSON字符串添加查询条件
+     */
+    public void addConditionByJson(String json) throws Exception{
+        if(json!=null && json.length()>0) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            if (json.startsWith("[") && json.endsWith("]")) {
+                JavaType javaType = objectMapper.getTypeFactory().constructParametricType(List.class, QueryCondition.class);
+                List<QueryCondition> qcList = objectMapper.readValue(json, javaType);
+                if (qcList!=null && qcList.size()>0)
+                {
+                    for(QueryCondition qc : qcList){
+                        conditions.add(qc);
+                    }
+                }
+            } else {
+                QueryCondition qc = objectMapper.readValue(json, QueryCondition.class);
+                conditions.add(qc);
+            }
+        }
+    }
 }

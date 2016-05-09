@@ -3,16 +3,17 @@ package com.yihu.ehr.profile.controller.profile;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.model.profile.*;
+import com.yihu.ehr.model.profile.MProfile;
+import com.yihu.ehr.model.profile.MProfileDocument;
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.profile.core.StdProfile;
 import com.yihu.ehr.profile.persist.ProfileIndices;
-import com.yihu.ehr.profile.persist.ProfileIndicesService;
 import com.yihu.ehr.profile.persist.ProfileService;
 import com.yihu.ehr.profile.service.Template;
-import com.yihu.ehr.util.DateTimeUtils;
 import com.yihu.ehr.util.controller.BaseRestEndPoint;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -22,7 +23,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Map;
 
 /**
  * 档案接口。提供就诊数据的原始档案，以CDA文档配置作为数据内容架构。

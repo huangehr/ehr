@@ -2,6 +2,7 @@ package com.yihu.ehr.resource.dao;
 
 
 import com.yihu.ehr.query.common.model.DataList;
+import com.yihu.ehr.query.common.model.QueryEntity;
 import com.yihu.ehr.query.jdbc.DBHelper;
 import com.yihu.ehr.query.services.HbaseQuery;
 import com.yihu.ehr.query.services.SolrQuery;
@@ -23,6 +24,9 @@ public class ResourcesQueryDao extends BaseDao {
     @Autowired
     SolrQuery solr;
 
+    private Integer defaultPage = 1;
+    private Integer defaultSize = 50;
+
     /**
      * habse单core
      */
@@ -39,11 +43,40 @@ public class ResourcesQueryDao extends BaseDao {
         List list4 = db.query("select * from RS_CATEGORY");
         List<RsCategory> list5 = db.query(RsCategory.class,"select * from RS_CATEGORY");
         long count = solr.count("EHR_CENTER","patient_id:10293555");
-        DataList groupList = solr.getGroupCount("EHR_CENTER","patient_id");//根据病人ID分组
-        DataList list6 = hbase.queryBySolr("EHR_CENTER", "patient_id:10293555", null, 1, 50);
-        DataList list7 = hbase.queryBySolr("EHR_CENTER_SUB", "patient_id:10293555", null, 1, 50);*/
+        DataList groupList = solr.getGroupCount("EHR_CENTER","patient_id");//根据病人ID分组*/
 
-        return null;
+        //默认第一页
+        if(page == null)
+        {
+            page = defaultPage;
+        }
+        //默认50行
+        if(size == null)
+        {
+            size = defaultSize;
+        }
+
+        QueryEntity qe= new QueryEntity(core,page,size);
+        if(metadata!=null && metadata.length()>0)
+        {
+            qe.setFields(metadata);
+        }
+        if(queryParams!=null && queryParams.length()>0)
+        {
+            qe.addConditionByJson(queryParams);
+        }
+        else{
+            return hbase.query(qe);
+        }
+        //判断是否有包含Join查询
+        if(queryParams.indexOf("joinParams")>0)
+        {
+
+            return hbase.queryJoinJson(qe, "");
+        }
+        else {
+            return hbase.query(qe);
+        }
     }
 
     /**
@@ -51,16 +84,54 @@ public class ResourcesQueryDao extends BaseDao {
      */
     public DataList getHbaseMultiCore(String core,String metadata,String queryParams,Integer page,Integer size) throws Exception
     {
+        //默认第一页
+        if(page == null)
+        {
+            page = defaultPage;
+        }
+        //默认50行
+        if(size == null)
+        {
+            size = defaultSize;
+        }
 
-        return null;
+        QueryEntity qe= new QueryEntity(core,page,size);
+        return hbase.query(qe);
     }
 
     /**
      * habse的solr分组统计
      */
-    public DataList getHbaseSolr(String core,String metadata,String queryParams,Integer page,Integer size) throws Exception
+    public DataList getHbaseSolr(String core,String groupFields,String statsFields,String queryParams,Integer page,Integer size) throws Exception
     {
-        return null;
+        String q = hbase.jsonToCondition(queryParams);
+        //数值统计
+        if(statsFields!=null && statsFields.length()>0)
+        {
+            return solr.getStats(core, groupFields, statsFields,q);
+        }
+        //总数统计
+        else{
+            if(groupFields.contains(",")) //多分组
+            {
+                String[] groups = groupFields.split(",");
+                return solr.getGroupMult(core,groups,null,q); //自定义分组未完善
+            }
+            else{ //单分组
+                //默认第一页
+                if(page == null)
+                {
+                    page = defaultPage;
+                }
+                //默认50行
+                if(size == null)
+                {
+                    size = defaultSize;
+                }
+                return solr.getGroupCount(core,groupFields,q,page,size);
+            }
+        }
+
     }
 
     /**
