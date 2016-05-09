@@ -1,8 +1,10 @@
 package com.yihu.ehr.query.services;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.hbase.HBaseUtil;
 import com.yihu.ehr.query.common.enums.Logical;
+import com.yihu.ehr.query.common.enums.Operation;
 import com.yihu.ehr.query.common.model.DataList;
 import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.query.common.model.QueryEntity;
@@ -89,7 +91,7 @@ public class HbaseQuery {
 			for  (Cell cell : result.rawCells()) {
 				String fieldName = Bytes.toString(CellUtil.cloneQualifier(cell));
 				String fieldValue = Bytes.toString(CellUtil. cloneValue(cell));
-				if(fl!=null&&!fl.equals(""))
+				if(fl!=null&&!fl.equals("")&&!fl.equals("*"))
 				{
 					String[] fileds = fl.split(",");
 					for(String filed : fileds){
@@ -111,6 +113,68 @@ public class HbaseQuery {
 		else
 			return null;
 
+	}
+
+	/**
+	 * 条件转字符串
+	 * @return
+	 */
+	private String qcToString(QueryCondition qc){
+		String s = "";
+		String field = qc.getField();
+		Object keyword = qc.getKeyword();
+		Object[] keywords = qc.getKeywords();
+		switch(qc.getOperation()){
+			case Operation.LIKE:
+				s = field+":*"+keyword+"*";
+				break;
+			case Operation.LEFTLIKE:
+				s = field+":*"+keyword+"";
+				break;
+			case Operation.RIGHTLIKE:
+				s = field+":"+keyword+"*";
+				break;
+			case Operation.RANGE: {
+				if(keywords.length==2)
+				{
+					s = field + ":[" +  keywords[0] + " TO " + keywords[1] + "]";
+				}
+				else if(keywords.length==1)
+				{
+					s = field + ":[" +  keywords[0] + " TO *]";
+				}
+				else if(keyword!=null&&!keyword.equals(""))
+				{
+					s = field + ":[" +  keyword + " TO *]";
+				}
+
+				break;
+			}
+			case Operation.IN:
+			{
+				String in = "";
+				if(keywords!=null && keywords.length>0)
+				{
+					for (Object key : keywords)
+					{
+						if(in!=null&&in.length()>0)
+						{
+							in+=" OR " +field+":"+key;
+						}
+						else
+						{
+							in = field+":"+key;
+						}
+					}
+				}
+				s = "("+in+")";
+				break;
+			}
+			default:
+				s = field+":\""+keyword+"\"";
+		}
+
+		return s;
 	}
 
 	/**
@@ -140,32 +204,88 @@ public class HbaseQuery {
 					}
 				}
 
-				re+=condition.toString() +" ";
+				re+=qcToString(condition);
 			}
 		}
 		else {
-			re ="*:* ";
+			re ="*:*";
 		}
 		return re;
 	}
 
+
+	/**
+	 * JSON条件转字符串
+	 * @return
+	 */
+	public String jsonToCondition(String json) throws Exception
+	{
+		List<QueryCondition> conditions = new ArrayList<>();
+		if(json!=null && json.length()>0) {
+			ObjectMapper objectMapper = new ObjectMapper();
+			if (json.startsWith("[") && json.endsWith("]")) {
+				JavaType javaType = objectMapper.getTypeFactory().constructParametricType(List.class, QueryCondition.class);
+				List<QueryCondition> qcList = objectMapper.readValue(json, javaType);
+				if (qcList!=null && qcList.size()>0)
+				{
+					for(QueryCondition qc : qcList){
+						conditions.add(qc);
+					}
+				}
+			} else {
+				QueryCondition qc = objectMapper.readValue(json, QueryCondition.class);
+				conditions.add(qc);
+			}
+
+			return this.conditionToString(conditions);
+		}
+		else{
+			return "";
+		}
+	}
 	/*********************** 查询方法 ******************************************************************/
 	/**
 	 * 根据Query查询
 	 * @return
 	 */
 	public DataList query(QueryEntity query) throws Exception {
-		return query(query,null);
+		return queryJoin(query, null);
 	}
 
 	/**
 	 * 根据Query查询，
 	 * @return
 	 */
-	public DataList query(QueryEntity query,List<SolrJoinEntity> joins) throws Exception {
+	public DataList queryJoinJson(QueryEntity query,String joinsQuery) throws Exception {
+		List<SolrJoinEntity>  joins = new ArrayList<>();
+		if(joinsQuery!=null && joinsQuery.length()>0) {
+			ObjectMapper objectMapper = new ObjectMapper();
+			if (joinsQuery.startsWith("[") && joinsQuery.endsWith("]")) {
+				JavaType javaType = objectMapper.getTypeFactory().constructParametricType(List.class, SolrJoinEntity.class);
+				List<SolrJoinEntity> joinList = objectMapper.readValue(joinsQuery, javaType);
+				if (joinList!=null && joinList.size()>0)
+				{
+					for(SolrJoinEntity join : joinList){
+						joins.add(join);
+					}
+				}
+			} else {
+				SolrJoinEntity join = objectMapper.readValue(joinsQuery, SolrJoinEntity.class);
+				joins.add(join);
+			}
+		}
+		return queryJoin(query, joins);
+	}
+
+	/**
+	 * 根据Query查询，
+	 * @return
+	 */
+	public DataList queryJoin(QueryEntity query,List<SolrJoinEntity> joins) throws Exception {
 		String table = query.getTableName();
 		String q = "";
 		String fq = "";
+		String fl = query.getFields();
 		String sort = query.getSort();
 		long page = query.getPage();
 		long rows = query.getRows();
@@ -182,7 +302,7 @@ public class HbaseQuery {
 			q=conditionToString(conditions);
 		}
 
-		return queryBySolr(table,q,sort,page,rows,fq);
+		return queryBySolr(table,q,sort,page,rows,fq,fl);
 	}
 
 
