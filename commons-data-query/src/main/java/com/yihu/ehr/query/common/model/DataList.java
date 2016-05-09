@@ -10,6 +10,7 @@ public class DataList {
     private String name;
     private long page = 0;
     private long count = 0;
+    private int size = 50;
     private List list;
 
     public String getName() {
@@ -39,6 +40,14 @@ public class DataList {
 
     public void setCount(long count){
         this.count = count;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
     }
 
     /**

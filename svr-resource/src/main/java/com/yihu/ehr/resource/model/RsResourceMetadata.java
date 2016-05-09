@@ -23,6 +23,8 @@ public class RsResourceMetadata {
     private String nullAble;
     private String dimensionId;
     private String related;
+    private String displayCode;
+    private String statsType;
 
     @Id
     @GeneratedValue(generator = "Generator")
@@ -156,5 +158,25 @@ public class RsResourceMetadata {
     public void setRelated(String related)
     {
         this.related = related;
+    }
+
+    @Column(name="display_code")
+    public String getDisplayCode()
+    {
+        return  displayCode;
+    }
+    public void setDisplayCode(String displayCode)
+    {
+        this.displayCode = displayCode;
+    }
+
+    @Column(name="stats_type")
+    public String getStatsType()
+    {
+        return  statsType;
+    }
+    public void setStatsType(String statsType)
+    {
+        this.statsType = statsType;
     }
 }

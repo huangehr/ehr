@@ -45,7 +45,9 @@ public class SolrQuery {
 	 */
 	public DataList getGroupCount(String table,String groupField,String q,int page,int rows) throws Exception {
 		DataList re = new DataList();
+		re.setName(table);
 		re.setPage(page);
+		re.setSize(rows);
 		List<Map<String,Object>> data = new ArrayList<Map<String,Object>>();
 
 		if(rows < 0) rows = 10;
@@ -159,7 +161,7 @@ public class SolrQuery {
 	 */
 	public DataList getGroupMult(String table,String[] groups,List<SolrGroupEntity> customGroup,String q) throws Exception{
 		DataList re = new DataList();
-
+		re.setName(table);
 		if(groups!=null && groups.length>0)
 		{
 			List<SolrGroupEntity> grouplist = new ArrayList<SolrGroupEntity>();
@@ -381,6 +383,7 @@ public class SolrQuery {
 		String[] stats = statsFields.split(",");
 
 		DataList re = new DataList();
+		re.setName(table);
 		re.setPage(1);
 		if(groups!=null && groups.length>0)
 		{
