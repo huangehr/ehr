@@ -66,7 +66,6 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
         return convertToModels(ls, new ArrayList<>(ls.size()), MStdMetaData.class, fields);
     }
 
-
     @RequestMapping(value = ServiceApi.Standards.MetaDatas, method = RequestMethod.DELETE)
     @ApiOperation(value = "批量删除数据元")
     public boolean deleteMetaDatas(
@@ -127,7 +126,6 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
         List<BaseMetaData> list = metaDataService.search(entityClass,"dataSetId="+dataSetIs);
         return convertToModels(list, new ArrayList<>(list.size()), MStdMetaData.class, "");
     }
-
 
     @RequestMapping(value = ServiceApi.Standards.MetaData, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "更新数据元")

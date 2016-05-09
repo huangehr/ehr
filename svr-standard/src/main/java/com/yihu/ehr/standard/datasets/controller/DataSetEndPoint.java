@@ -110,7 +110,6 @@ public class DataSetEndPoint extends ExtendController<MStdDataSet> {
         return getModel(dataSetService.retrieve(id, getServiceEntity(version)));
     }
 
-
     @RequestMapping(value = ServiceApi.Standards.DataSetsIds, method = RequestMethod.GET)
     @ApiOperation(value = "根据数据集ids(用逗号隔开)获取数据集信息")
     public Collection<MStdDataSet> getDataSets(
@@ -122,7 +121,6 @@ public class DataSetEndPoint extends ExtendController<MStdDataSet> {
         List<BaseDataSet> list = dataSetService.search(entityClass,"", "id="+ids, "+id");
         return convertToModels(list, new ArrayList<>(list.size()), MStdDataSet.class, "");
     }
-
 
     @RequestMapping(value = ServiceApi.Standards.DataSets, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增数据集信息")

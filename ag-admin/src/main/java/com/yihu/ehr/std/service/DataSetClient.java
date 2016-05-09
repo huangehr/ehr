@@ -194,6 +194,7 @@ public interface DataSetClient {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version);
 
+
     @RequestMapping(value = ServiceApi.Standards.MetaDatasWithDataSet, method = RequestMethod.GET)
     @ApiOperation(value = "根据数据集id获取数据元")
     List<MStdMetaData> getMetaDataByDataSetId(
@@ -201,6 +202,7 @@ public interface DataSetClient {
             @PathVariable(value = "data_set_ids") String dataSetIs,
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version);
+
 
     @RequestMapping(value = ServiceApi.Standards.NoPageDataSets, method = RequestMethod.GET)
     List<MStdDataSet> search(

@@ -363,10 +363,9 @@ public class DataSetController extends BaseController {
             @RequestParam(value = "data_set_ids") String dataSetIds,
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version) throws Exception{
-        Envelop envelop = new Envelop();
 
-//        List<MStdMetaData> list = dataSetClient.getMetaDataByDataSetId(dataSetIs, version);
-//        Collection<MetaDataModel> metaDataList = convertToModels(list, new ArrayList<>(list.size()), MetaDataModel.class, null);
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
         envelop.setDetailModelList((List) dataSetClient.searchMetaDatas("dataSetId,columnName", "dataSetId=" + dataSetIds, "+dataSetId", -1, 0, version).getBody());
         return envelop;
     }
