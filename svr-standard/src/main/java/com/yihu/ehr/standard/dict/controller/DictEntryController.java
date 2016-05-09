@@ -72,8 +72,9 @@ public class DictEntryController extends ExtendController<MStdDictEntry> {
         BaseDictEntry dictEntry = (BaseDictEntry) jsonToObj(model, entityClass);
 //        if(dictEntryService.isExistByField("code", dictEntry.getCode(), entityClass))
 //            throw errRepeatCode();
-
-        return getModel(dictEntryService.insert(dictEntry));
+        if (dictEntryService.add(dictEntry, version))
+            return getModel(dictEntry);
+        return null;
     }
 
 

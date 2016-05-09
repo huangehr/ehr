@@ -8,7 +8,6 @@ import com.yihu.ehr.profile.core.StdDataSet;
 import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.profile.persist.repo.DataSetRepository;
 import com.yihu.ehr.profile.persist.repo.ProfileRepository;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,9 +48,11 @@ public class ProfileService {
      * @throws IOException
      * @throws ParseException
      */
-    public StdProfile getProfile(String profileId, boolean loadStdDataSet, boolean loadOriginDataSet) throws Exception {
-        Pair<StdProfile, String> result = profileRepo.findOne(profileId);
+    public StdProfile getProfile(String profileId, boolean loadStdDataSet, boolean loadOriginDataSet) throws IOException, ParseException {
+        Pair<StdProfile, String> result = profileRepo.findOne(profileId, loadStdDataSet, loadOriginDataSet);
         StdProfile profile = result.getLeft();
+        profile.determineEventType();
+
         String cdaVersion = profile.getCdaVersion();
         ProfileType pType = profile.getProfileType();
 
@@ -69,7 +70,6 @@ public class ProfileService {
                         profile.insertDataSet(pair.getLeft(), pair.getRight());
                     }
                 }
-
                 if (loadOriginDataSet) {
                     if (dataSetCode.contains(DataSetUtil.OriginDataSetFlag)) {
                         Pair<String, StdDataSet> pair = dataSetRepo.findOne(cdaVersion, dataSetCode, pType, rowKeys);
@@ -81,9 +81,6 @@ public class ProfileService {
                 profile.insertDataSet(pair.getLeft(), pair.getRight());
             }
         }
-
-        profile.determineEventType();
-        if(StringUtils.isEmpty(profile.getClientId())) profile.setClientId("kHAbVppx44");
 
         return profile;
     }

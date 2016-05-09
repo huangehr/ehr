@@ -2,7 +2,7 @@ package com.yihu.ehr.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.yihu.ehr.profile.core.StdProfile;
-import com.yihu.ehr.profile.util.ProfileFactory;
+import com.yihu.ehr.profile.util.ProfileGenerator;
 import com.yihu.ehr.profile.core.StdDataSet;
 import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.profile.extractor.KeyDataExtractor;
@@ -25,10 +25,10 @@ import java.util.Properties;
 public class StdPackageResolver extends PackageResolver {
     @Override
     public void resolve(StdProfile profile, File root) throws IOException, ParseException {
-        File standardFolder = new File(root.getAbsolutePath() + File.separator + ProfileFactory.StandardFolder);
+        File standardFolder = new File(root.getAbsolutePath() + File.separator + ProfileGenerator.StandardFolder);
         parseFiles(profile, standardFolder.listFiles(), false);
 
-        File originFolder = new File(root.getAbsolutePath() + File.separator + ProfileFactory.OriginFolder);
+        File originFolder = new File(root.getAbsolutePath() + File.separator + ProfileGenerator.OriginFolder);
         parseFiles(profile, originFolder.listFiles(), true);
     }
 

@@ -27,26 +27,26 @@ public class DataSetResolverWithTranslator extends DataSetResolver {
     /**
      * 翻译数据元。
      *
-     * @param cdaVersion
+     * @param innerVersion
      * @param dataSetCode
      * @param isOriginDataSet
      * @param metaData
      * @param actualData
      * @return
      */
-    protected String[] translateMetaData(String cdaVersion,
+    protected String[] translateMetaData(String innerVersion,
                                          String dataSetCode,
                                          String metaData,
                                          String actualData,
                                          boolean isOriginDataSet) {
         if (StringUtils.isEmpty(actualData)) return null;
 
-        String metaDataType = cacheReader.read(keySchema.metaDataType(cdaVersion, dataSetCode, metaData));
+        String metaDataType = cacheReader.read(keySchema.metaDataType(innerVersion, dataSetCode, metaData));
         if (StringUtils.isEmpty(metaDataType)) {
             String msg = "Meta data %1 in data set %2 is not found in version %3. FORGET cache standards?"
                     .replace("%1", metaData)
                     .replace("%2", dataSetCode)
-                    .replace("%3", cdaVersion);
+                    .replace("%3", innerVersion);
 
             LogService.getLogger().error(msg);
             return null;
@@ -55,14 +55,14 @@ public class DataSetResolverWithTranslator extends DataSetResolver {
         actualData = actualData.trim();
 
         // only translate meta that bind with dict
-        long dictId = cacheReader.read(keySchema.metaDataDict(cdaVersion, dataSetCode, metaData));
+        long dictId = cacheReader.read(keySchema.metaDataDict(innerVersion, dataSetCode, metaData));
         if (!isOriginDataSet && StringUtils.isNotEmpty(actualData) && dictId > 0) {
             String[] tempQualifiers = QualifierTranslator.splitMetaData(metaData);
 
             String codeQualifier = QualifierTranslator.hBaseQualifier(tempQualifiers[0], metaDataType);
             String valueQualifier = QualifierTranslator.hBaseQualifier(tempQualifiers[1], metaDataType);
 
-            String value = cacheReader.read(keySchema.dictEntryValue(cdaVersion, Long.toString(dictId), actualData));
+            String value = cacheReader.read(keySchema.dictEntryValue(innerVersion, Long.toString(dictId), actualData));
 
             return new String[]{codeQualifier, actualData, valueQualifier, value == null ? "" : value};
         } else {

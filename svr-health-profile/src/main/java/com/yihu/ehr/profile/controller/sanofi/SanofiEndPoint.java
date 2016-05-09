@@ -71,7 +71,7 @@ public class SanofiEndPoint {
             @ApiParam(value = "起始日期", defaultValue = "2015-10-01")
             @RequestParam("since") @DateTimeFormat(pattern = "yyyy-MM-dd") Date since,
             @ApiParam(value = "结束日期", defaultValue = "2016-10-01")
-            @RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd") Date to) throws Exception {
+            @RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd") Date to) throws IOException, ParseException {
         demographicId = demographicId == null ? null : new String(Base64.getDecoder().decode(demographicId));
 
         Pageable pageable = new PageRequest(0, 20);

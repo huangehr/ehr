@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.annotation;
+package com.yihu.ehr.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,8 +10,14 @@ import java.lang.annotation.Target;
  * @version 1.0
  * @created 2016.03.28 15:29
  */
-@Target(ElementType.TYPE)
+@Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Table {
+public @interface Mapping {
+    /**
+     * 列
+     * @return
+     */
     String value() default "";
+
+    String key() default "";
 }

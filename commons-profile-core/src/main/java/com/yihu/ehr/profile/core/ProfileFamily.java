@@ -8,24 +8,43 @@ package com.yihu.ehr.profile.core;
  * @author Sand
  * @created 2016.04.27 17:06
  */
-public class ProfileFamily{
-    // 列族
-    public static final String Basic = "basic";
-    public static final String Extension = "extension";
+public enum ProfileFamily {
+    Basic("basic"),
+    Extension("extension");
 
-    public static class BasicColumns {
-        public static final String CardId = "card_id";
-        public static final String OrgCode = "org_code";
-        public static final String PatientId = "patient_id";
-        public static final String EventNo = "event_no";
-        public static final String EventDate = "event_date";
-        public static final String EventType = "event_type";
-        public static final String ProfileType = "profile_type";
-        public static final String DemographicId = "demographic_id";
-        public static final String ClientId = "client_id";
-        public static final String CreateDate = "create_date";
-        public static final String DataSets = "data_sets";
-        public static final String CdaVersion = "inner_version";
+    private String family;
+
+    ProfileFamily(String family){
+        this.family = family;
+    }
+
+    public String toString(){
+        return family;
+    }
+
+    // 列
+    public enum BasicQualifier{
+        CardId("card_id"),
+        OrgCode("org_code"),
+        PatientId("patient_id"),
+        EventNo("event_no"),
+        EventDate("event_date"),
+        EventType("event_type"),
+        ProfileType("profile_type"),
+        DemographicId("demographic_id"),
+        CreateDate("create_date"),
+        DataSets("data_sets"),
+        CdaVersion("inner_version");
+
+        private String qualifier;
+
+        BasicQualifier(String qualifier){
+            this.qualifier = qualifier;
+        }
+
+        public String toString(){
+            return qualifier;
+        }
     }
 
     /**
@@ -35,8 +54,8 @@ public class ProfileFamily{
      */
     public static String[] getFamilies() {
         return new String[]{
-                ProfileFamily.Basic,
-                ProfileFamily.Extension
+                ProfileFamily.Basic.toString(),
+                ProfileFamily.Extension.toString()
         };
     }
 
@@ -45,19 +64,18 @@ public class ProfileFamily{
      *
      * @return
      */
-    public static String[] getColumns(String family) {
-        if (family.equals(ProfileFamily.Basic)) {
+    public static String[] getColumns(ProfileFamily family) {
+        if (family == ProfileFamily.Basic) {
             return new String[]{
-                    BasicColumns.CardId.toString(),
-                    BasicColumns.OrgCode.toString(),
-                    BasicColumns.PatientId.toString(),
-                    BasicColumns.EventNo.toString(),
-                    BasicColumns.EventDate.toString(),
-                    BasicColumns.DemographicId.toString(),
-                    BasicColumns.ClientId.toString(),
-                    BasicColumns.CreateDate.toString(),
-                    BasicColumns.DataSets.toString(),
-                    BasicColumns.CdaVersion.toString()
+                    BasicQualifier.CardId.toString(),
+                    BasicQualifier.OrgCode.toString(),
+                    BasicQualifier.PatientId.toString(),
+                    BasicQualifier.EventNo.toString(),
+                    BasicQualifier.EventDate.toString(),
+                    BasicQualifier.DemographicId.toString(),
+                    BasicQualifier.CreateDate.toString(),
+                    BasicQualifier.DataSets.toString(),
+                    BasicQualifier.CdaVersion.toString()
             };
         }
 

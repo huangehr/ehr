@@ -1,38 +1,82 @@
 package com.yihu.ehr.profile.util;
 
-import com.yihu.ehr.profile.core.FileFamily;
-import com.yihu.ehr.profile.core.FileProfile;
-import com.yihu.ehr.profile.core.RawDocument;
-import com.yihu.ehr.util.DateTimeUtils;
-
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * @author linaz
  * @created 2016.04.15
  */
 public class FileTableUtil {
-    public static final String Table = "RawFiles";
+    public static final String Table = "UnStructuredDocuments";
 
-    public static Map<String, String> getBasicFamilyCellMap(FileProfile profile) {
-        Map<String, String> map = new HashMap<>();
-        map.put(FileFamily.BasicColumns.ProfileId, profile.getId());
-        map.put(FileFamily.BasicColumns.PatientId, profile.getPatientId());
-        map.put(FileFamily.BasicColumns.EventNo, profile.getEventNo());
-        map.put(FileFamily.BasicColumns.CdaVersion, profile.getCdaVersion());
-        map.put(FileFamily.BasicColumns.OrgCode, profile.getOrgCode());
+    // 列族
+    public enum Family {
+        Basic("basic"),
+        Document("document"),
+        Extension("extension");
 
-        return map;
+        private String family;
+
+        Family(String family) {
+            this.family = family;
+        }
+
+        public String toString() {
+            return family;
+        }
     }
 
-    public static Map<String, String> getFileFamilyCellMap(RawDocument document){
-        Map<String, String> map = new HashMap<>();
-        map.put(FileFamily.FileColumns.CdaDocumentId, document.getCdaDocumentId());
-        map.put(FileFamily.FileColumns.OriginUrl, document.getOriginUrl());
-        map.put(FileFamily.FileColumns.ExpireDate, DateTimeUtils.utcDateTimeFormat(document.getExpireDate()));
-        map.put(FileFamily.FileColumns.Files, document.formatStorageUrls());
+    // 列
+    public enum BasicQualifier {
+        ProfileId("archive_id"),
+        InnerVersion("inner_version"),
+        LastUpdateTime("last_update_time");
 
-        return map;
+        private String qualifier;
+
+        BasicQualifier(String qualifier) {
+            this.qualifier = qualifier;
+        }
+
+        public String toString() {
+            return qualifier;
+        }
+    }
+
+
+    // 列
+    public enum DocumentQualifier{
+        OrgCode("org_code"),
+        PatientId("patient_id"),
+        EventNo("event_no"),
+        EventDate("event_date"),
+        CdaVersion("inner_version"),
+        DocumentsJson("documents_json");
+        private String qualifier;
+        DocumentQualifier(String qualifier){
+            this.qualifier = qualifier;
+        }
+        public String toString(){
+            return qualifier;
+        }
+    }
+
+    public static String[] getQualifiers(Family family) {
+        if (family == Family.Basic) {
+            return new String[]{
+                    BasicQualifier.ProfileId.toString(),
+                    BasicQualifier.InnerVersion.toString(),
+                    BasicQualifier.LastUpdateTime.toString()
+            };
+        }else if(family == Family.Document){
+            return new String[]{
+                    DocumentQualifier.OrgCode.toString(),
+                    DocumentQualifier.PatientId.toString(),
+                    DocumentQualifier.EventNo.toString(),
+                    DocumentQualifier.EventDate.toString(),
+                    DocumentQualifier.CdaVersion.toString(),
+                    DocumentQualifier.DocumentsJson.toString(),
+            };
+        }
+
+        return null;
     }
 }

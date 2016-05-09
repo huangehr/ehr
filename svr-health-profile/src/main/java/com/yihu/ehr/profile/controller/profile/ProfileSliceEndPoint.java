@@ -25,8 +25,8 @@ import java.util.Date;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-@Api(value = "健康档案主题服务", description = "提供档案分类数据及统计数据")
-public class ProfileSubjectEndPoint extends BaseRestEndPoint {
+@Api(value = "健康档案切片服务", description = "提供档案分类数据及统计数据")
+public class ProfileSliceEndPoint extends BaseRestEndPoint {
     @ApiOperation(value = "既往史", response = PastHistory.class, responseContainer = "list", notes = "患者在既往就诊中的病史，包括患者在医疗机构中登记的数据及自动分析出来的数据")
     @RequestMapping(value = ServiceApi.HealthProfile.PastHistories, method = RequestMethod.GET)
     public Collection<PastHistory> getPastHistories(

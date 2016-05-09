@@ -119,7 +119,7 @@ public class DataSetEndPoint extends ExtendController<MStdDataSet> {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version) {
         Class entityClass = getServiceEntity(version);
-        List<BaseDataSet> list = dataSetService.search(entityClass,"", "id="+ids, "+id");
+        List<BaseDataSet> list = dataSetService.search(entityClass,"id="+ids);
         return convertToModels(list, new ArrayList<>(list.size()), MStdDataSet.class, "");
     }
 
@@ -136,8 +136,9 @@ public class DataSetEndPoint extends ExtendController<MStdDataSet> {
         BaseDataSet dataSet = (BaseDataSet) jsonToObj(model, entityClass);
 //        if (dataSetService.isExistByField("code", dataSet.getCode(), entityClass))
 //            throw new ApiException(ErrorCode.RapeatDataSetCode, "代码重复！");
-
-        return getModel(dataSetService.insert(dataSet));
+        if(dataSetService.add(dataSet, version))
+            return getModel(dataSet);
+        return null;
     }
 
 

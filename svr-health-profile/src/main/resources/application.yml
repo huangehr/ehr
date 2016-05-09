@@ -6,7 +6,7 @@ management:
 
 info:
   app:
-    name: HealthProfileService
+    name: BrowserService
     description: EHR platform health profile service.
     version: 1.0.0
 

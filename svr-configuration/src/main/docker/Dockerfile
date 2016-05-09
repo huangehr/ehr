@@ -4,7 +4,7 @@ FROM java:8
 
 MAINTAINER Sand sand.fj.wen@gmail.com
 
-ENV oauth2.profiles.active default,dev
+ENV spring.profiles.active default,dev
 
 VOLUME /tmp
 
