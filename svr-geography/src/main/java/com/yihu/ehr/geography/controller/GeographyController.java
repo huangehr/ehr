@@ -13,6 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -57,11 +58,11 @@ public class GeographyController extends BaseRestController{
      * 地址检查并保存
      * @return
      */
-    @RequestMapping(value = "/geographies", method = RequestMethod.POST)
+    @RequestMapping(value = "/geographies", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "地址检查,如果地址在数据库中不存在，这新增这条记录，否则返回地址id")
     public String saveAddress(
             @ApiParam(name = "json_data", value = "地址json字符串")
-            @RequestParam( value = "json_data") String jsonData) throws Exception{
+            @RequestBody String jsonData) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
         Geography geography = objectMapper.readValue(jsonData, Geography.class);
         if (geography.getCountry() == null) {

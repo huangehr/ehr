@@ -29,7 +29,7 @@ public interface TemplateClient {
     @ApiOperation(value = "创建模板")
     @RequestMapping(value = ServiceApi.ProfileTemplate.Templates, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.POST)
     void saveTemplate(
-            @RequestParam(value = "model") String model);
+            @RequestBody String model);
 
     @ApiOperation(value = "获取模板列表", response = MTemplate.class, responseContainer = "List")
     @RequestMapping(value = ServiceApi.ProfileTemplate.Templates, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.GET)
@@ -46,10 +46,10 @@ public interface TemplateClient {
             @PathVariable(value = "id") int id);
 
     @ApiOperation(value = "更新模板属性")
-    @RequestMapping(value = ServiceApi.ProfileTemplate.Template, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.ProfileTemplate.Template, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     void updateTemplate(
             @PathVariable(value = "id") int id,
-            @RequestParam("model") String model) ;
+            @RequestBody String model) ;
 
     @ApiOperation(value = "下载模板展示文件")
     @RequestMapping(value = ServiceApi.ProfileTemplate.TemplateCtn, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE, method = RequestMethod.GET)

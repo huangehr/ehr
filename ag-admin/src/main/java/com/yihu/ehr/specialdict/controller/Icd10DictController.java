@@ -206,14 +206,16 @@ public class Icd10DictController extends BaseController {
 
     @RequestMapping(value = "/dict/icd10/drugs", method = RequestMethod.POST)
     @ApiOperation(value = "为ICD10增加药品关联。----批量关联" )
-    public Object createIcd10DrugRelation(
+    public Object createIcd10DrugRelations(
             @ApiParam(name = "icd10_id",value = "icd10字典id")
             @RequestParam(value = "icd10_id") String icd10Id,
             @ApiParam(name = "drug_ids",value = "所关联的药品字典ids，多个以逗号分隔")
-            @RequestParam(value = "drug_ids") String drugIds){
+            @RequestParam(value = "drug_ids") String drugIds,
+            @ApiParam(name = "create_user",value = "创建者")
+            @RequestParam(value = "create_user") String createUser){
 
         Envelop envelop = new Envelop();
-        Collection<MIcd10DrugRelation> mIcd10DrugRelations = icd10DictClient.createIcd10DrugRelations(icd10Id, drugIds);
+        Collection<MIcd10DrugRelation> mIcd10DrugRelations = icd10DictClient.createIcd10DrugRelations(icd10Id, drugIds,createUser);
         List<Icd10DrugRelationModel> icd10DrugRelationModels = (List<Icd10DrugRelationModel>)convertToModels(mIcd10DrugRelations,
                 new ArrayList<>(mIcd10DrugRelations.size()),Icd10DrugRelationModel.class,null);
         if(icd10DrugRelationModels.size() != 0){
@@ -353,8 +355,10 @@ public class Icd10DictController extends BaseController {
             @ApiParam(name = "icd10_id", value = "健康问题Id")
             @RequestParam(value = "icd10_id") String icd10Id,
             @ApiParam(name = "indicator_ids", value = "关联的指标字典ids,多个以逗号连接")
-            @RequestParam(value = "indicator_ids") String indicatorIds){
-        Collection<MIcd10IndicatorRelation> icd10IndicatorRelations = icd10DictClient.createIcd10IndicatorRelations(icd10Id,indicatorIds);
+            @RequestParam(value = "indicator_ids") String indicatorIds,
+            @ApiParam(name = "create_user",value = "创建者")
+            @RequestParam(value = "create_user") String createUser){
+        Collection<MIcd10IndicatorRelation> icd10IndicatorRelations = icd10DictClient.createIcd10IndicatorRelations(icd10Id,indicatorIds,createUser);
         List<Icd10IndicatorRelationModel> icd10IndicatorRelationModels = (List<Icd10IndicatorRelationModel>)convertToModels(icd10IndicatorRelations,
                 new ArrayList<>(icd10IndicatorRelations.size()),Icd10IndicatorRelationModel.class,null);
         Envelop envelop = new Envelop();

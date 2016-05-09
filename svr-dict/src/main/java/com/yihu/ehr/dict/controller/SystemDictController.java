@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -63,10 +64,10 @@ public class SystemDictController extends BaseRestController {
     }
 
     @ApiOperation(value = "创建字典", response = MSystemDict.class)
-    @RequestMapping(value = "/dictionaries", method = RequestMethod.POST)
+    @RequestMapping(value = "/dictionaries", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MSystemDict createDictionary(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) {
+            @RequestBody String dictJson) {
         SystemDict dict = toEntity(dictJson, SystemDict.class);
         SystemDict systemDict = dictService.createDict(dict);
         return convertToModel(systemDict, MSystemDict.class, null);
@@ -83,10 +84,10 @@ public class SystemDictController extends BaseRestController {
     }
 
     @ApiOperation(value = "更新字典")
-    @RequestMapping(value = "/dictionaries", method = RequestMethod.PUT)
+    @RequestMapping(value = "/dictionaries", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MSystemDict updateDictionary(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) throws Exception {
+            @RequestBody String dictJson) throws Exception {
         SystemDict dict = toEntity(dictJson, SystemDict.class);
         if (null == dictService.retrieve(dict.getId())) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
         dictService.updateDict(dict);

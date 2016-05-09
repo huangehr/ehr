@@ -23,6 +23,7 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.csource.common.MyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -80,11 +81,11 @@ public class UserController extends BaseRestController {
         return (List<MUser>) convertToModels(userList, new ArrayList<MUser>(userList.size()), MUser.class, fields);
     }
 
-    @RequestMapping(value = ServiceApi.Users.Users, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Users.Users, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建用户", notes = "重新绑定用户信息")
     public MUser createUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
+            @RequestBody String userJsonData) throws Exception {
         User user = toEntity(userJsonData, User.class);
         user.setId(getObjectId(BizObject.User));
         user.setCreateDate(new Date());
@@ -103,11 +104,11 @@ public class UserController extends BaseRestController {
         return convertToModel(user, MUser.class, null);
     }
 
-    @RequestMapping(value = ServiceApi.Users.Users, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Users.Users, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改用户", notes = "重新绑定用户信息")
     public MUser updateUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "user_json_data") String userJsonData) throws Exception {
+            @RequestBody String userJsonData) throws Exception {
         User user = toEntity(userJsonData, User.class);
         String userType = user.getUserType();
         MConventionalDict dict = conventionalDictClient.getUserType(userType);

@@ -8,11 +8,9 @@ import com.yihu.ehr.model.adaption.MAdapterRelationship;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
@@ -69,19 +67,19 @@ public interface AdapterDictClient {
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") Long id) ;
 
-    @RequestMapping(value = "/entry", method = RequestMethod.POST)
+    @RequestMapping(value = "/entry", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "保存字典项映射关系")
     public MAdapterDict createAdapterDictEntry(
             @ApiParam(name = "adapterDictModel", value = "字典数据模型", defaultValue = "")
-            @RequestParam(value = "adapterDictModel") String dictJsonModel) throws Exception ;
+            @RequestBody String dictJsonModel) throws Exception ;
 
-    @RequestMapping(value = "/entry/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/entry/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改字典项映射关系")
     public MAdapterDict updateAdapterDictEntry(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") Long id,
             @ApiParam(name = "adapterDictModel", value = "字典数据模型", defaultValue = "")
-            @RequestParam(value = "adapterDictModel") String dictJsonModel) throws Exception ;
+            @RequestBody String dictJsonModel) throws Exception ;
 
     @RequestMapping(value = "/entrys", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除字典项映射")

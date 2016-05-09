@@ -6,11 +6,9 @@ import com.yihu.ehr.model.family.MFamilies;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
@@ -37,17 +35,17 @@ public interface FamiliesClient {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) ;
 
-    @RequestMapping(value = "/families", method = RequestMethod.POST)
+    @RequestMapping(value = "/families", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建家庭关系")
     MFamilies createFamily(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
-            @RequestParam(value = "json_data") String jsonData) ;
+            @RequestBody String jsonData) ;
 
-    @RequestMapping(value = "/families", method = RequestMethod.PUT)
+    @RequestMapping(value = "/families", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改家庭关系")
     MFamilies updateFamily(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
-            @RequestParam(value = "json_data") String jsonData);
+            @RequestBody String jsonData);
 
     @RequestMapping(value = "/families/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取家庭关系")

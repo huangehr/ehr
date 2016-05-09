@@ -10,6 +10,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -118,30 +119,29 @@ public class DataSetEndPoint extends ExtendController<MStdDataSet> {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version) {
         Class entityClass = getServiceEntity(version);
-        List<BaseDataSet> list = dataSetService.search(entityClass,"id="+ids);
+        List<BaseDataSet> list = dataSetService.search(entityClass,"", "id="+ids, "+id");
         return convertToModels(list, new ArrayList<>(list.size()), MStdDataSet.class, "");
     }
 
 
-    @RequestMapping(value = ServiceApi.Standards.DataSets, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.DataSets, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增数据集信息")
     public MStdDataSet saveDataSet(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
             @RequestParam(value = "version") String version,
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
-            @RequestParam(value = "model") String model) throws Exception{
+            @RequestBody String model) throws Exception{
 
         Class entityClass = getServiceEntity(version);
         BaseDataSet dataSet = (BaseDataSet) jsonToObj(model, entityClass);
 //        if (dataSetService.isExistByField("code", dataSet.getCode(), entityClass))
 //            throw new ApiException(ErrorCode.RapeatDataSetCode, "代码重复！");
-        if(dataSetService.add(dataSet, version))
-            return getModel(dataSet);
-        return null;
+
+        return getModel(dataSetService.insert(dataSet));
     }
 
 
-    @RequestMapping(value = ServiceApi.Standards.DataSet, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Standards.DataSet, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改数据集信息")
     public MStdDataSet updateDataSet(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
@@ -149,7 +149,7 @@ public class DataSetEndPoint extends ExtendController<MStdDataSet> {
             @ApiParam(name = "id", value = "数据集编号", defaultValue = "")
             @PathVariable(value = "id") long id,
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
-            @RequestParam(value = "model") String model) throws Exception{
+            @RequestBody String model) throws Exception{
 
         Class entityClass = getServiceEntity(version);
         BaseDataSet dataSetModel = (BaseDataSet) jsonToObj(model, entityClass);

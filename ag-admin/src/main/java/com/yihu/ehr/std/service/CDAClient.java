@@ -8,6 +8,7 @@ import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -48,23 +49,23 @@ public interface CDAClient {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version") String versionCode);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Standards.Documents, method = RequestMethod.POST)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Standards.Documents, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "保存CDADocuments")
     MCDADocument saveCDADocuments(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
             @RequestParam(value = "version") String version,
             @ApiParam(name = "model", value = "文档json数据模型")
-            @RequestParam(value = "model") String cdaDocumentJsonData);
+            @RequestBody String cdaDocumentJsonData);
 
     @ApiOperation(value = "修改CDADocuments")
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Standards.Document, method = RequestMethod.PUT)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Standards.Document, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     MCDADocument updateCDADocuments(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
             @RequestParam(value = "version") String version,
             @ApiParam(name = "id", value = "编号")
             @PathVariable(value = "id") String id,
             @ApiParam(name = "model", value = "文档json数据模型")
-            @RequestParam(value = "model") String cdaDocumentJsonData);
+            @RequestBody String cdaDocumentJsonData);
 
     @ApiOperation(value = "删除CDADocuments")
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Standards.Documents, method = RequestMethod.DELETE)

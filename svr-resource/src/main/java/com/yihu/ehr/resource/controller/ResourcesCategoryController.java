@@ -1,65 +1,114 @@
 package com.yihu.ehr.resource.controller;
-
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.BizObject;
+import com.yihu.ehr.model.resource.MRsCategory;
+import com.yihu.ehr.resource.model.RsCategory;
+import com.yihu.ehr.resource.service.intf.IResourcesCategoryService;
+import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 
 /**
- * Created by hzp on 2016/4/19.
+ * Created by lyr on 2016/5/4.
  */
 
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0 + "/rs/category")
-@Api(value = "rsCategory", description = "资源分类服务接口")
-public class ResourcesCategoryController {
-    /*@Autowired
-    private IResourcesCategoryService resourcesCategoryService;
+@RequestMapping(value = ApiVersion.Version1_0 + "/resourceCategory")
+@Api(value = "resourceCategory", description = "资源分类服务接口")
+public class ResourcesCategoryController extends BaseRestController {
 
-    @RequestMapping(value = "/addResourcesCategory", method = RequestMethod.POST)
-    @ApiOperation(value = "新增资源分类")
-    public Result addResourcesCategory(
-            @ApiParam(name = "category", value = "对象JSON结构体", allowMultiple = true, defaultValue = "{\"name\": \"\", \"pid\": \"\", \"description\": \"\"}")
-            @RequestParam(value = "category", required = true) String categoryJson) throws Exception {
-            RsCategory obj = (RsCategory)JSONObject.toBean(JSONObject.fromObject(categoryJson),RsCategory.class);
-            return resourcesCategoryService.addResourcesCategory(obj);
+    @Autowired
+    private IResourcesCategoryService rsCategoryService;
+
+    @RequestMapping(method = RequestMethod.POST)
+    @ApiOperation("资源类别创建")
+    public MRsCategory createRsCategory(
+            @ApiParam(name = "resourceCategory", value = "资源分类", defaultValue = "{\"name\":\"string\",\"pid\":\"string\",\"description\":\"string\"}")
+            @RequestParam(name = "resourceCategory") String resourceCategory) throws Exception
+    {
+        RsCategory rsCategory = toEntity(resourceCategory, RsCategory.class);
+        rsCategory.setId(getObjectId(BizObject.ResourceCategory));
+        rsCategoryService.createOrUpdRsCategory(rsCategory);
+
+        return convertToModel(rsCategory, MRsCategory.class);
     }
 
-    @RequestMapping(value = "/editResourcesCategory", method = RequestMethod.POST)
-    @ApiOperation(value = "修改资源分类")
-    public Result editResourcesCategory(
-            @ApiParam(name = "category", value = "对象JSON结构体", allowMultiple = true, defaultValue = "{\"id\": \"\",\"name\": \"\", \"pid\": \"\", \"description\": \"\"}")
-            @RequestParam(value = "category", required = true) String categoryJson) {
-        try {
-            RsCategory obj = (RsCategory)JSONObject.toBean(JSONObject.fromObject(categoryJson),RsCategory.class);
-            return resourcesCategoryService.editResourcesCategory(obj);
-        }
-        catch (Exception e) {
-            return Result.error(e.getMessage());
-        }
+    @RequestMapping(method=RequestMethod.PUT)
+    @ApiOperation("资源类别更新")
+    public MRsCategory updateRsCategory(
+            @ApiParam(name="resourceCategory",value="资源分类", defaultValue = "{\"id\":\"string\",\"name\":\"string\",\"pid\":\"string\",\"description\":\"string\"}")
+            @RequestParam(name="resourceCategory")String resourceCategory) throws  Exception
+    {
+        RsCategory rsCategory = toEntity(resourceCategory, RsCategory.class);
+        rsCategoryService.createOrUpdRsCategory(rsCategory);
+
+        return convertToModel(rsCategory, MRsCategory.class);
     }
 
-    @RequestMapping(value = "/deleteResourcesCategory", method = RequestMethod.POST)
-    @ApiOperation(value = "删除资源分类")
-    public Result deleteResourcesCategory(
-            @ApiParam(name = "id", value = "主键") @RequestParam(value = "id", required = true) String id) {
-        try {
-            return resourcesCategoryService.deleteResourcesCategory(id);
-        }
-        catch (Exception e) {
-            return Result.error(e.getMessage());
-        }
+    @RequestMapping(value="/{id}",method = RequestMethod.DELETE)
+    @ApiOperation("删除资源类别")
+    public boolean deleteResourceCategory(
+            @ApiParam(name="id",value="资源类别ID",defaultValue = "string")
+            @PathVariable(value="id") String id) throws Exception
+    {
+        rsCategoryService.deleteRsCategory(id);
+        return true;
     }
 
-    @ApiOperation("获取资源分类")
-    @RequestMapping(value = "/queryResourcesCategory", method = RequestMethod.GET)
-    public Result queryResourcesCategory(@ApiParam("id") @RequestParam(value = "id", required = false) String id,@ApiParam("name") @RequestParam(value = "name", required = false) String name,@ApiParam("pid") @RequestParam(value = "pid", required = false) String pid) {
-        try {
-            return resourcesCategoryService.queryResourcesCategory(id,name,pid);
+    @RequestMapping(method = RequestMethod.GET)
+    @ApiOperation("获取资源类别")
+    public Page<MRsCategory> getRsCategories(
+            @ApiParam(name="fields",value="返回字段",defaultValue = "")
+            @RequestParam(name="fields",required = false)String fields,
+            @ApiParam(name="filters",value="过滤",defaultValue = "")
+            @RequestParam(name="filters",required = false)String filters,
+            @ApiParam(name="sorts",value="排序",defaultValue = "")
+            @RequestParam(name="sorts",required = false)String sorts,
+            @ApiParam(name="page",value="页码",defaultValue = "1")
+            @RequestParam(name="page",required = false)int page,
+            @ApiParam(name="size",value="分页大小",defaultValue = "15")
+            @RequestParam(name="size",required = false)int size,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws  Exception
+    {
+        Pageable pageable = new PageRequest(reducePage(page),size);
+        long total = 0;
+        Collection<MRsCategory> rsList;
+
+        //过滤条件为空
+        if(StringUtils.isEmpty(filters))
+        {
+            Page<RsCategory> resources = rsCategoryService.getRsCategories(sorts,reducePage(page),size);
+            total = resources.getTotalElements();
+            rsList = convertToModels(resources.getContent(),new ArrayList<>(resources.getNumber()),MRsCategory.class,fields);
         }
-        catch (Exception e) {
-            return Result.error(e.getMessage());
+        else
+        {
+            List<RsCategory> resources = rsCategoryService.search(fields,filters,sorts,page,size);
+            total = rsCategoryService.getCount(filters);
+            rsList = convertToModels(resources,new ArrayList<>(resources.size()),MRsCategory.class,fields);
         }
+
+        pagedResponse(request,response,total,page,size);
+        Page<MRsCategory> rsPage = new PageImpl<MRsCategory>((List<MRsCategory>)rsList,pageable,total);
+
+        return rsPage;
     }
-*/
+
 }

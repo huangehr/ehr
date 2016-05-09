@@ -6,11 +6,9 @@ import com.yihu.ehr.model.adaption.MAdapterPlan;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
@@ -50,22 +48,22 @@ public interface PlanClient {
             @PathVariable(value = "id") Long id) ;
 
 
-    @RequestMapping(value = "/adapter/plan", method = RequestMethod.POST)
+    @RequestMapping(value = "/adapter/plan", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "保存适配方案")
     MAdapterPlan saveAdapterPlan(
             @ApiParam(name = "parmJson", value = "数据模型", defaultValue = "")
-            @RequestParam(value = "parmJson") String parmJson,
+            @RequestBody String parmJson,
             @ApiParam(name = "isCover", value = "是否覆盖", defaultValue = "")
             @RequestParam(value = "isCover") String isCover) ;
 
 
-    @RequestMapping(value = "/adapter/plan/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/adapter/plan/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "更新适配方案")
     MAdapterPlan updateAdapterPlan(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") Long id,
             @ApiParam(name = "parmJson", value = "数据模型", defaultValue = "")
-            @RequestParam(value = "parmJson") String parmJson) ;
+            @RequestBody String parmJson) ;
 
     @RequestMapping(value = "/adapter/plans", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除适配方案")

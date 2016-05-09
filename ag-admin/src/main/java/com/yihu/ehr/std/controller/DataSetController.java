@@ -360,14 +360,14 @@ public class DataSetController extends BaseController {
     @ApiOperation(value = "根据数据集id获取数据元")
     public Envelop getMetaDataByDataSetId(
             @ApiParam(name = "data_set_id", value = "数据元编号", defaultValue = "")
-            @RequestParam(value = "data_set_id") long dataSetIs,
+            @RequestParam(value = "data_set_ids") String dataSetIds,
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version) throws Exception{
         Envelop envelop = new Envelop();
 
-        List<MStdMetaData> list = dataSetClient.getMetaDataByDataSetId(dataSetIs, version);
-        Collection<MetaDataModel> metaDataList = convertToModels(list, new ArrayList<>(list.size()), MetaDataModel.class, null);
-        envelop.setDetailModelList((List) metaDataList);
+//        List<MStdMetaData> list = dataSetClient.getMetaDataByDataSetId(dataSetIs, version);
+//        Collection<MetaDataModel> metaDataList = convertToModels(list, new ArrayList<>(list.size()), MetaDataModel.class, null);
+        envelop.setDetailModelList((List) dataSetClient.searchMetaDatas("dataSetId,columnName", "dataSetId=" + dataSetIds, "+dataSetId", -1, 0, version).getBody());
         return envelop;
     }
 

@@ -8,11 +8,9 @@ import com.yihu.ehr.model.standard.MStdMetaData;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
@@ -72,17 +70,17 @@ public interface DataSetClient {
             @RequestParam(value = "version") String version);
 
 
-    @RequestMapping(value = ServiceApi.Standards.DataSets, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.DataSets, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增数据集信息")
     MStdDataSet saveDataSet(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
             @RequestParam(value = "version") String version,
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
-            @RequestParam(value = "model") String model);
+            @RequestBody String model);
 
 
 
-    @RequestMapping(value = ServiceApi.Standards.DataSet, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Standards.DataSet, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改数据集信息")
     MStdDataSet updateDataSet(
             @ApiParam(name = "version", value = "标准版本", defaultValue = "")
@@ -90,7 +88,7 @@ public interface DataSetClient {
             @ApiParam(name = "id", value = "数据集编号", defaultValue = "")
             @PathVariable(value = "id") long id,
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
-            @RequestParam(value = "model") String model);
+            @RequestBody String model);
 
     @RequestMapping(value = ServiceApi.Standards.DataSetCodeIsExist,method = RequestMethod.GET)
     boolean isExistCode(
@@ -98,13 +96,13 @@ public interface DataSetClient {
             @RequestParam(value = "version_code")String versionCode);
 
     //以下是数据元部分
-    @RequestMapping(value = ServiceApi.Standards.MetaDatas, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Standards.MetaDatas, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增数据元")
     MStdMetaData saveMetaSet(
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version,
             @ApiParam(name = "model", value = "数据源模型", defaultValue = "")
-            @RequestParam(value = "model", required = false) String metadataJsonData);
+            @RequestBody String metadataJsonData);
 
 
     @RequestMapping(value = ServiceApi.Standards.MetaDatas, method = RequestMethod.GET)
@@ -133,7 +131,7 @@ public interface DataSetClient {
             @RequestParam(value = "version") String version);
 
 
-    @RequestMapping(value = ServiceApi.Standards.MetaData, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Standards.MetaData, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "更新数据元")
     MStdMetaData updataMetaSet(
             @ApiParam(name = "version", value = "版本", defaultValue = "")
@@ -141,7 +139,7 @@ public interface DataSetClient {
             @ApiParam(name = "id", value = "数据元编号", defaultValue = "")
             @PathVariable(value = "id") long id,
             @ApiParam(name = "model", value = "数据源模型", defaultValue = "")
-            @RequestParam(value = "model", required = false) String model);
+            @RequestBody String model);
 
 
     @RequestMapping(value = ServiceApi.Standards.MetaData, method = RequestMethod.DELETE)
@@ -200,7 +198,7 @@ public interface DataSetClient {
     @ApiOperation(value = "根据数据集id获取数据元")
     List<MStdMetaData> getMetaDataByDataSetId(
             @ApiParam(name = "data_set_id", value = "数据元编号", defaultValue = "")
-            @PathVariable(value = "data_set_id") long dataSetIs,
+            @PathVariable(value = "data_set_ids") String dataSetIs,
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version);
 
