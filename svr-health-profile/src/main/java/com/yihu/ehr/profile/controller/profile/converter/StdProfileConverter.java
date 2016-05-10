@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.controller.profile;
+package com.yihu.ehr.profile.controller.profile.converter;
 
 import com.yihu.ehr.cache.CacheReader;
 import com.yihu.ehr.exception.ApiException;
@@ -10,27 +10,23 @@ import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import com.yihu.ehr.profile.config.CdaDocumentTypeOptions;
 import com.yihu.ehr.profile.core.EventType;
+import com.yihu.ehr.profile.core.FileProfile;
 import com.yihu.ehr.profile.core.StdDataSet;
 import com.yihu.ehr.profile.core.StdProfile;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
-import com.yihu.ehr.profile.persist.ProfileIndices;
-import com.yihu.ehr.profile.persist.ProfileIndicesService;
 import com.yihu.ehr.profile.persist.ProfileService;
 import com.yihu.ehr.profile.service.Template;
 import com.yihu.ehr.profile.service.TemplateService;
 import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.schema.OrgKeySchema;
 import com.yihu.ehr.schema.StdKeySchema;
-import com.yihu.ehr.util.DateTimeUtils;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -40,10 +36,7 @@ import java.util.*;
  * @created 2016.05.03 14:08
  */
 @Service
-public class ProfileUtil {
-    @Autowired
-    private ProfileIndicesService indicesService;
-
+public class StdProfileConverter {
     @Autowired
     private ProfileService profileService;
 
@@ -65,27 +58,9 @@ public class ProfileUtil {
     @Autowired
     private StdKeySchema stdKeySchema;
 
-    public Page<ProfileIndices> searchProfile(MProfileSearch query, Date since, Date to) throws ParseException {
-        String demographicId = query.getDemographicId();
-        String orgCode = query.getOrganizationCode();
-        String patientId = query.getPatientId();
-        String eventNo = query.getEventNo();
-        String name = query.getName();
-        String telephone = query.getTelephone();
-        String gender = query.getGender();
-        Date birthday = DateTimeUtils.simpleDateParse(query.getBirthday());
-
-        Page<ProfileIndices> profileIndices = indicesService.findByIndices(orgCode, patientId, eventNo, since, to, null);
-        if (profileIndices == null || profileIndices.getContent().isEmpty()) {
-            profileIndices = indicesService.findByDemographic(demographicId, orgCode, name, telephone, gender, birthday, since, to, null);
-        }
-
-        return profileIndices;
-    }
-
-    public Collection<MProfile> loadAndConvertProfiles(Page<ProfileIndices> profileIndices,
-                                                        boolean loadStdDataSet,
-                                                        boolean loadOriginDataSet) throws Exception {
+    /*public Collection<MProfile> loadProfiles(Page<ProfileIndices> profileIndices,
+                                             boolean loadStdDataSet,
+                                             boolean loadOriginDataSet) throws Exception {
         if (profileIndices.getContent().size() == 0) return null;
 
         List<StdProfile> profiles = new ArrayList<>();
@@ -102,7 +77,7 @@ public class ProfileUtil {
         }
 
         return profileList;
-    }
+    }*/
 
     public MProfile convertProfile(StdProfile profile, boolean containDataSet) {
         MProfile mProfile = new MProfile();
@@ -116,20 +91,24 @@ public class ProfileUtil {
         mProfile.setProfileType(profile.getProfileType());
         mProfile.setEventType(profile.getEventType());
 
+        convertDocuments(profile, mProfile, containDataSet);
+
+        return mProfile;
+    }
+
+    protected void convertDocuments(StdProfile profile, MProfile mProfile, boolean containDataSet){
         Map<Template, MCDADocument> cdaDocuments = getCustomizedCDADocuments(profile.getCdaVersion(), profile.getOrgCode(), profile.getEventType());
         if (CollectionUtils.isEmpty(cdaDocuments)) {
             LogService.getLogger().error("Unable to get cda document of version " + profile.getCdaVersion()
                     + " for organization " + profile.getOrgCode() + ", template not uploaded?");
 
-            return null;
+            return;
         }
 
         for (Template template :cdaDocuments.keySet()){
             MProfileDocument document = convertDocument(profile, cdaDocuments.get(template), template.getId(), containDataSet);
-            mProfile.getDocuments().add(document);
+            if(document != null) mProfile.getDocuments().add(document);
         }
-
-        return mProfile;
     }
 
     public MProfileDocument convertDocument(StdProfile profile, MCDADocument cdaDocument, Integer templateId, boolean containDataSet) {
@@ -156,10 +135,14 @@ public class ProfileUtil {
                 convertDataSet(profile.getCdaVersion(), document, profile.getDataSet(DataSetUtil.originDataSetCode(dataSetCode)));
             }
 
-            if (!validDocument) validDocument = !dataSetCode.startsWith("HDSA00_01");
+            // 判断是否是一个正常的文档: 不只含有人口学信息部分
+            if (!validDocument && profile.getDataSet(dataSetCode) != null) validDocument = !dataSetCode.startsWith("HDSA00_01");
+
+            dataSetCode = DataSetUtil.originDataSetCode(dataSetCode);
+            if (!validDocument && profile.getDataSet(dataSetCode) != null) validDocument = !dataSetCode.startsWith("HDSA00_01");
         }
 
-        return document;
+        return validDocument ? document : null;
     }
 
     public void convertDataSet(String version, MProfileDocument document, StdDataSet dataSet) {

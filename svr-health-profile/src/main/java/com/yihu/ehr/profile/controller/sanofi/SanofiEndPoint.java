@@ -58,7 +58,7 @@ public class SanofiEndPoint {
     @ApiOperation(value = "获取体征数据", notes = "获取体征数据")
     @RequestMapping(value = ServiceApi.SanofiSupport.PhysicSigns, method = RequestMethod.GET)
     public ResponseEntity<String> getBodySigns(
-            @ApiParam(value = "身份证号,使用Base64编码", defaultValue = "NDEyNzI2MTk1MTExMzA2MjY4")
+            @ApiParam(value = "身份证号", defaultValue = "412726195111306268")
             @RequestParam(value = "demographic_id", required = false) String demographicId,
             @ApiParam(value = "患者姓名")
             @RequestParam(value = "name", required = false) String name,
@@ -71,9 +71,7 @@ public class SanofiEndPoint {
             @ApiParam(value = "起始日期", defaultValue = "2015-10-01")
             @RequestParam("since") @DateTimeFormat(pattern = "yyyy-MM-dd") Date since,
             @ApiParam(value = "结束日期", defaultValue = "2016-10-01")
-            @RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd") Date to) throws IOException, ParseException {
-        demographicId = demographicId == null ? null : new String(Base64.getDecoder().decode(demographicId));
-
+            @RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd") Date to) throws Exception {
         Pageable pageable = new PageRequest(0, 20);
         Page<ProfileIndices> profileIndices = indicesService.findByDemographic(demographicId, null, name, telephone, gender, birthday, since, to, pageable);
 

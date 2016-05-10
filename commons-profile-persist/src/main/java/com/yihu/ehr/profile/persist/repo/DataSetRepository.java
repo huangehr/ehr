@@ -1,14 +1,11 @@
 package com.yihu.ehr.profile.persist.repo;
 
 import com.yihu.ehr.cache.CacheReader;
-import com.yihu.ehr.profile.core.ProfileType;
+import com.yihu.ehr.profile.core.*;
 import com.yihu.ehr.data.hbase.TableBundle;
 import com.yihu.ehr.data.hbase.HBaseDao;
 import com.yihu.ehr.data.hbase.ResultUtil;
-import com.yihu.ehr.profile.core.DataRecord;
-import com.yihu.ehr.profile.core.LinkDataSet;
-import com.yihu.ehr.profile.core.StdDataSet;
-import com.yihu.ehr.profile.core.DataSetFamily;
+import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.profile.util.QualifierTranslator;
 import com.yihu.ehr.schema.StdKeySchema;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -40,6 +37,35 @@ public class DataSetRepository {
     @Autowired
     StdKeySchema keySchema;
 
+    public void save(StdProfile profile) throws IOException {
+        TableBundle bundle = new TableBundle();
+
+        // 再存数据集
+        for (StdDataSet dataSet : profile.getDataSets()) {
+            bundle.clear();
+
+            for (String rowkey : dataSet.getRecordKeys()) {
+                bundle.addValues(
+                        rowkey,
+                        DataSetFamily.Basic,
+                        DataSetUtil.getBasicFamilyQualifier(profile.getId(), dataSet));
+                bundle.addValues(
+                        rowkey,
+                        DataSetFamily.MetaData,
+                        DataSetUtil.getMetaDataFamilyQualifier(rowkey, dataSet));
+
+                if (dataSet instanceof LinkDataSet) {
+                    bundle.addValues(
+                            rowkey,
+                            DataSetFamily.Extension,
+                            DataSetUtil.getExtensionFamilyQualifier((LinkDataSet) dataSet));
+                }
+            }
+
+            hbaseDao.saveOrUpdate(dataSet.getCode(), bundle);
+        }
+    }
+
     /**
      * 获取数据集。
      *
@@ -59,9 +85,6 @@ public class DataSetRepository {
         TableBundle dataSetBundle = new TableBundle();
         for (String rowkey : rowkeys) {
             dataSetBundle.addRows(rowkey);
-            /*dataSetBundle.addFamily(rowkey, DataSetFamily.Basic);
-            dataSetBundle.addFamily(rowkey, DataSetFamily.MetaData);
-            dataSetBundle.addFamily(rowkey, DataSetFamily.Extension);*/
         }
 
         Object[] results = hbaseDao.get(dataSetCode, dataSetBundle);

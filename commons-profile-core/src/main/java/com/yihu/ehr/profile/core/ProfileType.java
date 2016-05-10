@@ -1,5 +1,7 @@
 package com.yihu.ehr.profile.core;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /**
  * 档案类型。注意新增类型只能依次增加，不能插队。
  *
@@ -9,7 +11,7 @@ package com.yihu.ehr.profile.core;
  */
 public enum ProfileType {
     Standard(0),
-    Document(1),
+    File(1),
     Link(2);
 
     private int type;
@@ -17,6 +19,7 @@ public enum ProfileType {
         this.type = type;
     }
 
+    @JsonValue
     public int getType(){
         return type;
     }
@@ -26,7 +29,7 @@ public enum ProfileType {
     }
 
     public static ProfileType create(String ordinal){
-        return create(Integer.getInteger(ordinal));
+        return create(Integer.parseInt(ordinal));
     }
 
     public static ProfileType create(int ordinal){
