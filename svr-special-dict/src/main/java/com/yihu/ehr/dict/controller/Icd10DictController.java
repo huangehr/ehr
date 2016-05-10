@@ -77,14 +77,6 @@ public class Icd10DictController extends BaseRestController {
                 icd10IndicatorRelationService.delete(indicationRelationId);
             }
         }
-        String diagnoseRelationId;
-        List<Icd10DiagnoseRelation> icd10DiagnoseRelations = icd10DiagnoseRelationService.getIcd10DiagnoseRelationListByIcd10Id(id);
-        if (icd10DiagnoseRelations != null) {
-            for(Icd10DiagnoseRelation icd10DiagnoseRelation : icd10DiagnoseRelations ){
-                diagnoseRelationId = icd10DiagnoseRelation.getId();
-                icd10DiagnoseRelationService.delete(diagnoseRelationId);
-            }
-        }
         icd10DictService.delete(id);
 
         return true;
@@ -109,14 +101,6 @@ public class Icd10DictController extends BaseRestController {
             if (icd10IndicatorRelations != null) {
                 for(Icd10IndicatorRelation icd10IndicatorRelation : icd10IndicatorRelations ){
                     indicationRelationIds.add(icd10IndicatorRelation.getId());
-                }
-            }
-            String diagnoseRelationId;
-            List<Icd10DiagnoseRelation> icd10DiagnoseRelations = icd10DiagnoseRelationService.getIcd10DiagnoseRelationListByIcd10Id(icd10Id);
-            if (icd10DiagnoseRelations != null) {
-                for(Icd10DiagnoseRelation icd10DiagnoseRelation : icd10DiagnoseRelations ){
-                    diagnoseRelationId = icd10DiagnoseRelation.getId();
-                    icd10DiagnoseRelationService.delete(diagnoseRelationId);
                 }
             }
         }
