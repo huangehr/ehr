@@ -293,7 +293,7 @@ public class ConventionalDictController extends BaseRestController {
     }
 
     @RequestMapping(value = "/dictionaries/family_relationship", method = RequestMethod.GET)
-    @ApiOperation(value = "获取家庭关系字典项", response = MConventionalDict.class)
+    @ApiOperation(value = "获取用户来源字典项", response = MConventionalDict.class)
     public MConventionalDict getFamilyRelationship(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {

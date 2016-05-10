@@ -110,7 +110,6 @@ public class DataSetEndPoint extends ExtendController<MStdDataSet> {
         return getModel(dataSetService.retrieve(id, getServiceEntity(version)));
     }
 
-
     @RequestMapping(value = ServiceApi.Standards.DataSetsIds, method = RequestMethod.GET)
     @ApiOperation(value = "根据数据集ids(用逗号隔开)获取数据集信息")
     public Collection<MStdDataSet> getDataSets(
@@ -119,10 +118,9 @@ public class DataSetEndPoint extends ExtendController<MStdDataSet> {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version) {
         Class entityClass = getServiceEntity(version);
-        List<BaseDataSet> list = dataSetService.search(entityClass,"id="+ids);
+        List<BaseDataSet> list = dataSetService.search(entityClass,"", "id="+ids, "+id");
         return convertToModels(list, new ArrayList<>(list.size()), MStdDataSet.class, "");
     }
-
 
     @RequestMapping(value = ServiceApi.Standards.DataSets, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增数据集信息")
@@ -136,9 +134,8 @@ public class DataSetEndPoint extends ExtendController<MStdDataSet> {
         BaseDataSet dataSet = (BaseDataSet) jsonToObj(model, entityClass);
 //        if (dataSetService.isExistByField("code", dataSet.getCode(), entityClass))
 //            throw new ApiException(ErrorCode.RapeatDataSetCode, "代码重复！");
-        if(dataSetService.add(dataSet, version))
-            return getModel(dataSet);
-        return null;
+
+        return getModel(dataSetService.insert(dataSet));
     }
 
 

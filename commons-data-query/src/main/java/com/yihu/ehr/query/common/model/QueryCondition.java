@@ -28,6 +28,9 @@ public class QueryCondition {
 		this.keyword = keyword;
 	}
 
+	public QueryCondition(){
+	}
+
 	/**
 	 * 构造函数
 	 */
@@ -48,7 +51,25 @@ public class QueryCondition {
 		this.keywords = keywords;
 	}
 
+	public void setField(String field) {
+		this.field = field;
+	}
 
+	public void setKeyword(Object keyword) {
+		this.keyword = keyword;
+	}
+
+	public void setKeywords(Object[] keywords) {
+		this.keywords = keywords;
+	}
+
+	public void setOperation(String operation) {
+		this.operation = operation;
+	}
+
+	public void setLogical(String logical) {
+		this.logical = logical;
+	}
 
 	/**
 	 * 获取条件关系

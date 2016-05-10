@@ -13,20 +13,9 @@ import org.springframework.context.ApplicationContextAware;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableFeignClients
-public class UserServiceApp extends SpringBootServletInitializer implements ApplicationContextAware{
+public class UserServiceApp{
 
     public static void main(String[] args) {
         SpringApplication.run(UserServiceApp.class, args);
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        //force the bean to get loaded as soon as possible
-        applicationContext.getBean("requestMappingHandlerAdapter");
-    }
-
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(UserServiceApp.class);
     }
 }
