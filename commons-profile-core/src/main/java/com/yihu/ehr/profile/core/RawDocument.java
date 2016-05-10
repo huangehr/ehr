@@ -1,11 +1,8 @@
 package com.yihu.ehr.profile.core;
 
-import com.yihu.ehr.util.StringBuilderUtil;
-
-import javax.activation.MimeType;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * 非结构化档案类。包含一个文档地址中的信息。
@@ -13,13 +10,14 @@ import java.util.List;
  * @author Sand
  * @created 2015.08.16 10:44
  */
-public class RawDocument extends ArrayList<String> {
-    String cdaDocumentId;
-    String url;         // 机构健康档案中的地址
+public class RawDocument {
+    private String cdaDocumentId;           // CDA文档ID
+    private String originUrl;               // 机构健康档案中的地址
+    private String mimeType;
+    private Date expireDate;
 
-    MimeType mimeType;
-
-    Date expireDate;
+    // 文件索引，key为文件名
+    private Map<String, String> storageUrls = new TreeMap<>();
 
     public String getCdaDocumentId() {
         return cdaDocumentId;
@@ -29,12 +27,12 @@ public class RawDocument extends ArrayList<String> {
         this.cdaDocumentId = cdaDocumentId;
     }
 
-    public String getUrl() {
-        return url;
+    public String getOriginUrl() {
+        return originUrl;
     }
 
-    public void setUrl(String fileUrl) {
-        this.url = fileUrl;
+    public void setOriginUrl(String fileUrl) {
+        this.originUrl = fileUrl;
     }
 
     public Date getExpireDate() {
@@ -45,12 +43,28 @@ public class RawDocument extends ArrayList<String> {
         this.expireDate = expireDate;
     }
 
-    public String getFileList(){
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+    }
+
+    public Map<String, String> getStorageUrls(){
+        return storageUrls;
+    }
+
+    public String formatStorageUrls(){
         StringBuilder builder = new StringBuilder();
-        for (String storagePath : this){
-            builder.append(storagePath).append(";");
+        for (String fileName : storageUrls.keySet()){
+            builder.append(fileName).append(":").append(storageUrls.get(fileName)).append(";");
         }
 
         return builder.toString();
+    }
+
+    public void addStorageUrl(String fileName, String storageUrl){
+        storageUrls.put(fileName, storageUrl);
     }
 }
