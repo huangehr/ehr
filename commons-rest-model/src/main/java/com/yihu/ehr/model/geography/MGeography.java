@@ -111,10 +111,9 @@ public class MGeography implements Serializable {
         String addressStr="";
         if (!StringUtils.isEmpty(province)){
             addressStr += province;
-            if (!"".equals(city)) {
-                if (!province.equals(city)){
-                    addressStr += city;
-                }
+            if (!StringUtils.isEmpty(city)
+                    && !province.equals(city)) {
+                addressStr += city;
             }
         }
         if (!StringUtils.isEmpty(district)){
