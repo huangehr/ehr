@@ -56,11 +56,15 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
             HttpServletResponse response) throws Exception{
 
         Class entityClass = getServiceEntity(version);
-        List ls = metaDataService.search(entityClass, fields, filters, sorts, page, size);
-        pagedResponse(request, response, metaDataService.getCount(entityClass, filters), page, size);
+        List ls;
+        if(size == -1)
+            ls = metaDataService.search(entityClass, fields, filters, sorts);
+        else{
+            ls = metaDataService.search(entityClass, fields, filters, sorts, page, size);
+            pagedResponse(request, response, metaDataService.getCount(entityClass, filters), page, size);
+        }
         return convertToModels(ls, new ArrayList<>(ls.size()), MStdMetaData.class, fields);
     }
-
 
     @RequestMapping(value = ServiceApi.Standards.MetaDatas, method = RequestMethod.DELETE)
     @ApiOperation(value = "批量删除数据元")
@@ -123,7 +127,6 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
         return convertToModels(list, new ArrayList<>(list.size()), MStdMetaData.class, "");
     }
 
-
     @RequestMapping(value = ServiceApi.Standards.MetaData, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "更新数据元")
     public MStdMetaData updataMetaSet(
@@ -155,9 +158,7 @@ public class MetaDataController extends ExtendController<MStdMetaData> {
             @RequestBody String model) throws Exception{
 
         BaseMetaData metaData = (BaseMetaData) jsonToObj(model, getServiceEntity(version));
-        if(metaDataService.saveMetaData(metaData, version))
-            return getModel(metaData);
-        return null;
+        return getModel(metaDataService.insert(metaData));
     }
 
 
