@@ -5,7 +5,7 @@ import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.service.IBaseCipher;
 import com.yihu.ehr.util.encrypt.DES;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.Random;
@@ -17,7 +17,7 @@ import java.util.Random;
  * @version 1.0
  * @created on 2016/5/10.
  */
-@Service("desCipher")
+@Component("desCipher")
 public class DesCipher implements IBaseCipher {
 
     @Autowired
