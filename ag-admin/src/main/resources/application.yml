@@ -1,10 +1,5 @@
 server:
   port: ${ag-admin.server.port}
-  compression:
-    enabled: true
-    min-response-size: 1024
-    mime-types: application/xml,application/json
-
 
 management:
   port: ${server.port}
