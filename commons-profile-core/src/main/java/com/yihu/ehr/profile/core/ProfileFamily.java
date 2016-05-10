@@ -25,6 +25,7 @@ public class ProfileFamily{
         public static final String ClientId = "client_id";
         public static final String CreateDate = "create_date";
         public static final String DataSets = "data_sets";
+        public static final String Files = "files";
         public static final String CdaVersion = "inner_version";
     }
 
@@ -48,16 +49,16 @@ public class ProfileFamily{
     public static String[] getColumns(String family) {
         if (family.equals(ProfileFamily.Basic)) {
             return new String[]{
-                    BasicColumns.CardId.toString(),
-                    BasicColumns.OrgCode.toString(),
-                    BasicColumns.PatientId.toString(),
-                    BasicColumns.EventNo.toString(),
-                    BasicColumns.EventDate.toString(),
-                    BasicColumns.DemographicId.toString(),
-                    BasicColumns.ClientId.toString(),
-                    BasicColumns.CreateDate.toString(),
-                    BasicColumns.DataSets.toString(),
-                    BasicColumns.CdaVersion.toString()
+                    BasicColumns.CardId,
+                    BasicColumns.OrgCode,
+                    BasicColumns.PatientId,
+                    BasicColumns.EventNo,
+                    BasicColumns.EventDate,
+                    BasicColumns.DemographicId,
+                    BasicColumns.ClientId,
+                    BasicColumns.CreateDate,
+                    BasicColumns.DataSets,
+                    BasicColumns.CdaVersion
             };
         }
 

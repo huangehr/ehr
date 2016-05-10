@@ -30,6 +30,10 @@ public class FileProfile extends StdProfile {
         this.documents = documents;
     }
 
+    public String getFileIndices(){
+        return null;
+    }
+
     protected ObjectNode jsonFormat() {
         ObjectNode root = super.jsonFormat();
         if (documents != null) {

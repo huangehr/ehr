@@ -45,7 +45,7 @@ public class ProfileRepository {
      * @param profileId
      * @return
      */
-    public Pair<StdProfile, String> findOne(String profileId) throws Exception {
+    public ProfileTuple findOne(String profileId) throws Exception {
         TableBundle profileTableBundle = new TableBundle();
         profileTableBundle.addRows(profileId);
 
@@ -54,7 +54,9 @@ public class ProfileRepository {
 
         ResultUtil record = new ResultUtil(results[0]);
 
-        String dataSets = record.getCellValue(ProfileFamily.Basic, ProfileFamily.BasicColumns.DataSets, null);
+        String dataSetIndices = record.getCellValue(ProfileFamily.Basic, ProfileFamily.BasicColumns.DataSets, null);
+        String fileIndices = record.getCellValue(ProfileFamily.Basic, ProfileFamily.BasicColumns.Files, null);
+
         String eventType = record.getCellValue(ProfileFamily.Basic, ProfileFamily.BasicColumns.EventType, null);
         String profileType = record.getCellValue(ProfileFamily.Basic, ProfileFamily.BasicColumns.ProfileType, ProfileType.Standard.toString());
 
@@ -68,7 +70,12 @@ public class ProfileRepository {
         profile.setEventType(eType);
         profile.setProfileType(pType);
 
-        return new ImmutablePair<>(profile, dataSets);
+        ProfileTuple tuple = new ProfileTuple();
+        tuple.setProfile(profile);
+        tuple.setDataSetIndices(dataSetIndices);
+        tuple.setFileIndices(fileIndices);
+
+        return tuple;
     }
 
     public void delete(String profileId) throws IOException {
@@ -102,5 +109,35 @@ public class ProfileRepository {
         tableBundle.addRows(profileId);
 
         hbaseDao.delete(ProfileUtil.Table, tableBundle);
+    }
+
+    public static class ProfileTuple{
+        private StdProfile profile;
+        private String dataSetIndices;
+        private String fileIndices;
+
+        public StdProfile getProfile() {
+            return profile;
+        }
+
+        public void setProfile(StdProfile profile) {
+            this.profile = profile;
+        }
+
+        public String getDataSetIndices() {
+            return dataSetIndices;
+        }
+
+        public void setDataSetIndices(String dataSetIndices) {
+            this.dataSetIndices = dataSetIndices;
+        }
+
+        public String getFileIndices() {
+            return fileIndices;
+        }
+
+        public void setFileIndices(String fileIndices) {
+            this.fileIndices = fileIndices;
+        }
     }
 }
