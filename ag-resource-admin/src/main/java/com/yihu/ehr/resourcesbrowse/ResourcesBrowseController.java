@@ -1,15 +1,16 @@
 package com.yihu.ehr.resourcesbrowse;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.util.FileUtil;
+import com.yihu.ehr.util.EhrFileUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.io.File;
 
 /**
  * Created by hzp on 2016/4/13.
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(value = "rsBrowse", description = "业务资源浏览接口")
 public class ResourcesBrowseController {
 
-    FileUtil fileUtil = new FileUtil();
+    EhrFileUtils fileUtil = new EhrFileUtils();
 
     @ApiOperation("门户 - 用户基本信息")
     @RequestMapping(value = "/home/getPatientInfo", method = RequestMethod.GET)
@@ -32,7 +33,7 @@ public class ResourcesBrowseController {
             @ApiParam(name = "size", value = "行数")
             @RequestParam(value = "size", required = false) int size) throws Exception {
 
-        return fileUtil.file2String("/json/pastHistory.json");
+        return fileUtil.file2String("/json/user.json");
     }
 
     //
@@ -76,7 +77,6 @@ public class ResourcesBrowseController {
             @RequestParam(value = "page", required = false) int page,
             @ApiParam(name = "size", value = "行数")
             @RequestParam(value = "size", required = false) int size) throws Exception {
-        FileUtil fileUtil = new FileUtil();
         return fileUtil.file2String("/json/healthProblem.json");
     }
 //
