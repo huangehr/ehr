@@ -104,6 +104,7 @@
                 <module>../ag-ehr-platform</module>
                 <module>../svr-family</module>
                 <module>../svr-resource</module>
+                <module>../svr-cipher</module>
                 <!--<module>../app-ehr-browser</module>-->
             </modules>
         </profile>
@@ -253,6 +254,7 @@
                 <module>../svr-esb</module>
                 <module>../ag-admin</module>
                 <module>../ag-ehr-platform</module>
+                <module>../svr-cipher</module>
                 <!--<module>../app-ehr-browser</module>-->
             </modules>
         </profile>
