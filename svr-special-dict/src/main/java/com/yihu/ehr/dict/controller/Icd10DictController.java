@@ -5,7 +5,6 @@ import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.dict.service.*;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.model.specialdict.MIcd10DiagnoseRelation;
 import com.yihu.ehr.model.specialdict.MIcd10Dict;
 import com.yihu.ehr.model.specialdict.MIcd10DrugRelation;
 import com.yihu.ehr.model.specialdict.MIcd10IndicatorRelation;
@@ -38,8 +37,6 @@ public class Icd10DictController extends BaseRestController {
     private Icd10DrugRelationService icd10DrugRelationService;
     @Autowired
     private Icd10IndicatorRelationService icd10IndicatorRelationService;
-    @Autowired
-    private Icd10DiagnoseRelationService icd10DiagnoseRelationService;
 
     @RequestMapping(value = "/dict/icd10", method = RequestMethod.POST)
     @ApiOperation(value = "创建新的ICD10字典" )
@@ -439,86 +436,4 @@ public class Icd10DictController extends BaseRestController {
         return icd10IndicatorRelationService.isExist(icd10Id,indicatorsId);
     }
     //-------------------------ICD10与指标之间关联关系管理--结束---------------------------------------------------------
-
-    //-------------------------ICD10与诊断关联关系管理---开始--------------------------------------------------------
-    @RequestMapping(value = "dict/icd10/diagnose",method = RequestMethod.POST)
-    @ApiOperation(value = "新增icd10关联的诊断")
-    public MIcd10DiagnoseRelation createIcd10DiagnoseRelation(
-            @ApiParam(name = "data_json",value = "关联关系json字符串")
-            @RequestParam(value = "data_json") String dataJson) throws Exception{
-        Icd10DiagnoseRelation relation = objectMapper.readValue(dataJson,Icd10DiagnoseRelation.class);
-        String id = getObjectId(BizObject.Dict);
-        relation.setId(id);
-        relation.setCreateDate(new Date());
-        Icd10DiagnoseRelation icd10DiagnoseRelation = icd10DiagnoseRelationService.save(relation);
-        return convertToModel(icd10DiagnoseRelation,MIcd10DiagnoseRelation.class);
-    }
-
-    @RequestMapping(value = "dict/icd10/diagnose",method = RequestMethod.PUT)
-    @ApiOperation(value = "修改icd10关联的诊断信息")
-    public MIcd10DiagnoseRelation updateIcd10DiagnoseRelation(
-            @ApiParam(name = "data_json",value = "关联关系json字符串")
-            @RequestParam(value = "data_json") String dataJson) throws Exception{
-        Icd10DiagnoseRelation relation = objectMapper.readValue(dataJson,Icd10DiagnoseRelation.class);
-        relation.setUpdateDate(new Date());
-        Icd10DiagnoseRelation icd10DiagnoseRelation = icd10DiagnoseRelationService.save(relation);
-        return convertToModel(icd10DiagnoseRelation,MIcd10DiagnoseRelation.class);
-    }
-
-    @RequestMapping(value = "/dict/icd10/diagnoses",method = RequestMethod.DELETE)
-    @ApiOperation(value = "批量、单次删除关联的诊断，多个以逗号隔开")
-    public boolean deleteIcd10DiagnoseRelations(
-            @ApiParam(name = "ids",value = "批量/单次删除关联诊断")
-            @RequestParam(value = "ids") String ids) throws Exception{
-        icd10DiagnoseRelationService.delete(ids.split(","));
-        return true;
-    }
-
-    @RequestMapping(value = "/dict/icd10/diagnoses",method = RequestMethod.GET)
-    @ApiOperation(value = "获取icd10与诊断关联关联列表，---分页")
-    public Collection<MIcd10DiagnoseRelation> searchIcd10diagnoseRelations(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,icd10Id,name,description,createUser")
-            @RequestParam(value = "fields",required = false) String fields,
-            @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
-            @RequestParam(value = "filters",required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+icd10Id")
-            @RequestParam(value = "sorts",required = false) String sorts,
-            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
-            @RequestParam(value = "size",required = false) int size,
-            @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page",required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception{
-        page = reducePage(page);
-
-        if (StringUtils.isEmpty(filters)) {
-            Page<Icd10DiagnoseRelation> icd10DiagnoseRelationPage = icd10DiagnoseRelationService.getRelationList(sorts,page,size);
-            pagedResponse(request,response,icd10DiagnoseRelationPage.getTotalElements(),page,size);
-            return convertToModels(icd10DiagnoseRelationPage.getContent(), new ArrayList<>(icd10DiagnoseRelationPage.getNumber()), MIcd10DiagnoseRelation.class, fields);
-        } else {
-            List<Icd10DiagnoseRelation> icd10DiagnoseRelations = icd10DiagnoseRelationService.search(fields, filters, sorts, page, size);
-            pagedResponse(request, response, icd10DiagnoseRelationService.getCount(filters), page, size);
-            return convertToModels(icd10DiagnoseRelations, new ArrayList<>(icd10DiagnoseRelations.size()), MIcd10DiagnoseRelation.class, fields);
-        }
-
-    }
-
-    @RequestMapping(value = "/dict/icd10/diagnoses/no_paging",method = RequestMethod.GET)
-    @ApiOperation(value = "查询icd10的诊断关联关系列表，---不分页")
-    public Collection<MIcd10DiagnoseRelation> searchIcd10DiagnoseRelationsWithoutPaging(
-            @ApiParam(name = "filters",value = "过滤条件，为空默认查询全部",defaultValue = "")
-            @RequestParam(value = "filters",required = false) String filters) throws Exception{
-        List<Icd10DiagnoseRelation> relations = icd10DiagnoseRelationService.search(filters);
-        return convertToModels(relations,new ArrayList<MIcd10DiagnoseRelation>(relations.size()),MIcd10DiagnoseRelation.class,null);
-    }
-
-    @RequestMapping(value = "/dict/icd10/diagnose/{id}",method = RequestMethod.GET)
-    @ApiOperation(value = "根据关联关系id，获取关联信息")
-    public MIcd10DiagnoseRelation getIcd10DiagnoseRelation(
-            @ApiParam(name = "id",value = "关联关系id")
-            @PathVariable(value = "id") String id) throws Exception{
-        Icd10DiagnoseRelation relation = icd10DiagnoseRelationService.retrieve(id);
-        return convertToModel(relation,MIcd10DiagnoseRelation.class);
-    }
-    //-------------------------ICD10与诊断关联关系管理---结束--------------------------------------------------------
 }
