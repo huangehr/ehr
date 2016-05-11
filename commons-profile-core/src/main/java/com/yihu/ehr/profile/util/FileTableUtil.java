@@ -1,8 +1,13 @@
 package com.yihu.ehr.profile.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.yihu.ehr.lang.SpringContext;
+import com.yihu.ehr.profile.core.CdaDocument;
 import com.yihu.ehr.profile.core.FileFamily;
 import com.yihu.ehr.profile.core.FileProfile;
-import com.yihu.ehr.profile.core.RawDocument;
+import com.yihu.ehr.profile.core.OriginFile;
 import com.yihu.ehr.util.DateTimeUtils;
 
 import java.util.HashMap;
@@ -17,21 +22,32 @@ public class FileTableUtil {
 
     public static Map<String, String> getBasicFamilyCellMap(FileProfile profile) {
         Map<String, String> map = new HashMap<>();
-        map.put(FileFamily.BasicColumns.ProfileId, profile.getId());
         map.put(FileFamily.BasicColumns.PatientId, profile.getPatientId());
         map.put(FileFamily.BasicColumns.EventNo, profile.getEventNo());
-        map.put(FileFamily.BasicColumns.CdaVersion, profile.getCdaVersion());
         map.put(FileFamily.BasicColumns.OrgCode, profile.getOrgCode());
 
         return map;
     }
 
-    public static Map<String, String> getFileFamilyCellMap(RawDocument document){
+    public static Map<String, String> getFileFamilyCellMap(CdaDocument cdaDocument) {
+        ArrayNode root = ((ObjectMapper) SpringContext.getService("objectMapper")).createArrayNode();
+        for (OriginFile originFile : cdaDocument.getOriginFiles()) {
+            ObjectNode subNode = root.addObject();
+            subNode.put("mime", originFile.getMime());
+            subNode.put("origin_url", originFile.getOriginUrl());
+            subNode.put("expire_date", DateTimeUtils.utcDateTimeFormat(originFile.getExpireDate()));
+
+            StringBuilder builder = new StringBuilder();
+            for (String fileName : originFile.getFileUrls().keySet()){
+                builder.append(fileName).append(":").append(originFile.getFileUrls().get(fileName)).append(";");
+            }
+            subNode.put("files", builder.toString());
+        }
+
         Map<String, String> map = new HashMap<>();
-        map.put(FileFamily.FileColumns.CdaDocumentId, document.getCdaDocumentId());
-        map.put(FileFamily.FileColumns.OriginUrl, document.getOriginUrl());
-        map.put(FileFamily.FileColumns.ExpireDate, DateTimeUtils.utcDateTimeFormat(document.getExpireDate()));
-        map.put(FileFamily.FileColumns.Files, document.formatStorageUrls());
+        map.put(FileFamily.FileColumns.CdaDocumentId, cdaDocument.getId());
+        map.put(FileFamily.FileColumns.CdaDocumentName, cdaDocument.getName());
+        map.put(FileFamily.FileColumns.FileList, root.toString());
 
         return map;
     }

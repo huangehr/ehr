@@ -23,14 +23,20 @@ public class ProfileUtil {
     public MProfile convertProfile(StdProfile profile, boolean containDataSet) {
         if (profile instanceof FileProfile){
             return fileProfileConverter.convertProfile(profile, containDataSet);
-        } else if (profile instanceof FileProfile){
+        } else if (profile instanceof StdProfile){
             return stdProfileConverter.convertProfile(profile, containDataSet);
         }
 
         return null;
     }
 
-    public MProfileDocument convertDocument(StdProfile profile, MCDADocument cdaDocument, Integer templateId, boolean containDataSet){
+    public MProfileDocument convertDocument(StdProfile profile, String documentId, boolean containDataSet){
+        if (profile instanceof FileProfile){
+            return fileProfileConverter.convertDocument(profile, documentId, containDataSet);
+        } else if (profile instanceof StdProfile){
+            return stdProfileConverter.convertDocument(profile, documentId, containDataSet);
+        }
+
         return null;
     }
 }

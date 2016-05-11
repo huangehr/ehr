@@ -1,13 +1,13 @@
 package com.yihu.ehr.profile.controller.profile.converter;
 
-import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.profile.MProfile;
 import com.yihu.ehr.model.profile.MProfileDocument;
-import com.yihu.ehr.model.profile.MRawDocument;
+import com.yihu.ehr.model.profile.MOriginFile;
 import com.yihu.ehr.profile.core.FileProfile;
-import com.yihu.ehr.profile.core.RawDocument;
-import com.yihu.ehr.profile.core.RawDocumentList;
+import com.yihu.ehr.profile.core.OriginFile;
+import com.yihu.ehr.profile.core.CdaDocument;
 import com.yihu.ehr.profile.core.StdProfile;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -26,28 +26,36 @@ public class FileProfileConverter extends StdProfileConverter {
         if (profile instanceof FileProfile){
             FileProfile fileProfile = (FileProfile) profile;
             for (String cdaDocumentId : fileProfile.getDocuments().keySet()){
+                CdaDocument cdaDocument = fileProfile.getDocuments().get(cdaDocumentId);
                 MProfileDocument document = new MProfileDocument();
-                document.setId(cdaDocumentId);
+
+                document.setId(cdaDocument.getId());
                 document.setName("");
                 document.setTemplateId(0);
 
-                mProfile.getDocuments().add(document);
+                for (OriginFile originFile : cdaDocument.getOriginFiles()){
+                    MOriginFile mOriginFile = new MOriginFile();
+                    mOriginFile.setMime(originFile.getMime());
+                    mOriginFile.setOriginUrl(originFile.getOriginUrl());
+                    mOriginFile.setExpireDate(originFile.getExpireDate());
 
-                RawDocumentList rawDocumentList = fileProfile.getDocuments().get(cdaDocumentId);
-                for (RawDocument rawDocument : rawDocumentList){
-                    MRawDocument mRawDocument = new MRawDocument();
-                    mRawDocument.setOriginUrl(rawDocument.getOriginUrl());
-                    mRawDocument.setExpireDate(rawDocument.getExpireDate());
-
-                    Map<String, String> files = rawDocument.getStorageUrls();
+                    Map<String, String> files = originFile.getFileUrls();
                     for (String name : files.keySet()){
                         String path = files.get(name);
-                        mRawDocument.getFiles().add(name + ":" + path);
+                        mOriginFile.getFiles().put(name, path);
                     }
 
-                    document.getRawDocuments().add(mRawDocument);
+                    document.getList().add(mOriginFile);
                 }
+
+                mProfile.getDocuments().add(document);
             }
         }
+
+        // TODO 若原档案包中包含有数据集，那此处需要将数据集解析到CDA文档中
+    }
+
+    public MProfileDocument convertDocument(StdProfile profile, String documentId, boolean containDataSet) {
+        return null;
     }
 }

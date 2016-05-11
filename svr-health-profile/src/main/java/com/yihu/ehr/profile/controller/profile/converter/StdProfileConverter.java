@@ -38,9 +38,6 @@ import java.util.*;
 @Service
 public class StdProfileConverter {
     @Autowired
-    private ProfileService profileService;
-
-    @Autowired
     private TemplateService templateService;
 
     @Autowired
@@ -106,12 +103,16 @@ public class StdProfileConverter {
         }
 
         for (Template template :cdaDocuments.keySet()){
-            MProfileDocument document = convertDocument(profile, cdaDocuments.get(template), template.getId(), containDataSet);
+            MProfileDocument document = convertDocument(profile, cdaDocuments.get(template), template, containDataSet);
             if(document != null) mProfile.getDocuments().add(document);
         }
     }
 
-    public MProfileDocument convertDocument(StdProfile profile, MCDADocument cdaDocument, Integer templateId, boolean containDataSet) {
+    public MProfileDocument convertDocument(StdProfile profile, String documentId, boolean containDataSet) {
+        return null;
+    }
+
+    protected MProfileDocument convertDocument(StdProfile profile, MCDADocument cdaDocument, Template template, boolean containDataSet){
         MProfileDocument document = new MProfileDocument();
         document.setId(cdaDocument.getId());
         document.setName(cdaDocument.getName());
@@ -145,7 +146,7 @@ public class StdProfileConverter {
         return validDocument ? document : null;
     }
 
-    public void convertDataSet(String version, MProfileDocument document, StdDataSet dataSet) {
+    protected void convertDataSet(String version, MProfileDocument document, StdDataSet dataSet) {
         if (dataSet != null) {
             String dataSetCode = DataSetUtil.standardDataSetCode(dataSet.getCode());
 
@@ -166,11 +167,11 @@ public class StdProfileConverter {
     }
 
     /**
-     * 卫生机构定制的CDA文档列表
+     * 获取机构定制CDA文档列表
      *
      * 定制的CDA文档列表根据档案中的数据集列表，从而获取这份档案的CDA类别。此CDA类别包含与文档相关的模板，CDA文档。
      */
-    public Map<Template, MCDADocument> getCustomizedCDADocuments(String cdaVersion, String orgCode, EventType eventType) {
+    protected Map<Template, MCDADocument> getCustomizedCDADocuments(String cdaVersion, String orgCode, EventType eventType) {
         // 使用CDA类别关键数据元映射，取得与此档案相关联的CDA类别ID
         String cdaType = cdaDocumentTypeOptions.getCdaDocumentTypeId(Integer.toString(eventType.getType()));
 
@@ -189,4 +190,23 @@ public class StdProfileConverter {
 
         return cdaDocuments;
     }
+
+    Map<Template, MCDADocument> cdaDocuments = getCustomizedCDADocuments(
+            profile.getCdaVersion(),
+            profile.getOrgCode(),
+            profile.getEventType());
+
+    Integer templateId = null;
+    MCDADocument cdaDocument = null;
+    for (Template template : cdaDocuments.keySet()){
+        cdaDocument = cdaDocuments.get(template);
+        if (cdaDocument.getId().equals(documentId)){
+            templateId = template.getId();
+            break;
+        }
+    }
+
+    if (templateId == null || cdaDocument == null) throw new ApiException(HttpStatus.NOT_FOUND, "File not found.");
+
+    return profileUtil.convertDocument(profile, cdaDocument, templateId, loadStdDataSet || loadOriginDataSet);
 }

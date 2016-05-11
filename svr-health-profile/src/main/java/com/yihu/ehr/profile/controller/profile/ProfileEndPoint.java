@@ -49,13 +49,6 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @Autowired
     private ProfileUtil profileUtil;
 
-    @ApiOperation(value = "删除档案", notes = "删除一份档案，包括数据集")
-    @RequestMapping(value = ServiceApi.HealthProfile.Profile, method = RequestMethod.DELETE)
-    public void deleteProfile(@ApiParam(value = "档案ID", defaultValue = "")
-                              @PathVariable("profile_id") String profileId) throws Exception {
-        profileService.deleteProfile(profileId);
-    }
-
     @ApiOperation(value = "获取档案", notes = "读取一份档案")
     @RequestMapping(value = ServiceApi.HealthProfile.Profile, method = RequestMethod.GET)
     public MProfile getProfile(
@@ -65,8 +58,8 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "load_std_data_set") boolean loadStdDataSet,
             @ApiParam(value = "是否加载原始数据集", defaultValue = "false")
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws Exception {
-        StdProfile profile = profileService.getProfile(profileId, loadStdDataSet, loadOriginDataSet);
 
+        StdProfile profile = profileService.getProfile(profileId, loadStdDataSet, loadOriginDataSet);
         return profileUtil.convertProfile(profile, loadStdDataSet || loadOriginDataSet);
     }
 
@@ -81,24 +74,15 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "load_std_data_set") boolean loadStdDataSet,
             @ApiParam(value = "是否加载原始数据集", defaultValue = "false")
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws Exception {
+
         StdProfile profile = profileService.getProfile(profileId, loadStdDataSet, loadOriginDataSet);
-        Map<Template, MCDADocument> cdaDocuments = null;/*profileUtil.getCustomizedCDADocuments(
-                profile.getCdaVersion(),
-                profile.getOrgCode(),
-                profile.getEventType());*/
+        return profileUtil.convertDocument(profile, documentId, loadStdDataSet, loadOriginDataSet);
+    }
 
-        Integer templateId = null;
-        MCDADocument cdaDocument = null;
-        for (Template template : cdaDocuments.keySet()){
-            cdaDocument = cdaDocuments.get(template);
-            if (cdaDocument.getId().equals(documentId)){
-                templateId = template.getId();
-                break;
-            }
-        }
-
-        if (templateId == null || cdaDocument == null) throw new ApiException(HttpStatus.NOT_FOUND, "File not found.");
-
-        return profileUtil.convertDocument(profile, cdaDocument, templateId, loadStdDataSet || loadOriginDataSet);
+    @ApiOperation(value = "删除档案", notes = "删除一份档案，包括数据集")
+    @RequestMapping(value = ServiceApi.HealthProfile.Profile, method = RequestMethod.DELETE)
+    public void deleteProfile(@ApiParam(value = "档案ID", defaultValue = "")
+                              @PathVariable("profile_id") String profileId) throws Exception {
+        profileService.deleteProfile(profileId);
     }
 }

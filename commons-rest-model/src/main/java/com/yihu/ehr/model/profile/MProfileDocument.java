@@ -1,7 +1,5 @@
 package com.yihu.ehr.model.profile;
 
-import com.yihu.ehr.profile.core.RawDocument;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +15,7 @@ public class MProfileDocument {
 
     private List<MDataSet> dataSets = new ArrayList<>();
 
-    private List<MRawDocument> rawDocuments = new ArrayList<>();
+    private List<MOriginFile> list = new ArrayList<>();    // 此CDA文档下的文档列表
 
     public String getId() {
         return id;
@@ -51,11 +49,11 @@ public class MProfileDocument {
         this.templateId = templateId;
     }
 
-    public List<MRawDocument> getRawDocuments() {
-        return rawDocuments;
+    public List<MOriginFile> getList() {
+        return list;
     }
 
-    public void setRawDocuments(List<MRawDocument> rawDocuments) {
-        this.rawDocuments = rawDocuments;
+    public void setList(List<MOriginFile> list) {
+        this.list = list;
     }
 }

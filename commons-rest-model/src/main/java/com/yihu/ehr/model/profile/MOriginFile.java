@@ -1,17 +1,27 @@
 package com.yihu.ehr.model.profile;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.*;
 
 /**
  * @author Sand
  * @created 2016.05.09 18:56
  */
-public class MRawDocument {
+public class MOriginFile {
+    String mime;
     String originUrl;
     Date expireDate;
-    List<String> files = new ArrayList<>();
+
+    Map<String, String> files = new TreeMap<>();
+
+    public String getMime() {
+        return mime;
+    }
+
+    public void setMime(String mime) {
+        this.mime = mime;
+    }
 
     public String getOriginUrl() {
         return originUrl;
@@ -29,11 +39,11 @@ public class MRawDocument {
         this.expireDate = expireDate;
     }
 
-    public List<String> getFiles() {
+    public Map<String, String> getFiles() {
         return files;
     }
 
-    public void setFiles(List<String> files) {
+    public void setFiles(Map<String, String> files) {
         this.files = files;
     }
 }

@@ -114,10 +114,13 @@ public class FilePackageResolver extends PackageResolver {
             String url = objectNode.get("url").asText();
             Date expireDate = DateTimeUtils.simpleDateParse(objectNode.get("expire_date").asText());
 
-            RawDocumentList rawDocuments = profile.getDocuments().get(cdaDocumentId);
-            if (rawDocuments == null){
-                rawDocuments = new RawDocumentList();
-                profile.getDocuments().put(cdaDocumentId, rawDocuments);
+            // 解析过程中，使用cda文档id作为文档列表的主键，待解析完成后，统一更新为rowkey
+            CdaDocument cdaDocument = profile.getDocuments().get(cdaDocumentId);
+            if (cdaDocument == null){
+                cdaDocument = new CdaDocument();
+                cdaDocument.setId(cdaDocumentId);
+
+                profile.getDocuments().put(cdaDocumentId, cdaDocument);
             }
 
             ArrayNode content = (ArrayNode) objectNode.get("content");
@@ -126,18 +129,17 @@ public class FilePackageResolver extends PackageResolver {
                 String mimeType = file.get("mime_type").asText();
                 String fileList[] = file.get("name").asText().split(";");
 
-                RawDocument rawDocument = new RawDocument();
-                rawDocument.setCdaDocumentId(cdaDocumentId);
-                rawDocument.setMimeType(mimeType);
-                rawDocument.setOriginUrl(url);
-                rawDocument.setExpireDate(expireDate);
+                OriginFile originFile = new OriginFile();
+                originFile.setMime(mimeType);
+                originFile.setOriginUrl(url);
+                originFile.setExpireDate(expireDate);
 
                 for (String fileName : fileList){
                     String storageUrl = saveFile(documentsPath + File.separator + fileName);
-                    rawDocument.addStorageUrl(fileName.substring(0, fileName.lastIndexOf('.')), storageUrl);
+                    originFile.addStorageUrl(fileName.substring(0, fileName.lastIndexOf('.')), storageUrl);
                 }
 
-                rawDocuments.add(rawDocument);
+                cdaDocument.getOriginFiles().add(originFile);
             }
         }
     }
