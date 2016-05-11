@@ -297,7 +297,7 @@ public class ConventionalDictController extends BaseRestController {
     public MConventionalDict getFamilyRelationship(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
-        SystemDictEntry drugFlag = dictEntryService.getDictEntry(27, code);
+        SystemDictEntry drugFlag = dictEntryService.getDictEntry(16, code);
         return getDictModel(drugFlag);
     }
 }
