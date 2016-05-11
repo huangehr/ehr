@@ -15,14 +15,6 @@
     <packaging>pom</packaging>
     <description>Spring Boot原始应用部署模板</description>
 
-    <!--<dependencies>-->
-        <!--<dependency>-->
-            <!--<groupId>org.springframework.boot</groupId>-->
-            <!--<artifactId>spring-boot-starter-tomcat</artifactId>-->
-            <!--<scope>${tomcatStarterScope}</scope>-->
-        <!--</dependency>-->
-    <!--</dependencies>-->
-
     <build>
         <extensions>
             <extension>
@@ -32,20 +24,12 @@
             </extension>
         </extensions>
         <plugins>
-            <!--spring 插件-->
+            <!--oauth2 插件-->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <executable>true</executable>
-                </configuration>
-            </plugin>
-            <!--surefire 插件-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <skipTests>${skipTests}</skipTests>
                 </configuration>
             </plugin>
             <!--wagon 插件-->
@@ -85,14 +69,13 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
                 <property>
-                    <name>spring.profiles.active</name>
+                    <name>oauth2.profiles.active</name>
                     <value>default,dev</value>
                 </property>
             </activation>
             <properties>
                 <skipTests>true</skipTests>
                 <packaging>jar</packaging>
-                <tomcatStarterScope>compile</tomcatStarterScope>
             </properties>
             <distributionManagement>
                 <repository>
@@ -121,26 +104,47 @@
                 <module>../ag-ehr-platform</module>
                 <module>../svr-family</module>
                 <module>../svr-resource</module>
+                <module>../svr-cipher</module>
                 <!--<module>../app-ehr-browser</module>-->
             </modules>
         </profile>
 
 
-        <!--开发库-->
+        <!--tomcat部署-->
         <profile>
             <id>tomcat</id>
             <properties>
                 <skipTests>true</skipTests>
                 <packaging>war</packaging>
-                <tomcatStarterScope>provided</tomcatStarterScope>
             </properties>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>spring.profiles.active</name>
+                    <name>oauth2.profiles.active</name>
                     <value>default,prod</value>
                 </property>
             </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-starter-tomcat</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework.integration</groupId>
+                    <artifactId>spring-integration-jmx</artifactId>
+                </dependency>
+            </dependencies>
             <distributionManagement>
                 <repository>
                     <id>192.168.1.220</id>
@@ -148,8 +152,8 @@
                 </repository>
             </distributionManagement>
             <modules>
-                <module>../svr-adaption</module>
-                <module>../svr-app</module>
+                <!--<module>../svr-adaption</module>-->
+                <!--<module>../svr-app</module>-->
                 <module>../svr-configuration</module>
                 <module>../svr-dict</module>
                 <module>../svr-discovery</module>
@@ -175,12 +179,11 @@
             <properties>
                 <skipTests>true</skipTests>
                 <packaging>jar</packaging>
-                <tomcatStarterScope>compile</tomcatStarterScope>
             </properties>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>spring.profiles.active</name>
+                    <name>oauth2.profiles.active</name>
                     <value>default,prod</value>
                 </property>
             </activation>
@@ -209,6 +212,7 @@
                 <module>../svr-esb</module>
                 <module>../ag-admin</module>
                 <module>../ag-ehr-platform</module>
+                <module>../svr-cipher</module>
                 <!--<module>../app-ehr-browser</module>-->
             </modules>
         </profile>
@@ -218,11 +222,10 @@
             <properties>
                 <skipTests>true</skipTests>
                 <packaging>jar</packaging>
-                <tomcatStarterScope>compile</tomcatStarterScope>
             </properties>
             <activation>
                 <property>
-                    <name>spring.profiles.active</name>
+                    <name>oauth2.profiles.active</name>
                     <value>default,prod</value>
                 </property>
             </activation>
@@ -251,6 +254,7 @@
                 <module>../svr-esb</module>
                 <module>../ag-admin</module>
                 <module>../ag-ehr-platform</module>
+                <module>../svr-cipher</module>
                 <!--<module>../app-ehr-browser</module>-->
             </modules>
         </profile>

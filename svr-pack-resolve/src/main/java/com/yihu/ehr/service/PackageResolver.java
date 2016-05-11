@@ -27,5 +27,5 @@ public abstract class PackageResolver {
     @Autowired
     protected ExtractorChain extractorChain;
 
-    public abstract void resolve(StdProfile profile, File root) throws IOException, ParseException;
+    public abstract void resolve(StdProfile profile, File root) throws Exception;
 }

@@ -1,6 +1,5 @@
 server:
-#  port: ${svr-app.server.port}
-  port: 10190
+  port: ${svr-app.server.port}
 
 management:
   port: ${server.port}
@@ -22,3 +21,4 @@ spring:
 ---
 spring:
   profiles: prod
+

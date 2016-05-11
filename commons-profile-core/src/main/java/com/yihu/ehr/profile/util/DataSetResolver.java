@@ -48,6 +48,7 @@ public class DataSetResolver {
             dataSet.setCdaVersion(version);
             dataSet.setCode(dataSetCode);
             dataSet.setOrgCode(orgCode);
+            dataSet.setEventDate(DateTimeUtils.simpleDateParse(eventDate));
             dataSet.setCreateDate(DateTimeUtils.simpleDateParse(createDate));
 
             JsonNode jsonRecords = jsonNode.get("data");

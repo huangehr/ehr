@@ -14,6 +14,7 @@ public class DataSetModel {
     private String stdVersion;
 
     private String reference;
+    private String referenceCode;
 
     private String summary;
 
@@ -56,6 +57,14 @@ public class DataSetModel {
 
     public void setReference(String reference) {
         this.reference = reference;
+    }
+
+    public String getReferenceCode() {
+        return referenceCode;
+    }
+
+    public void setReferenceCode(String referenceCode) {
+        this.referenceCode = referenceCode;
     }
 
     public String getSummary() {

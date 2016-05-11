@@ -6,8 +6,8 @@ import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.profile.MProfile;
 import com.yihu.ehr.model.profile.MProfileDocument;
 import com.yihu.ehr.model.standard.MCDADocument;
+import com.yihu.ehr.profile.controller.profile.converter.ProfileUtil;
 import com.yihu.ehr.profile.core.StdProfile;
-import com.yihu.ehr.profile.persist.ProfileIndices;
 import com.yihu.ehr.profile.persist.ProfileService;
 import com.yihu.ehr.profile.service.Template;
 import com.yihu.ehr.util.controller.BaseRestEndPoint;
@@ -15,16 +15,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Collection;
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -54,28 +48,6 @@ public class ProfileEndPoint extends BaseRestEndPoint {
 
     @Autowired
     private ProfileUtil profileUtil;
-
-    @ApiOperation(value = "搜索档案", notes = "返回符合条件的档案列表")
-    @RequestMapping(value = ServiceApi.HealthProfile.Profiles, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.POST)
-    public Collection<MProfile> searchProfile(
-            @ApiParam(value = "搜索参数", defaultValue = SampleQuery)
-            @RequestBody MProfileSearch query,
-            @ApiParam(value = "起始日期", defaultValue = "2015-10-01")
-            @RequestParam("since") @DateTimeFormat(pattern = "yyyy-MM-dd") Date since,
-            @ApiParam(value = "结束日期", defaultValue = "2016-10-01")
-            @RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-
-        Page<ProfileIndices> profileIndices = profileUtil.searchProfile(query, since, to);
-        if (profileIndices == null || profileIndices.getContent().isEmpty()) {
-            throw new ApiException(HttpStatus.NOT_FOUND, "No profile found with this query!");
-        }
-
-        pagedResponse(request, response, (long)(profileIndices.getContent().size()), 1, 100);
-
-        return profileUtil.loadAndConvertProfiles(profileIndices, false, false);
-    }
 
     @ApiOperation(value = "删除档案", notes = "删除一份档案，包括数据集")
     @RequestMapping(value = ServiceApi.HealthProfile.Profile, method = RequestMethod.DELETE)
@@ -110,10 +82,10 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(value = "是否加载原始数据集", defaultValue = "false")
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws Exception {
         StdProfile profile = profileService.getProfile(profileId, loadStdDataSet, loadOriginDataSet);
-        Map<Template, MCDADocument> cdaDocuments = profileUtil.getCustomizedCDADocuments(
+        Map<Template, MCDADocument> cdaDocuments = null;/*profileUtil.getCustomizedCDADocuments(
                 profile.getCdaVersion(),
                 profile.getOrgCode(),
-                profile.getEventType());
+                profile.getEventType());*/
 
         Integer templateId = null;
         MCDADocument cdaDocument = null;
@@ -127,6 +99,6 @@ public class ProfileEndPoint extends BaseRestEndPoint {
 
         if (templateId == null || cdaDocument == null) throw new ApiException(HttpStatus.NOT_FOUND, "File not found.");
 
-        return profileUtil.convertDocument(profile, cdaDocument, templateId, loadStdDataSet || loadStdDataSet);
+        return profileUtil.convertDocument(profile, cdaDocument, templateId, loadStdDataSet || loadOriginDataSet);
     }
 }
