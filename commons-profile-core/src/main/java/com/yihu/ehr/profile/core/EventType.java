@@ -1,12 +1,15 @@
 package com.yihu.ehr.profile.core;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /**
  * @author Sand
  * @created 2016.04.26 19:43
  */
 public enum EventType {
-    Clinic(0),          // 门诊
-    Resident(1);        // 住院
+    Clinic(0),              // 门诊
+    Resident(1),            // 住院
+    MedicalExam(2);         // 体检
 
     int type;
 
@@ -14,12 +17,13 @@ public enum EventType {
         this.type = type;
     }
 
+    @JsonValue
     public int getType(){
         return type;
     }
 
     public static EventType create(String ordinal){
-        return create(Integer.getInteger(ordinal));
+        return create(Integer.parseInt(ordinal));
     }
 
     public static EventType create(int ordinal){

@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.profile.core.ProfileType;
 import com.yihu.ehr.profile.core.StdProfile;
 import com.yihu.ehr.profile.core.StdDataSet;
+import com.yihu.ehr.profile.persist.repo.FileRepository;
 import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.profile.persist.repo.DataSetRepository;
 import com.yihu.ehr.profile.persist.repo.ProfileRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,10 +34,20 @@ public class ProfileService {
     DataSetRepository dataSetRepo;
 
     @Autowired
+    FileRepository fileRepo;
+
+    @Autowired
     ObjectMapper objectMapper;
 
     public void saveProfile(StdProfile profile) throws IOException {
+        // 档案主表
         profileRepo.save(profile);
+
+        // 数据元
+        dataSetRepo.save(profile);
+
+        // 存储文件记录
+        fileRepo.save(profile);
     }
 
     /**
@@ -48,11 +60,9 @@ public class ProfileService {
      * @throws IOException
      * @throws ParseException
      */
-    public StdProfile getProfile(String profileId, boolean loadStdDataSet, boolean loadOriginDataSet) throws IOException, ParseException {
-        Pair<StdProfile, String> result = profileRepo.findOne(profileId, loadStdDataSet, loadOriginDataSet);
+    public StdProfile getProfile(String profileId, boolean loadStdDataSet, boolean loadOriginDataSet) throws Exception {
+        Pair<StdProfile, String> result = profileRepo.findOne(profileId);
         StdProfile profile = result.getLeft();
-        profile.determineEventType();
-
         String cdaVersion = profile.getCdaVersion();
         ProfileType pType = profile.getProfileType();
 
@@ -70,6 +80,7 @@ public class ProfileService {
                         profile.insertDataSet(pair.getLeft(), pair.getRight());
                     }
                 }
+
                 if (loadOriginDataSet) {
                     if (dataSetCode.contains(DataSetUtil.OriginDataSetFlag)) {
                         Pair<String, StdDataSet> pair = dataSetRepo.findOne(cdaVersion, dataSetCode, pType, rowKeys);
@@ -81,6 +92,13 @@ public class ProfileService {
                 profile.insertDataSet(pair.getLeft(), pair.getRight());
             }
         }
+
+        if (profile.getProfileType() == ProfileType.File){
+            fileRepo.findAll();
+        }
+
+        profile.determineEventType();
+        if(StringUtils.isEmpty(profile.getClientId())) profile.setClientId("kHAbVppx44");
 
         return profile;
     }
