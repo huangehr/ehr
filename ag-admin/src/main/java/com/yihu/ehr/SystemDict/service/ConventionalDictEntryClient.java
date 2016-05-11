@@ -136,6 +136,12 @@ public interface ConventionalDictEntryClient {
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code);
 
+    @RequestMapping(value = "/dictionaries/family_relationship", method = RequestMethod.GET)
+    @ApiOperation(value = "获取家庭关系字典项", response = MConventionalDict.class, produces = "application/json")
+    MConventionalDict getFamilyRelationship(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
 
     @RequestMapping(value = "/dictionaries/std_source_types", method = RequestMethod.GET)
     @ApiOperation(value = "获取标准来源类型字典项", response = MConventionalDict.class, produces = "application/json")
