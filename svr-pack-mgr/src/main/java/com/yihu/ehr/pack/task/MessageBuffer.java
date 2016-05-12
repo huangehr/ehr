@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * 内部消息缓存。在接收到档案包消息后，将消息缓存起来。
+ *
  * @author Sand
  * @version 1.0
  * @created 2016.04.01 14:38

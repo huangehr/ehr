@@ -1,4 +1,4 @@
-package com.yihu.ehr.service;
+package com.yihu.ehr.service.resolver;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.yihu.ehr.profile.core.StdProfile;

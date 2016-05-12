@@ -55,7 +55,7 @@ public class FileProfileConverter extends StdProfileConverter {
         // TODO 若原档案包中包含有数据集，那此处需要将数据集解析到CDA文档中
     }
 
-    public MProfileDocument convertDocument(StdProfile profile, String documentId, boolean containDataSet) {
+    public MProfileDocument convertDocument(StdProfile profile, String cdaDocumentId, boolean containDataSet) {
         return null;
     }
 }

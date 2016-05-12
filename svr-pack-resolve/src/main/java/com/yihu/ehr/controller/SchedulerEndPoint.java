@@ -38,7 +38,7 @@ public class SchedulerEndPoint {
     @ApiOperation(value = "设置任务调度器状态")
     @RequestMapping(value = ServiceApi.PackageResolve.Scheduler, method = RequestMethod.PUT)
     public ResponseEntity<String> updateScheduler(
-            @ApiParam(name = "pause", value = "true: 执行, false: 暂停", defaultValue = "true")
+            @ApiParam(name = "pause", value = "true:暂停 , false: 执行", defaultValue = "true")
             @RequestParam(value = "pause") boolean pause) {
         try {
             if (pause) {

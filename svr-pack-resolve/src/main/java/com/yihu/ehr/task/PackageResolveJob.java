@@ -25,15 +25,7 @@ import java.util.NoSuchElementException;
  * @version 1.0
  * @created 2016.03.28 11:30
  */
-@Service
 public class PackageResolveJob implements InterruptableJob {
-
-    @Autowired
-    private PackageResolveEngine resolveEngine;
-
-    @Autowired
-    ObjectMapper objectMapper;
-
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
 
     @Override
@@ -58,6 +50,7 @@ public class PackageResolveJob implements InterruptableJob {
 
             LogService.getLogger().info("Package resolve job: package " + pack.getId());
 
+            PackageResolveEngine resolveEngine = SpringContext.getService(PackageResolveEngine.class);
             XPackageMgrClient packageMgrClient = SpringContext.getService(XPackageMgrClient.class);
             ProfileService profileService = SpringContext.getService(ProfileService.class);
 

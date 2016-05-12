@@ -93,8 +93,12 @@ public class StdProfileConverter {
         return mProfile;
     }
 
-    protected void convertDocuments(StdProfile profile, MProfile mProfile, boolean containDataSet){
-        Map<Template, MCDADocument> cdaDocuments = getCustomizedCDADocuments(profile.getCdaVersion(), profile.getOrgCode(), profile.getEventType());
+    protected void convertDocuments(StdProfile profile, MProfile mProfile, boolean containDataSet) {
+        Map<Template, MCDADocument> cdaDocuments = getCustomizedCDADocuments(
+                profile.getCdaVersion(),
+                profile.getOrgCode(),
+                profile.getEventType());
+
         if (CollectionUtils.isEmpty(cdaDocuments)) {
             LogService.getLogger().error("Unable to get cda document of version " + profile.getCdaVersion()
                     + " for organization " + profile.getOrgCode() + ", template not uploaded?");
@@ -102,21 +106,35 @@ public class StdProfileConverter {
             return;
         }
 
-        for (Template template :cdaDocuments.keySet()){
-            MProfileDocument document = convertDocument(profile, cdaDocuments.get(template), template, containDataSet);
-            if(document != null) mProfile.getDocuments().add(document);
+        for (Template template : cdaDocuments.keySet()) {
+            MCDADocument cdaDocument = cdaDocuments.get(template);
+            MProfileDocument document = convertDocument(profile, cdaDocument, template, containDataSet);
+
+            if (document != null) mProfile.getDocuments().add(document);
         }
     }
 
-    public MProfileDocument convertDocument(StdProfile profile, String documentId, boolean containDataSet) {
+    public MProfileDocument convertDocument(StdProfile profile, String cdaDocumentId, boolean containDataSet) {
+        Map<Template, MCDADocument> cdaDocuments = getCustomizedCDADocument(profile.getCdaVersion(),
+                profile.getOrgCode(),
+                profile.getEventType(),
+                cdaDocumentId);
+
+        for (Template template : cdaDocuments.keySet()) {
+            MCDADocument cdaDocument = cdaDocuments.get(template);
+            MProfileDocument document = convertDocument(profile, cdaDocument, template, containDataSet);
+
+            return document;
+        }
+
         return null;
     }
 
-    protected MProfileDocument convertDocument(StdProfile profile, MCDADocument cdaDocument, Template template, boolean containDataSet){
+    protected MProfileDocument convertDocument(StdProfile profile, MCDADocument cdaDocument, Template template, boolean containDataSet) {
         MProfileDocument document = new MProfileDocument();
         document.setId(cdaDocument.getId());
         document.setName(cdaDocument.getName());
-        document.setTemplateId(templateId);
+        document.setTemplateId(template.getId());
 
         // CDA文档裁剪，根据从医院中实际采集到的数据集，对CDA进行裁剪
         boolean validDocument = false;
@@ -137,10 +155,12 @@ public class StdProfileConverter {
             }
 
             // 判断是否是一个正常的文档: 不只含有人口学信息部分
-            if (!validDocument && profile.getDataSet(dataSetCode) != null) validDocument = !dataSetCode.startsWith("HDSA00_01");
+            if (!validDocument && profile.getDataSet(dataSetCode) != null)
+                validDocument = !dataSetCode.startsWith("HDSA00_01");
 
             dataSetCode = DataSetUtil.originDataSetCode(dataSetCode);
-            if (!validDocument && profile.getDataSet(dataSetCode) != null) validDocument = !dataSetCode.startsWith("HDSA00_01");
+            if (!validDocument && profile.getDataSet(dataSetCode) != null)
+                validDocument = !dataSetCode.startsWith("HDSA00_01");
         }
 
         return validDocument ? document : null;
@@ -155,7 +175,7 @@ public class StdProfileConverter {
             mDataSet.setCode(dataSet.getCode());
 
             for (String key : dataSet.getRecordKeys()) {
-                if(dataSet.getRecord(key) != null) {
+                if (dataSet.getRecord(key) != null) {
                     mDataSet.getRecords().put(key, new MRecord(dataSet.getRecord(key).getMetaDataGroup()));
                 } else {
                     mDataSet.getRecords().put(key, null);
@@ -168,22 +188,25 @@ public class StdProfileConverter {
 
     /**
      * 获取机构定制CDA文档列表
-     *
-     * 定制的CDA文档列表根据档案中的数据集列表，从而获取这份档案的CDA类别。此CDA类别包含与文档相关的模板，CDA文档。
+     * <p>
+     * 定制的CDA文档列表根据档案类别，从而获取这份档案的CDA类别。此CDA类别包含与文档相关的模板，CDA文档。
      */
     protected Map<Template, MCDADocument> getCustomizedCDADocuments(String cdaVersion, String orgCode, EventType eventType) {
-        // 使用CDA类别关键数据元映射，取得与此档案相关联的CDA类别ID
+        // 使用事件-CDA类别映射，取得与此档案相关联的CDA类别ID
         String cdaType = cdaDocumentTypeOptions.getCdaDocumentTypeId(Integer.toString(eventType.getType()));
 
         if (StringUtils.isEmpty(cdaType)) {
-            throw new RuntimeException("Cannot find cda document type by health event, forget event & cda document type mapping?");
+            LogService.getLogger().error("Cannot find cda document type by health event, forget event & cda document type mapping?");
+
+            return null;
         }
 
-        // 此类目下卫生机构定制的CDA文档列表
+        // 此类别下卫生机构定制的CDA文档列表
         Map<Template, MCDADocument> cdaDocuments = templateService.getOrganizationTemplates(orgCode, cdaVersion, cdaType);
         if (CollectionUtils.isEmpty(cdaDocuments)) {
-            LogService.getLogger().error("Unable to get cda document of version " + cdaVersion
-                    + " for organization " + orgCode + ", template not prepared?");
+            LogService.getLogger().error(
+                    String.format("Unable to get cda document of version %s for organization %s, template not prepared?",
+                            cdaVersion, orgCode));
 
             return null;
         }
@@ -191,22 +214,24 @@ public class StdProfileConverter {
         return cdaDocuments;
     }
 
-    Map<Template, MCDADocument> cdaDocuments = getCustomizedCDADocuments(
-            profile.getCdaVersion(),
-            profile.getOrgCode(),
-            profile.getEventType());
+    protected Map<Template, MCDADocument> getCustomizedCDADocument(String cdaVersion, String orgCode, EventType eventType, String cdaDocumentId){
+        String cdaType = cdaDocumentTypeOptions.getCdaDocumentTypeId(Integer.toString(eventType.getType()));
 
-    Integer templateId = null;
-    MCDADocument cdaDocument = null;
-    for (Template template : cdaDocuments.keySet()){
-        cdaDocument = cdaDocuments.get(template);
-        if (cdaDocument.getId().equals(documentId)){
-            templateId = template.getId();
-            break;
+        if (StringUtils.isEmpty(cdaType)) {
+            LogService.getLogger().error("Cannot find cda document type by health event, forget event & cda document type mapping?");
+
+            return null;
         }
+
+        Map<Template, MCDADocument> cdaDocuments = templateService.getOrganizationTemplate(orgCode, cdaVersion, cdaType, cdaDocumentId);
+        if (CollectionUtils.isEmpty(cdaDocuments)) {
+            LogService.getLogger().error(
+                    String.format("Unable to get cda document of version %s for organization %s, template not prepared?",
+                            cdaVersion, orgCode));
+
+            return null;
+        }
+
+        return cdaDocuments;
     }
-
-    if (templateId == null || cdaDocument == null) throw new ApiException(HttpStatus.NOT_FOUND, "File not found.");
-
-    return profileUtil.convertDocument(profile, cdaDocument, templateId, loadStdDataSet || loadOriginDataSet);
 }
