@@ -1,11 +1,10 @@
 package com.yihu.ehr.resourcesbrowse;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.util.FileUtil;
+import com.yihu.ehr.util.EhrFileUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,19 +19,15 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(value = "rsBrowse", description = "业务资源浏览接口")
 public class ResourcesBrowseController {
 
-    FileUtil fileUtil = new FileUtil();
+    EhrFileUtils EhrFileUtils = new EhrFileUtils();
 
     @ApiOperation("门户 - 用户基本信息")
     @RequestMapping(value = "/home/getPatientInfo", method = RequestMethod.GET)
     public String getPatientInfo(
-            @ApiParam(name = "id_no", value = "身份证号码")
-            @RequestParam(value = "id_no", required = true) String idNo,
-            @ApiParam(name = "page", value = "当前页")
-            @RequestParam(value = "page", required = false) int page,
-            @ApiParam(name = "size", value = "行数")
-            @RequestParam(value = "size", required = false) int size) throws Exception {
+            @ApiParam(name = "demographicId", value = "身份证号")
+            @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
 
-        return fileUtil.file2String("/json/pastHistory.json");
+        return EhrFileUtils.file2String("/json/user.json");
     }
 
     //
@@ -66,18 +61,10 @@ public class ResourcesBrowseController {
     @ApiOperation("门户 - 主要健康问题")
     @RequestMapping(value = "/home/getHealthProblem", method = RequestMethod.GET)
     public String getHealthProblem(
-            @ApiParam(name = "id_no", value = "身份证号码")
-            @RequestParam(value = "id_no", required = true) String idNo,
-            @ApiParam(name = "health_problem_code", value = "健康问题代码")
-            @RequestParam(value = "health_problem_code", required = true) String healthProblemCode,
-            @ApiParam(name = "drugs_flag", value = "常用药查询标识")
-            @RequestParam(value = "drugs_flag", required = false) String drugsFlag,
-            @ApiParam(name = "page", value = "当前页")
-            @RequestParam(value = "page", required = false) int page,
-            @ApiParam(name = "size", value = "行数")
-            @RequestParam(value = "size", required = false) int size) throws Exception {
-        FileUtil fileUtil = new FileUtil();
-        return fileUtil.file2String("/json/healthProblem.json");
+            @ApiParam(name = "demographicId", value = "身份证号")
+            @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
+        EhrFileUtils EhrFileUtils = new EhrFileUtils();
+        return EhrFileUtils.file2String("/json/healthProblem.json");
     }
 //
 
@@ -85,8 +72,8 @@ public class ResourcesBrowseController {
     @ApiOperation("门户 - 最近就诊事件")
     @RequestMapping(value = "/home/getMedicalEvents", method = RequestMethod.GET)
     public String getMedicalEvents(
-            @ApiParam(name = "idNo", value = "身份证号码")
-            @RequestParam(value = "idNo", required = true) String idNo,
+            @ApiParam(name = "demographicId", value = "身份证号")
+            @RequestParam(value = "demographicId", required = true) String demographicId,
             @ApiParam(name = "medicalEventsType", value = "就诊事件类别")
             @RequestParam(value = "medicalEventsType", required = true) String medicalEventsType,
             @ApiParam(name = "year", value = "年份", defaultValue = "当前年份")
@@ -102,46 +89,43 @@ public class ResourcesBrowseController {
             @ApiParam(name = "size", value = "行数")
             @RequestParam(value = "size", required = false) int size) throws Exception {
 
-        return fileUtil.file2String("/json/MedicalEventInfo.json");
+        return EhrFileUtils.file2String("/json/MedicalEventInfo.json");
 
     }
 
     @ApiOperation("门户 - 相关健康指标")
     @RequestMapping(value = "/home/getHealthIndicators", method = RequestMethod.GET)
     public String getHealthIndicators(
-            @ApiParam(name = "id_no", value = "身份证号码") @RequestParam(value = "id_no", required = true) String idNo,
-            @ApiParam(name = "medical_index_id", value = "指标项ID") @RequestParam(value = "medical_index_id", required = false) String medicalIndexId,
-            @ApiParam(name = "start_time", value = "查询开始时间") @RequestParam(value = "start_time", required = false) String startTime,
-            @ApiParam(name = "end_time", value = "查询结束时间") @RequestParam(value = "end_time", required = false) String endTime,
-            @ApiParam(name = "health_problem_code", value = "健康问题代码") @RequestParam(value = "health_problem_code", required = false) String healthProblemCode,
+            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
+            @ApiParam(name = "medicalIndexId", value = "指标项ID（逗号分隔）") @RequestParam(value = "medicalIndexId", required = false) String medicalIndexId,
+            @ApiParam(name = "startTime", value = "查询开始时间") @RequestParam(value = "startTime", required = false) String startTime,
+            @ApiParam(name = "endTime", value = "查询结束时间") @RequestParam(value = "endTime", required = false) String endTime,
             @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
             @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
 
-        return fileUtil.file2String("/json/HealthIndicators.json");
+        return EhrFileUtils.file2String("/json/HealthIndicators.json");
     }
 
 
     /************************************
      * 就诊事件详情
      *****************************************************************/
-    @ApiOperation("左侧档案列表导航")
-    @RequestMapping(value = "/cda/getPatientCdaList", method = RequestMethod.GET)
-    public String getPatientCdaList(
-            @ApiParam(name = "row_key", value = "档案ID") @RequestParam(value = "row_key", required = true) String rowKey,
-            @ApiParam(name = "id_no", value = "身份证号码") @RequestParam(value = "id_no", required = true) String idNo,
-            @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-            @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
-
-        return fileUtil.file2String("/json/MedicalEventInfo.json");
-
-    }
+//    @ApiOperation("左侧档案列表导航")
+//    @RequestMapping(value = "/cda/getPatientCdaList", method = RequestMethod.GET)
+//    public String getPatientCdaList(
+//            @ApiParam(name = "rowKey", value = "档案ID") @RequestParam(value = "rowKey", required = true) String rowKey,
+//            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
+//            @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
+//            @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
+//
+//        return EhrFileUtils.file2String("/json/MedicalEventInfo.json");
+//
+//    }
 
     @ApiOperation("右侧档案模版展示")
     @RequestMapping(value = "/cda/getPatientCdaInfo", method = RequestMethod.GET)
     public String getPatientCdaInfo(
-            @ApiParam(name = "rowKey", value = "档案ID") @RequestParam(value = "rowKey", required = true) String rowKey,
-            @ApiParam(name = "cdaId", value = "CDA编号") @RequestParam(value = "cdaId", required = true) String cdaId,
-            @ApiParam(name = "idNo", value = "身份证号码") @RequestParam(value = "idNo", required = true) String idNo) throws Exception {
+            @ApiParam(name = "profileId", value = "档案ID") @RequestParam(value = "profileId", required = true) String profileId) throws Exception {
 
         return "跟泽华要数据";
     }
@@ -152,12 +136,12 @@ public class ResourcesBrowseController {
     @ApiOperation("疾病事件 - 历史用药 - 药品清单")
     @RequestMapping(value = "/disease/getDrugList", method = RequestMethod.GET)
     public String getDrugList(
-            @ApiParam(name = "idNo", value = "身份证号码") @RequestParam(value = "idNo", required = true) String idNo,
-            @ApiParam(name = "healthProblemCode", value = "健康问题代码") @RequestParam(value = "healthProblemCode", required = false) String healthProblemCode,
+            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
+            @ApiParam(name = "diagnosisCode", value = "疾病代码（逗号分隔）") @RequestParam(value = "diagnosisCode", required = false) String diagnosisCode,
             @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
             @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
 
-        return fileUtil.file2String("/json/DrugList.json");
+        return EhrFileUtils.file2String("/json/DrugList.json");
 
     }
 //
@@ -193,23 +177,23 @@ public class ResourcesBrowseController {
      *****************************************************************/
     @ApiOperation("左侧指标列表导航")
     @RequestMapping(value = "/health/getHealthIndicatorsList", method = RequestMethod.GET)
-    public String getHealthIndicatorsList(@ApiParam(name = "contentFlag", value = "查询是否有值的情况") @RequestParam(value = "contentFlag", required = false) String contentFlag,
-                                          @ApiParam(name = "idNo", value = "身份证号码") @RequestParam(value = "idNo", required = false) String idNo,
-                                          @ApiParam(name = "indicatorsType", value = "指标分类") @RequestParam(value = "indicatorsType", required = false) String indicatorsType) throws Exception {
+    public String getHealthIndicatorsList(
+            @ApiParam(name = "contentFlag", value = "查询是否有值的情况") @RequestParam(value = "contentFlag", required = false) String contentFlag,
+            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = false) String demographicId,
+            @ApiParam(name = "medicalIndexId", value = "指标项ID（逗号分隔）") @RequestParam(value = "medicalIndexId", required = false) String medicalIndexId) throws Exception {
 
-        return fileUtil.file2String("/json/healthProblem.json");
+        return EhrFileUtils.file2String("/json/healthProblem.json");
 
     }
 
 
     /************************************
-     * 共通接口
+     * 机构列表
      *****************************************************************/
-    @ApiOperation("疾病一览")
+    @ApiOperation("机构列表")
     @RequestMapping(value = "/common/getDiagnosisList", method = RequestMethod.GET)
     public String getDiagnosisList(
-            @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-            @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
+            @ApiParam(name = "demographicId" ,value = "身份证号") @RequestParam(value = "demographicId", required = false) String demographicId) throws Exception {
 
         return "跟泽华要数据";
 
@@ -223,4 +207,21 @@ public class ResourcesBrowseController {
 //        return null;
 //
 //    }
+
+
+    /************************************
+     * 就诊过的城市
+     *****************************************************************/
+    @ApiOperation("就诊过的城市")
+    @RequestMapping(value = "/medic/getOrganizations", method = RequestMethod.GET)
+    public String getEventOrganizations(
+            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
+            @ApiParam(name = "beginTime", value = "查询开始时间") @RequestParam(value = "beginTime", required = false) String beginTime,
+            @ApiParam(name = "endTime", value = "查询结束时间") @RequestParam(value = "endTime", required = false) String endTime) throws Exception {
+
+        return EhrFileUtils.file2String("/json/MedicalOrganizations.json");
+
+
+    }
+
 }

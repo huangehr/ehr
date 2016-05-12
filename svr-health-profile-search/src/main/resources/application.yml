@@ -1,0 +1,23 @@
+server:
+  port: ${svr-health-profile-search.server.port}
+
+management:
+  port: ${server.port}
+
+info:
+  app:
+    name: HealthProfileSearchService
+    description: EHR platform health profile search service.
+    version: 1.0.0
+
+---
+spring:
+  profiles: dev
+
+---
+spring:
+  profiles: test
+
+---
+spring:
+  profiles: prod
