@@ -72,7 +72,7 @@ public class FamiliesController extends BaseRestController {
             @RequestBody String jsonData) throws Exception {
 
         Families families = toEntity(jsonData,Families.class);
-        families.setId(getObjectId((BizObject.Families)));
+        //families.setId(getObjectId((BizObject.Families)));
         families = familiesService.createFamilies(families);
         return convertToModel(families,MFamilies.class);
     }
