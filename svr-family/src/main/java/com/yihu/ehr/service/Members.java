@@ -22,8 +22,7 @@ public class Members {
     private Date createDate;
 
     @Id
-    @GeneratedValue(generator = "Generator")
-    @GenericGenerator(name = "Generator", strategy = "assigned")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", unique = true, nullable = false)
     public String getId() {
         return id;
