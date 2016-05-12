@@ -5,10 +5,12 @@ import com.yihu.ehr.agModel.standard.datasset.DataSetModel;
 import com.yihu.ehr.agModel.standard.datasset.MetaDataModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.MStdDict;
+import com.yihu.ehr.model.standard.MStdSource;
 import com.yihu.ehr.std.service.DataSetClient;
 import com.yihu.ehr.model.standard.MStdDataSet;
 import com.yihu.ehr.model.standard.MStdMetaData;
 import com.yihu.ehr.std.service.DictClient;
+import com.yihu.ehr.std.service.StandardSourceClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.ApiOperation;
@@ -36,6 +38,9 @@ public class DataSetController extends BaseController {
     private DictClient dictClient;
 
     @Autowired
+    private StandardSourceClient stdSourcrClient;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @RequestMapping(value = "/data_sets", method = RequestMethod.GET)
@@ -56,8 +61,16 @@ public class DataSetController extends BaseController {
 
         ResponseEntity<Collection<MStdDataSet>> responseEntity = dataSetClient.searchDataSets(fields, filters, sorts, size, page, version);
         List<DataSetModel> dataSetModelList = (List<DataSetModel>) convertToModels(responseEntity.getBody(), new ArrayList<DataSetModel>(responseEntity.getBody().size()), DataSetModel.class, null);
-
-        Envelop envelop = getResult(dataSetModelList, getTotalCount(responseEntity), page, size);
+        List<DataSetModel> dataSetModels = new ArrayList<>();
+        for(DataSetModel dataSetModel:dataSetModelList){
+            String reference = dataSetModel.getReference();
+            if (!StringUtils.isEmpty(reference)){
+                MStdSource mStdSource = stdSourcrClient.getStdSource(reference);
+                dataSetModel.setReferenceCode(mStdSource == null ? "" : mStdSource.getCode());
+            }
+            dataSetModels.add(dataSetModel);
+        }
+        Envelop envelop = getResult(dataSetModels, getTotalCount(responseEntity), page, size);
 
         return envelop;
     }
@@ -201,6 +214,7 @@ public class DataSetController extends BaseController {
                 if(!(dictId == 0)){
                     MStdDict dict = dictClient.getCdaDictInfo(dictId, version);
                     model.setDictName(dict == null?"":dict.getName());
+                    model.setDictCode(dict == null?"":dict.getCode());
                 }
                 metaDataModels.add(model);
             }

@@ -74,9 +74,9 @@ public class MembersController extends BaseRestController {
             @RequestBody String jsonData) throws Exception {
 
         Members mb = toEntity(jsonData,Members.class);
-        mb.setId(getObjectId(BizObject.Members));
+        //mb.setId(getObjectId(BizObject.Members));
         mb.setFamilyId(familiesId);
-        membersService.createMembers(mb);
+        mb = membersService.createMembers(mb);
         return convertToModel(mb,MMembers.class);
     }
 
