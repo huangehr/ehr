@@ -70,6 +70,16 @@ public class Icd10DictController extends BaseController {
             @ApiParam(name = "ids", value = "字典ID", defaultValue = "")
             @RequestParam(value = "ids") String ids) {
         Envelop envelop = new Envelop();
+        String[] icd10Ids = ids.split(",");
+        for (String icd10Id:icd10Ids){
+            boolean flag = icd10DictClient.icd10DictIsUsage(icd10Id);
+            if(flag){
+                MIcd10Dict icd10Dict = icd10DictClient.getIcd10Dict(icd10Id);
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("字典："+icd10Dict.getCode()+" 与疾病字典存在关联！请先解除关联。");
+                return envelop;
+            }
+        }
         Boolean bo = icd10DictClient.deleteIcd10Dicts(ids);
         envelop.setSuccessFlg(bo);
         return envelop;
