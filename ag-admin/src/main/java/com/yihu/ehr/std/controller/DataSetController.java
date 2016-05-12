@@ -108,7 +108,7 @@ public class DataSetController extends BaseController {
             return failed("请选择需要删除的数据!");
         }
 
-        envelop = isDeleteDataSet(ids);
+        envelop = isDeleteDataSet(ids,version,"该数据集正被当前版本的CDA文档使用，不可删除");
         if (!envelop.isSuccessFlg()){
             return envelop;
         }
@@ -120,22 +120,22 @@ public class DataSetController extends BaseController {
         return success(null);
     }
 
-    public Envelop isDeleteDataSet(String id){
+    public Envelop isDeleteDataSet(String id,String version,String msg){
 
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
 
-        ResponseEntity<Collection<MCDAVersion>> responseEntity = versionClient.searchCDAVersions("", "", "", 1000, 1);
-        Collection<MCDAVersion> mCdaVersions = responseEntity.getBody();
+//        ResponseEntity<Collection<MCDAVersion>> responseEntity = versionClient.searchCDAVersions("", "", "", 1000, 1);
+//        Collection<MCDAVersion> mCdaVersions = responseEntity.getBody();
 
-        for (MCDAVersion mcdaVersion : mCdaVersions) {
-            ResponseEntity<Collection<MCdaDataSetRelationship>> mCdaDataSetRelationships = cdaClient.getCDADataSetRelationships("", "dataSetId=" + id, "", id.length(), 1, mcdaVersion.getVersion());
+//        for (MCDAVersion mcdaVersion : mCdaVersions) {
+            ResponseEntity<Collection<MCdaDataSetRelationship>> mCdaDataSetRelationships = cdaClient.getCDADataSetRelationships("", "dataSetId=" + id, "", id.length(), 1, version);
             if (mCdaDataSetRelationships.getBody().size()>0){
                 envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("该数据集正被"+mcdaVersion.getVersionName()+"版本，CDA文档使用，不可删除");
+                envelop.setErrorMsg(msg);
                 return envelop;
             }
-        }
+//        }
 
         return envelop;
     }
@@ -262,12 +262,23 @@ public class DataSetController extends BaseController {
             @ApiParam(name = "version_code", value = "标准版本号")
             @RequestParam(value = "version_code") String versionCode) {
 
+        Envelop envelop = new Envelop();
+
         ids = trimEnd(ids, ",");
         if (StringUtils.isEmpty(ids)) {
             return failed("请选择需要删除的数据!");
         }
         if (StringUtils.isEmpty(versionCode)) {
             return failed("版本号不能为空!");
+        }
+
+        for (int i = 0;i<ids.split(",").length;i++){
+            MStdMetaData mStdMetaData = dataSetClient.getMetaData(Long.valueOf(ids.split(",")[i]), versionCode);
+            envelop = isDeleteDataSet(String.valueOf(mStdMetaData.getDataSetId()),versionCode,"该数据元正被当前版本的CDA文档使用，不可删除");
+
+            if (!envelop.isSuccessFlg()){
+                return envelop;
+            }
         }
 
         boolean bo = dataSetClient.deleteMetaDatas(ids, versionCode);
