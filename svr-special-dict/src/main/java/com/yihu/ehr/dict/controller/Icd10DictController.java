@@ -315,11 +315,11 @@ public class Icd10DictController extends BaseRestController {
 
     //-------------------------ICD10与指标之间关联关系管理---开始--------------------------------------------------------
 
-    @RequestMapping(value = "/dict/icd10/indicator", method = RequestMethod.POST)
+    @RequestMapping(value = "/dict/icd10/indicator", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "为ICD10增加指标关联。" )
     public MIcd10IndicatorRelation createIcd10IndicatorRelation(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) throws Exception{
+            @RequestBody String dictJson) throws Exception{
 
         Icd10IndicatorRelation relation = toEntity(dictJson, Icd10IndicatorRelation.class);
         String id = getObjectId(BizObject.Dict);
