@@ -7,11 +7,9 @@ import com.yihu.ehr.model.specialdict.MIndicatorsDict;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
@@ -24,11 +22,11 @@ import java.util.Collection;
 @ApiIgnore
 public interface IndicatorDictClient {
 
-    @RequestMapping(value = "/dict/indicator", method = RequestMethod.POST)
+    @RequestMapping(value = "/dict/indicator", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建新的指标字典" )
     MIndicatorsDict createIndicatorsDict(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson);
+            @RequestBody String dictJson);
 
     @RequestMapping(value = "dict/indicator/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除指标字典")
@@ -42,11 +40,11 @@ public interface IndicatorDictClient {
             @ApiParam(name = "ids", value = "指标字典代码")
             @RequestParam( value = "ids") String ids);
 
-    @RequestMapping(value = "/dict/indicator", method = RequestMethod.PUT)
+    @RequestMapping(value = "/dict/indicator", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "更新指标字典" )
     MIndicatorsDict updateIndicatorsDict(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) ;
+            @RequestBody String dictJson) ;
 
     @RequestMapping(value = "/dict/indicator/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据ID获取相应的指标字典信息。" )
