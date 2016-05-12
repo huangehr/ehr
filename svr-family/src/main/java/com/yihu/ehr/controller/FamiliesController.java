@@ -73,7 +73,7 @@ public class FamiliesController extends BaseRestController {
 
         Families families = toEntity(jsonData,Families.class);
         families.setId(getObjectId((BizObject.Families)));
-        familiesService.createFamilies(families);
+        families = familiesService.createFamilies(families);
         return convertToModel(families,MFamilies.class);
     }
 

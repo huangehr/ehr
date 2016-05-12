@@ -65,9 +65,7 @@ public class FamiliesService extends BaseJpaService<Families, XFamiliesRepositor
     public Families createFamilies(Families families)
     {
         families.setCreateDate(new Date());
-        familiesRep.save(families);
-
-        return families;
+        return familiesRep.save(families);
     }
 
     /*
