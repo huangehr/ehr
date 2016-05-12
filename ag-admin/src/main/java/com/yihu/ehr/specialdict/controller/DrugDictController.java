@@ -67,6 +67,16 @@ public class DrugDictController extends BaseController {
             @RequestParam(value = "ids") String ids) {
 
         Envelop envelop = new Envelop();
+        String[] drugIds = ids.split(",");
+        for(String drugId:drugIds){
+            boolean flag = drugDictClient.isUsage(drugId);
+            if(flag){
+                MDrugDict drugDict = drugDictClient.getDrugDict(drugId);
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("字典："+drugDict.getCode()+" 与诊断字典存在关联！请先解除关联。");
+                return envelop;
+            }
+        }
         Boolean bo = drugDictClient.deleteDrugDicts(ids);
         envelop.setSuccessFlg(bo);
         return envelop;

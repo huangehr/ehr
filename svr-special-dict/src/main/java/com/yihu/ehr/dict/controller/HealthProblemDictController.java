@@ -19,6 +19,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,11 +39,11 @@ public class HealthProblemDictController extends BaseRestController {
     @Autowired
     private HpIcd10RelationService hpIcd10RelationService;
 
-    @RequestMapping(value = "/dict/hp", method = RequestMethod.POST)
+    @RequestMapping(value = "/dict/hp", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建新的健康问题字典" )
     public MHealthProblemDict createHpDict(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) throws Exception {
+            @RequestBody String dictJson) throws Exception {
 
         HealthProblemDict dict = toEntity(dictJson, HealthProblemDict.class);
         String id = getObjectId(BizObject.Dict);
@@ -94,11 +95,11 @@ public class HealthProblemDictController extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(value = "/dict/hp", method = RequestMethod.PUT)
+    @RequestMapping(value = "/dict/hp", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "更新健康问题字典" )
     public MHealthProblemDict updateHpDict(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson)  throws Exception{
+            @RequestBody String dictJson)  throws Exception{
 
         HealthProblemDict dict = toEntity(dictJson, HealthProblemDict.class);
         if (null == hpDictService.retrieve(dict.getId())) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
@@ -165,11 +166,11 @@ public class HealthProblemDictController extends BaseRestController {
 
     //-------------------------健康问题与ICD10之间关联关系管理-----------------------------------------------------------
 
-    @RequestMapping(value = "/dict/hp/icd10", method = RequestMethod.POST)
+    @RequestMapping(value = "/dict/hp/icd10", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "为健康问题增加ICD10疾病关联。" )
     public MHpIcd10Relation createHpIcd10Relation(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) throws Exception {
+            @RequestBody String dictJson) throws Exception {
 
         HpIcd10Relation relation = toEntity(dictJson, HpIcd10Relation.class);
         String id = getObjectId(BizObject.Dict);
@@ -203,11 +204,11 @@ public class HealthProblemDictController extends BaseRestController {
         return mHpIcd10Relations;
     }
 
-    @RequestMapping(value = "/dict/hp/icd10", method = RequestMethod.PUT)
+    @RequestMapping(value = "/dict/hp/icd10", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "为健康问题修改ICD10疾病关联。" )
     public MHpIcd10Relation updateHpIcd10Relation(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) throws Exception {
+            @RequestBody String dictJson) throws Exception {
 
         HpIcd10Relation relation = toEntity(dictJson, HpIcd10Relation.class);
         if (null == hpIcd10RelationService.retrieve(relation.getId())) throw new ApiException(ErrorCode.GetDictFaild, "该关联不存在");

@@ -1,14 +1,14 @@
 package com.yihu.ehr.std.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.standard.datasset.DataSetModel;
 import com.yihu.ehr.agModel.standard.dict.DictEntryModel;
 import com.yihu.ehr.agModel.standard.dict.DictModel;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.model.standard.MCDAVersion;
-import com.yihu.ehr.model.standard.MStdDict;
-import com.yihu.ehr.model.standard.MStdDictEntry;
+import com.yihu.ehr.model.standard.*;
 import com.yihu.ehr.std.service.CDAVersionClient;
+import com.yihu.ehr.std.service.DataSetClient;
 import com.yihu.ehr.std.service.DictClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
@@ -38,6 +38,9 @@ public class DictController extends BaseController {
 
     @Autowired
     private CDAVersionClient versionClient;
+
+    @Autowired
+    private DataSetClient dataSetClient;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -230,16 +233,66 @@ public class DictController extends BaseController {
             @ApiParam(name = "dictId", value = "字典ID")
             @RequestParam(value = "dictId") String ids) {
 
+        Envelop envelop = new Envelop();
+
         ids = trimEnd(ids, ",");
         if (StringUtils.isEmpty(ids)) {
             return failed("请选择需要删除的数据!");
         }
+
+        envelop = isDeleteDict(ids,versionCode);
+        if (!envelop.isSuccessFlg()){
+            return envelop;
+        }
+
         boolean result = dictClient.deleteDicts(versionCode, ids);
 
         if (!result) {
             return failed("删除失败!");
         }
         return success(null);
+    }
+
+    public Envelop isDeleteDict(String id,String versionCode){
+
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+
+        try {
+
+            //查询所有版本
+            ResponseEntity<Collection<MCDAVersion>> responseEntity = versionClient.searchCDAVersions("", "", "", 1000, 1);
+            Collection<MCDAVersion> mCdaVersions = responseEntity.getBody();
+
+            ResponseEntity<Collection<MStdDict>> dict = dictClient.searchDict("", "baseDict=" + id, "", id.length(), 1, versionCode);
+            List<DictModel> dictModelList = (List<DictModel>) convertToModels(dict.getBody(), new ArrayList<DictModel>(dict.getBody().size()), DictModel.class, null);
+
+            if (dict.getBody().size()>0){
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("该字典正被"+dictModelList.get(0).getName()+"作为基础字典使用，不可删除");
+                return envelop;
+            }
+
+            for (MCDAVersion mcdaVersion : mCdaVersions){
+                List<MStdDataSet> mStdDataSetList = dataSetClient.search("",mcdaVersion.getVersion());
+
+                for (MStdDataSet mStdDataSet:mStdDataSetList){
+                    ResponseEntity<Collection<MStdMetaData>> metaDatas = dataSetClient.searchMetaDatas("", "dataSetId=" + mStdDataSet.getId() + " g1;dictId=" + id + " g2", "", id.length(), 1, mcdaVersion.getVersion());
+                    List<MStdMetaData> mStdMetaDatas = (List<MStdMetaData>) metaDatas.getBody();
+                    if(mStdMetaDatas.size()>0){
+                        envelop.setSuccessFlg(false);
+                        envelop.setErrorMsg("该字典正被"+mcdaVersion.getVersionName()+"版本，"+mStdDataSet.getName()+"数据集，"+mStdMetaDatas.get(0).getName()+"数据元使用，不可删除");
+                        return envelop;
+                    }
+                }
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return envelop;
     }
 
 

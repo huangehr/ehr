@@ -4,11 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.datasset.DataSetModel;
 import com.yihu.ehr.agModel.standard.datasset.MetaDataModel;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.model.standard.MStdDict;
-import com.yihu.ehr.std.service.DataSetClient;
-import com.yihu.ehr.model.standard.MStdDataSet;
-import com.yihu.ehr.model.standard.MStdMetaData;
-import com.yihu.ehr.std.service.DictClient;
+import com.yihu.ehr.model.standard.*;
+import com.yihu.ehr.std.service.*;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.ApiOperation;
@@ -36,6 +33,15 @@ public class DataSetController extends BaseController {
     private DictClient dictClient;
 
     @Autowired
+    private StandardSourceClient stdSourcrClient;
+
+    @Autowired
+    private CDAVersionClient versionClient;
+
+    @Autowired
+    private CDAClient cdaClient;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @RequestMapping(value = "/data_sets", method = RequestMethod.GET)
@@ -56,8 +62,16 @@ public class DataSetController extends BaseController {
 
         ResponseEntity<Collection<MStdDataSet>> responseEntity = dataSetClient.searchDataSets(fields, filters, sorts, size, page, version);
         List<DataSetModel> dataSetModelList = (List<DataSetModel>) convertToModels(responseEntity.getBody(), new ArrayList<DataSetModel>(responseEntity.getBody().size()), DataSetModel.class, null);
-
-        Envelop envelop = getResult(dataSetModelList, getTotalCount(responseEntity), page, size);
+        List<DataSetModel> dataSetModels = new ArrayList<>();
+        for(DataSetModel dataSetModel:dataSetModelList){
+            String reference = dataSetModel.getReference();
+            if (!StringUtils.isEmpty(reference)){
+                MStdSource mStdSource = stdSourcrClient.getStdSource(reference);
+                dataSetModel.setReferenceCode(mStdSource == null ? "" : mStdSource.getCode());
+            }
+            dataSetModels.add(dataSetModel);
+        }
+        Envelop envelop = getResult(dataSetModels, getTotalCount(responseEntity), page, size);
 
         return envelop;
     }
@@ -87,15 +101,43 @@ public class DataSetController extends BaseController {
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version) {
 
+        Envelop envelop = new Envelop();
+
         ids = trimEnd(ids, ",");
         if (StringUtils.isEmpty(ids)) {
             return failed("请选择需要删除的数据!");
         }
+
+        envelop = isDeleteDataSet(ids,version,"该数据集正被当前版本的CDA文档使用，不可删除");
+        if (!envelop.isSuccessFlg()){
+            return envelop;
+        }
+
         boolean bo = dataSetClient.deleteDataSet(ids, version);
         if (!bo) {
             return failed("删除失败!");
         }
         return success(null);
+    }
+
+    public Envelop isDeleteDataSet(String id,String version,String msg){
+
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+
+//        ResponseEntity<Collection<MCDAVersion>> responseEntity = versionClient.searchCDAVersions("", "", "", 1000, 1);
+//        Collection<MCDAVersion> mCdaVersions = responseEntity.getBody();
+
+//        for (MCDAVersion mcdaVersion : mCdaVersions) {
+            ResponseEntity<Collection<MCdaDataSetRelationship>> mCdaDataSetRelationships = cdaClient.getCDADataSetRelationships("", "dataSetId=" + id, "", id.length(), 1, version);
+            if (mCdaDataSetRelationships.getBody().size()>0){
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg(msg);
+                return envelop;
+            }
+//        }
+
+        return envelop;
     }
 
     @RequestMapping(value = "/data_set/{id}", method = RequestMethod.GET)
@@ -201,6 +243,7 @@ public class DataSetController extends BaseController {
                 if(!(dictId == 0)){
                     MStdDict dict = dictClient.getCdaDictInfo(dictId, version);
                     model.setDictName(dict == null?"":dict.getName());
+                    model.setDictCode(dict == null?"":dict.getCode());
                 }
                 metaDataModels.add(model);
             }
@@ -219,12 +262,23 @@ public class DataSetController extends BaseController {
             @ApiParam(name = "version_code", value = "标准版本号")
             @RequestParam(value = "version_code") String versionCode) {
 
+        Envelop envelop = new Envelop();
+
         ids = trimEnd(ids, ",");
         if (StringUtils.isEmpty(ids)) {
             return failed("请选择需要删除的数据!");
         }
         if (StringUtils.isEmpty(versionCode)) {
             return failed("版本号不能为空!");
+        }
+
+        for (int i = 0;i<ids.split(",").length;i++){
+            MStdMetaData mStdMetaData = dataSetClient.getMetaData(Long.valueOf(ids.split(",")[i]), versionCode);
+            envelop = isDeleteDataSet(String.valueOf(mStdMetaData.getDataSetId()),versionCode,"该数据元正被当前版本的CDA文档使用，不可删除");
+
+            if (!envelop.isSuccessFlg()){
+                return envelop;
+            }
         }
 
         boolean bo = dataSetClient.deleteMetaDatas(ids, versionCode);
