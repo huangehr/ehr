@@ -11,9 +11,11 @@ import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.profile.core.StdProfile;
 import com.yihu.ehr.profile.persist.ProfileService;
 import com.yihu.ehr.service.PackageResolveEngine;
+import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -51,16 +53,21 @@ public class ResolveEndPoint {
     public ResponseEntity<String> resolve(
             @ApiParam(value = "id", defaultValue = "0dae000555ff6a9f1d323246807324d6")
             @PathVariable("id") String packageId,
+            @ApiParam(value = "模拟应用ID", defaultValue = "usa911Em")
+            @RequestParam("clientId") String clientId,
             @ApiParam(value = "返回档案数据", defaultValue = "true")
             @RequestParam("echo") boolean echo) throws Exception {
-
         MPackage pack = packageMgrClient.getPackage(packageId);
         if (pack == null) throw new ApiException(HttpStatus.NOT_FOUND, "Package not found.");
 
+        if(StringUtils.isEmpty(pack.getClientId())) pack.setClientId(clientId);
         String zipFile = downloadTo(pack.getRemotePath());
-
         StdProfile profile = resolveEngine.doResolve(pack, zipFile);
         profileService.saveProfile(profile);
+
+        packageMgrClient.reportStatus(pack.getId(),
+                ArchiveStatus.Finished,
+                String.format("Rowkey: %s, identity: %s", profile.getId(), profile.getDemographicId()));
 
         if (echo) {
             return new ResponseEntity<>(profile.toJson(), HttpStatus.OK);
@@ -89,7 +96,7 @@ public class ResolveEndPoint {
             @RequestPart() MultipartFile file,
             @ApiParam("档案包密码")
             @RequestParam("password") String password,
-            @ApiParam(value = "档案包密码", defaultValue = "usa911Em")
+            @ApiParam(value = "模拟应用ID", defaultValue = "usa911Em")
             @RequestParam("clientId") String clientId,
             @ApiParam(value = "是否入库")
             @RequestParam(value = "persist", defaultValue = "false") boolean persist) throws FileNotFoundException {
@@ -110,7 +117,7 @@ public class ResolveEndPoint {
             StdProfile profile = resolveEngine.doResolve(pack, zipFile);
             profile.setClientId(clientId);
 
-            if(persist) profileService.saveProfile(profile);
+            if (persist) profileService.saveProfile(profile);
 
             return new ResponseEntity<>(profile.toJson(), HttpStatus.OK);
         } catch (Exception e) {

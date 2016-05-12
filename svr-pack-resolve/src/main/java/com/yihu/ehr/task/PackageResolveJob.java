@@ -48,7 +48,7 @@ public class PackageResolveJob implements InterruptableJob {
         try{
             if (pack == null) return;
 
-            LogService.getLogger().info("Package resolve job: package " + pack.getId());
+            LogService.getLogger().info("Package resolve job start: package " + pack.getId());
 
             PackageResolveEngine resolveEngine = SpringContext.getService(PackageResolveEngine.class);
             XPackageMgrClient packageMgrClient = SpringContext.getService(XPackageMgrClient.class);
@@ -61,7 +61,9 @@ public class PackageResolveJob implements InterruptableJob {
 
             packageMgrClient.reportStatus(pack.getId(),
                     ArchiveStatus.Finished,
-                    String.format("Rowkey: %s, identity: %s", profile.getDemographicId(), profile.getId()));
+                    String.format("Rowkey: %s, identity: %s", profile.getId(), profile.getDemographicId()));
+
+            LogService.getLogger().info("Package resolve job done: package " + pack.getId());
 
         } catch (Exception e) {
             LogService.getLogger().error(e.getMessage());

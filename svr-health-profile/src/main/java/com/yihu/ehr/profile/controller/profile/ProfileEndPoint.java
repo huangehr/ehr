@@ -76,7 +76,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws Exception {
 
         StdProfile profile = profileService.getProfile(profileId, loadStdDataSet, loadOriginDataSet);
-        return profileUtil.convertDocument(profile, documentId, loadStdDataSet, loadOriginDataSet);
+        return profileUtil.convertDocument(profile, documentId, loadStdDataSet || loadOriginDataSet);
     }
 
     @ApiOperation(value = "删除档案", notes = "删除一份档案，包括数据集")
