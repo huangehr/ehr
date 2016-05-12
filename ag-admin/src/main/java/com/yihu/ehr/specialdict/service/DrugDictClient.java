@@ -6,11 +6,9 @@ import com.yihu.ehr.model.specialdict.MDrugDict;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
@@ -24,10 +22,10 @@ import java.util.Collection;
 public interface DrugDictClient {
 
     @ApiOperation(value = "创建字典",  produces = "application/json")
-    @RequestMapping(value = "/dict/drug", method = RequestMethod.POST)
+    @RequestMapping(value = "/dict/drug", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     MDrugDict createDrugDict(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) ;
+            @RequestBody String dictJson) ;
 
     @ApiOperation(value = "删除字典")
     @RequestMapping(value = "dict/drug/{id}", method = RequestMethod.DELETE)
@@ -42,10 +40,10 @@ public interface DrugDictClient {
             @RequestParam(value = "ids") String ids);
 
     @ApiOperation(value = "修改字典")
-    @RequestMapping(value = "/dict/drug", method = RequestMethod.PUT)
+    @RequestMapping(value = "/dict/drug", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     MDrugDict updateDrugDict(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) ;
+            @RequestBody String dictJson) ;
 
     @ApiOperation(value = "获取字典")
     @RequestMapping(value = "/dict/drug/{id}", method = RequestMethod.GET)

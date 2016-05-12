@@ -89,6 +89,8 @@ public class URLHqlQueryParser<T> {
     }
 
     /**
+     * +code 以code字段进行升序排序
+     * -code 以code字段进行降序排序
      * 生成排序字段。
      *
      * @param criteria
