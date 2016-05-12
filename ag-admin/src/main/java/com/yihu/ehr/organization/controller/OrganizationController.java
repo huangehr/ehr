@@ -369,10 +369,13 @@ public class OrganizationController extends BaseController {
 
 
             if (!StringUtils.isEmpty(mOrg.getImgRemotePath())) {
-//                Map<String, String> map = toEntity(mOrg.getImgRemotePath(), Map.class);
-                String imagePath[] = mOrg.getImgRemotePath().split(":");
-                String localPath = orgClient.downloadPicture(imagePath[0], imagePath[1]);
-                mOrg.setImgLocalPath(localPath);
+                try {
+                    String imagePath[] = mOrg.getImgRemotePath().split(":");
+                    String localPath = orgClient.downloadPicture(imagePath[0], imagePath[1]);
+                    mOrg.setImgLocalPath(localPath);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
 
 
