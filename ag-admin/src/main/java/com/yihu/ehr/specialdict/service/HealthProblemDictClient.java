@@ -8,11 +8,9 @@ import com.yihu.ehr.model.specialdict.MHpIcd10Relation;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
@@ -25,11 +23,11 @@ import java.util.Collection;
 @ApiIgnore
 public interface HealthProblemDictClient {
 
-    @RequestMapping(value = "/dict/hp", method = RequestMethod.POST)
+    @RequestMapping(value = "/dict/hp", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建新的健康问题字典" )
     MHealthProblemDict createHpDict(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) ;
+            @RequestBody String dictJson) ;
 
     @RequestMapping(value = "dict/hp/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除健康问题字典（含健康问题字典及与ICD10的关联关系。）")
@@ -43,11 +41,11 @@ public interface HealthProblemDictClient {
             @ApiParam(name = "ids", value = "字典IDs")
             @RequestParam(value = "ids") String ids) ;
 
-    @RequestMapping(value = "/dict/hp", method = RequestMethod.PUT)
+    @RequestMapping(value = "/dict/hp", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "更新健康问题字典" )
     MHealthProblemDict updateHpDict(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) ;
+            @RequestBody String dictJson) ;
 
     @RequestMapping(value = "/dict/hp/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据ID获取相应的健康问题字典信息。" )
@@ -83,11 +81,11 @@ public interface HealthProblemDictClient {
 
     //-------------------------健康问题与ICD10之间关联关系管理---------------------------------------------------------
 
-    @RequestMapping(value = "/dict/hp/icd10", method = RequestMethod.POST)
+    @RequestMapping(value = "/dict/hp/icd10", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "为健康问题增加ICD10疾病关联。" )
     MHpIcd10Relation createHpIcd10Relation(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson);
+            @RequestBody String dictJson);
 
     @RequestMapping(value = "/dict/hp/icd10s", method = RequestMethod.POST)
     @ApiOperation(value = "为健康问题增加ICD10疾病关联,--批量增加关联。" )
@@ -99,11 +97,11 @@ public interface HealthProblemDictClient {
             @ApiParam(name = "create_user",value = "创建者")
             @RequestParam(value = "create_user") String createUser);
 
-    @RequestMapping(value = "/dict/hp/icd10", method = RequestMethod.PUT)
+    @RequestMapping(value = "/dict/hp/icd10", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "为健康问题修改ICD10疾病关联。" )
     MHpIcd10Relation updateHpIcd10Relation(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson);
+            @RequestBody String dictJson);
 
     @RequestMapping(value = "/dict/hp/icd10", method = RequestMethod.DELETE)
     @ApiOperation(value = "为健康问题删除ICD10疾病关联。" )

@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,11 +35,11 @@ public class IndicatorsDictController extends BaseRestController {
     @Autowired
     private Icd10IndicatorRelationService icd10IndicatorRelationService;
 
-    @RequestMapping(value = "/dict/indicator", method = RequestMethod.POST)
+    @RequestMapping(value = "/dict/indicator", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建新的指标字典" )
     public MIndicatorsDict createIndicatorsDict(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) throws Exception {
+            @RequestBody String dictJson) throws Exception {
 
         IndicatorsDict dict = toEntity(dictJson, IndicatorsDict.class);
         dict.setCreateDate(new Date());
@@ -68,11 +69,11 @@ public class IndicatorsDictController extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(value = "/dict/indicator", method = RequestMethod.PUT)
+    @RequestMapping(value = "/dict/indicator", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "更新指标字典" )
     public MIndicatorsDict updateIndicatorsDict(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) throws Exception {
+            @RequestBody String dictJson) throws Exception {
 
         IndicatorsDict dict = toEntity(dictJson, IndicatorsDict.class);
         if (null == indicatorsDictService.retrieve(dict.getId())) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
