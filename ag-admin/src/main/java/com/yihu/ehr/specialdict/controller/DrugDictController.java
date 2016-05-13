@@ -11,6 +11,7 @@ import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -55,6 +56,12 @@ public class DrugDictController extends BaseController {
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") String id) {
         Envelop envelop = new Envelop();
+        boolean flag = drugDictClient.isUsage(id);
+        if(flag){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("与疾病字典存在关联！请先解除关联。");
+            return envelop;
+        }
         Boolean bo = drugDictClient.deleteDrugDict(id);
         envelop.setSuccessFlg(bo);
         return envelop;
@@ -68,14 +75,19 @@ public class DrugDictController extends BaseController {
 
         Envelop envelop = new Envelop();
         String[] drugIds = ids.split(",");
+        String relaCodes = "";
         for(String drugId:drugIds){
             boolean flag = drugDictClient.isUsage(drugId);
             if(flag){
                 MDrugDict drugDict = drugDictClient.getDrugDict(drugId);
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("字典："+drugDict.getCode()+" 与诊断字典存在关联！请先解除关联。");
-                return envelop;
+                relaCodes += drugDict.getCode()+", ";
             }
+        }
+        if(!StringUtils.isEmpty(relaCodes)){
+            relaCodes = relaCodes.substring(0,relaCodes.length()-1);
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("字典："+relaCodes+"与疾病字典存在关联！请先解除关联。");
+            return envelop;
         }
         Boolean bo = drugDictClient.deleteDrugDicts(ids);
         envelop.setSuccessFlg(bo);

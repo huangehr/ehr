@@ -11,6 +11,7 @@ import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -55,6 +56,12 @@ public class IndicatorDictController extends BaseController {
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") String id) {
         Envelop envelop = new Envelop();
+        boolean flag = indicatorDictClient.indicatorIsUsage(id);
+        if(flag){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("与疾病字典存在关联！请先解除关联。");
+            return envelop;
+        }
         Boolean bo = indicatorDictClient.deleteIndicatorsDict(id);
         envelop.setSuccessFlg(bo);
         return envelop;
@@ -67,14 +74,19 @@ public class IndicatorDictController extends BaseController {
             @RequestParam(value = "ids") String ids) {
         Envelop envelop = new Envelop();
         String[] indicatorIds = ids.split(",");
+        String relaCodes = "";
         for (String indicatorId:indicatorIds){
             boolean flag = indicatorDictClient.indicatorIsUsage(indicatorId);
             if(flag){
                 MIndicatorsDict indicatorsDict = indicatorDictClient.getIndicatorsDict(indicatorId);
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("字典："+indicatorsDict.getCode()+" 与诊断字典存在关联！请先解除关联。");
-                return envelop;
+                relaCodes += indicatorsDict.getCode()+", ";
             }
+        }
+        if(!StringUtils.isEmpty(relaCodes)){
+            relaCodes = relaCodes.substring(0,relaCodes.length()-1);
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("字典："+relaCodes+"与诊断字典存在关联！请先解除关联。");
+            return envelop;
         }
         Boolean bo = indicatorDictClient.deleteIndicatorsDicts(ids);
         envelop.setSuccessFlg(bo);
