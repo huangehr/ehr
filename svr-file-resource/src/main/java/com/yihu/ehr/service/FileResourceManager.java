@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * @author linaz
@@ -16,16 +17,16 @@ import java.io.InputStream;
  */
 @Service
 @Transactional
-public class PictureResourceManager extends BaseJpaService<PictureResource, XPictureResourceRepository> {
+public class FileResourceManager extends BaseJpaService<FileResource, XFileResourceRepository> {
 
     @Autowired
-    private XPictureResourceRepository resourceRepository;
+    private XFileResourceRepository resourceRepository;
 
     @Autowired
     private FastDFSUtil fastDFSUtil;
 
 
-    public String saveResource(String fileStr, String fileName, PictureResource pictureResource) throws Exception {
+    public String saveFileResource(String fileStr, String fileName, FileResource fileResource) throws Exception {
 
         byte[] bytes = fileStr.getBytes();
         InputStream inputStream = new ByteArrayInputStream(bytes);
@@ -35,8 +36,25 @@ public class PictureResourceManager extends BaseJpaService<PictureResource, XPic
         String remoteFileName = objectNode.get("remoteFileName").toString();
         String path = groupName.substring(1,groupName.length()-1) + ":" + remoteFileName.substring(1,remoteFileName.length()-1);
         ////   保存到resource表中
-        pictureResource.setStoragePath(path);
-        resourceRepository.save(pictureResource);
+        fileResource.setStoragePath(path);
+        resourceRepository.save(fileResource);
         return path;
+    }
+
+    public List<FileResource> findByObjectId(String objectId) {
+        return resourceRepository.findByObjectId(objectId);
+    }
+
+    public boolean deleteFileResource(List<FileResource> fileResources) throws Exception {
+        for(FileResource fileResource : fileResources){
+            //删除表数据
+            resourceRepository.delete(fileResource.getId());
+            //删除fastdfs上的文件
+            String storagePath = fileResource.getStoragePath();
+            String groupName = storagePath.split(":")[0];
+            String remoteFileName = storagePath.split(":")[1];
+            fastDFSUtil.delete(groupName,remoteFileName);
+        }
+        return true;
     }
 }

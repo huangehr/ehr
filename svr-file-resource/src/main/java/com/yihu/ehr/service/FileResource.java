@@ -1,5 +1,4 @@
 package com.yihu.ehr.service;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -11,20 +10,19 @@ import java.util.Date;
 @Entity
 @Table(name = "file_resource")
 @Access(value = AccessType.PROPERTY)
-public class PictureResource {
+public class FileResource {
 
     private String id;                   // objectId
     private String storagePath;          // FDS path
     private String mime;                 // user/org/patient 冗余字段，后继图片管理用
     private String objectId;             // userId/orgCode/patientId 各类编号都是唯一
-    private String usage;                // face/credentials  用途 头像 资质认证
+    private String purpose;                // face/credentials  用途 头像 资质认证
     private Date createDate;
     private String createUser;
     private Date updateDate;
     private String updateUser;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", unique = true, nullable = false)
     public String getId() {
         return id;
@@ -57,12 +55,12 @@ public class PictureResource {
         this.objectId = objectId;
     }
 
-    @Column(name = "usage",  nullable = true)
-    public String getUsage() {
-        return usage;
+    @Column(name = "purpose",  nullable = true)
+    public String getPurpose() {
+        return purpose;
     }
-    public void setUsage(String usage) {
-        this.usage = usage;
+    public void setPurpose(String usage) {
+        this.purpose = purpose;
     }
 
     @Column(name = "create_date",  nullable = true)

@@ -11,9 +11,9 @@
 	</parent>
 
 	<groupId>com.yihu.ehr</groupId>
-	<artifactId>svr-picture</artifactId>
+	<artifactId>svr-file-resource</artifactId>
 	<packaging>jar</packaging>
-	<name>svr-picture</name>
+	<name>svr-file-resource</name>
 	<description>EHR platform picture service.</description>
 
 	<properties>

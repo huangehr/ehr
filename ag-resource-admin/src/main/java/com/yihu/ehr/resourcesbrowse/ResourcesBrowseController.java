@@ -47,17 +47,18 @@ public class ResourcesBrowseController {
 //         return null;
 //    }
 //
-//    @ApiOperation("门户 - 病史信息")
-//    @RequestMapping(value = "/home/getDiseaseHistory", method = RequestMethod.GET)
-//    public DataList getDiseaseHistory(@ApiParam(name = "idNo", value = "身份证号码") @RequestParam(value = "idNo", required = true) String idNo,
-//                                    @ApiParam(name = "searchFlag", value = "是否存在数据过滤", defaultValue = "0") @RequestParam(value = "searchFlag", required = false,defaultValue="0") String searchFlag,
-//                                    @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-//                                    @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception{
-//
-//            return null;
-//
-//    }
-//
+    @ApiOperation("门户 - 病史信息")
+    @RequestMapping(value = "/home/getDiseaseHistory", method = RequestMethod.GET)
+    public String getDiseaseHistory(
+            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
+            @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
+
+        return EhrFileUtils.file2String("/json/pastHistory.json");
+
+    }
+
+    //
     @ApiOperation("门户 - 主要健康问题")
     @RequestMapping(value = "/home/getHealthProblem", method = RequestMethod.GET)
     public String getHealthProblem(
@@ -121,7 +122,6 @@ public class ResourcesBrowseController {
 //        return EhrFileUtils.file2String("/json/MedicalEventInfo.json");
 //
 //    }
-
     @ApiOperation("右侧档案模版展示")
     @RequestMapping(value = "/cda/getPatientCdaInfo", method = RequestMethod.GET)
     public String getPatientCdaInfo(
@@ -193,7 +193,7 @@ public class ResourcesBrowseController {
     @ApiOperation("机构列表")
     @RequestMapping(value = "/common/getDiagnosisList", method = RequestMethod.GET)
     public String getDiagnosisList(
-            @ApiParam(name = "demographicId" ,value = "身份证号") @RequestParam(value = "demographicId", required = false) String demographicId) throws Exception {
+            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = false) String demographicId) throws Exception {
 
         return "跟泽华要数据";
 

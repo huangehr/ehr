@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-picture
+    name: svr-file-resource
 
 ---
 spring:

@@ -6,9 +6,9 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-public class SvrPictureApplication {
+public class SvrFileResourceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SvrPictureApplication.class, args);
+		SpringApplication.run(SvrFileResourceApplication.class, args);
 	}
 }
