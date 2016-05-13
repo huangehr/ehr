@@ -10,21 +10,21 @@ import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Created by AndyCai on 2016/1/19.
+ * @author linaz
+ * @created 2016.05.13 8:57
  */
 @SpringBootApplication
 @EnableDiscoveryClient
 @RestController
 @EnableFeignClients
 @EnableZuulProxy
-public class AgAdminApplication extends SpringBootServletInitializer {
+public class AgResourceAdminApplication extends SpringBootServletInitializer {
+
     public static void main(String[] args) {
-        SpringApplication.run(AgAdminApplication.class, args);
+        SpringApplication.run(AgResourceAdminApplication.class, args);
     }
 
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(AgAdminApplication.class);
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+        return builder.sources(new Class[]{AgResourceAdminApplication.class});
     }
-
 }

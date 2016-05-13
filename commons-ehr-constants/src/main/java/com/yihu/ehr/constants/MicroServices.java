@@ -24,22 +24,7 @@ public class MicroServices {
     public static final String Standard = "svr-standard";
     public static final String User = "svr-user";
     public static final String Family = "svr-family";
+    public static final String FileResource = "svr-file-resource";
     public static final String Cipher = "svr-cipher";
-    /*
-    public static final String Adaption       = "${micro-service.adaption}";
-    public static final String Application    = "${micro-service.application}";
-    public static final String Configuration  = "${micro-service.configuration}";
-    public static final String Dictionary     = "${micro-service.dict}";
-    public static final String Discovery      = "${micro-service.discovery}";
-    public static final String ESB            = "${micro-service.esb}";
-    public static final String Geography      = "${micro-service.svr-geography}";
-    public static final String HealthProfile  = "${micro-service.svr-health-profiles}";
-    public static final String Organization   = "${micro-service.svr-org}";
-    public static final String Package        = "${micro-service.svr-pack-mgr}";
-    public static final String PackageResolve = "${micro-service.svr-pack-resolve}";
-    public static final String Patient        = "${micro-service.svr-patient}";
-    public static final String Security       = "${micro-service.svr-security}";
-    public static final String Standard       = "${micro-service.svr-standard}";
-    public static final String User           = "${micro-service.svr-user}";
-     */
+
 }

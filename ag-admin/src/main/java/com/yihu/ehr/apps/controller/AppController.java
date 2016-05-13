@@ -14,6 +14,7 @@ import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -179,16 +180,19 @@ public class AppController extends BaseController {
      */
     private AppModel convertToAppModel(MApp mApp) {
         if(mApp==null)
-        {
             return null;
-        }
+
         AppModel appModel = convertToModel(mApp, AppModel.class);
         //获取app类别字典值
-        MConventionalDict catalogDict = conDictEntryClient.getAppCatalog(mApp.getCatalog());
-        appModel.setCatalogName(catalogDict == null ? "" : catalogDict.getValue());
+        if(!StringUtils.isEmpty(mApp.getCatalog())){
+            MConventionalDict catalogDict = conDictEntryClient.getAppCatalog(mApp.getCatalog());
+            appModel.setCatalogName(catalogDict == null ? "" : catalogDict.getValue());
+        }
         //获取状态字典值
-        MConventionalDict statusDict = conDictEntryClient.getAppStatus(mApp.getStatus());
-        appModel.setStatusName(statusDict == null ? "" : statusDict.getValue());
+        if(!StringUtils.isEmpty(mApp.getStatus())){
+            MConventionalDict statusDict = conDictEntryClient.getAppStatus(mApp.getStatus());
+            appModel.setStatusName(statusDict == null ? "" : statusDict.getValue());
+        }
         return appModel;
     }
 
@@ -209,11 +213,15 @@ public class AppController extends BaseController {
         app.setAuditTime(DateToString(mApp.getAuditTime(),AgAdminConstants.DateTimeFormat));
 
         //获取app类别字典值
-        MConventionalDict catalopDict = conDictEntryClient.getAppCatalog(mApp.getCatalog());
-        app.setCatalogName(catalopDict == null ? "" : catalopDict.getValue());
+        if(!StringUtils.isEmpty(mApp.getCatalog())){
+            MConventionalDict catalopDict = conDictEntryClient.getAppCatalog(mApp.getCatalog());
+            app.setCatalogName(catalopDict == null ? "" : catalopDict.getValue());
+        }
         //获取app状态字典值
-        MConventionalDict statusDict = conDictEntryClient.getAppStatus(mApp.getStatus());
-        app.setStatusName(statusDict == null ? "" : statusDict.getValue());
+        if(!StringUtils.isEmpty(mApp.getStatus())){
+            MConventionalDict statusDict = conDictEntryClient.getAppStatus(mApp.getStatus());
+            app.setStatusName(statusDict == null ? "" : statusDict.getValue());
+        }
         return app;
     }
 
