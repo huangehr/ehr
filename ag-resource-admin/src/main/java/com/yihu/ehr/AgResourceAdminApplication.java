@@ -7,27 +7,24 @@ import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
-import org.springframework.integration.jmx.config.EnableIntegrationMBeanExport;
-import org.springframework.jmx.support.RegistrationPolicy;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Created by AndyCai on 2016/1/19.
+ * @author linaz
+ * @created 2016.05.13 8:57
  */
 @SpringBootApplication
 @EnableDiscoveryClient
 @RestController
 @EnableFeignClients
 @EnableZuulProxy
-@EnableIntegrationMBeanExport(registration = RegistrationPolicy.REPLACE_EXISTING)
-public class AgAdminApplication extends SpringBootServletInitializer {
+public class AgResourceAdminApplication extends SpringBootServletInitializer {
+
     public static void main(String[] args) {
-        SpringApplication.run(AgAdminApplication.class, args);
+        SpringApplication.run(AgResourceAdminApplication.class, args);
     }
 
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(AgAdminApplication.class);
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+        return builder.sources(new Class[]{AgResourceAdminApplication.class});
     }
-
 }
