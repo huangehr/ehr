@@ -261,8 +261,8 @@ public class DictController extends BaseController {
         try {
 
             //查询所有版本
-            ResponseEntity<Collection<MCDAVersion>> responseEntity = versionClient.searchCDAVersions("", "", "", 1000, 1);
-            Collection<MCDAVersion> mCdaVersions = responseEntity.getBody();
+//            ResponseEntity<Collection<MCDAVersion>> responseEntity = versionClient.searchCDAVersions("", "", "", 1000, 1);
+//            Collection<MCDAVersion> mCdaVersions = responseEntity.getBody();
 
             ResponseEntity<Collection<MStdDict>> dict = dictClient.searchDict("", "baseDict=" + id, "", id.length(), 1, versionCode);
             List<DictModel> dictModelList = (List<DictModel>) convertToModels(dict.getBody(), new ArrayList<DictModel>(dict.getBody().size()), DictModel.class, null);
@@ -273,19 +273,19 @@ public class DictController extends BaseController {
                 return envelop;
             }
 
-            for (MCDAVersion mcdaVersion : mCdaVersions){
-                List<MStdDataSet> mStdDataSetList = dataSetClient.search("",mcdaVersion.getVersion());
+//            for (MCDAVersion mcdaVersion : mCdaVersions){
+                List<MStdDataSet> mStdDataSetList = dataSetClient.search("",versionCode);
 
                 for (MStdDataSet mStdDataSet:mStdDataSetList){
-                    ResponseEntity<Collection<MStdMetaData>> metaDatas = dataSetClient.searchMetaDatas("", "dataSetId=" + mStdDataSet.getId() + " g1;dictId=" + id + " g2", "", id.length(), 1, mcdaVersion.getVersion());
+                    ResponseEntity<Collection<MStdMetaData>> metaDatas = dataSetClient.searchMetaDatas("", "dataSetId=" + mStdDataSet.getId() + " g1;dictId=" + id + " g2", "", id.length(), 1, versionCode);
                     List<MStdMetaData> mStdMetaDatas = (List<MStdMetaData>) metaDatas.getBody();
                     if(mStdMetaDatas.size()>0){
                         envelop.setSuccessFlg(false);
-                        envelop.setErrorMsg("该字典正被"+mcdaVersion.getVersionName()+"版本，"+mStdDataSet.getName()+"数据集，"+mStdMetaDatas.get(0).getName()+"数据元使用，不可删除");
+                        envelop.setErrorMsg("该字典正被当前版本，"+mStdDataSet.getName()+"数据集，"+mStdMetaDatas.get(0).getName()+"数据元使用，不可删除");
                         return envelop;
                     }
                 }
-            }
+//            }
 
 
         } catch (Exception e) {
