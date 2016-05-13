@@ -26,7 +26,7 @@ public class ProfileIndicesService {
     private final static String ProfileCore = "HealthArchives";
 
     public Page<ProfileIndices> findByDemographicIdAndEventDateBetween(String demographicId, Date since, Date to, Pageable pageable) {
-        return indicesRepo.findByDemographicIdAndEventDateBetween(demographicId, since, to, pageable);
+        return indicesRepo.findByDemographicIdAndEventDate(demographicId, since, to, pageable);
     }
 
     /**

@@ -9,6 +9,7 @@ import com.yihu.ehr.util.RestEcho;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -77,7 +78,7 @@ public class AdaptionsEndPoint {
 
         ObjectMapper mapper = new ObjectMapper();
         Map rs = new HashMap<>();
-        if (org.apache.commons.lang.StringUtils.isEmpty(orgCode)) {
+        if (StringUtils.isEmpty(orgCode)) {
             rs.put("msg", "缺失参数:org_code!");
             return new ResponseEntity<>(mapper.writeValueAsString(rs), HttpStatus.BAD_REQUEST);
         }

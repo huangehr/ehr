@@ -11,7 +11,7 @@ import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.profile.util.FileTableUtil;
 import com.yihu.ehr.profile.util.ProfileFactory;
 import com.yihu.ehr.profile.util.ProfileUtil;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;

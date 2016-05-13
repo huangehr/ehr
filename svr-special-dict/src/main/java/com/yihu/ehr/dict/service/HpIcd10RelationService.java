@@ -1,7 +1,6 @@
 package com.yihu.ehr.dict.service;
 
 import com.yihu.ehr.query.BaseJpaService;
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

@@ -4,7 +4,7 @@ import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.redis.RedisClient;
 import com.yihu.ehr.schema.OrgKeySchema;
 import com.yihu.ehr.util.log.LogService;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;

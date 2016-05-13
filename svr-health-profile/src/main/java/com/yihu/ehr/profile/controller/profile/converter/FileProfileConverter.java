@@ -3,11 +3,14 @@ package com.yihu.ehr.profile.controller.profile.converter;
 import com.yihu.ehr.model.profile.MProfile;
 import com.yihu.ehr.model.profile.MProfileDocument;
 import com.yihu.ehr.model.profile.MOriginFile;
+import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.profile.core.FileProfile;
 import com.yihu.ehr.profile.core.OriginFile;
 import com.yihu.ehr.profile.core.CdaDocument;
 import com.yihu.ehr.profile.core.StdProfile;
-import org.apache.commons.lang3.tuple.ImmutablePair;
+import com.yihu.ehr.profile.service.Template;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.tomcat.jni.File;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -20,12 +23,12 @@ import java.util.Map;
 @Service
 public class FileProfileConverter extends StdProfileConverter {
     @Value("${fast-dfs.public-server}")
-    String fastDFSUtil;
+    String fastDFSPublicServer;
 
-    protected void convertDocuments(StdProfile profile, MProfile mProfile, boolean containDataSet){
-        if (profile instanceof FileProfile){
+    protected void convertDocuments(StdProfile profile, MProfile mProfile, boolean containDataSet) {
+        if (profile instanceof FileProfile) {
             FileProfile fileProfile = (FileProfile) profile;
-            for (String cdaDocumentId : fileProfile.getDocuments().keySet()){
+            for (String cdaDocumentId : fileProfile.getDocuments().keySet()) {
                 CdaDocument cdaDocument = fileProfile.getDocuments().get(cdaDocumentId);
                 MProfileDocument document = new MProfileDocument();
 
@@ -33,19 +36,19 @@ public class FileProfileConverter extends StdProfileConverter {
                 document.setName("");
                 document.setTemplateId(0);
 
-                for (OriginFile originFile : cdaDocument.getOriginFiles()){
+                for (OriginFile originFile : cdaDocument.getOriginFiles()) {
                     MOriginFile mOriginFile = new MOriginFile();
                     mOriginFile.setMime(originFile.getMime());
                     mOriginFile.setOriginUrl(originFile.getOriginUrl());
                     mOriginFile.setExpireDate(originFile.getExpireDate());
 
                     Map<String, String> files = originFile.getFileUrls();
-                    for (String name : files.keySet()){
+                    for (String name : files.keySet()) {
                         String path = files.get(name);
                         mOriginFile.getFiles().put(name, path);
                     }
 
-                    document.getList().add(mOriginFile);
+                    document.getInstances().add(mOriginFile);
                 }
 
                 mProfile.getDocuments().add(document);
@@ -56,6 +59,33 @@ public class FileProfileConverter extends StdProfileConverter {
     }
 
     public MProfileDocument convertDocument(StdProfile profile, String cdaDocumentId, boolean containDataSet) {
-        return null;
+        FileProfile fileProfile = (FileProfile) profile;
+
+        MProfileDocument profileDocument = new MProfileDocument();
+        profileDocument.setId(cdaDocumentId);
+        profileDocument.setName("");
+        profileDocument.setTemplateId(0);
+
+        for (String rowkey : fileProfile.getDocuments().keySet()){
+            CdaDocument cdaDocument = fileProfile.getDocuments().get(rowkey);
+            if (!cdaDocument.getId().equals(cdaDocumentId)) continue;
+
+            for (OriginFile originFile : cdaDocument.getOriginFiles()){
+                MOriginFile mOriginFile = new MOriginFile();
+                mOriginFile.setMime(originFile.getMime());
+                mOriginFile.setOriginUrl(originFile.getOriginUrl());
+                mOriginFile.setExpireDate(originFile.getExpireDate());
+
+                for (String fileName : originFile.getFileUrls().keySet()){
+                    mOriginFile.getFiles().put(fileName, fastDFSPublicServer + "/" + originFile.getFileUrls().get(fileName));
+                }
+
+                profileDocument.getInstances().add(mOriginFile);
+            }
+
+            break;
+        }
+
+        return profileDocument;
     }
 }

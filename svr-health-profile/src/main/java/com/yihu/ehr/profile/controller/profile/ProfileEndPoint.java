@@ -68,7 +68,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     public MProfileDocument getProfileDocument(
             @ApiParam(value = "档案ID", defaultValue = "41872607-9_10295435_000622450_1444060800000")
             @PathVariable("profile_id") String profileId,
-            @ApiParam(value = "文档ID", defaultValue = "0dae00065684e6570dc35654490aacb3")
+            @ApiParam(value = "CDA文档ID", defaultValue = "0dae0006568b67720dc35654490ac6da")
             @PathVariable("document_id") String documentId,
             @ApiParam(value = "是否加载标准数据集", defaultValue = "true")
             @RequestParam(value = "load_std_data_set") boolean loadStdDataSet,
@@ -76,7 +76,9 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws Exception {
 
         StdProfile profile = profileService.getProfile(profileId, loadStdDataSet, loadOriginDataSet);
-        return profileUtil.convertDocument(profile, documentId, loadStdDataSet || loadOriginDataSet);
+        MProfileDocument profileDocument =  profileUtil.convertDocument(profile, documentId, loadStdDataSet || loadOriginDataSet);
+
+        return profileDocument;
     }
 
     @ApiOperation(value = "删除档案", notes = "删除一份档案，包括数据集")

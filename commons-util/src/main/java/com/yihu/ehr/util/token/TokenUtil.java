@@ -2,7 +2,7 @@ package com.yihu.ehr.util.token;
 
 import com.yihu.ehr.util.encrypt.DES;
 import com.yihu.ehr.util.encrypt.MD5;
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.Date;
 import java.util.HashMap;

@@ -14,7 +14,7 @@
  ***************************************************************************/
 package com.yihu.ehr.util.operator;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Date;
 import java.sql.Time;
