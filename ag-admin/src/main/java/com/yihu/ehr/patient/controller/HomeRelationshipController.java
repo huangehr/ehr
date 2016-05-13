@@ -25,9 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by AndyCai on 2016/4/20.
@@ -117,8 +115,10 @@ public class HomeRelationshipController extends BaseController {
             }
             String id="";
             String idCardNo = mMemberses.get(0).getIdCardNo();
+            HashMap<String,String> familyRelationMap = new HashMap<String,String>();
             for(MMembers mMembers : mMemberses)
             {
+                familyRelationMap.put(mMembers.getFamilyId(),mMembers.getFamilyRelation());
                 id+=mMembers.getFamilyId()+",";
             }
             id = trimEnd(id,",");
@@ -131,6 +131,12 @@ public class HomeRelationshipController extends BaseController {
             for(MFamilies mFamilies:mFamiliesList)
             {
                 HomeGroupModel groupModel = convertToHomeGroupModel(mFamilies,idCardNo);
+                if(StringUtils.isNotBlank(familyRelationMap.get(mFamilies.getId()))){
+                    MConventionalDict dict = conventionalDictClient.getFamilyRelationship(familyRelationMap.get(mFamilies.getId()));
+                    if(dict!=null){
+                        groupModel.setRelationshipName(dict.getValue());
+                    }
+                }
                 homeGroupModels.add(groupModel);
             }
 
