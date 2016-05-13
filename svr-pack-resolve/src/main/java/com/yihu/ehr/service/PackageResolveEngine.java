@@ -2,8 +2,12 @@ package com.yihu.ehr.service;
 
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.profile.core.StdProfile;
-import com.yihu.ehr.profile.util.ProfileGenerator;
+import com.yihu.ehr.profile.util.ProfileFactory;
 import com.yihu.ehr.profile.core.ProfileType;
+import com.yihu.ehr.service.resolver.FilePackageResolver;
+import com.yihu.ehr.service.resolver.LinkPackageResolver;
+import com.yihu.ehr.service.resolver.PackageResolver;
+import com.yihu.ehr.service.resolver.StdPackageResolver;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.io.FileUtils;
@@ -32,7 +36,7 @@ public class PackageResolveEngine {
 
     Map<ProfileType, PackageResolver> packageResolvers;
 
-    private final static String TempPath = System.getProperty("java.io.tmpdir") + File.separatorChar;
+    private final static String TempPath = System.getProperty("java.io.tmpdir") + java.io.File.separator;
 
     /**
      * 执行归档作业。归档作为流程如下：
@@ -51,15 +55,15 @@ public class PackageResolveEngine {
                 throw new RuntimeException("Invalid package file, package id: " + pack.getId());
             }
 
-            StdProfile profile = ProfileGenerator.generate(root);
+            StdProfile profile = ProfileFactory.createProfile(root);
             PackageResolver packageResolver;
             switch (profile.getProfileType()) {
                 case Standard:
                     packageResolver = packageResolvers.get(ProfileType.Standard);
                     break;
 
-                case Document:
-                    packageResolver = packageResolvers.get(ProfileType.Document);
+                case File:
+                    packageResolver = packageResolvers.get(ProfileType.File);
                     break;
 
                 case Link:
@@ -73,6 +77,7 @@ public class PackageResolveEngine {
 
             packageResolver.resolve(profile, root);
 
+            profile.setClientId(pack.getClientId());
             profile.regularRowKey();
             profile.determineEventType();
 
@@ -95,7 +100,7 @@ public class PackageResolveEngine {
     private void init() {
         packageResolvers = new HashMap<>();
         packageResolvers.put(Standard, context.getBean(StdPackageResolver.class));
-        packageResolvers.put(Document, context.getBean(DocumentPackageResolver.class));
+        packageResolvers.put(File, context.getBean(FilePackageResolver.class));
         packageResolvers.put(Link, context.getBean(LinkPackageResolver.class));
     }
 }

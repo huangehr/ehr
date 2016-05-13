@@ -51,6 +51,8 @@ public class ServiceApi {
 
         public static final String ResolveMessage                   = "/message/resolve";
 
+        public static final String MessageTimer                     = "/message/timer";
+
         public static final String LegacyPackages                   = "/json_package";
     }
 

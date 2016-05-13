@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,11 +39,11 @@ public class Icd10DictController extends BaseRestController {
     @Autowired
     private Icd10IndicatorRelationService icd10IndicatorRelationService;
 
-    @RequestMapping(value = "/dict/icd10", method = RequestMethod.POST)
+    @RequestMapping(value = "/dict/icd10", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建新的ICD10字典" )
     public MIcd10Dict createIcd10Dict(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) throws Exception {
+            @RequestBody String dictJson) throws Exception {
 
         Icd10Dict dict = toEntity(dictJson, Icd10Dict.class);
         dict.setCreateDate(new Date());
@@ -53,7 +54,7 @@ public class Icd10DictController extends BaseRestController {
     }
 
     @RequestMapping(value = "dict/icd10/{id}", method = RequestMethod.DELETE)
-    @ApiOperation(value = "根据id删除icd10疾病字典(含与药品及指标的关联关系。)")
+    @ApiOperation(value = "根据id删除icd10疾病字典(含与药品及指标的关联关系，同时删除关联的诊断。)")
     public boolean deleteIcd10Dict(
             @ApiParam(name = "id", value = "icd10字典代码")
             @PathVariable( value = "id") String id) {
@@ -80,7 +81,7 @@ public class Icd10DictController extends BaseRestController {
     }
 
     @RequestMapping(value = "dict/icd10s", method = RequestMethod.DELETE)
-    @ApiOperation(value = "根据ids批量删除删除icd10疾病字典(含与药品及指标的关联关系。)")
+    @ApiOperation(value = "根据ids批量删除删除icd10疾病字典(含与药品及指标的关联关系，同时删除关联的诊断。)")
     public boolean deleteIcd10Dicts(
             @ApiParam(name = "ids", value = "icd10字典代码,多个以逗号隔开")
             @RequestParam( value = "ids") String ids) {
@@ -111,11 +112,11 @@ public class Icd10DictController extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(value = "/dict/icd10", method = RequestMethod.PUT)
+    @RequestMapping(value = "/dict/icd10", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "更新ICD10字典" )
     public MIcd10Dict updateIcd10Dict(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson)  throws Exception {
+            @RequestBody String dictJson)  throws Exception {
 
         Icd10Dict dict = toEntity(dictJson, Icd10Dict.class);
         if (null == icd10DictService.retrieve(dict.getId())) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
@@ -191,11 +192,11 @@ public class Icd10DictController extends BaseRestController {
 
     //-------------------------ICD10与药品之间关联关系管理-----------------------------------------------------------
 
-    @RequestMapping(value = "/dict/icd10/drug", method = RequestMethod.POST)
+    @RequestMapping(value = "/dict/icd10/drug", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "为ICD10增加药品关联。" )
     public MIcd10DrugRelation createIcd10DrugRelation(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) throws Exception {
+            @RequestBody String dictJson) throws Exception {
 
         Icd10DrugRelation relation = toEntity(dictJson, Icd10DrugRelation.class);
         String id = getObjectId(BizObject.Dict);
@@ -229,11 +230,11 @@ public class Icd10DictController extends BaseRestController {
         return convertToModels(icd10DrugRelations, new ArrayList<MIcd10DrugRelation>(icd10DrugRelations.size()), MIcd10DrugRelation.class, null);
     }
 
-    @RequestMapping(value = "/dict/icd10/drug", method = RequestMethod.PUT)
+    @RequestMapping(value = "/dict/icd10/drug", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "为ICD10修改药品关联。" )
     public MIcd10DrugRelation updateIcd10DrugRelation(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) throws Exception {
+            @RequestBody String dictJson) throws Exception {
 
         Icd10DrugRelation relation = toEntity(dictJson, Icd10DrugRelation.class);
         if (null == icd10DrugRelationService.retrieve(relation.getId())) throw new ApiException(ErrorCode.GetDictFaild, "该关联不存在");
@@ -312,13 +313,13 @@ public class Icd10DictController extends BaseRestController {
         return icd10DrugRelationService.isExist(icd10Id,drugId);
     }
 
-    //-------------------------ICD10与指标之间关联关系管理-----------------------------------------------------------
+    //-------------------------ICD10与指标之间关联关系管理---开始--------------------------------------------------------
 
-    @RequestMapping(value = "/dict/icd10/indicator", method = RequestMethod.POST)
+    @RequestMapping(value = "/dict/icd10/indicator", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "为ICD10增加指标关联。" )
     public MIcd10IndicatorRelation createIcd10IndicatorRelation(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) throws Exception{
+            @RequestBody String dictJson) throws Exception{
 
         Icd10IndicatorRelation relation = toEntity(dictJson, Icd10IndicatorRelation.class);
         String id = getObjectId(BizObject.Dict);
@@ -353,11 +354,11 @@ public class Icd10DictController extends BaseRestController {
         return convertToModels(relations, new ArrayList<MIcd10IndicatorRelation>(relations.size()), MIcd10IndicatorRelation.class, null);
     }
 
-    @RequestMapping(value = "/dict/icd10/indicator", method = RequestMethod.PUT)
+    @RequestMapping(value = "/dict/icd10/indicator", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "为ICD10修改指标关联。" )
     public MIcd10IndicatorRelation updateIcd10IndicatorRelation(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) throws Exception {
+            @RequestBody String dictJson) throws Exception {
 
         Icd10IndicatorRelation relation = toEntity(dictJson, Icd10IndicatorRelation.class);
         if (null == icd10IndicatorRelationService.retrieve(relation.getId())) throw new ApiException(ErrorCode.GetDictFaild, "该关联不存在");
@@ -435,4 +436,5 @@ public class Icd10DictController extends BaseRestController {
 
         return icd10IndicatorRelationService.isExist(icd10Id,indicatorsId);
     }
+    //-------------------------ICD10与指标之间关联关系管理--结束---------------------------------------------------------
 }

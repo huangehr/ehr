@@ -4,6 +4,7 @@ import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.feign.XCDAVersionClient;
 import com.yihu.ehr.query.BaseJpaService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -95,6 +96,26 @@ public class TemplateService extends BaseJpaService<Template, XTemplateRepositor
                 }
             }
         }
+
+        return cdaDocumentMap;
+    }
+
+    public Map<Template, MCDADocument> getOrganizationTemplate(String orgCode, String cdaVersion, String cdaType, String cdaDocumentId) {
+        Template template = getRepo().findByOrganizationCodeAndCdaVersionAndCdaDocumentId(orgCode, cdaVersion, cdaDocumentId);
+        if (template == null) return null;
+
+        List<MCDADocument> documentList = cdaDocumentClient.getCDADocumentByIds(
+                "id,name",
+                "id=" + cdaDocumentId + "&type=" + cdaType,
+                "+name",
+                1,
+                1,
+                cdaVersion);
+        if (CollectionUtils.isEmpty(documentList)) return null;
+
+        Map<Template, MCDADocument> cdaDocumentMap =  new HashMap<>();
+        MCDADocument cdaDocument = documentList.get(0);
+        cdaDocumentMap.put(template, cdaDocument);
 
         return cdaDocumentMap;
     }

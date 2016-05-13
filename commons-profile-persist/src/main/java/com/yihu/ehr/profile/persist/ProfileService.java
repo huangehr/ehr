@@ -2,12 +2,12 @@ package com.yihu.ehr.profile.persist;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.profile.core.ProfileType;
-import com.yihu.ehr.profile.core.StdProfile;
-import com.yihu.ehr.profile.core.StdDataSet;
+import com.yihu.ehr.profile.core.*;
+import com.yihu.ehr.profile.persist.repo.FileRepository;
 import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.profile.persist.repo.DataSetRepository;
 import com.yihu.ehr.profile.persist.repo.ProfileRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * 档案服务。
@@ -32,10 +33,20 @@ public class ProfileService {
     DataSetRepository dataSetRepo;
 
     @Autowired
+    FileRepository fileRepo;
+
+    @Autowired
     ObjectMapper objectMapper;
 
     public void saveProfile(StdProfile profile) throws IOException {
+        // 档案主表
         profileRepo.save(profile);
+
+        // 数据元
+        dataSetRepo.save(profile);
+
+        // 存储文件记录
+        fileRepo.save(profile);
     }
 
     /**
@@ -48,16 +59,15 @@ public class ProfileService {
      * @throws IOException
      * @throws ParseException
      */
-    public StdProfile getProfile(String profileId, boolean loadStdDataSet, boolean loadOriginDataSet) throws IOException, ParseException {
-        Pair<StdProfile, String> result = profileRepo.findOne(profileId, loadStdDataSet, loadOriginDataSet);
-        StdProfile profile = result.getLeft();
-        profile.determineEventType();
-
+    public StdProfile getProfile(String profileId, boolean loadStdDataSet, boolean loadOriginDataSet) throws Exception {
+        // 读取档案主体
+        ProfileRepository.ProfileTuple tuple = profileRepo.findOne(profileId);
+        StdProfile profile = tuple.getProfile();
         String cdaVersion = profile.getCdaVersion();
         ProfileType pType = profile.getProfileType();
 
-        // 加载数据集列表
-        JsonNode root = objectMapper.readTree(result.getRight());
+        // 读取数据集
+        JsonNode root = objectMapper.readTree(tuple.getDataSetIndices());
         Iterator<String> iterator = root.fieldNames();
         while (iterator.hasNext()) {
             String dataSetCode = iterator.next();
@@ -70,6 +80,7 @@ public class ProfileService {
                         profile.insertDataSet(pair.getLeft(), pair.getRight());
                     }
                 }
+
                 if (loadOriginDataSet) {
                     if (dataSetCode.contains(DataSetUtil.OriginDataSetFlag)) {
                         Pair<String, StdDataSet> pair = dataSetRepo.findOne(cdaVersion, dataSetCode, pType, rowKeys);
@@ -81,6 +92,15 @@ public class ProfileService {
                 profile.insertDataSet(pair.getLeft(), pair.getRight());
             }
         }
+
+        // 读取非结构化档案文件列表
+        if (profile.getProfileType() == ProfileType.File){
+            String[] fileRowKeys = tuple.getFileIndices().split(";");
+            ((FileProfile)profile).setDocuments(fileRepo.findAll(fileRowKeys));
+        }
+
+        profile.determineEventType();
+        if(StringUtils.isEmpty(profile.getClientId())) profile.setClientId("kHAbVppx44");
 
         return profile;
     }

@@ -206,7 +206,7 @@ public class PackageEndPoint extends BaseRestController {
      * @param packageCrypto zip密码密文, file 请求体中文件参数名
      */
     @RequestMapping(value = ServiceApi.Packages.LegacyPackages, method = RequestMethod.POST)
-    @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
+    @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包(兼容旧接口)")
     @Deprecated
     public void savePackageWithUser(
             @ApiParam(name = "package", value = "档案包", allowMultiple = true) MultipartHttpServletRequest pack,

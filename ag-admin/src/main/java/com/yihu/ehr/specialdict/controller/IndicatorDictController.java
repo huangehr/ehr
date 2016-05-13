@@ -66,6 +66,16 @@ public class IndicatorDictController extends BaseController {
             @ApiParam(name = "ids", value = "字典ID", defaultValue = "")
             @RequestParam(value = "ids") String ids) {
         Envelop envelop = new Envelop();
+        String[] indicatorIds = ids.split(",");
+        for (String indicatorId:indicatorIds){
+            boolean flag = indicatorDictClient.indicatorIsUsage(indicatorId);
+            if(flag){
+                MIndicatorsDict indicatorsDict = indicatorDictClient.getIndicatorsDict(indicatorId);
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("字典："+indicatorsDict.getCode()+" 与诊断字典存在关联！请先解除关联。");
+                return envelop;
+            }
+        }
         Boolean bo = indicatorDictClient.deleteIndicatorsDicts(ids);
         envelop.setSuccessFlg(bo);
         return envelop;

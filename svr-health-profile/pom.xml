@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>com.yihu.ehr</groupId>
-        <artifactId>commons-dependencies-native</artifactId>
-        <version>1.1.0</version>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.yihu.ehr</groupId>
+		<artifactId>commons-dependencies-native</artifactId>
+		<version>1.1.0</version>
         <relativePath>../commons-dependencies-native</relativePath>
-    </parent>
+	</parent>
 
-    <artifactId>svr-health-profile</artifactId>
-    <packaging>${packaging}</packaging>
-    <name>svr-health-profile</name>
-    <description>EHR platform health profiles service</description>
+	<artifactId>svr-health-profile</artifactId>
+	<packaging>${packaging}</packaging>
+	<name>svr-health-profile</name>
+	<description>EHR platform health profiles service</description>
 
-    <properties>
-    </properties>
+	<properties>
+	</properties>
 
-    <dependencies>
+	<dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -26,42 +26,42 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-config</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-eureka</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-eureka</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-ui-swagger</artifactId>
             <version>1.1.0</version>
         </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-util</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-feign</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-rest-model</artifactId>
-            <version>1.1.0</version>
-        </dependency>
+		<dependency>
+			<groupId>com.yihu.ehr</groupId>
+			<artifactId>commons-util</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-feign</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.yihu.ehr</groupId>
+			<artifactId>commons-rest-model</artifactId>
+			<version>1.1.0</version>
+		</dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-profile-core</artifactId>
@@ -83,19 +83,14 @@
             <version>1.1.0</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-solrj</artifactId>
-            <version>5.2.1</version>
-        </dependency>
-        <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-data-fastdfs</artifactId>
             <version>1.1.0</version>
         </dependency>
-        <dependency>
-            <groupId>happy.fish</groupId>
-            <artifactId>fastDFS</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-    </dependencies>
+		<dependency>
+			<groupId>happy.fish</groupId>
+			<artifactId>fastDFS</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+	</dependencies>
 </project>

@@ -25,5 +25,6 @@ public class MicroServices {
     public static final String User = "svr-user";
     public static final String Family = "svr-family";
     public static final String FileResource = "svr-file-resource";
+    public static final String Cipher = "svr-cipher";
 
 }

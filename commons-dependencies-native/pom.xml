@@ -104,6 +104,7 @@
                 <module>../ag-ehr-platform</module>
                 <module>../svr-family</module>
                 <module>../svr-resource</module>
+                <module>../svr-cipher</module>
                 <!--<module>../app-ehr-browser</module>-->
             </modules>
         </profile>
@@ -138,6 +139,10 @@
                             <artifactId>spring-boot-starter-tomcat</artifactId>
                         </exclusion>
                     </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework.integration</groupId>
+                    <artifactId>spring-integration-jmx</artifactId>
                 </dependency>
             </dependencies>
             <distributionManagement>
@@ -207,6 +212,7 @@
                 <module>../svr-esb</module>
                 <module>../ag-admin</module>
                 <module>../ag-ehr-platform</module>
+                <module>../svr-cipher</module>
                 <!--<module>../app-ehr-browser</module>-->
             </modules>
         </profile>
@@ -248,6 +254,7 @@
                 <module>../svr-esb</module>
                 <module>../ag-admin</module>
                 <module>../ag-ehr-platform</module>
+                <module>../svr-cipher</module>
                 <!--<module>../app-ehr-browser</module>-->
             </modules>
         </profile>

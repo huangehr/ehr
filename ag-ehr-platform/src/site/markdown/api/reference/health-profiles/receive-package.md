@@ -117,23 +117,29 @@ ZIP包：
 其中documents目录包含本次档案所有的非结构化原始文件，根目录下的meta.json文件包含此患者的部分摘要信息，其结构如下：
 	
 	{
+		"demographic_id": "患者身份证号",
 		"patient_id":"病人ID",
 		"event_no":"事件号",
-		"inner_version":"采集版本号",
+		"event_type": 2,
 		"org_code":"机构编码",
 		"create_date":"创建时间",
 		"event_time":"事件时间",
+		"inner_version":"CDA版本号" 
 		
-		"data":
+		"data_sets": {
+			"数据集编码": [
+				{
+					"数据元": "值"
+				}
+			]
+		},
+		
+		"files":
 		[
 			{
 				"cda_doc_id": "CDA文档ID",
-				"url": "档案请求路径，使用相对路径，主机使用机构中的配置参数",
-                "expiry_date": "过期时间，格式：2015-11-05 17:30:56"
-				"key_words": {
-					//key格式: 数据集.数据元
-					"key": "word"    
-				},
+				"url": "档案请求路径，使用相对路径，主机名使用机构参数中的回调URL。若路径中含有特殊字符，请使用URL编码，如：冒号，点号等。",
+                "expire_date": "过期时间，格式：2015-11-05 17:30:56",
 				"content":
 				[
 					{
@@ -165,24 +171,94 @@ ZIP包：
 meta.json
 
 	{
-		"inner_version": "000000000000",
+		"demographic_id": ""350322198511153812,
 		"patient_id": "10295514",
 		"event_no": "000622508",
+		"event_type": 2,
 		"org_code": "41872607-9",
 		"event_time": "2015-10-05 00:00:00"
 		"create_date": "2015-11-05 17:30:56",
+		"inner_version": "000000000000"
 		
-		data：
+		"data_sets": {
+			"HDSA00_01": [
+                  {
+					"HDSD00_01_002": "段廷兰",
+					"HDSA00_01_011": "2",
+					"HDSA00_01_012": "1951-11-30 00:00:00",
+					"HDSA00_01_017": "412726195111306268"
+                  }
+                ],
+                "HDSD02_03": [
+                  {
+                    "HDSD00_01_547": "",
+                    "HDSD00_05_040": "150929SXC00038",
+                    "JDSD02_03_02": "0269",
+                    "JDSD02_03_03": "0269",
+                    "JDSD02_03_04": "",
+                    "JDSD02_03_05_CODE": "AAA",
+                    "JDSD02_03_05_VALUE": "",
+                    "JDSD02_03_06": "",
+                    "JDSD02_03_07": "",
+                    "JDSD02_03_11": "002",
+                    "JDSD02_03_12": "",
+                    "JDSD02_03_13": "乙型肝炎e抗体",
+                    "JDSD02_03_14": "HBeAb"
+                  },
+                  {
+                    "HDSD00_01_547": "g/L",
+                    "HDSD00_05_040": "151002SHB00165",
+                    "JDSD02_03_02": "0181",
+                    "JDSD02_03_03": "0181",
+                    "JDSD02_03_04": "",
+                    "JDSD02_03_05_CODE": "AAA",
+                    "JDSD02_03_05_VALUE": "",
+                    "JDSD02_03_06": "1.00",
+                    "JDSD02_03_07": "1.60",
+                    "JDSD02_03_11": "002",
+                    "JDSD02_03_12": "",
+                    "JDSD02_03_13": "载脂蛋白A1",
+                    "JDSD02_03_14": "APOA1"
+                  },
+                  {
+                    "HDSD00_01_547": "g/L",
+                    "HDSD00_05_040": "151002SHB00165",
+                    "JDSD02_03_02": "0166",
+                    "JDSD02_03_03": "0166",
+                    "JDSD02_03_04": "",
+                    "JDSD02_03_05_CODE": "AAA",
+                    "JDSD02_03_05_VALUE": "",
+                    "JDSD02_03_06": "60.0",
+                    "JDSD02_03_07": "85.0",
+                    "JDSD02_03_11": "002",
+                    "JDSD02_03_12": "",
+                    "JDSD02_03_13": "总蛋白",
+                    "JDSD02_03_14": "TP"
+                  },
+                  {
+                    "HDSD00_01_547": "U/L",
+                    "HDSD00_05_040": "151002SHB00165",
+                    "JDSD02_03_02": "0164",
+                    "JDSD02_03_03": "0164",
+                    "JDSD02_03_04": "",
+                    "JDSD02_03_05_CODE": "AAA",
+                    "JDSD02_03_05_VALUE": "",
+                    "JDSD02_03_06": "7",
+                    "JDSD02_03_07": "45",
+                    "JDSD02_03_11": "002",
+                    "JDSD02_03_12": "",
+                    "JDSD02_03_13": "r-谷氨酰转移酶",
+                    "JDSD02_03_14": "GGT"
+                  }
+                ]
+		}
+		
+		files：
 		[
 			{
 				"cda_doc_id": "CDA_ABC",
 				"url": "/api/patient/patient_id=10295514&event_no=000622508",
-				"expiry_date": "2016-10-10 00:00:00"
-				"key_words": {
-					"key1": "word1",
-					"key2": "word2",
-					"key3": "word3"
-				},
+				"expire_date": "2016-10-10 00:00:00",
 				"content":{
 					"mime_type": "application/msword",
 					"name": "住院病历.doc"
@@ -191,17 +267,14 @@ meta.json
 			{
 				"cda_doc_id: "CDA_DEF",
 				"url": "/api/patient/patient_id=10295514&event_no=000622508",
-				"expiry_date": "2016-10-10 00:00:00"
-				"key_words": {
-                  					"dataset.code": "value" 
-                },
+				"expire_date": "2016-10-10 00:00:00",
 				"content":[
 					{
 						"mime_type": "application/png",
 						"name": "检验报告-血常规.png;检验报告-尿常规.png"
 					},
 					{
-						"mime_type": "application/pdf",
+						"mime_type": "application/x-pdf",
 						"name": "检验报告-肝功能.pdf;检验报告-肾功能.pdf"
 					}
 				]
@@ -228,7 +301,7 @@ meta.json
 		"inner_version": "标准版本",
 		"visit_type": "就诊类型 （门诊或住院）",
 		"event_time": "事件时间，格式：2014-02-27 15:05:06",
-		"expiry_date": "档案过期时间，格式：2014-02-27 15:05:06",
+		"expire_date": "档案过期时间，格式：2014-02-27 15:05:06",
 		
 		// 档案所包含数据集
 		dataset:

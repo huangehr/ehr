@@ -1,82 +1,54 @@
 package com.yihu.ehr.profile.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.yihu.ehr.lang.SpringContext;
+import com.yihu.ehr.profile.core.CdaDocument;
+import com.yihu.ehr.profile.core.FileFamily;
+import com.yihu.ehr.profile.core.FileProfile;
+import com.yihu.ehr.profile.core.OriginFile;
+import com.yihu.ehr.util.DateTimeUtils;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author linaz
  * @created 2016.04.15
  */
 public class FileTableUtil {
-    public static final String Table = "UnStructuredDocuments";
+    public static final String Table = "RawFiles";
 
-    // 列族
-    public enum Family {
-        Basic("basic"),
-        Document("document"),
-        Extension("extension");
+    public static Map<String, String> getBasicFamilyCellMap(FileProfile profile) {
+        Map<String, String> map = new HashMap<>();
+        map.put(FileFamily.BasicColumns.PatientId, profile.getPatientId());
+        map.put(FileFamily.BasicColumns.EventNo, profile.getEventNo());
+        map.put(FileFamily.BasicColumns.OrgCode, profile.getOrgCode());
 
-        private String family;
-
-        Family(String family) {
-            this.family = family;
-        }
-
-        public String toString() {
-            return family;
-        }
+        return map;
     }
 
-    // 列
-    public enum BasicQualifier {
-        ProfileId("archive_id"),
-        InnerVersion("inner_version"),
-        LastUpdateTime("last_update_time");
+    public static Map<String, String> getFileFamilyCellMap(CdaDocument cdaDocument) {
+        ArrayNode root = ((ObjectMapper) SpringContext.getService("objectMapper")).createArrayNode();
+        for (OriginFile originFile : cdaDocument.getOriginFiles()) {
+            ObjectNode subNode = root.addObject();
+            subNode.put("mime", originFile.getMime());
+            subNode.put("origin_url", originFile.getOriginUrl());
+            subNode.put("expire_date", DateTimeUtils.utcDateTimeFormat(originFile.getExpireDate()));
 
-        private String qualifier;
-
-        BasicQualifier(String qualifier) {
-            this.qualifier = qualifier;
+            StringBuilder builder = new StringBuilder();
+            for (String fileName : originFile.getFileUrls().keySet()){
+                builder.append(fileName).append(":").append(originFile.getFileUrls().get(fileName)).append(";");
+            }
+            subNode.put("files", builder.toString());
         }
 
-        public String toString() {
-            return qualifier;
-        }
-    }
+        Map<String, String> map = new HashMap<>();
+        map.put(FileFamily.FileColumns.CdaDocumentId, cdaDocument.getId());
+        map.put(FileFamily.FileColumns.CdaDocumentName, cdaDocument.getName());
+        map.put(FileFamily.FileColumns.FileList, root.toString());
 
-
-    // 列
-    public enum DocumentQualifier{
-        OrgCode("org_code"),
-        PatientId("patient_id"),
-        EventNo("event_no"),
-        EventDate("event_date"),
-        CdaVersion("inner_version"),
-        DocumentsJson("documents_json");
-        private String qualifier;
-        DocumentQualifier(String qualifier){
-            this.qualifier = qualifier;
-        }
-        public String toString(){
-            return qualifier;
-        }
-    }
-
-    public static String[] getQualifiers(Family family) {
-        if (family == Family.Basic) {
-            return new String[]{
-                    BasicQualifier.ProfileId.toString(),
-                    BasicQualifier.InnerVersion.toString(),
-                    BasicQualifier.LastUpdateTime.toString()
-            };
-        }else if(family == Family.Document){
-            return new String[]{
-                    DocumentQualifier.OrgCode.toString(),
-                    DocumentQualifier.PatientId.toString(),
-                    DocumentQualifier.EventNo.toString(),
-                    DocumentQualifier.EventDate.toString(),
-                    DocumentQualifier.CdaVersion.toString(),
-                    DocumentQualifier.DocumentsJson.toString(),
-            };
-        }
-
-        return null;
+        return map;
     }
 }

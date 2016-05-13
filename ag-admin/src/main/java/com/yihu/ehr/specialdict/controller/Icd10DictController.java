@@ -25,7 +25,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
-@Api(value = "DrugDict", description = "药品字典管理", tags = {"药品字典"})
+@Api(value = "Icd10Dict", description = "Icd10字典管理", tags = {"Icd10字典"})
 public class Icd10DictController extends BaseController {
 
     @Autowired
@@ -54,7 +54,7 @@ public class Icd10DictController extends BaseController {
     }
 
     @RequestMapping(value = "dict/icd10/{id}", method = RequestMethod.DELETE)
-    @ApiOperation(value = "根据id删除icd10疾病字典(含与药品及指标的关联关系。)")
+    @ApiOperation(value = "根据id删除icd10疾病字典(含与药品及指标的关联关系，同时删除关联的诊断。)")
     public Envelop deleteIcd10Dict(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") String id) {
@@ -65,11 +65,21 @@ public class Icd10DictController extends BaseController {
     }
 
     @RequestMapping(value = "dict/icd10s", method = RequestMethod.DELETE)
-    @ApiOperation(value = "根据ids批量删除icd10疾病字典(含与药品及指标的关联关系。)")
+    @ApiOperation(value = "根据ids批量删除icd10疾病字典(含与药品及指标的关联关系，同时删除关联的诊断。)")
     public Envelop deleteIcd10Dicts(
             @ApiParam(name = "ids", value = "字典ID", defaultValue = "")
             @RequestParam(value = "ids") String ids) {
         Envelop envelop = new Envelop();
+        String[] icd10Ids = ids.split(",");
+        for (String icd10Id:icd10Ids){
+            boolean flag = icd10DictClient.icd10DictIsUsage(icd10Id);
+            if(flag){
+                MIcd10Dict icd10Dict = icd10DictClient.getIcd10Dict(icd10Id);
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("字典："+icd10Dict.getCode()+" 与疾病字典存在关联！请先解除关联。");
+                return envelop;
+            }
+        }
         Boolean bo = icd10DictClient.deleteIcd10Dicts(ids);
         envelop.setSuccessFlg(bo);
         return envelop;
@@ -181,8 +191,21 @@ public class Icd10DictController extends BaseController {
 
         return envelop;
     }
+    private Icd10DictModel changeToModel(MIcd10Dict mIcd10Dict) {
+        Icd10DictModel icd10DictModel = convertToModel(mIcd10Dict, Icd10DictModel.class);
+        //获取字典标识（慢病标识）值
+        MConventionalDict flag = conDictEntryClient.getYesNo(mIcd10Dict.getChronicFlag()=="0"? false:true);
+        icd10DictModel.setChronicFlag(flag == null ? "" : flag.getValue());
+        //获取字典标识（传染病标识）值
+        MConventionalDict type = conDictEntryClient.getYesNo(mIcd10Dict.getInfectiousFlag() == "0" ? false : true);
+        icd10DictModel.setInfectiousFlag(type == null ? "" : type.getValue());
 
-    //-------------------------ICD10与药品之间关联关系管理-----------------------------------------------------------
+        return icd10DictModel;
+    }
+
+
+
+    //-------------------------ICD10与药品之间关联关系管理----开始-------------------------------------------------------
 
     @RequestMapping(value = "/dict/icd10/drug", method = RequestMethod.POST)
     @ApiOperation(value = "为ICD10增加药品关联。" )
@@ -326,8 +349,10 @@ public class Icd10DictController extends BaseController {
 
         return envelop;
     }
+    //-------------------------ICD10与药品之间关联关系管理--结束---------------------------------------------------------
 
-    //-------------------------ICD10与指标之间关联关系管理-----------------------------------------------------------
+
+    //-------------------------ICD10与指标之间关联关系管理------开始-----------------------------------------------------
 
     @RequestMapping(value = "/dict/icd10/indicator", method = RequestMethod.POST)
     @ApiOperation(value = "为ICD10增加指标关联。" )
@@ -470,16 +495,5 @@ public class Icd10DictController extends BaseController {
 
         return envelop;
     }
-
-    private Icd10DictModel changeToModel(MIcd10Dict mIcd10Dict) {
-        Icd10DictModel icd10DictModel = convertToModel(mIcd10Dict, Icd10DictModel.class);
-        //获取字典标识（慢病标识）值
-        MConventionalDict flag = conDictEntryClient.getYesNo(mIcd10Dict.getChronicFlag()=="0"? false:true);
-        icd10DictModel.setChronicFlag(flag == null ? "" : flag.getValue());
-        //获取字典标识（传染病标识）值
-        MConventionalDict type = conDictEntryClient.getYesNo(mIcd10Dict.getInfectiousFlag() == "0" ? false : true);
-        icd10DictModel.setInfectiousFlag(type == null ? "" : type.getValue());
-
-        return icd10DictModel;
-    }
+    //-------------------------ICD10与指标之间关联关系管理--结束---------------------------------------------------------
 }

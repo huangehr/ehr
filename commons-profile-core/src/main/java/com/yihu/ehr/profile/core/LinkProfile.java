@@ -1,5 +1,8 @@
 package com.yihu.ehr.profile.core;
 
+import com.yihu.ehr.profile.annotation.Table;
+import com.yihu.ehr.profile.util.ProfileUtil;
+
 import java.util.Date;
 
 /**
@@ -9,6 +12,7 @@ import java.util.Date;
  * @version 1.0
  * @created 2015.08.16 10:44
  */
+@Table(ProfileUtil.Table)
 public class LinkProfile extends StdProfile {
     public Date expireDate;
 

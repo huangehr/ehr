@@ -5,6 +5,7 @@ import com.yihu.ehr.util.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.List;
 
@@ -103,6 +104,16 @@ public class BaseUIController {
         envelop.setSuccessFlg(true);
         envelop.setObj(object);
         return envelop;
+    }
+    public String encodeStr(String str) {
+        try {
+            if (str == null) {
+                return null;
+            }
+            return new String(str.getBytes("ISO-8859-1"), "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            return null;
+        }
     }
 
     protected Envelop failedSystem() {

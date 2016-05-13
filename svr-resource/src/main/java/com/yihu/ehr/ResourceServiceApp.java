@@ -13,20 +13,9 @@ import org.springframework.context.ApplicationContextAware;
 @SpringBootApplication
 @EnableEurekaServer
 @EnableFeignClients
-public class ResourceServiceApp extends SpringBootServletInitializer implements ApplicationContextAware {
+public class ResourceServiceApp {
 
     public static void main(String[] args) {
         SpringApplication.run(ResourceServiceApp.class, args);
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        //force the bean to get loaded as soon as possible
-        applicationContext.getBean("requestMappingHandlerAdapter");
-    }
-
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(ResourceServiceApp.class);
     }
 }

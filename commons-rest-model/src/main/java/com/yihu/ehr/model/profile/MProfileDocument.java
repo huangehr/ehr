@@ -11,9 +11,11 @@ import java.util.List;
 public class MProfileDocument {
     private String id;                  // CDA文档ID
     private String name;                // CDA文档名称
-    private Integer templateId;       // 展示模板ID
+    private Integer templateId;         // 展示模板ID
 
     private List<MDataSet> dataSets = new ArrayList<>();
+
+    private List<MOriginFile> list = new ArrayList<>();    // 此CDA文档下的文档列表
 
     public String getId() {
         return id;
@@ -45,5 +47,13 @@ public class MProfileDocument {
 
     public void setTemplateId(Integer templateId) {
         this.templateId = templateId;
+    }
+
+    public List<MOriginFile> getList() {
+        return list;
+    }
+
+    public void setList(List<MOriginFile> list) {
+        this.list = list;
     }
 }

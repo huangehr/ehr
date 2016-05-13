@@ -1,9 +1,11 @@
 package com.yihu.ehr.patient.controller;
 
+import com.yihu.ehr.SystemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.agModel.patient.HomeGroupModel;
 import com.yihu.ehr.agModel.patient.HomeRelationshipModel;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.family.MFamilies;
 import com.yihu.ehr.model.family.MMembers;
 import com.yihu.ehr.model.patient.MDemographicInfo;
@@ -44,6 +46,9 @@ public class HomeRelationshipController extends BaseController {
     @Autowired
     private PatientClient patientClient;
 
+    @Autowired
+    private ConventionalDictEntryClient conventionalDictClient;
+
     @RequestMapping(value = "/home_relationship", method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件查家庭关系")
     public Envelop getHomeRelationship(
@@ -73,6 +78,12 @@ public class HomeRelationshipController extends BaseController {
             for(MMembers mMembers :mMemberses )
             {
                 HomeRelationshipModel relationshipModel = convertToHomeRelationshipModel(mMembers);
+                if(StringUtils.isNotBlank(mMembers.getFamilyRelation())){
+                  MConventionalDict dict = conventionalDictClient.getFamilyRelationship(mMembers.getFamilyRelation());
+                  if(dict!=null){
+                    relationshipModel.setRelationShipName(dict.getValue());
+                  }
+                }
                 relationshipModels.add(relationshipModel);
             }
 
