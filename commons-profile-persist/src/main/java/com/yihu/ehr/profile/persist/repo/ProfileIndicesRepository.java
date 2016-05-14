@@ -11,7 +11,6 @@ import org.springframework.data.solr.repository.support.SimpleSolrRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author Sand
@@ -19,7 +18,7 @@ import java.util.List;
  * @created 2016.04.07 16:29
  */
 @Service
-public class XProfileIndicesRepo extends SimpleSolrRepository<ProfileIndices, String> {
+public class ProfileIndicesRepository extends SimpleSolrRepository<ProfileIndices, String> {
     @Autowired
     SolrTemplate solrTemplate;
 

@@ -65,24 +65,6 @@ public class ProfileUtil {
     @Autowired
     private StdKeySchema stdKeySchema;
 
-    public Page<ProfileIndices> searchProfile(MProfileSearch query, Date since, Date to) throws ParseException {
-        String demographicId = query.getDemographicId();
-        String orgCode = query.getOrganizationCode();
-        String patientId = query.getPatientId();
-        String eventNo = query.getEventNo();
-        String name = query.getName();
-        String telephone = query.getTelephone();
-        String gender = query.getGender();
-        Date birthday = DateTimeUtils.simpleDateParse(query.getBirthday());
-
-        Page<ProfileIndices> profileIndices = indicesService.findByIndices(orgCode, patientId, eventNo, since, to, null);
-        if (profileIndices == null || profileIndices.getContent().isEmpty()) {
-            profileIndices = indicesService.findByDemographic(demographicId, orgCode, name, telephone, gender, birthday, since, to, null);
-        }
-
-        return profileIndices;
-    }
-
     public Collection<MProfile> loadAndConvertProfiles(Page<ProfileIndices> profileIndices,
                                                         boolean loadStdDataSet,
                                                         boolean loadOriginDataSet) throws Exception {

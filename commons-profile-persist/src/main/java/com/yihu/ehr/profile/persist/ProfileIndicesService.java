@@ -1,6 +1,6 @@
 package com.yihu.ehr.profile.persist;
 
-import com.yihu.ehr.profile.persist.repo.XProfileIndicesRepo;
+import com.yihu.ehr.profile.persist.repo.ProfileIndicesRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,16 +21,25 @@ import java.util.Date;
 @Service
 public class ProfileIndicesService {
     @Autowired
-    XProfileIndicesRepo indicesRepo;
+    ProfileIndicesRepository indicesRepo;
 
     private final static String ProfileCore = "HealthArchives";
 
-    public Page<ProfileIndices> findByDemographicIdAndEventDateBetween(String demographicId, Date since, Date to, Pageable pageable) {
+    /**
+     * 按人口学索引搜索。
+     *
+     * @param demographicId
+     * @param since
+     * @param to
+     * @param pageable
+     * @return
+     */
+    public Page<ProfileIndices> findByDemographic(String demographicId, Date since, Date to, Pageable pageable) {
         return indicesRepo.findByDemographicIdAndEventDate(demographicId, since, to, pageable);
     }
 
     /**
-     * 从档案的索引中搜索，如：机构代码，患者ID，事件号等
+     * 按患者的机构索引搜索，如：机构代码，患者ID，事件号等
      *
      * @param orgCode
      * @param patientId
@@ -39,12 +48,12 @@ public class ProfileIndicesService {
      * @param to
      * @return
      */
-    public Page<ProfileIndices> findByIndices(String orgCode,
-                                              String patientId,
-                                              String eventNo,
-                                              Date since,
-                                              Date to,
-                                              Pageable pageable) {
+    public Page<ProfileIndices> findByOrganizationIndices(String orgCode,
+                                                          String patientId,
+                                                          String eventNo,
+                                                          Date since,
+                                                          Date to,
+                                                          Pageable pageable) {
         Criteria criteria = null;
 
         // 机构代码优先缩小搜索范围
@@ -64,7 +73,7 @@ public class ProfileIndicesService {
     }
 
     /**
-     * 从人口学信息中搜索档案。
+     * 按人口学索引搜索。
      *
      * @param orgCode
      * @param name
@@ -113,7 +122,7 @@ public class ProfileIndicesService {
             }
         }
 
-        if(criteria == null) return null;
+        if (criteria == null) return null;
 
         Page<Demographic> demographics = indicesRepo.query(Demographic.DemographicCore, criteria, Demographic.class);
         if (demographics.getContent().size() == 0) return null;
@@ -126,4 +135,6 @@ public class ProfileIndicesService {
         criteria = new Criteria("rowkey").contains(rowkeys);
         return indicesRepo.query(ProfileCore, criteria, ProfileIndices.class);
     }
+
+
 }
