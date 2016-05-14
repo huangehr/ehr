@@ -2,7 +2,7 @@ package com.yihu.ehr.query.services;
 
 import com.yihu.ehr.query.common.model.DataList;
 import com.yihu.ehr.query.common.model.SolrGroupEntity;
-import com.yihu.ehr.query.solr.SolrUtil;
+import com.yihu.ehr.solr.SolrUtil;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FieldStatsInfo;
 import org.apache.solr.client.solrj.response.PivotField;

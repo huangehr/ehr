@@ -1,7 +1,7 @@
 package com.yihu.ehr.resource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.resource.dao.ResourceMetadataDao;
+import com.yihu.ehr.resource.dao.intf.ResourceMetadataDao;
 import com.yihu.ehr.resource.model.RsResourceMetadata;
 import com.yihu.ehr.resource.service.intf.IResourceMetadataService;
 import org.springframework.beans.factory.annotation.Autowired;

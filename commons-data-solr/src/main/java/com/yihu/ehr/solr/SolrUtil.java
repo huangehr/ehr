@@ -1,4 +1,4 @@
-package com.yihu.ehr.query.solr;
+package com.yihu.ehr.solr;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
@@ -180,6 +180,9 @@ public class SolrUtil {
         if(null != q && !q.equals("")) //设置查询条件
         {
             query.setQuery(q);
+        }
+        else{
+            query.setQuery("*:*");
         }
         query.setFacet(true);//设置facet=on
         query.setRows(0);
