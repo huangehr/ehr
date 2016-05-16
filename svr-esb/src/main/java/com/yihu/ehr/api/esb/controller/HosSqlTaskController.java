@@ -9,6 +9,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -52,22 +53,22 @@ public class HosSqlTaskController extends BaseRestController{
 
 
 
-    @RequestMapping(value = "/createHosSqlTask", method = RequestMethod.POST)
+    @RequestMapping(value = "/createHosSqlTask", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建his穿透信息", notes = "创建his穿透信息")
     public MHosSqlTask createHosSqlTask(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
-            @RequestParam(value = "json_data", required = true) String jsonData) throws Exception {
+            @RequestBody String jsonData) throws Exception {
         HosSqlTask hosSqlTask = toEntity(jsonData, HosSqlTask.class);
 
         hosSqlTaskService.save(hosSqlTask);
         return convertToModel(hosSqlTask, MHosSqlTask.class, null);
     }
 
-    @RequestMapping(value = "/updateHosSqlTask", method = RequestMethod.PUT)
+    @RequestMapping(value = "/updateHosSqlTask", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改his穿透信息", notes = "修改his穿透信息")
     public MHosSqlTask updateHosSqlTask(
             @ApiParam(name = "json_data", value = "")
-            @RequestParam(value = "json_data") String jsonData) throws Exception {
+            @RequestBody String jsonData) throws Exception {
 
         HosSqlTask hosSqlTask = toEntity(jsonData, HosSqlTask.class);
         hosSqlTaskService.save(hosSqlTask);

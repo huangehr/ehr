@@ -4,10 +4,8 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.esb.MHosSqlTask;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
@@ -31,13 +29,13 @@ public interface HosSqlTaskClient {
 
 
 
-    @RequestMapping(value = "/createHosSqlTask", method = RequestMethod.POST)
+    @RequestMapping(value = "/createHosSqlTask", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     MHosSqlTask createHosSqlTask(
-            @RequestParam(value = "json_data", required = true) String jsonData);
+            @RequestBody String jsonData);
 
-    @RequestMapping(value = "/updateHosSqlTask", method = RequestMethod.PUT)
+    @RequestMapping(value = "/updateHosSqlTask", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     MHosSqlTask updateHosSqlTask(
-            @RequestParam(value = "json_data") String jsonData);
+            @RequestBody String jsonData);
 
 
     @RequestMapping(value = "/deleteHosSqlTask/{id}", method = RequestMethod.DELETE)

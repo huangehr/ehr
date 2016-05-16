@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.List;
 
@@ -40,8 +42,8 @@ public class HosLogController extends BaseController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page) throws ParseException {
-        ResponseEntity<List<MHosLog>> responseEntity = hosLogClient.searchHosLogs(fields,filters,sorts,size,page);
+            @RequestParam(value = "page", required = false) int page) throws Exception {
+        ResponseEntity<List<MHosLog>> responseEntity = hosLogClient.searchHosLogs(fields, filters,sorts,size,page);
         List<MHosLog> hosLogs = responseEntity.getBody();
 
         return hosLogs;
