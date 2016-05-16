@@ -3,7 +3,6 @@ package com.yihu.ehr.resource.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsResources;
-import com.yihu.ehr.resource.model.RsAppResource;
 import com.yihu.ehr.resource.model.RsResources;
 import com.yihu.ehr.resource.service.intf.IResourcesService;
 import io.swagger.annotations.Api;

@@ -13,6 +13,16 @@ public class DataList {
     private int size = 50;
     private List list;
 
+    public DataList()
+    {
+
+    }
+    public DataList(long _page,long _count)
+    {
+        page = _page;
+        count = _count;
+    }
+
     public String getName() {
         return name;
     }
