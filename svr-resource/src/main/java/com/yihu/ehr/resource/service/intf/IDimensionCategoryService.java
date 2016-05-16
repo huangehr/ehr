@@ -10,9 +10,7 @@ import java.util.List;
  * Created by lyr on 2016/4/25.
  */
 public interface IDimensionCategoryService {
-    RsDimensionCategory createDimensionCategory(RsDimensionCategory dimensionCategory);
-
-    void updateDimensionCategory(RsDimensionCategory dimensionCategory);
+    RsDimensionCategory saveDimensionCategory(RsDimensionCategory dimensionCategory);
 
     void deleteDimensionCategory(String id) throws Exception;
 

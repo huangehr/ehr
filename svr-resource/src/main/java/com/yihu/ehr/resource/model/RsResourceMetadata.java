@@ -48,7 +48,7 @@ public class RsResourceMetadata {
         this.metadataId = metadataId;
     }
 
-    @Column(name="related")
+    @Column(name="description")
     public String getDescription()
     {
         return  description;

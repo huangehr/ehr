@@ -9,10 +9,8 @@ public class MRsResources {
     private String code;
     private String name;
     private String categoryId;
-    private String type;
-    private String relatedAction;
-    private String relatedDatasource;
-    private String relatedDatasets;
+    private String rsInterface;
+    private String grantType;
     private String description;
 
     public String getId() {
@@ -43,32 +41,22 @@ public class MRsResources {
         this.categoryId = categoryId;
     }
 
-    public String getType() {
-        return type;
+    public String getRsInterface()
+    {
+        return rsInterface;
     }
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getRelatedAction() {
-        return relatedAction;
-    }
-    public void setRelatedAction(String relatedAction) {
-        this.relatedAction = relatedAction;
+    public void setRsInterface(String rsInterface)
+    {
+        this.rsInterface = rsInterface;
     }
 
-    public String getRelatedDatasource() {
-        return relatedDatasource;
+    public String getGrantType()
+    {
+        return grantType;
     }
-    public void setRelatedDatasource(String relatedDatasource) {
-        this.relatedDatasource = relatedDatasource;
-    }
-
-    public String getRelatedDatasets() {
-        return relatedDatasets;
-    }
-    public void setRelatedDatasets(String relatedDatasets) {
-        this.relatedDatasets = relatedDatasets;
+    public void setGrantType(String grantType)
+    {
+        this.grantType = grantType;
     }
 
     public String getDescription() {

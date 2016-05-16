@@ -26,11 +26,11 @@ public class ResourceGrantService extends BaseJpaService<RsAppResource,AppResour
     @Autowired
     private AppResourceMetadataDao appRsMetadataDao;
 
-    /*
+    /**
      * 资源授权单个App
      *
-     * @param 资源授权实体
-     * @return 资源授权实体
+     * @param rsAppResource RsAppResource 资源授权实体
+     * @return RsAppResource 资源授权实体
      */
     public RsAppResource grantResource(RsAppResource rsAppResource)
     {
@@ -39,11 +39,11 @@ public class ResourceGrantService extends BaseJpaService<RsAppResource,AppResour
         return rsAppResource;
     }
 
-    /*
+    /**
      * 资源授权多个APP
      *
-     * @param 资源授权实体集合
-     * @return 资源授权实体集合
+     * @param appRsList List<RsAppResource> 资源授权实体集合
+     * @return List<RsAppResource> 资源授权实体集合
      */
     public List<RsAppResource> grantResourceBatch(List<RsAppResource> appRsList)
     {
@@ -52,23 +52,28 @@ public class ResourceGrantService extends BaseJpaService<RsAppResource,AppResour
         return appRsList;
     }
 
-    /*
+    /**
      * 删除资源授权
      *
-     * @param 授权ID
+     * @param id String 授权ID
      */
     public void deleteResourceGrant(String id)
     {
-        appRsMetadataDao.deleteByAppResourceId(id);
-        appRsDao.delete(id);
+        String[] idArray = id.split(",");
+
+        for(String _id:idArray)
+        {
+            appRsMetadataDao.deleteByAppResourceId(_id);
+            appRsDao.delete(_id);
+        }
     }
 
-    /*
-     *资源授权获取
+    /**
+     * 资源授权获取
      *
-     * @param sorts 排序
-     * @param page 页码
-     * @param size 分页大小
+     * @param sorts String 排序
+     * @param page int 页码
+     * @param size int 分页大小
      * @return Page<RsResources> 资源
      */
     public Page<RsAppResource> getAppResourceGrant(String sorts, int page, int size)
@@ -78,12 +83,12 @@ public class ResourceGrantService extends BaseJpaService<RsAppResource,AppResour
         return appRsDao.findAll(pageable);
     }
 
-    /*
-     *资源获取
+    /**
+     * 资源获取
      *
-     * @param sorts 排序
-     * @param page 页码
-     * @param size 分页大小
+     * @param sorts String 排序
+     * @param page int 页码
+     * @param size int 分页大小
      * @return Page<RsResources> 资源
      */
     public Page<RsAppResourceMetadata> getAppRsMetadataGrant(String sorts, int page, int size)
