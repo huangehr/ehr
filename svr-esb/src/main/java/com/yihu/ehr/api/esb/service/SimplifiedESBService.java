@@ -59,7 +59,7 @@ public class SimplifiedESBService {
 
     @Transactional
     public void changeFillMiningStatus(String id, String message, String status) {
-        HosAcqTask r = hosAcqTackDao.getOne(id);
+        HosAcqTask r = hosAcqTackDao.findOne(id);
         r.setMessage(message);
         r.setStatus(status);
     }

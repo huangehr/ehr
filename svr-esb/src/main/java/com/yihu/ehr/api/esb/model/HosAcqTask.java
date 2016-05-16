@@ -3,8 +3,7 @@ package com.yihu.ehr.api.esb.model;// default package
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
-
+import java.util.Date;
 
 /**
  * HosAcqTask entity. @author MyEclipse Persistence Tools
@@ -19,11 +18,11 @@ public class HosAcqTask implements java.io.Serializable {
     private String id;
     private String orgCode;
     private String systemCode;
-    private Timestamp startTime;
-    private Timestamp endTime;
+    private Date startTime;
+    private Date endTime;
     private String status;
     private String message;
-    private Timestamp createTime;
+    private Date createTime;
 
 
     // Constructors
@@ -44,7 +43,7 @@ public class HosAcqTask implements java.io.Serializable {
     /**
      * full constructor
      */
-    public HosAcqTask(String id, String orgCode, String systemCode, Timestamp startTime, Timestamp endTime, String status, String message, Timestamp createTime) {
+    public HosAcqTask(String id, String orgCode, String systemCode, Date startTime, Date endTime, String status, String message, Date createTime) {
         this.id = id;
         this.orgCode = orgCode;
         this.systemCode = systemCode;
@@ -93,21 +92,21 @@ public class HosAcqTask implements java.io.Serializable {
 
     @Column(name = "start_time", length = 0)
 
-    public Timestamp getStartTime() {
+    public Date getStartTime() {
         return this.startTime;
     }
 
-    public void setStartTime(Timestamp startTime) {
+    public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
 
     @Column(name = "end_time", length = 0)
 
-    public Timestamp getEndTime() {
+    public Date getEndTime() {
         return this.endTime;
     }
 
-    public void setEndTime(Timestamp endTime) {
+    public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
 
@@ -133,11 +132,11 @@ public class HosAcqTask implements java.io.Serializable {
 
     @Column(name = "create_time", length = 0)
 
-    public Timestamp getCreateTime() {
+    public Date getCreateTime() {
         return this.createTime;
     }
 
-    public void setCreateTime(Timestamp createTime) {
+    public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 
