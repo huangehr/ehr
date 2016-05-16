@@ -70,8 +70,7 @@ public class HosAcqTaskController extends BaseRestController{
     @ApiOperation(value = "修改补采任务信息", notes = "修改补采任务信息")
     public MHosAcqTask updateHosAcqTask(
             @ApiParam(name = "json_data", value = "")
-            @RequestParam(value = "json_data") String jsonData) throws Exception {
-
+            @RequestBody String jsonData) throws Exception {
         HosAcqTask hosAcqTask = toEntity(jsonData, HosAcqTask.class);
         hosAcqTaskService.save(hosAcqTask);
         return convertToModel(hosAcqTask, MHosAcqTask.class, null);

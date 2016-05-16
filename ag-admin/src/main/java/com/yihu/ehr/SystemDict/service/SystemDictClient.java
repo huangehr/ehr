@@ -1,4 +1,4 @@
-package com.yihu.ehr.SystemDict.service;
+package com.yihu.ehr.systemDict.service;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;

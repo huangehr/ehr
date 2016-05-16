@@ -1,6 +1,6 @@
 package com.yihu.ehr.specialdict.controller;
 
-import com.yihu.ehr.SystemDict.service.ConventionalDictEntryClient;
+import com.yihu.ehr.systemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.agModel.specialdict.IndicatorsDictModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.specialdict.service.IndicatorDictClient;

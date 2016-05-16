@@ -1,6 +1,8 @@
 package com.yihu.ehr.util.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.util.Envelop;
@@ -14,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -54,15 +57,6 @@ public class BaseController extends AbstractController {
         return target;
     }
 
-    public <T> T toEntity(String json, Class<T> entityCls) {
-        try {
-            T entity = objectMapper.readValue(json, entityCls);
-            return entity;
-        } catch (IOException ex) {
-            throw new ApiException(ErrorCode.SystemError, "无法转换json, " + ex.getMessage());
-        }
-    }
-
     /**
      * 将实体集合转换为模型集合。
      *
@@ -87,6 +81,25 @@ public class BaseController extends AbstractController {
 
         return targets;
     }
+
+    public <T> T toEntity(String json, Class<T> entityCls) {
+        try {
+            T entity = objectMapper.readValue(json, entityCls);
+            return entity;
+        } catch (IOException ex) {
+            throw new ApiException(ErrorCode.SystemError, "无法转换json, " + ex.getMessage());
+        }
+    }
+
+    public String toJson(Object obj) {
+        try {
+            return objectMapper.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
+    }
+
+
 
     /**
      * 计算不在类中的属性。
@@ -272,5 +285,64 @@ public class BaseController extends AbstractController {
             }
         }
         return age;
+    }
+
+
+    /**
+     * 网关前端对象转微服务对象
+     * @param source
+     * @param targetCls
+     * @param properties
+     * @param <T>
+     * @return
+     * @throws Exception
+     */
+    public <T> T convertToMModel(Object source, Class<T> targetCls, String... properties) throws Exception {
+        if (source == null) {
+            return null;
+        }
+        T target = BeanUtils.instantiate(targetCls);
+        BeanUtils.copyProperties(source, target, propertyDiffer(properties, targetCls));
+        Field[] targetFields = target.getClass().getDeclaredFields();    // 获取target的所有属性，返回Field数组
+        for (Field targetField : targetFields){
+            String name = targetField.getName();
+            Object type = targetField.getGenericType();
+            targetField.setAccessible(true);
+            if(type == java.util.Date.class){
+                Field sourceField = source.getClass().getDeclaredField(name);
+                sourceField.setAccessible(true);
+                targetField.set(target, StringToDate(sourceField.get(source).toString(), AgAdminConstants.DateTimeFormat));
+            }
+        }
+        return target;
+    }
+
+    /**
+     * 网关微服务对象转前端对象
+     * @param source
+     * @param targetCls
+     * @param properties
+     * @param <T>
+     * @return
+     * @throws Exception
+     */
+    public <T> T convertToModelDetail(Object source, Class<T> targetCls, String... properties) throws Exception {
+        if (source == null) {
+            return null;
+        }
+        T target = BeanUtils.instantiate(targetCls);
+        BeanUtils.copyProperties(source, target, propertyDiffer(properties, targetCls));
+        Field[] sourceFields = source.getClass().getDeclaredFields();    // 获取source的所有属性，返回Field数组
+        for (Field sourceField : sourceFields){
+            String name = sourceField.getName();
+            Object type = sourceField.getGenericType();
+            sourceField.setAccessible(true);
+            if(type == java.util.Date.class){
+                Field targetField = target.getClass().getDeclaredField(name);
+                targetField.setAccessible(true);
+                targetField.set(target, DateToString((Date) sourceField.get(source), AgAdminConstants.DateTimeFormat));
+            }
+        }
+        return target;
     }
 }

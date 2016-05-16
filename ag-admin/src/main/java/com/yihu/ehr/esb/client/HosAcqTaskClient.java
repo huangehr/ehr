@@ -32,9 +32,9 @@ public interface HosAcqTaskClient {
     MHosAcqTask createHosAcqTask(
             @RequestBody String jsonData);
 
-    @RequestMapping(value = "/updateHosAcqTask", method = RequestMethod.PUT)
+    @RequestMapping(value = "/updateHosAcqTask", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     MHosAcqTask updateHosAcqTask(
-            @RequestParam(value = "json_data") String jsonData);
+            @RequestBody String jsonData);
 
     @RequestMapping(value = "/deleteHosAcqTask/{id}", method = RequestMethod.DELETE)
     boolean deleteHosAcqTask(
