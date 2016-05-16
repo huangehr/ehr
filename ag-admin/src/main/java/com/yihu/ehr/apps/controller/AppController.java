@@ -1,7 +1,7 @@
 package com.yihu.ehr.apps.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.SystemDict.service.ConventionalDictEntryClient;
+import com.yihu.ehr.systemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.apps.service.AppClient;

@@ -1,6 +1,6 @@
 package com.yihu.ehr.adapter.controller;
 
-import com.yihu.ehr.SystemDict.service.ConventionalDictEntryClient;
+import com.yihu.ehr.systemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.adapter.service.AdapterOrgClient;
 import com.yihu.ehr.adapter.service.PlanClient;
 import com.yihu.ehr.adapter.utils.ExtendController;

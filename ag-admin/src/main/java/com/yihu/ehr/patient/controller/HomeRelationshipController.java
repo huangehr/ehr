@@ -1,6 +1,6 @@
 package com.yihu.ehr.patient.controller;
 
-import com.yihu.ehr.SystemDict.service.ConventionalDictEntryClient;
+import com.yihu.ehr.systemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.agModel.patient.HomeGroupModel;
 import com.yihu.ehr.agModel.patient.HomeRelationshipModel;
 import com.yihu.ehr.constants.AgAdminConstants;

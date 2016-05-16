@@ -5,7 +5,7 @@ import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.agModel.user.UsersModel;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.SystemDict.service.ConventionalDictEntryClient;
+import com.yihu.ehr.systemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.security.service.SecurityClient;
