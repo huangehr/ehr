@@ -1,8 +1,19 @@
 package com.yihu.ehr.resource.model;
 
+import com.yihu.ehr.profile.annotation.*;
+import org.apache.hadoop.hbase.shaded.org.codehaus.jackson.annotate.JsonProperty;
+import org.apache.hadoop.hbase.shaded.org.codehaus.jackson.annotate.JsonRawValue;
+import org.apache.hadoop.hbase.shaded.org.codehaus.jackson.annotate.JsonSetter;
+import org.apache.htrace.fasterxml.jackson.annotation.JsonGetter;
+import org.apache.htrace.fasterxml.jackson.annotation.JsonInclude;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Table;
+
 /**
  * Created by hzp on 2016/4/21.
  * 资源列表
@@ -54,19 +65,23 @@ public class RsResources {
         this.categoryId = categoryId;
     }
 
-    @Column(name="RS_INTERFACE")
-    public String getRsInterface() {
+    @Column(name="rs_interface")
+    public String getRsInterface()
+    {
         return rsInterface;
     }
-    public void setRsInterface(String rsInterface) {
+    public void setRsInterface(String rsInterface)
+    {
         this.rsInterface = rsInterface;
     }
 
-    @Column(name="GRANT_TYPE")
-    public String getGrantType() {
+    @Column(name="grant_type")
+    public String getGrantType()
+    {
         return grantType;
     }
-    public void setGrantType(String grantType) {
+    public void setGrantType(String grantType)
+    {
         this.grantType = grantType;
     }
 
