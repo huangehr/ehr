@@ -30,7 +30,7 @@ public enum BizObject {
     AppResource((short)0x0019),
     AppResourceMetadata((short)0x0020),
     ResourceCategory((short)0x0021),
-    PictureResource((short)0x0022);
+    FileResource((short)0x0022);
 
     public short getBizObject(){
         return bizObject;
