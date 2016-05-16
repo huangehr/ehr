@@ -2,6 +2,7 @@ package com.yihu.ehr.fileresource.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.fileresource.service.FileResourceClient;
+import com.yihu.ehr.util.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -17,7 +18,7 @@ import java.util.List;
  * @author linaz
  * @created 2016.05.11 11:32
  */
-@RequestMapping(ApiVersion.Version1_0)
+@RequestMapping(ApiVersion.Version1_0+"/admin")
 @RestController
 @Api(value = "图片上传管理接口", description = "图片上传管理接口")
 public class FileResourceController {
@@ -48,11 +49,16 @@ public class FileResourceController {
 
     @RequestMapping(value = "/files", method = RequestMethod.GET)
     @ApiOperation(value = "下载文件")
-    public List<String> fileDownload(
+    public Envelop fileDownload(
             @ApiParam(name = "object_id", value = "文件字符串")
             @RequestParam(value = "object_id") String objectId) throws Exception {
         List<String> filesStr = fileResourceClient.filesDownload(objectId);
-        return filesStr;
+
+        Envelop envelop = new Envelop();
+
+        envelop.setDetailModelList(filesStr);
+        return envelop;
+//        return filesStr;
     }
 
 }

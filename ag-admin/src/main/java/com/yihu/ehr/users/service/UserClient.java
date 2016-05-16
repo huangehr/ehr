@@ -119,4 +119,14 @@ public interface UserClient {
                            @RequestParam(value = "group_name") String groupName,
                            @ApiParam(name = "remote_file_name", value = "服务器头像名称", defaultValue = "")
                            @RequestParam(value = "remote_file_name") String remoteFileName);
+
+    @RequestMapping(value = ApiVersion.Version1_0 + "/files", method = RequestMethod.POST)
+    @ApiOperation(value = "file upload test")
+    public String pictureUpload(
+            @ApiParam(name = "file_str", value = "文件流转化后的字符串")
+            @RequestParam(value = "file_str") String fileStr,
+            @ApiParam(name = "file_name", value = "文件名")
+            @RequestParam(value = "file_name") String fileName,
+            @ApiParam(name = "json_data", value = "文件资源属性")
+            @RequestParam(value = "json_data") String jsonData);
 }
