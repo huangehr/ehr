@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -57,6 +59,7 @@ public class FileResourceController extends BaseRestController {
             @ApiParam(name = "json_data", value = "文件资源属性")
             @RequestParam(value = "json_data") String jsonData) throws Exception {
         FileResource fileResource = toEntity(jsonData, FileResource.class);
+        fileResource.setId(getObjectId(BizObject.FileResource));
         return fileResourceManager.saveFileResource(fileStr, fileName, fileResource);
 
     }
@@ -96,7 +99,8 @@ public class FileResourceController extends BaseRestController {
             String groupName = storagePath.split(":")[0];
             String remoteFileName = storagePath.split(":")[1];
             byte[] bytes = fastDFSUtil.download(groupName, remoteFileName);
-            String fileStream = new String(bytes);
+
+            String fileStream = new String(Base64.getEncoder().encode(bytes));
             filesStrs.add(fileStream);
         }
         return filesStrs;
