@@ -13,9 +13,9 @@ import com.yihu.ehr.util.IdValidator;
 import com.yihu.ehr.util.RestEcho;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -66,7 +66,7 @@ public class LegacyEndPoint {
             @ApiParam(name = "org_code", value = "机构编码")
             @RequestParam(value = "org_code") String orgCode) throws Exception {
 
-        if (org.apache.commons.lang.StringUtils.isEmpty(orgCode)) {
+        if (StringUtils.isEmpty(orgCode)) {
             return new RestEcho().failed(ErrorCode.MissParameter, "缺失参数:org_code!");
         }
         Object object = adaptionClient.getCDAVersionInfoByOrgCode(orgCode);

@@ -6,7 +6,7 @@ import com.yihu.ehr.profile.util.ProfileFactory;
 import com.yihu.ehr.profile.core.StdDataSet;
 import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.profile.extractor.KeyDataExtractor;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;

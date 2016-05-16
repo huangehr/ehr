@@ -15,7 +15,7 @@ public class MProfileDocument {
 
     private List<MDataSet> dataSets = new ArrayList<>();
 
-    private List<MOriginFile> list = new ArrayList<>();    // 此CDA文档下的文档列表
+    private List<MOriginFile> instances = new ArrayList<>();    // 此CDA文档下的文档列表
 
     public String getId() {
         return id;
@@ -49,11 +49,11 @@ public class MProfileDocument {
         this.templateId = templateId;
     }
 
-    public List<MOriginFile> getList() {
-        return list;
+    public List<MOriginFile> getInstances() {
+        return instances;
     }
 
-    public void setList(List<MOriginFile> list) {
-        this.list = list;
+    public void setInstances(List<MOriginFile> instances) {
+        this.instances = instances;
     }
 }

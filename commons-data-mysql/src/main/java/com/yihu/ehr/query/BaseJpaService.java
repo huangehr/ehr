@@ -1,7 +1,7 @@
 package com.yihu.ehr.query;
 
 import com.yihu.ehr.constants.PageArg;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;

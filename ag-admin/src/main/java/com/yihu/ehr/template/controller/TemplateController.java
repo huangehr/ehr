@@ -1,40 +1,28 @@
 package com.yihu.ehr.template.controller;
 
-import com.yihu.ehr.SystemDict.service.ConventionalDictEntryClient;
-import com.yihu.ehr.adapter.service.AdapterOrgClient;
-import com.yihu.ehr.adapter.service.PlanClient;
 import com.yihu.ehr.adapter.utils.ExtendController;
-import com.yihu.ehr.agModel.adapter.AdapterPlanDetailModel;
-import com.yihu.ehr.agModel.adapter.AdapterPlanModel;
 import com.yihu.ehr.agModel.template.TemplateModel;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.geography.service.AddressClient;
-import com.yihu.ehr.model.adaption.MAdapterOrg;
-import com.yihu.ehr.model.adaption.MAdapterPlan;
-import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.profile.MTemplate;
 import com.yihu.ehr.model.standard.MCDADocument;
-import com.yihu.ehr.model.standard.MCDAVersion;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.std.service.CDAClient;
-import com.yihu.ehr.std.service.CDAVersionClient;
 import com.yihu.ehr.template.service.TemplateClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.validate.ValidateResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**

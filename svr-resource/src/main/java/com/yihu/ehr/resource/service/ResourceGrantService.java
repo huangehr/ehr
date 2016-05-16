@@ -1,8 +1,8 @@
 package com.yihu.ehr.resource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.resource.dao.AppResourceDao;
-import com.yihu.ehr.resource.dao.AppResourceMetadataDao;
+import com.yihu.ehr.resource.dao.intf.AppResourceDao;
+import com.yihu.ehr.resource.dao.intf.AppResourceMetadataDao;
 import com.yihu.ehr.resource.model.RsAppResource;
 import com.yihu.ehr.resource.model.RsAppResourceMetadata;
 import com.yihu.ehr.resource.service.intf.IResourceGrantService;

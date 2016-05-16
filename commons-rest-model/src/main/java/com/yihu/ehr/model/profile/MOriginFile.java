@@ -1,8 +1,8 @@
 package com.yihu.ehr.model.profile;
 
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author Sand

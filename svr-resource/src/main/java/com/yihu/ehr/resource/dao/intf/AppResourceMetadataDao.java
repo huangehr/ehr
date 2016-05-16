@@ -1,4 +1,4 @@
-package com.yihu.ehr.resource.dao;
+package com.yihu.ehr.resource.dao.intf;
 
 import com.yihu.ehr.resource.model.RsAppResourceMetadata;
 import org.springframework.data.repository.PagingAndSortingRepository;

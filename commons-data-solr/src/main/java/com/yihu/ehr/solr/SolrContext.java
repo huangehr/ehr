@@ -1,13 +1,13 @@
 package com.yihu.ehr.solr;
 
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.impl.CloudSolrServer;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
 import org.springframework.data.solr.core.SolrTemplate;
-import org.springframework.data.solr.repository.support.SimpleSolrRepository;
 
 /**
  * Solr配置。仅支持SolrCloud，不支持单核模式。
@@ -22,7 +22,12 @@ public class SolrContext {
     String zkHost;
 
     @Bean
-    public CloudSolrServer solrServer() {
-        return new CloudSolrServer(zkHost);
+    public SolrClient solrClient() {
+        return new CloudSolrClient(zkHost);
+    }
+
+    @Bean
+    public SolrTemplate solrTemplate(SolrClient solrClient) throws Exception {
+        return new SolrTemplate(solrClient);
     }
 }

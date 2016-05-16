@@ -12,6 +12,10 @@
 
     <artifactId>commons-profile-persist</artifactId>
     <packaging>jar</packaging>
+    <description>EHR profile persist component</description>
+
+    <properties>
+    </properties>
 
     <dependencies>
         <dependency>

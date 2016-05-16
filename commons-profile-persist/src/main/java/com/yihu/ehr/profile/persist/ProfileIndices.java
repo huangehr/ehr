@@ -41,6 +41,18 @@ public class ProfileIndices {
         return demographicId;
     }
 
+    public void setRowkey(String rowkey) {
+        this.rowkey = rowkey;
+    }
+
+    public void setEventDate(Date eventDate) {
+        this.eventDate = eventDate;
+    }
+
+    public void setDemographicId(String demographicId) {
+        this.demographicId = demographicId;
+    }
+
     public Date getEventDate() {
         return eventDate;
     }

@@ -5,7 +5,9 @@ import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.feign.XCDAVersionClient;
 import com.yihu.ehr.query.BaseJpaService;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,7 +80,7 @@ public class TemplateService extends BaseJpaService<Template, XTemplateRepositor
 
         List<MCDADocument> documentList = cdaDocumentClient.getCDADocumentByIds(
                 "id,name",
-                "id=" + String.join(",", cdaDocumentIdList) + "&type=" + cdaType,
+                "id=" + String.join(",", cdaDocumentIdList) + ";type=" + cdaType,
                 "+name",
                 1000,
                 1,
@@ -100,23 +102,20 @@ public class TemplateService extends BaseJpaService<Template, XTemplateRepositor
         return cdaDocumentMap;
     }
 
-    public Map<Template, MCDADocument> getOrganizationTemplate(String orgCode, String cdaVersion, String cdaType, String cdaDocumentId) {
+    public Pair<Template, MCDADocument> getOrganizationTemplate(String orgCode, String cdaVersion, String cdaType, String cdaDocumentId) {
         Template template = getRepo().findByOrganizationCodeAndCdaVersionAndCdaDocumentId(orgCode, cdaVersion, cdaDocumentId);
         if (template == null) return null;
 
         List<MCDADocument> documentList = cdaDocumentClient.getCDADocumentByIds(
                 "id,name",
-                "id=" + cdaDocumentId + "&type=" + cdaType,
+                "id=" + cdaDocumentId + ";type=" + cdaType,
                 "+name",
                 1,
                 1,
                 cdaVersion);
         if (CollectionUtils.isEmpty(documentList)) return null;
 
-        Map<Template, MCDADocument> cdaDocumentMap =  new HashMap<>();
-        MCDADocument cdaDocument = documentList.get(0);
-        cdaDocumentMap.put(template, cdaDocument);
-
+        Pair<Template, MCDADocument> cdaDocumentMap =  new ImmutablePair<>(template, documentList.get(0));
         return cdaDocumentMap;
     }
 

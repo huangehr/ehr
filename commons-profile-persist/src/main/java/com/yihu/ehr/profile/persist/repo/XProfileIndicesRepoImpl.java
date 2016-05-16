@@ -1,40 +1,30 @@
 package com.yihu.ehr.profile.persist.repo;
 
-import org.apache.solr.client.solrj.impl.CloudSolrServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.Criteria;
 import org.springframework.data.solr.core.query.SimpleQuery;
-import org.springframework.data.solr.server.support.MulticoreSolrServerFactory;
 import org.springframework.stereotype.Repository;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Sand
  * @version 1.0
  * @created 2016.04.07 16:28
  */
-@Repository
 public class XProfileIndicesRepoImpl implements XProfileIndicesRepoCustom {
     @Autowired
-    private CloudSolrServer cloudSolrServer;
-
-    private Map<String, SolrTemplate> solrTemplateMap = new HashMap<>();
-
-    public XProfileIndicesRepoImpl() {
-    }
+    SolrTemplate solrTemplate;
 
     private SolrTemplate getSolrTemplate(String core) {
-        SolrTemplate solrTemplate = solrTemplateMap.get(core);
+        solrTemplate.setSolrCore(core);
+        /*SolrTemplate solrTemplate = solrTemplateMap.get(core);
         if (null == solrTemplate) {
-            solrTemplate = new SolrTemplate(new MulticoreSolrServerFactory(cloudSolrServer));
+            solrTemplate = new SolrTemplate(new MulticoreSolrServerFactory(solrClient));
             solrTemplate.setSolrCore(core);
             solrTemplate.afterPropertiesSet();
             solrTemplateMap.put(core, solrTemplate);
-        }
+        }*/
 
         return solrTemplate;
     }

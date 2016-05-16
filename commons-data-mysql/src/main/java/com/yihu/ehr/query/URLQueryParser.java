@@ -2,8 +2,8 @@ package com.yihu.ehr.query;
 
 import com.yihu.ehr.util.DateTimeUtils;
 import javafx.util.Pair;
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.NumberUtils;
 
 import javax.persistence.EntityManager;
@@ -12,7 +12,7 @@ import java.text.ParseException;
 import java.util.*;
 
 /**
- * URL 查询串解析器。将 {@link URLQueryBuilder} 中产生的查询字符串反解析。
+ * URL 查询串解析器。将 {@link com.yihu.ehr.util.URLQueryBuilder} 中产生的查询字符串反解析。
  *
  * @author Sand
  * @version 1.0

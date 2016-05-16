@@ -2,19 +2,19 @@ package com.yihu.ehr.resource.service;
 
 
 import com.yihu.ehr.query.common.model.DataList;
-import com.yihu.ehr.resource.dao.ResourceMetadataDao;
-import com.yihu.ehr.resource.dao.ResourcesDao;
+import com.yihu.ehr.resource.dao.ResourcesMetadataQueryDao;
+import com.yihu.ehr.resource.dao.intf.ResourcesDao;
 import com.yihu.ehr.resource.dao.ResourcesQueryDao;
-import com.yihu.ehr.resource.model.ResourcesType;
+import com.yihu.ehr.resource.model.DtoResourceMetadata;
+import com.yihu.ehr.resource.model.RsAppResource;
 import com.yihu.ehr.resource.model.RsResourceMetadata;
 import com.yihu.ehr.resource.model.RsResources;
 import com.yihu.ehr.resource.service.intf.IResourcesQueryService;
-import jdk.management.resource.ResourceType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,13 +25,11 @@ import java.util.Map;
 @Service("resourcesQueryService")
 public class ResourcesQueryService implements IResourcesQueryService {
 
-
-
     @Autowired
     private ResourcesDao resourcesDao;
 
     @Autowired
-    private ResourceMetadataDao resourceMetadataDao;
+    private ResourcesMetadataQueryDao resourceMetadataQueryDao;
 
     @Autowired
     private ResourcesQueryDao resourcesQueryDao;
@@ -51,22 +49,70 @@ public class ResourcesQueryService implements IResourcesQueryService {
         RsResources rs = resourcesDao.findByCode(resourcesCode);
         if(rs!=null)
         {
-            //资源类型
-            String type = rs.getType();
-            String dataset = rs.getRelatedDatasets();
-            String datasource = rs.getRelatedDatasource();
-            String action = rs.getRelatedAction();
-
-            //资源结构/权限
-            List<RsResourceMetadata> list = resourceMetadataDao.findByResourcesId(rs.getId());
-            if(list!=null && list.size()>0)
+            String methodName = rs.getRsInterface(); //执行函数
+            String grantType = rs.getGrantType(); //访问方式 0开放 1授权
+            //资源结构
+            List<DtoResourceMetadata> metadataList;
+            if(grantType=="1")
             {
+                //判断是否有资源权限
+                RsAppResource appResource = resourceMetadataQueryDao.loadAppResource(appId);
+                if(appResource!=null)
+                {
+                    //授权数据源
+                    metadataList = resourceMetadataQueryDao.getResourceMetadata(resourcesCode,appResource.getId());
+
+                }
+                else
+                {
+                    throw new Exception("该应用[appId="+appId+"]无权访问资源[resourcesCode="+resourcesCode+"]");
+                }
+            }
+            else{
+                //所有数据元
+                metadataList = resourceMetadataQueryDao.getResourceMetadata(resourcesCode);
+            }
+
+            if(metadataList!=null && metadataList.size()>0)
+            {
+                //执行函数
+                Class<ResourcesQueryDao> classType = ResourcesQueryDao.class;
+                Method method = classType.getMethod(methodName, null);
+                DataList re = (DataList)method.invoke(classType, queryParams, page, size);
+
+                /**** 转译 *****/
+                List<Map<String,Object>> list = new ArrayList<>();
+                for(DtoResourceMetadata obj : metadataList)
+                {
+                    /*String code = obj.getColumnCode();
+                    String displayCode = obj.getDisplayCode();
+
+                    metadata += code + ",";
+                    if(displayCode!=null && displayCode.length()>0 && !code.equals(displayCode))
+                    {
+                        needTranslation = true;
+                    }
+
+                    String statsType = obj.getStatsType();
+                    if(statsType!=null && statsType.equals("0"))
+                    {
+                        groupFields += code + ",";
+                    }
+                    else if(statsType!=null && statsType.equals("1"))
+                    {
+                        statsFields += code + ",";
+                    }*/
+                }
+
+/*
+
+
                 String metadata = ""; //逗号分隔，展示数据元
                 String groupFields = ""; //逗号分隔，分组数据元
                 String statsFields = ""; //逗号分隔，统计数据元
 
                 Boolean needTranslation = false;
-                for(RsResourceMetadata obj : list)
+                for(DtoResourceMetadata obj : metadataList)
                 {
                     String code = obj.getColumnCode();
                     String displayCode = obj.getDisplayCode();
@@ -98,31 +144,9 @@ public class ResourcesQueryService implements IResourcesQueryService {
                 }
 
 
-                DataList re = null;
-                if(type.equals(ResourcesType.HBASE_SINGLE_CORE)) //habse单core
-                {
-                    re = resourcesQueryDao.getHbaseSingleCore(dataset, metadata, queryParams, page, size);
-                }
-                else if(type.equals(ResourcesType.HBASE_MULTI_CORE)) //habse多core
-                {
-                    re = resourcesQueryDao.getHbaseMultiCore(dataset, metadata, queryParams, page, size);
-                }
-                else if(type.equals(ResourcesType.HBASE_SOLR)) //habse的solr分组统计
-                {
-                    re = resourcesQueryDao.getHbaseSolr(dataset, groupFields, statsFields,queryParams, page, size);
-                }
-                else if(type.equals(ResourcesType.RS_ETL)) //ETL数据
-                {
-                    re = resourcesQueryDao.getEtlData("datasource", dataset, metadata, queryParams, page, size);
-                }
-                else if(type.equals(ResourcesType.RS_CONFIG)) //配置数据
-                {
-                    re = resourcesQueryDao.getConfigData("datasource", dataset, metadata, queryParams, page, size);
-                }
-                else if(type.equals(ResourcesType.RS_DICT)) //字典数据
-                {
-                    re = resourcesQueryDao.getDictData("dictName");
-                }
+
+
+
 
                 //输出结果转化
                 if(needTranslation)
@@ -144,16 +168,12 @@ public class ResourcesQueryService implements IResourcesQueryService {
                             }
                         }
                     }
-                }
+                }*/
 
                 return re;
             }
         }
-        //测试代码
-        else
-        {
-            return resourcesQueryDao.getHbaseMultiCore("EHR_CENTER_SUB", null, null, page, size);
-        }
+
 
         throw new Exception("未找到资源" + resourcesCode +"，或者该资源为空！");
     }

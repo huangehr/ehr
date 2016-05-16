@@ -10,24 +10,24 @@ import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import com.yihu.ehr.profile.config.CdaDocumentTypeOptions;
 import com.yihu.ehr.profile.core.EventType;
-import com.yihu.ehr.profile.core.FileProfile;
 import com.yihu.ehr.profile.core.StdDataSet;
 import com.yihu.ehr.profile.core.StdProfile;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
-import com.yihu.ehr.profile.persist.ProfileService;
 import com.yihu.ehr.profile.service.Template;
 import com.yihu.ehr.profile.service.TemplateService;
 import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.schema.OrgKeySchema;
 import com.yihu.ehr.schema.StdKeySchema;
 import com.yihu.ehr.util.log.LogService;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 健康档案工具。
@@ -115,19 +115,17 @@ public class StdProfileConverter {
     }
 
     public MProfileDocument convertDocument(StdProfile profile, String cdaDocumentId, boolean containDataSet) {
-        Map<Template, MCDADocument> cdaDocuments = getCustomizedCDADocument(profile.getCdaVersion(),
+        Pair<Template, MCDADocument> cdaDocuments = getCustomizedCDADocument(profile.getCdaVersion(),
                 profile.getOrgCode(),
                 profile.getEventType(),
                 cdaDocumentId);
+        if (cdaDocuments == null) return null;
 
-        for (Template template : cdaDocuments.keySet()) {
-            MCDADocument cdaDocument = cdaDocuments.get(template);
-            MProfileDocument document = convertDocument(profile, cdaDocument, template, containDataSet);
+        Template template = cdaDocuments.getLeft();
+        MCDADocument cdaDocument = cdaDocuments.getRight();
+        MProfileDocument document = convertDocument(profile, cdaDocument, template, containDataSet);
 
-            return document;
-        }
-
-        return null;
+        return document;
     }
 
     protected MProfileDocument convertDocument(StdProfile profile, MCDADocument cdaDocument, Template template, boolean containDataSet) {
@@ -214,7 +212,7 @@ public class StdProfileConverter {
         return cdaDocuments;
     }
 
-    protected Map<Template, MCDADocument> getCustomizedCDADocument(String cdaVersion, String orgCode, EventType eventType, String cdaDocumentId){
+    protected Pair<Template, MCDADocument> getCustomizedCDADocument(String cdaVersion, String orgCode, EventType eventType, String cdaDocumentId){
         String cdaType = cdaDocumentTypeOptions.getCdaDocumentTypeId(Integer.toString(eventType.getType()));
 
         if (StringUtils.isEmpty(cdaType)) {
@@ -223,8 +221,8 @@ public class StdProfileConverter {
             return null;
         }
 
-        Map<Template, MCDADocument> cdaDocuments = templateService.getOrganizationTemplate(orgCode, cdaVersion, cdaType, cdaDocumentId);
-        if (CollectionUtils.isEmpty(cdaDocuments)) {
+        Pair<Template, MCDADocument> cdaDocuments = templateService.getOrganizationTemplate(orgCode, cdaVersion, cdaType, cdaDocumentId);
+        if (cdaDocuments == null) {
             LogService.getLogger().error(
                     String.format("Unable to get cda document of version %s for organization %s, template not prepared?",
                             cdaVersion, orgCode));

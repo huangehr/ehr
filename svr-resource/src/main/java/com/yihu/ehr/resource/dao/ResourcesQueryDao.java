@@ -1,24 +1,25 @@
 package com.yihu.ehr.resource.dao;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.query.common.model.DataList;
-import com.yihu.ehr.query.common.model.QueryEntity;
-import com.yihu.ehr.query.jdbc.DBHelper;
+import com.yihu.ehr.query.services.DBQuery;
 import com.yihu.ehr.query.services.HbaseQuery;
 import com.yihu.ehr.query.services.SolrQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 
 
 /**
  * Created by hzp on 2016/4/22.
  */
 @Service("resourcesQueryDao")
-public class ResourcesQueryDao extends BaseDao {
+public class ResourcesQueryDao {
 
     @Autowired
-    DBHelper db;
+    DBQuery query;
     @Autowired
     HbaseQuery hbase;
     @Autowired
@@ -27,23 +28,46 @@ public class ResourcesQueryDao extends BaseDao {
     private Integer defaultPage = 1;
     private Integer defaultSize = 50;
 
+
     /**
-     * habse单core
+     * 获取Hbase主表
+     * queryParams可为solr表达式，也可为json例：{"table":"HDSD00_08","q":"*:*","fq":"","fl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}""}
      */
-    public DataList getHbaseSingleCore(String core,String metadata,String queryParams,Integer page,Integer size) throws Exception
+    public DataList getEhrCenter(String queryParams,Integer page,Integer size) throws Exception
     {
-        /*DataList list= hbase.queryBySolr("EHR_CENTER", "patient_id:10293555", null, 1, 50);
-        DataList list2= solr.getGroupCount("EHR_CENTER","patient_id");
-        QueryEntity qe = new QueryEntity("EHR_CENTER",1,50);
-        List<QueryCondition> cl = new ArrayList<>();
-        cl.add(new QueryCondition("archive_id","41872607-9_10289499_000618952_1443715200000"));
-        List<SolrJoinEntity> joinList =  new ArrayList<>();
-        joinList.add(new SolrJoinEntity("EHR_CENTER_SUB_shard1_replica1","main_rowkey","rowkey",cl));
-        DataList list3= hbase.query(qe,joinList);
-        List list4 = db.query("select * from RS_CATEGORY");
-        List<RsCategory> list5 = db.query(RsCategory.class,"select * from RS_CATEGORY");
-        long count = solr.count("EHR_CENTER","patient_id:10293555");
-        DataList groupList = solr.getGroupCount("EHR_CENTER","patient_id");//根据病人ID分组*/
+        String core = "EHR_CENTER";
+        String q = "";
+        String fq = "";
+        String fl = "";
+        String sort = "";
+        if(queryParams!=null&&queryParams.length()>0)
+        {
+            if(queryParams.startsWith("{")&&queryParams.endsWith("}"))
+            {
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, String> obj = objectMapper.readValue(queryParams, Map.class);
+                if(obj.containsKey("q"))
+                {
+                    q = obj.get("q");
+                }
+                if(obj.containsKey("fq"))
+                {
+                    fq = obj.get("fq");
+                }
+                if(obj.containsKey("fl"))
+                {
+                    fl = obj.get("fl");
+                }
+                if(obj.containsKey("sort"))
+                {
+                    sort = obj.get("sort");
+                }
+            }
+            else
+            {
+                q = queryParams;
+            }
+        }
 
         //默认第一页
         if(page == null)
@@ -55,56 +79,92 @@ public class ResourcesQueryDao extends BaseDao {
         {
             size = defaultSize;
         }
+        return hbase.queryBySolr(core,q,sort,page,size,fq,fl);
+    }
 
-        QueryEntity qe= new QueryEntity(core,page,size);
-        if(metadata!=null && metadata.length()>0)
-        {
-            qe.setFields(metadata);
+    /**
+     * 获取Hbase细表
+     */
+    public DataList getEhrCenterSub(String queryParams,Integer page,Integer size) throws Exception
+    {
+        String core = "EHR_CENTER_SUB";
+        String q = "";
+        String fq = "";
+        String fl = "";
+        String sort = "";
+        if(queryParams!=null&&queryParams.length()>0) {
+            if (queryParams.startsWith("{") && queryParams.endsWith("}")) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, String> obj = objectMapper.readValue(queryParams, Map.class);
+                if (obj.containsKey("q")) {
+                    q = obj.get("q");
+                }
+                if (obj.containsKey("fq")) {
+                    fq = obj.get("fq");
+                }
+                if (obj.containsKey("fl")) {
+                    fl = obj.get("fl");
+                }
+                if (obj.containsKey("sort")) {
+                    sort = obj.get("sort");
+                }
+                if(obj.containsKey("table"))
+                {
+                    if(q.length()>0)
+                    {
+                        q+= " AND rowkey:*"+obj.get("table")+"*";
+                    }
+                    else {
+                        q = "rowkey:*"+obj.get("table")+"*";
+                    }
+                }
+            } else {
+                q = queryParams;
+            }
         }
-        if(queryParams!=null && queryParams.length()>0)
+
+        //默认第一页
+        if(page == null)
         {
-            qe.addConditionByJson(queryParams);
+            page = defaultPage;
+        }
+        //默认50行
+        if(size == null)
+        {
+            size = defaultSize;
+        }
+        return hbase.queryBySolr(core,q,sort,page,size,fq,fl);
+    }
+
+    /**
+     * habse主表的solr分组统计
+     * queryParams为json例：{"q":"*:*","groupFields":"key1,key2","statsFields":"key3,key4"}
+     */
+    public DataList countEhrCenter(String queryParams,Integer page,Integer size) throws Exception
+    {
+        String core = "EHR_CENTER";
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, String> params = objectMapper.readValue(queryParams, Map.class);
+
+        String q = "";
+        String groupFields="";
+        String statsFields="";
+        if(params.containsKey("q"))
+        {
+            q = params.get("q");
+        }
+        if(params.containsKey("groupFields"))
+        {
+            groupFields = params.get("groupFields");
         }
         else{
-            return hbase.query(qe);
+            throw new Exception("缺少分组条件！");
         }
-        //判断是否有包含Join查询
-        if(queryParams.indexOf("joinParams")>0)
+        if(params.containsKey("statsFields"))
         {
-
-            return hbase.queryJoinJson(qe, "");
-        }
-        else {
-            return hbase.query(qe);
-        }
-    }
-
-    /**
-     * habsee多core
-     */
-    public DataList getHbaseMultiCore(String core,String metadata,String queryParams,Integer page,Integer size) throws Exception
-    {
-        //默认第一页
-        if(page == null)
-        {
-            page = defaultPage;
-        }
-        //默认50行
-        if(size == null)
-        {
-            size = defaultSize;
+            statsFields = params.get("statsFields");
         }
 
-        QueryEntity qe= new QueryEntity(core,page,size);
-        return hbase.query(qe);
-    }
-
-    /**
-     * habse的solr分组统计
-     */
-    public DataList getHbaseSolr(String core,String groupFields,String statsFields,String queryParams,Integer page,Integer size) throws Exception
-    {
-        String q = hbase.jsonToCondition(queryParams);
         //数值统计
         if(statsFields!=null && statsFields.length()>0)
         {
@@ -135,26 +195,86 @@ public class ResourcesQueryDao extends BaseDao {
     }
 
     /**
-     * ETL数据
+     * habse细表的solr分组统计
+     * queryParams为json例：{"q":"*:*","groupFields":"key1,key2","statsFields":"key3,key4"}
      */
-    public DataList getEtlData(String datasource,String table,String cols,String queryParams,Integer page,Integer size) throws Exception
+    public DataList countEhrCenterSub(String queryParams,Integer page,Integer size) throws Exception
     {
-        return null;
+        String core = "EHR_CENTER_SUB";
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, String> params = objectMapper.readValue(queryParams, Map.class);
+
+        String q = "";
+        String groupFields="";
+        String statsFields="";
+        if(params.containsKey("q"))
+        {
+            q = params.get("q");
+        }
+        if(params.containsKey("groupFields"))
+        {
+            groupFields = params.get("groupFields");
+        }
+        else{
+            throw new Exception("缺少分组条件！");
+        }
+        if(params.containsKey("statsFields"))
+        {
+            statsFields = params.get("statsFields");
+        }
+        if(params.containsKey("table"))
+        {
+            if(q.length()>0)
+            {
+                q+= " AND rowkey:*"+params.get("table")+"*";
+            }
+            else {
+                q = "rowkey:*"+params.get("table")+"*";
+            }
+        }
+
+        //数值统计
+        if(statsFields!=null && statsFields.length()>0)
+        {
+            return solr.getStats(core, groupFields, statsFields,q);
+        }
+        //总数统计
+        else{
+            if(groupFields.contains(",")) //多分组
+            {
+                String[] groups = groupFields.split(",");
+                return solr.getGroupMult(core,groups,null,q); //自定义分组未完善
+            }
+            else{ //单分组
+                //默认第一页
+                if(page == null)
+                {
+                    page = defaultPage;
+                }
+                //默认50行
+                if(size == null)
+                {
+                    size = defaultSize;
+                }
+                return solr.getGroupCount(core,groupFields,q,page,size);
+            }
+        }
+
     }
 
     /**
-     * 配置数据
+     * 获取Mysql配置库数据
      */
-    public DataList getConfigData(String datasource,String table,String cols,String queryParams,Integer page,Integer size) throws Exception
+    public DataList getMysqlData(String queryParams,Integer page,Integer size) throws Exception
     {
-        return null;
+        if(page!=null && size !=null)
+        {
+            return query.queryBySql(queryParams,page,size);
+        }
+        else{
+            return query.queryBySql(queryParams);
+        }
     }
 
-    /**
-     * 字典数据
-     */
-    public DataList getDictData(String dictName) throws Exception
-    {
-        return null;
-    }
+
 }

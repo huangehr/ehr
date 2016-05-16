@@ -1,7 +1,7 @@
 package com.yihu.ehr.resource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.resource.dao.DimensionDao;
+import com.yihu.ehr.resource.dao.intf.DimensionDao;
 import com.yihu.ehr.resource.model.RsDimension;
 import com.yihu.ehr.resource.service.intf.IDimensionService;
 import org.springframework.beans.factory.annotation.Autowired;

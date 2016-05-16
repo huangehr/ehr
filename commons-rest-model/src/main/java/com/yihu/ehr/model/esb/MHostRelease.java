@@ -9,13 +9,13 @@ import java.util.Date;
  */
 public class MHostRelease implements Serializable {
 
-    private String id;
-    private String systemCode;
-    private String versionName;
-    private Integer versionCode;
-    private String file;
-    private Date releaseTime;
-    private String orgCode;
+    String id;
+    String systemCode;
+    String versionName;
+    Integer versionCode;
+    String file;
+    Date releaseTime;
+    String orgCode;
 
     public String getId() {
         return id;

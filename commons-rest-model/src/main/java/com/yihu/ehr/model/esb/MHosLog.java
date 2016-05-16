@@ -8,20 +8,11 @@ import java.io.Serializable;
  */
 public class MHosLog implements Serializable {
 
-    private String id;
-    private String orgCode;
-    private String ip;
-    private String filePath;
-    private String uploadTime;
-
-
-    public MHosLog(String id, String orgCode, String ip, String filePath, String uploadTime) {
-        this.id = id;
-        this.orgCode = orgCode;
-        this.ip = ip;
-        this.filePath = filePath;
-        this.uploadTime = uploadTime;
-    }
+    String id;
+    String orgCode;
+    String ip;
+    String filePath;
+    String uploadTime;
 
     public String getId() {
         return id;

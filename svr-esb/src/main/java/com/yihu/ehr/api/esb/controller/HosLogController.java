@@ -5,6 +5,7 @@ import com.yihu.ehr.api.esb.service.HosLogService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.esb.MHosLog;
 import com.yihu.ehr.util.controller.BaseRestController;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,9 @@ import java.util.List;
  * @author linaz
  * @created 2016.05.12 18:00
  */
-@RequestMapping(ApiVersion.Version1_0)
+@RequestMapping(ApiVersion.Version1_0 + "/esb")
 @RestController
+@Api(value = "上传日志管理接口", description = "上传日志管理接口")
 public class HosLogController extends BaseRestController{
 
     @Autowired
@@ -50,7 +52,7 @@ public class HosLogController extends BaseRestController{
 
 
 
-    @RequestMapping(value = "/deleteHosLogs", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/deleteHosLogs/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除上传日志", notes = "根据id删除上传日志")
     public boolean deleteHosLogs(
             @ApiParam(name = "id", value = "id", defaultValue = "")
