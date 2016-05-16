@@ -1,4 +1,4 @@
-package com.yihu.ehr.model.esb;
+package com.yihu.ehr.agModel.esb;
 
 import java.io.Serializable;
 
@@ -6,7 +6,7 @@ import java.io.Serializable;
  * @author linaz
  * @created 2016.05.12 18:03
  */
-public class MHosLog implements Serializable {
+public class HosLogModel implements Serializable {
 
     String id;
     String orgCode;

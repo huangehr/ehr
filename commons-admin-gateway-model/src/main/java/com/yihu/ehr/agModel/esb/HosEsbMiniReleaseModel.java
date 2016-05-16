@@ -1,19 +1,16 @@
-package com.yihu.ehr.model.esb;// default package
-
-import java.util.Date;
-
+package com.yihu.ehr.agModel.esb;// default package
 
 /**
  * HosEsbMiniRelease entity. @author MyEclipse Persistence Tools
  */
-public class MHosEsbMiniRelease implements java.io.Serializable {
+public class HosEsbMiniReleaseModel implements java.io.Serializable {
 
     String id;
     String systemCode;
     String versionName;
     Integer versionCode;
     String file;
-    Date releaseTime;
+    String releaseTime;
     String orgCode;
 
     public String getId() {
@@ -56,11 +53,11 @@ public class MHosEsbMiniRelease implements java.io.Serializable {
         this.file = file;
     }
 
-    public Date getReleaseTime() {
+    public String getReleaseTime() {
         return releaseTime;
     }
 
-    public void setReleaseTime(Date releaseTime) {
+    public void setReleaseTime(String releaseTime) {
         this.releaseTime = releaseTime;
     }
 

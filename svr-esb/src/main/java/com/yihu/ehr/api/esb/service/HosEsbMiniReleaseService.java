@@ -1,6 +1,6 @@
 package com.yihu.ehr.api.esb.service;
 
-import com.yihu.ehr.api.esb.model.HosLog;
+import com.yihu.ehr.api.esb.model.HosEsbMiniRelease;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class HosLogService extends BaseJpaService<HosLog, XHosLogRepository> {
+public class HosEsbMiniReleaseService extends BaseJpaService<HosEsbMiniRelease, XHosEsbMiniReleaseRepository> {
 
 }
