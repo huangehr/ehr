@@ -1,8 +1,8 @@
 package com.yihu.ehr.profile.persist;
 
 import com.yihu.ehr.cache.CacheReader;
-import com.yihu.ehr.profile.util.DataSetResolver;
-import com.yihu.ehr.profile.util.QualifierTranslator;
+import com.yihu.ehr.profile.memory.util.DataSetResolver;
+import com.yihu.ehr.profile.memory.util.QualifierTranslator;
 import com.yihu.ehr.schema.StdKeySchema;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +26,8 @@ public class DataSetResolverWithTranslator extends DataSetResolver {
 
     /**
      * 翻译数据元。
+     *
+     * 资源化入库时，取消文件解析时的数据元翻译动作
      *
      * @param cdaVersion
      * @param dataSetCode
@@ -59,8 +61,8 @@ public class DataSetResolverWithTranslator extends DataSetResolver {
         if (!isOriginDataSet && StringUtils.isNotEmpty(actualData) && dictId > 0) {
             String[] tempQualifiers = QualifierTranslator.splitMetaData(metaData);
 
-            String codeQualifier = QualifierTranslator.hBaseQualifier(tempQualifiers[0], metaDataType);
-            String valueQualifier = QualifierTranslator.hBaseQualifier(tempQualifiers[1], metaDataType);
+            String codeQualifier = tempQualifiers[0];   /*QualifierTranslator.hBaseQualifier(tempQualifiers[0], metaDataType);*/
+            String valueQualifier = tempQualifiers[1];  /*QualifierTranslator.hBaseQualifier(tempQualifiers[1], metaDataType);*/
 
             String value = cacheReader.read(keySchema.dictEntryValue(cdaVersion, Long.toString(dictId), actualData));
 
@@ -71,7 +73,8 @@ public class DataSetResolverWithTranslator extends DataSetResolver {
                 actualData = actualData.replace(".0", "");
             }
 
-            return new String[]{QualifierTranslator.hBaseQualifier(metaData, metaDataType), actualData};
+            /*return new String[]{QualifierTranslator.hBaseQualifier(metaData, metaDataType), actualData};*/
+            return new String[]{metaData, actualData};
         }
     }
 }

@@ -8,7 +8,7 @@ import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.feign.XPackageMgrClient;
 import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.profile.core.StdProfile;
+import com.yihu.ehr.profile.memory.intermediate.MemoryProfile;
 import com.yihu.ehr.profile.persist.ProfileService;
 import com.yihu.ehr.service.PackageResolveEngine;
 import io.swagger.annotations.Api;
@@ -61,7 +61,7 @@ public class ResolveEndPoint {
 
         if(StringUtils.isEmpty(pack.getClientId())) pack.setClientId(clientId);
         String zipFile = downloadTo(pack.getRemotePath());
-        StdProfile profile = resolveEngine.doResolve(pack, zipFile);
+        MemoryProfile profile = resolveEngine.doResolve(pack, zipFile);
         profileService.saveProfile(profile);
 
         packageMgrClient.reportStatus(pack.getId(),
@@ -113,7 +113,7 @@ public class ResolveEndPoint {
             pack.setClientId(clientId);
             pack.setArchiveStatus(ArchiveStatus.Received);
 
-            StdProfile profile = resolveEngine.doResolve(pack, zipFile);
+            MemoryProfile profile = resolveEngine.doResolve(pack, zipFile);
             profile.setClientId(clientId);
 
             if (persist) profileService.saveProfile(profile);

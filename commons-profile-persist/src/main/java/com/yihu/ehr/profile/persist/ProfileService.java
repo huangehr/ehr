@@ -2,9 +2,12 @@ package com.yihu.ehr.profile.persist;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.profile.core.*;
+import com.yihu.ehr.profile.memory.intermediate.MemoryFileProfile;
+import com.yihu.ehr.profile.memory.intermediate.MemoryProfile;
+import com.yihu.ehr.profile.memory.commons.ProfileType;
+import com.yihu.ehr.profile.memory.intermediate.StdDataSet;
 import com.yihu.ehr.profile.persist.repo.FileRepository;
-import com.yihu.ehr.profile.util.DataSetUtil;
+import com.yihu.ehr.profile.memory.util.DataSetUtil;
 import com.yihu.ehr.profile.persist.repo.DataSetRepository;
 import com.yihu.ehr.profile.persist.repo.ProfileRepository;
 import org.apache.commons.lang3.StringUtils;
@@ -15,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Iterator;
-import java.util.Map;
 
 /**
  * 档案服务。
@@ -38,7 +40,7 @@ public class ProfileService {
     @Autowired
     ObjectMapper objectMapper;
 
-    public void saveProfile(StdProfile profile) throws IOException {
+    public void saveProfile(MemoryProfile profile) throws IOException {
         // 档案主表
         profileRepo.save(profile);
 
@@ -59,10 +61,10 @@ public class ProfileService {
      * @throws IOException
      * @throws ParseException
      */
-    public StdProfile getProfile(String profileId, boolean loadStdDataSet, boolean loadOriginDataSet) throws Exception {
+    public MemoryProfile getProfile(String profileId, boolean loadStdDataSet, boolean loadOriginDataSet) throws Exception {
         // 读取档案主体
         ProfileRepository.ProfileTuple tuple = profileRepo.findOne(profileId);
-        StdProfile profile = tuple.getProfile();
+        MemoryProfile profile = tuple.getProfile();
         String cdaVersion = profile.getCdaVersion();
         ProfileType pType = profile.getProfileType();
 
@@ -96,7 +98,7 @@ public class ProfileService {
         // 读取非结构化档案文件列表
         if (profile.getProfileType() == ProfileType.File){
             String[] fileRowKeys = tuple.getFileIndices().split(";");
-            ((FileProfile)profile).setDocuments(fileRepo.findAll(fileRowKeys));
+            ((MemoryFileProfile)profile).setDocuments(fileRepo.findAll(fileRowKeys));
         }
 
         profile.determineEventType();

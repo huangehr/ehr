@@ -9,19 +9,18 @@ import com.yihu.ehr.model.profile.MRecord;
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import com.yihu.ehr.profile.config.CdaDocumentTypeOptions;
-import com.yihu.ehr.profile.core.EventType;
-import com.yihu.ehr.profile.core.StdDataSet;
-import com.yihu.ehr.profile.core.StdProfile;
+import com.yihu.ehr.profile.memory.commons.EventType;
+import com.yihu.ehr.profile.memory.intermediate.MemoryProfile;
+import com.yihu.ehr.profile.memory.intermediate.StdDataSet;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.persist.ProfileIndices;
 import com.yihu.ehr.profile.persist.ProfileIndicesService;
 import com.yihu.ehr.profile.persist.ProfileService;
 import com.yihu.ehr.profile.service.Template;
 import com.yihu.ehr.profile.service.TemplateService;
-import com.yihu.ehr.profile.util.DataSetUtil;
+import com.yihu.ehr.profile.memory.util.DataSetUtil;
 import com.yihu.ehr.schema.OrgKeySchema;
 import com.yihu.ehr.schema.StdKeySchema;
-import com.yihu.ehr.util.DateTimeUtils;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -70,14 +68,14 @@ public class ProfileUtil {
                                                         boolean loadOriginDataSet) throws Exception {
         if (profileIndices.getContent().size() == 0) return null;
 
-        List<StdProfile> profiles = new ArrayList<>();
+        List<MemoryProfile> profiles = new ArrayList<>();
         for (ProfileIndices indices : profileIndices) {
-            StdProfile profile = profileService.getProfile(indices.getProfileId(), loadStdDataSet, loadOriginDataSet);
+            MemoryProfile profile = profileService.getProfile(indices.getProfileId(), loadStdDataSet, loadOriginDataSet);
             profiles.add(profile);
         }
 
         List<MProfile> profileList = new ArrayList<>();
-        for (StdProfile profile : profiles) {
+        for (MemoryProfile profile : profiles) {
             MProfile mProfile = convertProfile(profile, loadStdDataSet || loadOriginDataSet);
 
             profileList.add(mProfile);
@@ -86,7 +84,7 @@ public class ProfileUtil {
         return profileList;
     }
 
-    public MProfile convertProfile(StdProfile profile, boolean containDataSet) {
+    public MProfile convertProfile(MemoryProfile profile, boolean containDataSet) {
         MProfile mProfile = new MProfile();
         mProfile.setId(profile.getId());
         mProfile.setCdaVersion(profile.getCdaVersion());
@@ -114,7 +112,7 @@ public class ProfileUtil {
         return mProfile;
     }
 
-    public MProfileDocument convertDocument(StdProfile profile, MCDADocument cdaDocument, Integer templateId, boolean containDataSet) {
+    public MProfileDocument convertDocument(MemoryProfile profile, MCDADocument cdaDocument, Integer templateId, boolean containDataSet) {
         MProfileDocument document = new MProfileDocument();
         document.setId(cdaDocument.getId());
         document.setName(cdaDocument.getName());
@@ -154,7 +152,7 @@ public class ProfileUtil {
 
             for (String key : dataSet.getRecordKeys()) {
                 if(dataSet.getRecord(key) != null) {
-                    mDataSet.getRecords().put(key, new MRecord(dataSet.getRecord(key).getMetaDataGroup()));
+                    mDataSet.getRecords().put(key, new MRecord(dataSet.getRecord(key).getDataGroup()));
                 } else {
                     mDataSet.getRecords().put(key, null);
                 }

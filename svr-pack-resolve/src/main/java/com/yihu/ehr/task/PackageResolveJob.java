@@ -1,13 +1,12 @@
 package com.yihu.ehr.task;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.feign.XPackageMgrClient;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.mq.MessageBuffer;
-import com.yihu.ehr.profile.core.StdProfile;
+import com.yihu.ehr.profile.memory.intermediate.MemoryProfile;
 import com.yihu.ehr.profile.persist.ProfileService;
 import com.yihu.ehr.service.PackageResolveEngine;
 import com.yihu.ehr.util.log.LogService;
@@ -15,12 +14,12 @@ import org.quartz.InterruptableJob;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.UnableToInterruptJobException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
 
 /**
+ * 档案包解析作业。
+ *
  * @author Sand
  * @version 1.0
  * @created 2016.03.28 11:30
@@ -56,7 +55,7 @@ public class PackageResolveJob implements InterruptableJob {
 
             String zipFile = downloadTo(pack.getRemotePath());
 
-            StdProfile profile = resolveEngine.doResolve(pack, zipFile);
+            MemoryProfile profile = resolveEngine.doResolve(pack, zipFile);
             profileService.saveProfile(profile);
 
             packageMgrClient.reportStatus(pack.getId(),

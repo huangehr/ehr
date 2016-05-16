@@ -5,9 +5,10 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.cache.CacheReader;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
-import com.yihu.ehr.profile.core.*;
-import com.yihu.ehr.profile.util.ProfileFactory;
-import com.yihu.ehr.profile.util.QualifierTranslator;
+import com.yihu.ehr.profile.memory.commons.EventType;
+import com.yihu.ehr.profile.memory.intermediate.*;
+import com.yihu.ehr.profile.memory.util.MemoryProfileFactory;
+import com.yihu.ehr.profile.memory.util.QualifierTranslator;
 import com.yihu.ehr.schema.StdKeySchema;
 import com.yihu.ehr.util.DateTimeUtils;
 import com.yihu.ehr.util.log.LogService;
@@ -39,14 +40,14 @@ public class FilePackageResolver extends PackageResolver {
     FastDFSUtil fastDFSUtil;
 
     @Override
-    public void resolve(StdProfile profile, File root) throws Exception {
-        FileProfile fileProfile = (FileProfile) profile;
+    public void resolve(MemoryProfile profile, File root) throws Exception {
+        MemoryFileProfile memoryFileProfile = (MemoryFileProfile) profile;
 
         File metaFile = new File(root.getAbsolutePath() + File.separator + "meta.json");
-        parseFile(fileProfile, metaFile);
+        parseFile(memoryFileProfile, metaFile);
     }
 
-    private void parseFile(FileProfile profile, File metaFile) throws Exception {
+    private void parseFile(MemoryFileProfile profile, File metaFile) throws Exception {
         JsonNode root = objectMapper.readTree(metaFile);
 
         String demographicId = root.get("demographic_id").asText();
@@ -68,10 +69,10 @@ public class FilePackageResolver extends PackageResolver {
         profile.setEventDate(DateTimeUtils.simpleDateParse(eventDate));
 
         parseDataSets(profile, (ObjectNode) root.get("data_sets"));
-        parseFiles(profile, (ArrayNode) root.get("files"), metaFile.getParent() + File.separator + ProfileFactory.DocumentFolder);
+        parseFiles(profile, (ArrayNode) root.get("files"), metaFile.getParent() + File.separator + MemoryProfileFactory.DocumentFolder);
     }
 
-    private void parseDataSets(FileProfile profile, ObjectNode dataSets) {
+    private void parseDataSets(MemoryFileProfile profile, ObjectNode dataSets) {
         if (dataSets == null) return;
 
         Iterator<Map.Entry<String, JsonNode>> iterator = dataSets.fields();
@@ -88,7 +89,7 @@ public class FilePackageResolver extends PackageResolver {
             dataSet.setCdaVersion(profile.getCdaVersion());
 
             for (int i = 0; i < records.size(); ++i) {
-                DataRecord record = new DataRecord();
+                MetaDataRecord record = new MetaDataRecord();
 
                 ObjectNode jsonRecord = (ObjectNode) records.get(i);
                 Iterator<Map.Entry<String, JsonNode>> filedIterator = jsonRecord.fields();
@@ -107,7 +108,7 @@ public class FilePackageResolver extends PackageResolver {
         }
     }
 
-    private void parseFiles(FileProfile profile, ArrayNode files, String documentsPath) throws Exception {
+    private void parseFiles(MemoryFileProfile profile, ArrayNode files, String documentsPath) throws Exception {
         for (int i = 0; i < files.size(); ++i) {
             ObjectNode objectNode = (ObjectNode) files.get(i);
             String cdaDocumentId = objectNode.get("cda_doc_id").asText();

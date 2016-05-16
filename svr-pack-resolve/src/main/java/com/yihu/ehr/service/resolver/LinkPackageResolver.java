@@ -2,10 +2,10 @@ package com.yihu.ehr.service.resolver;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.yihu.ehr.profile.core.DataRecord;
-import com.yihu.ehr.profile.core.LinkDataSet;
-import com.yihu.ehr.profile.core.LinkProfile;
-import com.yihu.ehr.profile.core.StdProfile;
+import com.yihu.ehr.profile.memory.intermediate.MetaDataRecord;
+import com.yihu.ehr.profile.memory.intermediate.LinkDataSet;
+import com.yihu.ehr.profile.memory.intermediate.MemoryLinkProfile;
+import com.yihu.ehr.profile.memory.intermediate.MemoryProfile;
 import com.yihu.ehr.util.DateTimeUtils;
 import org.springframework.stereotype.Component;
 
@@ -24,14 +24,14 @@ import java.util.Iterator;
 @Component
 public class LinkPackageResolver extends PackageResolver {
     @Override
-    public void resolve(StdProfile profile, File root) throws IOException, ParseException {
-        LinkProfile linkProfile = (LinkProfile) profile;
+    public void resolve(MemoryProfile profile, File root) throws IOException, ParseException {
+        MemoryLinkProfile memoryLinkProfile = (MemoryLinkProfile) profile;
 
         File indexFile = new File(root.getAbsolutePath() + File.pathSeparator + "index/patient_index.json");
-        parseFile(linkProfile, indexFile);
+        parseFile(memoryLinkProfile, indexFile);
     }
 
-    private void parseFile(LinkProfile profile, File indexFile) throws IOException, ParseException {
+    private void parseFile(MemoryLinkProfile profile, File indexFile) throws IOException, ParseException {
         JsonNode jsonNode = objectMapper.readTree(indexFile);
 
         String patientId = jsonNode.get("patient_id").asText();
@@ -75,7 +75,7 @@ public class LinkPackageResolver extends PackageResolver {
             ArrayNode arrayNode = (ArrayNode) summaryNode.get(dataSetCode);
             for (int i = 0; i < arrayNode.size(); ++i){
 
-                DataRecord record = new DataRecord();
+                MetaDataRecord record = new MetaDataRecord();
                 Iterator<String> metaDataCodes = arrayNode.get(i).fieldNames();
                 while (metaDataCodes.hasNext()){
                     String metaDataCode = metaDataCodes.next();

@@ -1,11 +1,11 @@
 package com.yihu.ehr.service.resolver;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.yihu.ehr.profile.core.StdProfile;
-import com.yihu.ehr.profile.util.ProfileFactory;
-import com.yihu.ehr.profile.core.StdDataSet;
-import com.yihu.ehr.profile.util.DataSetUtil;
-import com.yihu.ehr.profile.extractor.KeyDataExtractor;
+import com.yihu.ehr.profile.memory.intermediate.MemoryProfile;
+import com.yihu.ehr.profile.memory.util.MemoryProfileFactory;
+import com.yihu.ehr.profile.memory.intermediate.StdDataSet;
+import com.yihu.ehr.profile.memory.util.DataSetUtil;
+import com.yihu.ehr.profile.memory.extractor.KeyDataExtractor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -24,18 +24,18 @@ import java.util.Properties;
 @Component
 public class StdPackageResolver extends PackageResolver {
     @Override
-    public void resolve(StdProfile profile, File root) throws IOException, ParseException {
-        File standardFolder = new File(root.getAbsolutePath() + File.separator + ProfileFactory.StandardFolder);
+    public void resolve(MemoryProfile profile, File root) throws IOException, ParseException {
+        File standardFolder = new File(root.getAbsolutePath() + File.separator + MemoryProfileFactory.StandardFolder);
         parseFiles(profile, standardFolder.listFiles(), false);
 
-        File originFolder = new File(root.getAbsolutePath() + File.separator + ProfileFactory.OriginFolder);
+        File originFolder = new File(root.getAbsolutePath() + File.separator + MemoryProfileFactory.OriginFolder);
         parseFiles(profile, originFolder.listFiles(), true);
     }
 
     /**
      * 结构化档案包解析JSON文件中的数据。
      */
-    private void parseFiles(StdProfile profile, File[] files, boolean origin) throws ParseException, IOException {
+    private void parseFiles(MemoryProfile profile, File[] files, boolean origin) throws ParseException, IOException {
         for (File file : files) {
             StdDataSet dataSet = generateDataSet(file, origin);
 

@@ -56,9 +56,7 @@ public class ProfileIndicesEndPoint extends BaseRestEndPoint {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 
-
-
-        Page<ProfileIndices> profileIndices = searchProfile(query, since, to, page, size);
+        Page<ProfileIndices> profileIndices = searchProfile(null, since, to, page, size);
         if (profileIndices == null || profileIndices.getContent().isEmpty()) {
             throw new ApiException(HttpStatus.NOT_FOUND, "No profile found with this query!");
         }

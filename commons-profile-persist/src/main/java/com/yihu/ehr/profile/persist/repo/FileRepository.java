@@ -7,8 +7,9 @@ import com.yihu.ehr.data.hbase.HBaseDao;
 import com.yihu.ehr.data.hbase.ResultUtil;
 import com.yihu.ehr.data.hbase.TableBundle;
 import com.yihu.ehr.lang.SpringContext;
-import com.yihu.ehr.profile.core.*;
-import com.yihu.ehr.profile.util.FileTableUtil;
+import com.yihu.ehr.profile.memory.commons.ProfileType;
+import com.yihu.ehr.profile.memory.intermediate.*;
+import com.yihu.ehr.profile.memory.util.FileTableUtil;
 import com.yihu.ehr.util.DateTimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,15 +28,15 @@ public class FileRepository {
     @Autowired
     HBaseDao hbaseDao;
 
-    public void save(StdProfile profile) throws IOException {
+    public void save(MemoryProfile profile) throws IOException {
         if (profile.getProfileType() == ProfileType.File){
             TableBundle bundle = new TableBundle();
-            FileProfile fileProfile = (FileProfile)profile;
+            MemoryFileProfile memoryFileProfile = (MemoryFileProfile)profile;
 
-            Map<String, CdaDocument> cdaDocuments = fileProfile.getDocuments();
+            Map<String, CdaDocument> cdaDocuments = memoryFileProfile.getDocuments();
             for (String rowkey : cdaDocuments.keySet()){
                 CdaDocument cdaDocument = cdaDocuments.get(rowkey);
-                bundle.addValues(rowkey, FileFamily.Basic, FileTableUtil.getBasicFamilyCellMap(fileProfile));
+                bundle.addValues(rowkey, FileFamily.Basic, FileTableUtil.getBasicFamilyCellMap(memoryFileProfile));
                 bundle.addValues(rowkey, FileFamily.Files, FileTableUtil.getFileFamilyCellMap(cdaDocument));
             }
 
