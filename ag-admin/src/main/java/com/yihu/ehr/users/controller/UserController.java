@@ -1,6 +1,7 @@
 package com.yihu.ehr.users.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.fileresource.FileResourceModel;
 import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.agModel.user.UsersModel;
 import com.yihu.ehr.constants.AgAdminConstants;
@@ -186,30 +187,15 @@ public class UserController extends BaseController {
     }
 
 
-    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    @RequestMapping(value = "/user", method = RequestMethod.POST)
     @ApiOperation(value = "创建用户", notes = "重新绑定用户信息")
     public Envelop createUser(
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "user_json_data") String userJsonData,
-            @ApiParam(name = "inputStream", value = "转换后的输入流", defaultValue = "")
-            @RequestParam(value = "inputStream") String inputStream,
-            @ApiParam(name = "imageName", value = "图片全名", defaultValue = "")
-            @RequestParam(value = "imageName") String imageName) {
+            @RequestParam(value = "user_json_data") String userJsonData) {
 
         try {
-            //头像上传,接收头像保存的远程路径  path
-            String path = null;
-            if (!StringUtils.isEmpty(inputStream)) {
-                String jsonData = inputStream + "," + imageName;
-                path = userClient.uploadPicture(jsonData);
-            }
 
             UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
-
-            if (!StringUtils.isEmpty(path)) {
-                detailModel.setImgRemotePath(path);
-                detailModel.setImgLocalPath("");
-            }
 
             String errorMsg = null;
             if (StringUtils.isEmpty(detailModel.getLoginCode())) {
@@ -255,29 +241,14 @@ public class UserController extends BaseController {
     }
 
 
-    @RequestMapping(value = "/user", method = RequestMethod.POST)
+    @RequestMapping(value = "/user", method = RequestMethod.PUT)
     @ApiOperation(value = "修改用户", notes = "重新绑定用户信息")
     public Envelop updateUser(
-            @ApiParam(name = "user_json_datas", value = "", defaultValue = "")
-            @RequestParam(value = "user_json_datas") String userJsonData,
-            @ApiParam(name = "inputStream", value = "转换后的输入流", defaultValue = "")
-            @RequestParam(value = "inputStream") String inputStream,
-            @ApiParam(name = "imageName", value = "图片全名", defaultValue = "")
-            @RequestParam(value = "imageName") String imageName) {
+            @ApiParam(name = "user_json_data", value = "", defaultValue = "")
+            @RequestParam(value = "user_json_data") String userJsonData) {
         try {
-            //头像上传,接收头像保存的远程路径  path
-            String path = null;
-            if (!StringUtils.isEmpty(inputStream)) {
-                String jsonData = inputStream + "," + imageName;
-                path = userClient.uploadPicture(jsonData);
-            }
 
             UserDetailModel detailModel = toEntity(userJsonData, UserDetailModel.class);
-
-            if (!StringUtils.isEmpty(path)) {
-                detailModel.setImgRemotePath(path);
-                detailModel.setImgLocalPath("");
-            }
 
             String errorMsg = null;
             if (StringUtils.isEmpty(detailModel.getLoginCode())) {
@@ -342,12 +313,12 @@ public class UserController extends BaseController {
             if (mUser == null) {
                 return failed("用户信息获取失败!");
             }
-            if (!StringUtils.isEmpty(mUser.getImgRemotePath())) {
-//                Map<String, String> map = toEntity(mUser.getImgRemotePath(), Map.class);
-                String imagePath[] = mUser.getImgRemotePath().split(":");
-                String localPath = userClient.downloadPicture(imagePath[0], imagePath[1]);
-                mUser.setImgLocalPath(localPath);
-            }
+//            if (!StringUtils.isEmpty(mUser.getImgRemotePath())) {
+////                Map<String, String> map = toEntity(mUser.getImgRemotePath(), Map.class);
+//                String imagePath[] = mUser.getImgRemotePath().split(":");
+//                String localPath = userClient.downloadPicture(imagePath[0], imagePath[1]);
+//                mUser.setImgLocalPath(localPath);
+//            }
 
             UserDetailModel detailModel = convertToUserDetailModel(mUser);
 
