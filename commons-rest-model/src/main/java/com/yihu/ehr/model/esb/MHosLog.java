@@ -13,6 +13,19 @@ public class MHosLog implements Serializable {
     String ip;
     String filePath;
     String uploadTime;
+    /**
+     * modify linz
+     * 添加组织名称字段，用于界面展示
+     */
+    String orgName;
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
 
     public String getId() {
         return id;

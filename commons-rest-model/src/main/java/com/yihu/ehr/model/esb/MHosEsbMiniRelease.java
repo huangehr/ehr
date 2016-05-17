@@ -14,7 +14,16 @@ public class MHosEsbMiniRelease implements java.io.Serializable {
     Integer versionCode;
     String file;
     Date releaseTime;
+    String releaseDate;
     String orgCode;
+
+    public String getReleaseDate() {
+        return releaseDate;
+    }
+
+    public void setReleaseDate(String releaseDate) {
+        this.releaseDate = releaseDate;
+    }
 
     public String getId() {
         return id;
