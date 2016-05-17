@@ -38,8 +38,8 @@ public interface HosLogClient {
 
 
 
-    @RequestMapping(value = "/deleteHosLogs/{id}", method = RequestMethod.DELETE)
-    boolean deleteHosLogs(
+    @RequestMapping(value = "/deleteHosLog/{id}", method = RequestMethod.DELETE)
+    boolean deleteHosLog(
             @PathVariable(value = "id") String id);
 
 }

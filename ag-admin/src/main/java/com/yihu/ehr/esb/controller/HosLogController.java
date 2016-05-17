@@ -74,9 +74,9 @@ public class HosLogController extends BaseController {
 
 
 
-    @RequestMapping(value = "/deleteHosLogs/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/deleteHosLog/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除上传日志", notes = "根据id删除上传日志")
-    public boolean deleteHosLogs(
+    public boolean deleteHosLog(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id) throws Exception {
         return hosLogClient.deleteHosLogs(id);
