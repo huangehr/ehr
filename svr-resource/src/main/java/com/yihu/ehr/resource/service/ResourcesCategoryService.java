@@ -26,7 +26,7 @@ public class ResourcesCategoryService extends BaseJpaService<RsCategory,Resource
     @Autowired
     private ResourcesDao rsDao;
 
-    /*
+    /**
      * 删除资源类别
      *
      * @param id 资源类别id
@@ -46,7 +46,7 @@ public class ResourcesCategoryService extends BaseJpaService<RsCategory,Resource
         rsCategoryDao.delete(id);
     }
 
-    /*
+    /**
      * 创建或更新资源类别
      *
      * @param rsCategory 资源类别
@@ -59,6 +59,14 @@ public class ResourcesCategoryService extends BaseJpaService<RsCategory,Resource
         return rsCategory;
     }
 
+    /**
+     * 获取资源类别
+     *
+     * @param sorts String 排序
+     * @param page int 分页
+     * @param size int 分页大小
+     * @return Page<RsCategory>
+     */
     public Page<RsCategory> getRsCategories(String sorts, int page, int size)
     {
         Pageable pageable = new PageRequest(page,size,parseSorts(sorts));
