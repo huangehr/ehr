@@ -17,6 +17,24 @@ public class MHosEsbMiniInstallLog implements Serializable {
     private String currentVersionCode;
     private Date installTime;
     private String message;
+    private String orgName;
+    private String installDate;
+
+    public String getInstallDate() {
+        return installDate;
+    }
+
+    public void setInstallDate(String installDate) {
+        this.installDate = installDate;
+    }
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
 
     public String getId() {
         return id;
