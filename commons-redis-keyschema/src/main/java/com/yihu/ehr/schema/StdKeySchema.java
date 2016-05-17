@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * 标准化数据 Redis Key生成器. 格式为
+ * 标准化数据 Redis Key生成器. 格式:
  *
  *  表名：主键值：列名
  *
@@ -18,34 +18,34 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class StdKeySchema extends KeySchema {
-    @Value("${redis-key-schema.std.version-table-prefix}")
+    @Value("${ehr.redis-key-schema.std.version-table-prefix}")
     private String VersionTable = "std_cda_versions";
 
-    @Value("${redis-key-schema.std.version-name}")
+    @Value("${ehr.redis-key-schema.std.version-name}")
     private String VersionNameColumn = "name";
 
-    @Value("${redis-key-schema.std.data-set-table-prefix}")
+    @Value("${ehr.redis-key-schema.std.data-set-table-prefix}")
     private String DataSetTable = "std_data_set_";
 
-    @Value("${redis-key-schema.std.data-set-code}")
+    @Value("${ehr.redis-key-schema.std.data-set-code}")
     private String DataSetCodeColumn = "code";
 
-    @Value("${redis-key-schema.std.data-set-name}")
+    @Value("${ehr.redis-key-schema.std.data-set-name}")
     private String DataSetNameColumn = "name";
 
-    @Value("${redis-key-schema.std.meta-data-table-prefix}")
+    @Value("${ehr.redis-key-schema.std.meta-data-table-prefix}")
     private String MetaDataTable = "std_meta_data_";
 
-    @Value("${redis-key-schema.std.meta-data-dict-id}")
+    @Value("${ehr.redis-key-schema.std.meta-data-dict-id}")
     private String MetaDataDictIdColumn = "dict_id";
 
-    @Value("${redis-key-schema.std.meta-data-type}")
+    @Value("${ehr.redis-key-schema.std.meta-data-type}")
     private String MetaDataTypeColumn = "type";
 
-    @Value("${redis-key-schema.std.dict-entry-table-prefix}")
+    @Value("${ehr.redis-key-schema.std.dict-entry-table-prefix}")
     private String DictEntryTable = "std_dictionary_entry_";
 
-    @Value("${redis-key-schema.std.dict-entry-value}")
+    @Value("${ehr.redis-key-schema.std.dict-entry-value}")
     private String DictEntryValueColumn = "value";
 
     public String versionName(String version){

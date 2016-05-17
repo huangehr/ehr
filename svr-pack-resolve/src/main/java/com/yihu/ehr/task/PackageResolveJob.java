@@ -5,10 +5,10 @@ import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.feign.XPackageMgrClient;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.mq.MessageBuffer;
-import com.yihu.ehr.profile.memory.intermediate.MemoryProfile;
+import com.yihu.ehr.queue.MessageBuffer;
+import com.yihu.ehr.service.resource.stage1.StdPackModel;
 import com.yihu.ehr.profile.persist.ProfileService;
-import com.yihu.ehr.service.PackageResolveEngine;
+import com.yihu.ehr.service.resource.stage1.PackageResolveEngine;
 import com.yihu.ehr.util.log.LogService;
 import org.quartz.InterruptableJob;
 import org.quartz.JobExecutionContext;
@@ -55,7 +55,7 @@ public class PackageResolveJob implements InterruptableJob {
 
             String zipFile = downloadTo(pack.getRemotePath());
 
-            MemoryProfile profile = resolveEngine.doResolve(pack, zipFile);
+            StdPackModel profile = resolveEngine.doResolve(pack, zipFile);
             profileService.saveProfile(profile);
 
             packageMgrClient.reportStatus(pack.getId(),

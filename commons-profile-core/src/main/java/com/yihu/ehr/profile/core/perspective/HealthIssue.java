@@ -1,6 +1,5 @@
 package com.yihu.ehr.profile.core.perspective;
 
-import com.yihu.ehr.profile.memory.intermediate.MemoryProfile;
 
 /**
  * 健康问题。
@@ -15,5 +14,4 @@ public class HealthIssue {
     int treatmentTimes;             // 就诊次数（包括随访，门诊及住院）
     int residentTimes;              // 住院次数
 
-    MemoryProfile lastProfile;    // 最后一次就诊的档案
 }

@@ -5,7 +5,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.profile.MProfile;
 import com.yihu.ehr.model.profile.MProfileDocument;
 import com.yihu.ehr.profile.controller.profile.converter.ProfileUtil;
-import com.yihu.ehr.profile.memory.intermediate.MemoryProfile;
+import com.yihu.ehr.service.memory.intermediate.MemoryProfile;
 import com.yihu.ehr.profile.persist.ProfileService;
 import com.yihu.ehr.util.controller.BaseRestEndPoint;
 import io.swagger.annotations.Api;

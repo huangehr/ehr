@@ -2,8 +2,8 @@ package com.yihu.ehr.profile.controller.profile.converter;
 
 import com.yihu.ehr.model.profile.MProfile;
 import com.yihu.ehr.model.profile.MProfileDocument;
-import com.yihu.ehr.profile.memory.intermediate.MemoryFileProfile;
-import com.yihu.ehr.profile.memory.intermediate.MemoryProfile;
+import com.yihu.ehr.service.memory.intermediate.MemoryFileProfile;
+import com.yihu.ehr.service.memory.intermediate.MemoryProfile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
