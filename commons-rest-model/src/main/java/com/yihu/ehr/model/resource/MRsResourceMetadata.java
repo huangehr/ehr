@@ -6,17 +6,9 @@ package com.yihu.ehr.model.resource;
 public class MRsResourceMetadata {
     private String id;
     private String resourcesId;
-    private String columnCode;
-    private String columnName;
-    private String columnType;
-    private String definition;
-    private int length;
-    private String type;
-    private String format;
-    private String primaryKey;
-    private String nullAble;
-    private String dimensionId;
-    private String related;
+    private String metadataId;
+    private String statsType;
+    private String description;
 
     public String getId()
     {
@@ -35,102 +27,30 @@ public class MRsResourceMetadata {
         this.resourcesId = resourcesId;
     }
 
-    public String getColumnCode()
+    public String getMetadataId()
     {
-        return columnCode;
+        return metadataId;
     }
-    public void setColumnCode(String columnCode)
+    public void setMetadataId(String metadataId)
     {
-        this.columnCode = columnCode;
-    }
-
-    public String getColumnName()
-    {
-        return columnName;
-    }
-    public void setColumnName(String columnName)
-    {
-        this.columnName = columnName;
+        this.metadataId = metadataId;
     }
 
-    public String getColumnType()
+    public String getDescription()
     {
-        return this.columnType;
+        return  description;
     }
-    public void setColumnType(String columnType)
+    public void setDescription(String description)
     {
-        this.columnType =  columnType;
-    }
-
-    public String getDefinition()
-    {
-        return definition;
-    }
-    public void setDefinition(String definition)
-    {
-        this.definition = definition;
+        this.description = description;
     }
 
-    public int getLength()
+    public String getStatsType()
     {
-        return length;
+        return  statsType;
     }
-    public void setLength(int length)
+    public void setStatsType(String statsType)
     {
-        this.length = length;
-    }
-
-    public String getType()
-    {
-        return type;
-    }
-    public void setType(String type)
-    {
-        this.type = type;
-    }
-
-    public String getFormat()
-    {
-        return format;
-    }
-    public void setFormat(String format)
-    {
-        this.format = format;
-    }
-
-    public String getPrimaryKey()
-    {
-        return primaryKey;
-    }
-    public void setPrimaryKey(String primaryKey)
-    {
-        this.primaryKey = primaryKey;
-    }
-
-    public String getNullAble()
-    {
-        return nullAble;
-    }
-    public void setNullAble(String nullAble)
-    {
-        this.nullAble = nullAble;
-    }
-
-    public String getDimensionId()
-    {
-        return dimensionId;
-    }
-    public void setDimensionId(String dimensionId)
-    {
-        this.dimensionId = dimensionId;
-    }
-
-    public String getRelated()
-    {
-        return  related;
-    }
-    public void setRelated(String related)
-    {
-        this.related = related;
+        this.statsType = statsType;
     }
 }

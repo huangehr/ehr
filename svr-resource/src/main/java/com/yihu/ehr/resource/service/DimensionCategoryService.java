@@ -23,30 +23,19 @@ public class DimensionCategoryService extends BaseJpaService<RsDimensionCategory
     @Autowired
     private DimensionDao dimensionDao;
 
-    /*
-     *维度类别创建
+    /**
+     * 维度类别创建
      *
-     * @param resource 维度类别实体
+     * @param dimensionCategory RsDimensionCategory 维度类别实体
      * @return RsResources 维度类别实体
      */
-    public RsDimensionCategory createDimensionCategory(RsDimensionCategory dimensionCategory)
+    public RsDimensionCategory saveDimensionCategory(RsDimensionCategory dimensionCategory)
     {
-        dmcDao.save(dimensionCategory);
-        return dimensionCategory;
+        return dmcDao.save(dimensionCategory);
     }
 
-    /*
-     *维度类别更新
-     *
-     * @param resource 维度类别实体
-     */
-    public void updateDimensionCategory(RsDimensionCategory dimensionCategory)
-    {
-        dmcDao.save(dimensionCategory);
-    }
-
-    /*
-     *维度类别删除
+    /**
+     * 维度类别删除
      *
      * @param id 维度类别ID
      */
@@ -65,8 +54,8 @@ public class DimensionCategoryService extends BaseJpaService<RsDimensionCategory
         dmcDao.delete(id);
     }
 
-    /*
-     *维度类别获取
+    /**
+     * 维度类别获取
      *
      * @param sorts 排序
      * @param page 页码

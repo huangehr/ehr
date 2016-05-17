@@ -42,7 +42,7 @@ public class ResourceMetadataController extends BaseRestController {
     {
         RsResourceMetadata rsMetadata = toEntity(metadata,RsResourceMetadata.class);
         rsMetadata.setId(getObjectId(BizObject.ResourceMetadata));
-        rsMetadataService.createResourceMetadata(rsMetadata);
+        rsMetadataService.saveResourceMetadata(rsMetadata);
         return convertToModel(rsMetadata, MRsResourceMetadata.class);
     }
 
@@ -53,7 +53,7 @@ public class ResourceMetadataController extends BaseRestController {
             @RequestParam(name="dimension")String metadata) throws Exception
     {
         RsResourceMetadata  rsMetadata= toEntity(metadata,RsResourceMetadata.class);
-        rsMetadataService.updateResourceMetadata(rsMetadata);
+        rsMetadataService.saveResourceMetadata(rsMetadata);
         return convertToModel(rsMetadata, MRsResourceMetadata.class);
     }
 

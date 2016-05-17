@@ -10,9 +10,7 @@ import java.util.List;
  * Created by lyr on 2016/4/25.
  */
 public interface IDimensionService {
-    RsDimension createDimension(RsDimension dimension);
-
-    void updateDimension(RsDimension dimension);
+    RsDimension saveDimension(RsDimension dimension);
 
     void deleteDimension(String id);
 

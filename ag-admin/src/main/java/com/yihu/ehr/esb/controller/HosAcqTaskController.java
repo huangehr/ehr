@@ -70,11 +70,11 @@ public class HosAcqTaskController extends BaseController {
 
 
 
-    @RequestMapping(value = "/createHosAcqTask", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/createHosAcqTask", method = RequestMethod.POST)
     @ApiOperation(value = "创建补采任务信息", notes = "创建补采任务信息")
     public Envelop createHosAcqTask(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
-            @RequestBody String jsonData) {
+            @RequestParam(value = "json_data") String jsonData)  {
         Envelop envelop = new Envelop();
         HosAcqTaskModel hosAcqTaskModel = toEntity(jsonData,HosAcqTaskModel.class);
         try {
@@ -90,11 +90,11 @@ public class HosAcqTaskController extends BaseController {
 
     }
 
-    @RequestMapping(value = "/updateHosAcqTask", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/updateHosAcqTask", method = RequestMethod.PUT)
     @ApiOperation(value = "修改补采任务信息", notes = "修改补采任务信息")
     public Envelop updateHosAcqTask(
             @ApiParam(name = "json_data", value = "")
-            @RequestBody String jsonData)  {
+            @RequestParam(value = "json_data") String jsonData)  {
         Envelop envelop = new Envelop();
         try {
             HosAcqTaskModel hosAcqTaskModel = toEntity(jsonData,HosAcqTaskModel.class);

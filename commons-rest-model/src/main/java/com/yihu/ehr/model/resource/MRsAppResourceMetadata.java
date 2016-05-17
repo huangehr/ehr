@@ -6,7 +6,7 @@ package com.yihu.ehr.model.resource;
 public class MRsAppResourceMetadata {
     private String id;
     private String AppResourceId;
-    private String MetadataId;
+    private String ResourceMetadataId;
     private String DimensionId;
     private String DimensionValue;
 
@@ -25,10 +25,10 @@ public class MRsAppResourceMetadata {
     }
 
     public String getMetadataId() {
-        return MetadataId;
+        return ResourceMetadataId;
     }
-    public void setMetadataId(String metadataId) {
-        MetadataId = metadataId;
+    public void setMetadataId(String ResourceMetadataId) {
+        ResourceMetadataId = ResourceMetadataId;
     }
 
     public String getDimensionId() {
