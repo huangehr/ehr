@@ -25,40 +25,36 @@ public class ResourcesService extends BaseJpaService<RsResources, ResourcesDao> 
     @Autowired
     private ResourceMetadataDao rsMetadataDao;
 
-    /*
+    /**
      * 资源创建
      *
      * @param resource 资源实体
      * @return RsResources 资源实体
      */
-    public RsResources createResource(RsResources resource)
+    public RsResources saveResource(RsResources resource)
     {
-        rsDao.save(resource);
-        return resource;
+        return rsDao.save(resource);
     }
 
-    /*
-     * 资源更新
-     *
-     * @param resource 资源实体
-     */
-    public void updateResource(RsResources resource)
-    {
-        rsDao.save(resource);
-    }
-
-    /*
+    /**
      * 资源删除
      *
      * @param id 资源ID
      */
     public void deleteResource(String id)
     {
-        rsMetadataDao.deleteByResourcesId(id);
+        String[] ids = id.split(",");
+
+        for(String id_ : ids)
+        {
+            rsMetadataDao.deleteByResourcesId(id_);
+            rsDao.delete(id_);
+        }
+
         rsDao.delete(id);
     }
 
-    /*
+    /**
      * 资源获取
      *
      * @param sorts 排序

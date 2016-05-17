@@ -40,9 +40,9 @@ public class ResourcesController extends BaseRestController {
             @ApiParam(name="resource",value="资源",defaultValue = "")
             @RequestParam(name="resource")String resource) throws Exception
     {
-        RsResources  rs= toEntity(resource,RsResources.class);
+        RsResources rs = toEntity(resource,RsResources.class);
         rs.setId(getObjectId(BizObject.Resources));
-        rsService.createResource(rs);
+        rsService.saveResource(rs);
         return convertToModel(rs,MRsResources.class);
     }
 
@@ -52,8 +52,8 @@ public class ResourcesController extends BaseRestController {
             @ApiParam(name="resource",value="资源",defaultValue="")
             @RequestParam(name="resource")String resource) throws Exception
     {
-        RsResources  rs= toEntity(resource,RsResources.class);
-        rsService.updateResource(rs);
+        RsResources rs = toEntity(resource,RsResources.class);
+        rsService.saveResource(rs);
         return convertToModel(rs,MRsResources.class);
     }
 
@@ -73,13 +73,7 @@ public class ResourcesController extends BaseRestController {
             @ApiParam(name="id",value="资源ID",defaultValue = "")
             @RequestParam(name="id") String id) throws Exception
     {
-        String[] ids = id.split(",");
-
-        for(String id_ : ids)
-        {
-            rsService.deleteResource(id_);
-        }
-
+        rsService.deleteResource(id);
         return true;
     }
 

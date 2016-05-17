@@ -24,12 +24,12 @@ public class ResourceMetadataGrantService  extends BaseJpaService<RsResourceMeta
     @Autowired
     private AppResourceMetadataDao appRsMetadataDao;
 
-    /*
-    * 资源元数据授权
-    *
-    * @param 资源数据元实体
-    * @return 资源数据元实体
-    */
+    /**
+     * 资源元数据授权
+     *
+     * @param rsAppMetadata RsAppResourceMetadata 资源数据元实体
+     * @return RsAppResourceMetadata 资源数据元实体
+     */
     public RsAppResourceMetadata grantRsMetadata(RsAppResourceMetadata  rsAppMetadata)
     {
         appRsMetadataDao.save(rsAppMetadata);
@@ -37,12 +37,12 @@ public class ResourceMetadataGrantService  extends BaseJpaService<RsResourceMeta
         return rsAppMetadata;
     }
 
-    /*
-    * 资源数据元授权多个APP
-    *
-    * @param 资源数据元授权实体集合
-    * @return 资源数据元授权实体集合
-    */
+    /**
+     * 资源数据元授权多个APP
+     *
+     * @param rsMetadataList List<RsAppResourceMetadata> 资源数据元授权实体集合
+     * @return List<RsAppResourceMetadata> 资源数据元授权实体集合
+     */
     public List<RsAppResourceMetadata> grantRsMetadataBatch(List<RsAppResourceMetadata> rsMetadataList)
     {
         appRsMetadataDao.save(rsMetadataList);
@@ -50,22 +50,27 @@ public class ResourceMetadataGrantService  extends BaseJpaService<RsResourceMeta
         return rsMetadataList;
     }
 
-    /*
+    /**
      * 删除资源数据元授权
      *
-     * @param 授权ID
+     * @param id String 授权ID
      */
     public void deleteRsMetadataGrant(String id)
     {
-        appRsMetadataDao.delete(id);
+        String[] idArray = id.split(",");
+
+        for(String _id:idArray)
+        {
+            appRsMetadataDao.delete(_id);
+        }
     }
 
-    /*
-     *资源授权获取
+    /**
+     * 资源授权获取
      *
-     * @param sorts 排序
-     * @param page 页码
-     * @param size 分页大小
+     * @param sorts String 排序
+     * @param page int 页码
+     * @param size size 分页大小
      * @return Page<RsResources> 资源
      */
     public Page<RsAppResourceMetadata> getAppRsMetadataGrant(String sorts, int page, int size)

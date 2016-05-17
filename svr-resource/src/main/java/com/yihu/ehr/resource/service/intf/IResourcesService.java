@@ -12,9 +12,7 @@ import java.util.List;
  */
 public interface IResourcesService {
 
-    RsResources createResource(RsResources resource);
-
-    void updateResource(RsResources resource);
+    RsResources saveResource(RsResources resource);
 
     void deleteResource(String id);
 
