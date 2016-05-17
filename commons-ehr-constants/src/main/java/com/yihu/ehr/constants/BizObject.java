@@ -31,7 +31,9 @@ public enum BizObject {
     AppResourceMetadata((short)0x0020),
     ResourceCategory((short)0x0021),
     FileResource((short)0x0022),
-    RsMetadata((short)0x0022);;
+    RsMetadata((short)0x0023),
+    RsAdapterSchema((short)0x0024),
+    RsAdapterMetadata((short)0x0025);
 
     public short getBizObject(){
         return bizObject;
