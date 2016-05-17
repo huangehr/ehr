@@ -124,4 +124,17 @@ public class HosReleaseController extends BaseRestController{
         hosEsbMiniReleaseService.delete(id);
         return true;
     }
+
+
+    @RequestMapping(value = "/deleteHosEsbMiniReleases", method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据查询条件批量删除程序版本发布信息", notes = "根据查询条件批量删除程序版本发布信息")
+    public boolean deleteHosEsbMiniReleases(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) throws ParseException {
+        List<HosEsbMiniRelease> hosEsbMiniReleases = hosEsbMiniReleaseService.search( filters);
+        for(HosEsbMiniRelease hosEsbMiniRelease : hosEsbMiniReleases){
+            hosEsbMiniReleaseService.delete(hosEsbMiniRelease.getId());
+        }
+        return true;
+    }
 }

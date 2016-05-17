@@ -4,15 +4,14 @@ import com.yihu.ehr.api.esb.model.HosEsbMiniInstallLog;
 import com.yihu.ehr.api.esb.service.HosEsbMiniInstallLogService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.esb.MHosEsbMiniInstallLog;
+import com.yihu.ehr.model.esb.MHosSqlTask;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -51,6 +50,52 @@ public class HosEsbMiniInstallLogController extends BaseRestController{
         pagedResponse(request, response, hosEsbMiniInstallLogService.getCount(filters), page, size);
 
         return (List<MHosEsbMiniInstallLog>) convertToModels(hosEsbMiniInstallLogs, new ArrayList<MHosEsbMiniInstallLog>(hosEsbMiniInstallLogs.size()), MHosEsbMiniInstallLog.class, fields);
+    }
+
+
+    @RequestMapping(value = "/createInstallLog", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "创建安装日志信息", notes = "创建安装日志信息")
+    public MHosEsbMiniInstallLog createInstallLog(
+            @ApiParam(name = "json_data", value = "", defaultValue = "")
+            @RequestBody String jsonData) throws Exception {
+        HosEsbMiniInstallLog hosEsbMiniInstallLog = toEntity(jsonData, HosEsbMiniInstallLog.class);
+
+        hosEsbMiniInstallLogService.save(hosEsbMiniInstallLog);
+        return convertToModel(hosEsbMiniInstallLog, MHosEsbMiniInstallLog.class, null);
+    }
+
+    @RequestMapping(value = "/updateInstallLog", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "修改安装日志信息", notes = "修改安装日志信息")
+    public MHosEsbMiniInstallLog updateInstallLog(
+            @ApiParam(name = "json_data", value = "")
+            @RequestBody String jsonData) throws Exception {
+
+        HosEsbMiniInstallLog hosEsbMiniInstallLog = toEntity(jsonData, HosEsbMiniInstallLog.class);
+        hosEsbMiniInstallLogService.save(hosEsbMiniInstallLog);
+        return convertToModel(hosEsbMiniInstallLog, MHosEsbMiniInstallLog.class, null);
+    }
+
+
+    @RequestMapping(value = "/deleteInstallLog/{id}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除安装日志信息", notes = "删除安装日志信息")
+    public boolean deleteInstallLog(
+            @ApiParam(name = "id", value = "id", defaultValue = "")
+            @PathVariable(value = "id") String id) throws Exception {
+        hosEsbMiniInstallLogService.delete(id);
+        return true;
+    }
+
+
+    @RequestMapping(value = "/deleteInstallLogs", method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据查询条件批量删除安装日志信息", notes = "根据查询条件批量删除安装日志信息")
+    public boolean deleteInstallLogs(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) throws ParseException {
+        List<HosEsbMiniInstallLog> hosEsbMiniInstallLogs = hosEsbMiniInstallLogService.search( filters);
+        for(HosEsbMiniInstallLog hosEsbMiniInstallLog : hosEsbMiniInstallLogs){
+            hosEsbMiniInstallLogService.delete(hosEsbMiniInstallLog.getId());
+        }
+        return true;
     }
 
 

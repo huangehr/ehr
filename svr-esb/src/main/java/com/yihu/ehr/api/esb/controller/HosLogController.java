@@ -52,12 +52,25 @@ public class HosLogController extends BaseRestController{
 
 
 
-    @RequestMapping(value = "/deleteHosLogs/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/deleteHosLog/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除上传日志", notes = "根据id删除上传日志")
-    public boolean deleteHosLogs(
+    public boolean deleteHosLog(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id) throws Exception {
         hosLogService.delete(id);
+        return true;
+    }
+
+
+    @RequestMapping(value = "/deleteHosLogs", method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据查询条件批量删除上传日志", notes = "根据查询条件批量删除上传日志")
+    public boolean deleteHosLogs(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) throws ParseException {
+        List<HosLog> hosLogs = hosLogService.search( filters);
+        for(HosLog hosLog : hosLogs){
+            hosLogService.delete(hosLog.getId());
+        }
         return true;
     }
 }
