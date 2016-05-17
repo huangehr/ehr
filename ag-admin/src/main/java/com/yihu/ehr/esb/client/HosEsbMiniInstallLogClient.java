@@ -2,6 +2,7 @@ package com.yihu.ehr.esb.client;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.model.esb.MHosEsbMiniInstallLog;
 import com.yihu.ehr.model.esb.MHosEsbMiniRelease;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -20,18 +21,13 @@ import java.util.List;
 @FeignClient(name=MicroServices.ESB)
 @RequestMapping(value = ApiVersion.Version1_0 + "/esb")
 @ApiIgnore
-public interface HosReleaseClient {
+public interface HosEsbMiniInstallLogClient {
 
-    @RequestMapping(value = "/searchHosEsbMiniReleases", method = RequestMethod.GET)
-    ResponseEntity<List<MHosEsbMiniRelease>> searchHosEsbMiniReleases(
+    @RequestMapping(value = "/searchInstallLogs", method = RequestMethod.GET)
+    ResponseEntity<List<MHosEsbMiniInstallLog>> searchHosEsbMiniInstallLogs(
             @RequestParam(value = "fields", required = false) String fields,
             @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,
             @RequestParam(value = "size", required = false) int size,
             @RequestParam(value = "page", required = false) int page);
-
-    @RequestMapping(value = "/deleteHosEsbMiniRelease/{id}", method = RequestMethod.DELETE)
-    boolean deleteHosEsbMiniRelease(
-            @PathVariable(value = "id") String id);
-
 }
