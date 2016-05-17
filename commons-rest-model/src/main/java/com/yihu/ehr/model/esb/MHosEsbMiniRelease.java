@@ -1,9 +1,5 @@
 package com.yihu.ehr.model.esb;// default package
 
-import org.hibernate.annotations.GenericGenerator;
-
-import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.Date;
 
 
@@ -12,16 +8,22 @@ import java.util.Date;
  */
 public class MHosEsbMiniRelease implements java.io.Serializable {
 
+    String id;
+    String systemCode;
+    String versionName;
+    Integer versionCode;
+    String file;
+    Date releaseTime;
+    String releaseDate;
+    String orgCode;
 
-    // Fields
+    public String getReleaseDate() {
+        return releaseDate;
+    }
 
-    private String id;
-    private String systemCode;
-    private String versionName;
-    private Integer versionCode;
-    private String file;
-    private Date releaseTime;
-    private String orgCode;
+    public void setReleaseDate(String releaseDate) {
+        this.releaseDate = releaseDate;
+    }
 
     public String getId() {
         return id;

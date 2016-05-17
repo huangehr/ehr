@@ -2,10 +2,9 @@ package com.yihu.ehr.resource.service;
 
 
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.resource.dao.ResourcesCategoryDao;
-import com.yihu.ehr.resource.dao.ResourcesDao;
+import com.yihu.ehr.resource.dao.intf.ResourcesCategoryDao;
+import com.yihu.ehr.resource.dao.intf.ResourcesDao;
 import com.yihu.ehr.resource.model.RsCategory;
-import com.yihu.ehr.resource.model.RsResources;
 import com.yihu.ehr.resource.service.intf.IResourcesCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,10 +12,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import java.util.List;
-import java.util.UUID;
 
 
 /**
@@ -31,7 +26,7 @@ public class ResourcesCategoryService extends BaseJpaService<RsCategory,Resource
     @Autowired
     private ResourcesDao rsDao;
 
-    /*
+    /**
      * 删除资源类别
      *
      * @param id 资源类别id
@@ -51,7 +46,7 @@ public class ResourcesCategoryService extends BaseJpaService<RsCategory,Resource
         rsCategoryDao.delete(id);
     }
 
-    /*
+    /**
      * 创建或更新资源类别
      *
      * @param rsCategory 资源类别
@@ -64,6 +59,14 @@ public class ResourcesCategoryService extends BaseJpaService<RsCategory,Resource
         return rsCategory;
     }
 
+    /**
+     * 获取资源类别
+     *
+     * @param sorts String 排序
+     * @param page int 分页
+     * @param size int 分页大小
+     * @return Page<RsCategory>
+     */
     public Page<RsCategory> getRsCategories(String sorts, int page, int size)
     {
         Pageable pageable = new PageRequest(page,size,parseSorts(sorts));

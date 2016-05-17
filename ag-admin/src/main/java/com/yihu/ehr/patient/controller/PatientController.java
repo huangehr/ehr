@@ -1,7 +1,7 @@
 package com.yihu.ehr.patient.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.SystemDict.service.ConventionalDictEntryClient;
+import com.yihu.ehr.systemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 import com.yihu.ehr.agModel.patient.PatientDetailModel;
 import com.yihu.ehr.agModel.patient.PatientModel;
@@ -143,12 +143,12 @@ public class PatientController extends BaseController {
             @PathVariable(value = "id_card_no") String idCardNo) throws Exception {
 
         MDemographicInfo demographicInfo = patientClient.getPatient(idCardNo);
-        if (!StringUtils.isEmpty(demographicInfo.getPicPath())) {
+//        if (!StringUtils.isEmpty(demographicInfo.getPicPath())) {
 //            Map<String, String> map = toEntity(demographicInfo.getPicPath(), Map.class);
-            String imagePath[] = demographicInfo.getPicPath().split(":");
-            String localPath = patientClient.downloadPicture(imagePath[0], imagePath[1]);
-            demographicInfo.setLocalPath(localPath);
-        }
+//            String imagePath[] = demographicInfo.getPicPath().split(":");
+//            String localPath = patientClient.downloadPicture(imagePath[0], imagePath[1]);
+//            demographicInfo.setLocalPath(localPath);
+//        }
 
         if (demographicInfo == null) {
             return failed("数据获取失败！");
@@ -170,23 +170,19 @@ public class PatientController extends BaseController {
     @ApiOperation(value = "根据前端传回来的json创建一个人口信息")
     public Envelop createPatient(
             @ApiParam(name = "patientModelJsonData", value = "身份证号", defaultValue = "")
-            @RequestParam(value = "patientModelJsonData") String patientModelJsonData,
-            @ApiParam(name = "inputStream", value = "转换后的输入流", defaultValue = "")
-            @RequestParam(value = "inputStream") String inputStream,
-            @ApiParam(name = "imageName", value = "图片全名", defaultValue = "")
-            @RequestParam(value = "imageName") String imageName) throws Exception {
+            @RequestParam(value = "patientModelJsonData") String patientModelJsonData) throws Exception {
 
         //头像上传,接收头像保存的远程路径  path
-        String path = null;
-        if (!StringUtils.isEmpty(inputStream)) {
-            String jsonData = inputStream + "," + imageName;
-            path = patientClient.uploadPicture(jsonData);
-        }
+//        String path = null;
+//        if (!StringUtils.isEmpty(inputStream)) {
+//            String jsonData = inputStream + "," + imageName;
+//            path = patientClient.uploadPicture(jsonData);
+//        }
 
         PatientDetailModel detailModel = objectMapper.readValue(patientModelJsonData, PatientDetailModel.class);
-        if (!StringUtils.isEmpty(path)) {
-            detailModel.setPicPath(path);
-        }
+//        if (!StringUtils.isEmpty(path)) {
+//            detailModel.setPicPath(path);
+//        }
         String errorMsg = "";
         if (StringUtils.isEmpty(detailModel.getName())) {
             errorMsg += "姓名不能为空!";
@@ -256,24 +252,20 @@ public class PatientController extends BaseController {
     @ApiOperation(value = "根据前端传回来的json修改人口信息")
     public Envelop updatePatient(
             @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
-            @RequestParam(value = "patient_model_json_data") String patientModelJsonData,
-            @ApiParam(name = "inputStream", value = "转换后的输入流", defaultValue = "")
-            @RequestParam(value = "inputStream") String inputStream,
-            @ApiParam(name = "imageName", value = "图片全名", defaultValue = "")
-            @RequestParam(value = "imageName") String imageName) throws Exception {
+            @RequestParam(value = "patient_model_json_data") String patientModelJsonData) throws Exception {
 
         //头像上传,接收头像保存的远程路径  path
-        String path = null;
-        if (!StringUtils.isEmpty(inputStream)) {
-            String jsonData = inputStream + "," + imageName;
-            path = patientClient.uploadPicture(jsonData);
-        }
+//        String path = null;
+//        if (!StringUtils.isEmpty(inputStream)) {
+//            String jsonData = inputStream + "," + imageName;
+//            path = patientClient.uploadPicture(jsonData);
+//        }
 
         PatientDetailModel detailModel = objectMapper.readValue(patientModelJsonData, PatientDetailModel.class);
-        if (!StringUtils.isEmpty(path)) {
-            detailModel.setPicPath(path);
-            detailModel.setLocalPath("");
-        }
+//        if (!StringUtils.isEmpty(path)) {
+//            detailModel.setPicPath(path);
+//            detailModel.setLocalPath("");
+//        }
         String errorMsg = "";
         if (StringUtils.isEmpty(detailModel.getName())) {
             errorMsg += "姓名不能为空!";

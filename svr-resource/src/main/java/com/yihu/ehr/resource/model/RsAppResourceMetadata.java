@@ -11,15 +11,15 @@ import javax.persistence.*;
 @Table(name="rs_app_resource_metadata")
 public class RsAppResourceMetadata {
     private String id;
-    private String AppResourceId;
-    private String MetadataId;
-    private String DimensionId;
-    private String DimensionValue;
+    private String appResourceId;
+    private String resourceMetadataId;
+    private String dimensionId;
+    private String dimensionValue;
 
     @Id
     @GeneratedValue(generator = "Generator")
-    @GenericGenerator(name="Generator",strategy = "assigned")
-    @Column(name="id",unique = true,nullable = false)
+    @GenericGenerator(name = "Generator", strategy = "assigned")
+    @Column(name = "id", unique = true, nullable = false)
     public String getId() {
         return id;
     }
@@ -29,34 +29,34 @@ public class RsAppResourceMetadata {
 
     @Column(name="app_resource_id",nullable = false)
     public String getAppResourceId() {
-        return AppResourceId;
+        return appResourceId;
     }
     public void setAppResourceId(String appResourceId) {
-        AppResourceId = appResourceId;
+        appResourceId = appResourceId;
     }
 
     @Column(name="metadata_id",nullable = false)
     public String getMetadataId() {
-        return MetadataId;
+        return resourceMetadataId;
     }
-    public void setMetadataId(String metadataId) {
-        MetadataId = metadataId;
+    public void setMetadataId(String resourceMetadataId) {
+        resourceMetadataId = resourceMetadataId;
     }
 
     @Column(name="dimension_id")
     public String getDimensionId() {
-        return DimensionId;
+        return dimensionId;
     }
     public void setDimensionId(String dimensionId) {
-        DimensionId = dimensionId;
+        dimensionId = dimensionId;
     }
 
     @Column(name="dimension_value")
     public String getDimensionValue() {
-        return DimensionValue;
+        return dimensionValue;
     }
     public void setDimensionValue(String dimensionValue) {
-        DimensionValue = dimensionValue;
+        dimensionValue = dimensionValue;
     }
 
 }

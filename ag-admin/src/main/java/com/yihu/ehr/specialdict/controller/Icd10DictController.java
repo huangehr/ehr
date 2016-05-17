@@ -1,6 +1,6 @@
 package com.yihu.ehr.specialdict.controller;
 
-import com.yihu.ehr.SystemDict.service.ConventionalDictEntryClient;
+import com.yihu.ehr.systemDict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.agModel.specialdict.Icd10DictModel;
 import com.yihu.ehr.agModel.specialdict.Icd10DrugRelationModel;
 import com.yihu.ehr.agModel.specialdict.Icd10IndicatorRelationModel;
@@ -15,6 +15,7 @@ import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -54,31 +55,42 @@ public class Icd10DictController extends BaseController {
     }
 
     @RequestMapping(value = "dict/icd10/{id}", method = RequestMethod.DELETE)
-    @ApiOperation(value = "根据id删除icd10疾病字典(含与药品及指标的关联关系，同时删除关联的诊断。)")
+    @ApiOperation(value = "根据id删除icd10疾病字典(含与药品及指标的关联关系。)")
     public Envelop deleteIcd10Dict(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") String id) {
         Envelop envelop = new Envelop();
+        boolean flag = icd10DictClient.icd10DictIsUsage(id);
+        if(flag){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("与疾病字典存在关联！请先解除关联。");
+            return envelop;
+        }
         Boolean bo = icd10DictClient.deleteIcd10Dict(id);
         envelop.setSuccessFlg(bo);
         return envelop;
     }
 
     @RequestMapping(value = "dict/icd10s", method = RequestMethod.DELETE)
-    @ApiOperation(value = "根据ids批量删除icd10疾病字典(含与药品及指标的关联关系，同时删除关联的诊断。)")
+    @ApiOperation(value = "根据ids批量删除icd10疾病字典(含与药品及指标的关联关系。)")
     public Envelop deleteIcd10Dicts(
             @ApiParam(name = "ids", value = "字典ID", defaultValue = "")
             @RequestParam(value = "ids") String ids) {
         Envelop envelop = new Envelop();
         String[] icd10Ids = ids.split(",");
+        String relaCodes = "";
         for (String icd10Id:icd10Ids){
             boolean flag = icd10DictClient.icd10DictIsUsage(icd10Id);
             if(flag){
                 MIcd10Dict icd10Dict = icd10DictClient.getIcd10Dict(icd10Id);
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("字典："+icd10Dict.getCode()+" 与疾病字典存在关联！请先解除关联。");
-                return envelop;
+                relaCodes += icd10Dict.getCode()+", ";
             }
+        }
+        if(!StringUtils.isEmpty(relaCodes)){
+            relaCodes = relaCodes.substring(0,relaCodes.length()-1);
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("字典："+relaCodes+"与疾病字典存在关联！请先解除关联。");
+            return envelop;
         }
         Boolean bo = icd10DictClient.deleteIcd10Dicts(ids);
         envelop.setSuccessFlg(bo);

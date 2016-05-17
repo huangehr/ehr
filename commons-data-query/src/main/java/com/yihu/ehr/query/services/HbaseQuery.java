@@ -9,7 +9,7 @@ import com.yihu.ehr.query.common.model.DataList;
 import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.query.common.model.QueryEntity;
 import com.yihu.ehr.query.common.model.SolrJoinEntity;
-import com.yihu.ehr.query.solr.SolrUtil;
+import com.yihu.ehr.solr.SolrUtil;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.client.Result;

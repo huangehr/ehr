@@ -1,4 +1,4 @@
-package com.yihu.ehr.resource.dao;
+package com.yihu.ehr.resource.dao.intf;
 
 import com.yihu.ehr.resource.model.RsDimension;
 import org.springframework.data.jpa.repository.Query;

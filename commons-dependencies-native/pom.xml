@@ -90,7 +90,7 @@
                 <module>../svr-dict</module>
                 <module>../svr-discovery</module>
                 <module>../svr-geography</module>
-                <module>../svr-health-profile-search</module>
+                <!--<module>../svr-health-profile-search</module>-->
                 <module>../svr-health-profile</module>
                 <module>../svr-organization</module>
                 <module>../svr-pack-mgr</module>
@@ -104,7 +104,7 @@
                 <module>../ag-admin</module>
                 <module>../ag-ehr-platform</module>
                 <module>../svr-family</module>
-                <module>../svr-resource</module>
+                <!--<module>../svr-resource</module>-->
                 <module>../svr-cipher</module>
                 <!--<module>../app-ehr-browser</module>-->
             </modules>

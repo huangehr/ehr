@@ -43,7 +43,7 @@ public class DimensionController extends BaseRestController {
     {
         RsDimension dimens = toEntity(dimension,RsDimension.class);
         dimens.setId(getObjectId(BizObject.Dimensions));
-        dimensionService.createDimension(dimens);
+        dimensionService.saveDimension(dimens);
         return convertToModel(dimens,MRsDimension.class);
     }
 
@@ -54,7 +54,7 @@ public class DimensionController extends BaseRestController {
             @RequestParam(name="dimension")String dimension) throws Exception
     {
         RsDimension  dimens= toEntity(dimension,RsDimension.class);
-        dimensionService.updateDimension(dimens);
+        dimensionService.saveDimension(dimens);
         return convertToModel(dimens,MRsDimension.class);
     }
 

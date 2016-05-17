@@ -9,9 +9,7 @@ import java.util.List;
  * Created by lyr on 2016/4/25.
  */
 public interface IResourceMetadataService {
-    RsResourceMetadata createResourceMetadata(RsResourceMetadata metadata);
-
-    void updateResourceMetadata(RsResourceMetadata metadata);
+    RsResourceMetadata saveResourceMetadata(RsResourceMetadata metadata);
 
     void deleteResourceMetadata(String id);
 

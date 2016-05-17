@@ -99,12 +99,7 @@ public class ResourcesGrantController extends BaseRestController{
             @ApiParam(name="id",value="授权ID",defaultValue = "")
             @RequestParam(value="id")String id) throws Exception
     {
-        String[] idArray = id.split(",");
-
-        for(String _id:idArray)
-        {
-            rsGrantService.deleteResourceGrant(_id);
-        }
+        rsGrantService.deleteResourceGrant(id);
 
         return true;
     }
@@ -208,12 +203,7 @@ public class ResourcesGrantController extends BaseRestController{
             @ApiParam(name="id",value="授权ID",defaultValue = "")
             @RequestParam(value="id")String id) throws Exception
     {
-        String[] idArray = id.split(",");
-
-        for(String _id:idArray)
-        {
-            rsMetadataGrantService.deleteRsMetadataGrant(_id);
-        }
+        rsMetadataGrantService.deleteRsMetadataGrant(id);
 
         return true;
     }

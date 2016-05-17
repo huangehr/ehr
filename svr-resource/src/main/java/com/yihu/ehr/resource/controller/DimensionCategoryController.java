@@ -41,7 +41,7 @@ public class DimensionCategoryController extends BaseRestController{
     {
         RsDimensionCategory dmc = toEntity(dimensionCategory,RsDimensionCategory.class);
         dmc.setId(getObjectId(BizObject.DimensionsCategories));
-        dmcService.createDimensionCategory(dmc);
+        dmcService.saveDimensionCategory(dmc);
         return convertToModel(dmc,MRsDimensionCategory.class);
     }
 
@@ -52,7 +52,7 @@ public class DimensionCategoryController extends BaseRestController{
             @RequestParam(name="dimensionCategory")String dimensionCategory) throws Exception
     {
         RsDimensionCategory  dmc= toEntity(dimensionCategory,RsDimensionCategory.class);
-        dmcService.updateDimensionCategory(dmc);
+        dmcService.saveDimensionCategory(dmc);
         return convertToModel(dmc,MRsDimensionCategory.class);
     }
 

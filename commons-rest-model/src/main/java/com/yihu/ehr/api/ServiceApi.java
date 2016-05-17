@@ -32,7 +32,9 @@ public class ServiceApi {
     }
 
     public static class ESB{
+        public static final String SearchHosLogs                            = "/searchHosLogs";
 
+        public static final String DeleteHosLogs                            = "/deleteHosLogs";
     }
 
     public static class Geography{

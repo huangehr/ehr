@@ -224,4 +224,16 @@ public class ResourcesBrowseController {
 
     }
 
+
+    @ApiOperation("档案搜索接口")
+    @RequestMapping(value = "/medic/getArchives", method = RequestMethod.GET)
+    public String getArchives(
+            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
+            @ApiParam(name = "archiveType", value = "就诊类型(传空默认搜索全部数据)") @RequestParam(value = "archiveType", required = false) String archiveType,
+            @ApiParam(name = "name", value = "诊断记录名称") @RequestParam(value = "name", required = false) String name) throws Exception {
+        return EhrFileUtils.file2String("/json/archiveSearch.json");
+
+    }
+
+
 }

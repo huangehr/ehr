@@ -1,7 +1,7 @@
 package com.yihu.ehr.resource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.resource.dao.DimensionDao;
+import com.yihu.ehr.resource.dao.intf.DimensionDao;
 import com.yihu.ehr.resource.model.RsDimension;
 import com.yihu.ehr.resource.service.intf.IDimensionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,30 +20,20 @@ public class DimensionService extends BaseJpaService<RsDimension,DimensionDao>  
     @Autowired
     private DimensionDao dimensionDao;
 
-    /*
-     *资源创建
+    /**
+     * 资源创建
      *
-     * @param resource 资源实体
+     * @param dimension RsDimension 资源实体
      * @return RsResources 资源实体
      */
-    public RsDimension createDimension(RsDimension dimension)
+    public RsDimension saveDimension(RsDimension dimension)
     {
         dimensionDao.save(dimension);
         return dimension;
     }
 
-    /*
-     *资源更新
-     *
-     * @param resource 资源实体
-     */
-    public void updateDimension(RsDimension dimension)
-    {
-        dimensionDao.save(dimension);
-    }
-
-    /*
-     *资源删除
+    /**
+     * 资源删除
      *
      * @param id 资源ID
      */
@@ -52,8 +42,8 @@ public class DimensionService extends BaseJpaService<RsDimension,DimensionDao>  
         dimensionDao.delete(id);
     }
 
-    /*
-     *资源获取
+    /**
+     * 资源获取
      *
      * @param sorts 排序
      * @param page 页码

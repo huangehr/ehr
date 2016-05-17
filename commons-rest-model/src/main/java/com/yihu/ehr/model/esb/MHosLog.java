@@ -8,19 +8,23 @@ import java.io.Serializable;
  */
 public class MHosLog implements Serializable {
 
-    private String id;
-    private String orgCode;
-    private String ip;
-    private String filePath;
-    private String uploadTime;
+    String id;
+    String orgCode;
+    String ip;
+    String filePath;
+    String uploadTime;
+    /**
+     * modify linz
+     * 添加组织名称字段，用于界面展示
+     */
+    String orgName;
 
+    public String getOrgName() {
+        return orgName;
+    }
 
-    public MHosLog(String id, String orgCode, String ip, String filePath, String uploadTime) {
-        this.id = id;
-        this.orgCode = orgCode;
-        this.ip = ip;
-        this.filePath = filePath;
-        this.uploadTime = uploadTime;
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
     }
 
     public String getId() {

@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.model;
 
+import com.yihu.ehr.profile.annotation.*;
 import org.apache.hadoop.hbase.shaded.org.codehaus.jackson.annotate.JsonProperty;
 import org.apache.hadoop.hbase.shaded.org.codehaus.jackson.annotate.JsonRawValue;
 import org.apache.hadoop.hbase.shaded.org.codehaus.jackson.annotate.JsonSetter;
@@ -10,6 +11,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Table;
+
 /**
  * Created by hzp on 2016/4/21.
  * 资源列表
@@ -22,10 +26,8 @@ public class RsResources {
     private String code;
     private String name;
     private String categoryId;
-    private String type;
-    private String relatedAction;
-    private String relatedDatasource;
-    private String relatedDatasets;
+    private String rsInterface;
+    private String grantType;
     private String description;
 
     @Id
@@ -63,36 +65,24 @@ public class RsResources {
         this.categoryId = categoryId;
     }
 
-    @Column(name="type",nullable = false)
-    public String getType() {
-        return type;
+    @Column(name="rs_interface")
+    public String getRsInterface()
+    {
+        return rsInterface;
     }
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    @Column(name="related_action")
-    public String getRelatedAction() {
-        return relatedAction;
-    }
-    public void setRelatedAction(String relatedAction) {
-        this.relatedAction = relatedAction;
+    public void setRsInterface(String rsInterface)
+    {
+        this.rsInterface = rsInterface;
     }
 
-    @Column(name="related_datasource")
-    public String getRelatedDatasource() {
-        return relatedDatasource;
+    @Column(name="grant_type")
+    public String getGrantType()
+    {
+        return grantType;
     }
-    public void setRelatedDatasource(String relatedDatasource) {
-        this.relatedDatasource = relatedDatasource;
-    }
-
-    @Column(name="related_datasets")
-    public String getRelatedDatasets() {
-        return relatedDatasets;
-    }
-    public void setRelatedDatasets(String relatedDatasets) {
-        this.relatedDatasets = relatedDatasets;
+    public void setGrantType(String grantType)
+    {
+        this.grantType = grantType;
     }
 
     @Column(name="description")
