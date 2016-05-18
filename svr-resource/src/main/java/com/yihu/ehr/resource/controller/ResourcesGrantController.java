@@ -40,27 +40,34 @@ public class ResourcesGrantController extends BaseRestController{
     @Autowired
     private IResourceMetadataGrantService rsMetadataGrantService;
 
-    @ApiOperation("资源授权单个应用")
-    @RequestMapping(value= ServiceApi.Resources.ResourceGrantApp ,method = RequestMethod.POST)
-    public MRsAppResource grantResource(
-            @ApiParam(name="resource_id",value="资源ID",defaultValue = "")
-            @PathVariable(value="resource_id") String resource_id,
+    @ApiOperation("单个应用授权多个资源")
+    @RequestMapping(value= ServiceApi.Resources.AppsGrantResources ,method = RequestMethod.POST)
+    public Collection<MRsAppResource> grantAppResource(
             @ApiParam(name="app_id",value="资源ID",defaultValue = "")
-            @PathVariable(value="app_id") String app_id) throws Exception
+            @PathVariable(value="app_id") String app_id,
+            @ApiParam(name="resource_id",value="资源ID",defaultValue = "")
+            @RequestParam(value="resource_id") String resource_id) throws Exception
     {
-        RsAppResource appRs = new RsAppResource();
+        String[] resourceIdArray = resource_id.split(",");
+        List<RsAppResource> appRsList = new ArrayList<RsAppResource>();
 
-        appRs.setId(getObjectId(BizObject.AppResource));
-        appRs.setAppId(app_id);
-        appRs.setResourceId(resource_id);
+        for(String resoruceId : resourceIdArray)
+        {
+            RsAppResource appRs = new RsAppResource();
 
-        rsGrantService.grantResource(appRs);
-        return convertToModel(appRs, MRsAppResource.class);
+            appRs.setId(getObjectId(BizObject.AppResource));
+            appRs.setAppId(app_id);
+            appRs.setResourceId(resoruceId);
+
+            appRsList.add(appRs);
+        }
+
+        return convertToModels( rsGrantService.grantResourceBatch(appRsList),new ArrayList<>(appRsList.size()),MRsAppResource.class,"");
     }
 
     @ApiOperation("资源授权多个应用")
     @RequestMapping(value= ServiceApi.Resources.ResourceGrantApps,method = RequestMethod.POST)
-    public Collection<MRsAppResource> grantResourceMany(
+    public Collection<MRsAppResource> grantResourceApp(
             @ApiParam(name="resource_id",value="资源ID",defaultValue = "")
             @PathVariable(value="resource_id") String resource_id,
             @ApiParam(name="app_id",value="资源ID",defaultValue = "")
@@ -80,8 +87,7 @@ public class ResourcesGrantController extends BaseRestController{
             appRsList.add(appRs);
         }
 
-        rsGrantService.grantResourceBatch(appRsList);
-        return convertToModels(appRsList,new ArrayList<>(appRsList.size()),MRsAppResource.class,"");
+        return convertToModels(rsGrantService.grantResourceBatch(appRsList),new ArrayList<>(appRsList.size()),MRsAppResource.class,"");
     }
 
     @ApiOperation("资源授权删除")

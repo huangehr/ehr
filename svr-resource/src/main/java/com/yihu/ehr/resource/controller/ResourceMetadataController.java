@@ -47,6 +47,24 @@ public class ResourceMetadataController extends BaseRestController {
         return convertToModel(rsMetadata, MRsResourceMetadata.class);
     }
 
+    @ApiOperation("批量创建资源数据元")
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasBatch,method = RequestMethod.POST)
+    public Collection<MRsResourceMetadata> createResourceMetadataBatch(
+            @ApiParam(name="metadatas",value="资源数据元",defaultValue = "")
+            @RequestParam(name="metadatas")String metadatas) throws Exception
+    {
+        RsResourceMetadata[] rsMetadata = toEntity(metadatas,RsResourceMetadata[].class);
+
+        for(RsResourceMetadata metadata : rsMetadata)
+        {
+            metadata.setId(getObjectId(BizObject.ResourceMetadata));
+        }
+
+        List<RsResourceMetadata> metadataList = rsMetadataService.saveMetadataBatch(rsMetadata);
+
+        return convertToModels(metadataList,new ArrayList<MRsResourceMetadata>(),MRsResourceMetadata.class,"");
+    }
+
     @ApiOperation("更新资源数据元")
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas,method = RequestMethod.PUT)
     public MRsResourceMetadata updateResourceMetadata(
