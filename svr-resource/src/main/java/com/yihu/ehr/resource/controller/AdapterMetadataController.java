@@ -30,13 +30,13 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value= ApiVersion.Version1_0 + "/adapterMetadata")
-@Api(value = "adapterMetadata", description = "适配方案服务")
+@Api(value = "adapterMetadata", description = "适配数据元服务")
 public class AdapterMetadataController extends BaseRestController {
     @Autowired
     private IAdapterMetadataService metadataService;
 
     @RequestMapping(method = RequestMethod.POST)
-    @ApiOperation("创建数据元")
+    @ApiOperation("创建适配数据元")
     public MRsAdapterMetadata createMetadata(
             @ApiParam(name="adapterSchema",value="数据元JSON",defaultValue = "")
             @RequestParam(name="adapterSchema") String adapterMetadata) throws Exception
@@ -48,7 +48,7 @@ public class AdapterMetadataController extends BaseRestController {
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    @ApiOperation("更新数据元")
+    @ApiOperation("更新适配数据元")
     public MRsAdapterMetadata updateMetadata(
             @ApiParam(name="adapterSchemaa",value="数据元JSON",defaultValue = "")
             @RequestParam(name="adapterSchemaa") String adapterMetadata) throws Exception
@@ -59,7 +59,7 @@ public class AdapterMetadataController extends BaseRestController {
     }
 
     @RequestMapping(value="/{id}",method = RequestMethod.DELETE)
-    @ApiOperation("删除数据元")
+    @ApiOperation("删除适配数据元")
     public boolean deleteMetadata(
             @ApiParam(name="id",value="数据元ID",defaultValue = "")
             @PathVariable(value="id")String id) throws Exception
@@ -69,7 +69,7 @@ public class AdapterMetadataController extends BaseRestController {
     }
 
     @RequestMapping(method = RequestMethod.DELETE)
-    @ApiOperation("删除数据元")
+    @ApiOperation("删除适配数据元")
     public boolean deleteMetadataBatch(
             @ApiParam(name="id",value="数据元ID",defaultValue = "")
             @RequestParam(name="id") String id) throws Exception
@@ -79,7 +79,7 @@ public class AdapterMetadataController extends BaseRestController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    @ApiOperation("查询数据元")
+    @ApiOperation("查询适配数据元")
     public Page<MRsAdapterMetadata> getMetadata(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(name="fields",required = false)String fields,

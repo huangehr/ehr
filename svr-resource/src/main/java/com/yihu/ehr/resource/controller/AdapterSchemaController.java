@@ -36,7 +36,7 @@ public class AdapterSchemaController extends BaseRestController {
     private IAdapterSchemaService schemaService;
 
     @RequestMapping(method = RequestMethod.POST)
-    @ApiOperation("创建数据元")
+    @ApiOperation("创建适配方案")
     public MRsAdapterSchema createSchema(
             @ApiParam(name="adapterSchema",value="数据元JSON",defaultValue = "")
             @RequestParam(name="adapterSchema") String adapterSchema) throws Exception
@@ -48,7 +48,7 @@ public class AdapterSchemaController extends BaseRestController {
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    @ApiOperation("更新数据元")
+    @ApiOperation("更新适配方案")
     public MRsAdapterSchema updateSchema(
             @ApiParam(name="adapterSchemaa",value="数据元JSON",defaultValue = "")
             @RequestParam(name="adapterSchemaa") String adapterSchemaa) throws Exception
@@ -59,7 +59,7 @@ public class AdapterSchemaController extends BaseRestController {
     }
 
     @RequestMapping(value="/{id}",method = RequestMethod.DELETE)
-    @ApiOperation("删除数据元")
+    @ApiOperation("删除适配方案")
     public boolean deleteSchema(
             @ApiParam(name="id",value="数据元ID",defaultValue = "")
             @PathVariable(value="id")String id) throws Exception
@@ -69,7 +69,7 @@ public class AdapterSchemaController extends BaseRestController {
     }
 
     @RequestMapping(method = RequestMethod.DELETE)
-    @ApiOperation("删除数据元")
+    @ApiOperation("删除适配方案")
     public boolean deleteSchemaBatch(
             @ApiParam(name="id",value="数据元ID",defaultValue = "")
             @RequestParam(name="id") String id) throws Exception
@@ -79,7 +79,7 @@ public class AdapterSchemaController extends BaseRestController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    @ApiOperation("查询数据元")
+    @ApiOperation("查询适配方案")
     public Page<MRsAdapterSchema> getSchema(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(name="fields",required = false)String fields,
