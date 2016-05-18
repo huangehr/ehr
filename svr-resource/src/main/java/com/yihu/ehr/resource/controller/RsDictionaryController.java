@@ -25,9 +25,9 @@ import java.util.List;
  * @author linaz
  * @created 2016.05.17 16:33
  */
-/*@RestController
+@RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/dictionaries")
-@Api(value = "dictionaries", description = "标准字典服务接口")*/
+@Api(value = "dictionaries", description = "标准字典服务接口")
 public class RsDictionaryController extends BaseRestController {
 
     @Autowired
