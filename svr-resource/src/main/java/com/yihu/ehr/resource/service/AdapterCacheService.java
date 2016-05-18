@@ -44,7 +44,7 @@ public class AdapterCacheService implements IAdapterCacheService{
 
         for(RsAdapterMetadata meta : metaIterable)
         {
-            if(StringUtils.isEmpty(meta.getSrcDatasetCode()))
+            if(StringUtils.isEmpty(meta.getSrcDatasetCode().trim()))
             {
                 continue;
             }
