@@ -189,7 +189,7 @@ public class SolrUtil {
         query.addFacetField(groups);
         query.setFacetLimit(1000);//限制每次返回结果数
         query.set(FacetParams.FACET_OFFSET,0);
-        query.setFacetMissing(false);//不统计null的值
+        query.setFacetMissing(true);//不统计null的值
         query.setFacetMinCount(0);// 设置返回的数据中每个分组的数据最小值，比如设置为0，则统计数量最小为0，不然不显示
 
         QueryResponse rsp = conn.query(query);
@@ -222,11 +222,10 @@ public class SolrUtil {
         query.setRows(0);
         query.addFacetPivotField(groupFields);
         query.setFacetLimit(rows);//限制每次返回结果数
-        query.set(FacetParams.FACET_OFFSET,start);
         query.setFacetMissing(false);//不统计null的值
         query.setFacetMinCount(0);// 设置返回的数据中每个分组的数据最小值，比如设置为0，则统计数量最小为0，不然不显示
 
-        QueryResponse rsp = conn.query(query, SolrRequest.METHOD.POST);
+        QueryResponse rsp = conn.query(query);
         qtime = rsp.getQTime();
         System.out.print("Solr Group Time:"+qtime);
 
@@ -278,5 +277,6 @@ public class SolrUtil {
 
         return null;
     }
+
 
 }

@@ -1,15 +1,18 @@
 package com.yihu.ehr.resource.dao;
 
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.query.common.model.DataList;
+import com.yihu.ehr.query.common.model.QueryCondition;
+import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.query.services.DBQuery;
 import com.yihu.ehr.query.services.HbaseQuery;
 import com.yihu.ehr.query.services.SolrQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -31,7 +34,7 @@ public class ResourcesQueryDao {
 
     /**
      * 获取Hbase主表
-     * queryParams可为solr表达式，也可为json例：{"table":"HDSD00_08","q":"*:*","fq":"","fl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}""}
+     * queryParams可为solr表达式，也可为json例：{"q":"*:*","fq":"","fl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}""}
      */
     public DataList getEhrCenter(String queryParams,Integer page,Integer size) throws Exception
     {
@@ -84,6 +87,7 @@ public class ResourcesQueryDao {
 
     /**
      * 获取Hbase细表
+     * queryParams可为solr表达式，也可为json例：{"table":"HDSD00_08","q":"*:*","fq":"","fl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}""}
      */
     public DataList getEhrCenterSub(String queryParams,Integer page,Integer size) throws Exception
     {
@@ -138,46 +142,57 @@ public class ResourcesQueryDao {
 
     /**
      * habse主表的solr分组统计
-     * queryParams为json例：{"q":"*:*","groupFields":"key1,key2","statsFields":"key3,key4"}
+     * queryParams为json例：{"q":"*:*","groupFields":"key1,key2","statsFields":"key3,key4","customGroup":[{"groupField":"lastUpdateTime","groupCondition":{"3Month":"last_update_time:[2016-02-16 TO *]","6Month":"last_update_time:[2015-11-10 TO *]"}}]}
      */
     public DataList countEhrCenter(String queryParams,Integer page,Integer size) throws Exception
     {
         String core = "EHR_CENTER";
         ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, String> params = objectMapper.readValue(queryParams, Map.class);
+        Map<String, Object> params = objectMapper.readValue(queryParams, Map.class);
 
         String q = "";
         String groupFields="";
         String statsFields="";
+        List<SolrGroupEntity> customGroup = new ArrayList<>();
         if(params.containsKey("q"))
         {
-            q = params.get("q");
+            q = params.get("q").toString();
         }
         if(params.containsKey("groupFields"))
         {
-            groupFields = params.get("groupFields");
-        }
-        else{
-            throw new Exception("缺少分组条件！");
+            groupFields = params.get("groupFields").toString();
         }
         if(params.containsKey("statsFields"))
         {
-            statsFields = params.get("statsFields");
+            statsFields = params.get("statsFields").toString();
+        }
+        if(params.containsKey("customGroup"))
+        {
+            ArrayList listGroup = ((ArrayList)params.get("customGroup"));
+            if(listGroup!=null && listGroup.size()>0)
+            {
+                for(int i=0;i<listGroup.size();i++)
+                {
+                    String groupField = ((LinkedHashMap)listGroup.get(i)).get("groupField").toString();
+                    Map<String,String> groupCondition = (Map)((LinkedHashMap)listGroup.get(i)).get("groupCondition");
+
+                    customGroup.add(new SolrGroupEntity(groupField,groupCondition));
+                }
+            }
         }
 
+        if(groupFields.length()==0 &&customGroup.size()==0){
+            throw new Exception("缺少分组条件！");
+        }
         //数值统计
         if(statsFields!=null && statsFields.length()>0)
         {
-            return solr.getStats(core, groupFields, statsFields,q);
+            return solr.getStats(core, groupFields, statsFields,q,customGroup);
         }
         //总数统计
         else{
-            if(groupFields.contains(",")) //多分组
+            if(customGroup.size()==0)
             {
-                String[] groups = groupFields.split(",");
-                return solr.getGroupMult(core,groups,null,q); //自定义分组未完善
-            }
-            else{ //单分组
                 //默认第一页
                 if(page == null)
                 {
@@ -188,7 +203,19 @@ public class ResourcesQueryDao {
                 {
                     size = defaultSize;
                 }
-                return solr.getGroupCount(core,groupFields,q,page,size);
+
+                //多分组
+                if(groupFields.contains(","))
+                {
+                    return solr.getGroupMult(core,groupFields,q,page,size);
+                }
+                else{
+                    return solr.getGroupCount(core, groupFields, q, page, size);
+                }
+            }
+            else
+            {
+                return solr.getGroupMult(core,groupFields,customGroup,q);
             }
         }
 
@@ -196,7 +223,7 @@ public class ResourcesQueryDao {
 
     /**
      * habse细表的solr分组统计
-     * queryParams为json例：{"q":"*:*","groupFields":"key1,key2","statsFields":"key3,key4"}
+     * queryParams为json例：{"table":"HDSD00_08","q":"*:*","groupFields":"key1,key2","statsFields":"key3,key4",customGroup:""}
      */
     public DataList countEhrCenterSub(String queryParams,Integer page,Integer size) throws Exception
     {
@@ -243,7 +270,7 @@ public class ResourcesQueryDao {
             if(groupFields.contains(",")) //多分组
             {
                 String[] groups = groupFields.split(",");
-                return solr.getGroupMult(core,groups,null,q); //自定义分组未完善
+                return solr.getGroupMult(core,groupFields,null,q); //自定义分组未完善
             }
             else{ //单分组
                 //默认第一页
@@ -267,12 +294,20 @@ public class ResourcesQueryDao {
      */
     public DataList getMysqlData(String queryParams,Integer page,Integer size) throws Exception
     {
+        String sql = queryParams;
+
+        //判定是否完整sql语句
+        if(sql.toLowerCase().indexOf(" from ")<=0)
+        {
+            sql = "select * from "+queryParams;
+        }
+
         if(page!=null && size !=null)
         {
-            return query.queryBySql(queryParams,page,size);
+            return query.queryBySql(sql,page,size);
         }
         else{
-            return query.queryBySql(queryParams);
+            return query.queryBySql(sql);
         }
     }
 
