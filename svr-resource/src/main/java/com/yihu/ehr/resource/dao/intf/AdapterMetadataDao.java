@@ -8,4 +8,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  */
 public interface AdapterMetadataDao extends PagingAndSortingRepository<RsAdapterMetadata,String> {
     Iterable<RsAdapterMetadata> findBySchemaId(String schema_id);
+
+    void deleteBySchemaId(String schema_id);
 }
