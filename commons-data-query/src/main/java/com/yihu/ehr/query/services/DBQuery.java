@@ -4,6 +4,7 @@ import com.yihu.ehr.query.common.model.DataList;
 import com.yihu.ehr.query.common.model.QueryEntity;
 import com.yihu.ehr.query.common.sqlparser.*;
 import com.yihu.ehr.query.jdbc.DBHelper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,15 +16,12 @@ import java.util.Map;
  */
 @Service
 public class DBQuery {
+    @Autowired
     private DBHelper db;
     private ParserSql ps;
 
     public DBHelper getDB() throws Exception
     {
-        if(db==null)
-        {
-            db.connect();
-        }
         return db;
     }
 
@@ -81,8 +79,8 @@ public class DBQuery {
      */
     public Map<String,Object> load(QueryEntity qe) throws Exception
     {
-        String sql = ps.getSql(qe);
-        return db.load(sql);
+        String sql = getParserSql().getSql(qe);
+        return getDB().load(sql);
     }
 
     /**
@@ -90,8 +88,8 @@ public class DBQuery {
      */
     public <T> T load(Class<T> cls,QueryEntity qe) throws Exception
     {
-        String sql = ps.getSql(qe);
-        return db.load(cls,sql);
+        String sql = getParserSql().getSql(qe);
+        return getDB().load(cls, sql);
     }
 
     /**
@@ -107,8 +105,8 @@ public class DBQuery {
 
         if(count!=0)
         {
-            String sql = ps.getSql(qe);
-            list.setList(db.query(sql));
+            String sql = getParserSql().getSql(qe);
+            list.setList(getDB().query(sql));
         }
 
         return list;
@@ -119,8 +117,8 @@ public class DBQuery {
      */
     public <T> List<T> query(Class<T> cls,QueryEntity qe) throws Exception
     {
-        String sql = ps.getSql(qe);
-        return db.query(cls, sql);
+        String sql = getParserSql().getSql(qe);
+        return getDB().query(cls, sql);
     }
 
     /**
@@ -129,8 +127,8 @@ public class DBQuery {
      */
     public int count(QueryEntity qe) throws Exception
     {
-        String sqlCount = ps.getCountSql(qe);
-        return Integer.parseInt(String.valueOf(db.scalar(sqlCount)));
+        String sqlCount = getParserSql().getCountSql(qe);
+        return Integer.parseInt(String.valueOf(getDB().scalar(sqlCount)));
     }
 
     /********************** SQL语句 ************************************/
@@ -142,7 +140,7 @@ public class DBQuery {
      */
     public DataList queryBySql(String sql) throws Exception {
         DataList re = new DataList();
-        List<Map<String,Object>> list = db.query(sql);
+        List<Map<String,Object>> list = getDB().query(sql);
         re.setList(list);
         return re;
     }
@@ -157,11 +155,11 @@ public class DBQuery {
      */
     public DataList queryBySql(String sql,int page,int size) throws Exception {
         DataList re = new DataList(page,size);
-        String sqlPage = ps.getPageSql(sql,page,size);
-        String sqlCount = ps.getCountSql(sql);
-        List<Map<String,Object>> list = db.query(sqlPage);
+        String sqlPage = getParserSql().getPageSql(sql, page, size);
+        String sqlCount = getParserSql().getCountSql(sql);
+        List<Map<String,Object>> list = getDB().query(sqlPage);
         re.setList(list);
-        Integer count = (Integer)db.scalar(sqlCount);
+        Integer count = (Integer)getDB().scalar(sqlCount);
         re.setCount(count);
         return re;
     }

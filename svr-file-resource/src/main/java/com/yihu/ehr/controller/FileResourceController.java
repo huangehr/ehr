@@ -49,7 +49,7 @@ public class FileResourceController extends BaseRestController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/files", method = RequestMethod.POST)
+    @RequestMapping(value = "/files_upload", method = RequestMethod.POST)
     @ApiOperation(value = "上传文件", notes = "图片上传")
     public String fileUpload(
             @ApiParam(name = "file_str", value = "文件字符串")
@@ -87,7 +87,7 @@ public class FileResourceController extends BaseRestController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/files", method = RequestMethod.GET)
+    @RequestMapping(value = "/files_download", method = RequestMethod.GET)
     @ApiOperation(value = "下载文件")
     public List<String> filesDownload(
             @ApiParam(name = "object_id", value = "文件字符串")

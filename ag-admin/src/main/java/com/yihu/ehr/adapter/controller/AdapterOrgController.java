@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.thirdpartystandard.AdapterOrgDetailModel;
 import com.yihu.ehr.agModel.thirdpartystandard.AdapterOrgModel;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.systemDict.service.ConventionalDictEntryClient;
+import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.adapter.service.AdapterOrgClient;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.model.adaption.MAdapterOrg;
