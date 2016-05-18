@@ -2,9 +2,9 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
-import com.yihu.ehr.model.resource.MRsMetadata;
-import com.yihu.ehr.resource.model.RsMetadata;
-import com.yihu.ehr.resource.service.intf.IMetadataService;
+import com.yihu.ehr.model.resource.MRsAdapterSchema;
+import com.yihu.ehr.resource.model.RsAdapterSchema;
+import com.yihu.ehr.resource.service.intf.IAdapterSchemaService;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,64 +24,63 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * 数据元服务接口
+ * 适配方案服务
  *
- * Created by lyr on 2016/5/16.
+ * Created by lyr on 2016/5/17.
  */
 @RestController
-@RequestMapping(value= ApiVersion.Version1_0 + "/metadata")
-@Api(value = "metadata", description = "数据元服务接口")
-public class MetadataController  extends BaseRestController{
-
+@RequestMapping(value= ApiVersion.Version1_0 + "/adapterSchema")
+@Api(value = "adapterSchema", description = "适配方案服务")
+public class AdapterSchemaController extends BaseRestController {
     @Autowired
-    private IMetadataService metadataService;
+    private IAdapterSchemaService schemaService;
 
     @RequestMapping(method = RequestMethod.POST)
-    @ApiOperation("创建数据元")
-    public MRsMetadata createMetadata(
-        @ApiParam(name="metadata",value="数据元JSON",defaultValue = "")
-        @RequestParam(name="metadata") String metadata) throws Exception
+    @ApiOperation("创建适配方案")
+    public MRsAdapterSchema createSchema(
+            @ApiParam(name="adapterSchema",value="数据元JSON",defaultValue = "")
+            @RequestParam(name="adapterSchema") String adapterSchema) throws Exception
     {
-        RsMetadata rsMetadata = toEntity(metadata,RsMetadata.class);
-        rsMetadata.setId(getObjectId(BizObject.RsMetadata));
-        rsMetadata = metadataService.saveMetadata(rsMetadata);
-        return convertToModel(rsMetadata,MRsMetadata.class);
+        RsAdapterSchema schema = toEntity(adapterSchema,RsAdapterSchema.class);
+        schema.setId(getObjectId(BizObject.RsAdapterSchema));
+        schema = schemaService.saveAdapterSchema(schema);
+        return convertToModel(schema,MRsAdapterSchema.class);
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    @ApiOperation("更新数据元")
-    public MRsMetadata updateMetadata(
-            @ApiParam(name="metadata",value="数据元JSON",defaultValue = "")
-            @RequestParam(name="metadata") String metadata) throws Exception
+    @ApiOperation("更新适配方案")
+    public MRsAdapterSchema updateSchema(
+            @ApiParam(name="adapterSchemaa",value="数据元JSON",defaultValue = "")
+            @RequestParam(name="adapterSchemaa") String adapterSchemaa) throws Exception
     {
-        RsMetadata rsMetadata = toEntity(metadata,RsMetadata.class);
-        rsMetadata = metadataService.saveMetadata(rsMetadata);
-        return convertToModel(rsMetadata,MRsMetadata.class);
+        RsAdapterSchema schema = toEntity(adapterSchemaa,RsAdapterSchema.class);
+        schema = schemaService.saveAdapterSchema(schema);
+        return convertToModel(schema,MRsAdapterSchema.class);
     }
 
     @RequestMapping(value="/{id}",method = RequestMethod.DELETE)
-    @ApiOperation("删除数据元")
-    public boolean deleteMetadata(
+    @ApiOperation("删除适配方案")
+    public boolean deleteSchema(
             @ApiParam(name="id",value="数据元ID",defaultValue = "")
             @PathVariable(value="id")String id) throws Exception
     {
-        metadataService.deleteMetadata(id);
+        schemaService.deleteAdapterSchema(id);
         return true;
     }
 
     @RequestMapping(method = RequestMethod.DELETE)
-    @ApiOperation("删除数据元")
-    public boolean deleteMetadataBatch(
+    @ApiOperation("删除适配方案")
+    public boolean deleteSchemaBatch(
             @ApiParam(name="id",value="数据元ID",defaultValue = "")
             @RequestParam(name="id") String id) throws Exception
     {
-        metadataService.deleteMetadata(id);
+        schemaService.deleteAdapterSchema(id);
         return true;
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    @ApiOperation("查询数据元")
-    public Page<MRsMetadata> getMetadata(
+    @ApiOperation("查询适配方案")
+    public Page<MRsAdapterSchema> getSchema(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(name="fields",required = false)String fields,
             @ApiParam(name="filters",value="过滤",defaultValue = "")
@@ -97,24 +96,24 @@ public class MetadataController  extends BaseRestController{
     {
         Pageable pageable = new PageRequest(reducePage(page),size);
         long total = 0;
-        Collection<MRsMetadata> metaList;
+        Collection<MRsAdapterSchema> metaList;
 
         //过滤条件为空
         if(StringUtils.isEmpty(filters))
         {
-            Page<RsMetadata> metadataPage = metadataService.getMetadata(sorts,reducePage(page),size);
+            Page<RsAdapterSchema> metadataPage = schemaService.getAdapterSchema(sorts,reducePage(page),size);
             total = metadataPage.getTotalElements();
-            metaList = convertToModels(metadataPage.getContent(),new ArrayList<>(metadataPage.getNumber()),MRsMetadata.class,fields);
+            metaList = convertToModels(metadataPage.getContent(),new ArrayList<>(metadataPage.getNumber()),MRsAdapterSchema.class,fields);
         }
         else
         {
-            List<RsMetadata> metadata = metadataService.search(fields,filters,sorts,page,size);
-            total = metadataService.getCount(filters);
-            metaList = convertToModels(metadata,new ArrayList<>(metadata.size()),MRsMetadata.class,fields);
+            List<RsAdapterSchema> metadata = schemaService.search(fields,filters,sorts,page,size);
+            total = schemaService.getCount(filters);
+            metaList = convertToModels(metadata,new ArrayList<>(metadata.size()),MRsAdapterSchema.class,fields);
         }
 
         pagedResponse(request,response,total,page,size);
-        Page<MRsMetadata> metaPage = new PageImpl<MRsMetadata>((List<MRsMetadata>)metaList,pageable,total);
+        Page<MRsAdapterSchema> metaPage = new PageImpl<MRsAdapterSchema>((List<MRsAdapterSchema>)metaList,pageable,total);
 
         return metaPage;
     }
