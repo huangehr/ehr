@@ -3,7 +3,7 @@ package com.yihu.ehr.resource.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.resource.MRsSystemDictionaryEntry;
 import com.yihu.ehr.resource.model.RsSystemDictionaryEntry;
-import com.yihu.ehr.resource.service.RsSystemDictionaryService;
+import com.yihu.ehr.resource.service.RsSystemDictionaryEntryService;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,7 +26,7 @@ import java.util.List;
 @Api(value = "systemDictionaryEntries", description = "系统字典项服务接口")
 public class RsSystemDictionaryEntryController extends BaseRestController {
     @Autowired
-    private RsSystemDictionaryService rsSystemDictionaryService;
+    private RsSystemDictionaryEntryService systemDictionaryEntryService;
 
     @RequestMapping(value = "/searchRsSystemDictionaryEntries", method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件获取系统字典项列表", notes = "根据查询条件获取系统字典项列表")
@@ -43,8 +43,8 @@ public class RsSystemDictionaryEntryController extends BaseRestController {
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        List<RsSystemDictionaryEntry> systemDictionaryEntries = rsSystemDictionaryService.search(fields, filters, sorts, page, size);
-        pagedResponse(request, response, rsSystemDictionaryService.getCount(filters), page, size);
+        List<RsSystemDictionaryEntry> systemDictionaryEntries = systemDictionaryEntryService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, systemDictionaryEntryService.getCount(filters), page, size);
         return (List<MRsSystemDictionaryEntry>) convertToModels(systemDictionaryEntries, new ArrayList<MRsSystemDictionaryEntry>(systemDictionaryEntries.size()), MRsSystemDictionaryEntry.class, fields);
     }
 
@@ -56,7 +56,7 @@ public class RsSystemDictionaryEntryController extends BaseRestController {
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestBody String jsonData) throws Exception {
         RsSystemDictionaryEntry systemDictionaryEntry = toEntity(jsonData, RsSystemDictionaryEntry.class);
-        rsSystemDictionaryService.save(systemDictionaryEntry);
+        systemDictionaryEntryService.save(systemDictionaryEntry);
         return convertToModel(systemDictionaryEntry, MRsSystemDictionaryEntry.class, null);
 
     }
@@ -67,7 +67,7 @@ public class RsSystemDictionaryEntryController extends BaseRestController {
             @ApiParam(name = "json_data", value = "")
             @RequestBody String jsonData) throws Exception {
         RsSystemDictionaryEntry systemDictionaryEntry = toEntity(jsonData, RsSystemDictionaryEntry.class);
-        rsSystemDictionaryService.save(systemDictionaryEntry);
+        systemDictionaryEntryService.save(systemDictionaryEntry);
         return convertToModel(systemDictionaryEntry, MRsSystemDictionaryEntry.class, null);
     }
 
@@ -76,7 +76,7 @@ public class RsSystemDictionaryEntryController extends BaseRestController {
     public boolean deleteRsSystemDictionaryEntry(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id) throws Exception {
-        rsSystemDictionaryService.delete(id);
+        systemDictionaryEntryService.delete(id);
         return true;
     }
 }
