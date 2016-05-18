@@ -12,10 +12,11 @@ public class ResourceAdaptionKeySchema extends KeySchema {
     @Value("${ehr.redis-key-schema.resource-adaption.table}")
     private String Table = "table";
 
-    @Value("${ehr.redis-key-schema.resource-adaption.code}")
+    @Value("${ehr.redis-key-schema.resource-adaption.resource-meta-data}")
     private String ResourceMetaData = "resource_metadata";
 
     public String metaData(String cdaVersion, String dataSet, String ehrMetaData){
         return makeKey(Table, String.format("%s.%s.%s", cdaVersion, dataSet, ehrMetaData), ResourceMetaData);
     }
+
 }
