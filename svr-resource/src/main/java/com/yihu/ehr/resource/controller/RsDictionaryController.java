@@ -122,8 +122,7 @@ public class RsDictionaryController extends BaseRestController {
     public boolean createRsDictionaries(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestBody String jsonData) throws Exception {
-        JSONArray jsonArray = JSONArray.fromObject(jsonData);
-        List<RsDictionary> list = (List) JSONArray.toCollection(jsonArray, RsDictionary.class);
+        RsDictionary[] list = toEntity(jsonData,RsDictionary[].class);;
         dictionaryService.batchInsertDictionaries(list);
         return true;
     }
