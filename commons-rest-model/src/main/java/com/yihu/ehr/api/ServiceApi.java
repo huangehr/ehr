@@ -17,6 +17,38 @@ public class ServiceApi {
     }
 
     public static class Adaptions{
+        public static final String Cache                          = "/adaptions/{schema_id}/cache";
+        public static final String CacheGet                       = "/adaptions/{key}/cache";
+
+        public static final String Schema                         = "/adaptions/schemas/{schema_id}";
+        public static final String Schemas                         = "/adaptions/schemas";
+
+        public static final String SchemaMetadatas                 ="/adaptions/schema/metadatas";
+        public static final String SchemaMetadata                   ="/adaptions/schema/metadatas/{id}";
+
+    }
+
+    public static class Resources{
+        public static final String Resources                    = "/resources";
+        public static final String Resource                     = "/resources/{id}";
+
+        public static final String ResourceMetadatas           = "/resources/rsmetadatas";
+        public static final String ResourceMetadatasBatch      = "/resources/rsmetadatas/batch";
+        public static final String ResourceMetadata            = "/resources/rsmetadatas/{id}";
+
+        public static final String ResourceGrant                 = "/resources/grants/{id}";
+        public static final String ResourceGrants                = "/resources/grants";
+        public static final String AppsGrantResources             = "/resources/apps/{app_id}/grant";
+        public static final String ResourceGrantApps            = "/resources/{resource_id}/grant";
+
+        public static final String ResourceMetadatasGrants      = "/resources/metadatas/grants";
+        public static final String ResourceMetadatasGrant      = "/resources/metadatas/grants/{id}";
+        public static final String ResourceMetadataGrantApp      = "/resources/appresources/{app_resource_id}/grant/metadatas/{metadata_id}";
+        public static final String ResourceMetadatasGrantApp      = "/resources/metadatas/grant/{app_resource_id}";
+
+        public static final String Metadatas                    ="/resources/metadatas";
+        public static final String MetadatasBatch               ="/resources/metadatas/batch";
+        public static final String Metadata                     ="/resources/metadatas/{id}";
     }
 
     public static class Apps{

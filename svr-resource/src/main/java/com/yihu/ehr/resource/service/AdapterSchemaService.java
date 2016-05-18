@@ -1,6 +1,7 @@
 package com.yihu.ehr.resource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.resource.dao.intf.AdapterMetadataDao;
 import com.yihu.ehr.resource.dao.intf.AdapterSchemaDao;
 import com.yihu.ehr.resource.model.RsAdapterSchema;
 import com.yihu.ehr.resource.service.intf.IAdapterSchemaService;
@@ -24,6 +25,9 @@ public class AdapterSchemaService extends BaseJpaService<RsAdapterSchema,Adapter
     @Autowired
     private AdapterSchemaDao schemaDao;
 
+    @Autowired
+    private AdapterMetadataDao metadataDao;
+
     /**
      * 保存适配方案
      *
@@ -46,6 +50,7 @@ public class AdapterSchemaService extends BaseJpaService<RsAdapterSchema,Adapter
 
         for(String id_ : ids)
         {
+            metadataDao.deleteBySchemaId(id_);
             schemaDao.delete(id_);
         }
     }

@@ -7,7 +7,8 @@ public class MRsResourceMetadata {
     private String id;
     private String resourcesId;
     private String metadataId;
-    private String statsType;
+    private String groupType;
+    private String groupData;
     private String description;
 
     public String getId()
@@ -45,12 +46,21 @@ public class MRsResourceMetadata {
         this.description = description;
     }
 
-    public String getStatsType()
+    public String getGroupType()
     {
-        return  statsType;
+        return  groupType;
     }
-    public void setStatsType(String statsType)
+    public void setGroupType(String groupType)
     {
-        this.statsType = statsType;
+        this.groupType = groupType;
+    }
+
+    public String getGroupData()
+    {
+        return  groupData;
+    }
+    public void setGroupData(String groupData)
+    {
+        this.groupData = groupData;
     }
 }

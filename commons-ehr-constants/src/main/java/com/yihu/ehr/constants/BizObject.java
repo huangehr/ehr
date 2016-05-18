@@ -33,7 +33,12 @@ public enum BizObject {
     FileResource((short)0x0022),
     RsMetadata((short)0x0023),
     RsAdapterSchema((short)0x0024),
-    RsAdapterMetadata((short)0x0025);
+    RsAdapterMetadata((short)0x0025),
+    RsDictionary((short)0x0026),
+    RsDictionaryEntry((short)0x0027),
+    RsSystemDictionary((short)0x0028),
+    RsSystemDictionaryEntry((short)0x0029);
+
 
     public short getBizObject(){
         return bizObject;

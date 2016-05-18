@@ -1,7 +1,9 @@
 package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsSystemDictionaryEntry;
+import com.yihu.ehr.resource.model.RsDictionaryEntry;
 import com.yihu.ehr.resource.model.RsSystemDictionaryEntry;
 import com.yihu.ehr.resource.service.RsSystemDictionaryEntryService;
 import com.yihu.ehr.util.controller.BaseRestController;
@@ -49,13 +51,18 @@ public class RsSystemDictionaryEntryController extends BaseRestController {
     }
 
 
-
     @RequestMapping(value = "/createRsSystemDictionaryEntry", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建系统字典项", notes = "创建系统字典项")
     public MRsSystemDictionaryEntry createRsSystemDictionaryEntry(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestBody String jsonData) throws Exception {
         RsSystemDictionaryEntry systemDictionaryEntry = toEntity(jsonData, RsSystemDictionaryEntry.class);
+        String code = systemDictionaryEntry.getCode();
+        String dictCode = systemDictionaryEntry.getDictCode();
+        if(isExistence(dictCode,code)){
+            throw new Exception("字典项代码不能重复");
+        }
+        systemDictionaryEntry.setId(getObjectId(BizObject.RsSystemDictionaryEntry));
         systemDictionaryEntryService.save(systemDictionaryEntry);
         return convertToModel(systemDictionaryEntry, MRsSystemDictionaryEntry.class, null);
 
@@ -67,6 +74,13 @@ public class RsSystemDictionaryEntryController extends BaseRestController {
             @ApiParam(name = "json_data", value = "")
             @RequestBody String jsonData) throws Exception {
         RsSystemDictionaryEntry systemDictionaryEntry = toEntity(jsonData, RsSystemDictionaryEntry.class);
+        String id = systemDictionaryEntry.getId();
+        RsSystemDictionaryEntry d = systemDictionaryEntryService.findById(id);
+        String code = systemDictionaryEntry.getCode();
+        String dictCode = systemDictionaryEntry.getDictCode();
+        if(code!=d.getCode() && isExistence(dictCode,code)){
+            throw new Exception("字典代码不可修改");
+        }
         systemDictionaryEntryService.save(systemDictionaryEntry);
         return convertToModel(systemDictionaryEntry, MRsSystemDictionaryEntry.class, null);
     }
@@ -78,5 +92,9 @@ public class RsSystemDictionaryEntryController extends BaseRestController {
             @PathVariable(value = "id") String id) throws Exception {
         systemDictionaryEntryService.delete(id);
         return true;
+    }
+
+    public boolean isExistence(String dictCode,String code) {
+        return systemDictionaryEntryService.findByFields(new String[]{"dictCode","code"},new String[]{dictCode,code}) != null;
     }
 }
