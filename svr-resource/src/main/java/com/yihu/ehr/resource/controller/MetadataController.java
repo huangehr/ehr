@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsMetadata;
@@ -29,14 +30,14 @@ import java.util.List;
  * Created by lyr on 2016/5/16.
  */
 @RestController
-@RequestMapping(value= ApiVersion.Version1_0 + "/metadata")
+@RequestMapping(value= ApiVersion.Version1_0)
 @Api(value = "metadata", description = "数据元服务接口")
 public class MetadataController  extends BaseRestController{
 
     @Autowired
     private IMetadataService metadataService;
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.Metadatas,method = RequestMethod.POST)
     @ApiOperation("创建数据元")
     public MRsMetadata createMetadata(
         @ApiParam(name="metadata",value="数据元JSON",defaultValue = "")
@@ -48,7 +49,7 @@ public class MetadataController  extends BaseRestController{
         return convertToModel(rsMetadata,MRsMetadata.class);
     }
 
-    @RequestMapping(method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.Metadatas,method = RequestMethod.PUT)
     @ApiOperation("更新数据元")
     public MRsMetadata updateMetadata(
             @ApiParam(name="metadata",value="数据元JSON",defaultValue = "")
@@ -59,7 +60,7 @@ public class MetadataController  extends BaseRestController{
         return convertToModel(rsMetadata,MRsMetadata.class);
     }
 
-    @RequestMapping(value="/{id}",method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.Metadata,method = RequestMethod.DELETE)
     @ApiOperation("删除数据元")
     public boolean deleteMetadata(
             @ApiParam(name="id",value="数据元ID",defaultValue = "")
@@ -69,7 +70,7 @@ public class MetadataController  extends BaseRestController{
         return true;
     }
 
-    @RequestMapping(method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.Metadatas,method = RequestMethod.DELETE)
     @ApiOperation("删除数据元")
     public boolean deleteMetadataBatch(
             @ApiParam(name="id",value="数据元ID",defaultValue = "")
@@ -79,7 +80,7 @@ public class MetadataController  extends BaseRestController{
         return true;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.Metadatas,method = RequestMethod.GET)
     @ApiOperation("查询数据元")
     public Page<MRsMetadata> getMetadata(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")

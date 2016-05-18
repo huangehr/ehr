@@ -35,20 +35,16 @@ public class AdapterCacheService implements IAdapterCacheService{
      * 缓存适配数据元
      *
      */
-    public void cacheData()
+    public void cacheData(String schema_id)
     {
-        Iterable<RsAdapterSchema>  schemaList = schemaDao.findAll();
+        RsAdapterSchema schema = schemaDao.findOne(schema_id);
+        Iterable<RsAdapterMetadata> metaIterable = metadataDao.findBySchemaId(schema_id);
 
-        for(RsAdapterSchema schema : schemaList)
+        for(RsAdapterMetadata meta : metaIterable)
         {
-            Iterable<RsAdapterMetadata> metaList = metadataDao.findAll();
+            String redisKey = keySchema.metaData(schema.getAdapterVersion(),meta.getSrcDatasetCode(),meta.getSrcMetadataCode());
 
-            for(RsAdapterMetadata meta : metaList)
-            {
-                String redisKey = keySchema.metaData(schema.getAdapterVersion(),meta.getSrcDatasetCode(),meta.getSrcMetadataCode());
-
-                redisClient.set(redisKey,meta.getMetadataId());
-            }
+            redisClient.set(redisKey,meta.getMetadataId());
         }
     }
 

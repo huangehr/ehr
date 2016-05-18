@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsAdapterSchema;
@@ -29,13 +30,13 @@ import java.util.List;
  * Created by lyr on 2016/5/17.
  */
 @RestController
-@RequestMapping(value= ApiVersion.Version1_0 + "/adapterSchema")
+@RequestMapping(value= ApiVersion.Version1_0)
 @Api(value = "adapterSchema", description = "适配方案服务")
 public class AdapterSchemaController extends BaseRestController {
     @Autowired
     private IAdapterSchemaService schemaService;
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Adaptions.Schemas,method = RequestMethod.POST)
     @ApiOperation("创建适配方案")
     public MRsAdapterSchema createSchema(
             @ApiParam(name="adapterSchema",value="数据元JSON",defaultValue = "")
@@ -47,7 +48,7 @@ public class AdapterSchemaController extends BaseRestController {
         return convertToModel(schema,MRsAdapterSchema.class);
     }
 
-    @RequestMapping(method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Adaptions.Schemas,method = RequestMethod.PUT)
     @ApiOperation("更新适配方案")
     public MRsAdapterSchema updateSchema(
             @ApiParam(name="adapterSchemaa",value="数据元JSON",defaultValue = "")
@@ -58,7 +59,7 @@ public class AdapterSchemaController extends BaseRestController {
         return convertToModel(schema,MRsAdapterSchema.class);
     }
 
-    @RequestMapping(value="/{id}",method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Adaptions.Schema,method = RequestMethod.DELETE)
     @ApiOperation("删除适配方案")
     public boolean deleteSchema(
             @ApiParam(name="id",value="数据元ID",defaultValue = "")
@@ -68,7 +69,7 @@ public class AdapterSchemaController extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Adaptions.Schemas,method = RequestMethod.DELETE)
     @ApiOperation("删除适配方案")
     public boolean deleteSchemaBatch(
             @ApiParam(name="id",value="数据元ID",defaultValue = "")
@@ -78,7 +79,7 @@ public class AdapterSchemaController extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Adaptions.Schemas,method = RequestMethod.GET)
     @ApiOperation("查询适配方案")
     public Page<MRsAdapterSchema> getSchema(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")

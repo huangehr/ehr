@@ -12,7 +12,7 @@ public interface IAdapterCacheService {
      * 缓存适配数据元
      *
      */
-    void cacheData();
+    void cacheData(String schema_id);
 
     /**
      * 获取缓存

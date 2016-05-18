@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsResourceMetadata;
@@ -28,14 +29,14 @@ import java.util.List;
  */
 @RestController
 @Api(value="ResourceMetadata",description = "资源数据元")
-@RequestMapping(value= ApiVersion.Version1_0 + "/resourceMetadata")
+@RequestMapping(value= ApiVersion.Version1_0)
 public class ResourceMetadataController extends BaseRestController {
 
     @Autowired
     private IResourceMetadataService rsMetadataService;
 
     @ApiOperation("创建资源数据元")
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas,method = RequestMethod.POST)
     public MRsResourceMetadata createResourceMetadata(
             @ApiParam(name="metadata",value="资源数据元",defaultValue = "")
             @RequestParam(name="metadata")String metadata) throws Exception
@@ -47,7 +48,7 @@ public class ResourceMetadataController extends BaseRestController {
     }
 
     @ApiOperation("更新资源数据元")
-    @RequestMapping(method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas,method = RequestMethod.PUT)
     public MRsResourceMetadata updateResourceMetadata(
             @ApiParam(name="dimension",value="资源数据元",defaultValue="")
             @RequestParam(name="dimension")String metadata) throws Exception
@@ -58,7 +59,7 @@ public class ResourceMetadataController extends BaseRestController {
     }
 
     @ApiOperation("资源数据元删除")
-    @RequestMapping(value="/{id}",method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadata,method = RequestMethod.DELETE)
     public boolean deleteResourceMetadata(
             @ApiParam(name="id",value="资源数据元ID",defaultValue = "")
             @PathVariable(value="id") String id) throws Exception
@@ -68,7 +69,7 @@ public class ResourceMetadataController extends BaseRestController {
     }
 
     @ApiOperation("根据资源ID批量删除资源数据元")
-    @RequestMapping(method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas,method = RequestMethod.DELETE)
     public boolean deleteResourceMetadataPatch(
             @ApiParam(name="resourceId",value="资源ID",defaultValue = "")
             @RequestParam(value="resourceId") String resourceId) throws Exception
@@ -78,7 +79,7 @@ public class ResourceMetadataController extends BaseRestController {
     }
 
     @ApiOperation("资源数据元查询")
-    @RequestMapping(value="",method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas,method = RequestMethod.GET)
     public Page<MRsResourceMetadata> queryDimensions(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(name="fields",required = false)String fields,
