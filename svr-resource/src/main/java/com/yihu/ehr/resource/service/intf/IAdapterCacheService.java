@@ -11,6 +11,7 @@ public interface IAdapterCacheService {
     /**
      * 缓存适配数据元
      *
+     * @param schema_id String 方案ID
      */
     void cacheData(String schema_id);
 
