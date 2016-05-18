@@ -3,6 +3,7 @@ package com.yihu.ehr.query.services;
 import com.yihu.ehr.query.common.model.DataList;
 import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.solr.SolrUtil;
+import org.apache.hadoop.hbase.TableName;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FieldStatsInfo;
 import org.apache.solr.client.solrj.response.PivotField;
@@ -44,10 +45,8 @@ public class SolrQuery {
 	 * 单分组统计Count(分页)
 	 */
 	public DataList getGroupCount(String table,String groupField,String q,int page,int rows) throws Exception {
-		DataList re = new DataList();
+		DataList re = new DataList(page,rows);
 		re.setName(table);
-		re.setPage(page);
-		re.setSize(rows);
 		List<Map<String,Object>> data = new ArrayList<Map<String,Object>>();
 
 		if(rows < 0) rows = 10;
@@ -62,7 +61,7 @@ public class SolrQuery {
 			for (Map.Entry<String, Long> item : list.entrySet()) {
 				Map<String,Object> obj = new HashMap<>();
 				obj.put(groupField, item.getKey());
-				obj.put("count", item.getValue());
+				obj.put("$count", item.getValue());
 				data.add(obj);
 			}
 		}
@@ -72,7 +71,62 @@ public class SolrQuery {
 	}
 
 	/**
-	 * 递归获取分组数据
+	 * 递归转换统计数据
+	 */
+	private List<Map<String, Object>> pivotToMapList(List<PivotField> pivotList,List<Map<String, Object>> data,Map<String, Object> pre)
+	{
+		if(data == null)
+		{
+			data = new ArrayList<>();
+		}
+
+		if(pivotList!=null)
+		{
+			for (PivotField pivot : pivotList) {
+				String field = pivot.getField();
+				String value = pivot.getValue().toString();
+				Map<String, Object> newRow = new HashMap<>();
+				if(pre!=null)
+				{
+					newRow.putAll(pre); //深度复制
+				}
+
+				newRow.put(field,value);
+
+				//递归获取子数据
+				if(pivot.getPivot()!=null && pivot.getPivot().size()>0)
+				{
+					data = pivotToMapList(pivot.getPivot(),data,newRow);
+				}
+				else{
+					int count = pivot.getCount();
+					newRow.put("$count",count);
+					data.add(newRow);
+				}
+			}
+		}
+
+		return data;
+	}
+
+	/**
+	 * 多级分组统计Count(不包含自定义分组)
+	 */
+	public DataList getGroupMult(String table,String groupFields,String q,int page,int rows) throws Exception
+	{
+		DataList re = new DataList(page,rows);
+		re.setName(table);
+
+		List<Map<String, Object>> data = new ArrayList<>();
+		List<PivotField> listPivot = solr.groupCountMult(table,q,groupFields,page,rows);
+		re.setList(pivotToMapList(listPivot,null,null));
+		return re;
+	}
+
+
+
+	/**
+	 * 递归获取分组数据(混合)
 	 * @return
 	 */
 	private List<Map<String,Object>> recGroupCount(String table,List<SolrGroupEntity> grouplist,int num,List<Map<String,Object>> preList,String q) throws Exception
@@ -149,21 +203,61 @@ public class SolrQuery {
 	}
 
 	/**
-	 * 多级分组统计Count
+	 * 纯自定义分组递归
 	 */
-	public DataList getGroupMult(String table,String[] groups) throws Exception
+	private List<Map<String,Object>> recGroupCount(String table,List<SolrGroupEntity> grouplist,int num,List<Map<String,Object>> data,Map<String, Object> pre,String q) throws Exception
 	{
-		return getGroupMult(table,groups,null,"");
+		if(data == null)
+		{
+			data = new ArrayList<>();
+		}
+		String groupField = grouplist.get(num).getGroupField();
+		Map<String,String> list = grouplist.get(num).getGroupCondition();
+
+		for(String key : list.keySet())
+		{
+			String condition = list.get(key);
+			String query = q;
+			if(query!=null&&query.length()>0)
+			{
+				query+=" AND "+condition;
+			}
+			else{
+				query=condition;
+			}
+
+			Map<String, Object> newRow = new HashMap<>();
+			if(pre!=null)
+			{
+				newRow.putAll(pre); //深度复制
+			}
+			newRow.put(groupField,key);
+
+			//最后一级查询
+			if(num == grouplist.size()-1)
+			{
+				long count = solr.count(table,query);
+				newRow.put("$count",count);
+				data.add(newRow);
+			}
+			else{
+				data = recGroupCount(table,grouplist,num+1,data,newRow,query);
+			}
+		}
+
+		return data;
 	}
 
 	/**
 	 * 多级分组统计Count（包含自定义分组）
 	 */
-	public DataList getGroupMult(String table,String[] groups,List<SolrGroupEntity> customGroup,String q) throws Exception{
+	public DataList getGroupMult(String table,String groupFields,List<SolrGroupEntity> customGroup,String q) throws Exception{
 		DataList re = new DataList();
 		re.setName(table);
-		if(groups!=null && groups.length>0)
+
+		if(groupFields!=null && groupFields.length()>0)
 		{
+			String[] groups = groupFields.split(",");
 			List<SolrGroupEntity> grouplist = new ArrayList<SolrGroupEntity>();
 			if(customGroup!=null && customGroup.size() > 0)
 			{
@@ -188,33 +282,17 @@ public class SolrQuery {
 			List<Map<String, Object>> data = recGroupCount(table,grouplist, 0, null,q);
 			re.setList(data);
 		}
-		else
-		{
-			//全部自定义条件
-			System.out.print("All custom condition!");
+		//纯自定义分组
+		else{
+			if(customGroup!=null && customGroup.size() > 0)
+			{
+				re.setList(recGroupCount(table,customGroup,0,null,null,null));
+			}
 		}
-
 		return re;
 	}
 
-	/**
-	 * 多字段分组统计Count
-	 * groupFields 逗号分隔
-	 * @return
-	 */
-	public List<PivotField> getGroupMult(String table,String groupFields,String q,int page,int rows) throws Exception
-	{
-		if(rows < 0) rows = 10;
-		if(rows >100) rows = 100;
-		if(page <0) page = 1;
-		int start= (page-1) * rows;
-		List<PivotField> list = solr.groupCountMult(table,q,groupFields,start,rows);
-
-		return list;
-	}
-
 	/************************* 数值统计 **********************************************/
-
 	/**
 	 * 递归数值统计
 	 */
@@ -360,15 +438,15 @@ public class SolrQuery {
 	/**
 	 * 多级数值统计
 	 */
-	public DataList getStats(String table,String statsFields,String groupFields) throws Exception{
-		return getStats(table,statsFields,groupFields,"",null);
+	public DataList getStats(String table,String groupFields,String statsFields) throws Exception{
+		return getStats(table,groupFields,statsFields,"",null);
 	}
 
 	/**
 	 * 多级数值统计
 	 */
-	public DataList getStats(String table,String statsFields,String groupFields,String q) throws Exception{
-		return getStats(table,statsFields,groupFields,q,null);
+	public DataList getStats(String table,String groupFields,String statsFields,String q) throws Exception{
+		return getStats(table,groupFields,statsFields,q,null);
 	}
 
 	/**
@@ -378,7 +456,7 @@ public class SolrQuery {
 	 * q 查询条件
 	 * customGroup 额外自定义分组
 	 */
-	public DataList getStats(String table,String statsFields,String groupFields,String q,List<SolrGroupEntity> customGroup) throws Exception{
+	public DataList getStats(String table,String groupFields,String statsFields,String q,List<SolrGroupEntity> customGroup) throws Exception{
 		String[] groups =groupFields.split(",");
 		String[] stats = statsFields.split(",");
 

@@ -1,11 +1,11 @@
-package com.yihu.ehr.systemDict.controller;
+package com.yihu.ehr.systemdict.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.dict.SystemDictEntryModel;
 import com.yihu.ehr.agModel.dict.SystemDictModel;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.systemDict.service.SystemDictClient;
+import com.yihu.ehr.systemdict.service.SystemDictClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.dict.MSystemDict;

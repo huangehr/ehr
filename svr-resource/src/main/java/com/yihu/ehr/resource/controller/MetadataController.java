@@ -69,7 +69,7 @@ public class MetadataController  extends BaseRestController{
         return true;
     }
 
-    @RequestMapping(value="/batch",method = RequestMethod.DELETE)
+    @RequestMapping(method = RequestMethod.DELETE)
     @ApiOperation("删除数据元")
     public boolean deleteMetadataBatch(
             @ApiParam(name="id",value="数据元ID",defaultValue = "")

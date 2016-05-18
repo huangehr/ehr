@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -75,100 +76,50 @@ public class ResourcesQueryService implements IResourcesQueryService {
 
             if(metadataList!=null && metadataList.size()>0)
             {
+
                 //执行函数
                 Class<ResourcesQueryDao> classType = ResourcesQueryDao.class;
-                Method method = classType.getMethod(methodName, null);
-                DataList re = (DataList)method.invoke(classType, queryParams, page, size);
+                Method method = classType.getMethod(methodName, new Class[]{String.class,Integer.class,Integer.class});
+                DataList re = (DataList)method.invoke(resourcesQueryDao, queryParams, page, size);
 
-                /**** 转译 *****/
-                List<Map<String,Object>> list = new ArrayList<>();
-                for(DtoResourceMetadata obj : metadataList)
+                if(re.getList()!=null&&re.getList().size()>0)
                 {
-                    /*String code = obj.getColumnCode();
-                    String displayCode = obj.getDisplayCode();
-
-                    metadata += code + ",";
-                    if(displayCode!=null && displayCode.length()>0 && !code.equals(displayCode))
+                    /**** 转译 *****/
+                    List<Map<String,Object>> list = new ArrayList<>();
+                    //遍历所有行
+                    for(int i=0;i<re.getList().size();i++)
                     {
-                        needTranslation = true;
-                    }
-
-                    String statsType = obj.getStatsType();
-                    if(statsType!=null && statsType.equals("0"))
-                    {
-                        groupFields += code + ",";
-                    }
-                    else if(statsType!=null && statsType.equals("1"))
-                    {
-                        statsFields += code + ",";
-                    }*/
-                }
-
-/*
-
-
-                String metadata = ""; //逗号分隔，展示数据元
-                String groupFields = ""; //逗号分隔，分组数据元
-                String statsFields = ""; //逗号分隔，统计数据元
-
-                Boolean needTranslation = false;
-                for(DtoResourceMetadata obj : metadataList)
-                {
-                    String code = obj.getColumnCode();
-                    String displayCode = obj.getDisplayCode();
-
-                    metadata += code + ",";
-                    if(displayCode!=null && displayCode.length()>0 && !code.equals(displayCode))
-                    {
-                        needTranslation = true;
-                    }
-
-                    String statsType = obj.getStatsType();
-                    if(statsType!=null && statsType.equals("0"))
-                    {
-                        groupFields += code + ",";
-                    }
-                    else if(statsType!=null && statsType.equals("1"))
-                    {
-                        statsFields += code + ",";
-                    }
-                }
-                metadata = metadata.substring(0,metadata.length()-1);
-                if(groupFields.length()>0)
-                {
-                    groupFields = groupFields.substring(0,groupFields.length()-1);
-                }
-                if(statsFields.length()>0)
-                {
-                    statsFields = statsFields.substring(0,statsFields.length()-1);
-                }
-
-
-
-
-
-
-                //输出结果转化
-                if(needTranslation)
-                {
-                    List<Map<String,Object>> lits = re.getList();
-                    for(Map<String,Object> row : lits)
-                    {
-                        //遍历字段
-                        for(RsResourceMetadata obj : list)
-                        {
-                            String code = obj.getColumnCode();
-                            String displayCode = obj.getDisplayCode();
-
-                            if(displayCode!=null && displayCode.length()>0 && !code.equals(displayCode) && row.containsKey(code))
+                        Map<String,Object> oldObj = (Map<String,Object>)re.getList().get(i);
+                        Map<String,Object> newObj = new HashMap<>();
+                        //遍历资源数据元
+                        for(DtoResourceMetadata metadada : metadataList) {
+                            String key = metadada.getStdCode();//***先用std标准代码映射
+                            if(metadada.getDictCode()!=null&& metadada.getDictCode().length()>0&&!metadada.getDictCode().equals("0"))
                             {
-                                Object val = row.get(code);
-                                row.remove(code);
-                                row.put(displayCode,val);
+                                key += "_CODE_"+metadada.getColumnType().substring(0,1);
+                            }
+                            else{
+                                key += "_"+metadada.getColumnType().substring(0, 1);
+                            }
+
+                            if(oldObj.containsKey(key))
+                            {
+                                newObj.put(metadada.getCode(),oldObj.get(key));
                             }
                         }
+
+                        //统计字段
+                        for(String key : oldObj.keySet())
+                        {
+                            if (key.startsWith("$")) {
+                                newObj.put(key,oldObj.get(key));
+                            }
+                        }
+                        list.add(newObj);
                     }
-                }*/
+                    re.setList(list);
+                }
+
 
                 return re;
             }

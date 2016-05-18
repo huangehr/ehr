@@ -110,4 +110,20 @@ public class DateTimeUtils {
         Date parsedDate = simpleDateTimeShortFormat.get().parse(date);
         return parsedDate;
     }
+
+
+    /**
+     * 时间戳转date
+     * @param dateTime
+     * @param formatRule
+     * @return
+     * @throws ParseException
+     */
+    public static Date timeStampToDate(String dateTime,String formatRule) throws ParseException {
+        SimpleDateFormat format =  new SimpleDateFormat(formatRule);
+        Long time = new Long(dateTime);
+        String d = format.format(time);
+        Date date= format.parse(d);
+        return date;
+    }
 }
