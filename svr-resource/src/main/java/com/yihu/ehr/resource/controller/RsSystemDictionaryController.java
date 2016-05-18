@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsSystemDictionary;
@@ -25,7 +26,7 @@ import java.util.List;
  * @created 2016.05.17 16:33
  */
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0 + "/systemDictionaries")
+@RequestMapping(value = ApiVersion.Version1_0)
 @Api(value = "systemDictionaries", description = "系统字典服务接口")
 public class RsSystemDictionaryController extends BaseRestController {
 
@@ -35,7 +36,7 @@ public class RsSystemDictionaryController extends BaseRestController {
     @Autowired
     private RsSystemDictionaryEntryService rsSystemDictionaryEntryService;
 
-    @RequestMapping(value = "/searchRsSystemDictionaries", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.SystemDicts, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件获取系统字典列表", notes = "根据查询条件获取系统字典列表")
     public List<MRsSystemDictionary> searchRsSystemDictionaries(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
@@ -57,7 +58,7 @@ public class RsSystemDictionaryController extends BaseRestController {
 
 
 
-    @RequestMapping(value = "/createRsSystemDictionary", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.SystemDicts, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建系统字典", notes = "创建系统字典")
     public MRsSystemDictionary createRsSystemDictionary(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
@@ -73,7 +74,7 @@ public class RsSystemDictionaryController extends BaseRestController {
 
     }
 
-    @RequestMapping(value = "/updateRsSystemDictionary", method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.SystemDicts, method = RequestMethod.PUT)
     @ApiOperation(value = "修改系统字典", notes = "修改系统字典")
     public MRsSystemDictionary updateRsSystemDictionary(
             @ApiParam(name = "json_data", value = "")
@@ -89,7 +90,7 @@ public class RsSystemDictionaryController extends BaseRestController {
         return convertToModel(rsSystemDictionary, MRsSystemDictionary.class, null);
     }
 
-    @RequestMapping(value = "/deleteRsSystemDictionary/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.SystemDict, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除系统字典", notes = "删除系统字典")
     public boolean deleteRsSystemDictionary(
             @ApiParam(name = "id", value = "id", defaultValue = "")

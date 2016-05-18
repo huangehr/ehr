@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsSystemDictionaryEntry;
@@ -12,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,13 +26,13 @@ import java.util.List;
  * @created 2016.05.17 16:33
  */
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0 + "/systemDictionaryEntries")
+@RequestMapping(value = ApiVersion.Version1_0)
 @Api(value = "systemDictionaryEntries", description = "系统字典项服务接口")
 public class RsSystemDictionaryEntryController extends BaseRestController {
     @Autowired
     private RsSystemDictionaryEntryService systemDictionaryEntryService;
 
-    @RequestMapping(value = "/searchRsSystemDictionaryEntries", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.SystemDictEntries, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件获取系统字典项列表", notes = "根据查询条件获取系统字典项列表")
     public List<MRsSystemDictionaryEntry> searchRsSystemDictionaryEntries(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
@@ -51,7 +53,7 @@ public class RsSystemDictionaryEntryController extends BaseRestController {
     }
 
 
-    @RequestMapping(value = "/createRsSystemDictionaryEntry", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.SystemDictEntries, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建系统字典项", notes = "创建系统字典项")
     public MRsSystemDictionaryEntry createRsSystemDictionaryEntry(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
@@ -68,7 +70,7 @@ public class RsSystemDictionaryEntryController extends BaseRestController {
 
     }
 
-    @RequestMapping(value = "/updateRsSystemDictionaryEntry", method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.SystemDictEntries, method = RequestMethod.PUT)
     @ApiOperation(value = "修改系统字典项", notes = "修改系统字典项")
     public MRsSystemDictionaryEntry updateRsSystemDictionaryEntry(
             @ApiParam(name = "json_data", value = "")
@@ -85,7 +87,7 @@ public class RsSystemDictionaryEntryController extends BaseRestController {
         return convertToModel(systemDictionaryEntry, MRsSystemDictionaryEntry.class, null);
     }
 
-    @RequestMapping(value = "/deleteRsSystemDictionaryEntry/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.SystemDictEntry, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除系统字典项", notes = "删除系统字典项")
     public boolean deleteRsSystemDictionaryEntry(
             @ApiParam(name = "id", value = "id", defaultValue = "")
