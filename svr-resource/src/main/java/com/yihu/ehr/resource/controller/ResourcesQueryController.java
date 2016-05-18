@@ -1,4 +1,4 @@
-package com.yihu.ehr.resource.controller;
+﻿package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.query.common.model.DataList;
