@@ -42,4 +42,7 @@ public interface HosLogClient {
     boolean deleteHosLog(
             @PathVariable(value = "id") String id);
 
+    @RequestMapping(value = "/deleteHosLogs", method = RequestMethod.GET)
+    boolean deleteHosLogs(@RequestParam(value = "filters", required = false) String filters);
+
 }

@@ -1,5 +1,5 @@
 server:
-  port: ${svr-app.server.port}
+  port: ${svr-family.server.port}
 
 management:
   port: ${server.port}
