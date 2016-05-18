@@ -13,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 
 /**
  * Created by lyr on 2016/4/25.
@@ -68,5 +70,10 @@ public class ResourcesService extends BaseJpaService<RsResources, ResourcesDao> 
 
         return rsDao.findAll(pageable);
     }
+
+    public List<RsResources> findByCategoryId(String CategoryId){
+        return rsDao.findByCategoryId(CategoryId);
+    }
+
 
 }

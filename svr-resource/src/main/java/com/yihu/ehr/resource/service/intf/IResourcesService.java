@@ -21,4 +21,6 @@ public interface IResourcesService {
     List search(String fields, String filters, String sorts, Integer page, Integer size) throws java.text.ParseException;
 
     Page<RsResources> getResources(String sorts, int page, int size);
+
+    List<RsResources> findByCategoryId(String categoryId);
 }

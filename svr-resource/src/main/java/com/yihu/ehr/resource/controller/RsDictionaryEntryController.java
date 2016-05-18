@@ -1,9 +1,9 @@
 package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsDictionaryEntry;
 import com.yihu.ehr.resource.model.RsDictionaryEntry;
-import com.yihu.ehr.resource.model.RsDictionary;
 import com.yihu.ehr.resource.service.RsDictionaryEntryService;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
@@ -57,6 +57,12 @@ public class RsDictionaryEntryController extends BaseRestController {
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestBody String jsonData) throws Exception {
         RsDictionaryEntry dictionaryEntry = toEntity(jsonData, RsDictionaryEntry.class);
+        String code = dictionaryEntry.getCode();
+        String dictCode = dictionaryEntry.getDictCode();
+        if(isExistence(dictCode,code)){
+            throw new Exception("字典项代码不能重复");
+        }
+        dictionaryEntry.setId(getObjectId(BizObject.RsDictionaryEntry));
         rsDictionaryEntryService.save(dictionaryEntry);
         return convertToModel(dictionaryEntry, MRsDictionaryEntry.class, null);
 
@@ -68,6 +74,13 @@ public class RsDictionaryEntryController extends BaseRestController {
             @ApiParam(name = "json_data", value = "")
             @RequestBody String jsonData) throws Exception {
         RsDictionaryEntry dictionaryEntry = toEntity(jsonData, RsDictionaryEntry.class);
+        String id = dictionaryEntry.getId();
+        RsDictionaryEntry d = rsDictionaryEntryService.findById(id);
+        String code = dictionaryEntry.getCode();
+        String dictCode = dictionaryEntry.getDictCode();
+        if(code!=d.getCode() && isExistence(dictCode,code)){
+            throw new Exception("字典代码不可修改");
+        }
         rsDictionaryEntryService.save(dictionaryEntry);
         return convertToModel(dictionaryEntry, MRsDictionaryEntry.class, null);
     }
@@ -79,5 +92,18 @@ public class RsDictionaryEntryController extends BaseRestController {
             @PathVariable(value = "id") String id) throws Exception {
         rsDictionaryEntryService.delete(id);
         return true;
+    }
+
+    @RequestMapping(value = "/getRsDictionaryById", method = RequestMethod.GET)
+    @ApiOperation(value = "根据id获取获取标准字典")
+    public MRsDictionaryEntry getRsDictionaryEntryById(
+            @ApiParam(name = "id", value = "", defaultValue = "")
+            @RequestParam(value = "id") String id) {
+        RsDictionaryEntry dictionaryEntry = rsDictionaryEntryService.findById(id);
+        return convertToModel(dictionaryEntry, MRsDictionaryEntry.class);
+    }
+
+    public boolean isExistence(String dictCode,String code) {
+        return rsDictionaryEntryService.findByFields(new String[]{"dictCode","code"},new String[]{dictCode,code}) != null;
     }
 }

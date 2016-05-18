@@ -3,7 +3,9 @@ package com.yihu.ehr.resource.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.resource.MRsCategory;
 import com.yihu.ehr.resource.model.RsCategory;
+import com.yihu.ehr.resource.model.RsResources;
 import com.yihu.ehr.resource.service.RsCategoryService;
+import com.yihu.ehr.resource.service.intf.IResourcesService;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,8 +27,12 @@ import java.util.List;
 @RequestMapping(value = ApiVersion.Version1_0 + "/categories")
 @Api(value = "categories", description = "资源类别服务管理接口")
 public class RsCategoryController extends BaseRestController {
+
     @Autowired
     private RsCategoryService rsCategoryService;
+
+    @Autowired
+    private IResourcesService resourcesService;
 
     @RequestMapping(value = "/searchRsCategories", method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件获取资源类别列表", notes = "根据查询条件获取资源类别列表")
@@ -77,7 +83,16 @@ public class RsCategoryController extends BaseRestController {
     public boolean deleteRsCategory(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id) throws Exception {
+        List<RsCategory> categories = rsCategoryService.findByField("pid",id);
+        if(categories!=null && categories.size()!=0){
+            throw new Exception("该字资源类别含子节点，不可删除");
+        }
+        List<RsResources> resources = resourcesService.findByCategoryId(id);
+        if(resources!=null && resources.size()!=0){
+            throw new Exception("该字资源类别含子资源，不可删除");
+        }
         rsCategoryService.delete(id);
         return true;
     }
+
 }

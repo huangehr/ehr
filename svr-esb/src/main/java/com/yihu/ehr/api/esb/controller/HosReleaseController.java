@@ -63,49 +63,18 @@ public class HosReleaseController extends BaseRestController{
     @ApiOperation(value = "创建程序版本发布信息", notes = "创建程序版本发布信息")
     public MHosEsbMiniRelease createHosEsbMiniRelease(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
-            @RequestParam(value = "json_data", required = true) String jsonData,
-            @ApiParam(name = "file", value = "日志文件")
-            @RequestPart(value = "file") MultipartFile file) throws Exception {
-        if (!file.isEmpty()) {
-            HosEsbMiniRelease hosEsbMiniRelease = toEntity(jsonData, HosEsbMiniRelease.class);
-            String fileName = file.getOriginalFilename();
-            String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-            ObjectNode objectNode = fastDFSUtil.upload(file.getInputStream(),fileExtension,"");
-            String groupName = objectNode.get("groupName").toString();
-            String remoteFileName = objectNode.get("remoteFileName").toString();
-            String filePath = groupName.substring(1,groupName.length()-1) + "/" + remoteFileName.substring(1,remoteFileName.length()-1);
-            hosEsbMiniRelease.setFile(filePath);
+            @RequestBody String jsonData) throws Exception {
+             HosEsbMiniRelease hosEsbMiniRelease = toEntity(jsonData, HosEsbMiniRelease.class);
             hosEsbMiniReleaseService.save(hosEsbMiniRelease);
             return convertToModel(hosEsbMiniRelease, MHosEsbMiniRelease.class, null);
-        }else {
-            throw new Exception("日志文件不能为空");
-        }
-
     }
 
     @RequestMapping(value = "/updateHosEsbMiniRelease", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改程序版本发布信息", notes = "修改程序版本发布信息")
     public MHosEsbMiniRelease updateHosEsbMiniRelease(
             @ApiParam(name = "json_data", value = "")
-            @RequestParam(value = "json_data") String jsonData,
-            @ApiParam(name = "file", value = "日志文件")
-            @RequestPart(value = "file") MultipartFile file) throws Exception {
+            @RequestBody String jsonData) throws Exception {
         HosEsbMiniRelease hosEsbMiniRelease = toEntity(jsonData, HosEsbMiniRelease.class);
-        if(!file.isEmpty()){
-            //删除旧文件
-            String filePath = hosEsbMiniRelease.getFile();
-            String groupName = filePath.split("/")[0];
-            String remoteFileName = filePath.substring(groupName.length()+1,filePath.length());
-            fastDFSUtil.delete(groupName,remoteFileName);
-            //新文件
-            String fileName = file.getOriginalFilename();
-            String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-            ObjectNode objectNode = fastDFSUtil.upload(file.getInputStream(),fileExtension,"");
-            String groupNameNew = objectNode.get("groupName").toString();
-            String remoteFileNameNew = objectNode.get("remoteFileName").toString();
-            String filePathNew = groupNameNew.substring(1,groupNameNew.length()-1) + "/" + remoteFileNameNew.substring(1,remoteFileNameNew.length()-1);
-            hosEsbMiniRelease.setFile(filePathNew);
-        }
         hosEsbMiniReleaseService.save(hosEsbMiniRelease);
         return convertToModel(hosEsbMiniRelease, MHosEsbMiniRelease.class, null);
     }
