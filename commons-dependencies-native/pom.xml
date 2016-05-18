@@ -107,6 +107,7 @@
                 <!--<module>../svr-resource</module>-->
                 <module>../svr-cipher</module>
                 <!--<module>../app-ehr-browser</module>-->
+                <module>../svr-file-resource</module>
             </modules>
         </profile>
 
