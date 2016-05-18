@@ -1,15 +1,19 @@
 package com.yihu.ehr.esb.controller;
 
+import com.yihu.ehr.agModel.esb.HosSqlTaskModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.esb.client.HosSqlTaskClient;
 import com.yihu.ehr.model.esb.MHosSqlTask;
+import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,7 +31,7 @@ public class HosSqlTaskController extends BaseController {
 
     @RequestMapping(value = "/searchHosSqlTasks", method = RequestMethod.GET)
     @ApiOperation(value = "根据条件进行his穿透查询", notes = "根据条件进行his穿透查询")
-    public List<MHosSqlTask> searchHosSqlTasks(
+    public Envelop searchHosSqlTasks(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -38,33 +42,76 @@ public class HosSqlTaskController extends BaseController {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) throws Exception {
-        return hosSqlTaskClient.searchHosSqlTasks(fields,filters,sorts,size,page);
+        ResponseEntity<List<MHosSqlTask>> responseEntity = hosSqlTaskClient.searchHosSqlTasks(fields,filters,sorts,size,page);
+        List<MHosSqlTask> hosSqlTasks = responseEntity.getBody();
+
+        List<HosSqlTaskModel> hosAcqTaskModels = new ArrayList<>();
+        for(MHosSqlTask mHosSqlTask : hosSqlTasks) {
+            HosSqlTaskModel hosAcqTaskModel = null;
+            try {
+                hosAcqTaskModel = convertToModelDetail(mHosSqlTask,HosSqlTaskModel.class);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            hosAcqTaskModels.add(hosAcqTaskModel);
+        }
+        Envelop envelop = getResult(hosAcqTaskModels, getTotalCount(responseEntity), page, size);
+        return envelop;
     }
 
 
 
     @RequestMapping(value = "/createHosSqlTask", method = RequestMethod.POST)
     @ApiOperation(value = "创建his穿透信息", notes = "创建his穿透信息")
-    public MHosSqlTask createHosSqlTask(
+    public Envelop createHosSqlTask(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestParam(value = "json_data", required = true) String jsonData) throws Exception {
-        return hosSqlTaskClient.createHosSqlTask(jsonData);
+        Envelop envelop = new Envelop();
+        HosSqlTaskModel hosSqlTaskModel = toEntity(jsonData,HosSqlTaskModel.class);
+        try {
+            MHosSqlTask hosSqlTask = convertToMModel(hosSqlTaskModel,MHosSqlTask.class);
+            hosSqlTaskClient.createHosSqlTask(toJson(hosSqlTask));
+            convertToModelDetail(hosSqlTask,HosSqlTaskModel.class);
+            envelop.setSuccessFlg(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
     }
 
     @RequestMapping(value = "/updateHosSqlTask", method = RequestMethod.PUT)
     @ApiOperation(value = "修改his穿透信息", notes = "修改his穿透信息")
-    public MHosSqlTask updateHosSqlTask(
+    public Envelop updateHosSqlTask(
             @ApiParam(name = "json_data", value = "")
             @RequestParam(value = "json_data") String jsonData) throws Exception {
-        return hosSqlTaskClient.updateHosSqlTask(jsonData);
+        Envelop envelop = new Envelop();
+        HosSqlTaskModel hosSqlTaskModel = toEntity(jsonData,HosSqlTaskModel.class);
+        try {
+            MHosSqlTask hosSqlTask = convertToMModel(hosSqlTaskModel,MHosSqlTask.class);
+            hosSqlTaskClient.updateHosSqlTask(toJson(hosSqlTask));
+            convertToModelDetail(hosSqlTask,HosSqlTaskModel.class);
+            envelop.setSuccessFlg(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
     }
 
 
     @RequestMapping(value = "/deleteHosSqlTask/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除his穿透信息", notes = "删除his穿透信息")
-    public boolean deleteHosSqlTask(
+    public Envelop deleteHosSqlTask(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id) throws Exception {
-        return hosSqlTaskClient.deleteHosSqlTask(id);
-    }
+        Envelop envelop = new Envelop();
+        try {
+            hosSqlTaskClient.deleteHosSqlTask(id);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){e.printStackTrace();
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;    }
 }
