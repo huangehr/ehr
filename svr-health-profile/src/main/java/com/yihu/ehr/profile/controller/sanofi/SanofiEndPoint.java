@@ -7,13 +7,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.lang.SpringContext;
-import com.yihu.ehr.profile.core.DataRecord;
-import com.yihu.ehr.profile.core.StdDataSet;
-import com.yihu.ehr.profile.core.StdProfile;
+import com.yihu.ehr.service.memory.intermediate.MetaDataRecord;
+import com.yihu.ehr.service.memory.intermediate.MemoryProfile;
+import com.yihu.ehr.service.memory.intermediate.StdDataSet;
 import com.yihu.ehr.profile.persist.ProfileIndices;
 import com.yihu.ehr.profile.persist.ProfileIndicesService;
 import com.yihu.ehr.profile.persist.ProfileService;
-import com.yihu.ehr.profile.persist.repo.DataSetRepository;
+import com.yihu.ehr.service.resource.stage2.repo.DataSetRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -29,7 +29,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -77,17 +76,17 @@ public class SanofiEndPoint {
 
         if (profileIndices == null) return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
 
-        List<StdProfile> profiles = new ArrayList<>();
+        List<MemoryProfile> profiles = new ArrayList<>();
         for (ProfileIndices indices : profileIndices.getContent()) {
-            StdProfile stdProfile = profileService.getProfile(indices.getProfileId(), false, false);
-            profiles.add(stdProfile);
+            MemoryProfile memoryProfile = profileService.getProfile(indices.getProfileId(), false, false);
+            profiles.add(memoryProfile);
         }
 
         if (profiles.size() == 0) return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
 
         ObjectMapper objectMapper = SpringContext.getService("objectMapper");
         ArrayNode document = objectMapper.createArrayNode();
-        for (StdProfile profile : profiles) {
+        for (MemoryProfile profile : profiles) {
             ObjectNode section = objectMapper.createObjectNode();
             convert(section, profile);
 
@@ -97,7 +96,7 @@ public class SanofiEndPoint {
         return new ResponseEntity<>(document.toString(), HttpStatus.NOT_FOUND);
     }
 
-    private void convert(ObjectNode document, StdProfile profile) throws IOException {
+    private void convert(ObjectNode document, MemoryProfile profile) throws IOException {
         JsonNode section;
         StdDataSet dataSet;
         String[] innerCodes;
@@ -172,7 +171,7 @@ public class SanofiEndPoint {
         }
     }
 
-    private void mergeData(JsonNode section, StdProfile profile, StdDataSet emptyDataSet, String[] metaDataCodes) throws IOException {
+    private void mergeData(JsonNode section, MemoryProfile profile, StdDataSet emptyDataSet, String[] metaDataCodes) throws IOException {
         StdDataSet dataSet = dataSetRepo.findOne(profile.getCdaVersion(),
                 emptyDataSet.getCode(),
                 profile.getProfileType(),
@@ -183,7 +182,7 @@ public class SanofiEndPoint {
             ArrayNode array = (ArrayNode) section;
             for (String recordKey : dataSet.getRecordKeys()) {
                 ObjectNode arrayNode = array.addObject();
-                DataRecord record = dataSet.getRecord(recordKey);
+                MetaDataRecord record = dataSet.getRecord(recordKey);
                 for (String metaDataCode : metaDataCodes) {
                     String value = record.getMetaData(metaDataCode);
                     arrayNode.put(metaDataCode, StringUtils.isEmpty(value) ? "" : value);
@@ -192,7 +191,7 @@ public class SanofiEndPoint {
         } else if (section.isObject()) {
             ObjectNode objectNode = (ObjectNode) section;
             for (String recordKey : dataSet.getRecordKeys()) {
-                DataRecord record = dataSet.getRecord(recordKey);
+                MetaDataRecord record = dataSet.getRecord(recordKey);
                 for (String metaDataCode : record.getMetaDataCodes()) {
                     objectNode.put(metaDataCode, record.getMetaData(metaDataCode));
                 }

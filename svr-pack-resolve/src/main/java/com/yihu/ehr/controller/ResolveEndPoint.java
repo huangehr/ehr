@@ -8,9 +8,11 @@ import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.feign.XPackageMgrClient;
 import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.profile.core.StdProfile;
-import com.yihu.ehr.profile.persist.ProfileService;
-import com.yihu.ehr.service.PackageResolveEngine;
+import com.yihu.ehr.service.resource.stage1.StdPackModel;
+import com.yihu.ehr.service.resource.stage1.PackageResolveEngine;
+import com.yihu.ehr.service.resource.stage2.PackMill;
+import com.yihu.ehr.service.resource.stage2.ResourceBucket;
+import com.yihu.ehr.service.resource.stage2.ResourceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -30,16 +32,19 @@ import java.io.FileOutputStream;
 
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-@Api(value = "档案包解析", description = "档案包解析服务")
+@Api(value = "档案资源化", description = "档案包资源化服务。在包解析完之后，资源化入库。")
 public class ResolveEndPoint {
     @Autowired
-    ProfileService profileService;
+    ResourceService resourceService;
+
+    @Autowired
+    PackMill packMill;
 
     @Autowired
     FastDFSUtil fastDFSUtil;
 
     @Autowired
-    private PackageResolveEngine resolveEngine;
+    private PackageResolveEngine packResolveEngine;
 
     @Autowired
     XPackageMgrClient packageMgrClient;
@@ -55,21 +60,23 @@ public class ResolveEndPoint {
             @ApiParam(value = "模拟应用ID", defaultValue = "usa911Em")
             @RequestParam("clientId") String clientId,
             @ApiParam(value = "返回档案数据", defaultValue = "true")
-            @RequestParam("echo") boolean echo) throws Exception {
+        @RequestParam("echo") boolean echo) throws Exception {
         MPackage pack = packageMgrClient.getPackage(packageId);
         if (pack == null) throw new ApiException(HttpStatus.NOT_FOUND, "Package not found.");
 
         if(StringUtils.isEmpty(pack.getClientId())) pack.setClientId(clientId);
         String zipFile = downloadTo(pack.getRemotePath());
-        StdProfile profile = resolveEngine.doResolve(pack, zipFile);
-        profileService.saveProfile(profile);
+
+        StdPackModel packModel = packResolveEngine.doResolve(pack, zipFile);
+        ResourceBucket resourceBucket = packMill.grindingPackModel(packModel);
+        resourceService.save(resourceBucket);
 
         packageMgrClient.reportStatus(pack.getId(),
                 ArchiveStatus.Finished,
-                String.format("Rowkey: %s, identity: %s", profile.getId(), profile.getDemographicId()));
+                String.format("Rowkey: %s, identity: %s", packModel.getId(), packModel.getDemographicId()));
 
         if (echo) {
-            return new ResponseEntity<>(profile.toJson(), HttpStatus.OK);
+            return new ResponseEntity<>(packModel.toJson(), HttpStatus.OK);
         }
 
         return null;
@@ -113,21 +120,20 @@ public class ResolveEndPoint {
             pack.setClientId(clientId);
             pack.setArchiveStatus(ArchiveStatus.Received);
 
-            StdProfile profile = resolveEngine.doResolve(pack, zipFile);
-            profile.setClientId(clientId);
+            StdPackModel packModel = packResolveEngine.doResolve(pack, zipFile);
+            packModel.setClientId(clientId);
 
-            if (persist) profileService.saveProfile(profile);
+            ResourceBucket resourceBucket = packMill.grindingPackModel(packModel);
+            if (persist) resourceService.save(resourceBucket);
 
-            return new ResponseEntity<>(profile.toJson(), HttpStatus.OK);
+            return new ResponseEntity<>(packModel.toJson(), HttpStatus.OK);
         } catch (Exception e) {
             throw new ApiException(HttpStatus.NOT_ACCEPTABLE, e.getMessage());
         }
     }
 
-    private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
-
     private String downloadTo(String filePath) throws Exception {
         String[] tokens = filePath.split(":");
-        return fastDFSUtil.download(tokens[0], tokens[1], LocalTempPath);
+        return fastDFSUtil.download(tokens[0], tokens[1], System.getProperty("java.io.tmpdir"));
     }
 }

@@ -2,24 +2,18 @@ package com.yihu.ehr.profile.controller.profile;
 
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.profile.MProfile;
 import com.yihu.ehr.model.profile.MProfileDocument;
-import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.profile.controller.profile.converter.ProfileUtil;
-import com.yihu.ehr.profile.core.StdProfile;
+import com.yihu.ehr.service.memory.intermediate.MemoryProfile;
 import com.yihu.ehr.profile.persist.ProfileService;
-import com.yihu.ehr.profile.service.Template;
 import com.yihu.ehr.util.controller.BaseRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 /**
  * 档案接口。提供就诊数据的原始档案，以CDA文档配置作为数据内容架构。
@@ -59,7 +53,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(value = "是否加载原始数据集", defaultValue = "false")
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws Exception {
 
-        StdProfile profile = profileService.getProfile(profileId, loadStdDataSet, loadOriginDataSet);
+        MemoryProfile profile = profileService.getProfile(profileId, loadStdDataSet, loadOriginDataSet);
         return profileUtil.convertProfile(profile, loadStdDataSet || loadOriginDataSet);
     }
 
@@ -75,7 +69,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(value = "是否加载原始数据集", defaultValue = "false")
             @RequestParam(value = "load_origin_data_set") boolean loadOriginDataSet) throws Exception {
 
-        StdProfile profile = profileService.getProfile(profileId, loadStdDataSet, loadOriginDataSet);
+        MemoryProfile profile = profileService.getProfile(profileId, loadStdDataSet, loadOriginDataSet);
         MProfileDocument profileDocument =  profileUtil.convertDocument(profile, documentId, loadStdDataSet || loadOriginDataSet);
 
         return profileDocument;

@@ -7,9 +7,9 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.feign.PatientClient;
 import com.yihu.ehr.model.patient.MDemographicInfo;
-import com.yihu.ehr.profile.core.DataRecord;
-import com.yihu.ehr.profile.core.StdDataSet;
-import com.yihu.ehr.profile.util.DataSetResolver;
+import com.yihu.ehr.service.memory.intermediate.MetaDataRecord;
+import com.yihu.ehr.service.memory.intermediate.StdDataSet;
+import com.yihu.ehr.service.util.DataSetResolver;
 import com.yihu.ehr.util.DateTimeUtils;
 import com.yihu.ehr.util.IdValidator;
 import io.swagger.annotations.Api;
@@ -55,7 +55,7 @@ public class PatientsEndPoint {
         StdDataSet dataSet = dataSetResolver.parseStructuredJsonDataSet(patientNode, false);
 
         for (String key : dataSet.getRecordKeys()) {
-            DataRecord record = dataSet.getRecord(key);
+            MetaDataRecord record = dataSet.getRecord(key);
 
             if (StringUtils.isEmpty(demographicId)) {
                 throw new ApiException(HttpStatus.NOT_ACCEPTABLE, ErrorCode.MissParameter, "Missing identity card no.");

@@ -2,7 +2,7 @@ package com.yihu.ehr.profile.controller.profile;
 
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.profile.core.slice.*;
+import com.yihu.ehr.profile.core.perspective.*;
 import com.yihu.ehr.util.controller.BaseRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

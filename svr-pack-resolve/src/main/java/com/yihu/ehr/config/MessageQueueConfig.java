@@ -1,7 +1,7 @@
 package com.yihu.ehr.config;
 
 import com.yihu.ehr.constants.Channel;
-import com.yihu.ehr.mq.MessageReceiver;
+import com.yihu.ehr.queue.MessageReceiver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -3,14 +3,10 @@ package com.yihu.ehr.profile.controller.profile.converter;
 import com.yihu.ehr.model.profile.MProfile;
 import com.yihu.ehr.model.profile.MProfileDocument;
 import com.yihu.ehr.model.profile.MOriginFile;
-import com.yihu.ehr.model.standard.MCDADocument;
-import com.yihu.ehr.profile.core.FileProfile;
-import com.yihu.ehr.profile.core.OriginFile;
-import com.yihu.ehr.profile.core.CdaDocument;
-import com.yihu.ehr.profile.core.StdProfile;
-import com.yihu.ehr.profile.service.Template;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.tomcat.jni.File;
+import com.yihu.ehr.service.memory.intermediate.MemoryFileProfile;
+import com.yihu.ehr.service.memory.intermediate.MemoryProfile;
+import com.yihu.ehr.service.memory.intermediate.OriginFile;
+import com.yihu.ehr.service.memory.intermediate.CdaDocument;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -25,11 +21,11 @@ public class FileProfileConverter extends StdProfileConverter {
     @Value("${fast-dfs.public-server}")
     String fastDFSPublicServer;
 
-    protected void convertDocuments(StdProfile profile, MProfile mProfile, boolean containDataSet) {
-        if (profile instanceof FileProfile) {
-            FileProfile fileProfile = (FileProfile) profile;
-            for (String cdaDocumentId : fileProfile.getDocuments().keySet()) {
-                CdaDocument cdaDocument = fileProfile.getDocuments().get(cdaDocumentId);
+    protected void convertDocuments(MemoryProfile profile, MProfile mProfile, boolean containDataSet) {
+        if (profile instanceof MemoryFileProfile) {
+            MemoryFileProfile memoryFileProfile = (MemoryFileProfile) profile;
+            for (String cdaDocumentId : memoryFileProfile.getDocuments().keySet()) {
+                CdaDocument cdaDocument = memoryFileProfile.getDocuments().get(cdaDocumentId);
                 MProfileDocument document = new MProfileDocument();
 
                 document.setId(cdaDocument.getId());
@@ -58,16 +54,16 @@ public class FileProfileConverter extends StdProfileConverter {
         // TODO 若原档案包中包含有数据集，那此处需要将数据集解析到CDA文档中
     }
 
-    public MProfileDocument convertDocument(StdProfile profile, String cdaDocumentId, boolean containDataSet) {
-        FileProfile fileProfile = (FileProfile) profile;
+    public MProfileDocument convertDocument(MemoryProfile profile, String cdaDocumentId, boolean containDataSet) {
+        MemoryFileProfile memoryFileProfile = (MemoryFileProfile) profile;
 
         MProfileDocument profileDocument = new MProfileDocument();
         profileDocument.setId(cdaDocumentId);
         profileDocument.setName("");
         profileDocument.setTemplateId(0);
 
-        for (String rowkey : fileProfile.getDocuments().keySet()){
-            CdaDocument cdaDocument = fileProfile.getDocuments().get(rowkey);
+        for (String rowkey : memoryFileProfile.getDocuments().keySet()){
+            CdaDocument cdaDocument = memoryFileProfile.getDocuments().get(rowkey);
             if (!cdaDocument.getId().equals(cdaDocumentId)) continue;
 
             for (OriginFile originFile : cdaDocument.getOriginFiles()){

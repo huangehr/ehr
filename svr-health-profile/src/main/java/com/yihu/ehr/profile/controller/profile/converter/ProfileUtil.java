@@ -2,9 +2,8 @@ package com.yihu.ehr.profile.controller.profile.converter;
 
 import com.yihu.ehr.model.profile.MProfile;
 import com.yihu.ehr.model.profile.MProfileDocument;
-import com.yihu.ehr.model.standard.MCDADocument;
-import com.yihu.ehr.profile.core.FileProfile;
-import com.yihu.ehr.profile.core.StdProfile;
+import com.yihu.ehr.service.memory.intermediate.MemoryFileProfile;
+import com.yihu.ehr.service.memory.intermediate.MemoryProfile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,20 +19,20 @@ public class ProfileUtil {
     @Autowired
     private FileProfileConverter fileProfileConverter;
 
-    public MProfile convertProfile(StdProfile profile, boolean containDataSet) {
-        if (profile instanceof FileProfile){
+    public MProfile convertProfile(MemoryProfile profile, boolean containDataSet) {
+        if (profile instanceof MemoryFileProfile){
             return fileProfileConverter.convertProfile(profile, containDataSet);
-        } else if (profile instanceof StdProfile){
+        } else if (profile instanceof MemoryProfile){
             return stdProfileConverter.convertProfile(profile, containDataSet);
         }
 
         return null;
     }
 
-    public MProfileDocument convertDocument(StdProfile profile, String documentId, boolean containDataSet){
-        if (profile instanceof FileProfile){
+    public MProfileDocument convertDocument(MemoryProfile profile, String documentId, boolean containDataSet){
+        if (profile instanceof MemoryFileProfile){
             return fileProfileConverter.convertDocument(profile, documentId, containDataSet);
-        } else if (profile instanceof StdProfile){
+        } else if (profile instanceof MemoryProfile){
             return stdProfileConverter.convertDocument(profile, documentId, containDataSet);
         }
 

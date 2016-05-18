@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class OrgKeySchema extends KeySchema {
-    @Value("${redis-key-schema.org.table}")
+    @Value("${ehr.redis-key-schema.org.table}")
     private String Table = "table";
 
-    @Value("${redis-key-schema.org.name}")
+    @Value("${ehr.redis-key-schema.org.name}")
     private String Name = "name";
 
     public String name(String code){
