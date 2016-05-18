@@ -47,14 +47,4 @@ public class ResourceStorageUtil {
 
         return map;
     }
-
-    public static Map<String, String> getSubResCellMap(String profileId, StdDataSet dataSet){
-        Map<String, String> map = new HashMap<>();
-        map.put(SubResourceFamily.BasicColumns.ProfileId.toString(), profileId);
-        map.put(SubResourceFamily.BasicColumns.CdaVersion.toString(), dataSet.getCdaVersion());
-        map.put(SubResourceFamily.BasicColumns.OrgCode.toString(), dataSet.getOrgCode());
-        map.put(SubResourceFamily.BasicColumns.LastUpdateTime.toString(), DateTimeUtils.utcDateTimeFormat(new Date()));
-
-        return map;
-    }
 }

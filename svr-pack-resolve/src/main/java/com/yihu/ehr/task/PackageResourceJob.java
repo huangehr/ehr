@@ -7,8 +7,8 @@ import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.queue.MessageBuffer;
 import com.yihu.ehr.service.resource.stage1.StdPackModel;
-import com.yihu.ehr.profile.persist.ProfileService;
 import com.yihu.ehr.service.resource.stage1.PackageResolveEngine;
+import com.yihu.ehr.service.resource.stage2.PackMill;
 import com.yihu.ehr.util.log.LogService;
 import org.quartz.InterruptableJob;
 import org.quartz.JobExecutionContext;
@@ -24,7 +24,7 @@ import java.util.NoSuchElementException;
  * @version 1.0
  * @created 2016.03.28 11:30
  */
-public class PackageResolveJob implements InterruptableJob {
+public class PackageResourceJob implements InterruptableJob {
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
 
     @Override
@@ -51,16 +51,16 @@ public class PackageResolveJob implements InterruptableJob {
 
             PackageResolveEngine resolveEngine = SpringContext.getService(PackageResolveEngine.class);
             XPackageMgrClient packageMgrClient = SpringContext.getService(XPackageMgrClient.class);
-            ProfileService profileService = SpringContext.getService(ProfileService.class);
+            PackMill packMill = SpringContext.getService(PackMill.class);
 
             String zipFile = downloadTo(pack.getRemotePath());
 
-            StdPackModel profile = resolveEngine.doResolve(pack, zipFile);
-            profileService.saveProfile(profile);
+            StdPackModel stdPackModel = resolveEngine.doResolve(pack, zipFile);
+            packMill.grindingPackModel(stdPackModel);
 
             packageMgrClient.reportStatus(pack.getId(),
                     ArchiveStatus.Finished,
-                    String.format("Rowkey: %s, identity: %s", profile.getId(), profile.getDemographicId()));
+                    String.format("Rowkey: %s, identity: %s", stdPackModel.getId(), stdPackModel.getDemographicId()));
 
             LogService.getLogger().info("Package resolve job done: package " + pack.getId());
 

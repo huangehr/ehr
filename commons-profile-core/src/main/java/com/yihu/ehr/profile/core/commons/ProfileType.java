@@ -10,9 +10,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * @created 2015.12.20 15:37
  */
 public enum ProfileType {
-    Standard(0),
-    File(1),
-    Link(2);
+    Standard(1),
+    File(2),
+    Link(3);
 
     private int type;
     ProfileType(int type){
