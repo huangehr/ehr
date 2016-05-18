@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 /**
  * @author linaz
  * @created 2016.05.17 16:33
@@ -29,7 +27,7 @@ public class RsDictionaryService extends BaseJpaService<RsDictionary, RsDictiona
         return dictionaryDao.findOne(id);
     }
 
-    public void batchInsertDictionaries(List<RsDictionary> dictionaries){
+    public void batchInsertDictionaries(RsDictionary[] dictionaries){
         dictionaryQueryDao.batchInsertDictionaries(dictionaries);
     }
 
