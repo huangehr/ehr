@@ -36,6 +36,14 @@ public interface IMetadataService {
      */
     Page<RsMetadata> getMetadata(String sorts, int page, int size);
 
+    /**
+     * 批量创建数据元
+     *
+     * @param metadataArray RsMetadata[]
+     * @return List<RsMetadata>
+     */
+     List<RsMetadata> saveMetadataBatch(RsMetadata[] metadataArray);
+
     long getCount(String filters) throws java.text.ParseException;
 
     List search(String fields, String filters, String sorts, Integer page, Integer size) throws java.text.ParseException;

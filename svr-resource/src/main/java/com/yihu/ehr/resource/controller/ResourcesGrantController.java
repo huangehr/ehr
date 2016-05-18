@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsAppResource;
@@ -31,7 +32,7 @@ import java.util.List;
  */
 
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0 + "/resource/grants")
+@RequestMapping(value = ApiVersion.Version1_0)
 @Api(value = "resourceGrant", description = "资源授权服务接口")
 public class ResourcesGrantController extends BaseRestController{
     @Autowired
@@ -39,33 +40,40 @@ public class ResourcesGrantController extends BaseRestController{
     @Autowired
     private IResourceMetadataGrantService rsMetadataGrantService;
 
-    @ApiOperation("资源授权单个应用")
-    @RequestMapping(value="/{resourceId}",method = RequestMethod.POST)
-    public MRsAppResource grantResource(
-            @ApiParam(name="resourceId",value="资源ID",defaultValue = "")
-            @PathVariable(value="resourceId") String resourceId,
-            @ApiParam(name="appId",value="资源ID",defaultValue = "")
-            @RequestParam(name="appId") String appId) throws Exception
+    @ApiOperation("单个应用授权多个资源")
+    @RequestMapping(value= ServiceApi.Resources.AppsGrantResources ,method = RequestMethod.POST)
+    public Collection<MRsAppResource> grantAppResource(
+            @ApiParam(name="app_id",value="资源ID",defaultValue = "")
+            @PathVariable(value="app_id") String app_id,
+            @ApiParam(name="resource_id",value="资源ID",defaultValue = "")
+            @RequestParam(value="resource_id") String resource_id) throws Exception
     {
-        RsAppResource appRs = new RsAppResource();
+        String[] resourceIdArray = resource_id.split(",");
+        List<RsAppResource> appRsList = new ArrayList<RsAppResource>();
 
-        appRs.setId(getObjectId(BizObject.AppResource));
-        appRs.setAppId(appId);
-        appRs.setResourceId(resourceId);
+        for(String resoruceId : resourceIdArray)
+        {
+            RsAppResource appRs = new RsAppResource();
 
-        rsGrantService.grantResource(appRs);
-        return convertToModel(appRs, MRsAppResource.class);
+            appRs.setId(getObjectId(BizObject.AppResource));
+            appRs.setAppId(app_id);
+            appRs.setResourceId(resoruceId);
+
+            appRsList.add(appRs);
+        }
+
+        return convertToModels( rsGrantService.grantResourceBatch(appRsList),new ArrayList<>(appRsList.size()),MRsAppResource.class,"");
     }
 
     @ApiOperation("资源授权多个应用")
-    @RequestMapping(value="/{resourceId}/batch",method = RequestMethod.POST)
-    public Collection<MRsAppResource> grantResourceMany(
-            @ApiParam(name="resourceId",value="资源ID",defaultValue = "")
-            @PathVariable(value="resourceId") String resourceId,
-            @ApiParam(name="appId",value="资源ID",defaultValue = "")
-            @RequestParam(name="appId") String appId) throws Exception
+    @RequestMapping(value= ServiceApi.Resources.ResourceGrantApps,method = RequestMethod.POST)
+    public Collection<MRsAppResource> grantResourceApp(
+            @ApiParam(name="resource_id",value="资源ID",defaultValue = "")
+            @PathVariable(value="resource_id") String resource_id,
+            @ApiParam(name="app_id",value="资源ID",defaultValue = "")
+            @RequestParam(name="app_id") String app_id) throws Exception
     {
-        String[] appIdArray = appId.split(",");
+        String[] appIdArray = app_id.split(",");
         List<RsAppResource> appRsList = new ArrayList<RsAppResource>();
 
         for(String _appId : appIdArray)
@@ -74,17 +82,16 @@ public class ResourcesGrantController extends BaseRestController{
 
             appRs.setId(getObjectId(BizObject.AppResource));
             appRs.setAppId(_appId);
-            appRs.setResourceId(resourceId);
+            appRs.setResourceId(resource_id);
 
             appRsList.add(appRs);
         }
 
-        rsGrantService.grantResourceBatch(appRsList);
-        return convertToModels(appRsList,new ArrayList<>(appRsList.size()),MRsAppResource.class,"");
+        return convertToModels(rsGrantService.grantResourceBatch(appRsList),new ArrayList<>(appRsList.size()),MRsAppResource.class,"");
     }
 
     @ApiOperation("资源授权删除")
-    @RequestMapping(value="/{id}",method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.ResourceGrant,method = RequestMethod.DELETE)
     public boolean deleteGrant(
             @ApiParam(name="id",value="授权ID",defaultValue = "")
             @PathVariable(value="id")String id) throws Exception
@@ -94,7 +101,7 @@ public class ResourcesGrantController extends BaseRestController{
     }
 
     @ApiOperation("资源授权批量删除")
-    @RequestMapping(method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.ResourceGrants,method = RequestMethod.DELETE)
     public boolean deleteGrantBatch(
             @ApiParam(name="id",value="授权ID",defaultValue = "")
             @RequestParam(value="id")String id) throws Exception
@@ -105,7 +112,7 @@ public class ResourcesGrantController extends BaseRestController{
     }
 
     @ApiOperation("资源授权查询")
-    @RequestMapping(value="",method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.ResourceGrants,method = RequestMethod.GET)
     public Page<MRsAppResource> queryAppResourceGrant(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(name="fields",required = false)String fields,
@@ -145,31 +152,31 @@ public class ResourcesGrantController extends BaseRestController{
     }
 
     @ApiOperation("资源数据元授权")
-    @RequestMapping(value="/{appResourceId}/metadata/{metadataId}",method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrantApp,method = RequestMethod.POST)
     public MRsAppResourceMetadata grantRsMetaData(
-            @ApiParam(name="appResourceId",value="资源ID",defaultValue = "")
-            @PathVariable(value="appResourceId")String appResourceId,
-            @ApiParam(name="metadataId",value="资源数据元ID",defaultValue = "")
-            @PathVariable(value="metadataId")String metadataId)throws Exception
+            @ApiParam(name="metadata_id",value="资源ID",defaultValue = "")
+            @PathVariable(value="metadata_id")String metadata_id,
+            @ApiParam(name="app_resource_id",value="资源数据元ID",defaultValue = "")
+            @PathVariable(value="app_resource_id")String app_resource_id)throws Exception
     {
         RsAppResourceMetadata appRsMetadata = new RsAppResourceMetadata();
         appRsMetadata.setId(getObjectId(BizObject.AppResourceMetadata));
-        appRsMetadata.setAppResourceId(appResourceId);
-        appRsMetadata.setMetadataId(metadataId);
+        appRsMetadata.setAppResourceId(app_resource_id);
+        appRsMetadata.setMetadataId(metadata_id);
 
         rsMetadataGrantService.grantRsMetadata(appRsMetadata);
         return convertToModel(appRsMetadata, MRsAppResourceMetadata.class);
     }
 
     @ApiOperation("资源数据元批量授权")
-    @RequestMapping(value="/{appResourceId}/metadata/batch",method = RequestMethod.POST)
+    @RequestMapping(value=ServiceApi.Resources.ResourceMetadatasGrantApp,method = RequestMethod.POST)
     public Collection<MRsAppResourceMetadata> grantRsMetaDataBatch(
-            @ApiParam(name="appResourceId",value="资源ID",defaultValue = "")
-            @PathVariable(value="appResourceId")String appResourceId,
-            @ApiParam(name="metadataId",value="资源数据元ID",defaultValue = "")
-            @RequestParam(value="metadataId")String metadataId)throws Exception
+            @ApiParam(name="app_resource_id",value="资源ID",defaultValue = "")
+            @PathVariable(value="app_resource_id")String app_resource_id,
+            @ApiParam(name="metadata_id",value="资源数据元ID",defaultValue = "")
+            @RequestParam(value="metadata_id")String metadata_id)throws Exception
     {
-        String[] metadataIdArray = metadataId.split(metadataId);
+        String[] metadataIdArray = metadata_id.split(",");
         List<RsAppResourceMetadata> appRsMetadataList = new ArrayList<RsAppResourceMetadata>();
 
         for(String _metadataId : metadataIdArray)
@@ -177,7 +184,7 @@ public class ResourcesGrantController extends BaseRestController{
             RsAppResourceMetadata appRsMetadata = new RsAppResourceMetadata();
 
             appRsMetadata.setId(getObjectId(BizObject.AppResourceMetadata));
-            appRsMetadata.setAppResourceId(appResourceId);
+            appRsMetadata.setAppResourceId(app_resource_id);
             appRsMetadata.setMetadataId(_metadataId);
 
             appRsMetadataList.add(appRsMetadata);
@@ -188,7 +195,7 @@ public class ResourcesGrantController extends BaseRestController{
     }
 
     @ApiOperation("资源数据元授权删除")
-    @RequestMapping(value="/metadata/{id}",method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasGrant,method = RequestMethod.DELETE)
     public boolean deleteMetadataGrant(
             @ApiParam(name="id",value="授权ID",defaultValue = "")
             @PathVariable(value="id")String id) throws Exception
@@ -198,7 +205,7 @@ public class ResourcesGrantController extends BaseRestController{
     }
 
     @ApiOperation("资源数据元授权批量删除")
-    @RequestMapping(value="/metadata",method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasGrants,method = RequestMethod.DELETE)
     public boolean deleteMetadataGrantBatch(
             @ApiParam(name="id",value="授权ID",defaultValue = "")
             @RequestParam(value="id")String id) throws Exception
@@ -209,7 +216,7 @@ public class ResourcesGrantController extends BaseRestController{
     }
 
     @ApiOperation("资源数据元授权查询")
-    @RequestMapping(value="/metadata",method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasGrants,method = RequestMethod.GET)
     public Page<MRsAppResourceMetadata> queryAppRsMetadataGrant(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(name="fields",required = false)String fields,
