@@ -10,6 +10,7 @@ import com.yihu.ehr.resource.service.intf.IAdapterMetadataService;
 import com.yihu.ehr.schema.ResourceAdaptionKeySchema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 
@@ -43,6 +44,11 @@ public class AdapterCacheService implements IAdapterCacheService{
 
         for(RsAdapterMetadata meta : metaIterable)
         {
+            if(StringUtils.isEmpty(meta.getSrcDatasetCode()))
+            {
+                continue;
+            }
+
             String redisKey = keySchema.metaData(schema.getAdapterVersion(),meta.getSrcDatasetCode(),meta.getSrcMetadataCode());
 
             redisClient.set(redisKey,meta.getMetadataId());
