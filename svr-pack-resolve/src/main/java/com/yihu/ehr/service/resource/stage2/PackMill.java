@@ -25,7 +25,6 @@ import java.util.Set;
  */
 @Service
 public class PackMill {
-    private Set<String> ignoreMetaData;
 
     @Autowired
     private RedisClient redisClient;
