@@ -26,16 +26,9 @@ public class SubResourceRepository {
     @Autowired
     HBaseDao hbaseDao;
 
-    @Autowired
-    CacheReader cacheReader;
-
-    @Autowired
-    StdKeySchema keySchema;
-
     public void save(ResourceBucket resBucket) throws IOException {
         TableBundle bundle = new TableBundle();
 
-        // 再存数据集
         SubRecords subRecords = resBucket.getSubRecords();
         for (SubRecord record : subRecords.getRecords()){
             bundle.addValues(

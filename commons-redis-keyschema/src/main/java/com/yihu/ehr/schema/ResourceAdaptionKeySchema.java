@@ -1,11 +1,13 @@
 package com.yihu.ehr.schema;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Sand
  * @created 2016.05.17 16:03
  */
+@Service
 public class ResourceAdaptionKeySchema extends KeySchema {
     @Value("${ehr.redis-key-schema.resource-adaption.table}")
     private String Table = "table";

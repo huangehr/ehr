@@ -31,7 +31,7 @@ public class ResourceBucket {
     protected SubRecords subRecords;                    // 子记录
 
     // CDA文档列表，Key为HBase rowkey
-    private Map<String, CdaDocument> documents = new TreeMap<>();
+    private Map<String, CdaDocument> cdaDocuments = new TreeMap<>();
 
     ResourceBucket() {
         masterRecord = new MasterRecord();
@@ -135,10 +135,10 @@ public class ResourceBucket {
     }
 
     public Map<String, CdaDocument> getCdaDocuments() {
-        return documents;
+        return cdaDocuments;
     }
 
     public void setCdaDocuments(Map<String, CdaDocument> cdaDocuments) {
-        this.documents = cdaDocuments;
+        this.cdaDocuments = cdaDocuments;
     }
 }
