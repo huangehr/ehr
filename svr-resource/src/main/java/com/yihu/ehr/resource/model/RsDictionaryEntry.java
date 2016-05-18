@@ -14,7 +14,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "rs_dictionary_entry")
-public class RsDictionartyEntry {
+public class RsDictionaryEntry {
     private String id;
     private String dictCode;
     private String code;

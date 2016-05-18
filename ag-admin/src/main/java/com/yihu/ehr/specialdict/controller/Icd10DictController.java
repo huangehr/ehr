@@ -1,6 +1,6 @@
 package com.yihu.ehr.specialdict.controller;
 
-import com.yihu.ehr.systemDict.service.ConventionalDictEntryClient;
+import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.agModel.specialdict.Icd10DictModel;
 import com.yihu.ehr.agModel.specialdict.Icd10DrugRelationModel;
 import com.yihu.ehr.agModel.specialdict.Icd10IndicatorRelationModel;

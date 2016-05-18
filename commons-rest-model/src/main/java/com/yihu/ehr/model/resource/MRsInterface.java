@@ -3,7 +3,7 @@ package com.yihu.ehr.model.resource;
 /**
  * Created by lyr on 2016/5/16.
  */
-public class MRsInterfacce {
+public class MRsInterface {
     private String id;
     private String name;
     private String resourceInterface;
