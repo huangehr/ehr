@@ -28,6 +28,10 @@ public interface HosAcqTaskClient {
             @RequestParam(value = "size", required = false) int size,
             @RequestParam(value = "page", required = false) int page);
 
+    @RequestMapping(value = "/hosAcqTask/{id}",method = RequestMethod.GET)
+    MHosAcqTask getHosAcqTask(
+            @PathVariable(value = "id") String id);
+
     @RequestMapping(value = "/createHosAcqTask", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     MHosAcqTask createHosAcqTask(
             @RequestBody String jsonData);

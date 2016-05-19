@@ -45,20 +45,37 @@ public class HosSqlTaskController extends BaseController {
         ResponseEntity<List<MHosSqlTask>> responseEntity = hosSqlTaskClient.searchHosSqlTasks(fields,filters,sorts,size,page);
         List<MHosSqlTask> hosSqlTasks = responseEntity.getBody();
 
-        List<HosSqlTaskModel> hosAcqTaskModels = new ArrayList<>();
+        List<HosSqlTaskModel> hosSqlTaskModels = new ArrayList<>();
         for(MHosSqlTask mHosSqlTask : hosSqlTasks) {
-            HosSqlTaskModel hosAcqTaskModel = null;
+            HosSqlTaskModel hosSqlTaskModel = null;
             try {
-                hosAcqTaskModel = convertToModelDetail(mHosSqlTask,HosSqlTaskModel.class);
+                hosSqlTaskModel = convertToModelDetail(mHosSqlTask,HosSqlTaskModel.class);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            hosAcqTaskModels.add(hosAcqTaskModel);
+            hosSqlTaskModels.add(hosSqlTaskModel);
         }
-        Envelop envelop = getResult(hosAcqTaskModels, getTotalCount(responseEntity), page, size);
+        Envelop envelop = getResult(hosSqlTaskModels, getTotalCount(responseEntity), page, size);
         return envelop;
     }
 
+    @RequestMapping(value = "/hosSqlTask/{id}",method = RequestMethod.GET)
+    @ApiOperation(value = "根据id获取his穿透信息",notes = "根据id获取his穿透信息")
+    public Envelop getHosSqlTask(
+            @ApiParam(name = "id",value ="",defaultValue = "")
+            @PathVariable(value = "id") String id) throws  Exception{
+        Envelop envelop = new Envelop();
+        MHosSqlTask mHosSqlTask = hosSqlTaskClient.getHosSqlTask(id);
+        try{
+            HosSqlTaskModel hosSqlTaskModel = convertToModelDetail(mHosSqlTask,HosSqlTaskModel.class);
+            envelop.setObj(hosSqlTaskModel);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
 
 
     @RequestMapping(value = "/createHosSqlTask", method = RequestMethod.POST)

@@ -52,6 +52,14 @@ public class HosAcqTaskController extends BaseRestController{
         return (List<MHosAcqTask>) convertToModels(hosAcqTasks, new ArrayList<MHosAcqTask>(hosAcqTasks.size()), MHosAcqTask.class, fields);
     }
 
+    @RequestMapping(value = "/hosAcqTask/{id}",method = RequestMethod.GET)
+    @ApiOperation(value = "根据id获取补采任务信息",notes = "根据id获取补采任务信息")
+    public MHosAcqTask getHosAcqTask(
+            @ApiParam(name = "id",value ="",defaultValue = "")
+            @PathVariable(value = "id") String id) throws  Exception{
+        HosAcqTask hosAcqTask = hosAcqTaskService.retrieve(id);
+        return convertToModel(hosAcqTask,MHosAcqTask.class);
+    }
 
 
     @RequestMapping(value = "/createHosAcqTask", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -60,7 +68,7 @@ public class HosAcqTaskController extends BaseRestController{
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestBody String jsonData) throws Exception {
         HosAcqTask hosAcqTask = toEntity(jsonData, HosAcqTask.class);
-
+        hosAcqTask.setStatus("0");
         hosAcqTaskService.save(hosAcqTask);
         return convertToModel(hosAcqTask, MHosAcqTask.class, null);
 

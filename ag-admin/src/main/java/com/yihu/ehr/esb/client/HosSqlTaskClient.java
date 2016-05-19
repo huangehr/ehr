@@ -29,6 +29,9 @@ public interface HosSqlTaskClient {
             @RequestParam(value = "page", required = false) int page);
 
 
+    @RequestMapping(value = "/hosSqlTask/{id}",method = RequestMethod.GET)
+    MHosSqlTask getHosSqlTask(
+            @PathVariable(value = "id") String id);
 
     @RequestMapping(value = "/createHosSqlTask", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     MHosSqlTask createHosSqlTask(
