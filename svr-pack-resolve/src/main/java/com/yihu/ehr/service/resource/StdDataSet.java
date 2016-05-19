@@ -24,7 +24,7 @@ public class StdDataSet {
     protected String cdaVersion;
     protected Date eventDate;
     protected Date createDate;
-    protected boolean isMainRecord;
+    protected boolean isMultiRecord = false;
 
     protected Map<String, MetaDataRecord> records = new TreeMap<>();
 
@@ -162,11 +162,11 @@ public class StdDataSet {
         return root;
     }
 
-    public boolean isMainRecord() {
-        return isMainRecord;
+    public boolean isMultiRecord() {
+        return isMultiRecord;
     }
 
-    public void setMainRecord(boolean mainRecord) {
-        isMainRecord = mainRecord;
+    public void setMultiRecord(boolean multiRecord) {
+        isMultiRecord = multiRecord;
     }
 }

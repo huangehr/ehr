@@ -16,18 +16,19 @@ import java.util.Objects;
 @MappedSuperclass
 public class BaseDataSet {
 
-    public long id;
-    long documentId;
-    int catalog;
-    int hashCode;
-    int lang;
-    String reference;
-    int publisher;
-    String stdVersion;
-    String code;
-    String name;
-    String summary;
-    String innerVersionId;
+    private long id;
+    private long documentId;
+    private int catalog;
+    private int hashCode;
+    private int lang;
+    private int publisher;
+    private boolean multiRecord;
+    private String reference;
+    private String stdVersion;
+    private String code;
+    private String name;
+    private String summary;
+    private String innerVersionId;
 
     public BaseDataSet(){
     }
@@ -135,6 +136,15 @@ public class BaseDataSet {
 
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    @Column(name = "multi_record", nullable = false)
+    public boolean isMultiRecord() {
+        return multiRecord;
+    }
+
+    public void setMultiRecord(boolean multiRecord) {
+        this.multiRecord = multiRecord;
     }
 
     @Transient

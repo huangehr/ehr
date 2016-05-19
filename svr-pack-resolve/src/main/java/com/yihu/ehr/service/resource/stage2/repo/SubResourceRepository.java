@@ -1,10 +1,8 @@
 package com.yihu.ehr.service.resource.stage2.repo;
 
-import com.yihu.ehr.cache.CacheReader;
 import com.yihu.ehr.data.hbase.HBaseDao;
 import com.yihu.ehr.data.hbase.TableBundle;
 import com.yihu.ehr.profile.family.SubResourceFamily;
-import com.yihu.ehr.schema.StdKeySchema;
 import com.yihu.ehr.service.resource.stage2.ResourceBucket;
 import com.yihu.ehr.service.resource.stage2.SubRecord;
 import com.yihu.ehr.service.resource.stage2.SubRecords;
