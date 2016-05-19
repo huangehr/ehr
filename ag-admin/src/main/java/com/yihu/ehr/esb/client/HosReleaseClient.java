@@ -1,14 +1,16 @@
 package com.yihu.ehr.esb.client;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.esb.MHosEsbMiniRelease;
+import com.yihu.ehr.model.standard.MStdDict;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
@@ -34,4 +36,16 @@ public interface HosReleaseClient {
     boolean deleteHosEsbMiniRelease(
             @PathVariable(value = "id") String id);
 
+    @RequestMapping(value = "/createHosEsbMiniRelease", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "新增软件包")
+    MHosEsbMiniRelease createHosEsbMiniRelease(
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestBody String model);
+
+
+    @RequestMapping(value = "/updateHosEsbMiniRelease", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "修改软件包")
+    MHosEsbMiniRelease updateHosEsbMiniRelease(
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestBody String model);
 }

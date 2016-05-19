@@ -8,4 +8,5 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  * @created 2016.05.17 16:33
  */
 public interface RsDictionaryDao extends PagingAndSortingRepository<RsDictionary,String> {
+
 }

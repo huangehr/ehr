@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsResources;
@@ -28,14 +29,14 @@ import java.util.List;
  */
 
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0 + "/resources")
+@RequestMapping(value = ApiVersion.Version1_0)
 @Api(value = "resources", description = "资源服务接口")
 public class ResourcesController extends BaseRestController {
     @Autowired
     private IResourcesService rsService;
 
     @ApiOperation("创建资源")
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.Resources,method = RequestMethod.POST)
     public MRsResources createResource(
             @ApiParam(name="resource",value="资源",defaultValue = "")
             @RequestParam(name="resource")String resource) throws Exception
@@ -47,7 +48,7 @@ public class ResourcesController extends BaseRestController {
     }
 
     @ApiOperation("更新资源")
-    @RequestMapping(method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.PUT)
     public MRsResources updateResources(
             @ApiParam(name="resource",value="资源",defaultValue="")
             @RequestParam(name="resource")String resource) throws Exception
@@ -58,7 +59,7 @@ public class ResourcesController extends BaseRestController {
     }
 
     @ApiOperation("资源删除")
-    @RequestMapping(value="/{id}",method = RequestMethod.DELETE)
+    @RequestMapping(value=ServiceApi.Resources.Resource,method = RequestMethod.DELETE)
     public boolean deleteResources(
             @ApiParam(name="id",value="资源ID",defaultValue = "")
             @PathVariable(value="id") String id) throws Exception
@@ -68,7 +69,7 @@ public class ResourcesController extends BaseRestController {
     }
 
     @ApiOperation("资源删除")
-    @RequestMapping(method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.Resources,method = RequestMethod.DELETE)
     public boolean deleteResourcesPatch(
             @ApiParam(name="id",value="资源ID",defaultValue = "")
             @RequestParam(name="id") String id) throws Exception
@@ -78,7 +79,7 @@ public class ResourcesController extends BaseRestController {
     }
 
     @ApiOperation("资源查询")
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.Resources,method = RequestMethod.GET)
     public Page<MRsResources> queryResources(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(name="fields",required = false)String fields,

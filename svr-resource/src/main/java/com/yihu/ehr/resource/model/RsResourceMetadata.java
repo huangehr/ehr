@@ -13,7 +13,8 @@ public class RsResourceMetadata {
     private String id;
     private String resourcesId;
     private String metadataId;
-    private String statsType;
+    private String groupType;
+    private String groupData;
     private String description;
 
     @Id
@@ -58,13 +59,23 @@ public class RsResourceMetadata {
         this.description = description;
     }
 
-    @Column(name="stats_type")
-    public String getStatsType()
+    @Column(name="group_type")
+    public String getGroupType()
     {
-        return  statsType;
+        return  groupType;
     }
-    public void setStatsType(String statsType)
+    public void setGroupType(String groupType)
     {
-        this.statsType = statsType;
+        this.groupType = groupType;
+    }
+
+    @Column(name="group_data")
+    public String getGroupData()
+    {
+        return  groupData;
+    }
+    public void setGroupData(String groupData)
+    {
+        this.groupData = groupData;
     }
 }

@@ -5,6 +5,8 @@
       "summary": "住院",
       "orgName": "宜昌1.0",
       "orgCode": "CS0324001",
+      "dept": "消化内科",
+      "etiology": "胃炎",
       "diagnosisName": "",
       "diagnosisCode": "",
       "documents": [
