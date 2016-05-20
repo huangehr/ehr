@@ -7,18 +7,19 @@ package com.yihu.ehr.model.standard;
  * @created 2016.2.1
  */
 public class MStdDataSet {
-    public long id;
-    long documentId;
-    int catalog;
-    int hashCode;
-    int lang;
-    String reference;
-    int publisher;
-    String stdVersion;
-    String code;
-    String name;
-    String summary;
-    String innerVersionId;
+    private long id;
+    private long documentId;
+    private int catalog;
+    private int hashCode;
+    private int lang;
+    private int publisher;
+    private boolean multiRecord;
+    private String reference;
+    private String stdVersion;
+    private String code;
+    private String name;
+    private String summary;
+    private String innerVersionId;
 
     public long getId() {
         return id;
@@ -114,5 +115,13 @@ public class MStdDataSet {
 
     public void setInnerVersionId(String innerVersionId) {
         this.innerVersionId = innerVersionId;
+    }
+
+    public boolean isMultiRecord() {
+        return multiRecord;
+    }
+
+    public void setMultiRecord(boolean multiRecord) {
+        this.multiRecord = multiRecord;
     }
 }

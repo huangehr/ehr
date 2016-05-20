@@ -25,7 +25,6 @@ import java.util.Set;
  */
 @Service
 public class PackMill {
-    private Set<String> ignoreMetaData;
 
     @Autowired
     private RedisClient redisClient;
@@ -48,7 +47,7 @@ public class PackMill {
             if(DataSetUtil.isOriginDataSet(dataSet.getCode())) continue;
 
             Set<String> keys = dataSet.getRecordKeys();
-            if (dataSet.isMainRecord()){
+            if (dataSet.isMultiRecord()){
                 MasterRecord masterRecord = resourceBucket.getMasterRecord();
 
                 for (String key : keys){
@@ -71,8 +70,6 @@ public class PackMill {
                     SubRecord subRecord = new SubRecord();
                     subRecord.setRowkey(packModel.getId(), dataSet.getCode(), index++);
 
-                    subRecords.addRecord(subRecord);
-
                     MetaDataRecord metaDataRecord = dataSet.getRecord(key);
                     for (String metaDataCode : metaDataRecord.getMetaDataCodes()){
                         String resourceMetaData = ResourceMetaData(packModel.getCdaVersion(), dataSet.getCode(), metaDataCode);
@@ -80,6 +77,8 @@ public class PackMill {
 
                         subRecord.addResource(resourceMetaData, metaDataRecord.getMetaData(metaDataCode));
                     }
+
+                    if(subRecord.getDataGroup().size() > 0) subRecords.addRecord(subRecord);
                 }
             }
         }

@@ -3,8 +3,9 @@ package com.yihu.ehr.standard.cache;
 import com.yihu.ehr.config.StdSessionFactoryBean;
 import com.yihu.ehr.model.standard.MCDAVersion;
 import com.yihu.ehr.redis.RedisClient;
-import com.yihu.ehr.schema.StdKeySchema;
-import com.yihu.ehr.standard.version.service.CDAVersion;
+import com.yihu.ehr.schema.StdDataSetKeySchema;
+import com.yihu.ehr.schema.StdMetaDataKeySchema;
+import com.yihu.ehr.schema.StdVersionKeySchema;
 import com.yihu.ehr.standard.version.service.CDAVersionService;
 import com.yihu.ehr.util.CDAVersionUtil;
 import com.yihu.ehr.util.log.LogService;
@@ -30,7 +31,7 @@ import java.util.Set;
 @Component
 public class StdCache {
 
-    static String DataSetQuery = "SELECT id, code, name FROM data.set.table";
+    static String DataSetQuery = "SELECT id, code, name, multi_record FROM data.set.table";
     static String MetaDataQuery = "SELECT a.code AS data_set_code, b.inner_code, b.type, b.dict_id FROM data.set.table a, " +
             "meta.data.table b WHERE a.id = b.dataset_id";
     static String DictEntryQuery = "SELECT t.dict_id, t.code, t.value FROM dict.entry.table t";
@@ -39,7 +40,13 @@ public class StdCache {
     RedisClient redisClient;
 
     @Autowired
-    StdKeySchema keySchema;
+    StdDataSetKeySchema dataSetKeySchema;
+
+    @Autowired
+    StdVersionKeySchema versionKeySchema;
+
+    @Autowired
+    StdMetaDataKeySchema metaDataKeySchema;
 
     @Autowired
     protected StdSessionFactoryBean localSessionFactoryBean;
@@ -48,7 +55,7 @@ public class StdCache {
     CDAVersionService versionService;
 
     public List<MCDAVersion> versions() {
-        Set<String> keys = redisClient.keys(keySchema.versionName("*"));
+        Set<String> keys = redisClient.keys(versionKeySchema.versionName("*"));
         List<MCDAVersion> versions = new ArrayList<>(keys.size());
 
         for (String key : keys) {
@@ -63,7 +70,7 @@ public class StdCache {
     }
 
     public MCDAVersion version(String version) {
-        String name = redisClient.get(keySchema.versionName(version));
+        String name = redisClient.get(versionKeySchema.versionName(version));
         if (StringUtils.isEmpty(name)) return null;
 
         MCDAVersion mcdaVersion = new MCDAVersion();
@@ -83,7 +90,7 @@ public class StdCache {
 
         Session session = openSession();
         try {
-            String versionKey = keySchema.versionName(version);
+            String versionKey = versionKeySchema.versionName(version);
 
             String dataSetTable = CDAVersionUtil.getDataSetTableName(version);
             String metaDataTable = CDAVersionUtil.getMetaDataTableName(version);
@@ -100,8 +107,8 @@ public class StdCache {
                     String type = (String) record[2];
                     long dictId = (Integer) record[3];
 
-                    String metaDataTypeKey = keySchema.metaDataType(version, dataSetCode, innerCode);
-                    String metaDataDictKey = keySchema.metaDataDict(version, dataSetCode, innerCode);
+                    String metaDataTypeKey = metaDataKeySchema.metaDataType(version, dataSetCode, innerCode);
+                    String metaDataDictKey = metaDataKeySchema.metaDataDict(version, dataSetCode, innerCode);
 
                     if (!force && redisClient.hasKey(metaDataTypeKey)) {
                         LogService.getLogger().warn("Meta data duplicated: " + metaDataTypeKey);
@@ -120,15 +127,19 @@ public class StdCache {
                     String id = record[0].toString();
                     String code = (String)record[1];
                     String name = (String)record[2];
+                    boolean multiRecord = (boolean)record[3];
 
-                    String codeKey = keySchema.dataSetCode(version, id);
+                    String codeKey = dataSetKeySchema.dataSetCode(version, id);
                     redisClient.set(codeKey, code);
 
-                    String nameKey = keySchema.dataSetName(version, id);
+                    String nameKey = dataSetKeySchema.dataSetName(version, id);
                     redisClient.set(nameKey, name);
 
-                    String nameKeyByCode = keySchema.dataSetNameByCode(version, code);
+                    String nameKeyByCode = dataSetKeySchema.dataSetNameByCode(version, code);
                     redisClient.set(nameKeyByCode, name);
+
+                    String multiRecordKey = dataSetKeySchema.dataSetMultiRecord(version, code);
+                    redisClient.set(multiRecordKey, multiRecord);
                 }
             }
 
@@ -141,7 +152,7 @@ public class StdCache {
                     String code = (String) record[1];
                     String value = (String) record[2];
 
-                    String entryValueKey = keySchema.dictEntryValue(version, dictId, code);
+                    String entryValueKey = metaDataKeySchema.dictEntryValue(version, dictId, code);
                     redisClient.set(entryValueKey, value);
                 }
             }
@@ -159,16 +170,16 @@ public class StdCache {
      * @param version
      */
     public void clearStdData(String version) {
-        String versionName = keySchema.versionName(version);
+        String versionName = versionKeySchema.versionName(version);
 
         redisClient.delete(versionName);
-        redisClient.delete(keySchema.metaDataDict(version, "*", "*"));
-        redisClient.delete(keySchema.metaDataType(version, "*", "*"));
-        redisClient.delete(keySchema.dictEntryValue(version, "*", "*"));
+        redisClient.delete(metaDataKeySchema.metaDataDict(version, "*", "*"));
+        redisClient.delete(metaDataKeySchema.metaDataType(version, "*", "*"));
+        redisClient.delete(metaDataKeySchema.dictEntryValue(version, "*", "*"));
     }
 
     public boolean isCached(String version) {
-        return redisClient.hasKey(keySchema.versionName(version));
+        return redisClient.hasKey(versionKeySchema.versionName(version));
     }
 
     private Session openSession() {

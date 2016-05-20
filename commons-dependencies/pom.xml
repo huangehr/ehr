@@ -285,5 +285,6 @@
         <module>../commons-rest-model</module>
         <module>../commons-admin-gateway-model</module>
         <module>../commons-redis-mq</module>
+        <module>../commons-data-query</module>
     </modules>
 </project>
