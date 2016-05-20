@@ -71,7 +71,7 @@ public class ResourceMetadataGrantService  extends BaseJpaService<RsResourceMeta
      * @param sorts String 排序
      * @param page int 页码
      * @param size size 分页大小
-     * @return Page<RsResources> 资源
+     * @return Page<RsResource> 资源
      */
     public Page<RsAppResourceMetadata> getAppRsMetadataGrant(String sorts, int page, int size)
     {

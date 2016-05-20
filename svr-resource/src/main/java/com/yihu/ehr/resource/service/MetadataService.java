@@ -4,7 +4,6 @@ import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.intf.ResourceMetadataDao;
 import com.yihu.ehr.resource.dao.intf.RsMetadataDao;
 import com.yihu.ehr.resource.model.RsMetadata;
-import com.yihu.ehr.resource.model.RsResources;
 import com.yihu.ehr.resource.service.intf.IMetadataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -79,7 +78,7 @@ public class MetadataService extends BaseJpaService<RsMetadata,ResourceMetadataD
      * @param sorts 排序
      * @param page 页码
      * @param size 分页大小
-     * @return Page<RsResources> 资源
+     * @return Page<RsResource> 资源
      */
     public Page<RsMetadata> getMetadata(String sorts, int page, int size)
     {
