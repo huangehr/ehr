@@ -157,16 +157,16 @@ public class URLQueryParser<T> {
 
             String filter = filterArray[i];
             //查看是否是时间格式 yyyy-MM-dd hh:mm:ss
-            Pattern p = Pattern.compile("[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}");
-            String[] filters = filter.split("[?]|<>|>=|>|<=|<|=");
-            Matcher m = p.matcher(filters[1]);
             String[] tokens;
-            if (m.matches()) {
-                tokens = new String[]{filter};
-            }else {
-                tokens = filter.split(" ");
-            }
-
+//            Pattern p = Pattern.compile("[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}");
+//            String[] filters = filter.split("[?]|<>|>=|>|<=|<|=");
+//            Matcher m = p.matcher(filters[1]);
+//            if (m.matches()) {
+//                tokens = new String[]{filter};
+//            }else {
+//                tokens = filter.split(" ");
+//            }
+            tokens = filter.split(" ");
             if (tokens.length > 2) throw new IllegalArgumentException("无效过滤参数");
 
             String group = null;
@@ -202,7 +202,7 @@ public class URLQueryParser<T> {
             Pair<Path, String> pair = getPair(filter, ">=", root);
             String value = pair.getValue();
             if(pair.getKey().getJavaType() == Date.class){
-                Date date = DateTimeUtils.simpleDateParse(pair.getValue());
+                Date date = DateTimeUtils.utcDateTimeParse(pair.getValue());
                 predicate = cb.greaterThanOrEqualTo(pair.getKey(), date);
             }else {
                 predicate = cb.greaterThanOrEqualTo(pair.getKey(),value);
@@ -211,7 +211,7 @@ public class URLQueryParser<T> {
             Pair<Path, String> pair = getPair(filter, ">", root);
             String value = pair.getValue();
             if(pair.getKey().getJavaType() == Date.class){
-                Date date = DateTimeUtils.simpleDateParse(pair.getValue());
+                Date date = DateTimeUtils.utcDateTimeParse(pair.getValue());
                 predicate = cb.greaterThan(pair.getKey(), date);
             }else {
                 predicate = cb.greaterThan(pair.getKey(),value);
@@ -220,7 +220,7 @@ public class URLQueryParser<T> {
             Pair<Path, String> pair = getPair(filter, "<=", root);
             String value = pair.getValue();
             if(pair.getKey().getJavaType() == Date.class){
-                Date date = DateTimeUtils.simpleDateParse(pair.getValue());
+                Date date = DateTimeUtils.utcDateTimeParse(pair.getValue());
                 predicate = cb.lessThanOrEqualTo(pair.getKey(), date);
             }else {
                 predicate = cb.lessThanOrEqualTo(pair.getKey(),value);
@@ -229,7 +229,7 @@ public class URLQueryParser<T> {
             Pair<Path, String> pair = getPair(filter, "<", root);
             String value = pair.getValue();
             if(pair.getKey().getJavaType() == Date.class){
-                Date date = DateTimeUtils.simpleDateParse(pair.getValue());
+                Date date = DateTimeUtils.utcDateTimeParse(pair.getValue());
                 predicate = cb.lessThan(pair.getKey(), date);
             }else {
                 predicate = cb.lessThan(pair.getKey(),value);
@@ -243,7 +243,7 @@ public class URLQueryParser<T> {
                 } else if (pair.getKey().getJavaType().equals(Boolean.TYPE)) {
                     values.add(BooleanUtils.toBoolean(value));
                 } else if(pair.getKey().getJavaType() == Date.class){
-                    Date date = DateTimeUtils.simpleDateParse(pair.getValue());
+                    Date date = DateTimeUtils.utcDateTimeParse(pair.getValue());
                     values.add(date);
                 }else {
                     values.add(value);

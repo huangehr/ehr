@@ -1,8 +1,8 @@
 package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.resource.model.RsResourceMetadata;
-import com.yihu.ehr.resource.service.ResourceMetadataService;
+import com.yihu.ehr.resource.model.RsMetadata;
+import com.yihu.ehr.resource.service.MetadataService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -33,7 +33,7 @@ public class ResourceSolrSchemaEndPoint {
     private String HealthProfileSubCore = "HealthProfileSub";
 
     @Autowired
-    ResourceMetadataService resMetaDataService;
+    MetadataService metaDataService;
 
     @Autowired
     SolrClient solrClient;
@@ -43,7 +43,7 @@ public class ResourceSolrSchemaEndPoint {
     public void updateSolrSchema(@ApiParam("adaption_id")
                                  @PathVariable("adaption_id") int resourceAdaption) throws IOException, SolrServerException {
 
-        Page<RsResourceMetadata> metaDatas = resMetaDataService.getResourceMetadata("+id", 0, 100000);
+        Page<RsMetadata> metaDatas = metaDataService.getMetadata("+id", 0, 100000);
 
         SchemaRequest.Fields fieldsRequest = new SchemaRequest.Fields(null);
         SchemaResponse.FieldsResponse fieldsResponse = fieldsRequest.process(solrClient);

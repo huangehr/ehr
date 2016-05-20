@@ -1,5 +1,6 @@
 package com.yihu.ehr.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.family.MMembers;
@@ -35,7 +36,7 @@ public class MembersController extends BaseRestController {
     @Autowired
     private MembersService membersService;
 
-    @RequestMapping(value = "/members", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Families.FamiliesMembers, method = RequestMethod.GET)
     @ApiOperation(value = "获取家庭成员列表")
     public Collection<MMembers> searchMembers(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -65,7 +66,7 @@ public class MembersController extends BaseRestController {
         }
     }
 
-    @RequestMapping(value = "/families/{families_id}/members", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Families.FamilyMembers, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建家庭成员")
     public MMembers createMember(
             @ApiParam(name = "families_id", value = "家庭关系ID", defaultValue = "")
@@ -80,7 +81,7 @@ public class MembersController extends BaseRestController {
         return convertToModel(mb,MMembers.class);
     }
 
-    @RequestMapping(value = "/families/{families_id}/members", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Families.FamilyMembers, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改家庭成员")
     public MMembers updateMember(
             @ApiParam(name = "families_id", value = "家庭关系ID", defaultValue = "")
@@ -94,7 +95,7 @@ public class MembersController extends BaseRestController {
         return convertToModel(mb,MMembers.class);
     }
 
-    @RequestMapping(value = "/families/{families_id}/members/{id_card_no}", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Families.FamilyMember, method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取家庭成员")
     public MMembers getMember(
             @ApiParam(name = "families_id", value = "家庭关系ID", defaultValue = "")
@@ -106,7 +107,7 @@ public class MembersController extends BaseRestController {
         return convertToModel(mb,MMembers.class);
     }
 
-    @RequestMapping(value = "/families/{families_id}/members/{id_card_no}", method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Families.FamilyMember, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除家庭成员")
     public boolean deleteMember(
             @ApiParam(name = "families_id", value = "家庭关系ID", defaultValue = "")
@@ -117,6 +118,5 @@ public class MembersController extends BaseRestController {
         membersService.deleteMembers(familiesId,id_card_no);
         return true;
     }
-
 
 }

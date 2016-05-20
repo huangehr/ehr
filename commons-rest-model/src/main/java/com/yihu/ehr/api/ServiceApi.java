@@ -70,6 +70,20 @@ public class ServiceApi {
         public static final String Category                        ="/resources/categories/{id}";
     }
 
+    public static class Families{
+        public static final String Families                        ="/families";
+        public static final String Family                          ="/families/{id}";
+
+        public static final String FamiliesMembers                ="/families/members";
+        public static final String FamilyMembers                 ="/families/{family_id}/members";
+        public static final String FamilyMember                ="/families/{family_id}/members/{id_card_no}";
+    }
+
+    public static class Cipher{
+        public static final String Encryption                   ="/cipher/encryption/{type}";
+        public static final String Decryption                   ="/cipher/decryption/{type}";
+    }
+
     public static class Apps{
         public static final String Apps                            = "/apps";
         public static final String App                             = "/apps/{app_id}";
