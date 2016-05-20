@@ -1,14 +1,18 @@
 package com.yihu.ehr.esb.controller;
 
+import com.yihu.ehr.agModel.standard.dict.DictModel;
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.esb.client.HosReleaseClient;
 import com.yihu.ehr.model.esb.MHosEsbMiniRelease;
 import com.yihu.ehr.model.esb.MHosLog;
+import com.yihu.ehr.model.standard.MStdDict;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -65,5 +69,57 @@ public class HosReleaseController extends BaseController {
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id) throws Exception {
         return hosReleaseClient.deleteHosEsbMiniRelease(id);
+    }
+
+    @RequestMapping(value = "/saveReleaseInfo", method = RequestMethod.POST)
+    public Envelop saveDict(
+            @ApiParam(name = "json_data", value = "软件版本信息")
+            @RequestParam(value = "json_data") String jsonData) {
+
+        try {
+            MHosEsbMiniRelease mHosEsbMiniRelease = objectMapper.readValue(jsonData, MHosEsbMiniRelease.class);
+            String errorMsg = "";
+            if (StringUtils.isEmpty(mHosEsbMiniRelease.getSystemCode())) {
+                errorMsg += "系统代码为空!";
+            }
+            if (StringUtils.isEmpty(mHosEsbMiniRelease.getFile())) {
+                errorMsg += "文件路径不能为空!";
+            }
+            if (StringUtils.isEmpty(mHosEsbMiniRelease.getVersionName())) {
+                errorMsg += "版本名称不能为空！";
+            }
+            if (StringUtils.isEmpty(""+mHosEsbMiniRelease.getVersionCode())) {
+                errorMsg += "版本编号不能为空！";
+            }
+            if (StringUtils.isNotEmpty(errorMsg)) {
+                return failed(errorMsg);
+            }
+
+            //系统代码唯一性校验
+
+
+            if (mHosEsbMiniRelease.getId()==null) {
+                ResponseEntity<List<MHosEsbMiniRelease>> responseEntity = hosReleaseClient.searchHosEsbMiniReleases("","systemCode="+mHosEsbMiniRelease.getSystemCode(),"",1,1);
+                List<MHosEsbMiniRelease> mHosEsbMiniReleases = responseEntity.getBody();
+                if(mHosEsbMiniReleases.size()>0){
+                    return failed("系统编码已经存在请修改！");
+                }
+                mHosEsbMiniRelease = hosReleaseClient.createHosEsbMiniRelease(objectMapper.writeValueAsString(mHosEsbMiniRelease));
+            } else {
+                ResponseEntity<List<MHosEsbMiniRelease>> responseEntity = hosReleaseClient.searchHosEsbMiniReleases("","systemCode="+mHosEsbMiniRelease.getSystemCode()+";id<>"+mHosEsbMiniRelease.getId(),"",1,1);
+                List<MHosEsbMiniRelease> mHosEsbMiniReleases = responseEntity.getBody();
+                if(mHosEsbMiniReleases.size()>0){
+                    return failed("系统编码已经存在请修改！");
+                }
+                mHosEsbMiniRelease = hosReleaseClient.updateHosEsbMiniRelease(objectMapper.writeValueAsString(mHosEsbMiniRelease));
+            }
+             MHosEsbMiniRelease hosEsbMiniRelease = convertToModel(mHosEsbMiniRelease, MHosEsbMiniRelease.class);
+            if (hosEsbMiniRelease == null) {
+                return failed("保存失败!");
+            }
+            return success(hosEsbMiniRelease);
+        } catch (Exception ex) {
+            return failedSystem();
+        }
     }
 }

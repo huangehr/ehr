@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.resource.MRsInterface;
 import com.yihu.ehr.resource.model.RsInterface;
@@ -22,13 +23,13 @@ import java.util.List;
  * @created 2016.05.17 16:33
  */
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0 + "/interfaces")
+@RequestMapping(value = ApiVersion.Version1_0)
 @Api(value = "interfaces", description = "资源服务接口")
 public class RsInterfaceController extends BaseRestController {
     @Autowired
     private RsInterfaceService interfaceService;
 
-    @RequestMapping(value = "/searchRsInterfaces", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.Interfaces, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件获取资源列表", notes = "根据查询条件获取资源列表")
     public List<MRsInterface> searchRsInterfaces(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
@@ -51,7 +52,7 @@ public class RsInterfaceController extends BaseRestController {
 
 
 
-    @RequestMapping(value = "/createRsInterface", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.Interfaces, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建资源", notes = "创建资源")
     public MRsInterface createRsInterface(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
@@ -62,7 +63,7 @@ public class RsInterfaceController extends BaseRestController {
 
     }
 
-    @RequestMapping(value = "/updateRsInterface", method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.Interfaces, method = RequestMethod.PUT)
     @ApiOperation(value = "修改资源", notes = "修改资源")
     public MRsInterface updateRsInterface(
             @ApiParam(name = "json_data", value = "")
@@ -72,7 +73,7 @@ public class RsInterfaceController extends BaseRestController {
         return convertToModel(rsInterface, MRsInterface.class, null);
     }
 
-    @RequestMapping(value = "/deleteRsInterface{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.Interface, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除资源", notes = "删除资源")
     public boolean deleteRsInterface(
             @ApiParam(name = "id", value = "id", defaultValue = "")

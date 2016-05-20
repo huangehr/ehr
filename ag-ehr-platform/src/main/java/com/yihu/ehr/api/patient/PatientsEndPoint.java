@@ -7,9 +7,6 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.feign.PatientClient;
 import com.yihu.ehr.model.patient.MDemographicInfo;
-import com.yihu.ehr.service.memory.intermediate.MetaDataRecord;
-import com.yihu.ehr.service.memory.intermediate.StdDataSet;
-import com.yihu.ehr.service.util.DataSetResolver;
 import com.yihu.ehr.util.DateTimeUtils;
 import com.yihu.ehr.util.IdValidator;
 import io.swagger.annotations.Api;
@@ -35,7 +32,7 @@ import java.text.ParseException;
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "patients", description = "患者服务")
 public class PatientsEndPoint {
-    @Autowired
+    /*@Autowired
     DataSetResolver dataSetResolver;
 
     @Autowired
@@ -113,13 +110,13 @@ public class PatientsEndPoint {
         return "";
     }
 
-    /**
+    *//**
      * 判断患者是否已注册。
      *
      * @param demographicId
      * @return
-     */
+     *//*
     protected boolean isPatientRegistered(String demographicId) {
         return patientClient.isRegistered(demographicId);
-    }
+    }*/
 }

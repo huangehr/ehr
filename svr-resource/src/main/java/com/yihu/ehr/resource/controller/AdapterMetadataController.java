@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsAdapterMetadata;
@@ -29,17 +30,17 @@ import java.util.List;
  * Created by lyr on 2016/5/17.
  */
 @RestController
-@RequestMapping(value= ApiVersion.Version1_0 + "/adapterMetadata")
+@RequestMapping(value= ApiVersion.Version1_0)
 @Api(value = "adapterMetadata", description = "适配数据元服务")
 public class AdapterMetadataController extends BaseRestController {
     @Autowired
     private IAdapterMetadataService metadataService;
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas,method = RequestMethod.POST)
     @ApiOperation("创建适配数据元")
     public MRsAdapterMetadata createMetadata(
-            @ApiParam(name="adapterSchema",value="数据元JSON",defaultValue = "")
-            @RequestParam(name="adapterSchema") String adapterMetadata) throws Exception
+            @ApiParam(name="adapterMetadata",value="数据元JSON",defaultValue = "")
+            @RequestParam(name="adapterMetadata") String adapterMetadata) throws Exception
     {
         RsAdapterMetadata metadata = toEntity(adapterMetadata,RsAdapterMetadata.class);
         metadata.setId(getObjectId(BizObject.RsAdapterMetadata));
@@ -47,18 +48,18 @@ public class AdapterMetadataController extends BaseRestController {
         return convertToModel(metadata,MRsAdapterMetadata.class);
     }
 
-    @RequestMapping(method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas,method = RequestMethod.PUT)
     @ApiOperation("更新适配数据元")
     public MRsAdapterMetadata updateMetadata(
-            @ApiParam(name="adapterSchemaa",value="数据元JSON",defaultValue = "")
-            @RequestParam(name="adapterSchemaa") String adapterMetadata) throws Exception
+            @ApiParam(name="adapterMetadata",value="数据元JSON",defaultValue = "")
+            @RequestParam(name="adapterMetadata") String adapterMetadata) throws Exception
     {
         RsAdapterMetadata metadata = toEntity(adapterMetadata,RsAdapterMetadata.class);
         metadata = metadataService.saveAdapterMetadata(metadata);
         return convertToModel(metadata,MRsAdapterMetadata.class);
     }
 
-    @RequestMapping(value="/{id}",method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadata,method = RequestMethod.DELETE)
     @ApiOperation("删除适配数据元")
     public boolean deleteMetadata(
             @ApiParam(name="id",value="数据元ID",defaultValue = "")
@@ -68,7 +69,7 @@ public class AdapterMetadataController extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas,method = RequestMethod.DELETE)
     @ApiOperation("删除适配数据元")
     public boolean deleteMetadataBatch(
             @ApiParam(name="id",value="数据元ID",defaultValue = "")
@@ -78,7 +79,7 @@ public class AdapterMetadataController extends BaseRestController {
         return true;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas,method = RequestMethod.GET)
     @ApiOperation("查询适配数据元")
     public Page<MRsAdapterMetadata> getMetadata(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")

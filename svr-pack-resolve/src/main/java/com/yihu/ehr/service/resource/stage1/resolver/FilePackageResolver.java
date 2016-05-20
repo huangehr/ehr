@@ -6,11 +6,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.cache.CacheReader;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.profile.core.commons.EventType;
+import com.yihu.ehr.schema.StdMetaDataKeySchema;
 import com.yihu.ehr.service.resource.*;
 import com.yihu.ehr.service.resource.stage1.*;
 import com.yihu.ehr.service.resource.stage1.PackModelFactory;
 import com.yihu.ehr.service.util.QualifierTranslator;
-import com.yihu.ehr.schema.StdKeySchema;
+import com.yihu.ehr.schema.StdDataSetKeySchema;
 import com.yihu.ehr.util.DateTimeUtils;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +36,10 @@ public class FilePackageResolver extends PackageResolver {
     CacheReader cacheReader;
 
     @Autowired
-    StdKeySchema keySchema;
+    StdDataSetKeySchema dataSetKeySchema;
+
+    @Autowired
+    StdMetaDataKeySchema metaDataKeySchema;
 
     @Autowired
     FastDFSUtil fastDFSUtil;
@@ -149,7 +153,7 @@ public class FilePackageResolver extends PackageResolver {
     protected String translateMetaDataCode(String cdaVersion,
                                            String dataSetCode,
                                            String metaData) {
-        String metaDataType = cacheReader.read(keySchema.metaDataType(cdaVersion, dataSetCode, metaData));
+        String metaDataType = cacheReader.read(metaDataKeySchema.metaDataType(cdaVersion, dataSetCode, metaData));
         if (StringUtils.isEmpty(metaDataType)) {
             String msg = "Meta data %1 in data set %2 is not found in version %3. FORGET cache standards or it's INVALID?"
                     .replace("%1", metaData)

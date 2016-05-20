@@ -1,9 +1,12 @@
 package com.yihu.ehr.service.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.yihu.ehr.redis.RedisClient;
+import com.yihu.ehr.schema.StdDataSetKeySchema;
 import com.yihu.ehr.service.resource.stage1.MetaDataRecord;
 import com.yihu.ehr.service.resource.StdDataSet;
 import com.yihu.ehr.util.DateTimeUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Iterator;
@@ -21,6 +24,11 @@ import java.util.Map;
  */
 @Component
 public class DataSetResolver {
+    @Autowired
+    StdDataSetKeySchema dataSetKeySchema;
+
+    @Autowired
+    RedisClient redisClient;
 
     /**
      * 结构化档案包数据集处理
@@ -50,6 +58,7 @@ public class DataSetResolver {
             dataSet.setOrgCode(orgCode);
             dataSet.setEventDate(DateTimeUtils.simpleDateParse(eventDate));
             dataSet.setCreateDate(DateTimeUtils.simpleDateParse(createDate));
+            dataSet.setMultiRecord(redisClient.get(dataSetKeySchema.dataSetMultiRecord(version, dataSetCode)));
 
             JsonNode dataNode = root.get("data");
             for (int i = 0; i < dataNode.size(); ++i) {
