@@ -51,7 +51,14 @@ public class HosSqlTaskController extends BaseRestController{
         return (List<MHosSqlTask>) convertToModels(hosSqlTasks, new ArrayList<MHosSqlTask>(hosSqlTasks.size()), MHosSqlTask.class, fields);
     }
 
-
+    @RequestMapping(value = "/hosSqlTask/{id}",method = RequestMethod.GET)
+    @ApiOperation(value = "根据id获取his穿透信息",notes = "根据id获取his穿透信息")
+    public MHosSqlTask getHosSqlTask(
+            @ApiParam(name = "id",value ="",defaultValue = "")
+            @PathVariable(value = "id") String id) throws  Exception{
+        HosSqlTask hosSqlTask = hosSqlTaskService.retrieve(id);
+        return convertToModel(hosSqlTask,MHosSqlTask.class);
+    }
 
     @RequestMapping(value = "/createHosSqlTask", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建his穿透信息", notes = "创建his穿透信息")
@@ -59,7 +66,7 @@ public class HosSqlTaskController extends BaseRestController{
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestBody String jsonData) throws Exception {
         HosSqlTask hosSqlTask = toEntity(jsonData, HosSqlTask.class);
-
+        hosSqlTask.setStatus("0");
         hosSqlTaskService.save(hosSqlTask);
         return convertToModel(hosSqlTask, MHosSqlTask.class, null);
     }

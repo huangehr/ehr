@@ -12,7 +12,7 @@
 
 	<groupId>com.yihu.ehr</groupId>
 	<artifactId>svr-file-resource</artifactId>
-	<packaging>jar</packaging>
+	<packaging>${packaging}</packaging>
 	<name>svr-file-resource</name>
 	<description>EHR platform picture service.</description>
 
