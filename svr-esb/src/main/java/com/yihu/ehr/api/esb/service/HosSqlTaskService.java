@@ -11,6 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class HosSqlTaskService extends BaseJpaService<HosSqlTask, XHosLogRepository> {
+public class HosSqlTaskService extends BaseJpaService<HosSqlTask, XHosSqlTaskRepository> {
 
 }
