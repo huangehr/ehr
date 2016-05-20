@@ -59,8 +59,7 @@ public class SystemDictController extends BaseController {
             ResponseEntity<Collection<MSystemDict>> responseEntity = systemDictClient.getDictionaries(fields, filters, sorts, size, page);
             List<MSystemDict> systemDicts = (List<MSystemDict>) responseEntity.getBody();
             List<SystemDictModel> systemDictModelList = new ArrayList<>();
-            for(MSystemDict mSystemDict : systemDicts)
-            {
+            for (MSystemDict mSystemDict : systemDicts) {
                 SystemDictModel dictModel = convertToSysDictModel(mSystemDict);
                 systemDictModelList.add(dictModel);
             }
@@ -81,13 +80,11 @@ public class SystemDictController extends BaseController {
             @RequestParam(value = "dictionary") String dictJson) {
 
         try {
-            SystemDictModel systemDictModel = objectMapper.readValue(dictJson,SystemDictModel.class);
-            if(StringUtils.isEmpty(systemDictModel.getName()))
-            {
+            SystemDictModel systemDictModel = objectMapper.readValue(dictJson, SystemDictModel.class);
+            if (StringUtils.isEmpty(systemDictModel.getName())) {
                 return failed("名称不能为空!");
             }
-            if(systemDictClient.isDictNameExists(systemDictModel.getName()))
-            {
+            if (systemDictClient.isDictNameExists(systemDictModel.getName())) {
                 return failed("名称已存在!");
             }
             MSystemDict systemDict = convertToMSystemDict(systemDictModel);
@@ -114,7 +111,7 @@ public class SystemDictController extends BaseController {
         try {
             MSystemDict systemDict = systemDictClient.getDictionary(id);
             SystemDictModel systemDictModel = convertToModel(systemDict, SystemDictModel.class);
-            systemDictModel.setCreateDate(DateToString(systemDict.getCreateDate(),AgAdminConstants.DateTimeFormat));
+            systemDictModel.setCreateDate(DateToString(systemDict.getCreateDate(), AgAdminConstants.DateTimeFormat));
             if (systemDictModel == null) {
                 return failed("获取字典失败!");
             }
@@ -132,20 +129,17 @@ public class SystemDictController extends BaseController {
             @ApiParam(name = "dictionary", value = "字典JSON结构")
             @RequestParam(value = "dictionary") String dictJson) {
         try {
-            SystemDictModel systemDictModel = toEntity(dictJson,SystemDictModel.class);
-            if(StringUtils.isEmpty(systemDictModel.getName()))
-            {
+            SystemDictModel systemDictModel = toEntity(dictJson, SystemDictModel.class);
+            if (StringUtils.isEmpty(systemDictModel.getName())) {
                 return failed("名称不能为空!");
             }
 
             MSystemDict systemDict = systemDictClient.getDictionary(systemDictModel.getId());
-            if(systemDict==null)
-            {
+            if (systemDict == null) {
                 return failed("系统字典不存在，请确认!");
             }
-            if(!systemDict.getName().equals(systemDictModel.getName())
-                    && systemDictClient.isDictNameExists(systemDictModel.getName()))
-            {
+            if (!systemDict.getName().equals(systemDictModel.getName())
+                    && systemDictClient.isDictNameExists(systemDictModel.getName())) {
                 return failed("名称已存在!");
             }
             systemDict = convertToMSystemDict(systemDictModel);
@@ -194,11 +188,10 @@ public class SystemDictController extends BaseController {
             @RequestParam(value = "page", required = false) Integer page) {
 
         try {
-            if(size==null)
-            {
-                size=999;
+            if (size == null) {
+                size = 999;
             }
-            ResponseEntity<List<MDictionaryEntry>> responseEntity = systemDictClient.getDictEntries(fields,filters,sorts,size,page);
+            ResponseEntity<List<MDictionaryEntry>> responseEntity = systemDictClient.getDictEntries(fields, filters, sorts, size, page);
             List<MDictionaryEntry> dictionaryEntries = responseEntity.getBody();
             List<SystemDictEntryModel> systemDictEntryModelList = (List<SystemDictEntryModel>) convertToModels(dictionaryEntries
                     , new ArrayList<SystemDictEntryModel>(dictionaryEntries.size())
@@ -309,35 +302,31 @@ public class SystemDictController extends BaseController {
         return systemDictClient.isDictNameExists(dictName);
     }
 
-    @RequestMapping(value = "/dictionaries/existence/{dict_id}" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dictionaries/existence/{dict_id}", method = RequestMethod.GET)
     @ApiOperation(value = "根基dictId和code判断提交的字典项名称是否已经存在")
-    public  boolean isDictEntryCodeExists(
+    public boolean isDictEntryCodeExists(
             @ApiParam(name = "dict_id", value = "dict_id", defaultValue = "")
             @PathVariable(value = "dict_id") long dictId,
             @ApiParam(name = "code", value = "code", defaultValue = "")
-            @RequestParam(value = "code") String code){
-        return systemDictClient.isDictEntryCodeExists(dictId,code);
+            @RequestParam(value = "code") String code) {
+        return systemDictClient.isDictEntryCodeExists(dictId, code);
     }
 
-    public SystemDictModel convertToSysDictModel(MSystemDict mSystemDict)
-    {
-        if(mSystemDict==null)
-        {
+    public SystemDictModel convertToSysDictModel(MSystemDict mSystemDict) {
+        if (mSystemDict == null) {
             return null;
         }
-        SystemDictModel dictModel = convertToModel(mSystemDict,SystemDictModel.class);
+        SystemDictModel dictModel = convertToModel(mSystemDict, SystemDictModel.class);
         dictModel.setCreateDate(DateToString(mSystemDict.getCreateDate(), AgAdminConstants.DateTimeFormat));
         return dictModel;
     }
 
-    public MSystemDict convertToMSystemDict(SystemDictModel dictModel)
-    {
-        if(dictModel==null)
-        {
+    public MSystemDict convertToMSystemDict(SystemDictModel dictModel) {
+        if (dictModel == null) {
             return null;
         }
-        MSystemDict mSystemDict = convertToModel(dictModel,MSystemDict.class);
-        mSystemDict.setCreateDate(StringToDate(dictModel.getCreateDate(),AgAdminConstants.DateTimeFormat));
-        return  mSystemDict;
+        MSystemDict mSystemDict = convertToModel(dictModel, MSystemDict.class);
+        mSystemDict.setCreateDate(StringToDate(dictModel.getCreateDate(), AgAdminConstants.DateTimeFormat));
+        return mSystemDict;
     }
 }
