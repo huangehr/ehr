@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -54,6 +55,10 @@ public class HosLogController extends BaseController {
         List<MHosLog> hosLogs = responseEntity.getBody();
         if(hosLogs.size()>0){
             for (MHosLog mHosLog :hosLogs){
+                if(StringUtils.isNotBlank(mHosLog.getUploadTime())){
+                    SimpleDateFormat sm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    mHosLog.setUploadTime(sm.format(sm.parse(mHosLog.getUploadTime())));
+                }
                 if(StringUtils.isNotBlank(mHosLog.getOrgCode())){
                     //过滤特殊字符，防止GET出错
                     String regEx="[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
