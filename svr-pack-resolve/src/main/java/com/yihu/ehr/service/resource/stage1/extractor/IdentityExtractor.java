@@ -21,10 +21,10 @@ import java.util.*;
 public class IdentityExtractor extends KeyDataExtractor {
     private List<String> dataSets = new ArrayList<>();        // 包含身份信息的数据集
 
-    @Value("${extractor.identity.meta-data.id-card-no}")
+    @Value("${ehr.pack-extractor.identity.meta-data.id-card-no}")
     private String IdCardNoMetaData;
 
-    @Value("${extractor.identity.meta-data.id-card-type}")
+    @Value("${ehr.pack-extractor.identity.meta-data.id-card-type}")
     private String IdCardTypeMetaData;
 
     private static final String IdCardNoDictEntry = "01;02";    // 身份字典项代码：身份证号与护照

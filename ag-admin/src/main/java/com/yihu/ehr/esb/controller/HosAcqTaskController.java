@@ -1,29 +1,18 @@
 package com.yihu.ehr.esb.controller;
 
-import com.yihu.ehr.agModel.dict.SystemDictModel;
 import com.yihu.ehr.agModel.esb.HosAcqTaskModel;
-import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.esb.client.HosAcqTaskClient;
-import com.yihu.ehr.model.dict.MSystemDict;
 import com.yihu.ehr.model.esb.MHosAcqTask;
-import com.yihu.ehr.model.esb.MHosLog;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Type;
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -68,7 +57,23 @@ public class HosAcqTaskController extends BaseController {
         return envelop;
     }
 
-
+    @RequestMapping(value = "/hosAcqTask/{id}",method = RequestMethod.GET)
+    @ApiOperation(value = "根据id获取补采任务信息",notes = "根据id获取补采任务信息")
+    public Envelop getHosAcqTask(
+            @ApiParam(name = "id",value ="",defaultValue = "")
+            @PathVariable(value = "id") String id){
+        Envelop envelop = new Envelop();
+        MHosAcqTask mHosAcqTask = hosAcqTaskClient.getHosAcqTask(id);
+        try{
+            HosAcqTaskModel hosAcqTaskModel = convertToModelDetail(mHosAcqTask,HosAcqTaskModel.class);
+            envelop.setObj(hosAcqTaskModel);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
 
     @RequestMapping(value = "/createHosAcqTask", method = RequestMethod.POST)
     @ApiOperation(value = "创建补采任务信息", notes = "创建补采任务信息")
@@ -79,8 +84,8 @@ public class HosAcqTaskController extends BaseController {
         HosAcqTaskModel hosAcqTaskModel = toEntity(jsonData,HosAcqTaskModel.class);
         try {
             MHosAcqTask hosAcqTask = convertToMModel(hosAcqTaskModel,MHosAcqTask.class);
-            hosAcqTaskClient.updateHosAcqTask(toJson(hosAcqTask));
-            convertToModelDetail(hosAcqTask,HosAcqTaskModel.class);
+            MHosAcqTask mHosAcqTaskNew = hosAcqTaskClient.createHosAcqTask(toJson(hosAcqTask));
+            convertToModelDetail(mHosAcqTaskNew,HosAcqTaskModel.class);
             envelop.setSuccessFlg(true);
         } catch (Exception e) {
             e.printStackTrace();

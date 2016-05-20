@@ -11,6 +11,8 @@ import java.util.List;
 public interface IResourceMetadataService {
     RsResourceMetadata saveResourceMetadata(RsResourceMetadata metadata);
 
+    List<RsResourceMetadata> saveMetadataBatch(RsResourceMetadata[] metadataArray);
+
     void deleteResourceMetadata(String id);
 
     void deleteRsMetadataByResourceId(String resourceId);

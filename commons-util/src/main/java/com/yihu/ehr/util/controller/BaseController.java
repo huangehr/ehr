@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.util.DateTimeUtils;
 import com.yihu.ehr.util.Envelop;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,7 +101,6 @@ public class BaseController extends AbstractController {
     }
 
 
-
     /**
      * 计算不在类中的属性。
      *
@@ -193,10 +193,9 @@ public class BaseController extends AbstractController {
     public <T> Collection<T> getEnvelopList(String jsonData, Collection<T> targets, Class<T> targetCls) {
         try {
             Envelop envelop = objectMapper.readValue(jsonData, Envelop.class);
-            for(int i=0;i<envelop.getDetailModelList().size();i++)
-            {
+            for (int i = 0; i < envelop.getDetailModelList().size(); i++) {
                 String objJsonData = objectMapper.writeValueAsString(envelop.getDetailModelList().get(i));
-                T model = objectMapper.readValue(objJsonData,targetCls);
+                T model = objectMapper.readValue(objJsonData, targetCls);
 
                 targets.add(model);
             }
@@ -210,18 +209,15 @@ public class BaseController extends AbstractController {
 
     /**
      * 将字符串转为Data
-     * @param dateTime 日期字符串
+     *
+     * @param dateTime   日期字符串
      * @param formatRule 转换格式
      * @return 时间格式的日期
      */
-    public Date StringToDate(String dateTime,String formatRule)
-    {
+    public Date StringToDate(String dateTime, String formatRule) {
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat(formatRule);
-            return dateTime==null?null:sdf.parse(dateTime);
-        }
-        catch (Exception ex)
-        {
+            return dateTime == null ? null : DateTimeUtils.utcDateTimeParse(dateTime);
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return null;
@@ -229,18 +225,15 @@ public class BaseController extends AbstractController {
 
     /**
      * 将日期转为字符串
-     * @param dateTime 日期
+     *
+     * @param dateTime   日期
      * @param formatRule 转换格式
      * @return 日期字符串
      */
-    public String DateToString(Date dateTime,String formatRule)
-    {
+    public String DateToString(Date dateTime, String formatRule) {
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat(formatRule);
-            return dateTime==null?null:sdf.format(dateTime);
-        }
-        catch (Exception ex)
-        {
+            return dateTime == null ? null : DateTimeUtils.utcDateTimeFormat(dateTime);
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return null;
@@ -248,12 +241,13 @@ public class BaseController extends AbstractController {
 
     /**
      * 计算出生日期
+     *
      * @param birthday
      * @return
      */
     public static int getAgeByBirthday(Date birthday) {
 
-        if(birthday==null)
+        if (birthday == null)
             return 0;
 
         Calendar cal = Calendar.getInstance();
@@ -290,6 +284,7 @@ public class BaseController extends AbstractController {
 
     /**
      * 网关前端对象转微服务对象
+     *
      * @param source
      * @param targetCls
      * @param properties
@@ -304,11 +299,11 @@ public class BaseController extends AbstractController {
         T target = BeanUtils.instantiate(targetCls);
         BeanUtils.copyProperties(source, target, propertyDiffer(properties, targetCls));
         Field[] targetFields = target.getClass().getDeclaredFields();    // 获取target的所有属性，返回Field数组
-        for (Field targetField : targetFields){
+        for (Field targetField : targetFields) {
             String name = targetField.getName();
             Object type = targetField.getGenericType();
             targetField.setAccessible(true);
-            if(type == java.util.Date.class){
+            if (type == java.util.Date.class) {
                 Field sourceField = source.getClass().getDeclaredField(name);
                 sourceField.setAccessible(true);
                 targetField.set(target, StringToDate(sourceField.get(source).toString(), AgAdminConstants.DateTimeFormat));
@@ -319,6 +314,7 @@ public class BaseController extends AbstractController {
 
     /**
      * 网关微服务对象转前端对象
+     *
      * @param source
      * @param targetCls
      * @param properties
@@ -333,11 +329,11 @@ public class BaseController extends AbstractController {
         T target = BeanUtils.instantiate(targetCls);
         BeanUtils.copyProperties(source, target, propertyDiffer(properties, targetCls));
         Field[] sourceFields = source.getClass().getDeclaredFields();    // 获取source的所有属性，返回Field数组
-        for (Field sourceField : sourceFields){
+        for (Field sourceField : sourceFields) {
             String name = sourceField.getName();
             Object type = sourceField.getGenericType();
             sourceField.setAccessible(true);
-            if(type == java.util.Date.class){
+            if (type == java.util.Date.class) {
                 Field targetField = target.getClass().getDeclaredField(name);
                 targetField.setAccessible(true);
                 targetField.set(target, DateToString((Date) sourceField.get(source), AgAdminConstants.DateTimeFormat));

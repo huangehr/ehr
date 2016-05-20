@@ -1,5 +1,6 @@
 package com.yihu.ehr.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.service.ICipherService;
 import com.yihu.ehr.util.controller.BaseRestController;
@@ -17,14 +18,14 @@ import org.springframework.web.bind.annotation.*;
  * @created on 2016/5/10
  */
 @RestController
-@RequestMapping(ApiVersion.Version1_0 +"/cipher")
+@RequestMapping(ApiVersion.Version1_0)
 @Api(value = "cipher", description = "加密解密接口")
 public class CipherController extends BaseRestController {
 
     @Autowired
     private ICipherService cipherService; //加密解密服务
 
-    @RequestMapping(value="/encryption/{type}",method = RequestMethod.GET)
+    @RequestMapping(value= ServiceApi.Cipher.Encryption,method = RequestMethod.GET)
     @ApiOperation("加密")
     public String encrypt(
             @ApiParam(name="type",value="加密类型",defaultValue = "des")
@@ -35,7 +36,7 @@ public class CipherController extends BaseRestController {
         return cipherService.encrypt(plainText,type);
     }
 
-    @RequestMapping(value="/decryption/{type}",method = RequestMethod.GET)
+    @RequestMapping(value=ServiceApi.Cipher.Decryption,method = RequestMethod.GET)
     @ApiOperation("解密")
     public String decrypt(
             @ApiParam(name="type",value="解密类型",defaultValue = "des")

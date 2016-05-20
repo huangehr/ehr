@@ -1,7 +1,10 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsSystemDictionaryEntry;
+import com.yihu.ehr.resource.model.RsDictionaryEntry;
 import com.yihu.ehr.resource.model.RsSystemDictionaryEntry;
 import com.yihu.ehr.resource.service.RsSystemDictionaryEntryService;
 import com.yihu.ehr.util.controller.BaseRestController;
@@ -10,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,13 +26,13 @@ import java.util.List;
  * @created 2016.05.17 16:33
  */
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0 + "/systemDictionaryEntries")
+@RequestMapping(value = ApiVersion.Version1_0)
 @Api(value = "systemDictionaryEntries", description = "系统字典项服务接口")
 public class RsSystemDictionaryEntryController extends BaseRestController {
     @Autowired
     private RsSystemDictionaryEntryService systemDictionaryEntryService;
 
-    @RequestMapping(value = "/searchRsSystemDictionaryEntries", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.SystemDictEntries, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件获取系统字典项列表", notes = "根据查询条件获取系统字典项列表")
     public List<MRsSystemDictionaryEntry> searchRsSystemDictionaryEntries(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
@@ -49,34 +53,50 @@ public class RsSystemDictionaryEntryController extends BaseRestController {
     }
 
 
-
-    @RequestMapping(value = "/createRsSystemDictionaryEntry", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.SystemDictEntries, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建系统字典项", notes = "创建系统字典项")
     public MRsSystemDictionaryEntry createRsSystemDictionaryEntry(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestBody String jsonData) throws Exception {
         RsSystemDictionaryEntry systemDictionaryEntry = toEntity(jsonData, RsSystemDictionaryEntry.class);
+        String code = systemDictionaryEntry.getCode();
+        String dictCode = systemDictionaryEntry.getDictCode();
+        if(isExistence(dictCode,code)){
+            throw new Exception("字典项代码不能重复");
+        }
+        systemDictionaryEntry.setId(getObjectId(BizObject.RsSystemDictionaryEntry));
         systemDictionaryEntryService.save(systemDictionaryEntry);
         return convertToModel(systemDictionaryEntry, MRsSystemDictionaryEntry.class, null);
 
     }
 
-    @RequestMapping(value = "/updateRsSystemDictionaryEntry", method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.SystemDictEntries, method = RequestMethod.PUT)
     @ApiOperation(value = "修改系统字典项", notes = "修改系统字典项")
     public MRsSystemDictionaryEntry updateRsSystemDictionaryEntry(
             @ApiParam(name = "json_data", value = "")
             @RequestBody String jsonData) throws Exception {
         RsSystemDictionaryEntry systemDictionaryEntry = toEntity(jsonData, RsSystemDictionaryEntry.class);
+        String id = systemDictionaryEntry.getId();
+        RsSystemDictionaryEntry d = systemDictionaryEntryService.findById(id);
+        String code = systemDictionaryEntry.getCode();
+        String dictCode = systemDictionaryEntry.getDictCode();
+        if(code!=d.getCode() && isExistence(dictCode,code)){
+            throw new Exception("字典代码不可修改");
+        }
         systemDictionaryEntryService.save(systemDictionaryEntry);
         return convertToModel(systemDictionaryEntry, MRsSystemDictionaryEntry.class, null);
     }
 
-    @RequestMapping(value = "/deleteRsSystemDictionaryEntry/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.SystemDictEntry, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除系统字典项", notes = "删除系统字典项")
     public boolean deleteRsSystemDictionaryEntry(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id) throws Exception {
         systemDictionaryEntryService.delete(id);
         return true;
+    }
+
+    public boolean isExistence(String dictCode,String code) {
+        return systemDictionaryEntryService.findByFields(new String[]{"dictCode","code"},new String[]{dictCode,code}) != null;
     }
 }

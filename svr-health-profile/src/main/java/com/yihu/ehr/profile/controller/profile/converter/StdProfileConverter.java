@@ -17,7 +17,7 @@ import com.yihu.ehr.profile.service.Template;
 import com.yihu.ehr.profile.service.TemplateService;
 import com.yihu.ehr.service.util.DataSetUtil;
 import com.yihu.ehr.schema.OrgKeySchema;
-import com.yihu.ehr.schema.StdKeySchema;
+import com.yihu.ehr.schema.StdDataSetKeySchema;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -53,7 +53,7 @@ public class StdProfileConverter {
     private OrgKeySchema orgKeySchema;
 
     @Autowired
-    private StdKeySchema stdKeySchema;
+    private StdDataSetKeySchema dataSetKeySchema;
 
     /*public Collection<MProfile> loadProfiles(Page<ProfileIndices> profileIndices,
                                              boolean loadStdDataSet,
@@ -142,7 +142,7 @@ public class StdProfileConverter {
 
         for (MCdaDataSetRelationship datasetRelationship : datasetRelationships) {
             String dataSetId = datasetRelationship.getDataSetId();
-            String dataSetCode = cacheReader.read(stdKeySchema.dataSetCode(profile.getCdaVersion(), dataSetId));
+            String dataSetCode = cacheReader.read(dataSetKeySchema.dataSetCode(profile.getCdaVersion(), dataSetId));
             if (StringUtils.isEmpty(dataSetCode)) {
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Data set of version " + profile.getCdaVersion() + " not cached in redis.");
             }
@@ -169,7 +169,7 @@ public class StdProfileConverter {
             String dataSetCode = DataSetUtil.standardDataSetCode(dataSet.getCode());
 
             MDataSet mDataSet = new MDataSet();
-            mDataSet.setName(cacheReader.read(stdKeySchema.dataSetNameByCode(version, dataSetCode)));
+            mDataSet.setName(cacheReader.read(dataSetKeySchema.dataSetNameByCode(version, dataSetCode)));
             mDataSet.setCode(dataSet.getCode());
 
             for (String key : dataSet.getRecordKeys()) {

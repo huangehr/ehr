@@ -13,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 数据源服务
@@ -51,6 +53,24 @@ public class MetadataService extends BaseJpaService<RsMetadata,ResourceMetadataD
      */
     public RsMetadata saveMetadata(RsMetadata metadata){
         return metadataDao.save(metadata);
+    }
+
+    /**
+     * 批量创建数据元
+     *
+     * @param metadataArray RsMetadata[]
+     * @return List<RsMetadata>
+     */
+    public List<RsMetadata> saveMetadataBatch(RsMetadata[] metadataArray)
+    {
+        List<RsMetadata>  metadataList = new ArrayList<RsMetadata>();
+
+        for(RsMetadata metadata : metadataArray)
+        {
+            metadataList.add(metadataDao.save(metadata));
+        }
+
+        return metadataList;
     }
 
     /**

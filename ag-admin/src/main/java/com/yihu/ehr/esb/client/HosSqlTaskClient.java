@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.esb.MHosSqlTask;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -20,7 +21,7 @@ import java.util.List;
 public interface HosSqlTaskClient {
 
     @RequestMapping(value = "/searchHosSqlTasks", method = RequestMethod.GET)
-    List<MHosSqlTask> searchHosSqlTasks(
+    ResponseEntity<List<MHosSqlTask>> searchHosSqlTasks(
             @RequestParam(value = "fields", required = false) String fields,
             @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,
@@ -28,6 +29,9 @@ public interface HosSqlTaskClient {
             @RequestParam(value = "page", required = false) int page);
 
 
+    @RequestMapping(value = "/hosSqlTask/{id}",method = RequestMethod.GET)
+    MHosSqlTask getHosSqlTask(
+            @PathVariable(value = "id") String id);
 
     @RequestMapping(value = "/createHosSqlTask", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     MHosSqlTask createHosSqlTask(

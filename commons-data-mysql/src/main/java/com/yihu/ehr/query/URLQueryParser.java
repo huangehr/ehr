@@ -1,5 +1,6 @@
 package com.yihu.ehr.query;
 
+import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.util.DateTimeUtils;
 import javafx.util.Pair;
 import org.apache.commons.lang3.BooleanUtils;
@@ -10,6 +11,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.criteria.*;
 import java.text.ParseException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * URL 查询串解析器。将 {@link com.yihu.ehr.util.URLQueryBuilder} 中产生的查询字符串反解析。
@@ -136,7 +139,7 @@ public class URLQueryParser<T> {
      * <=：使用小于号和小于等于语法，如：createDate<=2015
      * 分组：在条件后面加上空格，并设置分组号，如：createDate>2012 g1，具有相同组名的条件将使用or连接
      * 多条件组合：使用";"来分隔
-     * <p>
+     * <p/>
      * 生成 where 条件。
      *
      * @param criteriaBuilder
@@ -144,7 +147,7 @@ public class URLQueryParser<T> {
      * @param root
      */
     private void makeWhere(CriteriaBuilder criteriaBuilder, CriteriaQuery query, Root<T> root) throws ParseException {
-        if (StringUtils.isEmpty(filters)) return;
+         if (StringUtils.isEmpty(filters)) return;
 
         Map<String, Predicate> predicateMap = new HashMap<>();
 
@@ -152,7 +155,18 @@ public class URLQueryParser<T> {
 
         for (int i = 0; i < filterArray.length; ++i) {
 
-            String[] tokens = filterArray[i].split(" ");
+            String filter = filterArray[i];
+            //查看是否是时间格式 yyyy-MM-dd hh:mm:ss
+            String[] tokens;
+//            Pattern p = Pattern.compile("[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}");
+//            String[] filters = filter.split("[?]|<>|>=|>|<=|<|=");
+//            Matcher m = p.matcher(filters[1]);
+//            if (m.matches()) {
+//                tokens = new String[]{filter};
+//            }else {
+//                tokens = filter.split(" ");
+//            }
+            tokens = filter.split(" ");
             if (tokens.length > 2) throw new IllegalArgumentException("无效过滤参数");
 
             String group = null;
@@ -179,7 +193,6 @@ public class URLQueryParser<T> {
             predicate = cb.like(pair.getKey(), "%" + pair.getValue() + "%");
         } else if (filter.contains("<>")) {
             Pair<Path, String> pair = getPair(filter, "<>", root);
-
             if (pair.getValue().contains(",")) {
                 predicate = cb.not(pair.getKey().in(pair.getValue().split(",")));
             } else {
@@ -187,35 +200,55 @@ public class URLQueryParser<T> {
             }
         } else if (filter.contains(">=")) {
             Pair<Path, String> pair = getPair(filter, ">=", root);
-            predicate = cb.ge(pair.getKey(), NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
+            String value = pair.getValue();
+            if(pair.getKey().getJavaType() == Date.class){
+                Date date = DateTimeUtils.utcDateTimeParse(pair.getValue());
+                predicate = cb.greaterThanOrEqualTo(pair.getKey(), date);
+            }else {
+                predicate = cb.greaterThanOrEqualTo(pair.getKey(),value);
+            }
         } else if (filter.contains(">")) {
             Pair<Path, String> pair = getPair(filter, ">", root);
-            if (pair.getKey().getJavaType() == Date.class) {
-                Date date = DateTimeUtils.simpleDateParse(pair.getValue());
+            String value = pair.getValue();
+            if(pair.getKey().getJavaType() == Date.class){
+                Date date = DateTimeUtils.utcDateTimeParse(pair.getValue());
                 predicate = cb.greaterThan(pair.getKey(), date);
-            } else {
-                predicate = cb.gt(pair.getKey(), NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
+            }else {
+                predicate = cb.greaterThan(pair.getKey(),value);
             }
         } else if (filter.contains("<=")) {
             Pair<Path, String> pair = getPair(filter, "<=", root);
-            predicate = cb.le(pair.getKey(), NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
+            String value = pair.getValue();
+            if(pair.getKey().getJavaType() == Date.class){
+                Date date = DateTimeUtils.utcDateTimeParse(pair.getValue());
+                predicate = cb.lessThanOrEqualTo(pair.getKey(), date);
+            }else {
+                predicate = cb.lessThanOrEqualTo(pair.getKey(),value);
+            }
         } else if (filter.contains("<")) {
             Pair<Path, String> pair = getPair(filter, "<", root);
-            predicate = cb.lt(pair.getKey(), NumberUtils.parseNumber(pair.getValue(), pair.getKey().getJavaType()));
+            String value = pair.getValue();
+            if(pair.getKey().getJavaType() == Date.class){
+                Date date = DateTimeUtils.utcDateTimeParse(pair.getValue());
+                predicate = cb.lessThan(pair.getKey(), date);
+            }else {
+                predicate = cb.lessThan(pair.getKey(),value);
+            }
         } else if (filter.contains("=")) {
             Pair<Path, String> pair = getPair(filter, "=", root);
-
             Set<Object> values = new HashSet<>();
-            for (String data : pair.getValue().split(",")){
-                if (pair.getKey().getJavaType().isEnum()){
-                    values.add(Enum.valueOf(pair.getKey().getJavaType(), data));
-                } else if(pair.getKey().getJavaType().equals(Boolean.TYPE)){
-                    values.add(BooleanUtils.toBoolean(data));
-                } else {
-                    values.add(data);
+            for (String value : pair.getValue().split(",")) {
+                if (pair.getKey().getJavaType().isEnum()) {
+                    values.add(Enum.valueOf(pair.getKey().getJavaType(), value));
+                } else if (pair.getKey().getJavaType().equals(Boolean.TYPE)) {
+                    values.add(BooleanUtils.toBoolean(value));
+                } else if(pair.getKey().getJavaType() == Date.class){
+                    Date date = DateTimeUtils.utcDateTimeParse(pair.getValue());
+                    values.add(date);
+                }else {
+                    values.add(value);
                 }
             }
-
             predicate = pair.getKey().in(values);
         }
 

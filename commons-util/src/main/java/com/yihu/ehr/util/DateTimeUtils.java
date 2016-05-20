@@ -13,7 +13,7 @@ import java.util.Date;
  */
 public class DateTimeUtils {
     public static final String simpleDateTimePattern = "yyyy-MM-dd HH:mm:ss";
-    public static final String utcDateTimePattern = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    public static final String utcDateTimePattern = "yyyy-MM-dd'T'HH:mm:ss'Z'ZZ";
     public static final String slashDateTimePattern = "yyyy/MM/dd HH:mm:ss";
     public static final String simpleDatePattern = "yyyy-MM-dd";
     public static final String simpleDateTimeShortPattern = "yyyy/MM/dd HH:mm";
@@ -111,19 +111,4 @@ public class DateTimeUtils {
         return parsedDate;
     }
 
-
-    /**
-     * 时间戳转date
-     * @param dateTime
-     * @param formatRule
-     * @return
-     * @throws ParseException
-     */
-    public static Date timeStampToDate(String dateTime,String formatRule) throws ParseException {
-        SimpleDateFormat format =  new SimpleDateFormat(formatRule);
-        Long time = new Long(dateTime);
-        String d = format.format(time);
-        Date date= format.parse(d);
-        return date;
-    }
 }
