@@ -21,7 +21,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "rs_resources")
 @Access(value = AccessType.PROPERTY)
-public class RsResources {
+public class RsResource {
     private String id;
     private String code;
     private String name;

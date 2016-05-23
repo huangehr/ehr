@@ -1,7 +1,6 @@
 package com.yihu.ehr.resource.service.intf;
 
 import com.yihu.ehr.resource.model.RsDimension;
-import com.yihu.ehr.resource.model.RsResources;
 import org.springframework.data.domain.Page;
 
 import java.util.List;

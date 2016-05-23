@@ -27,7 +27,7 @@ public class DimensionCategoryService extends BaseJpaService<RsDimensionCategory
      * 维度类别创建
      *
      * @param dimensionCategory RsDimensionCategory 维度类别实体
-     * @return RsResources 维度类别实体
+     * @return RsResource 维度类别实体
      */
     public RsDimensionCategory saveDimensionCategory(RsDimensionCategory dimensionCategory)
     {
@@ -60,7 +60,7 @@ public class DimensionCategoryService extends BaseJpaService<RsDimensionCategory
      * @param sorts 排序
      * @param page 页码
      * @param size 分页大小
-     * @return Page<RsResources> 维度类别
+     * @return Page<RsResource> 维度类别
      */
     public Page<RsDimensionCategory> getDimensionCategories(String sorts, int page, int size)
     {

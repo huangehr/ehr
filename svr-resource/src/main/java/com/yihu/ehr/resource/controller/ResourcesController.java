@@ -4,7 +4,7 @@ import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsResources;
-import com.yihu.ehr.resource.model.RsResources;
+import com.yihu.ehr.resource.model.RsResource;
 import com.yihu.ehr.resource.service.intf.IResourcesService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,7 +41,7 @@ public class ResourcesController extends BaseRestController {
             @ApiParam(name="resource",value="资源",defaultValue = "")
             @RequestParam(name="resource")String resource) throws Exception
     {
-        RsResources rs = toEntity(resource,RsResources.class);
+        RsResource rs = toEntity(resource,RsResource.class);
         rs.setId(getObjectId(BizObject.Resources));
         rsService.saveResource(rs);
         return convertToModel(rs,MRsResources.class);
@@ -53,7 +53,7 @@ public class ResourcesController extends BaseRestController {
             @ApiParam(name="resource",value="资源",defaultValue="")
             @RequestParam(name="resource")String resource) throws Exception
     {
-        RsResources rs = toEntity(resource,RsResources.class);
+        RsResource rs = toEntity(resource,RsResource.class);
         rsService.saveResource(rs);
         return convertToModel(rs,MRsResources.class);
     }
@@ -101,13 +101,13 @@ public class ResourcesController extends BaseRestController {
         //过滤条件为空
         if(StringUtils.isEmpty(filters))
         {
-            Page<RsResources> resources = rsService.getResources(sorts,reducePage(page),size);
+            Page<RsResource> resources = rsService.getResources(sorts,reducePage(page),size);
             total = resources.getTotalElements();
             rsList = convertToModels(resources.getContent(),new ArrayList<>(resources.getNumber()),MRsResources.class,fields);
         }
         else
         {
-            List<RsResources> resources = rsService.search(fields,filters,sorts,page,size);
+            List<RsResource> resources = rsService.search(fields,filters,sorts,page,size);
             total = rsService.getCount(filters);
             rsList = convertToModels(resources,new ArrayList<>(resources.size()),MRsResources.class,fields);
         }
