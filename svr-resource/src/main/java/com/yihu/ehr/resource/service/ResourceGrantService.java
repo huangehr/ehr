@@ -74,7 +74,7 @@ public class ResourceGrantService extends BaseJpaService<RsAppResource,AppResour
      * @param sorts String 排序
      * @param page int 页码
      * @param size int 分页大小
-     * @return Page<RsResources> 资源
+     * @return Page<RsResource> 资源
      */
     public Page<RsAppResource> getAppResourceGrant(String sorts, int page, int size)
     {
@@ -89,7 +89,7 @@ public class ResourceGrantService extends BaseJpaService<RsAppResource,AppResour
      * @param sorts String 排序
      * @param page int 页码
      * @param size int 分页大小
-     * @return Page<RsResources> 资源
+     * @return Page<RsResource> 资源
      */
     public Page<RsAppResourceMetadata> getAppRsMetadataGrant(String sorts, int page, int size)
     {

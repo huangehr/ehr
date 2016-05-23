@@ -7,8 +7,7 @@ import com.yihu.ehr.resource.dao.intf.ResourcesDao;
 import com.yihu.ehr.resource.dao.ResourcesQueryDao;
 import com.yihu.ehr.resource.model.DtoResourceMetadata;
 import com.yihu.ehr.resource.model.RsAppResource;
-import com.yihu.ehr.resource.model.RsResourceMetadata;
-import com.yihu.ehr.resource.model.RsResources;
+import com.yihu.ehr.resource.model.RsResource;
 import com.yihu.ehr.resource.service.intf.IResourcesQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,7 +46,7 @@ public class ResourcesQueryService implements IResourcesQueryService {
      */
     public DataList getResources(String resourcesCode,String appId,String queryParams,Integer page,Integer size) throws Exception {
         //获取资源信息
-        RsResources rs = resourcesDao.findByCode(resourcesCode);
+        RsResource rs = resourcesDao.findByCode(resourcesCode);
         if(rs!=null)
         {
             String methodName = rs.getRsInterface(); //执行函数

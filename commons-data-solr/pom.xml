@@ -15,7 +15,6 @@
     <description>EHR solr component</description>
 
     <properties>
-        <solr.version></solr.version>
     </properties>
 
     <dependencies>

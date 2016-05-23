@@ -230,22 +230,4 @@ public class HttpClientUtil {
         }
         return response;
     }
-
-    public static void main(String[] args) throws Exception {
-        Map<String, Object> params = new HashMap<String, Object>();
-//        params.put("standard", "{\n" +
-//                "    \"id\": 4,\n" +
-//                "    \"name\": \"电子健康档案标准bbb\",\n" +
-//                "    \"code\": \"YY20160114\",\n" +
-//                "    \"publisher\": \"健康之路2\",\n" +
-//                "    \"publisherOrgCode\": \"jkzl\",\n" +
-//                "    \"summary\": \"string\",\n" +
-//                "    \"refStandard\": \"WS2012\",\n" +
-//                "    \"refStandardVersion\": \"V1.0\",\n" +
-//                "    \"versionStatus\": 0\n" +
-//                "}");
-        params.put("versionId","5694696eb80d");
-        params.put("publisher","lfq");
-        System.out.println(HttpClientUtil.doPost("http://192.168.131.17:6020/api/v1.0/standard_center/version/publish", params, "user", "standard"));
-    }
 }
