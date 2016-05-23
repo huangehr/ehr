@@ -136,7 +136,7 @@ public class HosSqlTask implements java.io.Serializable {
         return this.createTime;
     }
 
-    public void setCreateTime(Timestamp createTime) {
+    public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 
