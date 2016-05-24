@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -67,6 +68,7 @@ public class HosSqlTaskController extends BaseRestController{
             @RequestBody String jsonData) throws Exception {
         HosSqlTask hosSqlTask = toEntity(jsonData, HosSqlTask.class);
         hosSqlTask.setStatus("0");
+        hosSqlTask.setCreateTime(new Date());
         hosSqlTaskService.save(hosSqlTask);
         return convertToModel(hosSqlTask, MHosSqlTask.class, null);
     }
