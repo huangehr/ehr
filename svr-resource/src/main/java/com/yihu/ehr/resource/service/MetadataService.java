@@ -73,6 +73,17 @@ public class MetadataService extends BaseJpaService<RsMetadata,ResourceMetadataD
     }
 
     /**
+     * 获取数据元
+     *
+     * @param id String Id
+     * @return RsMetadata
+     */
+    public RsMetadata getMetadataById(String id)
+    {
+        return metadataDao.findOne(id);
+    }
+
+    /**
      * 资源获取
      *
      * @param sorts 排序

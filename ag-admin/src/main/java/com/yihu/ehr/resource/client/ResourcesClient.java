@@ -42,6 +42,11 @@ public interface ResourcesClient {
     boolean deleteResourcesPatch(
             @RequestParam(value = "ids") String ids);
 
+    @RequestMapping(value = ServiceApi.Resources.Resource,method = RequestMethod.GET)
+    @ApiOperation("根据ID获取资源")
+    public MRsResources getResourceById(
+            @PathVariable(value="id") String id);
+
     @ApiOperation("资源查询")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.GET)
     Page<MRsResources> queryResources(

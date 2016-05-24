@@ -37,6 +37,11 @@ public interface ResourcesCategoryClient {
     boolean deleteResourceCategory(
             @PathVariable(value = "id") String id);
 
+    @RequestMapping(value = ServiceApi.Resources.Category,method = RequestMethod.GET)
+    @ApiOperation("根据ID获取资源类别")
+    public MRsCategory getRsCategoryById(
+            @PathVariable(value="id") String id);
+
     @RequestMapping(value = ServiceApi.Resources.Categories, method = RequestMethod.GET)
     @ApiOperation("获取资源类别")
     Page<MRsCategory> getRsCategories(

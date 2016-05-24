@@ -42,6 +42,11 @@ public interface AdapterSchemaClient {
     boolean deleteSchemaBatch(
             @RequestParam(value = "ids") String ids);
 
+    @RequestMapping(value = ServiceApi.Adaptions.Schema,method = RequestMethod.GET)
+    @ApiOperation("根据ID获取适配方案")
+    public MRsAdapterSchema getMetadataById(
+            @PathVariable(value="id") String id);
+
     @RequestMapping(value = ServiceApi.Adaptions.Schemas, method = RequestMethod.GET)
     @ApiOperation("查询适配方案")
     Page<MRsAdapterSchema> getSchema(

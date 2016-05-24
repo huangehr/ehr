@@ -49,6 +49,11 @@ public interface MetadataClient {
     boolean deleteMetadataBatch(
             @RequestParam(value = "id") String id);
 
+    @RequestMapping(value = ServiceApi.Resources.Metadata,method = RequestMethod.GET)
+    @ApiOperation("根据ID获取数据元")
+    public MRsMetadata getMetadataById(
+            @PathVariable(value="id") String id);
+
     @RequestMapping(value = ServiceApi.Resources.Metadatas, method = RequestMethod.GET)
     @ApiOperation("查询数据元")
     Page<MRsMetadata> getMetadata(

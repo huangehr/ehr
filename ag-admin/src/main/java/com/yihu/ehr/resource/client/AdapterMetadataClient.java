@@ -44,6 +44,11 @@ public interface AdapterMetadataClient {
     boolean deleteMetadataBatch(
             @RequestParam(value = "ids") String ids);
 
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadata,method = RequestMethod.GET)
+    @ApiOperation("根据ID获取适配数据元")
+    public MRsAdapterMetadata getMetadataById(
+            @PathVariable(value="id") String id);
+
     @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas, method = RequestMethod.GET)
     @ApiOperation("查询适配数据元")
     ResponseEntity<List<MRsAdapterMetadata>> getMetadata(

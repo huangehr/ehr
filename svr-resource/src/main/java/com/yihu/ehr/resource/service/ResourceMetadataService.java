@@ -87,4 +87,15 @@ public class ResourceMetadataService extends BaseJpaService<RsResourceMetadata,R
 
         return rsMetadataDao.findAll(pageable);
     }
+
+    /**
+     * 获取资源数据元
+     *
+     * @param id String Id
+     * @return RsResourceMetadata
+     */
+    public RsResourceMetadata getRsMetadataById(String id)
+    {
+        return rsMetadataDao.findOne(id);
+    }
 }
