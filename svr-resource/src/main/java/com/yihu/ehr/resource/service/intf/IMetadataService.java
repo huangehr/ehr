@@ -40,7 +40,7 @@ public interface IMetadataService {
      * @param sorts 排序
      * @param page 页码
      * @param size 分页大小
-     * @return Page<RsResource> 资源
+     * @return Page<RsResources> 资源
      */
     Page<RsMetadata> getMetadata(String sorts, int page, int size);
 
