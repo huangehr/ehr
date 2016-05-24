@@ -76,19 +76,19 @@ public class ResourcesBrowseController {
             @ApiParam(name = "demographicId", value = "身份证号")
             @RequestParam(value = "demographicId", required = true) String demographicId,
             @ApiParam(name = "medicalEventsType", value = "就诊事件类别")
-            @RequestParam(value = "medicalEventsType", required = true) String medicalEventsType,
+            @RequestParam(value = "medicalEventsType", required = false) String medicalEventsType,
             @ApiParam(name = "year", value = "年份", defaultValue = "当前年份")
             @RequestParam(value = "year", required = false, defaultValue = "") String year,
-            @ApiParam(name = "orgCode", value = "机构代码（逗号分隔）")
-            @RequestParam(value = "orgCode", required = true) String orgCode,
-            @ApiParam(name = "cardType", value = "卡类型")
-            @RequestParam(value = "cardType", required = false) String cardType,
+            @ApiParam(name = "area", value = "地区")
+            @RequestParam(value = "area", required = false) String area,
+            @ApiParam(name = "hpId", value = "健康问题id")
+            @RequestParam(value = "hpId", required = false) String hpId,
             @ApiParam(name = "diagnosisCode", value = "疾病代码（逗号分隔）")
-            @RequestParam(value = "diagnosisCode", required = true) String diagnosisCode,
+            @RequestParam(value = "diagnosisCode", required = false) String diagnosisCode,
             @ApiParam(name = "page", value = "当前页")
-            @RequestParam(value = "page", required = false) int page,
+            @RequestParam(value = "page", required = false,defaultValue = "1") int page,
             @ApiParam(name = "size", value = "行数")
-            @RequestParam(value = "size", required = false) int size) throws Exception {
+            @RequestParam(value = "size", required = false, defaultValue = "5") int size) throws Exception {
 
         return EhrFileUtils.file2String("/json/MedicalEventInfo.json");
 

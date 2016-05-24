@@ -37,13 +37,13 @@ public class AdapterMetadataService extends BaseJpaService<RsAdapterMetadata,Ada
     /**
      * 删除适配方案
      *
-     * @param id String 适配方案ID
+     * @param ids String 适配方案ID
      */
-    public void deleteAdapterMetadata(String id)
+    public void deleteAdapterMetadata(String ids)
     {
-        String[] ids = id.split(",");
+        String[] idsArray = ids.split(",");
 
-        for(String id_ : ids)
+        for(String id_ : idsArray)
         {
             adMetadataDao.delete(id_);
         }

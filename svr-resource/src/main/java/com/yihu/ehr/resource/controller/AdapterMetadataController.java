@@ -70,12 +70,12 @@ public class AdapterMetadataController extends BaseRestController {
     }
 
     @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas,method = RequestMethod.DELETE)
-    @ApiOperation("删除适配数据元")
+    @ApiOperation("批量删除适配数据元")
     public boolean deleteMetadataBatch(
-            @ApiParam(name="id",value="数据元ID",defaultValue = "")
-            @RequestParam(name="id") String id) throws Exception
+            @ApiParam(name="ids",value="数据元ID",defaultValue = "")
+            @RequestParam(name="ids") String ids) throws Exception
     {
-        metadataService.deleteAdapterMetadata(id);
+        metadataService.deleteAdapterMetadata(ids);
         return true;
     }
 

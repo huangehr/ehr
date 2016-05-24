@@ -80,12 +80,7 @@ public class RsDictionaryController extends BaseRestController {
             @ApiParam(name = "json_data", value = "")
             @RequestBody String jsonData) throws Exception {
         RsDictionary dictionary = toEntity(jsonData, RsDictionary.class);
-        String id = dictionary.getId();
-        RsDictionary d = dictionaryService.findById(id);
-        String code = dictionary.getCode();
-        if(code!=d.getCode()){
-            throw new Exception("字典代码不可修改");
-        }
+        hasChild(dictionary);
         dictionaryService.save(dictionary);
         return convertToModel(dictionary, MRsDictionary.class, null);
     }
@@ -97,11 +92,7 @@ public class RsDictionaryController extends BaseRestController {
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id) throws Exception {
         RsDictionary dictionary = dictionaryService.findById(id);
-        String code = dictionary.getCode();
-        List<RsDictionaryEntry> dictionaryEntries = dictionaryEntryService.findByField("dictCode",code);
-        if(dictionaryEntries!=null && dictionaryEntries.size()!=0){
-            throw new Exception("该字典包含字典项，不可删除");
-        }
+        hasChild(dictionary);
         dictionaryService.delete(id);
         return true;
     }
@@ -115,7 +106,7 @@ public class RsDictionaryController extends BaseRestController {
         return convertToModel(dictionary, MRsDictionary.class);
     }
 
-    @RequestMapping(value = "/createRsDictionaries", method = RequestMethod.POST)
+    @RequestMapping(value = "/createRsDictionaries", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "批量创建标准字典", notes = "批量创建标准字典")
     public boolean createRsDictionaries(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
@@ -126,8 +117,16 @@ public class RsDictionaryController extends BaseRestController {
     }
 
 
-    public boolean isExistence(String code) {
+    private boolean isExistence(String code) {
         return dictionaryService.findByField("code",code) != null;
+    }
+
+    private void hasChild(RsDictionary dictionary) throws Exception {
+        String code = dictionary.getCode();
+        List<RsDictionaryEntry> dictionaryEntries = dictionaryEntryService.findByField("dictCode",code);
+        if(dictionaryEntries!=null && dictionaryEntries.size()!=0){
+            throw new Exception("该字典包含字典项，不可删除");
+        }
     }
 
 }
