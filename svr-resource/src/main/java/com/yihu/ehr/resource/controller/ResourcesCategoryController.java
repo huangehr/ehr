@@ -98,7 +98,6 @@ public class ResourcesCategoryController extends BaseRestController {
             HttpServletResponse response
     ) throws  Exception
     {
-        //Pageable pageable = new PageRequest(reducePage(page),size);
         long total = 0;
         Collection<MRsCategory> rsList;
 
@@ -117,8 +116,6 @@ public class ResourcesCategoryController extends BaseRestController {
         }
 
         pagedResponse(request,response,total,page,size);
-        //Page<MRsCategory> rsPage = new PageImpl<MRsCategory>((List<MRsCategory>)rsList,pageable,total);
-
         return (List<MRsCategory>)rsList;
     }
 

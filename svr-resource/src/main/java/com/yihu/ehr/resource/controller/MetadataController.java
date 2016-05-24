@@ -123,7 +123,6 @@ public class MetadataController  extends BaseRestController{
             HttpServletRequest request,
             HttpServletResponse response) throws Exception
     {
-        //Pageable pageable = new PageRequest(reducePage(page),size);
         long total = 0;
         Collection<MRsMetadata> metaList;
 
@@ -142,8 +141,6 @@ public class MetadataController  extends BaseRestController{
         }
 
         pagedResponse(request,response,total,page,size);
-        //Page<MRsMetadata> metaPage = new PageImpl<MRsMetadata>((List<MRsMetadata>)metaList,pageable,total);
-
         return (List<MRsMetadata>)metaList;
     }
 }

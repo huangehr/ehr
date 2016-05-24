@@ -104,7 +104,6 @@ public class AdapterSchemaController extends BaseRestController {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception
     {
-        //Pageable pageable = new PageRequest(reducePage(page),size);
         long total = 0;
         Collection<MRsAdapterSchema> metaList;
 
@@ -123,8 +122,6 @@ public class AdapterSchemaController extends BaseRestController {
         }
 
         pagedResponse(request,response,total,page,size);
-        //Page<MRsAdapterSchema> metaPage = new PageImpl<MRsAdapterSchema>((List<MRsAdapterSchema>)metaList,pageable,total);
-
         return (List<MRsAdapterSchema>)metaList;
     }
 }

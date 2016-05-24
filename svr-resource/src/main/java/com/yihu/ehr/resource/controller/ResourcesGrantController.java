@@ -136,7 +136,6 @@ public class ResourcesGrantController extends BaseRestController{
             HttpServletRequest request,
             HttpServletResponse response) throws Exception
     {
-        //Pageable pageable = new PageRequest(reducePage(page),size);
         long total = 0;
         Collection<MRsAppResource> rsAppList;
 
@@ -155,8 +154,6 @@ public class ResourcesGrantController extends BaseRestController{
         }
 
         pagedResponse(request,response,total,page,size);
-        //Page<MRsAppResource> rsAppPage = new PageImpl<MRsAppResource>((List<MRsAppResource>)rsAppList,pageable,total);
-
         return (List<MRsAppResource>)rsAppList;
     }
 
@@ -249,7 +246,6 @@ public class ResourcesGrantController extends BaseRestController{
             HttpServletRequest request,
             HttpServletResponse response) throws Exception
     {
-        //Pageable pageable = new PageRequest(reducePage(page),size);
         long total = 0;
         Collection<MRsAppResourceMetadata> rsAppMetaList;
 
@@ -268,8 +264,6 @@ public class ResourcesGrantController extends BaseRestController{
         }
 
         pagedResponse(request,response,total,page,size);
-        //Page<MRsAppResourceMetadata> rsPage = new PageImpl<MRsAppResourceMetadata>((List<MRsAppResourceMetadata>)rsAppMetaList,pageable,total);
-
         return (List<MRsAppResourceMetadata>)rsAppMetaList;
     }
 }
