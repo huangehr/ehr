@@ -20,4 +20,6 @@ public interface IResourceMetadataGrantService {
     long getCount(String filters) throws java.text.ParseException;
 
     List search(String fields, String filters, String sorts, Integer page, Integer size) throws java.text.ParseException;
+
+    RsAppResourceMetadata getRsMetadataGrantById(String id);
 }

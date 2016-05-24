@@ -41,7 +41,7 @@ public class MetadataController  extends BaseRestController{
     @ApiOperation("创建数据元")
     public MRsMetadata createMetadata(
         @ApiParam(name="metadata",value="数据元JSON",defaultValue = "")
-        @RequestParam(name="metadata") String metadata) throws Exception
+        @RequestParam(value="metadata") String metadata) throws Exception
     {
         RsMetadata rsMetadata = toEntity(metadata,RsMetadata.class);
         rsMetadata.setId(getObjectId(BizObject.RsMetadata));
@@ -53,7 +53,7 @@ public class MetadataController  extends BaseRestController{
     @ApiOperation("批量创建数据元")
     public Collection<MRsMetadata> createMetadataPatch(
             @ApiParam(name="metadatas",value="数据元JSON",defaultValue = "")
-            @RequestParam(name="metadatas") String metadatas) throws Exception
+            @RequestParam(value="metadatas") String metadatas) throws Exception
     {
         RsMetadata[] metadataArray = toEntity(metadatas, RsMetadata[].class);
 
@@ -71,7 +71,7 @@ public class MetadataController  extends BaseRestController{
     @ApiOperation("更新数据元")
     public MRsMetadata updateMetadata(
             @ApiParam(name="metadata",value="数据元JSON",defaultValue = "")
-            @RequestParam(name="metadata") String metadata) throws Exception
+            @RequestParam(value="metadata") String metadata) throws Exception
     {
         RsMetadata rsMetadata = toEntity(metadata,RsMetadata.class);
         rsMetadata = metadataService.saveMetadata(rsMetadata);
@@ -96,6 +96,15 @@ public class MetadataController  extends BaseRestController{
     {
         metadataService.deleteMetadata(id);
         return true;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.Metadata,method = RequestMethod.GET)
+    @ApiOperation("根据ID获取数据元")
+    public MRsMetadata getMetadataById(
+            @ApiParam(name="id",value="id",defaultValue = "")
+            @PathVariable(value="id") String id) throws Exception
+    {
+        return convertToModel(metadataService.getMetadataById(id),MRsMetadata.class);
     }
 
     @RequestMapping(value = ServiceApi.Resources.Metadatas,method = RequestMethod.GET)

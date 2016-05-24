@@ -11,6 +11,7 @@ import javax.persistence.*;
 @Table(name="rs_app_resource_metadata")
 public class RsAppResourceMetadata {
     private String id;
+    private String appId;
     private String appResourceId;
     private String resourceMetadataId;
     private String dimensionId;
@@ -32,15 +33,23 @@ public class RsAppResourceMetadata {
         return appResourceId;
     }
     public void setAppResourceId(String appResourceId) {
-        appResourceId = appResourceId;
+        this.appResourceId = appResourceId;
     }
 
-    @Column(name="metadata_id",nullable = false)
-    public String getMetadataId() {
+    @Column(name="app_id",nullable = false)
+    public String getAppId() {
+        return appId;
+    }
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
+    @Column(name="resource_metadata_id",nullable = false)
+    public String getResourceMetadataId() {
         return resourceMetadataId;
     }
-    public void setMetadataId(String resourceMetadataId) {
-        resourceMetadataId = resourceMetadataId;
+    public void setResourceMetadataId(String resourceMetadataId) {
+        this.resourceMetadataId = resourceMetadataId;
     }
 
     @Column(name="dimension_id")
@@ -48,7 +57,7 @@ public class RsAppResourceMetadata {
         return dimensionId;
     }
     public void setDimensionId(String dimensionId) {
-        dimensionId = dimensionId;
+        this.dimensionId = dimensionId;
     }
 
     @Column(name="dimension_value")
@@ -56,7 +65,7 @@ public class RsAppResourceMetadata {
         return dimensionValue;
     }
     public void setDimensionValue(String dimensionValue) {
-        dimensionValue = dimensionValue;
+        this.dimensionValue = dimensionValue;
     }
 
 }

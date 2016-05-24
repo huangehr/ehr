@@ -5,10 +5,11 @@ package com.yihu.ehr.agModel.resource;
  */
 public class RsAppResourceMetadataModel {
     private String id;
-    private String AppResourceId;
-    private String ResourceMetadataId;
-    private String DimensionId;
-    private String DimensionValue;
+    private String appResourceId;
+    private String appId;
+    private String resourceMetadataId;
+    private String dimensionId;
+    private String dimensionValue;
 
     public String getId() {
         return id;
@@ -18,31 +19,38 @@ public class RsAppResourceMetadataModel {
     }
 
     public String getAppResourceId() {
-        return AppResourceId;
+        return appResourceId;
     }
     public void setAppResourceId(String appResourceId) {
-        AppResourceId = appResourceId;
+        this.appResourceId = appResourceId;
     }
 
-    public String getMetadataId() {
-        return ResourceMetadataId;
+    public String getAppId() {
+        return appId;
     }
-    public void setMetadataId(String ResourceMetadataId) {
-        ResourceMetadataId = ResourceMetadataId;
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
+    public String getResourceMetadataId() {
+        return resourceMetadataId;
+    }
+    public void setResourceMetadataId(String resourceMetadataId) {
+        this.resourceMetadataId = resourceMetadataId;
     }
 
     public String getDimensionId() {
-        return DimensionId;
+        return dimensionId;
     }
     public void setDimensionId(String dimensionId) {
-        DimensionId = dimensionId;
+        this.dimensionId = dimensionId;
     }
 
     public String getDimensionValue() {
-        return DimensionValue;
+        return dimensionValue;
     }
     public void setDimensionValue(String dimensionValue) {
-        DimensionValue = dimensionValue;
+        this.dimensionValue = dimensionValue;
     }
 
 }

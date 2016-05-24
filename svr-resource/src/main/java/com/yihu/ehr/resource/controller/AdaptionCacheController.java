@@ -26,10 +26,10 @@ public class AdaptionCacheController extends BaseRestController{
     @RequestMapping(value= ServiceApi.Adaptions.Cache,method = RequestMethod.POST)
     @ApiOperation("缓存适配数据")
     public boolean cacheData(
-            @ApiParam(name="schema_id",value="schema_id",defaultValue = "")
-            @PathVariable("schema_id")String schema_id)
+            @ApiParam(name="id",value="schema_id",defaultValue = "")
+            @PathVariable(value = "id")String id)
     {
-        adapterCacheService.cacheData(schema_id);
+        adapterCacheService.cacheData(id);
         return true;
     }
 

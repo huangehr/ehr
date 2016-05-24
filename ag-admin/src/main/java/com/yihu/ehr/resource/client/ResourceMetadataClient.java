@@ -49,6 +49,11 @@ public interface ResourceMetadataClient {
     boolean deleteResourceMetadataPatch(
             @RequestParam(value = "resourceId") String resourceId);
 
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadata,method = RequestMethod.GET)
+    @ApiOperation("根据ID获取资源数据元")
+    public MRsResourceMetadata getRsMetadataById(
+            @PathVariable(value="id") String id);
+
     @ApiOperation("资源数据元查询")
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas, method = RequestMethod.GET)
     Page<MRsResourceMetadata> queryDimensions(

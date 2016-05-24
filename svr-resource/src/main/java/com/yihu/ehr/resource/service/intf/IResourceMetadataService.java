@@ -17,6 +17,14 @@ public interface IResourceMetadataService {
 
     void deleteRsMetadataByResourceId(String resourceId);
 
+    /**
+     * 获取资源数据元
+     *
+     * @param id String Id
+     * @return RsResourceMetadata
+     */
+    RsResourceMetadata getRsMetadataById(String id);
+
     long getCount(String filters) throws java.text.ParseException;
 
     List search(String fields, String filters, String sorts, Integer page, Integer size) throws java.text.ParseException;

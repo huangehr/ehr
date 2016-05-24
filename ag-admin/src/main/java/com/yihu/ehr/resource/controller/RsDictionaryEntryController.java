@@ -4,12 +4,14 @@ import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.resource.MRsDictionaryEntry;
 import com.yihu.ehr.resource.client.RsDictionaryEntryClient;
+import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,7 +29,7 @@ public class RsDictionaryEntryController extends BaseController {
 
     @RequestMapping(value = ServiceApi.Resources.DictEntries, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件获取标准字典项列表", notes = "根据查询条件获取标准字典项列表")
-    public List<MRsDictionaryEntry> searchRsDictionaryEntries(
+    public Envelop searchRsDictionaryEntries(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -38,41 +40,86 @@ public class RsDictionaryEntryController extends BaseController {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) throws Exception {
-        return rsDictionaryEntryClient.searchRsDictionaryEntries(fields,filters,sorts,page,size);
+        Envelop envelop = new Envelop();
+        try {
+            ResponseEntity<List<MRsDictionaryEntry>> responseEntity = rsDictionaryEntryClient.searchRsDictionaryEntries(fields,filters,sorts,page,size);
+            List<MRsDictionaryEntry> rsDictionaryEntries = responseEntity.getBody();
+            envelop = getResult(rsDictionaryEntries, getTotalCount(responseEntity), page, size);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+
+        return envelop;
     }
 
 
 
     @RequestMapping(value = ServiceApi.Resources.DictEntries, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建标准字典项", notes = "创建标准字典项")
-    public MRsDictionaryEntry createRsDictionaryEntry(
+    public Envelop createRsDictionaryEntry(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestBody String jsonData) throws Exception {
-        return rsDictionaryEntryClient.createRsDictionaryEntry(jsonData);
+        Envelop envelop = new Envelop();
+        try{
+            MRsDictionaryEntry rsDictionaryEntry = rsDictionaryEntryClient.createRsDictionaryEntry(jsonData);
+            envelop.setObj(rsDictionaryEntry);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
     }
 
     @RequestMapping(value =ServiceApi.Resources.DictEntries, method = RequestMethod.PUT)
     @ApiOperation(value = "修改标准字典项", notes = "修改标准字典项")
-    public MRsDictionaryEntry updateRsDictionaryEntry(
+    public Envelop updateRsDictionaryEntry(
             @ApiParam(name = "json_data", value = "")
             @RequestBody String jsonData) throws Exception {
-        return rsDictionaryEntryClient.updateRsDictionaryEntry(jsonData);
+        Envelop envelop = new Envelop();
+        try{
+            MRsDictionaryEntry rsDictionaryEntry = rsDictionaryEntryClient.updateRsDictionaryEntry(jsonData);
+            envelop.setObj(rsDictionaryEntry);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
     }
 
     @RequestMapping(value = ServiceApi.Resources.DictEntry, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除标准字典项", notes = "删除标准字典项")
-    public boolean deleteRsDictionaryEntry(
+    public Envelop deleteRsDictionaryEntry(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id) throws Exception {
-        return rsDictionaryEntryClient.deleteRsDictionaryEntry(id);
+        Envelop envelop = new Envelop();
+        try{
+            rsDictionaryEntryClient.deleteRsDictionaryEntry(id);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
     }
 
     @RequestMapping(value = ServiceApi.Resources.DictEntry, method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取获取标准字典")
-    public MRsDictionaryEntry getRsDictionaryEntryById(
+    public Envelop getRsDictionaryEntryById(
             @ApiParam(name = "id", value = "", defaultValue = "")
             @PathVariable(value = "id") String id) {
-        return rsDictionaryEntryClient.getRsDictionaryEntryById(id);
+        Envelop envelop = new Envelop();
+        try{
+            MRsDictionaryEntry rsDictionaryEntry = rsDictionaryEntryClient.getRsDictionaryEntryById(id);
+            envelop.setObj(rsDictionaryEntry);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
     }
 
 }

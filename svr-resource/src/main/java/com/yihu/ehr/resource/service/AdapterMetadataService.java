@@ -24,10 +24,10 @@ public class AdapterMetadataService extends BaseJpaService<RsAdapterMetadata,Ada
     private AdapterMetadataDao adMetadataDao;
 
     /**
-     * 保存适配方案
+     * 保存适配数据元
      *
-     * @param adapterMetadata RsAdapterMetadata 适配方案
-     * @return RsAdapterSchema 适配方案
+     * @param adapterMetadata RsAdapterMetadata 适配数据元
+     * @return RsAdapterSchema 适配数据元
      */
     public RsAdapterMetadata saveAdapterMetadata(RsAdapterMetadata adapterMetadata)
     {
@@ -35,7 +35,7 @@ public class AdapterMetadataService extends BaseJpaService<RsAdapterMetadata,Ada
     }
 
     /**
-     * 删除适配方案
+     * 删除适配数据元
      *
      * @param ids String 适配方案ID
      */
@@ -50,7 +50,7 @@ public class AdapterMetadataService extends BaseJpaService<RsAdapterMetadata,Ada
     }
 
     /**
-     * 获取适配方案
+     * 获取适配数据元
      *
      * @param sorts String 排序
      * @param page int 分页
@@ -62,5 +62,16 @@ public class AdapterMetadataService extends BaseJpaService<RsAdapterMetadata,Ada
         Pageable pageable =  new PageRequest(page,size,parseSorts(sorts));
 
         return adMetadataDao.findAll(pageable);
+    }
+
+    /**
+     * 获取适配数据元
+     *
+     * @param id String Id
+     * @return RsAdapterMetadata
+     */
+    public RsAdapterMetadata getAdapterMetadataById(String id)
+    {
+        return adMetadataDao.findOne(id);
     }
 }

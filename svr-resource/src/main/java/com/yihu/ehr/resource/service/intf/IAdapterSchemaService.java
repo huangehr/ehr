@@ -28,6 +28,14 @@ public interface IAdapterSchemaService {
     void deleteAdapterSchema(String ids);
 
     /**
+     * 获取适配方案
+     *
+     * @param id String Id
+     * @return RsAdapterSchema
+     */
+    RsAdapterSchema getAdapterSchemaById(String id);
+
+    /**
      * 保存适配方案
      *
      * @param adapterSchema RsAdapterSchema 适配方案

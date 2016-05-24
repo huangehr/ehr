@@ -20,4 +20,6 @@ public interface IResourcesCategoryService {
 
     Page<RsCategory> getRsCategories(String sorts, int page, int size);
 
+    RsCategory getRsCategoryById(String id);
+
 }

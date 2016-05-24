@@ -22,7 +22,7 @@ public interface AdaptionCacheClient {
     @RequestMapping(value = ServiceApi.Adaptions.Cache, method = RequestMethod.POST)
     @ApiOperation("缓存适配数据")
     boolean cacheData(
-            @PathVariable("schema_id") String schema_id);
+            @PathVariable("id") String id);
 
     @RequestMapping(value = ServiceApi.Adaptions.CacheGet, method = RequestMethod.GET)
     @ApiOperation("获取适配数据")

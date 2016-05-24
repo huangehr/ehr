@@ -39,7 +39,7 @@ public class ResourcesController extends BaseRestController {
     @RequestMapping(value = ServiceApi.Resources.Resources,method = RequestMethod.POST)
     public MRsResources createResource(
             @ApiParam(name="resource",value="资源",defaultValue = "")
-            @RequestParam(name="resource")String resource) throws Exception
+            @RequestParam(value="resource")String resource) throws Exception
     {
         RsResource rs = toEntity(resource,RsResource.class);
         rs.setId(getObjectId(BizObject.Resources));
@@ -51,7 +51,7 @@ public class ResourcesController extends BaseRestController {
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.PUT)
     public MRsResources updateResources(
             @ApiParam(name="resource",value="资源",defaultValue="")
-            @RequestParam(name="resource")String resource) throws Exception
+            @RequestParam(value="resource")String resource) throws Exception
     {
         RsResource rs = toEntity(resource,RsResource.class);
         rsService.saveResource(rs);
@@ -72,25 +72,34 @@ public class ResourcesController extends BaseRestController {
     @RequestMapping(value = ServiceApi.Resources.Resources,method = RequestMethod.DELETE)
     public boolean deleteResourcesPatch(
             @ApiParam(name="id",value="资源ID",defaultValue = "")
-            @RequestParam(name="id") String id) throws Exception
+            @RequestParam(value="id") String id) throws Exception
     {
         rsService.deleteResource(id);
         return true;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.Resource,method = RequestMethod.GET)
+    @ApiOperation("根据ID获取资源")
+    public MRsResources getResourceById(
+            @ApiParam(name="id",value="id",defaultValue = "")
+            @PathVariable(value="id") String id) throws Exception
+    {
+        return convertToModel(rsService.getResourceById(id),MRsResources.class);
     }
 
     @ApiOperation("资源查询")
     @RequestMapping(value = ServiceApi.Resources.Resources,method = RequestMethod.GET)
     public Page<MRsResources> queryResources(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
-            @RequestParam(name="fields",required = false)String fields,
+            @RequestParam(value="fields",required = false)String fields,
             @ApiParam(name="filters",value="过滤",defaultValue = "")
-            @RequestParam(name="filters",required = false)String filters,
+            @RequestParam(value="filters",required = false)String filters,
             @ApiParam(name="sorts",value="排序",defaultValue = "")
-            @RequestParam(name="sorts",required = false)String sorts,
+            @RequestParam(value="sorts",required = false)String sorts,
             @ApiParam(name="page",value="页码",defaultValue = "1")
-            @RequestParam(name="page",required = false)int page,
+            @RequestParam(value="page",required = false)int page,
             @ApiParam(name="size",value="分页大小",defaultValue = "15")
-            @RequestParam(name="size",required = false)int size,
+            @RequestParam(value="size",required = false)int size,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception
     {

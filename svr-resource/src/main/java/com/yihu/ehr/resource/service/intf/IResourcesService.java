@@ -21,4 +21,6 @@ public interface IResourcesService {
     Page<RsResource> getResources(String sorts, int page, int size);
 
     List<RsResource> findByCategoryId(String categoryId);
+
+    RsResource getResourceById(String id);
 }

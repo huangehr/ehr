@@ -10,7 +10,7 @@ import javax.persistence.*;
  * 资源类别
  */
 @Entity
-@Table(name="rs_category")
+@Table(name="rs_resources_category")
 public class RsCategory {
 
     private String id;

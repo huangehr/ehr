@@ -27,6 +27,14 @@ public interface IMetadataService {
     RsMetadata saveMetadata(RsMetadata metadata);
 
     /**
+     * 获取数据元
+     *
+     * @param id String Id
+     * @return RsMetadata
+     */
+     RsMetadata getMetadataById(String id);
+
+    /**
      * 资源获取
      *
      * @param sorts 排序
