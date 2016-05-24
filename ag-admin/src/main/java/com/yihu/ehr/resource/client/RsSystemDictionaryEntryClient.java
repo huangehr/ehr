@@ -28,8 +28,8 @@ public interface RsSystemDictionaryEntryClient {
             @RequestParam(value = "fields", required = false) String fields,
             @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,
-            @RequestParam(value = "size", required = false) int size,
-            @RequestParam(value = "page", required = false) int page);
+            @RequestParam(value = "page", required = false) int page,
+            @RequestParam(value = "size", required = false) int size);
 
     @RequestMapping(value = ServiceApi.Resources.SystemDictEntries, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建系统字典项", notes = "创建系统字典项")
