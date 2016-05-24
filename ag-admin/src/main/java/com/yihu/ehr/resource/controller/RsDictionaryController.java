@@ -1,13 +1,9 @@
 package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsDictionary;
-import com.yihu.ehr.resource.model.RsDictionary;
-import com.yihu.ehr.resource.model.RsDictionaryEntry;
-import com.yihu.ehr.resource.service.RsDictionaryEntryService;
-import com.yihu.ehr.resource.service.RsDictionaryService;
-import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.resource.client.RsDictionaryClient;
+import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -15,25 +11,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author linaz
- * @created 2016.05.17 16:33
+ * @created 2016.05.23 17:11
  */
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0 + "/dictionaries")
+@RequestMapping(value = ApiVersion.Version1_0 + "/admin" + "/dictionaries")
 @Api(value = "dictionaries", description = "标准字典服务接口")
-public class RsDictionaryController extends BaseRestController {
+public class RsDictionaryController extends BaseController {
 
     @Autowired
-    private RsDictionaryService dictionaryService;
+    private RsDictionaryClient rsDictionaryClient;
 
-    @Autowired
-    private RsDictionaryEntryService dictionaryEntryService;
 
     @RequestMapping(value = "/searchRsDictionaries", method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件获取标准字典列表", notes = "根据查询条件获取标准字典列表")
@@ -47,13 +38,8 @@ public class RsDictionaryController extends BaseRestController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-        List<RsDictionary> dictionaries = dictionaryService.search(fields, filters, sorts, page, size);
-        pagedResponse(request, response, dictionaryService.getCount(filters), page, size);
-
-        return (List<MRsDictionary>) convertToModels(dictionaries, new ArrayList<MRsDictionary>(dictionaries.size()), MRsDictionary.class, fields);
+            @RequestParam(value = "page", required = false) int page) throws Exception {
+        return rsDictionaryClient.searchRsDictionaries(fields,filters,sorts,page,size);
     }
 
 
@@ -63,15 +49,7 @@ public class RsDictionaryController extends BaseRestController {
     public MRsDictionary createRsDictionary(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestBody String jsonData) throws Exception {
-        RsDictionary rsDictionary = toEntity(jsonData, RsDictionary.class);
-        String code = rsDictionary.getCode();
-        if(isExistence(code)){
-            throw new Exception("字典代码不能重复");
-        }
-        rsDictionary.setId(getObjectId(BizObject.Dimensions));
-        dictionaryService.save(rsDictionary);
-        return convertToModel(rsDictionary, MRsDictionary.class, null);
-
+        return rsDictionaryClient.createRsDictionary(jsonData);
     }
 
     @RequestMapping(value = "/updateRsDictionary", method = RequestMethod.PUT)
@@ -79,10 +57,7 @@ public class RsDictionaryController extends BaseRestController {
     public MRsDictionary updateRsDictionary(
             @ApiParam(name = "json_data", value = "")
             @RequestBody String jsonData) throws Exception {
-        RsDictionary dictionary = toEntity(jsonData, RsDictionary.class);
-        hasChild(dictionary);
-        dictionaryService.save(dictionary);
-        return convertToModel(dictionary, MRsDictionary.class, null);
+        return rsDictionaryClient.updateRsDictionary(jsonData);
     }
 
 
@@ -91,10 +66,7 @@ public class RsDictionaryController extends BaseRestController {
     public boolean deleteRsDictionary(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id) throws Exception {
-        RsDictionary dictionary = dictionaryService.findById(id);
-        hasChild(dictionary);
-        dictionaryService.delete(id);
-        return true;
+        return rsDictionaryClient.deleteRsDictionary(id);
     }
 
     @RequestMapping(value = "/getRsDictionaryById", method = RequestMethod.GET)
@@ -102,31 +74,15 @@ public class RsDictionaryController extends BaseRestController {
     public MRsDictionary getRsDictionaryById(
             @ApiParam(name = "id", value = "", defaultValue = "")
             @RequestParam(value = "id") String id) {
-        RsDictionary dictionary = dictionaryService.findById(id);
-        return convertToModel(dictionary, MRsDictionary.class);
+        return rsDictionaryClient.getRsDictionaryById(id);
     }
 
-    @RequestMapping(value = "/createRsDictionaries", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/createRsDictionaries", method = RequestMethod.POST)
     @ApiOperation(value = "批量创建标准字典", notes = "批量创建标准字典")
     public boolean createRsDictionaries(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestBody String jsonData) throws Exception {
-        RsDictionary[] list = toEntity(jsonData,RsDictionary[].class);;
-        dictionaryService.batchInsertDictionaries(list);
-        return true;
-    }
-
-
-    private boolean isExistence(String code) {
-        return dictionaryService.findByField("code",code) != null;
-    }
-
-    private void hasChild(RsDictionary dictionary) throws Exception {
-        String code = dictionary.getCode();
-        List<RsDictionaryEntry> dictionaryEntries = dictionaryEntryService.findByField("dictCode",code);
-        if(dictionaryEntries!=null && dictionaryEntries.size()!=0){
-            throw new Exception("该字典包含字典项，不可删除");
-        }
+        return rsDictionaryClient.createRsDictionaries(jsonData);
     }
 
 }

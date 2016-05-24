@@ -300,4 +300,14 @@ public class ConventionalDictController extends BaseRestController {
         SystemDictEntry drugFlag = dictEntryService.getDictEntry(16, code);
         return getDictModel(drugFlag);
     }
+
+    @RequestMapping(value = "/dictionaries/resource_adapt_scheme", method = RequestMethod.GET)
+    @ApiOperation(value = "获取资源适配方案类别字典项", response = MConventionalDict.class)
+    public MConventionalDict getResourceAdaptScheme(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        SystemDictEntry drugFlag = dictEntryService.getDictEntry(39, code);
+        return getDictModel(drugFlag);
+    }
+
 }

@@ -1,17 +1,9 @@
-package com.yihu.ehr.resource.model;
-
-import org.hibernate.annotations.GenericGenerator;
-
-import javax.persistence.*;
+package com.yihu.ehr.agModel.resource;
 
 /**
- * 资源系统字典
- *
- * Created by lyr on 2016/5/13.
+ * Created by lyr on 2016/5/16.
  */
-@Entity
-@Table(name="rs_system_dictionary")
-public class RsSystemDictionary {
+public class RsSystemDictionaryModel {
     private String id;
     private String code;
     private String name;
@@ -21,10 +13,6 @@ public class RsSystemDictionary {
     private String textColumn;
     private String expandColumn;
 
-    @Id
-    @GeneratedValue(generator = "Generator")
-    @GenericGenerator(name = "Generator", strategy = "assigned")
-    @Column(name = "id", unique = true, nullable = false)
     public String getId() {
         return id;
     }
@@ -33,7 +21,6 @@ public class RsSystemDictionary {
         this.id = id;
     }
 
-    @Column(name = "code",nullable = false)
     public String getCode()
     {
         return code;
@@ -43,7 +30,6 @@ public class RsSystemDictionary {
         this.code = code;
     }
 
-    @Column(name="name",nullable = false)
     public String getName()
     {
         return name;
@@ -53,7 +39,6 @@ public class RsSystemDictionary {
         this.name = name;
     }
 
-    @Column(name="description")
     public String getDescription()
     {
         return description;
@@ -63,7 +48,6 @@ public class RsSystemDictionary {
         this.description = description;
     }
 
-    @Column(name="related_table")
     public String getRelatedTable()
     {
         return relatedTable;
@@ -73,7 +57,6 @@ public class RsSystemDictionary {
         this.relatedTable = relatedTable;
     }
 
-    @Column(name="code_column")
     public String getCodeColumn()
     {
         return codeColumn;
@@ -83,7 +66,6 @@ public class RsSystemDictionary {
         this.codeColumn = codeColumn;
     }
 
-    @Column(name="text_column")
     public String getTextColumn()
     {
         return textColumn;
@@ -93,7 +75,6 @@ public class RsSystemDictionary {
         this.textColumn = textColumn;
     }
 
-    @Column(name="expand_column")
     public String getExpandColumn()
     {
         return expandColumn;
@@ -102,4 +83,5 @@ public class RsSystemDictionary {
     {
         this.expandColumn = expandColumn;
     }
+
 }

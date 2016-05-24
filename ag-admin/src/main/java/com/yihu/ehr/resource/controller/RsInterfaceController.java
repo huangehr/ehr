@@ -2,11 +2,9 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsInterface;
-import com.yihu.ehr.resource.model.RsInterface;
-import com.yihu.ehr.resource.service.RsInterfaceService;
-import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.resource.client.RsInterfaceClient;
+import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -14,21 +12,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author linaz
- * @created 2016.05.17 16:33
+ * @created 2016.05.23 17:11
  */
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0)
+@RequestMapping(value = ApiVersion.Version1_0 + "/admin")
 @Api(value = "interfaces", description = "资源服务接口")
-public class RsInterfaceController extends BaseRestController {
+public class RsInterfaceController extends BaseController {
     @Autowired
-    private RsInterfaceService interfaceService;
+    private RsInterfaceClient rsInterfaceClient;
 
     @RequestMapping(value = ServiceApi.Resources.Interfaces, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件获取资源列表", notes = "根据查询条件获取资源列表")
@@ -42,13 +37,8 @@ public class RsInterfaceController extends BaseRestController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-        List<RsInterface> interfaces = interfaceService.search(fields, filters, sorts, page, size);
-        pagedResponse(request, response, interfaceService.getCount(filters), page, size);
-
-        return (List<MRsInterface>) convertToModels(interfaces, new ArrayList<MRsInterface>(interfaces.size()), MRsInterface.class, fields);
+            @RequestParam(value = "page", required = false) int page) throws Exception {
+        return rsInterfaceClient.searchRsInterfaces(fields,filters,sorts,size,page);
     }
 
 
@@ -57,11 +47,7 @@ public class RsInterfaceController extends BaseRestController {
     public MRsInterface createRsInterface(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestBody String jsonData) throws Exception {
-        RsInterface rsInterface = toEntity(jsonData, RsInterface.class);
-        rsInterface.setId(getObjectId(BizObject.RsInterface));
-        interfaceService.save(rsInterface);
-        return convertToModel(rsInterface, MRsInterface.class, null);
-
+        return rsInterfaceClient.createRsInterface(jsonData);
     }
 
     @RequestMapping(value = ServiceApi.Resources.Interfaces, method = RequestMethod.PUT)
@@ -69,9 +55,7 @@ public class RsInterfaceController extends BaseRestController {
     public MRsInterface updateRsInterface(
             @ApiParam(name = "json_data", value = "")
             @RequestBody String jsonData) throws Exception {
-        RsInterface rsInterface = toEntity(jsonData, RsInterface.class);
-        interfaceService.save(rsInterface);
-        return convertToModel(rsInterface, MRsInterface.class, null);
+        return rsInterfaceClient.updateRsInterface(jsonData);
     }
 
     @RequestMapping(value = ServiceApi.Resources.Interface, method = RequestMethod.DELETE)
@@ -79,7 +63,6 @@ public class RsInterfaceController extends BaseRestController {
     public boolean deleteRsInterface(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id) throws Exception {
-        interfaceService.delete(id);
-        return true;
+        return rsInterfaceClient.deleteRsInterface(id);
     }
 }

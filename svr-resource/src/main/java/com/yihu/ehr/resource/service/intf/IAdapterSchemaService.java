@@ -23,9 +23,9 @@ public interface IAdapterSchemaService {
     /**
      * 删除适配方案
      *
-     * @param id String 适配方案ID
+     * @param ids String 适配方案ID
      */
-    void deleteAdapterSchema(String id);
+    void deleteAdapterSchema(String ids);
 
     /**
      * 保存适配方案

@@ -42,13 +42,13 @@ public class AdapterSchemaService extends BaseJpaService<RsAdapterSchema,Adapter
     /**
      * 删除适配方案
      *
-     * @param id String 适配方案ID
+     * @param ids String 适配方案ID
      */
-    public void deleteAdapterSchema(String id)
+    public void deleteAdapterSchema(String ids)
     {
-        String[] ids = id.split(",");
+        String[] idsArray = ids.split(",");
 
-        for(String id_ : ids)
+        for(String id_ : idsArray)
         {
             metadataDao.deleteBySchemaId(id_);
             schemaDao.delete(id_);
