@@ -51,7 +51,7 @@ public class ServiceApi {
         public static final String Metadata                     ="/resources/metadatas/{id}";
 
         public static final String Dicts                         ="/resources/dicts";
-        public static final String DictsBatch                   ="/resources/dicts/batch";
+        public static final String DictsBatch                    ="/resources/dicts/batch";
         public static final String Dict                          ="/resources/dicts/{id}";
 
         public static final String DictEntries                   ="/resources/dictentries";

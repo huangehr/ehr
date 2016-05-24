@@ -7,6 +7,7 @@ import com.yihu.ehr.model.resource.MRsInterface;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -23,7 +24,7 @@ public interface RsInterfaceClient {
 
     @RequestMapping(value = ServiceApi.Resources.Interfaces, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件获取资源列表", notes = "根据查询条件获取资源列表")
-    List<MRsInterface> searchRsInterfaces(
+    ResponseEntity<List<MRsInterface>> searchRsInterfaces(
             @RequestParam(value = "fields", required = false) String fields,
             @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,
