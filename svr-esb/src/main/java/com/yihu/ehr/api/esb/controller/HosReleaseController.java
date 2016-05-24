@@ -87,9 +87,7 @@ public class HosReleaseController extends BaseRestController{
             @PathVariable(value = "id") String id) throws Exception {
         HosEsbMiniRelease hosEsbMiniRelease = hosEsbMiniReleaseService.retrieve(id);
         String filePath = hosEsbMiniRelease.getFile();
-        String groupName = filePath.split("/")[0];
-        String remoteFileName = filePath.substring(groupName.length()+1,filePath.length());
-        fastDFSUtil.delete(groupName,remoteFileName);
+        deleteFile(filePath);
         hosEsbMiniReleaseService.delete(id);
         return true;
     }
@@ -99,11 +97,19 @@ public class HosReleaseController extends BaseRestController{
     @ApiOperation(value = "根据查询条件批量删除程序版本发布信息", notes = "根据查询条件批量删除程序版本发布信息")
     public boolean deleteHosEsbMiniReleases(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters) throws ParseException {
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
         List<HosEsbMiniRelease> hosEsbMiniReleases = hosEsbMiniReleaseService.search( filters);
         for(HosEsbMiniRelease hosEsbMiniRelease : hosEsbMiniReleases){
+            String filePath = hosEsbMiniRelease.getFile();
+            deleteFile(filePath);
             hosEsbMiniReleaseService.delete(hosEsbMiniRelease.getId());
         }
         return true;
+    }
+
+    private void deleteFile(String filePath) throws Exception {
+        String groupName = filePath.split("/")[0];
+        String remoteFileName = filePath.substring(groupName.length()+1,filePath.length());
+        fastDFSUtil.delete(groupName,remoteFileName);
     }
 }

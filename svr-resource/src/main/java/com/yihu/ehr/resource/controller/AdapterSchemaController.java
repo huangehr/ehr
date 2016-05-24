@@ -52,9 +52,9 @@ public class AdapterSchemaController extends BaseRestController {
     @ApiOperation("更新适配方案")
     public MRsAdapterSchema updateSchema(
             @ApiParam(name="adapterSchemaa",value="数据元JSON",defaultValue = "")
-            @RequestParam(name="adapterSchemaa") String adapterSchemaa) throws Exception
+            @RequestParam(name="adapterSchemaa") String adapterSchema) throws Exception
     {
-        RsAdapterSchema schema = toEntity(adapterSchemaa,RsAdapterSchema.class);
+        RsAdapterSchema schema = toEntity(adapterSchema,RsAdapterSchema.class);
         schema = schemaService.saveAdapterSchema(schema);
         return convertToModel(schema,MRsAdapterSchema.class);
     }
@@ -70,12 +70,12 @@ public class AdapterSchemaController extends BaseRestController {
     }
 
     @RequestMapping(value = ServiceApi.Adaptions.Schemas,method = RequestMethod.DELETE)
-    @ApiOperation("删除适配方案")
+    @ApiOperation("批量删除适配方案")
     public boolean deleteSchemaBatch(
-            @ApiParam(name="id",value="数据元ID",defaultValue = "")
-            @RequestParam(name="id") String id) throws Exception
+            @ApiParam(name="ids",value="ids",defaultValue = "")
+            @RequestParam(name="ids") String ids) throws Exception
     {
-        schemaService.deleteAdapterSchema(id);
+        schemaService.deleteAdapterSchema(ids);
         return true;
     }
 

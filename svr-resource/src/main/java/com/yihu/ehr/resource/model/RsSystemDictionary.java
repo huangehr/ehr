@@ -10,7 +10,7 @@ import javax.persistence.*;
  * Created by lyr on 2016/5/13.
  */
 @Entity
-@Table(name="rs_dictionary")
+@Table(name="rs_system_dictionary")
 public class RsSystemDictionary {
     private String id;
     private String code;

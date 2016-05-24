@@ -27,7 +27,7 @@ public class FileResourceController {
     FileResourceClient fileResourceClient;
 
     @RequestMapping(value = "/files", method = RequestMethod.POST)
-    @ApiOperation(value = "file upload test")
+    @ApiOperation(value = "资源文件上传")
     public String pictureUpload(
             @ApiParam(name = "file_str", value = "文件流转化后的字符串")
             @RequestParam(value = "file_str") String fileStr,

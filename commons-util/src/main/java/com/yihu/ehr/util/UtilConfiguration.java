@@ -2,14 +2,11 @@ package com.yihu.ehr.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.yihu.ehr.util.compress.Zipper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * 常用工具类Bean配置源，可用来产生一些常用的工具单件，并由Spring管理。
