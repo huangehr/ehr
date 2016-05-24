@@ -40,7 +40,7 @@ public class AdapterMetadataController extends BaseRestController {
     @ApiOperation("创建适配数据元")
     public MRsAdapterMetadata createMetadata(
             @ApiParam(name="adapterMetadata",value="数据元JSON",defaultValue = "")
-            @RequestParam(name="adapterMetadata") String adapterMetadata) throws Exception
+            @RequestParam(value="adapterMetadata") String adapterMetadata) throws Exception
     {
         RsAdapterMetadata metadata = toEntity(adapterMetadata,RsAdapterMetadata.class);
         metadata.setId(getObjectId(BizObject.RsAdapterMetadata));
@@ -52,7 +52,7 @@ public class AdapterMetadataController extends BaseRestController {
     @ApiOperation("更新适配数据元")
     public MRsAdapterMetadata updateMetadata(
             @ApiParam(name="adapterMetadata",value="数据元JSON",defaultValue = "")
-            @RequestParam(name="adapterMetadata") String adapterMetadata) throws Exception
+            @RequestParam(value="adapterMetadata") String adapterMetadata) throws Exception
     {
         RsAdapterMetadata metadata = toEntity(adapterMetadata,RsAdapterMetadata.class);
         metadata = metadataService.saveAdapterMetadata(metadata);
@@ -73,25 +73,35 @@ public class AdapterMetadataController extends BaseRestController {
     @ApiOperation("批量删除适配数据元")
     public boolean deleteMetadataBatch(
             @ApiParam(name="ids",value="数据元ID",defaultValue = "")
-            @RequestParam(name="ids") String ids) throws Exception
+            @RequestParam(value="ids") String ids) throws Exception
     {
         metadataService.deleteAdapterMetadata(ids);
         return true;
     }
 
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadata,method = RequestMethod.GET)
+    @ApiOperation("根据ID获取适配数据元")
+    public MRsAdapterMetadata getMetadataById(
+            @ApiParam(name="id",value="id",defaultValue = "")
+            @PathVariable(value="id") String id) throws Exception
+    {
+         return convertToModel(metadataService.getAdapterMetadataById(id),MRsAdapterMetadata.class);
+    }
+
+
     @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas,method = RequestMethod.GET)
     @ApiOperation("查询适配数据元")
     public Page<MRsAdapterMetadata> getMetadata(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
-            @RequestParam(name="fields",required = false)String fields,
+            @RequestParam(value="fields",required = false)String fields,
             @ApiParam(name="filters",value="过滤",defaultValue = "")
-            @RequestParam(name="filters",required = false)String filters,
+            @RequestParam(value="filters",required = false)String filters,
             @ApiParam(name="sorts",value="排序",defaultValue = "")
-            @RequestParam(name="sorts",required = false)String sorts,
+            @RequestParam(value="sorts",required = false)String sorts,
             @ApiParam(name="page",value="页码",defaultValue = "1")
-            @RequestParam(name="page",required = false)int page,
+            @RequestParam(value="page",required = false)int page,
             @ApiParam(name="size",value="分页大小",defaultValue = "15")
-            @RequestParam(name="size",required = false)int size,
+            @RequestParam(value="size",required = false)int size,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         Pageable pageable = new PageRequest(reducePage(page), size);

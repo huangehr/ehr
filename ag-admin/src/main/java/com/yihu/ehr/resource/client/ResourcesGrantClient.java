@@ -28,14 +28,14 @@ public interface ResourcesGrantClient {
     @ApiOperation("单个应用授权多个资源")
     @RequestMapping(value = ServiceApi.Resources.AppsGrantResources, method = RequestMethod.POST)
     Collection<MRsAppResource> grantAppResource(
-            @PathVariable(value = "app_id") String app_id,
-            @RequestParam(value = "resource_id") String resource_id);
+            @PathVariable(value = "appId") String appId,
+            @RequestParam(value = "resourceId") String resourceId);
 
     @ApiOperation("资源授权多个应用")
     @RequestMapping(value = ServiceApi.Resources.ResourceGrantApps, method = RequestMethod.POST)
     Collection<MRsAppResource> grantResourceApp(
-            @PathVariable(value = "resource_id") String resource_id,
-            @RequestParam(value = "app_id") String app_id);
+            @PathVariable(value = "resourceId") String resourceId,
+            @RequestParam(value = "appId") String appId);
 
     @ApiOperation("资源授权删除")
     @RequestMapping(value = ServiceApi.Resources.ResourceGrant, method = RequestMethod.DELETE)
@@ -45,7 +45,12 @@ public interface ResourcesGrantClient {
     @ApiOperation("资源授权批量删除")
     @RequestMapping(value = ServiceApi.Resources.ResourceGrants, method = RequestMethod.DELETE)
     boolean deleteGrantBatch(
-            @RequestParam(value = "id") String id);
+            @RequestParam(value = "ids") String ids);
+
+    @RequestMapping(value = ServiceApi.Resources.ResourceGrant,method = RequestMethod.GET)
+    @ApiOperation("根据ID获取资源授权")
+    public MRsAppResource getRsAppGrantById(
+            @PathVariable(value="id") String id);
 
     @ApiOperation("资源授权查询")
     @RequestMapping(value = ServiceApi.Resources.ResourceGrants, method = RequestMethod.GET)
@@ -58,14 +63,14 @@ public interface ResourcesGrantClient {
     @ApiOperation("资源数据元授权")
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrantApp, method = RequestMethod.POST)
     MRsAppResourceMetadata grantRsMetaData(
-            @PathVariable(value = "metadata_id") String metadata_id,
-            @PathVariable(value = "app_resource_id") String app_resource_id);
+            @PathVariable(value = "metadataId") String metadataId,
+            @PathVariable(value = "appResourceId") String appResourceId);
 
     @ApiOperation("资源数据元批量授权")
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasGrantApp, method = RequestMethod.POST)
     Collection<MRsAppResourceMetadata> grantRsMetaDataBatch(
-            @PathVariable(value = "app_resource_id") String app_resource_id,
-            @RequestParam(value = "metadata_id") String metadata_id);
+            @PathVariable(value = "appResourceId") String appResourceId,
+            @RequestParam(value = "metadataIds") String metadataIds);
 
     @ApiOperation("资源数据元授权删除")
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasGrant, method = RequestMethod.DELETE)
@@ -75,7 +80,12 @@ public interface ResourcesGrantClient {
     @ApiOperation("资源数据元授权批量删除")
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasGrants, method = RequestMethod.DELETE)
     boolean deleteMetadataGrantBatch(
-            @RequestParam(value = "id") String id);
+            @RequestParam(value = "ids") String ids);
+
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasGrant,method = RequestMethod.GET)
+    @ApiOperation("根据ID获取资源数据元授权")
+    public MRsAppResourceMetadata getRsMetadataGrantById(
+            @PathVariable(value="id") String id);
 
     @ApiOperation("资源数据元授权查询")
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasGrants, method = RequestMethod.GET)

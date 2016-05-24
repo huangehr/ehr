@@ -39,7 +39,7 @@ public class ResourceMetadataController extends BaseRestController {
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas,method = RequestMethod.POST)
     public MRsResourceMetadata createResourceMetadata(
             @ApiParam(name="metadata",value="资源数据元",defaultValue = "")
-            @RequestParam(name="metadata")String metadata) throws Exception
+            @RequestParam(value="metadata")String metadata) throws Exception
     {
         RsResourceMetadata rsMetadata = toEntity(metadata,RsResourceMetadata.class);
         rsMetadata.setId(getObjectId(BizObject.ResourceMetadata));
@@ -51,7 +51,7 @@ public class ResourceMetadataController extends BaseRestController {
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasBatch,method = RequestMethod.POST)
     public Collection<MRsResourceMetadata> createResourceMetadataBatch(
             @ApiParam(name="metadatas",value="资源数据元",defaultValue = "")
-            @RequestParam(name="metadatas")String metadatas) throws Exception
+            @RequestParam(value="metadatas")String metadatas) throws Exception
     {
         RsResourceMetadata[] rsMetadata = toEntity(metadatas,RsResourceMetadata[].class);
 
@@ -69,7 +69,7 @@ public class ResourceMetadataController extends BaseRestController {
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas,method = RequestMethod.PUT)
     public MRsResourceMetadata updateResourceMetadata(
             @ApiParam(name="dimension",value="资源数据元",defaultValue="")
-            @RequestParam(name="dimension")String metadata) throws Exception
+            @RequestParam(value="dimension")String metadata) throws Exception
     {
         RsResourceMetadata  rsMetadata= toEntity(metadata,RsResourceMetadata.class);
         rsMetadataService.saveResourceMetadata(rsMetadata);
@@ -96,19 +96,28 @@ public class ResourceMetadataController extends BaseRestController {
         return true;
     }
 
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadata,method = RequestMethod.GET)
+    @ApiOperation("根据ID获取资源数据元")
+    public MRsResourceMetadata getRsMetadataById(
+            @ApiParam(name="id",value="id",defaultValue = "")
+            @PathVariable(value="id") String id) throws Exception
+    {
+        return convertToModel(rsMetadataService.getRsMetadataById(id),MRsResourceMetadata.class);
+    }
+
     @ApiOperation("资源数据元查询")
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas,method = RequestMethod.GET)
     public Page<MRsResourceMetadata> queryDimensions(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
-            @RequestParam(name="fields",required = false)String fields,
+            @RequestParam(value="fields",required = false)String fields,
             @ApiParam(name="filters",value="过滤",defaultValue = "")
-            @RequestParam(name="filters",required = false)String filters,
+            @RequestParam(value="filters",required = false)String filters,
             @ApiParam(name="sorts",value="排序",defaultValue = "")
-            @RequestParam(name="sorts",required = false)String sorts,
+            @RequestParam(value="sorts",required = false)String sorts,
             @ApiParam(name="page",value="页码",defaultValue = "1")
-            @RequestParam(name="page",required = false)int page,
+            @RequestParam(value="page",required = false)int page,
             @ApiParam(name="size",value="分页大小",defaultValue = "15")
-            @RequestParam(name="size",required = false)int size,
+            @RequestParam(value="size",required = false)int size,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception
     {

@@ -69,4 +69,16 @@ public class AdapterSchemaService extends BaseJpaService<RsAdapterSchema,Adapter
 
         return schemaDao.findAll(pageable);
     }
+
+
+    /**
+     * 获取适配方案
+     *
+     * @param id String Id
+     * @return RsAdapterSchema
+     */
+    public RsAdapterSchema getAdapterSchemaById(String id)
+    {
+        return schemaDao.findOne(id);
+    }
 }

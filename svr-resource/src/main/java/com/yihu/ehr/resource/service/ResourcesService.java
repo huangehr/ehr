@@ -75,5 +75,15 @@ public class ResourcesService extends BaseJpaService<RsResource, ResourcesDao> i
         return rsDao.findByCategoryId(CategoryId);
     }
 
+    /**
+     * 根据ID获取资源
+     *
+     * @param id String Id
+     * @return RsResource
+     */
+    public RsResource getResourceById(String id)
+    {
+        return rsDao.findOne(id);
+    }
 
 }

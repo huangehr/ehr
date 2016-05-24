@@ -27,6 +27,14 @@ public interface IAdapterMetadataService {
     void deleteAdapterMetadata(String ids);
 
     /**
+     * 获取适配数据元
+     *
+     * @param id String Id
+     * @return RsAdapterMetadata
+     */
+    RsAdapterMetadata getAdapterMetadataById(String id);
+
+    /**
      * 获取适配方案
      *
      * @param sorts String 排序

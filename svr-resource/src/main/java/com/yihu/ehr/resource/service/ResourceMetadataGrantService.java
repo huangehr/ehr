@@ -79,4 +79,15 @@ public class ResourceMetadataGrantService  extends BaseJpaService<RsResourceMeta
 
         return appRsMetadataDao.findAll(pageable);
     }
+
+    /**
+     * 根据ID获取资源数据元授权
+     *
+     * @param id String Id
+     * @return RsAppResource
+     */
+    public RsAppResourceMetadata getRsMetadataGrantById(String id)
+    {
+        return appRsMetadataDao.findOne(id);
+    }
 }
