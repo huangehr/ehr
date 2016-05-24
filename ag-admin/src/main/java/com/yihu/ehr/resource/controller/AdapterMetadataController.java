@@ -93,6 +93,24 @@ public class AdapterMetadataController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadata,method = RequestMethod.GET)
+    @ApiOperation("根据ID获取适配数据元")
+    public Envelop getMetadataById(
+            @ApiParam(name="id",value="id",defaultValue = "")
+            @PathVariable(value="id") String id) throws Exception
+    {
+        Envelop envelop = new Envelop();
+        try{
+            MRsAdapterMetadata rsAdapterMetadata = adapterMetadataClient.getMetadataById(id);
+            envelop.setObj(rsAdapterMetadata);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
     @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas, method = RequestMethod.GET)
     @ApiOperation("查询适配数据元")
     public Envelop getMetadata(
@@ -106,10 +124,19 @@ public class AdapterMetadataController extends BaseController {
             @RequestParam(value = "page", required = false) int page,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size) throws Exception {
-        ResponseEntity<List<MRsAdapterMetadata>> responseEntity = adapterMetadataClient.getMetadata(fields,filters,sorts,size,page);
-        List<MRsAdapterMetadata> rsAdapterMetadatas = responseEntity.getBody();
-        Envelop envelop = getResult(rsAdapterMetadatas, getTotalCount(responseEntity), page, size);
-        return envelop;
-
+        try
+        {
+            ResponseEntity<List<MRsAdapterMetadata>> responseEntity = adapterMetadataClient.getMetadata(fields,filters,sorts,size,page);
+            List<MRsAdapterMetadata> rsAdapterMetadatas = responseEntity.getBody();
+            Envelop envelop = getResult(rsAdapterMetadatas, getTotalCount(responseEntity), page, size);
+            return envelop;
+        }
+        catch (Exception e)
+        {
+            Envelop envelop = new Envelop();
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            return envelop;
+        }
     }
 }

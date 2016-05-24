@@ -81,7 +81,7 @@ public class AdapterSchemaController extends BaseRestController {
 
     @RequestMapping(value = ServiceApi.Adaptions.Schema,method = RequestMethod.GET)
     @ApiOperation("根据ID获取适配方案")
-    public MRsAdapterSchema getMetadataById(
+    public MRsAdapterSchema getAdapterSchemaById(
             @ApiParam(name="id",value="id",defaultValue = "")
             @PathVariable(value="id") String id) throws Exception
     {
@@ -90,7 +90,7 @@ public class AdapterSchemaController extends BaseRestController {
 
     @RequestMapping(value = ServiceApi.Adaptions.Schemas,method = RequestMethod.GET)
     @ApiOperation("查询适配方案")
-    public Page<MRsAdapterSchema> getSchema(
+    public List<MRsAdapterSchema> getSchema(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(value="fields",required = false)String fields,
             @ApiParam(name="filters",value="过滤",defaultValue = "")
@@ -104,7 +104,7 @@ public class AdapterSchemaController extends BaseRestController {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception
     {
-        Pageable pageable = new PageRequest(reducePage(page),size);
+        //Pageable pageable = new PageRequest(reducePage(page),size);
         long total = 0;
         Collection<MRsAdapterSchema> metaList;
 
@@ -123,8 +123,8 @@ public class AdapterSchemaController extends BaseRestController {
         }
 
         pagedResponse(request,response,total,page,size);
-        Page<MRsAdapterSchema> metaPage = new PageImpl<MRsAdapterSchema>((List<MRsAdapterSchema>)metaList,pageable,total);
+        //Page<MRsAdapterSchema> metaPage = new PageImpl<MRsAdapterSchema>((List<MRsAdapterSchema>)metaList,pageable,total);
 
-        return metaPage;
+        return (List<MRsAdapterSchema>)metaList;
     }
 }

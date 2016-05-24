@@ -68,13 +68,13 @@ public class ResourcesController extends BaseRestController {
         return true;
     }
 
-    @ApiOperation("资源删除")
+    @ApiOperation("批量资源删除")
     @RequestMapping(value = ServiceApi.Resources.Resources,method = RequestMethod.DELETE)
-    public boolean deleteResourcesPatch(
-            @ApiParam(name="id",value="资源ID",defaultValue = "")
-            @RequestParam(value="id") String id) throws Exception
+    public boolean deleteResourcesBatch(
+            @ApiParam(name="ids",value="资源ID",defaultValue = "")
+            @RequestParam(value="ids") String ids) throws Exception
     {
-        rsService.deleteResource(id);
+        rsService.deleteResource(ids);
         return true;
     }
 
@@ -89,7 +89,7 @@ public class ResourcesController extends BaseRestController {
 
     @ApiOperation("资源查询")
     @RequestMapping(value = ServiceApi.Resources.Resources,method = RequestMethod.GET)
-    public Page<MRsResources> queryResources(
+    public List<MRsResources> queryResources(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(value="fields",required = false)String fields,
             @ApiParam(name="filters",value="过滤",defaultValue = "")
@@ -103,7 +103,7 @@ public class ResourcesController extends BaseRestController {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception
     {
-        Pageable pageable = new PageRequest(reducePage(page),size);
+        //Pageable pageable = new PageRequest(reducePage(page),size);
         long total = 0;
         Collection<MRsResources> rsList;
 
@@ -122,8 +122,8 @@ public class ResourcesController extends BaseRestController {
         }
 
         pagedResponse(request,response,total,page,size);
-        Page<MRsResources> rsPage = new PageImpl<MRsResources>((List<MRsResources>)rsList,pageable,total);
+        //Page<MRsResources> rsPage = new PageImpl<MRsResources>((List<MRsResources>)rsList,pageable,total);
 
-        return rsPage;
+        return (List<MRsResources>)rsList;
     }
 }

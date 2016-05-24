@@ -83,7 +83,7 @@ public class ResourcesCategoryController extends BaseRestController {
 
     @RequestMapping(value = ServiceApi.Resources.Categories,method = RequestMethod.GET)
     @ApiOperation("获取资源类别")
-    public Page<MRsCategory> getRsCategories(
+    public List<MRsCategory> getRsCategories(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(value="fields",required = false)String fields,
             @ApiParam(name="filters",value="过滤",defaultValue = "")
@@ -98,7 +98,7 @@ public class ResourcesCategoryController extends BaseRestController {
             HttpServletResponse response
     ) throws  Exception
     {
-        Pageable pageable = new PageRequest(reducePage(page),size);
+        //Pageable pageable = new PageRequest(reducePage(page),size);
         long total = 0;
         Collection<MRsCategory> rsList;
 
@@ -117,9 +117,9 @@ public class ResourcesCategoryController extends BaseRestController {
         }
 
         pagedResponse(request,response,total,page,size);
-        Page<MRsCategory> rsPage = new PageImpl<MRsCategory>((List<MRsCategory>)rsList,pageable,total);
+        //Page<MRsCategory> rsPage = new PageImpl<MRsCategory>((List<MRsCategory>)rsList,pageable,total);
 
-        return rsPage;
+        return (List<MRsCategory>)rsList;
     }
 
 }

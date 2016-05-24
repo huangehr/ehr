@@ -7,6 +7,7 @@ import com.yihu.ehr.model.resource.MRsMetadata;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author linaz
@@ -45,9 +47,9 @@ public interface MetadataClient {
             @PathVariable(value = "id") String id);
 
     @RequestMapping(value = ServiceApi.Resources.Metadatas, method = RequestMethod.DELETE)
-    @ApiOperation("删除数据元")
+    @ApiOperation("批量删除数据元")
     boolean deleteMetadataBatch(
-            @RequestParam(value = "id") String id);
+            @RequestParam(value = "ids") String id);
 
     @RequestMapping(value = ServiceApi.Resources.Metadata,method = RequestMethod.GET)
     @ApiOperation("根据ID获取数据元")
@@ -56,7 +58,7 @@ public interface MetadataClient {
 
     @RequestMapping(value = ServiceApi.Resources.Metadatas, method = RequestMethod.GET)
     @ApiOperation("查询数据元")
-    Page<MRsMetadata> getMetadata(
+    ResponseEntity<List<MRsMetadata>> getMetadata(
             @RequestParam(value = "fields", required = false) String fields,
             @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,
