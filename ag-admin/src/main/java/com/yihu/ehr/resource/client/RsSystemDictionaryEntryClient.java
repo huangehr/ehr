@@ -7,6 +7,7 @@ import com.yihu.ehr.model.resource.MRsSystemDictionaryEntry;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -23,7 +24,7 @@ public interface RsSystemDictionaryEntryClient {
 
     @RequestMapping(value = ServiceApi.Resources.SystemDictEntries, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件获取系统字典项列表", notes = "根据查询条件获取系统字典项列表")
-    List<MRsSystemDictionaryEntry> searchRsSystemDictionaryEntries(
+    ResponseEntity<List<MRsSystemDictionaryEntry>> searchRsSystemDictionaryEntries(
             @RequestParam(value = "fields", required = false) String fields,
             @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,
