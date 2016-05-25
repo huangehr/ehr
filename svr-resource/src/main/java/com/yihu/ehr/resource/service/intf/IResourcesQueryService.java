@@ -1,7 +1,9 @@
 package com.yihu.ehr.resource.service.intf;
 
 
-import com.yihu.ehr.query.common.model.DataList;
+import org.springframework.data.domain.Page;
+
+import java.util.Map;
 
 /**
  * Created by hzp on 20160422.
@@ -20,5 +22,5 @@ public interface IResourcesQueryService {
      * @return
      * @throws Exception
      */
-    DataList getResources(String resourcesCode,String appId,String queryParams,Integer page,Integer size) throws Exception;
+    Page<Map<String,Object>> getResources(String resourcesCode,String appId,String queryParams,Integer page,Integer size) throws Exception;
 }

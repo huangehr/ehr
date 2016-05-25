@@ -2,12 +2,16 @@ package com.yihu.ehr.resource.dao;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.query.common.model.DataList;
 import com.yihu.ehr.query.common.model.SolrGroupEntity;
-import com.yihu.ehr.query.services.DBQuery;
+import com.yihu.ehr.query.common.sqlparser.ParserFactory;
+import com.yihu.ehr.query.common.sqlparser.ParserSql;
 import com.yihu.ehr.query.services.HbaseQuery;
 import com.yihu.ehr.query.services.SolrQuery;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,7 +27,7 @@ import java.util.Map;
 public class ResourcesQueryDao {
 
     @Autowired
-    DBQuery query;
+    JdbcTemplate jdbcTemplate;
     @Autowired
     HbaseQuery hbase;
     @Autowired
@@ -37,7 +41,7 @@ public class ResourcesQueryDao {
      * 获取Hbase主表
      * queryParams可为solr表达式，也可为json例：{"q":"*:*","fq":"","fl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}""}
      */
-    public DataList getEhrCenter(String queryParams, Integer page, Integer size) throws Exception {
+    public Page<Map<String,Object>> getEhrCenter(String queryParams, Integer page, Integer size) throws Exception {
         String core = "EHR_CENTER";
         String q = "";
         String fq = "";
@@ -79,7 +83,7 @@ public class ResourcesQueryDao {
      * 获取Hbase细表
      * queryParams可为solr表达式，也可为json例：{"table":"HDSD00_08","q":"*:*","fq":"","fl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}""}
      */
-    public DataList getEhrCenterSub(String queryParams, Integer page, Integer size) throws Exception {
+    public Page<Map<String,Object>> getEhrCenterSub(String queryParams, Integer page, Integer size) throws Exception {
         String core = "EHR_CENTER_SUB";
         String q = "";
         String fq = "";
@@ -128,7 +132,7 @@ public class ResourcesQueryDao {
      * habse主表的solr分组统计
      * queryParams为json例：{"q":"*:*","groupFields":"key1,key2","statsFields":"key3,key4","customGroup":[{"groupField":"lastUpdateTime","groupCondition":{"3Month":"last_update_time:[2016-02-16 TO *]","6Month":"last_update_time:[2015-11-10 TO *]"}}]}
      */
-    public DataList countEhrCenter(String queryParams, Integer page, Integer size) throws Exception {
+    public Page<Map<String,Object>> countEhrCenter(String queryParams, Integer page, Integer size) throws Exception {
         String core = "EHR_CENTER";
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> params = objectMapper.readValue(queryParams, Map.class);
@@ -194,7 +198,7 @@ public class ResourcesQueryDao {
      * habse细表的solr分组统计
      * queryParams为json例：{"table":"HDSD00_08","q":"*:*","groupFields":"key1,key2","statsFields":"key3,key4",customGroup:""}
      */
-    public DataList countEhrCenterSub(String queryParams, Integer page, Integer size) throws Exception {
+    public Page<Map<String,Object>> countEhrCenterSub(String queryParams, Integer page, Integer size) throws Exception {
         String core = "EHR_CENTER_SUB";
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, String> params = objectMapper.readValue(queryParams, Map.class);
@@ -249,7 +253,7 @@ public class ResourcesQueryDao {
     /**
      * 获取Mysql配置库数据
      */
-    public DataList getMysqlData(String queryParams, Integer page, Integer size) throws Exception {
+    public Page<Map<String,Object>> getMysqlData(String queryParams, Integer page, Integer size) throws Exception {
         String sql = queryParams;
 
         //判定是否完整sql语句
@@ -257,11 +261,23 @@ public class ResourcesQueryDao {
             sql = "select * from " + queryParams;
         }
 
+        //分页查询
         if (page != null && size != null) {
-            return query.queryBySql(sql, page, size);
-        } else {
-            return query.queryBySql(sql);
+            ParserSql parser = ParserFactory.getParserSql();
+            String sqlCount = parser.getCountSql(sql);
+            String sqlList = parser.getPageSql(sql, page, size);
+
+            //查询总条数
+            long count = jdbcTemplate.queryForObject(sqlCount,Long.class);
+            //查询数据
+            List<Map<String,Object>> list =jdbcTemplate.queryForList(sqlList);
+            return new PageImpl<Map<String, Object>>(list,new PageRequest(page, size),count);
         }
+        else{
+            //查询数据
+            return new PageImpl<Map<String, Object>>(jdbcTemplate.queryForList(sql));
+        }
+
     }
 
 

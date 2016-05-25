@@ -1,8 +1,7 @@
 package com.yihu.ehr.solr;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrRequest;
-import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FieldStatsInfo;
 import org.apache.solr.client.solrj.response.PivotField;
@@ -42,6 +41,10 @@ public class SolrUtil {
 
     /************************* 基础操作 **************************************************/
 
+
+
+
+
     /************************** 查询操作 *****************************************************/
     /**
      * 简单查询方法
@@ -59,8 +62,8 @@ public class SolrUtil {
      * @param rows 查询行数
      * @return
      */
-    public SolrDocumentList query(String tablename,String q,String fq,Map<String, String> sort,long start,long rows) throws Exception{
-        CloudSolrClient conn =  pool.getConnection(tablename);
+    public SolrDocumentList query(String core,String q,String fq,Map<String, String> sort,long start,long rows) throws Exception{
+        SolrClient conn =  pool.getConnection(core);
         SolrQuery query = new SolrQuery();
         if(null != q && !q.equals("")) //设置查询条件
         {
@@ -94,7 +97,7 @@ public class SolrUtil {
         System.out.print("Solr Query Time:"+qtime);
         SolrDocumentList docs = rsp.getResults();
 
-        pool.release(conn); //释放连接
+        pool.close(core); //释放连接
         return docs;
 
     }
@@ -103,15 +106,15 @@ public class SolrUtil {
     /**
      * 总数查询方法
      */
-    public long count(String tablename,String q) throws Exception{
-        return count(tablename, q, null);
+    public long count(String core,String q) throws Exception{
+        return count(core, q, null);
     }
 
     /**
      * 总数查询方法
      */
-    public long count(String tablename,String q,String fq) throws Exception{
-        CloudSolrClient conn =  pool.getConnection(tablename);
+    public long count(String core,String q,String fq) throws Exception{
+        SolrClient conn =  pool.getConnection(core);
         SolrQuery query = new SolrQuery();
         query.setRows(1);
         if(null != q && !q.equals("")) //设置查询条件
@@ -130,16 +133,16 @@ public class SolrUtil {
         qtime = rsp.getQTime();
         System.out.print("Solr Count Time:"+qtime);
 
-        pool.release(conn);
+        pool.close(core);
         return rsp.getResults().getNumFound();
     }
 
     /**
      * 单组分组Count统计（start从0开始）
      */
-    public Map<String,Long> groupCount(String tablename,String q,String groupField,int start,int rows) throws Exception
+    public Map<String,Long> groupCount(String core,String q,String groupField,int start,int rows) throws Exception
     {
-        CloudSolrClient conn =  pool.getConnection(tablename);
+        SolrClient conn =  pool.getConnection(core);
         SolrQuery query = new SolrQuery();
         if(null != q && !q.equals("")) //设置查询条件
         {
@@ -167,15 +170,15 @@ public class SolrUtil {
                 rmap.put(count.getName(), (long) count.getCount());
         }
 
-        pool.release(conn);
+        pool.close(core);
         return rmap;
     }
 
     /**
      * 多组分组Count(独立计算)
      */
-    public List<FacetField> groupCount(String tablename,String q,String[] groups) throws Exception{
-        CloudSolrClient conn =  pool.getConnection(tablename);
+    public List<FacetField> groupCount(String core,String q,String[] groups) throws Exception{
+        SolrClient conn =  pool.getConnection(core);
         SolrQuery query = new SolrQuery();
         if(null != q && !q.equals("")) //设置查询条件
         {
@@ -197,19 +200,17 @@ public class SolrUtil {
         System.out.print("Solr Group Time:"+qtime);
         List<FacetField> facets = rsp.getFacetFields();
 
-        pool.release(conn);
+        pool.close(core);
         return facets;
     }
 
     /**
      * 多组分组Count统计（关联计算）
-     * @param tablename
-     * @param q
      * @return
      */
-    public List<PivotField> groupCountMult(String tablename,String q,String groupFields,int start,int rows) throws Exception
+    public List<PivotField> groupCountMult(String core,String q,String groupFields,int start,int rows) throws Exception
     {
-        CloudSolrClient conn =  pool.getConnection(tablename);
+        SolrClient conn =  pool.getConnection(core);
         SolrQuery query = new SolrQuery();
         if(null != q && !q.equals("")) //设置查询条件
         {
@@ -231,7 +232,7 @@ public class SolrUtil {
 
         NamedList<List<PivotField>> namedList = rsp.getFacetPivot();
 
-        pool.release(conn);
+        pool.close(core);
         if(namedList != null && namedList.size()>0) {
             return namedList.getVal(0);
         }
@@ -243,14 +244,14 @@ public class SolrUtil {
     /**************************** 数值统计 ******************************************/
     /**
      * 分组数值统计
-     * @param tablename 表名
+     * @param core 表名
      * @param q 查询条件
      * @param statsField 统计字段
      * @param groupField 分组字段
      * @return
      */
-    public List<FieldStatsInfo> getStats(String tablename,String q,String statsField,String groupField) throws Exception{
-        CloudSolrClient conn =  pool.getConnection(tablename);
+    public List<FieldStatsInfo> getStats(String core,String q,String statsField,String groupField) throws Exception{
+        SolrClient conn =  pool.getConnection(core);
         SolrQuery query = new SolrQuery();
         if (null != q && !q.equals("")) //设置查询条件
         {
@@ -267,7 +268,7 @@ public class SolrUtil {
         System.out.print("Solr Stats Time:" + qtime);
 
         Map<String, FieldStatsInfo> stats = rsp.getFieldStatsInfo();
-        pool.release(conn);
+        pool.close(core);
         if (stats != null && stats.size() > 0) {
             Map<String, List<FieldStatsInfo>> map = stats.get(statsField).getFacets();
             if (map != null) {

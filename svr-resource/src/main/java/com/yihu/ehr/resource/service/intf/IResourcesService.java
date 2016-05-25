@@ -1,6 +1,6 @@
 package com.yihu.ehr.resource.service.intf;
 
-import com.yihu.ehr.resource.model.RsResource;
+import com.yihu.ehr.resource.model.RsResources;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.List;
  */
 public interface IResourcesService {
 
-    RsResource saveResource(RsResource resource);
+    RsResources saveResource(RsResources resource);
 
     void deleteResource(String id);
 
@@ -18,9 +18,9 @@ public interface IResourcesService {
 
     List search(String fields, String filters, String sorts, Integer page, Integer size) throws java.text.ParseException;
 
-    Page<RsResource> getResources(String sorts, int page, int size);
+    Page<RsResources> getResources(String sorts, int page, int size);
 
-    List<RsResource> findByCategoryId(String categoryId);
+    List<RsResources> findByCategoryId(String categoryId);
 
-    RsResource getResourceById(String id);
+    RsResources getResourceById(String id);
 }
