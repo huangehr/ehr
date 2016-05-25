@@ -111,7 +111,7 @@ public class ResourcesCategoryController extends BaseController {
             @RequestParam(value = "size", required = false) int size) throws Exception {
         try
         {
-            ResponseEntity<List<MRsCategory>> responseEntity = resourcesCategoryClient.getRsCategories(fields,filters,sorts,size,page);
+            ResponseEntity<List<MRsCategory>> responseEntity = resourcesCategoryClient.getRsCategories(fields,filters,sorts,page,size);
             List<MRsCategory> rsCategories = responseEntity.getBody();
             Envelop envelop = getResult(rsCategories, getTotalCount(responseEntity), page, size);
             return envelop;

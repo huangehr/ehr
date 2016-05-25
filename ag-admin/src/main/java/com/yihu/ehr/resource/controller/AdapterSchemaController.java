@@ -137,7 +137,7 @@ public class AdapterSchemaController extends BaseController {
             @RequestParam(value = "size", required = false) int size) throws Exception {
         try
         {
-            ResponseEntity<List<MRsAdapterSchema>> responseEntity = adapterSchemaClient.getSchema(fields,filters,sorts,size,page);
+            ResponseEntity<List<MRsAdapterSchema>> responseEntity = adapterSchemaClient.getSchema(fields,filters,sorts,page,size);
             List<MRsAdapterSchema> rsAdapterSchema = responseEntity.getBody();
             Envelop envelop = getResult(rsAdapterSchema, getTotalCount(responseEntity), page, size);
             return envelop;

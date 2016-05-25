@@ -126,7 +126,7 @@ public class AdapterMetadataController extends BaseController {
             @RequestParam(value = "size", required = false) int size) throws Exception {
         try
         {
-            ResponseEntity<List<MRsAdapterMetadata>> responseEntity = adapterMetadataClient.getMetadata(fields,filters,sorts,size,page);
+            ResponseEntity<List<MRsAdapterMetadata>> responseEntity = adapterMetadataClient.getMetadata(fields,filters,sorts,page,size);
             List<MRsAdapterMetadata> rsAdapterMetadatas = responseEntity.getBody();
             Envelop envelop = getResult(rsAdapterMetadatas, getTotalCount(responseEntity), page, size);
             return envelop;

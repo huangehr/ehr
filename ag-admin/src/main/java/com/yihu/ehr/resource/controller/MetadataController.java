@@ -145,7 +145,7 @@ public class MetadataController extends BaseController {
             @RequestParam(value = "size", required = false) int size) throws Exception {
         try
         {
-            ResponseEntity<List<MRsMetadata>> responseEntity = metadataClient.getMetadata(fields,filters,sorts,size,page);
+            ResponseEntity<List<MRsMetadata>> responseEntity = metadataClient.getMetadata(fields,filters,sorts,page,size);
             List<MRsMetadata> rsMetadatas = responseEntity.getBody();
             Envelop envelop = getResult(rsMetadatas, getTotalCount(responseEntity), page, size);
             return envelop;

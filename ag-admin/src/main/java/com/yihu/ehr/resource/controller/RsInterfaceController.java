@@ -42,7 +42,7 @@ public class RsInterfaceController extends BaseController {
             @RequestParam(value = "page", required = false) int page) throws Exception {
         Envelop envelop = new Envelop();
         try {
-            ResponseEntity<List<MRsInterface>> responseEntity = rsInterfaceClient.searchRsInterfaces(fields,filters,sorts,size,page);
+            ResponseEntity<List<MRsInterface>> responseEntity = rsInterfaceClient.searchRsInterfaces(fields,filters,sorts,page,size);
             List<MRsInterface> rsInterfaces = responseEntity.getBody();
             envelop = getResult(rsInterfaces, getTotalCount(responseEntity), page, size);
         }catch (Exception e){

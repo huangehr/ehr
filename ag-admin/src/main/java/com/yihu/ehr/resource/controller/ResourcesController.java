@@ -126,7 +126,7 @@ public class ResourcesController extends BaseController {
             @RequestParam(value = "size", required = false) int size) throws Exception {
         try
         {
-            ResponseEntity<List<MRsResources>> responseEntity = resourcesClient.queryResources(fields,filters,sorts,size,page);
+            ResponseEntity<List<MRsResources>> responseEntity = resourcesClient.queryResources(fields,filters,sorts,page,size);
             List<MRsResources> rsResources = responseEntity.getBody();
             Envelop envelop = getResult(rsResources, getTotalCount(responseEntity), page, size);
             return envelop;

@@ -133,7 +133,7 @@ public class ResourcesGrantController extends BaseController {
             @RequestParam(value = "size", required = false) int size) throws Exception {
         try
         {
-            ResponseEntity<List<MRsAppResource>> responseEntity = resourcesGrantClient.queryAppResourceGrant(fields,filters,sorts,size,page);
+            ResponseEntity<List<MRsAppResource>> responseEntity = resourcesGrantClient.queryAppResourceGrant(fields,filters,sorts,page,size);
             List<MRsAppResource> rsAppResources = responseEntity.getBody();
             Envelop envelop = getResult(rsAppResources, getTotalCount(responseEntity), page, size);
             return envelop;
@@ -250,7 +250,7 @@ public class ResourcesGrantController extends BaseController {
             @RequestParam(value = "size", required = false) int size) throws Exception {
         try
         {
-            ResponseEntity<List<MRsAppResourceMetadata>> responseEntity = resourcesGrantClient.queryAppRsMetadataGrant(fields,filters,sorts,size,page);
+            ResponseEntity<List<MRsAppResourceMetadata>> responseEntity = resourcesGrantClient.queryAppRsMetadataGrant(fields,filters,sorts,page,size);
             List<MRsAppResourceMetadata> rsAppResourceMetadatas = responseEntity.getBody();
             Envelop envelop = getResult(rsAppResourceMetadatas, getTotalCount(responseEntity), page, size);
             return envelop;

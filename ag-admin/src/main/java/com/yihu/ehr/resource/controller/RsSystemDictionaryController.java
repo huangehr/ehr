@@ -43,7 +43,7 @@ public class RsSystemDictionaryController extends BaseController {
             @RequestParam(value = "page", required = false) int page) throws Exception {
         Envelop envelop = new Envelop();
         try {
-            ResponseEntity<List<MRsSystemDictionary>> responseEntity = rsSystemDictionaryClient.searchRsSystemDictionaries(fields,filters,sorts,size,page);
+            ResponseEntity<List<MRsSystemDictionary>> responseEntity = rsSystemDictionaryClient.searchRsSystemDictionaries(fields,filters,sorts,page,size);
             List<MRsSystemDictionary> rsSystemDictionaries = responseEntity.getBody();
             envelop = getResult(rsSystemDictionaries, getTotalCount(responseEntity), page, size);
         }catch (Exception e){
