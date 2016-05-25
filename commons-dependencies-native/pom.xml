@@ -39,7 +39,7 @@
                 <version>1.0</version>
                 <configuration>
                     <fromFile>${project.build.directory}/${project.build.finalName}.jar</fromFile>
-                    <url>scp://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</url>
+                    <url>scp://admin:admin123@http://172.19.103.47:8081/nexus/content/repositories/releases/</url>
                 </configuration>
             </plugin>
         </plugins>
