@@ -42,13 +42,13 @@ public class AdapterSchemaService extends BaseJpaService<RsAdapterSchema,Adapter
     /**
      * 删除适配方案
      *
-     * @param id String 适配方案ID
+     * @param ids String 适配方案ID
      */
-    public void deleteAdapterSchema(String id)
+    public void deleteAdapterSchema(String ids)
     {
-        String[] ids = id.split(",");
+        String[] idsArray = ids.split(",");
 
-        for(String id_ : ids)
+        for(String id_ : idsArray)
         {
             metadataDao.deleteBySchemaId(id_);
             schemaDao.delete(id_);
@@ -68,5 +68,17 @@ public class AdapterSchemaService extends BaseJpaService<RsAdapterSchema,Adapter
         Pageable pageable =  new PageRequest(page,size,parseSorts(sorts));
 
         return schemaDao.findAll(pageable);
+    }
+
+
+    /**
+     * 获取适配方案
+     *
+     * @param id String Id
+     * @return RsAdapterSchema
+     */
+    public RsAdapterSchema getAdapterSchemaById(String id)
+    {
+        return schemaDao.findOne(id);
     }
 }

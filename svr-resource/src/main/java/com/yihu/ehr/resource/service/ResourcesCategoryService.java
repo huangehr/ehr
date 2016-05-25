@@ -73,4 +73,15 @@ public class ResourcesCategoryService extends BaseJpaService<RsCategory,Resource
 
         return rsCategoryDao.findAll(pageable);
     }
+
+    /**
+     * 获取资源类别
+     *
+     * @param id String Id
+     * @return RsCategory
+     */
+    public RsCategory getRsCategoryById(String id)
+    {
+        return rsCategoryDao.findOne(id);
+    }
 }

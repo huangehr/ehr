@@ -24,7 +24,7 @@ public class DimensionService extends BaseJpaService<RsDimension,DimensionDao>  
      * 资源创建
      *
      * @param dimension RsDimension 资源实体
-     * @return RsResource 资源实体
+     * @return RsResources 资源实体
      */
     public RsDimension saveDimension(RsDimension dimension)
     {
@@ -48,7 +48,7 @@ public class DimensionService extends BaseJpaService<RsDimension,DimensionDao>  
      * @param sorts 排序
      * @param page 页码
      * @param size 分页大小
-     * @return Page<RsResource> 资源
+     * @return Page<RsResources> 资源
      */
     public Page<RsDimension> getDimensions(String sorts, int page, int size)
     {

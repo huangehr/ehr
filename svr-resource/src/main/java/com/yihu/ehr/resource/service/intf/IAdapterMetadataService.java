@@ -22,9 +22,17 @@ public interface IAdapterMetadataService {
     /**
      * 删除适配方案
      *
-     * @param id String 适配方案ID
+     * @param ids String 适配方案ID
      */
-    void deleteAdapterMetadata(String id);
+    void deleteAdapterMetadata(String ids);
+
+    /**
+     * 获取适配数据元
+     *
+     * @param id String Id
+     * @return RsAdapterMetadata
+     */
+    RsAdapterMetadata getAdapterMetadataById(String id);
 
     /**
      * 获取适配方案

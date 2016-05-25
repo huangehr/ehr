@@ -73,12 +73,23 @@ public class MetadataService extends BaseJpaService<RsMetadata,ResourceMetadataD
     }
 
     /**
+     * 获取数据元
+     *
+     * @param id String Id
+     * @return RsMetadata
+     */
+    public RsMetadata getMetadataById(String id)
+    {
+        return metadataDao.findOne(id);
+    }
+
+    /**
      * 资源获取
      *
      * @param sorts 排序
      * @param page 页码
      * @param size 分页大小
-     * @return Page<RsResource> 资源
+     * @return Page<RsResources> 资源
      */
     public Page<RsMetadata> getMetadata(String sorts, int page, int size)
     {

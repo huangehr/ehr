@@ -2,6 +2,7 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsInterface;
 import com.yihu.ehr.resource.model.RsInterface;
 import com.yihu.ehr.resource.service.RsInterfaceService;
@@ -38,10 +39,10 @@ public class RsInterfaceController extends BaseRestController {
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
             @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
-            @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         List<RsInterface> interfaces = interfaceService.search(fields, filters, sorts, page, size);
@@ -51,13 +52,13 @@ public class RsInterfaceController extends BaseRestController {
     }
 
 
-
     @RequestMapping(value = ServiceApi.Resources.Interfaces, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建资源", notes = "创建资源")
     public MRsInterface createRsInterface(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestBody String jsonData) throws Exception {
         RsInterface rsInterface = toEntity(jsonData, RsInterface.class);
+        rsInterface.setId(getObjectId(BizObject.RsInterface));
         interfaceService.save(rsInterface);
         return convertToModel(rsInterface, MRsInterface.class, null);
 

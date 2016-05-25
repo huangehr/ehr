@@ -40,7 +40,7 @@ public class AdapterSchemaController extends BaseRestController {
     @ApiOperation("创建适配方案")
     public MRsAdapterSchema createSchema(
             @ApiParam(name="adapterSchema",value="数据元JSON",defaultValue = "")
-            @RequestParam(name="adapterSchema") String adapterSchema) throws Exception
+            @RequestParam(value="adapterSchema") String adapterSchema) throws Exception
     {
         RsAdapterSchema schema = toEntity(adapterSchema,RsAdapterSchema.class);
         schema.setId(getObjectId(BizObject.RsAdapterSchema));
@@ -52,9 +52,9 @@ public class AdapterSchemaController extends BaseRestController {
     @ApiOperation("更新适配方案")
     public MRsAdapterSchema updateSchema(
             @ApiParam(name="adapterSchemaa",value="数据元JSON",defaultValue = "")
-            @RequestParam(name="adapterSchemaa") String adapterSchemaa) throws Exception
+            @RequestParam(value="adapterSchemaa") String adapterSchema) throws Exception
     {
-        RsAdapterSchema schema = toEntity(adapterSchemaa,RsAdapterSchema.class);
+        RsAdapterSchema schema = toEntity(adapterSchema,RsAdapterSchema.class);
         schema = schemaService.saveAdapterSchema(schema);
         return convertToModel(schema,MRsAdapterSchema.class);
     }
@@ -70,32 +70,40 @@ public class AdapterSchemaController extends BaseRestController {
     }
 
     @RequestMapping(value = ServiceApi.Adaptions.Schemas,method = RequestMethod.DELETE)
-    @ApiOperation("删除适配方案")
+    @ApiOperation("批量删除适配方案")
     public boolean deleteSchemaBatch(
-            @ApiParam(name="id",value="数据元ID",defaultValue = "")
-            @RequestParam(name="id") String id) throws Exception
+            @ApiParam(name="ids",value="ids",defaultValue = "")
+            @RequestParam(value="ids") String ids) throws Exception
     {
-        schemaService.deleteAdapterSchema(id);
+        schemaService.deleteAdapterSchema(ids);
         return true;
+    }
+
+    @RequestMapping(value = ServiceApi.Adaptions.Schema,method = RequestMethod.GET)
+    @ApiOperation("根据ID获取适配方案")
+    public MRsAdapterSchema getAdapterSchemaById(
+            @ApiParam(name="id",value="id",defaultValue = "")
+            @PathVariable(value="id") String id) throws Exception
+    {
+        return convertToModel(schemaService.getAdapterSchemaById(id),MRsAdapterSchema.class);
     }
 
     @RequestMapping(value = ServiceApi.Adaptions.Schemas,method = RequestMethod.GET)
     @ApiOperation("查询适配方案")
-    public Page<MRsAdapterSchema> getSchema(
+    public List<MRsAdapterSchema> getSchema(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
-            @RequestParam(name="fields",required = false)String fields,
+            @RequestParam(value="fields",required = false)String fields,
             @ApiParam(name="filters",value="过滤",defaultValue = "")
-            @RequestParam(name="filters",required = false)String filters,
+            @RequestParam(value="filters",required = false)String filters,
             @ApiParam(name="sorts",value="排序",defaultValue = "")
-            @RequestParam(name="sorts",required = false)String sorts,
+            @RequestParam(value="sorts",required = false)String sorts,
             @ApiParam(name="page",value="页码",defaultValue = "1")
-            @RequestParam(name="page",required = false)int page,
+            @RequestParam(value="page",required = false)int page,
             @ApiParam(name="size",value="分页大小",defaultValue = "15")
-            @RequestParam(name="size",required = false)int size,
+            @RequestParam(value="size",required = false)int size,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception
     {
-        Pageable pageable = new PageRequest(reducePage(page),size);
         long total = 0;
         Collection<MRsAdapterSchema> metaList;
 
@@ -114,8 +122,6 @@ public class AdapterSchemaController extends BaseRestController {
         }
 
         pagedResponse(request,response,total,page,size);
-        Page<MRsAdapterSchema> metaPage = new PageImpl<MRsAdapterSchema>((List<MRsAdapterSchema>)metaList,pageable,total);
-
-        return metaPage;
+        return (List<MRsAdapterSchema>)metaList;
     }
 }

@@ -1,27 +1,10 @@
-package com.yihu.ehr.resource.model;
-
-import com.yihu.ehr.profile.annotation.*;
-import org.apache.hadoop.hbase.shaded.org.codehaus.jackson.annotate.JsonProperty;
-import org.apache.hadoop.hbase.shaded.org.codehaus.jackson.annotate.JsonRawValue;
-import org.apache.hadoop.hbase.shaded.org.codehaus.jackson.annotate.JsonSetter;
-import org.apache.htrace.fasterxml.jackson.annotation.JsonGetter;
-import org.apache.htrace.fasterxml.jackson.annotation.JsonInclude;
-import org.hibernate.annotations.GenericGenerator;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
-
-import javax.persistence.*;
-import javax.persistence.Column;
-import javax.persistence.Table;
+package com.yihu.ehr.agModel.resource;
 
 /**
- * Created by hzp on 2016/4/21.
+ * Created by hzp on 2016/5/4.
  * 资源列表
  */
-@Entity
-@Table(name = "rs_resources")
-@Access(value = AccessType.PROPERTY)
-public class RsResource {
+public class RsResourcesModel {
     private String id;
     private String code;
     private String name;
@@ -30,10 +13,6 @@ public class RsResource {
     private String grantType;
     private String description;
 
-    @Id
-    @GeneratedValue(generator = "Generator")
-    @GenericGenerator(name = "Generator", strategy = "assigned")
-    @Column(name = "id", unique = true, nullable = false)
     public String getId() {
         return id;
     }
@@ -41,7 +20,6 @@ public class RsResource {
         this.id = id;
     }
 
-    @Column(name="code",nullable = false)
     public String getCode() {
         return code;
     }
@@ -49,7 +27,6 @@ public class RsResource {
         this.code = code;
     }
 
-    @Column(name="name",nullable = false)
     public String getName() {
         return name;
     }
@@ -57,7 +34,6 @@ public class RsResource {
         this.name = name;
     }
 
-    @Column(name="category_id",nullable=false)
     public String getCategoryId() {
         return categoryId;
     }
@@ -65,7 +41,6 @@ public class RsResource {
         this.categoryId = categoryId;
     }
 
-    @Column(name="rs_interface")
     public String getRsInterface()
     {
         return rsInterface;
@@ -75,7 +50,6 @@ public class RsResource {
         this.rsInterface = rsInterface;
     }
 
-    @Column(name="grant_type")
     public String getGrantType()
     {
         return grantType;
@@ -85,7 +59,6 @@ public class RsResource {
         this.grantType = grantType;
     }
 
-    @Column(name="description")
     public String getDescription() {
         return description;
     }

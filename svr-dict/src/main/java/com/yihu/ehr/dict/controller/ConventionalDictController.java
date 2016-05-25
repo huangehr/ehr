@@ -300,4 +300,61 @@ public class ConventionalDictController extends BaseRestController {
         SystemDictEntry drugFlag = dictEntryService.getDictEntry(16, code);
         return getDictModel(drugFlag);
     }
+
+    @RequestMapping(value = "/dictionaries/resource_adapt_scheme", method = RequestMethod.GET)
+    @ApiOperation(value = "获取资源适配方案类别字典项", response = MConventionalDict.class)
+    public MConventionalDict getResourceAdaptScheme(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        SystemDictEntry drugFlag = dictEntryService.getDictEntry(39, code);
+        return getDictModel(drugFlag);
+    }
+
+
+    @RequestMapping(value = "/dictionaries/mete_data_field_type", method = RequestMethod.GET)
+    @ApiOperation(value = "获取数据元字段类型字典项", response = MConventionalDict.class)
+    public MConventionalDict getMeteDataFieldType(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        SystemDictEntry drugFlag = dictEntryService.getDictEntry(40, code);
+        return getDictModel(drugFlag);
+    }
+
+    @RequestMapping(value = "/dictionaries/resource_type", method = RequestMethod.GET)
+    @ApiOperation(value = "获取资源分类字典项", response = MConventionalDict.class)
+    public MConventionalDict getResourceType(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        SystemDictEntry drugFlag = dictEntryService.getDictEntry(42, code);
+        return getDictModel(drugFlag);
+    }
+
+    @RequestMapping(value = "/dictionaries/business_domain", method = RequestMethod.GET)
+    @ApiOperation(value = "获取业务领域字典项", response = MConventionalDict.class)
+    public MConventionalDict getBusinessDomain(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        SystemDictEntry drugFlag = dictEntryService.getDictEntry(41, code);
+        return getDictModel(drugFlag);
+    }
+
+    @RequestMapping(value = "/dictionaries/resource_access_type", method = RequestMethod.GET)
+    @ApiOperation(value = "获取资源访问方式字典项", response = MConventionalDict.class)
+    public MConventionalDict getResourceAccessType(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        SystemDictEntry drugFlag = dictEntryService.getDictEntry(43, code);
+        return getDictModel(drugFlag);
+    }
+
+    @RequestMapping(value = "/dictionaries/logical_relationship", method = RequestMethod.GET)
+    @ApiOperation(value = "获取逻辑关系字典项", response = MConventionalDict.class)
+    public MConventionalDict getLogicalRelationship(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        SystemDictEntry drugFlag = dictEntryService.getDictEntry(45, code);
+        return getDictModel(drugFlag);
+    }
+
+
 }

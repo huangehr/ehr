@@ -71,12 +71,23 @@ public class ResourceMetadataGrantService  extends BaseJpaService<RsResourceMeta
      * @param sorts String 排序
      * @param page int 页码
      * @param size size 分页大小
-     * @return Page<RsResource> 资源
+     * @return Page<RsResources> 资源
      */
     public Page<RsAppResourceMetadata> getAppRsMetadataGrant(String sorts, int page, int size)
     {
         Pageable pageable =  new PageRequest(page,size,parseSorts(sorts));
 
         return appRsMetadataDao.findAll(pageable);
+    }
+
+    /**
+     * 根据ID获取资源数据元授权
+     *
+     * @param id String Id
+     * @return RsAppResource
+     */
+    public RsAppResourceMetadata getRsMetadataGrantById(String id)
+    {
+        return appRsMetadataDao.findOne(id);
     }
 }

@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * @author linaz
  * @created 2016.05.17 16:33
@@ -20,5 +22,9 @@ public class RsDictionaryEntryService extends BaseJpaService<RsDictionaryEntry, 
     private RsDictionaryEntryDao dictionaryEntryDao;
     public RsDictionaryEntry findById(String id) {
         return dictionaryEntryDao.findOne(id);
+    }
+
+    public List<RsDictionaryEntry> findByDictCode(String code) {
+        return dictionaryEntryDao.findByDictCode(code);
     }
 }

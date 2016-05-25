@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.hbase.HBaseUtil;
 import com.yihu.ehr.query.common.enums.Logical;
 import com.yihu.ehr.query.common.enums.Operation;
-import com.yihu.ehr.query.common.model.DataList;
 import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.query.common.model.QueryEntity;
 import com.yihu.ehr.query.common.model.SolrJoinEntity;
@@ -17,6 +16,9 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -244,11 +246,23 @@ public class HbaseQuery {
 		}
 	}
 	/*********************** 查询方法 ******************************************************************/
+
+	/**
+	 * Keyrow条件查询
+	 * @param rowkey
+	 * @return
+	 */
+	public Map<String,Object> queryByRowkey(String table,String rowkey) throws Exception
+	{
+		Result rs = hbu.getResult(table, rowkey);
+		return resultToMap(rs, "");
+	}
+
 	/**
 	 * 根据Query查询
 	 * @return
 	 */
-	public DataList query(QueryEntity query) throws Exception {
+	public Page<Map<String,Object>> query(QueryEntity query) throws Exception {
 		return queryJoin(query, null);
 	}
 
@@ -256,7 +270,7 @@ public class HbaseQuery {
 	 * 根据Query查询，
 	 * @return
 	 */
-	public DataList queryJoinJson(QueryEntity query,String joinsQuery) throws Exception {
+	public Page<Map<String,Object>> queryJoinJson(QueryEntity query,String joinsQuery) throws Exception {
 		List<SolrJoinEntity>  joins = new ArrayList<>();
 		if(joinsQuery!=null && joinsQuery.length()>0) {
 			ObjectMapper objectMapper = new ObjectMapper();
@@ -281,14 +295,14 @@ public class HbaseQuery {
 	 * 根据Query查询，
 	 * @return
 	 */
-	public DataList queryJoin(QueryEntity query,List<SolrJoinEntity> joins) throws Exception {
+	public Page<Map<String,Object>> queryJoin(QueryEntity query,List<SolrJoinEntity> joins) throws Exception {
 		String table = query.getTableName();
 		String q = "";
 		String fq = "";
 		String fl = query.getFields();
 		String sort = query.getSort();
-		long page = query.getPage();
-		long rows = query.getRows();
+		int page = query.getPage();
+		int rows = query.getRows();
 		List<QueryCondition> conditions = query.getConditions();
 
 		if(joins!=null&&joins.size()>0)
@@ -308,22 +322,11 @@ public class HbaseQuery {
 
 
 	/**
-	 * Keyrow条件查询
-	 * @param rowkey
-	 * @return
-	 */
-	public Map<String,Object> queryByRowkey(String table,String rowkey) throws Exception
-	{
-		Result rs = hbu.getResult(table, rowkey);
-		return resultToMap(rs, "");
-	}
-
-	/**
 	 * json条件查询
 	 * @param json{'q':'*:*','fq':'','sort':'','page':1,'row':10}
 	 * @return
 	 */
-	public DataList queryByJson(String table,String json) throws Exception
+	public Page<Map<String,Object>> queryByJson(String table,String json) throws Exception
 	{
 		ObjectMapper objectMapper = new ObjectMapper();
 		Map<String, String> query = objectMapper.readValue(json, Map.class);
@@ -333,8 +336,8 @@ public class HbaseQuery {
 			String q = query.containsKey("q")?query.get("q").toString():"";
 			String fq = query.containsKey("q")?query.get("fq").toString():"";
 			String sort = query.containsKey("sort")?query.get("sort").toString():"";
-			long page = query.containsKey("page")?Long.parseLong(query.get("page").toString()):1;
-			long rows = query.containsKey("rows")?Long.parseLong(query.get("rows").toString()):50;
+			int page = query.containsKey("page")?Integer.parseInt(query.get("page").toString()):1;
+			int rows = query.containsKey("rows")?Integer.parseInt(query.get("rows").toString()):50;
 
 			return queryBySolr(table,q,sort,page,rows,fq);
 		}
@@ -345,7 +348,7 @@ public class HbaseQuery {
 	/**
 	 * 查询
 	 */
-	public DataList queryBySolr(String table,String q,String sort,long page,long rows) throws Exception
+	public Page<Map<String,Object>> queryBySolr(String table,String q,String sort,int page,int rows) throws Exception
 	{
 		return queryBySolr(table,q, sort, page, rows,"");
 	}
@@ -353,16 +356,16 @@ public class HbaseQuery {
 	/**
 	 * 查询
 	 */
-	public DataList queryBySolr(String table,String q,String sort,long page,long rows,String fq) throws Exception {
+	public Page<Map<String,Object>> queryBySolr(String table,String q,String sort,int page,int rows,String fq) throws Exception {
 		return queryBySolr(table,q, sort, page, rows,fq,"");
 	}
 
 	/**
 	 * 查询方法
 	 */
-	public DataList queryBySolr(String table,String q,String sort,long page,long rows,String fq,String fl) throws Exception{
-		DataList re = new DataList();
-		re.setPage(page);
+	public Page<Map<String,Object>> queryBySolr(String table,String q,String sort,int page,int rows,String fq,String fl) throws Exception{
+
+		long count = 0;
 		List<Map<String,Object>> data = new ArrayList<>();
 
 		if(rows < 0) rows = 10;
@@ -379,7 +382,7 @@ public class HbaseQuery {
 		List<String> list = new ArrayList<String>();
 		if(solrList!=null && solrList.getNumFound()>0)
 		{
-			re.setCount(solrList.getNumFound());
+			count = solrList.getNumFound();
 			for (SolrDocument doc : solrList){
 				String rowkey = String.valueOf(doc.getFieldValue("rowkey"));
 				list.add(rowkey);
@@ -398,9 +401,8 @@ public class HbaseQuery {
 
 			}
 		}
-		re.setList(data);
 
-		return re;
+		return new PageImpl<Map<String,Object>>(data,new PageRequest(page, rows), count);
 	}
 
 	/************************* 全文检索 ******************************************************/
@@ -409,7 +411,7 @@ public class HbaseQuery {
 	 * fields 检索和返回字段，逗号分隔
 	 * query 空格分隔
 	 */
-	public DataList getLucene(String table,String fields,String query,String sort,long page,long rows) throws Exception{
+	public Page<Map<String,Object>> getLucene(String table,String fields,String query,String sort,int page,int rows) throws Exception{
 
 		String[] queryList = query.split(" ");
 		String[] fieldList = fields.split(",");

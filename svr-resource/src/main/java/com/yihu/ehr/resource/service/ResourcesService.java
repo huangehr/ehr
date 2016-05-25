@@ -4,7 +4,7 @@ package com.yihu.ehr.resource.service;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.intf.ResourceMetadataDao;
 import com.yihu.ehr.resource.dao.intf.ResourcesDao;
-import com.yihu.ehr.resource.model.RsResource;
+import com.yihu.ehr.resource.model.RsResources;
 import com.yihu.ehr.resource.service.intf.IResourcesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,7 +21,7 @@ import java.util.List;
  */
 @Service
 @Transactional
-public class ResourcesService extends BaseJpaService<RsResource, ResourcesDao> implements IResourcesService {
+public class ResourcesService extends BaseJpaService<RsResources, ResourcesDao> implements IResourcesService {
     @Autowired
     private ResourcesDao rsDao;
     @Autowired
@@ -31,9 +31,9 @@ public class ResourcesService extends BaseJpaService<RsResource, ResourcesDao> i
      * 资源创建
      *
      * @param resource 资源实体
-     * @return RsResource 资源实体
+     * @return RsResources 资源实体
      */
-    public RsResource saveResource(RsResource resource)
+    public RsResources saveResource(RsResources resource)
     {
         return rsDao.save(resource);
     }
@@ -62,18 +62,28 @@ public class ResourcesService extends BaseJpaService<RsResource, ResourcesDao> i
      * @param sorts 排序
      * @param page 页码
      * @param size 分页大小
-     * @return Page<RsResource> 资源
+     * @return Page<RsResources> 资源
      */
-    public Page<RsResource> getResources(String sorts, int page, int size)
+    public Page<RsResources> getResources(String sorts, int page, int size)
     {
         Pageable pageable =  new PageRequest(page,size,parseSorts(sorts));
 
         return rsDao.findAll(pageable);
     }
 
-    public List<RsResource> findByCategoryId(String CategoryId){
+    public List<RsResources> findByCategoryId(String CategoryId){
         return rsDao.findByCategoryId(CategoryId);
     }
 
+    /**
+     * 根据ID获取资源
+     *
+     * @param id String Id
+     * @return RsResources
+     */
+    public RsResources getResourceById(String id)
+    {
+        return rsDao.findOne(id);
+    }
 
 }

@@ -41,7 +41,7 @@ public class ResourcesCategoryController extends BaseRestController {
     @ApiOperation("资源类别创建")
     public MRsCategory createRsCategory(
             @ApiParam(name = "resourceCategory", value = "资源分类", defaultValue = "{\"name\":\"string\",\"pid\":\"string\",\"description\":\"string\"}")
-            @RequestParam(name = "resourceCategory") String resourceCategory) throws Exception
+            @RequestParam(value = "resourceCategory") String resourceCategory) throws Exception
     {
         RsCategory rsCategory = toEntity(resourceCategory, RsCategory.class);
         rsCategory.setId(getObjectId(BizObject.ResourceCategory));
@@ -54,7 +54,7 @@ public class ResourcesCategoryController extends BaseRestController {
     @ApiOperation("资源类别更新")
     public MRsCategory updateRsCategory(
             @ApiParam(name="resourceCategory",value="资源分类", defaultValue = "{\"id\":\"string\",\"name\":\"string\",\"pid\":\"string\",\"description\":\"string\"}")
-            @RequestParam(name="resourceCategory")String resourceCategory) throws  Exception
+            @RequestParam(value="resourceCategory")String resourceCategory) throws  Exception
     {
         RsCategory rsCategory = toEntity(resourceCategory, RsCategory.class);
         rsCategoryService.createOrUpdRsCategory(rsCategory);
@@ -72,24 +72,32 @@ public class ResourcesCategoryController extends BaseRestController {
         return true;
     }
 
+    @RequestMapping(value = ServiceApi.Resources.Category,method = RequestMethod.GET)
+    @ApiOperation("根据ID获取资源类别")
+    public MRsCategory getRsCategoryById(
+            @ApiParam(name="id",value="id",defaultValue = "")
+            @PathVariable(value="id") String id) throws Exception
+    {
+        return convertToModel(rsCategoryService.getRsCategoryById(id),MRsCategory.class);
+    }
+
     @RequestMapping(value = ServiceApi.Resources.Categories,method = RequestMethod.GET)
     @ApiOperation("获取资源类别")
-    public Page<MRsCategory> getRsCategories(
+    public List<MRsCategory> getRsCategories(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
-            @RequestParam(name="fields",required = false)String fields,
+            @RequestParam(value="fields",required = false)String fields,
             @ApiParam(name="filters",value="过滤",defaultValue = "")
-            @RequestParam(name="filters",required = false)String filters,
+            @RequestParam(value="filters",required = false)String filters,
             @ApiParam(name="sorts",value="排序",defaultValue = "")
-            @RequestParam(name="sorts",required = false)String sorts,
+            @RequestParam(value="sorts",required = false)String sorts,
             @ApiParam(name="page",value="页码",defaultValue = "1")
-            @RequestParam(name="page",required = false)int page,
+            @RequestParam(value="page",required = false)int page,
             @ApiParam(name="size",value="分页大小",defaultValue = "15")
-            @RequestParam(name="size",required = false)int size,
+            @RequestParam(value="size",required = false)int size,
             HttpServletRequest request,
             HttpServletResponse response
     ) throws  Exception
     {
-        Pageable pageable = new PageRequest(reducePage(page),size);
         long total = 0;
         Collection<MRsCategory> rsList;
 
@@ -108,9 +116,7 @@ public class ResourcesCategoryController extends BaseRestController {
         }
 
         pagedResponse(request,response,total,page,size);
-        Page<MRsCategory> rsPage = new PageImpl<MRsCategory>((List<MRsCategory>)rsList,pageable,total);
-
-        return rsPage;
+        return (List<MRsCategory>)rsList;
     }
 
 }

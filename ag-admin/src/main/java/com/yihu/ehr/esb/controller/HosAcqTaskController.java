@@ -4,6 +4,7 @@ import com.yihu.ehr.agModel.esb.HosAcqTaskModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.esb.client.HosAcqTaskClient;
 import com.yihu.ehr.model.esb.MHosAcqTask;
+import com.yihu.ehr.util.DateTimeUtils;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
@@ -48,6 +49,7 @@ public class HosAcqTaskController extends BaseController {
             HosAcqTaskModel hosAcqTaskModel = null;
             try {
                 hosAcqTaskModel = convertToModelDetail(mHosAcqTask,HosAcqTaskModel.class);
+                hosAcqTaskModel = utcTimeChange(hosAcqTaskModel,mHosAcqTask);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -55,6 +57,16 @@ public class HosAcqTaskController extends BaseController {
         }
         Envelop envelop = getResult(hosAcqTaskModels, getTotalCount(responseEntity), page, size);
         return envelop;
+    }
+
+    /**
+     * utc时间转化成yyyy-MM-dd HH:mm:ss
+     */
+    public HosAcqTaskModel utcTimeChange(HosAcqTaskModel hosAcqTaskModel,MHosAcqTask mHosAcqTask){
+        hosAcqTaskModel.setStartTime(DateTimeUtils.simpleDateTimeFormat(mHosAcqTask.getStartTime()));
+        hosAcqTaskModel.setEndTime(DateTimeUtils.simpleDateTimeFormat(mHosAcqTask.getEndTime()));
+        hosAcqTaskModel.setCreateTime(DateTimeUtils.simpleDateTimeFormat(mHosAcqTask.getCreateTime()));
+        return hosAcqTaskModel;
     }
 
     @RequestMapping(value = "/hosAcqTask/{id}",method = RequestMethod.GET)
@@ -66,6 +78,7 @@ public class HosAcqTaskController extends BaseController {
         MHosAcqTask mHosAcqTask = hosAcqTaskClient.getHosAcqTask(id);
         try{
             HosAcqTaskModel hosAcqTaskModel = convertToModelDetail(mHosAcqTask,HosAcqTaskModel.class);
+            hosAcqTaskModel = utcTimeChange(hosAcqTaskModel,mHosAcqTask);
             envelop.setObj(hosAcqTaskModel);
             envelop.setSuccessFlg(true);
         }catch (Exception e){

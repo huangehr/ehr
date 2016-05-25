@@ -91,7 +91,7 @@ public class HosLogController extends BaseController {
     @ApiOperation(value = "根据id删除上传日志", notes = "根据id删除上传日志")
     public boolean deleteHosLogs(
             @ApiParam(name = "filters", value = "filters", defaultValue = "")
-            @PathVariable(value = "filters") String filters) throws Exception {
+            @RequestParam(value = "filters") String filters) throws Exception {
         return hosLogClient.deleteHosLogs(filters);
     }
 }

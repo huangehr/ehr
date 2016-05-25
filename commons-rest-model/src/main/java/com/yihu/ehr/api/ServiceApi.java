@@ -17,10 +17,10 @@ public class ServiceApi {
     }
 
     public static class Adaptions{
-        public static final String Cache                          = "/adaptions/{schema_id}/cache";
+        public static final String Cache                          = "/adaptions/{id}/cache";
         public static final String CacheGet                       = "/adaptions/{key}/cache";
 
-        public static final String Schema                         = "/adaptions/schemas/{schema_id}";
+        public static final String Schema                         = "/adaptions/schemas/{id}";
         public static final String Schemas                         = "/adaptions/schemas";
 
         public static final String SchemaMetadatas                 ="/adaptions/schema/metadatas";
@@ -38,20 +38,20 @@ public class ServiceApi {
 
         public static final String ResourceGrant                 = "/resources/grants/{id}";
         public static final String ResourceGrants                = "/resources/grants";
-        public static final String AppsGrantResources             = "/resources/apps/{app_id}/grant";
-        public static final String ResourceGrantApps            = "/resources/{resource_id}/grant";
+        public static final String AppsGrantResources             = "/resources/apps/{appId}/grant";
+        public static final String ResourceGrantApps            = "/resources/{resourceId}/grant";
 
         public static final String ResourceMetadatasGrants      = "/resources/metadatas/grants";
         public static final String ResourceMetadatasGrant      = "/resources/metadatas/grants/{id}";
-        public static final String ResourceMetadataGrantApp      = "/resources/appresources/{app_resource_id}/grant/metadatas/{metadata_id}";
-        public static final String ResourceMetadatasGrantApp      = "/resources/metadatas/grant/{app_resource_id}";
+        public static final String ResourceMetadataGrantApp      = "/resources/appresources/{appResourceId}/grant/metadatas/{metadataId}";
+        public static final String ResourceMetadatasGrantApp      = "/resources/metadatas/grant/{appResourceId}";
 
         public static final String Metadatas                    ="/resources/metadatas";
         public static final String MetadatasBatch               ="/resources/metadatas/batch";
         public static final String Metadata                     ="/resources/metadatas/{id}";
 
         public static final String Dicts                         ="/resources/dicts";
-        public static final String DictsBatch                   ="/resources/dicts/batch";
+        public static final String DictsBatch                    ="/resources/dicts/batch";
         public static final String Dict                          ="/resources/dicts/{id}";
 
         public static final String DictEntries                   ="/resources/dictentries";

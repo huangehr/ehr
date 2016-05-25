@@ -37,7 +37,8 @@ public enum BizObject {
     RsDictionary((short)0x0026),
     RsDictionaryEntry((short)0x0027),
     RsSystemDictionary((short)0x0028),
-    RsSystemDictionaryEntry((short)0x0029);
+    RsSystemDictionaryEntry((short)0x0029),
+    RsInterface((short)0x0030);
 
 
     public short getBizObject(){

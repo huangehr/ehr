@@ -37,7 +37,7 @@ public class DimensionCategoryController extends BaseRestController{
     @RequestMapping(method = RequestMethod.POST)
     public MRsDimensionCategory createDimensionCategory(
             @ApiParam(name="dimensionCategory",value="维度类别",defaultValue = "")
-            @RequestParam(name="dimensionCategory")String dimensionCategory) throws Exception
+            @RequestParam(value="dimensionCategory")String dimensionCategory) throws Exception
     {
         RsDimensionCategory dmc = toEntity(dimensionCategory,RsDimensionCategory.class);
         dmc.setId(getObjectId(BizObject.DimensionsCategories));
@@ -49,7 +49,7 @@ public class DimensionCategoryController extends BaseRestController{
     @RequestMapping(method = RequestMethod.PUT)
     public MRsDimensionCategory updateDimensionCategory(
             @ApiParam(name="dimensionCategory",value="维度类别",defaultValue="")
-            @RequestParam(name="dimensionCategory")String dimensionCategory) throws Exception
+            @RequestParam(value="dimensionCategory")String dimensionCategory) throws Exception
     {
         RsDimensionCategory  dmc= toEntity(dimensionCategory,RsDimensionCategory.class);
         dmcService.saveDimensionCategory(dmc);
@@ -70,15 +70,15 @@ public class DimensionCategoryController extends BaseRestController{
     @RequestMapping(value="",method = RequestMethod.GET)
     public Page<MRsDimensionCategory> queryCategories(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
-            @RequestParam(name="fields",required = false)String fields,
+            @RequestParam(value="fields",required = false)String fields,
             @ApiParam(name="filters",value="过滤",defaultValue = "")
-            @RequestParam(name="filters",required = false)String filters,
+            @RequestParam(value="filters",required = false)String filters,
             @ApiParam(name="sorts",value="排序",defaultValue = "")
-            @RequestParam(name="sorts",required = false)String sorts,
+            @RequestParam(value="sorts",required = false)String sorts,
             @ApiParam(name="page",value="页码",defaultValue = "1")
-            @RequestParam(name="page",required = false)int page,
+            @RequestParam(value="page",required = false)int page,
             @ApiParam(name="size",value="分页大小",defaultValue = "15")
-            @RequestParam(name="size",required = false)int size,
+            @RequestParam(value="size",required = false)int size,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception
     {

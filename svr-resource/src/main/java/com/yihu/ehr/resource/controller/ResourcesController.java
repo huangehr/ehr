@@ -4,7 +4,7 @@ import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsResources;
-import com.yihu.ehr.resource.model.RsResource;
+import com.yihu.ehr.resource.model.RsResources;
 import com.yihu.ehr.resource.service.intf.IResourcesService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -39,9 +39,9 @@ public class ResourcesController extends BaseRestController {
     @RequestMapping(value = ServiceApi.Resources.Resources,method = RequestMethod.POST)
     public MRsResources createResource(
             @ApiParam(name="resource",value="资源",defaultValue = "")
-            @RequestParam(name="resource")String resource) throws Exception
+            @RequestParam(value="resource")String resource) throws Exception
     {
-        RsResource rs = toEntity(resource,RsResource.class);
+        RsResources rs = toEntity(resource,RsResources.class);
         rs.setId(getObjectId(BizObject.Resources));
         rsService.saveResource(rs);
         return convertToModel(rs,MRsResources.class);
@@ -51,9 +51,9 @@ public class ResourcesController extends BaseRestController {
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.PUT)
     public MRsResources updateResources(
             @ApiParam(name="resource",value="资源",defaultValue="")
-            @RequestParam(name="resource")String resource) throws Exception
+            @RequestParam(value="resource")String resource) throws Exception
     {
-        RsResource rs = toEntity(resource,RsResource.class);
+        RsResources rs = toEntity(resource,RsResources.class);
         rsService.saveResource(rs);
         return convertToModel(rs,MRsResources.class);
     }
@@ -68,53 +68,59 @@ public class ResourcesController extends BaseRestController {
         return true;
     }
 
-    @ApiOperation("资源删除")
+    @ApiOperation("批量资源删除")
     @RequestMapping(value = ServiceApi.Resources.Resources,method = RequestMethod.DELETE)
-    public boolean deleteResourcesPatch(
-            @ApiParam(name="id",value="资源ID",defaultValue = "")
-            @RequestParam(name="id") String id) throws Exception
+    public boolean deleteResourcesBatch(
+            @ApiParam(name="ids",value="资源ID",defaultValue = "")
+            @RequestParam(value="ids") String ids) throws Exception
     {
-        rsService.deleteResource(id);
+        rsService.deleteResource(ids);
         return true;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.Resource,method = RequestMethod.GET)
+    @ApiOperation("根据ID获取资源")
+    public MRsResources getResourceById(
+            @ApiParam(name="id",value="id",defaultValue = "")
+            @PathVariable(value="id") String id) throws Exception
+    {
+        return convertToModel(rsService.getResourceById(id),MRsResources.class);
     }
 
     @ApiOperation("资源查询")
     @RequestMapping(value = ServiceApi.Resources.Resources,method = RequestMethod.GET)
-    public Page<MRsResources> queryResources(
+    public List<MRsResources> queryResources(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
-            @RequestParam(name="fields",required = false)String fields,
+            @RequestParam(value="fields",required = false)String fields,
             @ApiParam(name="filters",value="过滤",defaultValue = "")
-            @RequestParam(name="filters",required = false)String filters,
+            @RequestParam(value="filters",required = false)String filters,
             @ApiParam(name="sorts",value="排序",defaultValue = "")
-            @RequestParam(name="sorts",required = false)String sorts,
+            @RequestParam(value="sorts",required = false)String sorts,
             @ApiParam(name="page",value="页码",defaultValue = "1")
-            @RequestParam(name="page",required = false)int page,
+            @RequestParam(value="page",required = false)int page,
             @ApiParam(name="size",value="分页大小",defaultValue = "15")
-            @RequestParam(name="size",required = false)int size,
+            @RequestParam(value="size",required = false)int size,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception
     {
-        Pageable pageable = new PageRequest(reducePage(page),size);
         long total = 0;
         Collection<MRsResources> rsList;
 
         //过滤条件为空
         if(StringUtils.isEmpty(filters))
         {
-            Page<RsResource> resources = rsService.getResources(sorts,reducePage(page),size);
+            Page<RsResources> resources = rsService.getResources(sorts,reducePage(page),size);
             total = resources.getTotalElements();
             rsList = convertToModels(resources.getContent(),new ArrayList<>(resources.getNumber()),MRsResources.class,fields);
         }
         else
         {
-            List<RsResource> resources = rsService.search(fields,filters,sorts,page,size);
+            List<RsResources> resources = rsService.search(fields,filters,sorts,page,size);
             total = rsService.getCount(filters);
             rsList = convertToModels(resources,new ArrayList<>(resources.size()),MRsResources.class,fields);
         }
 
         pagedResponse(request,response,total,page,size);
-        Page<MRsResources> rsPage = new PageImpl<MRsResources>((List<MRsResources>)rsList,pageable,total);
-
-        return rsPage;
+        return (List<MRsResources>)rsList;
     }
 }

@@ -17,7 +17,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name="rs_dictionary")
 public class RsDictionary {
-    private String id;
     private String code;
     private String name;
     private String description;
@@ -25,15 +24,6 @@ public class RsDictionary {
     @Id
     @GeneratedValue(generator = "Generator")
     @GenericGenerator(name = "Generator", strategy = "assigned")
-    @Column(name = "id", unique = true, nullable = false)
-    public String getId() {
-        return id;
-    }
-    public void setId(String id)
-    {
-        this.id = id;
-    }
-
     @Column(name = "code",nullable = false)
     public String getCode()
     {
