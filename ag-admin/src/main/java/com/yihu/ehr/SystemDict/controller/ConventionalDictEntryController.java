@@ -444,12 +444,82 @@ public class ConventionalDictEntryController extends BaseController{
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         Envelop envelop = new Envelop();
-
         MConventionalDict mConventionalDict = dictEntryClient.getUserSource(code);
         SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict, SystemDictEntryModel.class);
-
         envelop.setObj(systemDictEntryModel);
+        return envelop;
+    }
 
+
+    @RequestMapping(value = "/dictionaries/resource_adapt_scheme", method = RequestMethod.GET)
+    @ApiOperation(value = "获取资源适配方案类别字典项", response = MConventionalDict.class)
+    public Envelop getResourceAdaptScheme(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        Envelop envelop = new Envelop();
+        MConventionalDict mConventionalDict = dictEntryClient.getResourceAdaptScheme(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict, SystemDictEntryModel.class);
+        envelop.setObj(systemDictEntryModel);
+        return envelop;
+    }
+
+    @RequestMapping(value = "/dictionaries/mete_data_field_type", method = RequestMethod.GET)
+    @ApiOperation(value = "获取数据元字段类型字典项", response = MConventionalDict.class)
+    public Envelop getMeteDataFieldType(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        Envelop envelop = new Envelop();
+        MConventionalDict mConventionalDict = dictEntryClient.getMeteDataFieldType(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict, SystemDictEntryModel.class);
+        envelop.setObj(systemDictEntryModel);
+        return envelop;
+    }
+
+    @RequestMapping(value = "/dictionaries/resource_type", method = RequestMethod.GET)
+    @ApiOperation(value = "获取资源分类字典项", response = MConventionalDict.class)
+    public Envelop getResourceType(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        Envelop envelop = new Envelop();
+        MConventionalDict mConventionalDict = dictEntryClient.getResourceType(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict, SystemDictEntryModel.class);
+        envelop.setObj(systemDictEntryModel);
+        return envelop;
+    }
+
+    @RequestMapping(value = "/dictionaries/business_domain", method = RequestMethod.GET)
+    @ApiOperation(value = "获取业务领域字典项", response = MConventionalDict.class)
+    public Envelop getBusinessDomain(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        Envelop envelop = new Envelop();
+        MConventionalDict mConventionalDict = dictEntryClient.getBusinessDomain(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict, SystemDictEntryModel.class);
+        envelop.setObj(systemDictEntryModel);
+        return envelop;
+    }
+
+    @RequestMapping(value = "/dictionaries/resource_access_type", method = RequestMethod.GET)
+    @ApiOperation(value = "获取资源访问方式字典项", response = MConventionalDict.class)
+    public Envelop getResourceAccessType(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        Envelop envelop = new Envelop();
+        MConventionalDict mConventionalDict = dictEntryClient.getResourceAccessType(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict, SystemDictEntryModel.class);
+        envelop.setObj(systemDictEntryModel);
+        return envelop;
+    }
+
+    @RequestMapping(value = "/dictionaries/logical_relationship", method = RequestMethod.GET)
+    @ApiOperation(value = "获取逻辑关系字典项", response = MConventionalDict.class)
+    public Envelop getLogicalRelationship(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        Envelop envelop = new Envelop();
+        MConventionalDict mConventionalDict = dictEntryClient.getLogicalRelationship(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict, SystemDictEntryModel.class);
+        envelop.setObj(systemDictEntryModel);
         return envelop;
     }
 }

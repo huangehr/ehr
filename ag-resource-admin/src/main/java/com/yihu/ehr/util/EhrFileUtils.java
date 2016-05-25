@@ -16,8 +16,14 @@ public class EhrFileUtils {
      * @return 返回文件内容
      */
     public String file2String(String path) throws IOException {
-        String pastHistoryJsonPath = EhrFileUtils.class.getProtectionDomain().getCodeSource().getLocation().getPath()+path;
-        File file = new File(pastHistoryJsonPath);
+        String folder=System.getProperty("java.io.tmpdir");
+        String filePath = folder+path;
+        File file = new File(filePath);
         return FileUtil.readAsString(file);
     }
+
+    public static void main(String[] args) {
+        String folder=System.getProperty("java.io.tmpdir");
+    }
+
 }

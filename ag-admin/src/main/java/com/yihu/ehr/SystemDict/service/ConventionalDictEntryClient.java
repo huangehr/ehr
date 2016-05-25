@@ -3,6 +3,7 @@ package com.yihu.ehr.systemdict.service;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.util.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -180,4 +181,42 @@ public interface ConventionalDictEntryClient {
     MConventionalDict getUserSource(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/resource_adapt_scheme", method = RequestMethod.GET)
+    @ApiOperation(value = "获取资源适配方案类别字典项", response = MConventionalDict.class)
+    MConventionalDict getResourceAdaptScheme(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/mete_data_field_type", method = RequestMethod.GET)
+    @ApiOperation(value = "获取数据元字段类型字典项", response = MConventionalDict.class)
+    MConventionalDict getMeteDataFieldType(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/resource_type", method = RequestMethod.GET)
+    @ApiOperation(value = "获取资源分类字典项", response = MConventionalDict.class)
+    MConventionalDict getResourceType(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/business_domain", method = RequestMethod.GET)
+    @ApiOperation(value = "获取业务领域字典项", response = MConventionalDict.class)
+    MConventionalDict getBusinessDomain(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/resource_access_type", method = RequestMethod.GET)
+    @ApiOperation(value = "获取资源访问方式字典项", response = MConventionalDict.class)
+    MConventionalDict getResourceAccessType(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/logical_relationship", method = RequestMethod.GET)
+    @ApiOperation(value = "获取逻辑关系字典项", response = MConventionalDict.class)
+    MConventionalDict getLogicalRelationship(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+
 }

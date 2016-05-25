@@ -1,25 +1,26 @@
-package com.yihu.ehr.resourcesbrowse;
+package com.yihu.ehr.profile.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.util.EhrFileUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.aspectj.util.FileUtil;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Created by hzp on 2016/4/13.
- */
+import java.io.File;
+import java.io.IOException;
 
+/**
+ * @author linaz
+ * @created 2016.05.25 14:51
+ */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/rs/browse")
 @Api(value = "rsBrowse", description = "业务资源浏览接口")
 public class ResourcesBrowseController {
-
-    EhrFileUtils EhrFileUtils = new EhrFileUtils();
 
     @ApiOperation("门户 - 用户基本信息")
     @RequestMapping(value = "/home/getPatientInfo", method = RequestMethod.GET)
@@ -27,7 +28,7 @@ public class ResourcesBrowseController {
             @ApiParam(name = "demographicId", value = "身份证号")
             @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
 
-        return EhrFileUtils.file2String("/json/user.json");
+        return file2String("/json/user.json");
     }
 
     //
@@ -54,7 +55,7 @@ public class ResourcesBrowseController {
             @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
             @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
 
-        return EhrFileUtils.file2String("/json/pastHistory.json");
+        return file2String("/json/pastHistory.json");
 
     }
 
@@ -64,8 +65,7 @@ public class ResourcesBrowseController {
     public String getHealthProblem(
             @ApiParam(name = "demographicId", value = "身份证号")
             @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
-        EhrFileUtils EhrFileUtils = new EhrFileUtils();
-        return EhrFileUtils.file2String("/json/healthProblem.json");
+        return file2String("/json/healthProblem.json");
     }
 //
 
@@ -90,7 +90,7 @@ public class ResourcesBrowseController {
             @ApiParam(name = "size", value = "行数")
             @RequestParam(value = "size", required = false, defaultValue = "5") int size) throws Exception {
 
-        return EhrFileUtils.file2String("/json/MedicalEventInfo.json");
+        return file2String("/json/MedicalEventInfo.json");
 
     }
 
@@ -104,7 +104,7 @@ public class ResourcesBrowseController {
             @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
             @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
 
-        return EhrFileUtils.file2String("/json/HealthIndicators.json");
+        return file2String("/json/HealthIndicators.json");
     }
 
 
@@ -119,7 +119,7 @@ public class ResourcesBrowseController {
 //            @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
 //            @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
 //
-//        return EhrFileUtils.file2String("/json/MedicalEventInfo.json");
+//        return file2String("/json/MedicalEventInfo.json");
 //
 //    }
     @ApiOperation("右侧档案模版展示")
@@ -141,7 +141,7 @@ public class ResourcesBrowseController {
             @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
             @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
 
-        return EhrFileUtils.file2String("/json/DrugList.json");
+        return file2String("/json/DrugList.json");
 
     }
 //
@@ -181,7 +181,7 @@ public class ResourcesBrowseController {
             @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = false) String demographicId,
             @ApiParam(name = "hpId", value = "指标项ID（逗号分隔）") @RequestParam(value = "hpId", required = false) String hpId) throws Exception {
 
-        return EhrFileUtils.file2String("/json/indicatorItems.json");
+        return file2String("/json/indicatorItems.json");
 
     }
 
@@ -218,7 +218,7 @@ public class ResourcesBrowseController {
             @ApiParam(name = "beginTime", value = "查询开始时间") @RequestParam(value = "beginTime", required = false) String beginTime,
             @ApiParam(name = "endTime", value = "查询结束时间") @RequestParam(value = "endTime", required = false) String endTime) throws Exception {
 
-        return EhrFileUtils.file2String("/json/MedicalOrganizations.json");
+        return file2String("/json/MedicalOrganizations.json");
 
 
     }
@@ -230,8 +230,16 @@ public class ResourcesBrowseController {
             @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
             @ApiParam(name = "archiveType", value = "就诊类型(传空默认搜索全部数据)") @RequestParam(value = "archiveType", required = false) String archiveType,
             @ApiParam(name = "name", value = "诊断记录名称") @RequestParam(value = "name", required = false) String name) throws Exception {
-        return EhrFileUtils.file2String("/json/archiveSearch.json");
+        return file2String("/json/archiveSearch.json");
 
+    }
+
+
+    public String file2String(String path) throws IOException {
+        String folder=System.getProperty("java.io.tmpdir");
+        String filePath = folder+path;
+        File file = new File(filePath);
+        return FileUtil.readAsString(file);
     }
 
 
