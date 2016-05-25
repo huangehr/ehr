@@ -7,13 +7,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.lang.SpringContext;
-import com.yihu.ehr.service.memory.intermediate.MetaDataRecord;
+/*import com.yihu.ehr.service.memory.intermediate.MetaDataRecord;
 import com.yihu.ehr.service.memory.intermediate.MemoryProfile;
 import com.yihu.ehr.service.memory.intermediate.StdDataSet;
 import com.yihu.ehr.profile.persist.ProfileIndices;
 import com.yihu.ehr.profile.persist.ProfileIndicesService;
 import com.yihu.ehr.profile.persist.ProfileService;
-import com.yihu.ehr.service.resource.stage2.repo.DataSetRepository;
+import com.yihu.ehr.service.resource.stage2.repo.DataSetRepository;*/
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -45,7 +45,7 @@ import java.util.*;
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "赛诺菲数据服务", description = "赛诺菲项目体征数据提取服务")
 public class SanofiEndPoint {
-    @Autowired
+    /*@Autowired
     private ProfileService profileService;
 
     @Autowired
@@ -199,5 +199,5 @@ public class SanofiEndPoint {
                 break;  // 就一行
             }
         }
-    }
+    }*/
 }

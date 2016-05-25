@@ -38,9 +38,9 @@ public class TableBundle {
         row.addFamily(family.toString());
     }
 
-    public void addColumns(String rowkey, Object family, Object... columns) {
+    public void addColumns(String rowkey, Object family, String... columns) {
         Row row = getRow(rowkey);
-        row.addColumns(family.toString(), columns.toString());
+        row.addColumns(family.toString(), columns);
     }
 
     public void addValues(String rowkey, Object family, Map<String, String> values) {
