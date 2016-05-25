@@ -45,10 +45,10 @@ public class ResourcesGrantController extends BaseRestController{
     public Collection<MRsAppResource> grantAppResource(
             @ApiParam(name="appId",value="资源ID",defaultValue = "")
             @PathVariable(value="appId") String appId,
-            @ApiParam(name="resourceId",value="资源ID",defaultValue = "")
-            @RequestParam(value="resourceId") String resourceId) throws Exception
+            @ApiParam(name="resourceIds",value="资源ID",defaultValue = "")
+            @RequestParam(value="resourceIds") String resourceIds) throws Exception
     {
-        String[] resourceIdArray = resourceId.split(",");
+        String[] resourceIdArray = resourceIds.split(",");
         List<RsAppResource> appRsList = new ArrayList<RsAppResource>();
 
         for(String resoruceId : resourceIdArray)
@@ -70,10 +70,10 @@ public class ResourcesGrantController extends BaseRestController{
     public Collection<MRsAppResource> grantResourceApp(
             @ApiParam(name="resourceId",value="资源ID",defaultValue = "")
             @PathVariable(value="resourceId") String resourceId,
-            @ApiParam(name="appId",value="资源ID",defaultValue = "")
-            @RequestParam(value="appId") String appId) throws Exception
+            @ApiParam(name="appIds",value="资源ID",defaultValue = "")
+            @RequestParam(value="appIds") String appIds) throws Exception
     {
-        String[] appIdArray = appId.split(",");
+        String[] appIdArray = appIds.split(",");
         List<RsAppResource> appRsList = new ArrayList<RsAppResource>();
 
         for(String _appId : appIdArray)
@@ -122,7 +122,7 @@ public class ResourcesGrantController extends BaseRestController{
 
     @ApiOperation("资源授权查询")
     @RequestMapping(value = ServiceApi.Resources.ResourceGrants,method = RequestMethod.GET)
-    public Page<MRsAppResource> queryAppResourceGrant(
+    public List<MRsAppResource> queryAppResourceGrant(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(value="fields",required = false)String fields,
             @ApiParam(name="filters",value="过滤",defaultValue = "")
@@ -136,7 +136,6 @@ public class ResourcesGrantController extends BaseRestController{
             HttpServletRequest request,
             HttpServletResponse response) throws Exception
     {
-        Pageable pageable = new PageRequest(reducePage(page),size);
         long total = 0;
         Collection<MRsAppResource> rsAppList;
 
@@ -155,9 +154,7 @@ public class ResourcesGrantController extends BaseRestController{
         }
 
         pagedResponse(request,response,total,page,size);
-        Page<MRsAppResource> rsAppPage = new PageImpl<MRsAppResource>((List<MRsAppResource>)rsAppList,pageable,total);
-
-        return rsAppPage;
+        return (List<MRsAppResource>)rsAppList;
     }
 
     @ApiOperation("资源数据元授权")
@@ -235,7 +232,7 @@ public class ResourcesGrantController extends BaseRestController{
 
     @ApiOperation("资源数据元授权查询")
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasGrants,method = RequestMethod.GET)
-    public Page<MRsAppResourceMetadata> queryAppRsMetadataGrant(
+    public List<MRsAppResourceMetadata> queryAppRsMetadataGrant(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(value="fields",required = false)String fields,
             @ApiParam(name="filters",value="过滤",defaultValue = "")
@@ -249,7 +246,6 @@ public class ResourcesGrantController extends BaseRestController{
             HttpServletRequest request,
             HttpServletResponse response) throws Exception
     {
-        Pageable pageable = new PageRequest(reducePage(page),size);
         long total = 0;
         Collection<MRsAppResourceMetadata> rsAppMetaList;
 
@@ -268,8 +264,6 @@ public class ResourcesGrantController extends BaseRestController{
         }
 
         pagedResponse(request,response,total,page,size);
-        Page<MRsAppResourceMetadata> rsPage = new PageImpl<MRsAppResourceMetadata>((List<MRsAppResourceMetadata>)rsAppMetaList,pageable,total);
-
-        return rsPage;
+        return (List<MRsAppResourceMetadata>)rsAppMetaList;
     }
 }

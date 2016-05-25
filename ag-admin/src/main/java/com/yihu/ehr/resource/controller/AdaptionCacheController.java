@@ -3,6 +3,7 @@ package com.yihu.ehr.resource.controller;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.resource.client.AdaptionCacheClient;
+import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,17 +27,33 @@ public class AdaptionCacheController extends BaseController {
 
     @RequestMapping(value = ServiceApi.Adaptions.Cache, method = RequestMethod.POST)
     @ApiOperation("缓存适配数据")
-    public boolean cacheData(
-            @ApiParam(name = "schema_id", value = "schema_id", defaultValue = "")
-            @PathVariable("schema_id") String schema_id) {
-        return adaptionCacheClient.cacheData(schema_id);
+    public Envelop cacheData(
+            @ApiParam(name = "id", value = "id", defaultValue = "")
+            @PathVariable("id") String id) {
+        Envelop envelop = new Envelop();
+        try{
+            adaptionCacheClient.cacheData(id);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
     }
 
     @RequestMapping(value = ServiceApi.Adaptions.CacheGet, method = RequestMethod.GET)
     @ApiOperation("获取适配数据")
-    public String getCache(
+    public Envelop getCache(
             @ApiParam(name = "key", value = "key", defaultValue = "")
             @PathVariable(value = "key") String key) {
-        return adaptionCacheClient.getCache(key);
+        Envelop envelop = new Envelop();
+        try{
+            adaptionCacheClient.getCache(key);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
     }
 }

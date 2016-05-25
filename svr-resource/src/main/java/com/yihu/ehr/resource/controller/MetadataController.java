@@ -89,12 +89,12 @@ public class MetadataController  extends BaseRestController{
     }
 
     @RequestMapping(value = ServiceApi.Resources.Metadatas,method = RequestMethod.DELETE)
-    @ApiOperation("删除数据元")
+    @ApiOperation("批量删除数据元")
     public boolean deleteMetadataBatch(
-            @ApiParam(name="id",value="数据元ID",defaultValue = "")
-            @RequestParam(name="id") String id) throws Exception
+            @ApiParam(name="ids",value="数据元ID",defaultValue = "")
+            @RequestParam(name="ids") String ids) throws Exception
     {
-        metadataService.deleteMetadata(id);
+        metadataService.deleteMetadata(ids);
         return true;
     }
 
@@ -109,7 +109,7 @@ public class MetadataController  extends BaseRestController{
 
     @RequestMapping(value = ServiceApi.Resources.Metadatas,method = RequestMethod.GET)
     @ApiOperation("查询数据元")
-    public Page<MRsMetadata> getMetadata(
+    public List<MRsMetadata> getMetadata(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(name="fields",required = false)String fields,
             @ApiParam(name="filters",value="过滤",defaultValue = "")
@@ -123,7 +123,6 @@ public class MetadataController  extends BaseRestController{
             HttpServletRequest request,
             HttpServletResponse response) throws Exception
     {
-        Pageable pageable = new PageRequest(reducePage(page),size);
         long total = 0;
         Collection<MRsMetadata> metaList;
 
@@ -142,8 +141,6 @@ public class MetadataController  extends BaseRestController{
         }
 
         pagedResponse(request,response,total,page,size);
-        Page<MRsMetadata> metaPage = new PageImpl<MRsMetadata>((List<MRsMetadata>)metaList,pageable,total);
-
-        return metaPage;
+        return (List<MRsMetadata>)metaList;
     }
 }

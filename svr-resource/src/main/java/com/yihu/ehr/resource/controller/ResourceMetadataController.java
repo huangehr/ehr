@@ -88,7 +88,7 @@ public class ResourceMetadataController extends BaseRestController {
 
     @ApiOperation("根据资源ID批量删除资源数据元")
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas,method = RequestMethod.DELETE)
-    public boolean deleteResourceMetadataPatch(
+    public boolean deleteResourceMetadataBatch(
             @ApiParam(name="resourceId",value="资源ID",defaultValue = "")
             @RequestParam(value="resourceId") String resourceId) throws Exception
     {
@@ -107,7 +107,7 @@ public class ResourceMetadataController extends BaseRestController {
 
     @ApiOperation("资源数据元查询")
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas,method = RequestMethod.GET)
-    public Page<MRsResourceMetadata> queryDimensions(
+    public List<MRsResourceMetadata> queryDimensions(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(value="fields",required = false)String fields,
             @ApiParam(name="filters",value="过滤",defaultValue = "")
@@ -121,7 +121,6 @@ public class ResourceMetadataController extends BaseRestController {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception
     {
-        Pageable pageable = new PageRequest(reducePage(page),size);
         long total = 0;
         Collection<MRsResourceMetadata> rsAppMetaList;
 
@@ -140,8 +139,6 @@ public class ResourceMetadataController extends BaseRestController {
         }
 
         pagedResponse(request,response,total,page,size);
-        Page<MRsResourceMetadata> rsMetaPage = new PageImpl<MRsResourceMetadata>((List<MRsResourceMetadata>)rsAppMetaList,pageable,total);
-
-        return rsMetaPage;
+        return (List<MRsResourceMetadata>)rsAppMetaList;
     }
 }
