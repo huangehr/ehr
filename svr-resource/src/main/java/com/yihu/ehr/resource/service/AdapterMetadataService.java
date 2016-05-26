@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -23,6 +24,7 @@ public class AdapterMetadataService extends BaseJpaService<RsAdapterMetadata,Ada
     @Autowired
     private AdapterMetadataDao adMetadataDao;
 
+
     /**
      * 保存适配数据元
      *
@@ -31,6 +33,7 @@ public class AdapterMetadataService extends BaseJpaService<RsAdapterMetadata,Ada
      */
     public RsAdapterMetadata saveAdapterMetadata(RsAdapterMetadata adapterMetadata)
     {
+
         return adMetadataDao.save(adapterMetadata);
     }
 

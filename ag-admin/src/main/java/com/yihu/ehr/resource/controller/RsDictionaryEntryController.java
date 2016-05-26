@@ -55,11 +55,11 @@ public class RsDictionaryEntryController extends BaseController {
 
 
 
-    @RequestMapping(value = ServiceApi.Resources.DictEntries, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.DictEntries, method = RequestMethod.POST)
     @ApiOperation(value = "创建标准字典项", notes = "创建标准字典项")
     public Envelop createRsDictionaryEntry(
-            @ApiParam(name = "json_data", value = "", defaultValue = "")
-            @RequestBody String jsonData) throws Exception {
+            @ApiParam(name = "model", value = "", defaultValue = "")
+            @RequestParam(value = "model") String jsonData) throws Exception {
         Envelop envelop = new Envelop();
         try{
             MRsDictionaryEntry rsDictionaryEntry = rsDictionaryEntryClient.createRsDictionaryEntry(jsonData);
@@ -76,7 +76,7 @@ public class RsDictionaryEntryController extends BaseController {
     @ApiOperation(value = "修改标准字典项", notes = "修改标准字典项")
     public Envelop updateRsDictionaryEntry(
             @ApiParam(name = "json_data", value = "")
-            @RequestBody String jsonData) throws Exception {
+            @RequestParam(value = "model") String jsonData) throws Exception {
         Envelop envelop = new Envelop();
         try{
             MRsDictionaryEntry rsDictionaryEntry = rsDictionaryEntryClient.updateRsDictionaryEntry(jsonData);
@@ -122,4 +122,17 @@ public class RsDictionaryEntryController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.Resources.DictEntriesExistence,method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    public Envelop isExistence(
+            @ApiParam(name="filters",value="filters",defaultValue = "")
+            @RequestParam(value="filters") String filters) {
+
+        try {
+            return success(rsDictionaryEntryClient.isExistence(filters));
+        }catch (Exception e){
+            e.printStackTrace();
+            return failed("查询出错！");
+        }
+    }
 }

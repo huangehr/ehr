@@ -38,7 +38,7 @@ public class MetadataService extends BaseJpaService<RsMetadata,ResourceMetadataD
 
         for(String id_ : ids)
         {
-            RsMetadata metadata = metadataDao.findOne(id);
+            RsMetadata metadata = metadataDao.findOne(id_);
             metadata.setValid("0");
             metadataDao.save(metadata);
         }

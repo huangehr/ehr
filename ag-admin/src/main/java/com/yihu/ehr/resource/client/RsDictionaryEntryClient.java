@@ -53,4 +53,8 @@ public interface RsDictionaryEntryClient {
     MRsDictionaryEntry getRsDictionaryEntryById(
             @PathVariable(value = "id") String id);
 
+    @RequestMapping(value = ServiceApi.Resources.DictEntriesExistence,method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    boolean isExistence(
+            @RequestParam(value="filters") String filters) ;
 }

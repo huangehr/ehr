@@ -3,10 +3,6 @@ package com.yihu.ehr.profile.controller.profile.converter;
 import com.yihu.ehr.model.profile.MProfile;
 import com.yihu.ehr.model.profile.MProfileDocument;
 import com.yihu.ehr.model.profile.MOriginFile;
-import com.yihu.ehr.service.memory.intermediate.MemoryFileProfile;
-import com.yihu.ehr.service.memory.intermediate.MemoryProfile;
-import com.yihu.ehr.service.memory.intermediate.OriginFile;
-import com.yihu.ehr.service.memory.intermediate.CdaDocument;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +14,7 @@ import java.util.Map;
  */
 @Service
 public class FileProfileConverter extends StdProfileConverter {
-    @Value("${fast-dfs.public-server}")
+    /*@Value("${fast-dfs.public-server}")
     String fastDFSPublicServer;
 
     protected void convertDocuments(MemoryProfile profile, MProfile mProfile, boolean containDataSet) {
@@ -83,5 +79,5 @@ public class FileProfileConverter extends StdProfileConverter {
         }
 
         return profileDocument;
-    }
+    }*/
 }
