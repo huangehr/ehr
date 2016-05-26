@@ -53,11 +53,11 @@ public class RsInterfaceController extends BaseController {
     }
 
 
-    @RequestMapping(value = ServiceApi.Resources.Interfaces, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.Interfaces, method = RequestMethod.POST)
     @ApiOperation(value = "创建资源", notes = "创建资源")
     public Envelop createRsInterface(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
-            @RequestBody String jsonData) throws Exception {
+            @RequestParam(value = "json_data") String jsonData) throws Exception {
         Envelop envelop = new Envelop();
         try{
             MRsInterface rsInterface = rsInterfaceClient.createRsInterface(jsonData);
@@ -74,7 +74,7 @@ public class RsInterfaceController extends BaseController {
     @ApiOperation(value = "修改资源", notes = "修改资源")
     public Envelop updateRsInterface(
             @ApiParam(name = "json_data", value = "")
-            @RequestBody String jsonData) throws Exception {
+            @RequestParam(value = "json_data") String jsonData) throws Exception {
         Envelop envelop = new Envelop();
         try{
             MRsInterface rsInterface = rsInterfaceClient.updateRsInterface(jsonData);
