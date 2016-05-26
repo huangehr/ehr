@@ -2,7 +2,6 @@ package com.yihu.ehr.resource.client;
 
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.resource.MRsDictionary;
 import io.swagger.annotations.ApiOperation;
@@ -13,9 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -61,4 +57,9 @@ public interface RsDictionaryClient {
     boolean createRsDictionaries(
             @RequestBody String jsonData);
 
+    @RequestMapping(value = ServiceApi.Resources.DictsExistence,method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    boolean isExistence(
+            @ApiParam(name="filters",value="filters",defaultValue = "")
+            @RequestParam(value="filters") String filters);
 }
