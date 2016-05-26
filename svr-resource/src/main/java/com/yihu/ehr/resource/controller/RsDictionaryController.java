@@ -74,7 +74,7 @@ public class RsDictionaryController extends BaseRestController {
 
     }
 
-    @RequestMapping(value = ServiceApi.Resources.Dicts, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.Dicts, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改标准字典", notes = "修改标准字典")
     public MRsDictionary updateRsDictionary(
             @ApiParam(name = "json_data", value = "")
@@ -117,7 +117,7 @@ public class RsDictionaryController extends BaseRestController {
 
 
     private boolean isExistence(String code) {
-        return dictionaryService.findByField("code",code) != null;
+        return dictionaryService.findByField("code",code).size() != 0;
     }
 
     private void hasChild(RsDictionary dictionary) throws Exception {

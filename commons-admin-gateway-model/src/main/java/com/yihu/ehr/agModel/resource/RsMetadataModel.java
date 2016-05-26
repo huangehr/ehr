@@ -6,15 +6,16 @@ package com.yihu.ehr.agModel.resource;
 public class RsMetadataModel {
     private String id;
     private String domain;
+    private String domainName;
     private String name;
-    private String code;
     private String stdCode;
     private String displayCode;
     private String columnType;
+    private String columnTypeName;
     private String nullAble;
     private String dictCode;
     private String description;
-    private String valid;
+    private String valid = "1";
 
     public String getId() {
         return id;
@@ -35,13 +36,6 @@ public class RsMetadataModel {
     }
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getCode() {
-        return code;
-    }
-    public void setCode(String code) {
-        this.code = code;
     }
 
     public String getStdCode() {
@@ -91,5 +85,21 @@ public class RsMetadataModel {
     }
     public void setValid(String valid) {
         this.valid = valid;
+    }
+
+    public String getDomainName() {
+        return domainName;
+    }
+
+    public void setDomainName(String domainName) {
+        this.domainName = domainName;
+    }
+
+    public String getColumnTypeName() {
+        return columnTypeName;
+    }
+
+    public void setColumnTypeName(String columnTypeName) {
+        this.columnTypeName = columnTypeName;
     }
 }

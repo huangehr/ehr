@@ -80,7 +80,7 @@ public class RsDictionaryEntryController extends BaseRestController {
         RsDictionaryEntry d = rsDictionaryEntryService.findById(id);
         String code = dictionaryEntry.getCode();
         String dictCode = dictionaryEntry.getDictCode();
-        if(code!=d.getCode() && isExistence(dictCode,code)){
+        if(!d.getCode().equals(code) && isExistence(dictCode,code)){
             throw new Exception("字典代码不可修改");
         }
         rsDictionaryEntryService.save(dictionaryEntry);

@@ -55,11 +55,11 @@ public class RsDictionaryController extends BaseController {
     }
 
 
-    @RequestMapping(value = "/admin" + ServiceApi.Resources.Dicts, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/admin" + ServiceApi.Resources.Dicts, method = RequestMethod.POST)
     @ApiOperation(value = "创建标准字典", notes = "创建标准字典")
     public Envelop createRsDictionary(
-            @ApiParam(name = "json_data", value = "", defaultValue = "")
-            @RequestBody String jsonData) throws Exception {
+            @ApiParam(name = "model", value = "", defaultValue = "")
+            @RequestParam(value = "model") String jsonData) throws Exception {
         Envelop envelop = new Envelop();
         try{
             MRsDictionary rsDictionary = rsDictionaryClient.createRsDictionary(jsonData);
@@ -72,11 +72,11 @@ public class RsDictionaryController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = "/admin" + ServiceApi.Resources.Dicts, method = RequestMethod.PUT)
+    @RequestMapping(value = "/admin" + ServiceApi.Resources.Dict, method = RequestMethod.PUT)
     @ApiOperation(value = "修改标准字典", notes = "修改标准字典")
     public Envelop updateRsDictionary(
-            @ApiParam(name = "json_data", value = "")
-            @RequestBody String jsonData) throws Exception {
+            @ApiParam(name = "model", value = "")
+            @RequestParam(value = "model") String jsonData) throws Exception {
         Envelop envelop = new Envelop();
         try{
             MRsDictionary rsDictionary = rsDictionaryClient.updateRsDictionary(jsonData);

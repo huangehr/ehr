@@ -41,7 +41,7 @@ public interface RsDictionaryClient {
     MRsDictionary createRsDictionary(
             @RequestBody String jsonData);
 
-    @RequestMapping(value = ServiceApi.Resources.Dicts, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.Dicts, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改标准字典", notes = "修改标准字典")
     MRsDictionary updateRsDictionary(
             @RequestBody String jsonData);
