@@ -6,7 +6,6 @@ import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.resource.MRsMetadata;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -65,4 +64,8 @@ public interface MetadataClient {
             @RequestParam(value = "page", required = false) int page,
             @RequestParam(value = "size", required = false) int size);
 
+    @RequestMapping(value = ServiceApi.Resources.MetadatasExistence,method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    boolean isExistence(
+            @RequestParam(value="filters") String filters);
 }

@@ -12,7 +12,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -80,7 +79,7 @@ public class RsDictionaryEntryController extends BaseRestController {
         RsDictionaryEntry d = rsDictionaryEntryService.findById(id);
         String code = dictionaryEntry.getCode();
         String dictCode = dictionaryEntry.getDictCode();
-        if(code!=d.getCode() && isExistence(dictCode,code)){
+        if(!d.getCode().equals(code) && isExistence(dictCode,code)){
             throw new Exception("字典代码不可修改");
         }
         rsDictionaryEntryService.save(dictionaryEntry);
@@ -103,6 +102,16 @@ public class RsDictionaryEntryController extends BaseRestController {
             @PathVariable(value = "id") String id) {
         RsDictionaryEntry dictionaryEntry = rsDictionaryEntryService.findById(id);
         return convertToModel(dictionaryEntry, MRsDictionaryEntry.class);
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.DictEntriesExistence,method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    public boolean isExistence(
+            @ApiParam(name="filters",value="filters",defaultValue = "")
+            @RequestParam(value="filters") String filters) throws Exception {
+
+        List ls = rsDictionaryEntryService.search("",filters,"", 1, 1);
+        return ls!=null && ls.size()>0;
     }
 
     public boolean isExistence(String dictCode,String code) {
