@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.agModel.resource.RsInterfaceModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.resource.MRsInterface;
@@ -80,6 +81,48 @@ public class RsInterfaceController extends BaseController {
             MRsInterface rsInterface = rsInterfaceClient.updateRsInterface(jsonData);
             envelop.setObj(rsInterface);
             envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.Interface, method = RequestMethod.GET)
+    @ApiOperation(value = "根据id获取获取标准字典")
+    public Envelop getRsInterfaceById(
+            @ApiParam(name = "id", value = "", defaultValue = "")
+            @PathVariable(value = "id") String id) {
+        Envelop envelop = new Envelop();
+        try{
+            MRsInterface mRsInterface = rsInterfaceClient.getRsInterfaceById(id);
+            RsInterfaceModel rsInterface = convertToModel(mRsInterface,RsInterfaceModel.class);
+            if(rsInterface ==null){
+                envelop.setSuccessFlg(false);
+            }else {
+                envelop.setObj(rsInterface);
+                envelop.setSuccessFlg(true);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.InterfaceNameExistence, method = RequestMethod.GET)
+    @ApiOperation(value = "根据id获取获取标准字典")
+    public Envelop isExistenceName(
+            @ApiParam(name = "name", value = "", defaultValue = "")
+            @RequestParam(value = "name") String name) {
+        Envelop envelop = new Envelop();
+        try{
+            boolean bo = rsInterfaceClient.isExistenceName(name);
+            if(bo){
+                envelop.setSuccessFlg(true);
+            }else {
+                envelop.setSuccessFlg(false);
+            }
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
