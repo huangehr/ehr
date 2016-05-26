@@ -1,10 +1,13 @@
 package com.yihu.ehr.profile.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.profile.feign.XResourceClient;
+import com.yihu.ehr.util.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.aspectj.util.FileUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,13 +25,18 @@ import java.io.IOException;
 @Api(value = "rsBrowse", description = "业务资源浏览接口")
 public class ResourcesBrowseController {
 
+    @Autowired
+    XResourceClient resource;
+
+    String appId = "svr-health-profile";
+
     @ApiOperation("门户 - 用户基本信息")
     @RequestMapping(value = "/home/getPatientInfo", method = RequestMethod.GET)
-    public String getPatientInfo(
+    public Envelop getPatientInfo(
             @ApiParam(name = "demographicId", value = "身份证号")
             @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
 
-        return file2String("/json/user.json");
+        return resource.getResources("RS_PATIENT_INFO",appId,"{\"q\":\"demographic_id:"+demographicId+"\"}");
     }
 
     //

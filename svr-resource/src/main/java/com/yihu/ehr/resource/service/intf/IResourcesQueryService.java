@@ -1,9 +1,7 @@
 package com.yihu.ehr.resource.service.intf;
 
 
-import org.springframework.data.domain.Page;
-
-import java.util.Map;
+import com.yihu.ehr.util.Envelop;
 
 /**
  * Created by hzp on 20160422.
@@ -22,5 +20,5 @@ public interface IResourcesQueryService {
      * @return
      * @throws Exception
      */
-    Page<Map<String,Object>> getResources(String resourcesCode,String appId,String queryParams,Integer page,Integer size) throws Exception;
+    Envelop getResources(String resourcesCode,String appId,String queryParams,Integer page,Integer size) throws Exception;
 }

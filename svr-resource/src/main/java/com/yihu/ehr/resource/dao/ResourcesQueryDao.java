@@ -193,7 +193,7 @@ public class ResourcesQueryDao {
         }
 
     }
-
+    
     /**
      * habse细表的solr分组统计
      * queryParams为json例：{"table":"HDSD00_08","q":"*:*","groupFields":"key1,key2","statsFields":"key3,key4",customGroup:""}

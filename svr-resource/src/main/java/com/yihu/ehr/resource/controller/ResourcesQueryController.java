@@ -3,9 +3,11 @@ package com.yihu.ehr.resource.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.resource.dao.ResourcesQueryDao;
 import com.yihu.ehr.resource.service.intf.IResourcesQueryService;
+import com.yihu.ehr.util.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +36,7 @@ public class ResourcesQueryController {
      */
     @ApiOperation("获取资源数据")
     @RequestMapping(value = "/getResources", method = RequestMethod.GET)
-    public Page<Map<String,Object>> getResources(@ApiParam("resourcesCode") @RequestParam(value = "resourcesCode", required = true) String resourcesCode,
+    public Envelop getResources(@ApiParam("resourcesCode") @RequestParam(value = "resourcesCode", required = true) String resourcesCode,
                                                  @ApiParam("appId") @RequestParam(value = "appId", required = true) String appId,
                                                  @ApiParam("queryParams") @RequestParam(value = "queryParams", required = false) String queryParams,
                                                  @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
