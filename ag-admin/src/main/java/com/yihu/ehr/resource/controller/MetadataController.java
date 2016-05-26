@@ -134,6 +134,20 @@ public class MetadataController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.Resources.MetadatasExistence,method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    public Envelop isExistence(
+            @ApiParam(name="filters",value="filters",defaultValue = "")
+            @RequestParam(value="filters") String filters) {
+
+        try {
+            return success(metadataClient.isExistence(filters));
+        }catch (Exception e){
+            e.printStackTrace();
+            return failed("查询出错！");
+        }
+    }
+
     @RequestMapping(value = ServiceApi.Resources.Metadatas, method = RequestMethod.GET)
     @ApiOperation("查询数据元")
     public Envelop getMetadata(
@@ -167,8 +181,8 @@ public class MetadataController extends BaseController {
         List<RsMetadataModel> rs = new ArrayList<>();
         if(!isEmpty(rsMetadatas)){
             RsMetadataModel model;
-            Map<String, String> domain = getDictMap(41);
-            Map<String, String> columnType = getDictMap(40);
+            Map<String, String> domain = getDictMap(31);
+            Map<String, String> columnType = getDictMap(30);
             for(MRsMetadata mRsMetadata : rsMetadatas){
                 model = convertToModel(mRsMetadata, RsMetadataModel.class);
                 model.setDomainName(nullToSpace(domain.get(model.getDomain())));

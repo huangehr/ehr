@@ -107,6 +107,16 @@ public class MetadataController  extends BaseRestController{
         return convertToModel(metadataService.getMetadataById(id),MRsMetadata.class);
     }
 
+    @RequestMapping(value = ServiceApi.Resources.MetadatasExistence,method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    public boolean isExistence(
+            @ApiParam(name="filters",value="filters",defaultValue = "")
+            @RequestParam(value="filters") String filters) throws Exception {
+
+        List<RsMetadata> metadata = metadataService.search("",filters,"", 1, 1);
+        return metadata!=null && metadata.size()>0;
+    }
+
     @RequestMapping(value = ServiceApi.Resources.Metadatas,method = RequestMethod.GET)
     @ApiOperation("查询数据元")
     public List<MRsMetadata> getMetadata(

@@ -2,7 +2,6 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsDictionary;
 import com.yihu.ehr.resource.model.RsDictionary;
 import com.yihu.ehr.resource.model.RsDictionaryEntry;
@@ -115,6 +114,15 @@ public class RsDictionaryController extends BaseRestController {
         return true;
     }
 
+    @RequestMapping(value = ServiceApi.Resources.DictsExistence,method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    public boolean isExistenceFilters(
+            @ApiParam(name="filters",value="filters",defaultValue = "")
+            @RequestParam(value="filters") String filters) throws Exception {
+
+        List ls = dictionaryService.search("",filters,"", 1, 1);
+        return ls!=null && ls.size()>0;
+    }
 
     private boolean isExistence(String code) {
         return dictionaryService.findByField("code",code).size() != 0;
