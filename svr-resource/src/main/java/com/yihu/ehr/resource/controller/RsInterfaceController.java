@@ -64,7 +64,7 @@ public class RsInterfaceController extends BaseRestController {
 
     }
 
-    @RequestMapping(value = ServiceApi.Resources.Interfaces, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.Interfaces, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改资源", notes = "修改资源")
     public MRsInterface updateRsInterface(
             @ApiParam(name = "json_data", value = "")

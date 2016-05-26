@@ -37,7 +37,7 @@ public interface RsInterfaceClient {
     MRsInterface createRsInterface(
             @RequestBody String jsonData);
 
-    @RequestMapping(value = ServiceApi.Resources.Interfaces, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.Interfaces, method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改资源", notes = "修改资源")
     MRsInterface updateRsInterface(
             @RequestBody String jsonData);
