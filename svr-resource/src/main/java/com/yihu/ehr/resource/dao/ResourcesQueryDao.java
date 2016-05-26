@@ -36,13 +36,18 @@ public class ResourcesQueryDao {
     private Integer defaultPage = 1;
     private Integer defaultSize = 50;
 
+    private String mainCore = "EHR_CENTER";
+    private String subCore = "EHR_CENTER_SUB";
+    private String mainJoinCore = "EHR_CENTER_shard1_replica1";
+    private String subJoinCore = "EHR_CENTER_SUB_shard1_replica1";
 
     /**
      * 获取Hbase主表
      * queryParams可为solr表达式，也可为json例：{"q":"*:*","fq":"","fl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}""}
+     * q和fq都存在则做join操作
      */
     public Page<Map<String,Object>> getEhrCenter(String queryParams, Integer page, Integer size) throws Exception {
-        String core = "EHR_CENTER";
+        String core = mainCore;
         String q = "";
         String fq = "";
         String fl = "";
@@ -54,22 +59,35 @@ public class ResourcesQueryDao {
                 if (obj.containsKey("q")) {
                     q = obj.get("q");
                 }
-                if (obj.containsKey("fq")) {
-                    fq = obj.get("fq");
-                }
                 if (obj.containsKey("fl")) {
                     fl = obj.get("fl");
                 }
                 if (obj.containsKey("sort")) {
                     sort = obj.get("sort");
                 }
-            } else {
+
+                //q和fq都存在则做join操作
+                if (obj.containsKey("fq")) {
+                    fq = obj.get("fq");
+                    if(q.length()>0)
+                    {
+                        q = "{!join fromIndex="+subJoinCore+" from=main_rowkey to=rowkey}" +q;
+                    }
+                    else
+                    {
+                        q = "{!join fromIndex="+subJoinCore+" from=main_rowkey to=rowkey}*:*";
+                    }
+                }
+
+            }
+            else {
                 q = queryParams;
             }
         }
 
         //默认第一页
-        if (page == null) {
+        if (page == null)
+        {
             page = defaultPage;
         }
         //默认50行
@@ -82,9 +100,10 @@ public class ResourcesQueryDao {
     /**
      * 获取Hbase细表
      * queryParams可为solr表达式，也可为json例：{"table":"HDSD00_08","q":"*:*","fq":"","fl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}""}
+     * q和fq都存在则做join操作
      */
     public Page<Map<String,Object>> getEhrCenterSub(String queryParams, Integer page, Integer size) throws Exception {
-        String core = "EHR_CENTER_SUB";
+        String core = subCore;
         String q = "";
         String fq = "";
         String fl = "";
@@ -96,21 +115,44 @@ public class ResourcesQueryDao {
                 if (obj.containsKey("q")) {
                     q = obj.get("q");
                 }
-                if (obj.containsKey("fq")) {
-                    fq = obj.get("fq");
-                }
                 if (obj.containsKey("fl")) {
                     fl = obj.get("fl");
                 }
                 if (obj.containsKey("sort")) {
                     sort = obj.get("sort");
                 }
-                if (obj.containsKey("table")) {
-                    if (q.length() > 0) {
-                        q += " AND rowkey:*" + obj.get("table") + "*";
-                    } else {
-                        q = "rowkey:*" + obj.get("table") + "*";
+
+                //q和fq都存在则做join操作
+                if (obj.containsKey("fq")) {
+                    fq = obj.get("fq");
+                    if(q.length()>0)
+                    {
+                        q = "{!join fromIndex="+mainJoinCore+" from=rowkey to=main_rowkey}" +q;
                     }
+                    else
+                    {
+                        q = "{!join fromIndex="+mainJoinCore+" from=rowkey to=main_rowkey}*:*";
+                    }
+                }
+
+                //细表数据集条件
+                if (obj.containsKey("table")) {
+                    if(q.startsWith("{!join"))
+                    {
+                        if (fq.length() > 0) {
+                            fq += " AND rowkey:*" + obj.get("table") + "*";
+                        } else {
+                            fq = "rowkey:*" + obj.get("table") + "*";
+                        }
+                    }
+                    else{
+                        if (q.length() > 0) {
+                            q += " AND rowkey:*" + obj.get("table") + "*";
+                        } else {
+                            q = "rowkey:*" + obj.get("table") + "*";
+                        }
+                    }
+
                 }
             } else {
                 q = queryParams;
@@ -133,7 +175,7 @@ public class ResourcesQueryDao {
      * queryParams为json例：{"q":"*:*","groupFields":"key1,key2","statsFields":"key3,key4","customGroup":[{"groupField":"lastUpdateTime","groupCondition":{"3Month":"last_update_time:[2016-02-16 TO *]","6Month":"last_update_time:[2015-11-10 TO *]"}}]}
      */
     public Page<Map<String,Object>> countEhrCenter(String queryParams, Integer page, Integer size) throws Exception {
-        String core = "EHR_CENTER";
+        String core = mainCore;
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> params = objectMapper.readValue(queryParams, Map.class);
 
@@ -199,7 +241,7 @@ public class ResourcesQueryDao {
      * queryParams为json例：{"table":"HDSD00_08","q":"*:*","groupFields":"key1,key2","statsFields":"key3,key4",customGroup:""}
      */
     public Page<Map<String,Object>> countEhrCenterSub(String queryParams, Integer page, Integer size) throws Exception {
-        String core = "EHR_CENTER_SUB";
+        String core = subCore;
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, String> params = objectMapper.readValue(queryParams, Map.class);
 

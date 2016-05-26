@@ -1,8 +1,8 @@
 package com.yihu.ehr.profile.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.profile.feign.XResourceClient;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.profile.service.PatientInfoBaseService;
+import com.yihu.ehr.profile.service.PatientInfoDetailService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author linaz
@@ -26,36 +28,20 @@ import java.io.IOException;
 public class ResourcesBrowseController {
 
     @Autowired
-    XResourceClient resource;
+    PatientInfoBaseService patient;
 
-    String appId = "svr-health-profile";
+    @Autowired
+    PatientInfoDetailService patientDetail;
 
     @ApiOperation("门户 - 用户基本信息")
     @RequestMapping(value = "/home/getPatientInfo", method = RequestMethod.GET)
-    public Envelop getPatientInfo(
+    public Map<String,Object> getPatientInfo(
             @ApiParam(name = "demographicId", value = "身份证号")
             @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
-
-        return resource.getResources("RS_PATIENT_INFO",appId,"{\"q\":\"demographic_id:"+demographicId+"\"}");
+        return patient.getPatientInfo(demographicId);
     }
 
-    //
-//    @ApiOperation("门户 - 挂号信息展开")
-//    @RequestMapping(value = "/home/getRegistrationInfo", method = RequestMethod.GET)
-//    public DataList getRegistrationInfo(@ApiParam(name = "idNo", value = "身份证号码") @RequestParam(value = "idNo", required = true) String idNo,
-//                                      @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-//                                      @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception{
-//         return null;
-//    }
-//
-//    @ApiOperation("门户 - 在线问诊展开")
-//    @RequestMapping(value = "/home/getOnlineVisit", method = RequestMethod.GET)
-//    public DataList getOnlineVisit(@ApiParam(name = "idNo", value = "身份证号码") @RequestParam(value = "idNo", required = true) String idNo,
-//                                 @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-//                                 @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception{
-//         return null;
-//    }
-//
+
     @ApiOperation("门户 - 病史信息")
     @RequestMapping(value = "/home/getDiseaseHistory", method = RequestMethod.GET)
     public String getDiseaseHistory(
@@ -67,15 +53,16 @@ public class ResourcesBrowseController {
 
     }
 
-    //
+
     @ApiOperation("门户 - 主要健康问题")
     @RequestMapping(value = "/home/getHealthProblem", method = RequestMethod.GET)
-    public String getHealthProblem(
+    public List<Map<String,Object>> getHealthProblem(
             @ApiParam(name = "demographicId", value = "身份证号")
             @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
-        return file2String("/json/healthProblem.json");
+
+
+        return patient.getHealthProblem(demographicId);
     }
-//
 
 
     @ApiOperation("门户 - 最近就诊事件")
