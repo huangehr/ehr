@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.service.intf;
 
+import com.yihu.ehr.model.resource.MRsAdapterMetadata;
 import com.yihu.ehr.resource.model.RsAdapterMetadata;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -47,4 +48,6 @@ public interface IAdapterMetadataService {
     long getCount(String filters) throws java.text.ParseException;
 
     List search(String fields, String filters, String sorts, Integer page, Integer size) throws java.text.ParseException;
+
+    void batchInsertAdapterMetadatas(RsAdapterMetadata[] adapterMetadatas);
 }

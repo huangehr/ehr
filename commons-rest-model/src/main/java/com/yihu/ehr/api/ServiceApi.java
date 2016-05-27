@@ -24,7 +24,8 @@ public class ServiceApi {
         public static final String Schemas                         = "/adaptions/schemas";
 
         public static final String SchemaMetadatas                 ="/adaptions/schema/metadatas";
-        public static final String SchemaMetadata                   ="/adaptions/schema/metadatas/{id}";
+        public static final String SchemaMetadata                  ="/adaptions/schema/metadatas/{id}";
+        public static final String SchemaMetadatasBatch            ="/adaptions/schema/metadatas/batch";
 
     }
 
@@ -68,6 +69,7 @@ public class ServiceApi {
 
         public static final String Interfaces                       ="/resources/interfaces";
         public static final String Interface                       ="/resources/interfaces/{id}";
+        public static final String InterfaceNameExistence          ="/resources/existence/name";
 
         public static final String Categories                       ="/resources/categories";
         public static final String Category                        ="/resources/categories/{id}";

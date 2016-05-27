@@ -8,10 +8,9 @@ import com.yihu.ehr.resource.model.DtoResourceMetadata;
 import com.yihu.ehr.resource.model.RsAppResource;
 import com.yihu.ehr.resource.model.RsResources;
 import com.yihu.ehr.resource.service.intf.IResourcesQueryService;
+import com.yihu.ehr.util.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Method;
@@ -71,7 +70,7 @@ public class ResourcesQueryService implements IResourcesQueryService {
      * @return
      * @throws Exception
      */
-    public Page<Map<String,Object>> getResources(String resourcesCode,String appId,String queryParams,Integer page,Integer size) throws Exception {
+    public Envelop getResources(String resourcesCode,String appId,String queryParams,Integer page,Integer size) throws Exception {
         //获取资源信息
         RsResources rs = resourcesDao.findByCode(resourcesCode);
         if(rs!=null)
@@ -156,48 +155,54 @@ public class ResourcesQueryService implements IResourcesQueryService {
                 /************** 执行函数 *************************/
                 Class<ResourcesQueryDao> classType = ResourcesQueryDao.class;
                 Method method = classType.getMethod(methodName, new Class[]{String.class,Integer.class,Integer.class});
-                Page<Map<String,Object>> re = (Page<Map<String,Object>>)method.invoke(resourcesQueryDao, queryParams, page, size);
+                Page<Map<String,Object>> result = (Page<Map<String,Object>>)method.invoke(resourcesQueryDao, queryParams, page, size);
 
-                if(re.getContent()!=null&&re.getContent().size()>0)
+                Envelop re = new Envelop();
+                if(result!=null)
                 {
-                    /**** 转译 *****/
-                    List<Map<String,Object>> list = new ArrayList<>();
-                    //遍历所有行
-                    for(int i=0;i<re.getContent().size();i++)
+                    re.setCurrPage(result.getNumber());
+                    re.setPageSize(result.getSize());
+                    re.setTotalCount(new Long(result.getTotalElements()).intValue());
+
+                    if(result.getContent()!=null&&result.getContent().size()>0)
                     {
-                        Map<String,Object> oldObj = (Map<String,Object>)re.getContent().get(i);
-                        Map<String,Object> newObj = new HashMap<>();
-                        //遍历资源数据元
-                        for(DtoResourceMetadata metadada : metadataList) {
-                            String key = metadada.getStdCode();//***先用std标准代码映射
-                            if(metadada.getDictCode()!=null&& metadada.getDictCode().length()>0&&!metadada.getDictCode().equals("0"))
-                            {
-                                key += "_CODE_"+metadada.getColumnType().substring(0,1);
-                            }
-                            else{
-                                key += "_"+metadada.getColumnType().substring(0, 1);
-                            }
-
-                            if(oldObj.containsKey(key))
-                            {
-                                newObj.put(metadada.getCode(),oldObj.get(key));
-                            }
-                        }
-
-                        //统计字段
-                        for(String key : oldObj.keySet())
+                        /**** 转译 *****/
+                        List<Map<String,Object>> list = new ArrayList<>();
+                        //遍历所有行
+                        for(int i=0;i<result.getContent().size();i++)
                         {
-                            if (key.startsWith("$")) {
-                                newObj.put(key,oldObj.get(key));
+                            Map<String,Object> oldObj = (Map<String,Object>)result.getContent().get(i);
+                            Map<String,Object> newObj = new HashMap<>();
+                            //遍历资源数据元
+                            for(DtoResourceMetadata metadada : metadataList) {
+                                String key = metadada.getStdCode();//***先用std标准代码映射
+                                if(metadada.getDictCode()!=null&& metadada.getDictCode().length()>0&&!metadada.getDictCode().equals("0"))
+                                {
+                                    key += "_CODE_"+metadada.getColumnType().substring(0,1);
+                                }
+                                else{
+                                    key += "_"+metadada.getColumnType().substring(0, 1);
+                                }
+
+                                if(oldObj.containsKey(key))
+                                {
+                                    newObj.put(metadada.getId(),oldObj.get(key));
+                                }
                             }
+
+                            //统计字段
+                            for(String key : oldObj.keySet())
+                            {
+                                if (key.startsWith("$")) {
+                                    newObj.put(key,oldObj.get(key));
+                                }
+                            }
+                            list.add(newObj);
                         }
-                        list.add(newObj);
+                        re.setDetailModelList(list);
                     }
-                    return new PageImpl<Map<String,Object>>(list,new PageRequest(re.getNumber(), re.getSize()),re.getTotalElements());
                 }
-                else{
-                    return re;
-                }
+                return re;
             }
         }
 

@@ -46,6 +46,7 @@ public class MetadataController extends BaseController {
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("系统出错！");
         }
         return envelop;
     }
@@ -63,6 +64,7 @@ public class MetadataController extends BaseController {
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("系统出错！");
         }
         return envelop;
     }
@@ -80,6 +82,7 @@ public class MetadataController extends BaseController {
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("系统出错！");
         }
         return envelop;
     }
@@ -96,6 +99,7 @@ public class MetadataController extends BaseController {
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("系统出错！");
         }
         return envelop;
     }
@@ -112,6 +116,7 @@ public class MetadataController extends BaseController {
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("系统出错！");
         }
         return envelop;
     }

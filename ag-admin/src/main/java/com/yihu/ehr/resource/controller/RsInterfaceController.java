@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.agModel.resource.RsInterfaceModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.resource.MRsInterface;
@@ -53,11 +54,11 @@ public class RsInterfaceController extends BaseController {
     }
 
 
-    @RequestMapping(value = ServiceApi.Resources.Interfaces, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.Interfaces, method = RequestMethod.POST)
     @ApiOperation(value = "创建资源", notes = "创建资源")
     public Envelop createRsInterface(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
-            @RequestBody String jsonData) throws Exception {
+            @RequestParam(value = "json_data") String jsonData) throws Exception {
         Envelop envelop = new Envelop();
         try{
             MRsInterface rsInterface = rsInterfaceClient.createRsInterface(jsonData);
@@ -74,12 +75,54 @@ public class RsInterfaceController extends BaseController {
     @ApiOperation(value = "修改资源", notes = "修改资源")
     public Envelop updateRsInterface(
             @ApiParam(name = "json_data", value = "")
-            @RequestBody String jsonData) throws Exception {
+            @RequestParam(value = "json_data") String jsonData) throws Exception {
         Envelop envelop = new Envelop();
         try{
             MRsInterface rsInterface = rsInterfaceClient.updateRsInterface(jsonData);
             envelop.setObj(rsInterface);
             envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.Interface, method = RequestMethod.GET)
+    @ApiOperation(value = "根据id获取获取标准字典")
+    public Envelop getRsInterfaceById(
+            @ApiParam(name = "id", value = "", defaultValue = "")
+            @PathVariable(value = "id") String id) {
+        Envelop envelop = new Envelop();
+        try{
+            MRsInterface mRsInterface = rsInterfaceClient.getRsInterfaceById(id);
+            RsInterfaceModel rsInterface = convertToModel(mRsInterface,RsInterfaceModel.class);
+            if(rsInterface ==null){
+                envelop.setSuccessFlg(false);
+            }else {
+                envelop.setObj(rsInterface);
+                envelop.setSuccessFlg(true);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.InterfaceNameExistence, method = RequestMethod.GET)
+    @ApiOperation(value = "根据id获取获取标准字典")
+    public Envelop isExistenceName(
+            @ApiParam(name = "name", value = "", defaultValue = "")
+            @RequestParam(value = "name") String name) {
+        Envelop envelop = new Envelop();
+        try{
+            boolean bo = rsInterfaceClient.isExistenceName(name);
+            if(bo){
+                envelop.setSuccessFlg(true);
+            }else {
+                envelop.setSuccessFlg(false);
+            }
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);

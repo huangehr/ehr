@@ -6,11 +6,11 @@ import com.yihu.ehr.model.resource.MRsDictionary;
 import com.yihu.ehr.resource.client.RsDictionaryClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.utils.FeignExceptionUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -68,6 +68,7 @@ public class RsDictionaryController extends BaseController {
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(FeignExceptionUtils.getErrorMsg(e));
         }
         return envelop;
     }
@@ -99,9 +100,10 @@ public class RsDictionaryController extends BaseController {
         try{
             rsDictionaryClient.deleteRsDictionary(id);
             envelop.setSuccessFlg(true);
-        }catch (Exception e){
+        } catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(FeignExceptionUtils.getErrorMsg(e));
         }
         return envelop;
     }
