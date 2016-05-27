@@ -9,5 +9,6 @@ package com.yihu.ehr.profile.family;
 public class SubResourceFamily extends ResourceFamily {
     // Basic列族
     public static class BasicColumns {
+        public final static String ProfileId = "profile_id";
     }
 }

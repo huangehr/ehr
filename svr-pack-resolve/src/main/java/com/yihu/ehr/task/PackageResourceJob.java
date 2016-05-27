@@ -33,18 +33,18 @@ public class PackageResourceJob implements InterruptableJob {
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-        try{
+        try {
             MessageBuffer messageBuffer = SpringContext.getService(MessageBuffer.class);
             MPackage pack = messageBuffer.getMessage();
 
             doResolve(pack);
-        } catch (NoSuchElementException e){
+        } catch (NoSuchElementException e) {
             LogService.getLogger().debug("No package to resolve in queue.");
         }
     }
 
-    private void doResolve(MPackage pack){
-        try{
+    private void doResolve(MPackage pack) {
+        try {
             if (pack == null) return;
 
             LogService.getLogger().info("Package resolve job start: package " + pack.getId());
@@ -56,14 +56,18 @@ public class PackageResourceJob implements InterruptableJob {
             String zipFile = downloadTo(pack.getRemotePath());
 
             StdPackModel stdPackModel = resolveEngine.doResolve(pack, zipFile);
-            packMill.grindingPackModel(stdPackModel);
+            if (!stdPackModel.getCdaVersion().equals("000000000000")) {
+                packMill.grindingPackModel(stdPackModel);
 
-            packageMgrClient.reportStatus(pack.getId(),
-                    ArchiveStatus.Finished,
-                    String.format("Rowkey: %s, identity: %s", stdPackModel.getId(), stdPackModel.getDemographicId()));
+                packageMgrClient.reportStatus(pack.getId(),
+                        ArchiveStatus.Finished,
+                        String.format("Rowkey: %s, identity: %s", stdPackModel.getId(), stdPackModel.getDemographicId()));
 
-            LogService.getLogger().info("Package resolve job done: package " + pack.getId());
-
+                LogService.getLogger().info("Package resolve job done: package " + pack.getId());
+            } else {
+                packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
+                        "Package is collected by cda version 00000000000, pass.");
+            }
         } catch (Exception e) {
             LogService.getLogger().error(e.getMessage());
         }

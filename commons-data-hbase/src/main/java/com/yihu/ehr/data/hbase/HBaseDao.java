@@ -21,7 +21,7 @@ import java.util.List;
  */
 @Service
 public class HBaseDao extends AbstractHBaseClient {
-    public void saveOrUpdate(String tableName, TableBundle tableBundle) throws IOException {
+    public void save(String tableName, TableBundle tableBundle) throws IOException {
         hbaseTemplate.execute(tableName, new TableCallback<Object>() {
 
             public Object doInTable(HTableInterface htable) throws Throwable {

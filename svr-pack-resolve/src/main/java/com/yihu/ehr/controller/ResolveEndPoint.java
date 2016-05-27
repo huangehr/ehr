@@ -60,23 +60,28 @@ public class ResolveEndPoint {
             @ApiParam(value = "模拟应用ID", defaultValue = "usa911Em")
             @RequestParam("clientId") String clientId,
             @ApiParam(value = "返回档案数据", defaultValue = "true")
-        @RequestParam("echo") boolean echo) throws Exception {
+        @RequestParam("echo") boolean echo) throws Throwable {
         MPackage pack = packageMgrClient.getPackage(packageId);
         if (pack == null) throw new ApiException(HttpStatus.NOT_FOUND, "Package not found.");
 
         if(StringUtils.isEmpty(pack.getClientId())) pack.setClientId(clientId);
         String zipFile = downloadTo(pack.getRemotePath());
 
-        StdPackModel packModel = packResolveEngine.doResolve(pack, zipFile);
-        ResourceBucket resourceBucket = packMill.grindingPackModel(packModel);
-        resourceService.save(resourceBucket);
+        StdPackModel stdPackModel = packResolveEngine.doResolve(pack, zipFile);
+        if (!stdPackModel.getCdaVersion().equals("000000000000")) {
+            ResourceBucket resourceBucket = packMill.grindingPackModel(stdPackModel);
+            resourceService.save(resourceBucket);
 
-        packageMgrClient.reportStatus(pack.getId(),
-                ArchiveStatus.Finished,
-                String.format("Rowkey: %s, identity: %s", packModel.getId(), packModel.getDemographicId()));
+            packageMgrClient.reportStatus(pack.getId(),
+                    ArchiveStatus.Finished,
+                    String.format("Rowkey: %s, identity: %s", stdPackModel.getId(), stdPackModel.getDemographicId()));
+        }else {
+            packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
+                    "Package is collected by cda version 00000000000, pass.");
+        }
 
         if (echo) {
-            return new ResponseEntity<>(packModel.toJson(), HttpStatus.OK);
+            return new ResponseEntity<>(stdPackModel.toJson(), HttpStatus.OK);
         }
 
         return null;
@@ -105,7 +110,7 @@ public class ResolveEndPoint {
             @ApiParam(value = "模拟应用ID", defaultValue = "usa911Em")
             @RequestParam("clientId") String clientId,
             @ApiParam(value = "是否入库")
-            @RequestParam(value = "persist", defaultValue = "false") boolean persist) throws FileNotFoundException {
+            @RequestParam(value = "persist", defaultValue = "false") boolean persist) throws Throwable {
 
         String zipFile = System.getProperty("java.io.tmpdir") + packageId + ".zip";
 

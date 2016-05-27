@@ -30,10 +30,10 @@ public class FileResourceRepository {
             for (String rowkey : cdaDocuments.keySet()){
                 CdaDocument cdaDocument = cdaDocuments.get(rowkey);
                 bundle.addValues(rowkey, FileFamily.Basic, FileTableUtil.getBasicFamilyCellMap(resBucket));
-                bundle.addValues(rowkey, FileFamily.Resource, FileTableUtil.getFileFamilyCellMap(cdaDocument));
+                bundle.addValues(rowkey, FileFamily.Data, FileTableUtil.getFileFamilyCellMap(cdaDocument));
             }
 
-            hbaseDao.saveOrUpdate(FileTableUtil.Table, bundle);
+            hbaseDao.save(FileTableUtil.Table, bundle);
         }
     }
 

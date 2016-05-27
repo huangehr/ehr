@@ -26,12 +26,14 @@ import javax.xml.transform.Result;
 import java.util.Iterator;
 
 /**
+ * 此功能有毒！
+ *
  * @author Sand
  * @created 2016.05.25 10:09
  */
-@RestController
+/*@RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "历史档案服务", description = "维护/获取历史档案")
+@Api(value = "历史档案服务", description = "维护/获取历史档案")*/
 public class LegacyProfileEndPoint extends BaseRestEndPoint {
     private String Table = "HealthArchives";
 
@@ -56,36 +58,35 @@ public class LegacyProfileEndPoint extends BaseRestEndPoint {
     @RequestMapping(value = "/legacy_profile", method = RequestMethod.DELETE)
     public void deleteProfile(
             @ApiParam(value = "organization_code", defaultValue = "test001_test00000001")
-            @RequestParam("organization_code") String organizationCode) throws Throwable {
-        ObjectMapper objectMapper = SpringContext.getService("objectMapper");
+            @RequestParam("organization_code") String organizationCode,
+            @ApiParam(value = "data_sets", defaultValue = "HDSA00_01,HDSC01_02,HDSC01_03,HDSC01_04,HDSC01_05,HDSC01_06,HDSC02_09,HDSC02_17,HDSC02_03,HDSC02_05,HDSC02_07,HDSC02_08,HDSC02_11,HDSC02_12,HDSC02_14,HDSC02_15,HDSC02_16,HDSD00_08,HDSD01_01,HDS01_02,HDSD02_01,HDSD02_02,HDSD02_03,HDSD02_04,HDSD02_05,HDSF00_01")
+            @RequestParam("data_sets") String dataSets) throws Throwable {
 
-        String[] rowKeys = hBaseDao.findRowKeys(Table, "^" + organizationCode);
+        String tables[] = dataSets.split(",");
+
         TableBundle bundle = new TableBundle();
-        bundle.addRows(rowKeys);
-
-        for (String rowKey : rowKeys){
-            bundle.clear();
-            bundle.addColumns(rowKey, "basic", "data_sets");
-
-            Object[] objects = hBaseDao.get(Table, bundle);
-            for (Object object : objects){
-                ResultUtil result = new ResultUtil(object);
-                String dataSets = result.getCellValue("basic", "data_sets", "");
-
-                ObjectNode root = (ObjectNode) objectMapper.readTree(dataSets);
-                Iterator<String> tables = root.fieldNames();
-                while (tables.hasNext()){
-                    String table = tables.next();
-                    String[] dataSetRowKeys = root.get(table).asText().split(",");
-
-                    bundle.clear();
-                    bundle.addRows(dataSetRowKeys);
-                    hBaseDao.delete(table, bundle);
-                }
+        for (String table : tables){
+            String[] rowKeys = hBaseDao.findRowKeys(table, "^" + organizationCode);
+            if (rowKeys != null){
+                bundle.clear();
+                bundle.addRows(rowKeys);
+                hBaseDao.delete(table, bundle);
             }
 
+            table = table + "_ORIGIN";
+
+            rowKeys = hBaseDao.findRowKeys(table, "^" + organizationCode);
+            if (rowKeys != null){
+                bundle.clear();
+                bundle.addRows(rowKeys);
+                hBaseDao.delete(table, bundle);
+            }
+        }
+
+        String[] rowKeys = hBaseDao.findRowKeys(Table, "^" + organizationCode);
+        if (rowKeys != null){
             bundle.clear();
-            bundle.addRows(rowKey);
+            bundle.addRows(rowKeys);
             hBaseDao.delete(Table, bundle);
         }
     }

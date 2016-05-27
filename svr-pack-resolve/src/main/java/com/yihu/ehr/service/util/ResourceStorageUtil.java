@@ -1,10 +1,10 @@
 package com.yihu.ehr.service.util;
 
-import com.yihu.ehr.service.resource.*;
+import com.yihu.ehr.profile.family.SubResourceFamily;
 import com.yihu.ehr.service.resource.stage2.MasterRecord;
 import com.yihu.ehr.service.resource.stage2.ResourceBucket;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
-import com.yihu.ehr.profile.family.SubResourceFamily;
+import com.yihu.ehr.service.resource.stage2.SubRecord;
 import com.yihu.ehr.util.DateTimeUtils;
 
 import java.util.Date;
@@ -40,9 +40,23 @@ public class ResourceStorageUtil {
             map.put(MasterResourceFamily.BasicColumns.DemographicId, profile.getDemographicId() == null ? "" : profile.getDemographicId());
             map.put(MasterResourceFamily.BasicColumns.CreateDate, DateTimeUtils.utcDateTimeFormat(new Date()));
             map.put(MasterResourceFamily.BasicColumns.CdaVersion, profile.getCdaVersion());
-        } else if (family.equals(MasterResourceFamily.Resource)){
+        } else if (family.equals(MasterResourceFamily.Data)){
             MasterRecord masterRecord = profile.getMasterRecord();
             map = masterRecord.getDataGroup();
+        }
+
+        return map;
+    }
+
+    public static Map<String, String> getSubResCells(String family, SubRecord subRecord){
+        Map<String, String> map = null;
+
+        if (family.equals(SubResourceFamily.Basic)){
+            map = new HashMap<>();
+
+            map.put(SubResourceFamily.BasicColumns.ProfileId, subRecord.getProfileId());
+        } else if (family.equals(SubResourceFamily.Data)){
+            map = subRecord.getDataGroup();
         }
 
         return map;

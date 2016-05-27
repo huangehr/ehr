@@ -20,8 +20,6 @@ import springfox.documentation.swagger2.web.Swagger2Controller;
 import java.net.URI;
 import java.util.*;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-
 /**
  * 应用API入口。入口处显示平台的开放API列表，并可以点击进去。列表只显示各API的第一个GET方法链接。若含有多个GET方法会被忽略。
  * GET方法点击进去之后，根据方法的实际情况
@@ -81,7 +79,7 @@ public class ApiEndPoint {
                                 }
                             }
 
-                            String url = "https://" + hostName() + apiListing.getResourcePath() + (queryParam.length() > 0 ? "/" + queryParam : queryParam);
+                            String url = "https://" + apiListing.getResourcePath() + (queryParam.length() > 0 ? "/" + queryParam : queryParam);
                             urls.put(key + "_url", url);
 
                             break;
@@ -92,16 +90,5 @@ public class ApiEndPoint {
         }
 
         return new ResponseEntity<>(new Json(objectMapper.writeValueAsString(urls)), HttpStatus.OK);
-    }
-
-    private String hostName() {
-        URI uri = linkTo(Swagger2Controller.class).toUri();
-        String host = uri.getHost();
-        int port = uri.getPort();
-        if (port > -1) {
-            return String.format("%s:%d", host, port);
-        }
-
-        return host;
     }
 }

@@ -4,14 +4,6 @@ server:
 management:
   port: ${server.port}
 
-spring:
-  metrics:
-    export:
-      statsd:
-        host: 192.168.1.221
-        port: 8125
-        prefix: ag-ehr-platform
-
 ---
 spring:
   profiles: dev

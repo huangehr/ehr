@@ -30,12 +30,12 @@ public class ResourceService {
     @Autowired
     ObjectMapper objectMapper;
 
-    public void save(ResourceBucket resourceBucket) throws IOException {
+    public void save(ResourceBucket resourceBucket) throws Throwable {
         // 资源主表
-        masterResRepo.save(resourceBucket);
+        masterResRepo.saveOrUpdate(resourceBucket);
 
         // 资源子表
-        subResRepo.save(resourceBucket);
+        subResRepo.saveOrUpdate(resourceBucket);
 
         // 存储文件记录
         fileResRepo.save(resourceBucket);
