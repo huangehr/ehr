@@ -64,7 +64,7 @@ public class RsInterfaceController extends BaseRestController {
 
     }
 
-    @RequestMapping(value = ServiceApi.Resources.Interfaces, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.Interfaces, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改资源", notes = "修改资源")
     public MRsInterface updateRsInterface(
             @ApiParam(name = "json_data", value = "")
@@ -72,6 +72,23 @@ public class RsInterfaceController extends BaseRestController {
         RsInterface rsInterface = toEntity(jsonData, RsInterface.class);
         interfaceService.save(rsInterface);
         return convertToModel(rsInterface, MRsInterface.class, null);
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.Interface, method = RequestMethod.GET)
+    @ApiOperation(value = "根据id获取获取标准字典")
+    public MRsInterface getRsInterfaceById(
+            @ApiParam(name = "id", value = "", defaultValue = "")
+            @PathVariable(value = "id") String id) {
+        RsInterface rsInterface = interfaceService.retrieve(id);
+        return convertToModel(rsInterface, MRsInterface.class);
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.InterfaceNameExistence, method = RequestMethod.GET)
+    @ApiOperation(value = "根据id获取获取标准字典")
+    public boolean isExistenceName(
+            @ApiParam(name = "name", value = "", defaultValue = "")
+            @RequestParam(value = "name") String name) {
+        return interfaceService.isNameExist(name);
     }
 
     @RequestMapping(value = ServiceApi.Resources.Interface, method = RequestMethod.DELETE)
