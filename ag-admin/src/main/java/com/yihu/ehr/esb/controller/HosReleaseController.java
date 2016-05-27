@@ -1,5 +1,6 @@
 package com.yihu.ehr.esb.controller;
 
+import com.yihu.ehr.agModel.esb.HostReleaseModel;
 import com.yihu.ehr.agModel.standard.dict.DictModel;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
@@ -7,18 +8,21 @@ import com.yihu.ehr.esb.client.HosReleaseClient;
 import com.yihu.ehr.model.esb.MHosEsbMiniRelease;
 import com.yihu.ehr.model.esb.MHosLog;
 import com.yihu.ehr.model.standard.MStdDict;
+import com.yihu.ehr.util.DateTimeUtils;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,16 +53,15 @@ public class HosReleaseController extends BaseController {
             @RequestParam(value = "page", required = false) int page) throws ParseException {
         ResponseEntity<List<MHosEsbMiniRelease>> responseEntity = hosReleaseClient.searchHosEsbMiniReleases(fields,filters,sorts,size,page);
         List<MHosEsbMiniRelease> mHosEsbMiniReleases = responseEntity.getBody();
-        if(mHosEsbMiniReleases.size()>0){
-            for(MHosEsbMiniRelease mHosEsbMiniRelease:mHosEsbMiniReleases){
-                if(mHosEsbMiniRelease.getReleaseTime()!=null){
-                    SimpleDateFormat sm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    mHosEsbMiniRelease.setReleaseDate(sm.format(mHosEsbMiniRelease.getReleaseTime()));
-                }
-            }
+        List<HostReleaseModel>  hostReleaseModels = new ArrayList<>();
+        for(MHosEsbMiniRelease mHosEsbMiniRelease: mHosEsbMiniReleases){
+            HostReleaseModel  hostReleaseModel = new HostReleaseModel();
+            BeanUtils.copyProperties(mHosEsbMiniRelease,hostReleaseModel);
+            hostReleaseModel.setReleaseDate(DateTimeUtils.simpleDateTimeFormat(mHosEsbMiniRelease.getReleaseTime()));
+            hostReleaseModels.add(hostReleaseModel);
         }
         int totalCount = getTotalCount (responseEntity);
-        return getResult(mHosEsbMiniReleases, totalCount, page, size);
+        return getResult(hostReleaseModels, totalCount, page, size);
 
 
     }
@@ -98,7 +101,7 @@ public class HosReleaseController extends BaseController {
             //系统代码唯一性校验
 
 
-            if (mHosEsbMiniRelease.getId()==null) {
+            if (StringUtils.isBlank(mHosEsbMiniRelease.getId())) {
                 ResponseEntity<List<MHosEsbMiniRelease>> responseEntity = hosReleaseClient.searchHosEsbMiniReleases("","systemCode="+mHosEsbMiniRelease.getSystemCode(),"",1,1);
                 List<MHosEsbMiniRelease> mHosEsbMiniReleases = responseEntity.getBody();
                 if(mHosEsbMiniReleases.size()>0){

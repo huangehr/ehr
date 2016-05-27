@@ -1,6 +1,7 @@
 package com.yihu.ehr.agModel.esb;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author linaz
@@ -13,8 +14,21 @@ public class HostReleaseModel implements Serializable {
     String versionName;
     Integer versionCode;
     String file;
-    String releaseTime;
+    String releaseDate;
     String orgCode;
+    Date releaseTime;
+
+    public String getReleaseDate() {
+        return releaseDate;
+    }
+
+    public void setReleaseDate(String releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
+    public void setReleaseTime(Date releaseTime) {
+        this.releaseTime = releaseTime;
+    }
 
     public String getId() {
         return id;
@@ -56,13 +70,6 @@ public class HostReleaseModel implements Serializable {
         this.file = file;
     }
 
-    public String getReleaseTime() {
-        return releaseTime;
-    }
-
-    public void setReleaseTime(String releaseTime) {
-        this.releaseTime = releaseTime;
-    }
 
     public String getOrgCode() {
         return orgCode;
