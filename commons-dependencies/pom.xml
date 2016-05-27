@@ -297,15 +297,14 @@
         <module>../commons-redis-keyschema</module>
         <module>../commons-profile-core</module>
         <module>../commons-profile-persist</module>
-        <!--
-        <module>../commons-thrift-services</module>
-        <module>../commons-thrift-client</module>
-        <module>../commons-thrift-server</module>
-        -->
         <module>../commons-rest-model</module>
         <module>../commons-admin-gateway-model</module>
         <module>../commons-redis-mq</module>
         <module>../commons-data-query</module>
+        <module>../commons-metrics</module>
+        <!--<module>../commons-thrift-services</module>
+        <module>../commons-thrift-client</module>
+        <module>../commons-thrift-server</module>-->
     </modules>
 
     <profiles>

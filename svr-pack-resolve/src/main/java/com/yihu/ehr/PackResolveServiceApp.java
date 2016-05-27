@@ -15,15 +15,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableDiscoveryClient
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableFeignClients
-@EnableIntegrationMBeanExport(registration = RegistrationPolicy.REPLACE_EXISTING)
-public class PackResolveServiceApp extends SpringBootServletInitializer{
+@EnableScheduling
+public class PackResolveServiceApp{
 
 	public static void main(String[] args) {
 		SpringApplication.run(PackResolveServiceApp.class, args);
-	}
-
-	@Override
-	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-		return application.sources(PackResolveServiceApp.class);
 	}
 }

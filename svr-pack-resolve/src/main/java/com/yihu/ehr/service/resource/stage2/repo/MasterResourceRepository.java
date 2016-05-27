@@ -22,15 +22,25 @@ public class MasterResourceRepository {
     @Autowired
     HBaseDao hbaseDao;
 
-    public void save(ResourceBucket resBucket) throws IOException {
+    public void saveOrUpdate(ResourceBucket resBucket) throws Throwable {
         TableBundle bundle = new TableBundle();
+
+        // delete legacy data if they are exist
+        String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceStorageUtil.MasterTable, "^" + resBucket.getId());
+        if (legacyRowKeys != null && legacyRowKeys.length > 0){
+            bundle.addRows(legacyRowKeys);
+            hbaseDao.delete(ResourceStorageUtil.MasterTable, bundle);
+        }
+
+        // now save the data to hbase
+        bundle.clear();
         bundle.addValues(resBucket.getId(),
                 MasterResourceFamily.Basic,
                 ResourceStorageUtil.getMasterResCells(MasterResourceFamily.Basic, resBucket));
         bundle.addValues(resBucket.getId(),
-                MasterResourceFamily.Resource,
-                ResourceStorageUtil.getMasterResCells(MasterResourceFamily.Resource, resBucket));
+                MasterResourceFamily.Data,
+                ResourceStorageUtil.getMasterResCells(MasterResourceFamily.Data, resBucket));
 
-        hbaseDao.saveOrUpdate(ResourceStorageUtil.MasterTable, bundle);
+        hbaseDao.save(ResourceStorageUtil.MasterTable, bundle);
     }
 }

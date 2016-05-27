@@ -24,18 +24,31 @@ public class SubResourceRepository {
     @Autowired
     HBaseDao hbaseDao;
 
-    public void save(ResourceBucket resBucket) throws IOException {
+    public void saveOrUpdate(ResourceBucket resBucket) throws Throwable {
         TableBundle bundle = new TableBundle();
 
+        // delete legacy data if they are exist
+        String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceStorageUtil.SubTable, "^" + resBucket.getId());
+        if (legacyRowKeys != null && legacyRowKeys.length > 0){
+            bundle.addRows(legacyRowKeys);
+            hbaseDao.delete(ResourceStorageUtil.SubTable, bundle);
+        }
+
+        // now save the data to hbase
         SubRecords subRecords = resBucket.getSubRecords();
         for (SubRecord record : subRecords.getRecords()){
             bundle.addValues(
                     record.getRowkey(),
-                    SubResourceFamily.Resource,
-                    record.getDataGroup());
+                    SubResourceFamily.Basic,
+                    ResourceStorageUtil.getSubResCells(SubResourceFamily.Basic, record));
+
+            bundle.addValues(
+                    record.getRowkey(),
+                    SubResourceFamily.Data,
+                    ResourceStorageUtil.getSubResCells(SubResourceFamily.Data, record));
         }
 
-        hbaseDao.saveOrUpdate(ResourceStorageUtil.SubTable, bundle);
+        hbaseDao.save(ResourceStorageUtil.SubTable, bundle);
     }
 
     /**

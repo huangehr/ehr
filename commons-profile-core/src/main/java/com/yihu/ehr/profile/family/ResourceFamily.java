@@ -6,8 +6,8 @@ package com.yihu.ehr.profile.family;
  */
 public class ResourceFamily {
     public static final String Basic = "basic";
-    public static final String Resource = "resource";
-    public static final String Extension = "extension";
+    public static final String Data = "d";
+    public static final String Extension = "ext";
 
     /**
      * 获取列族.
@@ -17,7 +17,7 @@ public class ResourceFamily {
     public static String[] getFamilies() {
         return new String[]{
                 ResourceFamily.Basic,
-                ResourceFamily.Resource,
+                ResourceFamily.Data,
                 ResourceFamily.Extension
         };
     }
