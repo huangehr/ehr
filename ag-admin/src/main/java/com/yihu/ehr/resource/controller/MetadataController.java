@@ -1,21 +1,22 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.agModel.resource.RsMetadataModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.resource.MRsMetadata;
 import com.yihu.ehr.resource.client.MetadataClient;
+import com.yihu.ehr.systemdict.service.SystemDictClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author linaz
@@ -28,6 +29,9 @@ public class MetadataController extends BaseController {
 
     @Autowired
     private MetadataClient metadataClient;
+
+    @Autowired
+    private SystemDictClient systemDictClient;
 
     @RequestMapping(value = ServiceApi.Resources.Metadatas, method = RequestMethod.POST)
     @ApiOperation("创建数据元")
@@ -42,6 +46,7 @@ public class MetadataController extends BaseController {
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("系统出错！");
         }
         return envelop;
     }
@@ -59,6 +64,7 @@ public class MetadataController extends BaseController {
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("系统出错！");
         }
         return envelop;
     }
@@ -76,6 +82,7 @@ public class MetadataController extends BaseController {
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("系统出错！");
         }
         return envelop;
     }
@@ -92,6 +99,7 @@ public class MetadataController extends BaseController {
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("系统出错！");
         }
         return envelop;
     }
@@ -108,6 +116,7 @@ public class MetadataController extends BaseController {
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("系统出错！");
         }
         return envelop;
     }
@@ -130,6 +139,20 @@ public class MetadataController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.Resources.MetadatasExistence,method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    public Envelop isExistence(
+            @ApiParam(name="filters",value="filters",defaultValue = "")
+            @RequestParam(value="filters") String filters) {
+
+        try {
+            return success(metadataClient.isExistence(filters));
+        }catch (Exception e){
+            e.printStackTrace();
+            return failed("查询出错！");
+        }
+    }
+
     @RequestMapping(value = ServiceApi.Resources.Metadatas, method = RequestMethod.GET)
     @ApiOperation("查询数据元")
     public Envelop getMetadata(
@@ -147,7 +170,7 @@ public class MetadataController extends BaseController {
         {
             ResponseEntity<List<MRsMetadata>> responseEntity = metadataClient.getMetadata(fields,filters,sorts,page,size);
             List<MRsMetadata> rsMetadatas = responseEntity.getBody();
-            Envelop envelop = getResult(rsMetadatas, getTotalCount(responseEntity), page, size);
+            Envelop envelop = getResult(coverModelLs(rsMetadatas), getTotalCount(responseEntity), page, size);
             return envelop;
         }
         catch (Exception e)
@@ -157,5 +180,40 @@ public class MetadataController extends BaseController {
             envelop.setSuccessFlg(false);
             return envelop;
         }
+    }
+
+    private List<RsMetadataModel> coverModelLs(List<MRsMetadata> rsMetadatas){
+        List<RsMetadataModel> rs = new ArrayList<>();
+        if(!isEmpty(rsMetadatas)){
+            RsMetadataModel model;
+            Map<String, String> domain = getDictMap(31);
+            Map<String, String> columnType = getDictMap(30);
+            for(MRsMetadata mRsMetadata : rsMetadatas){
+                model = convertToModel(mRsMetadata, RsMetadataModel.class);
+                model.setDomainName(nullToSpace(domain.get(model.getDomain())));
+                model.setColumnTypeName(nullToSpace(columnType.get(model.getColumnType())));
+                rs.add(model);
+            }
+        }
+        return rs;
+    }
+
+    private Map<String, String> getDictMap(int dictId){
+        List<MDictionaryEntry> dictLs = systemDictClient.getDictEntries("", "dictId="+dictId, "", 500, 1).getBody();
+        Map<String, String> map = new HashMap<>();
+        if(!isEmpty(dictLs)){
+            for(MDictionaryEntry mDictionaryEntry: dictLs){
+                map.put(mDictionaryEntry.getCode(), mDictionaryEntry.getValue());
+            }
+        }
+        return map;
+    }
+
+    private boolean isEmpty(List ls){
+        return ls==null || ls.size()==0;
+    }
+
+    private String nullToSpace(String str){
+        return str==null? "" : str;
     }
 }

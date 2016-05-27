@@ -15,7 +15,6 @@ public class RsMetadata {
     private String id;
     private String domain;
     private String name;
-    private String code;
     private String stdCode;
     private String displayCode;
     private String columnType;
@@ -49,14 +48,6 @@ public class RsMetadata {
     }
     public void setName(String name) {
         this.name = name;
-    }
-
-    @Column(name="code")
-    public String getCode() {
-        return code;
-    }
-    public void setCode(String code) {
-        this.code = code;
     }
 
     @Column(name="std_code")

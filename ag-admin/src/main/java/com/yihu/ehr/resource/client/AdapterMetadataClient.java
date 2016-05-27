@@ -6,11 +6,9 @@ import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.resource.MRsAdapterMetadata;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
@@ -58,4 +56,7 @@ public interface AdapterMetadataClient {
             @RequestParam(value = "page", required = false) int page,
             @RequestParam(value = "size", required = false) int size);
 
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatasBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation("批量创建适配数据元")
+    MRsAdapterMetadata createRsMetaDataBatch(@RequestBody String jsonData);
 }

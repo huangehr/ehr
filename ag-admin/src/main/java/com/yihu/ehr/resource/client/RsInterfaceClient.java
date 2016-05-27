@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.resource.MRsInterface;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,10 +38,23 @@ public interface RsInterfaceClient {
     MRsInterface createRsInterface(
             @RequestBody String jsonData);
 
-    @RequestMapping(value = ServiceApi.Resources.Interfaces, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.Interfaces, method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改资源", notes = "修改资源")
     MRsInterface updateRsInterface(
             @RequestBody String jsonData);
+
+    @RequestMapping(value = ServiceApi.Resources.Interface, method = RequestMethod.GET)
+    @ApiOperation(value = "根据id获取获取标准字典")
+    MRsInterface getRsInterfaceById(
+            @ApiParam(name = "id", value = "", defaultValue = "")
+            @PathVariable(value = "id") String id);
+
+    @RequestMapping(value = ServiceApi.Resources.InterfaceNameExistence, method = RequestMethod.GET)
+    @ApiOperation(value = "根据id获取获取标准字典")
+    boolean isExistenceName(
+            @ApiParam(name = "name", value = "", defaultValue = "")
+            @RequestParam(value = "name") String name);
+
     @RequestMapping(value = ServiceApi.Resources.Interface, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除资源", notes = "删除资源")
     boolean deleteRsInterface(

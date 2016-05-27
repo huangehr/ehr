@@ -2,7 +2,6 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsDictionary;
 import com.yihu.ehr.resource.model.RsDictionary;
 import com.yihu.ehr.resource.model.RsDictionaryEntry;
@@ -74,7 +73,7 @@ public class RsDictionaryController extends BaseRestController {
 
     }
 
-    @RequestMapping(value = ServiceApi.Resources.Dicts, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.Dicts, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改标准字典", notes = "修改标准字典")
     public MRsDictionary updateRsDictionary(
             @ApiParam(name = "json_data", value = "")
@@ -110,14 +109,23 @@ public class RsDictionaryController extends BaseRestController {
     public boolean createRsDictionaries(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestBody String jsonData) throws Exception {
-        RsDictionary[] list = toEntity(jsonData,RsDictionary[].class);;
-        dictionaryService.batchInsertDictionaries(list);
+        RsDictionary[] dictionaries = toEntity(jsonData,RsDictionary[].class);
+        dictionaryService.batchInsertDictionaries(dictionaries);
         return true;
     }
 
+    @RequestMapping(value = ServiceApi.Resources.DictsExistence,method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    public boolean isExistenceFilters(
+            @ApiParam(name="filters",value="filters",defaultValue = "")
+            @RequestParam(value="filters") String filters) throws Exception {
+
+        List ls = dictionaryService.search("",filters,"", 1, 1);
+        return ls!=null && ls.size()>0;
+    }
 
     private boolean isExistence(String code) {
-        return dictionaryService.findByField("code",code) != null;
+        return dictionaryService.findByField("code",code).size() != 0;
     }
 
     private void hasChild(RsDictionary dictionary) throws Exception {

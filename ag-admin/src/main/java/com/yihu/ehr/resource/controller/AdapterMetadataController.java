@@ -10,6 +10,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -138,5 +139,22 @@ public class AdapterMetadataController extends BaseController {
             envelop.setSuccessFlg(false);
             return envelop;
         }
+    }
+
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatasBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "批量创建适配数据元", notes = "批量创建适配数据元")
+    public Envelop createRsMetaDataBatch(
+            @ApiParam(name = "json_data", value = "", defaultValue = "")
+            @RequestBody String jsonData) throws Exception {
+        Envelop envelop = new Envelop();
+        try{
+            MRsAdapterMetadata rsAdapterMetadata = adapterMetadataClient.createRsMetaDataBatch(jsonData);
+            envelop.setObj(rsAdapterMetadata);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
     }
 }
