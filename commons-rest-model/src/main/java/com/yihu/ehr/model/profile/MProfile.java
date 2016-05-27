@@ -1,9 +1,9 @@
 package com.yihu.ehr.model.profile;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.yihu.ehr.constants.EventType;
+import com.yihu.ehr.constants.ProfileType;
 import org.apache.commons.lang3.StringUtils;
-import com.yihu.ehr.profile.core.commons.EventType;
-import com.yihu.ehr.profile.core.commons.ProfileType;
 
 import java.util.ArrayList;
 import java.util.Date;

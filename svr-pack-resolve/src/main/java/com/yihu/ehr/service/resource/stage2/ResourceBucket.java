@@ -1,7 +1,7 @@
 package com.yihu.ehr.service.resource.stage2;
 
-import com.yihu.ehr.profile.core.commons.EventType;
-import com.yihu.ehr.profile.core.commons.ProfileType;
+import com.yihu.ehr.constants.EventType;
+import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.service.resource.stage1.CdaDocument;
 
 import java.util.Date;

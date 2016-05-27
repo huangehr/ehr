@@ -1,7 +1,7 @@
 package com.yihu.ehr.service.resource.stage1;
 
+import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.profile.core.commons.ProfileType;
 import com.yihu.ehr.service.resource.stage1.resolver.FilePackageResolver;
 import com.yihu.ehr.service.resource.stage1.resolver.LinkPackageResolver;
 import com.yihu.ehr.service.resource.stage1.resolver.PackageResolver;
@@ -18,7 +18,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.yihu.ehr.profile.core.commons.ProfileType.*;
+import static com.yihu.ehr.constants.ProfileType.*;
 
 /**
  * 档案解析引擎.
