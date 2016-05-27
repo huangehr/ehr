@@ -10,12 +10,9 @@ import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import com.yihu.ehr.profile.config.CdaDocumentTypeOptions;
 import com.yihu.ehr.profile.core.commons.EventType;
-import com.yihu.ehr.service.memory.intermediate.MemoryProfile;
-import com.yihu.ehr.service.memory.intermediate.StdDataSet;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.service.Template;
 import com.yihu.ehr.profile.service.TemplateService;
-import com.yihu.ehr.service.util.DataSetUtil;
 import com.yihu.ehr.schema.OrgKeySchema;
 import com.yihu.ehr.schema.StdDataSetKeySchema;
 import com.yihu.ehr.util.log.LogService;
@@ -74,7 +71,7 @@ public class StdProfileConverter {
         }
 
         return profileList;
-    }*/
+    }
 
     public MProfile convertProfile(MemoryProfile profile, boolean containDataSet) {
         MProfile mProfile = new MProfile();
@@ -182,7 +179,7 @@ public class StdProfileConverter {
 
             document.getDataSets().add(mDataSet);
         }
-    }
+    }*/
 
     /**
      * 获取机构定制CDA文档列表

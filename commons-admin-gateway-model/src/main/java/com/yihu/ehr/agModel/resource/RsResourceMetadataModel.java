@@ -11,6 +11,10 @@ public class RsResourceMetadataModel {
     private String groupData;
     private String description;
 
+    private String stdCode;
+    private String name;
+    private String columnType;
+
     public String getId()
     {
         return id;
@@ -62,5 +66,29 @@ public class RsResourceMetadataModel {
     public void setGroupData(String groupData)
     {
         this.groupData = groupData;
+    }
+
+    public String getStdCode() {
+        return stdCode;
+    }
+
+    public void setStdCode(String stdCode) {
+        this.stdCode = stdCode;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getColumnType() {
+        return columnType;
+    }
+
+    public void setColumnType(String columnType) {
+        this.columnType = columnType;
     }
 }

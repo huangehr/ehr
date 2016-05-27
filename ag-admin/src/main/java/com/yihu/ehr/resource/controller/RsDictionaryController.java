@@ -6,11 +6,11 @@ import com.yihu.ehr.model.resource.MRsDictionary;
 import com.yihu.ehr.resource.client.RsDictionaryClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.utils.FeignExceptionUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,11 +55,11 @@ public class RsDictionaryController extends BaseController {
     }
 
 
-    @RequestMapping(value = "/admin" + ServiceApi.Resources.Dicts, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/admin" + ServiceApi.Resources.Dicts, method = RequestMethod.POST)
     @ApiOperation(value = "创建标准字典", notes = "创建标准字典")
     public Envelop createRsDictionary(
-            @ApiParam(name = "json_data", value = "", defaultValue = "")
-            @RequestBody String jsonData) throws Exception {
+            @ApiParam(name = "model", value = "", defaultValue = "")
+            @RequestParam(value = "model") String jsonData) throws Exception {
         Envelop envelop = new Envelop();
         try{
             MRsDictionary rsDictionary = rsDictionaryClient.createRsDictionary(jsonData);
@@ -68,15 +68,16 @@ public class RsDictionaryController extends BaseController {
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(FeignExceptionUtils.getErrorMsg(e));
         }
         return envelop;
     }
 
-    @RequestMapping(value = "/admin" + ServiceApi.Resources.Dicts, method = RequestMethod.PUT)
+    @RequestMapping(value = "/admin" + ServiceApi.Resources.Dict, method = RequestMethod.PUT)
     @ApiOperation(value = "修改标准字典", notes = "修改标准字典")
     public Envelop updateRsDictionary(
-            @ApiParam(name = "json_data", value = "")
-            @RequestBody String jsonData) throws Exception {
+            @ApiParam(name = "model", value = "")
+            @RequestParam(value = "model") String jsonData) throws Exception {
         Envelop envelop = new Envelop();
         try{
             MRsDictionary rsDictionary = rsDictionaryClient.updateRsDictionary(jsonData);
@@ -99,9 +100,10 @@ public class RsDictionaryController extends BaseController {
         try{
             rsDictionaryClient.deleteRsDictionary(id);
             envelop.setSuccessFlg(true);
-        }catch (Exception e){
+        } catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(FeignExceptionUtils.getErrorMsg(e));
         }
         return envelop;
     }
@@ -139,4 +141,17 @@ public class RsDictionaryController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value =  "/admin" + ServiceApi.Resources.DictsExistence,method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    public Envelop isExistence(
+            @ApiParam(name="filters",value="filters",defaultValue = "")
+            @RequestParam(value="filters") String filters) {
+
+        try {
+            return success(rsDictionaryClient.isExistence(filters));
+        }catch (Exception e){
+            e.printStackTrace();
+            return failed("查询出错！");
+        }
+    }
 }

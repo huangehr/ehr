@@ -49,13 +49,16 @@ public class ServiceApi {
         public static final String Metadatas                    ="/resources/metadatas";
         public static final String MetadatasBatch               ="/resources/metadatas/batch";
         public static final String Metadata                     ="/resources/metadatas/{id}";
+        public static final String MetadatasExistence          ="/resources/metadatas/existence";
 
         public static final String Dicts                         ="/resources/dicts";
         public static final String DictsBatch                    ="/resources/dicts/batch";
         public static final String Dict                          ="/resources/dicts/{id}";
+        public static final String DictsExistence               ="/resources/dicts/existence";
 
         public static final String DictEntries                   ="/resources/dictentries";
         public static final String DictEntry                     ="/resources/dictentries/{id}";
+        public static final String DictEntriesExistence         ="/resources/dictentries/existence";
 
         public static final String SystemDicts                   ="/resources/systemdicts";
         public static final String SystemDict                    ="/resources/systemdicts/{id}";
@@ -65,6 +68,7 @@ public class ServiceApi {
 
         public static final String Interfaces                       ="/resources/interfaces";
         public static final String Interface                       ="/resources/interfaces/{id}";
+        public static final String InterfaceNameExistence          ="/resources/existence/name";
 
         public static final String Categories                       ="/resources/categories";
         public static final String Category                        ="/resources/categories/{id}";

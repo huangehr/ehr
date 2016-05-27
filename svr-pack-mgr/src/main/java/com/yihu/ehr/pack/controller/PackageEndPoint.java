@@ -5,16 +5,18 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.pack.feign.SecurityClient;
-import com.yihu.ehr.pack.feign.UserClient;
+import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MUser;
+import com.yihu.ehr.pack.feign.SecurityClient;
+import com.yihu.ehr.pack.feign.UserClient;
 import com.yihu.ehr.pack.service.Package;
 import com.yihu.ehr.pack.service.PackageService;
 import com.yihu.ehr.pack.task.MessageBuffer;
 import com.yihu.ehr.util.controller.BaseRestController;
 import com.yihu.ehr.util.encrypt.RSA;
+import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -32,7 +34,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 档案包控制器。
@@ -56,6 +60,9 @@ public class PackageEndPoint extends BaseRestController {
     @Autowired
     MessageBuffer messageBuffer;
 
+    @Autowired
+    FastDFSUtil fastDFSUtil;
+
     @RequestMapping(value = ServiceApi.Packages.PackageSearch, method = RequestMethod.GET)
     @ApiOperation(value = "搜索档案包", response = MPackage.class, responseContainer = "List", notes = "搜索档案包")
     public Collection<MPackage> packageList(
@@ -77,6 +84,29 @@ public class PackageEndPoint extends BaseRestController {
         pagedResponse(request, response, packService.getCount(filters), page, size);
 
         return convertToModels(packageList, new ArrayList<MPackage>(packageList.size()), MPackage.class, fields);
+    }
+
+    @RequestMapping(value = ServiceApi.Packages.Packages, method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除档案包", response = MPackage.class, responseContainer = "List", notes = "每次删除一万条记录")
+    public Collection<Package> deletePackages(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "message?jkzl")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+receiveDate")
+            @RequestParam(value = "sorts", required = false) String sorts) throws ParseException {
+
+        List<Package> packageList = packService.search("id", filters, sorts, 0, 10000);
+
+        for (Package pack : packageList) {
+            String tokens[] = pack.getRemotePath().split(":");
+            try {
+                fastDFSUtil.delete(tokens[0], tokens[1]);
+                packService.deletePackage(pack.getId());
+            } catch (Exception e) {
+                LogService.getLogger().warn("Error occurred while deleting package: " + e.getMessage());
+            }
+        }
+
+        return packageList;
     }
 
     /**

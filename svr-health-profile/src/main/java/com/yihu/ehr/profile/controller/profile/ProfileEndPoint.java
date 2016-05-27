@@ -5,8 +5,6 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.profile.MProfile;
 import com.yihu.ehr.model.profile.MProfileDocument;
 import com.yihu.ehr.profile.controller.profile.converter.ProfileUtil;
-import com.yihu.ehr.service.memory.intermediate.MemoryProfile;
-import com.yihu.ehr.profile.persist.ProfileService;
 import com.yihu.ehr.util.controller.BaseRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,18 +24,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "健康档案服务", description = "提供档案搜索及完整档案下载")
 public class ProfileEndPoint extends BaseRestEndPoint {
-    private final static String SampleQuery = "{\n" +
-            "\"demographicId\": \"412726195111306268\",\n" +
-            "\"organizationCode\": \"41872607-9\",\n" +
-            "\"patientId\": \"10295435\",\n" +
-            "\"eventNo\": \"000622450\",\n" +
-            "\"name\": \"段廷兰\",\n" +
-            "\"telephone\": \"11\",\n" +
-            "\"gender\": \"女\",\n" +
-            "\"birthday\": \"1951-11-30\"\n" +
-            "}";
 
-    @Autowired
+    /*@Autowired
     private ProfileService profileService;
 
     @Autowired
@@ -80,5 +68,5 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     public void deleteProfile(@ApiParam(value = "档案ID", defaultValue = "")
                               @PathVariable("profile_id") String profileId) throws Exception {
         profileService.deleteProfile(profileId);
-    }
+    }*/
 }

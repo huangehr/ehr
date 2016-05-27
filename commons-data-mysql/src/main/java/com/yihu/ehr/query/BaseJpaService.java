@@ -76,7 +76,7 @@ public class BaseJpaService<T, R> {
         CriteriaQuery query = queryParser.makeCriteriaQuery();
 
         if (page == null || page <= 0) page = PageArg.DefaultPage;
-        if (size == null || size <= 0 || size >= 1000) size = PageArg.DefaultSize;
+        if (size == null || size <= 0 || size > 10000) size = PageArg.DefaultSize;
 
         return entityManager
                 .createQuery(query)
