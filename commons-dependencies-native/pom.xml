@@ -38,8 +38,16 @@
                 <artifactId>wagon-maven-plugin</artifactId>
                 <version>1.0</version>
                 <configuration>
+                    <serverId>${wagonServerId}</serverId>
                     <fromFile>${project.build.directory}/${project.build.finalName}.jar</fromFile>
-                    <url>scp://admin:admin123@http://172.19.103.47:8081/nexus/content/repositories/releases/</url>
+                    <url>${wagonUrl}</url>
+                    <commands>
+                        <!-- 杀死原来的进程 -->
+                        <command>pkill -f ${project.build.finalName}.jar</command>
+                        <!-- 重新启动进程，程序的输出结果写到nohup.out文件中 -->
+                        <command>java -Djava.security.egd=file:/dev/./urandom -jar ${project.build.finalName}.jar</command>
+                    </commands>
+                    <displayCommandOutputs>true</displayCommandOutputs>
                 </configuration>
             </plugin>
         </plugins>
@@ -76,6 +84,8 @@
             <properties>
                 <skipTests>true</skipTests>
                 <packaging>jar</packaging>
+                <wagonServerId>192.168.1.220</wagonServerId>
+                <wagonUrl>scp://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</wagonUrl>
             </properties>
             <distributionManagement>
                 <repository>
@@ -124,6 +134,8 @@
             <properties>
                 <skipTests>true</skipTests>
                 <packaging>war</packaging>
+                <wagonServerId>192.168.1.220</wagonServerId>
+                <wagonUrl>scp://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</wagonUrl>
             </properties>
             <activation>
                 <activeByDefault>false</activeByDefault>
@@ -193,6 +205,8 @@
             <properties>
                 <skipTests>true</skipTests>
                 <packaging>jar</packaging>
+                <wagonServerId>192.168.1.220</wagonServerId>
+                <wagonUrl>scp://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</wagonUrl>
             </properties>
             <activation>
                 <activeByDefault>false</activeByDefault>
@@ -236,6 +250,8 @@
             <properties>
                 <skipTests>true</skipTests>
                 <packaging>jar</packaging>
+                <wagonServerId>192.168.1.220</wagonServerId>
+                <wagonUrl>scp://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</wagonUrl>
             </properties>
             <activation>
                 <property>
