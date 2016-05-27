@@ -10,15 +10,6 @@ public class MRsAdapterSchema {
     private String code;
     private String adapterVersion;
     private String description;
-    private String typeName;
-
-    public String getTypeName() {
-        return typeName;
-    }
-
-    public void setTypeName(String typeName) {
-        this.typeName = typeName;
-    }
 
     public String getId() {
         return id;

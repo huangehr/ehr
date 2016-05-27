@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.agModel.resource.RsAdapterSchemaModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.dict.MConventionalDict;
@@ -12,10 +13,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -117,9 +120,11 @@ public class AdapterSchemaController extends BaseController {
         Envelop envelop = new Envelop();
         try{
             MRsAdapterSchema rsAdapterSchema= adapterSchemaClient.getAdapterSchemaById(id);
+            RsAdapterSchemaModel rsAdapterSchemaModel = new RsAdapterSchemaModel();
+            BeanUtils.copyProperties(rsAdapterSchema,rsAdapterSchemaModel);
             MConventionalDict adapterType=  dictClint.getResourceAdaptScheme(rsAdapterSchema.getType());
-            rsAdapterSchema.setTypeName(adapterType.getValue());
-            envelop.setObj(rsAdapterSchema);
+            rsAdapterSchemaModel.setTypeName(adapterType.getValue());
+            envelop.setObj(rsAdapterSchemaModel);
             envelop.setSuccessFlg(true);
         }catch (Exception e){
             e.printStackTrace();
@@ -145,13 +150,17 @@ public class AdapterSchemaController extends BaseController {
         {
             ResponseEntity<List<MRsAdapterSchema>> responseEntity = adapterSchemaClient.getSchema(fields,filters,sorts,page,size);
             List<MRsAdapterSchema> rsAdapterSchemas = responseEntity.getBody();
+            List<RsAdapterSchemaModel> rsAdapterSchemaModels = new ArrayList<RsAdapterSchemaModel>();
             for(MRsAdapterSchema mRsAdapterSchema: rsAdapterSchemas){
                 if(StringUtils.isNotBlank(mRsAdapterSchema.getType())){
+                    RsAdapterSchemaModel rsAdapterSchemaModel = new RsAdapterSchemaModel();
+                    BeanUtils.copyProperties(mRsAdapterSchema,rsAdapterSchemaModel);
                     MConventionalDict adapterType=  dictClint.getResourceAdaptScheme(mRsAdapterSchema.getType());
-                    mRsAdapterSchema.setTypeName(adapterType.getValue());
+                    rsAdapterSchemaModel.setTypeName(adapterType.getValue());
+                    rsAdapterSchemaModels.add(rsAdapterSchemaModel);
                 }
             }
-            Envelop envelop = getResult(rsAdapterSchemas, getTotalCount(responseEntity), page, size);
+            Envelop envelop = getResult(rsAdapterSchemaModels, getTotalCount(responseEntity), page, size);
             return envelop;
         }
         catch (Exception e)
