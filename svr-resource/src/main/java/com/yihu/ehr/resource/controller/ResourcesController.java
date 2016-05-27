@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import com.yihu.ehr.util.controller.BaseRestController;
@@ -36,10 +37,10 @@ public class ResourcesController extends BaseRestController {
     private IResourcesService rsService;
 
     @ApiOperation("创建资源")
-    @RequestMapping(value = ServiceApi.Resources.Resources,method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.Resources,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MRsResources createResource(
             @ApiParam(name="resource",value="资源",defaultValue = "")
-            @RequestParam(value="resource")String resource) throws Exception
+            @RequestBody String resource) throws Exception
     {
         RsResources rs = toEntity(resource,RsResources.class);
         rs.setId(getObjectId(BizObject.Resources));
@@ -48,10 +49,10 @@ public class ResourcesController extends BaseRestController {
     }
 
     @ApiOperation("更新资源")
-    @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MRsResources updateResources(
             @ApiParam(name="resource",value="资源",defaultValue="")
-            @RequestParam(value="resource")String resource) throws Exception
+            @RequestBody String resource) throws Exception
     {
         RsResources rs = toEntity(resource,RsResources.class);
         rsService.saveResource(rs);

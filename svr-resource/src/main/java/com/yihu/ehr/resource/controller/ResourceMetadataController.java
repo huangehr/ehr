@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,10 +37,10 @@ public class ResourceMetadataController extends BaseRestController {
     private IResourceMetadataService rsMetadataService;
 
     @ApiOperation("创建资源数据元")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas,method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MRsResourceMetadata createResourceMetadata(
             @ApiParam(name="metadata",value="资源数据元",defaultValue = "")
-            @RequestParam(value="metadata")String metadata) throws Exception
+            @RequestBody String metadata) throws Exception
     {
         RsResourceMetadata rsMetadata = toEntity(metadata,RsResourceMetadata.class);
         rsMetadata.setId(getObjectId(BizObject.ResourceMetadata));
@@ -48,10 +49,10 @@ public class ResourceMetadataController extends BaseRestController {
     }
 
     @ApiOperation("批量创建资源数据元")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasBatch,method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasBatch,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public Collection<MRsResourceMetadata> createResourceMetadataBatch(
             @ApiParam(name="metadatas",value="资源数据元",defaultValue = "")
-            @RequestParam(value="metadatas")String metadatas) throws Exception
+            @RequestBody String metadatas) throws Exception
     {
         RsResourceMetadata[] rsMetadata = toEntity(metadatas,RsResourceMetadata[].class);
 

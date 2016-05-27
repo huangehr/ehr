@@ -22,15 +22,15 @@ import java.util.List;
 @ApiIgnore
 public interface AdapterMetadataClient {
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas, method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("创建适配数据元")
     MRsAdapterMetadata createMetadata(
-            @RequestParam(value = "adapterMetadata") String adapterMetadata);
+            @RequestBody String adapterMetadata);
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas, method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("更新适配数据元")
     MRsAdapterMetadata updateMetadata(
-            @RequestParam(value = "adapterMetadata") String adapterMetadata);
+            @RequestBody String adapterMetadata);
 
     @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadata, method = RequestMethod.DELETE)
     @ApiOperation("删除适配数据元")
