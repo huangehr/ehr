@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -121,5 +122,15 @@ public class AdapterMetadataController extends BaseRestController {
         pagedResponse(request, response, total, page, size);
 
         return (List<MRsAdapterMetadata>)metaList;
+    }
+
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatasBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "批量创建适配数据元", notes = "批量创建适配数据元")
+    public boolean createRsMetaDataBatch(
+            @ApiParam(name = "json_data", value = "", defaultValue = "")
+            @RequestBody String jsonData) throws Exception {
+        RsAdapterMetadata[] adapterMetadatas = toEntity(jsonData,RsAdapterMetadata[].class);
+        metadataService.batchInsertAdapterMetadatas(adapterMetadatas);
+        return true;
     }
 }

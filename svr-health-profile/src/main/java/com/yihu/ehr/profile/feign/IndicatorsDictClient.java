@@ -1,29 +1,17 @@
 package com.yihu.ehr.profile.feign;
 
-import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.BizObject;
-import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.MicroServices;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.specialdict.MIndicatorsDict;
-import com.yihu.ehr.model.standard.MCDADocument;
-import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.data.domain.Page;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
-import java.util.List;
 
 /**
  * @author linaz
