@@ -6,11 +6,9 @@ import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.resource.MRsMetadata;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
@@ -25,20 +23,20 @@ import java.util.List;
 @ApiIgnore
 public interface MetadataClient {
 
-    @RequestMapping(value = ServiceApi.Resources.Metadatas, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.Metadatas, method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("创建数据元")
     MRsMetadata createMetadata(
-            @RequestParam(value = "metadata") String metadata);
+            @RequestBody String metadata);
 
     @RequestMapping(value = ServiceApi.Resources.MetadatasBatch, method = RequestMethod.POST)
     @ApiOperation("批量创建数据元")
     Collection<MRsMetadata> createMetadataPatch(
             @RequestParam(value = "metadatas") String metadatas);
 
-    @RequestMapping(value = ServiceApi.Resources.Metadatas, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.Metadatas, method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("更新数据元")
     MRsMetadata updateMetadata(
-            @RequestParam(value = "metadata") String metadata);
+            @RequestBody String metadata);
 
     @RequestMapping(value = ServiceApi.Resources.Metadata, method = RequestMethod.DELETE)
     @ApiOperation("删除数据元")

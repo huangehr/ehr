@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,11 +37,11 @@ public class AdapterSchemaController extends BaseRestController {
     @Autowired
     private IAdapterSchemaService schemaService;
 
-    @RequestMapping(value = ServiceApi.Adaptions.Schemas,method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Adaptions.Schemas,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("创建适配方案")
     public MRsAdapterSchema createSchema(
             @ApiParam(name="adapterSchema",value="数据元JSON",defaultValue = "")
-            @RequestParam(value="adapterSchema") String adapterSchema) throws Exception
+            @RequestBody String adapterSchema) throws Exception
     {
         RsAdapterSchema schema = toEntity(adapterSchema,RsAdapterSchema.class);
         schema.setId(getObjectId(BizObject.RsAdapterSchema));
@@ -48,11 +49,11 @@ public class AdapterSchemaController extends BaseRestController {
         return convertToModel(schema,MRsAdapterSchema.class);
     }
 
-    @RequestMapping(value = ServiceApi.Adaptions.Schemas,method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Adaptions.Schemas,method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("更新适配方案")
     public MRsAdapterSchema updateSchema(
             @ApiParam(name="adapterSchemaa",value="数据元JSON",defaultValue = "")
-            @RequestParam(value="adapterSchemaa") String adapterSchema) throws Exception
+            @RequestBody String adapterSchema) throws Exception
     {
         RsAdapterSchema schema = toEntity(adapterSchema,RsAdapterSchema.class);
         schema = schemaService.saveAdapterSchema(schema);

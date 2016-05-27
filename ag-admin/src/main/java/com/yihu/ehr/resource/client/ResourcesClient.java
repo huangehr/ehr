@@ -7,11 +7,9 @@ import com.yihu.ehr.model.resource.MRsResources;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
@@ -26,14 +24,14 @@ import java.util.List;
 public interface ResourcesClient {
 
     @ApiOperation("创建资源")
-    @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     MRsResources createResource(
-            @RequestParam(value = "resource") String resource);
+            @RequestBody String resource);
 
     @ApiOperation("更新资源")
-    @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     MRsResources updateResources(
-            @RequestParam(value = "resource") String resource);
+            @RequestBody String resource);
 
     @ApiOperation("资源删除")
     @RequestMapping(value = ServiceApi.Resources.Resource, method = RequestMethod.DELETE)

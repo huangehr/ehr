@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,11 +38,11 @@ public class MetadataController  extends BaseRestController{
     @Autowired
     private IMetadataService metadataService;
 
-    @RequestMapping(value = ServiceApi.Resources.Metadatas,method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.Metadatas,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("创建数据元")
     public MRsMetadata createMetadata(
         @ApiParam(name="metadata",value="数据元JSON",defaultValue = "")
-        @RequestParam(value="metadata") String metadata) throws Exception
+        @RequestBody String metadata) throws Exception
     {
         RsMetadata rsMetadata = toEntity(metadata,RsMetadata.class);
         rsMetadata.setId(getObjectId(BizObject.RsMetadata));
@@ -67,11 +68,11 @@ public class MetadataController  extends BaseRestController{
         return convertToModels(metadataList,new ArrayList<MRsMetadata>(),MRsMetadata.class,"");
     }
 
-    @RequestMapping(value = ServiceApi.Resources.Metadatas,method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.Metadatas,method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("更新数据元")
     public MRsMetadata updateMetadata(
             @ApiParam(name="metadata",value="数据元JSON",defaultValue = "")
-            @RequestParam(value="metadata") String metadata) throws Exception
+            @RequestBody String metadata) throws Exception
     {
         RsMetadata rsMetadata = toEntity(metadata,RsMetadata.class);
         rsMetadata = metadataService.saveMetadata(rsMetadata);
