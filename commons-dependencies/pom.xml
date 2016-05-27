@@ -208,6 +208,13 @@
     </dependencies>
 
     <build>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>2.8</version>
+            </extension>
+        </extensions>
         <plugins>
             <!--maven java 编译插件-->
             <plugin>
@@ -217,35 +224,22 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
+                <version>3.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>wagon-maven-plugin</artifactId>
+                <version>1.0</version>
+                <configuration>
+                    <serverId>${wagonServerId}</serverId>
+                    <fromFile>${project.build.directory}/${project.build.finalName}.jar</fromFile>
+                    <url>${wagonUrl}</url>
+                </configuration>
             </plugin>
         </plugins>
     </build>
 
     <repositories>
-        <!--lcoal-->
-        <!--<repository>-->
-            <!--<id>Releases</id>-->
-            <!--<name>local private nexus</name>-->
-            <!--<url>http://172.19.103.47:8081/nexus/content/repositories/releases/</url>-->
-            <!--<releases>-->
-                <!--<enabled>true</enabled>-->
-            <!--</releases>-->
-            <!--<snapshots>-->
-                <!--<enabled>false</enabled>-->
-            <!--</snapshots>-->
-        <!--</repository>-->
-        <!--<repository>-->
-            <!--<id>snapshots</id>-->
-            <!--<name>local private nexus</name>-->
-            <!--<url>http://172.19.103.47:8081/nexus/content/repositories/snapshots/</url>-->
-            <!--<releases>-->
-                <!--<enabled>true</enabled>-->
-            <!--</releases>-->
-            <!--<snapshots>-->
-                <!--<enabled>false</enabled>-->
-            <!--</snapshots>-->
-        <!--</repository>-->
-
         <!-- os china 建立了一个maven 的私服 -->
         <repository>
             <id>nexus</id>
@@ -267,7 +261,6 @@
             </snapshots>
         </repository>
     </repositories>
-
 
 
     <pluginRepositories>
@@ -314,4 +307,56 @@
         <module>../commons-redis-mq</module>
         <module>../commons-data-query</module>
     </modules>
+
+    <profiles>
+        <!--开发库-->
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <wagonServerId>192.168.1.220</wagonServerId>
+                <wagonUrl>scp://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</wagonUrl>
+            </properties>
+        </profile>
+
+
+        <!--tomcat部署-->
+        <profile>
+            <id>tomcat</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <wagonServerId>192.168.1.220</wagonServerId>
+                <wagonUrl>scp://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</wagonUrl>
+            </properties>
+        </profile>
+
+        <!--测试库-->
+        <profile>
+            <id>test</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <wagonServerId>192.168.1.220</wagonServerId>
+                <wagonUrl>scp://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</wagonUrl>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>prod</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <wagonServerId>192.168.1.220</wagonServerId>
+                <wagonUrl>scp://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</wagonUrl>
+            </properties>
+        </profile>
+    </profiles>
+
+
 </project>
