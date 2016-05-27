@@ -1,8 +1,12 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.agModel.resource.RsMetadataModel;
+import com.yihu.ehr.agModel.resource.RsResourceMetadataModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.resource.MRsMetadata;
 import com.yihu.ehr.model.resource.MRsResourceMetadata;
+import com.yihu.ehr.resource.client.MetadataClient;
 import com.yihu.ehr.resource.client.ResourceMetadataClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
@@ -12,8 +16,10 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -28,6 +34,9 @@ public class ResourceMetadataController extends BaseController {
 
     @Autowired
     private ResourceMetadataClient resourceMetadataClient;
+
+    @Autowired
+    private MetadataClient metadataClient;
 
     @ApiOperation("创建资源数据元")
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas, method = RequestMethod.POST)
@@ -135,6 +144,8 @@ public class ResourceMetadataController extends BaseController {
     public Envelop queryDimensions(
             @ApiParam(name = "fields", value = "返回字段", defaultValue = "")
             @RequestParam(name = "fields", required = false) String fields,
+            @ApiParam(name = "resources_id",value = "资源id",defaultValue = "")
+            @RequestParam(name = "resources_id",required = false) String resourcesId,
             @ApiParam(name = "filters", value = "过滤", defaultValue = "")
             @RequestParam(name = "filters", required = false) String filters,
             @ApiParam(name = "sorts", value = "排序", defaultValue = "")
@@ -145,9 +156,12 @@ public class ResourceMetadataController extends BaseController {
             @RequestParam(name = "size", required = false) int size) throws Exception {
         try
         {
-            ResponseEntity<List<MRsResourceMetadata>> responseEntity = resourceMetadataClient.queryDimensions(fields,filters,sorts,page,size);
+            ResponseEntity<List<MRsResourceMetadata>> responseEntity = resourceMetadataClient.queryDimensions(fields,"resourcesId=" + resourcesId,sorts,page,size);
             List<MRsResourceMetadata> rsMetadatas = responseEntity.getBody();
-            Envelop envelop = getResult(rsMetadatas, getTotalCount(responseEntity), page, size);
+
+            List<RsResourceMetadataModel> rsResourceMetadataModels = getRsMetadata(rsMetadatas,filters,page,size);
+
+            Envelop envelop = getResult(rsResourceMetadataModels, getTotalCount(responseEntity), page, size);
             return envelop;
         }
         catch (Exception e)
@@ -157,5 +171,27 @@ public class ResourceMetadataController extends BaseController {
             envelop.setSuccessFlg(false);
             return envelop;
         }
+    }
+
+    public List<RsResourceMetadataModel> getRsMetadata(List<MRsResourceMetadata> rsMetadatas,String filters,int page,int size){
+
+        List<RsResourceMetadataModel> rsMetadataModels = new ArrayList<>();
+
+        String fs = null;
+        for (MRsResourceMetadata mrm : rsMetadatas){
+            RsResourceMetadataModel rsMetadataModel = convertToModel(mrm,RsResourceMetadataModel.class);
+            fs = "id=" + rsMetadataModel.getMetadataId()+" g2;"+filters;
+
+            ResponseEntity<List<MRsMetadata>> responseEntity = metadataClient.getMetadata("",fs,"",1,size);
+            List<MRsMetadata> mRsMetadatas = responseEntity.getBody();
+
+            if (mRsMetadatas.size()>0) {
+                rsMetadataModel.setName(mRsMetadatas.get(0).getName());
+                rsMetadataModel.setColumnType(mRsMetadatas.get(0).getColumnType());
+                rsMetadataModel.setStdCode(mRsMetadatas.get(0).getStdCode());
+                rsMetadataModels.add(rsMetadataModel);
+            }
+        }
+        return rsMetadataModels;
     }
 }
