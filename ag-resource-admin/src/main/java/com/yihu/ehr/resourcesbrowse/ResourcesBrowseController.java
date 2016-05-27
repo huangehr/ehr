@@ -234,5 +234,13 @@ public class ResourcesBrowseController {
 
     }
 
+    @ApiOperation("cda档案类别接口")
+    @RequestMapping(value = "/medic/getCdaTypes", method = RequestMethod.GET)
+    public String getCdaTypes(
+            @ApiParam(name = "profileId", value = "档案编号")
+            @RequestParam(value = "profileId", required = true) String profileId) throws Exception {
+        return EhrFileUtils.file2String("/json/cdaTypes.json");
+
+    }
 
 }
