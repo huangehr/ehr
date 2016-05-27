@@ -6,6 +6,7 @@ import com.yihu.ehr.model.resource.MRsDictionaryEntry;
 import com.yihu.ehr.resource.client.RsDictionaryEntryClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.utils.FeignExceptionUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -68,6 +69,7 @@ public class RsDictionaryEntryController extends BaseController {
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(FeignExceptionUtils.getErrorMsg(e));
         }
         return envelop;
     }
@@ -85,6 +87,7 @@ public class RsDictionaryEntryController extends BaseController {
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(FeignExceptionUtils.getErrorMsg(e));
         }
         return envelop;
     }
@@ -101,6 +104,7 @@ public class RsDictionaryEntryController extends BaseController {
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(FeignExceptionUtils.getErrorMsg(e));
         }
         return envelop;
     }

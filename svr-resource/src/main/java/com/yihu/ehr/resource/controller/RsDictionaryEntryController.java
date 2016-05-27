@@ -115,6 +115,6 @@ public class RsDictionaryEntryController extends BaseRestController {
     }
 
     public boolean isExistence(String dictCode,String code) {
-        return rsDictionaryEntryService.findByFields(new String[]{"dictCode","code"},new String[]{dictCode,code}) != null;
+        return rsDictionaryEntryService.findByFields(new String[]{"dictCode","code"},new String[]{dictCode,code}).size() != 0;
     }
 }
