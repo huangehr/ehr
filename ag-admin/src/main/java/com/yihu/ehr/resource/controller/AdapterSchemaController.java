@@ -2,15 +2,17 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.resource.MRsAdapterSchema;
 import com.yihu.ehr.resource.client.AdapterSchemaClient;
+import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +29,9 @@ public class AdapterSchemaController extends BaseController {
 
     @Autowired
     private AdapterSchemaClient adapterSchemaClient;
+
+    @Autowired
+    private ConventionalDictEntryClient dictClint;
 
     @RequestMapping(value = ServiceApi.Adaptions.Schemas, method = RequestMethod.POST)
     @ApiOperation("创建适配方案")
@@ -61,7 +66,6 @@ public class AdapterSchemaController extends BaseController {
             MRsAdapterSchema rsAdapterSchema = adapterSchemaClient.updateSchema(adapterSchema);
             envelop.setObj(rsAdapterSchema);
             envelop.setSuccessFlg(true);
-
         }
         catch (Exception e)
         {
@@ -113,6 +117,8 @@ public class AdapterSchemaController extends BaseController {
         Envelop envelop = new Envelop();
         try{
             MRsAdapterSchema rsAdapterSchema= adapterSchemaClient.getAdapterSchemaById(id);
+            MConventionalDict adapterType=  dictClint.getResourceAdaptScheme(rsAdapterSchema.getType());
+            rsAdapterSchema.setTypeName(adapterType.getValue());
             envelop.setObj(rsAdapterSchema);
             envelop.setSuccessFlg(true);
         }catch (Exception e){
@@ -138,8 +144,14 @@ public class AdapterSchemaController extends BaseController {
         try
         {
             ResponseEntity<List<MRsAdapterSchema>> responseEntity = adapterSchemaClient.getSchema(fields,filters,sorts,page,size);
-            List<MRsAdapterSchema> rsAdapterSchema = responseEntity.getBody();
-            Envelop envelop = getResult(rsAdapterSchema, getTotalCount(responseEntity), page, size);
+            List<MRsAdapterSchema> rsAdapterSchemas = responseEntity.getBody();
+            for(MRsAdapterSchema mRsAdapterSchema: rsAdapterSchemas){
+                if(StringUtils.isNotBlank(mRsAdapterSchema.getType())){
+                    MConventionalDict adapterType=  dictClint.getResourceAdaptScheme(mRsAdapterSchema.getType());
+                    mRsAdapterSchema.setTypeName(adapterType.getValue());
+                }
+            }
+            Envelop envelop = getResult(rsAdapterSchemas, getTotalCount(responseEntity), page, size);
             return envelop;
         }
         catch (Exception e)
