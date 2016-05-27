@@ -1,7 +1,7 @@
 package com.yihu.ehr.service.resource.stage1.extractor;
 
+import com.yihu.ehr.constants.EventType;
 import com.yihu.ehr.service.resource.stage1.MetaDataRecord;
-import com.yihu.ehr.profile.core.commons.EventType;
 import com.yihu.ehr.service.resource.StdDataSet;
 import com.yihu.ehr.service.util.DataSetUtil;
 import com.yihu.ehr.util.DateTimeUtils;

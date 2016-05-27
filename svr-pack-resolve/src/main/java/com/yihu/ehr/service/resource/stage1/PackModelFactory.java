@@ -1,6 +1,6 @@
 package com.yihu.ehr.service.resource.stage1;
 
-import com.yihu.ehr.profile.core.commons.ProfileType;
+import com.yihu.ehr.constants.ProfileType;
 import org.springframework.util.CollectionUtils;
 
 import java.io.File;
