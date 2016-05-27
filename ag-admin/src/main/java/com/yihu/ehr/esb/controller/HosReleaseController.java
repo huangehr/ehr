@@ -49,14 +49,6 @@ public class HosReleaseController extends BaseController {
             @RequestParam(value = "page", required = false) int page) throws ParseException {
         ResponseEntity<List<MHosEsbMiniRelease>> responseEntity = hosReleaseClient.searchHosEsbMiniReleases(fields,filters,sorts,size,page);
         List<MHosEsbMiniRelease> mHosEsbMiniReleases = responseEntity.getBody();
-        if(mHosEsbMiniReleases.size()>0){
-            for(MHosEsbMiniRelease mHosEsbMiniRelease:mHosEsbMiniReleases){
-                if(mHosEsbMiniRelease.getReleaseTime()!=null){
-                    SimpleDateFormat sm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    mHosEsbMiniRelease.setReleaseDate(sm.format(mHosEsbMiniRelease.getReleaseTime()));
-                }
-            }
-        }
         int totalCount = getTotalCount (responseEntity);
         return getResult(mHosEsbMiniReleases, totalCount, page, size);
 
@@ -98,7 +90,7 @@ public class HosReleaseController extends BaseController {
             //系统代码唯一性校验
 
 
-            if (mHosEsbMiniRelease.getId()==null) {
+            if (StringUtils.isBlank(mHosEsbMiniRelease.getId())) {
                 ResponseEntity<List<MHosEsbMiniRelease>> responseEntity = hosReleaseClient.searchHosEsbMiniReleases("","systemCode="+mHosEsbMiniRelease.getSystemCode(),"",1,1);
                 List<MHosEsbMiniRelease> mHosEsbMiniReleases = responseEntity.getBody();
                 if(mHosEsbMiniReleases.size()>0){
