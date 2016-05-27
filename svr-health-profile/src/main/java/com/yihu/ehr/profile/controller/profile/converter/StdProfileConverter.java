@@ -1,6 +1,7 @@
 package com.yihu.ehr.profile.controller.profile.converter;
 
 import com.yihu.ehr.cache.CacheReader;
+import com.yihu.ehr.constants.EventType;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.profile.MDataSet;
 import com.yihu.ehr.model.profile.MProfile;
@@ -9,7 +10,6 @@ import com.yihu.ehr.model.profile.MRecord;
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import com.yihu.ehr.profile.config.CdaDocumentTypeOptions;
-import com.yihu.ehr.profile.core.commons.EventType;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.service.Template;
 import com.yihu.ehr.profile.service.TemplateService;

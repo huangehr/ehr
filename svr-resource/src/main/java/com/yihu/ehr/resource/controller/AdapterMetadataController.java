@@ -37,11 +37,11 @@ public class AdapterMetadataController extends BaseRestController {
     @Autowired
     private IAdapterMetadataService metadataService;
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas,method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("创建适配数据元")
     public MRsAdapterMetadata createMetadata(
             @ApiParam(name="adapterMetadata",value="数据元JSON",defaultValue = "")
-            @RequestParam(value="adapterMetadata") String adapterMetadata) throws Exception
+            @RequestBody String adapterMetadata) throws Exception
     {
         RsAdapterMetadata metadata = toEntity(adapterMetadata,RsAdapterMetadata.class);
         metadata.setId(getObjectId(BizObject.RsAdapterMetadata));
@@ -49,11 +49,11 @@ public class AdapterMetadataController extends BaseRestController {
         return convertToModel(metadata,MRsAdapterMetadata.class);
     }
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas,method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas,method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("更新适配数据元")
     public MRsAdapterMetadata updateMetadata(
             @ApiParam(name="adapterMetadata",value="数据元JSON",defaultValue = "")
-            @RequestParam(value="adapterMetadata") String adapterMetadata) throws Exception
+            @RequestBody String adapterMetadata) throws Exception
     {
         RsAdapterMetadata metadata = toEntity(adapterMetadata,RsAdapterMetadata.class);
         metadata = metadataService.saveAdapterMetadata(metadata);

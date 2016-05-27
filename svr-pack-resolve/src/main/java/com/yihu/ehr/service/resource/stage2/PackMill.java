@@ -1,6 +1,6 @@
 package com.yihu.ehr.service.resource.stage2;
 
-import com.yihu.ehr.profile.core.commons.ProfileType;
+import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.redis.RedisClient;
 import com.yihu.ehr.schema.ResourceAdaptionKeySchema;
 import com.yihu.ehr.service.resource.StdDataSet;

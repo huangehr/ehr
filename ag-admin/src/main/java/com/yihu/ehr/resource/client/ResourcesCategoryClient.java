@@ -7,11 +7,9 @@ import com.yihu.ehr.model.resource.MRsCategory;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
@@ -25,15 +23,15 @@ import java.util.List;
 @ApiIgnore
 public interface ResourcesCategoryClient {
 
-    @RequestMapping(value = ServiceApi.Resources.Categories, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.Categories, method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("资源类别创建")
     MRsCategory createRsCategory(
-            @RequestParam(value = "resourceCategory") String resourceCategory);
+            @RequestBody String resourceCategory);
 
-    @RequestMapping(value = ServiceApi.Resources.Categories, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.Categories, method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("资源类别更新")
     MRsCategory updateRsCategory(
-            @RequestParam(value = "resourceCategory") String resourceCategory);
+            @RequestBody String resourceCategory);
 
     @RequestMapping(value = ServiceApi.Resources.Category, method = RequestMethod.DELETE)
     @ApiOperation("删除资源类别")
