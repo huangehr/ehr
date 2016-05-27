@@ -1,18 +1,23 @@
 package com.yihu.ehr.controller;
 
+import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.config.MetricNames;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.feign.XPackageMgrClient;
+import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.service.resource.stage1.StdPackModel;
 import com.yihu.ehr.service.resource.stage1.PackageResolveEngine;
 import com.yihu.ehr.service.resource.stage2.PackMill;
 import com.yihu.ehr.service.resource.stage2.ResourceBucket;
 import com.yihu.ehr.service.resource.stage2.ResourceService;
+import com.yihu.ehr.service.util.LegacyPackageException;
+import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -52,39 +57,48 @@ public class ResolveEndPoint {
     @Autowired
     ObjectMapper objectMapper;
 
-    @ApiOperation(value = "档案包入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "档案包入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "若包ID为OLDEST，则取最旧的未解析档案包")
     @RequestMapping(value = ServiceApi.Packages.Package, method = RequestMethod.PUT)
     public ResponseEntity<String> resolve(
-            @ApiParam(value = "id", defaultValue = "0dae000555ff6a9f1d323246807324d6")
+            @ApiParam(value = "id", defaultValue = "OLDEST")
             @PathVariable("id") String packageId,
             @ApiParam(value = "模拟应用ID", defaultValue = "usa911Em")
             @RequestParam("clientId") String clientId,
             @ApiParam(value = "返回档案数据", defaultValue = "true")
-        @RequestParam("echo") boolean echo) throws Throwable {
-        MPackage pack = packageMgrClient.getPackage(packageId);
-        if (pack == null) throw new ApiException(HttpStatus.NOT_FOUND, "Package not found.");
+            @RequestParam("echo") boolean echo) throws Throwable {
+        try {
+            MPackage pack = packageMgrClient.getPackage(packageId);
+            if (pack == null) throw new ApiException(HttpStatus.NOT_FOUND, "Package not found.");
 
-        if(StringUtils.isEmpty(pack.getClientId())) pack.setClientId(clientId);
-        String zipFile = downloadTo(pack.getRemotePath());
+            long start = System.currentTimeMillis();
 
-        StdPackModel stdPackModel = packResolveEngine.doResolve(pack, zipFile);
-        if (!stdPackModel.getCdaVersion().equals("000000000000")) {
+            if (StringUtils.isEmpty(pack.getClientId())) pack.setClientId(clientId);
+            String zipFile = downloadTo(pack.getRemotePath());
+
+            StdPackModel stdPackModel = packResolveEngine.doResolve(pack, zipFile);
             ResourceBucket resourceBucket = packMill.grindingPackModel(stdPackModel);
             resourceService.save(resourceBucket);
 
             packageMgrClient.reportStatus(pack.getId(),
                     ArchiveStatus.Finished,
                     String.format("Rowkey: %s, identity: %s", stdPackModel.getId(), stdPackModel.getDemographicId()));
-        }else {
-            packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
-                    "Package is collected by cda version 00000000000, pass.");
-        }
 
-        if (echo) {
-            return new ResponseEntity<>(stdPackModel.toJson(), HttpStatus.OK);
-        }
+            getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
 
-        return null;
+            if (echo) {
+                return new ResponseEntity<>(stdPackModel.toJson(), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("", HttpStatus.OK);
+            }
+        } catch (LegacyPackageException e) {
+            packageMgrClient.reportStatus(packageId, ArchiveStatus.LegacyIgnored, e.getMessage());
+
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
+        } catch (Exception e) {
+            LogService.getLogger().error("Package resolve job error: package " + e.getMessage());
+
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
+        }
     }
 
     /**
@@ -94,7 +108,7 @@ public class ResolveEndPoint {
      * 3. 读取包中的 origin, standard 文件夹中的 JSON 数据并解析。
      * 4. 对关联字典的数据元进行标准化，将字典的值直接写入数据
      * 5. 解析完的数据存入HBase，并将JSON文档的状态标记为 Finished。
-     * 6. 以上步骤有任何一个失败的，将文档标记为 InDoubt 状态，即无法决定该JSON档案的去向，需要人为干预。
+     * 6. 以上步骤有任何一个失败的，将文档标记为 LegacyIgnored 状态，即无法决定该JSON档案的去向，需要人为干预。
      * <p>
      * ObjectMapper Stream API使用，参见：http://wiki.fasterxml.com/JacksonStreamingApi
      */
@@ -140,5 +154,9 @@ public class ResolveEndPoint {
     private String downloadTo(String filePath) throws Exception {
         String[] tokens = filePath.split(":");
         return fastDFSUtil.download(tokens[0], tokens[1], System.getProperty("java.io.tmpdir"));
+    }
+
+    private MetricRegistry getMetricRegistry(){
+        return SpringContext.getService(MetricRegistry.class);
     }
 }

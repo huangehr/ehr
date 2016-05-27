@@ -22,8 +22,8 @@ public class StdDataSet {
     protected String eventNo;
     protected String orgCode;
     protected String cdaVersion;
-    protected Date eventDate;
-    protected Date createDate;
+    protected Date eventTime;
+    protected Date createTime;
     protected boolean isMultiRecord = false;
 
     protected Map<String, MetaDataRecord> records = new TreeMap<>();
@@ -76,20 +76,20 @@ public class StdDataSet {
         this.eventNo = eventNo;
     }
 
-    public Date getEventDate() {
-        return eventDate;
+    public Date getEventTime() {
+        return eventTime;
     }
 
-    public void setEventDate(Date eventDate) {
-        this.eventDate = eventDate;
+    public void setEventTime(Date eventTime) {
+        this.eventTime = eventTime;
     }
 
-    public Date getCreateDate() {
-        return createDate;
+    public Date getCreateTime() {
+        return createTime;
     }
 
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
     public Set<String> getRecordKeys() {

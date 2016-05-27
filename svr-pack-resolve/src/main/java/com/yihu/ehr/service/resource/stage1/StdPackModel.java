@@ -213,8 +213,8 @@ public class StdPackModel {
         root.put("eventNo", this.getEventNo());
         root.put("cdaVersion", this.getCdaVersion());
         root.put("clientId", this.getClientId());
-        root.put("eventDate", DateTimeUtils.utcDateTimeFormat(this.getEventDate()));
-        root.put("createDate", DateTimeUtils.utcDateTimeFormat(this.getCreateDate()));
+        root.put("eventTime", DateTimeUtils.utcDateTimeFormat(this.getEventDate()));
+        root.put("createTime", DateTimeUtils.utcDateTimeFormat(this.getCreateDate()));
         root.put("eventType", this.getEventType().toString());
         root.put("profileType", this.getProfileType().toString());
 

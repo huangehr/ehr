@@ -174,4 +174,10 @@ public class BaseRestEndPoint extends AbstractController {
 
         return 1;
     }
+
+    protected String getClientId(HttpServletRequest request){
+        String userAgent = request.getHeader("User-Agent");
+
+        return StringUtils.isEmpty(userAgent) ? "" : userAgent.split(" ")[1];
+    }
 }

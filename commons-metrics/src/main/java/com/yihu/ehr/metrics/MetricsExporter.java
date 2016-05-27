@@ -2,6 +2,7 @@ package com.yihu.ehr.metrics;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.Gauge;
+import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,14 @@ public class MetricsExporter {
 
             Metric metric = new Metric(name.replace("api.v1.0", "api"), (Double)(gauge.getValue()));
             metricWriter.set(metric);
+        }
+
+        SortedMap<String, Histogram> histograms = registry.getHistograms();
+        for (String name : histograms.keySet()){
+            if (couldIgnore(name)) continue;
+
+            Histogram histogram = histograms.get(name);
+            Metric metric = new Metric(name, histogram.getCount());
         }
     }
 
