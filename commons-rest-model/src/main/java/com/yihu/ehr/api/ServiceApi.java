@@ -24,7 +24,8 @@ public class ServiceApi {
         public static final String Schemas                         = "/adaptions/schemas";
 
         public static final String SchemaMetadatas                 ="/adaptions/schema/metadatas";
-        public static final String SchemaMetadata                   ="/adaptions/schema/metadatas/{id}";
+        public static final String SchemaMetadata                  ="/adaptions/schema/metadatas/{id}";
+        public static final String SchemaMetadatasBatch            ="/adaptions/schema/metadatas/batch";
 
     }
 
