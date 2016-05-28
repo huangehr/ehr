@@ -30,8 +30,8 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "hpIcd10relation", description = "健康问题和ICD10关管理接口")
-public class HpIcd10RelationController extends BaseRestController {
+@Api(value = "icd10HpRelation", description = "健康问题和ICD10关系管理接口")
+public class Icd10HpRelationController extends BaseRestController {
 
     @Autowired
     private Icd10HpRelationService icd10HpRelationService;
