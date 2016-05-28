@@ -54,7 +54,7 @@ public class PatientInfoBaseService {
     {
         List<Map<String,Object>> re = new ArrayList<>();
         //门诊诊断
-        Envelop outpatient = resource.getResources("RS_OUTPATIENT_DIAGNOSIS",appId,"{\"fq\":\"demographic_id:"+demographicId+"\"}");
+        Envelop outpatient = resource.getResources("RS_OUTPATIENT_DIAGNOSIS",appId,"{\"join\":\"demographic_id:"+demographicId+"\"}");
         if(outpatient.getDetailModelList()!=null && outpatient.getDetailModelList().size()>0)
         {
 

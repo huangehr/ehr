@@ -55,4 +55,8 @@ public class Icd10DrugRelationService extends BaseJpaService<Icd10DrugRelation, 
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
         return icd10DrugRelaRepo.findAll(pageable);
     }
+
+    public List<Icd10DrugRelation> getIcd10DrugRelationsByIcd10Ids(String[] icd10Ids) {
+        return icd10DrugRelaRepo.findByIcd10Ids(icd10Ids);
+    }
 }

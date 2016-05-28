@@ -8,7 +8,7 @@ import java.util.List;
  * @version 1.0
  * @created 2015.09.10 13:37
  */
-public class Array_ListUtil {
+public class ArrayListUtil {
 
    public static String[] getArray(List<String> list){
         String[] str = list.toArray(new String[]{});

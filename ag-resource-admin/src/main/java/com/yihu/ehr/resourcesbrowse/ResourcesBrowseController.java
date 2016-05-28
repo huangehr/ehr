@@ -5,6 +5,7 @@ import com.yihu.ehr.util.EhrFileUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -77,6 +78,8 @@ public class ResourcesBrowseController {
             @RequestParam(value = "demographicId", required = true) String demographicId,
             @ApiParam(name = "medicalEventsType", value = "就诊事件类别")
             @RequestParam(value = "medicalEventsType", required = false) String medicalEventsType,
+            @ApiParam(name = "cdaType", value = "cda文档类别")
+            @RequestParam(value = "cdaType", required = false) String cdaType,
             @ApiParam(name = "year", value = "年份", defaultValue = "当前年份")
             @RequestParam(value = "year", required = false, defaultValue = "") String year,
             @ApiParam(name = "area", value = "地区")
@@ -89,9 +92,33 @@ public class ResourcesBrowseController {
             @RequestParam(value = "page", required = false,defaultValue = "1") int page,
             @ApiParam(name = "size", value = "行数")
             @RequestParam(value = "size", required = false, defaultValue = "5") int size) throws Exception {
+        if (!StringUtils.isEmpty(medicalEventsType)) {
+            return EhrFileUtils.file2String("/json/events.json");
+        } else if (cdaType.equals("1")) {
+            return EhrFileUtils.file2String("/json/events.json");
+        } else if (cdaType.equals("2")) {
+            return EhrFileUtils.file2String("/json/events.json");
+        } else if (cdaType.equals("3")) {
+            return EhrFileUtils.file2String("/json/events.json");
+        } else if (cdaType.equals("4")) {
+            return EhrFileUtils.file2String("/json/events.json");
+        }
+        return null;
+    }
 
-        return EhrFileUtils.file2String("/json/MedicalEventInfo.json");
+    @ApiOperation("门户 - 定位就诊事件")
+    @RequestMapping(value = "/home/getMedicalEvent", method = RequestMethod.GET)
+    public String getMedicalEvent(
+            @ApiParam(name = "demographicId", value = "病人身份证号", required = true)
+            @RequestParam(value = "demographicId") String demographicId,
+            @ApiParam(name = "eventNo", value = "就诊事件号", required = false)
+            @RequestParam(value = "eventNo", required = false) String eventNo,
+            @ApiParam(name = "cdaType", value = "cda文档类别", required = false)
+            @RequestParam(value = "cdaType", required = false) String cdaType,
+            @ApiParam(name = "orgCode", value = "机构代码", required = false)
+            @RequestParam(value = "orgCode", required = false) String orgCode) throws Exception {
 
+        return EhrFileUtils.file2String("/json/MedicalEventInfo1.json");
     }
 
     @ApiOperation("门户 - 相关健康指标")

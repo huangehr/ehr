@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 
 /**
  * 用户公私钥管理
@@ -53,5 +54,9 @@ public class DrugDictService extends BaseJpaService<DrugDict, XDrugDictRepositor
     public boolean isUsage(String id){
         boolean result = (icd10DrugReRepo.findByDrugId(id) != null);
         return result;
+    }
+
+    public List<DrugDict> getDrugDictByIds(String[] ids) {
+        return drugDictRepo.findByIds(ids);
     }
 }

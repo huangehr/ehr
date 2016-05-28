@@ -5,7 +5,6 @@ import com.yihu.ehr.resource.dao.intf.AppResourceMetadataDao;
 import com.yihu.ehr.resource.dao.intf.ResourceMetadataDao;
 import com.yihu.ehr.resource.model.RsAppResourceMetadata;
 import com.yihu.ehr.resource.model.RsResourceMetadata;
-import com.yihu.ehr.resource.service.intf.IResourceMetadataGrantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,7 +19,7 @@ import java.util.List;
  */
 @Service
 @Transactional
-public class ResourceMetadataGrantService  extends BaseJpaService<RsResourceMetadata,ResourceMetadataDao> implements IResourceMetadataGrantService {
+public class ResourceMetadataGrantService  extends BaseJpaService<RsResourceMetadata,ResourceMetadataDao>  {
     @Autowired
     private AppResourceMetadataDao appRsMetadataDao;
 

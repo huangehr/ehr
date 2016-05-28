@@ -32,6 +32,7 @@ public class MOrganization implements Serializable{
     private String tags;
     private String imgRemotePath;
     private String imgLocalPath;
+    private int administrativeDivision;
 
     public MOrganization() {
     }
@@ -140,6 +141,14 @@ public class MOrganization implements Serializable{
 
     public void setImgLocalPath(String imgLocalPath) {
         this.imgLocalPath = imgLocalPath;
+    }
+
+    public int getAdministrativeDivision() {
+        return administrativeDivision;
+    }
+
+    public void setAdministrativeDivision(int administrativeDivision) {
+        this.administrativeDivision = administrativeDivision;
     }
 
     public List<String> getTags() {

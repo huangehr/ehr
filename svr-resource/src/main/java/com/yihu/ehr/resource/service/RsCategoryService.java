@@ -3,7 +3,6 @@ package com.yihu.ehr.resource.service;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.intf.RsCategoryDao;
 import com.yihu.ehr.resource.model.RsCategory;
-import com.yihu.ehr.resource.service.intf.IRsCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class RsCategoryService extends BaseJpaService<RsCategory, RsCategoryDao> implements IRsCategoryService {
+public class RsCategoryService extends BaseJpaService<RsCategory, RsCategoryDao> {
 
     @Autowired
     private  RsCategoryDao categoryDao;

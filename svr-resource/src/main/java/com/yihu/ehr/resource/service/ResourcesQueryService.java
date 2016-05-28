@@ -7,7 +7,6 @@ import com.yihu.ehr.resource.dao.intf.ResourcesDao;
 import com.yihu.ehr.resource.model.DtoResourceMetadata;
 import com.yihu.ehr.resource.model.RsAppResource;
 import com.yihu.ehr.resource.model.RsResources;
-import com.yihu.ehr.resource.service.intf.IResourcesQueryService;
 import com.yihu.ehr.util.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,7 +23,7 @@ import java.util.Map;
  * Created by hzp on 2016/4/13.
  */
 @Service("resourcesQueryService")
-public class ResourcesQueryService implements IResourcesQueryService {
+public class ResourcesQueryService  {
 
     @Autowired
     private ResourcesDao resourcesDao;

@@ -7,17 +7,14 @@ import com.yihu.ehr.model.resource.MRsAppResource;
 import com.yihu.ehr.model.resource.MRsAppResourceMetadata;
 import com.yihu.ehr.resource.model.RsAppResource;
 import com.yihu.ehr.resource.model.RsAppResourceMetadata;
-import com.yihu.ehr.resource.service.intf.IResourceGrantService;
-import com.yihu.ehr.resource.service.intf.IResourceMetadataGrantService;
+import com.yihu.ehr.resource.service.ResourceGrantService;
+import com.yihu.ehr.resource.service.ResourceMetadataGrantService;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,9 +33,9 @@ import java.util.List;
 @Api(value = "resourceGrant", description = "资源授权服务接口")
 public class ResourcesGrantController extends BaseRestController{
     @Autowired
-    private IResourceGrantService rsGrantService;
+    private ResourceGrantService rsGrantService;
     @Autowired
-    private IResourceMetadataGrantService rsMetadataGrantService;
+    private ResourceMetadataGrantService rsMetadataGrantService;
 
     @ApiOperation("单个应用授权多个资源")
     @RequestMapping(value= ServiceApi.Resources.AppsGrantResources ,method = RequestMethod.POST)

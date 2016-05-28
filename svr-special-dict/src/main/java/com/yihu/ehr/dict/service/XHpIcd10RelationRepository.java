@@ -12,6 +12,7 @@ import java.util.List;
 public interface XHpIcd10RelationRepository extends PagingAndSortingRepository<HpIcd10Relation, String> {
 
     List<HpIcd10Relation> findByIcd10Id(String icd10Id);
+
     List<HpIcd10Relation> findByHpId(String hpId);
 
     HpIcd10Relation findByIcd10IdAndHpId(String icd10Id,String hpId);

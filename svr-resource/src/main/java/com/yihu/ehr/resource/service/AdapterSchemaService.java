@@ -6,7 +6,6 @@ import com.yihu.ehr.resource.dao.intf.AdapterMetadataDao;
 import com.yihu.ehr.resource.dao.intf.AdapterSchemaDao;
 import com.yihu.ehr.resource.model.RsAdapterMetadata;
 import com.yihu.ehr.resource.model.RsAdapterSchema;
-import com.yihu.ehr.resource.service.intf.IAdapterSchemaService;
 import com.yihu.ehr.util.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +26,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class AdapterSchemaService extends BaseJpaService<RsAdapterSchema,AdapterSchemaDao> implements IAdapterSchemaService {
+public class AdapterSchemaService extends BaseJpaService<RsAdapterSchema,AdapterSchemaDao> {
 
     @Autowired
     private AdapterSchemaDao schemaDao;

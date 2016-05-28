@@ -5,16 +5,13 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsMetadata;
 import com.yihu.ehr.resource.model.RsMetadata;
-import com.yihu.ehr.resource.service.intf.IMetadataService;
+import com.yihu.ehr.resource.service.MetadataService;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +33,7 @@ import java.util.List;
 public class MetadataController  extends BaseRestController{
 
     @Autowired
-    private IMetadataService metadataService;
+    private MetadataService metadataService;
 
     @RequestMapping(value = ServiceApi.Resources.Metadatas,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("创建数据元")

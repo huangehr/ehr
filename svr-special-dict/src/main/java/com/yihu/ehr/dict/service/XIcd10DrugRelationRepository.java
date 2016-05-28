@@ -1,6 +1,8 @@
 package com.yihu.ehr.dict.service;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -15,4 +17,8 @@ public interface XIcd10DrugRelationRepository extends PagingAndSortingRepository
     List<Icd10DrugRelation> findByDrugId(String drugId);
 
     Icd10DrugRelation findByIcd10IdAndDrugId(String icd10Id,String drugId);
+
+    @Query("select icd10DrugRelation from Icd10DrugRelation icd10DrugRelation  where icd10DrugRelation.icd10Id in (:icd10Ids)")
+    List<Icd10DrugRelation> findByIcd10Ids(@Param("icd10Ids") String[] icd10Ids);
+
 }
