@@ -160,10 +160,10 @@ public class Icd10IndicatorRelationController  extends BaseRestController {
 
     @RequestMapping(value = "/icd10_indicator_relations/icd10_ids" , method = RequestMethod.GET)
     @ApiOperation(value = "根据ICD10id列表获取IDC10和指标关系")
-    public List<MIcd10IndicatorRelation> getIcd10DrugRelationsByIcd10Ids(
+    public List<MIcd10IndicatorRelation> getIcd10IndicatorRelationsByIcd10Ids(
             @ApiParam(name = "icd10_ids", value = "icd10_ids", defaultValue = "")
             @RequestParam(value = "icd10_ids", required = false) String[] icd10Ids) throws Exception {
-        List<Icd10IndicatorRelation> icd10IndicatorRelations = icd10IndicatorRelationService.getIcd10DrugRelationsByIcd10Ids(icd10Ids);
+        List<Icd10IndicatorRelation> icd10IndicatorRelations = icd10IndicatorRelationService.getIcd10IndicatorRelationsByIcd10Ids(icd10Ids);
         return ( List<MIcd10IndicatorRelation>)convertToModels(icd10IndicatorRelations,new ArrayList<MIcd10IndicatorRelation>(icd10IndicatorRelations.size()),MIcd10IndicatorRelation.class,"");
     }
 }

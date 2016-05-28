@@ -2,12 +2,12 @@ package com.yihu.ehr.profile.feign;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
-import com.yihu.ehr.model.org.MOrganization;
+import com.yihu.ehr.model.specialdict.MDrugDict;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
@@ -18,12 +18,11 @@ import java.util.List;
  */
 @ApiIgnore
 @RequestMapping(ApiVersion.Version1_0)
-@FeignClient(name = MicroServices.Organization)
-public interface XOrganizationClient {
-    MOrganization getOrg(String orgCode);
+@FeignClient(name = MicroServices.SpecialDict)
+public interface XDrugDictClient{
 
-    @RequestMapping(value = "/organizations/{org_codes}", method = RequestMethod.GET)
-    @ApiOperation(value = "根据机构代码列表批量查询机构")
-    List<MOrganization> getOrgs(
-            @PathVariable(value = "org_codes") List<String> orgCodes);
+    @RequestMapping(value = "/drugs/ids", method = RequestMethod.GET)
+    @ApiOperation(value = "根据ID获取相应的药品字典信息。" )
+    List<MDrugDict> getDrugDictByIds(
+            @RequestParam(value = "ids") List<String> ids);
 }

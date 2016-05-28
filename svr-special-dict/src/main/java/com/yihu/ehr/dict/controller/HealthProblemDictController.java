@@ -162,7 +162,7 @@ public class HealthProblemDictController extends BaseRestController {
         return hpDictService.isCodeExist(code);
     }
 
-    @RequestMapping(value = "/dict/hp/name" , method = RequestMethod.GET)
+    @RequestMapping(value = "/problemDict/code" , method = RequestMethod.GET)
     @ApiOperation(value = "根据字典代码获取健康问题字典")
     public MHealthProblemDict getHpDictByCode(
             @ApiParam(name = "code", value = "code", defaultValue = "")

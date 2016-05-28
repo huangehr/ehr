@@ -6,8 +6,6 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.dict.service.*;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.specialdict.MIcd10Dict;
-import com.yihu.ehr.model.specialdict.MIcd10DrugRelation;
-import com.yihu.ehr.model.specialdict.MIcd10IndicatorRelation;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,7 +25,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "icd10dict", description = "疾病字典管理接口")
+@Api(value = "icd10dict", description = "ICD10字典管理接口")
 public class Icd10DictController extends BaseRestController {
 
     @Autowired
@@ -191,6 +189,15 @@ public class Icd10DictController extends BaseRestController {
             @ApiParam(name = "code", value = "code", defaultValue = "")
             @PathVariable(value = "code") String code){
         return icd10DictService.isCodeExist(code);
+    }
+
+    @RequestMapping(value = "/icd10_dict/ids" , method = RequestMethod.GET)
+    @ApiOperation(value = "根据id列表获取ICD10字典信息")
+    public List<MIcd10Dict> getIcd10DictListByIds(
+            @ApiParam(name = "ids", value = "字典代码")
+            @RequestParam(value = "ids") String[] ids) throws Exception {
+        List<MIcd10Dict> icd10DictList = icd10DictService.findByIds(ids);
+        return (List<MIcd10Dict>)convertToModels(icd10DictList, new ArrayList<>(icd10DictList.size()), MIcd10Dict.class, "");
     }
 
 }

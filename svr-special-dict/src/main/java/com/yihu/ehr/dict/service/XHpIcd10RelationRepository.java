@@ -1,5 +1,6 @@
 package com.yihu.ehr.dict.service;
 
+import com.yihu.ehr.model.specialdict.MIcd10Dict;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;
