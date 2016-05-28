@@ -4,7 +4,6 @@ import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.intf.DimensionCategoryDao;
 import com.yihu.ehr.resource.dao.intf.DimensionDao;
 import com.yihu.ehr.resource.model.RsDimensionCategory;
-import com.yihu.ehr.resource.service.intf.IDimensionCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class DimensionCategoryService extends BaseJpaService<RsDimensionCategory,DimensionCategoryDao> implements IDimensionCategoryService{
+public class DimensionCategoryService extends BaseJpaService<RsDimensionCategory,DimensionCategoryDao> {
     @Autowired
     private DimensionCategoryDao dmcDao;
     @Autowired

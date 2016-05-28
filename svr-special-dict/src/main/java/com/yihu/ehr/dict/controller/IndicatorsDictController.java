@@ -27,7 +27,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "indicatorsdict", description = "指标字典管理接口", tags = {"Indicators"})
+@Api(value = "IndicatorsDict", description = "指标字典管理接口")
 public class IndicatorsDictController extends BaseRestController {
 
     @Autowired
@@ -40,7 +40,6 @@ public class IndicatorsDictController extends BaseRestController {
     public MIndicatorsDict createIndicatorsDict(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
             @RequestBody String dictJson) throws Exception {
-
         IndicatorsDict dict = toEntity(dictJson, IndicatorsDict.class);
         dict.setCreateDate(new Date());
         String id = getObjectId(BizObject.Dict);
@@ -145,5 +144,24 @@ public class IndicatorsDictController extends BaseRestController {
             @ApiParam(name = "code", value = "code", defaultValue = "")
             @PathVariable(value = "code") String code){
         return indicatorsDictService.isCodeExist(code);
+    }
+
+    @RequestMapping(value = "/indicators/code", method = RequestMethod.GET)
+    @ApiOperation(value = "根据code获取相应的指标字典信息" )
+    public MIndicatorsDict getIndicatorsDictByCode(
+            @ApiParam(name = "code", value = "指标代码")
+            @RequestParam(value = "code") String code) throws Exception {
+        IndicatorsDict dict = indicatorsDictService.findByCode(code);
+        if (dict == null) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
+        return convertToModel(dict, MIndicatorsDict.class);
+    }
+
+    @RequestMapping(value = "/indicators/ids", method = RequestMethod.GET)
+    @ApiOperation(value = "根据ids获取相应的指标字典信息" )
+    public List<MIndicatorsDict> getIndicatorsDictByIds(
+            @ApiParam(name = "ids", value = "指标代码")
+            @RequestParam(value = "ids") String[] ids) throws Exception {
+        List<IndicatorsDict> indicatorsDicts = indicatorsDictService.getIndicatorsDictByIds(ids);
+        return (List<MIndicatorsDict>)convertToModels(indicatorsDicts, new ArrayList<>(indicatorsDicts.size()), MIndicatorsDict.class, "");
     }
 }

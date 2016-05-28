@@ -1,5 +1,6 @@
 package com.yihu.ehr.dict.service;
 
+import com.yihu.ehr.model.specialdict.MHealthProblemDict;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -56,4 +57,7 @@ public class HealthProblemDictService extends BaseJpaService<HealthProblemDict, 
         return result;
     }
 
+    public HealthProblemDict findHpDictByCode(String code) {
+        return hpDictRepo.findByCode(code);
+    }
 }

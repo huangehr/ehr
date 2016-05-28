@@ -2,7 +2,7 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.resource.service.intf.IAdapterCacheService;
+import com.yihu.ehr.resource.service.AdapterCacheService;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(value="adaption_cache",description = "适配数据缓存")
 public class AdaptionCacheController extends BaseRestController{
     @Autowired
-    private IAdapterCacheService adapterCacheService;
+    private AdapterCacheService adapterCacheService;
 
     @RequestMapping(value= ServiceApi.Adaptions.Cache,method = RequestMethod.POST)
     @ApiOperation("缓存适配数据")

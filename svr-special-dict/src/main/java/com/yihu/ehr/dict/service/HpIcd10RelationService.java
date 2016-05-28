@@ -9,8 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.List;
 
 
@@ -25,8 +23,6 @@ import java.util.List;
 @Service
 public class HpIcd10RelationService extends BaseJpaService<HpIcd10Relation, XHpIcd10RelationRepository> {
 
-    @PersistenceContext
-    protected EntityManager entityManager;
     @Autowired
     private XHpIcd10RelationRepository hpIcd10ReRepo;
 
@@ -68,4 +64,7 @@ public class HpIcd10RelationService extends BaseJpaService<HpIcd10Relation, XHpI
         return query.executeUpdate();
     }
 
+    public List<HpIcd10Relation> getHpIcd10RelationByHpId(String hpId) {
+        return hpIcd10ReRepo.findByHpId(hpId);
+    }
 }

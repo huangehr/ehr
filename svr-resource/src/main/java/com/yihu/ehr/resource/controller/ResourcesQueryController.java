@@ -2,12 +2,11 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.resource.dao.ResourcesQueryDao;
-import com.yihu.ehr.resource.service.intf.IResourcesQueryService;
+import com.yihu.ehr.resource.service.ResourcesQueryService;
 import com.yihu.ehr.util.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +25,7 @@ import java.util.Map;
 @Api(value = "query", description = "资源查询服务接口")
 public class ResourcesQueryController {
     @Autowired
-    private IResourcesQueryService resourcesQueryService;
+    private ResourcesQueryService resourcesQueryService;
 
     @Autowired
     private ResourcesQueryDao resourcesQueryDao;

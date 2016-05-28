@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 
 /**
  * 用户公私钥管理
@@ -53,5 +54,13 @@ public class IndicatorsDictService extends BaseJpaService<IndicatorsDict, XIndic
         dict.setName(dict.getName());
         indicatorsDictRepo.save(dict);
         return dict;
+    }
+
+    public IndicatorsDict findByCode(String code) {
+        return indicatorsDictRepo.findByCode(code);
+    }
+
+    public List<IndicatorsDict> getIndicatorsDictByIds(String[] ids) {
+        return indicatorsDictRepo.findByIds(ids);
     }
 }
