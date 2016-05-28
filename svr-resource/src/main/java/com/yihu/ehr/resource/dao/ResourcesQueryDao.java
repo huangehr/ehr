@@ -43,8 +43,8 @@ public class ResourcesQueryDao {
 
     /**
      * 获取Hbase主表
-     * queryParams可为solr表达式，也可为json例：{"q":"*:*","fq":"","fl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}""}
-     * q和fq都存在则做join操作
+     * queryParams可为solr表达式，也可为json例：{"q":"*:*","join":"*:*","fl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}""}
+     * 有join参数做join操作
      */
     public Page<Map<String,Object>> getEhrCenter(String queryParams, Integer page, Integer size) throws Exception {
         String core = mainCore;
@@ -66,17 +66,11 @@ public class ResourcesQueryDao {
                     sort = obj.get("sort");
                 }
 
-                //q和fq都存在则做join操作
-                if (obj.containsKey("fq")) {
-                    fq = obj.get("fq");
-                    if(q.length()>0)
-                    {
-                        q = "{!join fromIndex="+subJoinCore+" from=main_rowkey to=rowkey}" +q;
-                    }
-                    else
-                    {
-                        q = "{!join fromIndex="+subJoinCore+" from=main_rowkey to=rowkey}*:*";
-                    }
+                //join操作
+                if (obj.containsKey("join")) {
+                    String join = obj.get("join");
+                    fq = q;
+                    q = "{!join fromIndex="+subJoinCore+" from=main_rowkey to=rowkey}" +join;
                 }
 
             }
@@ -99,8 +93,8 @@ public class ResourcesQueryDao {
 
     /**
      * 获取Hbase细表
-     * queryParams可为solr表达式，也可为json例：{"table":"HDSD00_08","q":"*:*","fq":"","fl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}""}
-     * q和fq都存在则做join操作
+     * queryParams可为solr表达式，也可为json例：{"table":"HDSD00_08","q":"*:*","join":"*:*","fl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}""}
+     * 有join参数做join操作
      */
     public Page<Map<String,Object>> getEhrCenterSub(String queryParams, Integer page, Integer size) throws Exception {
         String core = subCore;
@@ -122,38 +116,27 @@ public class ResourcesQueryDao {
                     sort = obj.get("sort");
                 }
 
-                //q和fq都存在则做join操作
-                if (obj.containsKey("fq")) {
-                    fq = obj.get("fq");
-                    if(q.length()>0)
-                    {
-                        q = "{!join fromIndex="+mainJoinCore+" from=rowkey to=main_rowkey}" +q;
-                    }
-                    else
-                    {
-                        q = "{!join fromIndex="+mainJoinCore+" from=rowkey to=main_rowkey}*:*";
-                    }
-                }
-
-                //细表数据集条件
-                if (obj.containsKey("table")) {
-                    if(q.startsWith("{!join"))
-                    {
+                //join操作
+                if (obj.containsKey("join")) {
+                    String join = obj.get("join");
+                    fq = q;
+                    q = "{!join  fromIndex="+mainJoinCore+" from=rowkey to=main_rowkey}" +join;
+                    if (obj.containsKey("table")) {
                         if (fq.length() > 0) {
                             fq += " AND rowkey:*" + obj.get("table") + "*";
                         } else {
                             fq = "rowkey:*" + obj.get("table") + "*";
                         }
                     }
-                    else{
-                        if (q.length() > 0) {
-                            q += " AND rowkey:*" + obj.get("table") + "*";
-                        } else {
-                            q = "rowkey:*" + obj.get("table") + "*";
-                        }
-                    }
-
                 }
+                else{
+                    if (q.length() > 0) {
+                        q += " AND rowkey:*" + obj.get("table") + "*";
+                    } else {
+                        q = "rowkey:*" + obj.get("table") + "*";
+                    }
+                }
+
             } else {
                 q = queryParams;
             }

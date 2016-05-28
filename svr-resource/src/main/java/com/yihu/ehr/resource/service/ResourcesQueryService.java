@@ -13,10 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -34,6 +31,8 @@ public class ResourcesQueryService  {
     @Autowired
     private ResourcesQueryDao resourcesQueryDao;
 
+    //忽略字段
+    private List<String> ignoreField = new ArrayList<String>(Arrays.asList("rowkey","event_type", "demographic_id", "patient_id","org_code","event_date","profile_id", "main_rowkey"));
 
     /**
      * 新增参数
@@ -175,24 +174,37 @@ public class ResourcesQueryService  {
                             //遍历资源数据元
                             for(DtoResourceMetadata metadada : metadataList) {
                                 String key = metadada.getStdCode();//***先用std标准代码映射
-                                if(metadada.getDictCode()!=null&& metadada.getDictCode().length()>0&&!metadada.getDictCode().equals("0"))
-                                {
-                                    key += "_CODE_"+metadada.getColumnType().substring(0,1);
-                                }
-                                else{
-                                    key += "_"+metadada.getColumnType().substring(0, 1);
-                                }
 
                                 if(oldObj.containsKey(key))
                                 {
                                     newObj.put(metadada.getId(),oldObj.get(key));
                                 }
+                                else{
+                                    if(metadada.getDictCode()!=null&& metadada.getDictCode().length()>0&&!metadada.getDictCode().equals("0"))
+                                    {
+                                        key += "_CODE_"+metadada.getColumnType().substring(0,1);
+                                    }
+                                    else{
+                                        key += "_"+metadada.getColumnType().substring(0, 1);
+                                    }
+                                    if(oldObj.containsKey(key))
+                                    {
+                                        newObj.put(metadada.getId(),oldObj.get(key));
+                                    }
+                                }
                             }
 
-                            //统计字段
+
+
                             for(String key : oldObj.keySet())
                             {
+                                //统计字段
                                 if (key.startsWith("$")) {
+                                    newObj.put(key,oldObj.get(key));
+                                }
+
+                                //忽略字段
+                                if (ignoreField.contains(key)) {
                                     newObj.put(key,oldObj.get(key));
                                 }
                             }
