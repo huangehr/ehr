@@ -1,7 +1,7 @@
 package com.yihu.ehr.dict.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.dict.cache.Icd10HpRelationCacheService;
+import com.yihu.ehr.dict.service.Icd10HpRelationCacheService;
 import com.yihu.ehr.dict.model.HealthProblemDict;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

@@ -1,4 +1,4 @@
-package com.yihu.ehr.dict.cache;
+package com.yihu.ehr.dict.service;
 
 import com.yihu.ehr.dict.model.HealthProblemDict;
 import com.yihu.ehr.dict.model.Icd10HpRelation;
