@@ -3,7 +3,7 @@ package com.yihu.ehr.dict.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.dict.service.DrugDict;
+import com.yihu.ehr.dict.model.DrugDict;
 import com.yihu.ehr.dict.service.DrugDictService;
 import com.yihu.ehr.dict.service.Icd10DrugRelationService;
 import com.yihu.ehr.exception.ApiException;

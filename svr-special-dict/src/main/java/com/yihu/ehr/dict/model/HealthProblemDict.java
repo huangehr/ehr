@@ -1,7 +1,6 @@
-package com.yihu.ehr.dict.service;
+package com.yihu.ehr.dict.model;
 
 import com.yihu.ehr.util.ObjectVersion;
-import com.yihu.ehr.util.PinyinUtil;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -16,21 +15,16 @@ import java.util.Date;
  * @updated 02-6月-2015 20:25:02
  */
 @Entity
-@Table(name = "indicators_dict")
+@Table(name = "health_problem_dict")
 @Access(value = AccessType.PROPERTY)
-public class IndicatorsDict implements Serializable{
+public class HealthProblemDict implements Serializable{
 
-    public IndicatorsDict() {
+    public HealthProblemDict() {
     }
 
     private String id;
     private String code;
     private String name;
-    private String phoneticCode;
-    private String type;
-    private String unit;
-    private String upperLimit;
-    private String lowerLimit;
     private String description;
     private String createUser;
     private Date createDate;
@@ -62,47 +56,6 @@ public class IndicatorsDict implements Serializable{
     }
     public void setName(String name){
         this.name = name;
-        this.phoneticCode = PinyinUtil.getPinYinHeadChar(name, true);
-    }
-
-    @Column(name = "phonetic_code", nullable = false)
-    public String getPhoneticCode() {
-        return phoneticCode;
-    }
-    public void setPhoneticCode(String phoneticCode) {
-        this.phoneticCode = phoneticCode;
-    }
-
-    @Column(name = "type",  nullable = true)
-    public String getType() {
-        return type;
-    }
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    @Column(name = "unit",  nullable = true)
-    public String getUnit() {
-        return unit;
-    }
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
-
-    @Column(name = "upper_limit",  nullable = true)
-    public String getUpperLimit() {
-        return upperLimit;
-    }
-    public void setUpperLimit(String upperLimit) {
-        this.upperLimit = upperLimit;
-    }
-
-    @Column(name = "lower_limit",  nullable = true)
-    public String getLowerLimit() {
-        return lowerLimit;
-    }
-    public void setLowerLimit(String lowerLimit) {
-        this.lowerLimit = lowerLimit;
     }
 
     @Column(name = "description",  nullable = true)
@@ -144,5 +97,4 @@ public class IndicatorsDict implements Serializable{
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
     }
-
 }

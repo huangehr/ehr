@@ -1,4 +1,4 @@
-package com.yihu.ehr.dict.service;
+package com.yihu.ehr.dict.model;
 
 import org.hibernate.annotations.GenericGenerator;
 

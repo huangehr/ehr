@@ -1,4 +1,4 @@
-package com.yihu.ehr.dict.service;
+package com.yihu.ehr.dict.model;
 
 import com.yihu.ehr.util.ObjectVersion;
 import com.yihu.ehr.util.PinyinUtil;
@@ -16,11 +16,11 @@ import java.util.Date;
  * @updated 02-6月-2015 20:25:02
  */
 @Entity
-@Table(name = "drug_dict")
+@Table(name = "indicators_dict")
 @Access(value = AccessType.PROPERTY)
-public class DrugDict implements Serializable{
+public class IndicatorsDict implements Serializable{
 
-    public DrugDict() {
+    public IndicatorsDict() {
     }
 
     private String id;
@@ -28,10 +28,9 @@ public class DrugDict implements Serializable{
     private String name;
     private String phoneticCode;
     private String type;
-    private String flag;
-    private String tradeName;
     private String unit;
-    private String specifications;
+    private String upperLimit;
+    private String lowerLimit;
     private String description;
     private String createUser;
     private Date createDate;
@@ -74,7 +73,7 @@ public class DrugDict implements Serializable{
         this.phoneticCode = phoneticCode;
     }
 
-    @Column(name = "type", nullable = false)
+    @Column(name = "type",  nullable = true)
     public String getType() {
         return type;
     }
@@ -82,23 +81,7 @@ public class DrugDict implements Serializable{
         this.type = type;
     }
 
-    @Column(name = "flag", nullable = false)
-    public String getFlag() {
-        return flag;
-    }
-    public void setFlag(String flag) {
-        this.flag = flag;
-    }
-
-    @Column(name = "trade_name", nullable = false)
-    public String getTradeName() {
-        return tradeName;
-    }
-    public void setTradeName(String tradeName) {
-        this.tradeName = tradeName;
-    }
-
-    @Column(name = "unit", nullable = false)
+    @Column(name = "unit",  nullable = true)
     public String getUnit() {
         return unit;
     }
@@ -106,12 +89,20 @@ public class DrugDict implements Serializable{
         this.unit = unit;
     }
 
-    @Column(name = "specifications", nullable = false)
-    public String getSpecifications() {
-        return specifications;
+    @Column(name = "upper_limit",  nullable = true)
+    public String getUpperLimit() {
+        return upperLimit;
     }
-    public void setSpecifications(String specifications) {
-        this.specifications = specifications;
+    public void setUpperLimit(String upperLimit) {
+        this.upperLimit = upperLimit;
+    }
+
+    @Column(name = "lower_limit",  nullable = true)
+    public String getLowerLimit() {
+        return lowerLimit;
+    }
+    public void setLowerLimit(String lowerLimit) {
+        this.lowerLimit = lowerLimit;
     }
 
     @Column(name = "description",  nullable = true)
@@ -153,4 +144,5 @@ public class DrugDict implements Serializable{
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
     }
+
 }

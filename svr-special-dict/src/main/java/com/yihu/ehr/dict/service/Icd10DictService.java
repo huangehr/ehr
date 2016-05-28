@@ -1,5 +1,6 @@
 package com.yihu.ehr.dict.service;
 
+import com.yihu.ehr.dict.model.Icd10Dict;
 import com.yihu.ehr.model.specialdict.MIcd10Dict;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class Icd10DictService extends BaseJpaService<Icd10Dict, XIcd10DictReposi
     @Autowired
     private XIcd10DictRepository icd10DictRepo;
     @Autowired
-    private XHpIcd10RelationRepository hpIcd10ReRepo;
+    private XIcd10HpRelationRepository hpIcd10ReRepo;
     @Autowired
     private XIcd10DrugRelationRepository icd10DrugReRepo;
     @Autowired

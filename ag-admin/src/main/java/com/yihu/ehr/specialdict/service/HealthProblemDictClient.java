@@ -1,10 +1,8 @@
 package com.yihu.ehr.specialdict.service;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.model.dict.MSystemDict;
-import com.yihu.ehr.model.specialdict.MDrugDict;
 import com.yihu.ehr.model.specialdict.MHealthProblemDict;
-import com.yihu.ehr.model.specialdict.MHpIcd10Relation;
+import com.yihu.ehr.model.specialdict.MIcd10HpRelation;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -83,13 +81,13 @@ public interface HealthProblemDictClient {
 
     @RequestMapping(value = "/dict/hp/icd10", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "为健康问题增加ICD10疾病关联。" )
-    MHpIcd10Relation createHpIcd10Relation(
+    MIcd10HpRelation createHpIcd10Relation(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
             @RequestBody String dictJson);
 
     @RequestMapping(value = "/dict/hp/icd10s", method = RequestMethod.POST)
     @ApiOperation(value = "为健康问题增加ICD10疾病关联,--批量增加关联。" )
-    Collection<MHpIcd10Relation> createHpIcd10Relations(
+    Collection<MIcd10HpRelation> createHpIcd10Relations(
             @ApiParam(name = "hp_id", value = "健康问题Id")
             @RequestParam(value = "hp_id") String hpId,
             @ApiParam(name = "icd10_ids", value = "关联的icd10字典ids,多个以逗号连接")
@@ -99,7 +97,7 @@ public interface HealthProblemDictClient {
 
     @RequestMapping(value = "/dict/hp/icd10", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "为健康问题修改ICD10疾病关联。" )
-    MHpIcd10Relation updateHpIcd10Relation(
+    MIcd10HpRelation updateHpIcd10Relation(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
             @RequestBody String dictJson);
 
@@ -117,7 +115,7 @@ public interface HealthProblemDictClient {
 
     @RequestMapping(value = "/dict/hp/icd10s", method = RequestMethod.GET)
     @ApiOperation(value = "根据健康问题查询相应的ICD10关联列表信息。" )
-    ResponseEntity<Collection<MHpIcd10Relation>> getHpIcd10RelationList(
+    ResponseEntity<Collection<MIcd10HpRelation>> getHpIcd10RelationList(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,hpId,icd10Id")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
@@ -131,7 +129,7 @@ public interface HealthProblemDictClient {
 
     @RequestMapping(value = "/dict/hp/icd10s/no_paging", method = RequestMethod.GET)
     @ApiOperation(value = "根据健康问题查询相应的ICD10关联列表信息。" )
-    Collection<MHpIcd10Relation> getHpIcd10RelationListWithoutPaging(
+    Collection<MIcd10HpRelation> getHpIcd10RelationListWithoutPaging(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters);
 

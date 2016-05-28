@@ -1,6 +1,7 @@
-package com.yihu.ehr.dict.service;
+package com.yihu.ehr.dict.model;
 
 import com.yihu.ehr.util.ObjectVersion;
+import com.yihu.ehr.util.PinyinUtil;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -15,16 +16,19 @@ import java.util.Date;
  * @updated 02-6月-2015 20:25:02
  */
 @Entity
-@Table(name = "health_problem_dict")
+@Table(name = "icd10_dict")
 @Access(value = AccessType.PROPERTY)
-public class HealthProblemDict implements Serializable{
+public class Icd10Dict implements Serializable{
 
-    public HealthProblemDict() {
+    public Icd10Dict() {
     }
 
     private String id;
     private String code;
     private String name;
+    private String phoneticCode;
+    private String chronicFlag;
+    private String infectiousFlag;
     private String description;
     private String createUser;
     private Date createDate;
@@ -56,6 +60,31 @@ public class HealthProblemDict implements Serializable{
     }
     public void setName(String name){
         this.name = name;
+        this.phoneticCode = PinyinUtil.getPinYinHeadChar(name, true);
+    }
+
+    @Column(name = "phonetic_code", nullable = false)
+    public String getPhoneticCode() {
+        return phoneticCode;
+    }
+    public void setPhoneticCode(String phoneticCode) {
+        this.phoneticCode = phoneticCode;
+    }
+
+    @Column(name = "chronic_flag",  nullable = true)
+    public String getChronicFlag() {
+        return chronicFlag;
+    }
+    public void setChronicFlag(String chronicFlag) {
+        this.chronicFlag = chronicFlag;
+    }
+
+    @Column(name = "infectious_flag",  nullable = true)
+    public String getInfectiousFlag() {
+        return infectiousFlag;
+    }
+    public void setInfectiousFlag(String infectiousFlag) {
+        this.infectiousFlag = infectiousFlag;
     }
 
     @Column(name = "description",  nullable = true)
@@ -97,4 +126,5 @@ public class HealthProblemDict implements Serializable{
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
     }
+
 }
