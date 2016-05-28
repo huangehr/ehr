@@ -55,7 +55,7 @@ public class Icd10IndicatorRelationService extends BaseJpaService<Icd10Indicator
         return icd10IndicatorRelaRepo.findAll(pageable);
     }
 
-    public List<Icd10IndicatorRelation> getIcd10DrugRelationsByIcd10Ids(String[] icd10Ids) {
+    public List<Icd10IndicatorRelation> getIcd10IndicatorRelationsByIcd10Ids(String[] icd10Ids) {
         return icd10IndicatorRelaRepo.findByIcd10Ids(icd10Ids);
     }
 }

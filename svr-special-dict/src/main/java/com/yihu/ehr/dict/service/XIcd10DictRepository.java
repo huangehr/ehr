@@ -1,6 +1,11 @@
 package com.yihu.ehr.dict.service;
 
+import com.yihu.ehr.model.specialdict.MIcd10Dict;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 /**
  * @author Sand
@@ -12,4 +17,6 @@ public interface XIcd10DictRepository extends PagingAndSortingRepository<Icd10Di
     Icd10Dict findByCode(String code);
     Icd10Dict findByName(String name);
 
+    @Query("select icd10Dict from Icd10Dict icd10Dict  where icd10Dict.id in (:ids)")
+    List<MIcd10Dict> findByIds(@Param("ids") String[] ids);
 }
