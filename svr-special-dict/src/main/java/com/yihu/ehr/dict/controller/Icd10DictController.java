@@ -3,6 +3,9 @@ package com.yihu.ehr.dict.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.dict.model.Icd10Dict;
+import com.yihu.ehr.dict.model.Icd10DrugRelation;
+import com.yihu.ehr.dict.model.Icd10IndicatorRelation;
 import com.yihu.ehr.dict.service.*;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.specialdict.MIcd10Dict;
@@ -32,7 +35,7 @@ public class Icd10DictController extends BaseRestController {
     private Icd10DictService icd10DictService;
 
     @Autowired
-    private HpIcd10RelationService hpIcd10RelationService;
+    private Icd10HpRelationService icd10HpRelationService;
 
     @Autowired
     private Icd10DrugRelationService icd10DrugRelationService;
@@ -172,7 +175,7 @@ public class Icd10DictController extends BaseRestController {
             @ApiParam(name = "id", value = "icd10字典代码")
             @PathVariable( value = "id") String id) {
 
-        return hpIcd10RelationService.isUsage(id);
+        return icd10HpRelationService.isUsage(id);
     }
 
     @RequestMapping(value = "/dict/icd10/existence/name" , method = RequestMethod.GET)

@@ -4,7 +4,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.dict.service.Icd10IndicatorRelationService;
-import com.yihu.ehr.dict.service.IndicatorsDict;
+import com.yihu.ehr.dict.model.IndicatorsDict;
 import com.yihu.ehr.dict.service.IndicatorsDictService;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.specialdict.MIndicatorsDict;

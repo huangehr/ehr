@@ -3,10 +3,10 @@ package com.yihu.ehr.dict.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.dict.service.HealthProblemDict;
+import com.yihu.ehr.dict.model.HealthProblemDict;
 import com.yihu.ehr.dict.service.HealthProblemDictService;
-import com.yihu.ehr.dict.service.HpIcd10Relation;
-import com.yihu.ehr.dict.service.HpIcd10RelationService;
+import com.yihu.ehr.dict.model.Icd10HpRelation;
+import com.yihu.ehr.dict.service.Icd10HpRelationService;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.specialdict.MHealthProblemDict;
 import com.yihu.ehr.util.controller.BaseRestController;
@@ -35,7 +35,7 @@ public class HealthProblemDictController extends BaseRestController {
     private HealthProblemDictService hpDictService;
 
     @Autowired
-    private HpIcd10RelationService hpIcd10RelationService;
+    private Icd10HpRelationService icd10HpRelationService;
 
     @RequestMapping(value = "/dict/hp", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建新的健康问题字典" )
@@ -58,11 +58,11 @@ public class HealthProblemDictController extends BaseRestController {
             @PathVariable( value = "id") String id) {
 
         String relationId;
-        List<HpIcd10Relation> hpIcd10RelationList = hpIcd10RelationService.getHpIcd10RelationListByHpId(id);
-        if (hpIcd10RelationList != null) {
-            for(HpIcd10Relation hpIcd10Relation : hpIcd10RelationList ){
-                relationId = hpIcd10Relation.getId();
-                hpIcd10RelationService.delete(relationId);
+        List<Icd10HpRelation> icd10HpRelationList = icd10HpRelationService.getHpIcd10RelationListByHpId(id);
+        if (icd10HpRelationList != null) {
+            for(Icd10HpRelation icd10HpRelation : icd10HpRelationList){
+                relationId = icd10HpRelation.getId();
+                icd10HpRelationService.delete(relationId);
             }
         }
         hpDictService.delete(id);
@@ -79,15 +79,15 @@ public class HealthProblemDictController extends BaseRestController {
         String[] hpIds = ids.split(",");
         List<String> relationIds = new ArrayList<>();
         for(String hpId:hpIds){
-            List<HpIcd10Relation> hpIcd10RelationList = hpIcd10RelationService.getHpIcd10RelationListByHpId(hpId);
-            if (hpIcd10RelationList != null) {
-                for(HpIcd10Relation hpIcd10Relation : hpIcd10RelationList ){
-                    relationIds.add(hpIcd10Relation.getId());
+            List<Icd10HpRelation> icd10HpRelationList = icd10HpRelationService.getHpIcd10RelationListByHpId(hpId);
+            if (icd10HpRelationList != null) {
+                for(Icd10HpRelation icd10HpRelation : icd10HpRelationList){
+                    relationIds.add(icd10HpRelation.getId());
                 }
             }
         }
         if (relationIds.size() != 0){
-            hpIcd10RelationService.delete(relationIds);
+            icd10HpRelationService.delete(relationIds);
         }
         hpDictService.delete(ids.split(","));
         return true;

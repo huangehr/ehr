@@ -1,5 +1,6 @@
 package com.yihu.ehr.dict.service;
 
+import com.yihu.ehr.dict.model.HealthProblemDict;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 /**

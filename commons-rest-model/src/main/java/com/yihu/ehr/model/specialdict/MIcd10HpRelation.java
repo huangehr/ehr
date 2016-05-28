@@ -10,9 +10,9 @@ import java.util.Date;
  * @version 1.0
  * @created 02-6月-2015 17:38:05
  */
-public class MHpIcd10Relation implements Serializable{
+public class MIcd10HpRelation implements Serializable{
 
-	public MHpIcd10Relation() {
+	public MIcd10HpRelation() {
 	}
 
 	private String id;

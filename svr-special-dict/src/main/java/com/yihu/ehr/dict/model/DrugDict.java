@@ -1,4 +1,4 @@
-package com.yihu.ehr.dict.service;
+package com.yihu.ehr.dict.model;
 
 import com.yihu.ehr.util.ObjectVersion;
 import com.yihu.ehr.util.PinyinUtil;
@@ -16,19 +16,22 @@ import java.util.Date;
  * @updated 02-6月-2015 20:25:02
  */
 @Entity
-@Table(name = "icd10_dict")
+@Table(name = "drug_dict")
 @Access(value = AccessType.PROPERTY)
-public class Icd10Dict implements Serializable{
+public class DrugDict implements Serializable{
 
-    public Icd10Dict() {
+    public DrugDict() {
     }
 
     private String id;
     private String code;
     private String name;
     private String phoneticCode;
-    private String chronicFlag;
-    private String infectiousFlag;
+    private String type;
+    private String flag;
+    private String tradeName;
+    private String unit;
+    private String specifications;
     private String description;
     private String createUser;
     private Date createDate;
@@ -71,20 +74,44 @@ public class Icd10Dict implements Serializable{
         this.phoneticCode = phoneticCode;
     }
 
-    @Column(name = "chronic_flag",  nullable = true)
-    public String getChronicFlag() {
-        return chronicFlag;
+    @Column(name = "type", nullable = false)
+    public String getType() {
+        return type;
     }
-    public void setChronicFlag(String chronicFlag) {
-        this.chronicFlag = chronicFlag;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    @Column(name = "infectious_flag",  nullable = true)
-    public String getInfectiousFlag() {
-        return infectiousFlag;
+    @Column(name = "flag", nullable = false)
+    public String getFlag() {
+        return flag;
     }
-    public void setInfectiousFlag(String infectiousFlag) {
-        this.infectiousFlag = infectiousFlag;
+    public void setFlag(String flag) {
+        this.flag = flag;
+    }
+
+    @Column(name = "trade_name", nullable = false)
+    public String getTradeName() {
+        return tradeName;
+    }
+    public void setTradeName(String tradeName) {
+        this.tradeName = tradeName;
+    }
+
+    @Column(name = "unit", nullable = false)
+    public String getUnit() {
+        return unit;
+    }
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    @Column(name = "specifications", nullable = false)
+    public String getSpecifications() {
+        return specifications;
+    }
+    public void setSpecifications(String specifications) {
+        this.specifications = specifications;
     }
 
     @Column(name = "description",  nullable = true)
@@ -126,5 +153,4 @@ public class Icd10Dict implements Serializable{
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
     }
-
 }

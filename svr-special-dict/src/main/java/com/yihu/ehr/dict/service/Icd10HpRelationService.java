@@ -1,5 +1,6 @@
 package com.yihu.ehr.dict.service;
 
+import com.yihu.ehr.dict.model.Icd10HpRelation;
 import com.yihu.ehr.query.BaseJpaService;
 import org.hibernate.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,32 +22,32 @@ import java.util.List;
  */
 @Transactional
 @Service
-public class HpIcd10RelationService extends BaseJpaService<HpIcd10Relation, XHpIcd10RelationRepository> {
+public class Icd10HpRelationService extends BaseJpaService<Icd10HpRelation, XIcd10HpRelationRepository> {
 
     @Autowired
-    private XHpIcd10RelationRepository hpIcd10ReRepo;
+    private XIcd10HpRelationRepository Icd10hpReRepo;
 
     public boolean isExist(String icd10Id,String hpId){
-        HpIcd10Relation hpIcd10Relation = hpIcd10ReRepo.findByIcd10IdAndHpId(icd10Id,hpId);
-        return hpIcd10Relation != null;
+        Icd10HpRelation icd10HpRelation = Icd10hpReRepo.findByIcd10IdAndHpId(icd10Id,hpId);
+        return icd10HpRelation != null;
     }
 
-    public List<HpIcd10Relation> getHpIcd10RelationListByHpId(String hpId){
-        List<HpIcd10Relation> hpIcd10RelationList = hpIcd10ReRepo.findByHpId(hpId);
-        if(hpIcd10RelationList.size() == 0){
+    public List<Icd10HpRelation> getHpIcd10RelationListByHpId(String hpId){
+        List<Icd10HpRelation> icd10HpRelationList = Icd10hpReRepo.findByHpId(hpId);
+        if(icd10HpRelationList.size() == 0){
             return null;
         }
-        return hpIcd10RelationList;
+        return icd10HpRelationList;
     }
 
-    public Page<HpIcd10Relation> getRelationList(String sorts, int page, int size) {
+    public Page<Icd10HpRelation> getRelationList(String sorts, int page, int size) {
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
-        return hpIcd10ReRepo.findAll(pageable);
+        return Icd10hpReRepo.findAll(pageable);
     }
 
     public boolean isUsage(String icd10Id){
-        List<HpIcd10Relation> hpIcd10RelationList = hpIcd10ReRepo.findByIcd10Id(icd10Id);
-        if(hpIcd10RelationList.size() == 0){
+        List<Icd10HpRelation> icd10HpRelationList = Icd10hpReRepo.findByIcd10Id(icd10Id);
+        if(icd10HpRelationList.size() == 0){
             return false;
         }
         return true;
@@ -58,13 +59,13 @@ public class HpIcd10RelationService extends BaseJpaService<HpIcd10Relation, XHpI
      * @param ids
      */
     public int delete(String[] ids) {
-        String hql = "DELETE FROM HpIcd10Relation WHERE id in (:ids)";
+        String hql = "DELETE FROM Icd10HpRelation WHERE id in (:ids)";
         Query query = currentSession().createQuery(hql);
         query.setParameterList("ids", ids);
         return query.executeUpdate();
     }
 
-    public List<HpIcd10Relation> getHpIcd10RelationByHpId(String hpId) {
-        return hpIcd10ReRepo.findByHpId(hpId);
+    public List<Icd10HpRelation> getHpIcd10RelationByHpId(String hpId) {
+        return Icd10hpReRepo.findByHpId(hpId);
     }
 }

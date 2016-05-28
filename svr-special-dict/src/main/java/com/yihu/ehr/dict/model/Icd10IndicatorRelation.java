@@ -1,4 +1,4 @@
-package com.yihu.ehr.dict.service;
+package com.yihu.ehr.dict.model;
 
 import com.yihu.ehr.util.ObjectVersion;
 import org.hibernate.annotations.GenericGenerator;
@@ -15,16 +15,16 @@ import java.util.Date;
  * @updated 02-6月-2015 20:25:02
  */
 @Entity
-@Table(name = "hp_icd10_relation")
+@Table(name = "icd10_indicator_relation")
 @Access(value = AccessType.PROPERTY)
-public class HpIcd10Relation implements Serializable{
+public class Icd10IndicatorRelation implements Serializable{
 
-    public HpIcd10Relation() {
+    public Icd10IndicatorRelation() {
     }
 
     private String id;
-    private String hpId;
     private String icd10Id;
+    private String indicatorId;
     private String createUser;
     private Date createDate;
 
@@ -39,20 +39,20 @@ public class HpIcd10Relation implements Serializable{
         this.id = id;
     }
 
-    @Column(name = "hp_id", nullable = false)
-    public String getHpId() {
-        return hpId;
-    }
-    public void setHpId(String hpId) {
-        this.hpId = hpId;
-    }
-
     @Column(name = "icd10_id", nullable = false)
     public String getIcd10Id() {
         return icd10Id;
     }
     public void setIcd10Id(String icd10Id) {
         this.icd10Id = icd10Id;
+    }
+
+    @Column(name = "indicator_id", nullable = false)
+    public String getIndicatorId() {
+        return indicatorId;
+    }
+    public void setIndicatorId(String indicatorId) {
+        this.indicatorId = indicatorId;
     }
 
     @Column(name = "create_user",  nullable = true)
