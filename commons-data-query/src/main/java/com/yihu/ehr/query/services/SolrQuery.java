@@ -66,7 +66,7 @@ public class SolrQuery {
 			}
 		}
 
-		return new PageImpl<Map<String,Object>>(data,new PageRequest(page, rows), data.size());
+		return new PageImpl<Map<String,Object>>(data,new PageRequest(page-1, rows), data.size());
 	}
 
 	/**
@@ -115,7 +115,7 @@ public class SolrQuery {
 	{
 		List<PivotField> listPivot = solr.groupCountMult(table,q,groupFields,page,rows);
 
-		return new PageImpl<Map<String,Object>>(pivotToMapList(listPivot,null,null),new PageRequest(page, rows), listPivot.size());
+		return new PageImpl<Map<String,Object>>(pivotToMapList(listPivot,null,null),new PageRequest(page-1, rows), listPivot.size());
 	}
 
 

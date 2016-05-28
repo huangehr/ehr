@@ -402,7 +402,7 @@ public class HbaseQuery {
 			}
 		}
 
-		return new PageImpl<Map<String,Object>>(data,new PageRequest(page, rows), count);
+		return new PageImpl<Map<String,Object>>(data,new PageRequest(page-1, rows), count);
 	}
 
 	/************************* 全文检索 ******************************************************/

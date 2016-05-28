@@ -20,7 +20,6 @@ import java.util.List;
 @RequestMapping(ApiVersion.Version1_0)
 @FeignClient(name = MicroServices.Organization)
 public interface XOrganizationClient {
-    MOrganization getOrg(String orgCode);
 
     @RequestMapping(value = "/organizations/{org_codes}", method = RequestMethod.GET)
     @ApiOperation(value = "根据机构代码列表批量查询机构")

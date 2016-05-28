@@ -38,6 +38,11 @@ public class CD10Service {
     @Autowired
     private XIcd10DictClient icd10DictClient;
 
+    /**
+     * 根据健康问题代码获取药品信息
+     * @param problemCode
+     * @return
+     */
     public List<MDrugDict> getDrugDictList(String problemCode){
         //获取健康问题id
         MHealthProblemDict healthProblemDict = healthProblemDictClient.getHpDictByCode(problemCode);
@@ -61,7 +66,11 @@ public class CD10Service {
         return drugDicts;
     }
 
-
+    /**
+     * 根据健康问题代码获取指标信息
+     * @param problemCode
+     * @return
+     */
     public List<MIndicatorsDict> getIndicatorsDictList(String problemCode) {
         //获取健康问题id
         MHealthProblemDict healthProblemDict = healthProblemDictClient.getHpDictByCode(problemCode);
@@ -85,6 +94,11 @@ public class CD10Service {
         return indicatorsDict;
     }
 
+    /**
+     * "根据健康问题代码获取ICD10代码列表
+     * @param problemCode
+     * @return
+     */
     public List<MIcd10Dict> getIcd10DictList(String problemCode) {
         MHealthProblemDict healthProblemDict = healthProblemDictClient.getHpDictByCode(problemCode);
         String hpId = healthProblemDict.getId();
