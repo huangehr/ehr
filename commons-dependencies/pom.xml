@@ -240,6 +240,18 @@
     </build>
 
     <repositories>
+        <repository>
+            <id>repositoryCentral</id>
+            <name>repositoryCentral</name>
+            <url>http://172.19.103.47:8081/nexus/content/repositories/central/</url>
+        </repository>
+        <repository>
+            <id>repositoryReleases</id>
+            <name>repositoryReleases</name>
+            <url>http://172.19.103.47:8081/nexus/content/repositories/releases/</url>
+        </repository>
+
+
         <!-- os china 建立了一个maven 的私服 -->
         <repository>
             <id>nexus</id>
@@ -261,6 +273,8 @@
             </snapshots>
         </repository>
     </repositories>
+
+
 
 
     <pluginRepositories>
