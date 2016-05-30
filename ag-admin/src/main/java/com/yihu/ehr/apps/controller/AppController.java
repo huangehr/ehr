@@ -1,6 +1,8 @@
 package com.yihu.ehr.apps.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.model.org.MOrganization;
+import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
@@ -34,9 +36,10 @@ public class AppController extends BaseController {
     private AppClient appClient;
     @Autowired
     private ConventionalDictEntryClient conDictEntryClient;
-
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private OrganizationClient organizationClient;
 
     @RequestMapping(value = "/apps", method = RequestMethod.GET)
     @ApiOperation(value = "获取App列表")
@@ -193,6 +196,11 @@ public class AppController extends BaseController {
             MConventionalDict statusDict = conDictEntryClient.getAppStatus(mApp.getStatus());
             appModel.setStatusName(statusDict == null ? "" : statusDict.getValue());
         }
+        //获取机构名称
+        if(!StringUtils.isEmpty(mApp.getOrg())){
+            MOrganization organization = organizationClient.getOrg(mApp.getOrg());
+            appModel.setOrgName(organization == null ? "" : organization.getFullName());
+        }
         return appModel;
     }
 
@@ -221,6 +229,11 @@ public class AppController extends BaseController {
         if(!StringUtils.isEmpty(mApp.getStatus())){
             MConventionalDict statusDict = conDictEntryClient.getAppStatus(mApp.getStatus());
             app.setStatusName(statusDict == null ? "" : statusDict.getValue());
+        }
+        //获取机构名称
+        if(!StringUtils.isEmpty(mApp.getOrg())){
+            MOrganization organization = organizationClient.getOrg(mApp.getOrg());
+            app.setOrgName(organization == null ? "" : organization.getFullName());
         }
         return app;
     }

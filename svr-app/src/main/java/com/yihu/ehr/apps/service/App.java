@@ -36,7 +36,7 @@ public class    App {
     private String status;
     private String description;
     private String tags;
-
+    private String org;
 	public App(){
 //        id  = new ObjectVersion().toString();
     }
@@ -132,7 +132,7 @@ public class    App {
     @Column(name = "tags",  nullable = true)
     public List<String> getTags() {
         List<String> list = new ArrayList<>();
-        if(org.springframework.util.StringUtils.isEmpty(tags)){
+        if(StringUtils.isEmpty(tags)){
         }else {
             String[] arr = tags.split(";|；");
             list = Arrays.asList(arr);
@@ -145,5 +145,14 @@ public class    App {
         }else {
             this.tags = "";
         }
+    }
+
+    @Column(name = "org",  nullable = true)
+    public String getOrg() {
+        return org;
+    }
+
+    public void setOrg(String org) {
+        this.org = org;
     }
 }
