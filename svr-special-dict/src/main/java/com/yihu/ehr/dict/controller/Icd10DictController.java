@@ -28,7 +28,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "icd10dict", description = "ICD10字典管理接口")
+@Api(value = "Icd10Dict", description = "ICD10字典管理接口")
 public class Icd10DictController extends BaseRestController {
 
     @Autowired
@@ -51,8 +51,6 @@ public class Icd10DictController extends BaseRestController {
 
         Icd10Dict dict = toEntity(dictJson, Icd10Dict.class);
         dict.setCreateDate(new Date());
-        String id = getObjectId(BizObject.Dict);
-        dict.setId(id);
         Icd10Dict  icd10Dict= icd10DictService.createDict(dict);
         return convertToModel(icd10Dict, MIcd10Dict.class, null);
     }
@@ -63,7 +61,7 @@ public class Icd10DictController extends BaseRestController {
             @ApiParam(name = "id", value = "icd10字典代码")
             @PathVariable( value = "id") String id) {
 
-        String drugRelationId;
+        long drugRelationId;
         List<Icd10DrugRelation> icd10DrugRelations = icd10DrugRelationService.getIcd10DrugRelationListByIcd10Id(id);
         if (icd10DrugRelations != null) {
             for(Icd10DrugRelation icd10DrugRelation : icd10DrugRelations ){
@@ -71,7 +69,7 @@ public class Icd10DictController extends BaseRestController {
                 icd10DrugRelationService.delete(drugRelationId);
             }
         }
-        String indicationRelationId;
+        long indicationRelationId;
         List<Icd10IndicatorRelation> icd10IndicatorRelations = icd10IndicatorRelationService.getIcd10IndicatorRelationListByIcd10Id(id);
         if (icd10IndicatorRelations != null) {
             for(Icd10IndicatorRelation icd10IndicatorRelation : icd10IndicatorRelations ){
@@ -90,8 +88,8 @@ public class Icd10DictController extends BaseRestController {
             @ApiParam(name = "ids", value = "icd10字典代码,多个以逗号隔开")
             @RequestParam( value = "ids") String ids) {
         String[] icd10Ids = ids.split(",");
-        List<String> drugRelationIds = new ArrayList<>();
-        List<String> indicationRelationIds = new ArrayList<>();
+        List<Long> drugRelationIds = new ArrayList<>();
+        List<Long> indicationRelationIds = new ArrayList<>();
         for(String icd10Id:icd10Ids){
             List<Icd10DrugRelation> icd10DrugRelations = icd10DrugRelationService.getIcd10DrugRelationListByIcd10Id(icd10Id);
             if (icd10DrugRelations != null) {

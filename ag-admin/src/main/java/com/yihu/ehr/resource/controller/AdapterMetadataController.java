@@ -1,19 +1,28 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.agModel.resource.RsAdapterMetadataModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.resource.MRsAdapterMetadata;
+import com.yihu.ehr.model.resource.MRsMetadata;
 import com.yihu.ehr.resource.client.AdapterMetadataClient;
+import com.yihu.ehr.resource.client.MetadataClient;
+import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,6 +36,12 @@ public class AdapterMetadataController extends BaseController {
 
     @Autowired
     private AdapterMetadataClient adapterMetadataClient;
+
+    @Autowired
+    private ConventionalDictEntryClient conventionalDictEntryClient;
+
+    @Autowired
+    private MetadataClient metadataClient;
 
     @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas, method = RequestMethod.POST)
     @ApiOperation("创建适配数据元")
@@ -127,9 +142,25 @@ public class AdapterMetadataController extends BaseController {
             @RequestParam(value = "size", required = false) int size) throws Exception {
         try
         {
-            ResponseEntity<List<MRsAdapterMetadata>> responseEntity = adapterMetadataClient.getMetadata(fields,filters,sorts,page,size);
+            ResponseEntity<List<MRsAdapterMetadata>> responseEntity = adapterMetadataClient.getMetadata(fields, filters, sorts, page, size);
             List<MRsAdapterMetadata> rsAdapterMetadatas = responseEntity.getBody();
-            Envelop envelop = getResult(rsAdapterMetadatas, getTotalCount(responseEntity), page, size);
+            List<RsAdapterMetadataModel> rsAdapterMetadataModels = new ArrayList<RsAdapterMetadataModel>();
+            for (MRsAdapterMetadata rsAdapterMetadata: rsAdapterMetadatas){
+                RsAdapterMetadataModel rsAdapterMetadataModel = new RsAdapterMetadataModel();
+                BeanUtils.copyProperties(rsAdapterMetadata,rsAdapterMetadataModel);
+                if(StringUtils.isNotBlank(rsAdapterMetadata.getMetadataDomain())){
+                    MConventionalDict mConventionalDict = conventionalDictEntryClient.getBusinessDomain(rsAdapterMetadata.getMetadataDomain());
+                    if(mConventionalDict!=null){
+                        rsAdapterMetadataModel.setMetadataDomainName(mConventionalDict.getValue());
+                    }
+                }
+                if(StringUtils.isNotBlank(rsAdapterMetadata.getMetadataId())){
+                    MRsMetadata mRsMetadata =  metadataClient.getMetadataById(rsAdapterMetadata.getMetadataId());
+                    rsAdapterMetadataModel.setMetadataName(mRsMetadata.getName());
+                }
+                rsAdapterMetadataModels.add(rsAdapterMetadataModel);
+            }
+            Envelop envelop = getResult(rsAdapterMetadataModels, getTotalCount(responseEntity), page, size);
             return envelop;
         }
         catch (Exception e)

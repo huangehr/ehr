@@ -26,6 +26,7 @@ public class MApp implements Serializable {
     private String status;
     private String description;
     private String tags;
+    private String org;
 
 	public MApp(){
     }
@@ -120,7 +121,7 @@ public class MApp implements Serializable {
 
     public List<String> getTags() {
         List<String> list = new ArrayList<>();
-        if(org.springframework.util.StringUtils.isEmpty(tags)){
+        if(StringUtils.isEmpty(tags)){
         }else {
             String[] arr = tags.split(";|；");
             list = Arrays.asList(arr);
@@ -133,5 +134,13 @@ public class MApp implements Serializable {
         }else {
             this.tags = "";
         }
+    }
+
+    public String getOrg() {
+        return org;
+    }
+
+    public void setOrg(String org) {
+        this.org = org;
     }
 }

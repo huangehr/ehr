@@ -1,7 +1,5 @@
 package com.yihu.ehr.dict.model;
 
-import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -21,20 +19,19 @@ public class Icd10DrugRelation implements Serializable{
     public Icd10DrugRelation() {
     }
 
-    private String id;
+    private long id;
     private String icd10Id;
     private String drugId;
     private String createUser;
     private Date createDate;
 
     @Id
-    @GeneratedValue(generator = "Generator")
-    @GenericGenerator(name = "Generator", strategy = "assigned")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", unique = true, nullable = false)
-    public String getId() {
+    public long getId() {
         return id;
     }
-    public void setId(String id) {
+    public void setId(long id) {
         this.id = id;
     }
 

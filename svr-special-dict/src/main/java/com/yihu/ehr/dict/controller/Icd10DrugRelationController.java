@@ -30,7 +30,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "icd10DrugRelation", description = "ICD10和疾病关系管理接口")
+@Api(value = "Icd10DrugRelation", description = "ICD10和疾病关系管理接口")
 public class Icd10DrugRelationController extends BaseRestController{
 
     @Autowired
@@ -43,8 +43,6 @@ public class Icd10DrugRelationController extends BaseRestController{
             @RequestBody String dictJson) throws Exception {
 
         Icd10DrugRelation relation = toEntity(dictJson, Icd10DrugRelation.class);
-        String id = getObjectId(BizObject.Dict);
-        relation.setId(id);
         relation.setCreateDate(new Date());
         icd10DrugRelationService.save(relation);
         return convertToModel(relation, MIcd10DrugRelation.class, null);
@@ -66,8 +64,6 @@ public class Icd10DrugRelationController extends BaseRestController{
             icd10DrugRelation.setCreateDate(new Date());
             icd10DrugRelation.setIcd10Id(icd10Id);
             icd10DrugRelation.setDrugId(drugId);
-            String id = getObjectId(BizObject.Dict);
-            icd10DrugRelation.setId(id);
             icd10DrugRelationService.save(icd10DrugRelation);
             icd10DrugRelations.add(icd10DrugRelation);
         }

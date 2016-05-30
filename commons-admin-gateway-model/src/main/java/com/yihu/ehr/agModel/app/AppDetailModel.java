@@ -25,6 +25,9 @@ public class AppDetailModel {
     private String description;
     private String tags;
 
+    private String org;
+    private String orgName;
+
     public String getId() {
         return id;
     }
@@ -131,7 +134,7 @@ public class AppDetailModel {
 
     public List<String> getTags() {
         List<String> list = new ArrayList<>();
-        if(org.springframework.util.StringUtils.isEmpty(tags)){
+        if(StringUtils.isEmpty(tags)){
         }else {
             String[] arr = tags.split(";|；");
             list = Arrays.asList(arr);
@@ -144,5 +147,21 @@ public class AppDetailModel {
         }else {
             this.tags = "";
         }
+    }
+
+    public String getOrg() {
+        return org;
+    }
+
+    public void setOrg(String org) {
+        this.org = org;
+    }
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
     }
 }

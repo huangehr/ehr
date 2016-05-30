@@ -9,6 +9,24 @@ public class MRsAdapterMetadata {
     private String metadataId;
     private String srcDatasetCode;
     private String srcMetadataCode;
+    private String srcMetadataName;
+    private String metadataDomain;
+
+    public String getSrcMetadataName() {
+        return srcMetadataName;
+    }
+
+    public void setSrcMetadataName(String srcMetadataName) {
+        this.srcMetadataName = srcMetadataName;
+    }
+
+    public String getMetadataDomain() {
+        return metadataDomain;
+    }
+
+    public void setMetadataDomain(String metadataDomain) {
+        this.metadataDomain = metadataDomain;
+    }
 
     public String getId() {
         return id;

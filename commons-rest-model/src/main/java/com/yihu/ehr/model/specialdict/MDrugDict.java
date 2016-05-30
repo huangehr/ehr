@@ -15,7 +15,7 @@ public class MDrugDict implements Serializable{
 	public MDrugDict() {
 	}
 
-	private String id;
+	private Long id;
 	private String code;
 	private String name;
 	private String phoneticCode;
@@ -30,11 +30,11 @@ public class MDrugDict implements Serializable{
     private String updateUser;
     private Date updateDate;
 
-	public String getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
