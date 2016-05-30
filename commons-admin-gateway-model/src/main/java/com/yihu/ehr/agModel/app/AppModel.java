@@ -12,6 +12,8 @@ public class AppModel {
     private String url;
     private String status;
     private String statusName;
+    private String org;
+    private String orgName;
 
     public String getId() {
         return id;
@@ -75,5 +77,21 @@ public class AppModel {
 
     public void setStatusName(String statusName) {
         this.statusName = statusName;
+    }
+
+    public String getOrg() {
+        return org;
+    }
+
+    public void setOrg(String org) {
+        this.org = org;
+    }
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
     }
 }
