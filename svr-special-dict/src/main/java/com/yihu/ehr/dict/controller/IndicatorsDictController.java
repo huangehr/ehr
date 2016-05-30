@@ -42,8 +42,6 @@ public class IndicatorsDictController extends BaseRestController {
             @RequestBody String dictJson) throws Exception {
         IndicatorsDict dict = toEntity(dictJson, IndicatorsDict.class);
         dict.setCreateDate(new Date());
-        String id = getObjectId(BizObject.Dict);
-        dict.setId(id);
         IndicatorsDict indicatorsDict = indicatorsDictService.createDict(dict);
         return convertToModel(indicatorsDict, MIndicatorsDict.class, null);
     }

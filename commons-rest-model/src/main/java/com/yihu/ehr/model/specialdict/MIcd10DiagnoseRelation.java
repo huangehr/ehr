@@ -7,7 +7,7 @@ import java.util.Date;
  * Created by yww on 2016/5/6.
  */
 public class MIcd10DiagnoseRelation implements Serializable {
-    private String id;
+    private Long id;
     private String icd10Id;
     private String name;
     private String description;
@@ -16,10 +16,10 @@ public class MIcd10DiagnoseRelation implements Serializable {
     private String updateUser;
     private Date updateDate;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
