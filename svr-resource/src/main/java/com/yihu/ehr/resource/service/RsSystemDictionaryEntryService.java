@@ -3,7 +3,6 @@ package com.yihu.ehr.resource.service;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.intf.RsSystemDictionaryEntryDao;
 import com.yihu.ehr.resource.model.RsSystemDictionaryEntry;
-import com.yihu.ehr.resource.service.intf.IRsSystemDictionaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class RsSystemDictionaryEntryService extends BaseJpaService<RsSystemDictionaryEntry, RsSystemDictionaryEntryDao> implements IRsSystemDictionaryService {
+public class RsSystemDictionaryEntryService extends BaseJpaService<RsSystemDictionaryEntry, RsSystemDictionaryEntryDao> {
 
     @Autowired
     private RsSystemDictionaryEntryDao systemDictionaryEntryDao;

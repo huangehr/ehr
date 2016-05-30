@@ -4,7 +4,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsDimension;
 import com.yihu.ehr.resource.model.RsDimension;
-import com.yihu.ehr.resource.service.intf.IDimensionService;
+import com.yihu.ehr.resource.service.DimensionService;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,13 +34,13 @@ import java.util.List;
 public class DimensionController extends BaseRestController {
 
     @Autowired
-    private IDimensionService dimensionService;
+    private DimensionService dimensionService;
 
     @ApiOperation("创建维度")
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MRsDimension createDimension(
             @ApiParam(name="dimension",value="维度",defaultValue = "")
-            @RequestParam(value="dimension")String dimension) throws Exception
+            @RequestBody String dimension) throws Exception
     {
         RsDimension dimens = toEntity(dimension,RsDimension.class);
         dimens.setId(getObjectId(BizObject.Dimensions));
@@ -48,10 +49,10 @@ public class DimensionController extends BaseRestController {
     }
 
     @ApiOperation("更新维度")
-    @RequestMapping(method = RequestMethod.PUT)
+    @RequestMapping(method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MRsDimension updateDimension(
             @ApiParam(name="dimension",value="维度",defaultValue="")
-            @RequestParam(value="dimension")String dimension) throws Exception
+            @RequestBody String dimension) throws Exception
     {
         RsDimension  dimens= toEntity(dimension,RsDimension.class);
         dimensionService.saveDimension(dimens);

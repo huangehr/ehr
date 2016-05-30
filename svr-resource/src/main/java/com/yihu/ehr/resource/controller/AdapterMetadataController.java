@@ -5,16 +5,13 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsAdapterMetadata;
 import com.yihu.ehr.resource.model.RsAdapterMetadata;
-import com.yihu.ehr.resource.service.intf.IAdapterMetadataService;
+import com.yihu.ehr.resource.service.AdapterMetadataService;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -35,13 +32,13 @@ import java.util.List;
 @Api(value = "adapterMetadata", description = "适配数据元服务")
 public class AdapterMetadataController extends BaseRestController {
     @Autowired
-    private IAdapterMetadataService metadataService;
+    private AdapterMetadataService metadataService;
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas,method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("创建适配数据元")
     public MRsAdapterMetadata createMetadata(
             @ApiParam(name="adapterMetadata",value="数据元JSON",defaultValue = "")
-            @RequestParam(value="adapterMetadata") String adapterMetadata) throws Exception
+            @RequestBody String adapterMetadata) throws Exception
     {
         RsAdapterMetadata metadata = toEntity(adapterMetadata,RsAdapterMetadata.class);
         metadata.setId(getObjectId(BizObject.RsAdapterMetadata));
@@ -49,11 +46,11 @@ public class AdapterMetadataController extends BaseRestController {
         return convertToModel(metadata,MRsAdapterMetadata.class);
     }
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas,method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas,method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("更新适配数据元")
     public MRsAdapterMetadata updateMetadata(
             @ApiParam(name="adapterMetadata",value="数据元JSON",defaultValue = "")
-            @RequestParam(value="adapterMetadata") String adapterMetadata) throws Exception
+            @RequestBody String adapterMetadata) throws Exception
     {
         RsAdapterMetadata metadata = toEntity(adapterMetadata,RsAdapterMetadata.class);
         metadata = metadataService.saveAdapterMetadata(metadata);

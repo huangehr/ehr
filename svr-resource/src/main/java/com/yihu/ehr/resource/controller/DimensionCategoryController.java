@@ -4,7 +4,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsDimensionCategory;
 import com.yihu.ehr.resource.model.RsDimensionCategory;
-import com.yihu.ehr.resource.service.intf.IDimensionCategoryService;
+import com.yihu.ehr.resource.service.DimensionCategoryService;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,13 +32,13 @@ import java.util.List;
 @RequestMapping(value= ApiVersion.Version1_0 + "/dimensionCategories")
 public class DimensionCategoryController extends BaseRestController{
     @Autowired
-    private IDimensionCategoryService dmcService;
+    private DimensionCategoryService dmcService;
 
     @ApiOperation("创建维度类别")
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MRsDimensionCategory createDimensionCategory(
             @ApiParam(name="dimensionCategory",value="维度类别",defaultValue = "")
-            @RequestParam(value="dimensionCategory")String dimensionCategory) throws Exception
+            @RequestBody String dimensionCategory) throws Exception
     {
         RsDimensionCategory dmc = toEntity(dimensionCategory,RsDimensionCategory.class);
         dmc.setId(getObjectId(BizObject.DimensionsCategories));
@@ -46,10 +47,10 @@ public class DimensionCategoryController extends BaseRestController{
     }
 
     @ApiOperation("更新维度类别")
-    @RequestMapping(method = RequestMethod.PUT)
+    @RequestMapping(method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MRsDimensionCategory updateDimensionCategory(
             @ApiParam(name="dimensionCategory",value="维度类别",defaultValue="")
-            @RequestParam(value="dimensionCategory")String dimensionCategory) throws Exception
+            @RequestBody String dimensionCategory) throws Exception
     {
         RsDimensionCategory  dmc= toEntity(dimensionCategory,RsDimensionCategory.class);
         dmcService.saveDimensionCategory(dmc);

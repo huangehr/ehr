@@ -36,6 +36,7 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -123,18 +124,20 @@ public class PackageEndPoint extends BaseRestController {
             @ApiParam(name = "package_crypto", value = "档案包解压密码,二次加密")
             @RequestParam(value = "package_crypto") String packageCrypto,
             @ApiParam(name = "md5", value = "档案包MD5")
-            @RequestParam(value = "md5", required = false) String md5) throws Exception {
+            @RequestParam(value = "md5", required = false) String md5,
+            HttpServletRequest request) throws Exception {
 
         MultipartFile multipartFile = pack.getFile("file");
         if (multipartFile == null) throw new ApiException(HttpStatus.FORBIDDEN, ErrorCode.MissParameter, "file");
 
         MKey key = securityClient.getOrgKey(orgCode);
         String privateKey = key.getPrivateKey();
-        if (null == privateKey)
+        if (null == privateKey) {
             throw new ApiException(HttpStatus.FORBIDDEN, "Invalid public key, maybe you miss the organization code?");
+        }
 
-        String unzipPwd = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
-        Package aPackage = packService.receive(multipartFile.getInputStream(), unzipPwd);
+        String password = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
+        Package aPackage = packService.receive(multipartFile.getInputStream(), password, md5, orgCode, getClientId(request));
 
         messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
     }
@@ -146,9 +149,10 @@ public class PackageEndPoint extends BaseRestController {
      * @return
      */
     @RequestMapping(value = ServiceApi.Packages.Package, method = {RequestMethod.GET})
-    @ApiOperation(value = "获取档案包", notes = "获取档案包的信息")
-    public ResponseEntity<MPackage> getPackage(@ApiParam(name = "id", value = "档案包编号")
-                                               @PathVariable(value = "id") String id) throws IOException {
+    @ApiOperation(value = "获取档案包", notes = "获取档案包的信息，若ID为OLDEST，则获取最早，还没解析的档案包")
+    public ResponseEntity<MPackage> getPackage(
+            @ApiParam(name = "id", value = "档案包编号", defaultValue = "OLDEST")
+            @PathVariable(value = "id") String id) throws IOException {
         Package aPackage;
         if (id.equals("OLDEST")) {
             // only use for svr-pack-resolve, it will change pack status internal
@@ -179,11 +183,15 @@ public class PackageEndPoint extends BaseRestController {
         Package aPackage = packService.getPackage(id);
         if (aPackage == null) return new ResponseEntity<>((MPackage) null, HttpStatus.NOT_FOUND);
 
-        if (status == ArchiveStatus.Failed) {
-            packService.reportArchiveFailed(id, message);
-        } else if (status == ArchiveStatus.Finished) {
-            packService.reportArchiveFinished(id, message);
+        aPackage.setArchiveStatus(status);
+        aPackage.setMessage(message);
+        if (status != ArchiveStatus.Failed) {
+            aPackage.setFinishDate(new Date());
+        } else {
+            aPackage.setFinishDate(null);
         }
+
+        packService.save(aPackage);
 
         return new ResponseEntity<>((MPackage) null, HttpStatus.OK);
     }
@@ -197,8 +205,7 @@ public class PackageEndPoint extends BaseRestController {
     @RequestMapping(value = ServiceApi.Packages.Package, method = {RequestMethod.DELETE})
     @ApiOperation(value = "删除档案", response = Object.class, notes = "删除一个数据包")
     public void deletePackage(@ApiParam(name = "id", value = "档案包编号")
-                              @PathVariable(value = "id")
-                                      String id) {
+                              @PathVariable(value = "id") String id) {
         packService.deletePackage(id);
     }
 
@@ -211,8 +218,7 @@ public class PackageEndPoint extends BaseRestController {
     @RequestMapping(value = ServiceApi.Packages.PackageDownloads, method = {RequestMethod.GET})
     @ApiOperation(value = "获取档案包", notes = "获取档案包的信息")
     public ResponseEntity<MPackage> downloadPackage(@ApiParam(name = "id", value = "档案包编号")
-                                                    @PathVariable(value = "id")
-                                                            String id,
+                                                    @PathVariable(value = "id") String id,
                                                     HttpServletResponse response) throws Exception {
         try {
             InputStream is = packService.downloadFile(id);
@@ -257,7 +263,7 @@ public class PackageEndPoint extends BaseRestController {
             throw new ApiException(HttpStatus.FORBIDDEN, "Invalid public key, maybe you miss the user name?");
 
         String unzipPwd = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
-        Package aPackage = packService.receive(multipartFile.getInputStream(), unzipPwd);
+        Package aPackage = packService.receive(multipartFile.getInputStream(), unzipPwd, md5, null, null);
 
         messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
     }

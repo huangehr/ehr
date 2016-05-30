@@ -1,6 +1,5 @@
 package com.yihu.ehr.resource.controller;
 
-import com.yihu.ehr.agModel.resource.RsMetadataModel;
 import com.yihu.ehr.agModel.resource.RsResourceMetadataModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
@@ -8,15 +7,14 @@ import com.yihu.ehr.model.resource.MRsMetadata;
 import com.yihu.ehr.model.resource.MRsResourceMetadata;
 import com.yihu.ehr.resource.client.MetadataClient;
 import com.yihu.ehr.resource.client.ResourceMetadataClient;
+import com.yihu.ehr.util.ArrayListUtil;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -97,6 +95,23 @@ public class ResourceMetadataController extends BaseController {
         Envelop envelop = new Envelop();
         try{
             resourceMetadataClient.deleteResourceMetadata(id);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
+    @ApiOperation("根据ids批量资源数据元删除")
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasBatch, method = RequestMethod.DELETE)
+    public Envelop deleteResourceMetadataBatchById(
+            @ApiParam(name = "ids", value = "ids", defaultValue = "")
+            @RequestParam(value = "ids") String[] idArray) throws Exception {
+        Envelop envelop = new Envelop();
+        try{
+            List<String> ids = ArrayListUtil.getList(idArray);
+            resourceMetadataClient.deleteResourceMetadataBatchById(ids);
             envelop.setSuccessFlg(true);
         }catch (Exception e){
             e.printStackTrace();

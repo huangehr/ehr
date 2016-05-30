@@ -1,19 +1,25 @@
 package com.yihu.ehr.task;
 
+import com.codahale.metrics.MetricRegistry;
+import com.yihu.ehr.config.MetricNames;
 import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.feign.XPackageMgrClient;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.queue.MessageBuffer;
-import com.yihu.ehr.service.resource.stage1.StdPackModel;
 import com.yihu.ehr.service.resource.stage1.PackageResolveEngine;
+import com.yihu.ehr.service.resource.stage1.StdPackModel;
 import com.yihu.ehr.service.resource.stage2.PackMill;
+import com.yihu.ehr.service.resource.stage2.ResourceBucket;
+import com.yihu.ehr.service.resource.stage2.ResourceService;
+import com.yihu.ehr.service.util.LegacyPackageException;
 import com.yihu.ehr.util.log.LogService;
 import org.quartz.InterruptableJob;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.UnableToInterruptJobException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.NoSuchElementException;
 
@@ -44,32 +50,28 @@ public class PackageResourceJob implements InterruptableJob {
     }
 
     private void doResolve(MPackage pack) {
+        PackageResolveEngine resolveEngine = SpringContext.getService(PackageResolveEngine.class);
+        XPackageMgrClient packageMgrClient = SpringContext.getService(XPackageMgrClient.class);
+        PackMill packMill = SpringContext.getService(PackMill.class);
+        ResourceService resourceService = SpringContext.getService(ResourceService.class);
+
         try {
             if (pack == null) return;
 
-            LogService.getLogger().info("Package resolve job start: package " + pack.getId());
+            long start = System.currentTimeMillis();
 
-            PackageResolveEngine resolveEngine = SpringContext.getService(PackageResolveEngine.class);
-            XPackageMgrClient packageMgrClient = SpringContext.getService(XPackageMgrClient.class);
-            PackMill packMill = SpringContext.getService(PackMill.class);
+            StdPackModel stdPackModel = resolveEngine.doResolve(pack, downloadTo(pack.getRemotePath()));
+            ResourceBucket resourceBucket = packMill.grindingPackModel(stdPackModel);
+            resourceService.save(resourceBucket);
 
-            String zipFile = downloadTo(pack.getRemotePath());
+            packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
+                    String.format("Profile: %s, identity: %s", resourceBucket.getId(), resourceBucket.getDemographicId()));
 
-            StdPackModel stdPackModel = resolveEngine.doResolve(pack, zipFile);
-            if (!stdPackModel.getCdaVersion().equals("000000000000")) {
-                packMill.grindingPackModel(stdPackModel);
-
-                packageMgrClient.reportStatus(pack.getId(),
-                        ArchiveStatus.Finished,
-                        String.format("Rowkey: %s, identity: %s", stdPackModel.getId(), stdPackModel.getDemographicId()));
-
-                LogService.getLogger().info("Package resolve job done: package " + pack.getId());
-            } else {
-                packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,
-                        "Package is collected by cda version 00000000000, pass.");
-            }
-        } catch (Exception e) {
-            LogService.getLogger().error(e.getMessage());
+            getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
+        } catch(LegacyPackageException e){
+            packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.LegacyIgnored, e.getMessage());
+        } catch (Throwable throwable) {
+            LogService.getLogger().error("Package resolve job error: package " + throwable.getMessage());
         }
     }
 
@@ -78,5 +80,9 @@ public class PackageResourceJob implements InterruptableJob {
 
         String[] tokens = filePath.split(":");
         return fastDFSUtil.download(tokens[0], tokens[1], LocalTempPath);
+    }
+
+    private MetricRegistry getMetricRegistry(){
+        return SpringContext.getService(MetricRegistry.class);
     }
 }

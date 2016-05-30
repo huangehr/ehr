@@ -2,13 +2,13 @@ package com.yihu.ehr.service.resource.stage1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.yihu.ehr.constants.EventType;
+import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.profile.annotation.Column;
 import com.yihu.ehr.profile.annotation.Table;
 import com.yihu.ehr.service.resource.stage1.extractor.EventExtractor;
 import com.yihu.ehr.service.resource.stage1.extractor.KeyDataExtractor;
-import com.yihu.ehr.profile.core.commons.EventType;
-import com.yihu.ehr.profile.core.commons.ProfileType;
 import com.yihu.ehr.service.resource.ProfileId;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.service.resource.StdDataSet;
@@ -213,8 +213,8 @@ public class StdPackModel {
         root.put("eventNo", this.getEventNo());
         root.put("cdaVersion", this.getCdaVersion());
         root.put("clientId", this.getClientId());
-        root.put("eventDate", DateTimeUtils.utcDateTimeFormat(this.getEventDate()));
-        root.put("createDate", DateTimeUtils.utcDateTimeFormat(this.getCreateDate()));
+        root.put("eventTime", DateTimeUtils.utcDateTimeFormat(this.getEventDate()));
+        root.put("createTime", DateTimeUtils.utcDateTimeFormat(this.getCreateDate()));
         root.put("eventType", this.getEventType().toString());
         root.put("profileType", this.getProfileType().toString());
 

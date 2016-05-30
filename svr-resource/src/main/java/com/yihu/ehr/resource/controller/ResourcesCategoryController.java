@@ -1,20 +1,18 @@
 package com.yihu.ehr.resource.controller;
+
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsCategory;
 import com.yihu.ehr.resource.model.RsCategory;
-import com.yihu.ehr.resource.service.intf.IResourcesCategoryService;
+import com.yihu.ehr.resource.service.ResourcesCategoryService;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
+import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,13 +33,13 @@ import java.util.List;
 public class ResourcesCategoryController extends BaseRestController {
 
     @Autowired
-    private IResourcesCategoryService rsCategoryService;
+    private ResourcesCategoryService rsCategoryService;
 
-    @RequestMapping(value= ServiceApi.Resources.Categories,method = RequestMethod.POST)
+    @RequestMapping(value= ServiceApi.Resources.Categories,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("资源类别创建")
     public MRsCategory createRsCategory(
             @ApiParam(name = "resourceCategory", value = "资源分类", defaultValue = "{\"name\":\"string\",\"pid\":\"string\",\"description\":\"string\"}")
-            @RequestParam(value = "resourceCategory") String resourceCategory) throws Exception
+            @RequestBody String resourceCategory) throws Exception
     {
         RsCategory rsCategory = toEntity(resourceCategory, RsCategory.class);
         rsCategory.setId(getObjectId(BizObject.ResourceCategory));
@@ -50,11 +48,11 @@ public class ResourcesCategoryController extends BaseRestController {
         return convertToModel(rsCategory, MRsCategory.class);
     }
 
-    @RequestMapping(value = ServiceApi.Resources.Categories,method=RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.Categories,method=RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("资源类别更新")
     public MRsCategory updateRsCategory(
             @ApiParam(name="resourceCategory",value="资源分类", defaultValue = "{\"id\":\"string\",\"name\":\"string\",\"pid\":\"string\",\"description\":\"string\"}")
-            @RequestParam(value="resourceCategory")String resourceCategory) throws  Exception
+            @RequestBody String resourceCategory) throws  Exception
     {
         RsCategory rsCategory = toEntity(resourceCategory, RsCategory.class);
         rsCategoryService.createOrUpdRsCategory(rsCategory);

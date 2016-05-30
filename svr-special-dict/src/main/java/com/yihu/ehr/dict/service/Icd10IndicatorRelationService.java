@@ -1,5 +1,6 @@
 package com.yihu.ehr.dict.service;
 
+import com.yihu.ehr.dict.model.Icd10IndicatorRelation;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -53,5 +54,9 @@ public class Icd10IndicatorRelationService extends BaseJpaService<Icd10Indicator
     public Page<Icd10IndicatorRelation> getRelationList(String sorts, int page, int size) {
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
         return icd10IndicatorRelaRepo.findAll(pageable);
+    }
+
+    public List<Icd10IndicatorRelation> getIcd10IndicatorRelationsByIcd10Ids(String[] icd10Ids) {
+        return icd10IndicatorRelaRepo.findByIcd10Ids(icd10Ids);
     }
 }

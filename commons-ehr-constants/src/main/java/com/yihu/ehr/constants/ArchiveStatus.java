@@ -10,5 +10,5 @@ public enum ArchiveStatus {
     Acquired,                   // 正在入库库
     Failed,                     // 入库失败
     Finished,                   // 已入库
-    InDoubt;                    // 未能入库的档案
+    LegacyIgnored;              // 未能入库的档案
 }

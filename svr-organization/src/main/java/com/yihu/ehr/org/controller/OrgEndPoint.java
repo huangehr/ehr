@@ -142,6 +142,22 @@ public class OrgEndPoint extends BaseRestController {
         return orgModel;
     }
 
+
+    /**
+     * 根据机构代码列表批量查询机构
+     *
+     * @param orgCodes
+     * @return
+     */
+    @RequestMapping(value = "/organizations/{org_codes}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据机构代码列表批量查询机构")
+    public List<MOrganization> getOrgs(
+            @ApiParam(name = "org_codes", value = "机构代码", defaultValue = "")
+            @PathVariable(value = "org_codes") String[] orgCodes) throws Exception {
+        List<MOrganization> organizationList = orgService.findByOrgCodes(orgCodes);
+        return (List<MOrganization>) convertToModels(organizationList, new ArrayList<MOrganization>(organizationList.size()), MOrganization.class, "");
+    }
+
     /**
      * 根据管理员登录帐号获取机构
      *

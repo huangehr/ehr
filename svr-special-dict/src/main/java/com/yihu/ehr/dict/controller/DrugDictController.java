@@ -3,7 +3,7 @@ package com.yihu.ehr.dict.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.dict.service.DrugDict;
+import com.yihu.ehr.dict.model.DrugDict;
 import com.yihu.ehr.dict.service.DrugDictService;
 import com.yihu.ehr.dict.service.Icd10DrugRelationService;
 import com.yihu.ehr.exception.ApiException;
@@ -27,11 +27,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "drugdict", description = "药品字典管理接口", tags = {"Drug"})
+@Api(value = "drugDict", description = "药品字典管理接口")
 public class DrugDictController extends BaseRestController {
 
     @Autowired
     private DrugDictService drugDictService;
+
     @Autowired
     private Icd10DrugRelationService icd10DrugRelationService;
 
@@ -146,5 +147,14 @@ public class DrugDictController extends BaseRestController {
             @ApiParam(name = "code", value = "code", defaultValue = "")
             @PathVariable(value = "code") String code){
         return drugDictService.isCodeExist(code);
+    }
+
+    @RequestMapping(value = "/drugs/ids", method = RequestMethod.GET)
+    @ApiOperation(value = "根据ID获取相应的药品字典信息。" )
+    public List<MDrugDict> getDrugDictByIds(
+            @ApiParam(name = "ids", value = "字典内码")
+            @RequestParam(value = "ids") String[] ids) throws Exception {
+        List<DrugDict> drugDictList = drugDictService.getDrugDictByIds(ids);
+        return (List<MDrugDict>)convertToModels(drugDictList, new ArrayList<>(drugDictList.size()), MDrugDict.class, "");
     }
 }

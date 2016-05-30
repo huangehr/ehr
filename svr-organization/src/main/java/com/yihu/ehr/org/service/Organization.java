@@ -39,6 +39,7 @@ public class Organization  {
 
     private String imgRemotePath;
     private String imgLocalPath;
+    private int administrativeDivision;
 
     public Organization() {
         //tags = new HashSet<>();
@@ -151,12 +152,20 @@ public class Organization  {
         this.imgRemotePath = imgRemotePath;
     }
 
-    @Column(name = "img_local_path",nullable = true)
+
     public String getImgLocalPath() {
         return imgLocalPath;
     }
     public void setImgLocalPath(String imgLocalPath) {
         this.imgLocalPath = imgLocalPath;
+    }
+
+    @Column(name = "administrative_division",nullable = true)
+    public int getAdministrativeDivision() {
+        return administrativeDivision;
+    }
+    public void setAdministrativeDivision(int administrativeDivision) {
+        this.administrativeDivision = administrativeDivision;
     }
 
     @Column(name = "tags",  nullable = true)

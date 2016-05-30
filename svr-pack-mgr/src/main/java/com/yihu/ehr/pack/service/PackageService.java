@@ -37,9 +37,9 @@ public class PackageService extends BaseJpaService<Package, XPackageRepository> 
     @Autowired
     FastDFSUtil fastDFSUtil;
 
-    public Package receive(InputStream is, String pwd) {
+    public Package receive(InputStream is, String pwd, String md5, String orgCode, String clientId) {
         Map<String, String> metaData = storeJsonPackage(is);
-        return checkIn(metaData.get("id"), metaData.get("path"), pwd);
+        return checkIn(metaData.get("id"), metaData.get("path"), pwd, md5, orgCode, clientId);
     }
 
     public Package getPackage(String id) {
@@ -76,24 +76,6 @@ public class PackageService extends BaseJpaService<Package, XPackageRepository> 
         getRepo().save(aPackage);
 
         return aPackage;
-    }
-
-    public void reportArchiveFinished(String id, String message) {
-        Package aPackage = getRepo().findOne(id);
-        aPackage.setArchiveStatus(ArchiveStatus.Finished);
-        aPackage.setMessage(message);
-        aPackage.setFinishDate(new Date());
-
-        getRepo().save(aPackage);
-    }
-
-    public void reportArchiveFailed(String id, String message) {
-        Package aPackage = getRepo().findOne(id);
-        aPackage.setArchiveStatus(ArchiveStatus.Failed);
-        aPackage.setMessage(message);
-        aPackage.setFinishDate(null);
-
-        getRepo().save(aPackage);
     }
 
     /**
@@ -133,10 +115,13 @@ public class PackageService extends BaseJpaService<Package, XPackageRepository> 
      * @param pwd  zip密码
      * @return 索引存储成功
      */
-    Package checkIn(String id, String path, String pwd) {
+    Package checkIn(String id, String path, String pwd, String md5, String orgCode, String clientId) {
         try {
             Package aPackage = new Package();
             aPackage.setId(id);
+            aPackage.setMd5(md5);
+            aPackage.setOrgCode(orgCode);
+            aPackage.setClientId(clientId);
             aPackage.setRemotePath(path);
             aPackage.setPwd(pwd);
             aPackage.setReceiveDate(new Date());

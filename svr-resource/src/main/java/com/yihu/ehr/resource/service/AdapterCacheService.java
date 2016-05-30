@@ -1,12 +1,11 @@
 package com.yihu.ehr.resource.service;
 
+import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.redis.RedisClient;
 import com.yihu.ehr.resource.dao.intf.AdapterMetadataDao;
 import com.yihu.ehr.resource.dao.intf.AdapterSchemaDao;
 import com.yihu.ehr.resource.model.RsAdapterMetadata;
 import com.yihu.ehr.resource.model.RsAdapterSchema;
-import com.yihu.ehr.resource.service.intf.IAdapterCacheService;
-import com.yihu.ehr.resource.service.intf.IAdapterMetadataService;
 import com.yihu.ehr.schema.ResourceAdaptionKeySchema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +18,7 @@ import javax.transaction.Transactional;
  */
 @Service
 @Transactional
-public class AdapterCacheService implements IAdapterCacheService{
+public class AdapterCacheService extends BaseJpaService<RsAdapterSchema,AdapterSchemaDao>{
     @Autowired
     private ResourceAdaptionKeySchema keySchema;
 

@@ -7,11 +7,9 @@ import com.yihu.ehr.model.resource.MRsResourceMetadata;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
@@ -27,9 +25,9 @@ import java.util.List;
 public interface ResourceMetadataClient {
 
     @ApiOperation("创建资源数据元")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas, method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     MRsResourceMetadata createResourceMetadata(
-            @RequestParam(value = "metadata") String metadata);
+            @RequestBody String metadata);
 
     @ApiOperation("批量创建资源数据元")
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasBatch, method = RequestMethod.POST)
@@ -37,9 +35,9 @@ public interface ResourceMetadataClient {
             @RequestParam(value = "metadatas") String metadatas);
 
     @ApiOperation("更新资源数据元")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas, method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     MRsResourceMetadata updateResourceMetadata(
-            @RequestParam(value = "dimension") String metadata);
+            @RequestBody String metadata);
 
     @ApiOperation("资源数据元删除")
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadata, method = RequestMethod.DELETE)
@@ -64,4 +62,7 @@ public interface ResourceMetadataClient {
             @RequestParam(value = "sorts", required = false) String sorts,
             @RequestParam(value = "page", required = false) int page,
             @RequestParam(value = "size", required = false) int size);
+
+    void deleteResourceMetadataBatchById(
+            @RequestParam(value = "ids", required = false) List<String> ids);
 }

@@ -1,6 +1,9 @@
 package com.yihu.ehr.dict.service;
 
+import com.yihu.ehr.dict.model.Icd10IndicatorRelation;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -15,4 +18,7 @@ public interface XIcd10IndicatorRelationRepository extends PagingAndSortingRepos
     List<Icd10IndicatorRelation> findByIndicatorId(String indicatorId);
 
     Icd10IndicatorRelation findByIcd10IdAndIndicatorId(String icd10Id,String indicatorId);
+
+    @Query("select icd10IndicatorRelation from Icd10IndicatorRelation icd10IndicatorRelation  where icd10IndicatorRelation.icd10Id in (:icd10Ids)")
+    List<Icd10IndicatorRelation> findByIcd10Ids(@Param("icd10Ids") String[] icd10Ids);
 }

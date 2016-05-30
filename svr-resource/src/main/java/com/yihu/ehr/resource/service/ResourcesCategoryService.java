@@ -5,7 +5,6 @@ import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.intf.ResourcesCategoryDao;
 import com.yihu.ehr.resource.dao.intf.ResourcesDao;
 import com.yihu.ehr.resource.model.RsCategory;
-import com.yihu.ehr.resource.service.intf.IResourcesCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class ResourcesCategoryService extends BaseJpaService<RsCategory,ResourcesCategoryDao> implements IResourcesCategoryService {
+public class ResourcesCategoryService extends BaseJpaService<RsCategory,ResourcesCategoryDao> {
 
     @Autowired
     private ResourcesCategoryDao rsCategoryDao;

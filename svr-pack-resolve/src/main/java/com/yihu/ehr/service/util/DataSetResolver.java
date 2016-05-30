@@ -9,6 +9,7 @@ import com.yihu.ehr.util.DateTimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.text.ParseException;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -41,23 +42,23 @@ public class DataSetResolver {
         StdDataSet dataSet = new StdDataSet();
 
         try {
-            assert root != null;
-
             String version = root.get("inner_version").asText();
+            if (version.equals("000000000000")) throw new LegacyPackageException("Package is collected via cda version 00000000000, ignored.");
+
             String dataSetCode = root.get("code").asText();
             String eventNo = root.get("event_no").asText();
             String patientId = root.get("patient_id").asText();
             String orgCode = root.get("org_code").asText();
-            String createDate = root.get("create_date").isNull() ? "" : root.get("create_date").asText();
-            String eventDate = root.path("event_time").isNull() ? "" : root.path("event_time").asText();    // 旧数据集结构可能不存在这个属性
+            String createTime = root.get("create_date").isNull() ? "" : root.get("create_date").asText();
+            String eventTime = root.path("event_time").isNull() ? "" : root.path("event_time").asText();    // 旧数据集结构可能不存在这个属性
 
             dataSet.setPatientId(patientId);
             dataSet.setEventNo(eventNo);
             dataSet.setCdaVersion(version);
             dataSet.setCode(dataSetCode);
             dataSet.setOrgCode(orgCode);
-            dataSet.setEventDate(DateTimeUtils.simpleDateParse(eventDate));
-            dataSet.setCreateDate(DateTimeUtils.simpleDateParse(createDate));
+            dataSet.setEventTime(DateTimeUtils.simpleDateParse(eventTime));
+            dataSet.setCreateTime(DateTimeUtils.simpleDateParse(createTime));
             dataSet.setMultiRecord(redisClient.get(dataSetKeySchema.dataSetMultiRecord(version, dataSetCode)));
 
             JsonNode dataNode = root.get("data");
@@ -87,11 +88,10 @@ public class DataSetResolver {
 
                 dataSet.addRecord(Integer.toString(i), record);
             }
-        } catch (NullPointerException ex) {
+        } catch (NullPointerException e) {
             throw new RuntimeException("Null pointer occurs while generate data set");
-        } catch (Exception ex) {
-            throw new RuntimeException(ex.getMessage());
-        } finally {
+        } catch (ParseException e) {
+            throw new RuntimeException("Invalid date time format.");
         }
 
         return dataSet;

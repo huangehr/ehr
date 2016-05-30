@@ -1,6 +1,11 @@
 package com.yihu.ehr.dict.service;
 
+import com.yihu.ehr.dict.model.IndicatorsDict;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 /**
  * @author Sand
@@ -12,4 +17,6 @@ public interface XIndicatorsDictRepository extends PagingAndSortingRepository<In
     IndicatorsDict findByCode(String code);
     IndicatorsDict findByName(String name);
 
+    @Query("select indicatorsDict from IndicatorsDict indicatorsDict  where indicatorsDict.id in (:ids)")
+    List<IndicatorsDict> findByIds(@Param("ids") String[] ids);
 }

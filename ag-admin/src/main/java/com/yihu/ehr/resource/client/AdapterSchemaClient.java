@@ -7,11 +7,9 @@ import com.yihu.ehr.model.resource.MRsAdapterSchema;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
@@ -25,15 +23,15 @@ import java.util.List;
 @ApiIgnore
 public interface AdapterSchemaClient {
 
-    @RequestMapping(value = ServiceApi.Adaptions.Schemas, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Adaptions.Schemas, method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("创建适配方案")
     MRsAdapterSchema createSchema(
-            @RequestParam(value = "adapterSchema") String adapterSchema);
+            @RequestBody String adapterSchema);
 
-    @RequestMapping(value = ServiceApi.Adaptions.Schemas, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Adaptions.Schemas, method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("更新适配方案")
     MRsAdapterSchema updateSchema(
-            @RequestParam(value = "adapterSchema") String adapterSchema);
+            @RequestBody String adapterSchema);
 
     @RequestMapping(value = ServiceApi.Adaptions.Schema, method = RequestMethod.DELETE)
     @ApiOperation("删除适配方案")

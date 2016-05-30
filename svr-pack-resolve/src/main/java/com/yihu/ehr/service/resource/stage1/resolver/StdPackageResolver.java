@@ -65,7 +65,7 @@ public class StdPackageResolver extends PackageResolver {
             profile.setEventNo(dataSet.getEventNo());
             profile.setOrgCode(dataSet.getOrgCode());
             profile.setCdaVersion(dataSet.getCdaVersion());
-            profile.setCreateDate(dataSet.getCreateDate());
+            profile.setCreateDate(dataSet.getCreateTime());
             profile.insertDataSet(dataSetCode, dataSet);
         }
     }
