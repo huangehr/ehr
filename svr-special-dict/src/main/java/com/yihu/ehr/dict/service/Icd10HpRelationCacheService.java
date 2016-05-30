@@ -2,14 +2,11 @@ package com.yihu.ehr.dict.service;
 
 import com.yihu.ehr.dict.model.HealthProblemDict;
 import com.yihu.ehr.dict.model.Icd10HpRelation;
-import com.yihu.ehr.dict.service.XHealthProblemDictRepository;
-import com.yihu.ehr.dict.service.XIcd10HpRelationRepository;
 import com.yihu.ehr.redis.RedisClient;
 import com.yihu.ehr.schema.Icd10HpRelationKeySchema;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -18,8 +15,7 @@ import java.util.Set;
  * @author linaz
  * @created 2016.05.28 16:10
  */
-@Service
-@Transactional
+@Component
 public class Icd10HpRelationCacheService {
 
     @Autowired
