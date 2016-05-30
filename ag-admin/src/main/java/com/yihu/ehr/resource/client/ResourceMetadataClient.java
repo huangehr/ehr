@@ -51,7 +51,7 @@ public interface ResourceMetadataClient {
 
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadata,method = RequestMethod.GET)
     @ApiOperation("根据ID获取资源数据元")
-    public MRsResourceMetadata getRsMetadataById(
+    MRsResourceMetadata getRsMetadataById(
             @PathVariable(value="id") String id);
 
     @ApiOperation("资源数据元查询")
@@ -63,6 +63,8 @@ public interface ResourceMetadataClient {
             @RequestParam(value = "page", required = false) int page,
             @RequestParam(value = "size", required = false) int size);
 
+    @ApiOperation("根据ids批量资源数据元删除")
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasBatch, method = RequestMethod.DELETE)
     void deleteResourceMetadataBatchById(
             @RequestParam(value = "ids", required = false) List<String> ids);
 }
