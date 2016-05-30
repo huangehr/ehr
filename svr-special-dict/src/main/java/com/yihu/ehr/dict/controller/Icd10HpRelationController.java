@@ -1,7 +1,6 @@
 package com.yihu.ehr.dict.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.dict.model.Icd10HpRelation;
 import com.yihu.ehr.dict.service.Icd10HpRelationService;
@@ -43,8 +42,6 @@ public class Icd10HpRelationController extends BaseRestController {
             @RequestBody String dictJson) throws Exception {
 
         Icd10HpRelation relation = toEntity(dictJson, Icd10HpRelation.class);
-        String id = getObjectId(BizObject.Dict);
-        relation.setId(id);
         relation.setCreateDate(new Date());
         icd10HpRelationService.save(relation);
         return convertToModel(relation, MIcd10HpRelation.class, null);
@@ -66,8 +63,6 @@ public class Icd10HpRelationController extends BaseRestController {
             relation.setCreateDate(new Date());
             relation.setHpId(hpId);
             relation.setIcd10Id(icd10Id);
-            String id = getObjectId(BizObject.Dict);
-            relation.setId(id);
             icd10HpRelationService.save(relation);
             mIcd10HpRelations.add(convertToModel(relation, MIcd10HpRelation.class, null));
         }
