@@ -39,13 +39,13 @@ public class SolrQuery {
 	 * @return
 	 */
 	public Page<Map<String,Object>> getGroupCount(String table,String groupField) throws Exception {
-		return getGroupCount(table,groupField,"", 1, 1000);
+		return getGroupCount(table,groupField,"","", 1, 1000);
 	}
 
 	/**
 	 * 单分组统计Count(分页)
 	 */
-	public Page<Map<String,Object>> getGroupCount(String table,String groupField,String q,int page,int rows) throws Exception {
+	public Page<Map<String,Object>> getGroupCount(String table,String groupField,String q,String fq,int page,int rows) throws Exception {
 
 		List<Map<String,Object>> data = new ArrayList<Map<String,Object>>();
 
@@ -55,7 +55,7 @@ public class SolrQuery {
 		int start= (page-1) * rows;
 
 		/***** Solr查询 ********/
-		Map<String,Long> list = solr.groupCount(table, q, groupField, start,rows);
+		Map<String,Long> list = solr.groupCount(table, q,fq, groupField, start,rows);
 
 		if(list!=null && list.size()>0){
 			for (Map.Entry<String, Long> item : list.entrySet()) {
@@ -111,9 +111,9 @@ public class SolrQuery {
 	/**
 	 * 多级分组统计Count(不包含自定义分组)
 	 */
-	public Page<Map<String,Object>> getGroupMult(String table,String groupFields,String q,int page,int rows) throws Exception
+	public Page<Map<String,Object>> getGroupMult(String table,String groupFields,String q,String fq,int page,int rows) throws Exception
 	{
-		List<PivotField> listPivot = solr.groupCountMult(table,q,groupFields,page,rows);
+		List<PivotField> listPivot = solr.groupCountMult(table,q,fq,groupFields,page,rows);
 
 		return new PageImpl<Map<String,Object>>(pivotToMapList(listPivot,null,null),new PageRequest(page-1, rows), listPivot.size());
 	}
@@ -124,7 +124,7 @@ public class SolrQuery {
 	 * 递归获取分组数据(混合)
 	 * @return
 	 */
-	private List<Map<String,Object>> recGroupCount(String table,List<SolrGroupEntity> grouplist,int num,List<Map<String,Object>> preList,String q) throws Exception
+	private List<Map<String,Object>> recGroupCount(String table,List<SolrGroupEntity> grouplist,int num,List<Map<String,Object>> preList,String q,String fq) throws Exception
 	{
 		String conditionName = "$condition";
 		if (num==grouplist.size()-1)
@@ -136,13 +136,13 @@ public class SolrQuery {
 			for(Map<String,Object> preObj:preList) {
 				String query = preObj.get(conditionName).toString();
 
-				if(q!=null && !q.equals("") && !q.equals("*:*"))
+				if(fq!=null && !fq.equals("") && !fq.equals("*:*"))
 				{
-					query += " AND " +q;
+					query += " AND " +fq;
 				}
 
 				//最后一级Solr统计
-				Map<String,Long> maps = solr.groupCount(table, query, groupName, 0, 1000);
+				Map<String,Long> maps = solr.groupCount(table,q, query, groupName, 0, 1000);
 				if(maps!=null && maps.size()>0)
 				{
 					for (String key : maps.keySet())
@@ -192,7 +192,7 @@ public class SolrQuery {
 				}
 			}
 
-			return recGroupCount(table,grouplist, num + 1, list,q);
+			return recGroupCount(table,grouplist, num + 1, list,q,fq);
 		}
 
 	}
@@ -200,7 +200,7 @@ public class SolrQuery {
 	/**
 	 * 纯自定义分组递归
 	 */
-	private List<Map<String,Object>> recGroupCount(String table,List<SolrGroupEntity> grouplist,int num,List<Map<String,Object>> data,Map<String, Object> pre,String q) throws Exception
+	private List<Map<String,Object>> recGroupCount(String table,List<SolrGroupEntity> grouplist,int num,List<Map<String,Object>> data,Map<String, Object> pre,String q,String fq) throws Exception
 	{
 		if(data == null)
 		{
@@ -212,7 +212,7 @@ public class SolrQuery {
 		for(String key : list.keySet())
 		{
 			String condition = list.get(key);
-			String query = q;
+			String query = fq;
 			if(query!=null&&query.length()>0)
 			{
 				query+=" AND "+condition;
@@ -236,7 +236,7 @@ public class SolrQuery {
 				data.add(newRow);
 			}
 			else{
-				data = recGroupCount(table,grouplist,num+1,data,newRow,query);
+				data = recGroupCount(table,grouplist,num+1,data,newRow,q,query);
 			}
 		}
 
@@ -246,7 +246,7 @@ public class SolrQuery {
 	/**
 	 * 多级分组统计Count（包含自定义分组）
 	 */
-	public Page<Map<String,Object>> getGroupMult(String table,String groupFields,List<SolrGroupEntity> customGroup,String q) throws Exception{
+	public Page<Map<String,Object>> getGroupMult(String table,String groupFields,List<SolrGroupEntity> customGroup,String q,String fq) throws Exception{
 
 		List<Map<String, Object>> data = null;
 		if(groupFields!=null && groupFields.length()>0)
@@ -259,7 +259,7 @@ public class SolrQuery {
 			}
 
 			//遍历字段分组
-			List<FacetField> facets = solr.groupCount(table, q, groups);
+			List<FacetField> facets = solr.groupCount(table, q,fq, groups);
 			for (FacetField facet : facets) {
 				String groupName = facet.getName();
 				SolrGroupEntity group = new SolrGroupEntity(groupName);
@@ -273,7 +273,7 @@ public class SolrQuery {
 				grouplist.add(group);
 			}
 
-			data = recGroupCount(table,grouplist, 0, null,q);
+			data = recGroupCount(table,grouplist, 0, null,q,fq);
 		}
 		//纯自定义分组
 		else{
@@ -289,7 +289,7 @@ public class SolrQuery {
 	/**
 	 * 递归数值统计
 	 */
-	private List<Map<String, Object>> recStats(String table,String[] stats,List<SolrGroupEntity> grouplist,String q,int num,List<Map<String, Object>> preList) throws Exception
+	private List<Map<String, Object>> recStats(String table,String[] stats,List<SolrGroupEntity> grouplist,String q,String fq,int num,List<Map<String, Object>> preList) throws Exception
 	{
 		String conditionName = "$condition";
 		if (num==grouplist.size()-1)
@@ -305,13 +305,13 @@ public class SolrQuery {
 				for(Map<String, Object> preObj:preList) {
 					String query = preObj.get(conditionName).toString();
 
-					if((q!=null && !q.equals(""))&&(query!=null && !query.equals("")))
+					if((fq!=null && !fq.equals(""))&&(query!=null && !query.equals("")))
 					{
-						query= q+" AND "+query;
+						query= fq+" AND "+query;
 					}
 					else
 					{
-						query = q+query;
+						query = fq+query;
 					}
 
 					//根据条件最后一级数值统计
@@ -319,7 +319,7 @@ public class SolrQuery {
 					//所有统计字段
 					for(String stat : stats)
 					{
-						List<FieldStatsInfo> statsList = solr.getStats(table, query,stat, groupName);
+						List<FieldStatsInfo> statsList = solr.getStats(table,q, query, stat, groupName);
 						statsMap.put(stat,statsList);
 					}
 
@@ -358,7 +358,7 @@ public class SolrQuery {
 				//所有统计字段
 				for(String stat : stats)
 				{
-					List<FieldStatsInfo> statsList = solr.getStats(table, q,stat, groupName);
+					List<FieldStatsInfo> statsList = solr.getStats(table, q,fq,stat, groupName);
 					statsMap.put(stat,statsList);
 				}
 
@@ -423,7 +423,7 @@ public class SolrQuery {
 				}
 			}
 
-			return recStats(table,stats,grouplist, q,num + 1, list);
+			return recStats(table,stats,grouplist, q,fq,num + 1, list);
 		}
 
 	}
@@ -432,14 +432,14 @@ public class SolrQuery {
 	 * 多级数值统计
 	 */
 	public Page<Map<String,Object>> getStats(String table,String groupFields,String statsFields) throws Exception{
-		return getStats(table,groupFields,statsFields,"",null);
+		return getStats(table,groupFields,statsFields,"","",null);
 	}
 
 	/**
 	 * 多级数值统计
 	 */
-	public Page<Map<String,Object>> getStats(String table,String groupFields,String statsFields,String q) throws Exception{
-		return getStats(table,groupFields,statsFields,q,null);
+	public Page<Map<String,Object>> getStats(String table,String groupFields,String statsFields,String q,String fq) throws Exception{
+		return getStats(table,groupFields,statsFields,q,fq,null);
 	}
 
 	/**
@@ -449,7 +449,7 @@ public class SolrQuery {
 	 * q 查询条件
 	 * customGroup 额外自定义分组
 	 */
-	public Page<Map<String,Object>> getStats(String table,String groupFields,String statsFields,String q,List<SolrGroupEntity> customGroup) throws Exception{
+	public Page<Map<String,Object>> getStats(String table,String groupFields,String statsFields,String q,String fq,List<SolrGroupEntity> customGroup) throws Exception{
 		String[] groups =groupFields.split(",");
 		String[] stats = statsFields.split(",");
 
@@ -463,7 +463,7 @@ public class SolrQuery {
 			}
 
 			//遍历字段分组
-			List<FacetField> facets = solr.groupCount(table, "", groups);
+			List<FacetField> facets = solr.groupCount(table, q,fq, groups);
 			for (FacetField facet : facets) {
 				String groupName = facet.getName();
 				SolrGroupEntity group = new SolrGroupEntity(groupName);
@@ -477,7 +477,7 @@ public class SolrQuery {
 				grouplist.add(group);
 			}
 
-			data = recStats(table,stats,grouplist,q, 0, null);
+			data = recStats(table,stats,grouplist,q,fq, 0, null);
 		}
 		else
 		{
