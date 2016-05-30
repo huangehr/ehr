@@ -44,8 +44,6 @@ public class HealthProblemDictController extends BaseRestController {
             @RequestBody String dictJson) throws Exception {
 
         HealthProblemDict dict = toEntity(dictJson, HealthProblemDict.class);
-        String id = getObjectId(BizObject.Dict);
-        dict.setId(id);
         dict.setCreateDate(new Date());
         HealthProblemDict healthProblemDict = hpDictService.createDict(dict);
         return convertToModel(healthProblemDict, MHealthProblemDict.class, null);
@@ -57,12 +55,10 @@ public class HealthProblemDictController extends BaseRestController {
             @ApiParam(name = "id", value = "字典代码")
             @PathVariable( value = "id") String id) {
 
-        String relationId;
         List<Icd10HpRelation> icd10HpRelationList = icd10HpRelationService.getHpIcd10RelationListByHpId(id);
         if (icd10HpRelationList != null) {
             for(Icd10HpRelation icd10HpRelation : icd10HpRelationList){
-                relationId = icd10HpRelation.getId();
-                icd10HpRelationService.delete(relationId);
+                icd10HpRelationService.delete(icd10HpRelation.getId());
             }
         }
         hpDictService.delete(id);
@@ -77,7 +73,7 @@ public class HealthProblemDictController extends BaseRestController {
             @RequestParam( value = "ids") String ids) {
 
         String[] hpIds = ids.split(",");
-        List<String> relationIds = new ArrayList<>();
+        List<Long> relationIds = new ArrayList<>();
         for(String hpId:hpIds){
             List<Icd10HpRelation> icd10HpRelationList = icd10HpRelationService.getHpIcd10RelationListByHpId(hpId);
             if (icd10HpRelationList != null) {

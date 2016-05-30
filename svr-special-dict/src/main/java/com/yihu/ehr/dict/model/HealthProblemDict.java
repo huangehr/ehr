@@ -1,8 +1,5 @@
 package com.yihu.ehr.dict.model;
 
-import com.yihu.ehr.util.ObjectVersion;
-import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -22,7 +19,7 @@ public class HealthProblemDict implements Serializable{
     public HealthProblemDict() {
     }
 
-    private String id;
+    private long id;
     private String code;
     private String name;
     private String description;
@@ -32,13 +29,12 @@ public class HealthProblemDict implements Serializable{
     private Date updateDate;
 
     @Id
-    @GeneratedValue(generator = "Generator")
-    @GenericGenerator(name = "Generator", strategy = "assigned")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", unique = true, nullable = false)
-    public String getId() {
+    public long getId() {
         return id;
     }
-    public void setId(String id) {
+    public void setId(long id) {
         this.id = id;
     }
 

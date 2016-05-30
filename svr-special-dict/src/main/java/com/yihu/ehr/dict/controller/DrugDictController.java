@@ -43,8 +43,6 @@ public class DrugDictController extends BaseRestController {
             @RequestBody String dictJson) throws Exception {
 
         DrugDict dict = toEntity(dictJson, DrugDict.class);
-        String id = getObjectId(BizObject.Dict);
-        dict.setId(id);
         dict.setCreateDate(new Date());
         DrugDict drugDict = drugDictService.createDict(dict);
 
