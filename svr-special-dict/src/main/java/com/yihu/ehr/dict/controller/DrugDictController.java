@@ -27,7 +27,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "drugDict", description = "药品字典管理接口")
+@Api(value = "DrugDict", description = "药品字典管理接口")
 public class DrugDictController extends BaseRestController {
 
     @Autowired
