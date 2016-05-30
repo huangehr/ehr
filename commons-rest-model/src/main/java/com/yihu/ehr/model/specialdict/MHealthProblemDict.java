@@ -15,7 +15,7 @@ public class MHealthProblemDict implements Serializable{
 	public MHealthProblemDict() {
 	}
 
-	private String id;
+	private Long id;
 	private String code;
 	private String name;
 	private String description;
@@ -24,11 +24,11 @@ public class MHealthProblemDict implements Serializable{
     private String updateUser;
     private Date updateDate;
 
-	public String getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

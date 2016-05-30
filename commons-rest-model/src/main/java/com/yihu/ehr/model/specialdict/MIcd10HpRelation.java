@@ -15,17 +15,17 @@ public class MIcd10HpRelation implements Serializable{
 	public MIcd10HpRelation() {
 	}
 
-	private String id;
+	private Long id;
 	private String hpId;
 	private String icd10Id;
     private String createUser;
     private Date createDate;
 
-	public String getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

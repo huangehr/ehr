@@ -15,17 +15,17 @@ public class MIcd10IndicatorRelation implements Serializable{
 	public MIcd10IndicatorRelation() {
 	}
 
-	private String id;
+	private Long id;
 	private String icd10Id;
 	private String indicatorId;
     private String createUser;
     private Date createDate;
 
-	public String getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

@@ -43,8 +43,6 @@ public class Icd10IndicatorRelationController  extends BaseRestController {
             @RequestBody String dictJson) throws Exception{
 
         Icd10IndicatorRelation relation = toEntity(dictJson, Icd10IndicatorRelation.class);
-        String id = getObjectId(BizObject.Dict);
-        relation.setId(id);
         relation.setCreateDate(new Date());
         icd10IndicatorRelationService.save(relation);
         return convertToModel(relation, MIcd10IndicatorRelation.class, null);
@@ -67,8 +65,6 @@ public class Icd10IndicatorRelationController  extends BaseRestController {
             relation.setCreateDate(new Date());
             relation.setIcd10Id(icd10Id);
             relation.setIndicatorId(indicatorId);
-            String id = getObjectId(BizObject.Dict);
-            relation.setId(id);
             icd10IndicatorRelationService.save(relation);
             relations.add(relation);
         }
