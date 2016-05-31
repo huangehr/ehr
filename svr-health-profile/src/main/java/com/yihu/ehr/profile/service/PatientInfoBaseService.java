@@ -269,7 +269,6 @@ public class PatientInfoBaseService {
                 }
             }
 
-
             //健康问题用药统计（另外获取）
 
         }
@@ -278,15 +277,26 @@ public class PatientInfoBaseService {
     }
 
     //（疾病模型）患者 -> 门诊住院记录
-    public List<Map<String,Object>> getMedicalEvents(String demographicId,String hpId,String year,String area,String medicalEventsType) throws Exception
+    public List<Map<String,Object>> getMedicalEvents(String demographicId,String eventType,String year,String area,String hpId,String diseaseId) throws Exception
     {
         List<Map<String,Object>> re = new ArrayList<>();
         //患者事件列表
         String q = "demographic_id:"+demographicId;
-        //卡类型*********暂不处理
-        if(medicalEventsType!=null && medicalEventsType.length()>0)
+        String join = "";
+        //事件类型
+        if(eventType!=null && eventType.length()>0)
         {
-
+            if(eventType.equals("1") || eventType.equals("2"))
+            {
+                q += " AND event_type:"+eventType;
+            }
+            else if(eventType.equals("3")) //根据业务来区分数据
+            {
+                join = " ";
+            }
+            else if(eventType.equals("4")){
+                join = " ";
+            }
         }
         //事件年份
         if(year!=null && year.length()>0)
@@ -295,52 +305,60 @@ public class PatientInfoBaseService {
         }
 
         String queryParams = "{\"q\":\""+q+"\"}";
-        //健康问题
-        if(hpId!=null && hpId.length()>0)
+
+        //疾病ID
+        if(diseaseId!=null &&diseaseId.length()>0)
         {
-            //健康问题->疾病ICD10代码
-            List<MIcd10Dict> dictCodeList = dictService.getIcd10DictList(hpId);
-            String join = "";
-            if(dictCodeList!=null && dictCodeList.size()>0)
-            {
-                String mzJoin = "";
-                String zyJoin = "";
-                //遍历疾病列表
-                for(MIcd10Dict ICD10 :dictCodeList)
-                {
-                    if(mzJoin.length()>0)
-                    {
-                        mzJoin += " OR "+BasisConstant.mzzd +":" + ICD10.getCode();
-                        zyJoin += " OR "+BasisConstant.zyzd +":" + ICD10.getCode();
-                    }
-                    else{
-                        mzJoin = BasisConstant.mzzd +":" + ICD10.getCode();
-                        zyJoin = BasisConstant.zyzd +":" + ICD10.getCode();
-                    }
-                }
-
-                if(mzJoin.length()>0 && zyJoin.length()>0)
-                {
-                    join = "("+mzJoin +") OR ("+zyJoin+")";
-                }
-                else{
-                    if(mzJoin.length()>0)
-                    {
-                        join = "("+mzJoin+")";
-                    }
-                    else if(zyJoin.length()>0)
-                    {
-                        join = "("+zyJoin+")";
-                    }
-                }
-            }
-
             if(join.length()>0)
             {
-                queryParams = "{\"q\":\""+q+"\",\"join\":\""+join+"\"}";
+                join += " AND ("+BasisConstant.mzzd+":"+diseaseId+" OR "+BasisConstant.zyzd+":"+diseaseId+")";
             }
-
+            else{
+                join = BasisConstant.mzzd+":"+diseaseId+" OR "+BasisConstant.zyzd+":"+diseaseId;
+            }
+            queryParams = "{\"q\":\""+q+"\",\"join\":\""+join+"\"}";
         }
+        else{
+            //健康问题
+            if(hpId!=null && hpId.length()>0) {
+                //健康问题->疾病ICD10代码
+                List<MIcd10Dict> dictCodeList = dictService.getIcd10DictList(hpId);
+                String hpJoin = "";
+                if (dictCodeList != null && dictCodeList.size() > 0) {
+                    String mzJoin = "";
+                    String zyJoin = "";
+                    //遍历疾病列表
+                    for (MIcd10Dict ICD10 : dictCodeList) {
+                        if (mzJoin.length() > 0) {
+                            mzJoin += " OR " + BasisConstant.mzzd + ":" + ICD10.getCode();
+                            zyJoin += " OR " + BasisConstant.zyzd + ":" + ICD10.getCode();
+                        } else {
+                            mzJoin = BasisConstant.mzzd + ":" + ICD10.getCode();
+                            zyJoin = BasisConstant.zyzd + ":" + ICD10.getCode();
+                        }
+                    }
+
+                    if (mzJoin.length() > 0 && zyJoin.length() > 0) {
+                        hpJoin = "(" + mzJoin + ") OR (" + zyJoin + ")";
+                    } else {
+                        if (mzJoin.length() > 0) {
+                            hpJoin = "(" + mzJoin + ")";
+                        } else if (zyJoin.length() > 0) {
+                            hpJoin = "(" + zyJoin + ")";
+                        }
+                    }
+                }
+
+                if(join.length()>0)
+                {
+                    join += " AND "+hpJoin;
+                }
+                else{
+                    join = hpJoin;
+                }
+            }
+        }
+
         //获取相关门诊住院记录
         Envelop result = resource.getResources(BasisConstant.patientEvent,appId,queryParams);
         if(result.getDetailModelList()!=null && result.getDetailModelList().size()>0)
@@ -389,8 +407,37 @@ public class PatientInfoBaseService {
     }
 
 
-    //根据患者住院门诊记录做年份统计
-    public List<String> getMedicalYear(String demographicId) throws Exception
+    //患者就诊过的疾病
+    public List<String> getPatientDisease(String demographicId) throws Exception
+    {
+        List<String> list = new ArrayList<>();
+        //门诊诊断
+        Envelop outpatient = resource.getResources(BasisConstant.outpatientDiagnosis,appId,"{\"table\":\""+BasisConstant.mzzdTable+"\",\"join\":\"demographic_id:"+demographicId+"\"}");
+        if(outpatient.getDetailModelList()!=null && outpatient.getDetailModelList().size()>0) {
+            for(int i=0;i<outpatient.getDetailModelList().size();i++) {
+                Map<String, Object> obj = (Map<String, Object>) outpatient.getDetailModelList().get(i);
+                if(obj.containsKey(BasisConstant.mzzd)) {
+                    String code = obj.get(BasisConstant.mzzd).toString();
+                    list.add(code);
+                }
+            }
+        }
+        //住院诊断
+        Envelop hospitalized = resource.getResources(BasisConstant.hospitalizedDiagnosis,appId,"{\"table\":\""+BasisConstant.zyzdTable+"\",\"join\":\"patient_id:"+demographicId+"\"}");//暂时没数据demographic_id************10291272
+        if(hospitalized.getDetailModelList()!=null && hospitalized.getDetailModelList().size()>0) {
+            for(int i=0;i<hospitalized.getDetailModelList().size();i++) {
+                Map<String, Object> obj = (Map<String, Object>) hospitalized.getDetailModelList().get(i);
+                if(obj.containsKey(BasisConstant.zyzd)) {
+                    String code = obj.get(BasisConstant.zyzd).toString();
+                    list.add(code);
+                }
+            }
+        }
+        return list;
+    }
+
+    //患者就诊过的年份
+    public List<String> getPatientYear(String demographicId) throws Exception
     {
         List<String> list = new ArrayList<>();
         //患者事件列表
@@ -412,13 +459,13 @@ public class PatientInfoBaseService {
     }
 
 
-    //根据患者住院门诊记录做地区统计
-    public List<String> getMedicalArea(String demographicId) throws Exception
+    //患者就诊过的地区
+    public List<String> getPatientArea(String demographicId) throws Exception
     {
         List<String> re = new ArrayList<>();
         //患者事件列表
-        Envelop result = resource.getResources(BasisConstant.patientEvent,appId,"{\"q\":\"demographic_id:"+demographicId+"\"}");
         List<String> orgCodelist = new ArrayList<>();
+        Envelop result = resource.getResources(BasisConstant.patientEvent,appId,"{\"q\":\"demographic_id:"+demographicId+"\"}");
         if(result.getDetailModelList()!=null && result.getDetailModelList().size()>0)
         {
             for(int i=0;i<result.getDetailModelList().size();i++)

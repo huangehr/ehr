@@ -5,9 +5,9 @@ import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.org.MOrganization;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
@@ -21,8 +21,8 @@ import java.util.List;
 @FeignClient(name = MicroServices.Organization)
 public interface XOrganizationClient {
 
-    @RequestMapping(value = "/organizations/{org_codes}", method = RequestMethod.GET)
+    @RequestMapping(value = "/organizations/org_codes", method = RequestMethod.GET)
     @ApiOperation(value = "根据机构代码列表批量查询机构")
     List<MOrganization> getOrgs(
-            @PathVariable(value = "org_codes") List<String> orgCodes);
+            @RequestParam(value = "org_codes") List<String> orgCodes);
 }
